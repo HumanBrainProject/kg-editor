@@ -16,8 +16,11 @@ const styles = {
       marginLeft:"20px",
     },
     "&.active":{
-      background:"white",
+      background:"#f5f5f5",
       transform:"scale(1)"
+    },
+    "&.main, &.main.active":{
+      background:"white"
     },
     /*"&.after, &.before":{
       zIndex:2
@@ -26,12 +29,12 @@ const styles = {
       zIndex:2
     },
     "&.after:hover":{
-      background:"#ebebeb",
+      background:"white",
       transform:"scale(0.95) translateX(-50%)",
       marginRight:"40px"
     },
     "&.before:hover":{
-      background:"#ebebeb",
+      background:"white",
       transform:"scale(0.95) translateX(50%)",
       marginLeft:"40px"
     },
@@ -72,12 +75,12 @@ export default class Pane extends React.Component{
 
   render(){
     const {classes, paneStore} =  this.props;
-    let thisIndex = paneStore.panes.indexOf(this.paneId);
-
-    let activeClass = paneStore.selectedIndex < thisIndex? "after": paneStore.selectedIndex > thisIndex? "before": "active";
+    const index = paneStore.panes.indexOf(this.paneId);
+    const mainClass = index === 0?" main":"";
+    const activeClass = paneStore.selectedIndex < index? "after": paneStore.selectedIndex > index? "before": "active";
 
     return (
-      <div className={`${classes.pane} ${activeClass}`} onFocus={this.handleFocus} onClick={this.handleFocus}>
+      <div className={`${classes.pane}${mainClass} ${activeClass}`} onFocus={this.handleFocus} onClick={this.handleFocus}>
         <div>
           {this.props.children}
         </div>

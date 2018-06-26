@@ -28,7 +28,7 @@ export default class SearchStore{
         return false;
       }
       const label = nodeType.label.toLowerCase();
-      return terms.every(term => label.indexOf(term) !== -1);
+      return terms.every(term => label.includes(term));
     });
   }
 
@@ -45,10 +45,11 @@ export default class SearchStore{
       const { data } = await API.axios.get(API.endpoints.nodeTypes());
       runInAction(() => {
         this.isFetching = false;
-        this.nodeTypes = data;
+        this.nodeTypes = (data && data.data)?data.data:[];
       });
     } catch (e) {
-      this.error = "Couldn't fetch node types: " + e;
+      const message = e.message?e.message:e;
+      this.error = `Error while retrieving node types (${message})`;
       this.isFetching = false;
     }
   }

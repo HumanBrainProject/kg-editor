@@ -1,6 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { observer } from "mobx-react";
+import { observer, inject } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import NodeTypeStore from "../Stores/NodeTypeStore";
@@ -215,11 +215,13 @@ const styles = {
 };
 
 @injectStyles(styles)
+@inject("navigationStore")
 @observer
 export default class NodeType extends React.Component {
   constructor(props){
     super(props);
     this.nodeTypeStore = new NodeTypeStore(this.props.match.params.id);
+    this.props.navigationStore.setNodeTypeStore(this.nodeTypeStore);
   }
   fetchInstances = () => {
     this.nodeTypeStore.fetchInstances();
@@ -236,9 +238,12 @@ export default class NodeType extends React.Component {
   componentDidMount = () => {
     this.nameInput && this.nameInput.focus();
   }
+  componentWillUnmount() {
+    this.props.navigationStore.setNodeTypeStore(null);
+  }
+
   render = () => {
     const {classes} = this.props;
-    const [, , , schema, , ] = (window.rootPath?location.pathname.substr(window.rootPath.length):location.pathname).replace(/\/(.*)\/?$/, "$1").split("/");
     return(
       <div className={classes.container}>
         {!this.nodeTypeStore.hasError?
@@ -247,7 +252,7 @@ export default class NodeType extends React.Component {
               <React.Fragment>
                 <div className={classes.header}>
                   <div>
-                    <h3><strong>{schema}</strong> selection:</h3>
+                    <h3><strong>{this.nodeTypeStore.nodeTypeLabel}</strong> selection:</h3>
                   </div>
                   <form className="navbar-form" role="search">
                     <div className="input-group">
@@ -261,7 +266,7 @@ export default class NodeType extends React.Component {
                       {this.nodeTypeStore.filteredInstances.map(instance => (
                         <li key={instance.id}>
                           <Link to={ `/instance/${instance.id}` }>
-                            <h6>{schema}</h6>
+                            <h6>{this.nodeTypeStore.nodeTypeLabel}</h6>
                             <h4>{instance.label}</h4>
                             {instance.description?
                               <React.Fragment>
@@ -284,7 +289,7 @@ export default class NodeType extends React.Component {
               <div className={classes.noResultPanel}>
                 <h4>No instance of type &quot;{this.nodeTypeStore.nodeTypeId}&quot; available.</h4>
                 <div>
-                  <Link to={"/"} className="btn btn-default">Cancel</Link>
+                  <Link to={"/search"} className="btn btn-default">Cancel</Link>
                   <Button bsStyle="primary" onClick={this.fetchInstances}>Retry</Button>
                 </div>
               </div>
@@ -297,7 +302,7 @@ export default class NodeType extends React.Component {
           <div className={classes.fetchErrorPanel}>
             <h4>{this.nodeTypeStore.error}</h4>
             <div>
-              <Link to={"/"} className="btn btn-default">Cancel</Link>
+              <Link to={"/search"} className="btn btn-default">Cancel</Link>
               <Button bsStyle="primary" onClick={this.fetchInstances}>Retry</Button>
             </div>
           </div>

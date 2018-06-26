@@ -1,7 +1,8 @@
-var webpack = require("webpack");
-var path = require("path");
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require("webpack");
+const path = require("path");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   entry: ["babel-polyfill","./src/index.js"],
@@ -10,7 +11,7 @@ module.exports = {
     filename: "./bundle.js"
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         loader: "babel-loader",
@@ -23,6 +24,29 @@ module.exports = {
   },
   externals:{
     "LOG_LEVEL": '"prod"'
+  },
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        test: /\.js($|\?)/i,
+        cache: false,
+        parallel: true,
+        uglifyOptions: {
+          compress: true,
+          ecma: 6,
+          mangle: true,
+          output: {
+            comments: false,
+            beautify: false
+          },
+          compress: {
+            dead_code: true,
+            drop_console: true
+          }
+        },
+        sourceMap: false
+      })
+    ]
   },
   plugins: [
     new CopyWebpackPlugin([{ from: "**/*", context: "public/", ignore:"index.*" }]),

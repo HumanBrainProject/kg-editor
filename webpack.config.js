@@ -1,7 +1,7 @@
-var webpack = require("webpack");
-var path = require("path");
-var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require("webpack");
+const path = require("path");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: ["babel-polyfill","./src/index.js"],
@@ -10,7 +10,7 @@ module.exports = {
     filename: "./bundle.js"
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         loader: "babel-loader",
@@ -34,7 +34,8 @@ module.exports = {
         changeOrigin: true
       },
       "/editor/api/**": {
-        target:"https://nexus-admin-dev.humanbrainproject.org",
+        //target:"https://nexus-admin-dev.humanbrainproject.org",
+        target:"http://localhost:9000",
         secure:false,
         changeOrigin: true
       }

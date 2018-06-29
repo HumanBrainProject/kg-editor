@@ -128,7 +128,7 @@ export default class InstanceStore {
     this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
     this.instances.forEach((instance) => {
       if (instance.isFetched) {
-        if(!instance.form.readMode){
+        if(!instance.form.readMode && !instance.hasChanged){
           instance.form.toggleReadMode(true);
         }
       }
@@ -142,7 +142,7 @@ export default class InstanceStore {
       if (instance.isFetched) {
         if(instanceId === id && instance.form.readMode !== readMode){
           instance.form.toggleReadMode(readMode);
-        } else if(instanceId !== id && !instance.form.readMode){
+        } else if(instanceId !== id && !instance.form.readMode && !instance.hasChanged){
           instance.form.toggleReadMode(true);
         }
       }

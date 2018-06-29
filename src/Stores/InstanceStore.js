@@ -166,7 +166,7 @@ export default class InstanceStore {
   @action
   async saveInstance(instanceId){
     try {
-      const { data } = await API.axios.post(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
+      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
       runInAction(() => {
         console.log("saved", data);
       });

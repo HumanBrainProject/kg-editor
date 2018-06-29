@@ -128,7 +128,7 @@ export default class InstanceStore {
     this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
     this.instances.forEach((instance) => {
       if (instance.isFetched) {
-        if(!instance.form.readMode && !instance.hasChanged){
+        if(!instance.form.readMode){
           instance.form.toggleReadMode(true);
         }
       }
@@ -142,7 +142,7 @@ export default class InstanceStore {
       if (instance.isFetched) {
         if(instanceId === id && instance.form.readMode !== readMode){
           instance.form.toggleReadMode(readMode);
-        } else if(instanceId !== id && !instance.form.readMode && !instance.hasChanged){
+        } else if(instanceId !== id && !instance.form.readMode){
           instance.form.toggleReadMode(true);
         }
       }
@@ -166,7 +166,7 @@ export default class InstanceStore {
   @action
   async saveInstance(instanceId){
     try {
-      const { data } = await API.axios.post(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
+      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
       runInAction(() => {
         console.log("saved", data);
       });

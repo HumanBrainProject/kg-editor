@@ -29,13 +29,13 @@ module.exports = {
     proxy: {
       "/api/**": {
         //target:"https://nexus-admin-dev.humanbrainproject.org/editor",
-        target:"http://localhost:9000",
+        target:"http://localhost:9000/editor",
         secure:false,
         changeOrigin: true
       },
       "/editor/api/**": {
         //target:"https://nexus-admin-dev.humanbrainproject.org",
-        target:"http://localhost:9000",
+        target:"http://localhost:9000/editor",
         secure:false,
         changeOrigin: true
       }

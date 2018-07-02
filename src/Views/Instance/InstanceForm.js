@@ -1,28 +1,137 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { Form, Field } from "hbp-spark";
 import { observer, inject } from "mobx-react";
-import { Row, Col, Button, Glyphicon } from "react-bootstrap";
+import { Panel, Row, Col, Button, Glyphicon } from "react-bootstrap";
+import { Form, Field } from "hbp-spark";
 import { Link } from "react-router-dom";
+import ToggleButton from "./ToggleButton";
 
 const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
 const animationId = generateRandomName();
 
 const styles = {
+  panelHeader: {
+    padding: "0",
+    "& h6": {
+      margin: 0,
+      color: "gray",
+      fontWeight: "bold"
+    }
+  },
+  panelSummary: {
+    padding: "10px 0 0 0"
+  },
+  panelBody: {
+    border: "0",
+    borderRadius: "0",
+    boxShadow: "none",
+    backgroundColor: "transparent",
+    margin: "0",
+    padding: "0",
+    "& .panel-body": {
+      padding: "0"
+    }
+  },
+  panelFooter: {
+    padding: "0"
+  },
+  readModeToggleContainer: {
+    width: "40px",
+    height: "34px",
+    perspective: "600px"
+  },
+  readModeTogglePanel: {
+    position: "relative",
+    height: "100%",
+    width: "100%",
+    transition: "transform 1s",
+    transformStyle: "preserve-3d"
+  },
+  readModeToggleButton: {
+    position: "absolute",
+    height: "100%",
+    width: "100%",
+    backfaceVisibility: "hidden"
+  },
+  editModeButton: {
+
+  },
+  readModeButton: {
+    transform: "rotateY(180deg)"
+  },
+  panel: {
+    transition: "all 0.25s linear",
+    "&:not(.current)": {
+      borderRadius: "10px",
+      color: "#555",
+      cursor:"pointer"
+    },
+    "&.main:not(.current)": {
+      border: "1px solid transparent",
+      padding: "10px"
+    },
+    "&:not(.main)" : {
+      marginBottom: "10px",
+      border: "1px solid #ccc",
+      borderRadius: "10px"
+    },
+    "&:not(.main).current": {
+      borderColor: "#adadad",
+      backgroundColor: "white"
+    },
+    "&.hasChanged:not(.current):not(.readMode)": {
+      background: "#ffe6e5"
+    },
+    "&:hover:not(.current)": {
+      backgroundColor: "#eff5fb",
+      borderColor: "#337ab7"
+    },
+    "&:hover:not(.current).readMode": {
+      color: "#337ab7",
+    },
+    "&:not(.readMode) textarea": {
+      minHeight: "200px"
+    },
+    "&:not(.readMode) $readModeTogglePanel": {
+      transform: "rotateY(180deg)"
+    },
+    "&:not(.main) $panelHeader": {
+      padding: "10px 10px 0 10px"
+    },
+    "&.current $panelHeader": {
+      borderBottom: "1px solid #ccc",
+      paddingBottom: "10px"
+    },
+    "&.current $panelHeader h6": {
+      margin: "10px 0",
+      color: "#333"
+    },
+    "&:not(.main) $panelSummary": {
+      padding: "10px 10px 0 10px"
+    },
+    "&:not(.main) $panelBody": {
+      padding: "0 10px"
+    },
+    "&.current $panelBody": {
+      paddingBottom: "10px"
+    },
+    "&:not(.main) $panelFooter": {
+      padding: "0 10px"
+    },
+    "&.current $panelFooter": {
+      borderTop: "1px solid #ccc",
+      paddingTop: "10px"
+    },
+    "&.current:not(.editMode) $panelFooter": {
+      paddingBottom: "10px"
+    }
+  },
   id:{
     paddingBottom: "10px",
     color:"grey",
     fontWeight:"300",
     fontSize:"0.7em",
     wordBreak: "break-all"
-  },
-  writeMode: {
-    "& textarea": {
-      minHeight: "200px"
-    }
-  },
-  readMode:{
-    cursor:"pointer"
   },
   action:{
     "& .btn":{
@@ -40,7 +149,7 @@ const styles = {
         width: "180px"
       }
     },
-    "&[active=true]": {
+    "&[active='true']": {
       position: "absolute",
       top: "50%",
       left: "50%",
@@ -115,6 +224,13 @@ const styles = {
     "& button span + span": {
       marginLeft: "4px"
     }
+  },
+  hasChangedIndicator: {
+    height: "9px",
+    width: "9px",
+    backgroundColor: "#FC3D3A",
+    borderRadius: "50%",
+    display: "inline-block"
   }
 };
 
@@ -133,6 +249,10 @@ export default class InstanceForm extends React.Component{
     }
   }
 
+  handleEdit = () => {
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
+  }
+
   handleChange = () => {
     this.props.instanceStore.instanceHasChanged(this.props.id);
   }
@@ -142,10 +262,15 @@ export default class InstanceForm extends React.Component{
   }
 
   handleCancel = () => {
-    this.props.instanceStore.cancelInstanceChanges(this.props.id);
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+    const instance = this.props.instanceStore.getInstance(this.props.id);
+    if (instance.hasChanged) {
+      this.props.instanceStore.cancelInstanceChanges(this.props.id);
+    }
   }
 
   handleSave = () => {
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
     this.props.instanceStore.saveInstance(this.props.id);
   }
 
@@ -156,7 +281,29 @@ export default class InstanceForm extends React.Component{
   render(){
     const { classes, level } = this.props;
     const instance = this.props.instanceStore.getInstance(this.props.id);
+
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
+
+    const [organization, domain, schema, version, ] = this.props.id.split("/");
+
+    const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
+
+    const backLink = (organization && domain && schema && version)?`/nodetype/${organization}/${domain}/${schema}/${version}`:"/";
+
+    let panelClassName = classes.panel;
+    if (isReadMode) {
+      panelClassName += " readMode";
+    }
+    if (this.props.id === this.props.instanceStore.currentInstanceId) {
+      panelClassName += " current";
+    }
+    if (this.props.level === 0) {
+      panelClassName += " main";
+    }
+    if (instance.hasChanged){
+      panelClassName += " hasChanged";
+    }
+
     return(
       (!instance.hasFetchError)?
         (!instance.isFetching)?
@@ -165,26 +312,68 @@ export default class InstanceForm extends React.Component{
             onClick={this.handleFocus}
             onChange={this.handleChange}
             onLoad={this.handleLoad}
-            className={`${isReadMode?classes.readMode:classes.writeMode}`}>
+            className={panelClassName}>
             <Form store={instance.form}>
-              {Object.keys(instance.data.fields).map(key => {
-                return (
-                  <Field key={key} name={key}/>
-                );
-              })}
-              {!isReadMode &&
-              <Row>
-                <Col xs={12} md={8}>
-                  <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
-                </Col>
-                <Col xs={6} md={2} className={classes.action}>
-                  {instance.hasChanged && <Button bsStyle={"default"} onClick={this.handleCancel}>Cancel</Button>}
-                </Col>
-                <Col xs={6} md={2} className={classes.action}>
-                  <Button disabled={!instance.hasChanged} bsStyle={"success"} onClick={this.handleSave}>Save</Button>
-                </Col>
-              </Row>
-              }
+              <div className={classes.panelHeader}>
+                <Row>
+                  <Col xs={10}>
+                    <h6>{nodeType}</h6>
+                  </Col>
+                  <Col xs={2} >
+                    <span className="pull-right">
+                      {this.props.id === this.props.instanceStore.currentInstanceId?
+                        <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancel} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
+                        :
+                        null
+                      }
+                    </span>
+                  </Col>
+                </Row>
+              </div>
+              <div className={classes.panelSummary}>
+                {(instance.data && instance.data.ui_info && instance.data.ui_info.summary)?
+                  instance.data.ui_info.summary.map(key => {
+                    const name = key.replace(/\//g, "%nexus-slash%");
+                    return instance.data.fields[name]?<Field key={name} name={name}/>:null;
+                  })
+                  :
+                  null
+                }
+              </div>
+              <Panel className={classes.panelBody} expanded={this.props.id === this.props.instanceStore.currentInstanceId || !isReadMode} onToggle={() => {}}>
+                <Panel.Collapse>
+                  <Panel.Body>
+                    {Object.keys(instance.data.fields)
+                      .filter(name => {
+                        const key = name.replace(/%nexus-slash%/g, "/");
+                        return instance.data && instance.data.ui_info && instance.data.ui_info.summary && !instance.data.ui_info.summary.includes(key);
+                      })
+                      .map(name => <Field key={name} name={name}/>)
+                    }
+                  </Panel.Body>
+                </Panel.Collapse>
+              </Panel>
+              <div className={classes.panelFooter}>
+                {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId?
+                  <Row>
+                    <Col xs={12}>
+                      <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
+                    </Col>
+                  </Row>
+                  :
+                  <Row>
+                    <Col xs={12} md={8}>
+                      <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
+                    </Col>
+                    <Col xs={6} md={2} className={classes.action}>
+                      <Button bsStyle={"default"} onClick={this.handleCancel}>Cancel</Button>
+                    </Col>
+                    <Col xs={6} md={2} className={classes.action}>
+                      <Button disabled={!instance.hasChanged} bsStyle={"success"} onClick={this.handleSave}>Save</Button>
+                    </Col>
+                  </Row>
+                }
+              </div>
             </Form>
           </div>
           :
@@ -198,7 +387,7 @@ export default class InstanceForm extends React.Component{
           <div className={classes.fetchErrorPanel}>
             <h4>{instance.fetchError}</h4>
             <div>
-              <Link to={"/"} className="btn btn-default">Cancel</Link>
+              <Link to={backLink} className="btn btn-default">Cancel</Link>
               <Button bsStyle="primary" onClick={this.fetchInstance}>Retry</Button>
             </div>
           </div>

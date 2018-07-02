@@ -15,6 +15,10 @@ export default class InstanceStore {
     this.setCurrentInstanceId(this.mainInstanceId, 0);
   }
 
+  get mainInstance(){
+    return this.getInstance(this.mainInstanceId);
+  }
+
   getInstance(instanceId){
     if (this.instances.has(instanceId)) {
       return this.instances.get(instanceId);
@@ -56,18 +60,33 @@ export default class InstanceStore {
       const { data } = await API.axios.get(API.endpoints.instanceData(instanceId));
 
       runInAction(async () => {
-        let fieldsWithOptions = new Map();
-        for(let fieldKey in data.fields){
-          let optionsUrl = data.fields[fieldKey].optionsUrl;
-          if(optionsUrl){
-            delete data.fields[fieldKey].optionsUrl;
-            fieldsWithOptions.set(fieldKey, optionsUrl);
-            if(!this.optionsCache.has(optionsUrl)){
-              this.optionsCache.set(optionsUrl, []);
-              const { data } = await API.axios.get(window.rootPath+optionsUrl);
-              this.optionsCache.set(optionsUrl, data);
+        const fieldsWithOptions = new Map();
+        try {
+          for(let fieldKey in data.fields){
+            const optionsUrl = data.fields[fieldKey].optionsUrl;
+            if(optionsUrl){
+              delete data.fields[fieldKey].optionsUrl;
+              fieldsWithOptions.set(fieldKey, optionsUrl);
+              if(!this.optionsCache.has(optionsUrl)){
+                this.optionsCache.set(optionsUrl, []);
+                try {
+                  const { data } = await API.axios.get(window.rootPath+optionsUrl);
+                  this.optionsCache.set(optionsUrl, (data && data.data)?data.data:[]);
+                } catch (e) {
+                  const label = data.fields[fieldKey].label?data.fields[fieldKey].label.toLowerCase():fieldKey;
+                  const [,, organization, domain, schema, version] = optionsUrl.replace(/\/(.*)\/?$/, "$1").split("/");
+                  const path = (organization && domain && schema && version)?` "${organization}/${domain}/${schema}/${version}"`:"";
+                  const message = e.message?e.message:e;
+                  throw `Error while retrieving the list of ${label}${path} (${message})`;
+                }
+              }
             }
           }
+        } catch (e) {
+          instance.fetchError = e.message?e.message:e;
+          instance.hasFetchError = true;
+          instance.isFetched = false;
+          instance.isFetching = false;
         }
 
         instance.data = data;
@@ -87,12 +106,11 @@ export default class InstanceStore {
 
         this.memorizeInstanceInitialValues(instanceId);
 
-        if(instanceId !== this.currentInstanceId){
-          instance.form.toggleReadMode(true);
-        }
+        instance.form.toggleReadMode(true);
       });
     } catch (e) {
-      instance.fetchError = "Couldn't fetch instance details: "+e;
+      const message = e.message?e.message:e;
+      instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
       instance.hasFetchError = true;
       instance.isFetched = false;
       instance.isFetching = false;
@@ -108,11 +126,23 @@ export default class InstanceStore {
   @action
   setCurrentInstanceId(id, level){
     this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
+    this.instances.forEach((instance) => {
+      if (instance.isFetched) {
+        if(!instance.form.readMode && !instance.hasChanged){
+          instance.form.toggleReadMode(true);
+        }
+      }
+    });
+  }
+
+  @action
+  toggleReadMode(id, level, readMode){
+    this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
     this.instances.forEach((instance, instanceId) => {
       if (instance.isFetched) {
-        if(instanceId === id && instance.form.readMode){
-          instance.form.toggleReadMode(false);
-        } else if(instanceId !== id && !instance.form.readMode){
+        if(instanceId === id && instance.form.readMode !== readMode){
+          instance.form.toggleReadMode(readMode);
+        } else if(instanceId !== id && !instance.form.readMode && !instance.hasChanged){
           instance.form.toggleReadMode(true);
         }
       }
@@ -136,12 +166,12 @@ export default class InstanceStore {
   @action
   async saveInstance(instanceId){
     try {
-      const { data } = await API.axios.post(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
+      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
       runInAction(() => {
         console.log("saved", data);
       });
     } catch (e) {
-      throw "Couldn't fetch instance details: "+e;
+      throw "Couldn't save instance details: "+e;
     }
   }
 }

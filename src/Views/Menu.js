@@ -1,5 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
+import { observer, inject } from "mobx-react";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 
@@ -77,36 +78,58 @@ const styles = {
 };
 
 @injectStyles(styles)
+@inject("navigationStore")
+@observer
 export default class Menu extends React.Component{
   constructor(props){
     super(props);
   }
 
-  render(){
-    const {classes} =  this.props;
+  selectHandler = (eventKey) => {
 
-    const [view, organization, domain, schema, version, id] = (window.rootPath?location.pathname.substr(window.rootPath.length):location.pathname).replace(/\/(.*)\/?$/, "$1").split("/");
+    let env = "";
+    if (/.+-dev\.[^.]+\.[a-zA-Z\-_]{2,3}/.test(location.host) || /localhost/.test(location.host)) {
+      env = "-dev";
+    } else if (/.+-int\.[^.]+\.[a-zA-Z\-_]{2,3}/.test(location.host)) {
+      env = "-int";
+    }
+    switch (eventKey) {
+    case 4.2:
+      location.href = "mailto:kg-team@humanbrainproject.eu";
+      break;
+    case 4.3:
+      window.open(`https://nexus-admin${env}.humanbrainproject.org`);
+      break;
+    case 4.4:
+      window.open(`https://kg${env}.humanbrainproject.org/webapp/`);
+      break;
+    }
+  }
+
+  render(){
+    const {classes, navigationStore} =  this.props;
+
     return (
       <div className={classes.container}>
-        <Navbar fluid={true} >
+        <Navbar fluid={true} onSelect={this.selectHandler}	>
           <Nav>
-            {view !== ""?
-              <LinkContainer to={"/"}>
+            {navigationStore.showHomeLink?
+              <LinkContainer to={"/"} exact={true}>
                 <NavItem eventKey={1}><Glyphicon glyph="home" /></NavItem>
               </LinkContainer>
               :
               null
             }
-            {schema?
+            {navigationStore.showSearchLink?
               <LinkContainer to={"/search"}>
                 <NavItem eventKey={2}><Glyphicon glyph="chevron-left" />Search</NavItem>
               </LinkContainer>
               :
               null
             }
-            {id?
-              <LinkContainer to={`/nodetype/${organization}/${domain}/${schema}/${version}`}>
-                <NavItem eventKey={3}><Glyphicon glyph="chevron-left" />{schema}</NavItem>
+            {navigationStore.showNodeTypeLink?
+              <LinkContainer to={`/nodetype/${navigationStore.nodeTypeId}`}>
+                <NavItem eventKey={3}><Glyphicon glyph="chevron-left" />{navigationStore.nodeTypeLabel}</NavItem>
               </LinkContainer>
               :
               null
@@ -125,6 +148,9 @@ export default class Menu extends React.Component{
               <LinkContainer to={"/help"}>
                 <MenuItem eventKey={4.1}>Help</MenuItem>
               </LinkContainer>
+              <MenuItem eventKey={4.2}>Contact</MenuItem>
+              <MenuItem eventKey={4.3}>Statistics</MenuItem>
+              <MenuItem eventKey={4.4}>Search</MenuItem>
             </NavDropdown>
           </Nav>
         </Navbar>

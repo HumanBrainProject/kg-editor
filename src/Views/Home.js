@@ -1,5 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
+import { observer, inject } from "mobx-react";
 import { Link } from "react-router-dom";
 
 const styles = {
@@ -82,7 +83,18 @@ const styles = {
 };
 
 @injectStyles(styles)
+@inject("navigationStore")
+@observer
 export default class Home extends React.Component{
+  constructor(props){
+    super(props);
+    this.props.navigationStore.setHomeLinkVisibility(false);
+  }
+
+  componentWillUnmount() {
+    this.props.navigationStore.setHomeLinkVisibility(true);
+  }
+
   render(){
     const {classes} =  this.props;
     return (

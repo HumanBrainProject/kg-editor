@@ -1,16 +1,11 @@
 import React from "react";
 import injectStyles from "react-jss";
+import { observer, inject } from "mobx-react";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 
-import { observer, inject } from "mobx-react";
-import { Panel } from "react-bootstrap";
-
 const styles = {
-  readMode:{
-    background:"#ccc"
-  },
-  panelBody:{
+  pane: {
     position: "relative"
   }
 };
@@ -31,7 +26,7 @@ class Links extends React.Component{
     return(
       <React.Fragment>
         {linkKeys.length > 0?
-          <Pane>
+          <Pane className={classes.pane}>
             {linkKeys.map(fieldKey => {
               let fieldObj = instance.form.getField(fieldKey);
               if(fieldObj.isLink && fieldObj.value.length > 0){
@@ -39,13 +34,9 @@ class Links extends React.Component{
                   <div key={fieldObj.label}>
                     <h4>{fieldObj.label}</h4>
                     {fieldObj.value.map(value => {
-                      let readModeClass = this.props.instanceStore.currentInstanceId !== value[fieldObj.mappingValue]? classes.readMode: undefined;
+                      const id = value[fieldObj.mappingValue];
                       return (
-                        <Panel className={readModeClass} key={value[fieldObj.mappingValue]}>
-                          <Panel.Body className={classes.panelBody}>
-                            <InstanceForm level={this.props.level} id={value[fieldObj.mappingValue]}/>
-                          </Panel.Body>
-                        </Panel>
+                        <InstanceForm level={this.props.level} id={id} key={id} />
                       );
                     })}
                   </div>

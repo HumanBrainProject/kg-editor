@@ -1,10 +1,11 @@
 import React from "react";
 import { render } from "react-dom";
-import { observer } from "mobx-react";
+import { observer, Provider } from "mobx-react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import injectStyles from "react-jss";
 
 import authStore from "./Stores/AuthStore";
+import NavigationStore from "./Stores/NavigationStore";
 import Login from "./Views/Login";
 import Home from "./Views/Home";
 import NotFound from "./Views/NotFound";
@@ -81,34 +82,37 @@ class App extends React.Component{
   constructor(props) {
     super(props);
     authStore.tryAuthenticate();
+    this.navigationStore = new NavigationStore();
   }
   render(){
     let {classes} = this.props;
     return(
-      <BrowserRouter basename={window.rootPath}>
-        <div className={classes.container}>
-          {!authStore.isAuthenticated?
-            <Route component={Login} />
-            :
-            <div className={classes.body}>
-              <div className={classes.logo}>
-                <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="60" height="60" />
-                <h1>Knowledge Graph Editor</h1>
+      <Provider navigationStore={this.navigationStore}>
+        <BrowserRouter basename={window.rootPath}>
+          <div className={classes.container}>
+            {!authStore.isAuthenticated?
+              <Route component={Login} />
+              :
+              <div className={classes.body}>
+                <div className={classes.logo}>
+                  <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="60" height="60" />
+                  <h1>Knowledge Graph Editor</h1>
+                </div>
+                <div className={classes.menu}>
+                  <Menu />
+                </div>
+                <Switch>
+                  <Route path="/instance/:id*" component={Instance} />
+                  <Route path="/nodetype/:id*" component={NodeType} />
+                  <Route path="/search" exact={true} component={Search} />
+                  <Route path="/" exact={true} component={Home} />
+                  <Route component={NotFound} />
+                </Switch>
               </div>
-              <div className={classes.menu}>
-                <Menu />
-              </div>
-              <Switch>
-                <Route path="/instance/:id*" component={Instance} />
-                <Route path="/nodetype/:id*" component={NodeType} />
-                <Route path="/search" exact={true} component={Search} />
-                <Route path="/" exact={true} component={Home} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>
-          }
-        </div>
-      </BrowserRouter>
+            }
+          </div>
+        </BrowserRouter>
+      </Provider>
     );
   }
 }

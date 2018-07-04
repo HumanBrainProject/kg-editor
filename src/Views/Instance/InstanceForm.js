@@ -124,6 +124,12 @@ const styles = {
     },
     "&.current:not(.editMode) $panelFooter": {
       paddingBottom: "10px"
+    },
+    "& .spark-field-input-text.spark-readmode, & .spark-field-dropdown-select.spark-readmode": {
+      marginBottom: "5px"
+    },
+    "& .spark-field-input-text.spark-readmode label.spark-label, & .spark-field-dropdown-select.spark-readmode label.spark-label": {
+      marginBottom: "0"
     }
   },
   id:{
@@ -278,6 +284,19 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.fetchInstanceData(this.props.id);
   }
 
+  renderReadModeField = (field) => {
+    if (this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
+      if (field && field.type === "TextArea") {
+        if (field.value && field.value.length && field.value.length >= 200) {
+          return field.value.substr(0,197) + "...";
+        }
+        return field.value;
+      }
+      return field.value;
+    }
+    return field.value;
+  }
+
   render(){
     const { classes, level } = this.props;
     const instance = this.props.instanceStore.getInstance(this.props.id);
@@ -334,7 +353,7 @@ export default class InstanceForm extends React.Component{
                 {(instance.data && instance.data.ui_info && instance.data.ui_info.summary)?
                   instance.data.ui_info.summary.map(key => {
                     const name = key.replace(/\//g, "%nexus-slash%");
-                    return instance.data.fields[name]?<Field key={name} name={name}/>:null;
+                    return instance.data.fields[name]?<Field key={name} name={name} readModeRendering={this.renderReadModeField}/>:null;
                   })
                   :
                   null

@@ -6,8 +6,9 @@ import { Form, Field } from "hbp-spark";
 import { Link } from "react-router-dom";
 import ToggleButton from "./ToggleButton";
 
-const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
-const animationId = generateRandomName();
+const generateRandomName = () => [...`${new Date().getTime()}`, ...`${Math.round(Math.random() * 100)}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
+const fetchAnimationId = generateRandomName();
+const saveAnimationId = generateRandomName();
 
 const styles = {
   panelHeader: {
@@ -59,7 +60,128 @@ const styles = {
   readModeButton: {
     transform: "rotateY(180deg)"
   },
+  savingContainer: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: "9px",
+    zIndex: "1200",
+  },
+  savingPanel: {
+    display: "inline-block",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    minWidth: "240px",
+    transform: "translate(-50%, -50%)",
+    fontSize: "18px",
+    fontWeight: "lighter",
+    background: "white",
+    padding: "20px",
+    borderRadius: "5px",
+    boxShadow: "2px 2px 4px #7f7a7a",
+    "& small": {
+      display: "block",
+      padding: "10px 0",
+      color:"grey",
+      fontWeight:"400",
+      fontSize:"0.6em",
+      fontStyle: "italic",
+      whiteSpace: "nowrap",
+      "@media screen and (max-width:576px)": {
+        wordBreak: "break-all",
+        wordWrap: "break-word",
+        whiteSpace: "normal",
+      }
+    }
+  },
+  savingGlyphicon: {
+    composes: "glyphicon glyphicon-record",
+    color: "red",
+    animation: `${saveAnimationId} 1.4s infinite linear`
+  },
+  [`@keyframes ${saveAnimationId}`]: {
+    "0%": {
+      transform: "scale(1)"
+    },
+    "50%": {
+      transform: "scale(0.1)"
+    },
+    "100%": {
+      transform: "scale(1)"
+    }
+  },
+  savingLabel: {
+    paddingLeft: "6px"
+  },
+  saveErrorContainer: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: "9px",
+    zIndex: "1200",
+  },
+  saveErrorPanel: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    minWidth: "220px",
+    transform: "translate(-50%, -50%)",
+    padding: "10px",
+    borderRadius: "5px",
+    background: "white",
+    textAlign: "center",
+    boxShadow: "2px 2px 4px #7f7a7a",
+    "& h4": {
+      margin: "0",
+      paddingBottom: "10px",
+      color: "red"
+    },
+    "& button + button, & a + button, & a + a": {
+      marginLeft: "20px"
+    }
+  },
+  confirmCancelContainer: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: "9px",
+    zIndex: "1200",
+  },
+  confirmCancelPanel: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    minWidth: "220px",
+    transform: "translate(-50%, -50%)",
+    padding: "10px",
+    borderRadius: "5px",
+    background: "white",
+    textAlign: "center",
+    boxShadow: "2px 2px 4px #7f7a7a",
+    "& h4": {
+      margin: "0",
+      paddingBottom: "10px",
+      color: "#333"
+    },
+    "& button": {
+      minWidth: "80px"
+    },
+    "& button + button, & a + button, & a + a": {
+      marginLeft: "20px"
+    }
+  },
   panel: {
+    position: "relative",
     transition: "all 0.25s linear",
     "&:not(.current)": {
       borderRadius: "10px",
@@ -125,6 +247,23 @@ const styles = {
     "&.current:not(.editMode) $panelFooter": {
       paddingBottom: "10px"
     },
+    "&.main $confirmCancelContainer": {
+      top: "-10px",
+      left: "-10px",
+      width: "calc(100% + 20px)",
+      height: "calc(100% + 20px)",
+    },
+    "&.main $saveErrorContainer": {
+      top: "-10px",
+      left: "-10px",
+      width: "calc(100% + 20px)",
+      height: "calc(100% + 20px)",
+    },
+    "&.main $savingContainer": {
+      top: "-10px",
+      left: "-10px",
+      width: "calc(100% + 20px)",
+      height: "calc(100% + 20px)",
     "& .spark-field-input-text.spark-readmode, & .spark-field-dropdown-select.spark-readmode": {
       marginBottom: "5px"
     },
@@ -178,9 +317,9 @@ const styles = {
   },
   fetchingGlyphicon: {
     composes: "glyphicon glyphicon-refresh",
-    animation: `${animationId} .7s infinite linear`
+    animation: `${fetchAnimationId} .7s infinite linear`
   },
-  [`@keyframes ${animationId}`]: {
+  [`@keyframes ${fetchAnimationId}`]: {
     "from": {
       transform: "scale(1) rotate(0deg)"
     },
@@ -267,17 +406,35 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.memorizeInstanceInitialValues(this.props.id);
   }
 
-  handleCancel = () => {
-    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+  handleCancelEdit = () => {
     const instance = this.props.instanceStore.getInstance(this.props.id);
     if (instance.hasChanged) {
       this.props.instanceStore.cancelInstanceChanges(this.props.id);
+    } else {
+      this.handleConfirmCancelEdit();
     }
+  }
+
+  handleConfirmCancelEdit = () => {
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+    const instance = this.props.instanceStore.getInstance(this.props.id);
+    if (instance.hasChanged) {
+      this.props.instanceStore.confirmCancelInstanceChanges(this.props.id);
+    }
+  }
+
+  handleContinueEditing = () => {
+    this.props.instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
   handleSave = () => {
     this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
     this.props.instanceStore.saveInstance(this.props.id);
+  }
+
+  handleCancelSave = () => {
+    this.props.instanceStore.cancelSaveInstance(this.props.id);
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
   }
 
   fetchInstance = () => {
@@ -340,8 +497,8 @@ export default class InstanceForm extends React.Component{
                   </Col>
                   <Col xs={2} >
                     <span className="pull-right">
-                      {this.props.id === this.props.instanceStore.currentInstanceId?
-                        <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancel} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
+                      {this.props.id === this.props.instanceStore.currentInstanceId && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel?
+                        <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancelEdit} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
                         :
                         null
                       }
@@ -373,7 +530,7 @@ export default class InstanceForm extends React.Component{
                 </Panel.Collapse>
               </Panel>
               <div className={classes.panelFooter}>
-                {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId?
+                {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId || instance.isSaving || instance.hasSaveError || instance.confirmCancel?
                   <Row>
                     <Col xs={12}>
                       <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
@@ -385,7 +542,7 @@ export default class InstanceForm extends React.Component{
                       <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
                     </Col>
                     <Col xs={6} md={2} className={classes.action}>
-                      <Button bsStyle={"default"} onClick={this.handleCancel}>Cancel</Button>
+                      <Button bsStyle={"default"} onClick={this.handleCancelEdit}>Cancel</Button>
                     </Col>
                     <Col xs={6} md={2} className={classes.action}>
                       <Button disabled={!instance.hasChanged} bsStyle={"success"} onClick={this.handleSave}>Save</Button>
@@ -394,6 +551,37 @@ export default class InstanceForm extends React.Component{
                 }
               </div>
             </Form>
+            {instance.isSaving &&
+                <div className={classes.savingContainer} >
+                  <div className={classes.savingPanel} >
+                    <span className={classes.savingGlyphicon}></span>
+                    <span className={classes.savingLabel}>Saving instance...</span>
+                    <small>Nexus ID: {this.props.id}</small>
+                  </div>
+                </div>
+            }
+            {instance.hasSaveError &&
+                <div className={classes.saveErrorContainer} >
+                  <div className={classes.saveErrorPanel}>
+                    <h4>{instance.saveError}</h4>
+                    <div>
+                      <Button bsStyle="default" onClick={this.handleCancelSave}>Cancel</Button>
+                      <Button bsStyle="primary" onClick={this.handleSave}>Retry</Button>
+                    </div>
+                  </div>
+                </div>
+            }
+            {instance.confirmCancel &&
+              <div className={classes.confirmCancelContainer} >
+                <div className={classes.confirmCancelPanel}>
+                  <h4>There are some unsaved changes. Are you sure you want to cancel the changes of this instance?</h4>
+                  <div>
+                    <Button bsStyle="default" onClick={this.handleConfirmCancelEdit}>Yes</Button>
+                    <Button bsStyle="danger" onClick={this.handleContinueEditing}>No</Button>
+                  </div>
+                </div>
+              </div>
+          }
           </div>
           :
           <div className={classes.fetchingPanel} active={level===0?"true":"false"}>

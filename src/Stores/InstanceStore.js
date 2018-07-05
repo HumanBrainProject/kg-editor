@@ -38,16 +38,24 @@ export default class InstanceStore {
       if (instance.isFetching) {
         return instance;
       }
+      instance.confirmCancel = false;
       instance.isFetching = true;
+      instance.isSaving = true;
       instance.isFetched = false;
       instance.fetchError = null;
       instance.hasFetchError = false;
+      instance.saveError = null;
+      instance.hasSaveError = false;
     } else {
       this.instances.set(instanceId, {
         data: null,
         form: null,
+        confirmCancel: null,
         fetchError: null,
         hasFetchError: false,
+        saveError: null,
+        hasSaveError: false,
+        isSaving: false,
         hasChanged: false,
         isFetching: true,
         isFetched: false
@@ -151,27 +159,60 @@ export default class InstanceStore {
 
   @action
   instanceHasChanged(instanceId){
-    if(!this.instances.get(instanceId).hasChanged){
-      this.instances.get(instanceId).hasChanged = true;
+    const instance = this.instances.get(instanceId);
+    if(!instance.hasChanged){
+      instance.hasChanged = true;
     }
   }
 
   @action
   cancelInstanceChanges(instanceId){
-    let instance = this.instances.get(instanceId);
+    const instance = this.instances.get(instanceId);
+    instance.confirmCancel = true;
+  }
+
+  @action
+  confirmCancelInstanceChanges(instanceId){
+    const instance = this.instances.get(instanceId);
     instance.form.injectValues(instance.initialValues);
     instance.hasChanged = false;
+    instance.confirmCancel = false;
+  }
+
+  @action
+  abortCancelInstanceChange(instanceId){
+    const instance = this.instances.get(instanceId);
+    instance.confirmCancel = false;
   }
 
   @action
   async saveInstance(instanceId){
+    const instance = this.instances.get(instanceId);
+    instance.confirmCancel = false;
+    instance.hasSaveError = false;
+    instance.isSaving = true;
     try {
-      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), this.instances.get(instanceId).form.getValues());
+      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), instance.form.getValues());
       runInAction(() => {
-        console.log("saved", data);
+        instance.hasChanged = false;
+        instance.saveError = null;
+        instance.hasSaveError = false;
+        instance.isSaving = false;
+        console.debug("successfully saved", data);
       });
     } catch (e) {
-      throw "Couldn't save instance details: "+e;
+      const message = e.message?e.message:e;
+      instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
+      instance.hasSaveError = true;
+      instance.isSaving = false;
     }
   }
+
+  @action
+  cancelSaveInstance(instanceId){
+    const instance = this.instances.get(instanceId);
+    instance.saveError = null;
+    instance.hasSaveError = false;
+  }
+
 }

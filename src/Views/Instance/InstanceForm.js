@@ -263,7 +263,8 @@ const styles = {
       top: "-10px",
       left: "-10px",
       width: "calc(100% + 20px)",
-      height: "calc(100% + 20px)",
+      height: "calc(100% + 20px)"
+    },
     "& .spark-field-input-text.spark-readmode, & .spark-field-dropdown-select.spark-readmode": {
       marginBottom: "5px"
     },
@@ -581,7 +582,7 @@ export default class InstanceForm extends React.Component{
                   </div>
                 </div>
               </div>
-          }
+            }
           </div>
           :
           <div className={classes.fetchingPanel} active={level===0?"true":"false"}>

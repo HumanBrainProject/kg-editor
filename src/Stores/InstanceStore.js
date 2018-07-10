@@ -40,7 +40,7 @@ export default class InstanceStore {
       }
       instance.confirmCancel = false;
       instance.isFetching = true;
-      instance.isSaving = true;
+      instance.isSaving = false;
       instance.isFetched = false;
       instance.fetchError = null;
       instance.hasFetchError = false;

@@ -198,8 +198,9 @@ const styles = {
       borderRadius: "10px"
     },
     "&:not(.main).current": {
-      borderColor: "#adadad",
-      backgroundColor: "white"
+      borderColor: "#666",
+      backgroundColor: "white",
+      boxShadow: "2px 2px 4px #a5a1a1"
     },
     "&.hasChanged:not(.current):not(.readMode)": {
       background: "#ffe6e5"
@@ -213,6 +214,33 @@ const styles = {
     },
     "&:not(.readMode) textarea": {
       minHeight: "200px"
+    },
+    "&:not(.current).readMode[highlight='true'], & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus": {
+      backgroundColor: "#a5c7e9",
+      borderColor: "#337ab7",
+      color: "#143048"
+    },
+    "& .hightlightArrow": {
+      display: "none",
+      position: "absolute",
+      top: "50%",
+      left: "-26px",
+      color: "transparent",
+      fontSize: "xx-large",
+      transform: "translateY(-50%) scale(0.5,0.8)"
+    },
+    "&:not(.current).readMode .hightlightArrow": {
+      display: "inline",
+      position: "absolute",
+      top: "50%",
+      left: "-26px",
+      color: "transparent",
+      fontSize: "xx-large",
+      transform: "translateY(-50%) scale(0.5,0.8)",
+      transition: "color 0.25s ease-in-out",
+    },
+    "&:not(.current).readMode[highlight='true'] .hightlightArrow": {
+      color: "#337ab7"
     },
     "&:not(.readMode) $readModeTogglePanel": {
       transform: "rotateY(180deg)"
@@ -264,6 +292,9 @@ const styles = {
       left: "-10px",
       width: "calc(100% + 20px)",
       height: "calc(100% + 20px)"
+    },
+    "&.readMode .spark-empty-field": {
+      display: "none"
     },
     "& .spark-field-input-text.spark-readmode, & .spark-field-dropdown-select.spark-readmode": {
       marginBottom: "5px"
@@ -382,6 +413,7 @@ const styles = {
 
 @injectStyles(styles)
 @inject("instanceStore")
+@inject("paneStore")
 @observer
 export default class InstanceForm extends React.Component{
   constructor(props){
@@ -438,6 +470,39 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
   }
 
+  handleFieldFocus = (field, value) => {
+    if (field && field.type === "DropdownSelect" && value && value.id) {
+      this.handleToggleOffFieldHighlight(field, value);
+      setTimeout(() => {
+        this.props.instanceStore.setCurrentInstanceId(value.id, this.props.level + 1);
+        const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+        if (target) {
+          target.scrollIntoViewIfNeeded();
+        }
+        this.props.paneStore.selectNextPane();
+      });
+    }
+  }
+
+  handleToggleOnFieldHighlight = (field, value) => {
+    if (field && field.type === "DropdownSelect" && value && value.id) {
+      const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+      if (target) {
+        target.scrollIntoViewIfNeeded();
+        target.setAttribute("highlight", "true");
+      }
+    }
+  }
+
+  handleToggleOffFieldHighlight = (field, value) => {
+    if (field && field.type === "DropdownSelect" && value && value.id) {
+      const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+      if (target) {
+        target.removeAttribute("highlight");
+      }
+    }
+  }
+
   fetchInstance = () => {
     this.props.instanceStore.fetchInstanceData(this.props.id);
   }
@@ -489,7 +554,8 @@ export default class InstanceForm extends React.Component{
             onClick={this.handleFocus}
             onChange={this.handleChange}
             onLoad={this.handleLoad}
-            className={panelClassName}>
+            className={panelClassName}
+            data-id={this.props.id}>
             <Form store={instance.form}>
               <div className={classes.panelHeader}>
                 <Row>
@@ -511,7 +577,17 @@ export default class InstanceForm extends React.Component{
                 {(instance.data && instance.data.ui_info && instance.data.ui_info.summary)?
                   instance.data.ui_info.summary.map(key => {
                     const name = key.replace(/\//g, "%nexus-slash%");
-                    return instance.data.fields[name]?<Field key={name} name={name} readModeRendering={this.renderReadModeField}/>:null;
+                    const field = instance.data.fields[name];
+                    if (field) {
+                      if (field.type === "TextArea")  {
+                        return <Field key={name} name={name} readModeRendering={this.renderReadModeField}/>;
+                      }
+                      if (field.type === "DropdownSelect") {
+                        return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight}/>;
+                      }
+                      return <Field key={name} name={name} />;
+                    }
+                    return null;
                   })
                   :
                   null
@@ -525,7 +601,13 @@ export default class InstanceForm extends React.Component{
                         const key = name.replace(/%nexus-slash%/g, "/");
                         return instance.data && instance.data.ui_info && instance.data.ui_info.summary && !instance.data.ui_info.summary.includes(key);
                       })
-                      .map(name => <Field key={name} name={name}/>)
+                      .map(name => {
+                        const field = instance.data.fields[name];
+                        if (field.type === "DropdownSelect") {
+                          return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight}/>;
+                        }
+                        return <Field key={name} name={name} />;
+                      })
                     }
                   </Panel.Body>
                 </Panel.Collapse>
@@ -552,6 +634,7 @@ export default class InstanceForm extends React.Component{
                 }
               </div>
             </Form>
+            <Glyphicon glyph="arrow-right" className="hightlightArrow" />
             {instance.isSaving &&
                 <div className={classes.savingContainer} >
                   <div className={classes.savingPanel} >

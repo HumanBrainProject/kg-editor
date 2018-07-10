@@ -2,13 +2,13 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Panel, Row, Col, Button, Glyphicon } from "react-bootstrap";
+import { uniqueId } from "lodash";
 import { Form, Field } from "hbp-spark";
 import { Link } from "react-router-dom";
 import ToggleButton from "./ToggleButton";
 
-const generateRandomName = () => [...`${new Date().getTime()}`, ...`${Math.round(Math.random() * 100)}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
-const fetchAnimationId = generateRandomName();
-const saveAnimationId = generateRandomName();
+const fetchAnimationId = uniqueId("animationId");
+const saveAnimationId = uniqueId("animationId");
 
 const styles = {
   panelHeader: {
@@ -173,7 +173,7 @@ const styles = {
       paddingBottom: "10px",
       color: "#333"
     },
-    "& button": {
+    "& button, & a.btn": {
       minWidth: "80px"
     },
     "& button + button, & a + button, & a + a": {
@@ -526,7 +526,7 @@ export default class InstanceForm extends React.Component{
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
 
-    const [organization, domain, schema, version, ] = this.props.id.split("/");
+    const [organization, domain, schema, version,] = this.props.id.split("/");
 
     const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
 
@@ -564,7 +564,7 @@ export default class InstanceForm extends React.Component{
                   </Col>
                   <Col xs={2} >
                     <span className="pull-right">
-                      {this.props.id === this.props.instanceStore.currentInstanceId && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel?
+                      {!instance.isNew && this.props.id === this.props.instanceStore.currentInstanceId && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel?
                         <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancelEdit} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
                         :
                         null
@@ -616,16 +616,20 @@ export default class InstanceForm extends React.Component{
                 {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId || instance.isSaving || instance.hasSaveError || instance.confirmCancel?
                   <Row>
                     <Col xs={12}>
-                      <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
+                      <div className={classes.id}>Nexus ID: {instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}</div>
                     </Col>
                   </Row>
                   :
                   <Row>
                     <Col xs={12} md={8}>
-                      <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
+                      <div className={classes.id}>Nexus ID: {instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}</div>
                     </Col>
                     <Col xs={6} md={2} className={classes.action}>
-                      <Button bsStyle={"default"} onClick={this.handleCancelEdit}>Cancel</Button>
+                      {!instance.isNew || instance.hasChanged?
+                        <Button bsStyle="default" onClick={this.handleCancelEdit}>Cancel</Button>
+                        :
+                        <Link to={backLink} className="btn btn-default">Cancel</Link>
+                      }
                     </Col>
                     <Col xs={6} md={2} className={classes.action}>
                       <Button disabled={!instance.hasChanged} bsStyle={"success"} onClick={this.handleSave}>Save</Button>
@@ -658,9 +662,13 @@ export default class InstanceForm extends React.Component{
             {instance.confirmCancel &&
               <div className={classes.confirmCancelContainer} >
                 <div className={classes.confirmCancelPanel}>
-                  <h4>There are some unsaved changes. Are you sure you want to cancel the changes of this instance?</h4>
+                  <h4>There are some unsaved changes. {instance.isNew?"Are you sure you want to cancel the creation of this instance?":"Are you sure you want to cancel the changes of this instance?"}</h4>
                   <div>
-                    <Button bsStyle="default" onClick={this.handleConfirmCancelEdit}>Yes</Button>
+                    {!instance.isNew || this.props.id !== this.props.instanceStore.mainInstanceId?
+                      <Button bsStyle="default" onClick={this.handleConfirmCancelEdit}>Yes</Button>
+                      :
+                      <Link to={backLink} className="btn btn-default">Yes</Link>
+                    }
                     <Button bsStyle="danger" onClick={this.handleContinueEditing}>No</Button>
                   </div>
                 </div>

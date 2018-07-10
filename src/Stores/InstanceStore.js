@@ -9,7 +9,8 @@ export default class InstanceStore {
   @observable currentInstancePath = [];
   @observable optionsCache = new Map();
 
-  constructor(instanceId){
+  constructor(history, instanceId){
+    this.history = history;
     this.mainInstanceId = instanceId;
     this.fetchInstanceData(this.mainInstanceId);
     this.setCurrentInstanceId(this.mainInstanceId, 0);
@@ -47,6 +48,7 @@ export default class InstanceStore {
       instance.saveError = null;
       instance.hasSaveError = false;
     } else {
+      const [, , , , shortId] = instanceId.split("/");
       this.instances.set(instanceId, {
         data: null,
         form: null,
@@ -58,7 +60,8 @@ export default class InstanceStore {
         isSaving: false,
         hasChanged: false,
         isFetching: true,
-        isFetched: false
+        isFetched: false,
+        isNew: !shortId
       });
       instance = this.instances.get(instanceId);
     }
@@ -114,7 +117,9 @@ export default class InstanceStore {
 
         this.memorizeInstanceInitialValues(instanceId);
 
-        instance.form.toggleReadMode(true);
+        if (!instance.isNew) {
+          instance.form.toggleReadMode(true);
+        }
       });
     } catch (e) {
       const message = e.message?e.message:e;
@@ -191,20 +196,48 @@ export default class InstanceStore {
     instance.confirmCancel = false;
     instance.hasSaveError = false;
     instance.isSaving = true;
-    try {
-      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), instance.form.getValues());
-      runInAction(() => {
-        instance.hasChanged = false;
-        instance.saveError = null;
-        instance.hasSaveError = false;
+    if (instance.isNew) {
+      try {
+        const { data } = await API.axios.post(API.endpoints.instanceData(instanceId), instance.form.getValues());
+        runInAction(() => {
+          instance.hasChanged = false;
+          instance.saveError = null;
+          instance.hasSaveError = false;
+          instance.isSaving = false;
+          instance.isNew = false;
+          console.debug("successfully created", data);
+          // TODO:
+          // - read new id,
+          // - add the new id to instance data,
+          // - replace instance in insances map with the new id,
+          // - change mainInstanceId with the new id if instanceId eq mainInstanceId;
+          const newId = data.id?data.id:data["@id"]?data["@id"].replace(/^.*\/v0\/data\//, ""):null;
+          if (instanceId === this.mainInstanceId) {
+            this.history.replace(newId?`/instance/${newId}`:`/nodetype/${instanceId}`);
+          }
+        });
+      } catch (e) {
+        const message = e.message?e.message:e;
+        instance.saveError = `Error while creating instance "${instanceId}" (${message})`;
+        instance.hasSaveError = true;
         instance.isSaving = false;
-        console.debug("successfully saved", data);
-      });
-    } catch (e) {
-      const message = e.message?e.message:e;
-      instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
-      instance.hasSaveError = true;
-      instance.isSaving = false;
+      }
+    } else {
+      try {
+        const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), instance.form.getValues());
+        runInAction(() => {
+          instance.hasChanged = false;
+          instance.saveError = null;
+          instance.hasSaveError = false;
+          instance.isSaving = false;
+          console.debug("successfully saved", data);
+        });
+      } catch (e) {
+        const message = e.message?e.message:e;
+        instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
+        instance.hasSaveError = true;
+        instance.isSaving = false;
+      }
     }
   }
 

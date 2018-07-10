@@ -1,7 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
-import { Button } from "react-bootstrap";
+import { Button, Glyphicon } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import NodeTypeStore from "../Stores/NodeTypeStore";
 
@@ -60,7 +60,7 @@ const styles = {
     "& ul": {
       listStyleType: "none",
       display: "grid",
-      gridTemplateColumns: "1fr",
+      gridTemplateColumns: "repeat(auto-fill, minmax(430px, 1fr))",
       columnGap: "20px",
       rowGap: "20px",
       position: "relative",
@@ -68,24 +68,6 @@ const styles = {
       margin: 0,
       padding: "20px",
       overflowY: "auto",
-      "@media screen and (min-width:1024px)": {
-        gridTemplateColumns: "repeat(2, 1fr)",
-      },
-      "@media screen and (min-width:1400px)": {
-        gridTemplateColumns: "repeat(3, 1fr)",
-      },
-      "@media screen and (min-width:1800px)": {
-        gridTemplateColumns: "repeat(4, 1fr)",
-      },
-      "@media screen and (min-width:2400px)": {
-        gridTemplateColumns: "repeat(5, 1fr)",
-      },
-      "@media screen and (min-width:2700px)": {
-        gridTemplateColumns: "repeat(6, 1fr)",
-      },
-      "@media screen and (min-width:3092px)": {
-        gridTemplateColumns: "repeat(7, 1fr)",
-      }
     },
     "& li": {
       display: "inline-block",
@@ -114,6 +96,38 @@ const styles = {
       borderColor: "#337ab7",
       color: "#337ab7",
       textDecoration: "none"
+    },
+    "& li > a.create": {
+      borderStyle: "dashed",
+      borderWidth: "9px",
+      textAlign: "center"
+    },
+    "& li > a.create:hover, & li > a.create:focus": {
+      backgroundColor: "transparent",
+      borderColor: "#adcceb",
+    },
+    "& li > a.create .glyphicon": {
+      fontSize: "xx-large",
+      transform: "scale(2) translateY(8px)",
+      color: "#ccc",
+      transition: "color 0.25s ease-in-out",
+      "@media screen and (min-width:1024px)": {
+        transform: "scale(6) translateY(17px)"
+      }
+    },
+    "& li > a.create:hover .glyphicon, & li > a.create:focus .glyphicon": {
+      color: "#4089c9"
+    },
+    "& li > a.create .createLabel": {
+      fontSize: "15px",
+      transform: "translateY(30px)",
+      color: "#999",
+      "@media screen and (min-width:1024px)": {
+        transform: "translateY(190px)"
+      }
+    },
+    "& li > a.create:hover .createLabel, & li > a.create:focus .createLabel": {
+      color: "#337ab7"
     },
     "& li > a h6": {
       marginTop: "0",
@@ -261,9 +275,15 @@ export default class NodeType extends React.Component {
                   </form>
                 </div>
                 <div className={classes.body}>
-                  {this.nodeTypeStore.filteredInstances.length?
-                    <ul>
-                      {this.nodeTypeStore.filteredInstances.map(instance => (
+                  <ul>
+                    <li key="new">
+                      <Link to={ `/instance/${this.props.match.params.id}` } className="create">
+                        <Glyphicon glyph="plus"/>
+                        <div className="createLabel">{`Create a new ${this.nodeTypeStore.nodeTypeLabel} instance`}</div>
+                      </Link>
+                    </li>
+                    {this.nodeTypeStore.filteredInstances.length?
+                      this.nodeTypeStore.filteredInstances.map(instance => (
                         <li key={instance.id}>
                           <Link to={ `/instance/${instance.id}` }>
                             <h6>{this.nodeTypeStore.nodeTypeLabel}</h6>
@@ -278,11 +298,13 @@ export default class NodeType extends React.Component {
                             <small>Nexus ID: {instance.id}</small>
                           </Link>
                         </li>
-                      ))}
-                    </ul>
-                    :
-                    <div className={classes.noFilterResult}>No instances matches your search. Please refine it.</div>
-                  }
+                      ))
+                      :
+                      <li key="notFound">
+                        <div className={classes.noFilterResult}>No instances matches your search. Please refine it.</div>
+                      </li>
+                    }
+                  </ul>
                 </div>
               </React.Fragment>
               :

@@ -215,6 +215,9 @@ const styles = {
     "&:not(.readMode) textarea": {
       minHeight: "200px"
     },
+    "& .spark-field-dropdown-select .spark-readmode-item button": {
+      margin: "0 1px 3px 2px"
+    },
     "&:not(.current).readMode[highlight='true'], & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus, & .spark-field-dropdown-select .spark-readmode-item button:hover, & .spark-field-dropdown-select .spark-readmode-item button:focus": {
       backgroundColor: "#a5c7e9",
       borderColor: "#337ab7",

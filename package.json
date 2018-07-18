@@ -7,7 +7,7 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "color": "^3.0.0",
-    "hbp-spark": "^1.1.23",
+    "hbp-spark": "^1.1.26",
     "lodash": "4.17.5",
     "mobx": "4.1.1",
     "mobx-react": "5.0.0",

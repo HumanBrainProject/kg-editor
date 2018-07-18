@@ -215,7 +215,7 @@ const styles = {
     "&:not(.readMode) textarea": {
       minHeight: "200px"
     },
-    "&:not(.current).readMode[highlight='true'], & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus": {
+    "&:not(.current).readMode[highlight='true'], & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus, & .spark-field-dropdown-select .spark-readmode-item button:hover, & .spark-field-dropdown-select .spark-readmode-item button:focus": {
       backgroundColor: "#a5c7e9",
       borderColor: "#337ab7",
       color: "#143048"
@@ -301,6 +301,9 @@ const styles = {
     },
     "& .spark-field-input-text.spark-readmode label.spark-label, & .spark-field-dropdown-select.spark-readmode label.spark-label": {
       marginBottom: "0"
+    },
+    "& .spark-field-disabled.spark-empty-field, .spark-field-readonly.spark-empty-field": {
+      display: "none"
     }
   },
   id:{
@@ -508,12 +511,23 @@ export default class InstanceForm extends React.Component{
   }
 
   renderReadModeField = (field) => {
-    if (this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
-      if (field && field.type === "TextArea") {
-        if (field.value && field.value.length && field.value.length >= 200) {
-          return field.value.substr(0,197) + "...";
+    if (field) {
+      if (field.type === "TextArea") {
+        if (this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
+          if (field.value && field.value.length && field.value.length >= 200) {
+            return field.value.substr(0,197) + "...";
+          }
+          return field.value;
         }
         return field.value;
+      } else if (field.type === "DropdownSelect") {
+        return <span className="spark-readmode-list">
+          {field.value.map(value =>
+            <span key={value.id} className="spark-readmode-item">
+              <button className="btn btn-xs btn-default"  onClick={(event) => {event.preventDefault(); this.handleFieldFocus(field, value);}} onFocus={(event) => {event.preventDefault(); this.handleToggleOnFieldHighlight(field, value);}} onMouseEnter={(event) => {event.preventDefault(); this.handleToggleOnFieldHighlight(field, value);}} onBlur={(event) => {event.preventDefault(); this.handleToggleOffFieldHighlight(field, value);}} onMouseLeave={(event) => {event.preventDefault(); this.handleToggleOffFieldHighlight(field, value);}}>{value.label}</button>
+            </span>)
+          }
+        </span>;
       }
       return field.value;
     }
@@ -575,15 +589,14 @@ export default class InstanceForm extends React.Component{
               </div>
               <div className={classes.panelSummary}>
                 {(instance.data && instance.data.ui_info && instance.data.ui_info.summary)?
-                  instance.data.ui_info.summary.map(key => {
-                    const name = key.replace(/\//g, "%nexus-slash%");
+                  instance.data.ui_info.summary.map(key => key.replace(/\//g, "%nexus-slash%")).map(name => {
                     const field = instance.data.fields[name];
                     if (field) {
                       if (field.type === "TextArea")  {
                         return <Field key={name} name={name} readModeRendering={this.renderReadModeField}/>;
                       }
-                      if (field.type === "DropdownSelect") {
-                        return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight}/>;
+                      if (field.type === "DropdownSelect" && field.isLink) {
+                        return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight} readModeRendering={this.renderReadModeField}/>;
                       }
                       return <Field key={name} name={name} />;
                     }
@@ -603,8 +616,8 @@ export default class InstanceForm extends React.Component{
                       })
                       .map(name => {
                         const field = instance.data.fields[name];
-                        if (field.type === "DropdownSelect") {
-                          return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight}/>;
+                        if (field.type === "DropdownSelect" && field.isLink) {
+                          return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight} readModeRendering={this.renderReadModeField}/>;
                         }
                         return <Field key={name} name={name} />;
                       })

@@ -5,9 +5,10 @@ import { FormStore } from "hbp-spark";
 
 export default class InstanceStore {
   @observable instances = new Map();
-  @observable mainInstanceId;
+  @observable mainInstanceId = null;
   @observable currentInstancePath = [];
   @observable optionsCache = new Map();
+  @observable highlightedInstance = null;
 
   constructor(history, instanceId){
     this.history = history;
@@ -29,6 +30,28 @@ export default class InstanceStore {
 
   @computed get currentInstanceId(){
     return this.currentInstancePath[this.currentInstancePath.length-1];
+  }
+
+  @action
+  highlightInstance(fieldLabel, instanceId) {
+    this.highlightedInstance = {
+      fieldLabel: fieldLabel,
+      instanceId: instanceId
+    };
+  }
+
+  @action
+  unhighlightInstance(fieldLabel, instanceId) {
+    if (this.isInstanceHighlighted(fieldLabel, instanceId)) {
+      this.highlightedInstance = null;
+    }
+  }
+
+  isInstanceHighlighted(fieldLabel, instanceId){
+    if (this.highlightedInstance === null) {
+      return false;
+    }
+    return this.highlightedInstance.fieldLabel === fieldLabel && this.highlightedInstance.instanceId === instanceId;
   }
 
   @action

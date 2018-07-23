@@ -218,7 +218,7 @@ const styles = {
     "& .spark-field-dropdown-select .spark-readmode-item button": {
       margin: "0 1px 3px 2px"
     },
-    "&:not(.current).readMode[highlight='true'], & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus, & .spark-field-dropdown-select .spark-readmode-item button:hover, & .spark-field-dropdown-select .spark-readmode-item button:focus": {
+    "&:not(.current).readMode.highlight, & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus, & .spark-field-dropdown-select .spark-readmode-item button:hover, & .spark-field-dropdown-select .spark-readmode-item button:focus": {
       backgroundColor: "#a5c7e9",
       borderColor: "#337ab7",
       color: "#143048"
@@ -242,7 +242,7 @@ const styles = {
       transform: "translateY(-50%) scale(0.5,0.8)",
       transition: "color 0.25s ease-in-out",
     },
-    "&:not(.current).readMode[highlight='true'] .hightlightArrow": {
+    "&:not(.current).readMode.highlight .hightlightArrow": {
       color: "#337ab7"
     },
     "&:not(.readMode) $readModeTogglePanel": {
@@ -492,20 +492,17 @@ export default class InstanceForm extends React.Component{
 
   handleToggleOnFieldHighlight = (field, value) => {
     if (field && field.type === "DropdownSelect" && value && value.id) {
+      this.props.instanceStore.highlightInstance(field.label, value.id);
       const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
       if (target) {
         target.scrollIntoViewIfNeeded();
-        target.setAttribute("highlight", "true");
       }
     }
   }
 
   handleToggleOffFieldHighlight = (field, value) => {
     if (field && field.type === "DropdownSelect" && value && value.id) {
-      const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
-      if (target) {
-        target.removeAttribute("highlight");
-      }
+      this.props.instanceStore.unhighlightInstance(field.label, value.id);
     }
   }
 
@@ -561,6 +558,9 @@ export default class InstanceForm extends React.Component{
     }
     if (instance.hasChanged){
       panelClassName += " hasChanged";
+    }
+    if (this.props.instanceStore.isInstanceHighlighted(this.props.property, this.props.id)) {
+      panelClassName += " highlight";
     }
 
     return(

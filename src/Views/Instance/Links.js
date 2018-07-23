@@ -36,7 +36,7 @@ class Links extends React.Component{
                     {fieldObj.value.map(value => {
                       const id = value[fieldObj.mappingValue];
                       return (
-                        <InstanceForm level={this.props.level} id={id} key={id} />
+                        <InstanceForm level={this.props.level} id={id} key={id} property={fieldObj.label} />
                       );
                     })}
                   </div>

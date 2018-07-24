@@ -2,12 +2,13 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Panel, Row, Col, Button, Glyphicon } from "react-bootstrap";
+import { uniqueId } from "lodash";
 import { Form, Field } from "hbp-spark";
 import { Link } from "react-router-dom";
 import ToggleButton from "./ToggleButton";
 
-const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
-const animationId = generateRandomName();
+const fetchAnimationId = uniqueId("animationId");
+const saveAnimationId = uniqueId("animationId");
 
 const styles = {
   panelHeader: {
@@ -59,7 +60,128 @@ const styles = {
   readModeButton: {
     transform: "rotateY(180deg)"
   },
+  savingContainer: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: "9px",
+    zIndex: "1200",
+  },
+  savingPanel: {
+    display: "inline-block",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    minWidth: "240px",
+    transform: "translate(-50%, -50%)",
+    fontSize: "18px",
+    fontWeight: "lighter",
+    background: "white",
+    padding: "20px",
+    borderRadius: "5px",
+    boxShadow: "2px 2px 4px #7f7a7a",
+    "& small": {
+      display: "block",
+      padding: "10px 0",
+      color:"grey",
+      fontWeight:"400",
+      fontSize:"0.6em",
+      fontStyle: "italic",
+      whiteSpace: "nowrap",
+      "@media screen and (max-width:576px)": {
+        wordBreak: "break-all",
+        wordWrap: "break-word",
+        whiteSpace: "normal",
+      }
+    }
+  },
+  savingGlyphicon: {
+    composes: "glyphicon glyphicon-record",
+    color: "red",
+    animation: `${saveAnimationId} 1.4s infinite linear`
+  },
+  [`@keyframes ${saveAnimationId}`]: {
+    "0%": {
+      transform: "scale(1)"
+    },
+    "50%": {
+      transform: "scale(0.1)"
+    },
+    "100%": {
+      transform: "scale(1)"
+    }
+  },
+  savingLabel: {
+    paddingLeft: "6px"
+  },
+  saveErrorContainer: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: "9px",
+    zIndex: "1200",
+  },
+  saveErrorPanel: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    minWidth: "220px",
+    transform: "translate(-50%, -50%)",
+    padding: "10px",
+    borderRadius: "5px",
+    background: "white",
+    textAlign: "center",
+    boxShadow: "2px 2px 4px #7f7a7a",
+    "& h4": {
+      margin: "0",
+      paddingBottom: "10px",
+      color: "red"
+    },
+    "& button + button, & a + button, & a + a": {
+      marginLeft: "20px"
+    }
+  },
+  confirmCancelContainer: {
+    position: "absolute",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: "9px",
+    zIndex: "1200",
+  },
+  confirmCancelPanel: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    minWidth: "220px",
+    transform: "translate(-50%, -50%)",
+    padding: "10px",
+    borderRadius: "5px",
+    background: "white",
+    textAlign: "center",
+    boxShadow: "2px 2px 4px #7f7a7a",
+    "& h4": {
+      margin: "0",
+      paddingBottom: "10px",
+      color: "#333"
+    },
+    "& button, & a.btn": {
+      minWidth: "80px"
+    },
+    "& button + button, & a + button, & a + a": {
+      marginLeft: "20px"
+    }
+  },
   panel: {
+    position: "relative",
     transition: "all 0.25s linear",
     "&:not(.current)": {
       borderRadius: "10px",
@@ -76,8 +198,9 @@ const styles = {
       borderRadius: "10px"
     },
     "&:not(.main).current": {
-      borderColor: "#adadad",
-      backgroundColor: "white"
+      borderColor: "#666",
+      backgroundColor: "white",
+      boxShadow: "2px 2px 4px #a5a1a1"
     },
     "&.hasChanged:not(.current):not(.readMode)": {
       background: "#ffe6e5"
@@ -91,6 +214,36 @@ const styles = {
     },
     "&:not(.readMode) textarea": {
       minHeight: "200px"
+    },
+    "& .spark-field-dropdown-select .spark-readmode-item button": {
+      margin: "0 1px 3px 2px"
+    },
+    "&:not(.current).readMode.highlight, & button.value-tag.spark-value-tag:hover, & button.value-tag.spark-value-tag:focus, & .spark-field-dropdown-select .spark-readmode-item button:hover, & .spark-field-dropdown-select .spark-readmode-item button:focus": {
+      backgroundColor: "#a5c7e9",
+      borderColor: "#337ab7",
+      color: "#143048"
+    },
+    "& .hightlightArrow": {
+      display: "none",
+      position: "absolute",
+      top: "50%",
+      left: "-26px",
+      color: "transparent",
+      fontSize: "xx-large",
+      transform: "translateY(-50%) scale(0.5,0.8)"
+    },
+    "&:not(.current).readMode .hightlightArrow": {
+      display: "inline",
+      position: "absolute",
+      top: "50%",
+      left: "-26px",
+      color: "transparent",
+      fontSize: "xx-large",
+      transform: "translateY(-50%) scale(0.5,0.8)",
+      transition: "color 0.25s ease-in-out",
+    },
+    "&:not(.current).readMode.highlight .hightlightArrow": {
+      color: "#337ab7"
     },
     "&:not(.readMode) $readModeTogglePanel": {
       transform: "rotateY(180deg)"
@@ -124,6 +277,36 @@ const styles = {
     },
     "&.current:not(.editMode) $panelFooter": {
       paddingBottom: "10px"
+    },
+    "&.main $confirmCancelContainer": {
+      top: "-10px",
+      left: "-10px",
+      width: "calc(100% + 20px)",
+      height: "calc(100% + 20px)",
+    },
+    "&.main $saveErrorContainer": {
+      top: "-10px",
+      left: "-10px",
+      width: "calc(100% + 20px)",
+      height: "calc(100% + 20px)",
+    },
+    "&.main $savingContainer": {
+      top: "-10px",
+      left: "-10px",
+      width: "calc(100% + 20px)",
+      height: "calc(100% + 20px)"
+    },
+    "&.readMode .spark-empty-field": {
+      display: "none"
+    },
+    "& .spark-field-input-text.spark-readmode, & .spark-field-dropdown-select.spark-readmode": {
+      marginBottom: "5px"
+    },
+    "& .spark-field-input-text.spark-readmode label.spark-label, & .spark-field-dropdown-select.spark-readmode label.spark-label": {
+      marginBottom: "0"
+    },
+    "& .spark-field-disabled.spark-empty-field, .spark-field-readonly.spark-empty-field": {
+      display: "none"
     }
   },
   id:{
@@ -172,9 +355,9 @@ const styles = {
   },
   fetchingGlyphicon: {
     composes: "glyphicon glyphicon-refresh",
-    animation: `${animationId} .7s infinite linear`
+    animation: `${fetchAnimationId} .7s infinite linear`
   },
-  [`@keyframes ${animationId}`]: {
+  [`@keyframes ${fetchAnimationId}`]: {
     "from": {
       transform: "scale(1) rotate(0deg)"
     },
@@ -236,6 +419,7 @@ const styles = {
 
 @injectStyles(styles)
 @inject("instanceStore")
+@inject("paneStore")
 @observer
 export default class InstanceForm extends React.Component{
   constructor(props){
@@ -261,12 +445,25 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.memorizeInstanceInitialValues(this.props.id);
   }
 
-  handleCancel = () => {
-    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+  handleCancelEdit = () => {
     const instance = this.props.instanceStore.getInstance(this.props.id);
     if (instance.hasChanged) {
       this.props.instanceStore.cancelInstanceChanges(this.props.id);
+    } else {
+      this.handleConfirmCancelEdit();
     }
+  }
+
+  handleConfirmCancelEdit = () => {
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+    const instance = this.props.instanceStore.getInstance(this.props.id);
+    if (instance.hasChanged) {
+      this.props.instanceStore.confirmCancelInstanceChanges(this.props.id);
+    }
+  }
+
+  handleContinueEditing = () => {
+    this.props.instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
   handleSave = () => {
@@ -274,8 +471,67 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.saveInstance(this.props.id);
   }
 
+  handleCancelSave = () => {
+    this.props.instanceStore.cancelSaveInstance(this.props.id);
+    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
+  }
+
+  handleFieldFocus = (field, value) => {
+    if (field && field.type === "DropdownSelect" && value && value.id) {
+      this.handleToggleOffFieldHighlight(field, value);
+      setTimeout(() => {
+        this.props.instanceStore.setCurrentInstanceId(value.id, this.props.level + 1);
+        const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+        if (target) {
+          target.scrollIntoViewIfNeeded();
+        }
+        this.props.paneStore.selectNextPane();
+      });
+    }
+  }
+
+  handleToggleOnFieldHighlight = (field, value) => {
+    if (field && field.type === "DropdownSelect" && value && value.id) {
+      this.props.instanceStore.highlightInstance(field.label, value.id);
+      const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+      if (target) {
+        target.scrollIntoViewIfNeeded();
+      }
+    }
+  }
+
+  handleToggleOffFieldHighlight = (field, value) => {
+    if (field && field.type === "DropdownSelect" && value && value.id) {
+      this.props.instanceStore.unhighlightInstance(field.label, value.id);
+    }
+  }
+
   fetchInstance = () => {
     this.props.instanceStore.fetchInstanceData(this.props.id);
+  }
+
+  renderReadModeField = (field) => {
+    if (field) {
+      if (field.type === "TextArea") {
+        if (this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
+          if (field.value && field.value.length && field.value.length >= 200) {
+            return field.value.substr(0,197) + "...";
+          }
+          return field.value;
+        }
+        return field.value;
+      } else if (field.type === "DropdownSelect") {
+        return <span className="spark-readmode-list">
+          {field.value.map(value =>
+            <span key={value.id} className="spark-readmode-item">
+              <button className="btn btn-xs btn-default"  onClick={(event) => {event.preventDefault(); this.handleFieldFocus(field, value);}} onFocus={(event) => {event.preventDefault(); this.handleToggleOnFieldHighlight(field, value);}} onMouseEnter={(event) => {event.preventDefault(); this.handleToggleOnFieldHighlight(field, value);}} onBlur={(event) => {event.preventDefault(); this.handleToggleOffFieldHighlight(field, value);}} onMouseLeave={(event) => {event.preventDefault(); this.handleToggleOffFieldHighlight(field, value);}}>{value.label}</button>
+            </span>)
+          }
+        </span>;
+      }
+      return field.value;
+    }
+    return field.value;
   }
 
   render(){
@@ -284,7 +540,7 @@ export default class InstanceForm extends React.Component{
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
 
-    const [organization, domain, schema, version, ] = this.props.id.split("/");
+    const [organization, domain, schema, version,] = this.props.id.split("/");
 
     const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
 
@@ -303,6 +559,9 @@ export default class InstanceForm extends React.Component{
     if (instance.hasChanged){
       panelClassName += " hasChanged";
     }
+    if (this.props.instanceStore.isInstanceHighlighted(this.props.property, this.props.id)) {
+      panelClassName += " highlight";
+    }
 
     return(
       (!instance.hasFetchError)?
@@ -312,7 +571,8 @@ export default class InstanceForm extends React.Component{
             onClick={this.handleFocus}
             onChange={this.handleChange}
             onLoad={this.handleLoad}
-            className={panelClassName}>
+            className={panelClassName}
+            data-id={this.props.id}>
             <Form store={instance.form}>
               <div className={classes.panelHeader}>
                 <Row>
@@ -321,8 +581,8 @@ export default class InstanceForm extends React.Component{
                   </Col>
                   <Col xs={2} >
                     <span className="pull-right">
-                      {this.props.id === this.props.instanceStore.currentInstanceId?
-                        <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancel} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
+                      {!instance.isNew && this.props.id === this.props.instanceStore.currentInstanceId && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel?
+                        <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancelEdit} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
                         :
                         null
                       }
@@ -332,9 +592,18 @@ export default class InstanceForm extends React.Component{
               </div>
               <div className={classes.panelSummary}>
                 {(instance.data && instance.data.ui_info && instance.data.ui_info.summary)?
-                  instance.data.ui_info.summary.map(key => {
-                    const name = key.replace(/\//g, "%nexus-slash%");
-                    return instance.data.fields[name]?<Field key={name} name={name}/>:null;
+                  instance.data.ui_info.summary.map(key => key.replace(/\//g, "%nexus-slash%")).map(name => {
+                    const field = instance.data.fields[name];
+                    if (field) {
+                      if (field.type === "TextArea")  {
+                        return <Field key={name} name={name} readModeRendering={this.renderReadModeField}/>;
+                      }
+                      if (field.type === "DropdownSelect" && field.isLink) {
+                        return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight} readModeRendering={this.renderReadModeField}/>;
+                      }
+                      return <Field key={name} name={name} />;
+                    }
+                    return null;
                   })
                   :
                   null
@@ -348,25 +617,35 @@ export default class InstanceForm extends React.Component{
                         const key = name.replace(/%nexus-slash%/g, "/");
                         return instance.data && instance.data.ui_info && instance.data.ui_info.summary && !instance.data.ui_info.summary.includes(key);
                       })
-                      .map(name => <Field key={name} name={name}/>)
+                      .map(name => {
+                        const field = instance.data.fields[name];
+                        if (field.type === "DropdownSelect" && field.isLink) {
+                          return <Field key={name} name={name} onValueClick={this.handleFieldFocus} onValueFocus={this.handleToggleOnFieldHighlight} onValueMouseEnter={this.handleToggleOnFieldHighlight} onValueBlur={this.handleToggleOffFieldHighlight} onValueMouseLeave={this.handleToggleOffFieldHighlight} readModeRendering={this.renderReadModeField}/>;
+                        }
+                        return <Field key={name} name={name} />;
+                      })
                     }
                   </Panel.Body>
                 </Panel.Collapse>
               </Panel>
               <div className={classes.panelFooter}>
-                {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId?
+                {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId || instance.isSaving || instance.hasSaveError || instance.confirmCancel?
                   <Row>
                     <Col xs={12}>
-                      <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
+                      <div className={classes.id}>Nexus ID: {instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}</div>
                     </Col>
                   </Row>
                   :
                   <Row>
                     <Col xs={12} md={8}>
-                      <div className={classes.id}>Nexus ID: {instance.data.fields.id.value.nexus_id}</div>
+                      <div className={classes.id}>Nexus ID: {instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}</div>
                     </Col>
                     <Col xs={6} md={2} className={classes.action}>
-                      <Button bsStyle={"default"} onClick={this.handleCancel}>Cancel</Button>
+                      {!instance.isNew || instance.hasChanged?
+                        <Button bsStyle="default" onClick={this.handleCancelEdit}>Cancel</Button>
+                        :
+                        <Link to={backLink} className="btn btn-default">Cancel</Link>
+                      }
                     </Col>
                     <Col xs={6} md={2} className={classes.action}>
                       <Button disabled={!instance.hasChanged} bsStyle={"success"} onClick={this.handleSave}>Save</Button>
@@ -375,6 +654,42 @@ export default class InstanceForm extends React.Component{
                 }
               </div>
             </Form>
+            <Glyphicon glyph="arrow-right" className="hightlightArrow" />
+            {instance.isSaving &&
+                <div className={classes.savingContainer} >
+                  <div className={classes.savingPanel} >
+                    <span className={classes.savingGlyphicon}></span>
+                    <span className={classes.savingLabel}>Saving instance...</span>
+                    <small>Nexus ID: {this.props.id}</small>
+                  </div>
+                </div>
+            }
+            {instance.hasSaveError &&
+                <div className={classes.saveErrorContainer} >
+                  <div className={classes.saveErrorPanel}>
+                    <h4>{instance.saveError}</h4>
+                    <div>
+                      <Button bsStyle="default" onClick={this.handleCancelSave}>Cancel</Button>
+                      <Button bsStyle="primary" onClick={this.handleSave}>Retry</Button>
+                    </div>
+                  </div>
+                </div>
+            }
+            {instance.confirmCancel &&
+              <div className={classes.confirmCancelContainer} >
+                <div className={classes.confirmCancelPanel}>
+                  <h4>There are some unsaved changes. {instance.isNew?"Are you sure you want to cancel the creation of this instance?":"Are you sure you want to cancel the changes of this instance?"}</h4>
+                  <div>
+                    {!instance.isNew || this.props.id !== this.props.instanceStore.mainInstanceId?
+                      <Button bsStyle="default" onClick={this.handleConfirmCancelEdit}>Yes</Button>
+                      :
+                      <Link to={backLink} className="btn btn-default">Yes</Link>
+                    }
+                    <Button bsStyle="danger" onClick={this.handleContinueEditing}>No</Button>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
           :
           <div className={classes.fetchingPanel} active={level===0?"true":"false"}>

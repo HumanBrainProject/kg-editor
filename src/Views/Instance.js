@@ -12,7 +12,7 @@ import PaneContainer from "./Instance/PaneContainer";
 export default class Edit extends React.Component{
   constructor(props){
     super(props);
-    this.store = new InstanceStore(this.props.match.params.id);
+    this.store = new InstanceStore(this.props.history, this.props.match.params.id);
     this.props.navigationStore.setInstanceStore(this.store);
   }
 

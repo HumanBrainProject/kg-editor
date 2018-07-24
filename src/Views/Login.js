@@ -2,10 +2,9 @@ import React from "react";
 import injectStyles from "react-jss";
 import authStore from "../Stores/AuthStore";
 import { Button } from "react-bootstrap";
+import { uniqueId } from "lodash";
 
-const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
-
-const animationId = generateRandomName();
+const animationId = uniqueId("animationId");
 
 const styles = {
   container: {

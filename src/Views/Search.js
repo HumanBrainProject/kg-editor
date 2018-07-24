@@ -4,10 +4,13 @@ import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import SearchStore from "../Stores/SearchStore";
+import { uniqueId } from "lodash";
 
-const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
+const promotedNodeTypes = [
+  "minds/core/dataset/v0.0.4"
+];
 
-const animationId = generateRandomName();
+const animationId = uniqueId("animationId");
 
 const styles = {
   container: {
@@ -53,41 +56,29 @@ const styles = {
       height: "calc(100% - 70px)",
       border: "1px solid #ccc",
     },
-    "& ul": {
-      listStyleType: "none",
-      display: "grid",
-      gridTemplateColumns: "1fr",
-      columnGap: "20px",
-      rowGap: "20px",
+    "& .content": {
       position: "relative",
       maxHeight: "100%",
       margin: 0,
       padding: "20px",
-      overflowY: "auto",
-      "@media screen and (min-width:576px)": {
-        gridTemplateColumns: "repeat(2, 1fr)",
-      },
-      "@media screen and (min-width:1024px)": {
-        gridTemplateColumns: "repeat(3, 1fr)",
-      },
-      "@media screen and (min-width:1400px)": {
-        gridTemplateColumns: "repeat(4, 1fr)",
-      },
-      "@media screen and (min-width:1600px)": {
-        gridTemplateColumns: "repeat(5, 1fr)",
-      },
-      "@media screen and (min-width:2048px)": {
-        gridTemplateColumns: "repeat(6, 1fr)",
-      },
-      "@media screen and (min-width:2400px)": {
-        gridTemplateColumns: "repeat(7, 1fr)",
-      },
-      "@media screen and (min-width:2700px)": {
-        gridTemplateColumns: "repeat(8, 1fr)",
-      },
-      "@media screen and (min-width:3092px)": {
-        gridTemplateColumns: "repeat(9, 1fr)",
-      }
+      overflowY: "auto"
+    },
+    "& .content .others": {
+      borderTop: "1px solid #ccc",
+      width: "100%",
+      marginTop: "20px",
+      padding: "10px 0",
+      fontSize: "14px",
+      color: "#777"
+    },
+    "& ul": {
+      listStyleType: "none",
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+      columnGap: "20px",
+      rowGap: "20px",
+      margin: 0,
+      padding: 0
     },
     "& li": {
       display: "inline-block",
@@ -214,24 +205,63 @@ export default class Search extends React.Component{
                   </form>
                 </div>
                 <div className={classes.body}>
-                  {this.searchStore.filteredNodeTypes.length?
-                    <ul>
-                      {this.searchStore.filteredNodeTypes.map(nodeType => {
-                        const [organisation, domain, schema, version] = nodeType.path.split("/");
-                        return (
-                          <li key={nodeType.path}>
-                            <Link to={ `/nodetype/${nodeType.path}` }>
-                              <h6>{organisation + "/" + domain}</h6>
-                              <h3>{nodeType.label?nodeType.label:schema}</h3>
-                              <h5>{version}</h5>
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    :
-                    <div className={classes.noFilterResult}>No node type matches your search. Please refine it.</div>
-                  }
+                  <div className="content">
+                    {promotedNodeTypes.length && this.searchStore.filteredNodeTypes.length === this.searchStore.nodeTypes.length?
+                      <React.Fragment>
+                        <ul>
+                          {this.searchStore.filteredNodeTypes
+                            .filter(nodeType => promotedNodeTypes.includes(nodeType.path))
+                            .map(nodeType => {
+                              const [organisation, domain, schema, version] = nodeType.path.split("/");
+                              return (
+                                <li key={nodeType.path}>
+                                  <Link to={ `/nodetype/${nodeType.path}` }>
+                                    <h6>{organisation + "/" + domain}</h6>
+                                    <h3>{nodeType.label?nodeType.label:schema}</h3>
+                                    <h5>{version}</h5>
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                        </ul>
+                        <div className="others">Other node tpyes</div>
+                        <ul>
+                          {this.searchStore.filteredNodeTypes
+                            .filter(nodeType => !promotedNodeTypes.includes(nodeType.path))
+                            .map(nodeType => {
+                              const [organisation, domain, schema, version] = nodeType.path.split("/");
+                              return (
+                                <li key={nodeType.path}>
+                                  <Link to={ `/nodetype/${nodeType.path}` }>
+                                    <h6>{organisation + "/" + domain}</h6>
+                                    <h3>{nodeType.label?nodeType.label:schema}</h3>
+                                    <h5>{version}</h5>
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                        </ul>
+                      </React.Fragment>
+                      :
+                      this.searchStore.filteredNodeTypes.length?
+                        <ul>
+                          {this.searchStore.filteredNodeTypes.map(nodeType => {
+                            const [organisation, domain, schema, version] = nodeType.path.split("/");
+                            return (
+                              <li key={nodeType.path}>
+                                <Link to={ `/nodetype/${nodeType.path}` }>
+                                  <h6>{organisation + "/" + domain}</h6>
+                                  <h3>{nodeType.label?nodeType.label:schema}</h3>
+                                  <h5>{version}</h5>
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                        :
+                        <div className={classes.noFilterResult}>No node type matches your search. Please refine it.</div>
+                    }
+                  </div>
                 </div>
               </React.Fragment>
               :

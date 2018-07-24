@@ -6,10 +6,6 @@ import { Link } from "react-router-dom";
 import SearchStore from "../Stores/SearchStore";
 import { uniqueId } from "lodash";
 
-const promotedNodeTypes = [
-  "minds/core/dataset/v0.0.4"
-];
-
 const animationId = uniqueId("animationId");
 
 const styles = {
@@ -190,6 +186,9 @@ export default class Search extends React.Component{
   }
   render = () => {
     const {classes} = this.props;
+
+    const promotedNodeTypes = this.searchStore.nodeTypes.filter(type => type.ui_info && type.ui_info.promote).map(type => type.path);
+
     return(
       <div className={classes.container}>
         {!this.searchStore.hasError?

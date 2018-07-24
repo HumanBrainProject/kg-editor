@@ -42,6 +42,9 @@ const styles = {
       opacity:"0.75",
       transition:"all 0.5s ease"
     },
+    "&.activing":{
+      zIndex: "1000"
+    },
     "&.active > div":{
       opacity:"1"
     },
@@ -73,14 +76,18 @@ export default class Pane extends React.Component{
     }
   }
 
+  handleMouseOver = () => {
+    this.props.paneStore.resetSelectionChanged();
+  }
+
   render(){
     const {classes, paneStore} =  this.props;
     const index = paneStore.panes.indexOf(this.paneId);
     const mainClass = index === 0?" main":"";
     const activeClass = paneStore.selectedIndex < index? "after": paneStore.selectedIndex > index? "before": "active";
-
+    const onClass = paneStore.selectionChanged?"activing":"";
     return (
-      <div className={`${classes.pane}${mainClass} ${activeClass}`} onFocus={this.handleFocus} onClick={this.handleFocus}>
+      <div className={`${classes.pane}${mainClass} ${activeClass} ${onClass}`} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
         <div>
           {this.props.children}
         </div>

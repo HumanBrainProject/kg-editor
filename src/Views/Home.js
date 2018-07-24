@@ -103,10 +103,10 @@ export default class Home extends React.Component{
           <h1>Welcome</h1>
           <ul>
             <li>
-              <Link className="btn btn-default" to={"/search"}><h2>Search<br/>(review &amp; edit)<br/>an instance</h2></Link>
+              <Link className="btn btn-default" to={"/search"}><h2>Review<br/>(create &amp; edit)<br/>instances</h2></Link>
             </li>
             <li>
-              <Link className="btn btn-default" to={"/create"}><h2>Create<br/>a new instance</h2></Link>
+              <Link className="btn btn-default" to={"/define"}><h2>Create &amp; Edit<br/>node types</h2></Link>
             </li>
             <li>
               <Link className="btn btn-default" to={"/help"}><h2>Help<br/>&<br/>Tutorials</h2></Link>

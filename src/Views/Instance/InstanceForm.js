@@ -534,15 +534,15 @@ export default class InstanceForm extends React.Component{
     return field.value;
   }
 
-  addCustomValueHandler = (value, field, formStore) => {
-    return JSON.stringify(formStore.structure);
-    /*
+  addCustomValueHandler = (value, field) => {
+    const id = `${field.instancesPath}/${uniqueId("___NEW___")}`;
     field.options.push({
-      [field.mappingValue]: value,
+      [field.mappingValue]: id,
       [field.mappingLabel]: value
     });
-    formStore.addValue(field.path, field.options[field.options.length-1]);
-    */
+    field.addValue(field.options[field.options.length-1]);
+    this.props.instanceStore.instanceHasChanged(this.props.id);
+    this.handleFieldFocus(field, {id: id});
   }
 
   render(){
@@ -555,7 +555,13 @@ export default class InstanceForm extends React.Component{
 
     const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
 
-    const backLink = (organization && domain && schema && version)?`/nodetype/${organization}/${domain}/${schema}/${version}`:"/";
+    const backLink = (instance.isFetched && instance.data && instance.data.instancesPath)?
+      instance.data.instancesPath
+      :
+      (organization && domain && schema && version)?
+        `/nodetype/${organization}/${domain}/${schema}/${version}`
+        :
+        "/";
 
     let panelClassName = classes.panel;
     if (isReadMode) {
@@ -619,8 +625,8 @@ export default class InstanceForm extends React.Component{
                 </Row>
               </div>
               <div className={classes.panelSummary}>
-                {(instance.data && instance.data.ui_info && instance.data.ui_info.summary)?
-                  instance.data.ui_info.summary.map(key => key.replace(/\//g, "%nexus-slash%")).map(renderField)
+                {(instance.data && instance.data.ui_info && instance.data.ui_info.promotedFields)?
+                  instance.data.ui_info.promotedFields.map(key => key.replace(/\//g, "%nexus-slash%")).map(renderField)
                   :
                   null
                 }
@@ -631,7 +637,7 @@ export default class InstanceForm extends React.Component{
                     {Object.keys(instance.data.fields)
                       .filter(name => {
                         const key = name.replace(/%nexus-slash%/g, "/");
-                        return instance.data && instance.data.ui_info && instance.data.ui_info.summary && !instance.data.ui_info.summary.includes(key);
+                        return instance.data && instance.data.ui_info && instance.data.ui_info.promotedFields && !instance.data.ui_info.promotedFields.includes(key);
                       })
                       .map(renderField)
                     }

@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Panel, Row, Col, Button, Glyphicon } from "react-bootstrap";
 import { uniqueId } from "lodash";
-import { Form, Field } from "hbp-spark";
+import { Form, Field } from "hbp-quickfire";
 import { Link } from "react-router-dom";
 import ToggleButton from "./ToggleButton";
 
@@ -215,10 +215,10 @@ const styles = {
     "&:not(.readMode) textarea": {
       minHeight: "200px"
     },
-    "& .spark-field-dropdown-select .spark-readmode-item button": {
+    "& .quickfire-field-dropdown-select .quickfire-readmode-item button": {
       margin: "0 1px 3px 2px"
     },
-    "&:not(.current).readMode.highlight, & .btn.spark-value-tag:hover, & .btn.spark-value-tag:focus, & .spark-field-dropdown-select .spark-readmode-item button:hover, & .spark-field-dropdown-select .spark-readmode-item button:focus": {
+    "&:not(.current).readMode.highlight, & .btn.quickfire-value-tag:hover, & .btn.quickfire-value-tag:focus, & .quickfire-field-dropdown-select .quickfire-readmode-item button:hover, & .quickfire-field-dropdown-select .quickfire-readmode-item button:focus": {
       backgroundColor: "#a5c7e9",
       borderColor: "#337ab7",
       color: "#143048"
@@ -296,16 +296,16 @@ const styles = {
       width: "calc(100% + 20px)",
       height: "calc(100% + 20px)"
     },
-    "&.readMode .spark-empty-field": {
+    "&.readMode .quickfire-empty-field": {
       display: "none"
     },
-    "& .spark-field-input-text.spark-readmode, & .spark-field-dropdown-select.spark-readmode": {
+    "& .quickfire-field-input-text.quickfire-readmode, & .quickfire-field-dropdown-select.quickfire-readmode": {
       marginBottom: "5px"
     },
-    "& .spark-field-input-text.spark-readmode label.spark-label, & .spark-field-dropdown-select.spark-readmode label.spark-label": {
+    "& .quickfire-field-input-text.quickfire-readmode label.quickfire-label, & .quickfire-field-dropdown-select.quickfire-readmode label.quickfire-label": {
       marginBottom: "0"
     },
-    "& .spark-field-disabled.spark-empty-field, .spark-field-readonly.spark-empty-field": {
+    "& .quickfire-field-disabled.quickfire-empty-field, .quickfire-field-readonly.quickfire-empty-field": {
       display: "none"
     }
   },
@@ -521,9 +521,9 @@ export default class InstanceForm extends React.Component{
         }
         return field.value;
       } else if (field.type === "DropdownSelect") {
-        return <span className="spark-readmode-list">
+        return <span className="quickfire-readmode-list">
           {field.value.map(value =>
-            <span key={value.id} className="spark-readmode-item">
+            <span key={value.id} className="quickfire-readmode-item">
               <button className="btn btn-xs btn-default"  onClick={(event) => {event.preventDefault(); this.handleFieldFocus(field, value);}} onFocus={(event) => {event.preventDefault(); this.handleToggleOnFieldHighlight(field, value);}} onMouseEnter={(event) => {event.preventDefault(); this.handleToggleOnFieldHighlight(field, value);}} onBlur={(event) => {event.preventDefault(); this.handleToggleOffFieldHighlight(field, value);}} onMouseLeave={(event) => {event.preventDefault(); this.handleToggleOffFieldHighlight(field, value);}}>{value.label}</button>
             </span>)
           }

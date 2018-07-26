@@ -71,7 +71,7 @@ export default class InstanceStore {
       instance.saveError = null;
       instance.hasSaveError = false;
     } else {
-      const [, , , , shortId] = instanceId.split("/");
+      const [organization, domain, schema, version, shortId] = instanceId.split("/");
       this.instances.set(instanceId, {
         data: null,
         form: null,
@@ -84,34 +84,39 @@ export default class InstanceStore {
         hasChanged: false,
         isFetching: true,
         isFetched: false,
-        isNew: !shortId
+        isNew: !shortId || shortId.indexOf("___NEW___") === 0,
+        path: (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:""
       });
       instance = this.instances.get(instanceId);
     }
 
     try {
-      console.debug("fetch instance " + instanceId + ".");
-      const { data } = await API.axios.get(API.endpoints.instanceData(instanceId));
+      let path = instanceId;
+      if (instance.isNew) {
+        path = instance.path;
+        console.debug("fetch an instance template of type " + path + ".");
+      } else {
+        console.debug("fetch instance " + path + ".");
+      }
+      const { data } = await API.axios.get(API.endpoints.instanceData(path));
 
       runInAction(async () => {
         const fieldsWithOptions = new Map();
         try {
           for(let fieldKey in data.fields){
-            const optionsUrl = data.fields[fieldKey].optionsUrl;
-            if(optionsUrl){
-              delete data.fields[fieldKey].optionsUrl;
-              fieldsWithOptions.set(fieldKey, optionsUrl);
-              if(!this.optionsCache.has(optionsUrl)){
-                this.optionsCache.set(optionsUrl, []);
+            const instancesPath = data.fields[fieldKey].instancesPath
+            ;
+            if(instancesPath){
+              fieldsWithOptions.set(fieldKey, instancesPath);
+              if(!this.optionsCache.has(instancesPath)){
+                this.optionsCache.set(instancesPath, []);
                 try {
-                  const { data } = await API.axios.get(window.rootPath+optionsUrl);
-                  this.optionsCache.set(optionsUrl, (data && data.data)?data.data:[]);
+                  const { data } = await API.axios.get(API.endpoints.instances(instancesPath));
+                  this.optionsCache.set(instancesPath, (data && data.data)?data.data:[]);
                 } catch (e) {
                   const label = data.fields[fieldKey].label?data.fields[fieldKey].label.toLowerCase():fieldKey;
-                  const [,, organization, domain, schema, version] = optionsUrl.replace(/\/(.*)\/?$/, "$1").split("/");
-                  const path = (organization && domain && schema && version)?` "${organization}/${domain}/${schema}/${version}"`:"";
                   const message = e.message?e.message:e;
-                  throw `Error while retrieving the list of ${label}${path} (${message})`;
+                  throw `Error while retrieving the list of ${label}${instancesPath} (${message})`;
                 }
               }
             }
@@ -121,6 +126,19 @@ export default class InstanceStore {
           instance.hasFetchError = true;
           instance.isFetched = false;
           instance.isFetching = false;
+        }
+
+        if (instance.isNew && data && data.fields && data.ui_info && data.ui_info.labelField) {
+          const keyFieldName = data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+          if (data.fields[keyFieldName]) {
+            const options = this.optionsCache.get(path);
+            if (options) {
+              const option = options.find(o => o.id === instanceId);
+              if (option) {
+                data.fields[keyFieldName].value = option.label;
+              }
+            }
+          }
         }
 
         instance.data = data;
@@ -134,7 +152,7 @@ export default class InstanceStore {
           }
         });
 
-        instance.hasChanged = false;
+        instance.hasChanged = instance.isNew;
         instance.isFetching = false;
         instance.isFetched = true;
 
@@ -221,7 +239,7 @@ export default class InstanceStore {
     instance.isSaving = true;
     if (instance.isNew) {
       try {
-        const { data } = await API.axios.post(API.endpoints.instanceData(instanceId), instance.form.getValues());
+        const { data } = await API.axios.post(API.endpoints.instanceData(instance.path), instance.form.getValues());
         runInAction(() => {
           instance.hasChanged = false;
           instance.saveError = null;
@@ -229,19 +247,29 @@ export default class InstanceStore {
           instance.isSaving = false;
           instance.isNew = false;
           console.debug("successfully created", data);
-          // TODO:
-          // - read new id,
-          // - add the new id to instance data,
-          // - replace instance in insances map with the new id,
-          // - change mainInstanceId with the new id if instanceId eq mainInstanceId;
           const newId = data.id?data.id:data["@id"]?data["@id"].replace(/^.*\/v0\/data\//, ""):null;
+          this.instances.set(newId, instance);
+          this.instances.delete(instanceId);
+          const idx = this.currentInstancePath.findIndex(e => e === instanceId);
+          if (idx > -1) {
+            this.currentInstancePath[idx] = newId;
+          }
           if (instanceId === this.mainInstanceId) {
-            this.history.replace(newId?`/instance/${newId}`:`/nodetype/${instanceId}`);
+            this.mainInstanceId = newId;
+            this.history.replace(newId?`/instance/${newId}`:`/nodetype/${instance.path}`);
+          } else {
+            const options = this.optionsCache.get(instance.path);
+            if (options) {
+              const option = options.find(o => o.id === instanceId);
+              if (option) {
+                option.id = newId;
+              }
+            }
           }
         });
       } catch (e) {
         const message = e.message?e.message:e;
-        instance.saveError = `Error while creating instance "${instanceId}" (${message})`;
+        instance.saveError = `Error while creating instance of type "${instance.path}" (${message})`;
         instance.hasSaveError = true;
         instance.isSaving = false;
       }

@@ -239,7 +239,8 @@ export default class InstanceStore {
     instance.isSaving = true;
     if (instance.isNew) {
       try {
-        const { data } = await API.axios.post(API.endpoints.instanceData(instance.path), instance.form.getValues());
+        const payload = instance.form.getValues();
+        const { data } = await API.axios.post(API.endpoints.instanceData(instance.path), payload);
         runInAction(() => {
           instance.hasChanged = false;
           instance.saveError = null;
@@ -263,6 +264,12 @@ export default class InstanceStore {
               const option = options.find(o => o.id === instanceId);
               if (option) {
                 option.id = newId;
+                if (instance.data.ui_info && instance.data.ui_info.labelField) {
+                  const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+                  if (payload && payload[keyFieldName]) {
+                    option.label = payload[keyFieldName];
+                  }
+                }
               }
             }
           }
@@ -275,13 +282,26 @@ export default class InstanceStore {
       }
     } else {
       try {
-        const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), instance.form.getValues());
+        const payload = instance.form.getValues();
+        const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), payload);
         runInAction(() => {
           instance.hasChanged = false;
           instance.saveError = null;
           instance.hasSaveError = false;
           instance.isSaving = false;
           console.debug("successfully saved", data);
+          const options = this.optionsCache.get(instance.path);
+          if (options) {
+            const option = options.find(o => o.id === instanceId);
+            if (option) {
+              if (instance.data.ui_info && instance.data.ui_info.labelField) {
+                const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+                if (payload && payload[keyFieldName]) {
+                  option.label = payload[keyFieldName];
+                }
+              }
+            }
+          }
         });
       } catch (e) {
         const message = e.message?e.message:e;

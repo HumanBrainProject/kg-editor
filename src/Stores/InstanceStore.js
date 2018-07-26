@@ -1,7 +1,7 @@
 import {observable, action, runInAction, computed} from "mobx";
 import console from "../Services/Logger";
 import API from "../Services/API";
-import { FormStore } from "hbp-spark";
+import { FormStore } from "hbp-quickfire";
 
 export default class InstanceStore {
   @observable instances = new Map();

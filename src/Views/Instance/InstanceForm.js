@@ -513,7 +513,7 @@ export default class InstanceForm extends React.Component{
   renderReadModeField = (field) => {
     if (field) {
       if (field.type === "TextArea") {
-        if (this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
+        if (this.props.id !== this.props.instanceStore.mainInstanceId && this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
           if (field.value && field.value.length && field.value.length >= 200) {
             return field.value.substr(0,197) + "...";
           }
@@ -631,7 +631,7 @@ export default class InstanceForm extends React.Component{
                   null
                 }
               </div>
-              <Panel className={classes.panelBody} expanded={this.props.id === this.props.instanceStore.currentInstanceId || !isReadMode} onToggle={() => {}}>
+              <Panel className={classes.panelBody} expanded={this.props.id === this.props.instanceStore.mainInstanceId || this.props.id === this.props.instanceStore.currentInstanceId || !isReadMode} onToggle={() => {}}>
                 <Panel.Collapse>
                   <Panel.Body>
                     {Object.keys(instance.data.fields)

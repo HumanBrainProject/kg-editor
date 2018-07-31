@@ -35,64 +35,36 @@ export default class InstanceStore {
   }
 
   @action
-  highlightInstance(fieldLabel, instanceId) {
-    this.highlightedInstance = {
-      fieldLabel: fieldLabel,
-      instanceId: instanceId
-    };
-  }
-
-  @action
-  unhighlightInstance(fieldLabel, instanceId) {
-    if (this.isInstanceHighlighted(fieldLabel, instanceId)) {
-      this.highlightedInstance = null;
+  setInstanceHighlight(instanceId, provenence) {
+    if (this.instances.has(instanceId)) {
+      const instance = this.instances.get(instanceId);
+      instance.highlight = provenence;
     }
   }
 
-  isInstanceHighlighted(fieldLabel, instanceId){
-    if (this.highlightedInstance === null) {
-      return false;
-    }
-    return this.highlightedInstance.fieldLabel === fieldLabel && this.highlightedInstance.instanceId === instanceId;
-  }
-/*
-  checkLinkedInstances(check) {
-    const fields = this.instances.get(this.mainInstanceId).form.getField();
-    Object.entries(fields).forEach(([name, field]) => {
-      if (field && field.options && field.value) {
-        field.value.some(option => {
-          if (option.id) {
-            const instance = this.instances.get(option.id);
-            if (instance && typeof check === "function") {
-              return check(option.id, instance);
-            }
+  checkLinkedInstances(instance, check) {
+    const fields = instance.form.getField();
+    return Object.values(fields).some(field => {
+      return field.isLink && field.value.some(option => {
+        if (option.id) {
+          const linkedInstance = this.instances.get(option.id);
+          if (linkedInstance && typeof check === "function") {
+            return check(option.id, linkedInstance);
           }
-          return false;
-        });
-      }
+        }
+        return false;
+      });
     });
   }
 
-  hasInstanceSomeLinkedInstancesInUnsavedState() {
-    return this.checkLinkedInstances((id, instance) => {
-      if (instance && instance.isFetched && instance.hasChanged) {
-        console.log("instance " + id + " has changed");
-        return true;
-      }
-      return false;
-    });
+  doesInstanceHaveLinkedInstancesInUnsavedState = (instance) => {
+    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
   }
 
-  hasInstanceSomeLinkedInstancesInNewState() {
-    return this.checkLinkedInstances((id, instance) => {
-      if (instance && instance.isNew) {
-        console.log("instance " + id + " is new");
-        return true;
-      }
-      return false;
-    });
+  doesInstanceHaveLinkedInstancesInNewState(instance) {
+    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isNew);
   }
-*/
+
   @action
   async fetchInstanceData(instanceId) {
     let instance = null;
@@ -123,6 +95,7 @@ export default class InstanceStore {
         hasChanged: false,
         isFetching: true,
         isFetched: false,
+        highlight: null,
         isNew: !shortId || shortId.indexOf("___NEW___") === 0,
         path: (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:""
       });
@@ -266,8 +239,8 @@ export default class InstanceStore {
       this.instances.forEach(instance => {
         if(instance.isFetched){
           const fields = instance.form.getField();
-          Object.entries(fields).forEach(([, field]) => {
-            if (field.type === "DropdownSelect") {
+          Object.values(fields).forEach(field => {
+            if (field.isLinked) {
               field.removeValue(optionToDelete);
             }
           });

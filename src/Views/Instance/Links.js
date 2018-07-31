@@ -31,12 +31,12 @@ class Links extends React.Component{
               let fieldObj = instance.form.getField(fieldKey);
               if(fieldObj.isLink && fieldObj.value.length > 0){
                 return (
-                  <div key={fieldObj.label} data-property={fieldObj.label}>
+                  <div key={fieldObj.label} data-provenence={fieldObj.label}>
                     <h4>{fieldObj.label}</h4>
                     {fieldObj.value.map(value => {
                       const id = value[fieldObj.mappingValue];
                       return (
-                        <InstanceForm level={this.props.level} id={id} key={id} property={fieldObj.label} />
+                        <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} />
                       );
                     })}
                   </div>

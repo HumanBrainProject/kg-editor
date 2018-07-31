@@ -487,11 +487,11 @@ export default class InstanceForm extends React.Component{
   }
 
   handleFieldFocus = (field, value) => {
-    if (field && field.type === "DropdownSelect" && value && value.id) {
+    if (field && field.isLink && value && value.id) {
       this.handleToggleOffFieldHighlight(field, value);
       setTimeout(() => {
         this.props.instanceStore.setCurrentInstanceId(value.id, this.props.level + 1);
-        const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+        const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
         if (target) {
           target.scrollIntoViewIfNeeded();
         }
@@ -501,9 +501,9 @@ export default class InstanceForm extends React.Component{
   }
 
   handleToggleOnFieldHighlight = (field, value) => {
-    if (field && field.type === "DropdownSelect" && value && value.id) {
-      this.props.instanceStore.highlightInstance(field.label, value.id);
-      const target = document.querySelector(`[data-property="${field.label}"] [data-id="${value.id}"]`);
+    if (field && field.isLink && value && value.id) {
+      this.props.instanceStore.setInstanceHighlight(value.id, field.label);
+      const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
       if (target) {
         target.scrollIntoViewIfNeeded();
       }
@@ -511,8 +511,8 @@ export default class InstanceForm extends React.Component{
   }
 
   handleToggleOffFieldHighlight = (field, value) => {
-    if (field && field.type === "DropdownSelect" && value && value.id) {
-      this.props.instanceStore.unhighlightInstance(field.label, value.id);
+    if (field && field.isLink && value && value.id) {
+      this.props.instanceStore.setInstanceHighlight(value.id, null);
     }
   }
 
@@ -556,6 +556,7 @@ export default class InstanceForm extends React.Component{
   }
 
   render(){
+    console.log(this.props.id);
     const { classes, level } = this.props;
     const instance = this.props.instanceStore.getInstance(this.props.id);
 
@@ -586,7 +587,7 @@ export default class InstanceForm extends React.Component{
     if (instance.hasChanged){
       panelClassName += " hasChanged";
     }
-    if (this.props.instanceStore.isInstanceHighlighted(this.props.property, this.props.id)) {
+    if (instance.highlight === this.props.provenence) {
       panelClassName += " highlight";
     }
 
@@ -606,6 +607,7 @@ export default class InstanceForm extends React.Component{
       }
       return null;
     };
+
 
     return(
       (!instance.hasFetchError)?

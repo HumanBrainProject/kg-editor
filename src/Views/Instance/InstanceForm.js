@@ -611,10 +611,6 @@ export default class InstanceForm extends React.Component{
       return null;
     };
 
-    if (window.toto && !instance.data) {
-      debugger;
-    }
-
     return(
       (!instance.hasFetchError)?
         (!instance.isFetching)?

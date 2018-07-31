@@ -1,4 +1,5 @@
 import {observable, action, runInAction, computed} from "mobx";
+import { find, remove } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
@@ -21,6 +22,7 @@ export default class InstanceStore {
     return this.getInstance(this.mainInstanceId);
   }
 
+  @action
   getInstance(instanceId){
     if (this.instances.has(instanceId)) {
       return this.instances.get(instanceId);
@@ -53,7 +55,44 @@ export default class InstanceStore {
     }
     return this.highlightedInstance.fieldLabel === fieldLabel && this.highlightedInstance.instanceId === instanceId;
   }
+/*
+  checkLinkedInstances(check) {
+    const fields = this.instances.get(this.mainInstanceId).form.getField();
+    Object.entries(fields).forEach(([name, field]) => {
+      if (field && field.options && field.value) {
+        field.value.some(option => {
+          if (option.id) {
+            const instance = this.instances.get(option.id);
+            if (instance && typeof check === "function") {
+              return check(option.id, instance);
+            }
+          }
+          return false;
+        });
+      }
+    });
+  }
 
+  hasInstanceSomeLinkedInstancesInUnsavedState() {
+    return this.checkLinkedInstances((id, instance) => {
+      if (instance && instance.isFetched && instance.hasChanged) {
+        console.log("instance " + id + " has changed");
+        return true;
+      }
+      return false;
+    });
+  }
+
+  hasInstanceSomeLinkedInstancesInNewState() {
+    return this.checkLinkedInstances((id, instance) => {
+      if (instance && instance.isNew) {
+        console.log("instance " + id + " is new");
+        return true;
+      }
+      return false;
+    });
+  }
+*/
   @action
   async fetchInstanceData(instanceId) {
     let instance = null;
@@ -62,7 +101,7 @@ export default class InstanceStore {
       if (instance.isFetching) {
         return instance;
       }
-      instance.confirmCancel = false;
+      instance.cancelRequest = false;
       instance.isFetching = true;
       instance.isSaving = false;
       instance.isFetched = false;
@@ -75,7 +114,7 @@ export default class InstanceStore {
       this.instances.set(instanceId, {
         data: null,
         form: null,
-        confirmCancel: null,
+        cancelRequest: null,
         fetchError: null,
         hasFetchError: false,
         saveError: null,
@@ -144,9 +183,9 @@ export default class InstanceStore {
         instance.data = data;
         instance.form = new FormStore(data);
 
-        Object.keys(this.instances.get(instanceId).form.getField()).forEach(fieldKey => {
+        const fields = instance.form.getField();
+        Object.entries(fields).forEach(([fieldKey, field]) => {
           if(fieldsWithOptions.has(fieldKey)){
-            let field = this.instances.get(instanceId).form.getField(fieldKey);
             field.options = this.optionsCache.get(fieldsWithOptions.get(fieldKey));
             field.injectValue();
           }
@@ -212,29 +251,52 @@ export default class InstanceStore {
   }
 
   @action
-  cancelInstanceChanges(instanceId){
+  requestCancelInstanceChanges(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.confirmCancel = true;
+    instance.cancelRequest = true;
   }
 
   @action
   confirmCancelInstanceChanges(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.form.injectValues(instance.initialValues);
-    instance.hasChanged = false;
-    instance.confirmCancel = false;
+    if (instance.isNew) {
+      const options = this.optionsCache.get(instance.path);
+      const optionToDelete = find(options, o => o.id === instanceId);
+      remove(options, optionToDelete);
+      this.instances.forEach(instance => {
+        if(instance.isFetched){
+          const fields = instance.form.getField();
+          Object.entries(fields).forEach(([, field]) => {
+            if (field.type === "DropdownSelect") {
+              field.removeValue(optionToDelete);
+            }
+          });
+        }
+      });
+      const level = this.currentInstancePath.findIndex(id => id === instanceId);
+      if (level !== -1) {
+        this.currentInstancePath.splice(level, this.currentInstancePath.length-level);
+      }
+      this.instances.delete(instanceId);
+      instance.hasChanged = false;
+      instance.cancelRequest = false;
+    } else {
+      instance.form.injectValues(instance.initialValues);
+      instance.hasChanged = false;
+      instance.cancelRequest = false;
+    }
   }
 
   @action
   abortCancelInstanceChange(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.confirmCancel = false;
+    instance.cancelRequest = false;
   }
 
   @action
   async saveInstance(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.confirmCancel = false;
+    instance.cancelRequest = false;
     instance.hasSaveError = false;
     instance.isSaving = true;
     if (instance.isNew) {

@@ -433,7 +433,8 @@ export default class InstanceForm extends React.Component{
     }
   }
 
-  handleEdit = () => {
+  handleEdit = (e) => {
+    e.stopPropagation();
     this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
   }
 
@@ -445,33 +446,42 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.memorizeInstanceInitialValues(this.props.id);
   }
 
-  handleCancelEdit = () => {
+  handleCancelEdit = (e) => {
+    e.stopPropagation();
     const instance = this.props.instanceStore.getInstance(this.props.id);
     if (instance.hasChanged) {
-      this.props.instanceStore.cancelInstanceChanges(this.props.id);
+      this.props.instanceStore.requestCancelInstanceChanges(this.props.id);
     } else {
       this.handleConfirmCancelEdit();
     }
   }
 
-  handleConfirmCancelEdit = () => {
-    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+  handleConfirmCancelEdit = (e) => {
+    e.stopPropagation();
     const instance = this.props.instanceStore.getInstance(this.props.id);
-    if (instance.hasChanged) {
+    if (instance.isNew) {
       this.props.instanceStore.confirmCancelInstanceChanges(this.props.id);
+    } else {
+      this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+      if (instance.hasChanged) {
+        this.props.instanceStore.confirmCancelInstanceChanges(this.props.id);
+      }
     }
   }
 
-  handleContinueEditing = () => {
+  handleContinueEditing = (e) => {
+    e.stopPropagation();
     this.props.instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
-  handleSave = () => {
+  handleSave = (e) => {
+    e.stopPropagation();
     this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
     this.props.instanceStore.saveInstance(this.props.id);
   }
 
-  handleCancelSave = () => {
+  handleCancelSave = (e) => {
+    e.stopPropagation();
     this.props.instanceStore.cancelSaveInstance(this.props.id);
     this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
   }
@@ -691,7 +701,7 @@ export default class InstanceForm extends React.Component{
                   </div>
                 </div>
             }
-            {instance.confirmCancel &&
+            {instance.cancelRequest &&
               <div className={classes.confirmCancelContainer} >
                 <div className={classes.confirmCancelPanel}>
                   <h4>There are some unsaved changes. {instance.isNew?"Are you sure you want to cancel the creation of this instance?":"Are you sure you want to cancel the changes of this instance?"}</h4>

@@ -240,7 +240,7 @@ export default class InstanceStore {
         if(instance.isFetched){
           const fields = instance.form.getField();
           Object.values(fields).forEach(field => {
-            if (field.isLinked) {
+            if (field.isLink) {
               field.removeValue(optionToDelete);
             }
           });
@@ -250,9 +250,9 @@ export default class InstanceStore {
       if (level !== -1) {
         this.currentInstancePath.splice(level, this.currentInstancePath.length-level);
       }
-      this.instances.delete(instanceId);
       instance.hasChanged = false;
       instance.cancelRequest = false;
+      this.instances.delete(instanceId);
     } else {
       instance.form.injectValues(instance.initialValues);
       instance.hasChanged = false;

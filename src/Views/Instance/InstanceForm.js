@@ -556,9 +556,9 @@ export default class InstanceForm extends React.Component{
   }
 
   render(){
-    console.log(this.props.id);
-    const { classes, level } = this.props;
-    const instance = this.props.instanceStore.getInstance(this.props.id);
+    const { classes, level, instanceStore } = this.props;
+
+    const instance = instanceStore.getInstance(this.props.id);
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
 
@@ -574,22 +574,25 @@ export default class InstanceForm extends React.Component{
         :
         "/";
 
-    let panelClassName = classes.panel;
-    if (isReadMode) {
-      panelClassName += " readMode";
-    }
-    if (this.props.id === this.props.instanceStore.currentInstanceId) {
-      panelClassName += " current";
-    }
-    if (this.props.level === 0) {
-      panelClassName += " main";
-    }
-    if (instance.hasChanged){
-      panelClassName += " hasChanged";
-    }
-    if (instance.highlight === this.props.provenence) {
-      panelClassName += " highlight";
-    }
+    const panelClassName = () => {
+      let className = classes.panel;
+      if (isReadMode) {
+        className += " readMode";
+      }
+      if (this.props.id === instanceStore.currentInstanceId) {
+        className += " current";
+      }
+      if (this.props.level === 0) {
+        className += " main";
+      }
+      if (instance.hasChanged){
+        className += " hasChanged";
+      }
+      if (instance.highlight === this.props.provenence) {
+        className += " highlight";
+      }
+      return className;
+    };
 
     const renderField = name => {
       const field = instance.data.fields[name];
@@ -608,6 +611,9 @@ export default class InstanceForm extends React.Component{
       return null;
     };
 
+    if (window.toto && !instance.data) {
+      debugger;
+    }
 
     return(
       (!instance.hasFetchError)?
@@ -617,7 +623,7 @@ export default class InstanceForm extends React.Component{
             onClick={this.handleFocus}
             onChange={this.handleChange}
             onLoad={this.handleLoad}
-            className={panelClassName}
+            className={panelClassName()}
             data-id={this.props.id}>
             <Form store={instance.form}>
               <div className={classes.panelHeader}>
@@ -627,7 +633,7 @@ export default class InstanceForm extends React.Component{
                   </Col>
                   <Col xs={2} >
                     <span className="pull-right">
-                      {!instance.isNew && this.props.id === this.props.instanceStore.currentInstanceId && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel?
+                      {!instance.isNew && this.props.id === instanceStore.currentInstanceId && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel?
                         <ToggleButton isOn={!isReadMode} onToggle={this.handleEdit} offToggle={this.handleCancelEdit} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
                         :
                         null
@@ -643,7 +649,7 @@ export default class InstanceForm extends React.Component{
                   null
                 }
               </div>
-              <Panel className={classes.panelBody} expanded={this.props.id === this.props.instanceStore.mainInstanceId || this.props.id === this.props.instanceStore.currentInstanceId || !isReadMode} onToggle={() => {}}>
+              <Panel className={classes.panelBody} expanded={this.props.id === instanceStore.mainInstanceId || this.props.id === instanceStore.currentInstanceId || !isReadMode} onToggle={() => {}}>
                 <Panel.Collapse>
                   <Panel.Body>
                     {Object.keys(instance.data.fields)
@@ -657,7 +663,7 @@ export default class InstanceForm extends React.Component{
                 </Panel.Collapse>
               </Panel>
               <div className={classes.panelFooter}>
-                {isReadMode || this.props.id !== this.props.instanceStore.currentInstanceId || instance.isSaving || instance.hasSaveError || instance.confirmCancel?
+                {isReadMode || this.props.id !== instanceStore.currentInstanceId || instance.isSaving || instance.hasSaveError || instance.confirmCancel?
                   <Row>
                     <Col xs={12}>
                       <div className={classes.id}>Nexus ID: {instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}</div>
@@ -708,7 +714,7 @@ export default class InstanceForm extends React.Component{
                 <div className={classes.confirmCancelPanel}>
                   <h4>There are some unsaved changes. {instance.isNew?"Are you sure you want to cancel the creation of this instance?":"Are you sure you want to cancel the changes of this instance?"}</h4>
                   <div>
-                    {!instance.isNew || this.props.id !== this.props.instanceStore.mainInstanceId?
+                    {!instance.isNew || this.props.id !== instanceStore.mainInstanceId?
                       <Button bsStyle="default" onClick={this.handleConfirmCancelEdit}>Yes</Button>
                       :
                       <Link to={backLink} className="btn btn-default">Yes</Link>
@@ -726,7 +732,7 @@ export default class InstanceForm extends React.Component{
             <small>Nexus ID: {this.props.id}</small>
           </div>
         :
-        (this.props.id === this.props.instanceStore.mainInstanceId)?
+        (this.props.id === instanceStore.mainInstanceId)?
           <div className={classes.fetchErrorPanel}>
             <h4>{instance.fetchError}</h4>
             <div>

@@ -139,7 +139,6 @@ export default class InstanceStore {
           instance.isFetched = false;
           instance.isFetching = false;
         }
-
         if (instance.isNew && data && data.fields && data.ui_info && data.ui_info.labelField) {
           const keyFieldName = data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
           if (data.fields[keyFieldName]) {
@@ -164,7 +163,7 @@ export default class InstanceStore {
           }
         });
 
-        instance.hasChanged = instance.isNew;
+        instance.hasChanged = instance.isNew && instanceId !== this.mainInstanceId;
         instance.isFetching = false;
         instance.isFetched = true;
 

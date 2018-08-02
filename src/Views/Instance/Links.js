@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import Pane from "./Pane";
-import InstanceForm from "./InstanceForm";
+import InstanceForm from "./InstanceForm/index";
 
 const styles = {
   pane: {

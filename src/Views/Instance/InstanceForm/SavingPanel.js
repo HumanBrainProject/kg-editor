@@ -46,7 +46,7 @@ const styles = {
       "@media screen and (max-width:576px)": {
         wordBreak: "break-all",
         wordWrap: "break-word",
-        whiteSpace: "normal",
+        whiteSpace: "normal"
       }
     }
   },

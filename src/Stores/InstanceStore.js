@@ -1,4 +1,5 @@
 import {observable, action, runInAction, computed} from "mobx";
+import { find, remove } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
@@ -21,6 +22,7 @@ export default class InstanceStore {
     return this.getInstance(this.mainInstanceId);
   }
 
+  @action
   getInstance(instanceId){
     if (this.instances.has(instanceId)) {
       return this.instances.get(instanceId);
@@ -33,25 +35,34 @@ export default class InstanceStore {
   }
 
   @action
-  highlightInstance(fieldLabel, instanceId) {
-    this.highlightedInstance = {
-      fieldLabel: fieldLabel,
-      instanceId: instanceId
-    };
-  }
-
-  @action
-  unhighlightInstance(fieldLabel, instanceId) {
-    if (this.isInstanceHighlighted(fieldLabel, instanceId)) {
-      this.highlightedInstance = null;
+  setInstanceHighlight(instanceId, provenence) {
+    if (this.instances.has(instanceId)) {
+      const instance = this.instances.get(instanceId);
+      instance.highlight = provenence;
     }
   }
 
-  isInstanceHighlighted(fieldLabel, instanceId){
-    if (this.highlightedInstance === null) {
-      return false;
-    }
-    return this.highlightedInstance.fieldLabel === fieldLabel && this.highlightedInstance.instanceId === instanceId;
+  checkLinkedInstances(instance, check) {
+    const fields = instance.form.getField();
+    return Object.values(fields).some(field => {
+      return field.isLink && field.value.some(option => {
+        if (option.id) {
+          const linkedInstance = this.instances.get(option.id);
+          if (linkedInstance && typeof check === "function") {
+            return check(option.id, linkedInstance);
+          }
+        }
+        return false;
+      });
+    });
+  }
+
+  doesInstanceHaveLinkedInstancesInUnsavedState = (instance) => {
+    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
+  }
+
+  doesInstanceHaveLinkedInstancesInNewState(instance) {
+    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isNew);
   }
 
   @action
@@ -62,7 +73,7 @@ export default class InstanceStore {
       if (instance.isFetching) {
         return instance;
       }
-      instance.confirmCancel = false;
+      instance.cancelRequest = false;
       instance.isFetching = true;
       instance.isSaving = false;
       instance.isFetched = false;
@@ -75,7 +86,7 @@ export default class InstanceStore {
       this.instances.set(instanceId, {
         data: null,
         form: null,
-        confirmCancel: null,
+        cancelRequest: null,
         fetchError: null,
         hasFetchError: false,
         saveError: null,
@@ -84,6 +95,7 @@ export default class InstanceStore {
         hasChanged: false,
         isFetching: true,
         isFetched: false,
+        highlight: null,
         isNew: !shortId || shortId.indexOf("___NEW___") === 0,
         path: (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:""
       });
@@ -127,7 +139,6 @@ export default class InstanceStore {
           instance.isFetched = false;
           instance.isFetching = false;
         }
-
         if (instance.isNew && data && data.fields && data.ui_info && data.ui_info.labelField) {
           const keyFieldName = data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
           if (data.fields[keyFieldName]) {
@@ -144,15 +155,15 @@ export default class InstanceStore {
         instance.data = data;
         instance.form = new FormStore(data);
 
-        Object.keys(this.instances.get(instanceId).form.getField()).forEach(fieldKey => {
+        const fields = instance.form.getField();
+        Object.entries(fields).forEach(([fieldKey, field]) => {
           if(fieldsWithOptions.has(fieldKey)){
-            let field = this.instances.get(instanceId).form.getField(fieldKey);
             field.options = this.optionsCache.get(fieldsWithOptions.get(fieldKey));
             field.injectValue();
           }
         });
 
-        instance.hasChanged = instance.isNew;
+        instance.hasChanged = instance.isNew && instanceId !== this.mainInstanceId;
         instance.isFetching = false;
         instance.isFetched = true;
 
@@ -212,29 +223,52 @@ export default class InstanceStore {
   }
 
   @action
-  cancelInstanceChanges(instanceId){
+  requestCancelInstanceChanges(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.confirmCancel = true;
+    instance.cancelRequest = true;
   }
 
   @action
   confirmCancelInstanceChanges(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.form.injectValues(instance.initialValues);
-    instance.hasChanged = false;
-    instance.confirmCancel = false;
+    if (instance.isNew) {
+      const options = this.optionsCache.get(instance.path);
+      const optionToDelete = find(options, o => o.id === instanceId);
+      remove(options, optionToDelete);
+      this.instances.forEach(instance => {
+        if(instance.isFetched){
+          const fields = instance.form.getField();
+          Object.values(fields).forEach(field => {
+            if (field.isLink) {
+              field.removeValue(optionToDelete);
+            }
+          });
+        }
+      });
+      const level = this.currentInstancePath.findIndex(id => id === instanceId);
+      if (level !== -1) {
+        this.currentInstancePath.splice(level, this.currentInstancePath.length-level);
+      }
+      instance.hasChanged = false;
+      instance.cancelRequest = false;
+      this.instances.delete(instanceId);
+    } else {
+      instance.form.injectValues(instance.initialValues);
+      instance.hasChanged = false;
+      instance.cancelRequest = false;
+    }
   }
 
   @action
   abortCancelInstanceChange(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.confirmCancel = false;
+    instance.cancelRequest = false;
   }
 
   @action
   async saveInstance(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.confirmCancel = false;
+    instance.cancelRequest = false;
     instance.hasSaveError = false;
     instance.isSaving = true;
     if (instance.isNew) {

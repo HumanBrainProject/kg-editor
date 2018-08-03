@@ -37,14 +37,24 @@ export default class ToggleButton extends React.Component{
   render(){
     const { classes, isOn, onToggle, offToggle, onGlyph, offGlyph, onTitle, offTitle } = this.props;
 
+    const handleOnToggle = (e) => {
+      e.stopPropagation();
+      onToggle(e);
+    };
+
+    const handleOffToggle = (e) => {
+      e.stopPropagation();
+      offToggle(e);
+    };
+
     return(
       <div className={classes.container}>
         <div className={classes.panel + (isOn?" isOn":"")}>
           <div className={classes.button + " " + classes.on}>
-            <Button onClick={onToggle} bsStyle="default" title={onTitle}><Glyphicon glyph={onGlyph} onClick={onToggle} title={onTitle} /></Button>
+            <Button onClick={handleOnToggle} bsStyle="default" title={onTitle}><Glyphicon glyph={onGlyph} onClick={handleOnToggle} title={onTitle} /></Button>
           </div>
           <div className={classes.button + " " + classes.off}>
-            <Button onClick={offToggle} bsStyle="default" title={offTitle}><Glyphicon glyph={offGlyph} onClick={offToggle} title={offTitle} /></Button>
+            <Button onClick={handleOffToggle} bsStyle="default" title={offTitle}><Glyphicon glyph={offGlyph} onClick={handleOffToggle} title={offTitle} /></Button>
           </div>
         </div>
       </div>

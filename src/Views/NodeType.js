@@ -2,6 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Button, Glyphicon } from "react-bootstrap";
+import { uniqueId } from "lodash";
 import { Link } from "react-router-dom";
 import NodeTypeStore from "../Stores/NodeTypeStore";
 
@@ -277,7 +278,7 @@ export default class NodeType extends React.Component {
                 <div className={classes.body}>
                   <ul>
                     <li key="new">
-                      <Link to={ `/instance/${this.props.match.params.id}` } className="create">
+                      <Link to={ `/instance/${this.props.match.params.id}/${uniqueId("___NEW___")}` } className="create">
                         <Glyphicon glyph="plus"/>
                         <div className="createLabel">{`Create a new ${this.nodeTypeStore.nodeTypeLabel} instance`}</div>
                       </Link>

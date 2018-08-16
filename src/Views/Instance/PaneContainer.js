@@ -1,9 +1,15 @@
 import React from "react";
 import injectStyles from "react-jss";
 import PaneStore from "../../Stores/PaneStore";
+import GraphStore from "../../Stores/GraphStore";
 import { observer, Provider, inject } from "mobx-react";
-import API from "../../Services/API";
 import VIS from "vis";
+import cytoscape from "cytoscape";
+import cola from 'cytoscape-cola';
+import dagre from 'cytoscape-dagre';
+
+
+
 
 const styles = {
   container: {
@@ -37,6 +43,46 @@ const styles = {
   }
 };
 
+var layoutOptions = {
+  name: 'dagre',
+
+  // animate: true, // whether to show the layout as it's running
+  // refresh: 1, // number of ticks per frame; higher is faster but more jerky
+  // maxSimulationTime: 4000, // max length in ms to run the layout
+  // ungrabifyWhileSimulating: false, // so you can't drag nodes during layout
+  // fit: true, // on every layout reposition of nodes, fit the viewport
+  // padding: 30, // padding around the simulation
+  // boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+  // nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
+
+  // // layout event callbacks
+  // ready: function(){}, // on layoutready
+  // stop: function(){}, // on layoutstop
+
+  // // positioning options
+  // randomize: false, // use random node positions at beginning of layout
+  // avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+  // handleDisconnected: true, // if true, avoids disconnected components from overlapping
+  // nodeSpacing: function( node ){ return 10; }, // extra spacing around nodes
+  // flow: undefined, // use DAG/tree flow layout if specified, e.g. { axis: 'y', minSeparation: 30 }
+  // alignment: undefined, // relative alignment constraints on nodes, e.g. function( node ){ return { x: 0, y: 1 } }
+  // gapInequalities: undefined, // list of inequality constraints for the gap between the nodes, e.g. [{"axis":"y", "left":node1, "right":node2, "gap":25}]. The constraint in the example says that the center of node1 must be at least 25 pixels above the center of node2. In other words, it is an inequality constraint that requires "node1.y + gap <= node2.y". You can set the extra "equality" attribute as "true" to convert it into an equality constraint.
+
+  // // different methods of specifying edge length
+  // // each can be a constant numerical value or a function like `function( edge ){ return 2; }`
+  // edgeLength: undefined, // sets edge length directly in simulation
+  // edgeSymDiffLength: undefined, // symmetric diff edge length in simulation
+  // edgeJaccardLength: undefined, // jaccard edge length in simulation
+
+  // // iterations of cola algorithm; uses default values on undefined
+  // unconstrIter: undefined, // unconstrained initial layout iterations
+  // userConstIter: undefined, // initial layout iterations with user-specified constraints
+  // allConstIter: undefined, // initial layout iterations with all constraints including non-overlap
+
+  // // infinite layout options
+  // infinite: false // overrides all other options for a forces-all-the-time mode
+};
+
 @injectStyles(styles)
 @inject("instanceStore")
 @observer
@@ -47,52 +93,23 @@ export default class PaneContainer extends React.Component{
       vertices: [],
       edges: []
     }
-    this.fetchGraph(this.props.instanceStore.mainInstanceId);
     this.paneStore = new PaneStore();
+    this.graphStore = new GraphStore();
+    this.fetchGraph(this.props.instanceStore.mainInstanceId);
   }
 
-  async fetchGraph(id) {
-  
-    const getRandomColor = function() {
-      var letters = '0123456789ABCDEF';
-      var color = '#';
-      for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    }
-    
-    const { data } = await API.axios.get(API.endpoints.graph(id));
-    var groups = {};
-    data.vertices.forEach( (v) => {
-      if(!groups[v.label]){
-        groups[v.label] = {
-          color:{background:getRandomColor()}
-        }
-      }
-      v.group = v.label;
-    });
-    let e = data.edges.concat(this.state.edges);
-    var unique = {};
-    var distinct = [];
-    data.vertices.concat(this.state.vertices).forEach(function (x) {
-      if (!unique[x.id]) {
-        distinct.push(x);
-        unique[x.id] = true;
-      }
-    });
-    console.log("V", distinct);
-    this.setState({edges:e, vertices:distinct})
+  async fetchGraph(id){
+    await this.graphStore.fetchGraph(id);
+    const graph = this.graphStore.graph;
+    this.setState({vertices: graph.vertices, edges:graph.edges});
   }
-  
+
+ 
   render(){
-    
-  
     var data = {
       nodes: new VIS.DataSet(this.state.vertices),
       edges: new VIS.DataSet(this.state.edges)
     };
-    
     // provide the data in the vis format
     if(this.state.vertices.length > 1){
       
@@ -105,6 +122,7 @@ export default class PaneContainer extends React.Component{
             middle: {enabled: false, scaleFactor:1, type:'arrow'},
             from:   {enabled: false, scaleFactor:1, type:'arrow'}
           },
+          smooth: true
         },
         interaction: {
           dragNodes: false,
@@ -136,11 +154,37 @@ export default class PaneContainer extends React.Component{
         network.fit();
       }).on("hoverNode", (params) => {
         this.props.instanceStore.setInstanceHighlight(params.node, "Project");
-
-
       }).on("blurNode", (params) => {
         this.props.instanceStore.setInstanceHighlight(params.node, null);
       })
+    //   cytoscape.use( dagre );
+
+    //   var cy = cytoscape({
+    //     container: this.refs.Graph, // container to render in
+    //     elements: this.state.vertices.concat(this.state.edges),
+    //     style: [ // the stylesheet for the graph
+    //       {
+    //         selector: 'node',
+    //         style: {
+    //           'background-color': '#666',
+    //           'label': 'data(label)'
+    //         }
+    //       },
+      
+    //       {
+    //         selector: 'edge',
+    //         style: {
+    //           'curve-style': 'bezier',
+    //           'width': 4,
+    //           'target-arrow-shape': 'triangle',
+    //           'line-color': '#9dbaea',
+    //           'target-arrow-color': '#9dbaea'
+    //         }
+    //       }
+    //     ],
+    //     layout: layoutOptions
+    //   });
+      
     }
     const {classes} =  this.props;
     let selectedIndex = this.paneStore.selectedIndex;

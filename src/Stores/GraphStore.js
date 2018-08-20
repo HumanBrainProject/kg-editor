@@ -1,43 +1,55 @@
-import { observable, flow, computed,action } from "mobx";
+import { observable, computed,action } from "mobx";
 import API from "../Services/API";
+import toMaterialStyle from 'material-color-hash';
+import ColorScheme from 'color-scheme'
 
-const GROUP_THRESHOLD = 5;
+const GROUP_THRESHOLD = 2;
+const COLOR_ARRAY_SIZE = 12;
+const getColorID = function(s){
+    let id = 0;
+    for(let i = 0; i < s.length; i ++ ){
+        id += s.charCodeAt(i);
+    }
+    return id % COLOR_ARRAY_SIZE;
+};
+
+const colors = new ColorScheme()
+    .from_hex('bfffd6')
+    .scheme('tetrade')
+    .distance(0.75)
+    .web_safe(true)
+    .colors();
 
 export default class GraphStore {
   @observable colorMap = {};
   @observable graph = {};
-
+  
   @action async fetchGraph(id){
         try {
             let edgesMap = {};
             const { data } = await API.axios.get(API.endpoints.graph(id));
-            let groups = {};
             let cluster = {};
-            let clusterComp = {}
+            let clusterComp = {};
             data.vertices.forEach( (v) => {
-                if(!groups[v.label]){
-                    groups[v.label] = {
-                    color:{background:this.groupColor(v.label)}
-                    };
+                if(!cluster[v.dataType]){
+                    cluster[v.dataType] = [];
                 }
-                if(!cluster[v.label]){
-                    cluster[v.label] = [];
-                }
-                cluster[v.label].push(v);
-                v.group = v.label;
+                v.color = {background: '#' + colors[getColorID(v.dataType)] }
+                cluster[v.dataType].push(v);
             });
             // Nodes that should be clustered
             let compound = [];
             for(var key in cluster){
                 if(cluster[key].length > GROUP_THRESHOLD){
-                    compound.push({id: key, label:`${key} (${cluster[key].length})`, subnodes:cluster[key], group:key});
-                    clusterComp[key] = {id: key, label:`${key} (${cluster[key].length})`, subnodes:cluster[key], group:key};
+                    let compoundNode = {id: key, label:`${key} (${cluster[key].length})`, subnodes:cluster[key], dataType:key, isCompound: true};
+                    compound.push(compoundNode);
+                    clusterComp[key] = compoundNode;
                 }
             }
             let compoundOutEdges = [];
             //Setting links to target compound nodes
             data.edges.forEach( (e) => {
-                //If multiple edges apply more curve (not to compound)
+                //If multiple edges: apply more curvature (not to compound)
                 let id = ""+e.from + e.to;  
                 if(edgesMap.hasOwnProperty(id)){
                     edgesMap[id] += 1;
@@ -50,12 +62,12 @@ export default class GraphStore {
                     el.subnodes.forEach( (subnode) => {
                         //Moving edge from single node to compound 
                         if(subnode.id == e.to){
-                            e.prev = e.to;
+                            e.prevTo = e.to;
                             e.to = el.id;
                         }
                         //Creating edge from compund to single node
                         if(subnode.id == e.from){
-                            compoundOutEdges.push({from: el.id, to: e.to, id:el.id + Math.random() + e.to });
+                            compoundOutEdges.push({from: el.id, to: e.to, id:el.id + Math.random() + e.to, prevFrom: e.from });
                         }
                     });
                 });
@@ -63,17 +75,22 @@ export default class GraphStore {
             });
 
             data.edges = data.edges.concat(compoundOutEdges);
-            console.log(data.edges);
             //Removing nodes and adding compund
             data.vertices = data.vertices.filter( (v) => {
-                return !cluster[v.label] || (cluster[v.label] && cluster[v.label].length <= GROUP_THRESHOLD);
+                return !cluster[v.dataType] || (cluster[v.dataType] && cluster[v.dataType].length <= GROUP_THRESHOLD);
             }).concat(compound);
+            data.vertices = data.vertices.map( (v) => {
+                v.color = {
+                    background:'#' + colors[getColorID(v.dataType)]
+                };
+                return v;
+            });
             data.edges.forEach( (edge) => {
                 if(clusterComp[edge.to] && clusterComp[edge.to].subnodes.length > GROUP_THRESHOLD){
                     for(var g in clusterComp){
                         clusterComp[g].subnodes.forEach( (v) => {
                             if(v.id == edge.from){
-                                edge.prev = edge.from;
+                                edge.prevFrom = edge.from;
                                 edge.from = g;
                             }
                         });
@@ -82,19 +99,36 @@ export default class GraphStore {
                     for(var gr in clusterComp){
                         clusterComp[gr].subnodes.forEach( (v) => {
                             if(v.id == edge.to){
-                                edge.prev = edge.to;
+                                edge.prevTo = edge.to;
                                 edge.to = gr;
                             }
                         });
                     }
                 }
             });
-            console.log(data.vertices);
-
             this.setGraph(data);
         }catch(e){
             console.log(e);
         }
+  }
+
+  @action explodeNode(id, data, vertex){
+    let verticesToAdd = vertex.subnodes;
+    //Removing the compound nodes
+    data.vertices = data.vertices.filter( (v) => v.id !== id); 
+    //Adding the sub nodes
+    data.vertices = data.vertices.concat(verticesToAdd);
+    //Restoring links
+    data.edges.map( (e) => {
+        if(e.to === id){
+            e.to = e.prevTo;
+        }
+        if(e.from === id ){
+            e.from = e.prevFrom;
+        }
+    });
+    this.setGraph(data);
+    return this.graph;
   }
 
   @action setGraph(g){
@@ -102,19 +136,5 @@ export default class GraphStore {
     this.graph.vertices = g.vertices;
   }
 
-   groupColor(group){
-    const getRandomColor = function() {
-      var letters = '0123456789ABCDEF';
-      var color = '#';
-      for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    }
-    if(!this.colorMap[group]){
-      let color = getRandomColor();
-      this.colorMap[group] = color;
-    }
-    return this.colorMap[group];
-  }
+
 }

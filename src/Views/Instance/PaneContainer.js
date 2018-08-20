@@ -7,9 +7,7 @@ import VIS from "vis";
 import cytoscape from "cytoscape";
 import cola from 'cytoscape-cola';
 import dagre from 'cytoscape-dagre';
-
-
-
+import toMaterialStyle from 'material-color-hash';
 
 const styles = {
   container: {
@@ -110,12 +108,19 @@ export default class PaneContainer extends React.Component{
       nodes: new VIS.DataSet(this.state.vertices),
       edges: new VIS.DataSet(this.state.edges)
     };
-    // provide the data in the vis format
+
     if(this.state.vertices.length > 1){
       
       var options = {
         physics:{enabled:false},
-        layout:{hierarchical:{enabled:true, direction:"LR"}},
+        layout:{
+          hierarchical:{
+            enabled:true, 
+            direction:'LR',
+            sortMethod: 'directed',
+            nodeSpacing: 200
+          }
+        },
         edges:{
           arrows: {
             to:     {enabled: true, scaleFactor:1, type:'arrow'},
@@ -123,6 +128,12 @@ export default class PaneContainer extends React.Component{
             from:   {enabled: false, scaleFactor:1, type:'arrow'}
           },
           smooth: true
+        },
+        nodes:{
+          shape:'circle',
+          widthConstraint:{
+            maximum: 100
+          }
         },
         interaction: {
           dragNodes: false,
@@ -135,20 +146,24 @@ export default class PaneContainer extends React.Component{
       network.on("selectNode", (params) => {
         if(params.nodes.length == 1){
           let id = params.nodes[0];
-          network.focus(id, {
-            scale:1.3, 
-            animation:{
-              duration:300,
-              easingFunction: "easeInOutQuad"
-            }
-          });
-          setTimeout(() => {
+          let node = this.state.vertices.filter( (el) =>{ return el.id == id});
+          if(node && node[0] && node[0].isCompound){
+            let g = this.graphStore.explodeNode(id, {edges:this.state.edges, vertices:this.state.vertices}, node[0]);
+            this.setState(g);
+          }else{
+            network.focus(id, {
+              scale:1.3, 
+              animation:{
+                duration:300,
+                easingFunction: "easeInOutQuad"
+              }
+            });
             if(id !== this.props.instanceStore.mainInstanceId){
               this.props.instanceStore.setCurrentInstanceId(id, this.props.level + 1);
               this.paneStore.selectNextPane();
             }
-          });
-          this.fetchGraph(id);
+            this.fetchGraph(id);
+          }
         }
       }).on("doubleClick", () => {
         network.fit();

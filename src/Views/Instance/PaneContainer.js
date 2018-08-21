@@ -4,10 +4,6 @@ import PaneStore from "../../Stores/PaneStore";
 import GraphStore from "../../Stores/GraphStore";
 import { observer, Provider, inject } from "mobx-react";
 import VIS from "vis";
-import cytoscape from "cytoscape";
-import cola from 'cytoscape-cola';
-import dagre from 'cytoscape-dagre';
-import toMaterialStyle from 'material-color-hash';
 
 const styles = {
   container: {
@@ -37,49 +33,45 @@ const styles = {
     height: "90%",
     position: "absolute",
     "background-color": "white",
-    "z-index": "10"
+    "z-index": "10",
+    '& .vis-tooltip': {
+      "z-index":"11",
+      backgroundColor: "#1496bb",
+      color: "#fff",
+      display: "block",
+      "margin-bottom": "15px",
+      padding: "20px",
+      "pointer-events": "none",
+      position: "absolute",
+      transform:"opacity  0s linear 1s",
+      "box-shadow": "2px 2px 6px rgba(0, 0, 0, 0.28)",
+      '&:before':{
+        bottom: "-20px",
+        content: " ",
+        display: "block",
+        height: "20px",
+        opacity: 0,
+        left: 0,
+        position: "absolute",
+        width: "100%"
+      },
+      '&:after': {
+        "border-left": "solid transparent 10px",
+        "border-right": "solid transparent 10px",
+        "border-top": "solid #1496bb 10px",
+        "bottom": "-10px",
+        content: " ",
+        height: 0,
+        left: "50%",
+        marginLeft: "-13px",
+        position: "absolute",
+        width: 0
+      }
+
+    }
   }
 };
 
-var layoutOptions = {
-  name: 'dagre',
-
-  // animate: true, // whether to show the layout as it's running
-  // refresh: 1, // number of ticks per frame; higher is faster but more jerky
-  // maxSimulationTime: 4000, // max length in ms to run the layout
-  // ungrabifyWhileSimulating: false, // so you can't drag nodes during layout
-  // fit: true, // on every layout reposition of nodes, fit the viewport
-  // padding: 30, // padding around the simulation
-  // boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
-  // nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
-
-  // // layout event callbacks
-  // ready: function(){}, // on layoutready
-  // stop: function(){}, // on layoutstop
-
-  // // positioning options
-  // randomize: false, // use random node positions at beginning of layout
-  // avoidOverlap: true, // if true, prevents overlap of node bounding boxes
-  // handleDisconnected: true, // if true, avoids disconnected components from overlapping
-  // nodeSpacing: function( node ){ return 10; }, // extra spacing around nodes
-  // flow: undefined, // use DAG/tree flow layout if specified, e.g. { axis: 'y', minSeparation: 30 }
-  // alignment: undefined, // relative alignment constraints on nodes, e.g. function( node ){ return { x: 0, y: 1 } }
-  // gapInequalities: undefined, // list of inequality constraints for the gap between the nodes, e.g. [{"axis":"y", "left":node1, "right":node2, "gap":25}]. The constraint in the example says that the center of node1 must be at least 25 pixels above the center of node2. In other words, it is an inequality constraint that requires "node1.y + gap <= node2.y". You can set the extra "equality" attribute as "true" to convert it into an equality constraint.
-
-  // // different methods of specifying edge length
-  // // each can be a constant numerical value or a function like `function( edge ){ return 2; }`
-  // edgeLength: undefined, // sets edge length directly in simulation
-  // edgeSymDiffLength: undefined, // symmetric diff edge length in simulation
-  // edgeJaccardLength: undefined, // jaccard edge length in simulation
-
-  // // iterations of cola algorithm; uses default values on undefined
-  // unconstrIter: undefined, // unconstrained initial layout iterations
-  // userConstIter: undefined, // initial layout iterations with user-specified constraints
-  // allConstIter: undefined, // initial layout iterations with all constraints including non-overlap
-
-  // // infinite layout options
-  // infinite: false // overrides all other options for a forces-all-the-time mode
-};
 
 @injectStyles(styles)
 @inject("instanceStore")
@@ -159,8 +151,7 @@ export default class PaneContainer extends React.Component{
               }
             });
             if(id !== this.props.instanceStore.mainInstanceId){
-              this.props.instanceStore.setCurrentInstanceId(id, this.props.level + 1);
-              this.paneStore.selectNextPane();
+              this.props.instanceStore.setCurrentInstanceId(id, 0);
             }
             this.fetchGraph(id);
           }
@@ -171,42 +162,22 @@ export default class PaneContainer extends React.Component{
         this.props.instanceStore.setInstanceHighlight(params.node, "Project");
       }).on("blurNode", (params) => {
         this.props.instanceStore.setInstanceHighlight(params.node, null);
-      })
-    //   cytoscape.use( dagre );
-
-    //   var cy = cytoscape({
-    //     container: this.refs.Graph, // container to render in
-    //     elements: this.state.vertices.concat(this.state.edges),
-    //     style: [ // the stylesheet for the graph
-    //       {
-    //         selector: 'node',
-    //         style: {
-    //           'background-color': '#666',
-    //           'label': 'data(label)'
-    //         }
-    //       },
-      
-    //       {
-    //         selector: 'edge',
-    //         style: {
-    //           'curve-style': 'bezier',
-    //           'width': 4,
-    //           'target-arrow-shape': 'triangle',
-    //           'line-color': '#9dbaea',
-    //           'target-arrow-color': '#9dbaea'
-    //         }
-    //       }
-    //     ],
-    //     layout: layoutOptions
-    //   });
-      
+      }).on("oncontext", (params) => {
+        // params.event.preventDefault();
+        console.log("Params", params);
+        let node = network.getNodeAt(params.pointer.DOM);
+        console.log("Node", node);
+      });
+     
     }
     const {classes} =  this.props;
     let selectedIndex = this.paneStore.selectedIndex;
     const step = document.documentElement.clientWidth >= 992?50:80;
     return (
       <div>
-        <div className={classes.graph} > <div style={{width:"100%", height:"100%"}} ref="Graph"></div> </div>
+        <div className={classes.graph} > 
+          <div style={{width:"100%", height:"100%"}} ref="Graph"></div> 
+        </div>
         <Provider paneStore={this.paneStore}>
           <div className={classes.container} style={{transform:`translateX(${selectedIndex*-step}vw)`}}>
             {this.props.children}

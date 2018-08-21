@@ -41,7 +41,7 @@ export default class GraphStore {
             let compound = [];
             for(var key in cluster){
                 if(cluster[key].length > GROUP_THRESHOLD){
-                    let compoundNode = {id: key, label:`${key} (${cluster[key].length})`, subnodes:cluster[key], dataType:key, isCompound: true};
+                    let compoundNode = {id: key, label:`${cluster[key][0].label} (${cluster[key].length})`, subnodes:cluster[key], dataType:key, isCompound: true};
                     compound.push(compoundNode);
                     clusterComp[key] = compoundNode;
                 }

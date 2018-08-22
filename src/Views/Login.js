@@ -45,7 +45,7 @@ const styles = {
       paddingLeft: "10px",
       verticalAlign: "middle",
       fontSize: "18px",
-      "@media screen and (min-width:576px)":{
+      "@media screen and (min-width:576px)": {
         fontSize: "28px"
       }
     }
@@ -78,26 +78,26 @@ const styles = {
       margin: "20px 0"
     }
   },
-  oidFrame:{
-    position:"absolute",
-    top:0,
-    left:0,
-    width:"100vw",
-    height:"100vh",
-    background:"white"
+  oidFrame: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    background: "white"
   }
 };
 
 @injectStyles(styles)
-export default class Login extends React.Component{
-  constructor(props){
+export default class Login extends React.Component {
+  constructor(props) {
     super(props);
 
-    this.state = {showFrame:false};
+    this.state = { showFrame: false };
   }
 
-  render(){
-    const {classes} =  this.props;
+  render() {
+    const { classes } = this.props;
     return (
       <div className={classes.container}>
         <div className={classes.backgroundPanel}><div className={classes.background}></div></div>
@@ -113,13 +113,13 @@ export default class Login extends React.Component{
           </div>
         </div>
         {this.state.showFrame &&
-          <iframe className={classes.oidFrame} frameBorder="0" src={authStore.loginUrl}/>
+          <iframe className={classes.oidFrame} frameBorder="0" src={authStore.loginUrl} />
         }
       </div>
     );
   }
 
-  showFrame(){
-    this.setState({showFrame:true});
+  showFrame() {
+    this.setState({ showFrame: true });
   }
 }

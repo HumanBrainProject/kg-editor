@@ -103,16 +103,20 @@ export default class Menu extends React.Component{
     case 4.4:
       window.open(`https://kg${env}.humanbrainproject.org/webapp/`);
       break;
+    case 5:
+      this.props.navigationStore.setShowGraph(!this.props.navigationStore.showGraph);
     }
   }
 
   render(){
     const {classes, navigationStore} =  this.props;
+    const viewIcon = navigationStore.showGraph? "align-justify": "grain";
 
     return (
       <div className={classes.container}>
         <Navbar fluid={true} onSelect={this.selectHandler}	>
           <Nav>
+            <NavItem eventKey={5}><Glyphicon glyph={ viewIcon} /></NavItem>
             {navigationStore.showHomeLink?
               <LinkContainer to={"/"} exact={true}>
                 <NavItem eventKey={1}><Glyphicon glyph="home" /></NavItem>

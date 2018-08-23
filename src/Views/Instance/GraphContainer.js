@@ -8,7 +8,6 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import VIS from "vis";
 
-
 const styles = {
   graphContainer: {
     padding: "80px 20px 20px 20px",
@@ -156,7 +155,7 @@ class GraphContainer extends React.Component {
     this.handleHoverNode = this.handleHoverNode.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.fetchGraph(this.props.instanceStore.mainInstanceId, this.state.step);
   }
 
@@ -186,13 +185,14 @@ class GraphContainer extends React.Component {
             easingFunction: "easeInOutQuad"
           }
         });
-        // if(id !== this.props.instanceStore.mainInstanceId){
-        //   this.props.instanceStore.setCurrentInstanceId(id, 0);
-        // }
-        // this.fetchGraph(id);
-        this.props.history.push(`/instance/${id}`);
-        window.location.reload();
-
+        if (id !== this.props.instanceStore.mainInstanceId) {
+          this.props.history.push(`/instance/${id}`);
+          this.props.instanceStore.history = this.props.history;
+          this.props.instanceStore.mainInstanceId = id;
+          this.props.instanceStore.fetchInstanceData(this.props.instanceStore.mainInstanceId);
+          this.props.instanceStore.setCurrentInstanceId(this.props.instanceStore.mainInstanceId, 0);
+          this.fetchGraph(id, this.state.step);
+        }
       }
     }
   }
@@ -206,7 +206,7 @@ class GraphContainer extends React.Component {
   }
 
   handleDoubleClick() {
-    if (this.network){
+    if (this.network) {
       this.network.fit();
     }
   }
@@ -222,7 +222,7 @@ class GraphContainer extends React.Component {
   handleMenuClick(event) {
     let action = event.currentTarget.dataset.action;
     switch (action) {
-      case 'regroup':
+      case "regroup":
         break;
     }
     this.setState({

@@ -40,7 +40,9 @@ module.exports = {
         changeOrigin: true
       }
     },
-    historyApiFallback: true
+    historyApiFallback: {
+      disableDotRule: true
+    }
   },
   externals:{
     "LOG_LEVEL": '"debug"'

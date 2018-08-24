@@ -5,10 +5,8 @@ import { Button, Glyphicon } from "react-bootstrap";
 import { uniqueId } from "lodash";
 import { Link } from "react-router-dom";
 import NodeTypeStore from "../Stores/NodeTypeStore";
-
-const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
-
-const animationId = generateRandomName();
+import ReleaseStatus from "./Instance/ReleaseStatus";
+import FetchingLoader from "../Components/FetchingLoader";
 
 const styles = {
   container: {
@@ -72,7 +70,8 @@ const styles = {
     },
     "& li": {
       display: "inline-block",
-      margin: "0"
+      margin: "0",
+      position:"relative"
     },
     "& li > a": {
       display: "inline-block",
@@ -184,30 +183,6 @@ const styles = {
   noFilterResult: {
     padding: "20px"
   },
-  fetchingPanel: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    fontSize: "18px",
-    fontWeight: "lighter",
-    minWidth: "220px"
-  },
-  fetchingGlyphicon: {
-    composes: "glyphicon glyphicon-refresh",
-    animation: `${animationId} .7s infinite linear`
-  },
-  [`@keyframes ${animationId}`]: {
-    "from": {
-      transform: "scale(1) rotate(0deg)"
-    },
-    "to": {
-      transform: "scale(1) rotate(360deg)"
-    }
-  },
-  fetchingLabel: {
-    paddingLeft: "6px"
-  },
   fetchErrorPanel: {
     position: "absolute",
     top: "50%",
@@ -226,11 +201,41 @@ const styles = {
     "& button + button, & a + button, & a + a": {
       marginLeft: "20px"
     }
+  },
+
+  status:{
+    position:"absolute",
+    top:"10px",
+    right:"10px",
+    zIndex:1,
+    cursor:"pointer",
+    width:"24px",
+    height:"34px",
+    "& .release-status":{
+      position: "absolute"
+    },
+    "& .release-action":{
+      position: "absolute",
+      width:"100%",
+      height:"100%",
+      background:"#3498db",
+      color:"white",
+      borderRadius:"3px",
+      opacity:0,
+      textAlign:"center"
+    },
+    "&:hover .release-action":{
+      opacity:1,
+      transition:"opacity 0.25s ease",
+      lineHeight:"34px"
+    }
   }
+
+
 };
 
 @injectStyles(styles)
-@inject("navigationStore")
+@inject("navigationStore","routerHistory")
 @observer
 export default class NodeType extends React.Component {
   constructor(props){
@@ -246,6 +251,9 @@ export default class NodeType extends React.Component {
   }
   handleClose = () => {
     this.nodeTypeStore.clearNodeType();
+  }
+  handleStatusClick(instance){
+    this.props.routerHistory.push("/release/"+instance.id);
   }
   componentDidUpdate = () => {
     this.nameInput && this.nameInput.focus();
@@ -284,22 +292,33 @@ export default class NodeType extends React.Component {
                       </Link>
                     </li>
                     {this.nodeTypeStore.filteredInstances.length?
-                      this.nodeTypeStore.filteredInstances.map(instance => (
-                        <li key={instance.id}>
-                          <Link to={ `/instance/${instance.id}` }>
-                            <h6>{this.nodeTypeStore.nodeTypeLabel}</h6>
-                            <h4>{instance.label}</h4>
-                            {instance.description?
-                              <React.Fragment>
-                                <label>Description:</label>
-                                <span title={instance.description}>{instance.description.length > 400?instance.description.substring(0,397) + "...":instance.description}</span>
-                              </React.Fragment>
-                              :null
-                            }
-                            <small>Nexus ID: {instance.id}</small>
-                          </Link>
-                        </li>
-                      ))
+                      this.nodeTypeStore.filteredInstances.map(instance => {
+
+                        return (
+                          <li key={instance.id}>
+                            <div className={`${classes.status}`} onClick={this.handleStatusClick.bind(this, instance)}>
+                              <div className={"release-status"}>
+                                <ReleaseStatus instanceStatus={instance.status} childrenStatus={instance.childrenStatus}/>
+                              </div>
+                              <div className={"release-action"}>
+                                <Glyphicon glyph="cog"/>
+                              </div>
+                            </div>
+                            <Link to={ `/instance/${instance.id}` }>
+                              <h6>{this.nodeTypeStore.nodeTypeLabel}</h6>
+                              <h4>{instance.label}</h4>
+                              {instance.description?
+                                <React.Fragment>
+                                  <label>Description:</label>
+                                  <span title={instance.description}>{instance.description.length > 400?instance.description.substring(0,397) + "...":instance.description}</span>
+                                </React.Fragment>
+                                :null
+                              }
+                              <small>Nexus ID: {instance.id}</small>
+                            </Link>
+                          </li>
+                        );
+                      })
                       :
                       <li key="notFound">
                         <div className={classes.noFilterResult}>No instances matches your search. Please refine it.</div>
@@ -317,10 +336,9 @@ export default class NodeType extends React.Component {
                 </div>
               </div>
             :
-            <div className={classes.fetchingPanel}>
-              <span className={classes.fetchingGlyphicon}></span>
-              <span className={classes.fetchingLabel}>Fetching instances...</span>
-            </div>
+            <FetchingLoader>
+              <span>Fetching instances...</span>
+            </FetchingLoader>
           :
           <div className={classes.fetchErrorPanel}>
             <h4>{this.nodeTypeStore.error}</h4>

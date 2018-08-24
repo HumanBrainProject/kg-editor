@@ -1,8 +1,10 @@
 import React from "react";
 import { render } from "react-dom";
 import { observer, Provider } from "mobx-react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { Router, Route, Switch } from "react-router-dom";
 import injectStyles from "react-jss";
+
+import createBrowserHistory from "history/createBrowserHistory";
 
 import authStore from "./Stores/AuthStore";
 import NavigationStore from "./Stores/NavigationStore";
@@ -12,9 +14,11 @@ import NotFound from "./Views/NotFound";
 import Search from "./Views/Search";
 import NodeType from "./Views/NodeType";
 import Instance from "./Views/Instance";
+import Release from "./Views/Release";
 import Menu from "./Views/Menu";
 import "babel-polyfill";
 
+const routerHistory = createBrowserHistory({basename:window.rootPath});
 
 const styles = {
   "@global html, @global body, @global #root": {
@@ -87,8 +91,8 @@ class App extends React.Component{
   render(){
     let {classes} = this.props;
     return(
-      <Provider navigationStore={this.navigationStore}>
-        <BrowserRouter basename={window.rootPath}>
+      <Provider navigationStore={this.navigationStore} routerHistory={routerHistory}>
+        <Router history={routerHistory}>
           <div className={classes.container}>
             {!authStore.isAuthenticated?
               <Route component={Login} />
@@ -103,6 +107,7 @@ class App extends React.Component{
                 </div>
                 <Switch>
                   <Route path="/instance/:id*" component={Instance} />
+                  <Route path="/release/:id*" component={Release} />
                   <Route path="/nodetype/:id*" component={NodeType} />
                   <Route path="/search" exact={true} component={Search} />
                   <Route path="/" exact={true} component={Home} />
@@ -111,7 +116,7 @@ class App extends React.Component{
               </div>
             }
           </div>
-        </BrowserRouter>
+        </Router>
       </Provider>
     );
   }

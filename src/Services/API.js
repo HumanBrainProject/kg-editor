@@ -4,7 +4,8 @@ import authStore from "../Stores/AuthStore";
 const endpoints = {
   "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
-  "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`
+  "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
+  "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`
 };
 
 class API{

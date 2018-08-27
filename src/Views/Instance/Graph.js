@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import GraphContextMenu from "./GraphContextMenu";
+import GraphNavigation from "./GraphNavigation";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
@@ -130,11 +131,17 @@ export default class Graph extends React.Component {
     this.props.graphStore.handleOnContext(params);
   }
 
-
+  handlePrevious(){
+    this.props.graphStore.handlePrevious();
+  }
 
   changeValue(e) {
     this.props.graphStore.setStep(e);
     this.props.graphStore.updateGraph(this.props.instanceStore.mainInstanceId);
+  }
+
+  handleNavigationClick(index){
+    this.props.graphStore.handleNavigationClick(index);
   }
 
 
@@ -146,6 +153,7 @@ export default class Graph extends React.Component {
         <div style={{ width: "100%", height: "100%" }} ref={this.graphRef}></div>
         <Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />
         <GraphContextMenu style={this.props.graphStore.menuDisplay} handleMenuClick={this.handleMenuClick} />
+        <GraphNavigation handleNavigationClick={this.handleNavigationClick.bind(this)} breadCrumbs={this.props.graphStore.breadCrumbs} />
       </div>
     );
   }

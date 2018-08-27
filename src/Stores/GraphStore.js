@@ -35,6 +35,7 @@ export default class GraphStore {
   };
 
 
+
   constructor(instanceStore){
     this.instanceStore = instanceStore;
     this._graph;
@@ -81,16 +82,18 @@ export default class GraphStore {
       nodes: new VIS.DataSet(g.vertices),
       edges: new VIS.DataSet(g.edges)
     };
+    let node = g.vertices.filter(( v) => v.id === id)[0];
     this.network = new VIS.Network(ref, data, this.options);
     this.network.selectNodes([id]);
+    this.setSelectedNode(node);
   }
 
   @action async fetchGraph(id) {
     try {
       let edgesMap = {};
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
-      let currentNode = data.vertices.filter(( v) => v.id === id)[0];
-      this.handleBreadCrumb(currentNode);
+      // let currentNode = data.vertices.filter(( v) => v.id === id)[0];
+      // this.handleBreadCrumb(currentNode);
       let cluster = {};
       let clusterComp = {};
       data.vertices.forEach((v) => {
@@ -98,7 +101,11 @@ export default class GraphStore {
           cluster[v.dataType] = [];
         }
         v.color = { background: "#" + colors[getColorID(v.dataType)] };
-        cluster[v.dataType].push(v);
+        if(this.previousNode && v.id === this.previousNode.id){
+          v.isPrevious = true;
+        }else{
+          cluster[v.dataType].push(v);
+        }
       });
       // Nodes that should be clustered
       let compound = [];
@@ -119,6 +126,10 @@ export default class GraphStore {
           edgesMap[id] += 1;
         } else {
           edgesMap[id] = 1;
+        }
+        if(this.previousNode && (e.to === this.previousNode.id || e.from == this.previousNode.id)){
+          console.log("Prev", this.previousNode);
+          e.dashes = true;
         }
         let curve = edgesMap[id] / 10;
         e.smooth = { type: "curvedCCW", roundness: curve };
@@ -226,7 +237,7 @@ export default class GraphStore {
           this.instanceStore.setCurrentInstanceId(this.instanceStore.mainInstanceId, 0);
           this.fetchGraph(id).then( (data) => {
             this.setGraphData(data);
-            this.setSelectedNode(node);
+            this.setSelectedNode(node[0]);
           });
         }
       }
@@ -255,7 +266,6 @@ export default class GraphStore {
   }
 
   @action setGraphData(g) {
-    console.log("Set graph", g);
     this._graph = g;
     var data = {
       nodes: new VIS.DataSet(this._graph.vertices),
@@ -269,11 +279,29 @@ export default class GraphStore {
   }
 
   @action setSelectedNode(node){
+    let arr = this.breadCrumbs.peek();
+    arr.push(node);
+    this.setBreadCrumbs(arr);
     this.selectedNode = node;
   }
 
-  @action handleBreadCrumb(node){
-    this.breadCrumbs.push(node);
+  get breadCrumbs(){
+    return this.breadCrumbs.peek();
   }
 
+  @action setBreadCrumbs(b){
+    this.breadCrumbs = b;
+  }
+
+  @action handleNavigationClick(index){
+    if(this.breadCrumbs && this.breadCrumbs.length > 0){
+      let temp = [];
+      for(let i = 0; i < index + 1; i++){
+        temp.push(this.breadCrumbs[i]);
+      }
+      let node = temp[temp.length -1];
+      this.setBreadCrumbs(temp);
+      this.updateGraph(node.id);
+    }
+  }
 }

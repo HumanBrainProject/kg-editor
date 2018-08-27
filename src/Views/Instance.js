@@ -21,6 +21,9 @@ export default class Edit extends React.Component {
     this.props.navigationStore.setInstanceStore(null);
   }
 
+  UNSAFE_componentWillReceiveProps(newProps){
+    this.store.setMainInstance(newProps.match.params.id);
+  }
 
   render() {
     let showGraph = this.props.navigationStore.showGraph;

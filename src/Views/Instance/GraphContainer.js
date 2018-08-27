@@ -26,7 +26,6 @@ export default class GraphContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    this.graphRef = React.createRef();
     this.graphStore = new GraphStore(this.props.instanceStore);
     this.paneStore = new PaneStore();
     this.events = {};

@@ -5,6 +5,7 @@ import GraphNavigation from "./GraphNavigation";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
+import { ForceGraph2D } from "react-force-graph";
 
 const styles = {
   graph: {
@@ -72,7 +73,8 @@ const styles = {
 export default class Graph extends React.Component {
   constructor(props) {
     super(props);
-    this.graphRef = React.createRef();
+    // this.graphRef = React.createRef();
+    this.divRef= React.createRef();
     this.handleSelectNode = this.handleSelectNode.bind(this);
     this.handleOnContext = this.handleOnContext.bind(this);
     this.handleDoubleClick = this.handleDoubleClick.bind(this);
@@ -82,12 +84,13 @@ export default class Graph extends React.Component {
   }
 
   componentDidMount() {
-    this.props.graphStore.initGraph(this.props.instanceStore.mainInstanceId, this.graphRef.current).then(() => {
-      this.props.graphStore.network.on("selectNode", this.handleSelectNode);
-      this.props.graphStore.network.on("doubleClick", this.handleDoubleClick);
-      this.props.graphStore.network.on("hoverNode", this.handleHoverNode);
-      this.props.graphStore.network.on("blurNode", this.handleBlurNode);
-      this.props.graphStore.network.on("oncontext", this.handleOnContext);
+
+    this.props.graphStore.initGraph(this.props.instanceStore.mainInstanceId).then(() => {
+      // this.props.graphStore.network.on("selectNode", this.handleSelectNode);
+      // this.props.graphStore.network.on("doubleClick", this.handleDoubleClick);
+      // this.props.graphStore.network.on("hoverNode", this.handleHoverNode);
+      // this.props.graphStore.network.on("blurNode", this.handleBlurNode);
+      // this.props.graphStore.network.on("oncontext", this.handleOnContext);
     });
   }
   componentDidUpdate(prevProps) {
@@ -149,8 +152,12 @@ export default class Graph extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-      <div className={classes.graph}>
-        <div style={{ width: "100%", height: "100%" }} ref={this.graphRef}></div>
+      <div className={classes.graph} ref={this.divRef}>
+        {/* <div style={{ width: "100%", height: "100%" }} ref={this.graphRef}></div> */}
+        <ForceGraph2D
+          graphData={this.props.graphStore._graph}
+          nodeAutoColorBy={d => d.dataType}
+        />
         <Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />
         <GraphContextMenu style={this.props.graphStore.menuDisplay} handleMenuClick={this.handleMenuClick} />
         <GraphNavigation handleNavigationClick={this.handleNavigationClick.bind(this)} breadCrumbs={this.props.graphStore.breadCrumbs} />

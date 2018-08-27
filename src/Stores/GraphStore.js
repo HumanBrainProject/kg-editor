@@ -1,25 +1,24 @@
 import { observable, action } from "mobx";
 import API from "../Services/API";
-import ColorScheme from "color-scheme";
+// import ColorScheme from "color-scheme";
 import console from "../Services/Logger";
-import VIS from "vis";
 
-const GROUP_THRESHOLD = 2;
-const COLOR_ARRAY_SIZE = 12;
-const getColorID = function (s) {
-  let id = 0;
-  for (let i = 0; i < s.length; i++) {
-    id += s.charCodeAt(i);
-  }
-  return id % COLOR_ARRAY_SIZE;
-};
+// const GROUP_THRESHOLD = 2;
+// const COLOR_ARRAY_SIZE = 12;
+// const getColorID = function (s) {
+//   let id = 0;
+//   for (let i = 0; i < s.length; i++) {
+//     id += s.charCodeAt(i);
+//   }
+//   return id % COLOR_ARRAY_SIZE;
+// };
 
-const colors = new ColorScheme()
-  .from_hex("bfffd6")
-  .scheme("tetrade")
-  .distance(0.75)
-  .web_safe(true)
-  .colors();
+// const colors = new ColorScheme()
+//   .from_hex("bfffd6")
+//   .scheme("tetrade")
+//   .distance(0.75)
+//   .web_safe(true)
+//   .colors();
 
 export default class GraphStore {
   @observable colorMap = {};
@@ -33,12 +32,19 @@ export default class GraphStore {
     left: "-1000px",
     top: "-1000px"
   };
+  @observable graph = {
+    nodes:[],
+    links:[]
+  };
 
 
 
   constructor(instanceStore){
     this.instanceStore = instanceStore;
-    this._graph;
+    this._graph = {
+      nodes: [],
+      links: []
+    };
   }
 
 
@@ -75,114 +81,110 @@ export default class GraphStore {
     }
   };
 
-  @action async initGraph(id, ref){
+  @action async initGraph(id){
     const g = await this.fetchGraph(id);
-    this._graph = g;
-    var data = {
-      nodes: new VIS.DataSet(g.vertices),
-      edges: new VIS.DataSet(g.edges)
-    };
-    let node = g.vertices.filter(( v) => v.id === id)[0];
-    this.network = new VIS.Network(ref, data, this.options);
-    this.network.selectNodes([id]);
+    let node = g.nodes.filter(( v) => v.id === id)[0];
+    this.setGraph(g);
     this.setSelectedNode(node);
   }
 
   @action async fetchGraph(id) {
     try {
-      let edgesMap = {};
+      // let edgesMap = {};
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
-      // let currentNode = data.vertices.filter(( v) => v.id === id)[0];
-      // this.handleBreadCrumb(currentNode);
-      let cluster = {};
-      let clusterComp = {};
-      data.vertices.forEach((v) => {
-        if (!cluster[v.dataType]) {
-          cluster[v.dataType] = [];
-        }
-        v.color = { background: "#" + colors[getColorID(v.dataType)] };
-        if(this.previousNode && v.id === this.previousNode.id){
-          v.isPrevious = true;
-        }else{
-          cluster[v.dataType].push(v);
-        }
-      });
-      // Nodes that should be clustered
-      let compound = [];
-      for (var key in cluster) {
-        if (cluster[key].length > GROUP_THRESHOLD) {
-          //TODO do not add bread crumb to compound
-          let compoundNode = { id: key, label: `${cluster[key][0].label} (${cluster[key].length})`, subnodes: cluster[key], dataType: key, isCompound: true };
-          compound.push(compoundNode);
-          clusterComp[key] = compoundNode;
-        }
-      }
-      let compoundOutEdges = [];
-      //Setting links to target compound nodes
-      data.edges.forEach((e) => {
-        //If multiple edges: apply more curvature (not to compound)
-        let id = "" + e.from + e.to;
-        if (edgesMap.hasOwnProperty(id)) {
-          edgesMap[id] += 1;
-        } else {
-          edgesMap[id] = 1;
-        }
-        if(this.previousNode && (e.to === this.previousNode.id || e.from == this.previousNode.id)){
-          console.log("Prev", this.previousNode);
-          e.dashes = true;
-        }
-        let curve = edgesMap[id] / 10;
-        e.smooth = { type: "curvedCCW", roundness: curve };
-        compound.forEach((el) => {
-          el.subnodes.forEach((subnode) => {
-            //Moving edge from single node to compound
-            if (subnode.id == e.to) {
-              e.prevTo = e.to;
-              e.to = el.id;
-            }
-            //Creating edge from compund to single node
-            if (subnode.id == e.from) {
-              compoundOutEdges.push({ from: el.id, to: e.to, id: el.id + Math.random() + e.to, prevFrom: e.from });
-            }
-          });
-        });
+      // let cluster = {};
+      // let clusterComp = {};
+      // data.nodes.forEach((v) => {
+      //   if (!cluster[v.dataType]) {
+      //     cluster[v.dataType] = [];
+      //   }
+      //   v.color = { background: "#" + colors[getColorID(v.dataType)] };
+      //   if(this.previousNode && v.id === this.previousNode.id){
+      //     v.isPrevious = true;
+      //   }else{
+      //     cluster[v.dataType].push(v);
+      //   }
+      // });
+      // // Nodes that should be clustered
+      // let compound = [];
+      // for (var key in cluster) {
+      //   if (cluster[key].length > GROUP_THRESHOLD) {
+      //     let compoundNode = { id: key, label: `${cluster[key][0].label} (${cluster[key].length})`, subnodes: cluster[key], dataType: key, isCompound: true };
+      //     compound.push(compoundNode);
+      //     clusterComp[key] = compoundNode;
+      //   }
+      // }
+      // let compoundOutEdges = [];
+      // //Setting links to target compound nodes
+      // data.links.forEach((e) => {
+      //   //If multiple edges: apply more curvature (not to compound)
+      //   let id = "" + e.source + e.target;
+      //   if (edgesMap.hasOwnProperty(id)) {
+      //     edgesMap[id] += 1;
+      //   } else {
+      //     edgesMap[id] = 1;
+      //   }
+      //   if(this.previousNode && (e.target === this.previousNode.id || e.source == this.previousNode.id)){
+      //     e.dashes = true;
+      //   }
+      //   let curve = edgesMap[id] / 10;
+      //   e.smooth = { type: "curvedCCW", roundness: curve };
+      //   compound.forEach((el) => {
+      //     el.subnodes.forEach((subnode) => {
+      //       //Moving edge from single node to compound
+      //       if (subnode.id == e.target) {
+      //         e.prevTo = e.target;
+      //         e.target = el.id;
+      //       }
+      //       //Creating edge from compund to single node
+      //       if (subnode.id == e.source) {
+      //         compoundOutEdges.push({ from: el.id, to: e.target, prevFrom: e.source });
+      //       }
+      //     });
+      //   });
 
-      });
+      // });
 
-      data.edges = data.edges.concat(compoundOutEdges);
-      //Removing nodes and adding compund
-      data.vertices = data.vertices.filter((v) => {
-        return !cluster[v.dataType] || (cluster[v.dataType] && cluster[v.dataType].length <= GROUP_THRESHOLD);
-      }).concat(compound);
-      //Adding color
-      data.vertices = data.vertices.map((v) => {
-        v.color = {
-          background: "#" + colors[getColorID(v.dataType)]
-        };
-        return v;
-      });
-      // Recreating edges from and to compound nodes
-      data.edges.forEach((edge) => {
-        if (clusterComp[edge.to] && clusterComp[edge.to].subnodes.length > GROUP_THRESHOLD) {
-          for (var g in clusterComp) {
-            clusterComp[g].subnodes.forEach((v) => {
-              if (v.id == edge.from) {
-                edge.prevFrom = edge.from;
-                edge.from = g;
-              }
-            });
-          }
-        } else if (clusterComp[edge.from] && clusterComp[edge.from].subnodes.length > GROUP_THRESHOLD) {
-          for (var gr in clusterComp) {
-            clusterComp[gr].subnodes.forEach((v) => {
-              if (v.id == edge.to) {
-                edge.prevTo = edge.to;
-                edge.to = gr;
-              }
-            });
-          }
-        }
-      });
+      // data.links = data.links.concat(compoundOutEdges);
+      // //Removing nodes and adding compund
+      // data.nodes = data.nodes.filter((v) => {
+      //   return !cluster[v.dataType] || (cluster[v.dataType] && cluster[v.dataType].length <= GROUP_THRESHOLD);
+      // }).concat(compound);
+      // //Adding color
+      // data.nodes = data.nodes.map((v) => {
+      //   v.color = {
+      //     background: "#" + colors[getColorID(v.dataType)]
+      //   };
+      //   return v;
+      // });
+      // data.links.filter( (edge) => !edge.deleteMe);
+      // // Recreating edges from and to compound nodes
+      // data.links.forEach((edge) => {
+      //   if (clusterComp[edge.target] && clusterComp[edge.target].subnodes.length > GROUP_THRESHOLD) {
+      //     for (var g in clusterComp) {
+      //       clusterComp[g].subnodes.forEach((v) => {
+      //         if (v.id == edge.source) {
+      //           edge.prevFrom = edge.source;
+      //           edge.source = g;
+      //         }
+      //       });
+      //     }
+      //   } else if (clusterComp[edge.source] && clusterComp[edge.source].subnodes.length > GROUP_THRESHOLD) {
+      //     for (var gr in clusterComp) {
+      //       clusterComp[gr].subnodes.forEach((v) => {
+      //         if (v.id == edge.target) {
+      //           edge.prevTo = edge.target;
+      //           edge.target = gr;
+      //         }
+      //       });
+      //     }
+      //   }
+      // });
+      // data.links.filter( (edge) =>{
+      //   return data.nodes.findIndex( (node) => {
+      //     return edge.to == node.id || edge.from == node.id;
+      //   }) > -1;
+      // });
       return data;
     } catch (e) {
       console.log(e);
@@ -191,35 +193,35 @@ export default class GraphStore {
 
   @action updateGraph(id){
     this.fetchGraph(id).then((data) => {
-      this.setGraphData(data);
+      this.setGraph(data);
     });
   }
 
   @action explodeNode(id, vertex) {
     let verticesToAdd = vertex.subnodes;
-    let g = this._graph;
+    // let g = this.graph;
     //Removing the compound nodes
-    g.vertices =  g.vertices.filter((v) => v.id !== id);
+    this._graph.nodes.filter((v) => v.id !== id);
     //Adding the sub nodes
-    g.vertices =  g.vertices.concat(verticesToAdd);
+    this._graph.nodes.concat(verticesToAdd);
     //Restoring links
-    g.edges = g.edges.map((e) => {
-      if (e.to === id) {
-        e.to = e.prevTo;
+    this._graph.links = this._graph.links.map((e) => {
+      if (e.target === id) {
+        e.target = e.prevTo;
       }
-      if (e.from === id) {
-        e.from = e.prevFrom;
+      if (e.source === id) {
+        e.source = e.prevFrom;
       }
       return e;
     });
-    this.setGraphData(g);
+    this.setGraph(this._graph);
   }
 
   @action handleSelectNode(params){
     this.hideContextMenu();
     if (params.nodes.length == 1) {
       let id = params.nodes[0];
-      let node =  this._graph.vertices.filter((el) => { return el.id == id; });
+      let node =  this._graph.nodes.filter((el) => { return el.id == id; });
       if (node && node[0] && node[0].isCompound) {
         this.explodeNode(id, node[0]);
       } else {
@@ -236,7 +238,7 @@ export default class GraphStore {
           this.instanceStore.fetchInstanceData(this.instanceStore.mainInstanceId);
           this.instanceStore.setCurrentInstanceId(this.instanceStore.mainInstanceId, 0);
           this.fetchGraph(id).then( (data) => {
-            this.setGraphData(data);
+            this.setGraph(data);
             this.setSelectedNode(node[0]);
           });
         }
@@ -247,10 +249,10 @@ export default class GraphStore {
   @action handleOnContext(params){
     params.event.preventDefault();
     this.hideContextMenu();
-    let node = this.network.getNodeAt(params.pointer.DOM);
-    if (node) {
-      this.menuDisplay = { display: "block", left: params.pointer.DOM.x, top: params.pointer.DOM.y };
-    }
+    // let node = this.network.getNodeAt(params.pointer.DOM);
+    // if (node) {
+    //   this.menuDisplay = { display: "block", left: params.pointer.DOM.x, top: params.pointer.DOM.y };
+    // }
   }
 
   @action hideContextMenu(){
@@ -263,15 +265,6 @@ export default class GraphStore {
 
   get menuDisplay(){
     return this.menuDisplay;
-  }
-
-  @action setGraphData(g) {
-    this._graph = g;
-    var data = {
-      nodes: new VIS.DataSet(this._graph.vertices),
-      edges: new VIS.DataSet(this._graph.edges)
-    };
-    this.network.setData(data);
   }
 
   @action setStep(step){
@@ -303,5 +296,14 @@ export default class GraphStore {
       this.setBreadCrumbs(temp);
       this.updateGraph(node.id);
     }
+  }
+
+  get graph(){
+    return this._graph;
+  }
+
+  @action setGraph(g){
+    this.graph = g;
+    this._graph = g;
   }
 }

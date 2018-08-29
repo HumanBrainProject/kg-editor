@@ -81,7 +81,7 @@ export default class InstanceField extends React.Component{
           <span className="quickfire-readmode-list">
             {field.value.map(value =>
               <span key={value.id} className="quickfire-readmode-item">
-                <button className="btn btn-xs btn-default"
+                <button type="button" className="btn btn-xs btn-default"
                   onClick={(event) => {event.stopPropagation(); this.handleFieldFocus(field, value);}}
                   onFocus={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}
                   onMouseEnter={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}

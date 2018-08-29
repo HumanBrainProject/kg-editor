@@ -62,7 +62,7 @@ export default class ReleaseStatus extends React.Component{
       <div className={`${classes.status} ${globalStatusClass}`}>
         <div className={`${classes.instanceStatus} ${instanceStatusClass}`}>
           {instanceStatus === "NOT_RELEASED"?
-            <Glyphicon glyph="remove"/>
+            <Glyphicon glyph="ban-circle"/>
             :instanceStatus === "HAS_CHANGED"?
               <Glyphicon glyph="retweet"/>
               :instanceStatus === "RELEASED"?
@@ -74,7 +74,7 @@ export default class ReleaseStatus extends React.Component{
         {childrenStatus !== null &&
           <div className={`${classes.childrenStatus} ${childrenStatusClass}`}>
             {childrenStatus === "NOT_RELEASED"?
-              <Glyphicon glyph="remove"/>
+              <Glyphicon glyph="ban-circle"/>
               :childrenStatus === "HAS_CHANGED"?
                 <Glyphicon glyph="retweet"/>
                 :childrenStatus === "RELEASED"?

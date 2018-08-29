@@ -38,6 +38,7 @@ const styles = {
     }
   },
   icon: {
+    transformOrigin:"50% 44%",
     composes: "glyphicon glyphicon-refresh",
     animation: `${animationId} .7s infinite linear`
   },

@@ -221,7 +221,7 @@ const styles = {
     "& .section":{
       paddingBottom:"10px",
       "& h5":{
-        fontSize:"0.75em",
+        fontSize:"0.8em",
         fontWeight:"bold",
         paddingLeft:"4px"
       },
@@ -231,14 +231,14 @@ const styles = {
         "&.pending":{
           gridTemplateColumns:"2fr 1fr",
           "& .pending-count":{
-            fontSize:"0.75em",
+            fontSize:"0.8em",
             fontWeight:"bold",
             textAlign:"right",
             paddingRight:"4px"
           }
         },
         "& .name":{
-          fontSize:"0.75em",
+          fontSize:"0.8em",
           paddingLeft:"4px",
           lineHeight:"16px"
         },
@@ -257,7 +257,7 @@ const styles = {
             top:1,
             left:"50%",
             transform:"translateX(-50%)",
-            fontSize:"0.75em",
+            fontSize:"0.8em",
             fontWeight:"bold"
           },
           "&.not-released":{
@@ -406,6 +406,22 @@ export default class Release extends React.Component{
               </Button>
               <div className={classes.treeStats}>
                 <div className={"section"}>
+                  <h5>Pending changes:</h5>
+                  <div className={"stat pending"}>
+                    <div className={"name"}>Instances released</div>
+                    <div className={"pending-count"}>{treeStats.proceed_release}</div>
+                  </div>
+                  <div className={"stat pending"}>
+                    <div className={"name"}>Instances unreleased</div>
+                    <div className={"pending-count"}>{treeStats.proceed_unrelease}</div>
+                  </div>
+                  <div className={"stat pending"}>
+                    <div className={"name"}>Instances not modified</div>
+                    <div className={"pending-count"}>{treeStats.proceed_do_nothing}</div>
+                  </div>
+                </div>
+
+                <div className={"section"}>
                   <h5>Current state:</h5>
                   <div className={"stat"}>
                     <div className={"name"}>Released</div>
@@ -452,22 +468,6 @@ export default class Release extends React.Component{
                       <div className={"bar-inner"} style={{width:`${treeStats.pending_has_changed/treeStats.total*100}%`}}></div>
                       <div className={"bar-label"}>{treeStats.pending_has_changed} / {treeStats.total}</div>
                     </div>
-                  </div>
-                </div>
-
-                <div className={"section"}>
-                  <h5>Pending changes:</h5>
-                  <div className={"stat pending"}>
-                    <div className={"name"}>Instances released</div>
-                    <div className={"pending-count"}>{treeStats.proceed_release}</div>
-                  </div>
-                  <div className={"stat pending"}>
-                    <div className={"name"}>Instances unreleased</div>
-                    <div className={"pending-count"}>{treeStats.proceed_unrelease}</div>
-                  </div>
-                  <div className={"stat pending"}>
-                    <div className={"name"}>Instances not modified</div>
-                    <div className={"pending-count"}>{treeStats.proceed_do_nothing}</div>
                   </div>
                 </div>
               </div>

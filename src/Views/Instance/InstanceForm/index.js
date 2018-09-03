@@ -31,13 +31,13 @@ const styles = {
     "&:not(.current)": {
       borderRadius: "10px",
       color: "#555",
-      cursor:"pointer"
+      cursor: "pointer"
     },
     "&.main:not(.current)": {
       border: "1px solid transparent",
       padding: "10px"
     },
-    "&:not(.main)" : {
+    "&:not(.main)": {
       position: "relative",
       marginBottom: "10px",
       border: "1px solid #ccc",
@@ -134,8 +134,8 @@ const styles = {
 @injectStyles(styles)
 @inject("instanceStore")
 @observer
-export default class InstanceForm extends React.Component{
-  constructor(props){
+export default class InstanceForm extends React.Component {
+  constructor(props) {
     super(props);
     this.fetchInstance();
   }
@@ -145,7 +145,7 @@ export default class InstanceForm extends React.Component{
   }
 
   handleFocus = () => {
-    if(this.props.instanceStore.currentInstanceId !== this.props.id){
+    if (this.props.instanceStore.currentInstanceId !== this.props.id) {
       this.props.instanceStore.setCurrentInstanceId(this.props.id, this.props.level);
     }
   }
@@ -203,7 +203,9 @@ export default class InstanceForm extends React.Component{
     this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
   }
 
-  render(){
+
+
+  render() {
     const { classes, instanceStore } = this.props;
 
     const instance = instanceStore.getInstance(this.props.id);
@@ -217,10 +219,10 @@ export default class InstanceForm extends React.Component{
     const isMainInstance = this.props.id === instanceStore.mainInstanceId;
     const isCurrentInstance = this.props.id === instanceStore.currentInstanceId;
 
-    const backLink = (instance.isFetched && instance.data && instance.data.instancesPath)?
+    const backLink = (instance.isFetched && instance.data && instance.data.instancesPath) ?
       instance.data.instancesPath
       :
-      (organization && domain && schema && version)?
+      (organization && domain && schema && version) ?
         `/nodetype/${organization}/${domain}/${schema}/${version}`
         :
         "/";
@@ -236,7 +238,7 @@ export default class InstanceForm extends React.Component{
       if (isMainInstance) {
         className += " main";
       }
-      if (instance.hasChanged){
+      if (instance.hasChanged) {
         className += " hasChanged";
       }
       if (instance.highlight === this.props.provenence) {
@@ -265,7 +267,7 @@ export default class InstanceForm extends React.Component{
       return [];
     };
 
-    return(
+    return (
       <div className={panelClassName()} data-id={this.props.id}>
         {!instance.hasFetchError && !instance.isFetching &&
         <div

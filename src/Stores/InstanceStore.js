@@ -23,6 +23,13 @@ export default class InstanceStore {
   }
 
   @action
+  setMainInstance(mainInstanceId){
+    this.mainInstanceId = mainInstanceId;
+    this.fetchInstanceData(this.mainInstanceId);
+    this.setCurrentInstanceId(this.mainInstanceId, 0);
+  }
+
+  @action
   getInstance(instanceId){
     if (this.instances.has(instanceId)) {
       return this.instances.get(instanceId);

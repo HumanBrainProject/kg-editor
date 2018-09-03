@@ -5,31 +5,32 @@ const endpoints = {
   "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
-  "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`
+  "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
+  "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
 };
 
-class API{
-  constructor(){
+class API {
+  constructor() {
     this._axios = axios.create({
-      headers:{
+      headers: {
         Authorization: "Bearer " + authStore.accessToken
       }
     });
   }
 
-  get axios(){
+  get axios() {
     this.reloadToken();
     return this._axios;
   }
 
-  reloadToken(){
+  reloadToken() {
     Object.assign(this._axios.defaults, {
-      headers: {Authorization: "Bearer " + authStore.accessToken},
+      headers: { Authorization: "Bearer " + authStore.accessToken },
       withCredentials: true
     });
   }
 
-  get endpoints(){
+  get endpoints() {
     return endpoints;
   }
 }

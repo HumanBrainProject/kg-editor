@@ -15,6 +15,7 @@ import Search from "./Views/Search";
 import NodeType from "./Views/NodeType";
 import Instance from "./Views/Instance";
 import Release from "./Views/Release";
+import InstanceGraph from "./Views/InstanceGraph";
 import Menu from "./Views/Menu";
 import "babel-polyfill";
 
@@ -108,6 +109,7 @@ class App extends React.Component{
                 <Switch>
                   <Route path="/instance/:id*" component={Instance} />
                   <Route path="/release/:id*" component={Release} />
+                  <Route path="/graph/:id*" component={InstanceGraph} />
                   <Route path="/nodetype/:id*" component={NodeType} />
                   <Route path="/search" exact={true} component={Search} />
                   <Route path="/" exact={true} component={Home} />

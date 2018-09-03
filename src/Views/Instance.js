@@ -9,8 +9,8 @@ import PaneContainer from "./Instance/PaneContainer";
 
 @inject("navigationStore")
 @observer
-export default class Edit extends React.Component{
-  constructor(props){
+export default class Edit extends React.Component {
+  constructor(props) {
     super(props);
     this.store = new InstanceStore(this.props.history, this.props.match.params.id);
     this.props.navigationStore.setInstanceStore(this.store);
@@ -20,15 +20,19 @@ export default class Edit extends React.Component{
     this.props.navigationStore.setInstanceStore(null);
   }
 
-  render(){
-    return(
+  UNSAFE_componentWillReceiveProps(newProps){
+    this.store.setMainInstance(newProps.match.params.id);
+  }
+
+  render() {
+    return (
       <Provider instanceStore={this.store}>
         <PaneContainer>
           <React.Fragment>
             <Pane>
-              <InstanceForm level={0} id={this.store.mainInstanceId}/>
+              <InstanceForm level={0} id={this.store.mainInstanceId} />
             </Pane>
-            <Links level={1} id={this.store.mainInstanceId}/>
+            <Links level={1} id={this.store.mainInstanceId} />
           </React.Fragment>
         </PaneContainer>
       </Provider>

@@ -238,7 +238,7 @@ const styles = {
 @inject("navigationStore","routerHistory")
 @observer
 export default class NodeType extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.nodeTypeStore = new NodeTypeStore(this.props.match.params.id);
     this.props.navigationStore.setNodeTypeStore(this.nodeTypeStore);
@@ -266,12 +266,12 @@ export default class NodeType extends React.Component {
   }
 
   render = () => {
-    const {classes} = this.props;
-    return(
+    const { classes } = this.props;
+    return (
       <div className={classes.container}>
-        {!this.nodeTypeStore.hasError?
-          !this.nodeTypeStore.isFetching?
-            this.nodeTypeStore.instances.length?
+        {!this.nodeTypeStore.hasError ?
+          !this.nodeTypeStore.isFetching ?
+            this.nodeTypeStore.instances.length ?
               <React.Fragment>
                 <div className={classes.header}>
                   <div>
@@ -279,15 +279,15 @@ export default class NodeType extends React.Component {
                   </div>
                   <form className="navbar-form" role="search">
                     <div className="input-group">
-                      <input ref={(input) => { this.nameInput = input; }} className="form-control" placeholder="Search" name="filter-term" id="filter-term" type="text" value={this.nodeTypeStore.instanceFilter} onChange={this.handleFilterChange}/>
+                      <input ref={(input) => { this.nameInput = input; }} className="form-control" placeholder="Search" name="filter-term" id="filter-term" type="text" value={this.nodeTypeStore.instanceFilter} onChange={this.handleFilterChange} />
                     </div>
                   </form>
                 </div>
                 <div className={classes.body}>
                   <ul>
                     <li key="new">
-                      <Link to={ `/instance/${this.props.match.params.id}/${uniqueId("___NEW___")}` } className="create">
-                        <Glyphicon glyph="plus"/>
+                      <Link to={`/instance/${this.props.match.params.id}/${uniqueId("___NEW___")}`} className="create">
+                        <Glyphicon glyph="plus" />
                         <div className="createLabel">{`Create a new ${this.nodeTypeStore.nodeTypeLabel} instance`}</div>
                       </Link>
                     </li>

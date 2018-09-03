@@ -1,10 +1,20 @@
 import { observable, action, computed } from "mobx";
 
-export default class NavigationStore{
+export default class NavigationStore {
 
   @observable showHomeLink = true;
   @observable instanceStore = null;
   @observable nodeTypeStore = null;
+  @observable showGraph = true;
+
+  @action
+  setShowGraph(show) {
+    this.showGraph = show;
+  }
+
+  showGraph() {
+    return this.showGraph;
+  }
 
   @computed get showSearchLink() {
     return !!this.nodeTypeId;
@@ -20,7 +30,7 @@ export default class NavigationStore{
       if (mainInstance.data && mainInstance.data.label) {
         return mainInstance.data.label;
       }
-      const [, , schema, , ] = this.instanceStore.mainInstanceId.split("/");
+      const [, , schema, ,] = this.instanceStore.mainInstanceId.split("/");
       return schema;
     }
     if (this.nodeTypeStore) {
@@ -31,7 +41,7 @@ export default class NavigationStore{
 
   @computed get nodeTypeId() {
     if (this.instanceStore) {
-      const [organization, domain, schema, version, ] = this.instanceStore.mainInstanceId.split("/");
+      const [organization, domain, schema, version,] = this.instanceStore.mainInstanceId.split("/");
       return `${organization}/${domain}/${schema}/${version}`;
     }
     if (this.nodeTypeStore) {
@@ -41,17 +51,17 @@ export default class NavigationStore{
   }
 
   @action
-  setHomeLinkVisibility(visible){
+  setHomeLinkVisibility(visible) {
     this.showHomeLink = !!visible;
   }
 
   @action
-  setInstanceStore(store){
+  setInstanceStore(store) {
     this.instanceStore = store;
   }
 
   @action
-  setNodeTypeStore(store){
+  setNodeTypeStore(store) {
     this.nodeTypeStore = store;
   }
 }

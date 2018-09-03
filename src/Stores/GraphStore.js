@@ -1,270 +1,191 @@
-import { observable, action } from "mobx";
+import { observable, action, runInAction } from "mobx";
 import API from "../Services/API";
-// import ColorScheme from "color-scheme";
 import console from "../Services/Logger";
 
-// const GROUP_THRESHOLD = 2;
-// const COLOR_ARRAY_SIZE = 12;
-// const getColorID = function (s) {
-//   let id = 0;
-//   for (let i = 0; i < s.length; i++) {
-//     id += s.charCodeAt(i);
-//   }
-//   return id % COLOR_ARRAY_SIZE;
-// };
+import {find, remove, clone, pullAll, uniqueId, uniq, flatten, union} from "lodash";
 
-// const colors = new ColorScheme()
-//   .from_hex("bfffd6")
-//   .scheme("tetrade")
-//   .distance(0.75)
-//   .web_safe(true)
-//   .colors();
+import palette from "google-palette";
+
+const nodeTypeWhitelist = [
+  "Dataset",
+  "SpecimenGroup",
+  "ExperimentSubject",
+  "Activity",
+  "Person",
+  "PLAComponent",
+  "Publication",
+  "FileAssociation",
+  "DatasetDOI",
+  "ExperimentMethod",
+  "ReferenceSpace",
+  "ParcellationRegion",
+  "ParcellationAtlas",
+  "EmbargoStatus",
+  "EthicsApproval",
+  "ExperimentProtocol",
+  "Preparation",
+  "EthicsAuthority",
+  "Format",
+  "LicenseInformation"
+];
+
+const colorScheme = {};
+
+let colorTable = palette("mpn65", nodeTypeWhitelist.length).map(color => "#"+color);
+nodeTypeWhitelist.forEach((type, index) => {colorScheme[type] = colorTable[index];});
 
 export default class GraphStore {
-  @observable colorMap = {};
   @observable breadCrumbs = [];
   @observable network;
   @observable step = 2;
   @observable selectedNode;
-  @observable history = [];
-  @observable menuDisplay = {
-    display: "none",
-    left: "-1000px",
-    top: "-1000px"
-  };
-  @observable graph = {
-    nodes:[],
-    links:[]
-  };
 
-
+  @observable dataChanged = 0;
+  graphData = null;
+  originalData = null;
+  groupNodes = null;
+  highlightedNode = null;
+  connectedNodes = null;
+  connectedLinks = null;
 
   constructor(instanceStore){
     this.instanceStore = instanceStore;
-    this._graph = {
-      nodes: [],
-      links: []
-    };
   }
 
+  get colorScheme(){
+    return colorScheme;
+  }
 
-  options = {
-    physics: { enabled: false },
-    layout: {
-      hierarchical: {
-        enabled: true,
-        direction: "UD",
-        sortMethod: "directed",
-        nodeSpacing: 150
-      }
-    },
-    edges: {
-      arrows: {
-        to: { enabled: true, scaleFactor: 1, type: "arrow" },
-        middle: { enabled: false, scaleFactor: 1, type: "arrow" },
-        from: { enabled: false, scaleFactor: 1, type: "arrow" }
-      },
-      smooth: true
-    },
-    nodes: {
-      shape: "box",
-      widthConstraint: {
-        maximum: 100
-      },
-      font: {
-        size: 20
-      }
-    },
-    interaction: {
-      dragNodes: false,
-      hover: true,
-    }
-  };
+  findNodesByType(type){
+    return this.originalData.nodes.filter(node => node.dataType === type);
+  }
 
-  @action async initGraph(id){
-    const g = await this.fetchGraph(id);
-    let node = g.nodes.filter(( v) => v.id === id)[0];
-    this.setGraph(g);
-    this.setSelectedNode(node);
+  findLinksBySourceType(type){
+    return this.originalData.links.filter(link => link.source.dataType === type);
+  }
+
+  findLinksByTargetType(type){
+    return this.originalData.links.filter(link => link.target.dataType === type);
+  }
+
+  findLinksByType(type){
+    return this.originalData.links.filter(link => link.source.dataType === type || link.target.dataType === type);
+  }
+
+  findLinksBySourceAndTarget(sourceNode, targetNode){
+    return this.originalData.links.filter(link => link.source === sourceNode && link.target === targetNode);
+  }
+
+  findLinksByNode(node){
+    return this.originalData.links.filter(link => link.source === node || link.target === node);
+  }
+
+  findConnectedNodes(node){
+    return uniq(flatten(this.findLinksByNode(node).map(link => [link.target, link.source])));
+  }
+
+  @action hlNode(node){
+    this.highlightedNode = node;
+    this.connectedNodes = this.findConnectedNodes(node);
+    this.connectedLinks = this.findLinksByNode(node);
   }
 
   @action async fetchGraph(id) {
     try {
-      // let edgesMap = {};
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
-      // let cluster = {};
-      // let clusterComp = {};
-      // data.nodes.forEach((v) => {
-      //   if (!cluster[v.dataType]) {
-      //     cluster[v.dataType] = [];
-      //   }
-      //   v.color = { background: "#" + colors[getColorID(v.dataType)] };
-      //   if(this.previousNode && v.id === this.previousNode.id){
-      //     v.isPrevious = true;
-      //   }else{
-      //     cluster[v.dataType].push(v);
-      //   }
-      // });
-      // // Nodes that should be clustered
-      // let compound = [];
-      // for (var key in cluster) {
-      //   if (cluster[key].length > GROUP_THRESHOLD) {
-      //     let compoundNode = { id: key, label: `${cluster[key][0].label} (${cluster[key].length})`, subnodes: cluster[key], dataType: key, isCompound: true };
-      //     compound.push(compoundNode);
-      //     clusterComp[key] = compoundNode;
-      //   }
-      // }
-      // let compoundOutEdges = [];
-      // //Setting links to target compound nodes
-      // data.links.forEach((e) => {
-      //   //If multiple edges: apply more curvature (not to compound)
-      //   let id = "" + e.source + e.target;
-      //   if (edgesMap.hasOwnProperty(id)) {
-      //     edgesMap[id] += 1;
-      //   } else {
-      //     edgesMap[id] = 1;
-      //   }
-      //   if(this.previousNode && (e.target === this.previousNode.id || e.source == this.previousNode.id)){
-      //     e.dashes = true;
-      //   }
-      //   let curve = edgesMap[id] / 10;
-      //   e.smooth = { type: "curvedCCW", roundness: curve };
-      //   compound.forEach((el) => {
-      //     el.subnodes.forEach((subnode) => {
-      //       //Moving edge from single node to compound
-      //       if (subnode.id == e.target) {
-      //         e.prevTo = e.target;
-      //         e.target = el.id;
-      //       }
-      //       //Creating edge from compund to single node
-      //       if (subnode.id == e.source) {
-      //         compoundOutEdges.push({ from: el.id, to: e.target, prevFrom: e.source });
-      //       }
-      //     });
-      //   });
-
-      // });
-
-      // data.links = data.links.concat(compoundOutEdges);
-      // //Removing nodes and adding compund
-      // data.nodes = data.nodes.filter((v) => {
-      //   return !cluster[v.dataType] || (cluster[v.dataType] && cluster[v.dataType].length <= GROUP_THRESHOLD);
-      // }).concat(compound);
-      // //Adding color
-      // data.nodes = data.nodes.map((v) => {
-      //   v.color = {
-      //     background: "#" + colors[getColorID(v.dataType)]
-      //   };
-      //   return v;
-      // });
-      // data.links.filter( (edge) => !edge.deleteMe);
-      // // Recreating edges from and to compound nodes
-      // data.links.forEach((edge) => {
-      //   if (clusterComp[edge.target] && clusterComp[edge.target].subnodes.length > GROUP_THRESHOLD) {
-      //     for (var g in clusterComp) {
-      //       clusterComp[g].subnodes.forEach((v) => {
-      //         if (v.id == edge.source) {
-      //           edge.prevFrom = edge.source;
-      //           edge.source = g;
-      //         }
-      //       });
-      //     }
-      //   } else if (clusterComp[edge.source] && clusterComp[edge.source].subnodes.length > GROUP_THRESHOLD) {
-      //     for (var gr in clusterComp) {
-      //       clusterComp[gr].subnodes.forEach((v) => {
-      //         if (v.id == edge.target) {
-      //           edge.prevTo = edge.target;
-      //           edge.target = gr;
-      //         }
-      //       });
-      //     }
-      //   }
-      // });
-      // data.links.filter( (edge) =>{
-      //   return data.nodes.findIndex( (node) => {
-      //     return edge.to == node.id || edge.from == node.id;
-      //   }) > -1;
-      // });
-      return data;
+      runInAction( ()=>{
+        this.originalData = data;
+        this.setSelectedNode(find(this.originalData.nodes), node => node.id === id);
+        this.filterOriginalData();
+        this.computeGraphData();
+        this.dataChanged++;
+      } );
     } catch (e) {
       console.log(e);
     }
   }
 
-  @action updateGraph(id){
-    this.fetchGraph(id).then((data) => {
-      this.setGraph(data);
+  @action filterOriginalData(){
+    //Remove nodes that are not whitelisted
+    remove(this.originalData.nodes, node => nodeTypeWhitelist.indexOf(node.dataType) === -1);
+    remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
+
+    //Transform links source and target reference to actual node objects
+    this.originalData.links.forEach(link => {
+      link.source = find(this.originalData.nodes, node => node.id === link.source);
+      link.target = find(this.originalData.nodes, node => node.id === link.target);
+    });
+
+    this.groupNodes = new Map();
+
+    //Create group nodes
+    nodeTypeWhitelist.forEach(nodeType => {
+      let nodesOfType = this.findNodesByType(nodeType);
+      if(nodesOfType.length <= 1){
+        return;
+      }
+
+      let groupNode = {
+        id:"Group_"+nodeType,
+        dataType:"Group_"+nodeType,
+        name:"Group_"+nodeType,
+        title:"Group of "+nodeType+" ("+nodesOfType.length+")",
+        original_dataType:nodeType,
+        isGroup:true,
+        groupSize: nodesOfType.length
+      };
+
+      this.groupNodes.set(nodeType, groupNode);
+      this.originalData.nodes.push(groupNode);
+    });
+
+    this.originalData.links.forEach(link => {
+      let sourceGroupNode = this.groupNodes.get(link.source.dataType);
+      let targetGroupNode = this.groupNodes.get(link.target.dataType);
+
+      if(sourceGroupNode && this.findLinksBySourceAndTarget(sourceGroupNode, link.target).length === 0){
+        let newLink = clone(link);
+        newLink.source =  sourceGroupNode;
+        newLink.id = uniqueId("groupnode-link");
+        this.originalData.links.push(newLink);
+      }
+      if(targetGroupNode && this.findLinksBySourceAndTarget(link.source, targetGroupNode).length === 0){
+        let newLink = clone(link);
+        newLink.target =  targetGroupNode;
+        newLink.id = uniqueId("groupnode-link");
+        this.originalData.links.push(newLink);
+      }
+      if(sourceGroupNode && targetGroupNode && this.findLinksBySourceAndTarget(sourceGroupNode, targetGroupNode).length === 0){
+        let newLink = clone(link);
+        newLink.source =  sourceGroupNode;
+        newLink.target =  targetGroupNode;
+        newLink.id = uniqueId("groupnode-link");
+        this.originalData.links.push(newLink);
+      }
     });
   }
 
-  @action explodeNode(id, vertex) {
-    let verticesToAdd = vertex.subnodes;
-    // let g = this.graph;
-    //Removing the compound nodes
-    this._graph.nodes.filter((v) => v.id !== id);
-    //Adding the sub nodes
-    this._graph.nodes.concat(verticesToAdd);
-    //Restoring links
-    this._graph.links = this._graph.links.map((e) => {
-      if (e.target === id) {
-        e.target = e.prevTo;
-      }
-      if (e.source === id) {
-        e.source = e.prevFrom;
-      }
-      return e;
-    });
-    this.setGraph(this._graph);
-  }
-
-  @action handleSelectNode(params){
-    this.hideContextMenu();
-    if (params.nodes.length == 1) {
-      let id = params.nodes[0];
-      let node =  this._graph.nodes.filter((el) => { return el.id == id; });
-      if (node && node[0] && node[0].isCompound) {
-        this.explodeNode(id, node[0]);
-      } else {
-        this.network.focus(id, {
-          scale: 1.3,
-          animation: {
-            duration: 300,
-            easingFunction: "easeInOutQuad"
-          }
-        });
-        if (id !== this.instanceStore.mainInstanceId) {
-          this.instanceStore.history.push(`/instance/${id}`);
-          this.instanceStore.mainInstanceId = id;
-          this.instanceStore.fetchInstanceData(this.instanceStore.mainInstanceId);
-          this.instanceStore.setCurrentInstanceId(this.instanceStore.mainInstanceId, 0);
-          this.fetchGraph(id).then( (data) => {
-            this.setGraph(data);
-            this.setSelectedNode(node[0]);
-          });
-        }
-      }
-    }
-  }
-
-  @action handleOnContext(params){
-    params.event.preventDefault();
-    this.hideContextMenu();
-    // let node = this.network.getNodeAt(params.pointer.DOM);
-    // if (node) {
-    //   this.menuDisplay = { display: "block", left: params.pointer.DOM.x, top: params.pointer.DOM.y };
-    // }
-  }
-
-  @action hideContextMenu(){
-    this.menuDisplay = {
-      display: "none",
-      left: "-1000px",
-      top: "-1000px"
+  @action computeGraphData(){
+    this.graphData = {
+      nodes:[...this.originalData.nodes],
+      links:[...this.originalData.links]
     };
+
+    this.groupNodes.forEach(groupNode => {
+      pullAll(this.graphData.nodes, this.findNodesByType(groupNode.original_dataType));
+      pullAll(this.graphData.links, this.findLinksByType(groupNode.original_dataType));
+    });
   }
 
-  get menuDisplay(){
-    return this.menuDisplay;
+  @action explodeNode(clickedNode) {
+    if(clickedNode.isGroup){
+      pullAll(this.graphData.nodes, [clickedNode]);
+      remove(this.graphData.links, link => link.source === clickedNode || link.target === clickedNode);
+
+      this.graphData.nodes = union(this.graphData.nodes, this.findNodesByType(clickedNode.original_dataType));
+      this.graphData.links = union(this.graphData.links, this.findLinksByType(clickedNode.original_dataType).filter(link => find(this.graphData.nodes, link.source) && find(this.graphData.nodes, link.target)));
+    }
+    this.dataChanged++;
   }
 
   @action setStep(step){
@@ -296,14 +217,5 @@ export default class GraphStore {
       this.setBreadCrumbs(temp);
       this.updateGraph(node.id);
     }
-  }
-
-  get graph(){
-    return this._graph;
-  }
-
-  @action setGraph(g){
-    this.graph = g;
-    this._graph = g;
   }
 }

@@ -11,6 +11,7 @@
     "cytoscape": "^3.2.15",
     "cytoscape-cola": "^2.2.3",
     "cytoscape-dagre": "^2.2.1",
+    "google-palette": "^1.1.0",
     "hbp-quickfire": "^1.0.3",
     "lodash": "^4.17.10",
     "material-color-hash": "^0.1.4",

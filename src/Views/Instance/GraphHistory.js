@@ -3,6 +3,7 @@ import {observer, inject} from "mobx-react";
 import injectStyles from "react-jss";
 import Color from "color";
 import {Glyphicon} from "react-bootstrap";
+import { isString } from "lodash";
 
 const styles = {
   container:{
@@ -58,7 +59,7 @@ export default class GraphHistory extends React.Component{
             <Glyphicon glyph={"arrow-right"} className={classes.currentMarker}/>
             <div className={classes.entryLegend} style={{borderRadius: "50%", background:graphStore.colorScheme[currentNode.dataType], borderColor:new Color(graphStore.colorScheme[currentNode.dataType]).darken(0.25).hex()}}/>
             <div className={classes.entryLabel}>
-              <small><strong>({currentNode.dataType})</strong></small>&nbsp;{currentNode.title}
+              <small><strong>({currentNode.dataType})</strong></small>&nbsp;{isString(currentNode.title)?currentNode.title:currentNode.id}
             </div>
           </div>
         }
@@ -68,7 +69,7 @@ export default class GraphHistory extends React.Component{
             <div className={`${classes.entry}`} key={node.id+"_"+index} onClick={this.handleEntryClick.bind(this, index)}>
               <div className={classes.entryLegend} style={{borderRadius: "50%", background:graphStore.colorScheme[node.dataType], borderColor:new Color(graphStore.colorScheme[node.dataType]).darken(0.25).hex()}}/>
               <div className={classes.entryLabel}>
-                <small><strong>({node.dataType})</strong></small>&nbsp;{node.title}
+                <small><strong>({node.dataType})</strong></small>&nbsp;{isString(node.title)?node.title:node.id}
               </div>
             </div>
           );

@@ -304,7 +304,9 @@ export default class NodeType extends React.Component {
                                 <Glyphicon glyph="cog"/>
                               </div>
                             </div>
-                            <Link to={ `/instance/${instance.id}` }>
+                            <Link to={this.props.navigationStore.showGraph
+                              ?`/instance/${instance.id}`
+                              :`/graph/${instance.id}`}>
                               <h6>{this.nodeTypeStore.nodeTypeLabel}</h6>
                               <h4>{instance.label}</h4>
                               {instance.description?

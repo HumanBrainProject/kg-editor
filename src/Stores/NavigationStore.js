@@ -12,10 +12,6 @@ export default class NavigationStore {
     this.showGraph = show;
   }
 
-  showGraph() {
-    return this.showGraph;
-  }
-
   @computed get showSearchLink() {
     return !!this.nodeTypeId;
   }

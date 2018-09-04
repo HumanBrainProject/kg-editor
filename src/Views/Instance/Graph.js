@@ -34,6 +34,11 @@ const styles = {
     position:"absolute",
     top:"20px",
     right:"20px"
+  },
+  history:{
+    position:"absolute",
+    top:"74px",
+    right:"20px"
   }
 };
 
@@ -44,21 +49,11 @@ const styles = {
 export default class Graph extends React.Component {
   constructor(props) {
     super(props);
-    /*this.handleSelectNode = this.handleSelectNode.bind(this);
-    this.handleOnContext = this.handleOnContext.bind(this);
-    this.handleDoubleClick = this.handleDoubleClick.bind(this);
-    this.handleBlurNode = this.handleBlurNode.bind(this);
-    this.handleHoverNode = this.handleHoverNode.bind(this);
-    this.handleMenuClick = this.handleMenuClick.bind(this);*/
     this.props.graphStore.fetchGraph(props.instanceStore.mainInstanceId);
     this.state = {
       graphWidth:0,
       graphHeight:0
     };
-  }
-
-  UNSAFE_componentWillReceiveProps(newProps) {
-    this.props.graphStore.fetchGraph(newProps.instanceStore.mainInstanceId);
   }
 
   componentDidMount(){
@@ -88,7 +83,11 @@ export default class Graph extends React.Component {
   }
 
   handleNodeClick = (node) => {
-    this.props.graphStore.explodeNode(node);
+    if(node.isGroup){
+      this.props.graphStore.explodeNode(node);
+    } else {
+      this.props.graphStore.historyPush(node);
+    }
   }
 
   handleCapture = (e) => {
@@ -97,7 +96,11 @@ export default class Graph extends React.Component {
   }
 
   handleToggleSettings = () => {
+    this.props.graphStore.toggleSettingsPanel();
+  }
 
+  handleToggleHistory = () => {
+    this.props.graphStore.toggleHistoryPanel();
   }
 
   handleNodeHover = (node) => {
@@ -141,14 +144,10 @@ export default class Graph extends React.Component {
     if(this.props.graphStore.highlightedNode){
       if(node !== this.props.graphStore.highlightedNode && this.props.graphStore.connectedNodes.indexOf(node) === -1){
         ctx.globalAlpha = 0.1;
-        ctx.strokeStyle = new Color(this.props.graphStore.colorScheme[dataType]).darken(0.25).hex();
-      } else {
-        ctx.strokeStyle = new Color(this.props.graphStore.colorScheme[this.props.graphStore.highlightedNode.original_dataType || this.props.graphStore.highlightedNode.dataType]).hex();
       }
-    } else {
-      ctx.strokeStyle = new Color(this.props.graphStore.colorScheme[dataType]).darken(0.25).hex();
     }
 
+    ctx.strokeStyle = new Color(this.props.graphStore.colorScheme[dataType]).darken(0.25).hex();
     ctx.fillStyle = this.props.graphStore.colorScheme[dataType];
 
     ctx.stroke();
@@ -174,8 +173,10 @@ export default class Graph extends React.Component {
     if(this.props.graphStore.highlightedNode){
       if(this.props.graphStore.connectedLinks.indexOf(link) === -1){
         return new Color("#ccc").alpha(0.1).rgb();
-      } else {
-        return new Color(this.props.graphStore.colorScheme[this.props.graphStore.highlightedNode.original_dataType || this.props.graphStore.highlightedNode.dataType]).alpha(1).rgb();
+      } else if(link.target === this.props.graphStore.highlightedNode){
+        return new Color("#f39c12").alpha(1).rgb();
+      } else if(link.source === this.props.graphStore.highlightedNode){
+        return new Color("#1abc9c").alpha(1).rgb();
       }
     } else {
       return new Color("#ccc").alpha(1).rgb();
@@ -195,19 +196,13 @@ export default class Graph extends React.Component {
   }
 
   render() {
-    const { classes } = this.props;
-    this.props.graphStore.dataChanged;
+    const { classes, graphStore } = this.props;
 
-    let data = {};
-
-    if(this.props.graphStore.graphData){
-      data.nodes = [...this.props.graphStore.graphData.nodes];
-      data.links = [...this.props.graphStore.graphData.links];
-    }
+    let data = graphStore.graphData;
 
     return (
       <div className={classes.graph} ref={ref => this.graphWrapper = ref}>
-        {this.props.graphStore.graphData &&
+        {data !== null &&
         <ForceGraph2D
           ref={ref => this.graphRef = ref}
           width={this.state.graphWidth}
@@ -227,9 +222,8 @@ export default class Graph extends React.Component {
         }
         <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
         <Button className={`${classes.settings} btn btn-primary`} onClick={this.handleToggleSettings}><Glyphicon glyph={"cog"}/></Button>
+        <Button className={`${classes.history} btn btn-primary`} onClick={this.handleToggleHistory}><Glyphicon glyph={"time"}/></Button>
         <Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />
-        {/*<GraphContextMenu style={this.props.graphStore.menuDisplay} handleMenuClick={this.handleMenuClick} />*/}
-        {/*<GraphNavigation handleNavigationClick={this.handleNavigationClick.bind(this)} breadCrumbs={this.props.graphStore.breadCrumbs} />*/}
       </div>
     );
   }

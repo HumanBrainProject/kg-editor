@@ -2,7 +2,7 @@ import { observable, action, runInAction } from "mobx";
 import API from "../Services/API";
 import console from "../Services/Logger";
 
-import {find, remove, clone, pullAll, uniqueId, uniq, flatten, union} from "lodash";
+import {find, remove, clone, pullAll, uniqueId, uniq, flatten, slice} from "lodash";
 
 import palette from "google-palette";
 
@@ -26,7 +26,8 @@ const nodeTypeWhitelist = [
   "Preparation",
   "EthicsAuthority",
   "Format",
-  "LicenseInformation"
+  "LicenseInformation",
+  "ExperimentSample"
 ];
 
 const colorScheme = {};
@@ -35,21 +36,28 @@ let colorTable = palette("mpn65", nodeTypeWhitelist.length).map(color => "#"+col
 nodeTypeWhitelist.forEach((type, index) => {colorScheme[type] = colorTable[index];});
 
 export default class GraphStore {
-  @observable breadCrumbs = [];
-  @observable network;
   @observable step = 2;
   @observable selectedNode;
+  @observable sidePanel = false;
+  @observable typeStates = null;
+  @observable expandedTypes = [];
 
-  @observable dataChanged = 0;
-  graphData = null;
+  @observable.shallow nodeHistory = [];
+
   originalData = null;
   groupNodes = null;
   highlightedNode = null;
   connectedNodes = null;
   connectedLinks = null;
 
+  routerHistory = null;
+
   constructor(instanceStore){
     this.instanceStore = instanceStore;
+  }
+
+  registerRouter(routerHistory){
+    this.routerHistory = routerHistory;
   }
 
   get colorScheme(){
@@ -85,9 +93,12 @@ export default class GraphStore {
   }
 
   @action hlNode(node){
+    if(node !== null && this.typeStates.get(node.dataType) === "group"){
+      node = this.groupNodes.get(node.dataType);
+    }
     this.highlightedNode = node;
-    this.connectedNodes = this.findConnectedNodes(node);
-    this.connectedLinks = this.findLinksByNode(node);
+    this.connectedNodes = node !== null? this.findConnectedNodes(node): [];
+    this.connectedLinks = node !== null? this.findLinksByNode(node): [];
   }
 
   @action async fetchGraph(id) {
@@ -95,10 +106,8 @@ export default class GraphStore {
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
       runInAction( ()=>{
         this.originalData = data;
-        this.setSelectedNode(find(this.originalData.nodes), node => node.id === id);
         this.filterOriginalData();
-        this.computeGraphData();
-        this.dataChanged++;
+        this.expandedTypes = [];
       } );
     } catch (e) {
       console.log(e);
@@ -117,11 +126,12 @@ export default class GraphStore {
     });
 
     this.groupNodes = new Map();
-
+    this.typeStates = new Map();
     //Create group nodes
     nodeTypeWhitelist.forEach(nodeType => {
       let nodesOfType = this.findNodesByType(nodeType);
       if(nodesOfType.length <= 1){
+        this.typeStates.set(nodeType, nodesOfType.length===1?"show":"none");
         return;
       }
 
@@ -136,6 +146,7 @@ export default class GraphStore {
       };
 
       this.groupNodes.set(nodeType, groupNode);
+      this.typeStates.set(nodeType, "group");
       this.originalData.nodes.push(groupNode);
     });
 
@@ -165,57 +176,100 @@ export default class GraphStore {
     });
   }
 
-  @action computeGraphData(){
-    this.graphData = {
+  get graphData(){
+    if(this.typeStates === null || this.originalData === null){
+      return null;
+    }
+
+    let graphData = {
       nodes:[...this.originalData.nodes],
       links:[...this.originalData.links]
     };
 
-    this.groupNodes.forEach(groupNode => {
-      pullAll(this.graphData.nodes, this.findNodesByType(groupNode.original_dataType));
-      pullAll(this.graphData.links, this.findLinksByType(groupNode.original_dataType));
+    this.typeStates.forEach((state, type)=>{
+      if(state === "group" || state === "hide"){
+        pullAll(graphData.nodes, this.findNodesByType(type));
+        pullAll(graphData.links, this.findLinksByType(type));
+      }
+      if(state === "show" || state === "hide"){
+        pullAll(graphData.nodes, this.findNodesByType("Group_"+type));
+        pullAll(graphData.links, this.findLinksByType("Group_"+type));
+      }
     });
+
+    return graphData;
   }
 
   @action explodeNode(clickedNode) {
     if(clickedNode.isGroup){
-      pullAll(this.graphData.nodes, [clickedNode]);
-      remove(this.graphData.links, link => link.source === clickedNode || link.target === clickedNode);
-
-      this.graphData.nodes = union(this.graphData.nodes, this.findNodesByType(clickedNode.original_dataType));
-      this.graphData.links = union(this.graphData.links, this.findLinksByType(clickedNode.original_dataType).filter(link => find(this.graphData.nodes, link.source) && find(this.graphData.nodes, link.target)));
+      this.typeStates.set(clickedNode.original_dataType, "show");
     }
-    this.dataChanged++;
   }
 
   @action setStep(step){
     this.step = step;
   }
 
-  @action setSelectedNode(node){
-    let arr = this.breadCrumbs.peek();
-    arr.push(node);
-    this.setBreadCrumbs(arr);
-    this.selectedNode = node;
-  }
-
-  get breadCrumbs(){
-    return this.breadCrumbs.peek();
-  }
-
-  @action setBreadCrumbs(b){
-    this.breadCrumbs = b;
-  }
-
-  @action handleNavigationClick(index){
-    if(this.breadCrumbs && this.breadCrumbs.length > 0){
-      let temp = [];
-      for(let i = 0; i < index + 1; i++){
-        temp.push(this.breadCrumbs[i]);
+  @action toggleSettingsPanel(state){
+    if(state === undefined){
+      this.sidePanel = this.sidePanel === "settings"?"":"settings";
+    } else {
+      if(state){
+        this.sidePanel = "settings";
+      } else {
+        this.sidePanel = "";
       }
-      let node = temp[temp.length -1];
-      this.setBreadCrumbs(temp);
-      this.updateGraph(node.id);
     }
+  }
+
+  @action toggleHistoryPanel(state){
+    if(state === undefined){
+      this.sidePanel = this.sidePanel === "history"?"":"history";
+    } else {
+      if(state){
+        this.sidePanel = "history";
+      } else {
+        this.sidePanel = "";
+      }
+    }
+  }
+
+  @action setTypeState(nodeType, state){
+    this.typeStates.set(nodeType, state);
+  }
+
+  get nodeTypeWhitelist(){
+    return nodeTypeWhitelist;
+  }
+
+  @action expandType(typeToExpand){
+    this.expandedTypes.push(typeToExpand);
+  }
+
+  @action collapseType(typeToCollapse){
+    remove(this.expandedTypes, type => typeToCollapse === type);
+  }
+
+  @action toggleType(typeToToggle){
+    if(find(this.expandedTypes, type => typeToToggle === type)){
+      this.collapseType(typeToToggle);
+    } else {
+      this.expandType(typeToToggle);
+    }
+  }
+
+  @action historyPush(nextNode){
+    this.nodeHistory.push(find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId));
+    this.routerHistory.push("/graph/"+nextNode.id);
+  }
+  @action historyBack(level = 0){
+    level = this.nodeHistory.length - 1 - level;
+    let targetNode = this.nodeHistory[level];
+    this.nodeHistory = slice(this.nodeHistory, 0, level);
+    this.routerHistory.push("/graph/"+targetNode.id);
+  }
+
+  getCurrentNode(){
+    return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
   }
 }

@@ -7,6 +7,8 @@ import GraphStore from "../Stores/GraphStore";
 import PaneStore from "../Stores/PaneStore";
 import InstanceForm from "./Instance/InstanceForm/index";
 import Graph from "./Instance/Graph";
+import GraphSettings from "./Instance/GraphSettings";
+import GraphHistory from "./Instance/GraphHistory";
 
 const styles = {
   container:{
@@ -33,11 +35,19 @@ const styles = {
     borderRadius:"4px",
     padding:"20px",
     position:"relative"
+  },
+
+  settings:{
+    extend:"form"
+  },
+
+  history:{
+    extend:"form"
   }
 };
 
 @injectStyles(styles)
-@inject("navigationStore")
+@inject("navigationStore", "routerHistory")
 @observer
 export default class GraphInstance extends React.Component {
   constructor(props) {
@@ -45,6 +55,7 @@ export default class GraphInstance extends React.Component {
     this.instanceStore = new InstanceStore(this.props.history, this.props.match.params.id);
     this.props.navigationStore.setInstanceStore(this.instanceStore);
     this.graphStore = new GraphStore(this.instanceStore);
+    this.graphStore.registerRouter(props.routerHistory);
     this.paneStore = new PaneStore();
   }
 
@@ -53,7 +64,8 @@ export default class GraphInstance extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    this.store.setMainInstance(newProps.match.params.id);
+    this.instanceStore.setMainInstance(newProps.match.params.id);
+    this.graphStore.fetchGraph(newProps.match.params.id);
   }
 
   render() {
@@ -65,9 +77,19 @@ export default class GraphInstance extends React.Component {
           <div className={classes.graph}>
             <Graph />
           </div>
-          <div className={classes.form}>
-            <InstanceForm level={0} id={this.instanceStore.mainInstanceId} />
-          </div>
+          {this.graphStore.sidePanel === "settings"?
+            <div className={classes.settings}>
+              <GraphSettings/>
+            </div>
+            :this.graphStore.sidePanel === "history"?
+              <div className={classes.history}>
+                <GraphHistory/>
+              </div>
+              :
+              <div className={classes.form}>
+                <InstanceForm level={0} id={this.instanceStore.mainInstanceId} />
+              </div>
+          }
         </div>
       </Provider>
     );

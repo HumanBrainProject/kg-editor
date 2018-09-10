@@ -1,14 +1,16 @@
 import React from "react";
 import { observer, inject, Provider } from "mobx-react";
 import injectStyles from "react-jss";
+import { Button, Glyphicon } from "react-bootstrap";
 
 import InstanceStore from "../Stores/InstanceStore";
 import GraphStore from "../Stores/GraphStore";
 import PaneStore from "../Stores/PaneStore";
-import InstanceForm from "./Instance/InstanceForm/index";
+import InstanceForm from "./Instance/InstanceForm.js";
 import Graph from "./Instance/Graph";
 import GraphSettings from "./Instance/GraphSettings";
 import GraphHistory from "./Instance/GraphHistory";
+import Instance from "./Instance";
 
 const styles = {
   container:{
@@ -19,14 +21,15 @@ const styles = {
     height:"calc(100vh - 120px)",
     display:"grid",
     gridGap:"20px",
-    gridTemplateRows:"1fr",
+    gridTemplateRows:"1fr 300px",
     gridTemplateColumns:"1fr 600px"
   },
 
   graph:{
     background:"white",
     borderRadius:"4px",
-    overflow:"hidden"
+    overflow:"hidden",
+    gridRow:"1/span 2"
   },
 
   form:{
@@ -43,6 +46,21 @@ const styles = {
 
   history:{
     extend:"form"
+  },
+
+  editInstance:{
+    position:"fixed",
+    background:"rgba(0,0,0,0.75)",
+    top:0,
+    left:0,
+    zIndex:100,
+    width:"100vw",
+    height:"100vh"
+  },
+  closeEdit:{
+    position:"absolute",
+    top:20,
+    right:20
   }
 };
 
@@ -53,6 +71,7 @@ export default class GraphInstance extends React.Component {
   constructor(props) {
     super(props);
     this.instanceStore = new InstanceStore(this.props.history, this.props.match.params.id);
+    this.instanceStore.readOnlyMode = true;
     this.props.navigationStore.setInstanceStore(this.instanceStore);
     this.graphStore = new GraphStore(this.instanceStore);
     this.graphStore.registerRouter(props.routerHistory);
@@ -68,6 +87,10 @@ export default class GraphInstance extends React.Component {
     this.graphStore.fetchGraph(newProps.match.params.id);
   }
 
+  handleCloseEdit = () => {
+    this.graphStore.toggleEditModal();
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -75,20 +98,24 @@ export default class GraphInstance extends React.Component {
       <Provider instanceStore={this.instanceStore} graphStore={this.graphStore} paneStore={this.paneStore}>
         <div className={classes.container}>
           <div className={classes.graph}>
-            <Graph />
+            {!this.graphStore.editModal && <Graph />}
           </div>
           {this.graphStore.sidePanel === "settings"?
             <div className={classes.settings}>
               <GraphSettings/>
             </div>
-            :this.graphStore.sidePanel === "history"?
-              <div className={classes.history}>
-                <GraphHistory/>
-              </div>
-              :
-              <div className={classes.form}>
-                <InstanceForm level={0} id={this.instanceStore.mainInstanceId} />
-              </div>
+            :<div className={classes.form}>
+              <InstanceForm level={0} id={this.instanceStore.mainInstanceId} />
+            </div>
+          }
+          <div className={classes.history}>
+            <GraphHistory/>
+          </div>
+          {this.graphStore.editModal &&
+            <div className={classes.editInstance}>
+              <Instance history={this.props.routerHistory} match={{params:{id:this.instanceStore.mainInstanceId}}}/>
+              <Button className={`btn ${classes.closeEdit}`} onClick={this.handleCloseEdit}><Glyphicon glyph={"remove"}/></Button>
+            </div>
           }
         </div>
       </Provider>

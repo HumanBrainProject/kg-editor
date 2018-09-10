@@ -3,15 +3,15 @@ import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Glyphicon } from "react-bootstrap";
 import { Form } from "hbp-quickfire";
-import HeaderPanel from "./HeaderPanel";
-import SummaryPanel from "./SummaryPanel";
-import BodyPanel from "./BodyPanel";
-import FooterPanel from "./FooterPanel";
-import FetchErrorPanel from "./FetchErrorPanel";
-import SaveErrorPanel from "./SaveErrorPanel";
-import FetchingPanel from "./FetchingPanel";
-import SavingPanel from "./SavingPanel";
-import ConfirmCancelEditPanel from "./ConfirmCancelEditPanel";
+import HeaderPanel from "./InstanceForm/HeaderPanel";
+import SummaryPanel from "./InstanceForm/SummaryPanel";
+import BodyPanel from "./InstanceForm/BodyPanel";
+import FooterPanel from "./InstanceForm/FooterPanel";
+import FetchErrorPanel from "./InstanceForm/FetchErrorPanel";
+import SaveErrorPanel from "./InstanceForm/SaveErrorPanel";
+import FetchingPanel from "./InstanceForm/FetchingPanel";
+import SavingPanel from "./InstanceForm/SavingPanel";
+import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 
 const styles = {
   panelHeader: {
@@ -211,6 +211,7 @@ export default class InstanceForm extends React.Component {
     const instance = instanceStore.getInstance(this.props.id);
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
+    const readOnlyMode = this.props.instanceStore.readOnlyMode;
 
     const [organization, domain, schema, version,] = this.props.id.split("/");
 
@@ -283,7 +284,7 @@ export default class InstanceForm extends React.Component {
               isReadMode={isReadMode}
               onEdit={this.handleEdit}
               onReadMode={this.handleCancelEdit}
-              showButtons={!instance.isNew && isCurrentInstance && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel}
+              showButtons={!readOnlyMode && !instance.isNew && isCurrentInstance && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel}
               instanceStatus={instance.data.status}
               childrenStatus={instance.data.childrenStatus}/>
             <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} instance={instance} fields={getSummaryFields(instance)} />

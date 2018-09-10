@@ -2,7 +2,7 @@ import React from "react";
 import {observer, inject} from "mobx-react";
 import injectStyles from "react-jss";
 import Color from "color";
-import {Glyphicon} from "react-bootstrap";
+import { Glyphicon } from "react-bootstrap";
 import { isString } from "lodash";
 
 const styles = {
@@ -51,6 +51,9 @@ export default class GraphHistory extends React.Component{
 
   render(){
     const {classes, graphStore} = this.props;
+    if(graphStore.typeStates === null){
+      return null;
+    }
     let currentNode = graphStore.getCurrentNode();
     return (
       <div className={classes.container}>

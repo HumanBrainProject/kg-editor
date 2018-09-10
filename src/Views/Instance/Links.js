@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import Pane from "./Pane";
-import InstanceForm from "./InstanceForm/index";
+import InstanceForm from "./InstanceForm.js";
 
 const styles = {
   pane: {
@@ -20,7 +20,7 @@ class Links extends React.Component{
     const instance = this.props.instanceStore.getInstance(this.props.id);
     if(instance.isFetched){
       linkKeys = Object.keys(instance.data.fields).filter(fieldKey => {
-        return instance.form.getField(fieldKey).isLink;
+        return instance.form.getField(fieldKey).isLink && instance.form.getField(fieldKey).getValue().length > 0;
       });
     }
     return(

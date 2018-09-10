@@ -110,7 +110,7 @@ export default class Menu extends React.Component{
 
   render(){
     const {classes, navigationStore} =  this.props;
-    const viewIcon = navigationStore.showGraph? "align-justify": "grain";
+    const viewIcon = navigationStore.showGraph? "grain": "th";
 
     return (
       <div className={classes.container}>

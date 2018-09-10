@@ -10,6 +10,7 @@ export default class InstanceStore {
   @observable currentInstancePath = [];
   @observable optionsCache = new Map();
   @observable highlightedInstance = null;
+  @observable readOnlyMode = false;
 
   constructor(history, instanceId){
     this.history = history;

@@ -27,7 +27,8 @@ const nodeTypeWhitelist = [
   "EthicsAuthority",
   "Format",
   "LicenseInformation",
-  "ExperimentSample"
+  "ExperimentSample",
+  "File"
 ];
 
 const colorScheme = {};
@@ -37,10 +38,11 @@ nodeTypeWhitelist.forEach((type, index) => {colorScheme[type] = colorTable[index
 
 export default class GraphStore {
   @observable step = 2;
-  @observable selectedNode;
   @observable sidePanel = false;
   @observable typeStates = null;
   @observable expandedTypes = [];
+
+  @observable editModal = false;
 
   @observable.shallow nodeHistory = [];
 
@@ -222,15 +224,11 @@ export default class GraphStore {
     }
   }
 
-  @action toggleHistoryPanel(state){
+  @action toggleEditModal(state){
     if(state === undefined){
-      this.sidePanel = this.sidePanel === "history"?"":"history";
+      this.editModal = !this.editModal;
     } else {
-      if(state){
-        this.sidePanel = "history";
-      } else {
-        this.sidePanel = "";
-      }
+      this.editModal = !!state;
     }
   }
 

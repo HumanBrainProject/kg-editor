@@ -23,11 +23,9 @@ export default class BodyPanel extends React.Component{
     const { classes, className,  show, level, id, instance, fields } = this.props;
     return(
       <Panel className={`${classes.panel} ${className}`} expanded={show} onToggle={() => {}}>
-        <Panel.Collapse>
-          <Panel.Body>
-            {fields.map(name => <InstanceField key={name} name={name} level={level} id={id} instance={instance} />)}
-          </Panel.Body>
-        </Panel.Collapse>
+        <Panel.Body>
+          {fields.map(name => <InstanceField key={name} name={name} level={level} id={id} instance={instance} />)}
+        </Panel.Body>
       </Panel>
     );
   }

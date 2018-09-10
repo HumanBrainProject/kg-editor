@@ -2,7 +2,7 @@ import React from "react";
 import { observer, inject, Provider } from "mobx-react";
 import InstanceStore from "../Stores/InstanceStore";
 
-import InstanceForm from "./Instance/InstanceForm/index";
+import InstanceForm from "./Instance/InstanceForm.js";
 import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";

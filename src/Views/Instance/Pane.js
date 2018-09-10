@@ -10,7 +10,7 @@ const styles = {
     margin: "0",
     transform: "scale(0.90)",
     padding: "20px",
-    transition: "all 0.5s ease",
+    transition: "transform 0.5s ease",
     "@media screen and (min-width:992px)": {
       marginRight: "20px",
       marginLeft: "20px",
@@ -40,7 +40,7 @@ const styles = {
     },
     "& > div": {
       opacity: "0.75",
-      transition: "all 0.5s ease"
+      transition: "opacity 0.5s ease"
     },
     "&.activing": {
       zIndex: "1000"

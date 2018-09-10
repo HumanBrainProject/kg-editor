@@ -35,10 +35,10 @@ const styles = {
     top:"20px",
     right:"20px"
   },
-  history:{
+  edit:{
     position:"absolute",
-    top:"74px",
-    right:"20px"
+    top:"20px",
+    right:"74px"
   }
 };
 
@@ -99,33 +99,38 @@ export default class Graph extends React.Component {
     this.props.graphStore.toggleSettingsPanel();
   }
 
-  handleToggleHistory = () => {
-    this.props.graphStore.toggleHistoryPanel();
+  handleToggleEdit = () => {
+    this.props.graphStore.toggleEditModal();
   }
 
   handleNodeHover = (node) => {
     this.props.graphStore.hlNode(node);
   }
 
-  _wrapText(context, text, x, y, maxWidth, lineHeight) {
-    let words = text.split(/( |_|-|\.)/gi);
-    let line = "";
-    let lines = [];
+  _wrapText(context, text, x, y, maxWidth, lineHeight, node) {
+    if(node.labelLines === undefined){
+      let words = text.split(/( |_|-|\.)/gi);
+      let line = "";
+      let lines = [];
 
-    for(let n = 0; n < words.length; n++) {
-      let testLine = line + words[n];
-      let metrics = context.measureText(testLine);
-      let testWidth = metrics.width;
-      if (testWidth > maxWidth && n > 0) {
-        lines.push(line);
-        line = words[n];
-      }  else {
-        line = testLine;
+      for(let n = 0; n < words.length; n++) {
+        let testLine = line + words[n];
+        let metrics = context.measureText(testLine);
+        let testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          lines.push(line);
+          line = words[n];
+        }  else {
+          line = testLine;
+        }
       }
+      lines.push(line);
+
+      node.labelLines = lines;
     }
-    lines.push(line);
-    y = y-(lineHeight*(lines.length-2)/2);
-    lines.forEach(line => {
+
+    y = y-(lineHeight*(node.labelLines.length-2)/2);
+    node.labelLines.forEach(line => {
       context.fillText(line, x, y);
       y+=lineHeight;
     });
@@ -163,7 +168,7 @@ export default class Graph extends React.Component {
         label = `(${node.dataType}) ${label}`;
       }
 
-      this._wrapText(ctx, label, node.x, node.y, 10, 1.3);
+      this._wrapText(ctx, label, node.x, node.y, 10, 1.3, node);
     }
 
     ctx.globalAlpha = 1;
@@ -213,7 +218,7 @@ export default class Graph extends React.Component {
           nodeCanvasObject={this._paintNode}
           onNodeClick={this.handleNodeClick}
           onNodeHover={this.handleNodeHover}
-          cooldownTime={15000}
+          cooldownTime={4000}
           linkColor={this.linkColor}
           linkWidth={this.linkWidth}
           nodeRelSize={7}
@@ -222,7 +227,7 @@ export default class Graph extends React.Component {
         }
         <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
         <Button className={`${classes.settings} btn btn-primary`} onClick={this.handleToggleSettings}><Glyphicon glyph={"cog"}/></Button>
-        <Button className={`${classes.history} btn btn-primary`} onClick={this.handleToggleHistory}><Glyphicon glyph={"time"}/></Button>
+        <Button className={`${classes.edit} btn btn-primary`} onClick={this.handleToggleEdit}><Glyphicon glyph={"edit"}/>&nbsp;Edit this instance</Button>
         <Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />
       </div>
     );

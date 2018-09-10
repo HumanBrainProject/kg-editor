@@ -111,28 +111,20 @@ export default class InstanceField extends React.Component{
   render(){
     const { classes, name, instance } = this.props;
     const field = instance.data.fields[name];
+    const readOnlyMode = this.props.instanceStore.readOnlyMode;
     if (field) {
       if (field.type === "TextArea")  {
         return <Field key={name} name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
       if (field.type === "DropdownSelect" && field.isLink) {
-        if (field.allowCustomValues) {
-          return <Field key={name} name={name} className={classes.field}
-            onValueClick={this.handleFieldFocus}
-            onValueFocus={this.handleToggleOnFieldHighlight}
-            onValueMouseEnter={this.handleToggleOnFieldHighlight}
-            onValueBlur={this.handleToggleOffFieldHighlight}
-            onValueMouseLeave={this.handleToggleOffFieldHighlight}
-            readModeRendering={this.renderReadModeField}
-            onAddCustomValue={this.addCustomValueHandler} />;
-        }
         return <Field key={name} name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
           onValueBlur={this.handleToggleOffFieldHighlight}
           onValueMouseLeave={this.handleToggleOffFieldHighlight}
-          readModeRendering={this.renderReadModeField}/>;
+          readModeRendering={readOnlyMode?undefined:this.renderReadModeField}
+          onAddCustomValue={field.allowCustomValues?this.addCustomValueHandler:undefined} />;
       }
       return <Field key={name} name={name} className={classes.field} />;
     }

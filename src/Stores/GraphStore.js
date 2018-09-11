@@ -28,7 +28,8 @@ const nodeTypeWhitelist = [
   "Format",
   "LicenseInformation",
   "ExperimentSample",
-  "File"
+  "File",
+  "Subject"
 ];
 
 const colorScheme = {};

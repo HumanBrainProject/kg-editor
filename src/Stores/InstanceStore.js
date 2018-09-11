@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed} from "mobx";
-import { find, remove } from "lodash";
+import { find, remove, uniqueId } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
@@ -11,6 +11,8 @@ export default class InstanceStore {
   @observable optionsCache = new Map();
   @observable highlightedInstance = null;
   @observable readOnlyMode = false;
+
+  generatedKeys = new WeakMap();
 
   constructor(history, instanceId){
     this.history = history;
@@ -48,6 +50,13 @@ export default class InstanceStore {
       const instance = this.instances.get(instanceId);
       instance.highlight = provenence;
     }
+  }
+
+  getGeneratedKey(from, namespace){
+    if(!this.generatedKeys.has(from)){
+      this.generatedKeys.set(from, uniqueId(namespace));
+    }
+    return this.generatedKeys.get(from);
   }
 
   checkLinkedInstances(instance, check) {
@@ -259,11 +268,15 @@ export default class InstanceStore {
       }
       instance.hasChanged = false;
       instance.cancelRequest = false;
+      instance.saveError = null;
+      instance.hasSaveError = false;
       this.instances.delete(instanceId);
     } else {
       instance.form.injectValues(instance.initialValues);
       instance.hasChanged = false;
       instance.cancelRequest = false;
+      instance.saveError = null;
+      instance.hasSaveError = false;
     }
   }
 

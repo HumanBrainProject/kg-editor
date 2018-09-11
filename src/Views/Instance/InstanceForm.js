@@ -141,7 +141,7 @@ export default class InstanceForm extends React.Component {
   }
 
   fetchInstance = () => {
-    this.props.instanceStore.fetchInstanceData(this.props.id);
+    this.props.instanceStore.getInstance(this.props.id);
   }
 
   handleFocus = () => {

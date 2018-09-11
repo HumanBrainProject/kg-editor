@@ -4,17 +4,17 @@ import { inject, observer } from "mobx-react";
 
 const styles = {
   pane: {
+    position:"absolute",
+    width:"50%",
+    height:"100%",
+    "--pane-index":"0",
+    left:"calc(calc(50% * calc(var(--pane-index) - var(--selected-index))) + 25%)",
     overflow: "auto",
     background: "#ebebeb",
     boxShadow: "0 2px 10px #333",
-    margin: "0",
     transform: "scale(0.90)",
     padding: "20px",
-    transition: "transform 0.5s ease",
-    "@media screen and (min-width:992px)": {
-      marginRight: "20px",
-      marginLeft: "20px",
-    },
+    transition: "left 0.5s ease, transform 0.5s ease",
     "&.active": {
       background: "#f5f5f5",
       transform: "scale(1)"
@@ -22,36 +22,20 @@ const styles = {
     "&.main, &.main.active": {
       background: "white"
     },
-    /*"&.after, &.before":{
-      zIndex:2
-    },*/
     "&:hover": {
       zIndex: 2
     },
     "&.after:hover": {
-      background: "white",
-      transform: "scale(0.95) translateX(-50%)",
-      marginRight: "40px"
+      transform: "scale(0.95) translateX(-50%)"
     },
     "&.before:hover": {
-      background: "white",
-      transform: "scale(0.95) translateX(50%)",
-      marginLeft: "40px"
+      transform: "scale(0.95) translateX(50%)"
     },
     "& > div": {
       opacity: "0.75",
-      transition: "opacity 0.5s ease"
+      transition: "opacity 0.25s ease"
     },
-    "&.activing": {
-      zIndex: "1000"
-    },
-    "&.active > div": {
-      opacity: "1"
-    },
-    "&.after:hover > div": {
-      opacity: "1"
-    },
-    "&.before:hover > div": {
+    "&.active > div, &.after:hover > div, &.before:hover > div": {
       opacity: "1"
     }
   }
@@ -76,18 +60,13 @@ export default class Pane extends React.Component {
     }
   }
 
-  handleMouseOver = () => {
-    this.props.paneStore.resetSelectionChanged();
-  }
-
   render() {
     const { classes, paneStore } = this.props;
     const index = paneStore.panes.indexOf(this.paneId);
     const mainClass = index === 0 ? " main" : "";
     const activeClass = paneStore.selectedIndex < index ? "after" : paneStore.selectedIndex > index ? "before" : "active";
-    const onClass = paneStore.selectionChanged ? "activing" : "";
     return (
-      <div className={`${classes.pane}${mainClass} ${activeClass} ${onClass}`} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
+      <div className={`${classes.pane}${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
         <div>
           {this.props.children}
         </div>

@@ -68,6 +68,9 @@ export default class GraphHistory extends React.Component{
         }
 
         {graphStore.nodeHistory.concat().reverse().map((node, index) => {
+          if(!node){
+            return null;
+          }
           return(
             <div className={`${classes.entry}`} key={node.id+"_"+index} onClick={this.handleEntryClick.bind(this, index)}>
               <div className={classes.entryLegend} style={{borderRadius: "50%", background:graphStore.colorScheme[node.dataType], borderColor:new Color(graphStore.colorScheme[node.dataType]).darken(0.25).hex()}}/>

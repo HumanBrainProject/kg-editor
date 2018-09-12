@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import injectStyles from "react-jss";
 import {Button, ButtonGroup, Glyphicon} from "react-bootstrap";
 import { uniqueId } from "lodash";
+import { Prompt } from "react-router-dom";
 
 const animationId = uniqueId("animationId");
 
@@ -110,11 +111,29 @@ export default class SavePanel extends React.Component{
     this.props.instanceStore.cancelSaveInstance(instanceId);
   }
 
+  onUnload = (event) => { // the method that will be used for both add and remove event
+    if(Array.from(this.props.instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).length === 0){
+      return null;
+    }
+    event.returnValue = "You have unsaved modifications. Are you sure you want to leave this page?";
+    return event.returnValue;
+  }
+
+  componentDidMount() {
+    window.addEventListener("beforeunload", this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.onUnload);
+  }
+
   render(){
     const { classes, instanceStore } = this.props;
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
+
     return(
       <div className={classes.container}>
+        <Prompt when={changedInstances.length > 0} message={()=>"You have unsaved modifications. Are you sure you want to leave this page?"}/>
         <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
         <div className={classes.instances}>
           {changedInstances.length === 0 &&

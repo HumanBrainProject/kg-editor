@@ -21,7 +21,7 @@ const styles = {
     position: "relative",
     width: "100%",
     height: "100%",
-    background: `url(${window.rootPath}/assets/hbp_home.jpg) center center no-repeat #154979`,
+    background: "linear-gradient(165deg, #085078, #85d8ce)",
     backgroundSize: "cover",
     animation: `${animationId} 30s linear infinite`
   },

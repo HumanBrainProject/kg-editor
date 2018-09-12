@@ -45,7 +45,7 @@ const styles = {
     height: "100vh",
     width: "100vw",
     overflow:"hidden",
-    background: `url(${window.rootPath}/assets/hbp_home.jpg) center center no-repeat #154979`,
+    background: "linear-gradient(165deg, #085078, #85d8ce)",
     backgroundSize: "cover",
     "@media screen and (min-width:576px)": {
       display: "block"

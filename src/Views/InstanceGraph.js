@@ -88,7 +88,10 @@ export default class GraphInstance extends React.Component {
   }
 
   handleCloseEdit = () => {
-    this.graphStore.toggleEditModal();
+    if(Array.from(this.editorInstanceStoreRef.instances.entries()).filter(([, instance]) => instance.hasChanged).length === 0
+    || window.confirm("You have unsaved modifications. Are you sure you want to leave this page?")){
+      this.graphStore.toggleEditModal();
+    }
   }
 
   render() {
@@ -113,7 +116,7 @@ export default class GraphInstance extends React.Component {
           </div>
           {this.graphStore.editModal &&
             <div className={classes.editInstance}>
-              <Instance history={this.props.routerHistory} match={{params:{id:this.instanceStore.mainInstanceId}}}/>
+              <Instance refInstanceStore={ref => this.editorInstanceStoreRef = ref} history={this.props.routerHistory} match={{params:{id:this.instanceStore.mainInstanceId}}}/>
               <Button className={`btn ${classes.closeEdit}`} onClick={this.handleCloseEdit}><Glyphicon glyph={"remove"}/></Button>
             </div>
           }

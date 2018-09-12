@@ -36,6 +36,9 @@ export default class Edit extends React.Component {
     super(props);
     this.store = new InstanceStore(this.props.history, this.props.match.params.id);
     this.props.navigationStore.setInstanceStore(this.store);
+    if(this.props.refInstanceStore){
+      this.props.refInstanceStore(this.store);
+    }
   }
 
   componentWillUnmount() {

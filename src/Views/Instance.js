@@ -8,7 +8,7 @@ import InstanceForm from "./Instance/InstanceForm.js";
 import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";
-import SavePanel from "./Instance/SavePanel";
+import SaveBar from "./Instance/SaveBar";
 
 const styles = {
   container:{
@@ -65,7 +65,7 @@ export default class Edit extends React.Component {
             </PaneContainer>
           </div>
           <div className={classes.sidebar}>
-            <SavePanel/>
+            <SaveBar/>
           </div>
         </div>
       </Provider>

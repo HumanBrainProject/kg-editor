@@ -285,8 +285,8 @@ export default class InstanceForm extends React.Component {
               onEdit={this.handleEdit}
               onReadMode={this.handleCancelEdit}
               showButtons={!readOnlyMode && !instance.isNew && isCurrentInstance && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel}
-              instanceStatus={instance.data.status}
-              childrenStatus={instance.data.childrenStatus}/>
+              instanceStatus={instance.data && instance.data.status}
+              childrenStatus={instance.data && instance.data.childrenStatus}/>
             <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} instance={instance} fields={getSummaryFields(instance)} />
             <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} instance={instance} fields={getBodyFields(instance)} show={isMainInstance || isCurrentInstance || !isReadMode} />
             <FooterPanel

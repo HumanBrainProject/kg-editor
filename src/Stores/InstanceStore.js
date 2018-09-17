@@ -11,6 +11,7 @@ export default class InstanceStore {
   @observable optionsCache = new Map();
   @observable highlightedInstance = null;
   @observable readOnlyMode = false;
+  @observable comparedInstanceId = null;
 
   generatedKeys = new WeakMap();
 
@@ -372,6 +373,11 @@ export default class InstanceStore {
     const instance = this.instances.get(instanceId);
     instance.saveError = null;
     instance.hasSaveError = false;
+  }
+
+  @action
+  setComparedInstance(instanceId){
+    this.comparedInstanceId = instanceId;
   }
 
 }

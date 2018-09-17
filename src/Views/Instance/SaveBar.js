@@ -1,9 +1,10 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import injectStyles from "react-jss";
-import {Button, ButtonGroup, Glyphicon} from "react-bootstrap";
+import {Button, ButtonGroup, Glyphicon, Modal} from "react-bootstrap";
 import { uniqueId } from "lodash";
 import { Prompt } from "react-router-dom";
+import CompareChanges from "./CompareChanges";
 
 const animationId = uniqueId("animationId");
 
@@ -89,6 +90,9 @@ const styles = {
   allGreenText:{
     fontWeight:"bold",
     marginTop:"20px"
+  },
+  compareModal:{
+    width:"90%"
   }
 };
 
@@ -103,12 +107,17 @@ export default class SavePanel extends React.Component{
   }
   handleSave(instanceId){
     this.props.instanceStore.saveInstance(instanceId);
+    this.props.instanceStore.setComparedInstance(null);
   }
   handleReset(instanceId){
     this.props.instanceStore.confirmCancelInstanceChanges(instanceId);
+    this.props.instanceStore.setComparedInstance(null);
   }
   handleDismissSaveError(instanceId){
     this.props.instanceStore.cancelSaveInstance(instanceId);
+  }
+  handleShowCompare(instanceId){
+    this.props.instanceStore.setComparedInstance(instanceId);
   }
 
   onUnload = (event) => { // the method that will be used for both add and remove event
@@ -131,11 +140,27 @@ export default class SavePanel extends React.Component{
     const { classes, instanceStore } = this.props;
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
 
+    const comparedInstance = instanceStore.comparedInstanceId?instanceStore.getInstance(instanceStore.comparedInstanceId):null;
+
     return(
       <div className={classes.container}>
         <Prompt when={changedInstances.length > 0} message={()=>"You have unsaved modifications. Are you sure you want to leave this page?"}/>
         <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
         <div className={classes.instances}>
+          {instanceStore.comparedInstanceId &&
+            <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
+              <Modal.Header closeButton>
+                <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue()}
+              </Modal.Header>
+              <Modal.Body>
+                <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+              </Modal.Body>
+              <Modal.Footer>
+                {!comparedInstance.isNew && <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>}
+                <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"save"}/>&nbsp;Save this instance</Button>
+              </Modal.Footer>
+            </Modal>
+          }
           {changedInstances.length === 0 &&
             <div className={classes.noChanges}>
               <div className={classes.allGreenIcon}><Glyphicon glyph={"ok"}/></div>
@@ -156,6 +181,7 @@ export default class SavePanel extends React.Component{
                     <ButtonGroup vertical>
                       <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)}><Glyphicon glyph={"save"}/></Button>
                       {!instance.isNew && <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>}
+                      {!instance.isNew && <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>}
                     </ButtonGroup>
                   }
                 </div>

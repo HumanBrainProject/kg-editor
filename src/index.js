@@ -1,30 +1,39 @@
 import React from "react";
 import { render } from "react-dom";
-import { observer, Provider } from "mobx-react";
-import { Router, Route, Switch } from "react-router-dom";
+import { observer } from "mobx-react";
+import { Router, Route, Switch, matchPath } from "react-router-dom";
 import injectStyles from "react-jss";
-
-import createBrowserHistory from "history/createBrowserHistory";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faUserLock, faQuestionCircle, faHome, faSearch,
+  faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
-import NavigationStore from "./Stores/NavigationStore";
-import Login from "./Views/Login";
-import Home from "./Views/Home";
+import routerStore from "./Stores/RouterStore";
+import instanceStore from "./Stores/InstanceStore";
+import graphStore from "./Stores/GraphStore";
+
+import Tab from "./Components/Tab";
+
 import NotFound from "./Views/NotFound";
+import Home from "./Views/Home";
+import Login from "./Views/Login";
+import Help from "./Views/Help";
+import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
-import NodeType from "./Views/NodeType";
 import Instance from "./Views/Instance";
 import Release from "./Views/Release";
-import InstanceGraph from "./Views/InstanceGraph";
-import Menu from "./Views/Menu";
+
 import "babel-polyfill";
 
-const routerHistory = createBrowserHistory({basename:window.rootPath});
-
 const styles = {
-  "@global html, @global body, @global #root": {
+  "@global html, body, #root": {
     height: "100%",
-    overflow: "hidden"
+    overflow: "hidden",
+    textRendering: "optimizeLegibility",
+    "-webkit-font-smoothing": "antialiased",
+    "-webkit-tap-highlight-color": "transparent",
+    fontFamily:"Lato, sans-serif"
   },
   "@global *": {
     boxSizing: "border-box"
@@ -33,51 +42,51 @@ const styles = {
     "-webkit-touch-callout": "none",
     userSelect: "none"
   },
-  container:{
-    textRendering: "optimizeLegibility",
-    "-webkit-font-smoothing": "antialiased",
-    "-webkit-tap-highlight-color": "transparent",
-    fontFamily:"Lato, sans-serif",
-    height: "100vh"
+
+  layout:{
+    height: "100vh",
+    display:"grid",
+    overflow:"hidden",
+    gridTemplateColumns:"1fr",
+    gridTemplateRows:"auto 1fr 20px"
+  },
+  tabs: {
+    background: "#141618",
+    display:"grid",
+    gridTemplateRows:"1fr",
+    gridTemplateColumns:"auto auto 1fr auto"
+  },
+  fixedTabsLeft:{
+    display:"grid",
+    gridTemplateColumns:"repeat(6, auto)"
+  },
+  dynamicTabs:{
+    display:"grid",
+    gridTemplateColumns:"repeat(auto-fit, minmax(120px, 0.5fr))"
+  },
+  fixedTabsRight:{
+    display:"grid",
+    gridTemplateColumns:"repeat(6, auto)"
   },
   body: {
     position: "relative",
-    height: "100vh",
-    width: "100vw",
     overflow:"hidden",
-    background: "linear-gradient(165deg, #085078, #85d8ce)",
-    backgroundSize: "cover",
-    "@media screen and (min-width:576px)": {
-      display: "block"
-    }
+    background: "linear-gradient(165deg, #1C2022, #4895a4)",
+    backgroundSize: "200%"
   },
   logo: {
-    position: "absolute",
-    top: "0",
-    left: "0",
     padding: "10px",
-    "& h1": {
+    "& span": {
+      color: "rgb(224, 224, 224)",
       display: "inline-block",
-      margin: 0,
       paddingLeft: "10px",
-      verticalAlign: "middle",
-      color: "white",
-      fontSize: "18px",
-      "@media screen and (min-width:750px)":{
-        fontSize: "28px"
-      }
+      fontSize: "0.9em",
+      borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
+      marginLeft:"10px"
     }
   },
-  menu: {
-    zIndex: "100",
-    position: "absolute",
-    top: "80px",
-    width: "100vw",
-    "@media screen and (min-width:750px)": {
-      top: "10px",
-      right: "10px",
-      width: "auto"
-    }
+  status:{
+    background: "#141618"
   }
 };
 
@@ -87,41 +96,105 @@ class App extends React.Component{
   constructor(props) {
     super(props);
     authStore.tryAuthenticate();
-    this.navigationStore = new NavigationStore();
+    this.state = {currentLocation: routerStore.history.location.pathname};
+    routerStore.history.listen(location => {
+      this.setState({currentLocation:location.pathname});
+    });
   }
+
+  handleCloseInstance(instanceId){
+    if(matchPath(this.state.currentLocation, {path:"/instance/:id*", exact:"true"})){
+      if(matchPath(this.state.currentLocation, {path:`/instance/${instanceId}`, exact:"true"})){
+        if(instanceStore.openedInstances.size > 1){
+          let openedInstances = Array.from(instanceStore.openedInstances.keys());
+          let currentInstanceIndex = openedInstances.indexOf(instanceId);
+          let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
+
+          routerStore.history.push("/instance/"+newInstanceId);
+        } else {
+          routerStore.history.push("/");
+        }
+      }
+    }
+    instanceStore.closeInstance(instanceId);
+  }
+
   render(){
-    let {classes} = this.props;
+    const {classes} = this.props;
+    const {currentLocation} = this.state;
+
     return(
-      <Provider navigationStore={this.navigationStore} routerHistory={routerHistory}>
-        <Router history={routerHistory}>
-          <div className={classes.container}>
+      <Router history={routerStore.history}>
+        <div className={classes.layout}>
+          <div className={classes.tabs}>
+            <div className={classes.logo}>
+              <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
+              <span>Knowledge Graph Editor</span>
+            </div>
+            <div className={classes.fixedTabsLeft}>
+              {!authStore.isAuthenticated?
+                <Tab icon={"user-lock"} active={true}>Login</Tab>
+                :
+                <React.Fragment>
+                  <Tab icon={"home"} active={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
+                  <Tab icon={"search"} active={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
+                </React.Fragment>
+              }
+            </div>
+            <div className={classes.dynamicTabs}>
+              {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
+                const instance = instanceStore.getInstance(instanceId);
+                let label = instanceId;
+                let color = undefined;
+                if(!instance.isFetching && !instance.hasFetchError){
+                  label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+                  color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
+                }
+                return (
+                  <Tab
+                    key={instanceId}
+                    icon={instance.isFetching?"circle-notch":"circle"}
+                    iconSpin={instance.isFetching}
+                    iconColor={color}
+                    active={matchPath(currentLocation, {path:`/instance/${instanceId}`, exact:"true"})}
+                    path={`/instance/${instanceId}`}
+                    onClose={this.handleCloseInstance.bind(this, instanceId)}>
+                    {label}
+                  </Tab>
+                );
+              })}
+            </div>
+            <div className={classes.fixedTabsRight}>
+              <Tab icon={"chart-bar"} active={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
+              <Tab icon={"question-circle"} active={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
+            </div>
+          </div>
+          <div className={classes.body}>
             {!authStore.isAuthenticated?
               <Route component={Login} />
               :
-              <div className={classes.body}>
-                <div className={classes.logo}>
-                  <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="60" height="60" />
-                  <h1>Knowledge Graph Editor</h1>
-                </div>
-                <div className={classes.menu}>
-                  <Menu />
-                </div>
-                <Switch>
-                  <Route path="/instance/:id*" component={Instance} />
-                  <Route path="/release/:id*" component={Release} />
-                  <Route path="/graph/:id*" component={InstanceGraph} />
-                  <Route path="/nodetype/:id*" component={NodeType} />
-                  <Route path="/search" exact={true} component={Search} />
-                  <Route path="/" exact={true} component={Home} />
-                  <Route component={NotFound} />
-                </Switch>
-              </div>
+              <Switch>
+                <Route path="/instance/:id*" component={Instance} />
+                <Route path="/release/:id*" component={Release} />
+                {/*<Route path="/graph/:id*" component={InstanceGraph} />*/}
+                <Route path="/search" exact={true} component={Search} />
+                <Route path="/help" exact={true} component={Help} />
+                <Route path="/kg-stats" exact={true} component={Statistics} />
+                <Route path="/" exact={true} component={Home} />
+                <Route component={NotFound} />
+              </Switch>
             }
           </div>
-        </Router>
-      </Provider>
+          <div className={classes.status}>
+
+          </div>
+        </div>
+      </Router>
     );
   }
 }
+
+library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
+  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar);
 
 render(<App/>, document.getElementById("root"));

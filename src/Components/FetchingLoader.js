@@ -1,8 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
-
-const generateRandomName = () => [...`${new Date().getTime()}`].reduce((r, c) => r + String.fromCharCode(65 + Number(c)), "");
-const animationId = generateRandomName();
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   fetchingPanel: {
@@ -10,25 +8,14 @@ const styles = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    fontSize: "18px",
+    fontSize: "1.2em",
     fontWeight: "lighter",
-    minWidth: "220px"
-  },
-  fetchingGlyphicon: {
-    composes: "glyphicon glyphicon-refresh",
-    animation: `${animationId} .9s infinite linear`,
-    transformOrigin: "50% 44%"
-  },
-  [`@keyframes ${animationId}`]: {
-    "from": {
-      transform: "scale(1) rotate(0deg)"
-    },
-    "to": {
-      transform: "scale(1) rotate(360deg)"
-    }
+    width:"100%",
+    textAlign:"center"
   },
   fetchingLabel: {
-    paddingLeft: "6px"
+    paddingLeft: "6px",
+    display:"inline-block"
   }
 };
 
@@ -39,7 +26,7 @@ export default class FetchingLoader extends React.Component{
 
     return (
       <div className={classes.fetchingPanel}>
-        <span className={classes.fetchingGlyphicon}></span>
+        <FontAwesomeIcon icon="circle-notch" spin/>
         <span className={classes.fetchingLabel}>
           {this.props.children}
         </span>

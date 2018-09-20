@@ -1,10 +1,11 @@
 import React from "react";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import {Button, ButtonGroup, Glyphicon, Modal} from "react-bootstrap";
 import { uniqueId } from "lodash";
 import { Prompt } from "react-router-dom";
 import CompareChanges from "./CompareChanges";
+import instanceStore from "../../Stores/InstanceStore";
 
 const animationId = uniqueId("animationId");
 
@@ -97,31 +98,30 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("instanceStore")
 @observer
 export default class SavePanel extends React.Component{
   handleSaveAll = () => {
-    Array.from(this.props.instanceStore.instances.entries())
+    Array.from(instanceStore.instances.entries())
       .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
-      .forEach(([id, ]) => this.props.instanceStore.saveInstance(id));
+      .forEach(([id, ]) => instanceStore.saveInstance(id));
   }
   handleSave(instanceId){
-    this.props.instanceStore.saveInstance(instanceId);
-    this.props.instanceStore.setComparedInstance(null);
+    instanceStore.saveInstance(instanceId);
+    instanceStore.setComparedInstance(null);
   }
   handleReset(instanceId){
-    this.props.instanceStore.confirmCancelInstanceChanges(instanceId);
-    this.props.instanceStore.setComparedInstance(null);
+    instanceStore.confirmCancelInstanceChanges(instanceId);
+    instanceStore.setComparedInstance(null);
   }
   handleDismissSaveError(instanceId){
-    this.props.instanceStore.cancelSaveInstance(instanceId);
+    instanceStore.cancelSaveInstance(instanceId);
   }
   handleShowCompare(instanceId){
-    this.props.instanceStore.setComparedInstance(instanceId);
+    instanceStore.setComparedInstance(instanceId);
   }
 
   onUnload = (event) => { // the method that will be used for both add and remove event
-    if(Array.from(this.props.instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).length === 0){
+    if(Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).length === 0){
       return null;
     }
     event.returnValue = "You have unsaved modifications. Are you sure you want to leave this page?";
@@ -137,7 +137,7 @@ export default class SavePanel extends React.Component{
   }
 
   render(){
-    const { classes, instanceStore } = this.props;
+    const { classes } = this.props;
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
 
     const comparedInstance = instanceStore.comparedInstanceId?instanceStore.getInstance(instanceStore.comparedInstanceId):null;

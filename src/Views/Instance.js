@@ -1,74 +1,112 @@
 import React from "react";
-import { observer, inject, Provider } from "mobx-react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 
-import InstanceStore from "../Stores/InstanceStore";
+import instanceStore from "../Stores/InstanceStore";
 
 import InstanceForm from "./Instance/InstanceForm.js";
+import InstanceGraph from "./InstanceGraph";
 import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";
 import SaveBar from "./Instance/SaveBar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   container:{
     display:"grid",
     height:"100%",
     gridTemplateRows:"100%",
-    gridTemplateColumns:"1fr 400px"
+    gridTemplateColumns:"50px 1fr 400px",
+  },
+  tabs:{
+    borderRight:"1px solid #111314",
+    background:"#24282a"
+  },
+  tab:{
+    color:"rgba(255, 255, 255, 0.5)",
+    borderLeft:"2px solid transparent",
+    opacity:"0.5",
+    cursor:"pointer",
+    height:"50px",
+    lineHeight:"50px",
+    fontSize:"1.75em",
+    textAlign:"center",
+    "&:hover":{
+      background:"#2b353c",
+      borderColor:"#266ea1",
+      color:"rgb(224, 224, 224)",
+      opacity:"1",
+    },
+    "&.active":{
+      background:"#39464f",
+      borderColor:"#6caddc",
+      color:"rgb(224, 224, 224)",
+      opacity:"1",
+    }
   },
   body:{
     position:"relative",
     overflow:"hidden"
   },
   sidebar:{
-    background:"white",
-    borderLeft:"1px solid #ccc",
-    overflow:"auto"
+    background:"#24282a",
+    borderLeft:"1px solid #111314",
+    overflow:"auto",
+    color:"rgb(224, 224, 224)"
   }
 };
 
 @injectStyles(styles)
-@inject("navigationStore")
 @observer
 export default class Edit extends React.Component {
   constructor(props) {
     super(props);
-    this.store = new InstanceStore(this.props.history, this.props.match.params.id);
-    this.props.navigationStore.setInstanceStore(this.store);
-    if(this.props.refInstanceStore){
-      this.props.refInstanceStore(this.store);
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.navigationStore.setInstanceStore(null);
+    instanceStore.openInstance(this.props.match.params.id);
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    this.store.setMainInstance(newProps.match.params.id);
+    instanceStore.openInstance(newProps.match.params.id);
+  }
+
+  handleSelectMode(mode){
+    instanceStore.setInstanceViewMode(this.props.match.params.id, mode);
   }
 
   render() {
     const {classes} = this.props;
+    const openedInstance = instanceStore.openedInstances.get(this.props.match.params.id);
     return (
-      <Provider instanceStore={this.store}>
-        <div className={classes.container}>
-          <div className={classes.body}>
+      <div className={classes.container}>
+        <div className={classes.tabs}>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
+            <FontAwesomeIcon icon="edit"/>
+          </div>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "viz"?"active":""}`} onClick={this.handleSelectMode.bind(this, "viz")}>
+            <FontAwesomeIcon icon="project-diagram"/>
+          </div>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
+            <FontAwesomeIcon icon="cloud-upload-alt"/>
+          </div>
+        </div>
+        <div className={classes.body}>
+          {openedInstance.viewMode === "edit"?
             <PaneContainer>
               <React.Fragment>
                 <Pane>
-                  <InstanceForm level={0} id={this.store.mainInstanceId} />
+                  <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
                 </Pane>
-                <Links level={1} id={this.store.mainInstanceId} />
+                <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
               </React.Fragment>
             </PaneContainer>
-          </div>
-          <div className={classes.sidebar}>
-            <SaveBar/>
-          </div>
+            :openedInstance.viewMode === "viz"?
+              <InstanceGraph id={this.props.match.params.id}/>
+              :null}
         </div>
-      </Provider>
+        <div className={classes.sidebar}>
+          <SaveBar/>
+        </div>
+      </div>
     );
   }
 }

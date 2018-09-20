@@ -83,16 +83,10 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("navigationStore")
 @observer
 export default class Home extends React.Component{
   constructor(props){
     super(props);
-    this.props.navigationStore.setHomeLinkVisibility(false);
-  }
-
-  componentWillUnmount() {
-    this.props.navigationStore.setHomeLinkVisibility(true);
   }
 
   render(){

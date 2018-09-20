@@ -6,6 +6,8 @@ import {find, remove, clone, pullAll, uniqueId, uniq, flatten, slice} from "loda
 
 import palette from "google-palette";
 
+import routerStore from "../Stores/RouterStore";
+
 const nodeTypeWhitelist = [
   "Dataset",
   "SpecimenGroup",
@@ -37,7 +39,7 @@ const colorScheme = {};
 let colorTable = palette("mpn65", nodeTypeWhitelist.length).map(color => "#"+color);
 nodeTypeWhitelist.forEach((type, index) => {colorScheme[type] = colorTable[index];});
 
-export default class GraphStore {
+class GraphStore {
   @observable step = 2;
   @observable sidePanel = false;
   @observable typeStates = null;
@@ -52,16 +54,6 @@ export default class GraphStore {
   highlightedNode = null;
   connectedNodes = null;
   connectedLinks = null;
-
-  routerHistory = null;
-
-  constructor(instanceStore){
-    this.instanceStore = instanceStore;
-  }
-
-  registerRouter(routerHistory){
-    this.routerHistory = routerHistory;
-  }
 
   get colorScheme(){
     return colorScheme;
@@ -258,17 +250,19 @@ export default class GraphStore {
   }
 
   @action historyPush(nextNode){
-    this.nodeHistory.push(find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId));
-    this.routerHistory.push("/graph/"+nextNode.id);
+    //this.nodeHistory.push(find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId));
+    routerStore.history.push("/instance/"+nextNode.id);
   }
   @action historyBack(level = 0){
     level = this.nodeHistory.length - 1 - level;
     let targetNode = this.nodeHistory[level];
     this.nodeHistory = slice(this.nodeHistory, 0, level);
-    this.routerHistory.push("/graph/"+targetNode.id);
+    routerStore.history.push("/graph/"+targetNode.id);
   }
 
   getCurrentNode(){
     return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
   }
 }
+
+export default new GraphStore();

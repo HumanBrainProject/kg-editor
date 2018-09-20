@@ -1,12 +1,14 @@
 import React from "react";
 import injectStyles from "react-jss";
-import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
-import { observer, inject } from "mobx-react";
+//import Slider from "rc-slider";
+//import "rc-slider/assets/index.css";
+import { observer } from "mobx-react";
 import { ForceGraph2D } from "react-force-graph";
 import { debounce } from "lodash";
 import Color from "color";
 import { Button, Glyphicon } from "react-bootstrap";
+
+import graphStore from "../../Stores/GraphStore";
 
 
 const styles = {
@@ -44,12 +46,10 @@ const styles = {
 
 
 @injectStyles(styles)
-@inject("instanceStore", "graphStore")
 @observer
 export default class Graph extends React.Component {
   constructor(props) {
     super(props);
-    this.props.graphStore.fetchGraph(props.instanceStore.mainInstanceId);
     this.state = {
       graphWidth:0,
       graphHeight:0
@@ -74,19 +74,20 @@ export default class Graph extends React.Component {
   }
 
   changeValue(e) {
-    this.props.graphStore.setStep(e);
-    this.props.graphStore.fetchGraph(this.props.instanceStore.mainInstanceId);
+    graphStore.setStep(e);
+    //TODO: handle that in the store
+    //graphStore.fetchGraph(this.props.instanceStore.mainInstanceId);
   }
 
   handleNavigationClick(index){
-    this.props.graphStore.handleNavigationClick(index);
+    graphStore.handleNavigationClick(index);
   }
 
   handleNodeClick = (node) => {
     if(node.isGroup){
-      this.props.graphStore.explodeNode(node);
+      graphStore.explodeNode(node);
     } else {
-      this.props.graphStore.historyPush(node);
+      graphStore.historyPush(node);
     }
   }
 
@@ -96,15 +97,15 @@ export default class Graph extends React.Component {
   }
 
   handleToggleSettings = () => {
-    this.props.graphStore.toggleSettingsPanel();
+    graphStore.toggleSettingsPanel();
   }
 
   handleToggleEdit = () => {
-    this.props.graphStore.toggleEditModal();
+    graphStore.toggleEditModal();
   }
 
   handleNodeHover = (node) => {
-    this.props.graphStore.hlNode(node);
+    graphStore.hlNode(node);
   }
 
   _wrapText(context, text, x, y, maxWidth, lineHeight, node) {
@@ -146,14 +147,14 @@ export default class Graph extends React.Component {
       ctx.arc(node.x, node.y, 6, 0, 2*Math.PI);
     }
 
-    if(this.props.graphStore.highlightedNode){
-      if(node !== this.props.graphStore.highlightedNode && this.props.graphStore.connectedNodes.indexOf(node) === -1){
+    if(graphStore.highlightedNode){
+      if(node !== graphStore.highlightedNode && graphStore.connectedNodes.indexOf(node) === -1){
         ctx.globalAlpha = 0.1;
       }
     }
 
-    ctx.strokeStyle = new Color(this.props.graphStore.colorScheme[dataType]).darken(0.25).hex();
-    ctx.fillStyle = this.props.graphStore.colorScheme[dataType];
+    ctx.strokeStyle = new Color(graphStore.colorScheme[dataType]).darken(0.25).hex();
+    ctx.fillStyle = graphStore.colorScheme[dataType];
 
     ctx.stroke();
     ctx.fill();
@@ -175,12 +176,12 @@ export default class Graph extends React.Component {
   };
 
   linkColor = (link) => {
-    if(this.props.graphStore.highlightedNode){
-      if(this.props.graphStore.connectedLinks.indexOf(link) === -1){
+    if(graphStore.highlightedNode){
+      if(graphStore.connectedLinks.indexOf(link) === -1){
         return new Color("#ccc").alpha(0.1).rgb();
-      } else if(link.target === this.props.graphStore.highlightedNode){
+      } else if(link.target === graphStore.highlightedNode){
         return new Color("#f39c12").alpha(1).rgb();
-      } else if(link.source === this.props.graphStore.highlightedNode){
+      } else if(link.source === graphStore.highlightedNode){
         return new Color("#1abc9c").alpha(1).rgb();
       }
     } else {
@@ -189,8 +190,8 @@ export default class Graph extends React.Component {
   }
 
   linkWidth = (link) => {
-    if(this.props.graphStore.highlightedNode){
-      if(this.props.graphStore.connectedLinks.indexOf(link) === -1){
+    if(graphStore.highlightedNode){
+      if(graphStore.connectedLinks.indexOf(link) === -1){
         return 1;
       } else {
         return 2;
@@ -201,7 +202,7 @@ export default class Graph extends React.Component {
   }
 
   render() {
-    const { classes, graphStore } = this.props;
+    const { classes } = this.props;
 
     let data = graphStore.graphData;
 
@@ -228,7 +229,7 @@ export default class Graph extends React.Component {
         <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
         <Button className={`${classes.settings} btn btn-primary`} onClick={this.handleToggleSettings}><Glyphicon glyph={"cog"}/></Button>
         <Button className={`${classes.edit} btn btn-primary`} onClick={this.handleToggleEdit}><Glyphicon glyph={"edit"}/>&nbsp;Edit this instance</Button>
-        <Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />
+        {/*<Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />*/}
       </div>
     );
   }

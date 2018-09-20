@@ -6,7 +6,8 @@ const styles = {
   pane: {
     position:"absolute",
     width:"50%",
-    height:"100%",
+    height:"calc(100% - 40px)",
+    top:"20px",
     "--pane-index":"0",
     left:"calc(calc(50% * calc(var(--pane-index) - var(--selected-index))) + 25%)",
     overflow: "auto",

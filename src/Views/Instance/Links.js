@@ -1,8 +1,9 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import Pane from "./Pane";
-import InstanceForm from "./InstanceForm.js";
+import InstanceForm from "./InstanceForm";
+import instanceStore from "../../Stores/InstanceStore";
 
 const styles = {
   pane: {
@@ -11,13 +12,12 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("instanceStore")
 @observer
 class Links extends React.Component{
   render(){
-    const {classes} = this.props;
+    const {classes, mainInstanceId} = this.props;
     let linkKeys = [];
-    const instance = this.props.instanceStore.getInstance(this.props.id);
+    const instance = instanceStore.getInstance(this.props.id);
     if(instance.isFetched){
       linkKeys = Object.keys(instance.data.fields).filter(fieldKey => {
         return instance.form.getField(fieldKey).isLink && instance.form.getField(fieldKey).getValue().length > 0;
@@ -36,7 +36,7 @@ class Links extends React.Component{
                     {fieldObj.value.map(value => {
                       const id = value[fieldObj.mappingValue];
                       return (
-                        <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} />
+                        <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
                       );
                     })}
                   </div>
@@ -47,10 +47,11 @@ class Links extends React.Component{
           :
           null
         }
-        {this.props.instanceStore.currentInstancePath.length-1 >= this.props.level &&
+        {instanceStore.openedInstances.get(mainInstanceId).currentInstancePath.length-1 >= this.props.level &&
           <DecoratedLinks
             level={this.props.level+1}
-            id={this.props.instanceStore.currentInstancePath[this.props.level]}/>
+            id={instanceStore.openedInstances.get(mainInstanceId).currentInstancePath[this.props.level]}
+            mainInstanceId={mainInstanceId} />
         }
       </React.Fragment>
     );

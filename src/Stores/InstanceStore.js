@@ -1,55 +1,77 @@
-import {observable, action, runInAction, computed} from "mobx";
+import {observable, action, runInAction} from "mobx";
 import { find, remove, uniqueId } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
+import routerStore from "./RouterStore";
 
-export default class InstanceStore {
+const nodeTypeMapping = {
+  "Dataset":"Dataset",
+  "Specimen group":"SpecimenGroup",
+  "Subject":"ExperimentSubject",
+  "Activity":"Activity",
+  "Person":"Person",
+  "PLA Component":"PLAComponent",
+  "Publication":"Publication",
+  "File Association":"FileAssociation",
+  "DOI":"DatasetDOI",
+  "Method":"ExperimentMethod",
+  "Reference space":"ReferenceSpace",
+  "Parcellation Region":"ParcellationRegion",
+  "Parcellation Atlas":"ParcellationAtlas",
+  "Embargo Status":"EmbargoStatus",
+  "Approval":"EthicsApproval",
+  "Protocol":"ExperimentProtocol",
+  "Preparation":"Preparation",
+  "Authority":"EthicsAuthority",
+  "Format":"Format",
+  "License Type":"LicenseInformation",
+  "Sample":"ExperimentSample",
+  "File":"File"
+};
+
+class InstanceStore {
   @observable instances = new Map();
-  @observable mainInstanceId = null;
-  @observable currentInstancePath = [];
+  @observable openedInstances = new Map();
   @observable optionsCache = new Map();
-  @observable highlightedInstance = null;
-  @observable readOnlyMode = false;
   @observable comparedInstanceId = null;
 
   generatedKeys = new WeakMap();
 
-  constructor(history, instanceId){
-    this.history = history;
-    this.mainInstanceId = instanceId;
-    this.fetchInstanceData(this.mainInstanceId);
-    this.setCurrentInstanceId(this.mainInstanceId, 0);
+  get nodeTypeMapping(){
+    return nodeTypeMapping;
   }
 
-  get mainInstance(){
-    return this.getInstance(this.mainInstanceId);
+  @action openInstance(instanceId){
+    this.openedInstances.set(instanceId, {
+      currentInstancePath: [],
+      viewMode: "edit",
+      readOnlyMode: false
+    });
+    this.getInstance(instanceId);
+    this.setCurrentInstanceId(instanceId, instanceId, 0);
+  }
+
+  @action setInstanceViewMode(instanceId, mode){
+    this.openedInstances.get(instanceId).viewMode = mode;
+  }
+
+  @action closeInstance(instanceId){
+    this.openedInstances.delete(instanceId);
   }
 
   @action
-  setMainInstance(mainInstanceId){
-    this.mainInstanceId = mainInstanceId;
-    this.fetchInstanceData(this.mainInstanceId);
-    this.setCurrentInstanceId(this.mainInstanceId, 0);
-  }
-
-  @action
-  getInstance(instanceId){
-    if (this.instances.has(instanceId)) {
+  getInstance(instanceId, forceFetch = false){
+    if (this.instances.has(instanceId) && !forceFetch) {
       return this.instances.get(instanceId);
     }
     return this.fetchInstanceData(instanceId);
   }
 
-  @computed get currentInstanceId(){
-    return this.currentInstancePath[this.currentInstancePath.length-1];
-  }
-
   @action
   setInstanceHighlight(instanceId, provenence) {
     if (this.instances.has(instanceId)) {
-      const instance = this.instances.get(instanceId);
-      instance.highlight = provenence;
+      this.instances.get(instanceId).highlight = provenence;
     }
   }
 
@@ -207,8 +229,9 @@ export default class InstanceStore {
   }
 
   @action
-  setCurrentInstanceId(id, level){
-    this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
+  setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
+    let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
+    currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
     this.instances.forEach((instance) => {
       if (instance.isFetched) {
         if(!instance.form.readMode && !instance.hasChanged){
@@ -218,14 +241,20 @@ export default class InstanceStore {
     });
   }
 
+  getCurrentInstanceId(instanceId){
+    let currentInstancePath = this.openedInstances.get(instanceId).currentInstancePath;
+    return currentInstancePath[currentInstancePath.length-1];
+  }
+
   @action
-  toggleReadMode(id, level, readMode){
-    this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
+  toggleReadMode(mainInstanceId, targetInstanceId, level, readMode){
+    let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
+    currentInstancePath.splice(level, currentInstancePath.length-level, targetInstanceId);
     this.instances.forEach((instance, instanceId) => {
       if (instance.isFetched) {
-        if(instanceId === id && instance.form.readMode !== readMode){
+        if(instanceId === targetInstanceId && instance.form.readMode !== readMode){
           instance.form.toggleReadMode(readMode);
-        } else if(instanceId !== id && !instance.form.readMode && !instance.hasChanged){
+        } else if(instanceId !== targetInstanceId && !instance.form.readMode && !instance.hasChanged){
           instance.form.toggleReadMode(true);
         }
       }
@@ -313,7 +342,7 @@ export default class InstanceStore {
           }
           if (instanceId === this.mainInstanceId) {
             this.mainInstanceId = newId;
-            this.history.replace(newId?`/instance/${newId}`:`/nodetype/${instance.path}`);
+            routerStore.history.replace(newId?`/instance/${newId}`:`/nodetype/${instance.path}`);
           } else {
             const options = this.optionsCache.get(instance.path);
             if (options) {
@@ -381,3 +410,5 @@ export default class InstanceStore {
   }
 
 }
+
+export default new InstanceStore();

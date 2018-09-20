@@ -1,7 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import PaneStore from "../../Stores/PaneStore";
-import { observer, Provider, inject } from "mobx-react";
+import { observer, Provider } from "mobx-react";
 
 const styles = {
   container: {
@@ -15,7 +15,6 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("instanceStore")
 @observer
 export default class PaneContainer extends React.Component {
   constructor(props) {

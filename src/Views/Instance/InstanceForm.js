@@ -1,8 +1,10 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import { Glyphicon } from "react-bootstrap";
 import { Form } from "hbp-quickfire";
+
+import instanceStore from "../../Stores/InstanceStore";
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -132,7 +134,6 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("instanceStore")
 @observer
 export default class InstanceForm extends React.Component {
   constructor(props) {
@@ -140,34 +141,34 @@ export default class InstanceForm extends React.Component {
     this.fetchInstance();
   }
 
-  fetchInstance = () => {
-    this.props.instanceStore.getInstance(this.props.id);
+  fetchInstance(forceFetch = false){
+    instanceStore.getInstance(this.props.id, forceFetch);
   }
 
   handleFocus = () => {
-    if (this.props.instanceStore.currentInstanceId !== this.props.id) {
-      this.props.instanceStore.setCurrentInstanceId(this.props.id, this.props.level);
+    if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
+      instanceStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
     }
   }
 
   handleEdit = (e) => {
     e && e.stopPropagation();
-    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
+    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, false);
   }
 
   handleChange = () => {
-    this.props.instanceStore.instanceHasChanged(this.props.id);
+    instanceStore.instanceHasChanged(this.props.id);
   }
 
   handleLoad = () => {
-    this.props.instanceStore.memorizeInstanceInitialValues(this.props.id);
+    instanceStore.memorizeInstanceInitialValues(this.props.id);
   }
 
   handleCancelEdit = (e) => {
     e && e.stopPropagation();
-    const instance = this.props.instanceStore.getInstance(this.props.id);
+    const instance = instanceStore.getInstance(this.props.id);
     if (instance.hasChanged) {
-      this.props.instanceStore.requestCancelInstanceChanges(this.props.id);
+      instanceStore.requestCancelInstanceChanges(this.props.id);
     } else {
       this.handleConfirmCancelEdit();
     }
@@ -175,50 +176,51 @@ export default class InstanceForm extends React.Component {
 
   handleConfirmCancelEdit = (e) => {
     e && e.stopPropagation();
-    const instance = this.props.instanceStore.getInstance(this.props.id);
+    const instance = instanceStore.getInstance(this.props.id);
     if (instance.isNew) {
-      this.props.instanceStore.confirmCancelInstanceChanges(this.props.id);
+      instanceStore.confirmCancelInstanceChanges(this.props.id);
     } else {
-      this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
+      instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, true);
       if (instance.hasChanged) {
-        this.props.instanceStore.confirmCancelInstanceChanges(this.props.id);
+        instanceStore.confirmCancelInstanceChanges(this.props.id);
       }
     }
   }
 
   handleContinueEditing = (e) => {
     e && e.stopPropagation();
-    this.props.instanceStore.abortCancelInstanceChange(this.props.id);
+    instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
   handleSave = (e) => {
     e && e.stopPropagation();
-    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, true);
-    this.props.instanceStore.saveInstance(this.props.id);
+    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, true);
+    instanceStore.saveInstance(this.props.id);
   }
 
   handleCancelSave = (e) => {
     e && e.stopPropagation();
-    this.props.instanceStore.cancelSaveInstance(this.props.id);
-    this.props.instanceStore.toggleReadMode(this.props.id, this.props.level, false);
+    instanceStore.cancelSaveInstance(this.props.id);
+    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, false);
   }
 
 
 
   render() {
-    const { classes, instanceStore } = this.props;
+    const { classes, mainInstanceId, id } = this.props;
 
-    const instance = instanceStore.getInstance(this.props.id);
+    const instance = instanceStore.getInstance(id);
+    const mainOpenedInstance = instanceStore.openedInstances.get(mainInstanceId);
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
-    const readOnlyMode = this.props.instanceStore.readOnlyMode;
+    const readOnlyMode = mainOpenedInstance.readOnlyMode;
 
-    const [organization, domain, schema, version,] = this.props.id.split("/");
+    const [organization, domain, schema, version,] = id.split("/");
 
     const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
 
-    const isMainInstance = this.props.id === instanceStore.mainInstanceId;
-    const isCurrentInstance = this.props.id === instanceStore.currentInstanceId;
+    const isMainInstance = id === mainInstanceId;
+    const isCurrentInstance = id === instanceStore.getCurrentInstanceId(mainInstanceId);
 
     const backLink = (instance.isFetched && instance.data && instance.data.instancesPath) ?
       instance.data.instancesPath
@@ -277,7 +279,7 @@ export default class InstanceForm extends React.Component {
           onChange={this.handleChange}
           onLoad={this.handleLoad}
         >
-          <Form store={instance.form}>
+          <Form store={instance.form} key={mainInstanceId}>
             <HeaderPanel
               className={classes.panelHeader}
               title={nodeType}
@@ -287,8 +289,8 @@ export default class InstanceForm extends React.Component {
               showButtons={!readOnlyMode && !instance.isNew && isCurrentInstance && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel}
               instanceStatus={instance.data && instance.data.status}
               childrenStatus={instance.data && instance.data.childrenStatus}/>
-            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} instance={instance} fields={getSummaryFields(instance)} />
-            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} instance={instance} fields={getBodyFields(instance)} show={isMainInstance || isCurrentInstance || !isReadMode} />
+            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getSummaryFields(instance)} />
+            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getBodyFields(instance)} show={isMainInstance || isCurrentInstance || !isReadMode} />
             <FooterPanel
               className={classes.panelFooter}
               id={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}
@@ -313,7 +315,7 @@ export default class InstanceForm extends React.Component {
         }
         <Glyphicon glyph="arrow-right" className="hightlightArrow" />
         <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
-        <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onCancelBackLink={backLink} onRetry={this.fetchInstance} inline={!isMainInstance} />
+        <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onCancelBackLink={backLink} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
       </div>
     );
   }

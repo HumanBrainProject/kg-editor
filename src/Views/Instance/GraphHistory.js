@@ -1,5 +1,5 @@
 import React from "react";
-import {observer, inject} from "mobx-react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import Color from "color";
 import { Glyphicon } from "react-bootstrap";
@@ -42,7 +42,6 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("graphStore")
 @observer
 export default class GraphHistory extends React.Component{
   handleEntryClick(level){

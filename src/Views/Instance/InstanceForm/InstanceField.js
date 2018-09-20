@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { uniqueId } from "lodash";
 import { Field } from "hbp-quickfire";
+import instanceStore from "../../../Stores/InstanceStore";
 
 const styles = {
   field: {
@@ -30,7 +31,6 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("instanceStore")
 @inject("paneStore")
 @observer
 export default class InstanceField extends React.Component{
@@ -39,7 +39,7 @@ export default class InstanceField extends React.Component{
     if (field && field.isLink && value && value.id) {
       this.handleToggleOffFieldHighlight(field, value);
       setTimeout(() => {
-        this.props.instanceStore.setCurrentInstanceId(value.id, this.props.level + 1);
+        instanceStore.setCurrentInstanceId(this.props.mainInstanceId, value.id, this.props.level + 1);
         const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
         if (target) {
           target.scrollIntoViewIfNeeded();
@@ -51,7 +51,7 @@ export default class InstanceField extends React.Component{
 
   handleToggleOnFieldHighlight = (field, value) => {
     if (field && field.isLink && value && value.id) {
-      this.props.instanceStore.setInstanceHighlight(value.id, field.label);
+      instanceStore.setInstanceHighlight(value.id, field.label);
       const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
       if (target) {
         target.scrollIntoViewIfNeeded();
@@ -61,14 +61,14 @@ export default class InstanceField extends React.Component{
 
   handleToggleOffFieldHighlight = (field, value) => {
     if (field && field.isLink && value && value.id) {
-      this.props.instanceStore.setInstanceHighlight(value.id, null);
+      instanceStore.setInstanceHighlight(value.id, null);
     }
   }
 
   renderReadModeField = (field) => {
     if (field) {
       if (field.type === "TextArea") {
-        if (this.props.id !== this.props.instanceStore.mainInstanceId && this.props.id !== this.props.instanceStore.currentInstanceId && this.props.level !== 0) {
+        if (this.props.id !== this.props.mainInstanceId && this.props.id !== instanceStore.getCurrentInstanceId(this.props.mainInstanceId) && this.props.level !== 0) {
           if (field.value && field.value.length && field.value.length >= 200) {
             return field.value.substr(0,197) + "...";
           }
@@ -104,20 +104,20 @@ export default class InstanceField extends React.Component{
       [field.mappingLabel]: value
     });
     field.addValue(field.options[field.options.length-1]);
-    this.props.instanceStore.instanceHasChanged(this.props.id);
+    instanceStore.instanceHasChanged(this.props.id);
     this.handleFieldFocus(field, {id: id});
   }
 
   render(){
     const { classes, name, instance } = this.props;
     const field = instance.data.fields[name];
-    const readOnlyMode = this.props.instanceStore.readOnlyMode;
+    const readOnlyMode = instanceStore.readOnlyMode;
     if (field) {
       if (field.type === "TextArea")  {
-        return <Field key={name} name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
+        return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
       if (field.type === "DropdownSelect" && field.isLink) {
-        return <Field key={name} name={name} className={classes.field}
+        return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
@@ -126,7 +126,7 @@ export default class InstanceField extends React.Component{
           readModeRendering={readOnlyMode?undefined:this.renderReadModeField}
           onAddCustomValue={field.allowCustomValues?this.addCustomValueHandler:undefined} />;
       }
-      return <Field key={name} name={name} className={classes.field} />;
+      return <Field name={name} className={classes.field} />;
     }
     return null;
   }

@@ -1,11 +1,12 @@
 import React from "react";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { toJS } from "mobx";
 import { isEqual } from "lodash";
 import Color from "color";
-
 import { Form, FormStore, Field } from "hbp-quickfire";
+
+import instanceStore from "../../Stores/InstanceStore";
 
 let styles = {
   container:{
@@ -28,10 +29,9 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-@inject("instanceStore")
 export default class CompareChanges extends React.Component{
   render(){
-    const {classes, instanceStore} = this.props;
+    const {classes} = this.props;
     const instance = instanceStore.getInstance(this.props.instanceId);
 
     const formStoreBefore = new FormStore(toJS(instance.form.structure));

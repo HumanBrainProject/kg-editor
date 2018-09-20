@@ -1,10 +1,13 @@
 import React from "react";
-import {observer, inject} from "mobx-react";
+import {observer} from "mobx-react";
 import injectStyles from "react-jss";
 import MultiToggle from "../../Components/MultiToggle";
 import Color from "color";
 import {isString, sortBy} from "lodash";
 import {Glyphicon} from "react-bootstrap";
+
+import routerStore from "../../Stores/RouterStore";
+import graphStore from "../../Stores/GraphStore";
 
 const styles = {
   container:{
@@ -82,27 +85,26 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("graphStore","routerHistory")
 @observer
 export default class GraphSettings extends React.Component{
   handleChange(nodeType, state){
-    this.props.graphStore.setTypeState(nodeType, state);
+    graphStore.setTypeState(nodeType, state);
   }
 
   handleNodeHover(node){
-    this.props.graphStore.hlNode(node);
+    graphStore.hlNode(node);
   }
 
   handleNodeClick(node){
-    this.props.routerHistory.push("/graph/"+node.id);
+    routerStore.history.push("/graph/"+node.id);
   }
 
   handleExpandClick(nodeType){
-    this.props.graphStore.toggleType(nodeType);
+    graphStore.toggleType(nodeType);
   }
 
   render(){
-    const {classes, graphStore} = this.props;
+    const {classes} = this.props;
     return (
       <div className={classes.container}>
         <div className={classes.nodeList}>

@@ -1,6 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 
 const styles = {

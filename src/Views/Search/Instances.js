@@ -7,9 +7,10 @@ import { uniqueId } from "lodash";
 import { Link } from "react-router-dom";
 import searchStore from "../../Stores/SearchStore";
 import routerStore from "../../Stores/RouterStore";
-import ReleaseStatus from "../Instance/ReleaseStatus";
+import ReleaseStatus from "../../Components/ReleaseStatus";
 import FetchingLoader from "../../Components/FetchingLoader";
 import instanceStore from "../../Stores/InstanceStore";
+import NoSelectedList from "./NoSelectedList";
 
 const styles = {
   container:{
@@ -270,9 +271,7 @@ export default class Instances extends React.Component{
               </div>
             </div>
           :
-          <div className={classes.noSelectedLists}>
-            Please select a list of instances
-          </div>
+          <NoSelectedList/>
         }
       </div>
     );

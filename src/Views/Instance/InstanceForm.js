@@ -204,8 +204,6 @@ export default class InstanceForm extends React.Component {
     instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, false);
   }
 
-
-
   render() {
     const { classes, mainInstanceId, id } = this.props;
 

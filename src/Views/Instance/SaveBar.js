@@ -11,9 +11,9 @@ const animationId = uniqueId("animationId");
 
 const styles = {
   container:{
-    paddingTop:60,
     "& h4":{
       padding:10,
+      marginTop:0,
       lineHeight:"1.8",
       "& .btn":{
         float:"right"
@@ -25,15 +25,11 @@ const styles = {
   },
   instance:{
     padding:10,
-    borderBottom:"1px solid #f3f3f3",
     display:"grid",
     "&:nth-child(odd)":{
-      background:"#f3f3f3"
+      background:"#141618"
     },
     gridTemplateColumns:"1fr 50px",
-    "&:first-child":{
-      borderTop:"1px solid #f3f3f3",
-    }
   },
   actions:{
     gridRow:"span 4",

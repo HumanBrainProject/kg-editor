@@ -2,10 +2,9 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 
-import graphStore from "../Stores/GraphStore";
-import Graph from "./Instance/Graph";
-import GraphSettings from "./Instance/GraphSettings";
-//import GraphHistory from "./Instance/GraphHistory";
+import graphStore from "../../Stores/GraphStore";
+import GraphViz from "./InstanceGraph/GraphViz";
+import GraphSettings from "./InstanceGraph/GraphSettings";
 
 const styles = {
   container:{
@@ -14,16 +13,15 @@ const styles = {
     height:"100%",
     display:"grid",
     gridGap:"20px",
-    gridTemplateRows:"1fr 300px",
-    gridTemplateColumns:"1fr 600px",
+    gridTemplateRows:"1fr",
+    gridTemplateColumns:"1fr 450px",
     padding:"20px"
   },
 
   graph:{
     background:"white",
     borderRadius:"4px",
-    overflow:"hidden",
-    gridRow:"1/span 2"
+    overflow:"hidden"
   },
 
   form:{
@@ -76,19 +74,11 @@ export default class GraphInstance extends React.Component {
     return (
       <div className={classes.container}>
         <div className={classes.graph}>
-          <Graph />
+          <GraphViz />
         </div>
-        {graphStore.sidePanel === "settings"?
-          <div className={classes.settings}>
-            <GraphSettings/>
-          </div>
-          :null/*<div className={classes.form}>
-            <InstanceForm level={0} id={this.props.id} mainInstanceId={this.props.id}/>
-          </div>*/
-        }
-        {/*<div className={classes.history}>
-          <GraphHistory/>
-        </div>*/}
+        <div className={classes.settings}>
+          <GraphSettings/>
+        </div>
       </div>
     );
   }

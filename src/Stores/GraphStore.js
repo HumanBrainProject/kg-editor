@@ -44,8 +44,8 @@ class GraphStore {
   @observable sidePanel = false;
   @observable typeStates = null;
   @observable expandedTypes = [];
-
-  @observable editModal = false;
+  @observable isFetching = false;
+  @observable isFetched = false;
 
   @observable.shallow nodeHistory = [];
 
@@ -97,9 +97,13 @@ class GraphStore {
   }
 
   @action async fetchGraph(id) {
+    this.isFetched = false;
+    this.isFetching = true;
     try {
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
       runInAction( ()=>{
+        this.isFetched = true;
+        this.isFetching = false;
         this.originalData = data;
         this.filterOriginalData();
         this.expandedTypes = [];
@@ -107,6 +111,17 @@ class GraphStore {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  @action reset(){
+    this.isFetched = false;
+    this.isFetching = false;
+    this.expandedTypes = [];
+    this.originalData = null;
+    this.groupNodes = null;
+    this.highlightedNode = null;
+    this.connectedNodes = null;
+    this.connectedLinks = null;
   }
 
   @action filterOriginalData(){
@@ -214,14 +229,6 @@ class GraphStore {
       } else {
         this.sidePanel = "";
       }
-    }
-  }
-
-  @action toggleEditModal(state){
-    if(state === undefined){
-      this.editModal = !this.editModal;
-    } else {
-      this.editModal = !!state;
     }
   }
 

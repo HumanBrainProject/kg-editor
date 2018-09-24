@@ -4,8 +4,9 @@ import injectStyles from "react-jss";
 
 import instanceStore from "../Stores/InstanceStore";
 
-import InstanceForm from "./Instance/InstanceForm.js";
-import InstanceGraph from "./InstanceGraph";
+import InstanceForm from "./Instance/InstanceForm";
+import InstanceGraph from "./Instance/InstanceGraph";
+import InstanceRelease from "./Instance/InstanceRelease";
 import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";
@@ -101,7 +102,9 @@ export default class Edit extends React.Component {
             </PaneContainer>
             :openedInstance.viewMode === "viz"?
               <InstanceGraph id={this.props.match.params.id}/>
-              :null}
+              :openedInstance.viewMode === "release"?
+                <InstanceRelease id={this.props.match.params.id}/>
+                :null}
         </div>
         <div className={classes.sidebar}>
           <SaveBar/>

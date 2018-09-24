@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import ToggleButton from "./ToggleButton";
-import ReleaseStatus from "../ReleaseStatus";
+import ReleaseStatus from "../../../Components/ReleaseStatus";
 
 const styles = {
   panel: {

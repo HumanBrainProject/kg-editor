@@ -6,9 +6,9 @@ import { observer } from "mobx-react";
 import { ForceGraph2D } from "react-force-graph";
 import { debounce } from "lodash";
 import Color from "color";
-import { Button, Glyphicon } from "react-bootstrap";
+import { Glyphicon } from "react-bootstrap";
 
-import graphStore from "../../Stores/GraphStore";
+import graphStore from "../../../Stores/GraphStore";
 
 
 const styles = {
@@ -64,6 +64,7 @@ export default class Graph extends React.Component {
 
   componentWillUnmount(){
     window.removeEventListener("resize", this.resizeDebounceFn);
+    this.graphRef.stopAnimation();
   }
 
   resizeWrapper = () => {
@@ -79,15 +80,12 @@ export default class Graph extends React.Component {
     //graphStore.fetchGraph(this.props.instanceStore.mainInstanceId);
   }
 
-  handleNavigationClick(index){
-    graphStore.handleNavigationClick(index);
-  }
-
   handleNodeClick = (node) => {
     if(node.isGroup){
       graphStore.explodeNode(node);
     } else {
       graphStore.historyPush(node);
+      graphStore.reset();
     }
   }
 
@@ -98,10 +96,6 @@ export default class Graph extends React.Component {
 
   handleToggleSettings = () => {
     graphStore.toggleSettingsPanel();
-  }
-
-  handleToggleEdit = () => {
-    graphStore.toggleEditModal();
   }
 
   handleNodeHover = (node) => {
@@ -208,7 +202,7 @@ export default class Graph extends React.Component {
 
     return (
       <div className={classes.graph} ref={ref => this.graphWrapper = ref}>
-        {data !== null &&
+        {graphStore.isFetched && data !== null &&
         <ForceGraph2D
           ref={ref => this.graphRef = ref}
           width={this.state.graphWidth}
@@ -227,8 +221,7 @@ export default class Graph extends React.Component {
         />
         }
         <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
-        <Button className={`${classes.settings} btn btn-primary`} onClick={this.handleToggleSettings}><Glyphicon glyph={"cog"}/></Button>
-        <Button className={`${classes.edit} btn btn-primary`} onClick={this.handleToggleEdit}><Glyphicon glyph={"edit"}/>&nbsp;Edit this instance</Button>
+        {/*<Button className={`${classes.settings} btn btn-primary`} onClick={this.handleToggleSettings}><Glyphicon glyph={"cog"}/></Button>*/}
         {/*<Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />*/}
       </div>
     );

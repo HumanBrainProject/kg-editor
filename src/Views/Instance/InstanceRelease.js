@@ -1,29 +1,26 @@
 import React from "react";
-import ReleaseStore from "../Stores/ReleaseStore";
 import { observer } from "mobx-react";
-import FetchingLoader from "../Components/FetchingLoader";
 import injectStyles from "react-jss";
 import { Glyphicon, Button, ButtonGroup } from "react-bootstrap";
 import { uniqueId, fill } from "lodash";
 import Color from "color";
-import ReleaseStatus from "./Instance/ReleaseStatus";
-import MultiToggle from "../Components/MultiToggle";
+
+import ReleaseStore from "../../Stores/ReleaseStore";
+
+import FetchingLoader from "../../Components/FetchingLoader";
+import ReleaseStatus from "../../Components/ReleaseStatus";
+import MultiToggle from "../../Components/MultiToggle";
 
 const styles = {
   container: {
-    position: "absolute",
-    top: "80px",
-    width: "100vw",
-    height: "calc(100vh - 80px)",
+    position: "relative",
+    width: "calc(100% - 40px)",
+    height: "calc(100% - 40px)",
     backgroundColor: "white",
-    "@media screen and (min-width:576px)": {
-      left: "50%",
-      width: "calc(100vw - 40px)",
-      height: "calc(100vh - 100px)",
-      padding: "20px",
-      borderRadius: "10px",
-      transform: "translateX(-50%)"
-    }
+    margin:"20px",
+    padding:"20px",
+    borderRadius:"4px",
+    overflow:"auto"
   },
   hlActions:{
     position:"absolute",
@@ -280,15 +277,15 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Release extends React.Component{
+export default class InstanceRelease extends React.Component{
   constructor(props){
     super(props);
-    this.releaseStore = new ReleaseStore(props.match.params.id);
+    this.releaseStore = new ReleaseStore(props.id);
     this.keyMap = new WeakMap();
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    this.releaseStore = new ReleaseStore(newProps.match.id);
+    this.releaseStore = new ReleaseStore(newProps.id);
   }
 
   generateKey(o){

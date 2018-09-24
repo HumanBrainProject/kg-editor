@@ -6,7 +6,7 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
@@ -22,7 +22,6 @@ import Help from "./Views/Help";
 import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
 import Instance from "./Views/Instance";
-import Release from "./Views/Release";
 
 import "babel-polyfill";
 
@@ -112,7 +111,7 @@ class App extends React.Component{
 
           routerStore.history.push("/instance/"+newInstanceId);
         } else {
-          routerStore.history.push("/");
+          routerStore.history.push("/search");
         }
       }
     }
@@ -175,8 +174,6 @@ class App extends React.Component{
               :
               <Switch>
                 <Route path="/instance/:id*" component={Instance} />
-                <Route path="/release/:id*" component={Release} />
-                {/*<Route path="/graph/:id*" component={InstanceGraph} />*/}
                 <Route path="/search" exact={true} component={Search} />
                 <Route path="/help" exact={true} component={Help} />
                 <Route path="/kg-stats" exact={true} component={Statistics} />
@@ -195,6 +192,6 @@ class App extends React.Component{
 }
 
 library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
-  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar);
+  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch);
 
 render(<App/>, document.getElementById("root"));

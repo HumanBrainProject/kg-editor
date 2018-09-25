@@ -2,11 +2,9 @@ import { observable, action, runInAction } from "mobx";
 import API from "../Services/API";
 import console from "../Services/Logger";
 
-import {find, remove, clone, pullAll, uniqueId, uniq, flatten, slice} from "lodash";
+import {find, remove, clone, pullAll, uniqueId, uniq, flatten} from "lodash";
 
 import palette from "google-palette";
-
-import routerStore from "../Stores/RouterStore";
 
 const nodeTypeWhitelist = [
   "Dataset",
@@ -46,8 +44,6 @@ class GraphStore {
   @observable expandedTypes = [];
   @observable isFetching = false;
   @observable isFetched = false;
-
-  @observable.shallow nodeHistory = [];
 
   originalData = null;
   groupNodes = null;
@@ -254,17 +250,6 @@ class GraphStore {
     } else {
       this.expandType(typeToToggle);
     }
-  }
-
-  @action historyPush(nextNode){
-    //this.nodeHistory.push(find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId));
-    routerStore.history.push("/instance/"+nextNode.id);
-  }
-  @action historyBack(level = 0){
-    level = this.nodeHistory.length - 1 - level;
-    let targetNode = this.nodeHistory[level];
-    this.nodeHistory = slice(this.nodeHistory, 0, level);
-    routerStore.history.push("/graph/"+targetNode.id);
   }
 
   getCurrentNode(){

@@ -6,7 +6,7 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
@@ -102,14 +102,15 @@ class App extends React.Component{
   }
 
   handleCloseInstance(instanceId){
-    if(matchPath(this.state.currentLocation, {path:"/instance/:id*", exact:"true"})){
-      if(matchPath(this.state.currentLocation, {path:`/instance/${instanceId}`, exact:"true"})){
+    if(matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"})){
+      if(matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
         if(instanceStore.openedInstances.size > 1){
           let openedInstances = Array.from(instanceStore.openedInstances.keys());
           let currentInstanceIndex = openedInstances.indexOf(instanceId);
           let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
 
-          routerStore.history.push("/instance/"+newInstanceId);
+          let openedInstance = instanceStore.openedInstances.get(newInstanceId);
+          routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
         } else {
           routerStore.history.push("/search");
         }
@@ -143,6 +144,7 @@ class App extends React.Component{
             <div className={classes.dynamicTabs}>
               {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
                 const instance = instanceStore.getInstance(instanceId);
+                const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                 let label = instanceId;
                 let color = undefined;
                 if(!instance.isFetching && !instance.hasFetchError){
@@ -155,8 +157,8 @@ class App extends React.Component{
                     icon={instance.isFetching?"circle-notch":"circle"}
                     iconSpin={instance.isFetching}
                     iconColor={color}
-                    active={matchPath(currentLocation, {path:`/instance/${instanceId}`, exact:"true"})}
-                    path={`/instance/${instanceId}`}
+                    active={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
+                    path={`/instance/${mode}/${instanceId}`}
                     onClose={this.handleCloseInstance.bind(this, instanceId)}>
                     {label}
                   </Tab>
@@ -173,7 +175,11 @@ class App extends React.Component{
               <Route component={Login} />
               :
               <Switch>
-                <Route path="/instance/:id*" component={Instance} />
+                <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
+                <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
+                <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
+                <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+
                 <Route path="/search" exact={true} component={Search} />
                 <Route path="/help" exact={true} component={Help} />
                 <Route path="/kg-stats" exact={true} component={Statistics} />
@@ -192,6 +198,7 @@ class App extends React.Component{
 }
 
 library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
-  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch);
+  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
+  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle);
 
 render(<App/>, document.getElementById("root"));

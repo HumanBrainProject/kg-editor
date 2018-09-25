@@ -35,6 +35,7 @@ class InstanceStore {
   @observable openedInstances = new Map();
   @observable optionsCache = new Map();
   @observable comparedInstanceId = null;
+  @observable globalReadMode = true;
 
   generatedKeys = new WeakMap();
 
@@ -42,14 +43,18 @@ class InstanceStore {
     return nodeTypeMapping;
   }
 
-  @action openInstance(instanceId){
-    this.openedInstances.set(instanceId, {
-      currentInstancePath: [],
-      viewMode: "edit",
-      readOnlyMode: false
-    });
-    this.getInstance(instanceId);
-    this.setCurrentInstanceId(instanceId, instanceId, 0);
+  @action openInstance(instanceId, viewMode = "view", readMode = true){
+    this.setReadMode(readMode);
+    if(this.openedInstances.has(instanceId)){
+      this.openedInstances.get(instanceId).viewMode = viewMode;
+    } else {
+      this.openedInstances.set(instanceId, {
+        currentInstancePath: [],
+        viewMode: viewMode
+      });
+      this.getInstance(instanceId);
+      this.setCurrentInstanceId(instanceId, instanceId, 0);
+    }
   }
 
   @action setInstanceViewMode(instanceId, mode){
@@ -209,9 +214,7 @@ class InstanceStore {
 
         this.memorizeInstanceInitialValues(instanceId);
 
-        if (!instance.isNew) {
-          instance.form.toggleReadMode(true);
-        }
+        instance.form.toggleReadMode(this.globalReadMode);
       });
     } catch (e) {
       const message = e.message?e.message:e;
@@ -232,13 +235,6 @@ class InstanceStore {
   setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
     let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
     currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
-    this.instances.forEach((instance) => {
-      if (instance.isFetched) {
-        if(!instance.form.readMode && !instance.hasChanged){
-          instance.form.toggleReadMode(true);
-        }
-      }
-    });
   }
 
   getCurrentInstanceId(instanceId){
@@ -247,16 +243,11 @@ class InstanceStore {
   }
 
   @action
-  toggleReadMode(mainInstanceId, targetInstanceId, level, readMode){
-    let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
-    currentInstancePath.splice(level, currentInstancePath.length-level, targetInstanceId);
-    this.instances.forEach((instance, instanceId) => {
+  setReadMode(readMode){
+    this.globalReadMode = readMode;
+    this.instances.forEach((instance) => {
       if (instance.isFetched) {
-        if(instanceId === targetInstanceId && instance.form.readMode !== readMode){
-          instance.form.toggleReadMode(readMode);
-        } else if(instanceId !== targetInstanceId && !instance.form.readMode && !instance.hasChanged){
-          instance.form.toggleReadMode(true);
-        }
+        instance.form.toggleReadMode(readMode);
       }
     });
   }

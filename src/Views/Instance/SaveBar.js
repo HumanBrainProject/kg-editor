@@ -3,7 +3,6 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import {Button, ButtonGroup, Glyphicon, Modal} from "react-bootstrap";
 import { uniqueId } from "lodash";
-import { Prompt } from "react-router-dom";
 import CompareChanges from "./CompareChanges";
 import instanceStore from "../../Stores/InstanceStore";
 
@@ -140,7 +139,6 @@ export default class SavePanel extends React.Component{
 
     return(
       <div className={classes.container}>
-        <Prompt when={changedInstances.length > 0} message={()=>"You have unsaved modifications. Are you sure you want to leave this page?"}/>
         <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
         <div className={classes.instances}>
           {instanceStore.comparedInstanceId &&

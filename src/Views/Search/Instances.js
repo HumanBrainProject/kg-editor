@@ -182,14 +182,14 @@ export default class Instances extends React.Component{
   }
 
   handleStatusClick(instance){
-    routerStore.history.push("/release/"+instance.id);
+    routerStore.history.push("/instance/release/"+instance.id);
   }
 
   handleGoToInstance(instance, event){
     if(event.metaKey || event.ctrlKey){
       instanceStore.openInstance(instance.id);
     } else {
-      routerStore.history.push(`/instance/${instance.id}`);
+      routerStore.history.push(`/instance/view/${instance.id}`);
     }
   }
 

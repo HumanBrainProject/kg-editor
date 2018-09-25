@@ -40,7 +40,7 @@ export default class NotFound extends React.Component{
       <div className={classes.container}>
         <h3>Page not found</h3>
         <div>
-          <Link className="btn btn-default" to={"/"}>Go back to editor page</Link>
+          <Link className="btn btn-default" to={"/"}>Go back to the dashboard</Link>
         </div>
       </div>
     );

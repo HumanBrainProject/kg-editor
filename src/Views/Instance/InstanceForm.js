@@ -3,8 +3,10 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { Glyphicon } from "react-bootstrap";
 import { Form } from "hbp-quickfire";
+import Color from "color";
 
 import instanceStore from "../../Stores/InstanceStore";
+import graphStore from "../../Stores/GraphStore";
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -50,8 +52,8 @@ const styles = {
       backgroundColor: "white",
       boxShadow: "2px 2px 4px #a5a1a1"
     },
-    "&.hasChanged:not(.current):not(.readMode)": {
-      background: "#ffe6e5"
+    "&:not(.main).hasChanged": {
+      background: new Color("#f39c12").lighten(0.66).hex()
     },
     "&:hover:not(.current)": {
       backgroundColor: "#eff5fb",
@@ -93,10 +95,6 @@ const styles = {
     "&:not(.main) $panelHeader": {
       padding: "10px 10px 0 10px"
     },
-    "&.current $panelHeader": {
-      borderBottom: "1px solid #ccc",
-      paddingBottom: "10px"
-    },
     "&.current $panelHeader h6": {
       margin: "10px 0",
       color: "#333"
@@ -107,18 +105,8 @@ const styles = {
     "&:not(.main) $panelBody": {
       padding: "0 10px"
     },
-    "&.current $panelBody": {
-      paddingBottom: "10px"
-    },
     "&:not(.main) $panelFooter": {
       padding: "0 10px"
-    },
-    "&.current $panelFooter": {
-      borderTop: "1px solid #ccc",
-      paddingTop: "10px"
-    },
-    "&.current:not(.editMode) $panelFooter": {
-      paddingBottom: "10px"
     },
     "&.readMode .quickfire-empty-field": {
       display: "none"
@@ -149,11 +137,6 @@ export default class InstanceForm extends React.Component {
     if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
       instanceStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
     }
-  }
-
-  handleEdit = (e) => {
-    e && e.stopPropagation();
-    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, false);
   }
 
   handleChange = () => {
@@ -192,12 +175,6 @@ export default class InstanceForm extends React.Component {
     instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
-  handleSave = (e) => {
-    e && e.stopPropagation();
-    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, true);
-    instanceStore.saveInstance(this.props.id);
-  }
-
   handleCancelSave = (e) => {
     e && e.stopPropagation();
     instanceStore.cancelSaveInstance(this.props.id);
@@ -208,10 +185,8 @@ export default class InstanceForm extends React.Component {
     const { classes, mainInstanceId, id } = this.props;
 
     const instance = instanceStore.getInstance(id);
-    const mainOpenedInstance = instanceStore.openedInstances.get(mainInstanceId);
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
-    const readOnlyMode = mainOpenedInstance.readOnlyMode;
 
     const [organization, domain, schema, version,] = id.split("/");
 
@@ -280,24 +255,16 @@ export default class InstanceForm extends React.Component {
           <Form store={instance.form} key={mainInstanceId}>
             <HeaderPanel
               className={classes.panelHeader}
-              title={nodeType}
-              isReadMode={isReadMode}
-              onEdit={this.handleEdit}
-              onReadMode={this.handleCancelEdit}
-              showButtons={!readOnlyMode && !instance.isNew && isCurrentInstance && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel}
-              instanceStatus={instance.data && instance.data.status}
-              childrenStatus={instance.data && instance.data.childrenStatus}/>
+              nodeType={nodeType}
+              color={graphStore.colorScheme[instanceStore.nodeTypeMapping[nodeType]]}
+              hasChanged={instance.hasChanged}/>
+
             <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getSummaryFields(instance)} />
             <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getBodyFields(instance)} show={isMainInstance || isCurrentInstance || !isReadMode} />
+
             <FooterPanel
               className={classes.panelFooter}
-              id={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}
-              onSave={this.handleSave}
-              onCancel={this.handleCancelEdit}
-              onCancelBackLink={backLink}
-              useCancelBackLink={instance.isNew && !instance.hasChanged}
-              showEditButtons={isCurrentInstance && !isReadMode && !instance.isSaving && !instance.hasSaveError && !instance.confirmCancel}
-              disableSaveButton={!instance.hasChanged} />
+              id={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"} />
           </Form>
           <ConfirmCancelEditPanel
             show={instance.cancelRequest}

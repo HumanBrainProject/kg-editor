@@ -9,6 +9,7 @@ import Color from "color";
 import { Glyphicon } from "react-bootstrap";
 
 import graphStore from "../../../Stores/GraphStore";
+import routerStore from "../../../Stores/RouterStore";
 
 
 const styles = {
@@ -64,7 +65,7 @@ export default class Graph extends React.Component {
 
   componentWillUnmount(){
     window.removeEventListener("resize", this.resizeDebounceFn);
-    this.graphRef.stopAnimation();
+    this.graphRef && this.graphRef.stopAnimation();
   }
 
   resizeWrapper = () => {
@@ -84,7 +85,7 @@ export default class Graph extends React.Component {
     if(node.isGroup){
       graphStore.explodeNode(node);
     } else {
-      graphStore.historyPush(node);
+      routerStore.history.push("/instance/graph/"+node.id);
       graphStore.reset();
     }
   }

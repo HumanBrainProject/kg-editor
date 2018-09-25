@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 
 import instanceStore from "../Stores/InstanceStore";
+import routerStore from "../Stores/RouterStore";
 
 import InstanceForm from "./Instance/InstanceForm";
 import InstanceGraph from "./Instance/InstanceGraph";
@@ -63,27 +64,31 @@ const styles = {
 export default class Edit extends React.Component {
   constructor(props) {
     super(props);
-    instanceStore.openInstance(this.props.match.params.id);
+    this.UNSAFE_componentWillReceiveProps(this.props);
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    instanceStore.openInstance(newProps.match.params.id);
+    instanceStore.openInstance(newProps.match.params.id, newProps.mode, newProps.mode !== "edit");
   }
 
   handleSelectMode(mode){
-    instanceStore.setInstanceViewMode(this.props.match.params.id, mode);
+    routerStore.history.push(`/instance/${mode}/${this.props.match.params.id}`);
   }
 
   render() {
     const {classes} = this.props;
     const openedInstance = instanceStore.openedInstances.get(this.props.match.params.id);
+
     return (
       <div className={classes.container}>
         <div className={classes.tabs}>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
-            <FontAwesomeIcon icon="edit"/>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "view"?"active":""}`} onClick={this.handleSelectMode.bind(this, "view")}>
+            <FontAwesomeIcon icon="eye"/>
           </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "viz"?"active":""}`} onClick={this.handleSelectMode.bind(this, "viz")}>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
+            <FontAwesomeIcon icon="pencil-alt"/>
+          </div>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "graph"?"active":""}`} onClick={this.handleSelectMode.bind(this, "graph")}>
             <FontAwesomeIcon icon="project-diagram"/>
           </div>
           <div className={`${classes.tab} ${openedInstance.viewMode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
@@ -91,7 +96,7 @@ export default class Edit extends React.Component {
           </div>
         </div>
         <div className={classes.body}>
-          {openedInstance.viewMode === "edit"?
+          {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
             <PaneContainer>
               <React.Fragment>
                 <Pane>
@@ -100,7 +105,7 @@ export default class Edit extends React.Component {
                 <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
               </React.Fragment>
             </PaneContainer>
-            :openedInstance.viewMode === "viz"?
+            :openedInstance.viewMode === "graph"?
               <InstanceGraph id={this.props.match.params.id}/>
               :openedInstance.viewMode === "release"?
                 <InstanceRelease id={this.props.match.params.id}/>

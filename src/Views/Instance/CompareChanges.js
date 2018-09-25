@@ -17,7 +17,8 @@ let styles = {
   },
   field:{
     padding:10,
-    margin:"0 0 10px 0"
+    margin:"0 0 10px 0",
+    wordBreak:"break-word"
   },
   beforeDiff:{
     background:new Color("#e74c3c").lighten(0.6).hex()

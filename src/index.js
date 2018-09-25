@@ -6,7 +6,7 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
@@ -159,7 +159,8 @@ class App extends React.Component{
                     iconColor={color}
                     active={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
                     path={`/instance/${mode}/${instanceId}`}
-                    onClose={this.handleCloseInstance.bind(this, instanceId)}>
+                    onClose={this.handleCloseInstance.bind(this, instanceId)}
+                    fullText={label}>
                     {label}
                   </Tab>
                 );
@@ -199,6 +200,7 @@ class App extends React.Component{
 
 library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
   faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
-  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle);
+  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle,
+  faUnlink, faBan, faRedoAlt, faMoneyCheck);
 
 render(<App/>, document.getElementById("root"));

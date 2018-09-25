@@ -1,6 +1,8 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Button} from "react-bootstrap";
+import searchStore from "../../Stores/SearchStore";
 
 const styles = {
   container:{
@@ -25,16 +27,24 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class NoSelectedList extends React.Component{
+export default class NoResults extends React.Component{
+  handleRetry = () => {
+    searchStore.fetchInstances();
+  }
+
   render(){
     const { classes } = this.props;
     return(
       <div className={classes.container}>
         <div className={classes.icon}>
-          <FontAwesomeIcon icon={"code-branch"} transform={"flip-h rotate--90"}/>
+          <FontAwesomeIcon icon={"ban"}/>
         </div>
         <div className={classes.text}>
-          Select a list of instances in the left panel
+          There was a network problem retrieving the list of instances.<br/>
+          If the problem persists, please contact the support.<br/><br/>
+          <Button bsStyle={"primary"} onClick={this.handleRetry}>
+            <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+          </Button>
         </div>
       </div>
     );

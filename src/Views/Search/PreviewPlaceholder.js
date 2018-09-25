@@ -25,16 +25,16 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class NoSelectedList extends React.Component{
+export default class PreviewPlaceholder extends React.Component{
   render(){
     const { classes } = this.props;
     return(
       <div className={classes.container}>
         <div className={classes.icon}>
-          <FontAwesomeIcon icon={"code-branch"} transform={"flip-h rotate--90"}/>
+          <FontAwesomeIcon icon={"money-check"}/>
         </div>
         <div className={classes.text}>
-          Select a list of instances in the left panel
+          Select an instance to display its preview here.
         </div>
       </div>
     );

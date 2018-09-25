@@ -67,10 +67,10 @@ class InstanceStore {
 
   @action
   getInstance(instanceId, forceFetch = false){
-    if (this.instances.has(instanceId) && !forceFetch) {
-      return this.instances.get(instanceId);
+    if (!this.instances.has(instanceId) || forceFetch) {
+      this.fetchInstanceData(instanceId);
     }
-    return this.fetchInstanceData(instanceId);
+    return this.instances.get(instanceId);
   }
 
   @action

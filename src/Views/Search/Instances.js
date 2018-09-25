@@ -2,21 +2,27 @@ import React from "react";
 import injectStyles from "react-jss";
 
 import { observer } from "mobx-react";
-import { Button, Glyphicon } from "react-bootstrap";
-import { uniqueId } from "lodash";
-import { Link } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroller";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import searchStore from "../../Stores/SearchStore";
 import routerStore from "../../Stores/RouterStore";
-import ReleaseStatus from "../../Components/ReleaseStatus";
 import FetchingLoader from "../../Components/FetchingLoader";
 import instanceStore from "../../Stores/InstanceStore";
 import NoSelectedList from "./NoSelectedList";
+import NoResults from "./NoResults";
+import NoResultsError from "./NoResultsError";
+import Preview from "./Preview";
+import PreviewPlaceholder from "./PreviewPlaceholder";
 
 const styles = {
   container:{
     color: "rgb(224, 224, 224)",
-    overflow:"auto",
-    position:"relative"
+    overflow:"hidden",
+    position:"relative",
+    display:"grid",
+    gridTemplateColumns:"1fr 33%",
+    gridTemplateRows:"auto 1fr"
   },
 
   search:{
@@ -28,148 +34,105 @@ const styles = {
     border:"1px solid transparent",
     "&:focus":{
       borderColor: "rgba(64, 169, 243, 0.5)"
+    },
+    "&.disabled,&:disabled":{
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
     }
   },
 
   body: {
-    width: "100%",
-    height: "calc(100% - 92px)",
-    border: "0",
-    "@media screen and (min-width:576px)": {
-      height: "calc(100% - 70px)"
-    },
-    "& ul": {
-      listStyleType: "none",
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(430px, 1fr))",
-      columnGap: "20px",
-      rowGap: "20px",
-      position: "relative",
-      maxHeight: "100%",
-      margin: 0,
-      padding: "20px",
-      overflowY: "auto",
-    },
-    "& li": {
-      display: "inline-block",
-      margin: "0",
-      position:"relative"
-    },
-    "& li > a": {
-      display: "inline-block",
-      position: "relative",
-      width: "100%",
-      padding: "10px",
-      border: "1px solid #ccc",
-      backgroundColor: "#fff",
-      color: "#333",
-      textAlign: "left",
-      transition: "backgroundColor .2s ease-in, borderColor .2s ease-in",
-      "@media screen and (min-width:576px)": {
-        padding: "10px 10px 40px 10px",
-      },
-      "@media screen and (min-width:1024px)": {
-        padding: "20px 20px 40px 20px",
-        minHeight: "350px"
+    overflow:"auto",
+    position:"relative"
+  },
+
+  preview:{
+    position:"relative",
+    gridRow:"1 / span 2",
+    gridColumn:"2",
+    background:"#24282a",
+    borderLeft:"1px solid #111314",
+    overflow:"auto",
+    color:"rgb(224, 224, 224)"
+  },
+
+  loader:{
+    textAlign:"center",
+    margin:"20px 0 30px",
+    fontSize:"1.25em",
+    fontWeight:"300"
+  },
+
+  list:{
+    padding:"1px 11px 1px 11px"
+  },
+
+  listInstance:{
+    position:"relative",
+    minHeight:"47px",
+    cursor:"pointer",
+    padding:"10px",
+    background:"#24282a",
+    borderLeft:"4px solid transparent",
+    color:"rgba(255, 255, 255, 0.5)",
+    outline:"1px solid #111314",
+    marginBottom:"11px",
+    "&:hover":{
+      background:"#2b353c",
+      borderColor:"#266ea1",
+      color:"rgb(224, 224, 224)",
+      outline:"1px solid transparent",
+      "& $actions":{
+        opacity:0.75
       }
     },
-    "& li > a:hover, & li > a:focus": {
-      backgroundColor: "#eff5fb",
-      borderColor: "#337ab7",
-      color: "#337ab7",
-      textDecoration: "none"
-    },
-    "& li > a.create": {
-      borderStyle: "dashed",
-      borderWidth: "9px",
-      textAlign: "center"
-    },
-    "& li > a.create:hover, & li > a.create:focus": {
-      backgroundColor: "transparent",
-      borderColor: "#adcceb",
-    },
-    "& li > a.create .glyphicon": {
-      fontSize: "xx-large",
-      transform: "scale(2) translateY(8px)",
-      color: "#ccc",
-      transition: "color 0.25s ease-in-out",
-      "@media screen and (min-width:1024px)": {
-        transform: "scale(6) translateY(17px)"
-      }
-    },
-    "& li > a.create:hover .glyphicon, & li > a.create:focus .glyphicon": {
-      color: "#4089c9"
-    },
-    "& li > a.create .createLabel": {
-      fontSize: "15px",
-      transform: "translateY(30px)",
-      color: "#999",
-      "@media screen and (min-width:1024px)": {
-        transform: "translateY(190px)"
-      }
-    },
-    "& li > a.create:hover .createLabel, & li > a.create:focus .createLabel": {
-      color: "#337ab7"
-    },
-    "& li > a h6": {
-      marginTop: "0",
-      textTransform: "capitalize",
-      fontWeight: "bold"
-    },
-    "& li > a h4": {
-      marginBottom: "30px",
-      color: "#337ab7",
-      fontSize: "20px"
-    },
-    "& li > a label": {
-      display: "block",
-      color: "#333",
-      fontSize: "12px",
-      fontWeight: "bold"
-    },
-    "& li > a span": {
-      color: "#333",
-      fontSize: "14px"
-    },
-    "& li > a small": {
-      display: "inline-block",
-      marginTop: "10px",
-      bottom: "10px",
-      left: "10px",
-      color: "grey",
-      fontSize: "0.7em",
-      fontWeight: "300",
-      "@media screen and (min-width:576px)": {
-        position: "absolute"
-      }
+    "&.selected":{
+      background:"#39464f",
+      borderColor:"#6caddc",
+      color:"rgb(224, 224, 224)",
+      outline:"1px solid transparent"
     }
   },
 
-  status:{
+  listName:{
+    fontSize:"1.4em",
+    fontWeight:"300",
+    color:"rgb(244, 244, 244)"
+  },
+
+  listDescription:{
+    overflow:"hidden",
+    whiteSpace:"nowrap",
+    textOverflow:"ellipsis",
+    marginTop:"10px"
+  },
+
+  actions:{
     position:"absolute",
     top:"10px",
     right:"10px",
-    zIndex:1,
-    cursor:"pointer",
-    width:"24px",
-    height:"34px",
-    "& .release-status":{
-      position: "absolute"
+    width:"100px",
+    display:"grid",
+    gridTemplateColumns:"repeat(4, 1fr)",
+    opacity:0,
+    "&:hover":{
+      opacity:"1 !important"
+    }
+  },
+
+  action:{
+    fontSize:"0.9em",
+    lineHeight:"27px",
+    textAlign:"center",
+    backgroundColor: "#24282a",
+    color:"rgba(255,255,255,0.5)",
+    "&:hover":{
+      color:"rgba(224,224,224,1)"
     },
-    "& .release-action":{
-      position: "absolute",
-      width:"100%",
-      height:"100%",
-      background:"#3498db",
-      color:"white",
-      borderRadius:"3px",
-      opacity:0,
-      textAlign:"center"
+    "&:first-child":{
+      borderRadius:"4px 0 0 4px"
     },
-    "&:hover .release-action":{
-      opacity:1,
-      transition:"opacity 0.25s ease",
-      lineHeight:"34px"
+    "&:last-child":{
+      borderRadius:"0 4px 4px 0"
     }
   }
 };
@@ -178,101 +141,106 @@ const styles = {
 @observer
 export default class Instances extends React.Component{
   handleFilterChange = event => {
-    searchStore.setListsFilter(event.target.value);
+    searchStore.setInstancesFilter(event.target.value);
   }
 
   handleStatusClick(instance){
     routerStore.history.push("/instance/release/"+instance.id);
   }
 
-  handleGoToInstance(instance, event){
+  handleInstanceClick(instance, event){
     if(event.metaKey || event.ctrlKey){
       instanceStore.openInstance(instance.id);
     } else {
-      routerStore.history.push(`/instance/view/${instance.id}`);
+      searchStore.selectInstance(instance);
     }
+  }
+
+  handleOpenInstance(mode, instanceId, event){
+    event.stopPropagation();
+    if(event.metaKey || event.ctrlKey){
+      instanceStore.openInstance(instanceId, mode);
+    } else {
+      routerStore.history.push(`/instance/${mode}/${instanceId}`);
+    }
+  }
+
+  handleLoadMore = () => {
+    searchStore.fetchInstances(true);
   }
 
   render = () => {
     const { classes } = this.props;
+
     return (
       <div className={classes.container}>
-        {searchStore.selectedList ?
-          !searchStore.fetchError.instances ?
-            !searchStore.isFetching.instances ?
-              searchStore.instances.length ?
-                <React.Fragment>
-                  <div className={classes.header}>
-                    <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />
-                  </div>
-
-                  <div className={classes.body}>
-                    <ul>
-                      <li key="new">
+        <div className={classes.header}>
+          {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
+        </div>
+        <div className={classes.body}>
+          {searchStore.selectedList ?
+            !searchStore.fetchError.instances ?
+              !searchStore.isFetching.instances ?
+                searchStore.instances.length ?
+                  <InfiniteScroll
+                    threshold={400}
+                    pageStart={0}
+                    loadMore={this.handleLoadMore}
+                    hasMore={searchStore.canLoadMoreInstances}
+                    loader={<div className={classes.loader} key={0}><FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;<span>Loading more instances...</span></div>}
+                    useWindow={false}>
+                    <div className={classes.list}>
+                      {/*<li key="new">
                         <Link to={`/instance/${searchStore.selectedList.path}/${uniqueId("___NEW___")}`} className="create">
                           <Glyphicon glyph="plus" />
                           <div className="createLabel">{`Create a new ${searchStore.nodeTypeLabel} instance`}</div>
                         </Link>
-                      </li>
-                      {searchStore.filteredInstances.length?
-                        searchStore.filteredInstances.map(instance => {
+                      </li>*/}
+                      {searchStore.instances.map(instance => {
+                        return (
+                          <div key={instance.id} className={`${classes.listInstance} ${instance === searchStore.selectedInstance?"selected":""}`} onClick={this.handleInstanceClick.bind(this, instance)}>
+                            <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
+                            <div className={classes.listName}>{instance.label}</div>
+                            {!!instance.description && <div className={classes.listDescription}>{instance.description}</div>}
 
-                          return (
-                            <li key={instance.id}>
-                              <div className={`${classes.status}`} onClick={this.handleStatusClick.bind(this, instance)}>
-                                <div className={"release-status"}>
-                                  <ReleaseStatus instanceStatus={instance.status} childrenStatus={instance.childrenStatus}/>
-                                </div>
-                                <div className={"release-action"}>
-                                  <Glyphicon glyph="cog"/>
-                                </div>
+                            <div className={classes.actions}>
+                              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", instance.id)}>
+                                <FontAwesomeIcon icon="eye"/>
                               </div>
-                              <div onClick={this.handleGoToInstance.bind(this, instance)}>
-                                <h6>{searchStore.nodeTypeLabel}</h6>
-                                <h4>{instance.label}</h4>
-                                {instance.description?
-                                  <React.Fragment>
-                                    <label>Description:</label>
-                                    <span title={instance.description}>{instance.description.length > 400?instance.description.substring(0,397) + "...":instance.description}</span>
-                                  </React.Fragment>
-                                  :null
-                                }
-                                <small>Nexus ID: {instance.id}</small>
+                              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit", instance.id)}>
+                                <FontAwesomeIcon icon="pencil-alt"/>
                               </div>
-                            </li>
-                          );
-                        })
-                        :
-                        <li key="notFound">
-                          <div className={classes.noFilterResult}>No instances matches your search. Please refine it.</div>
-                        </li>
-                      }
-                    </ul>
-                  </div>
-                </React.Fragment>
+                              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph", instance.id)}>
+                                <FontAwesomeIcon icon="project-diagram"/>
+                              </div>
+                              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release", instance.id)}>
+                                <FontAwesomeIcon icon="cloud-upload-alt"/>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </InfiniteScroll>
+                  :
+                  <NoResults/>
                 :
-                <div className={classes.noResultPanel}>
-                  <h4>No instance of type &quot;{searchStore.nodeTypeId}&quot; available.</h4>
-                  <div>
-                    <Link to={"/search"} className="btn btn-default">Cancel</Link>
-                    <Button bsStyle="primary" onClick={this.fetchInstances}>Retry</Button>
-                  </div>
-                </div>
+                <FetchingLoader>
+                  <span>Fetching instances...</span>
+                </FetchingLoader>
               :
-              <FetchingLoader>
-                <span>Fetching instances...</span>
-              </FetchingLoader>
+              <NoResultsError/>
             :
-            <div className={classes.fetchErrorPanel}>
-              <h4>{searchStore.error}</h4>
-              <div>
-                <Link to={"/search"} className="btn btn-default">Cancel</Link>
-                <Button bsStyle="primary" onClick={this.fetchInstances}>Retry</Button>
-              </div>
-            </div>
-          :
-          <NoSelectedList/>
-        }
+            <NoSelectedList/>
+          }
+        </div>
+        <div className={classes.preview}>
+          {searchStore.selectedInstance?
+            <Preview/>
+            :
+            <PreviewPlaceholder/>
+          }
+        </div>
       </div>
     );
   }

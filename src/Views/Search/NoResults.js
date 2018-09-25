@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import searchStore from "../../Stores/SearchStore";
 
 const styles = {
   container:{
@@ -25,16 +26,17 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class NoSelectedList extends React.Component{
+export default class NoResults extends React.Component{
   render(){
     const { classes } = this.props;
     return(
       <div className={classes.container}>
         <div className={classes.icon}>
-          <FontAwesomeIcon icon={"code-branch"} transform={"flip-h rotate--90"}/>
+          <FontAwesomeIcon icon={"unlink"}/>
         </div>
         <div className={classes.text}>
-          Select a list of instances in the left panel
+          No instances could be found in this list
+          {searchStore.instancesFilter && <div>with the search term {`"${searchStore.instancesFilter}"`}</div>}
         </div>
       </div>
     );

@@ -14,14 +14,12 @@ const styles = {
     textAlign:"center",
     fontSize:"0.7em",
     color:"#337ab7",
-    opacity:0.7,
+    opacity:1,
     "&.has-changed":{
-      color:"#f39c12",
-      opacity:1
+      color:"#f39c12"
     },
     "&.not-released":{
-      color:"#e74c3c",
-      opacity:1
+      color:"#e74c3c"
     }
   },
 

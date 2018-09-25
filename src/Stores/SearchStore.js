@@ -1,4 +1,5 @@
 import { observable, action, runInAction, computed } from "mobx";
+import { debounce } from "lodash";
 
 import API from "../Services/API";
 
@@ -15,9 +16,15 @@ class SearchStore{
     instances: null
   };
   @observable selectedList = null;
+  @observable selectedInstance = null;
 
   @observable instances = [];
   @observable instancesFilter = "";
+
+  @observable canLoadMoreInstances = false;
+
+  pageStart = 0;
+  pageSize = 20;
 
   constructor(){
     this.fetchLists();
@@ -71,34 +78,45 @@ class SearchStore{
   }
 
   @action selectList(list){
+    this.instancesFilter = "";
     this.selectedList = list;
     this.fetchInstances();
   }
 
-
-  //Instances related methods
-  @computed get filteredInstances() {
-    const terms = this.instancesFilter.split(" ");
-    return this.instances.filter(instance => {
-      const label = instance.label && instance.label.toLowerCase();
-      const description = instance.description && instance.description.toLowerCase();
-      return terms.every(term => (label && label.includes(term)) || (description && description.includes(term)));
-    });
+  @action selectInstance(selectedInstance){
+    this.selectedInstance = selectedInstance;
   }
 
   @action setInstancesFilter(filter){
-    this.instancesFilter = filter.trim().replace(/\s+/g," ").toLowerCase();
+    this.instancesFilter = filter;
+    this.isFetching.instances = true;
+    this.applyInstancesFilter();
   }
 
+  applyInstancesFilter = debounce(() => {
+    this.fetchInstances();
+  }, 750);
+
   @action
-  async fetchInstances() {
+  async fetchInstances(loadMore = false) {
     try {
+      if(loadMore){
+        this.pageStart++;
+      } else {
+        this.pageStart = 0;
+        this.isFetching.instances = true;
+        this.selectedInstance = null;
+      }
       this.fetchError.instances = null;
-      this.isFetching.instances = true;
-      const { data } = await API.axios.get(API.endpoints.instances(this.selectedList.path));
+      const { data } = await API.axios.get(API.endpoints.listInstances(this.selectedList.path, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
       runInAction(() => {
         this.isFetching.instances = false;
-        this.instances = (data && data.data)?data.data:[];
+        if(loadMore){
+          this.instances = [...this.instances, ...((data && data.data)?data.data:[])];
+        } else {
+          this.instances = (data && data.data)?data.data:[];
+        }
+        this.canLoadMoreInstances = this.instances.length < data.total;
       });
     } catch (e) {
       const message = e.message?e.message:e;

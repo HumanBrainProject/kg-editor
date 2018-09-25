@@ -96,7 +96,7 @@ export default class GraphSettings extends React.Component{
   }
 
   handleNodeClick(node){
-    routerStore.history.push("/instance/"+node.id);
+    routerStore.history.push("/instance/graph/"+node.id);
     graphStore.reset();
   }
 

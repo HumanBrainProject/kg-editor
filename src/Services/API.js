@@ -4,6 +4,7 @@ import authStore from "../Stores/AuthStore";
 const endpoints = {
   "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
+  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
   "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`

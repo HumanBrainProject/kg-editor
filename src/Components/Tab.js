@@ -22,6 +22,12 @@ let styles = {
     gridTemplateColumns:"auto 1fr auto",
     "& $icon": {
       opacity:0.5
+    },
+    "&:hover":{
+      color:"rgb(224, 224, 224)",
+      "& $icon": {
+        opacity:1
+      }
     }
   },
   active:{
@@ -80,7 +86,7 @@ export default class Tab extends React.Component {
         <div className={classes.icon} style={iconColor?{color:iconColor}:{}}>
           {icon && <FontAwesomeIcon icon={icon} spin={iconSpin}/>}
         </div>
-        <div className={classes.text}>
+        <div className={classes.text} title={this.props.fullText}>
           {this.props.children}
         </div>
         {onClose?

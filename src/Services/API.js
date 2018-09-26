@@ -7,6 +7,7 @@ const endpoints = {
   "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
+  "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
   "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
 };
 

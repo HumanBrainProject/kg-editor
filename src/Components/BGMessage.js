@@ -25,16 +25,16 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class PreviewPlaceholder extends React.Component{
+export default class BGMessage extends React.Component{
   render(){
     const { classes } = this.props;
     return(
       <div className={classes.container}>
         <div className={classes.icon}>
-          <FontAwesomeIcon icon={"money-check"}/>
+          <FontAwesomeIcon icon={this.props.icon} transform={this.props.transform}/>
         </div>
         <div className={classes.text}>
-          Select an instance to display its preview here.
+          {this.props.children}
         </div>
       </div>
     );

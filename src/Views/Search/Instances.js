@@ -4,16 +4,15 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
 
 import searchStore from "../../Stores/SearchStore";
 import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import instanceStore from "../../Stores/InstanceStore";
-import NoSelectedList from "./NoSelectedList";
-import NoResults from "./NoResults";
-import NoResultsError from "./NoResultsError";
 import Preview from "./Preview";
-import PreviewPlaceholder from "./PreviewPlaceholder";
+import BGMessage from "../../Components/BGMessage";
+import Status from "../Instance/Status";
 
 const styles = {
   container:{
@@ -83,20 +82,30 @@ const styles = {
       outline:"1px solid transparent",
       "& $actions":{
         opacity:0.75
+      },
+      "& .status":{
+        opacity:"1"
       }
     },
     "&.selected":{
       background:"#39464f",
       borderColor:"#6caddc",
       color:"rgb(224, 224, 224)",
-      outline:"1px solid transparent"
+      outline:"1px solid transparent",
+      "& .status":{
+        opacity:"1"
+      }
     }
   },
 
-  listName:{
+  listLabel:{
     fontSize:"1.4em",
     fontWeight:"300",
-    color:"rgb(244, 244, 244)"
+    color:"rgb(244, 244, 244)",
+    "& .status":{
+      marginRight:"10px",
+      opacity:"0.5"
+    }
   },
 
   listDescription:{
@@ -104,6 +113,10 @@ const styles = {
     whiteSpace:"nowrap",
     textOverflow:"ellipsis",
     marginTop:"10px"
+  },
+
+  listStatus:{
+    paddingRight:"10px"
   },
 
   actions:{
@@ -200,7 +213,10 @@ export default class Instances extends React.Component{
                         return (
                           <div key={instance.id} className={`${classes.listInstance} ${instance === searchStore.selectedInstance?"selected":""}`} onClick={this.handleInstanceClick.bind(this, instance)}>
                             <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
-                            <div className={classes.listName}>{instance.label}</div>
+                            <div className={classes.listLabel}>
+                              <Status id={instance.id} darkmode={true}/>
+                              {instance.label}
+                            </div>
                             {!!instance.description && <div className={classes.listDescription}>{instance.description}</div>}
 
                             <div className={classes.actions}>
@@ -223,22 +239,35 @@ export default class Instances extends React.Component{
                     </div>
                   </InfiniteScroll>
                   :
-                  <NoResults/>
+                  <BGMessage icon={"unlink"}>
+                    No instances could be found in this list
+                    {searchStore.instancesFilter && <div>with the search term {`"${searchStore.instancesFilter}"`}</div>}
+                  </BGMessage>
                 :
                 <FetchingLoader>
                   <span>Fetching instances...</span>
                 </FetchingLoader>
               :
-              <NoResultsError/>
+              <BGMessage icon={"ban"}>
+                There was a network problem retrieving the list of instances.<br/>
+                If the problem persists, please contact the support.<br/><br/>
+                <Button bsStyle={"primary"} onClick={this.handleRetry}>
+                  <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                </Button>
+              </BGMessage>
             :
-            <NoSelectedList/>
+            <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
+              Select a list of instances in the left panel
+            </BGMessage>
           }
         </div>
         <div className={classes.preview}>
           {searchStore.selectedInstance?
             <Preview/>
             :
-            <PreviewPlaceholder/>
+            <BGMessage icon={"money-check"}>
+              Select an instance to display its preview here.
+            </BGMessage>
           }
         </div>
       </div>

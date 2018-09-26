@@ -6,7 +6,7 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
@@ -167,8 +167,12 @@ class App extends React.Component{
               })}
             </div>
             <div className={classes.fixedTabsRight}>
-              <Tab icon={"chart-bar"} active={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
-              <Tab icon={"question-circle"} active={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
+              {authStore.isAuthenticated &&
+                <React.Fragment>
+                  <Tab icon={"chart-bar"} active={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
+                  <Tab icon={"question-circle"} active={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
+                </React.Fragment>
+              }
             </div>
           </div>
           <div className={classes.body}>
@@ -201,6 +205,6 @@ class App extends React.Component{
 library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
   faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
   faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle,
-  faUnlink, faBan, faRedoAlt, faMoneyCheck);
+  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck);
 
 render(<App/>, document.getElementById("root"));

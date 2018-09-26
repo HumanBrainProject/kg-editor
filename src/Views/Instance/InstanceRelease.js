@@ -109,7 +109,7 @@ const styles = {
       backgroundColor:new Color("#f1c40f").lighten(0.6).hex()
     },
     "& .status-indicator":{
-      transform:"scale(0.8)",
+      //transform:"scale(0.8)",
       display:"inline-block",
       verticalAlign:"middle",
       marginRight:"4px"
@@ -142,7 +142,7 @@ const styles = {
   },
   nodeActions:{
     position:"absolute",
-    top:16,
+    top:7,
     right:10,
     "&.no-unrelease":{
       right:"34px"
@@ -252,8 +252,9 @@ const styles = {
           "& .bar-label":{
             position:"absolute",
             top:1,
-            left:"50%",
-            transform:"translateX(-50%)",
+            left:0,
+            width:"100%",
+            textAlign:"center",
             fontSize:"0.8em",
             fontWeight:"bold"
           },

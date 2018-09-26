@@ -3,13 +3,15 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { Form, Field } from "hbp-quickfire";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
 
 import searchStore from "../../Stores/SearchStore";
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
-import ReleaseStatus from "../../Components/ReleaseStatus";
+import BGMessage from "../../Components/BGMessage";
+import Status from "../Instance/Status";
 
 const styles = {
   container:{
@@ -36,8 +38,9 @@ const styles = {
   },
   status:{
     position:"absolute",
-    top:"70px",
-    right:"10px"
+    top:"65px",
+    right:"10px",
+    fontSize:"30px"
   },
   title:{
     fontSize:"1.5em",
@@ -75,6 +78,10 @@ export default class Preview extends React.Component{
     }
   }
 
+  handleRetry = () => {
+    instanceStore.fetchInstanceData(searchStore.selectedInstance.id);
+  }
+
   render(){
     const { classes } = this.props;
     let selectedInstance = instanceStore.getInstance(searchStore.selectedInstance.id);
@@ -84,43 +91,52 @@ export default class Preview extends React.Component{
           <FetchingLoader>
             <span>Fetching instance information...</span>
           </FetchingLoader>
-          :
-          <div className={classes.content}>
-            <div className={classes.actions}>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view")}>
-                <FontAwesomeIcon icon="eye"/>&nbsp;&nbsp;Open
-              </div>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit")}>
-                <FontAwesomeIcon icon="pencil-alt"/>&nbsp;&nbsp;Edit
-              </div>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph")}>
-                <FontAwesomeIcon icon="project-diagram"/>&nbsp;&nbsp;Explore
-              </div>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release")}>
-                <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
-              </div>
-            </div>
-            <div className={classes.title}>
-              {searchStore.selectedInstance.label}
-            </div>
-            <div className={classes.id}>
-              Nexus ID: {searchStore.selectedInstance.id}
-            </div>
-            <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
-              {Object.keys(selectedInstance.form.structure.fields).map(fieldKey => {
-                return(
-                  <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
-                    <Field name={fieldKey}/>
-                  </div>
-                );
-              })}
-              <div className={`${classes.status}`}>
-                <div className={"release-status"}>
-                  <ReleaseStatus instanceStatus={selectedInstance.data.status} childrenStatus={selectedInstance.data.childrenStatus}/>
+          :!selectedInstance.hasFetchError?
+            <div className={classes.content}>
+              <div className={classes.actions}>
+                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view")}>
+                  <FontAwesomeIcon icon="eye"/>&nbsp;&nbsp;Open
+                </div>
+                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit")}>
+                  <FontAwesomeIcon icon="pencil-alt"/>&nbsp;&nbsp;Edit
+                </div>
+                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph")}>
+                  <FontAwesomeIcon icon="project-diagram"/>&nbsp;&nbsp;Explore
+                </div>
+                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release")}>
+                  <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
                 </div>
               </div>
-            </Form>
-          </div>
+              <div className={classes.title}>
+                {searchStore.selectedInstance.label}
+              </div>
+              <div className={classes.id}>
+                Nexus ID: {searchStore.selectedInstance.id}
+              </div>
+              <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
+                {Object.keys(selectedInstance.form.structure.fields).map(fieldKey => {
+                  return(
+                    <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <Field name={fieldKey}/>
+                    </div>
+                  );
+                })}
+                <div className={`${classes.status}`}>
+                  <div className={"release-status"}>
+                    <Status id={searchStore.selectedInstance.id} darkmode={true}/>
+                  </div>
+                </div>
+              </Form>
+            </div>
+            :
+            <BGMessage icon={"ban"}>
+              There was a network problem fetching the instance.<br/>
+              If the problem persists, please contact the support.<br/>
+              <small>{selectedInstance.fetchError}</small><br/><br/>
+              <Button bsStyle={"primary"} onClick={this.handleRetry}>
+                <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+              </Button>
+            </BGMessage>
         }
       </div>
     );

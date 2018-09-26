@@ -1,41 +1,52 @@
 import React from "react";
 import injectStyles from "react-jss";
-import {Glyphicon} from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   status:{
-    borderRadius:"4px",
-    width:"24px",
-    height:"34px",
+    borderRadius:"0.14em",
+    width:"2.5em",
     background:"currentColor",
-    display:"inline-block",
-    overflow:"hidden",
-    lineHeight:"17px",
     textAlign:"center",
-    fontSize:"0.7em",
     color:"#337ab7",
     opacity:1,
+    padding:"2px",
+    lineHeight:"normal",
     "&.has-changed":{
       color:"#f39c12"
     },
     "&.not-released":{
       color:"#e74c3c"
+    },
+    display:"grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",
+    "&.darkmode $instanceStatus":{
+      color:"#24282a",
+    },
+    "&.darkmode $childrenStatus":{
+      background:"#24282a",
     }
   },
 
   instanceStatus:{
-    height:"15px",
     color:"white",
+    "& .svg-inline--fa":{
+      fontSize:"0.7em",
+      verticalAlign:"baseline"
+    },
     "&:only-child":{
-      height:"34px",
-      lineHeight:"34px"
+      "& .svg-inline--fa":{
+        fontSize:"0.8em"
+      },
     }
   },
   childrenStatus:{
-    borderRadius:"2px",
+    borderRadius:"0.07em",
     background:"white",
-    height:"15px",
-    margin:"2px",
+    "& .svg-inline--fa":{
+      fontSize:"0.7em",
+      verticalAlign:"baseline"
+    },
   },
 };
 
@@ -57,14 +68,14 @@ export default class ReleaseStatus extends React.Component{
         :"released";
 
     return(
-      <div className={`${classes.status} ${globalStatusClass}`}>
+      <div className={`${classes.status} ${globalStatusClass} ${this.props.darkmode? "darkmode": ""}`}>
         <div className={`${classes.instanceStatus} ${instanceStatusClass}`}>
           {instanceStatus === "NOT_RELEASED"?
-            <Glyphicon glyph="ban-circle"/>
+            <FontAwesomeIcon icon="unlink"/>
             :instanceStatus === "HAS_CHANGED"?
-              <Glyphicon glyph="retweet"/>
+              <FontAwesomeIcon icon="pencil-alt"/>
               :instanceStatus === "RELEASED"?
-                <Glyphicon glyph="ok"/>
+                <FontAwesomeIcon icon="check"/>
                 :
                 <strong>?</strong>
           }
@@ -72,11 +83,11 @@ export default class ReleaseStatus extends React.Component{
         {childrenStatus !== null &&
           <div className={`${classes.childrenStatus} ${childrenStatusClass}`}>
             {childrenStatus === "NOT_RELEASED"?
-              <Glyphicon glyph="ban-circle"/>
+              <FontAwesomeIcon icon="unlink"/>
               :childrenStatus === "HAS_CHANGED"?
-                <Glyphicon glyph="retweet"/>
+                <FontAwesomeIcon icon="pencil-alt"/>
                 :childrenStatus === "RELEASED"?
-                  <Glyphicon glyph="ok"/>
+                  <FontAwesomeIcon icon="check"/>
                   :
                   <strong>?</strong>
             }

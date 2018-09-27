@@ -5,6 +5,7 @@ import { observer } from "mobx-react";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
+import { Scrollbars } from "react-custom-scrollbars";
 
 import searchStore from "../../Stores/SearchStore";
 import routerStore from "../../Stores/RouterStore";
@@ -40,7 +41,6 @@ const styles = {
   },
 
   body: {
-    overflow:"auto",
     position:"relative"
   },
 
@@ -190,7 +190,7 @@ export default class Instances extends React.Component{
         <div className={classes.header}>
           {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
         </div>
-        <div className={classes.body}>
+        <Scrollbars className={classes.body}>
           {searchStore.selectedList ?
             !searchStore.fetchError.instances ?
               !searchStore.isFetching.instances ?
@@ -260,7 +260,7 @@ export default class Instances extends React.Component{
               Select a list of instances in the left panel
             </BGMessage>
           }
-        </div>
+        </Scrollbars>
         <div className={classes.preview}>
           {searchStore.selectedInstance?
             <Preview/>

@@ -7,29 +7,29 @@ import {find, remove, clone, pullAll, uniqueId, uniq, flatten} from "lodash";
 import palette from "google-palette";
 
 const nodeTypeWhitelist = [
-  "Dataset",
-  "SpecimenGroup",
-  "ExperimentSubject",
-  "Activity",
-  "Person",
-  "PLAComponent",
-  "Publication",
-  "FileAssociation",
-  "DatasetDOI",
-  "ExperimentMethod",
-  "ReferenceSpace",
-  "ParcellationRegion",
-  "ParcellationAtlas",
-  "EmbargoStatus",
-  "EthicsApproval",
-  "ExperimentProtocol",
-  "Preparation",
-  "EthicsAuthority",
-  "Format",
-  "LicenseInformation",
-  "ExperimentSample",
-  "File",
-  "Subject"
+  "http://hbp.eu/minds#Dataset",
+  "http://hbp.eu/minds#SpecimenGroup",
+  "http://hbp.eu/minds#ExperimentSubject",
+  "http://hbp.eu/minds#Activity",
+  "http://hbp.eu/minds#Person",
+  "http://hbp.eu/minds#PLAComponent",
+  "http://hbp.eu/minds#Publication",
+  "http://hbp.eu/minds#FileAssociation",
+  "http://hbp.eu/minds#DatasetDOI",
+  "http://hbp.eu/minds#ExperimentMethod",
+  "http://hbp.eu/minds#ReferenceSpace",
+  "http://hbp.eu/minds#ParcellationRegion",
+  "http://hbp.eu/minds#ParcellationAtlas",
+  "http://hbp.eu/minds#EmbargoStatus",
+  "http://hbp.eu/minds#EthicsApproval",
+  "http://hbp.eu/minds#ExperimentProtocol",
+  "http://hbp.eu/minds#Preparation",
+  "http://hbp.eu/minds#EthicsAuthority",
+  "http://hbp.eu/minds#Format",
+  "http://hbp.eu/minds#LicenseInformation",
+  "http://hbp.eu/minds#ExperimentSample",
+  "http://hbp.eu/minds#File",
+  "http://hbp.eu/minds#Subject"
 ];
 
 const colorScheme = {};
@@ -129,6 +129,9 @@ class GraphStore {
     this.originalData.links.forEach(link => {
       link.source = find(this.originalData.nodes, node => node.id === link.source);
       link.target = find(this.originalData.nodes, node => node.id === link.target);
+    });
+    this.originalData.nodes.forEach(node => {
+      node.niceDataType = node.dataType.replace("http://hbp.eu/minds#","");
     });
 
     this.groupNodes = new Map();

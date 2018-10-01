@@ -4,6 +4,7 @@ import injectStyles from "react-jss";
 import { Form, Field } from "hbp-quickfire";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
+import { Scrollbars } from "react-custom-scrollbars";
 
 import searchStore from "../../Stores/SearchStore";
 import instanceStore from "../../Stores/InstanceStore";
@@ -54,7 +55,8 @@ const styles = {
     marginBottom:"20px"
   },
   field:{
-    marginBottom:"10px"
+    marginBottom:"10px",
+    wordBreak:"break-word"
   }
 };
 
@@ -86,59 +88,61 @@ export default class Preview extends React.Component{
     const { classes } = this.props;
     let selectedInstance = instanceStore.getInstance(searchStore.selectedInstance.id);
     return(
-      <div className={classes.container}>
-        {selectedInstance.isFetching?
-          <FetchingLoader>
-            <span>Fetching instance information...</span>
-          </FetchingLoader>
-          :!selectedInstance.hasFetchError?
-            <div className={classes.content}>
-              <div className={classes.actions}>
-                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view")}>
-                  <FontAwesomeIcon icon="eye"/>&nbsp;&nbsp;Open
-                </div>
-                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit")}>
-                  <FontAwesomeIcon icon="pencil-alt"/>&nbsp;&nbsp;Edit
-                </div>
-                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph")}>
-                  <FontAwesomeIcon icon="project-diagram"/>&nbsp;&nbsp;Explore
-                </div>
-                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release")}>
-                  <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
-                </div>
-              </div>
-              <div className={classes.title}>
-                {searchStore.selectedInstance.label}
-              </div>
-              <div className={classes.id}>
-                Nexus ID: {searchStore.selectedInstance.id}
-              </div>
-              <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
-                {Object.keys(selectedInstance.form.structure.fields).map(fieldKey => {
-                  return(
-                    <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
-                      <Field name={fieldKey}/>
-                    </div>
-                  );
-                })}
-                <div className={`${classes.status}`}>
-                  <div className={"release-status"}>
-                    <Status id={searchStore.selectedInstance.id} darkmode={true}/>
+      <Scrollbars autoHide>
+        <div className={classes.container}>
+          {selectedInstance.isFetching?
+            <FetchingLoader>
+              <span>Fetching instance information...</span>
+            </FetchingLoader>
+            :!selectedInstance.hasFetchError?
+              <div className={classes.content}>
+                <div className={classes.actions}>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view")}>
+                    <FontAwesomeIcon icon="eye"/>&nbsp;&nbsp;Open
+                  </div>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit")}>
+                    <FontAwesomeIcon icon="pencil-alt"/>&nbsp;&nbsp;Edit
+                  </div>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph")}>
+                    <FontAwesomeIcon icon="project-diagram"/>&nbsp;&nbsp;Explore
+                  </div>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release")}>
+                    <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
                   </div>
                 </div>
-              </Form>
-            </div>
-            :
-            <BGMessage icon={"ban"}>
-              There was a network problem fetching the instance.<br/>
-              If the problem persists, please contact the support.<br/>
-              <small>{selectedInstance.fetchError}</small><br/><br/>
-              <Button bsStyle={"primary"} onClick={this.handleRetry}>
-                <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
-              </Button>
-            </BGMessage>
-        }
-      </div>
+                <div className={classes.title}>
+                  {searchStore.selectedInstance.label}
+                </div>
+                <div className={classes.id}>
+                  Nexus ID: {searchStore.selectedInstance.id}
+                </div>
+                <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
+                  {Object.keys(selectedInstance.form.structure.fields).map(fieldKey => {
+                    return(
+                      <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                        <Field name={fieldKey}/>
+                      </div>
+                    );
+                  })}
+                  <div className={`${classes.status}`}>
+                    <div className={"release-status"}>
+                      <Status id={searchStore.selectedInstance.id} darkmode={true}/>
+                    </div>
+                  </div>
+                </Form>
+              </div>
+              :
+              <BGMessage icon={"ban"}>
+                There was a network problem fetching the instance.<br/>
+                If the problem persists, please contact the support.<br/>
+                <small>{selectedInstance.fetchError}</small><br/><br/>
+                <Button bsStyle={"primary"} onClick={this.handleRetry}>
+                  <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                </Button>
+              </BGMessage>
+          }
+        </div>
+      </Scrollbars>
     );
   }
 }

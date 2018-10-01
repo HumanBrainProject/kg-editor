@@ -16,6 +16,7 @@ import SaveErrorPanel from "./InstanceForm/SaveErrorPanel";
 import FetchingPanel from "./InstanceForm/FetchingPanel";
 import SavingPanel from "./InstanceForm/SavingPanel";
 import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
+import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
 
 const styles = {
   panelHeader: {
@@ -151,7 +152,7 @@ export default class InstanceForm extends React.Component {
     e && e.stopPropagation();
     const instance = instanceStore.getInstance(this.props.id);
     if (instance.hasChanged) {
-      instanceStore.requestCancelInstanceChanges(this.props.id);
+      instanceStore.cancelInstanceChanges(this.props.id);
     } else {
       this.handleConfirmCancelEdit();
     }
@@ -160,13 +161,9 @@ export default class InstanceForm extends React.Component {
   handleConfirmCancelEdit = (e) => {
     e && e.stopPropagation();
     const instance = instanceStore.getInstance(this.props.id);
-    if (instance.isNew) {
+    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, true);
+    if (instance.hasChanged) {
       instanceStore.confirmCancelInstanceChanges(this.props.id);
-    } else {
-      instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, true);
-      if (instance.hasChanged) {
-        instanceStore.confirmCancelInstanceChanges(this.props.id);
-      }
     }
   }
 
@@ -188,20 +185,12 @@ export default class InstanceForm extends React.Component {
 
     const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
 
-    const [organization, domain, schema, version,] = id.split("/");
+    const [, , schema, ,] = id.split("/");
 
     const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
 
     const isMainInstance = id === mainInstanceId;
     const isCurrentInstance = id === instanceStore.getCurrentInstanceId(mainInstanceId);
-
-    const backLink = (instance.isFetched && instance.data && instance.data.instancesPath) ?
-      instance.data.instancesPath
-      :
-      (organization && domain && schema && version) ?
-        `/nodetype/${organization}/${domain}/${schema}/${version}`
-        :
-        "/";
 
     const panelClassName = () => {
       let className = classes.panel;
@@ -267,20 +256,19 @@ export default class InstanceForm extends React.Component {
               id={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"} />
           </Form>
           <ConfirmCancelEditPanel
-            show={instance.cancelRequest}
-            text={`There are some unsaved changes. ${instance.isNew?"Are you sure you want to cancel the creation of this instance?":"Are you sure you want to cancel the changes of this instance?"}`}
+            show={instance.cancelChangesPending}
+            text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
             onConfirm={this.handleConfirmCancelEdit}
             onCancel={this.handleContinueEditing}
-            onConfirmBackLink={backLink}
-            useConfirmBackLink={instance.isNew && isMainInstance}
             inline={!isMainInstance} />
           <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
+          <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance}/>
           <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
         </div>
         }
         <Glyphicon glyph="arrow-right" className="hightlightArrow" />
         <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
-        <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onCancelBackLink={backLink} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
+        <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
       </div>
     );
   }

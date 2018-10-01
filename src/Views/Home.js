@@ -1,83 +1,22 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import { Link } from "react-router-dom";
+import { Scrollbars } from "react-custom-scrollbars";
+import Hub from "./Home/Hub";
 
 const styles = {
   container: {
-    position: "absolute",
-    top: "80px",
-    width: "100%",
-    height: "calc(100% - 80px)",
-    "@media screen and (min-width:992px)": {
-      width: "auto",
-      height: "auto",
-      margin: "0",
-      top: "40%",
-      left: "50%",
-      transform: "translate(-50%, -50%)"
-    },
-    "& h1": {
-      margin: "20px 0 10px 0",
-      color: "white",
-      textAlign: "center",
-      "@media screen and (min-width:992px)": {
-        margin: "30px 0",
-        fontSize: "60px",
-      }
-    },
-    "& > div": {
-      position: "relative",
-      height: "100%"
-    },
-    "& ul": {
-      display: "grid",
-      gridTemplateRows: "repeat(3, 1fr)",
-      listStyleType: "none",
-      height: "calc(100% - 70px)",
-      margin: "0",
-      padding: "20px",
-      columnGap: "10px",
-      rowGap: "1em",
-      overflowY: "auto",
-      "@media screen and (min-width:992px)": {
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gridTemplateRows: "unset",
-      }
-    },
-    "& li": {
-      display: "inline-block",
-      borderRadius: "5px",
-      backgroundColor: "white",
-      color: "#444",
-    },
-    "& a": {
-      display: "inline-block",
-      width: "100%",
-      height: "100%",
-      textAlign: "center",
-      verticalAlign: "middle",
-      "@media screen and (min-width:992px)": {
-        width: "300px",
-        height: "300px"
-      },
-      "@media screen and (min-width:1200px)": {
-        width: "400px",
-        height: "400px"
-      }
-    },
-    "& h2": {
-      marginTop: "10px",
-      wordBreak: "break-word",
-      whiteSpace: "normal",
-      lineHeight: "1.3em",
-      "@media screen and (min-width:768px)": {
-        marginTop: "30px",
-      },
-      "@media screen and (min-width:992px)": {
-        marginTop: "30%",
-        fontSize: "36px"
-      }
+    display:"grid",
+    height:"100%",
+    width:"100%",
+    gridGap:"10px",
+    gridTemplateColumns:"repeat(12, 1fr)",
+    gridTemplateRows:"auto",
+    padding:"10px",
+    "& .widget":{
+      background:"#24282a",
+      border:"1px solid #111314",
+      color:"rgb(224, 224, 224)"
     }
   }
 };
@@ -90,24 +29,13 @@ export default class Home extends React.Component{
   }
 
   render(){
-    const {classes} =  this.props;
+    const { classes } =  this.props;
     return (
-      <div className={classes.container}>
-        <div>
-          <h1>Welcome</h1>
-          <ul>
-            <li>
-              <Link className="btn btn-default" to={"/search"}><h2>Review<br/>(create &amp; edit)<br/>instances</h2></Link>
-            </li>
-            <li>
-              <Link className="btn btn-default" to={"/define"}><h2>Create &amp; Edit<br/>node types</h2></Link>
-            </li>
-            <li>
-              <Link className="btn btn-default" to={"/help"}><h2>Help<br/>&<br/>Tutorials</h2></Link>
-            </li>
-          </ul>
+      <Scrollbars autoHide>
+        <div className={classes.container}>
+          <Hub/>
         </div>
-      </div>
+      </Scrollbars>
     );
   }
 }

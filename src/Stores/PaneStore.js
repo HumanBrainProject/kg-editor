@@ -8,13 +8,13 @@ export default class PaneStore {
   @computed get selectedIndex(){
     return this.panes.indexOf(this.selectedPane);
   }
-  @action registerPane(){
-    let id = uniqueId("pane");
-    this.panes.push(id);
+  @action registerPane(id){
+    let paneId = id || uniqueId("pane");
+    this.panes.push(paneId);
     if(this.selectedPane === undefined){
-      this.selectedPane = id;
+      this.selectedPane = paneId;
     }
-    return id;
+    return paneId;
   }
   @action selectPane(id){
     this.selectedPane = id;

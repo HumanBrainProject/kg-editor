@@ -40,10 +40,6 @@ const styles = {
     }
   },
 
-  body: {
-    position:"relative"
-  },
-
   preview:{
     position:"relative",
     gridRow:"1 / span 2",
@@ -169,6 +165,14 @@ export default class Instances extends React.Component{
     }
   }
 
+  handleInstanceDoubleClick(instance, event){
+    if(event.metaKey || event.ctrlKey){
+      instanceStore.openInstance(instance.id);
+    } else {
+      routerStore.history.push(`/instance/view/${instance.id}`);
+    }
+  }
+
   handleOpenInstance(mode, instanceId, event){
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
@@ -182,6 +186,10 @@ export default class Instances extends React.Component{
     searchStore.fetchInstances(true);
   }
 
+  handleRetry = () => {
+    searchStore.fetchInstances();
+  }
+
   render = () => {
     const { classes } = this.props;
 
@@ -190,7 +198,7 @@ export default class Instances extends React.Component{
         <div className={classes.header}>
           {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
         </div>
-        <Scrollbars className={classes.body}>
+        <Scrollbars autoHide>
           {searchStore.selectedList ?
             !searchStore.fetchError.instances ?
               !searchStore.isFetching.instances ?
@@ -203,15 +211,12 @@ export default class Instances extends React.Component{
                     loader={<div className={classes.loader} key={0}><FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;<span>Loading more instances...</span></div>}
                     useWindow={false}>
                     <div className={classes.list}>
-                      {/*<li key="new">
-                        <Link to={`/instance/${searchStore.selectedList.path}/${uniqueId("___NEW___")}`} className="create">
-                          <Glyphicon glyph="plus" />
-                          <div className="createLabel">{`Create a new ${searchStore.nodeTypeLabel} instance`}</div>
-                        </Link>
-                      </li>*/}
                       {searchStore.instances.map(instance => {
                         return (
-                          <div key={instance.id} className={`${classes.listInstance} ${instance === searchStore.selectedInstance?"selected":""}`} onClick={this.handleInstanceClick.bind(this, instance)}>
+                          <div key={instance.id}
+                            className={`${classes.listInstance} ${instance === searchStore.selectedInstance?"selected":""}`}
+                            onClick={this.handleInstanceClick.bind(this, instance)}
+                            onDoubleClick={this.handleInstanceDoubleClick.bind(this, instance)}>
                             <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
                             <div className={classes.listLabel}>
                               <Status id={instance.id} darkmode={true}/>

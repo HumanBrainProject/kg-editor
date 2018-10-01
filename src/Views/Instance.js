@@ -97,12 +97,14 @@ export default class Edit extends React.Component {
         </div>
         <div className={classes.body}>
           {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
-            <PaneContainer>
+            <PaneContainer key={this.props.match.params.id} paneStore={openedInstance.paneStore}>
               <React.Fragment>
-                <Pane>
+                <Pane paneId={this.props.match.params.id}>
                   <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
                 </Pane>
-                <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
+                {!instanceStore.getInstance(this.props.match.params.id).hasFetchError?
+                  <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
+                  :null}
               </React.Fragment>
             </PaneContainer>
             :openedInstance.viewMode === "graph"?

@@ -161,7 +161,7 @@ export default class Graph extends React.Component {
 
       let label = node.title.split?node.title:"";
       if(!node.isGroup){
-        label = `(${node.dataType}) ${label}`;
+        label = `(${node.niceDataType}) ${label}`;
       }
 
       this._wrapText(ctx, label, node.x, node.y, 10, 1.3, node);

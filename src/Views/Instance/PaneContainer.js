@@ -19,7 +19,11 @@ const styles = {
 export default class PaneContainer extends React.Component {
   constructor(props) {
     super(props);
-    this.paneStore = new PaneStore();
+    if(!this.props.paneStore){
+      this.paneStore = new PaneStore();
+    } else {
+      this.paneStore = this.props.paneStore;
+    }
   }
 
   render() {

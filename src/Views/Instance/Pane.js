@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { inject, observer } from "mobx-react";
+import { Scrollbars } from "react-custom-scrollbars";
 
 const styles = {
   pane: {
@@ -14,7 +15,6 @@ const styles = {
     background: "#ebebeb",
     boxShadow: "0 2px 10px #333",
     transform: "scale(0.90)",
-    padding: "20px",
     transition: "left 0.5s ease, transform 0.5s ease",
     "&.active": {
       background: "#f5f5f5",
@@ -39,6 +39,9 @@ const styles = {
     "&.active > div, &.after:hover > div, &.before:hover > div": {
       opacity: "1"
     }
+  },
+  scrolledView:{
+    padding:"20px",
   }
 };
 
@@ -48,29 +51,31 @@ const styles = {
 export default class Pane extends React.Component {
   constructor(props) {
     super(props);
-    this.paneId = this.props.paneStore.registerPane();
+    this.props.paneStore.registerPane(this.props.paneId);
   }
 
   componentWillUnmount() {
-    this.props.paneStore.unregisterPane(this.paneId);
+    this.props.paneStore.unregisterPane(this.props.paneId);
   }
 
   handleFocus = () => {
-    if (this.props.paneStore.selectedPane !== this.paneId) {
-      this.props.paneStore.selectPane(this.paneId);
+    if (this.props.paneStore.selectedPane !== this.props.paneId) {
+      this.props.paneStore.selectPane(this.props.paneId);
     }
   }
 
   render() {
-    const { classes, paneStore } = this.props;
-    const index = paneStore.panes.indexOf(this.paneId);
+    const { classes, paneStore, paneId } = this.props;
+    const index = paneStore.panes.indexOf(paneId);
     const mainClass = index === 0 ? " main" : "";
     const activeClass = paneStore.selectedIndex < index ? "after" : paneStore.selectedIndex > index ? "before" : "active";
     return (
       <div className={`${classes.pane}${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
-        <div>
-          {this.props.children}
-        </div>
+        <Scrollbars autoHide>
+          <div className={classes.scrolledView}>
+            {this.props.children}
+          </div>
+        </Scrollbars>
       </div>
     );
   }

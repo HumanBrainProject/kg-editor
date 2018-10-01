@@ -4,16 +4,20 @@ import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FetchingLoader from "../../Components/FetchingLoader";
+import { Scrollbars } from "react-custom-scrollbars";
 
 import searchStore from "../../Stores/SearchStore";
+import instanceStore from "../../Stores/InstanceStore";
+import routerStore from "../../Stores/RouterStore";
 
 const styles = {
   container:{
-    overflow:"auto",
     background:"#24282a",
     borderRight:"1px solid #111314",
     color: "rgb(224, 224, 224)",
-    position:"relative"
+    position:"relative",
+    display:"grid",
+    gridTemplateRows:"auto 1fr"
   },
   search:{
     borderRadius: "2px",
@@ -31,8 +35,15 @@ const styles = {
     textTransform:"uppercase",
     fontWeight:"bold",
     fontSize:"0.9em",
-    padding:"10px 10px 0 10px",
+    padding:"10px 10px 5px 10px",
     cursor:"pointer"
+  },
+  folderSearch:{
+    textTransform:"none",
+  },
+  folderNoMatch:{
+    display:"inline-block",
+    marginLeft:"20px"
   },
   list:{
     padding:"5px 5px 5px 30px",
@@ -42,13 +53,26 @@ const styles = {
     "&:hover":{
       background:"#2b353c",
       borderColor:"#266ea1",
-      color:"rgb(224, 224, 224)"
+      color:"rgb(224, 224, 224)",
+      "& $createInstance":{
+        display:"block",
+        color:"rgba(255, 255, 255, 0.5)",
+        "&:hover":{
+          color:"rgb(224, 224, 224)",
+        }
+      }
     },
     "&.selected":{
       background:"#39464f",
       borderColor:"#6caddc",
       color:"rgb(224, 224, 224)"
     }
+  },
+  createInstance:{
+    display:"none",
+    marginTop:"3px",
+    marginRight:"3px",
+    cursor:"pointer"
   },
   fetchErrorPanel:{
     textAlign:"center",
@@ -86,6 +110,12 @@ export default class Lists extends React.Component{
     searchStore.selectList(list);
   }
 
+  async handleCreateInstance(path, event){
+    event.stopPropagation();
+    let newInstanceId = await instanceStore.createNewInstance(path);
+    routerStore.history.push(`/instance/edit/${newInstanceId}`);
+  }
+
   render(){
     const {classes} = this.props;
 
@@ -98,13 +128,34 @@ export default class Lists extends React.Component{
                 <div className={classes.header}>
                   <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.listsFilter} onChange={this.handleFilterChange}/>
                 </div>
-                <div className={classes.body}>
-                  <div className="content">
-                    {searchStore.lists.map(folder => {
+                <Scrollbars autoHide>
+                  {searchStore.listsFilter.trim()?
+                    <div className="content">
+                      <div className={classes.folder} key={"search-results"}>
+                        <div className={classes.folderName}>
+                          <FontAwesomeIcon fixedWidth icon={"search"}/> &nbsp;
+                          Search results for <span className={classes.folderSearch}>{`"${searchStore.listsFilter.trim()}"`}</span>
+                        </div>
+                        <div className={classes.folderLists}>
+                          {searchStore.filteredLists.map((list, index) => {
+                            const [,, schema,] = list.path.split("/");
+                            return (
+                              <div className={`${classes.list} ${searchStore.selectedList === list?"selected":""}`} key={list.path+index} onClick={this.handleSelectList.bind(this, list)}>
+                                {list.label?list.label:schema}
+                              </div>
+                            );
+                          })}
+                          {searchStore.filteredLists.length === 0 && <em className={classes.folderNoMatch}>No matches found</em>}
+                        </div>
+                      </div>
+                    </div>
+                    :
+
+                    searchStore.lists.map(folder => {
                       return(
                         <div className={classes.folder} key={folder.folderName}>
                           <div className={classes.folderName} onClick={this.handleToggleFolder.bind(this,folder)}>
-                            <FontAwesomeIcon icon={folder.expand?"caret-down":"caret-right"}/> &nbsp;&nbsp;
+                            <FontAwesomeIcon fixedWidth icon={folder.expand?"caret-down":"caret-right"}/> &nbsp;
                             {folder.folderName}
                           </div>
                           {folder.expand && <div className={classes.folderLists}>
@@ -113,6 +164,9 @@ export default class Lists extends React.Component{
                               return (
                                 <div className={`${classes.list} ${searchStore.selectedList === list?"selected":""}`} key={list.path+index} onClick={this.handleSelectList.bind(this, list)}>
                                   {list.label?list.label:schema}
+                                  {instanceStore.isCreatingNewInstance?
+                                    <FontAwesomeIcon icon={"circle-notch"} spin pull={"right"} className={classes.createInstance}/>
+                                    :<FontAwesomeIcon icon={"plus"} pull={"right"} className={classes.createInstance} onClick={this.handleCreateInstance.bind(this, list.path)}/>}
                                 </div>
                               );
                             })}
@@ -120,8 +174,7 @@ export default class Lists extends React.Component{
                         </div>
                       );
                     })}
-                  </div>
-                </div>
+                </Scrollbars>
               </React.Fragment>
               :
               <div className={classes.noResultPanel}>

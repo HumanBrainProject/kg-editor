@@ -6,6 +6,7 @@ import API from "../Services/API";
 class SearchStore{
 
   @observable lists = [];
+  @observable allLists = null;
   @observable listsFilter = "";
   @observable isFetching = {
     lists: false,
@@ -30,20 +31,12 @@ class SearchStore{
     this.fetchLists();
   }
 
-  //Lists related methods
-  @computed get filteredLists() {
-    const terms = this.listsFilter.split(" ");
-    return this.lists.filter(list => {
-      if (!list.label) {
-        return false;
-      }
-      const label = list.label.toLowerCase();
-      return terms.every(term => label.includes(term));
-    });
+  @action setListsFilter(filter){
+    this.listsFilter = filter;
   }
 
-  @action setListsFilter(filter){
-    this.listsFilter = filter.trim().replace(/\s+/g," ").toLowerCase();
+  @computed get filteredLists(){
+    return this.allLists.filter(list => list.label.toLowerCase().includes(this.listsFilter.trim().toLowerCase()));
   }
 
   @action
@@ -55,15 +48,17 @@ class SearchStore{
       runInAction(() => {
         this.isFetching.lists = false;
         this.lists = [];
+        this.allLists = (data && data.data)? data.data: [];
+
         this.lists.push({
           folderName:"Common node types",
           expand:true,
-          lists:(data && data.data)? data.data.filter(type => type.ui_info && type.ui_info.promote):[]
+          lists:this.allLists.filter(type => type.ui_info && type.ui_info.promote)
         });
         this.lists.push({
           folderName:"Other node types",
           expand:true,
-          lists:(data && data.data)? data.data.filter(type => !type.ui_info || !type.ui_info.promote):[]
+          lists:this.allLists.filter(type => !type.ui_info || !type.ui_info.promote)
         });
       });
     } catch (e) {

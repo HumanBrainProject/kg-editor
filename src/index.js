@@ -6,7 +6,7 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
@@ -145,11 +145,14 @@ class App extends React.Component{
               {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
                 const instance = instanceStore.getInstance(instanceId);
                 const mode = instanceStore.openedInstances.get(instanceId).viewMode;
-                let label = instanceId;
+                let label;
                 let color = undefined;
                 if(!instance.isFetching && !instance.hasFetchError){
                   label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
                   color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
+                }
+                if(!label){
+                  label = instanceId;
                 }
                 return (
                   <Tab
@@ -205,6 +208,6 @@ class App extends React.Component{
 library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
   faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
   faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle,
-  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck);
+  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus);
 
 render(<App/>, document.getElementById("root"));

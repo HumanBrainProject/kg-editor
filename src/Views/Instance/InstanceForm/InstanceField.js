@@ -1,7 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
-import { uniqueId } from "lodash";
 import { Field } from "hbp-quickfire";
 import instanceStore from "../../../Stores/InstanceStore";
 
@@ -97,15 +96,12 @@ export default class InstanceField extends React.Component{
     return field.value;
   }
 
-  addCustomValueHandler = (value, field) => {
-    const id = `${field.instancesPath}/${uniqueId("___NEW___")}`;
-    field.options.push({
-      [field.mappingValue]: id,
-      [field.mappingLabel]: value
-    });
-    field.addValue(field.options[field.options.length-1]);
-    instanceStore.instanceHasChanged(this.props.id);
-    this.handleFieldFocus(field, {id: id});
+  addCustomValueHandler = async (value, field) => {
+    let newInstanceId = await instanceStore.createNewInstanceAsOption(field, value);
+    if(newInstanceId){
+      instanceStore.instanceHasChanged(this.props.id);
+      this.handleFieldFocus(field, {id: newInstanceId});
+    }
   }
 
   render(){

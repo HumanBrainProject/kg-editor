@@ -1,7 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
 
 const styles = {
   container: {
@@ -49,7 +48,7 @@ const styles = {
 @injectStyles(styles)
 export default class ConfirmCancelEditPanel extends React.Component{
   render(){
-    const { classes, show, text, onConfirm, onCancel, onConfirmBackLink, useConfirmBackLink, inline} = this.props;
+    const { classes, show, text, onConfirm, onCancel, inline} = this.props;
     const handleConfirm = (e) => {
       e.stopPropagation();
       onConfirm(e);
@@ -64,11 +63,7 @@ export default class ConfirmCancelEditPanel extends React.Component{
           <div className={classes.panel}>
             <h4>{text}</h4>
             <div>
-              {useConfirmBackLink?
-                <Link to={onConfirmBackLink} className="btn btn-default">Yes</Link>
-                :
-                <Button bsStyle="default" onClick={handleConfirm}>Yes</Button>
-              }
+              <Button bsStyle="default" onClick={handleConfirm}>Yes</Button>
               <Button bsStyle="danger" onClick={handleCancel}>No</Button>
             </div>
           </div>

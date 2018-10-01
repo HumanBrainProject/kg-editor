@@ -150,7 +150,7 @@ export default class SavePanel extends React.Component{
                 <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
               </Modal.Body>
               <Modal.Footer>
-                {!comparedInstance.isNew && <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>}
+                <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>
                 <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"save"}/>&nbsp;Save this instance</Button>
               </Modal.Footer>
             </Modal>
@@ -174,8 +174,8 @@ export default class SavePanel extends React.Component{
                     :
                     <ButtonGroup vertical>
                       <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)}><Glyphicon glyph={"save"}/></Button>
-                      {!instance.isNew && <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>}
-                      {!instance.isNew && <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>}
+                      <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>
+                      <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>
                     </ButtonGroup>
                   }
                 </div>

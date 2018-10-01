@@ -172,6 +172,11 @@ export default class InstanceForm extends React.Component {
     instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
+  handleSave = (e) => {
+    e && e.stopPropagation();
+    instanceStore.saveInstance(this.props.id);
+  }
+
   handleCancelSave = (e) => {
     e && e.stopPropagation();
     instanceStore.cancelSaveInstance(this.props.id);

@@ -11,6 +11,7 @@ const styles = {
       "--bg-color-ui-contrast1":"#ffffff",
       "--bg-color-ui-contrast2":"#eeeeee",
       "--bg-color-ui-contrast3":"#dddddd",
+      "--bg-color-ui-contrast4":"#cccccc",
 
       "--border-color-ui-contrast1":"#ffffff",
       "--border-color-ui-contrast2":"#ffffff",

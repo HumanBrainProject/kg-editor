@@ -1,12 +1,12 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {isFunction} from "lodash";
-import {Glyphicon} from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   container:{
     display:"inline-grid",
-    background:"white",
+    background:"var(--bg-color-ui-contrast4)",
     borderRadius:"20px",
     height:"24px"
   }
@@ -48,14 +48,14 @@ const toggleStyles = {
     transition:"all .2s ease",
     background:"none",
     "&.selected":{
-      background:"black",
+      background:"var(--bg-color-ui-contrast1)",
       borderRadius:"50%",
       transform:"scale(1.12)",
       fontSize:"0.8em",
-      backgroundColor:"currentColor",
-      "& span":{
+      /*backgroundColor:"currentColor",
+      "& svg":{
         color:"white"
-      },
+      },*/
       "&.noscale":{
         transform:"scale(1)",
       }
@@ -75,7 +75,7 @@ class Toggle extends React.Component{
     const {classes, selectedValue, value, noscale} = this.props;
     return(
       <div onClick={this.handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:this.props.color}}>
-        <Glyphicon glyph={this.props.icon || "asterisk"}/>
+        <FontAwesomeIcon icon={this.props.icon || "dot-circle"}/>
       </div>
     );
   }

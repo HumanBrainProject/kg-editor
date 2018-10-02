@@ -98,11 +98,11 @@ class GraphStore {
     try {
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
       runInAction( ()=>{
-        this.isFetched = true;
-        this.isFetching = false;
         this.originalData = data;
         this.filterOriginalData();
         this.expandedTypes = [];
+        this.isFetched = true;
+        this.isFetching = false;
       } );
     } catch (e) {
       console.log(e);
@@ -148,7 +148,7 @@ class GraphStore {
         id:"Group_"+nodeType,
         dataType:"Group_"+nodeType,
         name:"Group_"+nodeType,
-        title:"Group of "+nodeType+" ("+nodesOfType.length+")",
+        title:"Group of "+nodeType.replace("http://hbp.eu/minds#","")+" ("+nodesOfType.length+")",
         original_dataType:nodeType,
         isGroup:true,
         groupSize: nodesOfType.length

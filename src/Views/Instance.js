@@ -20,6 +20,12 @@ const styles = {
     height:"100%",
     gridTemplateRows:"100%",
     gridTemplateColumns:"50px 1fr 400px",
+    "&.hide-savebar":{
+      gridTemplateColumns:"50px 1fr",
+      "& $sidebar":{
+        display:"none"
+      }
+    }
   },
   tabs:{
     borderRight:"1px solid var(--border-color-ui-contrast1)",
@@ -80,7 +86,7 @@ export default class Edit extends React.Component {
     const openedInstance = instanceStore.openedInstances.get(this.props.match.params.id);
 
     return (
-      <div className={classes.container}>
+      <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
         <div className={classes.tabs}>
           <div className={`${classes.tab} ${openedInstance.viewMode === "view"?"active":""}`} onClick={this.handleSelectMode.bind(this, "view")}>
             <FontAwesomeIcon icon="eye"/>

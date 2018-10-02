@@ -11,6 +11,7 @@ const styles = {
       "--bg-color-ui-contrast1":"#141618",
       "--bg-color-ui-contrast2":"#24282a",
       "--bg-color-ui-contrast3":"#2B3032",
+      "--bg-color-ui-contrast4":"#4f5658",
 
       "--border-color-ui-contrast1":"#111314",
       "--border-color-ui-contrast2":"#141618",

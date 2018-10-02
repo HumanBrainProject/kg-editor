@@ -1,4 +1,4 @@
-import {observable, action, runInAction} from "mobx";
+import {observable, action, runInAction, computed} from "mobx";
 import { uniqueId } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
@@ -38,6 +38,7 @@ class InstanceStore {
   @observable globalReadMode = true;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
+  @observable showSaveBar = false;
 
   generatedKeys = new WeakMap();
 
@@ -78,6 +79,11 @@ class InstanceStore {
       this.fetchInstanceData(instanceId);
     }
     return this.instances.get(instanceId);
+  }
+
+  @computed
+  get hasUnsavedChanges(){
+    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
   }
 
   @action
@@ -340,6 +346,11 @@ class InstanceStore {
     const instance = this.instances.get(instanceId);
     instance.saveError = null;
     instance.hasSaveError = false;
+  }
+
+  @action
+  toggleSavebarDisplay(state){
+    this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
 }
 

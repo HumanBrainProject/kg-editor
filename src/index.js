@@ -6,7 +6,7 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faExpandArrowsAlt, faCompress, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
@@ -14,6 +14,7 @@ import instanceStore from "./Stores/InstanceStore";
 import graphStore from "./Stores/GraphStore";
 
 import Tab from "./Components/Tab";
+import SaveBar from "./Views/Instance/SaveBar";
 
 import NotFound from "./Views/NotFound";
 import Home from "./Views/Home";
@@ -27,6 +28,7 @@ import DefaultTheme from "./Themes/Default";
 import BrightTheme from "./Themes/Bright";
 
 import "babel-polyfill";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   "@global html, body, #root": {
@@ -89,6 +91,51 @@ const styles = {
   },
   status:{
     background: "var(--bg-color-ui-contrast1)"
+  },
+  savebar:{
+    position:"absolute",
+    top:0,
+    right:"-400px",
+    width:"400px",
+    background:"var(--bg-color-ui-contrast3)",
+    borderLeft:"1px solid var(--border-color-ui-contrast1)",
+    color:"var(--ft-color-loud)",
+    height:"100%",
+    zIndex:2,
+    transition:"right 0.25s ease",
+    "&.show":{
+      right:"0",
+    }
+  },
+  savebarToggle:{
+    cursor:"pointer",
+    position:"absolute",
+    bottom:"10px",
+    right:"100%",
+    background:"linear-gradient(90deg, var(--bg-color-ui-contrast1), var(--bg-color-ui-contrast3))",
+    borderRadius:"3px 0 0 3px",
+    padding:"10px",
+    border:"1px solid var(--border-color-ui-contrast1)",
+    borderRight:"none",
+    textAlign:"center",
+    color:"#e67e22",
+    "&:hover":{
+      background:"var(--bg-color-ui-contrast3)"
+    }
+  },
+  savebarToggleIcon:{
+    animation: "pulse 2s linear infinite"
+  },
+  "@keyframes pulse": {
+    "0%":{
+      "transform": "scale(1.1)"
+    },
+    "50%":{
+      "transform": "scale(0.8)"
+    },
+    "100%":{
+      "transform": "scale(1.1)"
+    }
   }
 };
 
@@ -112,6 +159,10 @@ class App extends React.Component{
     if(e.ctrlKey && e.altKey && e.keyCode === 84){
       this.setState({theme:this.state.theme === DefaultTheme? BrightTheme: DefaultTheme});
     }
+  }
+
+  handleToggleSaveBar = () => {
+    instanceStore.toggleSavebarDisplay();
   }
 
   handleCloseInstance(instanceId){
@@ -193,6 +244,16 @@ class App extends React.Component{
             </div>
           </div>
           <div className={classes.body}>
+            {instanceStore.hasUnsavedChanges && !matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) &&
+              <div className={`${classes.savebar} ${instanceStore.showSaveBar?"show":""}`}>
+                <div className={classes.savebarToggle} onClick={this.handleToggleSaveBar}>
+                  <FontAwesomeIcon className={classes.savebarToggleIcon} icon={"exclamation-triangle"}/>&nbsp;
+                  <FontAwesomeIcon icon={"caret-down"}/>&nbsp;
+                  <FontAwesomeIcon icon={"pencil-alt"}/>
+                </div>
+                <SaveBar/>
+              </div>
+            }
             {!authStore.isAuthenticated?
               <Route component={Login} />
               :
@@ -221,7 +282,8 @@ class App extends React.Component{
 
 library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
   faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
-  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle,
-  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus);
+  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faEyeSlash, faExclamationTriangle,
+  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle,
+  faExpandArrowsAlt, faCompress);
 
 render(<App/>, document.getElementById("root"));

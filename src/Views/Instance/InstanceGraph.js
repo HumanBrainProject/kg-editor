@@ -12,47 +12,23 @@ const styles = {
     width:"100%",
     height:"100%",
     display:"grid",
-    gridGap:"20px",
+    gridGap:"10px",
     gridTemplateRows:"1fr",
     gridTemplateColumns:"1fr 450px",
-    padding:"20px"
+    padding:"10px"
   },
 
   graph:{
-    background:"white",
-    borderRadius:"4px",
+    background:"var(--bg-color-ui-contrast2)",
+    border:"1px solid var(--border-color-ui-contrast1)",
     overflow:"hidden"
   },
 
-  form:{
-    background:"white",
-    overflow:"auto",
-    borderRadius:"4px",
-    padding:"20px",
-    position:"relative"
-  },
-
   settings:{
-    extend:"form"
-  },
-
-  history:{
-    extend:"form"
-  },
-
-  editInstance:{
-    position:"fixed",
-    background:"rgba(0,0,0,0.75)",
-    top:0,
-    left:0,
-    zIndex:100,
-    width:"100vw",
-    height:"100vh"
-  },
-  closeEdit:{
-    position:"absolute",
-    top:20,
-    right:20
+    background:"var(--bg-color-ui-contrast2)",
+    border:"1px solid var(--border-color-ui-contrast1)",
+    overflow:"auto",
+    position:"relative"
   }
 };
 
@@ -65,7 +41,9 @@ export default class GraphInstance extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    graphStore.fetchGraph(newProps.id);
+    if(newProps.id !== this.props.id){
+      graphStore.fetchGraph(newProps.id);
+    }
   }
 
   render() {

@@ -337,9 +337,9 @@ export default class InstanceRelease extends React.Component{
           {prefix === "" &&
             <div className={`${classes.nodeActions}${node.status==="NOT_RELEASED"?" no-unrelease":""}`}>
               <MultiToggle selectedValue={node.pending_status} onChange={this.handleToggleChange.bind(this, node)}>
-                {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="ok"/>}
-                <MultiToggle.Toggle color={"#999"} value={node.status} icon="record" noscale/>
-                {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="ban-circle"/>}
+                {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check"/>}
+                <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale/>
+                {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="unlink"/>}
               </MultiToggle>
             </div>
           }

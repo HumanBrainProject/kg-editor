@@ -30,8 +30,8 @@ const styles = {
   },
   capture:{
     position:"absolute",
-    top:"20px",
-    left:"20px"
+    top:"10px",
+    right:"10px"
   },
   settings:{
     position:"absolute",
@@ -55,6 +55,7 @@ export default class Graph extends React.Component {
       graphWidth:0,
       graphHeight:0
     };
+    this.initialZoom = false;
   }
 
   componentDidMount(){
@@ -66,6 +67,12 @@ export default class Graph extends React.Component {
   componentWillUnmount(){
     window.removeEventListener("resize", this.resizeDebounceFn);
     this.graphRef && this.graphRef.stopAnimation();
+  }
+
+  componentDidUpdate(){
+    if(!this.initialZoom){
+      this.graphRef && this.graphRef.zoom(7);
+    }
   }
 
   resizeWrapper = () => {
@@ -222,7 +229,6 @@ export default class Graph extends React.Component {
         />
         }
         <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
-        {/*<Button className={`${classes.settings} btn btn-primary`} onClick={this.handleToggleSettings}><Glyphicon glyph={"cog"}/></Button>*/}
         {/*<Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />*/}
       </div>
     );

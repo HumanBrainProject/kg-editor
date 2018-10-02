@@ -3,6 +3,8 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import {Button, ButtonGroup, Glyphicon, Modal} from "react-bootstrap";
 import { uniqueId } from "lodash";
+import { Scrollbars } from "react-custom-scrollbars";
+
 import CompareChanges from "./CompareChanges";
 import instanceStore from "../../Stores/InstanceStore";
 
@@ -10,6 +12,7 @@ const animationId = uniqueId("animationId");
 
 const styles = {
   container:{
+    height:"100%",
     "& h4":{
       padding:10,
       marginTop:0,
@@ -26,7 +29,10 @@ const styles = {
     padding:10,
     display:"grid",
     "&:nth-child(odd)":{
-      background:"var(--bg-color-ui-contrast1)"
+      background:"var(--bg-color-ui-contrast3)"
+    },
+    "&:nth-child(even)":{
+      background:"var(--bg-color-ui-contrast2)"
     },
     gridTemplateColumns:"1fr 50px",
   },
@@ -116,9 +122,10 @@ export default class SavePanel extends React.Component{
   }
 
   onUnload = (event) => { // the method that will be used for both add and remove event
-    if(Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).length === 0){
+    if(!instanceStore.hasUnsavedChanges){
       return null;
     }
+    instanceStore.toggleSavebarDisplay(true);
     event.returnValue = "You have unsaved modifications. Are you sure you want to leave this page?";
     return event.returnValue;
   }
@@ -139,61 +146,63 @@ export default class SavePanel extends React.Component{
 
     return(
       <div className={classes.container}>
-        <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
-        <div className={classes.instances}>
-          {instanceStore.comparedInstanceId &&
-            <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
-              <Modal.Header closeButton>
-                <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue()}
-              </Modal.Header>
-              <Modal.Body>
-                <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>
-                <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"save"}/>&nbsp;Save this instance</Button>
-              </Modal.Footer>
-            </Modal>
-          }
-          {changedInstances.length === 0 &&
-            <div className={classes.noChanges}>
-              <div className={classes.allGreenIcon}><Glyphicon glyph={"ok"}/></div>
-              <div className={classes.allGreenText}>You have no unsaved modifications !</div>
-            </div>
-          }
-          {changedInstances.map(([id, instance]) => {
-            const label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
-            return(
-              <div className={classes.instance} key={instanceStore.getGeneratedKey(instance, "savePanel")}>
-                <div className={classes.type}>
-                  {instance.data.label}
-                </div>
-                <div className={classes.actions}>
-                  {instance.isSaving?
-                    <span className={classes.saveIcon}></span>
-                    :
-                    <ButtonGroup vertical>
-                      <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)}><Glyphicon glyph={"save"}/></Button>
-                      <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>
-                      <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>
-                    </ButtonGroup>
+        <Scrollbars autoHide>
+          <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
+          <div className={classes.instances}>
+            {instanceStore.comparedInstanceId &&
+              <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
+                <Modal.Header closeButton>
+                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue()}
+                </Modal.Header>
+                <Modal.Body>
+                  <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>
+                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"save"}/>&nbsp;Save this instance</Button>
+                </Modal.Footer>
+              </Modal>
+            }
+            {!instanceStore.hasUnsavedChanges &&
+              <div className={classes.noChanges}>
+                <div className={classes.allGreenIcon}><Glyphicon glyph={"ok"}/></div>
+                <div className={classes.allGreenText}>You have no unsaved modifications !</div>
+              </div>
+            }
+            {changedInstances.map(([id, instance]) => {
+              const label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+              return(
+                <div className={classes.instance} key={instanceStore.getGeneratedKey(instance, "savePanel")}>
+                  <div className={classes.type}>
+                    {instance.data.label}
+                  </div>
+                  <div className={classes.actions}>
+                    {instance.isSaving?
+                      <span className={classes.saveIcon}></span>
+                      :
+                      <ButtonGroup vertical>
+                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)}><Glyphicon glyph={"save"}/></Button>
+                        <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>
+                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>
+                      </ButtonGroup>
+                    }
+                  </div>
+                  <div className={classes.label}>
+                    {label}
+                  </div>
+                  <div className={classes.id}>
+                    {id}
+                  </div>
+                  {instance.hasSaveError &&
+                    <div className={classes.errors}>
+                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><Glyphicon glyph={"ok"}/></Button>
+                    </div>
                   }
                 </div>
-                <div className={classes.label}>
-                  {label}
-                </div>
-                <div className={classes.id}>
-                  {id}
-                </div>
-                {instance.hasSaveError &&
-                  <div className={classes.errors}>
-                    {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><Glyphicon glyph={"ok"}/></Button>
-                  </div>
-                }
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </Scrollbars>
       </div>
     );
   }

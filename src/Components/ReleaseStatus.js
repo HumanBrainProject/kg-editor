@@ -21,10 +21,10 @@ const styles = {
     display:"grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",
     "&.darkmode $instanceStatus":{
-      color:"#24282a",
+      color:"var(--bg-color-ui-contrast2)",
     },
     "&.darkmode $childrenStatus":{
-      background:"#24282a",
+      background:"var(--bg-color-ui-contrast2)",
     }
   },
 

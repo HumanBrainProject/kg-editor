@@ -17,7 +17,7 @@ import Status from "../Instance/Status";
 
 const styles = {
   container:{
-    color: "rgb(224, 224, 224)",
+    color: "var(--ft-color-loud)",
     overflow:"hidden",
     position:"relative",
     display:"grid",
@@ -27,8 +27,8 @@ const styles = {
 
   search:{
     borderRadius: "2px",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    color: "rgb(224, 224, 224)",
+    backgroundColor: "var(--bg-color-blend-contrast1)",
+    color: "var(--ft-color-loud)",
     margin:"10px",
     width:"calc(100% - 20px)",
     border:"1px solid transparent",
@@ -36,7 +36,7 @@ const styles = {
       borderColor: "rgba(64, 169, 243, 0.5)"
     },
     "&.disabled,&:disabled":{
-      backgroundColor: "rgba(0, 0, 0, 0.2)",
+      backgroundColor: "var(--bg-color-blend-contrast1)",
     }
   },
 
@@ -44,10 +44,10 @@ const styles = {
     position:"relative",
     gridRow:"1 / span 2",
     gridColumn:"2",
-    background:"#24282a",
-    borderLeft:"1px solid #111314",
+    background:"var(--bg-color-ui-contrast2)",
+    borderLeft:"1px solid var(--border-color-ui-contrast1)",
     overflow:"auto",
-    color:"rgb(224, 224, 224)"
+    color:"var(--ft-color-loud)"
   },
 
   loader:{
@@ -66,15 +66,15 @@ const styles = {
     minHeight:"47px",
     cursor:"pointer",
     padding:"10px",
-    background:"#24282a",
+    background:"var(--bg-color-ui-contrast2)",
     borderLeft:"4px solid transparent",
-    color:"rgba(255, 255, 255, 0.5)",
-    outline:"1px solid #111314",
+    color:"var(--ft-color-normal)",
+    outline:"1px solid var(--border-color-ui-contrast1)",
     marginBottom:"11px",
     "&:hover":{
-      background:"#2b353c",
-      borderColor:"#266ea1",
-      color:"rgb(224, 224, 224)",
+      background:"var(--list-bg-hover)",
+      borderColor:"var(--list-border-hover)",
+      color:"var(--ft-color-loud)",
       outline:"1px solid transparent",
       "& $actions":{
         opacity:0.75
@@ -84,9 +84,9 @@ const styles = {
       }
     },
     "&.selected":{
-      background:"#39464f",
-      borderColor:"#6caddc",
-      color:"rgb(224, 224, 224)",
+      background:"var(--list-bg-selected)",
+      borderColor:"var(--list-border-selected)",
+      color:"var(--ft-color-loud)",
       outline:"1px solid transparent",
       "& .status":{
         opacity:"1"
@@ -97,7 +97,7 @@ const styles = {
   listLabel:{
     fontSize:"1.4em",
     fontWeight:"300",
-    color:"rgb(244, 244, 244)",
+    color:"var(--ft-color-louder)",
     "& .status":{
       marginRight:"10px",
       opacity:"0.5"
@@ -132,10 +132,10 @@ const styles = {
     fontSize:"0.9em",
     lineHeight:"27px",
     textAlign:"center",
-    backgroundColor: "#24282a",
-    color:"rgba(255,255,255,0.5)",
+    backgroundColor: "var(--bg-color-ui-contrast2)",
+    color:"var(--ft-color-normal)",
     "&:hover":{
-      color:"rgba(224,224,224,1)"
+      color:"var(--ft-color-loud)"
     },
     "&:first-child":{
       borderRadius:"4px 0 0 4px"

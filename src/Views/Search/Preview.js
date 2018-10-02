@@ -31,10 +31,10 @@ const styles = {
     lineHeight:"34px",
     textAlign:"center",
     borderRadius:"2px",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    color:"rgba(255,255,255,0.5)",
+    backgroundColor: "var(--bg-color-blend-contrast1)",
+    color:"var(--ft-color-normal)",
     "&:hover":{
-      color:"rgba(224,224,224,1)"
+      color:"var(--ft-color-loud)"
     }
   },
   status:{
@@ -50,7 +50,7 @@ const styles = {
   },
   id:{
     fontSize:"0.75em",
-    color:"rgba(255,255,255,0.5)",
+    color:"var(--ft-color-normal)",
     marginTop:"20px",
     marginBottom:"20px"
   },

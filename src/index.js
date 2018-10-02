@@ -23,6 +23,9 @@ import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
 import Instance from "./Views/Instance";
 
+import DefaultTheme from "./Themes/Default";
+import BrightTheme from "./Themes/Bright";
+
 import "babel-polyfill";
 
 const styles = {
@@ -50,7 +53,7 @@ const styles = {
     gridTemplateRows:"auto 1fr 20px"
   },
   tabs: {
-    background: "#141618",
+    background: "var(--bg-color-ui-contrast1)",
     display:"grid",
     gridTemplateRows:"1fr",
     gridTemplateColumns:"auto auto 1fr auto"
@@ -70,22 +73,22 @@ const styles = {
   body: {
     position: "relative",
     overflow:"hidden",
-    background: "linear-gradient(165deg, #1C2022, #4895a4)",
+    background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
     backgroundSize: "200%"
   },
   logo: {
     padding: "10px",
     "& span": {
-      color: "rgb(224, 224, 224)",
+      color: "var(--ft-color-loud)",
       display: "inline-block",
       paddingLeft: "10px",
       fontSize: "0.9em",
-      borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
+      borderLeft: "1px solid var(--border-color-ui-contrast5)",
       marginLeft:"10px"
     }
   },
   status:{
-    background: "#141618"
+    background: "var(--bg-color-ui-contrast1)"
   }
 };
 
@@ -95,10 +98,20 @@ class App extends React.Component{
   constructor(props) {
     super(props);
     authStore.tryAuthenticate();
-    this.state = {currentLocation: routerStore.history.location.pathname};
+    this.state = {currentLocation: routerStore.history.location.pathname, theme: DefaultTheme};
     routerStore.history.listen(location => {
       this.setState({currentLocation:location.pathname});
     });
+  }
+
+  componentDidMount(){
+    document.addEventListener("keydown", this.handleThemeSwitch);
+  }
+
+  handleThemeSwitch = (e) => {
+    if(e.ctrlKey && e.altKey && e.keyCode === 84){
+      this.setState({theme:this.state.theme === DefaultTheme? BrightTheme: DefaultTheme});
+    }
   }
 
   handleCloseInstance(instanceId){
@@ -126,6 +139,7 @@ class App extends React.Component{
     return(
       <Router history={routerStore.history}>
         <div className={classes.layout}>
+          <this.state.theme/>
           <div className={classes.tabs}>
             <div className={classes.logo}>
               <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
@@ -133,11 +147,11 @@ class App extends React.Component{
             </div>
             <div className={classes.fixedTabsLeft}>
               {!authStore.isAuthenticated?
-                <Tab icon={"user-lock"} active={true}>Login</Tab>
+                <Tab icon={"user-lock"} current={true}>Login</Tab>
                 :
                 <React.Fragment>
-                  <Tab icon={"home"} active={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
-                  <Tab icon={"search"} active={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
+                  <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
+                  <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
                 </React.Fragment>
               }
             </div>
@@ -160,7 +174,7 @@ class App extends React.Component{
                     icon={instance.isFetching?"circle-notch":"circle"}
                     iconSpin={instance.isFetching}
                     iconColor={color}
-                    active={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
+                    current={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
                     path={`/instance/${mode}/${instanceId}`}
                     onClose={this.handleCloseInstance.bind(this, instanceId)}
                     fullText={label}>
@@ -172,8 +186,8 @@ class App extends React.Component{
             <div className={classes.fixedTabsRight}>
               {authStore.isAuthenticated &&
                 <React.Fragment>
-                  <Tab icon={"chart-bar"} active={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
-                  <Tab icon={"question-circle"} active={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
+                  <Tab icon={"chart-bar"} current={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
+                  <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
                 </React.Fragment>
               }
             </div>

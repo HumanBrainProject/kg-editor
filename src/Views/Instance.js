@@ -22,11 +22,11 @@ const styles = {
     gridTemplateColumns:"50px 1fr 400px",
   },
   tabs:{
-    borderRight:"1px solid #111314",
-    background:"#24282a"
+    borderRight:"1px solid var(--border-color-ui-contrast1)",
+    background:"var(--bg-color-ui-contrast2)"
   },
   tab:{
-    color:"rgba(255, 255, 255, 0.5)",
+    color:"var(--ft-color-normal)",
     borderLeft:"2px solid transparent",
     opacity:"0.5",
     cursor:"pointer",
@@ -35,15 +35,15 @@ const styles = {
     fontSize:"1.75em",
     textAlign:"center",
     "&:hover":{
-      background:"#2b353c",
-      borderColor:"#266ea1",
-      color:"rgb(224, 224, 224)",
+      background:"var(--list-bg-hover)",
+      borderColor:"var(--list-border-hover)",
+      color:"var(--ft-color-loud)",
       opacity:"1",
     },
     "&.active":{
-      background:"#39464f",
-      borderColor:"#6caddc",
-      color:"rgb(224, 224, 224)",
+      background:"var(--list-bg-selected)",
+      borderColor:"var(--list-border-selected)",
+      color:"var(--ft-color-loud)",
       opacity:"1",
     }
   },
@@ -52,10 +52,10 @@ const styles = {
     overflow:"hidden"
   },
   sidebar:{
-    background:"#24282a",
-    borderLeft:"1px solid #111314",
+    background:"var(--bg-color-ui-contrast2)",
+    borderLeft:"1px solid var(--border-color-ui-contrast1)",
     overflow:"auto",
-    color:"rgb(224, 224, 224)"
+    color:"var(--ft-color-loud)"
   }
 };
 

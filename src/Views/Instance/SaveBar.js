@@ -26,7 +26,7 @@ const styles = {
     padding:10,
     display:"grid",
     "&:nth-child(odd)":{
-      background:"#141618"
+      background:"var(--bg-color-ui-contrast1)"
     },
     gridTemplateColumns:"1fr 50px",
   },

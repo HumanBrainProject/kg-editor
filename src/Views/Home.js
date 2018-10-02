@@ -14,9 +14,9 @@ const styles = {
     gridTemplateRows:"auto",
     padding:"10px",
     "& .widget":{
-      background:"#24282a",
-      border:"1px solid #111314",
-      color:"rgb(224, 224, 224)"
+      background:"var(--bg-color-ui-contrast2)",
+      border:"1px solid var(--border-color-ui-contrast1)",
+      color:"var(--ft-color-loud)"
     }
   }
 };

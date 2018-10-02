@@ -13,7 +13,7 @@ const styles = {
     left:"calc(calc(50% * calc(var(--pane-index) - var(--selected-index))) + 25%)",
     overflow: "auto",
     background: "#ebebeb",
-    boxShadow: "0 2px 10px #333",
+    boxShadow: "0 2px 10px var(--pane-box-shadow)",
     transform: "scale(0.90)",
     transition: "left 0.5s ease, transform 0.5s ease",
     "&.active": {

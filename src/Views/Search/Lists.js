@@ -12,17 +12,17 @@ import routerStore from "../../Stores/RouterStore";
 
 const styles = {
   container:{
-    background:"#24282a",
-    borderRight:"1px solid #111314",
-    color: "rgb(224, 224, 224)",
+    background:"var(--bg-color-ui-contrast2)",
+    borderRight:"1px solid var(--border-color-ui-contrast1)",
+    color: "var(--ft-color-loud)",
     position:"relative",
     display:"grid",
     gridTemplateRows:"auto 1fr"
   },
   search:{
     borderRadius: "2px",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    color: "rgb(224, 224, 224)",
+    backgroundColor: "var(--bg-color-blend-contrast1)",
+    color: "var(--ft-color-loud)",
     margin:"10px",
     width:"calc(100% - 20px)",
     border:"1px solid transparent",
@@ -31,7 +31,7 @@ const styles = {
     }
   },
   folderName:{
-    color:"rgba(255, 255, 255, 0.4)",
+    color:"var(--ft-color-quiet)",
     textTransform:"uppercase",
     fontWeight:"bold",
     fontSize:"0.9em",
@@ -48,24 +48,24 @@ const styles = {
   list:{
     padding:"5px 5px 5px 30px",
     borderLeft:"2px solid transparent",
-    color:"rgba(255, 255, 255, 0.5)",
+    color:"var(--ft-color-normal)",
     cursor:"pointer",
     "&:hover":{
-      background:"#2b353c",
-      borderColor:"#266ea1",
-      color:"rgb(224, 224, 224)",
+      background:"var(--list-bg-hover)",
+      borderColor:"var(--list-border-hover)",
+      color:"var(--ft-color-loud)",
       "& $createInstance":{
         display:"block",
-        color:"rgba(255, 255, 255, 0.5)",
+        color:"var(--ft-color-normal)",
         "&:hover":{
-          color:"rgb(224, 224, 224)",
+          color:"var(--ft-color-loud)",
         }
       }
     },
     "&.selected":{
-      background:"#39464f",
-      borderColor:"#6caddc",
-      color:"rgb(224, 224, 224)"
+      background:"var(--list-bg-selected)",
+      borderColor:"var(--list-border-selected)",
+      color:"var(--ft-color-loud)"
     }
   },
   createInstance:{
@@ -87,7 +87,7 @@ const styles = {
   },
   noResultPanel:{
     extend:"fetchErrorPanel",
-    color:"rgb(224, 224, 224)"
+    color:"var(--ft-color-loud)"
   }
 };
 

@@ -7,7 +7,7 @@ import Instances from "./Search/Instances";
 const styles = {
   container: {
     display:"grid",
-    gridTemplateColumns:"300px 1fr",
+    gridTemplateColumns:"311px 1fr",
     gridTemplateRows:"1fr",
     overflow:"hidden",
     height:"100%"

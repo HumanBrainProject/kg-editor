@@ -14,10 +14,10 @@ let styles = {
   loader:{
     borderRadius:"0.14em",
     width:"2.5em",
-    background:"#24282a",
+    background:"var(--bg-color-ui-contrast2)",
     textAlign:"center",
-    color:"rgb(224,224,224)",
-    border:"1px solid rgb(224,224,224)",
+    color:"var(--ft-color-loud)",
+    border:"1px solid var(--ft-color-loud)",
     "& .svg-inline--fa":{
       fontSize:"0.8em",
       verticalAlign:"baseline"

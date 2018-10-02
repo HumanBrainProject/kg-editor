@@ -15,11 +15,11 @@ const styles = {
   action:{
     textAlign:"center",
     padding:"10px",
-    borderBottom:"1px solid #111314",
-    color:"rgba(255,255,255,0.5)",
+    borderBottom:"1px solid var(--border-color-ui-contrast1)",
+    color:"var(--ft-color-normal)",
     cursor:"pointer",
     "&:hover":{
-      color:"rgb(224,224,224)"
+      color:"var(--ft-color-loud)"
     }
   },
   actionIcon:{

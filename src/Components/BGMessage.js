@@ -13,7 +13,7 @@ const styles = {
   icon:{
     fontSize:"10em",
     "& path":{
-      fill:"rgba(0, 0, 0, 0.2)",
+      fill:"var(--bg-color-blend-contrast1)",
       stroke:"rgba(200,200,200,.1)",
       strokeWidth:"3px"
     }

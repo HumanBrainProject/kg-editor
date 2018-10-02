@@ -17,33 +17,21 @@ const styles = {
     position: "relative",
     width: "100%",
     height: "100%",
-    background: "linear-gradient(165deg, #1C2022, #4895a4)",
+    background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
     backgroundSize: "cover",
   },
   panel: {
-    position: "relative",
-    width: "80%",
-    margin: "20% 10% 80% 10%",
-    padding: "20px",
-    borderRadius: "5px",
-    backgroundColor: "white",
-    color: "#444",
+    backgroundColor: "var(--bg-color-ui-contrast2)",
+    color:"var(--ft-color-loud)",
+    padding: "0px 20px 20px 20px",
+    borderRadius: "4px",
     textAlign: "center",
-    "@media screen and (min-width:992px)": {
-      width: "auto",
-      margin: "0",
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)"
-    },
-    "& h3": {
-      marginTop: "0",
-      fontSize: "18px",
-      "@media screen and (min-width:992px)": {
-        fontSize: "24px"
-      }
-    },
+    width: "auto",
+    margin: "0",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     "& p": {
       margin: "20px 0"
     }
@@ -54,7 +42,7 @@ const styles = {
     left: 0,
     width: "100vw",
     height: "100vh",
-    background: "white"
+    background: "var(--bg-color-ui-contrast2)"
   }
 };
 
@@ -75,7 +63,7 @@ export default class Login extends React.Component {
           <h3>Welcome to Knowledge Graph Editor</h3>
           <p>Please login to continue.</p>
           <div>
-            <Button onClick={this.showFrame.bind(this)}>Login</Button>
+            <Button bsStyle={"primary"} onClick={this.showFrame.bind(this)}>Login</Button>
           </div>
         </div>
         {this.state.showFrame &&

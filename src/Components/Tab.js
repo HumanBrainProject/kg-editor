@@ -1,6 +1,5 @@
 import React from "react";
 import injectStyles from "react-jss";
-import Color from "color";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react";
@@ -12,10 +11,10 @@ let styles = {
   container:{
     height:"50px",
     lineHeight:"50px",
-    color:"rgba(255, 255, 255, 0.5)",
-    background:"#1c2022",
+    color:"var(--ft-color-normal)",
+    background:"var(--bg-color-ui-contrast2)",
     padding:"0 20px",
-    border:"1px solid #141618",
+    border:"1px solid var(--border-color-ui-contrast2)",
     borderLeft:"none",
     cursor:"pointer",
     display:"grid",
@@ -24,15 +23,15 @@ let styles = {
       opacity:0.5
     },
     "&:hover":{
-      color:"rgb(224, 224, 224)",
+      color:"var(--ft-color-loud)",
       "& $icon": {
         opacity:1
       }
     }
   },
-  active:{
-    backgroundColor:new Color("#1c2022").lighten(0.2),
-    color:"rgb(224, 224, 224)",
+  current:{
+    backgroundColor:"var(--bg-color-ui-contrast3)",
+    color:"var(--ft-color-loud)",
     borderBottom:"1px solid #40a9f3",
     "& $icon": {
       opacity:1
@@ -48,16 +47,16 @@ let styles = {
     }
   },
   icon:{
-    color:"rgb(224, 224, 224)",
+    color:"var(--ft-color-loud)",
     display:"inline-block",
     "& + $text":{
       marginLeft:"10px"
     }
   },
   close:{
-    color:"rgba(255, 255, 255, 0.5)",
+    color:"var(--ft-color-normal)",
     "&:hover":{
-      color:"rgb(224, 224, 224)"
+      color:"var(--ft-color-loud)"
     }
   }
 };
@@ -80,9 +79,9 @@ export default class Tab extends React.Component {
   }
 
   render(){
-    const {classes, active, icon, onClose, iconColor, iconSpin} = this.props;
+    const {classes, current, icon, onClose, iconColor, iconSpin} = this.props;
     return (
-      <div className={`${classes.container} ${active? classes.active: ""}`} onClick={this.handleClick}>
+      <div className={`${classes.container} ${current? classes.current: ""}`} onClick={this.handleClick}>
         <div className={classes.icon} style={iconColor?{color:iconColor}:{}}>
           {icon && <FontAwesomeIcon icon={icon} spin={iconSpin}/>}
         </div>

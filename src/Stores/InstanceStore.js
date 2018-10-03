@@ -1,45 +1,136 @@
 import {observable, action, runInAction, computed} from "mobx";
-import { find, remove } from "lodash";
+import { uniqueId } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
+import PaneStore from "./PaneStore";
 
-export default class InstanceStore {
+const nodeTypeMapping = {
+  "Dataset":"http://hbp.eu/minds#Dataset",
+  "Specimen group":"http://hbp.eu/minds#SpecimenGroup",
+  "Subject":"http://hbp.eu/minds#ExperimentSubject",
+  "Activity":"http://hbp.eu/minds#Activity",
+  "Person":"http://hbp.eu/minds#Person",
+  "PLA Component":"http://hbp.eu/minds#PLAComponent",
+  "Publication":"http://hbp.eu/minds#Publication",
+  "File Association":"http://hbp.eu/minds#FileAssociation",
+  "DOI":"http://hbp.eu/minds#DatasetDOI",
+  "Method":"http://hbp.eu/minds#ExperimentMethod",
+  "Reference space":"http://hbp.eu/minds#ReferenceSpace",
+  "Parcellation Region":"http://hbp.eu/minds#ParcellationRegion",
+  "Parcellation Atlas":"http://hbp.eu/minds#ParcellationAtlas",
+  "Embargo Status":"http://hbp.eu/minds#EmbargoStatus",
+  "Approval":"http://hbp.eu/minds#EthicsApproval",
+  "Protocol":"http://hbp.eu/minds#ExperimentProtocol",
+  "Preparation":"http://hbp.eu/minds#Preparation",
+  "Authority":"http://hbp.eu/minds#EthicsAuthority",
+  "Format":"http://hbp.eu/minds#Format",
+  "License Type":"http://hbp.eu/minds#LicenseInformation",
+  "Sample":"http://hbp.eu/minds#ExperimentSample",
+  "File":"http://hbp.eu/minds#File"
+};
+
+class InstanceStore {
   @observable instances = new Map();
-  @observable mainInstanceId = null;
-  @observable currentInstancePath = [];
+  @observable openedInstances = new Map();
   @observable optionsCache = new Map();
-  @observable highlightedInstance = null;
+  @observable comparedInstanceId = null;
+  @observable globalReadMode = true;
+  @observable isCreatingNewInstance = false;
+  @observable instanceCreationError = null;
+  @observable showSaveBar = false;
 
-  constructor(history, instanceId){
-    this.history = history;
-    this.mainInstanceId = instanceId;
-    this.fetchInstanceData(this.mainInstanceId);
-    this.setCurrentInstanceId(this.mainInstanceId, 0);
+  generatedKeys = new WeakMap();
+
+  get nodeTypeMapping(){
+    return nodeTypeMapping;
   }
 
-  get mainInstance(){
-    return this.getInstance(this.mainInstanceId);
+  /**
+   * Opened instances are shown in their own tab in the UI
+   * We keep track in that store of which instances are opened
+   */
+  @action openInstance(instanceId, viewMode = "view", readMode = true){
+    this.setReadMode(readMode);
+    if(this.openedInstances.has(instanceId)){
+      this.openedInstances.get(instanceId).viewMode = viewMode;
+    } else {
+      this.openedInstances.set(instanceId, {
+        currentInstancePath: [],
+        viewMode: viewMode,
+        paneStore: new PaneStore()
+      });
+      this.getInstance(instanceId);
+      this.setCurrentInstanceId(instanceId, instanceId, 0);
+    }
+  }
+
+  @action setInstanceViewMode(instanceId, mode){
+    this.openedInstances.get(instanceId).viewMode = mode;
+  }
+
+  @action closeInstance(instanceId){
+    this.openedInstances.delete(instanceId);
   }
 
   @action
-  getInstance(instanceId){
-    if (this.instances.has(instanceId)) {
-      return this.instances.get(instanceId);
+  getInstance(instanceId, forceFetch = false){
+    if (!this.instances.has(instanceId) || forceFetch) {
+      this.fetchInstanceData(instanceId);
     }
-    return this.fetchInstanceData(instanceId);
+    return this.instances.get(instanceId);
   }
 
-  @computed get currentInstanceId(){
-    return this.currentInstancePath[this.currentInstancePath.length-1];
+  @computed
+  get hasUnsavedChanges(){
+    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
+  }
+
+  @action
+  async createNewInstance(path, name=""){
+    this.isCreatingNewInstance = path;
+    try{
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name":name});
+      this.isCreatingNewInstance = false;
+      return data.id;
+    } catch(e){
+      this.isCreatingNewInstance = false;
+      this.instanceCreationError = e.message;
+    }
+  }
+
+  @action
+  async createNewInstanceAsOption(field, name){
+    try{
+      const newInstanceId = await this.createNewInstance(field.instancesPath, name);
+      field.options.push({
+        [field.mappingValue]: newInstanceId,
+        [field.mappingLabel]: name
+      });
+      field.addValue(field.options[field.options.length-1]);
+      return newInstanceId;
+    } catch(e){
+      return false;
+    }
   }
 
   @action
   setInstanceHighlight(instanceId, provenence) {
     if (this.instances.has(instanceId)) {
-      const instance = this.instances.get(instanceId);
-      instance.highlight = provenence;
+      this.instances.get(instanceId).highlight = provenence;
     }
+  }
+
+  @action
+  setComparedInstance(instanceId){
+    this.comparedInstanceId = instanceId;
+  }
+
+  getGeneratedKey(from, namespace){
+    if(!this.generatedKeys.has(from)){
+      this.generatedKeys.set(from, uniqueId(namespace));
+    }
+    return this.generatedKeys.get(from);
   }
 
   checkLinkedInstances(instance, check) {
@@ -61,10 +152,6 @@ export default class InstanceStore {
     return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
   }
 
-  doesInstanceHaveLinkedInstancesInNewState(instance) {
-    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isNew);
-  }
-
   @action
   async fetchInstanceData(instanceId) {
     let instance = null;
@@ -73,7 +160,7 @@ export default class InstanceStore {
       if (instance.isFetching) {
         return instance;
       }
-      instance.cancelRequest = false;
+      instance.cancelChangesPending = false;
       instance.isFetching = true;
       instance.isSaving = false;
       instance.isFetched = false;
@@ -82,11 +169,11 @@ export default class InstanceStore {
       instance.saveError = null;
       instance.hasSaveError = false;
     } else {
-      const [organization, domain, schema, version, shortId] = instanceId.split("/");
+      const [organization, domain, schema, version, ] = instanceId.split("/");
       this.instances.set(instanceId, {
         data: null,
         form: null,
-        cancelRequest: null,
+        cancelChangesPending: null,
         fetchError: null,
         hasFetchError: false,
         saveError: null,
@@ -96,7 +183,6 @@ export default class InstanceStore {
         isFetching: true,
         isFetched: false,
         highlight: null,
-        isNew: !shortId || shortId.indexOf("___NEW___") === 0,
         path: (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:""
       });
       instance = this.instances.get(instanceId);
@@ -104,30 +190,26 @@ export default class InstanceStore {
 
     try {
       let path = instanceId;
-      if (instance.isNew) {
-        path = instance.path;
-        console.debug("fetch an instance template of type " + path + ".");
-      } else {
-        console.debug("fetch instance " + path + ".");
-      }
+      console.debug("fetch instance " + path + ".");
+
       const { data } = await API.axios.get(API.endpoints.instanceData(path));
 
       runInAction(async () => {
         const fieldsWithOptions = new Map();
         try {
           for(let fieldKey in data.fields){
-            const instancesPath = data.fields[fieldKey].instancesPath
-            ;
+            const instancesPath = data.fields[fieldKey].instancesPath;
             if(instancesPath){
               fieldsWithOptions.set(fieldKey, instancesPath);
               if(!this.optionsCache.has(instancesPath)){
                 this.optionsCache.set(instancesPath, []);
                 try {
                   const { data } = await API.axios.get(API.endpoints.instances(instancesPath));
-                  this.optionsCache.set(instancesPath, (data && data.data)?data.data:[]);
+                  this.optionsCache.set(instancesPath, (data && data.data)? data.data: []);
                 } catch (e) {
                   const label = data.fields[fieldKey].label?data.fields[fieldKey].label.toLowerCase():fieldKey;
                   const message = e.message?e.message:e;
+                  this.optionsCache.delete(instancesPath);
                   throw `Error while retrieving the list of ${label}${instancesPath} (${message})`;
                 }
               }
@@ -138,18 +220,6 @@ export default class InstanceStore {
           instance.hasFetchError = true;
           instance.isFetched = false;
           instance.isFetching = false;
-        }
-        if (instance.isNew && data && data.fields && data.ui_info && data.ui_info.labelField) {
-          const keyFieldName = data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
-          if (data.fields[keyFieldName]) {
-            const options = this.optionsCache.get(path);
-            if (options) {
-              const option = options.find(o => o.id === instanceId);
-              if (option) {
-                data.fields[keyFieldName].value = option.label;
-              }
-            }
-          }
         }
 
         instance.data = data;
@@ -163,15 +233,12 @@ export default class InstanceStore {
           }
         });
 
-        instance.hasChanged = instance.isNew && instanceId !== this.mainInstanceId;
         instance.isFetching = false;
         instance.isFetched = true;
 
         this.memorizeInstanceInitialValues(instanceId);
 
-        if (!instance.isNew) {
-          instance.form.toggleReadMode(true);
-        }
+        instance.form.toggleReadMode(this.globalReadMode);
       });
     } catch (e) {
       const message = e.message?e.message:e;
@@ -189,27 +256,22 @@ export default class InstanceStore {
   }
 
   @action
-  setCurrentInstanceId(id, level){
-    this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
-    this.instances.forEach((instance) => {
-      if (instance.isFetched) {
-        if(!instance.form.readMode && !instance.hasChanged){
-          instance.form.toggleReadMode(true);
-        }
-      }
-    });
+  setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
+    let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
+    currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
+  }
+
+  getCurrentInstanceId(instanceId){
+    let currentInstancePath = this.openedInstances.get(instanceId).currentInstancePath;
+    return currentInstancePath[currentInstancePath.length-1];
   }
 
   @action
-  toggleReadMode(id, level, readMode){
-    this.currentInstancePath.splice(level, this.currentInstancePath.length-level, id);
-    this.instances.forEach((instance, instanceId) => {
+  setReadMode(readMode){
+    this.globalReadMode = readMode;
+    this.instances.forEach((instance) => {
       if (instance.isFetched) {
-        if(instanceId === id && instance.form.readMode !== readMode){
-          instance.form.toggleReadMode(readMode);
-        } else if(instanceId !== id && !instance.form.readMode && !instance.hasChanged){
-          instance.form.toggleReadMode(true);
-        }
+        instance.form.toggleReadMode(readMode);
       }
     });
   }
@@ -223,126 +285,59 @@ export default class InstanceStore {
   }
 
   @action
-  requestCancelInstanceChanges(instanceId){
-    const instance = this.instances.get(instanceId);
-    instance.cancelRequest = true;
+  cancelInstanceChanges(instanceId){
+    this.instances.get(instanceId).cancelChangesPending = true;
   }
 
   @action
   confirmCancelInstanceChanges(instanceId){
     const instance = this.instances.get(instanceId);
-    if (instance.isNew) {
-      const options = this.optionsCache.get(instance.path);
-      const optionToDelete = find(options, o => o.id === instanceId);
-      remove(options, optionToDelete);
-      this.instances.forEach(instance => {
-        if(instance.isFetched){
-          const fields = instance.form.getField();
-          Object.values(fields).forEach(field => {
-            if (field.isLink) {
-              field.removeValue(optionToDelete);
-            }
-          });
-        }
-      });
-      const level = this.currentInstancePath.findIndex(id => id === instanceId);
-      if (level !== -1) {
-        this.currentInstancePath.splice(level, this.currentInstancePath.length-level);
-      }
-      instance.hasChanged = false;
-      instance.cancelRequest = false;
-      this.instances.delete(instanceId);
-    } else {
-      instance.form.injectValues(instance.initialValues);
-      instance.hasChanged = false;
-      instance.cancelRequest = false;
-    }
+    instance.form.injectValues(instance.initialValues);
+    instance.hasChanged = false;
+    instance.cancelChangesPending = false;
+    instance.saveError = null;
+    instance.hasSaveError = false;
   }
 
   @action
   abortCancelInstanceChange(instanceId){
-    const instance = this.instances.get(instanceId);
-    instance.cancelRequest = false;
+    this.instances.get(instanceId).cancelChangesPending = false;
   }
 
   @action
   async saveInstance(instanceId){
     const instance = this.instances.get(instanceId);
-    instance.cancelRequest = false;
+    instance.cancelChangesPending = false;
     instance.hasSaveError = false;
     instance.isSaving = true;
-    if (instance.isNew) {
-      try {
-        const payload = instance.form.getValues();
-        const { data } = await API.axios.post(API.endpoints.instanceData(instance.path), payload);
-        runInAction(() => {
-          instance.hasChanged = false;
-          instance.saveError = null;
-          instance.hasSaveError = false;
-          instance.isSaving = false;
-          instance.isNew = false;
-          console.debug("successfully created", data);
-          const newId = data.id?data.id:data["@id"]?data["@id"].replace(/^.*\/v0\/data\//, ""):null;
-          this.instances.set(newId, instance);
-          this.instances.delete(instanceId);
-          const idx = this.currentInstancePath.findIndex(e => e === instanceId);
-          if (idx > -1) {
-            this.currentInstancePath[idx] = newId;
-          }
-          if (instanceId === this.mainInstanceId) {
-            this.mainInstanceId = newId;
-            this.history.replace(newId?`/instance/${newId}`:`/nodetype/${instance.path}`);
-          } else {
-            const options = this.optionsCache.get(instance.path);
-            if (options) {
-              const option = options.find(o => o.id === instanceId);
-              if (option) {
-                option.id = newId;
-                if (instance.data.ui_info && instance.data.ui_info.labelField) {
-                  const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
-                  if (payload && payload[keyFieldName]) {
-                    option.label = payload[keyFieldName];
-                  }
-                }
+
+    try {
+      const payload = instance.form.getValues();
+      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), payload);
+      runInAction(() => {
+        instance.hasChanged = false;
+        instance.saveError = null;
+        instance.hasSaveError = false;
+        instance.isSaving = false;
+        console.debug("successfully saved", data);
+        const options = this.optionsCache.get(instance.path);
+        if (options) {
+          const option = options.find(o => o.id === instanceId);
+          if (option) {
+            if (instance.data.ui_info && instance.data.ui_info.labelField) {
+              const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+              if (payload && payload[keyFieldName]) {
+                option.label = payload[keyFieldName];
               }
             }
           }
-        });
-      } catch (e) {
-        const message = e.message?e.message:e;
-        instance.saveError = `Error while creating instance of type "${instance.path}" (${message})`;
-        instance.hasSaveError = true;
-        instance.isSaving = false;
-      }
-    } else {
-      try {
-        const payload = instance.form.getValues();
-        const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), payload);
-        runInAction(() => {
-          instance.hasChanged = false;
-          instance.saveError = null;
-          instance.hasSaveError = false;
-          instance.isSaving = false;
-          console.debug("successfully saved", data);
-          const options = this.optionsCache.get(instance.path);
-          if (options) {
-            const option = options.find(o => o.id === instanceId);
-            if (option) {
-              if (instance.data.ui_info && instance.data.ui_info.labelField) {
-                const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
-                if (payload && payload[keyFieldName]) {
-                  option.label = payload[keyFieldName];
-                }
-              }
-            }
-          }
-        });
-      } catch (e) {
-        const message = e.message?e.message:e;
-        instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
-        instance.hasSaveError = true;
-        instance.isSaving = false;
-      }
+        }
+      });
+    } catch (e) {
+      const message = e.message?e.message:e;
+      instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
+      instance.hasSaveError = true;
+      instance.isSaving = false;
     }
   }
 
@@ -353,4 +348,10 @@ export default class InstanceStore {
     instance.hasSaveError = false;
   }
 
+  @action
+  toggleSavebarDisplay(state){
+    this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
+  }
 }
+
+export default new InstanceStore();

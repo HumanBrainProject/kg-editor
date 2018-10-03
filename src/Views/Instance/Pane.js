@@ -1,96 +1,81 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { inject, observer } from "mobx-react";
+import { Scrollbars } from "react-custom-scrollbars";
 
 const styles = {
-  pane:{
-    overflow:"auto",
-    background:"#ebebeb",
-    boxShadow:"0 2px 10px #333",
-    margin:"0",
-    transform:"scale(0.90)",
-    padding:"20px",
-    transition:"all 0.5s ease",
-    "@media screen and (min-width:992px)": {
-      marginRight:"20px",
-      marginLeft:"20px",
+  pane: {
+    position:"absolute",
+    width:"50%",
+    height:"calc(100% - 40px)",
+    top:"20px",
+    "--pane-index":"0",
+    left:"calc(calc(50% * calc(var(--pane-index) - var(--selected-index))) + 25%)",
+    overflow: "auto",
+    background: "#ebebeb",
+    boxShadow: "0 2px 10px var(--pane-box-shadow)",
+    transform: "scale(0.90)",
+    transition: "left 0.5s ease, transform 0.5s ease",
+    "&.active": {
+      background: "#f5f5f5",
+      transform: "scale(1)"
     },
-    "&.active":{
-      background:"#f5f5f5",
-      transform:"scale(1)"
+    "&.main, &.main.active": {
+      background: "white"
     },
-    "&.main, &.main.active":{
-      background:"white"
+    "&:hover": {
+      zIndex: 2
     },
-    /*"&.after, &.before":{
-      zIndex:2
-    },*/
-    "&:hover":{
-      zIndex:2
+    "&.after:hover": {
+      transform: "scale(0.95) translateX(-50%)"
     },
-    "&.after:hover":{
-      background:"white",
-      transform:"scale(0.95) translateX(-50%)",
-      marginRight:"40px"
-    },
-    "&.before:hover":{
-      background:"white",
-      transform:"scale(0.95) translateX(50%)",
-      marginLeft:"40px"
+    "&.before:hover": {
+      transform: "scale(0.95) translateX(50%)"
     },
     "& > div": {
-      opacity:"0.75",
-      transition:"all 0.5s ease"
+      opacity: "0.75",
+      transition: "opacity 0.25s ease"
     },
-    "&.activing":{
-      zIndex: "1000"
-    },
-    "&.active > div":{
-      opacity:"1"
-    },
-    "&.after:hover > div":{
-      opacity:"1"
-    },
-    "&.before:hover > div":{
-      opacity:"1"
+    "&.active > div, &.after:hover > div, &.before:hover > div": {
+      opacity: "1"
     }
+  },
+  scrolledView:{
+    padding:"20px",
   }
 };
 
 @injectStyles(styles)
 @inject("paneStore")
 @observer
-export default class Pane extends React.Component{
-  constructor(props){
+export default class Pane extends React.Component {
+  constructor(props) {
     super(props);
-    this.paneId = this.props.paneStore.registerPane();
+    this.props.paneStore.registerPane(this.props.paneId);
   }
 
-  componentWillUnmount(){
-    this.props.paneStore.unregisterPane(this.paneId);
+  componentWillUnmount() {
+    this.props.paneStore.unregisterPane(this.props.paneId);
   }
 
   handleFocus = () => {
-    if(this.props.paneStore.selectedPane !== this.paneId){
-      this.props.paneStore.selectPane(this.paneId);
+    if (this.props.paneStore.selectedPane !== this.props.paneId) {
+      this.props.paneStore.selectPane(this.props.paneId);
     }
   }
 
-  handleMouseOver = () => {
-    this.props.paneStore.resetSelectionChanged();
-  }
-
-  render(){
-    const {classes, paneStore} =  this.props;
-    const index = paneStore.panes.indexOf(this.paneId);
-    const mainClass = index === 0?" main":"";
-    const activeClass = paneStore.selectedIndex < index? "after": paneStore.selectedIndex > index? "before": "active";
-    const onClass = paneStore.selectionChanged?"activing":"";
+  render() {
+    const { classes, paneStore, paneId } = this.props;
+    const index = paneStore.panes.indexOf(paneId);
+    const mainClass = index === 0 ? " main" : "";
+    const activeClass = paneStore.selectedIndex < index ? "after" : paneStore.selectedIndex > index ? "before" : "active";
     return (
-      <div className={`${classes.pane}${mainClass} ${activeClass} ${onClass}`} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
-        <div>
-          {this.props.children}
-        </div>
+      <div className={`${classes.pane}${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
+        <Scrollbars autoHide>
+          <div className={classes.scrolledView}>
+            {this.props.children}
+          </div>
+        </Scrollbars>
       </div>
     );
   }

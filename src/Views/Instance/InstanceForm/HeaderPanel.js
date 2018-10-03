@@ -1,50 +1,45 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { Row, Col } from "react-bootstrap";
-import ToggleButton from "./ToggleButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   panel: {
+    position:"relative",
     "& h6": {
-      margin: "0",
-      color: "gray",
+      margin: "0 !important",
+      color: "#333",
       fontWeight: "bold"
     }
   },
-  activePanel: {
-    "& h6": {
-      margin: "10px 0",
-      color: "#333"
-    }
+  hasChanged:{
+    position:"absolute",
+    top:5,
+    right:10,
+    color:"#e67e22"
   }
 };
 
 @injectStyles(styles)
 export default class HeaderPanel extends React.Component{
   render(){
-    const { classes, className,  title, onEdit, onReadMode, showButtons, isReadMode } = this.props;
-    const handleEdit = (e) => {
-      e.stopPropagation();
-      onEdit(e);
-    };
-    const handleReadMode = (e) => {
-      e.stopPropagation();
-      onReadMode(e);
-    };
+    const { classes, className, nodeType, color, hasChanged } = this.props;
     return(
-      <div className={`${classes.panel} ${showButtons?classes.activePanel:""} ${className}`}>
+      <div className={`${classes.panel} ${className}`}>
         <Row>
-          <Col xs={10}>
-            <h6>{title}</h6>
-          </Col>
-          <Col xs={2} >
-            <span className="pull-right">
-              {showButtons &&
-              <ToggleButton isOn={!isReadMode} onToggle={handleEdit} offToggle={handleReadMode} onGlyph="pencil" offGlyph="eye-open" onTitle="edit" offTitle="cancel edition" />
-              }
-            </span>
+          <Col xs={12}>
+            <h6>
+              <FontAwesomeIcon icon={"circle"} color={color?color:undefined}/>&nbsp;&nbsp;<span>{nodeType}</span>
+            </h6>
           </Col>
         </Row>
+        {hasChanged &&
+          <div className={classes.hasChanged}>
+            <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;
+            <FontAwesomeIcon icon={"caret-right"}/>&nbsp;
+            <FontAwesomeIcon icon={"pencil-alt"}/>
+          </div>
+        }
       </div>
     );
   }

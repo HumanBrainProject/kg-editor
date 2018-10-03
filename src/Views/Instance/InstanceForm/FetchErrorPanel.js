@@ -1,7 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { Button, Glyphicon } from "react-bootstrap";
-import { Link } from "react-router-dom";
 
 const styles = {
   fetchErrorPanel: {
@@ -50,20 +49,20 @@ const styles = {
 
 @injectStyles(styles)
 export default class FetchErrorPanel extends React.Component{
+  handleRetry = (e) => {
+    e.stopPropagation();
+    this.props.onRetry(e);
+  };
+
   render(){
-    const { classes, id, show, error, onCancelBackLink, onRetry, inline } = this.props;
-    const handleClick = (e) => {
-      e.stopPropagation();
-      onRetry(e);
-    };
+    const { classes, id, show, error, inline } = this.props;
     return(
       (show)?
         (!inline)?
           <div className={classes.fetchErrorPanel}>
             <h4>{error}</h4>
             <div>
-              {onCancelBackLink?<Link to={onCancelBackLink} className="btn btn-default">Cancel</Link>:null}
-              <Button bsStyle="primary" onClick={this.fetchInstance}>Retry</Button>
+              <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
             </div>
           </div>
           :
@@ -71,7 +70,7 @@ export default class FetchErrorPanel extends React.Component{
             <h5>{error}</h5>
             <small>Nexus ID: {id}</small>
             <div>
-              <Button onClick={handleClick}><Glyphicon glyph="refresh" /><span>Retry</span></Button>
+              <Button onClick={this.handleRetry}><Glyphicon glyph="refresh" /><span>Retry</span></Button>
             </div>
           </div>
         :

@@ -49,6 +49,8 @@ let sessionTimer = null;
 
 class AuthStore {
   @observable session = null;
+  reloginResolve = null;
+  reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
 
   constructor(){
     if(Storage === undefined){
@@ -60,6 +62,10 @@ class AuthStore {
         return;
       }
       this.tryAuthenticate();
+      if(this.isAuthenticated){
+        this.reloginResolve();
+        this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+      }
     });
   }
 
@@ -101,6 +107,7 @@ class AuthStore {
     if (typeof Storage !== "undefined" ) {
       localStorage.removeItem(oidLocalStorageKey);
     }
+    return this.reloginPromise;
   }
 
   listenForLogin(){

@@ -15,6 +15,10 @@ module.exports = {
         test: /\.jsx?$/,
         loader: "babel-loader",
         exclude: [path.resolve(__dirname, "node_modules")]
+      },
+      {
+        test: /\.css$/,
+        use: [ 'style-loader', 'css-loader' ]
       }
     ]
   },
@@ -38,9 +42,16 @@ module.exports = {
         target:"http://localhost:9000/editor",
         secure:false,
         changeOrigin: true
+      },
+      "/statistics": {
+        target:"https://kg-dev.humanbrainproject.org",
+        secure:false,
+        changeOrigin: true
       }
     },
-    historyApiFallback: true
+    historyApiFallback: {
+      disableDotRule: true
+    }
   },
   externals:{
     "LOG_LEVEL": '"debug"'

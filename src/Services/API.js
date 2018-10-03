@@ -13,9 +13,15 @@ const endpoints = {
 
 class API {
   constructor() {
-    this._axios = axios.create({
-      headers: {
-        Authorization: "Bearer " + authStore.accessToken
+    this._axios = axios.create({});
+    this._axios.interceptors.response.use(null, (error) => {
+      if (error.response.status === 401) {
+        return authStore.logout(true).then(()=>{
+          error.config.headers.Authorization = "Bearer " + authStore.accessToken;
+          return this.axios.request(error.config);
+        });
+      } else {
+        return Promise.reject(error);
       }
     });
   }

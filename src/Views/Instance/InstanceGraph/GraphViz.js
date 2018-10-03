@@ -70,8 +70,9 @@ export default class Graph extends React.Component {
   }
 
   componentDidUpdate(){
-    if(!this.initialZoom){
-      this.graphRef && this.graphRef.zoom(7);
+    if(!this.initialZoom && this.graphRef){
+      this.graphRef.zoom(Math.round(Math.min(window.innerWidth/365, window.innerHeight/205)));
+      this.initialZoom = true;
     }
   }
 

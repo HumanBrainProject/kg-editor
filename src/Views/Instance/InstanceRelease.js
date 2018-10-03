@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { Glyphicon, Button, ButtonGroup } from "react-bootstrap";
 import { uniqueId, fill } from "lodash";
-import Color from "color";
+import { Scrollbars } from "react-custom-scrollbars";
 
 import ReleaseStore from "../../Stores/ReleaseStore";
 
@@ -14,13 +14,12 @@ import MultiToggle from "../../Components/MultiToggle";
 const styles = {
   container: {
     position: "relative",
-    width: "calc(100% - 40px)",
-    height: "calc(100% - 40px)",
-    backgroundColor: "white",
-    margin:"20px",
-    padding:"20px",
-    borderRadius:"4px",
-    overflow:"auto"
+    width: "calc(100% - 20px)",
+    height: "calc(100% - 20px)",
+    backgroundColor: "var(--bg-color-ui-contrast2)",
+    color: "var(--ft-color-normal)",
+    border: "1px solid var(--bg-color-blend-contrast1)",
+    margin:"10px"
   },
   hlActions:{
     position:"absolute",
@@ -74,11 +73,11 @@ const styles = {
       transition:"outline-color 0.25s ease, background 0.25s ease",
       outlineColor:"transparent",
       "&.highlighted":{
-        outline:"3px dashed #2ecc71",
-        background: new Color("#2ecc71").lighten(0.75).hex(),
+        outline:"3px dashed var(--release-color-highlight)",
+        background: "var(--release-bg-highlight)",
         zIndex:"2",
         "& .node-content":{
-          opacity:0.75
+          opacity:0.8
         },
         "& .node::before":{
           display:"block",
@@ -86,7 +85,7 @@ const styles = {
           position:"absolute",
           width:"3px",
           height:"100%",
-          background:"#2ecc71",
+          background:"var(--release-color-highlight)",
           top:0,
           left:"-14px"
         }
@@ -95,21 +94,20 @@ const styles = {
     "& .node-content":{
       padding: "8px",
       position:"relative",
-      border:"5px solid white",
+      border:"2px solid var(--bg-color-ui-contrast2)",
       transition:"background 0.25s ease",
       marginLeft:"-32px"
     },
     "& .node.released > .node-content":{
-      backgroundColor:new Color("#3498db").lighten(0.6).hex()
+      backgroundColor:"var(--release-bg-released)"
     },
     "& .node.not-released > .node-content":{
-      backgroundColor:new Color("#e74c3c").lighten(0.575).hex()
+      backgroundColor:"var(--release-bg-not-released)"
     },
     "& .node.has-changed > .node-content":{
-      backgroundColor:new Color("#f1c40f").lighten(0.6).hex()
+      backgroundColor:"var(--release-bg-has-changed)"
     },
     "& .status-indicator":{
-      //transform:"scale(0.8)",
       display:"inline-block",
       verticalAlign:"middle",
       marginRight:"4px"
@@ -127,7 +125,7 @@ const styles = {
       display:"inline-block",
       verticalAlign:"middle",
       fontWeight:"bold",
-      color:"#333",
+      color:"var(--ft-color-loud)",
       marginRight:"5px"
     }
   },
@@ -135,6 +133,7 @@ const styles = {
     display:"grid",
     gridTemplateRows:"1fr",
     gridTemplateColumns:"1fr 240px 1fr",
+    padding:"10px"
   },
   label:{
     display:"inline-block",
@@ -166,9 +165,9 @@ const styles = {
   },
   globalActions:{
     position:"relative",
-    height:"60px",
     "& h4":{
-      marginTop:"16px"
+      margin:"0 0 10px 2px",
+      color:"var(--ft-color-loud)"
     }
   },
   releaseInfos:{
@@ -183,8 +182,8 @@ const styles = {
       position:"absolute",
       height:"100%",
       width:"1px",
-      backgroundColor:"#cccccc",
-      top:"30px",
+      backgroundColor:"var(--border-color-ui-contrast5)",
+      top:"50px",
       left:"50%"
     }
   },
@@ -193,7 +192,7 @@ const styles = {
     fontSize:"1.25em",
     position:"absolute",
     left:"50%",
-    top:"50px",
+    top:"100px",
     transform:"translateX(-50%)",
     borderRadius:"50%",
     width:"130px",
@@ -201,26 +200,26 @@ const styles = {
     outline:"none",
     "&:focus, &:active, &:focus:active, &:hover":{
       outline:"none",
-      border:"15px solid white"
+      border:"15px solid var(--bg-color-ui-contrast2)"
     },
-    border:"15px solid white"
+    border:"15px solid var(--bg-color-ui-contrast2)"
   },
   treeStats:{
     position:"absolute",
-    top:"200px",
-    width:"180px",
+    top:"280px",
+    width:"200px",
     left:"50%",
     marginLeft:"-90px",
-    background:"white",
-    border:"1px solid #ccc",
+    padding:"0 10px",
+    background:"var(--bg-color-ui-contrast3)",
+    border:"1px solid var(--border-color-ui-contrast1)",
     borderRadius:"4px",
     overflow:"hidden",
     "& .section":{
       paddingBottom:"10px",
       "& h5":{
         fontSize:"0.8em",
-        fontWeight:"bold",
-        paddingLeft:"4px"
+        fontWeight:"bold"
       },
       "& .stat":{
         display:"grid",
@@ -241,33 +240,34 @@ const styles = {
         },
         "& .bar":{
           height:"16px",
-          background:new Color("#3498db").lighten(0.75).hex(),
+          background:"var(--release-bg-released)",
           position:"relative",
           "& .bar-inner":{
             height:"16px",
             width:"0%",
-            background:"#3498db",
+            background:"var(--release-color-released)",
             transition:"width 0.25s ease"
           },
           "& .bar-label":{
             position:"absolute",
-            top:1,
+            top:0,
             left:0,
             width:"100%",
             textAlign:"center",
             fontSize:"0.8em",
-            fontWeight:"bold"
+            fontWeight:"bold",
+            color:"var(--ft-color-loud)"
           },
           "&.not-released":{
-            background:new Color("#e74c3c").lighten(0.68).hex(),
+            background:"var(--release-bg-not-released)",
             "& .bar-inner":{
-              background:"#e74c3c"
+              background:"var(--release-color-not-released)"
             }
           },
           "&.has-changed":{
-            background:new Color("#f1c40f").lighten(0.75).hex(),
+            background:"var(--release-bg-has-changed)",
             "& .bar-inner":{
-              background:"#f1c40f"
+              background:"var(--release-color-has-changed)"
             }
           }
         }
@@ -286,7 +286,9 @@ export default class InstanceRelease extends React.Component{
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    this.releaseStore = new ReleaseStore(newProps.id);
+    if(this.props.id !== newProps.id){
+      this.releaseStore = new ReleaseStore(newProps.id);
+    }
   }
 
   generateKey(o){
@@ -374,113 +376,99 @@ export default class InstanceRelease extends React.Component{
 
     return (
       <div className={classes.container}>
-        {this.releaseStore.isFetching?
-          <FetchingLoader><span>Fetching release data...</span></FetchingLoader>
-          :
-          <div className={classes.releasePreview}>
-            <div className={classes.globalActions}>
-              <h4>Current state</h4>
-              <div className={classes.nodeActions}>
-                <span>
-                  Select actions on all instances :&nbsp;
-                </span>
-                <ButtonGroup>
-                  <Button onClick={this.handleAllNodeChange.bind(this, "RELEASED", null)} bsSize={"xsmall"}>
-                    Release
-                  </Button>
-                  <Button onClick={this.handleAllNodeChange.bind(this, null, null)} bsSize={"xsmall"}>
-                    Do nothing
-                  </Button>
-                  <Button onClick={this.handleAllNodeChange.bind(this, "NOT_RELEASED", null)} bsSize={"xsmall"}>
-                    Unrelease
-                  </Button>
-                </ButtonGroup>
+        <Scrollbars autoHide>
+          {this.releaseStore.isFetching?
+            <FetchingLoader><span>Fetching release data...</span></FetchingLoader>
+            :
+            <div className={classes.releasePreview}>
+              <div className={classes.globalActions}>
+                <h4>Current state</h4>
               </div>
-            </div>
-            <div className={classes.releaseActions}>
-              <Button onClick={()=>{alert("Not implemented yet");}} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"}>
-                <Glyphicon glyph={"cloud-upload"}/>
-                <div>Proceed</div>
-              </Button>
-              <div className={classes.treeStats}>
-                <div className={"section"}>
-                  <h5>Pending changes:</h5>
-                  <div className={"stat pending"}>
-                    <div className={"name"}>Instances released</div>
-                    <div className={"pending-count"}>{treeStats.proceed_release}</div>
+              <div className={classes.releaseActions}>
+                <Button onClick={()=>{alert("Not implemented yet");}} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"}>
+                  <Glyphicon glyph={"cloud-upload"}/>
+                  <div>Proceed</div>
+                </Button>
+                <div className={classes.treeStats}>
+                  <div className={"section"}>
+                    <h5>Pending changes:</h5>
+                    <div className={"stat pending"}>
+                      <div className={"name"}>Instances released</div>
+                      <div className={"pending-count"}>{treeStats.proceed_release}</div>
+                    </div>
+                    <div className={"stat pending"}>
+                      <div className={"name"}>Instances unreleased</div>
+                      <div className={"pending-count"}>{treeStats.proceed_unrelease}</div>
+                    </div>
+                    <div className={"stat pending"}>
+                      <div className={"name"}>Instances not modified</div>
+                      <div className={"pending-count"}>{treeStats.proceed_do_nothing}</div>
+                    </div>
                   </div>
-                  <div className={"stat pending"}>
-                    <div className={"name"}>Instances unreleased</div>
-                    <div className={"pending-count"}>{treeStats.proceed_unrelease}</div>
-                  </div>
-                  <div className={"stat pending"}>
-                    <div className={"name"}>Instances not modified</div>
-                    <div className={"pending-count"}>{treeStats.proceed_do_nothing}</div>
-                  </div>
-                </div>
 
-                <div className={"section"}>
-                  <h5>Current state:</h5>
-                  <div className={"stat"}>
-                    <div className={"name"}>Released</div>
-                    <div className={"bar released"}>
-                      <div className={"bar-inner"} style={{width:`${treeStats.released/treeStats.total*100}%`}}></div>
-                      <div className={"bar-label"}>{treeStats.released} / {treeStats.total}</div>
+                  <div className={"section"}>
+                    <h5>Current state:</h5>
+                    <div className={"stat"}>
+                      <div className={"name"}>Released</div>
+                      <div className={"bar released"}>
+                        <div className={"bar-inner"} style={{width:`${treeStats.released/treeStats.total*100}%`}}></div>
+                        <div className={"bar-label"}>{treeStats.released} / {treeStats.total}</div>
+                      </div>
+                    </div>
+                    <div className={"stat"}>
+                      <div className={"name"}>Not released</div>
+                      <div className={"bar not-released"}>
+                        <div className={"bar-inner"} style={{width:`${treeStats.not_released/treeStats.total*100}%`}}></div>
+                        <div className={"bar-label"}>{treeStats.not_released} / {treeStats.total}</div>
+                      </div>
+                    </div>
+                    <div className={"stat"}>
+                      <div className={"name"}>Has changed</div>
+                      <div className={"bar has-changed"}>
+                        <div className={"bar-inner"} style={{width:`${treeStats.has_changed/treeStats.total*100}%`}}></div>
+                        <div className={"bar-label"}>{treeStats.has_changed} / {treeStats.total}</div>
+                      </div>
                     </div>
                   </div>
-                  <div className={"stat"}>
-                    <div className={"name"}>Not released</div>
-                    <div className={"bar not-released"}>
-                      <div className={"bar-inner"} style={{width:`${treeStats.not_released/treeStats.total*100}%`}}></div>
-                      <div className={"bar-label"}>{treeStats.not_released} / {treeStats.total}</div>
-                    </div>
-                  </div>
-                  <div className={"stat"}>
-                    <div className={"name"}>Has changed</div>
-                    <div className={"bar has-changed"}>
-                      <div className={"bar-inner"} style={{width:`${treeStats.has_changed/treeStats.total*100}%`}}></div>
-                      <div className={"bar-label"}>{treeStats.has_changed} / {treeStats.total}</div>
-                    </div>
-                  </div>
-                </div>
 
-                <div className={"section"}>
-                  <h5>Preview state:</h5>
-                  <div className={"stat"}>
-                    <div className={"name"}>Released</div>
-                    <div className={"bar released"}>
-                      <div className={"bar-inner"} style={{width:`${treeStats.pending_released/treeStats.total*100}%`}}></div>
-                      <div className={"bar-label"}>{treeStats.pending_released} / {treeStats.total}</div>
+                  <div className={"section"}>
+                    <h5>Preview state:</h5>
+                    <div className={"stat"}>
+                      <div className={"name"}>Released</div>
+                      <div className={"bar released"}>
+                        <div className={"bar-inner"} style={{width:`${treeStats.pending_released/treeStats.total*100}%`}}></div>
+                        <div className={"bar-label"}>{treeStats.pending_released} / {treeStats.total}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className={"stat"}>
-                    <div className={"name"}>Not released</div>
-                    <div className={"bar not-released"}>
-                      <div className={"bar-inner"} style={{width:`${treeStats.pending_not_released/treeStats.total*100}%`}}></div>
-                      <div className={"bar-label"}>{treeStats.pending_not_released} / {treeStats.total}</div>
+                    <div className={"stat"}>
+                      <div className={"name"}>Not released</div>
+                      <div className={"bar not-released"}>
+                        <div className={"bar-inner"} style={{width:`${treeStats.pending_not_released/treeStats.total*100}%`}}></div>
+                        <div className={"bar-label"}>{treeStats.pending_not_released} / {treeStats.total}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className={"stat"}>
-                    <div className={"name"}>Has changed</div>
-                    <div className={"bar has-changed"}>
-                      <div className={"bar-inner"} style={{width:`${treeStats.pending_has_changed/treeStats.total*100}%`}}></div>
-                      <div className={"bar-label"}>{treeStats.pending_has_changed} / {treeStats.total}</div>
+                    <div className={"stat"}>
+                      <div className={"name"}>Has changed</div>
+                      <div className={"bar has-changed"}>
+                        <div className={"bar-inner"} style={{width:`${treeStats.pending_has_changed/treeStats.total*100}%`}}></div>
+                        <div className={"bar-label"}>{treeStats.pending_has_changed} / {treeStats.total}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <div className={classes.releaseInfos}>
+                <h4>Preview state</h4>
+              </div>
+              <div className={classes.tree}>
+                {this.renderNode(this.releaseStore.instancesTree)}
+              </div>
+              <div className={classes.tree}>
+                {this.renderNode(this.releaseStore.instancesTree, "pending_")}
+              </div>
             </div>
-            <div className={classes.releaseInfos}>
-              <h4>Preview state</h4>
-            </div>
-            <div className={classes.tree}>
-              {this.renderNode(this.releaseStore.instancesTree)}
-            </div>
-            <div className={classes.tree}>
-              {this.renderNode(this.releaseStore.instancesTree, "pending_")}
-            </div>
-          </div>
-        }
+          }
+        </Scrollbars>
       </div>
     );
   }

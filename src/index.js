@@ -156,7 +156,7 @@ class App extends React.Component{
   }
 
   handleThemeSwitch = (e) => {
-    if(e.ctrlKey && e.altKey && e.keyCode === 84){
+    if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
       this.setState({theme:this.state.theme === DefaultTheme? BrightTheme: DefaultTheme});
     }
   }

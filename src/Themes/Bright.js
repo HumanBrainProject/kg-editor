@@ -29,7 +29,17 @@ const styles = {
       "--ft-color-loud":"#444444",
       "--ft-color-louder":"#222222",
 
-      "--pane-box-shadow":"rgba(0,0,0,0.3)"
+      "--pane-box-shadow":"rgba(0,0,0,0.3)",
+
+      "--release-color-released":"rgb(52, 152, 219)",
+      "--release-bg-released":"rgba(52, 152, 219, 0.25)",
+      "--release-color-not-released":"rgb(231, 76, 60)",
+      "--release-bg-not-released":"rgba(231, 76, 60, 0.25)",
+      "--release-color-has-changed":"rgb(241, 196, 15)",
+      "--release-bg-has-changed":"rgba(241, 196, 15, 0.25)",
+
+      "--release-color-highlight":"rgb(46, 204, 113)",
+      "--release-bg-highlight":"rgb(46, 204, 113, 0.25)"
     }
   }
 };

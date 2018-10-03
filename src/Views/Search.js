@@ -16,10 +16,6 @@ const styles = {
 
 @injectStyles(styles)
 export default class Search extends React.Component{
-  constructor(props){
-    super(props);
-  }
-
   render = () => {
     const {classes} = this.props;
 

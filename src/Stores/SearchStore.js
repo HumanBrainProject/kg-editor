@@ -27,10 +27,6 @@ class SearchStore{
   pageStart = 0;
   pageSize = 20;
 
-  constructor(){
-    this.fetchLists();
-  }
-
   @action setListsFilter(filter){
     this.listsFilter = filter;
   }

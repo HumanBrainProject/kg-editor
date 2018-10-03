@@ -94,6 +94,13 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Lists extends React.Component{
+  constructor(props){
+    super(props);
+    if(!searchStore.allLists && !searchStore.isFetching.lists){
+      searchStore.fetchLists();
+    }
+  }
+
   handleFilterChange = event => {
     searchStore.setListsFilter(event.target.value);
   }

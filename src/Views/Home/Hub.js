@@ -8,6 +8,7 @@ import routerStore from "../../Stores/RouterStore";
 import searchStore from "../../Stores/SearchStore";
 import instanceStore from "../../Stores/InstanceStore";
 import FetchingLoader from "../../Components/FetchingLoader";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const styles = {
   container:{
@@ -67,10 +68,10 @@ export default class Hub extends React.Component{
   }
 
   handleCreateInstance = () => {
-    this.setState({showCreateModal: true});
     if(!searchStore.allLists){
       searchStore.fetchLists();
     }
+    this.setState({showCreateModal: true});
   }
 
   handleHideCreateModal = () => {
@@ -98,7 +99,7 @@ export default class Hub extends React.Component{
 
         <div className={classes.action} onClick={this.handleCreateInstance}>
           <div className={classes.actionIcon}>
-            <FontAwesomeIcon icon={"file"}/>
+            <FontAwesomeIcon icon={searchStore.isFetching.lists?"circle-notch":"file"} spin={searchStore.isFetching.lists}/>
           </div>
           <div className={classes.actionText}>
             New instance
@@ -123,7 +124,11 @@ export default class Hub extends React.Component{
           </div>
         </div>
 
-        {this.state.showCreateModal &&
+        <div className={classes.action}>
+          <ThemeSwitcher/>
+        </div>
+
+        {this.state.showCreateModal && searchStore.allLists && !searchStore.isFetching.lists &&
           <Modal show={true} onHide={this.handleHideCreateModal}>
             <Modal.Header closeButton>
               New Instance

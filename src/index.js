@@ -6,8 +6,9 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faExpandArrowsAlt, faCompress, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faExpandArrowsAlt, faCompress, faEyeSlash, faExclamationCircle, faEnvelope, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 
+import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
 import instanceStore from "./Stores/InstanceStore";
@@ -24,11 +25,9 @@ import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
 import Instance from "./Views/Instance";
 
-import DefaultTheme from "./Themes/Default";
-import BrightTheme from "./Themes/Bright";
-
 import "babel-polyfill";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import GlobalError from "./Views/GlobalError";
 
 const styles = {
   "@global html, body, #root": {
@@ -145,19 +144,28 @@ class App extends React.Component{
   constructor(props) {
     super(props);
     authStore.tryAuthenticate();
-    this.state = {currentLocation: routerStore.history.location.pathname, theme: DefaultTheme};
+    this.state = {currentLocation: routerStore.history.location.pathname};
     routerStore.history.listen(location => {
       this.setState({currentLocation:location.pathname});
     });
   }
 
   componentDidMount(){
-    document.addEventListener("keydown", this.handleThemeSwitch);
+    document.addEventListener("keydown", this.handleGlobalShortcuts);
   }
 
-  handleThemeSwitch = (e) => {
+  componentDidCatch(error, info){
+    appStore.setGlobalError(error, info);
+  }
+
+  handleGlobalShortcuts = (e) => {
     if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
-      this.setState({theme:this.state.theme === DefaultTheme? BrightTheme: DefaultTheme});
+      appStore.toggleTheme();
+    } else if(e.altKey && e.keyCode === 87){
+      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+      if(matchInstanceTab){
+        this.handleCloseInstance(matchInstanceTab.params.id);
+      }
     }
   }
 
@@ -186,62 +194,68 @@ class App extends React.Component{
   render(){
     const {classes} = this.props;
     const {currentLocation} = this.state;
+    const Theme = appStore.availableThemes[appStore.currentTheme];
 
     return(
       <Router history={routerStore.history}>
         <div className={classes.layout}>
-          <this.state.theme/>
+          <Theme/>
           <div className={classes.tabs}>
             <div className={classes.logo}>
               <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
               <span>Knowledge Graph Editor</span>
             </div>
-            <div className={classes.fixedTabsLeft}>
-              {!authStore.isAuthenticated?
-                <Tab icon={"user-lock"} current={true}>Login</Tab>
-                :
-                <React.Fragment>
-                  <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
-                  <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
-                </React.Fragment>
-              }
-            </div>
-            <div className={classes.dynamicTabs}>
-              {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
-                const instance = instanceStore.getInstance(instanceId);
-                const mode = instanceStore.openedInstances.get(instanceId).viewMode;
-                let label;
-                let color = undefined;
-                if(!instance.isFetching && !instance.hasFetchError){
-                  label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
-                  color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
-                }
-                if(!label){
-                  label = instanceId;
-                }
-                return (
-                  <Tab
-                    key={instanceId}
-                    icon={instance.isFetching?"circle-notch":"circle"}
-                    iconSpin={instance.isFetching}
-                    iconColor={color}
-                    current={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
-                    path={`/instance/${mode}/${instanceId}`}
-                    onClose={this.handleCloseInstance.bind(this, instanceId)}
-                    fullText={label}>
-                    {label}
-                  </Tab>
-                );
-              })}
-            </div>
-            <div className={classes.fixedTabsRight}>
-              {authStore.isAuthenticated &&
-                <React.Fragment>
-                  <Tab icon={"chart-bar"} current={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
-                  <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
-                </React.Fragment>
-              }
-            </div>
+
+            {!appStore.globalError &&
+              <React.Fragment>
+                <div className={classes.fixedTabsLeft}>
+                  {!authStore.isAuthenticated?
+                    <Tab icon={"user-lock"} current={true}>Login</Tab>
+                    :
+                    <React.Fragment>
+                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
+                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
+                    </React.Fragment>
+                  }
+                </div>
+                <div className={classes.dynamicTabs}>
+                  {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
+                    const instance = instanceStore.getInstance(instanceId);
+                    const mode = instanceStore.openedInstances.get(instanceId).viewMode;
+                    let label;
+                    let color = undefined;
+                    if(!instance.isFetching && !instance.hasFetchError){
+                      label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+                      color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
+                    }
+                    if(!label){
+                      label = instanceId;
+                    }
+                    return (
+                      <Tab
+                        key={instanceId}
+                        icon={instance.isFetching?"circle-notch":"circle"}
+                        iconSpin={instance.isFetching}
+                        iconColor={color}
+                        current={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
+                        path={`/instance/${mode}/${instanceId}`}
+                        onClose={this.handleCloseInstance.bind(this, instanceId)}
+                        fullText={label}>
+                        {label}
+                      </Tab>
+                    );
+                  })}
+                </div>
+                <div className={classes.fixedTabsRight}>
+                  {authStore.isAuthenticated &&
+                    <React.Fragment>
+                      <Tab icon={"chart-bar"} current={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
+                      <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
+                    </React.Fragment>
+                  }
+                </div>
+              </React.Fragment>
+            }
           </div>
           <div className={classes.body}>
             {instanceStore.hasUnsavedChanges && !matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) &&
@@ -256,19 +270,22 @@ class App extends React.Component{
             }
             {!authStore.isAuthenticated?
               <Route component={Login} />
-              :
-              <Switch>
-                <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
-                <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
-                <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
-                <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+              :appStore.globalError?
+                <Route component={GlobalError} />
+                :
+                <Switch>
+                  <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
+                  <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
+                  <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
+                  <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
 
-                <Route path="/search" exact={true} component={Search} />
-                <Route path="/help" exact={true} component={Help} />
-                <Route path="/kg-stats" exact={true} component={Statistics} />
-                <Route path="/" exact={true} component={Home} />
-                <Route component={NotFound} />
-              </Switch>
+                  <Route path="/search" exact={true} component={Search} />
+                  <Route path="/help" exact={true} component={Help} />
+                  <Route path="/kg-stats" exact={true} component={Statistics} />
+                  <Route path="/loginSuccess" exact={true} component={()=>null} />
+                  <Route path="/" exact={true} component={Home} />
+                  <Route component={NotFound} />
+                </Switch>
             }
           </div>
           <div className={classes.status}>
@@ -284,6 +301,6 @@ library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
   faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
   faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faEyeSlash, faExclamationTriangle,
   faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle,
-  faExpandArrowsAlt, faCompress);
+  faExpandArrowsAlt, faCompress, faExclamationCircle, faEnvelope, faSun, faMoon);
 
 render(<App/>, document.getElementById("root"));

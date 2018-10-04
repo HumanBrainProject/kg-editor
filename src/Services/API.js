@@ -15,9 +15,10 @@ class API {
   constructor() {
     this._axios = axios.create({});
     this._axios.interceptors.response.use(null, (error) => {
-      if (error.response.status === 401) {
+      if (error.response.status === 401 && !error.config._isRetry) {
         return authStore.logout(true).then(()=>{
           error.config.headers.Authorization = "Bearer " + authStore.accessToken;
+          error.config._isRetry = true;
           return this.axios.request(error.config);
         });
       } else {

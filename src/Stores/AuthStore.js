@@ -43,7 +43,7 @@ const getKey = (hash, key) => {
 };
 
 let rootPath = window.rootPath || "";
-let redirectUri = `${window.location.protocol}//${window.location.host}${rootPath}/home`;
+let redirectUri = `${window.location.protocol}//${window.location.host}${rootPath}/loginSuccess`;
 let stateKey = btoa(redirectUri);
 let sessionTimer = null;
 
@@ -51,6 +51,7 @@ class AuthStore {
   @observable session = null;
   reloginResolve = null;
   reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+  expiredToken = false;
 
   constructor(){
     if(Storage === undefined){
@@ -62,10 +63,6 @@ class AuthStore {
         return;
       }
       this.tryAuthenticate();
-      if(this.isAuthenticated){
-        this.reloginResolve();
-        this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
-      }
     });
   }
 
@@ -100,10 +97,12 @@ class AuthStore {
     }, this.session.expiryTimestamp -(new Date()).getTime());
   }
 
+  @action
   logout() {
     console.log("logout");
     clearTimeout(sessionTimer);
     this.session = null;
+    this.expiredToken = true;
     if (typeof Storage !== "undefined" ) {
       localStorage.removeItem(oidLocalStorageKey);
     }
@@ -148,11 +147,17 @@ class AuthStore {
       if (oidStoredState && oidStoredState.expiryTimestamp && new Date() < oidStoredState.expiryTimestamp) {
         this.session = oidStoredState;
         this.startSessionTimer();
-      } else {
+      } else if(this.session){
         this.logout();
       }
 
     }
+
+    if(this.isAuthenticated){
+      this.reloginResolve();
+      this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+    }
+
     return this.session? this.session.accessToken: null;
   }
 }

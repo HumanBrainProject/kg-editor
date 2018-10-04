@@ -3,7 +3,9 @@ import { uniqueId } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
+
 import PaneStore from "./PaneStore";
+import authStore from "./AuthStore";
 
 const nodeTypeMapping = {
   "Dataset":"http://hbp.eu/minds#Dataset",
@@ -42,6 +44,15 @@ class InstanceStore {
 
   generatedKeys = new WeakMap();
 
+  constructor(){
+    if(localStorage.getItem("openedTabs")){
+      let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
+      authStore.reloginPromise.then(()=>{
+        this.restoreOpenedTabs(storedOpenedTabs);
+      });
+    }
+  }
+
   get nodeTypeMapping(){
     return nodeTypeMapping;
   }
@@ -62,6 +73,7 @@ class InstanceStore {
       });
       this.getInstance(instanceId);
       this.setCurrentInstanceId(instanceId, instanceId, 0);
+      this.syncStoredOpenedTabs();
     }
   }
 
@@ -71,6 +83,18 @@ class InstanceStore {
 
   @action closeInstance(instanceId){
     this.openedInstances.delete(instanceId);
+    this.syncStoredOpenedTabs();
+  }
+
+  syncStoredOpenedTabs(){
+    localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
+  }
+
+  @action
+  restoreOpenedTabs(storedOpenedTabs){
+    storedOpenedTabs.forEach(([id, viewMode]) => {
+      this.openInstance(id, viewMode, viewMode !== "edit");
+    });
   }
 
   @action

@@ -169,7 +169,10 @@ export default class Lists extends React.Component{
                             {folder.lists.map((list, index) => {
                               const [,, schema,] = list.path.split("/");
                               return (
-                                <div className={`${classes.list} ${searchStore.selectedList === list?"selected":""}`} key={list.path+index} onClick={this.handleSelectList.bind(this, list)}>
+                                <div className={`${classes.list} ${searchStore.selectedList === list?"selected":""}`}
+                                  key={list.path+index}
+                                  onClick={this.handleSelectList.bind(this, list)}
+                                  title={list.path}>
                                   {list.label?list.label:schema}
                                   {instanceStore.isCreatingNewInstance?
                                     <FontAwesomeIcon icon={"circle-notch"} spin pull={"right"} className={classes.createInstance}/>

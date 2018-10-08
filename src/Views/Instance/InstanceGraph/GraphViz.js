@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 //import Slider from "rc-slider";
 //import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
-import { ForceGraph2D } from "react-force-graph";
+import ForceGraph2D from "react-force-graph/src/ForceGraph2D";
 import { debounce } from "lodash";
 import Color from "color";
 import { Glyphicon } from "react-bootstrap";
@@ -55,6 +55,10 @@ export default class Graph extends React.Component {
       graphWidth:0,
       graphHeight:0
     };
+    this.initialZoom = false;
+  }
+
+  UNSAFE_componentWillReceiveProps(){
     this.initialZoom = false;
   }
 

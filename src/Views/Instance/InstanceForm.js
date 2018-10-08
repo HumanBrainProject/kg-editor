@@ -17,6 +17,7 @@ import FetchingPanel from "./InstanceForm/FetchingPanel";
 import SavingPanel from "./InstanceForm/SavingPanel";
 import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
+import routerStore from "../../Stores/RouterStore";
 
 const styles = {
   panelHeader: {
@@ -140,6 +141,14 @@ export default class InstanceForm extends React.Component {
     }
   }
 
+  handleOpenInstance = (e) => {
+    if((e.metaKey || e.ctrlKey)){
+      instanceStore.openInstance(this.props.id);
+    } else {
+      routerStore.history.push(`/instance/view/${this.props.id}`);
+    }
+  }
+
   handleChange = () => {
     instanceStore.instanceHasChanged(this.props.id);
   }
@@ -243,6 +252,7 @@ export default class InstanceForm extends React.Component {
         <div
           onFocus={this.handleFocus}
           onClick={this.handleFocus}
+          onDoubleClick={isReadMode && !isMainInstance?this.handleOpenInstance:undefined}
           onChange={this.handleChange}
           onLoad={this.handleLoad}
         >
@@ -258,7 +268,9 @@ export default class InstanceForm extends React.Component {
 
             <FooterPanel
               className={classes.panelFooter}
-              id={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"} />
+              nexusId={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}
+              id={id}
+              showOpenActions={isCurrentInstance && !isMainInstance}/>
           </Form>
           <ConfirmCancelEditPanel
             show={instance.cancelChangesPending}

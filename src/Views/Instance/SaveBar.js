@@ -94,7 +94,14 @@ const styles = {
     marginTop:"20px"
   },
   compareModal:{
-    width:"90%"
+    width:"90%",
+    "@media screen and (min-width:1024px)": {
+      width:"900px",
+    },
+    "& .modal-body": {
+      height: "calc(95vh - 112px)",
+      padding: "3px 0"
+    }
   }
 };
 
@@ -155,7 +162,9 @@ export default class SavePanel extends React.Component{
                   <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue()}
                 </Modal.Header>
                 <Modal.Body>
-                  <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+                  <Scrollbars autoHide>
+                    <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+                  </Scrollbars>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>

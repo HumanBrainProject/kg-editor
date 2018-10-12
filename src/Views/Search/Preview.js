@@ -87,6 +87,10 @@ export default class Preview extends React.Component{
   render(){
     const { classes } = this.props;
     let selectedInstance = instanceStore.getInstance(searchStore.selectedInstance.id);
+
+    const promotedFields = instanceStore.getPromotedFields(selectedInstance);
+    const nonPromotedFields = instanceStore.getNonPromotedFields(selectedInstance);
+
     return(
       <Scrollbars autoHide>
         <div className={classes.container}>
@@ -117,7 +121,14 @@ export default class Preview extends React.Component{
                   Nexus ID: {searchStore.selectedInstance.id}
                 </div>
                 <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
-                  {Object.keys(selectedInstance.form.structure.fields).map(fieldKey => {
+                  {promotedFields.map(fieldKey => {
+                    return(
+                      <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                        <Field name={fieldKey}/>
+                      </div>
+                    );
+                  })}
+                  {nonPromotedFields.map(fieldKey => {
                     return(
                       <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>

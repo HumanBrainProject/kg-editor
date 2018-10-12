@@ -217,25 +217,8 @@ export default class InstanceForm extends React.Component {
       return className;
     };
 
-    const getSummaryFields = instance => {
-      if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
-        return instance.data.ui_info.promotedFields
-          .map(key => key.replace(/\//g, "%nexus-slash%"))
-          .filter(name => instance.data.fields[name]);
-      }
-      return [];
-    };
-
-    const getBodyFields = instance => {
-      if (instance && instance.data && instance.data.fields) {
-        return Object.keys(instance.data.fields)
-          .filter(name => {
-            const key = name.replace(/%nexus-slash%/g, "/");
-            return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
-          });
-      }
-      return [];
-    };
+    const promotedFields = instanceStore.getPromotedFields(instance);
+    const nonPromotedFields = instanceStore.getNonPromotedFields(instance);
 
     return (
       <div className={panelClassName()} data-id={this.props.id}>
@@ -253,8 +236,8 @@ export default class InstanceForm extends React.Component {
               color={graphStore.colorScheme[instanceStore.nodeTypeMapping[nodeType]]}
               hasChanged={instance.hasChanged}/>
 
-            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getSummaryFields(instance)} />
-            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getBodyFields(instance)} show={isMainInstance || isCurrentInstance || !isReadMode} />
+            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} />
+            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={isMainInstance || isCurrentInstance || !isReadMode} />
 
             <FooterPanel
               className={classes.panelFooter}

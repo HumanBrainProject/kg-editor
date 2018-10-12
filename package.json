@@ -10,6 +10,7 @@
     "@fortawesome/react-fontawesome": "^0.1.3",
     "babel-polyfill": "^6.26.0",
     "color": "^3.0.0",
+    "diff": "^3.5.0",
     "google-palette": "^1.1.0",
     "hbp-quickfire": "^1.0.9",
     "lodash": "^4.17.10",

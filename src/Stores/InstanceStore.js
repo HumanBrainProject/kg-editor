@@ -57,6 +57,27 @@ class InstanceStore {
     return nodeTypeMapping;
   }
 
+
+  getPromotedFields(instance) {
+    if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
+      return instance.data.ui_info.promotedFields
+        .map(key => key.replace(/\//g, "%nexus-slash%"))
+        .filter(name => instance.data.fields[name]);
+    }
+    return [];
+  }
+
+  getNonPromotedFields(instance) {
+    if (instance && instance.data && instance.data.fields) {
+      return Object.keys(instance.data.fields)
+        .filter(name => {
+          const key = name.replace(/%nexus-slash%/g, "/");
+          return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
+        });
+    }
+    return [];
+  }
+
   /**
    * Opened instances are shown in their own tab in the UI
    * We keep track in that store of which instances are opened

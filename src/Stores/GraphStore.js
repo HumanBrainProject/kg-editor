@@ -44,6 +44,7 @@ class GraphStore {
   @observable expandedTypes = [];
   @observable isFetching = false;
   @observable isFetched = false;
+  @observable mainId = null;
 
   originalData = null;
   groupNodes = null;
@@ -98,6 +99,7 @@ class GraphStore {
     try {
       const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
       runInAction( ()=>{
+        this.mainId = id;
         this.originalData = data;
         this.filterOriginalData();
         this.expandedTypes = [];
@@ -118,6 +120,7 @@ class GraphStore {
     this.highlightedNode = null;
     this.connectedNodes = null;
     this.connectedLinks = null;
+    this.mainId = null;
   }
 
   @action filterOriginalData(){
@@ -132,6 +135,12 @@ class GraphStore {
     });
     this.originalData.nodes.forEach(node => {
       node.niceDataType = node.dataType.replace("http://hbp.eu/minds#","");
+      node.isMainNode = node.id.includes(this.mainId);
+
+      console.log(this.mainId);
+      if(node.isMainNode){
+        console.log(this.mainId);
+      }
     });
 
     this.groupNodes = new Map();

@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 //import Slider from "rc-slider";
 //import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
-import { ForceGraph2D } from "react-force-graph";
+import ForceGraph2D from "react-force-graph/src/ForceGraph2D";
 import { debounce } from "lodash";
 import Color from "color";
 import { Glyphicon } from "react-bootstrap";
@@ -58,6 +58,10 @@ export default class Graph extends React.Component {
     this.initialZoom = false;
   }
 
+  UNSAFE_componentWillReceiveProps(){
+    this.initialZoom = false;
+  }
+
   componentDidMount(){
     this.resizeDebounceFn = debounce(this.resizeWrapper, 250);
     window.addEventListener("resize", this.resizeDebounceFn);
@@ -92,9 +96,9 @@ export default class Graph extends React.Component {
   handleNodeClick = (node) => {
     if(node.isGroup){
       graphStore.explodeNode(node);
-    } else {
-      routerStore.history.push("/instance/graph/"+node.id);
+    } else if(node.id !== graphStore.mainId){
       graphStore.reset();
+      routerStore.history.push("/instance/graph/"+node.id);
     }
   }
 
@@ -147,7 +151,7 @@ export default class Graph extends React.Component {
     if(node.isGroup){
       ctx.rect(node.x-6, node.y-6, 12, 12);
     } else {
-      ctx.arc(node.x, node.y, 6, 0, 2*Math.PI);
+      ctx.arc(node.x, node.y, node.isMainNode?10:6, 0, 2*Math.PI);
     }
 
     if(graphStore.highlightedNode){
@@ -159,6 +163,11 @@ export default class Graph extends React.Component {
     ctx.strokeStyle = new Color(graphStore.colorScheme[dataType]).darken(0.25).hex();
     ctx.fillStyle = graphStore.colorScheme[dataType];
 
+    if(node.isMainNode){
+      ctx.setLineDash([2, 0.5]);
+    } else {
+      ctx.setLineDash([]);
+    }
     ctx.stroke();
     ctx.fill();
     if(scale > 3){

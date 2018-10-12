@@ -108,8 +108,10 @@ export default class GraphSettings extends React.Component{
   }
 
   handleNodeClick(node){
-    routerStore.history.push("/instance/graph/"+node.id);
-    graphStore.reset();
+    if(node.id !== graphStore.mainId){
+      graphStore.reset();
+      routerStore.history.push("/instance/graph/"+node.id);
+    }
   }
 
   handleExpandClick(nodeType){

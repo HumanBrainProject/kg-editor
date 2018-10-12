@@ -1,9 +1,10 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import {Button, ButtonGroup, Glyphicon, Modal} from "react-bootstrap";
+import {Button, ButtonGroup, Modal} from "react-bootstrap";
 import { uniqueId } from "lodash";
 import { Scrollbars } from "react-custom-scrollbars";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import CompareChanges from "./CompareChanges";
 import instanceStore from "../../Stores/InstanceStore";
@@ -60,7 +61,6 @@ const styles = {
     marginTop:5
   },
   saveIcon: {
-    composes: "glyphicon glyphicon-record",
     color: "red",
     animation: `${animationId} 1.4s infinite linear`
   },
@@ -154,7 +154,7 @@ export default class SavePanel extends React.Component{
     return(
       <div className={classes.container}>
         <Scrollbars autoHide>
-          <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
+          <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
           <div className={classes.instances}>
             {instanceStore.comparedInstanceId &&
               <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
@@ -167,14 +167,14 @@ export default class SavePanel extends React.Component{
                   </Scrollbars>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>
-                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"save"}/>&nbsp;Save this instance</Button>
+                  <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
+                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
                 </Modal.Footer>
               </Modal>
             }
             {!instanceStore.hasUnsavedChanges &&
               <div className={classes.noChanges}>
-                <div className={classes.allGreenIcon}><Glyphicon glyph={"ok"}/></div>
+                <div className={classes.allGreenIcon}><FontAwesomeIcon icon="check"/></div>
                 <div className={classes.allGreenText}>You have no unsaved modifications !</div>
               </div>
             }
@@ -187,12 +187,12 @@ export default class SavePanel extends React.Component{
                   </div>
                   <div className={classes.actions}>
                     {instance.isSaving?
-                      <span className={classes.saveIcon}></span>
+                      <FontAwesomeIcon className={classes.saveIcon} icon="dot-circle"/>
                       :
                       <ButtonGroup vertical>
-                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)}><Glyphicon glyph={"save"}/></Button>
-                        <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>
-                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>
+                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
+                        <Button bsSize="small" onClick={this.handleReset.bind(this, id)} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
+                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)} title="compare the changes"><FontAwesomeIcon icon="search"/></Button>
                       </ButtonGroup>
                     }
                   </div>
@@ -204,7 +204,7 @@ export default class SavePanel extends React.Component{
                   </div>
                   {instance.hasSaveError &&
                     <div className={classes.errors}>
-                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><Glyphicon glyph={"ok"}/></Button>
+                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><FontAwesomeIcon icon="check"/></Button>
                     </div>
                   }
                 </div>

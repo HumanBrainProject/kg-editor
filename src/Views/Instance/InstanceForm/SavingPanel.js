@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { uniqueId } from "lodash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const animationId = uniqueId("animationId");
 
@@ -51,7 +52,6 @@ const styles = {
     }
   },
   icon: {
-    composes: "glyphicon glyphicon-record",
     color: "red",
     animation: `${animationId} 1.4s infinite linear`
   },
@@ -75,17 +75,17 @@ const styles = {
 export default class FetchingPanel extends React.Component{
   render(){
     const { classes, id, show, inline } = this.props;
-    return(
-      (show)?
-        <div className={classes.container} inline={inline?"true":"false"}>
-          <div className={classes.panel} >
-            <span className={classes.icon}></span>
-            <span className={classes.label}>Saving instance...</span>
-            <small>Nexus ID: {id}</small>
-          </div>
+    if (!show) {
+      return null;
+    }
+    return (
+      <div className={classes.container} inline={inline?"true":"false"}>
+        <div className={classes.panel} >
+          <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
+          <span className={classes.label}>Saving instance...</span>
+          <small>Nexus ID: {id}</small>
         </div>
-        :
-        null
+      </div>
     );
   }
 }

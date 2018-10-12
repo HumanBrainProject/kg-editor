@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { Button, Glyphicon } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   fetchErrorPanel: {
@@ -44,6 +45,9 @@ const styles = {
     "& button span + span": {
       marginLeft: "4px"
     }
+  },
+  retryIcon: {
+    marginRight: "4px"
   }
 };
 
@@ -56,25 +60,25 @@ export default class FetchErrorPanel extends React.Component{
 
   render(){
     const { classes, id, show, error, inline } = this.props;
+    if (!show) {
+      return null;
+    }
     return(
-      (show)?
-        (!inline)?
-          <div className={classes.fetchErrorPanel}>
-            <h4>{error}</h4>
-            <div>
-              <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
-            </div>
+      (!inline)?
+        <div className={classes.fetchErrorPanel}>
+          <h4>{error}</h4>
+          <div>
+            <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
           </div>
-          :
-          <div className={classes.inlineFetchErrorPanel}>
-            <h5>{error}</h5>
-            <small>Nexus ID: {id}</small>
-            <div>
-              <Button onClick={this.handleRetry}><Glyphicon glyph="refresh" /><span>Retry</span></Button>
-            </div>
-          </div>
+        </div>
         :
-        null
+        <div className={classes.inlineFetchErrorPanel}>
+          <h5>{error}</h5>
+          <small>Nexus ID: {id}</small>
+          <div>
+            <Button onClick={this.handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
+          </div>
+        </div>
     );
   }
 }

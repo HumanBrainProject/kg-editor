@@ -1,9 +1,9 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import { Glyphicon } from "react-bootstrap";
 import { Form } from "hbp-quickfire";
 import Color from "color";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import instanceStore from "../../Stores/InstanceStore";
 import graphStore from "../../Stores/GraphStore";
@@ -85,10 +85,10 @@ const styles = {
       display: "inline",
       position: "absolute",
       top: "50%",
-      left: "-26px",
+      left: "-25px",
       color: "transparent",
       fontSize: "xx-large",
-      transform: "translateY(-50%) scale(0.5,0.8)",
+      transform: "translateY(-50%) scale(0.5,0.7)",
       transition: "color 0.25s ease-in-out"
     },
     "&:not(.current).readMode.highlight .hightlightArrow": {
@@ -266,7 +266,7 @@ export default class InstanceForm extends React.Component {
           <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
         </div>
         }
-        <Glyphicon glyph="arrow-right" className="hightlightArrow" />
+        <FontAwesomeIcon className="hightlightArrow"  icon="arrow-right"/>
         <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
         <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
       </div>

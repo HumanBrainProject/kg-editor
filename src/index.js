@@ -161,6 +161,8 @@ class App extends React.Component{
   handleGlobalShortcuts = (e) => {
     if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
       appStore.toggleTheme();
+    } else if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 87){
+      appStore.setTheme("cupcake");
     } else if(e.altKey && e.keyCode === 87){
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
@@ -201,7 +203,7 @@ class App extends React.Component{
         <div className={classes.layout}>
           <Theme/>
           <div className={classes.tabs}>
-            <div className={classes.logo}>
+            <div className={`${classes.logo} layout-logo`}>
               <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
               <span>Knowledge Graph Editor</span>
             </div>
@@ -288,7 +290,7 @@ class App extends React.Component{
                 </Switch>
             }
           </div>
-          <div className={classes.status}>
+          <div className={`${classes.status} layout-status`}>
 
           </div>
         </div>

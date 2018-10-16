@@ -43,6 +43,12 @@ module.exports = {
         secure:false,
         changeOrigin: true
       },
+      "/release": {
+        //target:"https://kg-dev.humanbrainproject.org",
+        target:"http://localhost:9000/editor",
+        secure:false,
+        changeOrigin: true
+      },
       "/statistics": {
         target:"https://kg-dev.humanbrainproject.org",
         secure:false,

@@ -6,7 +6,10 @@ import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch, faCamera,
   faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes, faUndo, faSave, faSyncAlt,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faArrowRight, faExpandArrowsAlt, faCompress, faEyeSlash, faExclamationCircle, faEnvelope, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye,
+  faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile,
+  faPlus, faDotCircle, faArrowRight, faExpandArrowsAlt, faCompress, faEyeSlash, faExclamationCircle,
+  faEnvelope, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";

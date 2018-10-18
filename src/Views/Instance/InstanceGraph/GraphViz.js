@@ -1,9 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
-//import Slider from "rc-slider";
-//import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
-import ForceGraph2D from "react-force-graph/src/ForceGraph2D";
+import ForceGraph2D from "react-force-graph-2d";
 import { debounce } from "lodash";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

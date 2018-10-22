@@ -42,12 +42,16 @@ export default class Status extends React.Component{
     const { classes } = this.props;
     return(
       <div className={`${classes.container} status`}>
-        {!instanceStatus.isFetched?
+        {instanceStatus.hasFetchError?
           <div className={classes.loader}>
-            <FontAwesomeIcon icon={"circle-notch"} spin/>
+            <FontAwesomeIcon icon={"question-circle"}/>
           </div>
-          :
-          <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.status} childrenStatus={instanceStatus.data.childrenStatus? instanceStatus.data.childrenStatus: null}/>
+          :!instanceStatus.isFetched?
+            <div className={classes.loader}>
+              <FontAwesomeIcon icon={"circle-notch"} spin/>
+            </div>
+            :
+            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.status} childrenStatus={instanceStatus.data.childrenStatus? instanceStatus.data.childrenStatus: null}/>
         }
       </div>
     );

@@ -13,12 +13,15 @@ let styles = {
     lineHeight:"50px",
     color:"var(--ft-color-normal)",
     background:"var(--bg-color-ui-contrast2)",
-    padding:"0 10px 0 20px",
+    padding:"0 20px 0 20px",
     border:"1px solid var(--border-color-ui-contrast2)",
     borderLeft:"none",
     cursor:"pointer",
     display:"grid",
     gridTemplateColumns:"auto 1fr auto",
+    "&$closable":{
+      paddingRight:"10px"
+    },
     "& $icon": {
       opacity:0.5
     },
@@ -29,6 +32,7 @@ let styles = {
       }
     }
   },
+  closable:{},
   current:{
     backgroundColor:"var(--bg-color-ui-contrast3)",
     color:"var(--ft-color-loud)",
@@ -82,7 +86,7 @@ export default class Tab extends React.Component {
   render(){
     const {classes, current, icon, onClose, iconColor, iconSpin} = this.props;
     return (
-      <div className={`${classes.container} ${current? classes.current: ""}`} onClick={this.handleClick}>
+      <div className={`${classes.container} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={this.handleClick}>
         <div className={classes.icon} style={iconColor?{color:iconColor}:{}}>
           {icon && <FontAwesomeIcon icon={icon} spin={iconSpin}/>}
         </div>

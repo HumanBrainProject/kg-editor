@@ -3,13 +3,8 @@ import { render } from "react-dom";
 import { observer } from "mobx-react";
 import { Router, Route, Switch, matchPath } from "react-router-dom";
 import injectStyles from "react-jss";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faUserLock, faQuestionCircle, faHome, faSearch, faCamera,
-  faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes, faUndo, faSave, faSyncAlt,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye,
-  faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile,
-  faPlus, faDotCircle, faArrowRight, faExpandArrowsAlt, faCompress, faEyeSlash, faExclamationCircle,
-  faEnvelope, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+
+import "./Services/IconsImport";
 
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
@@ -299,11 +294,5 @@ class App extends React.Component{
     );
   }
 }
-
-library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCamera, faCaretRight, faUndo, faSave, faSyncAlt,
-  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
-  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faEyeSlash, faExclamationTriangle,
-  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faArrowRight,
-  faExpandArrowsAlt, faCompress, faExclamationCircle, faEnvelope, faSun, faMoon);
 
 render(<App/>, document.getElementById("root"));

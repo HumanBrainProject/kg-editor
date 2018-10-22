@@ -15,10 +15,6 @@
             "lodash": {
                 "transform": "lodash/${member}",
                 "preventFullImport": true
-            },
-            "@fortawesome/free-solid-svg-icons": {
-                "transform": "@fortawesome/free-solid-svg-icons/${member}",
-                "preventFullImport": true
             }
         }]
     ],

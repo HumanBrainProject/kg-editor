@@ -14,6 +14,7 @@ import instanceStore from "../../Stores/InstanceStore";
 import Preview from "./Preview";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
+import FavoriteStatus from "../Instance/FavoriteStatus";
 
 const styles = {
   container:{
@@ -81,6 +82,9 @@ const styles = {
       },
       "& .status":{
         opacity:"1"
+      },
+      "& .favoriteStatus":{
+        opacity:"1"
       }
     },
     "&.selected":{
@@ -89,6 +93,9 @@ const styles = {
       color:"var(--ft-color-loud)",
       outline:"1px solid transparent",
       "& .status":{
+        opacity:"1"
+      },
+      "& .favoriteStatus":{
         opacity:"1"
       }
     }
@@ -101,6 +108,10 @@ const styles = {
     "& .status":{
       marginRight:"10px",
       opacity:"0.5"
+    },
+    "& .favoriteStatus":{
+      marginRight:"5px",
+      opacity:"0.5"
     }
   },
 
@@ -109,10 +120,6 @@ const styles = {
     whiteSpace:"nowrap",
     textOverflow:"ellipsis",
     marginTop:"10px"
-  },
-
-  listStatus:{
-    paddingRight:"10px"
   },
 
   actions:{
@@ -220,6 +227,7 @@ export default class Instances extends React.Component{
                             <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
                             <div className={classes.listLabel}>
                               <Status id={instance.id} darkmode={true}/>
+                              <FavoriteStatus id={instance.id} className="favoriteStatus" position="right" />
                               {instance.label}
                             </div>
                             {!!instance.description && <div className={classes.listDescription}>{instance.description}</div>}

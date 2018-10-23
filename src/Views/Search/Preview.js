@@ -13,6 +13,7 @@ import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
+import FavoriteStatus from "../Instance/FavoriteStatus";
 
 const styles = {
   container:{
@@ -43,10 +44,16 @@ const styles = {
     right:"10px",
     fontSize:"30px"
   },
+  favoriteStatus: {
+    marginRight: "5px",
+    fontSize: "1em"
+  },
+  titlePanel:{
+    width:"calc(100% - 70px)"
+  },
   title:{
     fontSize:"1.5em",
-    fontWeight:"300",
-    width:"calc(100% - 70px)"
+    fontWeight:"300"
   },
   id:{
     fontSize:"0.75em",
@@ -114,8 +121,11 @@ export default class Preview extends React.Component{
                     <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
                   </div>
                 </div>
-                <div className={classes.title}>
-                  {searchStore.selectedInstance.label}
+                <div className={classes.titlePanel}>
+                  <FavoriteStatus id={searchStore.selectedInstance.id} className={classes.favoriteStatus} position="bottom" />
+                  <span className={classes.title}>
+                    {searchStore.selectedInstance.label}
+                  </span>
                 </div>
                 <div className={classes.id}>
                   Nexus ID: {searchStore.selectedInstance.id}
@@ -137,7 +147,7 @@ export default class Preview extends React.Component{
                   })}
                   <div className={`${classes.status}`}>
                     <div className={"release-status"}>
-                      <Status id={searchStore.selectedInstance.id} darkmode={true}/>
+                      <Status id={searchStore.selectedInstance.id} />
                     </div>
                   </div>
                 </Form>

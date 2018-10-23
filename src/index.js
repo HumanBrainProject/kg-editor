@@ -5,7 +5,7 @@ import { Router, Route, Switch, matchPath } from "react-router-dom";
 import injectStyles from "react-jss";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserLock, faQuestionCircle, faHome, faSearch, faCamera,
-  faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes, faUndo, faSave, faSyncAlt,
+  faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes, faUndo, faSave, faSyncAlt, faStar,
   faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faArrowRight, faExpandArrowsAlt, faCompress, faEyeSlash, faExclamationCircle, faEnvelope, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 
 import appStore from "./Stores/AppStore";
@@ -297,7 +297,7 @@ class App extends React.Component{
   }
 }
 
-library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCamera, faCaretRight, faUndo, faSave, faSyncAlt,
+library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCamera, faCaretRight, faUndo, faSave, faSyncAlt, faStar,
   faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
   faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faEyeSlash, faExclamationTriangle,
   faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faArrowRight,

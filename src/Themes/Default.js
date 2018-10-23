@@ -39,7 +39,12 @@ const styles = {
       "--release-bg-has-changed":"rgba(241, 196, 15, 0.25)",
 
       "--release-color-highlight":"rgb(46, 204, 113)",
-      "--release-bg-highlight":"rgb(46, 204, 113, 0.25)"
+      "--release-bg-highlight":"rgb(46, 204, 113, 0.25)",
+
+      "--favorite-on-color":"#EFEC2D",
+      "--favorite-on-color-highlight":"#ffe100",
+      "--favorite-off-color":"var(--ft-color-normal)",
+      "--favorite-off-color-highlight":"var(--favorite-on-color-highlight)"
     }
   }
 };

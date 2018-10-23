@@ -205,7 +205,6 @@ class FavoriteStatusStore{
         });
       }, 500);
     } catch(e){
-      window.console.log("erreur");
       runInAction(() =>{
         const message = e.message?e.message:e;
         toProcess.forEach(id => {

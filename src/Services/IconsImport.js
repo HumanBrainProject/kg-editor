@@ -12,6 +12,7 @@ import {faCircleNotch} from "@fortawesome/free-solid-svg-icons/faCircleNotch";
 import {faCircle} from "@fortawesome/free-solid-svg-icons/faCircle";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 import {faUndo} from "@fortawesome/free-solid-svg-icons/faUndo";
+import {faUndoAlt} from "@fortawesome/free-solid-svg-icons/faUndoAlt";
 import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 import {faSyncAlt} from "@fortawesome/free-solid-svg-icons/faSyncAlt";
 import {faEdit} from "@fortawesome/free-solid-svg-icons/faEdit";
@@ -49,6 +50,7 @@ library.add(
   faCamera,
   faCaretRight,
   faUndo,
+  faUndoAlt,
   faSave,
   faSyncAlt,
   faCaretDown,

@@ -6,8 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import favoriteStore from "../../Stores/FavoriteStore";
 import favoriteStatusStore from "../../Stores/FavoriteStatusStore";
 import FavoriteButton from "../../Components/FavoriteButton";
-import { SingleField } from "hbp-quickfire";
-import { Button, ButtonGroup } from "react-bootstrap";
+import PopOverButton from "../../Components/PopOverButton";
 
 let styles = {
   container:{
@@ -26,139 +25,23 @@ let styles = {
       verticalAlign:"baseline"
     }
   },
-  favoritesContainer: {
-    position: "relative"
-  },
-  favoritesPanel: {
-    position: "absolute",
-    marginTop: "5px",
-    background: "var(--list-bg-hover)",
-    border: "1px solid var(--list-border-hover)",
-    //background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
-    //backgroundSize: "200%",
-    padding: "15px 15px 0 15px",
-    borderRadius: "3px",
-    zIndex: 100
-  },
-  favoritesCloseButton: {
-    position: "absolute",
-    top: "5px",
-    right: "5px",
-    backgroundColor: "transparent",
-    border: "transparent"
-  },
-  favoritesArrow: {
-    position: "absolute",
-    top: "-7px",
-    left: "1px",
-    width: 0,
-    height: 0,
-    border: "0 solid transparent",
-    borderRightWidth: "6px",
-    borderLeftWidth: "6px",
-    borderBottom: "6px solid var(--list-border-hover)" //--bg-color-ui-contrast1
-  },
-  fetchErrorContainer: {
-    position: "relative"
+  fetchErrorPopOver: {
+    marginLeft: "6px"
   },
   fetchErrorButton: {
-    backgroundColor: "transparent",
     color: "var(--favorite-off-color)",  // #e67e22 #e74c3c
-    border: "transparent",
-    outline: 0
-  },
-  fetchErrorPanel: {
-    position: "absolute",
-    marginTop: "5px",
-    background: "var(--list-bg-hover)",
-    border: "1px solid var(--list-border-hover)",
-    //background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
-    //backgroundSize: "200%",
-    padding: "15px 15px 0 15px",
-    borderRadius: "3px",
-    zIndex: 100
   },
   fetchErrorMessage: {
-    margin: "15px 0",
-    color: "#e74c3c",
-    wordBreak: "keep-all"
+    color: "#e74c3c"
   },
-  fetchErrorCloseButton: {
-    position: "absolute",
-    top: "5px",
-    right: "5px",
-    backgroundColor: "transparent",
-    border: "transparent"
-  },
-  fetchErrorButtons: {
-    width: "100%",
-    margin: "10px 0 15px 0",
-    textAlign: "center",
-    "& button + button": {
-      marginLeft: "20px"
-    }
-  },
-  fetchErrorArrow: {
-    position: "absolute",
-    top: "-7px",
-    left: "1px",
-    width: 0,
-    height: 0,
-    border: "0 solid transparent",
-    borderRightWidth: "6px",
-    borderLeftWidth: "6px",
-    borderBottom: "6px solid var(--list-border-hover)" //--bg-color-ui-contrast1
-  },
-  saveErrorContainer: {
-    position: "relative"
+  saveErrorPopOver: {
+    marginLeft: "7px"
   },
   saveErrorButton: {
-    backgroundColor: "transparent",
-    color: "#e74c3c",
-    border: "transparent",
-    outline: 0
-  },
-  saveErrorPanel: {
-    position: "absolute",
-    marginTop: "5px",
-    background: "var(--list-bg-hover)",
-    border: "1px solid var(--list-border-hover)",
-    //background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
-    //backgroundSize: "200%",
-    padding: "15px 15px 0 15px",
-    borderRadius: "3px",
-    zIndex: 100
+    color: "#e74c3c"
   },
   saveErrorMessage: {
-    margin: "15px 0",
-    color: "#e74c3c",
-    wordBreak: "keep-all"
-  },
-  saveErrorCloseButton: {
-    position: "absolute",
-    top: "5px",
-    right: "5px",
-    backgroundColor: "transparent",
-    border: "transparent"
-  },
-  saveErrorButtons: {
-    width: "100%",
-    margin: "10px 0 15px 0",
-    textAlign: "center",
-    "& button + button": {
-      marginLeft: "20px"
-    }
-  },
-  saveErrorArrow: {
-    position: "absolute",
-    top: "-7px",
-    left: "1px",
-    width: 0,
-    height: 0,
-    border: "0 solid transparent",
-    borderRightWidth: "6px",
-    borderLeftWidth: "6px",
-    borderBottom: "6px solid var(--list-border-hover)" //--bg-color-ui-contrast1
+    color: "#e74c3c"
   }
 };
 
@@ -167,27 +50,12 @@ let styles = {
 export default class FavoriteStatus extends React.Component{
   constructor(props){
     super(props);
-    this.state = { showFavorites: false, showError: false };
     favoriteStore.fetchLists();
     favoriteStatusStore.fetchStatus(this.props.id);
-    this.favoritesTimer = null;
-    this.handleFavoriteIconClick = this.handleFavoriteIconClick.bind(this);
-    this.handleFavoriteClose = this.handleFavoriteClose.bind(this);
-    this.handleFavoritesOver = this.handleFavoritesOver.bind(this);
-    this.handleFavoritesLeave = this.handleFavoritesLeave.bind(this);
-    this.handleFavoriteChange = this.handleFavoriteChange.bind(this);
-    this.handleAddFavorite = this.handleAddFavorite.bind(this);
-    this.fetchErrorTimer = null;
-    this.handleFetchErrorClick = this.handleFetchErrorClick.bind(this);
-    this.handleFetchErrorClose = this.handleFetchErrorClose.bind(this);
-    this.handleFetchErrorOver = this.handleFetchErrorOver.bind(this);
-    this.handleFetchErrorLeave = this.handleFetchErrorLeave.bind(this);
+    this.handleFavoritesSave = this.handleFavoritesSave.bind(this);
+    this.handleFavoritesChange = this.handleFavoritesChange.bind(this);
+    this.handleNewFavorite = this.handleNewFavorite.bind(this);
     this.handleFetchRetry = this.handleFetchRetry.bind(this);
-    this.saveErrorTimer = null;
-    this.handleSaveErrorClick = this.handleSaveErrorClick.bind(this);
-    this.handleSaveErrorClose = this.handleSaveErrorClose.bind(this);
-    this.handleSaveErrorOver = this.handleSaveErrorOver.bind(this);
-    this.handleSaveErrorLeave = this.handleSaveErrorLeave.bind(this);
     this.handleSaveCancel = this.handleSaveCancel.bind(this);
     this.handleSaveRetry = this.handleSaveRetry.bind(this);
   }
@@ -196,36 +64,15 @@ export default class FavoriteStatus extends React.Component{
     favoriteStatusStore.fetchStatus(newProps.id);
   }
 
-  handleFavoriteIconClick(event) {
-    event && event.stopPropagation();
-    this.setState(state => ({showFavorites: !state.showFavorites }));
-  }
-
-  handleFavoritesOver() {
-    if (this.state.showFavorites) {
-      clearTimeout(this.favoritesTimer);
-    }
-  }
-
-  handleFavoritesLeave() {
-    if (this.state.showFavorites) {
-      clearTimeout(this.favoritesTimer);
-      this.favoritesTimer = setTimeout(() => this.handleFavoriteClose(), 500);
-    }
-  }
-
-  handleFavoriteClose(event) {
-    event && event.stopPropagation();
-    this.setState({showFavorites: false});
+  handleFavoritesSave() {
     favoriteStatusStore.saveStatus(this.props.id);
   }
 
-  handleFavoriteChange(event, field) {
-    const favorites = field.value.map(favorite => favorite.value);
+  handleFavoritesChange(favorites) {
     favoriteStatusStore.updateStatus(this.props.id, favorites);
   }
 
-  async handleAddFavorite(name) { // , field, store) {
+  async handleNewFavorite(name) { // , field, store) {
     await favoriteStore.createNewFavorite(name);
     /*
     const newFavoriteId = await favoriteStore.createNewFavorite(name);
@@ -237,67 +84,15 @@ export default class FavoriteStatus extends React.Component{
     */
   }
 
-  handleFetchErrorClick(event) {
-    event.stopPropagation();
-    this.setState(state => ({showError: !state.showError }));
-  }
-
-  handleFetchErrorOver() {
-    if (this.state.showError) {
-      clearTimeout(this.fetchErrorTimer);
-    }
-  }
-
-  handleFetchErrorLeave() {
-    if (this.state.showError) {
-      clearTimeout(this.fetchErrorTimer);
-      this.fetchErrorTimer = setTimeout(() => this.handleFetchErrorClose(), 500);
-    }
-  }
-
-  handleFetchErrorClose(event) {
-    event && event.stopPropagation();
-    this.setState({showError: false});
-  }
-
-  handleFetchRetry(event) {
-    event && event.stopPropagation();
-    this.setState({showError: false});
+  handleFetchRetry() {
     favoriteStatusStore.retryFetchStatus();
   }
 
-  handleSaveErrorClick(event) {
-    event.stopPropagation();
-    this.setState(state => ({showError: !state.showError }));
-  }
-
-  handleSaveErrorOver() {
-    if (this.state.showError) {
-      clearTimeout(this.fetchErrorTimer);
-    }
-  }
-
-  handleSaveErrorLeave() {
-    if (this.state.showError) {
-      clearTimeout(this.fetchErrorTimer);
-      this.fetchErrorTimer = setTimeout(() => this.handleSaveErrorClose(), 500);
-    }
-  }
-
-  handleSaveErrorClose(event) {
-    event && event.stopPropagation();
-    this.setState({showError: false});
-  }
-
-  handleSaveCancel(event) {
-    event && event.stopPropagation();
-    this.setState({showError: false});
+  handleSaveCancel() {
     favoriteStatusStore.revertSaveStatus(this.props.id);
   }
 
-  handleSaveRetry(event) {
-    event && event.stopPropagation();
-    this.setState({showError: false});
+  handleSaveRetry() {
     favoriteStatusStore.saveStatus(this.props.id);
   }
 
@@ -305,7 +100,6 @@ export default class FavoriteStatus extends React.Component{
     const instanceStatus = favoriteStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.favorites.length)?toJS(instanceStatus.data.favorites):[];
-    const isFavorite = values.length;
     const favorites = toJS(favoriteStore.favorites);
     return(
       <div className={`${classes.container} ${className?className:""}`}>
@@ -315,50 +109,46 @@ export default class FavoriteStatus extends React.Component{
           </div>
           :
           instanceStatus.hasFetchError?
-            <div className={classes.fetchErrorContainer} onMouseLeave={this.handleFetchErrorLeave} onMouseOver={this.handleFetchErrorOver}>
-              <button className={classes.fetchErrorButton} onClick={this.handleFetchErrorClick} title="favrorite status unknown, click for more information">
-                <FontAwesomeIcon icon="question-circle"/>
-              </button>
-              {this.state.showError && (
-                <div className={classes.fetchErrorPanel} onMouseLeave={this.handleFetchErrorLeave} onMouseOver={this.handleFetchErrorOver} onClick={event => event.stopPropagation()}>
-                  <h5 className={classes.fetchErrorMessage}>{instanceStatus.fetchError}</h5>
-                  <div className={classes.fetchErrorButtons}>
-                    <Button bsStyle="primary" bsSize="small" onClick={this.handleFetchRetry}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
-                  </div>
-                  <button className={classes.fetchErrorCloseButton} onClick={this.handleFetchErrorClose}><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
-                  <div className={classes.fetchErrorArrow} />
-                </div>
+            <PopOverButton
+              buttonClassName={classes.fetchErrorButton}
+              buttonTitle="favrorite status unknown, click for more information"
+              iconComponent={FontAwesomeIcon}
+              iconProps={{icon: "question-circle"}}
+              popOverClassName={classes.fetchErrorPopOver}
+              text={instanceStatus.fetchError}
+              textClassName={classes.fetchErrorMessage}
+              okComponent={() => (
+                <React.Fragment>
+                  <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
+                </React.Fragment>
               )}
-            </div>
+              onOkClick={this.handleFetchRetry}
+            />
             :
             instanceStatus.hasSaveError?
-              <div className={classes.saveErrorContainer} onMouseLeave={this.handleSaveErrorLeave} onMouseOver={this.handleSaveErrorOver}>
-                <button className={classes.saveErrorButton} onClick={this.handleSaveErrorClick} title="failed to save favorite, click for more information">
-                  <FontAwesomeIcon icon="exclamation-triangle"/>
-                </button>
-                {this.state.showError && (
-                  <div className={classes.saveErrorPanel} onMouseLeave={this.handleSaveErrorLeave} onMouseOver={this.handleSaveErrorOver} onClick={event => event.stopPropagation()}>
-                    <h5 className={classes.saveErrorMessage}>{instanceStatus.saveError}</h5>
-                    <div className={classes.saveErrorButtons}>
-                      <Button bsStyle="primary" bsSize="small" onClick={this.handleSaveCancel}><FontAwesomeIcon icon="undo"/>&nbsp;Revert</Button>
-                      <Button bsStyle="primary" bsSize="small" onClick={this.handleSaveRetry}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
-                    </div>
-                    <button className={classes.saveErrorCloseButton} onClick={this.handleSaveErrorClose}><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
-                    <div className={classes.saveErrorArrow} />
-                  </div>
+              <PopOverButton
+                buttonClassName={classes.saveErrorButton}
+                buttonTitle="failed to save favorite, click for more information"
+                iconComponent={FontAwesomeIcon}
+                iconProps={{icon: "exclamation-triangle"}}
+                popOverClassName={classes.saveErrorPopOver}
+                text={instanceStatus.saveError}
+                textClassName={classes.saveErrorMessage}
+                okComponent={() => (
+                  <React.Fragment>
+                    <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
+                  </React.Fragment>
                 )}
-              </div>
+                onOkClick={this.handleSaveRetry}
+                cancelComponent={() => (
+                  <React.Fragment>
+                    <FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert
+                  </React.Fragment>
+                )}
+                onCancelClick={this.handleSaveCancel}
+              />
               :
-              <div className={classes.favoritesContainer} onMouseLeave={this.handleFavoritesLeave} onMouseOver={this.handleFavoritesOver}>
-                <FavoriteButton isFavorite={isFavorite} onClick={this.handleFavoriteIconClick} />
-                {this.state.showFavorites && (
-                  <div className={classes.favoritesPanel} onMouseLeave={this.handleFavoritesLeave} onMouseOver={this.handleFavoritesOver} onClick={event => event.stopPropagation()}>
-                    <SingleField type="DropdownSelect" label="Favorites:" value={values} options={favorites} allowCustomValues={true} onChange={this.handleFavoriteChange} onAddCustomValue={this.handleAddFavorite} />
-                    <button className={classes.favoritesCloseButton} onClick={this.handleFavoriteClose}><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
-                    <div className={classes.favoritesArrow} />
-                  </div>
-                )}
-              </div>
+              <FavoriteButton values={values} list={favorites} onSave={this.handleFavoritesSave} onChange={this.handleFavoritesChange} onNew={this.handleNewFavorite} />
         }
       </div>
     );

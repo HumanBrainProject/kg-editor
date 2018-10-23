@@ -251,7 +251,7 @@ export default class InstanceForm extends React.Component {
 
             <FooterPanel
               className={classes.panelFooter}
-              nexusId={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"}
+              nexusId={instance.data.fields.id?instance.data.fields.id.nexus_id:"<new>"}
               id={id}
               showOpenActions={isCurrentInstance && !isMainInstance}/>
           </Form>

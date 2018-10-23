@@ -50,11 +50,17 @@ const styles = {
     borderLeft:"2px solid transparent",
     color:"var(--ft-color-normal)",
     cursor:"pointer",
+    position:"relative",
     "&:hover":{
       background:"var(--list-bg-hover)",
       borderColor:"var(--list-border-hover)",
       color:"var(--ft-color-loud)",
       "& $createInstance":{
+        position:"absolute",
+        top:"0",
+        right:"0",
+        height:"100%",
+        padding:"5px 10px",
         display:"block",
         color:"var(--ft-color-normal)",
         "&:hover":{
@@ -70,8 +76,6 @@ const styles = {
   },
   createInstance:{
     display:"none",
-    marginTop:"3px",
-    marginRight:"3px",
     cursor:"pointer"
   },
   fetchErrorPanel:{
@@ -175,8 +179,14 @@ export default class Lists extends React.Component{
                                   title={list.path}>
                                   {list.label?list.label:schema}
                                   {instanceStore.isCreatingNewInstance?
-                                    <FontAwesomeIcon icon={"circle-notch"} spin pull={"right"} className={classes.createInstance}/>
-                                    :<FontAwesomeIcon icon={"plus"} pull={"right"} className={classes.createInstance} onClick={this.handleCreateInstance.bind(this, list.path)}/>}
+                                    <div className={classes.createInstance}>
+                                      <FontAwesomeIcon icon={"circle-notch"} spin/>
+                                    </div>
+                                    :
+                                    <div className={classes.createInstance} onClick={this.handleCreateInstance.bind(this, list.path)}>
+                                      <FontAwesomeIcon icon={"plus"}/>
+                                    </div>
+                                  }
                                 </div>
                               );
                             })}

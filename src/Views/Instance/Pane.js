@@ -2,6 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { inject, observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
+import { debounce } from "lodash";
 
 const styles = {
   pane: {
@@ -58,6 +59,20 @@ export default class Pane extends React.Component {
     this.props.paneStore.unregisterPane(this.props.paneId);
   }
 
+  componentDidUpdate(){
+    if (this.props.paneStore.selectedPane !== this.props.paneId) {
+      this.paneRef.style.pointerEvents = "none";
+      this.restorePointerEvents();
+    } else {
+      this.paneRef.style.pointerEvents = "auto";
+      this.restorePointerEvents.cancel();
+    }
+  }
+
+  restorePointerEvents = debounce(() => {
+    this.paneRef.style.pointerEvents = "auto";
+  }, 1000);
+
   handleFocus = () => {
     if (this.props.paneStore.selectedPane !== this.props.paneId) {
       this.props.paneStore.selectPane(this.props.paneId);
@@ -70,7 +85,7 @@ export default class Pane extends React.Component {
     const mainClass = index === 0 ? " main" : "";
     const activeClass = paneStore.selectedIndex < index ? "after" : paneStore.selectedIndex > index ? "before" : "active";
     return (
-      <div className={`${classes.pane}${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus} onMouseOver={this.handleMouseOver}>
+      <div ref={ref => this.paneRef = ref} className={`${classes.pane}${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus}>
         <Scrollbars autoHide>
           <div className={classes.scrolledView}>
             {this.props.children}

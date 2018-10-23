@@ -43,7 +43,7 @@ export default class InstanceField extends React.Component{
         if (target) {
           target.scrollIntoViewIfNeeded();
         }
-        this.props.paneStore.selectNextPane();
+        this.props.paneStore.selectPane(`ChildrenOf${this.props.id}`);
       });
     }
   }

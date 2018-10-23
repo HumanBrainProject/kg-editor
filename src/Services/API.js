@@ -7,6 +7,7 @@ const endpoints = {
   "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
+  "doRelease": () => `${window.rootPath}/release`,
   "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
   "listFavorites": () => `${window.rootPath}/api/favorites`,
   "addFavorite": () => `${window.rootPath}/api/favorite`,

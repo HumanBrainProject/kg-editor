@@ -105,7 +105,7 @@ export default class Edit extends React.Component {
           {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
             <PaneContainer key={this.props.match.params.id} paneStore={openedInstance.paneStore}>
               <React.Fragment>
-                <Pane paneId={this.props.match.params.id}>
+                <Pane paneId={this.props.match.params.id} key={this.props.match.params.id}>
                   <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
                 </Pane>
                 {!instanceStore.getInstance(this.props.match.params.id).hasFetchError?

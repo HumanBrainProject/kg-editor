@@ -13,6 +13,10 @@ class StatusStore{
     return this.statuses.get(id);
   }
 
+  @action flush(){
+    this.statuses = new Map();
+  }
+
   @action
   fetchStatus(instanceIds){
     if(!isArray(instanceIds)){

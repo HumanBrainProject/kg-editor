@@ -124,6 +124,9 @@ const styles = {
     },
     "&:last-child":{
       borderRadius:"0 4px 4px 0"
+    },
+    "&:first-child:last-child":{
+      borderRadius:"4px"
     }
   },
   deleteBookmarkDialog: {

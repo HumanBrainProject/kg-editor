@@ -32,7 +32,7 @@ let styles = {
     color: "var(--favorite-off-color)",  // #e67e22 #e74c3c
   },
   fetchErrorMessage: {
-    color: "#e74c3c"
+    //color: "#e74c3c"
   },
   saveErrorPopOver: {
     marginLeft: "7px"
@@ -41,7 +41,7 @@ let styles = {
     color: "#e74c3c"
   },
   saveErrorMessage: {
-    color: "#e74c3c"
+    //color: "#e74c3c"
   }
 };
 

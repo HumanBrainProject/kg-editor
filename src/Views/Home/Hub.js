@@ -68,7 +68,7 @@ export default class Hub extends React.Component{
   }
 
   handleCreateInstance = () => {
-    if(!searchStore.allLists){
+    if(!searchStore.isFetched.lists && !searchStore.isFetching.list){
       searchStore.fetchLists();
     }
     this.setState({showCreateModal: true});

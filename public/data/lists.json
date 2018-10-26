@@ -1,0 +1,156 @@
+{
+    "data": [
+        {
+            "folderName": "Bookmarks",
+            "type": "bookmark",
+            "lists": [
+                {
+                    "id": "favoriteList01",
+                    "name": "favorite list 01"
+                },
+                {
+                    "id": "favoriteList02",
+                    "name": "favorite list 02"
+                },
+                {
+                    "id": "favoriteList03",
+                    "name": "favorite list 03"
+                },
+                {
+                    "id": "favoriteList04",
+                    "name": "favorite list 04"
+                }
+            ]
+        },
+        {
+            "folderName": "Common node types",
+            "type": "nodetype",
+            "lists": [
+                {
+                    "id": "minds/core/dataset/v0.0.4",
+                    "relatedNodeType": "minds/core/dataset/v0.0.4",
+                    "name": "Dataset"
+                }
+            ]
+        },
+        {
+            "folderName": "Other node types",
+            "type": "nodetype",
+            "lists": [
+                {
+                    "id": "minds/core/activity/v0.0.4",
+                    "relatedNodeType": "minds/core/activity/v0.0.4",
+                    "name": "Activity"
+                }, {
+                    "id": "minds/core/agecategory/v0.0.4",
+                    "relatedNodeType": "minds/core/agecategory/v0.0.4",
+                    "name": "Age category"
+                }, {
+                    "id": "minds/ethics/approval/v0.0.4",
+                    "relatedNodeType": "minds/ethics/approval/v0.0.4",
+                    "name": "Approval"
+                }, {
+                    "id": "minds/ethics/authority/v0.0.4",
+                    "relatedNodeType": "minds/ethics/authority/v0.0.4",
+                    "name": "Authority"
+                }, {
+                    "id": "datacite/core/doi/v0.0.1",
+                    "relatedNodeType": "datacite/core/doi/v0.0.1",
+                    "name": "DOI"
+                }, {
+                    "id": "minds/core/embargostatus/v0.0.4",
+                    "relatedNodeType": "minds/core/embargostatus/v0.0.4",
+                    "name": "Embargo Status"
+                }, {
+                    "id": "minds/core/file/v0.0.4",
+                    "relatedNodeType": "minds/core/file/v0.0.4",
+                    "name": "File"
+                }, {
+                    "id": "minds/core/fileassociation/v0.0.4",
+                    "relatedNodeType": "minds/core/fileassociation/v0.0.4",
+                    "name": "File Association"
+                }, {
+                    "id": "minds/core/format/v0.0.4",
+                    "relatedNodeType": "minds/core/format/v0.0.4",
+                    "name": "Format"
+                }, {
+                    "id": "minds/core/licensetype/v0.0.4",
+                    "relatedNodeType": "minds/core/licensetype/v0.0.4",
+                    "name": "License Type"
+                }, {
+                    "id": "minds/core/method/v0.0.4",
+                    "relatedNodeType": "minds/core/method/v0.0.4",
+                    "name": "Method"
+                }, {
+                    "id": "minds/experiment/method/v0.0.4",
+                    "relatedNodeType": "minds/experiment/method/v0.0.4",
+                    "name": "Method"
+                }, {
+                    "id": "minds/core/placomponent/v0.0.4",
+                    "relatedNodeType": "minds/core/placomponent/v0.0.4",
+                    "name": "PLA Component"
+                }, {
+                    "id": "minds/core/parcellationatlas/v0.0.4",
+                    "relatedNodeType": "minds/core/parcellationatlas/v0.0.4",
+                    "name": "Parcellation Atlas"
+                }, {
+                    "id": "minds/core/parcellationregion/v0.0.4",
+                    "relatedNodeType": "minds/core/parcellationregion/v0.0.4",
+                    "name": "Parcellation Region"
+                }, {
+                    "id": "minds/core/person/v0.0.4",
+                    "relatedNodeType": "minds/core/person/v0.0.4",
+                    "name": "Person"
+                }, {
+                    "id": "minds/core/preparation/v0.0.4",
+                    "relatedNodeType": "minds/core/preparation/v0.0.4",
+                    "name": "Preparation"
+                }, {
+                    "id": "minds/experiment/protocol/v0.0.4",
+                    "relatedNodeType": "minds/experiment/protocol/v0.0.4",
+                    "name": "Protocol"
+                }, {
+                    "id": "minds/core/publication/v0.0.4",
+                    "relatedNodeType": "minds/core/publication/v0.0.4",
+                    "name": "Publication"
+                }, {
+                    "id": "minds/core/referencespace/v0.0.4",
+                    "relatedNodeType": "minds/core/referencespace/v0.0.4",
+                    "name": "Reference space"
+                }, {
+                    "id": "minds/prov/release/v0.0.4",
+                    "relatedNodeType": "minds/prov/release/v0.0.4",
+                    "name": "Release"
+                }, {
+                    "id": "minds/prov/role/v0.0.4",
+                    "relatedNodeType": "minds/prov/role/v0.0.4",
+                    "name": "Role"
+                }, {
+                    "id": "minds/experiment/sample/v0.0.4",
+                    "relatedNodeType": "minds/experiment/sample/v0.0.4",
+                    "name": "Sample"
+                }, {
+                    "id": "minds/core/sex/v0.0.4",
+                    "relatedNodeType": "minds/core/sex/v0.0.4",
+                    "name": "Sex"
+                }, {
+                    "id": "minds/core/softwareagent/v0.0.4",
+                    "relatedNodeType": "minds/core/softwareagent/v0.0.4",
+                    "name": "Software agent"
+                }, {
+                    "id": "minds/core/species/v0.0.4",
+                    "relatedNodeType": "minds/core/species/v0.0.4",
+                    "name": "Species"
+                }, {
+                    "id": "minds/core/specimengroup/v0.0.4",
+                    "relatedNodeType": "minds/core/specimengroup/v0.0.4",
+                    "name": "Specimen group"
+                }, {
+                    "id": "minds/experiment/subject/v0.0.4",
+                    "relatedNodeType": "minds/experiment/subject/v0.0.4",
+                    "name": "Subject"
+                }
+            ]
+        }    
+    ]
+}

@@ -3,14 +3,16 @@ import authStore from "../Stores/AuthStore";
 
 const endpoints = {
   "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
+  "lists": () => `${window.rootPath}/data/lists.json`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
   "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
   "doRelease": () => `${window.rootPath}/release`,
   "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
-  "listFavorites": () => `${window.rootPath}/api/favorites`,
-  "addFavorite": () => `${window.rootPath}/api/favorite`,
+  "addBookmark": () => `${window.rootPath}/api/bookmark`,
+  "renameBookmark": (id) => `${window.rootPath}/api/bookmark/${id}`,
+  "deleteBookmark": (id) => `${window.rootPath}/api/bookmark/${id}`,
   "listInstancesFavorites": () => `${window.rootPath}/api/instancesFavorites`,
   "setInstanceFavorites": (instance) => `${window.rootPath}/api/instanceFavorites/${instance}`,
   "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`

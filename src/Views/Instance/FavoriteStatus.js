@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { toJS } from "mobx";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import favoriteStore from "../../Stores/FavoriteStore";
+import searchStore from "../../Stores/SearchStore";
 import favoriteStatusStore from "../../Stores/FavoriteStatusStore";
 import FavoriteButton from "../../Components/FavoriteButton";
 import PopOverButton from "../../Components/PopOverButton";
@@ -50,7 +50,6 @@ let styles = {
 export default class FavoriteStatus extends React.Component{
   constructor(props){
     super(props);
-    favoriteStore.fetchLists();
     favoriteStatusStore.fetchStatus(this.props.id);
     this.handleFavoritesSave = this.handleFavoritesSave.bind(this);
     this.handleFavoritesChange = this.handleFavoritesChange.bind(this);
@@ -73,9 +72,9 @@ export default class FavoriteStatus extends React.Component{
   }
 
   async handleNewFavorite(name) { // , field, store) {
-    await favoriteStore.createNewFavorite(name);
+    await searchStore.createNewBookmark(name);
     /*
-    const newFavoriteId = await favoriteStore.createNewFavorite(name);
+    const newFavoriteId = await searchStore.createNewBookmark(name);
     if(newFavoriteId){
       const favorites = field.value.map(favorite => favorite.value);
       favorites.push(newFavoriteId);
@@ -100,7 +99,7 @@ export default class FavoriteStatus extends React.Component{
     const instanceStatus = favoriteStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.favorites.length)?toJS(instanceStatus.data.favorites):[];
-    const favorites = toJS(favoriteStore.favorites);
+    const favorites = toJS(searchStore.bookmarksList);
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?

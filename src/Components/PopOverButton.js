@@ -122,7 +122,7 @@ export default class PopOverButton extends React.Component{
             <h5 className={`${classes.text} ${textClassName?textClassName:""}`}>{text}</h5>
             <div className={classes.popOverFooterBar}>
               {CancelComponent && (
-                <Button bsStyle="primary" bsSize="small" onClick={this.handleCancelClick}><CancelComponent {...cancelProps} /></Button>
+                <Button bsSize="small" onClick={this.handleCancelClick}><CancelComponent {...cancelProps} /></Button>
               )}
               {OkComponent && (
                 <Button bsStyle="primary" bsSize="small" onClick={this.handleOkClick}><OkComponent {...okProps}  /></Button>

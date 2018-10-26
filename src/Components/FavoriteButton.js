@@ -107,7 +107,7 @@ export default class FavoriteButton extends React.Component {
   }
 
   handleValueChange(event, field) {
-    const favorites = field.value.map(favorite => favorite.value);
+    const favorites = field.value.map(favorite => favorite.id);
     typeof this.props.onChange === "function" && this.props.onChange(favorites);
   }
 
@@ -125,13 +125,12 @@ export default class FavoriteButton extends React.Component {
         </button>
         {this.state.showPopOver && (
           <div className={classes.popOver} onMouseLeave={this.handlePopOverLeave} onMouseOver={this.handlePopOverOver} onClick={event => event.stopPropagation()}>
-            <SingleField type="DropdownSelect" label="Favorites:" value={values} options={list} allowCustomValues={true} onChange={this.handleValueChange} onAddCustomValue={this.handleNew} />
+            <SingleField type="DropdownSelect" label="Favorites:" value={values} options={list} mappingValue="id" mappingLabel="name" allowCustomValues={true} onChange={this.handleValueChange} onAddCustomValue={this.handleNew} />
             <button className={classes.popOverCloseButton} onClick={this.handlePopOverClose}><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
             <div className={classes.popOverArrow} />
           </div>
         )}
       </div>
-      
     );
   }
 }

@@ -41,6 +41,8 @@ import {faEnvelope} from "@fortawesome/free-solid-svg-icons/faEnvelope";
 import {faSun} from "@fortawesome/free-solid-svg-icons/faSun";
 import {faMoon} from "@fortawesome/free-solid-svg-icons/faMoon";
 import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
+import {faTrashAlt} from "@fortawesome/free-solid-svg-icons/faTrashAlt";
+import {faLightbulb} from "@fortawesome/free-solid-svg-icons/faLightbulb";
 
 library.add(
   faUserLock,
@@ -82,5 +84,7 @@ library.add(
   faEnvelope,
   faSun,
   faMoon,
-  faStar
+  faStar,
+  faTrashAlt,
+  faLightbulb
 );

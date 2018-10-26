@@ -25,23 +25,11 @@ let styles = {
       verticalAlign:"baseline"
     }
   },
-  fetchErrorPopOver: {
-    marginLeft: "6px"
-  },
   fetchErrorButton: {
     color: "var(--favorite-off-color)",  // #e67e22 #e74c3c
   },
-  fetchErrorMessage: {
-    //color: "#e74c3c"
-  },
-  saveErrorPopOver: {
-    marginLeft: "7px"
-  },
   saveErrorButton: {
     color: "#e74c3c"
-  },
-  saveErrorMessage: {
-    //color: "#e74c3c"
   }
 };
 
@@ -113,9 +101,7 @@ export default class FavoriteStatus extends React.Component{
               buttonTitle="favrorite status unknown, click for more information"
               iconComponent={FontAwesomeIcon}
               iconProps={{icon: "question-circle"}}
-              popOverClassName={classes.fetchErrorPopOver}
               text={instanceStatus.fetchError}
-              textClassName={classes.fetchErrorMessage}
               okComponent={() => (
                 <React.Fragment>
                   <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
@@ -130,9 +116,7 @@ export default class FavoriteStatus extends React.Component{
                 buttonTitle="failed to save favorite, click for more information"
                 iconComponent={FontAwesomeIcon}
                 iconProps={{icon: "exclamation-triangle"}}
-                popOverClassName={classes.saveErrorPopOver}
                 text={instanceStatus.saveError}
-                textClassName={classes.saveErrorMessage}
                 okComponent={() => (
                   <React.Fragment>
                     <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry

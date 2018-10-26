@@ -24,7 +24,15 @@ let styles = {
     //backgroundSize: "200%",
     padding: "15px 15px 0 15px",
     borderRadius: "3px",
-    zIndex: 100
+    zIndex: 100,
+    "&.top": {
+      transform: "translateY(-100%)",
+      marginTop: "-25px",
+      "& $popOverArrow": {
+        top: "unset",
+        transform: "rotate(180deg)"
+      }
+    }
   },
   text: {
     margin: "15px 0",
@@ -58,12 +66,22 @@ let styles = {
   }
 };
 
+const windowHeight = () => {
+  const w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName("body")[0];
+  return w.innerHeight || e.clientHeight || g.clientHeight;
+  //return $(window).height();
+};
+
 @injectStyles(styles)
 @observer
 export default class PopOverButton extends React.Component{
   constructor(props){
     super(props);
-    this.state = { showPopOver: false };
+    this.state = { showPopOver: false, popOverPosition: null };
+    this.popOverRef = React.createRef();
     this.timer = null;
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handlePopOverClose = this.handlePopOverClose.bind(this);
@@ -73,9 +91,21 @@ export default class PopOverButton extends React.Component{
     this.handleOkClick = this.handleOkClick.bind(this);
   }
 
+  componentDidUpdate() {
+    if (this.state.showPopOver && !this.state.popOverPosition) {
+      let position = "bottom";
+      if (this.popOverRef.current) {
+        if (this.popOverRef.current.getBoundingClientRect().bottom >= windowHeight()) {
+          position = "top";
+        }
+      }
+      this.setState({popOverPosition: position });
+    }
+  }
+
   handleButtonClick(event) {
     event.stopPropagation();
-    this.setState(state => ({showPopOver: !state.showPopOver }));
+    this.setState(state => ({showPopOver: !state.showPopOver, popOverPosition: null }));
   }
 
   handlePopOverOver() {
@@ -93,19 +123,19 @@ export default class PopOverButton extends React.Component{
 
   handlePopOverClose(event) {
     event && event.stopPropagation();
-    this.setState({showPopOver: false});
+    this.setState({showPopOver: false, popOverPosition: null });
     typeof this.props.onCancelClick === "function" && this.props.onCloseClick();
   }
 
   handleCancelClick(event) {
     event && event.stopPropagation();
-    this.setState({showPopOver: false});
+    this.setState({showPopOver: false, popOverPosition: null });
     typeof this.props.onCancelClick === "function" && this.props.onCancelClick();
   }
 
   handleOkClick(event) {
     event && event.stopPropagation();
-    this.setState({showPopOver: false});
+    this.setState({showPopOver: false, popOverPosition: null });
     typeof this.props.onOkClick === "function" && this.props.onOkClick();
   }
 
@@ -120,7 +150,7 @@ export default class PopOverButton extends React.Component{
           <IconComponent {...iconProps} />
         </button>
         {this.state.showPopOver && (
-          <div className={`${classes.popOver} ${popOverClassName?popOverClassName:""}`} onMouseLeave={this.handlePopOverLeave} onMouseOver={this.handlePopOverOver} onClick={event => event.stopPropagation()}>
+          <div className={`${classes.popOver} ${popOverClassName?popOverClassName:""} ${this.state.popOverPosition?this.state.popOverPosition:""}`} onMouseLeave={this.handlePopOverLeave} onMouseOver={this.handlePopOverOver} onClick={event => event.stopPropagation()} ref={this.popOverRef}>
             <h5 className={`${classes.text} ${textClassName?textClassName:""}`}>{text}</h5>
             <div className={classes.popOverFooterBar}>
               {CancelComponent && (

@@ -30,6 +30,10 @@ let styles = {
   },
   saveErrorButton: {
     color: "#e74c3c"
+  },
+  textError: {
+    margin: 0,
+    wordBreak: "keep-all"
   }
 };
 
@@ -101,14 +105,15 @@ export default class FavoriteStatus extends React.Component{
               buttonTitle="favrorite status unknown, click for more information"
               iconComponent={FontAwesomeIcon}
               iconProps={{icon: "question-circle"}}
-              text={instanceStatus.fetchError}
               okComponent={() => (
                 <React.Fragment>
                   <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
                 </React.Fragment>
               )}
-              onOkClick={this.handleFetchRetry}
-            />
+              onOk={this.handleFetchRetry}
+            >
+              <h5 className={classes.textError}>{instanceStatus.fetchError}</h5>
+            </PopOverButton>
             :
             instanceStatus.hasSaveError?
               <PopOverButton
@@ -116,20 +121,21 @@ export default class FavoriteStatus extends React.Component{
                 buttonTitle="failed to save favorite, click for more information"
                 iconComponent={FontAwesomeIcon}
                 iconProps={{icon: "exclamation-triangle"}}
-                text={instanceStatus.saveError}
                 okComponent={() => (
                   <React.Fragment>
                     <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
                   </React.Fragment>
                 )}
-                onOkClick={this.handleSaveRetry}
+                onOk={this.handleSaveRetry}
                 cancelComponent={() => (
                   <React.Fragment>
                     <FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert
                   </React.Fragment>
                 )}
-                onCancelClick={this.handleSaveCancel}
-              />
+                onCancel={this.handleSaveCancel}
+              >
+                <h5 className={classes.textError}>{instanceStatus.saveError}</h5>
+              </PopOverButton>
               :
               <FavoriteButton values={values} list={favorites} onSave={this.handleFavoritesSave} onChange={this.handleFavoritesChange} onNew={this.handleNewFavorite} />
         }

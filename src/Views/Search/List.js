@@ -78,11 +78,35 @@ const styles = {
   smartlistIcon: {
     color: "var(--favorite-on-color)"
   },
-  editBookmarkName: {
+  editBookmark: {
+    display: "flex",
     width: "calc(100% - 19px)",
     marginLeft: "19px",
+  },
+  editBookmarkName: {
+    flex: "1",
     color: "var(--bg-color-ui-contrast1)",
     outline: 0
+  },
+  cancelRenameButton: {
+    marginLeft: "10px",
+    padding: "2px 8px",
+    backgroundColor: "#fff",
+    borderRadius: "4px",
+    color: "var(--bg-color-ui-contrast4)",
+    "&:hover":{
+      color:"var(--bg-color-ui-contrast1)"
+    }
+  },
+  renameButton: {
+    marginLeft: "10px",
+    padding: "2px 8px",
+    backgroundColor: "#337ab7",
+    borderRadius: "4px",
+    color:"var(--ft-color-loud)",
+    "&:hover":{
+      color:"var(--ft-color-louder)"
+    }
   },
   createInstance:{
     display:"none",
@@ -145,6 +169,7 @@ const styles = {
 export default class List extends React.Component{
   constructor(props){
     super(props);
+    this.editBookmarkNameRef = React.createRef();
     this.state = {isEditingBookmark: false, showDeleteBookmarkDialog: false};
   }
 
@@ -162,13 +187,23 @@ export default class List extends React.Component{
     this.setState({ isEditingBookmark: true });
   }
 
+  handleCancelEditBookmark(event) {
+    event && event.stopPropagation();
+    this.setState({ isEditingBookmark: false });
+  }
+
+  handleRenameBookmark(event) {
+    event && event.stopPropagation();
+    this.setState({ isEditingBookmark: false });
+    searchStore.renameBookmark(this.props.list.id, this.editBookmarkNameRef.current.value.trim());
+  }
+
   handleBookmarkNameKeyUp(event) {
     event.stopPropagation();
     if (event.keyCode === 27) {
-      this.setState({ isEditingBookmark: false });
+      this.handleCancelEditBookmark();
     } else if (event.keyCode === 13) {
-      this.setState({ isEditingBookmark: false });
-      searchStore.renameBookmark(this.props.list.id, event.target.value.trim());
+      this.handleRenameBookmark();
     }
   }
 
@@ -199,7 +234,15 @@ export default class List extends React.Component{
           <React.Fragment>
             <FontAwesomeIcon icon={"star"} className={`${classes.icon} ${classes.bookmarkIcon}`} />
             {this.state.isEditingBookmark?
-              <input type="text" className={classes.editBookmarkName} defaultValue={list.name} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)}/>
+              <div className={classes.editBookmark}>
+                <input type="text" className={classes.editBookmarkName} defaultValue={list.name} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)} ref={this.editBookmarkNameRef}/>
+                <div className={classes.cancelRenameButton} onClick={this.handleCancelEditBookmark.bind(this)} title="cancel rename">
+                  <FontAwesomeIcon icon="undo-alt"/>
+                </div>
+                <div className={classes.renameButton} onClick={this.handleRenameBookmark.bind(this)} title="confirm rename">
+                  <FontAwesomeIcon icon="check"/>
+                </div>
+              </div>
               :
               <React.Fragment>
                 <span>{list.name}</span>

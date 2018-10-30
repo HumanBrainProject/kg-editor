@@ -72,11 +72,17 @@ const styles = {
     color:"var(--ft-color-normal)",
     outline:"1px solid var(--border-color-ui-contrast1)",
     marginBottom:"11px",
+    "& .popover-popup": {
+      display: "none !important"
+    },
     "&:hover":{
       background:"var(--list-bg-hover)",
       borderColor:"var(--list-border-hover)",
       color:"var(--ft-color-loud)",
       outline:"1px solid transparent",
+      "& .popover-popup": {
+        display: "block !important"
+      },
       "& $actions":{
         opacity:0.75
       },
@@ -101,7 +107,7 @@ const styles = {
     }
   },
 
-  listLabel:{
+  listTitle:{
     fontSize:"1.4em",
     fontWeight:"300",
     color:"var(--ft-color-louder)",
@@ -225,9 +231,9 @@ export default class Instances extends React.Component{
                             onClick={this.handleInstanceClick.bind(this, instance)}
                             onDoubleClick={this.handleInstanceDoubleClick.bind(this, instance)}>
                             <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
-                            <div className={classes.listLabel}>
+                            <div className={classes.listTitle}>
                               <Status id={instance.id} darkmode={true}/>
-                              <FavoriteStatus id={instance.id} className="favoriteStatus" position="right" />
+                              <FavoriteStatus id={instance.id} className="favoriteStatus" />
                               {instance.label}
                             </div>
                             {!!instance.description && <div className={classes.listDescription}>{instance.description}</div>}

@@ -19,6 +19,14 @@ const styles = {
   container:{
     padding:"10px"
   },
+  content: {
+    "& .popover-popup": {
+      display: "none !important"
+    },
+    "&:hover .popover-popup": {
+      display: "block !important"
+    }
+  },
   actions:{
     display:"grid",
     gridTemplateColumns:"repeat(4, 1fr)",
@@ -122,7 +130,7 @@ export default class Preview extends React.Component{
                   </div>
                 </div>
                 <div className={classes.titlePanel}>
-                  <FavoriteStatus id={searchStore.selectedInstance.id} className={classes.favoriteStatus} position="bottom" />
+                  <FavoriteStatus id={searchStore.selectedInstance.id} className={classes.favoriteStatus} />
                   <span className={classes.title}>
                     {searchStore.selectedInstance.label}
                   </span>

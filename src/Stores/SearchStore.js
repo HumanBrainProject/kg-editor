@@ -20,6 +20,7 @@ class SearchStore{
   };
   @observable selectedList = null;
   @observable selectedInstance = null;
+  @observable editedBookmarksList = null;
 
   @observable instances = [];
   @observable instancesFilter = "";
@@ -53,6 +54,10 @@ class SearchStore{
       list.push(...folder.lists);
       return list;
     }, []);
+  }
+
+  isBookmarksListEdited(id){
+    return this.editedBookmarksList === id;
   }
 
   @action
@@ -160,6 +165,7 @@ class SearchStore{
 
   @action
   async renameBookmark(id, name) {
+    this.cancelEditBookmarksList(id);
     try {
       /*
       const { data } = await API.axios.post(API.endpoints.addBookmark(id), {"name": name});
@@ -207,6 +213,18 @@ class SearchStore{
     } catch (e) {
       this.isCreatingNewFavorite = false;
       this.favoriteCreationError = e.message;
+    }
+  }
+
+  @action
+  editBookmarksList(id) {
+    this.editedBookmarksList = id;
+  }
+
+  @action
+  cancelEditBookmarksList(id) {
+    if (!id || this.editedBookmarksList === id) {
+      this.editedBookmarksList = null;
     }
   }
 }

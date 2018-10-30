@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
+import { ButtonGroup, Button } from "react-bootstrap";
 
 import searchStore from "../../Stores/SearchStore";
 import instanceStore from "../../Stores/InstanceStore";
@@ -52,6 +52,9 @@ const styles = {
       background:"var(--list-bg-selected)",
       borderColor:"var(--list-border-selected)",
       color:"var(--ft-color-loud)"
+    },
+    "&.edited": {
+      padding: "0 5px 0 30px"
     }
   },
   icon: {
@@ -82,11 +85,23 @@ const styles = {
     display: "flex",
     width: "calc(100% - 19px)",
     marginLeft: "19px",
+    "& .btn-group": {
+      marginLeft: "6px"
+    }
   },
   editBookmarkName: {
     flex: "1",
-    color: "var(--bg-color-ui-contrast1)",
-    outline: 0
+    width:"calc(100% - 20px)",
+    height: "30px",
+    margin: 0,
+    padding: "0 2px",
+    border:"1px solid transparent",
+    borderRadius: "2px",
+    backgroundColor: "var(--bg-color-blend-contrast1)",
+    color: "var(--ft-color-loud)",
+    "&:focus":{
+      borderColor: "rgba(64, 169, 243, 0.5)"
+    }
   },
   cancelRenameButton: {
     marginLeft: "10px",
@@ -170,31 +185,30 @@ export default class List extends React.Component{
   constructor(props){
     super(props);
     this.editBookmarkNameRef = React.createRef();
-    this.state = {isEditingBookmark: false, showDeleteBookmarkDialog: false};
+    this.state = {showDeleteBookmarkDialog: false};
   }
 
   handleSelect(list){
-    if (!this.state.isEditingBookmark && !this.state.showDeleteBookmarkDialog) {
+    if (!searchStore.isBookmarksListEdited(this.props.list.id) && !this.state.showDeleteBookmarkDialog) {
       searchStore.selectList(list);
     }
   }
   handelCancelActions() {
-    this.setState({ isEditingBookmark: false, showDeleteBookmarkDialog: false });
+    this.setState({ showDeleteBookmarkDialog: false });
   }
 
   handleEditBookmark(event) {
     event.stopPropagation();
-    this.setState({ isEditingBookmark: true });
+    searchStore.editBookmarksList(this.props.list.id);
   }
 
   handleCancelEditBookmark(event) {
     event && event.stopPropagation();
-    this.setState({ isEditingBookmark: false });
+    searchStore.cancelEditBookmarksList(this.props.list.id);
   }
 
   handleRenameBookmark(event) {
     event && event.stopPropagation();
-    this.setState({ isEditingBookmark: false });
     searchStore.renameBookmark(this.props.list.id, this.editBookmarkNameRef.current.value.trim());
   }
 
@@ -227,21 +241,19 @@ export default class List extends React.Component{
   render(){
     const {classes, list} = this.props;
     const selected = searchStore.selectedList === list;
-
+    const edited = searchStore.isBookmarksListEdited(list.id);
     if (list.type === "bookmark") {
       return (
-        <div key={list.id} className={`${classes.container} ${selected?"selected":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
+        <div key={list.id} className={`${classes.container} ${selected?"selected":""} ${edited?"edited":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
             <FontAwesomeIcon icon={"star"} className={`${classes.icon} ${classes.bookmarkIcon}`} />
-            {this.state.isEditingBookmark?
+            {edited?
               <div className={classes.editBookmark}>
-                <input type="text" className={classes.editBookmarkName} defaultValue={list.name} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)} ref={this.editBookmarkNameRef}/>
-                <div className={classes.cancelRenameButton} onClick={this.handleCancelEditBookmark.bind(this)} title="cancel rename">
-                  <FontAwesomeIcon icon="undo-alt"/>
-                </div>
-                <div className={classes.renameButton} onClick={this.handleRenameBookmark.bind(this)} title="confirm rename">
-                  <FontAwesomeIcon icon="check"/>
-                </div>
+                <input type="text" className={`form-control ${classes.editBookmarkName}`} defaultValue={list.name} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)} ref={this.editBookmarkNameRef}/>
+                <ButtonGroup>
+                  <Button bsStyle="primary" bsSize="small" onClick={this.handleRenameBookmark.bind(this)} title="confirm rename"><FontAwesomeIcon icon="check"/></Button>
+                  <Button bsSize="small" onClick={this.handleCancelEditBookmark.bind(this)} title="cancel rename"><FontAwesomeIcon icon="undo"/></Button>
+                </ButtonGroup>
               </div>
               :
               <React.Fragment>

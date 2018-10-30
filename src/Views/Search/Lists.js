@@ -86,7 +86,7 @@ export default class Lists extends React.Component{
 
   render(){
     const {classes} = this.props;
-
+    searchStore.cancelEditBookmarksList();
     return(
       <div className={classes.container}>
         {!searchStore.fetchError.lists?

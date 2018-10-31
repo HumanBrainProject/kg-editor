@@ -159,7 +159,7 @@ export default class SavePanel extends React.Component{
             {instanceStore.comparedInstanceId &&
               <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
                 <Modal.Header closeButton>
-                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue()}
+                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http://schema.org/name").getValue()}
                 </Modal.Header>
                 <Modal.Body>
                   <Scrollbars autoHide>
@@ -179,7 +179,7 @@ export default class SavePanel extends React.Component{
               </div>
             }
             {changedInstances.map(([id, instance]) => {
-              const label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+              const label = instance.form.getField("http://schema.org/name").getValue();
               return(
                 <div className={classes.instance} key={instanceStore.getGeneratedKey(instance, "savePanel")}>
                   <div className={classes.type}>
@@ -192,7 +192,7 @@ export default class SavePanel extends React.Component{
                       <ButtonGroup vertical>
                         <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
                         <Button bsSize="small" onClick={this.handleReset.bind(this, id)} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
-                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)} title="compare the changes"><FontAwesomeIcon icon="search"/></Button>
+                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
                       </ButtonGroup>
                     }
                   </div>

@@ -35,8 +35,8 @@ const styles = {
     position:"absolute",
     top:"0",
     right:"15px",
-    width:"100px",
-    gridTemplateColumns:"repeat(4, 1fr)",
+    width:"25px",
+    gridTemplateColumns:"repeat(1, 1fr)",
     opacity:0.25,
     "&:hover":{
       opacity:"1 !important"
@@ -58,6 +58,9 @@ const styles = {
     },
     "&:last-child":{
       borderRadius:"0 4px 4px 0"
+    },
+    "&:first-child:last-child":{
+      borderRadius:"4px"
     }
   }
 };
@@ -85,9 +88,9 @@ export default class FooterPanel extends React.Component{
           <Col xs={2}>
             <div className={classes.actions}>
               <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
-                <FontAwesomeIcon icon="eye"/>
+                <FontAwesomeIcon icon="folder-open"/>
               </div>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit", id)}>
+              {/*<div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit", id)}>
                 <FontAwesomeIcon icon="pencil-alt"/>
               </div>
               <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph", id)}>
@@ -95,7 +98,7 @@ export default class FooterPanel extends React.Component{
               </div>
               <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release", id)}>
                 <FontAwesomeIcon icon="cloud-upload-alt"/>
-              </div>
+              </div>*/}
             </div>
           </Col>
         </Row>

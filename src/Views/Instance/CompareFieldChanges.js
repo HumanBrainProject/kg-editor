@@ -26,7 +26,7 @@ export default class CompareFieldChanges extends React.Component{
     return (
       <div className={classes.container}>
         <label className={classes.label}>{field.label}</label>
-        <CompareFieldValueChanges beforeValue={beforeValue} afterValue={afterValue}/>
+        <CompareFieldValueChanges mappingLabel={field.mappingLabel} beforeValue={beforeValue} afterValue={afterValue}/>
       </div>
     );
   }

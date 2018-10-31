@@ -61,7 +61,6 @@ class InstanceStore {
   getPromotedFields(instance) {
     if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
       return instance.data.ui_info.promotedFields
-        .map(key => key.replace(/\//g, "%nexus-slash%"))
         .filter(name => instance.data.fields[name]);
     }
     return [];
@@ -70,8 +69,7 @@ class InstanceStore {
   getNonPromotedFields(instance) {
     if (instance && instance.data && instance.data.fields) {
       return Object.keys(instance.data.fields)
-        .filter(name => {
-          const key = name.replace(/%nexus-slash%/g, "/");
+        .filter(key => {
           return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
         });
     }
@@ -135,7 +133,7 @@ class InstanceStore {
   async createNewInstance(path, name=""){
     this.isCreatingNewInstance = path;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name":name});
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
       this.isCreatingNewInstance = false;
       return data.id;
     } catch(e){
@@ -370,9 +368,9 @@ class InstanceStore {
           const option = options.find(o => o.id === instanceId);
           if (option) {
             if (instance.data.ui_info && instance.data.ui_info.labelField) {
-              const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+              const keyFieldName = instance.data.ui_info.labelField;
               if (payload && payload[keyFieldName]) {
-                option.label = payload[keyFieldName];
+                option.name = payload[keyFieldName];
               }
             }
           }

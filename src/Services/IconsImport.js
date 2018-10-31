@@ -39,6 +39,9 @@ import {faExclamationCircle} from "@fortawesome/free-solid-svg-icons/faExclamati
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons/faEnvelope";
 import {faSun} from "@fortawesome/free-solid-svg-icons/faSun";
 import {faMoon} from "@fortawesome/free-solid-svg-icons/faMoon";
+import {faFolderOpen} from "@fortawesome/free-solid-svg-icons/faFolderOpen";
+import {faGlasses} from "@fortawesome/free-solid-svg-icons/faGlasses";
+import {faPlusSquare} from "@fortawesome/free-solid-svg-icons/faPlusSquare";
 
 library.add(
   faUserLock,
@@ -78,5 +81,8 @@ library.add(
   faExclamationCircle,
   faEnvelope,
   faSun,
-  faMoon
+  faMoon,
+  faFolderOpen,
+  faGlasses,
+  faPlusSquare
 );

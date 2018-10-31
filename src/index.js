@@ -26,6 +26,9 @@ import Instance from "./Views/Instance";
 import "babel-polyfill";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GlobalError from "./Views/GlobalError";
+import { FormStore } from "hbp-quickfire";
+
+FormStore.setPathNodeSeparator("|");
 
 const styles = {
   "@global html, body, #root": {
@@ -77,6 +80,7 @@ const styles = {
   },
   logo: {
     padding: "10px",
+    cursor:"pointer",
     "& span": {
       color: "var(--ft-color-loud)",
       display: "inline-block",
@@ -84,6 +88,9 @@ const styles = {
       fontSize: "0.9em",
       borderLeft: "1px solid var(--border-color-ui-contrast5)",
       marginLeft:"10px"
+    },
+    "&:hover span": {
+      color: "var(--ft-color-louder)"
     }
   },
   status:{
@@ -189,6 +196,10 @@ class App extends React.Component{
     instanceStore.closeInstance(instanceId);
   }
 
+  handleGoToDashboard = () => {
+    routerStore.history.push("/");
+  }
+
   render(){
     const {classes} = this.props;
     const {currentLocation} = this.state;
@@ -199,7 +210,7 @@ class App extends React.Component{
         <div className={classes.layout}>
           <Theme/>
           <div className={classes.tabs}>
-            <div className={classes.logo}>
+            <div className={classes.logo} onClick={this.handleGoToDashboard}>
               <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
               <span>Knowledge Graph Editor</span>
             </div>
@@ -211,8 +222,7 @@ class App extends React.Component{
                     <Tab icon={"user-lock"} current={true}>Login</Tab>
                     :
                     <React.Fragment>
-                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
-                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
+                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Browse</Tab>
                     </React.Fragment>
                   }
                 </div>
@@ -223,7 +233,7 @@ class App extends React.Component{
                     let label;
                     let color = undefined;
                     if(!instance.isFetching && !instance.hasFetchError){
-                      label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+                      label = instance.form.getField("http://schema.org/name").getValue();
                       color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
                     }
                     if(!label){

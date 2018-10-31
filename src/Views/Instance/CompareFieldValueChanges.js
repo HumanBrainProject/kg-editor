@@ -29,7 +29,7 @@ const styles = {
 @injectStyles(styles)
 export default class CompareFieldValueChanges extends React.Component{
   render(){
-    const {classes, beforeValue, afterValue} = this.props;
+    const {classes, beforeValue, afterValue, mappingLabel} = this.props;
 
     const separator = "; ";
 
@@ -39,8 +39,8 @@ export default class CompareFieldValueChanges extends React.Component{
       }
       if (Array.isArray(value)) {
         return value.reduce((result, obj) => {
-          if (obj && obj.label !== undefined && obj.label !== null) {
-            return result + (result === ""?"":separator) + obj.label.toString();
+          if (obj && obj[mappingLabel] !== undefined && obj[mappingLabel] !== null) {
+            return result + (result === ""?"":separator) + obj[mappingLabel].toString();
           }
           return result;
         }, "");

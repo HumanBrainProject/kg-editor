@@ -62,7 +62,7 @@ const styles = {
         height:"100%",
         padding:"5px 10px",
         display:"block",
-        color:"var(--ft-color-normal)",
+        color:"var(--ft-color-quiet)",
         "&:hover":{
           color:"var(--ft-color-loud)",
         }
@@ -137,7 +137,7 @@ export default class Lists extends React.Component{
             searchStore.lists.length?
               <React.Fragment>
                 <div className={classes.header}>
-                  <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.listsFilter} onChange={this.handleFilterChange}/>
+                  <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Filter lists" type="text" value={searchStore.listsFilter} onChange={this.handleFilterChange}/>
                 </div>
                 <Scrollbars autoHide>
                   {searchStore.listsFilter.trim()?
@@ -184,7 +184,7 @@ export default class Lists extends React.Component{
                                     </div>
                                     :
                                     <div className={classes.createInstance} onClick={this.handleCreateInstance.bind(this, list.path)}>
-                                      <FontAwesomeIcon icon={"plus"}/>
+                                      <FontAwesomeIcon icon={"plus-square"}/>
                                     </div>
                                   }
                                 </div>

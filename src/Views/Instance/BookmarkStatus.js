@@ -4,8 +4,8 @@ import { toJS } from "mobx";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import searchStore from "../../Stores/SearchStore";
-import favoriteStatusStore from "../../Stores/FavoriteStatusStore";
-import FavoriteButton from "../../Components/FavoriteButton";
+import bookmarkStatusStore from "../../Stores/BookmarkStatusStore";
+import BookmarkButton from "../../Components/BookmarkButton";
 import PopOverButton from "../../Components/PopOverButton";
 
 let styles = {
@@ -26,7 +26,7 @@ let styles = {
     }
   },
   fetchErrorButton: {
-    color: "var(--favorite-off-color)",  // #e67e22 #e74c3c
+    color: "var(--bookmark-off-color)",  // #e67e22 #e74c3c
   },
   saveErrorButton: {
     color: "#e74c3c"
@@ -39,59 +39,59 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-export default class FavoriteStatus extends React.Component{
+export default class BookmarkStatus extends React.Component{
   constructor(props){
     super(props);
-    favoriteStatusStore.fetchStatus(this.props.id);
-    this.handleFavoritesSave = this.handleFavoritesSave.bind(this);
-    this.handleFavoritesChange = this.handleFavoritesChange.bind(this);
-    this.handleNewFavorite = this.handleNewFavorite.bind(this);
+    bookmarkStatusStore.fetchStatus(this.props.id);
+    this.handleBookmarksSave = this.handleBookmarksSave.bind(this);
+    this.handleBookmarksChange = this.handleBookmarksChange.bind(this);
+    this.handleNewBookmark = this.handleNewBookmark.bind(this);
     this.handleFetchRetry = this.handleFetchRetry.bind(this);
     this.handleSaveCancel = this.handleSaveCancel.bind(this);
     this.handleSaveRetry = this.handleSaveRetry.bind(this);
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
-    favoriteStatusStore.fetchStatus(newProps.id);
+    bookmarkStatusStore.fetchStatus(newProps.id);
   }
 
-  handleFavoritesSave() {
-    favoriteStatusStore.saveStatus(this.props.id);
+  handleBookmarksSave() {
+    bookmarkStatusStore.saveStatus(this.props.id);
   }
 
-  handleFavoritesChange(favorites) {
-    favoriteStatusStore.updateStatus(this.props.id, favorites);
+  handleBookmarksChange(bookmarks) {
+    bookmarkStatusStore.updateStatus(this.props.id, bookmarks);
   }
 
-  async handleNewFavorite(name) { // , field, store) {
-    await searchStore.createNewBookmark(name);
+  async handleNewBookmark(name) { // , field, store) {
+    await searchStore.createNewBookmarkList(name);
     /*
-    const newFavoriteId = await searchStore.createNewBookmark(name);
-    if(newFavoriteId){
-      const favorites = field.value.map(favorite => favorite.value);
-      favorites.push(newFavoriteId);
-      favoriteStatusStore.updateStatus(this.props.id, favorites);
+    const newBookmarkId = await searchStore.createNewBookmarkList(name);
+    if(newBookmarkId){
+      const bookmarks = field.value.map(bookmark => bookmark.value);
+      bookmarks.push(newBookmarkId);
+      bookmarkStatusStore.updateStatus(this.props.id, bookmarks);
     }
     */
   }
 
   handleFetchRetry() {
-    favoriteStatusStore.retryFetchStatus();
+    bookmarkStatusStore.retryFetchStatus();
   }
 
   handleSaveCancel() {
-    favoriteStatusStore.revertSaveStatus(this.props.id);
+    bookmarkStatusStore.revertSaveStatus(this.props.id);
   }
 
   handleSaveRetry() {
-    favoriteStatusStore.saveStatus(this.props.id);
+    bookmarkStatusStore.saveStatus(this.props.id);
   }
 
   render(){
-    const instanceStatus = favoriteStatusStore.getInstance(this.props.id);
+    const instanceStatus = bookmarkStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
-    const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.favorites.length)?toJS(instanceStatus.data.favorites):[];
-    const favorites = toJS(searchStore.bookmarksList);
+    const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarks.length)?toJS(instanceStatus.data.bookmarks):[];
+    const bookmarks = toJS(searchStore.bookmarkListFolder);
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?
@@ -118,7 +118,7 @@ export default class FavoriteStatus extends React.Component{
             instanceStatus.hasSaveError?
               <PopOverButton
                 buttonClassName={classes.saveErrorButton}
-                buttonTitle="failed to save favorite, click for more information"
+                buttonTitle="failed to save bookmark, click for more information"
                 iconComponent={FontAwesomeIcon}
                 iconProps={{icon: "exclamation-triangle"}}
                 okComponent={() => (
@@ -137,7 +137,7 @@ export default class FavoriteStatus extends React.Component{
                 <h5 className={classes.textError}>{instanceStatus.saveError}</h5>
               </PopOverButton>
               :
-              <FavoriteButton values={values} list={favorites} onSave={this.handleFavoritesSave} onChange={this.handleFavoritesChange} onNew={this.handleNewFavorite} />
+              <BookmarkButton values={values} list={bookmarks} onSave={this.handleBookmarksSave} onChange={this.handleBookmarksChange} onNew={this.handleNewBookmark} />
         }
       </div>
     );

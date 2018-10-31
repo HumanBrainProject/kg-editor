@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ButtonGroup, Button } from "react-bootstrap";
+import PopOverButton from "../../Components/PopOverButton";
 
 import searchStore from "../../Stores/SearchStore";
 import instanceStore from "../../Stores/InstanceStore";
@@ -66,7 +67,7 @@ const styles = {
     }
   },
   bookmarkIcon: {
-    color: "var(--favorite-on-color)",
+    color: "var(--bookmark-on-color)",
     "& + span": {
       maxWidth: "190px"
     }
@@ -79,7 +80,7 @@ const styles = {
     }
   },
   smartlistIcon: {
-    color: "var(--favorite-on-color)"
+    color: "var(--bookmark-on-color)"
   },
   editBookmark: {
     display: "flex",
@@ -176,6 +177,18 @@ const styles = {
     "&.show": {
       right: "5px"
     }
+  },
+  error: {
+    position:"absolute",
+    top:"5px",
+    right:"10px",
+  },
+  errorButton: {
+    color: "#e74c3c"
+  },
+  textError: {
+    margin: 0,
+    wordBreak: "keep-all"
   }
 };
 
@@ -189,7 +202,7 @@ export default class List extends React.Component{
   }
 
   handleSelect(list){
-    if (!searchStore.isBookmarksListEdited(this.props.list.id) && !this.state.showDeleteBookmarkDialog) {
+    if (this.currentlyEditedBookmarkList !== this.props.list && !this.state.showDeleteBookmarkDialog) {
       searchStore.selectList(list);
     }
   }
@@ -198,22 +211,31 @@ export default class List extends React.Component{
   }
 
   handleEditBookmark(event) {
-    event.stopPropagation();
-    searchStore.editBookmarksList(this.props.list.id);
+    event && event.stopPropagation();
+    searchStore.setCurrentlyEditedBookmarkList(this.props.list);
   }
 
   handleCancelEditBookmark(event) {
     event && event.stopPropagation();
-    searchStore.cancelEditBookmarksList(this.props.list.id);
+    searchStore.cancelCurrentlyEditedBookmarkList(this.props.list);
+  }
+
+  handleRevertEditBookmark(event) {
+    event && event.stopPropagation();
+    searchStore.revertBookmarkListChanges(this.props.list);
   }
 
   handleRenameBookmark(event) {
     event && event.stopPropagation();
-    searchStore.renameBookmark(this.props.list.id, this.editBookmarkNameRef.current.value.trim());
+    const editName = this.editBookmarkNameRef.current.value.trim();
+    if (this.props.list.name !== editName) {
+      searchStore.updateBookmarkList(this.props.list, {name: editName});
+    }
+    searchStore.cancelCurrentlyEditedBookmarkList(this.props.list);
   }
 
   handleBookmarkNameKeyUp(event) {
-    event.stopPropagation();
+    event && event.stopPropagation();
     if (event.keyCode === 27) {
       this.handleCancelEditBookmark();
     } else if (event.keyCode === 13) {
@@ -222,18 +244,23 @@ export default class List extends React.Component{
   }
 
   handleConfirmDeleteBookmark(event) {
-    event.stopPropagation();
+    event && event.stopPropagation();
     this.setState({ showDeleteBookmarkDialog: true });
   }
 
   async handleDeleteBookmark(event) {
-    event.stopPropagation();
+    event && event.stopPropagation();
     this.setState({ showDeleteBookmarkDialog: false });
-    searchStore.deleteBookmark(this.props.list.id);
+    searchStore.deleteBookmarkList(this.props.list);
+  }
+
+  handleCancelDeleteBookmark(event) {
+    event && event.stopPropagation();
+    searchStore.cancelBookmarkListDeletion(this.props.list);
   }
 
   async handleCreateInstance(path, event){
-    event.stopPropagation();
+    event && event.stopPropagation();
     let newInstanceId = await instanceStore.createNewInstance(path);
     routerStore.history.push(`/instance/edit/${newInstanceId}`);
   }
@@ -241,43 +268,89 @@ export default class List extends React.Component{
   render(){
     const {classes, list} = this.props;
     const selected = searchStore.selectedList === list;
-    const edited = searchStore.isBookmarksListEdited(list.id);
+    const edited = searchStore.currentlyEditedBookmarkList === list;
     if (list.type === "bookmark") {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""} ${edited?"edited":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
             <FontAwesomeIcon icon={"star"} className={`${classes.icon} ${classes.bookmarkIcon}`} />
-            {edited?
+            {edited && !list.updateError && !list.deleteError?
               <div className={classes.editBookmark}>
-                <input type="text" className={`form-control ${classes.editBookmarkName}`} defaultValue={list.name} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)} ref={this.editBookmarkNameRef}/>
+                <input type="text" className={`form-control ${classes.editBookmarkName}`} defaultValue={list.editName} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)} ref={this.editBookmarkNameRef}/>
                 <ButtonGroup>
                   <Button bsStyle="primary" bsSize="small" onClick={this.handleRenameBookmark.bind(this)} title="confirm rename"><FontAwesomeIcon icon="check"/></Button>
                   <Button bsSize="small" onClick={this.handleCancelEditBookmark.bind(this)} title="cancel rename"><FontAwesomeIcon icon="undo"/></Button>
                 </ButtonGroup>
               </div>
               :
-              <React.Fragment>
-                <span>{list.name}</span>
-                {searchStore.isSavingBookmark?
+              <span>{(list.editName && !list.updateError)?list.editName:list.name}</span>
+            }
+            {list.updateError?
+              <PopOverButton
+                className={classes.error}
+                buttonClassName={classes.errorButton}
+                buttonTitle="failed to rename bookmark, click for more information"
+                iconComponent={FontAwesomeIcon}
+                iconProps={{icon: "exclamation-triangle"}}
+                okComponent={() => (
+                  <React.Fragment>
+                    <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
+                  </React.Fragment>
+                )}
+                onOk={this.handleEditBookmark.bind(this)}
+                cancelComponent={() => (
+                  <React.Fragment>
+                    <FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel
+                  </React.Fragment>
+                )}
+                onCancel={this.handleRevertEditBookmark.bind(this)}
+              >
+                <h5 className={classes.textError}>{`Failed to rename bookmark "${list.name}" into "${list.editName}" (${list.updateError})`}</h5>
+              </PopOverButton>
+              :
+              list.deleteError?
+                <PopOverButton
+                  className={classes.error}
+                  buttonClassName={classes.errorButton}
+                  buttonTitle="failed to delete bookmark, click for more information"
+                  iconComponent={FontAwesomeIcon}
+                  iconProps={{icon: "exclamation-triangle"}}
+                  okComponent={() => (
+                    <React.Fragment>
+                      <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
+                    </React.Fragment>
+                  )}
+                  onOk={this.handleConfirmDeleteBookmark.bind(this)}
+                  cancelComponent={() => (
+                    <React.Fragment>
+                      <FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel
+                    </React.Fragment>
+                  )}
+                  onCancel={this.handleCancelDeleteBookmark.bind(this)}
+                >
+                  <h5 className={classes.textError}>{`Failed to delete bookmark "${list.name}" (${list.deleteError})`}</h5>
+                </PopOverButton>
+                :
+                list.isUpdating || list.isDeleting?
                   <div className={classes.savingBookmark}>
                     <FontAwesomeIcon icon={"circle-notch"} spin/>
                   </div>
                   :
-                  <React.Fragment>
-                    <div className={`${classes.actions} is-bookmark`}>
-                      <div className={classes.action} onClick={this.handleEditBookmark.bind(this)} title="rename">
-                        <FontAwesomeIcon icon="pencil-alt"/>
+                  !edited && !list.updateError && !list.deleteError && (
+                    <React.Fragment>
+                      <div className={`${classes.actions} is-bookmark`}>
+                        <div className={classes.action} onClick={this.handleEditBookmark.bind(this)} title="rename">
+                          <FontAwesomeIcon icon="pencil-alt"/>
+                        </div>
+                        <div className={classes.action} onClick={this.handleConfirmDeleteBookmark.bind(this)} title="delete">
+                          <FontAwesomeIcon icon="trash-alt"/>
+                        </div>
                       </div>
-                      <div className={classes.action} onClick={this.handleConfirmDeleteBookmark.bind(this)} title="delete">
-                        <FontAwesomeIcon icon="trash-alt"/>
+                      <div className={`${classes.deleteBookmarkDialog} ${this.state.showDeleteBookmarkDialog?"show":""}`}>
+                        <Button bsStyle="danger" bsSize="small" onClick={this.handleDeleteBookmark.bind(this)}><FontAwesomeIcon icon="trash-alt"/>&nbsp;Delete</Button>
                       </div>
-                    </div>
-                    <div className={`${classes.deleteBookmarkDialog} ${this.state.showDeleteBookmarkDialog?"show":""}`}>
-                      <Button bsStyle="danger" bsSize="small" onClick={this.handleDeleteBookmark.bind(this)}><FontAwesomeIcon icon="trash-alt"/>&nbsp;Delete</Button>
-                    </div>
-                  </React.Fragment>
-                }
-              </React.Fragment>
+                    </React.Fragment>
+                  )
             }
           </React.Fragment>
         </div>

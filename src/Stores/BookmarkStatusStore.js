@@ -4,7 +4,7 @@ import { isArray, debounce } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
 
-class FavoriteStatusStore{
+class BookmarkStatusStore{
   @observable statuses = new Map();
   @observable isFetching = false;
 
@@ -41,9 +41,9 @@ class FavoriteStatusStore{
   }
 
   @action
-  updateStatus(instanceIds, favorites){
-    if (!Array.isArray(favorites)) {
-      favorites = [];
+  updateStatus(instanceIds, bookmarks){
+    if (!Array.isArray(bookmarks)) {
+      bookmarks = [];
     }
     if(!isArray(instanceIds)){
       instanceIds = [instanceIds];
@@ -53,11 +53,11 @@ class FavoriteStatusStore{
         const status = this.statuses.get(id);
         if(!status.isFetching && !status.hasFetchError) {
           if (!status.data) {
-            status.data = {id: id, favorites: []};
+            status.data = {id: id, bookmarks: []};
           }
           status.hasChanged = true;
-          status.previousFavorites = toJS(status.data.favorites);
-          status.data.favorites = favorites;
+          status.previousBookmarks = toJS(status.data.bookmarks);
+          status.data.bookmarks = bookmarks;
         }
       }
     });
@@ -76,24 +76,24 @@ class FavoriteStatusStore{
           try {
             status.hasSaveError = false;
             status.isSaving = true;
-            const payload = (status.data && status.data.favorites)?toJS(status.data.favorites):[];
+            const payload = (status.data && status.data.bookmarks)?toJS(status.data.bookmarks):[];
             /*
-            const { data } = await API.axios.put(API.endpoints.setInstanceFavorites(id), payload);
+            const { data } = await API.axios.put(API.endpoints.setInstanceBookmarks(id), payload);
             runInAction(() => {
               status.hasChanged = false;
               status.saveError = null;
               status.hasSaveError = false;
               status.isSaving = false;
-              status.previousFavorites = [];
-              console.debug(`favorite of "${id}" successfully saved`, data);
+              status.previousBookmarks = [];
+              console.debug(`bookmark of "${id}" successfully saved`, data);
             });
             */
             if ((Math.floor(Math.random() * 10) % 2) === 0) {
-              throw "Failed to save favorite (Error 501).";
+              throw "Failed to save bookmark (Error 501).";
             }
             const data = {
               id: id,
-              favorites: payload
+              bookmarks: payload
             };
             setTimeout(() => {
               runInAction(() =>{
@@ -101,13 +101,13 @@ class FavoriteStatusStore{
                 status.saveError = null;
                 status.hasSaveError = false;
                 status.isSaving = false;
-                status.previousFavorites = [];
-                console.debug(`favorite of "${id}" successfully saved`, data);
+                status.previousBookmarks = [];
+                console.debug(`bookmark of "${id}" successfully saved`, data);
               });
             }, 500);
           } catch (e) {
             const message = e.message?e.message:e;
-            status.saveError = `Error while saving favorite of "${id}" (${message})`;
+            status.saveError = `Error while saving bookmark of "${id}" (${message})`;
             status.hasSaveError = true;
             status.isSaving = false;
           }
@@ -126,9 +126,9 @@ class FavoriteStatusStore{
         const status = this.statuses.get(id);
         if (status.hasChanged && !status.isSaving && !status.isFetching) {
           if (!status.data) {
-            status.data = {id: id, favorites: []};
+            status.data = {id: id, bookmarks: []};
           }
-          status.data.favorites = Array.isArray(status.previousFavorites)?status.previousFavorites:[];
+          status.data.bookmarks = Array.isArray(status.previousBookmarks)?status.previousBookmarks:[];
           status.hasChanged = false;
           status.saveError = null;
           status.hasSaveError = false;
@@ -171,7 +171,7 @@ class FavoriteStatusStore{
     });
     try{
       /*
-      //let response = await API.axios.post(API.endpoints.listInstancesFavoritesStatus(), toProcess);
+      //let response = await API.axios.post(API.endpoints.listInstancesBookmarksStatus(), toProcess);
       runInAction(() =>{
         response.data.forEach(status => {
           this.statuses.get(status.id).data = status;
@@ -183,13 +183,13 @@ class FavoriteStatusStore{
       });
       */
       if ((Math.floor(Math.random() * 10) % 2) === 0) {
-        throw "Failed to request favorite status (Error 501).";
+        throw "Failed to request bookmark status (Error 501).";
       }
       const response = {
         data: toProcess.map(id => (
           {
             id: id,
-            favorites: (Math.floor(Math.random() * 10) % 2) === 0?[]:["favoriteList02"]
+            bookmarks: (Math.floor(Math.random() * 10) % 2) === 0?[]:["bookmarkList02"]
           }
         ))
       };
@@ -210,7 +210,7 @@ class FavoriteStatusStore{
         toProcess.forEach(id => {
           this.statuses.get(id).isFetching = false;
           this.statuses.get(id).hasFetchError = true;
-          this.statuses.get(id).fetchError = `Error while fetching favorite of "${id}" (${message})`;
+          this.statuses.get(id).fetchError = `Error while fetching bookmark of "${id}" (${message})`;
         });
         this.fetchErrorQueue.push(...toProcess);
         this.isFetching = false;
@@ -220,4 +220,4 @@ class FavoriteStatusStore{
   }
 }
 
-export default new FavoriteStatusStore();
+export default new BookmarkStatusStore();

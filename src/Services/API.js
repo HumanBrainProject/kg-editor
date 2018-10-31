@@ -13,8 +13,8 @@ const endpoints = {
   "addBookmark": () => `${window.rootPath}/api/bookmark`,
   "renameBookmark": (id) => `${window.rootPath}/api/bookmark/${id}`,
   "deleteBookmark": (id) => `${window.rootPath}/api/bookmark/${id}`,
-  "listInstancesFavorites": () => `${window.rootPath}/api/instancesFavorites`,
-  "setInstanceFavorites": (instance) => `${window.rootPath}/api/instanceFavorites/${instance}`,
+  "listInstancesBookmarks": () => `${window.rootPath}/api/instancesBookmarks`,
+  "setInstanceBookmarks": (instance) => `${window.rootPath}/api/instanceBookmarks/${instance}`,
   "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
 };
 

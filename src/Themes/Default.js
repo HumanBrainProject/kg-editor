@@ -41,10 +41,10 @@ const styles = {
       "--release-color-highlight":"rgb(46, 204, 113)",
       "--release-bg-highlight":"rgb(46, 204, 113, 0.25)",
 
-      "--favorite-on-color":"#EFEC2D",
-      "--favorite-on-color-highlight":"#ffe100",
-      "--favorite-off-color":"var(--ft-color-normal)",
-      "--favorite-off-color-highlight":"var(--favorite-on-color-highlight)"
+      "--bookmark-on-color":"#EFEC2D",
+      "--bookmark-on-color-highlight":"#ffe100",
+      "--bookmark-off-color":"var(--ft-color-normal)",
+      "--bookmark-off-color-highlight":"var(--bookmark-on-color-highlight)"
     }
   }
 };

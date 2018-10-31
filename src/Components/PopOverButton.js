@@ -2,11 +2,13 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
+import { Overlay, Popover, Button } from "react-bootstrap";
+import {uniqueId} from "lodash";
 
 let styles = {
   container: {
-    position: "relative"
+    position: "relative",
+    display: "inline-block"
   },
   button: {
     position: "relative",
@@ -17,49 +19,33 @@ let styles = {
     outline: 0
   },
   popOver: {
-    position: "absolute",
-    marginTop: "5px",
     background: "var(--list-bg-hover)",
     border: "1px solid var(--list-border-hover)",
-    //background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
-    //backgroundSize: "200%",
-    padding: "25px 20px 0px",
-    borderRadius: "3px",
-    zIndex: 100,
-    "&.top": {
-      marginTop: "-5px",
-      "& $popOverArrow": {
-        top: "unset",
-        transform: "rotate(180deg)"
-      }
+    "& .arrow:after": {
+      borderBottomColor: "var(--list-border-hover) !important"
     }
   },
-  popOverContent: {},
+  popOverContent: {
+    margin: "20px 0",
+    color:"var(--ft-color-loud)"
+  },
   popOverCloseButton: {
     position: "absolute",
-    top: 0,
-    right: 0,
+    top: "3px",
+    right: "3px",
+    color:"var(--ft-color-loud)",
     backgroundColor: "transparent",
     border: "transparent"
   },
   popOverFooterBar: {
+    marginBottom: "10px",
     width: "100%",
-    margin: "20px 0",
     textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
     "& button + button": {
       marginLeft: "20px"
     }
-  },
-  popOverArrow: {
-    position: "absolute",
-    top: "-7px",
-    left: "1px",
-    width: 0,
-    height: 0,
-    border: "0 solid transparent",
-    borderRightWidth: "6px",
-    borderLeftWidth: "6px",
-    borderBottom: "6px solid var(--list-border-hover)" //--bg-color-ui-contrast1
   }
 };
 
@@ -72,108 +58,110 @@ const windowHeight = () => {
   //return $(window).height();
 };
 
+class PopOverContent extends React.Component {
+  constructor(props){
+    super(props);
+    this.ref = React.createRef();
+  }
+  componentDidMount() {
+    this.handleSizeChange();
+  }
+  componentDidUpdate() {
+    this.handleSizeChange();
+  }
+  handleSizeChange() {
+    if (this.ref.current) {
+      typeof this.props.onSizeChange === "function" && this.props.onSizeChange(this.ref.current.getBoundingClientRect());
+    }
+  }
+  render() {
+    return (
+      <div ref={this.ref}>
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
 @injectStyles(styles)
 @observer
 export default class PopOverButton extends React.Component{
   constructor(props){
     super(props);
-    this.state = { showPopOver: false, popOverPosition: null, popOverStyle: null };
+    this.state = { showPopOver: false, popOverPosition: "bottom" };
+    this.popOverId = uniqueId("popover");
     this.buttonRef = React.createRef();
-    this.popOverRef = React.createRef();
-    this.timer = null;
-    this.handleButtonClick = this.handleButtonClick.bind(this);
-    this.handlePopOverClose = this.handlePopOverClose.bind(this);
-    this.handlePopOverOver = this.handlePopOverOver.bind(this);
-    this.handlePopOverLeave = this.handlePopOverLeave.bind(this);
-    this.handleCancelClick = this.handleCancelClick.bind(this);
-    this.handleOkClick = this.handleOkClick.bind(this);
   }
 
-  componentDidUpdate() {
-    if (this.state.showPopOver && !this.state.popOverPosition) {
-      let position = "bottom";
-      let style = {};
-      if (this.popOverRef.current) {
-        const buttonBottomPosition = this.buttonRef.current?this.buttonRef.current.getBoundingClientRect().bottom:0;
-        const popOverHeight = this.popOverRef.current.getBoundingClientRect().height;
-        if ((buttonBottomPosition + popOverHeight + 5) >= windowHeight()) {
-          position = "top";
-          const buttonHeight = this.buttonRef.current?this.buttonRef.current.getBoundingClientRect().height:0;
-          style = {
-            transform: `translateY(-100%) translateY(-${buttonHeight}px)`
-          };
-        }
-      }
-      typeof this.props.onPositionChange === "function" &&  this.props.onPositionChange(position);
-      this.setState({popOverPosition: position, popOverStyle: style });
+  handlePopOverPosition(popOverRect) {
+    if (!popOverRect) { return null; }
+    const buttonRect = this.buttonRef.current.getBoundingClientRect();
+    const position = (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?"top":"bottom";
+    if (this.state.popOverPosition !== position) {
+      this.setState({popOverPosition: position});
     }
   }
 
   handleButtonClick(event) {
     event.stopPropagation();
-    this.setState(state => ({showPopOver: !state.showPopOver, popOverPosition: null }));
-  }
-
-  handlePopOverOver() {
-    if (this.state.showPopOver) {
-      clearTimeout(this.fetchtimer);
-    }
-  }
-
-  handlePopOverLeave() {
-    if (this.state.showPopOver) {
-      clearTimeout(this.fetchtimer);
-      this.fetchtimer = setTimeout(() => this.handlePopOverClose(), 500);
-    }
+    this.setState(state => ({showPopOver: !state.showPopOver }));
   }
 
   handlePopOverClose(event) {
     event && event.stopPropagation();
-    this.setState({showPopOver: false, popOverPosition: null });
+    this.setState({showPopOver: false });
     typeof this.props.onClose === "function" && this.props.onClose();
   }
 
   handleCancelClick(event) {
     event && event.stopPropagation();
-    this.setState({showPopOver: false, popOverPosition: null });
+    this.setState({showPopOver: false });
     typeof this.props.onCancel === "function" && this.props.onCancel();
   }
 
   handleOkClick(event) {
     event && event.stopPropagation();
-    this.setState({showPopOver: false, popOverPosition: null });
+    this.setState({showPopOver: false });
     typeof this.props.onOk === "function" && this.props.onOk();
   }
 
   render(){
-    const { classes, className, buttonClassName, buttonTitle, iconComponent, iconProps, popOverClassName, okComponent, okProps, cancelComponent, cancelProps, children } = this.props;
+    const { classes, className, buttonClassName, buttonTitle, iconComponent, iconProps, okComponent, okProps, cancelComponent, cancelProps, children } = this.props;
     const IconComponent = iconComponent;
     const OkComponent = okComponent;
     const CancelComponent = cancelComponent;
     return(
-      <div className={`${classes.container} ${className?className:""}`} onMouseLeave={this.handlePopOverLeave} onMouseOver={this.handlePopOverOver}>
-        <button className={`${classes.button} ${buttonClassName?buttonClassName:""}`} onClick={this.handleButtonClick} title={buttonTitle} ref={this.buttonRef}>
+      <div className={`${classes.container} ${className?className:""}`}>
+        <button className={`${classes.button} ${buttonClassName?buttonClassName:""}`} onClick={this.handleButtonClick.bind(this)} title={buttonTitle} ref={this.buttonRef}>
           <IconComponent {...iconProps} />
         </button>
-        {this.state.showPopOver && (
-          <div className={`popover-popup ${classes.popOver} ${popOverClassName?popOverClassName:""} ${this.state.popOverPosition?this.state.popOverPosition:""}`} style={this.state.popOverStyle} onMouseLeave={this.handlePopOverLeave} onMouseOver={this.handlePopOverOver} onClick={event => event.stopPropagation()} ref={this.popOverRef}>
-            <div className={classes.popOverContent}>
-              {children}
-            </div>
-            {(CancelComponent || OkComponent) && (
-              <div className={classes.popOverFooterBar}>
-                {CancelComponent && (
-                  <Button bsSize="small" onClick={this.handleCancelClick}><CancelComponent {...cancelProps} /></Button>
-                )}
-                {OkComponent && (
-                  <Button bsStyle="primary" bsSize="small" onClick={this.handleOkClick}><OkComponent {...okProps}  /></Button>
-                )}
+        <Overlay
+          show={this.state.showPopOver}
+          target={this.buttonRef.current}
+          placement={this.state.popOverPosition}
+          container={document.body}
+          rootClose={true}
+          onHide={this.handlePopOverClose.bind(this)}
+        >
+          <Popover id={this.popOverId} className={classes.popOver}>
+            <PopOverContent onSizeChange={this.handlePopOverPosition.bind(this)}>
+              <div className={classes.popOverContent}>
+                {children}
               </div>
-            )}
-            <button className={classes.popOverCloseButton} onClick={this.handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
-            <div className={classes.popOverArrow} />
-          </div>
-        )}
+              {(CancelComponent || OkComponent) && (
+                <div className={classes.popOverFooterBar}>
+                  {CancelComponent && (
+                    <Button bsSize="small" onClick={this.handleCancelClick.bind(this)}><CancelComponent {...cancelProps} /></Button>
+                  )}
+                  {OkComponent && (
+                    <Button bsStyle="primary" bsSize="small" onClick={this.handleOkClick.bind(this)}><OkComponent {...okProps}  /></Button>
+                  )}
+                </div>
+              )}
+              <button className={classes.popOverCloseButton} onClick={this.handlePopOverClose.bind(this)} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
+            </PopOverContent>
+          </Popover>
+        </Overlay>
       </div>
     );
   }

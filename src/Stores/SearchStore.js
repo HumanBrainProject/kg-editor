@@ -20,17 +20,26 @@ class SearchStore{
   };
   @observable selectedList = null;
   @observable selectedInstance = null;
-  @observable editedBookmarksList = null;
 
   @observable instances = [];
   @observable instancesFilter = "";
 
   @observable canLoadMoreInstances = false;
 
-  @observable isSavingBookmark = false;
+  @observable currentlyEditedBookmarkList = null;
+  @observable isCreatingNewBookmarkList = false;
+  @observable bookmarkListCreationError = null;
 
   pageStart = 0;
   pageSize = 20;
+
+  isUpdatingBookmarkList(id) {
+    return this.updatingBookmarkList === id;
+  }
+
+  isDeletingBookmarkList(id) {
+    return this.deletingBookmarkList === id;
+  }
 
   @action setListsFilter(filter){
     this.listsFilter = filter;
@@ -48,16 +57,12 @@ class SearchStore{
     }, []);
   }
 
-  @computed get bookmarksList(){
+  @computed get bookmarkListFolder(){
     return this.lists.reduce((list, folder) => {
       if (folder.type !== "bookmark") { return list; }
       list.push(...folder.lists);
       return list;
     }, []);
-  }
-
-  isBookmarksListEdited(id){
-    return this.editedBookmarksList === id;
   }
 
   @action
@@ -75,6 +80,12 @@ class SearchStore{
           folder.expand = true;
           folder.lists.forEach(list => {
             list.type = folder.type;
+            if (folder.type === "bookmark") {
+              list.isUpdating = false;
+              list.updateError = null;
+              list.isDeleting = false;
+              list.deleteError = null;
+            }
           });
         });
       });
@@ -138,10 +149,12 @@ class SearchStore{
   }
 
   @action
-  async createNewBookmark(name) {
+  async createNewBookmarkList(name) {
+    this.bookmarkListCreationError = null;
+    this.isCreatingNewBookmarkList = true;
     try{
       /*
-      const { data } = await API.axios.post(API.endpoints.addFavorite(), {"name": name});
+      const { data } = await API.axios.post(API.endpoints.addBookmark(), {"name": name});
       */
       const data = { id: uniqueId(`id${new Date().getTime()}`) };
       this.lists.some((folder) => {
@@ -149,82 +162,120 @@ class SearchStore{
           folder.lists.push({
             id: data.id,
             name: name,
-            type: folder.type
+            type: folder.type,
+            isUpdating: false,
+            updateError: null,
+            isDeleting: false,
+            deleteError: null
           });
           return true;
         }
         return false;
       });
-      this.isCreatingNewFavorite = true;
+      this.isCreatingNewBookmarkList = false;
       return data.id;
     } catch(e){
-      this.isCreatingNewFavorite = false;
-      this.favoriteCreationError = e.message;
+      this.isCreatingNewBookmarkList = false;
+      this.bookmarkListCreationError = e.message?e.message:e;
     }
   }
 
   @action
-  async renameBookmark(id, name) {
-    this.cancelEditBookmarksList(id);
+  async updateBookmarkList(list, newProps) {
+    if (!list) { return false; }
+    list.editName = newProps.name;
+    list.updateError = null;
+    list.isUpdating = true;
     try {
       /*
       const { data } = await API.axios.post(API.endpoints.addBookmark(id), {"name": name});
       */
-      const data = { id: id, name: name };
-      this.lists.some(folder => {
-        if (folder.type === "bookmark") {
-          folder.lists.some(bookmark => {
-            if (bookmark.id === id) {
-              bookmark.name = name;
-              return true;
-            }
-            return false;
-          });
-          return true;
-        }
-        return false;
+      runInAction(() => {
+        //throw {message: "error 500"};
+        const data = { id: list.id, name: name };
+        list.name = data.name;
+        list.isUpdating = false;
       });
-      this.isCreatingNewFavorite = true;
-      return data.name;
     } catch (e) {
-      this.isCreatingNewFavorite = false;
-      this.favoriteCreationError = e.message;
+      list.updateError = e.message?e.message:e;
+      list.isUpdating = false;
+      return false;
     }
   }
 
   @action
-  async deleteBookmark(id) {
+  revertBookmarkListChanges(list) {
+    if (!list) { return; }
+    /*
+    this.lists.some(folder => {
+      if (folder.type === "bookmark") {
+        folder.lists.some(bookmark => {
+          if (bookmark.id === list.id) {
+            bookmark.editName = null;
+            bookmark.updateError = null;
+            return true;
+          }
+          return false;
+        });
+        return true;
+      }
+      return false;
+    });
+    */
+    list.editName = null;
+    list.updateError = null;
+  }
+
+  @action
+  async deleteBookmarkList(list) {
+    if (!list) { return false; }
+    list.deleteError = null;
+    list.isDeleting = true;
     try {
       /*
       await API.axios.post(API.endpoints.deleteBookmark(id));
       */
-      this.lists.some(folder => {
-        if (folder.type === "bookmark") {
-          const index = folder.lists.findIndex(bookmark => bookmark.id === id);
-          if (index !== -1) {
-            folder.lists.splice(index, 1);
+      runInAction(() => {
+        list.deleteError = null;
+        list.isDeleting = false;
+        this.lists.some(folder => {
+          if (folder.type === "bookmark") {
+            const index = folder.lists.findIndex(bookmark => bookmark.id === list.id);
+            if (index !== -1) {
+              folder.lists.splice(index, 1);
+            }
+            return true;
           }
-          return true;
-        }
-        return false;
+          return false;
+        });
       });
-      this.isCreatingNewFavorite = true;
-      return true;
     } catch (e) {
-      this.isCreatingNewFavorite = false;
-      this.favoriteCreationError = e.message;
+      list.deleteError = e.message?e.message:e;
+      list.isDeleting = false;
+      return false;
     }
   }
 
   @action
-  editBookmarksList(id) {
-    this.editedBookmarksList = id;
+  cancelBookmarkListDeletion(list) {
+    if (!list) { return; }
+    list.deleteError = null;
   }
 
   @action
-  cancelEditBookmarksList(id) {
-    if (!id || this.editedBookmarksList === id) {
-      this.editedBookmarksList = null;
+  setCurrentlyEditedBookmarkList(list) {
+    if (list && !list.isUpdating && !list.isDeleting) {
+      if (!list.updateError) {
+        list.editName = list.name;
+      }
+      this.currentlyEditedBookmarkList = list;
+    }
+  }
+
+  @action
+  cancelCurrentlyEditedBookmarkList(list) {
+    if (!list || this.currentlyEditedBookmarkList === list) {
+      this.currentlyEditedBookmarkList = null;
     }
   }
 }

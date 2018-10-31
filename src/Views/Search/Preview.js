@@ -13,7 +13,7 @@ import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
-import FavoriteStatus from "../Instance/FavoriteStatus";
+import BookmarkStatus from "../Instance/BookmarkStatus";
 
 const styles = {
   container:{
@@ -52,7 +52,7 @@ const styles = {
     right:"10px",
     fontSize:"30px"
   },
-  favoriteStatus: {
+  bookmarkStatus: {
     marginRight: "5px",
     fontSize: "1em"
   },
@@ -130,7 +130,7 @@ export default class Preview extends React.Component{
                   </div>
                 </div>
                 <div className={classes.titlePanel}>
-                  <FavoriteStatus id={searchStore.selectedInstance.id} className={classes.favoriteStatus} />
+                  <BookmarkStatus id={searchStore.selectedInstance.id} className={classes.bookmarkStatus} />
                   <span className={classes.title}>
                     {searchStore.selectedInstance.label}
                   </span>

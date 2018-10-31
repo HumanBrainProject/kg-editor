@@ -5,20 +5,20 @@
             "type": "bookmark",
             "lists": [
                 {
-                    "id": "favoriteList01",
-                    "name": "favorite list 01"
+                    "id": "bookmarkList01",
+                    "name": "bookmark list 01"
                 },
                 {
-                    "id": "favoriteList02",
-                    "name": "favorite list 02"
+                    "id": "bookmarkList02",
+                    "name": "bookmark list 02"
                 },
                 {
-                    "id": "favoriteList03",
-                    "name": "favorite list 03"
+                    "id": "bookmarkList03",
+                    "name": "bookmark list 03"
                 },
                 {
-                    "id": "favoriteList04",
-                    "name": "favorite list 04"
+                    "id": "bookmarkList04",
+                    "name": "bookmark list 04"
                 }
             ]
         },

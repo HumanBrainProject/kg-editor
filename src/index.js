@@ -22,6 +22,7 @@ import Help from "./Views/Help";
 import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
 import Instance from "./Views/Instance";
+import QueryBuilder from "./Views/QueryBuilder";
 
 import "babel-polyfill";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -287,6 +288,7 @@ class App extends React.Component{
                   <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
                   <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
 
+                  <Route path="/qb" exact={true} component={QueryBuilder} />
                   <Route path="/search" exact={true} component={Search} />
                   <Route path="/help" exact={true} component={Help} />
                   <Route path="/kg-stats" exact={true} component={Statistics} />

@@ -239,9 +239,10 @@ class InstanceStore {
 
       runInAction(async () => {
         const fieldsWithOptions = new Map();
+        const instanceData = data.data?data.data:{fields: {}};
         try {
-          for(let fieldKey in data.fields){
-            const instancesPath = data.fields[fieldKey].instancesPath;
+          for(let fieldKey in instanceData.fields){
+            const instancesPath = instanceData.fields[fieldKey].instancesPath;
             if(instancesPath){
               fieldsWithOptions.set(fieldKey, instancesPath);
               if(!this.optionsCache.has(instancesPath)){
@@ -265,8 +266,8 @@ class InstanceStore {
           instance.isFetching = false;
         }
 
-        instance.data = data;
-        instance.form = new FormStore(data);
+        instance.data = instanceData;
+        instance.form = new FormStore(instanceData);
 
         const fields = instance.form.getField();
         Object.entries(fields).forEach(([fieldKey, field]) => {

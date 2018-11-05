@@ -12,11 +12,11 @@ const endpoints = {
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
   "doRelease": () => `${window.rootPath}/release`,
   "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
-  "addBookmark": () => `${window.rootPath}/api/bookmark`,
-  "renameBookmark": (id) => `${window.rootPath}/api/bookmark/${id}`,
-  "deleteBookmark": (id) => `${window.rootPath}/api/bookmark/${id}`,
-  "listInstancesBookmarks": () => `${window.rootPath}/api/instancesBookmarks`,
-  "setInstanceBookmarks": (instance) => `${window.rootPath}/api/instanceBookmarks/${instance}`,
+  "createBookmarkList": () => `${window.rootPath}/api/bookmarkList`,
+  "updateBookmarkList": (id) => `${window.rootPath}/api/bookmarkList/${id}`,
+  "deleteBookmarkList": (id) => `${window.rootPath}/api/bookmarkList/${id}`,
+  "listInstancesBookmarkLists": () => `${window.rootPath}/api/bookmarks`,
+  "setInstanceBookmarkLists": (instance) => `${window.rootPath}/api/instance/${instance}/bookmarks`,
   "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
 };
 

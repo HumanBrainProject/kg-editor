@@ -2,7 +2,7 @@
     "data": [
         {
             "folderName": "Bookmarks",
-            "type": "bookmark",
+            "type": "BOOKMARK",
             "lists": [
                 {
                     "id": "bookmarkList01",
@@ -24,7 +24,7 @@
         },
         {
             "folderName": "Common node types",
-            "type": "nodetype",
+            "type": "NODETYPE",
             "lists": [
                 {
                     "id": "minds/core/dataset/v0.0.4",
@@ -35,7 +35,7 @@
         },
         {
             "folderName": "Other node types",
-            "type": "nodetype",
+            "type": "NODETYPE",
             "lists": [
                 {
                     "id": "minds/core/activity/v0.0.4",

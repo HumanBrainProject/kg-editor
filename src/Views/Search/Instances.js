@@ -209,7 +209,7 @@ export default class Instances extends React.Component{
     return (
       <div className={classes.container}>
         <div className={classes.header}>
-          {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder={`Filter instances of ${searchStore.selectedList.label}`} type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
+          {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder={`Filter instances of ${searchStore.selectedList.name}`} type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
         </div>
         <Scrollbars autoHide>
           {searchStore.selectedList ?
@@ -234,7 +234,7 @@ export default class Instances extends React.Component{
                             <div className={classes.listTitle}>
                               <Status id={instance.id} darkmode={true}/>
                               <BookmarkStatus id={instance.id} className="bookmarkStatus" />
-                              {instance.label}
+                              {instance.name}
                             </div>
                             {!!instance.description && <div className={classes.listDescription}>{instance.description}</div>}
 

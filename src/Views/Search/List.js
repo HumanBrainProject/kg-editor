@@ -269,7 +269,7 @@ export default class List extends React.Component{
     const {classes, list} = this.props;
     const selected = searchStore.selectedList === list;
     const edited = searchStore.currentlyEditedBookmarkList === list;
-    if (list.type === "BOOKMARK") {
+    if (list.type === searchStore.bookmarkListType) {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""} ${edited?"edited":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
@@ -355,7 +355,7 @@ export default class List extends React.Component{
           </React.Fragment>
         </div>
       );
-    } else if (list.type === "NODETYPE") {
+    } else if (list.type === searchStore.nodetypeType) {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>

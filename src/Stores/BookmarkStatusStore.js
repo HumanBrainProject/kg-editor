@@ -2,7 +2,7 @@ import { observable, action, runInAction } from "mobx";
 import { toJS } from "mobx";
 import { isArray, debounce } from "lodash";
 import console from "../Services/Logger";
-//import API from "../Services/API";
+import API from "../Services/API";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
@@ -77,9 +77,8 @@ class BookmarkStatusStore{
             status.hasSaveError = false;
             status.isSaving = true;
             const payload = (status.data && status.data.bookmarks)?toJS(status.data.bookmarks):[];
-            /*
-            const { data } = await API.axios.put(API.endpoints.setInstanceBookmarks(id), payload);
-            runInAction(() => {
+            runInAction(async () => {
+              const { data } = await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
               status.hasChanged = false;
               status.saveError = null;
               status.hasSaveError = false;
@@ -87,7 +86,7 @@ class BookmarkStatusStore{
               status.previousBookmarks = [];
               console.debug(`bookmark of "${id}" successfully saved`, data);
             });
-            */
+            /* Mockup Data
             if ((Math.floor(Math.random() * 10) % 2) === 0) {
               throw "Failed to save bookmark (Error 501).";
             }
@@ -105,6 +104,7 @@ class BookmarkStatusStore{
                 console.debug(`bookmark of "${id}" successfully saved`, data);
               });
             }, 500);
+            */
           } catch (e) {
             const message = e.message?e.message:e;
             status.saveError = `Error while saving bookmark of "${id}" (${message})`;
@@ -170,9 +170,9 @@ class BookmarkStatusStore{
       this.statuses.get(id).isFetching = true;
     });
     try{
-      /*
-      //let response = await API.axios.post(API.endpoints.listInstancesBookmarksStatus(), toProcess);
+      let response = await API.axios.post(API.endpoints.listInstancesBookmarkLists(), toProcess);
       runInAction(() =>{
+        /*
         response.data.forEach(status => {
           this.statuses.get(status.id).data = status;
           this.statuses.get(status.id).isFetching = false;
@@ -180,8 +180,19 @@ class BookmarkStatusStore{
           this.isFetching = false;
           this.smartProcessQueue();
         });
+        */
+        Object.entries(response.data).map(([id, bookmarks]) => {
+          this.statuses.get(id).data = {
+            id: id,
+            bookmarks: bookmarks
+          };
+          this.statuses.get(id).isFetching = false;
+          this.statuses.get(id).isFetched = true;
+          this.isFetching = false;
+          this.smartProcessQueue();
+        });
       });
-      */
+      /* Mockup Data
       if ((Math.floor(Math.random() * 10) % 2) === 0) {
         throw "Failed to request bookmark status (Error 501).";
       }
@@ -204,6 +215,7 @@ class BookmarkStatusStore{
           });
         });
       }, 500);
+      */
     } catch(e){
       runInAction(() =>{
         const message = e.message?e.message:e;

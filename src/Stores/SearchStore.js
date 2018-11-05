@@ -59,7 +59,7 @@ class SearchStore{
 
   @computed get bookmarkListFolder(){
     return this.lists.reduce((list, folder) => {
-      if (folder.type !== "bookmark") { return list; }
+      if (folder.folderType !== "BOOKMARK") { return list; }
       list.push(...folder.lists);
       return list;
     }, []);
@@ -71,23 +71,25 @@ class SearchStore{
       this.fetchError.lists = null;
       this.isFetching.lists = true;
       this.isFetched.lists = false;
-      const { data } = await API.axios.get(API.endpoints.lists());
+      const { data } = await API.axios.get(API.endpoints.bookmarkListFolders());
       runInAction(() => {
         this.isFetching.lists = false;
         this.isFetched.lists = true;
-        this.lists = (data && data.data)?data.data:[];
-        this.lists.forEach(folder => {
+        const lists = Array.isArray(data)?data:[]; //(data && data.data)?data.data:[];
+        lists.forEach(folder => {
           folder.expand = true;
           folder.lists.forEach(list => {
-            list.type = folder.type;
-            if (folder.type === "bookmark") {
+            list.type = folder.folderType;
+            if (folder.folderType === "BOOKMARK") {
               list.isUpdating = false;
               list.updateError = null;
               list.isDeleting = false;
               list.deleteError = null;
+              list.editName = null;
             }
           });
         });
+        this.lists=lists;
       });
     } catch (e) {
       const message = e.message? e.message: e;
@@ -158,11 +160,11 @@ class SearchStore{
       */
       const data = { id: uniqueId(`id${new Date().getTime()}`) };
       this.lists.some((folder) => {
-        if (folder.type === "bookmark") {
+        if (folder.folderType === "BOOKMARK") {
           folder.lists.push({
             id: data.id,
             name: name,
-            type: folder.type,
+            type: folder.folderType,
             isUpdating: false,
             updateError: null,
             isDeleting: false,
@@ -186,12 +188,30 @@ class SearchStore{
     list.editName = newProps.name;
     list.updateError = null;
     list.isUpdating = true;
+    /* TODO: check non empty and no dupplicate name
+    this.lists.some(folder => {
+      if (folder.folderType === "BOOKMARK") {
+        folder.lists.some(bookmark => {
+          if (bookmark.id === list.id) {
+            bookmark.editName = null;
+            bookmark.updateError = null;
+            return true;
+          }
+          return false;
+        });
+        return true;
+      }
+      return false;
+    });
+    */
     try {
       /*
       const { data } = await API.axios.post(API.endpoints.addBookmark(id), {"name": name});
       */
       runInAction(() => {
-        //throw {message: "error 500"};
+        if ((Math.floor(Math.random() * 10) % 2) === 0) {
+          throw "Error 501";
+        }
         const data = { id: list.id, name: name };
         list.name = data.name;
         list.isUpdating = false;
@@ -206,24 +226,9 @@ class SearchStore{
   @action
   revertBookmarkListChanges(list) {
     if (!list) { return; }
-    /*
-    this.lists.some(folder => {
-      if (folder.type === "bookmark") {
-        folder.lists.some(bookmark => {
-          if (bookmark.id === list.id) {
-            bookmark.editName = null;
-            bookmark.updateError = null;
-            return true;
-          }
-          return false;
-        });
-        return true;
-      }
-      return false;
-    });
-    */
     list.editName = null;
     list.updateError = null;
+    this.cancelCurrentlyEditedBookmarkList(list);
   }
 
   @action
@@ -236,10 +241,12 @@ class SearchStore{
       await API.axios.post(API.endpoints.deleteBookmark(id));
       */
       runInAction(() => {
-        list.deleteError = null;
+        if ((Math.floor(Math.random() * 10) % 2) === 0) {
+          throw "Error 501";
+        }
         list.isDeleting = false;
         this.lists.some(folder => {
-          if (folder.type === "bookmark") {
+          if (folder.folderType === "BOOKMARK") {
             const index = folder.lists.findIndex(bookmark => bookmark.id === list.id);
             if (index !== -1) {
               folder.lists.splice(index, 1);
@@ -268,6 +275,7 @@ class SearchStore{
       if (!list.updateError) {
         list.editName = list.name;
       }
+      list.updateError = null;
       this.currentlyEditedBookmarkList = list;
     }
   }

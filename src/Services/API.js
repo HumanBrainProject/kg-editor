@@ -2,8 +2,10 @@ import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
 const endpoints = {
+  "user": () => `${window.rootPath}/api/user`,
   "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
-  "lists": () => `${window.rootPath}/data/lists.json`,
+  "mockupBookmarkListFolders": () => `${window.rootPath}/data/lists.json`,
+  "bookmarkListFolders": () => `${window.rootPath}/api/bookmarkListFolders`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
   "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,

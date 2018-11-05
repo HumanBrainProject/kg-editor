@@ -217,7 +217,7 @@ export default class List extends React.Component{
 
   handleCancelEditBookmark(event) {
     event && event.stopPropagation();
-    searchStore.cancelCurrentlyEditedBookmarkList(this.props.list);
+    searchStore.revertBookmarkListChanges(this.props.list);
   }
 
   handleRevertEditBookmark(event) {
@@ -269,7 +269,7 @@ export default class List extends React.Component{
     const {classes, list} = this.props;
     const selected = searchStore.selectedList === list;
     const edited = searchStore.currentlyEditedBookmarkList === list;
-    if (list.type === "bookmark") {
+    if (list.type === "BOOKMARK") {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""} ${edited?"edited":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
@@ -283,7 +283,7 @@ export default class List extends React.Component{
                 </ButtonGroup>
               </div>
               :
-              <span>{(list.editName && !list.updateError)?list.editName:list.name}</span>
+              <span>{list.editName?list.editName:list.name}</span>
             }
             {list.updateError?
               <PopOverButton
@@ -320,7 +320,7 @@ export default class List extends React.Component{
                       <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
                     </React.Fragment>
                   )}
-                  onOk={this.handleConfirmDeleteBookmark.bind(this)}
+                  onOk={this.handleDeleteBookmark.bind(this)}
                   cancelComponent={() => (
                     <React.Fragment>
                       <FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel
@@ -355,7 +355,7 @@ export default class List extends React.Component{
           </React.Fragment>
         </div>
       );
-    } else if (list.type === "nodetype") {
+    } else if (list.type === "NODETYPE") {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>

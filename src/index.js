@@ -207,17 +207,19 @@ class App extends React.Component{
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {!authStore.isAuthenticated?
+                  {!authStore.isOIDCAuthenticated?
                     <Tab icon={"user-lock"} current={true}>Login</Tab>
                     :
-                    <React.Fragment>
-                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
-                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
-                    </React.Fragment>
+                    authStore.isFullyAuthenticated?
+                      <React.Fragment>
+                        <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
+                        <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
+                      </React.Fragment>
+                      :null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
-                  {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
+                  {authStore.isFullyAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
                     const instance = instanceStore.getInstance(instanceId);
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
@@ -245,7 +247,7 @@ class App extends React.Component{
                   })}
                 </div>
                 <div className={classes.fixedTabsRight}>
-                  {authStore.isAuthenticated &&
+                  {authStore.isFullyAuthenticated &&
                     <React.Fragment>
                       <Tab icon={"chart-bar"} current={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
                       <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
@@ -266,24 +268,27 @@ class App extends React.Component{
                 <SaveBar/>
               </div>
             }
-            {!authStore.isAuthenticated?
-              <Route component={Login} />
-              :appStore.globalError?
-                <Route component={GlobalError} />
+            {appStore.globalError?
+              <Route component={GlobalError} />
+              :
+              !authStore.isOIDCAuthenticated?
+                <Route component={Login} />
                 :
-                <Switch>
-                  <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
-                  <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
-                  <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
-                  <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+                authStore.isFullyAuthenticated?
+                  <Switch>
+                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
+                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
+                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
+                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
 
-                  <Route path="/search" exact={true} component={Search} />
-                  <Route path="/help" exact={true} component={Help} />
-                  <Route path="/kg-stats" exact={true} component={Statistics} />
-                  <Route path="/loginSuccess" exact={true} component={()=>null} />
-                  <Route path="/" exact={true} component={Home} />
-                  <Route component={NotFound} />
-                </Switch>
+                    <Route path="/search" exact={true} component={Search} />
+                    <Route path="/help" exact={true} component={Help} />
+                    <Route path="/kg-stats" exact={true} component={Statistics} />
+                    <Route path="/loginSuccess" exact={true} component={()=>null} />
+                    <Route path="/" exact={true} component={Home} />
+                    <Route component={NotFound} />
+                  </Switch>
+                  :null
             }
           </div>
           <div className={classes.status}>

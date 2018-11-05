@@ -12,7 +12,7 @@
     "color": "^3.0.0",
     "diff": "^3.5.0",
     "google-palette": "^1.1.0",
-    "hbp-quickfire": "^1.0.9",
+    "hbp-quickfire": "^1.0.13-unstable",
     "lodash": "^4.17.10",
     "mobx": "^4.3.1",
     "mobx-react": "^5.0.0",

@@ -94,7 +94,7 @@ export default class Lists extends React.Component{
             searchStore.lists.length?
               <React.Fragment>
                 <div className={classes.header}>
-                  <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Search" type="text" value={searchStore.listsFilter} onChange={this.handleFilterChange}/>
+                  <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Filter lists" type="text" value={searchStore.listsFilter} onChange={this.handleFilterChange}/>
                 </div>
                 <Scrollbars autoHide>
                   {searchStore.listsFilter.trim()?

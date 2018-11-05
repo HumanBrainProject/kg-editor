@@ -7,7 +7,7 @@ const endpoints = {
   "mockupBookmarkListFolders": () => `${window.rootPath}/data/lists.json`,
   "bookmarkListFolders": () => `${window.rootPath}/api/bookmarkListFolders`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
-  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
+  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
   "doRelease": () => `${window.rootPath}/release`,

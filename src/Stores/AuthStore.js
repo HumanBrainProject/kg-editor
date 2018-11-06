@@ -79,13 +79,13 @@ class AuthStore {
   }
 
   @computed
-  get hasUserProfil() {
+  get hasUserProfile() {
     return !!this.user;
   }
 
   @computed
   get isFullyAuthenticated() {
-    return this.isOIDCAuthenticated && this.hasUserProfil;
+    return this.isOIDCAuthenticated && this.hasUserProfile;
   }
 
   get hasExpired() {

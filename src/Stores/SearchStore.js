@@ -31,7 +31,9 @@ class SearchStore{
   @observable canLoadMoreInstances = false;
 
   @observable currentlyEditedBookmarkList = null;
-  @observable isCreatingNewBookmarkList = false;
+
+  @observable newBookmarkListName = null;
+  @observable isCreatingBookmarkList = false;
   @observable bookmarkListCreationError = null;
 
   pageStart = 0;
@@ -156,8 +158,9 @@ class SearchStore{
 
   @action
   async createNewBookmarkList(name) {
+    this.newBookmarkListName = name;
     this.bookmarkListCreationError = null;
-    this.isCreatingNewBookmarkList = true;
+    this.isCreatingBookmarkList = true;
     let bookmarkListfolder = null;
     this.lists.some((folder) => {
       if (folder.folderType === this.bookmarkListType) {
@@ -181,16 +184,23 @@ class SearchStore{
           isDeleting: false,
           deleteError: null
         });
-        this.isCreatingNewBookmarkList = false;
+        this.isCreatingBookmarkList = false;
+        this.newBookmarkListName = null;
         return data.id;
       } catch(e){
-        this.isCreatingNewBookmarkList = false;
+        this.isCreatingBookmarkList = false;
         this.bookmarkListCreationError = e.message?e.message:e;
       }
     } else {
-      this.isCreatingNewBookmarkList = false;
+      this.isCreatingBookmarkList = false;
       this.bookmarkListCreationError = `Failed to create new bookmarkList ${name}. No folder of type this.bookmarkListType found.`;
     }
+  }
+
+  @action
+  dismissBookmarkListCreationError() {
+    this.bookmarkListCreationError = null;
+    this.newBookmarkListName = null;
   }
 
   @action

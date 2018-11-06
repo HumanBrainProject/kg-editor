@@ -62,7 +62,7 @@ export default class Search extends React.Component{
   }
 
   handleRetryCreateNewBookmarkList= () => {
-    searchStore.createNewBookmarkList(searchStore.newBookmarkListName);
+    searchStore.createBookmarkList(searchStore.newBookmarkListName);
   }
 
   render = () => {

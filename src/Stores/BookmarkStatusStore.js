@@ -3,6 +3,7 @@ import { toJS } from "mobx";
 import { isArray, debounce } from "lodash";
 import console from "../Services/Logger";
 import API from "../Services/API";
+import { constants } from "zlib";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
@@ -41,9 +42,9 @@ class BookmarkStatusStore{
   }
 
   @action
-  updateStatus(instanceIds, bookmarks){
-    if (!Array.isArray(bookmarks)) {
-      bookmarks = [];
+  updateStatus(instanceIds, bookmarkLists){
+    if (!Array.isArray(bookmarkLists)) {
+      bookmarkLists = [];
     }
     if(!isArray(instanceIds)){
       instanceIds = [instanceIds];
@@ -53,11 +54,11 @@ class BookmarkStatusStore{
         const status = this.statuses.get(id);
         if(!status.isFetching && !status.hasFetchError) {
           if (!status.data) {
-            status.data = {id: id, bookmarks: []};
+            status.data = {id: id, bookmarkLists: []};
           }
           status.hasChanged = true;
-          status.previousBookmarks = toJS(status.data.bookmarks);
-          status.data.bookmarks = bookmarks;
+          status.previousBookmarkLists = toJS(status.data.bookmarkLists);
+          status.data.bookmarkLists = bookmarkLists;
         }
       }
     });
@@ -76,14 +77,14 @@ class BookmarkStatusStore{
           try {
             status.hasSaveError = false;
             status.isSaving = true;
-            const payload = (status.data && status.data.bookmarks)?toJS(status.data.bookmarks):[];
+            const payload = (status.data && status.data.bookmarkLists)?toJS(status.data.bookmarkLists):[];
             runInAction(async () => {
               const { data } = await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
               status.hasChanged = false;
               status.saveError = null;
               status.hasSaveError = false;
               status.isSaving = false;
-              status.previousBookmarks = [];
+              status.previousBookmarkLists = [];
               console.debug(`bookmark of "${id}" successfully saved`, data);
             });
             /* Mockup Data
@@ -92,7 +93,7 @@ class BookmarkStatusStore{
             }
             const data = {
               id: id,
-              bookmarks: payload
+              bookmarkLists: payload
             };
             setTimeout(() => {
               runInAction(() =>{
@@ -100,7 +101,7 @@ class BookmarkStatusStore{
                 status.saveError = null;
                 status.hasSaveError = false;
                 status.isSaving = false;
-                status.previousBookmarks = [];
+                status.previousBookmarkLists = [];
                 console.debug(`bookmark of "${id}" successfully saved`, data);
               });
             }, 500);
@@ -126,9 +127,9 @@ class BookmarkStatusStore{
         const status = this.statuses.get(id);
         if (status.hasChanged && !status.isSaving && !status.isFetching) {
           if (!status.data) {
-            status.data = {id: id, bookmarks: []};
+            status.data = {id: id, bookmarkLists: []};
           }
-          status.data.bookmarks = Array.isArray(status.previousBookmarks)?status.previousBookmarks:[];
+          status.data.bookmarkLists = Array.isArray(status.previousBookmarkLists)?status.previousBookmarkLists:[];
           status.hasChanged = false;
           status.saveError = null;
           status.hasSaveError = false;
@@ -170,24 +171,13 @@ class BookmarkStatusStore{
       this.statuses.get(id).isFetching = true;
     });
     try{
-      let response = await API.axios.post(API.endpoints.listInstancesBookmarkLists(), toProcess);
+      const { data } = await API.axios.post(API.endpoints.listInstancesBookmarkLists(), toProcess);
       runInAction(() =>{
-        /*
-        response.data.forEach(status => {
+        const statuses = Array.isArray(data.data)?data.data:[];
+        statuses.forEach(status => {
           this.statuses.get(status.id).data = status;
           this.statuses.get(status.id).isFetching = false;
           this.statuses.get(status.id).isFetched = true;
-          this.isFetching = false;
-          this.smartProcessQueue();
-        });
-        */
-        Object.entries(response.data).map(([id, bookmarks]) => {
-          this.statuses.get(id).data = {
-            id: id,
-            bookmarks: bookmarks
-          };
-          this.statuses.get(id).isFetching = false;
-          this.statuses.get(id).isFetched = true;
           this.isFetching = false;
           this.smartProcessQueue();
         });
@@ -196,17 +186,18 @@ class BookmarkStatusStore{
       if ((Math.floor(Math.random() * 10) % 2) === 0) {
         throw "Failed to request bookmark status (Error 501).";
       }
-      const response = {
+      const { data } = {
         data: toProcess.map(id => (
           {
             id: id,
-            bookmarks: (Math.floor(Math.random() * 10) % 2) === 0?[]:["bookmarkList02"]
+            bookmarkLists: (Math.floor(Math.random() * 10) % 2) === 0?[]:["bookmarkList02"]
           }
         ))
       };
       setTimeout(() => {
         runInAction(() =>{
-          response.data.forEach(status => {
+          const statuses = Array.isArray(data.data)?data.data:[];
+          statuses.forEach(status => {
             this.statuses.get(status.id).data = status;
             this.statuses.get(status.id).isFetching = false;
             this.statuses.get(status.id).isFetched = true;

@@ -63,7 +63,7 @@ class SearchStore{
     }, []);
   }
 
-  @computed get bookmarkListFolder(){
+  @computed get bookmarkLists(){
     return this.lists.reduce((list, folder) => {
       if (folder.folderType !== this.bookmarkListType) { return list; }
       list.push(...folder.lists);
@@ -157,7 +157,7 @@ class SearchStore{
   }
 
   @action
-  async createNewBookmarkList(name) {
+  async createBookmarkList(name) {
     this.newBookmarkListName = name;
     this.bookmarkListCreationError = null;
     this.isCreatingBookmarkList = true;

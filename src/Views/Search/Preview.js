@@ -132,7 +132,7 @@ export default class Preview extends React.Component{
                 <div className={classes.titlePanel}>
                   <BookmarkStatus id={searchStore.selectedInstance.id} className={classes.bookmarkStatus} />
                   <span className={classes.title}>
-                    {searchStore.selectedInstance.label}
+                    {searchStore.selectedInstance.name}
                   </span>
                 </div>
                 <div className={classes.id}>

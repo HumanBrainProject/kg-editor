@@ -43,8 +43,8 @@ export default class BookmarkButton extends React.Component {
   }
 
   handleValueChange(event, field) {
-    const bookmarks = field.value.map(bookmark => bookmark.id);
-    typeof this.props.onChange === "function" && this.props.onChange(bookmarks);
+    const bookmarkLists = field.value.map(bookmarkList => bookmarkList.id);
+    typeof this.props.onChange === "function" && this.props.onChange(bookmarkLists);
   }
 
   handleNew(name) { // , field, store) {

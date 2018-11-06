@@ -59,18 +59,18 @@ export default class BookmarkStatus extends React.Component{
     bookmarkStatusStore.saveStatus(this.props.id);
   }
 
-  handleBookmarksChange(bookmarks) {
-    bookmarkStatusStore.updateStatus(this.props.id, bookmarks);
+  handleBookmarksChange(bookmarkLists) {
+    bookmarkStatusStore.updateStatus(this.props.id, bookmarkLists);
   }
 
   async handleNewBookmark(name) { // , field, store) {
-    await searchStore.createNewBookmarkList(name);
+    await searchStore.createBookmarkList(name);
     /*
-    const newBookmarkId = await searchStore.createNewBookmarkList(name);
+    const newBookmarkListId = await searchStore.createBookmarkList(name);
     if(newBookmarkId){
-      const bookmarks = field.value.map(bookmark => bookmark.value);
-      bookmarks.push(newBookmarkId);
-      bookmarkStatusStore.updateStatus(this.props.id, bookmarks);
+      const bookmarkListIds = field.value.map(bookmarkList => bookmarkList.value);
+      bookmarkListIds.push(newBookmarkListId);
+      bookmarkStatusStore.updateStatus(this.props.id, bookmarkListIds);
     }
     */
   }
@@ -90,8 +90,8 @@ export default class BookmarkStatus extends React.Component{
   render(){
     const instanceStatus = bookmarkStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
-    const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarks.length)?toJS(instanceStatus.data.bookmarks):[];
-    const bookmarks = toJS(searchStore.bookmarkListFolder);
+    const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarkLists.length)?toJS(instanceStatus.data.bookmarkLists):[];
+    const bookmarkLists = toJS(searchStore.bookmarkLists);
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?
@@ -137,7 +137,7 @@ export default class BookmarkStatus extends React.Component{
                 <h5 className={classes.textError}>{instanceStatus.saveError}</h5>
               </PopOverButton>
               :
-              <BookmarkButton values={values} list={bookmarks} onSave={this.handleBookmarksSave} onChange={this.handleBookmarksChange} onNew={this.handleNewBookmark} />
+              <BookmarkButton values={values} list={bookmarkLists} onSave={this.handleBookmarksSave} onChange={this.handleBookmarksChange} onNew={this.handleNewBookmark} />
         }
       </div>
     );

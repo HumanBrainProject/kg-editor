@@ -6,7 +6,7 @@ class Field {
   @observable schema = null;
   @observable id = 0;
   @observable alias = null;
-  @observable fields = []; 
+  @observable fields = [];
 
   constructor(schema){
     this.schema = schema;

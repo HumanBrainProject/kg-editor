@@ -4,7 +4,7 @@ import {observer} from "mobx-react";
 import {Button, Modal} from "react-bootstrap";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
-import Fields from "./QueryBuilder/Fields";
+import Field from "./QueryBuilder/Field";
 
 let styles = {
   container:{
@@ -78,9 +78,8 @@ export default class QueryBuilder extends React.Component{
                 </Modal>
               </React.Fragment>
               :
-              <div>
-                {queryBuilderStore.rootField.schema.label}
-                <Fields field={queryBuilderStore.rootField}/>
+              <React.Fragment>
+                <Field field={queryBuilderStore.rootField}/>
                 {queryBuilderStore.showModalFieldChoice &&
                   <Modal show={true}>
                     <Modal.Body>
@@ -115,7 +114,7 @@ export default class QueryBuilder extends React.Component{
                     </Modal.Body>
                   </Modal>
                 }
-              </div>
+              </React.Fragment>
             }
           </div>
 

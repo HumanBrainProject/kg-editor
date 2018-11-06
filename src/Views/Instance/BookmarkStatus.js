@@ -15,7 +15,7 @@ let styles = {
   },
   loader: {
     borderRadius:"0.14em",
-    width:"2.5em",
+    width: "20px",
     background:"var(--bg-color-ui-contrast2)",
     textAlign:"center",
     color:"var(--ft-color-loud)",

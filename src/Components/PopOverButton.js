@@ -12,10 +12,11 @@ let styles = {
   },
   button: {
     position: "relative",
-    backgroundColor: "transparent",
+    width: "20px",
     margin: 0,
     padding: 0,
     border: 0,
+    backgroundColor: "transparent",
     outline: 0
   },
   popOver: {

@@ -1,6 +1,6 @@
-import { observable, action, runInAction, computed, toJS } from "mobx";
+import { observable, action, runInAction, computed } from "mobx";
 import API from "../Services/API";
-import statusStore from "./StatusStore";
+//import statusStore from "./StatusStore";
 
 export default class ReleaseStore{
   @observable topInstanceId = null;
@@ -9,6 +9,10 @@ export default class ReleaseStore{
   @observable isFetching = false;
   @observable isFetched = false;
   @observable isSaving = false;
+  @observable savingTotal = 0;
+  @observable savingProgress = 0;
+  @observable savingErrors = [];
+  @observable savingLastEndedRequest = "";
 
   @observable fetchError = null;
   @observable saveError = null;
@@ -104,12 +108,50 @@ export default class ReleaseStore{
     }
   }
 
-  @action
   async commitStatusChanges(){
+    let nodesToProceed = this.getNodesToProceed();
     this.isSaving = true;
-    try{
+    this.savingProgress = 0;
+    this.savingTotal = nodesToProceed["NOT_RELEASED"].length + nodesToProceed["RELEASED"].length;
+    this.savingErrors = [];
+
+    nodesToProceed["RELEASED"].forEach(async (node) => {
+      node["@id"] = node["@id"].replace("https://nexus-dev.humanbrainproject.org/v0/data/","");
+      try{
+        await API.axios.put(API.endpoints.doRelease(node["@id"], {}));
+        runInAction(()=>{
+          this.savingProgress++;
+          this.savingLastEndedRequest = `(${node.type}) ${node.label} released successfully`;
+        });
+      } catch(e){
+        runInAction(()=>{
+          this.savingProgress++;
+          this.savingErrors.push(e.message);
+          this.savingLastEndedRequest = `(${node.type}) ${node.label} : an error occured while trying to release this instance`;
+        });
+      }
+    });
+
+    nodesToProceed["NOT_RELEASED"].forEach(async (node) => {
+      node["@id"] = node["@id"].replace("https://nexus-dev.humanbrainproject.org/v0/data/","");
+      try{
+        await API.axios.delete(API.endpoints.doRelease(node["@id"], {}));
+        runInAction(()=>{
+          this.savingProgress++;
+          this.savingLastEndedRequest = `(${node.type}) ${node.label} unreleased successfully`;
+        });
+      } catch(e){
+        runInAction(()=>{
+          this.savingProgress++;
+          this.savingErrors.push(e.message);
+          this.savingLastEndedRequest = `(${node.type}) ${node.label} : an error occured while trying to unrelease this instance`;
+        });
+      }
+    });
+
+    /*try{
       const payload = toJS(this.getNodesToProceed()["RELEASED"]).map(node => {return {id:node["@id"], rev:node.rev};});
-      await API.axios.post(API.endpoints.doRelease(), payload);
+      //await API.axios.post(API.endpoints.doRelease(), payload);
       runInAction(() => {
         this.isSaving = false;
         this.fetchReleaseData();
@@ -123,7 +165,7 @@ export default class ReleaseStore{
         this.fetchReleaseData();
         statusStore.flush();
       });
-    }
+    }*/
   }
 
   @action

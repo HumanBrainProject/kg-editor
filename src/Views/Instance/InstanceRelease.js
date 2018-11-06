@@ -13,6 +13,7 @@ import FetchingLoader from "../../Components/FetchingLoader";
 import ReleaseStatus from "../../Components/ReleaseStatus";
 import MultiToggle from "../../Components/MultiToggle";
 import BGMessage from "../../Components/BGMessage";
+import SavingModal from "./InstanceRelease/SavingModal";
 
 const styles = {
   container: {
@@ -511,6 +512,7 @@ export default class InstanceRelease extends React.Component{
                     <div className={classes.tree}>
                       {this.renderNode(this.releaseStore.instancesTree, "pending_")}
                     </div>
+                    <SavingModal store={this.releaseStore}/>
                   </div>
                 }
               </Scrollbars>

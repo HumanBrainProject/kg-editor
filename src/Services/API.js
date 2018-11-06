@@ -2,22 +2,22 @@ import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
 const endpoints = {
-  "user": () => `${window.rootPath}/api/user`,
-  "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
-  "mockupBookmarkListFolders": () => `${window.rootPath}/data/lists.json`,
-  "bookmarkListFolders": () => `${window.rootPath}/api/bookmarkListFolders`,
-  "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
-  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
-  "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
-  "doRelease": () => `${window.rootPath}/release`,
-  "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
-  "createBookmarkList": () => `${window.rootPath}/api/bookmarkList`,
-  "updateBookmarkList": (id) => `${window.rootPath}/api/bookmarkList/${id}`,
-  "deleteBookmarkList": (id) => `${window.rootPath}/api/bookmarkList/${id}`,
-  "listInstancesBookmarkLists": () => `${window.rootPath}/api/bookmarks`,
-  "setInstanceBookmarkLists": (instance) => `${window.rootPath}/api/instance/${instance}/bookmarks`,
-  "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
+  "user": () => "/editor/api/user",
+  "nodeTypes": () => "/editor/api/nodetypes",
+  "mockupBookmarkListFolders": () => "/data/lists.json",
+  "bookmarkListFolders": () => "/editor/api/bookmarkListFolders",
+  "instances": (entity) => `/editor/api/instances/${entity}`,
+  "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
+  "instanceData": (instance) => `/editor/api/instance/${instance}`,
+  "releaseData": (instance) => `/api/releases/${instance}/graph`,
+  "doRelease": (instance) => `/api/releases/${instance}`,
+  "releaseStatus": () => "/api/releases",
+  "createBookmarkList": () => "/editor/api/bookmarkList",
+  "updateBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
+  "deleteBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
+  "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
+  "setInstanceBookmarkLists": (instance) => `/editor/api/instance/${instance}/bookmarks`,
+  "graph": (instance, step) => `/editor/api/graph/${instance}?step=${step}`
 };
 
 class API {

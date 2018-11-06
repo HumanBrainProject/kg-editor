@@ -2,11 +2,12 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react";
+import { Modal, Button } from "react-bootstrap";
 
 import Lists from "./Search/Lists";
 import Instances from "./Search/Instances";
 import searchStore from "../Stores/SearchStore";
-import { Modal, Button } from "react-bootstrap";
+import FetchingLoader from "../Components/FetchingLoader";
 
 const styles = {
   container: {
@@ -51,6 +52,22 @@ const styles = {
         }
       }
     }
+  },
+  loader:{
+    position:"absolute",
+    top:0,
+    left:0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    "& [class*=fetchingPanel]": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--list-border-hover)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
   }
 };
 
@@ -89,6 +106,11 @@ export default class Search extends React.Component{
             <Button bsStyle="primary" onClick={this.handleDismissBookmarkListCreationError.bind(this)}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
           </Modal.Footer>
         </Modal>
+        {searchStore.isCreatingBookmarkList && (
+          <div className={classes.loader}>
+            <FetchingLoader>{`Creating a bookmark list "${searchStore.newBookmarkListName}"...`}</FetchingLoader>
+          </div>
+        )}
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import console from "../Services/Logger";
-import { observable, computed, action } from "mobx";
+import { observable, computed, action, runInAction } from "mobx";
+import API from "../Services/API";
 
 const oidConnectServerUri = "https://services.humanbrainproject.eu/oidc/authorize";
 const oidClientId = "nexus-kg-search";
@@ -49,6 +50,7 @@ let sessionTimer = null;
 
 class AuthStore {
   @observable session = null;
+  @observable user = null;
   reloginResolve = null;
   reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
   expiredToken = false;
@@ -72,8 +74,18 @@ class AuthStore {
   }
 
   @computed
-  get isAuthenticated() {
+  get isOIDCAuthenticated() {
     return !this.hasExpired;
+  }
+
+  @computed
+  get hasUserProfile() {
+    return !!this.user;
+  }
+
+  @computed
+  get isFullyAuthenticated() {
+    return this.isOIDCAuthenticated && this.hasUserProfile;
   }
 
   get hasExpired() {
@@ -103,6 +115,7 @@ class AuthStore {
     clearTimeout(sessionTimer);
     this.session = null;
     this.expiredToken = true;
+    this.user = null;
     if (typeof Storage !== "undefined" ) {
       localStorage.removeItem(oidLocalStorageKey);
     }
@@ -122,7 +135,7 @@ class AuthStore {
   }
 
   @action
-  tryAuthenticate() {
+  async tryAuthenticate() {
     const hash = window.location.hash;
     const accessToken = getKey(hash, "access_token");
     const state = getKey(hash, "state");
@@ -153,9 +166,13 @@ class AuthStore {
 
     }
 
-    if(this.isAuthenticated){
-      this.reloginResolve();
-      this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+    if(!this.hasExpired && !this.user){
+      const { data } = await API.axios.get(API.endpoints.user());
+      runInAction(() => {
+        this.user = data;
+        this.reloginResolve();
+        this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+      });
     }
 
     return this.session? this.session.accessToken: null;

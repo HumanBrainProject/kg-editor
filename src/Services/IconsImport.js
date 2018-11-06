@@ -12,6 +12,7 @@ import {faCircleNotch} from "@fortawesome/free-solid-svg-icons/faCircleNotch";
 import {faCircle} from "@fortawesome/free-solid-svg-icons/faCircle";
 import {faTimes} from "@fortawesome/free-solid-svg-icons/faTimes";
 import {faUndo} from "@fortawesome/free-solid-svg-icons/faUndo";
+import {faUndoAlt} from "@fortawesome/free-solid-svg-icons/faUndoAlt";
 import {faSave} from "@fortawesome/free-solid-svg-icons/faSave";
 import {faSyncAlt} from "@fortawesome/free-solid-svg-icons/faSyncAlt";
 import {faEdit} from "@fortawesome/free-solid-svg-icons/faEdit";
@@ -39,9 +40,11 @@ import {faExclamationCircle} from "@fortawesome/free-solid-svg-icons/faExclamati
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons/faEnvelope";
 import {faSun} from "@fortawesome/free-solid-svg-icons/faSun";
 import {faMoon} from "@fortawesome/free-solid-svg-icons/faMoon";
+import {faStar} from "@fortawesome/free-solid-svg-icons/faStar";
+import {faTrashAlt} from "@fortawesome/free-solid-svg-icons/faTrashAlt";
+import {faLightbulb} from "@fortawesome/free-solid-svg-icons/faLightbulb";
 import {faFolderOpen} from "@fortawesome/free-solid-svg-icons/faFolderOpen";
 import {faGlasses} from "@fortawesome/free-solid-svg-icons/faGlasses";
-import {faPlusSquare} from "@fortawesome/free-solid-svg-icons/faPlusSquare";
 
 library.add(
   faUserLock,
@@ -51,6 +54,7 @@ library.add(
   faCamera,
   faCaretRight,
   faUndo,
+  faUndoAlt,
   faSave,
   faSyncAlt,
   faCaretDown,
@@ -82,7 +86,9 @@ library.add(
   faEnvelope,
   faSun,
   faMoon,
+  faStar,
+  faTrashAlt,
+  faLightbulb,
   faFolderOpen,
-  faGlasses,
-  faPlusSquare
+  faGlasses
 );

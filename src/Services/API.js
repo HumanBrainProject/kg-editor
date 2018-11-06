@@ -2,13 +2,21 @@ import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
 const endpoints = {
+  "user": () => `${window.rootPath}/api/user`,
   "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
+  "mockupBookmarkListFolders": () => `${window.rootPath}/data/lists.json`,
+  "bookmarkListFolders": () => `${window.rootPath}/api/bookmarkListFolders`,
   "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
-  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
+  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
   "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
   "doRelease": () => `${window.rootPath}/release`,
   "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
+  "createBookmarkList": () => `${window.rootPath}/api/bookmarkList`,
+  "updateBookmarkList": (id) => `${window.rootPath}/api/bookmarkList/${id}`,
+  "deleteBookmarkList": (id) => `${window.rootPath}/api/bookmarkList/${id}`,
+  "listInstancesBookmarkLists": () => `${window.rootPath}/api/bookmarks`,
+  "setInstanceBookmarkLists": (instance) => `${window.rootPath}/api/instance/${instance}/bookmarks`,
   "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
 };
 

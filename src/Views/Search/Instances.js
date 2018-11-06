@@ -14,6 +14,7 @@ import instanceStore from "../../Stores/InstanceStore";
 import Preview from "./Preview";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
+import BookmarkStatus from "../Instance/BookmarkStatus";
 
 const styles = {
   container:{
@@ -71,15 +72,24 @@ const styles = {
     color:"var(--ft-color-normal)",
     outline:"1px solid var(--border-color-ui-contrast1)",
     marginBottom:"11px",
+    "& .popover-popup": {
+      display: "none !important"
+    },
     "&:hover":{
       background:"var(--list-bg-hover)",
       borderColor:"var(--list-border-hover)",
       color:"var(--ft-color-loud)",
       outline:"1px solid transparent",
+      "& .popover-popup": {
+        display: "block !important"
+      },
       "& $actions":{
         opacity:0.75
       },
       "& .status":{
+        opacity:"1"
+      },
+      "& .bookmarkStatus":{
         opacity:"1"
       }
     },
@@ -90,16 +100,23 @@ const styles = {
       outline:"1px solid transparent",
       "& .status":{
         opacity:"1"
+      },
+      "& .bookmarkStatus":{
+        opacity:"1"
       }
     }
   },
 
-  listLabel:{
+  listTitle:{
     fontSize:"1.4em",
     fontWeight:"300",
     color:"var(--ft-color-louder)",
     "& .status":{
       marginRight:"10px",
+      opacity:"0.5"
+    },
+    "& .bookmarkStatus":{
+      marginRight:"5px",
       opacity:"0.5"
     }
   },
@@ -109,10 +126,6 @@ const styles = {
     whiteSpace:"nowrap",
     textOverflow:"ellipsis",
     marginTop:"10px"
-  },
-
-  listStatus:{
-    paddingRight:"10px"
   },
 
   actions:{
@@ -196,7 +209,7 @@ export default class Instances extends React.Component{
     return (
       <div className={classes.container}>
         <div className={classes.header}>
-          {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder={`Filter instances of ${searchStore.selectedList.label}`} type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
+          {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder={`Filter instances of ${searchStore.selectedList.name}`} type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
         </div>
         <Scrollbars autoHide>
           {searchStore.selectedList ?
@@ -218,9 +231,10 @@ export default class Instances extends React.Component{
                             onClick={this.handleInstanceClick.bind(this, instance)}
                             onDoubleClick={this.handleInstanceDoubleClick.bind(this, instance)}>
                             <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
-                            <div className={classes.listLabel}>
+                            <div className={classes.listTitle}>
                               <Status id={instance.id} darkmode={true}/>
-                              {instance.label}
+                              <BookmarkStatus id={instance.id} className="bookmarkStatus" />
+                              {instance.name}
                             </div>
                             {!!instance.description && <div className={classes.listDescription}>{instance.description}</div>}
 

@@ -7,8 +7,8 @@ import FetchingLoader from "../../Components/FetchingLoader";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import searchStore from "../../Stores/SearchStore";
-import instanceStore from "../../Stores/InstanceStore";
-import routerStore from "../../Stores/RouterStore";
+
+import List from "./List";
 
 const styles = {
   container:{
@@ -45,39 +45,6 @@ const styles = {
     display:"inline-block",
     marginLeft:"20px"
   },
-  list:{
-    padding:"5px 5px 5px 30px",
-    borderLeft:"2px solid transparent",
-    color:"var(--ft-color-normal)",
-    cursor:"pointer",
-    position:"relative",
-    "&:hover":{
-      background:"var(--list-bg-hover)",
-      borderColor:"var(--list-border-hover)",
-      color:"var(--ft-color-loud)",
-      "& $createInstance":{
-        position:"absolute",
-        top:"0",
-        right:"0",
-        height:"100%",
-        padding:"5px 10px",
-        display:"block",
-        color:"var(--ft-color-quiet)",
-        "&:hover":{
-          color:"var(--ft-color-loud)",
-        }
-      }
-    },
-    "&.selected":{
-      background:"var(--list-bg-selected)",
-      borderColor:"var(--list-border-selected)",
-      color:"var(--ft-color-loud)"
-    }
-  },
-  createInstance:{
-    display:"none",
-    cursor:"pointer"
-  },
   fetchErrorPanel:{
     textAlign:"center",
     fontSize:"0.9em",
@@ -100,7 +67,7 @@ const styles = {
 export default class Lists extends React.Component{
   constructor(props){
     super(props);
-    if(!searchStore.allLists && !searchStore.isFetching.lists){
+    if(!searchStore.isFetched.lists && !searchStore.isFetching.lists){
       searchStore.fetchLists();
     }
   }
@@ -117,19 +84,9 @@ export default class Lists extends React.Component{
     searchStore.fetchLists();
   }
 
-  handleSelectList (list){
-    searchStore.selectList(list);
-  }
-
-  async handleCreateInstance(path, event){
-    event.stopPropagation();
-    let newInstanceId = await instanceStore.createNewInstance(path);
-    routerStore.history.push(`/instance/edit/${newInstanceId}`);
-  }
-
   render(){
     const {classes} = this.props;
-
+    searchStore.cancelCurrentlyEditedBookmarkList();
     return(
       <div className={classes.container}>
         {!searchStore.fetchError.lists?
@@ -148,14 +105,7 @@ export default class Lists extends React.Component{
                           Search results for <span className={classes.folderSearch}>{`"${searchStore.listsFilter.trim()}"`}</span>
                         </div>
                         <div className={classes.folderLists}>
-                          {searchStore.filteredLists.map((list, index) => {
-                            const [,, schema,] = list.path.split("/");
-                            return (
-                              <div className={`${classes.list} ${searchStore.selectedList === list?"selected":""}`} key={list.path+index} onClick={this.handleSelectList.bind(this, list)}>
-                                {list.label?list.label:schema}
-                              </div>
-                            );
-                          })}
+                          {searchStore.filteredLists.map(list => <List key={list.id} list={list} />)}
                           {searchStore.filteredLists.length === 0 && <em className={classes.folderNoMatch}>No matches found</em>}
                         </div>
                       </div>
@@ -169,28 +119,11 @@ export default class Lists extends React.Component{
                             <FontAwesomeIcon fixedWidth icon={folder.expand?"caret-down":"caret-right"}/> &nbsp;
                             {folder.folderName}
                           </div>
-                          {folder.expand && <div className={classes.folderLists}>
-                            {folder.lists.map((list, index) => {
-                              const [,, schema,] = list.path.split("/");
-                              return (
-                                <div className={`${classes.list} ${searchStore.selectedList === list?"selected":""}`}
-                                  key={list.path+index}
-                                  onClick={this.handleSelectList.bind(this, list)}
-                                  title={list.path}>
-                                  {list.label?list.label:schema}
-                                  {instanceStore.isCreatingNewInstance?
-                                    <div className={classes.createInstance}>
-                                      <FontAwesomeIcon icon={"circle-notch"} spin/>
-                                    </div>
-                                    :
-                                    <div className={classes.createInstance} onClick={this.handleCreateInstance.bind(this, list.path)}>
-                                      <FontAwesomeIcon icon={"plus-square"}/>
-                                    </div>
-                                  }
-                                </div>
-                              );
-                            })}
-                          </div>}
+                          {folder.expand && (
+                            <div className={classes.folderLists}>
+                              {folder.lists.map(list => <List key={list.id} list={list} />)}
+                            </div>
+                          )}
                         </div>
                       );
                     })}

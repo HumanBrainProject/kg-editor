@@ -45,6 +45,7 @@ import {faTrashAlt} from "@fortawesome/free-solid-svg-icons/faTrashAlt";
 import {faLightbulb} from "@fortawesome/free-solid-svg-icons/faLightbulb";
 import {faFolderOpen} from "@fortawesome/free-solid-svg-icons/faFolderOpen";
 import {faGlasses} from "@fortawesome/free-solid-svg-icons/faGlasses";
+import {faTimesCircle} from "@fortawesome/free-solid-svg-icons/faTimesCircle";
 
 library.add(
   faUserLock,
@@ -90,5 +91,6 @@ library.add(
   faTrashAlt,
   faLightbulb,
   faFolderOpen,
-  faGlasses
+  faGlasses,
+  faTimesCircle
 );

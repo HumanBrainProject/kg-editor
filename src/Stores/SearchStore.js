@@ -256,7 +256,7 @@ class SearchStore{
     list.deleteError = null;
     list.isDeleting = true;
     try {
-      await API.axios.post(API.endpoints.deleteBookmarkList(list.id));
+      await API.axios.delete(API.endpoints.deleteBookmarkList(list.id));
       /*
       if ((Math.floor(Math.random() * 10) % 2) === 0) {
         throw "Error 501";

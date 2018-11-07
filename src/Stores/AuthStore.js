@@ -51,6 +51,8 @@ let sessionTimer = null;
 class AuthStore {
   @observable session = null;
   @observable user = null;
+  @observable isRetrievingUserProfile = false;
+  @observable userProfileError = false;
   reloginResolve = null;
   reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
   expiredToken = false;
@@ -135,6 +137,31 @@ class AuthStore {
   }
 
   @action
+  async retriveUserProfile() {
+    if (!this.hasExpired && !this.user) {
+      this.userProfileError = false;
+      this.isRetrievingUserProfile = true;
+      try {
+        /* Uncomment to test error handling
+        if ((Math.floor(Math.random() * 10) % 2) === 0) {
+          throw "Error 501";
+        }
+        */
+        const { data } = await API.axios.get(API.endpoints.user());
+        runInAction(() => {
+          this.user = data;
+          this.isRetrievingUserProfile = false;
+          this.reloginResolve();
+          this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+        });
+      } catch (e) {
+        this.userProfileError = e.message?e.message:e;
+        this.isRetrievingUserProfile = false;
+      }
+    }
+  }
+
+  @action
   async tryAuthenticate() {
     const hash = window.location.hash;
     const accessToken = getKey(hash, "access_token");
@@ -166,14 +193,7 @@ class AuthStore {
 
     }
 
-    if(!this.hasExpired && !this.user){
-      const { data } = await API.axios.get(API.endpoints.user());
-      runInAction(() => {
-        this.user = data;
-        this.reloginResolve();
-        this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
-      });
-    }
+    this.retriveUserProfile();
 
     return this.session? this.session.accessToken: null;
   }

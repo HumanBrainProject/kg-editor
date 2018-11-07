@@ -22,11 +22,14 @@ import Help from "./Views/Help";
 import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
 import Instance from "./Views/Instance";
+import FetchingLoader from "./Components/FetchingLoader";
+import BGMessage from "./Components/BGMessage";
 
 import "babel-polyfill";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GlobalError from "./Views/GlobalError";
 import { FormStore } from "hbp-quickfire";
+import { Button } from "react-bootstrap";
 
 FormStore.setPathNodeSeparator("|");
 
@@ -140,6 +143,32 @@ const styles = {
     "100%":{
       "transform": "scale(1.1)"
     }
+  },
+  userProfileLoader:{
+    position:"absolute",
+    top:0,
+    left:0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    "& [class*=fetchingPanel]": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--list-border-hover)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
+  },
+  userProfileErrorFooterBar: {
+    marginBottom: "10px",
+    width: "100%",
+    textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
+    "& button + button": {
+      marginLeft: "20px"
+    }
   }
 };
 
@@ -198,6 +227,10 @@ class App extends React.Component{
 
   handleGoToDashboard = () => {
     routerStore.history.push("/");
+  }
+
+  handleRetryRetriveUserProfile = () => {
+    authStore.retriveUserProfile();
   }
 
   render(){
@@ -298,6 +331,21 @@ class App extends React.Component{
                   </Switch>
                   :null
             }
+            {authStore.isOIDCAuthenticated && !authStore.hasUserProfile && (
+              authStore.isRetrievingUserProfile?
+                <div className={classes.userProfileLoader}>
+                  <FetchingLoader>Retrieving user profile...</FetchingLoader>
+                </div>
+                :
+                authStore.userProfileError?
+                  <BGMessage icon={"ban"}>
+                    {`Failed to retrieve user profile(${authStore.userProfileError}).`}<br/><br/>
+                    <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
+                      <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                    </Button>
+                  </BGMessage>
+                  :null
+            )}
           </div>
           <div className={classes.status}>
 

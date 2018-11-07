@@ -160,6 +160,9 @@ const styles = {
       background: "var(--list-bg-hover)"
     }
   },
+  userProfileError: {
+    color: "var(--ft-color-loud)"
+  },
   userProfileErrorFooterBar: {
     marginBottom: "10px",
     width: "100%",
@@ -338,12 +341,15 @@ class App extends React.Component{
                 </div>
                 :
                 authStore.userProfileError?
-                  <BGMessage icon={"ban"}>
-                    {`Failed to retrieve user profile(${authStore.userProfileError}).`}<br/><br/>
-                    <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
-                      <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
-                    </Button>
-                  </BGMessage>
+                  <div  className={classes.userProfileError}>
+                    <BGMessage icon={"ban"}>
+                      {`There was a network problem retrieving user profile (${authStore.userProfileError}).
+If the problem persists, please contact the support.`}<br/><br/>
+                      <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
+                        <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                      </Button>
+                    </BGMessage>
+                  </div>
                   :null
             )}
           </div>

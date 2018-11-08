@@ -29,6 +29,7 @@ class SearchStore{
   @observable instancesFilter = "";
 
   @observable canLoadMoreInstances = false;
+  @observable totalInstances = 0;
 
   @observable currentlyEditedBookmarkList = null;
 
@@ -148,6 +149,7 @@ class SearchStore{
           this.instances = (data && data.data)?data.data:[];
         }
         this.canLoadMoreInstances = this.instances.length < data.total;
+        this.totalInstances = data.total;
       });
     } catch (e) {
       const message = e.message?e.message:e;

@@ -32,20 +32,13 @@ module.exports = {
     open: true,
     proxy: {
       "/api/**": {
-        //target:"https://kg-dev.humanbrainproject.org/editor",
-        target:"http://localhost:9000/editor",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       },
       "/editor/api/**": {
         //target:"https://kg-dev.humanbrainproject.org",
-        target:"http://localhost:9000/editor",
-        secure:false,
-        changeOrigin: true
-      },
-      "/release": {
-        //target:"https://kg-dev.humanbrainproject.org",
-        target:"http://localhost:9000/editor",
+        target:"http://localhost:9000",
         secure:false,
         changeOrigin: true
       },

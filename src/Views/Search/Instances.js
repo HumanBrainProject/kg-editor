@@ -30,8 +30,7 @@ const styles = {
     borderRadius: "2px",
     backgroundColor: "var(--bg-color-blend-contrast1)",
     color: "var(--ft-color-loud)",
-    margin:"10px",
-    width:"calc(100% - 20px)",
+    width:"100%",
     border:"1px solid transparent",
     "&:focus":{
       borderColor: "rgba(64, 169, 243, 0.5)"
@@ -156,6 +155,20 @@ const styles = {
     "&:last-child":{
       borderRadius:"0 4px 4px 0"
     }
+  },
+
+  header:{
+    display:"grid",
+    gridTemplateColumns:"1fr auto",
+    gridGap:"10px",
+    padding:"10px"
+  },
+
+  instanceCount:{
+    color: "var(--ft-color-normal)",
+    lineHeight:"34px",
+    background:"var(--bg-color-ui-contrast2)",
+    padding:"0 10px"
   }
 };
 
@@ -209,7 +222,18 @@ export default class Instances extends React.Component{
     return (
       <div className={classes.container}>
         <div className={classes.header}>
-          {searchStore.selectedList !== null && <input ref={ref => this.inputRef = ref} disabled={searchStore.selectedList === null} className={`form-control ${classes.search}`} placeholder={`Filter instances of ${searchStore.selectedList.name}`} type="text" value={searchStore.instancesFilter} onChange={this.handleFilterChange} />}
+          {searchStore.selectedList !== null &&
+            <input ref={ref => this.inputRef = ref}
+              disabled={searchStore.selectedList === null}
+              className={`form-control ${classes.search}`}
+              placeholder={`Filter instances of ${searchStore.selectedList.name}`}
+              type="text"
+              value={searchStore.instancesFilter}
+              onChange={this.handleFilterChange} />}
+          {searchStore.selectedList !== null &&
+            <div className={classes.instanceCount}>
+              {searchStore.totalInstances} Result{`${searchStore.totalInstances !== 0?"s":""}`}
+            </div>}
         </div>
         <Scrollbars autoHide>
           {searchStore.selectedList ?

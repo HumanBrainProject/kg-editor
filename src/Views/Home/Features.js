@@ -39,7 +39,7 @@ const styles = {
               color: "var(--ft-color-normal)",
             },
             "& svg": {
-              transform: "transform 0.2s ease"
+              transform: "transform 0.5s ease"
             }
           },
           "& a[aria-expanded='true']": {
@@ -65,10 +65,20 @@ const styles = {
             "&:hover, &:visited, &:focus": {
               color: "var(--ft-color-normal)",
             }
+          },
+          "& a[aria-expanded='false']": {
+            "& .collapseButtonLabel": {
+              display: "none"
+            }
+          },
+          "& a[aria-expanded='true']": {
+            "& .showButtonLabel": {
+              display: "none"
+            },
+            "& svg": {
+              transform: "rotateX(180deg)"
+            }
           }
-        },
-        "& > .panel-collapse.collapse:not(.in) + .panel-footer": {
-          display: "none",
         }
       }
     }
@@ -108,7 +118,7 @@ export default class Features extends React.Component {
     const { classes } = this.props;
     return (
       <div className={classes.container} >
-        <h3>Features:</h3>
+        <h3>Latest features:</h3>
         {!featuresStore.fetchError?
           !featuresStore.isFetching?
             featuresStore.releases.length?
@@ -125,9 +135,6 @@ export default class Features extends React.Component {
                     </li>
                   ))}
                   <Panel>
-                    <Panel.Heading>
-                      <Panel.Toggle componentClass="a"><FontAwesomeIcon icon={"angle-down"}/> &nbsp;Show previous releases</Panel.Toggle>
-                    </Panel.Heading>
                     <Panel.Collapse>
                       <Panel.Body>
                         {featuresStore.olderReleases.map(release => (
@@ -143,7 +150,7 @@ export default class Features extends React.Component {
                       </Panel.Body>
                     </Panel.Collapse>
                     <Panel.Footer>
-                      <Panel.Toggle componentClass="a"><FontAwesomeIcon icon={"angle-up"}/> &nbsp;Collapse previous releases</Panel.Toggle>
+                      <Panel.Toggle componentClass="a"><FontAwesomeIcon icon={"angle-down"}/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
                     </Panel.Footer>
                   </Panel>
                 </ul>

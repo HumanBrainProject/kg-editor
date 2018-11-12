@@ -3,8 +3,9 @@ import authStore from "../Stores/AuthStore";
 
 const endpoints = {
   "user": () => "/editor/api/user",
+  "features": () => "/data/features.json",
   "nodeTypes": () => "/editor/api/nodetypes",
-  "mockupBookmarkListFolders": () => "/data/lists.json",
+  "mockupBookmarkListFolders": () => "/data/mockups/lists.json",
   "bookmarkListFolders": () => "/editor/api/bookmarkListFolders",
   "instances": (entity) => `/editor/api/instances/${entity}`,
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,

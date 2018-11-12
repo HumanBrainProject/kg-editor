@@ -1,0 +1,36 @@
+{
+    "data": [
+        {
+            "version": "version 2.1",
+            "features": [
+                "Integration / improvement of releasing screen",
+                "Favorites / bookmarking feature",
+                "Counter for instances in search"
+            ]
+        },
+        {
+            "version": "version 2.0",
+            "features": [
+                "new tabbed layout "
+            ]
+        },
+        {
+            "version": "version 1.9",
+            "features": [
+                "new tabbed layout "
+            ]
+        },
+        {
+            "version": "version 1.8",
+            "features": [
+                "new tabbed layout "
+            ]
+        },
+        {
+            "version": "version 1.7",
+            "features": [
+                "new tabbed layout "
+            ]
+        }   
+    ]
+}

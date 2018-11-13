@@ -14,7 +14,13 @@ const styles = {
     "& h3": {
       marginTop: "0"
     },
-    "& > div > div > ul": {
+    "& .scroll-container": {
+      height: "calc(100% - 40px)"
+    },
+    "& img": {
+      width: "calc(100% - 20px)"
+    },
+    "& ul.list": {
       height: "100%",
       listStyleType: "square",
       "& > li > ul": {
@@ -120,39 +126,41 @@ export default class Features extends React.Component {
         {!featuresStore.fetchError?
           !featuresStore.isFetching?
             featuresStore.releases.length?
-              <Scrollbars autoHide>
-                <ul>
-                  {featuresStore.latestReleases.map(release => (
-                    <li key={release.version}>
-                      <h4>{release.version}</h4>
-                      <ul>
-                        {release.features.map(feature => (
-                          <li key={feature}><ReactMarkdown source={feature} /></li>
-                        ))}
-                      </ul>
-                    </li>
-                  ))}
-                  <Panel>
-                    <Panel.Collapse>
-                      <Panel.Body>
-                        {featuresStore.olderReleases.map(release => (
-                          <li key={release.version}>
-                            <h4>{release.version}</h4>
-                            <ul>
-                              {release.features.map(feature => (
-                                <li key={feature}><ReactMarkdown source={feature} /></li>
-                              ))}
-                            </ul>
-                          </li>
-                        ))}
-                      </Panel.Body>
-                    </Panel.Collapse>
-                    <Panel.Footer>
-                      <Panel.Toggle componentClass="a"><FontAwesomeIcon icon={"angle-down"}/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
-                    </Panel.Footer>
-                  </Panel>
-                </ul>
-              </Scrollbars>
+              <div className="scroll-container">
+                <Scrollbars autoHide >
+                  <ul className="list">
+                    {featuresStore.latestReleases.map(release => (
+                      <li key={release.version}>
+                        <h4>{release.version}</h4>
+                        <ul>
+                          {release.features.map(feature => (
+                            <li key={feature}><ReactMarkdown source={feature} /></li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                    <Panel>
+                      <Panel.Collapse>
+                        <Panel.Body>
+                          {featuresStore.olderReleases.map(release => (
+                            <li key={release.version}>
+                              <h4>{release.version}</h4>
+                              <ul>
+                                {release.features.map(feature => (
+                                  <li key={feature}><ReactMarkdown source={feature} /></li>
+                                ))}
+                              </ul>
+                            </li>
+                          ))}
+                        </Panel.Body>
+                      </Panel.Collapse>
+                      <Panel.Footer>
+                        <Panel.Toggle componentClass="a"><FontAwesomeIcon icon={"angle-down"}/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
+                      </Panel.Footer>
+                    </Panel>
+                  </ul>
+                </Scrollbars>
+              </div>
               :
               <div className={classes.noFeaturesPanel}>
                 <div>No list of features available.</div>

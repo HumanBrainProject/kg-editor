@@ -1,21 +1,19 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-import showdown from "showdown";
-import xssFilter from "showdown-xss-filter";
 import { Panel, Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactMarkdown  from "react-markdown";
 
 import featuresStore from "../../Stores/FeaturesStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 
-const converter = new showdown.Converter({extensions: [xssFilter]});
-
 const styles = {
   container: {
-    width: "100%",
-    height: "100%",
+    "& h3": {
+      marginTop: "0"
+    },
     "& > div > div > ul": {
       height: "100%",
       listStyleType: "square",
@@ -36,7 +34,7 @@ const styles = {
             textDecoration: "none",
             color: "var(--ft-color-normal)",
             "&:hover, &:visited, &:focus": {
-              color: "var(--ft-color-normal)",
+              color: "var(--ft-color-loud)"
             },
             "& svg": {
               transform: "transform 0.5s ease"
@@ -63,7 +61,7 @@ const styles = {
             textDecoration: "none",
             color: "var(--ft-color-normal)",
             "&:hover, &:visited, &:focus": {
-              color: "var(--ft-color-normal)",
+              color: "var(--ft-color-loud)"
             }
           },
           "& a[aria-expanded='false']": {
@@ -117,7 +115,7 @@ export default class Features extends React.Component {
   render(){
     const { classes } = this.props;
     return (
-      <div className={classes.container} >
+      <div className={`${classes.container} widget`}>
         <h3>Latest features:</h3>
         {!featuresStore.fetchError?
           !featuresStore.isFetching?
@@ -129,7 +127,7 @@ export default class Features extends React.Component {
                       <h4>{release.version}</h4>
                       <ul>
                         {release.features.map(feature => (
-                          <li key={feature} dangerouslySetInnerHTML={{__html:converter.makeHtml(feature)}}></li>
+                          <li key={feature}><ReactMarkdown source={feature} /></li>
                         ))}
                       </ul>
                     </li>
@@ -142,7 +140,7 @@ export default class Features extends React.Component {
                             <h4>{release.version}</h4>
                             <ul>
                               {release.features.map(feature => (
-                                <li key={feature} dangerouslySetInnerHTML={{__html:converter.makeHtml(feature)}}></li>
+                                <li key={feature}><ReactMarkdown source={feature} /></li>
                               ))}
                             </ul>
                           </li>

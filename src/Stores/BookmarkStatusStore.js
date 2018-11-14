@@ -42,9 +42,6 @@ class BookmarkStatusStore{
 
   @action
   updateStatus(instanceIds, bookmarkLists){
-    if (!Array.isArray(bookmarkLists)) {
-      bookmarkLists = [];
-    }
     if(!isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
@@ -57,7 +54,7 @@ class BookmarkStatusStore{
           }
           status.hasChanged = true;
           status.previousBookmarkLists = toJS(status.data.bookmarkLists);
-          status.data.bookmarkLists = bookmarkLists;
+          status.data.bookmarkLists = bookmarkLists||[];
         }
       }
     });
@@ -69,7 +66,7 @@ class BookmarkStatusStore{
     if(!isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
-    instanceIds.forEach(id => {
+    instanceIds.forEach(async id => {
       if(this.statuses.has(id)){
         const status = this.statuses.get(id);
         if(status.hasChanged && !status.isSaving && !status.isFetching && !status.hasFetchError) {
@@ -77,8 +74,8 @@ class BookmarkStatusStore{
             status.hasSaveError = false;
             status.isSaving = true;
             const payload = (status.data && status.data.bookmarkLists)?toJS(status.data.bookmarkLists):[];
-            runInAction(async () => {
-              const { data } = await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
+            const { data } = await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
+            runInAction(() => {
               status.hasChanged = false;
               status.saveError = null;
               status.hasSaveError = false;
@@ -106,10 +103,12 @@ class BookmarkStatusStore{
             }, 500);
             */
           } catch (e) {
-            const message = e.message?e.message:e;
-            status.saveError = `Error while saving bookmark of "${id}" (${message})`;
-            status.hasSaveError = true;
-            status.isSaving = false;
+            runInAction(() => {
+              const message = e.message?e.message:e;
+              status.saveError = `Error while saving bookmark of "${id}" (${message})`;
+              status.hasSaveError = true;
+              status.isSaving = false;
+            });
           }
         }
       }
@@ -173,10 +172,20 @@ class BookmarkStatusStore{
       const { data } = await API.axios.post(API.endpoints.listInstancesBookmarkLists(), toProcess);
       runInAction(() =>{
         const statuses = Array.isArray(data.data)?data.data:[];
-        statuses.forEach(status => {
-          this.statuses.get(status.id).data = status;
-          this.statuses.get(status.id).isFetching = false;
-          this.statuses.get(status.id).isFetched = true;
+        statuses.forEach(responseStatus => {
+          const status = this.statuses.get(responseStatus.id);
+          if (responseStatus.bookmarkLists.error) {
+            status.hasFetchError = true;
+            const error = (responseStatus.bookmarkLists.error.message?responseStatus.bookmarkLists.error.message:"") + (responseStatus.bookmarkLists.error.code?`(code ${responseStatus.bookmarkLists.error.code})`:"");
+            status.fetchError = `Error while fetching bookmark of "${responseStatus.id}" (${error})`;
+            status.data = { bookmarkLists: []};
+          } else {
+            status.data = responseStatus;
+            status.hasFetchError = false;
+            status.fetchError = null;
+          }
+          status.isFetching = false;
+          status.isFetched = true;
           this.isFetching = false;
           this.smartProcessQueue();
         });

@@ -185,6 +185,7 @@ class App extends React.Component{
     routerStore.history.listen(location => {
       this.setState({currentLocation:location.pathname});
     });
+    this.kCode = {step:0, ref:[38,38,40,40,37,39,37,39,66,65]};
   }
 
   componentDidMount(){
@@ -202,6 +203,12 @@ class App extends React.Component{
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
         this.handleCloseInstance(matchInstanceTab.params.id);
+      }
+    } else {
+      this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode? this.kCode.step+1: 0;
+      if(this.kCode.step === this.kCode.ref.length){
+        this.kCode.step = 0;
+        appStore.setTheme("cupcake");
       }
     }
   }
@@ -246,7 +253,8 @@ class App extends React.Component{
         <div className={classes.layout}>
           <Theme/>
           <div className={classes.tabs}>
-            <div className={classes.logo} onClick={this.handleGoToDashboard}>
+
+            <div className={`${classes.logo} layout-logo`} onClick={this.handleGoToDashboard}>
               <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
               <span>Knowledge Graph Editor</span>
             </div>
@@ -354,7 +362,7 @@ If the problem persists, please contact the support.`}<br/><br/>
                   :null
             )}
           </div>
-          <div className={classes.status}>
+          <div className={`${classes.status} layout-status`}>
 
           </div>
         </div>

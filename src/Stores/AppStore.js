@@ -2,6 +2,7 @@ import { observable, action } from "mobx";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
+import CupcakeTheme from "../Themes/Cupcake";
 
 class AppStore{
   @observable globalError = null;
@@ -9,7 +10,8 @@ class AppStore{
 
   availableThemes = {
     "default": DefaultTheme,
-    "bright": BrightTheme
+    "bright": BrightTheme,
+    "cupcake": CupcakeTheme
   }
 
   constructor(){
@@ -28,7 +30,7 @@ class AppStore{
   }
 
   setTheme(theme){
-    this.currentTheme = theme === "bright"? "bright": "default";
+    this.currentTheme = this.availableThemes[theme]? theme: "default";
     localStorage.setItem("currentTheme", this.currentTheme);
   }
 

@@ -154,7 +154,7 @@ const styles = {
     "& [class*=fetchingPanel]": {
       width: "auto",
       padding: "30px",
-      border: "1px solid var(--list-border-hover)",
+      border: "1px solid var(--border-color-ui-contrast1)",
       borderRadius: "4px",
       color: "var(--ft-color-loud)",
       background: "var(--list-bg-hover)"
@@ -269,7 +269,8 @@ class App extends React.Component{
                     let label;
                     let color = undefined;
                     if(!instance.isFetching && !instance.hasFetchError){
-                      label = instance.form.getField("http://schema.org/name").getValue();
+                      let field = instance.form.getField("http://schema.org/name");
+                      label = field? field.getValue(): instanceId;
                       color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
                     }
                     if(!label){

@@ -41,7 +41,11 @@ const styles = {
       "--release-bg-has-changed":"rgba(241, 196, 15, 0.25)",
 
       "--release-color-highlight":"rgb(46, 204, 113)",
-      "--release-bg-highlight":"rgb(46, 204, 113, 0.25)"
+      "--release-bg-highlight":"rgb(46, 204, 113, 0.25)",
+      "--bookmark-on-color":"#EFEC2D",
+      "--bookmark-on-color-highlight":"#ffe100",
+      "--bookmark-off-color":"var(--ft-color-normal)",
+      "--bookmark-off-color-highlight":"var(--bookmark-on-color-highlight)"
     },
     ".layout-status":{
       "background": "linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3) !important",

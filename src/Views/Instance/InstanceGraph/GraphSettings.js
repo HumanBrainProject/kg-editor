@@ -141,7 +141,7 @@ export default class GraphSettings extends React.Component{
                     <div className={classes.nodeTypeLabel} onMouseOver={
                       isGrouped? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType))
                         : undefined} onMouseOut={this.handleNodeHover.bind(this, null)}>
-                      {nodeType.replace("http://hbp.eu/minds#","")}
+                      {nodeType.replace("https://schema.hbp.eu/minds/","")}
                     </div>
                     <div className={classes.nodeTypeActions}>
                       {!isDisabled?

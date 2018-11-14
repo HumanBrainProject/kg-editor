@@ -1,8 +1,9 @@
 import { observable, action, runInAction, computed } from "mobx";
 //import { debounce, uniqueId } from "lodash";
-import { debounce } from "lodash";
+import { isArray, debounce } from "lodash";
 
 import API from "../Services/API";
+import bookmarkStatusStore from "./BookmarkStatusStore";
 
 const bookmarkListType = "BOOKMARK";
 const nodetypeType = "NODETYPE";
@@ -99,9 +100,11 @@ class SearchStore{
         this.lists=lists;
       });
     } catch (e) {
-      const message = e.message? e.message: e;
-      this.fetchError.lists = `Error while retrieving lists (${message})`;
-      this.isFetching.lists = false;
+      runInAction(() => {
+        const message = e.message? e.message: e;
+        this.fetchError.lists = `Error while retrieving lists (${message})`;
+        this.isFetching.lists = false;
+      });
     }
   }
 
@@ -152,14 +155,16 @@ class SearchStore{
         this.totalInstances = data.total;
       });
     } catch (e) {
-      const message = e.message?e.message:e;
-      this.fetchError.instances = `Error while retrieving instances "${this.nodeTypeId}" (${message})`;
-      this.isFetching.instances = false;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError.instances = `Error while retrieving instances "${this.nodeTypeId}" (${message})`;
+        this.isFetching.instances = false;
+      });
     }
   }
 
   @action
-  async createBookmarkList(name) {
+  async createBookmarkList(name, instanceIds) {
     this.newBookmarkListName = name;
     this.bookmarkListCreationError = null;
     this.isCreatingBookmarkList = true;
@@ -174,24 +179,36 @@ class SearchStore{
     if (bookmarkListfolder) {
       try{
         const { data } = await API.axios.post(API.endpoints.createBookmarkList(), {"name": name, "folderId": bookmarkListfolder.id});
-        /* Mockup Data
-        const data = { id: uniqueId(`id${new Date().getTime()}`, name: name) };
-        */
-        bookmarkListfolder.lists.push({
-          id: data.id,
-          name: data.name?data.name:name,
-          type: bookmarkListfolder.folderType,
-          isUpdating: false,
-          updateError: null,
-          isDeleting: false,
-          deleteError: null
+        runInAction(() => {
+          /* Mockup Data
+          const data = { id: uniqueId(`id${new Date().getTime()}`, name: name) };
+          */
+          bookmarkListfolder.lists.push({
+            id: data.id,
+            name: data.name?data.name:name,
+            type: bookmarkListfolder.folderType,
+            isUpdating: false,
+            updateError: null,
+            isDeleting: false,
+            deleteError: null
+          });
+          this.isCreatingBookmarkList = false;
+          this.newBookmarkListName = null;
+          if (instanceIds) {
+            if(!isArray(instanceIds)){
+              instanceIds = [instanceIds];
+            }
+            instanceIds.forEach(instanceId => {
+              const instance = bookmarkStatusStore.getInstance(instanceId);
+              instance && instance.data && instance.data.bookmarkLists && instance.data.bookmarkLists.indexOf(data.id) === -1 && instance.data.bookmarkLists.push(data.id);
+            });
+          }
         });
-        this.isCreatingBookmarkList = false;
-        this.newBookmarkListName = null;
-        return data.id;
       } catch(e){
-        this.isCreatingBookmarkList = false;
-        this.bookmarkListCreationError = e.message?e.message:e;
+        runInAction(() => {
+          this.isCreatingBookmarkList = false;
+          this.bookmarkListCreationError = e.message?e.message:e;
+        });
       }
     } else {
       this.isCreatingBookmarkList = false;
@@ -229,14 +246,16 @@ class SearchStore{
     */
     try {
       const { data } = await API.axios.put(API.endpoints.updateBookmarkList(list.id), {"name": newProps.name});
-      /* Mockup Data
-      if ((Math.floor(Math.random() * 10) % 2) === 0) {
-        throw "Error 501";
-      }
-      const data = { id: list.id, name: name };
-      */
-      list.name = data.name;
-      list.isUpdating = false;
+      runInAction(() => {
+        /* Mockup Data
+        if ((Math.floor(Math.random() * 10) % 2) === 0) {
+          throw "Error 501";
+        }
+        const data = { id: list.id, name: name };
+        */
+        list.name = data.name;
+        list.isUpdating = false;
+      });
     } catch (e) {
       list.updateError = e.message?e.message:e;
       list.isUpdating = false;
@@ -264,21 +283,25 @@ class SearchStore{
         throw "Error 501";
       }
       */
-      list.isDeleting = false;
-      this.lists.some(folder => {
-        if (folder.folderType === this.bookmarkListType) {
-          const index = folder.lists.findIndex(bookmark => bookmark.id === list.id);
-          if (index !== -1) {
-            folder.lists.splice(index, 1);
+      runInAction(() => {
+        list.isDeleting = false;
+        this.lists.some(folder => {
+          if (folder.folderType === this.bookmarkListType) {
+            const index = folder.lists.findIndex(bookmark => bookmark.id === list.id);
+            if (index !== -1) {
+              folder.lists.splice(index, 1);
+            }
+            return true;
           }
-          return true;
-        }
-        return false;
+          return false;
+        });
       });
     } catch (e) {
-      list.deleteError = e.message?e.message:e;
-      list.isDeleting = false;
-      return false;
+      runInAction(() => {
+        list.deleteError = e.message?e.message:e;
+        list.isDeleting = false;
+        return false;
+      });
     }
   }
 

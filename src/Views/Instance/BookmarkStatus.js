@@ -63,16 +63,8 @@ export default class BookmarkStatus extends React.Component{
     bookmarkStatusStore.updateStatus(this.props.id, bookmarkLists);
   }
 
-  async handleNewBookmark(name) { // , field, store) {
-    await searchStore.createBookmarkList(name);
-    /*
-    const newBookmarkListId = await searchStore.createBookmarkList(name);
-    if(newBookmarkId){
-      const bookmarkListIds = field.value.map(bookmarkList => bookmarkList.value);
-      bookmarkListIds.push(newBookmarkListId);
-      bookmarkStatusStore.updateStatus(this.props.id, bookmarkListIds);
-    }
-    */
+  handleNewBookmark(name) { // , field, store) {
+    searchStore.createBookmarkList(name, this.props.id);
   }
 
   handleFetchRetry() {

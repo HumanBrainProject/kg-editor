@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PopOverButton from "./PopOverButton";
 import { SingleField } from "hbp-quickfire";
-
+import {find} from "lodash";
 const styles = {
   button: {
     textAlign:"center",
@@ -63,7 +63,7 @@ export default class BookmarkButton extends React.Component {
         onClose={onSave}
         onPositionChange={this.changeBookmarkListPosition.bind(this)}
       >
-        <SingleField type="DropdownSelect" label="Bookmarks:" value={values} options={list} mappingValue="id" mappingLabel="name" listPosition={this.state.listPosition?this.state.listPosition:"bottom"} allowCustomValues={true} onChange={this.handleValueChange.bind(this)} onAddCustomValue={this.handleNew.bind(this)} />
+        <SingleField key={JSON.stringify(values)} type="DropdownSelect" label="Bookmarks:" value={values} options={list} mappingValue="id" mappingLabel="name" listPosition={this.state.listPosition?this.state.listPosition:"bottom"} allowCustomValues={true} onChange={this.handleValueChange.bind(this)} onAddCustomValue={this.handleNew.bind(this)} />
       </PopOverButton>
     );
   }

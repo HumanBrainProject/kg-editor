@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PopOverButton from "./PopOverButton";
 import { SingleField } from "hbp-quickfire";
-import {find} from "lodash";
+
 const styles = {
   button: {
     textAlign:"center",

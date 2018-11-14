@@ -185,6 +185,7 @@ class App extends React.Component{
     routerStore.history.listen(location => {
       this.setState({currentLocation:location.pathname});
     });
+    this.kCode = {step:0, ref:[38,38,40,40,37,39,37,39,66,65]};
   }
 
   componentDidMount(){
@@ -198,12 +199,16 @@ class App extends React.Component{
   handleGlobalShortcuts = (e) => {
     if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
       appStore.toggleTheme();
-    } else if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 87){
-      appStore.setTheme("cupcake");
     } else if(e.altKey && e.keyCode === 87){
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
         this.handleCloseInstance(matchInstanceTab.params.id);
+      }
+    } else {
+      this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode? this.kCode.step+1: 0;
+      if(this.kCode.step === this.kCode.ref.length){
+        this.kCode.step = 0;
+        appStore.setTheme("cupcake");
       }
     }
   }

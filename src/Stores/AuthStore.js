@@ -1,5 +1,6 @@
 import console from "../Services/Logger";
-import { observable, computed, action } from "mobx";
+import { observable, computed, action, runInAction } from "mobx";
+import API from "../Services/API";
 
 const oidConnectServerUri = "https://services.humanbrainproject.eu/oidc/authorize";
 const oidClientId = "nexus-kg-search";
@@ -49,6 +50,9 @@ let sessionTimer = null;
 
 class AuthStore {
   @observable session = null;
+  @observable user = null;
+  @observable isRetrievingUserProfile = false;
+  @observable userProfileError = false;
   reloginResolve = null;
   reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
   expiredToken = false;
@@ -72,8 +76,18 @@ class AuthStore {
   }
 
   @computed
-  get isAuthenticated() {
+  get isOIDCAuthenticated() {
     return !this.hasExpired;
+  }
+
+  @computed
+  get hasUserProfile() {
+    return !!this.user;
+  }
+
+  @computed
+  get isFullyAuthenticated() {
+    return this.isOIDCAuthenticated && this.hasUserProfile;
   }
 
   get hasExpired() {
@@ -103,6 +117,7 @@ class AuthStore {
     clearTimeout(sessionTimer);
     this.session = null;
     this.expiredToken = true;
+    this.user = null;
     if (typeof Storage !== "undefined" ) {
       localStorage.removeItem(oidLocalStorageKey);
     }
@@ -122,7 +137,32 @@ class AuthStore {
   }
 
   @action
-  tryAuthenticate() {
+  async retriveUserProfile() {
+    if (!this.hasExpired && !this.user) {
+      this.userProfileError = false;
+      this.isRetrievingUserProfile = true;
+      try {
+        /* Uncomment to test error handling
+        if ((Math.floor(Math.random() * 10) % 2) === 0) {
+          throw "Error 501";
+        }
+        */
+        const { data } = await API.axios.get(API.endpoints.user());
+        runInAction(() => {
+          this.user = data;
+          this.isRetrievingUserProfile = false;
+          this.reloginResolve();
+          this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
+        });
+      } catch (e) {
+        this.userProfileError = e.message?e.message:e;
+        this.isRetrievingUserProfile = false;
+      }
+    }
+  }
+
+  @action
+  async tryAuthenticate() {
     const hash = window.location.hash;
     const accessToken = getKey(hash, "access_token");
     const state = getKey(hash, "state");
@@ -153,10 +193,7 @@ class AuthStore {
 
     }
 
-    if(this.isAuthenticated){
-      this.reloginResolve();
-      this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
-    }
+    this.retriveUserProfile();
 
     return this.session? this.session.accessToken: null;
   }

@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { uniqueId } from "lodash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const animationId = uniqueId("animationId");
 
@@ -39,7 +40,6 @@ const styles = {
   },
   icon: {
     transformOrigin:"50% 44%",
-    composes: "glyphicon glyphicon-refresh",
     animation: `${animationId} .7s infinite linear`
   },
   [`@keyframes ${animationId}`]: {
@@ -59,15 +59,15 @@ const styles = {
 export default class FetchingPanel extends React.Component{
   render(){
     const { classes, id, show, inline } = this.props;
+    if (!show) {
+      return null;
+    }
     return(
-      (show)?
-        <div className={classes.panel} inline={inline?"true":"false"}>
-          <span className={classes.icon}></span>
-          <span className={classes.label}>Fetching instance...</span>
-          <small>Nexus ID: {id}</small>
-        </div>
-        :
-        null
+      <div className={classes.panel} inline={inline?"true":"false"}>
+        <FontAwesomeIcon className={classes.icon} icon="sync-alt"/>
+        <span className={classes.label}>Fetching instance...</span>
+        <small>Nexus ID: {id}</small>
+      </div>
     );
   }
 }

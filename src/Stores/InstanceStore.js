@@ -57,6 +57,25 @@ class InstanceStore {
     return nodeTypeMapping;
   }
 
+
+  getPromotedFields(instance) {
+    if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
+      return instance.data.ui_info.promotedFields
+        .filter(name => instance.data.fields[name]);
+    }
+    return [];
+  }
+
+  getNonPromotedFields(instance) {
+    if (instance && instance.data && instance.data.fields) {
+      return Object.keys(instance.data.fields)
+        .filter(key => {
+          return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
+        });
+    }
+    return [];
+  }
+
   /**
    * Opened instances are shown in their own tab in the UI
    * We keep track in that store of which instances are opened
@@ -114,7 +133,7 @@ class InstanceStore {
   async createNewInstance(path, name=""){
     this.isCreatingNewInstance = path;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name":name});
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
       this.isCreatingNewInstance = false;
       return data.id;
     } catch(e){
@@ -220,9 +239,10 @@ class InstanceStore {
 
       runInAction(async () => {
         const fieldsWithOptions = new Map();
+        const instanceData = data.data?data.data:{fields: {}};
         try {
-          for(let fieldKey in data.fields){
-            const instancesPath = data.fields[fieldKey].instancesPath;
+          for(let fieldKey in instanceData.fields){
+            const instancesPath = instanceData.fields[fieldKey].instancesPath;
             if(instancesPath){
               fieldsWithOptions.set(fieldKey, instancesPath);
               if(!this.optionsCache.has(instancesPath)){
@@ -246,8 +266,8 @@ class InstanceStore {
           instance.isFetching = false;
         }
 
-        instance.data = data;
-        instance.form = new FormStore(data);
+        instance.data = instanceData;
+        instance.form = new FormStore(instanceData);
 
         const fields = instance.form.getField();
         Object.entries(fields).forEach(([fieldKey, field]) => {
@@ -349,9 +369,9 @@ class InstanceStore {
           const option = options.find(o => o.id === instanceId);
           if (option) {
             if (instance.data.ui_info && instance.data.ui_info.labelField) {
-              const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+              const keyFieldName = instance.data.ui_info.labelField;
               if (payload && payload[keyFieldName]) {
-                option.label = payload[keyFieldName];
+                option.name = payload[keyFieldName];
               }
             }
           }

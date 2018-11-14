@@ -1,12 +1,10 @@
 import React from "react";
 import injectStyles from "react-jss";
-//import Slider from "rc-slider";
-//import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
-import ForceGraph2D from "react-force-graph/src/ForceGraph2D";
+import ForceGraph2D from "react-force-graph-2d";
 import { debounce } from "lodash";
 import Color from "color";
-import { Glyphicon } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import graphStore from "../../../Stores/GraphStore";
 import routerStore from "../../../Stores/RouterStore";
@@ -238,7 +236,7 @@ export default class Graph extends React.Component {
           linkDirectionalArrowLength={3}
         />
         }
-        <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
+        <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><FontAwesomeIcon icon="camera"/></a>
         {/*<Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />*/}
       </div>
     );

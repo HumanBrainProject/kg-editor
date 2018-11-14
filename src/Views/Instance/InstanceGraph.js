@@ -5,6 +5,7 @@ import injectStyles from "react-jss";
 import graphStore from "../../Stores/GraphStore";
 import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
+import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   container:{
@@ -15,13 +16,15 @@ const styles = {
     gridGap:"10px",
     gridTemplateRows:"1fr",
     gridTemplateColumns:"1fr 450px",
-    padding:"10px"
+    padding:"10px",
+    color:"var(--ft-color-normal)"
   },
 
   graph:{
     background:"var(--bg-color-ui-contrast2)",
     border:"1px solid var(--border-color-ui-contrast1)",
-    overflow:"hidden"
+    overflow:"hidden",
+    position:"relative",
   },
 
   settings:{
@@ -52,10 +55,18 @@ export default class GraphInstance extends React.Component {
     return (
       <div className={classes.container}>
         <div className={classes.graph}>
-          <GraphViz />
+          {graphStore.isFetching?
+            <FetchingLoader>Fetching visualization data...</FetchingLoader>
+            :
+            <GraphViz />
+          }
         </div>
         <div className={classes.settings}>
-          <GraphSettings/>
+          {graphStore.isFetching?
+            <FetchingLoader>Fetching data...</FetchingLoader>
+            :
+            <GraphSettings />
+          }
         </div>
       </div>
     );

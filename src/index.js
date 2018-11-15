@@ -335,7 +335,7 @@ class App extends React.Component{
                     <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
 
                     <Route path="/search" exact={true} component={Search} />
-                    <Route path="/help" exact={true} component={Help} />
+                    <Route path="/help" exact={false} component={Help} />
                     <Route path="/kg-stats" exact={true} component={Statistics} />
                     <Route path="/loginSuccess" exact={true} component={()=>null} />
                     <Route path="/" exact={true} component={Home} />

@@ -32,7 +32,8 @@ const nodeTypeWhitelist = [
   "https://schema.hbp.eu/minds/Softwareagent",
   "https://schema.hbp.eu/minds/Agecategory",
   "https://schema.hbp.eu/minds/Sex",
-  "https://schema.hbp.eu/minds/Species"
+  "https://schema.hbp.eu/minds/Species",
+  "https://schema.hbp.eu/minds/Role"
 ];
 
 const colorScheme = {};
@@ -41,7 +42,6 @@ let colorTable = palette("mpn65", nodeTypeWhitelist.length).map(color => "#"+col
 nodeTypeWhitelist.forEach((type, index) => {colorScheme[type] = colorTable[index];});
 
 class GraphStore {
-  @observable step = 2;
   @observable sidePanel = false;
   @observable typeStates = null;
   @observable expandedTypes = [];
@@ -100,7 +100,7 @@ class GraphStore {
     this.isFetched = false;
     this.isFetching = true;
     try {
-      const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
+      const { data } = await API.axios.get(API.endpoints.graph(id));
       runInAction( ()=>{
         this.mainId = id;
         this.originalData = data;
@@ -220,10 +220,6 @@ class GraphStore {
     if(clickedNode.isGroup){
       this.typeStates.set(clickedNode.original_dataType, "show");
     }
-  }
-
-  @action setStep(step){
-    this.step = step;
   }
 
   @action toggleSettingsPanel(state){

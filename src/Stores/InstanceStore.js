@@ -139,7 +139,7 @@ class InstanceStore {
     try{
       const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
       this.isCreatingNewInstance = false;
-      return data.id;
+      return data.data.id;
     } catch(e){
       this.isCreatingNewInstance = false;
       this.instanceCreationError = e.message;

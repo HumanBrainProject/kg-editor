@@ -33,7 +33,8 @@ const nodeTypeMapping = {
   "Software agent":"https://schema.hbp.eu/minds/Softwareagent",
   "Age category":"https://schema.hbp.eu/minds/Agecategory",
   "Sex":"https://schema.hbp.eu/minds/Sex",
-  "Species":"https://schema.hbp.eu/minds/Species"
+  "Species":"https://schema.hbp.eu/minds/Species",
+  "Role":"https://schema.hbp.eu/minds/Role"
 };
 
 class InstanceStore {

@@ -2,13 +2,22 @@ import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
 const endpoints = {
-  "nodeTypes": () => `${window.rootPath}/api/nodetypes`,
-  "instances": (entity) => `${window.rootPath}/api/instances/${entity}`,
-  "listInstances": (entity, from, size, search) => `${window.rootPath}/api/instances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "instanceData": (instance) => `${window.rootPath}/api/instance/${instance}`,
-  "releaseData": (instance) => `${window.rootPath}/api/release/${instance}`,
-  "releaseStatus": () => `${window.rootPath}/api/releasestatus`,
-  "graph": (instance, step) => `${window.rootPath}/api/graph/${instance}?step=${step}`
+  "user": () => "/editor/api/user",
+  "features": () => `${window.rootPath}/data/features.json`,
+  "nodeTypes": () => "/editor/api/nodetypes",
+  "bookmarkListFolders": (mockup) => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
+  "instances": (entity) => `/editor/api/instances/${entity}`,
+  "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
+  "instanceData": (instance) => `/editor/api/instance/${instance}`,
+  "releaseData": (instance) => `/api/releases/${instance}/graph`,
+  "doRelease": (instance) => `/api/releases/${instance}`,
+  "releaseStatus": () => "/api/releases",
+  "createBookmarkList": () => "/editor/api/bookmarkList",
+  "updateBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
+  "deleteBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
+  "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
+  "setInstanceBookmarkLists": (instance) => `/editor/api/instance/${instance}/bookmarks`,
+  "graph": (instance) => `/api/instances/${instance}/graph`
 };
 
 class API {

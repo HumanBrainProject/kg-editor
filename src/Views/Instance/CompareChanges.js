@@ -1,30 +1,14 @@
 import React from "react";
-import { observer } from "mobx-react";
 import injectStyles from "react-jss";
+import { observer } from "mobx-react";
 import { toJS } from "mobx";
-import { isEqual } from "lodash";
-import Color from "color";
-import { Form, FormStore, Field } from "hbp-quickfire";
-
+import { FormStore } from "hbp-quickfire";
+import CompareFieldChanges from "./CompareFieldChanges";
 import instanceStore from "../../Stores/InstanceStore";
 
-let styles = {
-  container:{
-    display:"grid",
-    gridTemplateColumns:"1fr 1fr",
-    fontFamily:"'Lato', sans-serif",
-    gridGap:"20px"
-  },
-  field:{
-    padding:10,
-    margin:"0 0 10px 0",
-    wordBreak:"break-word"
-  },
-  beforeDiff:{
-    background:new Color("#e74c3c").lighten(0.6).hex()
-  },
-  afterDiff:{
-    background:new Color("#2ecc71").lighten(0.6).hex()
+const styles = {
+  container: {
+    padding: "12px 15px"
   }
 };
 
@@ -32,7 +16,7 @@ let styles = {
 @observer
 export default class CompareChanges extends React.Component{
   render(){
-    const {classes} = this.props;
+    const { classes } = this.props;
     const instance = instanceStore.getInstance(this.props.instanceId);
 
     const formStoreBefore = new FormStore(toJS(instance.form.structure));
@@ -44,32 +28,21 @@ export default class CompareChanges extends React.Component{
     const beforeValues = formStoreBefore.getValues();
     const afterValues = formStoreAfter.getValues();
 
-    const valueDiff = {};
-
-    Object.keys(afterValues).forEach(key => {
-      valueDiff[key] = !isEqual(beforeValues[key], afterValues[key]);
-    });
+    const promotedFields = instanceStore.getPromotedFields(instance);
+    const nonPromotedFields = instanceStore.getNonPromotedFields(instance);
 
     return(
       <div className={classes.container}>
-        <div className={classes.before}>
-          <Form store={formStoreBefore}>
-            {Object.keys(formStoreBefore.structure.fields).map(key => {
-              return (<div className={`${classes.field} ${valueDiff[key]?classes.beforeDiff:""}`} key={key}>
-                <Field name={key}/>
-              </div>);
-            })}
-          </Form>
-        </div>
-        <div className={classes.before}>
-          <Form store={formStoreAfter}>
-            {Object.keys(formStoreAfter.structure.fields).map(key => {
-              return (<div className={`${classes.field} ${valueDiff[key]?classes.afterDiff:""}`} key={key}>
-                <Field name={key}/>
-              </div>);
-            })}
-          </Form>
-        </div>
+        {promotedFields.map(key => {
+          return (
+            <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
+          );
+        })}
+        {nonPromotedFields.map(key => {
+          return (
+            <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
+          );
+        })}
       </div>
     );
   }

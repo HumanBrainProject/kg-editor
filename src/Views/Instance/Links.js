@@ -26,7 +26,7 @@ class Links extends React.Component{
     return(
       <React.Fragment>
         {linkKeys.length > 0?
-          <Pane paneId={"ChildrenOf"+this.props.id} className={classes.pane}>
+          <Pane paneId={"ChildrenOf"+this.props.id} key={"ChildrenOf"+this.props.id} className={classes.pane}>
             {linkKeys.map(fieldKey => {
               let fieldObj = instance.form.getField(fieldKey);
               if(fieldObj.isLink && fieldObj.value.length > 0){

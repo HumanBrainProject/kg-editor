@@ -1,9 +1,9 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import { Glyphicon } from "react-bootstrap";
 import { Form } from "hbp-quickfire";
 import Color from "color";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import instanceStore from "../../Stores/InstanceStore";
 import graphStore from "../../Stores/GraphStore";
@@ -17,6 +17,7 @@ import FetchingPanel from "./InstanceForm/FetchingPanel";
 import SavingPanel from "./InstanceForm/SavingPanel";
 import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
+import routerStore from "../../Stores/RouterStore";
 
 const styles = {
   panelHeader: {
@@ -84,10 +85,10 @@ const styles = {
       display: "inline",
       position: "absolute",
       top: "50%",
-      left: "-26px",
+      left: "-25px",
       color: "transparent",
       fontSize: "xx-large",
-      transform: "translateY(-50%) scale(0.5,0.8)",
+      transform: "translateY(-50%) scale(0.5,0.7)",
       transition: "color 0.25s ease-in-out"
     },
     "&:not(.current).readMode.highlight .hightlightArrow": {
@@ -137,6 +138,14 @@ export default class InstanceForm extends React.Component {
   handleFocus = () => {
     if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
       instanceStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
+    }
+  }
+
+  handleOpenInstance = (e) => {
+    if((e.metaKey || e.ctrlKey)){
+      instanceStore.openInstance(this.props.id);
+    } else {
+      routerStore.history.push(`/instance/view/${this.props.id}`);
     }
   }
 
@@ -217,25 +226,8 @@ export default class InstanceForm extends React.Component {
       return className;
     };
 
-    const getSummaryFields = instance => {
-      if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
-        return instance.data.ui_info.promotedFields
-          .map(key => key.replace(/\//g, "%nexus-slash%"))
-          .filter(name => instance.data.fields[name]);
-      }
-      return [];
-    };
-
-    const getBodyFields = instance => {
-      if (instance && instance.data && instance.data.fields) {
-        return Object.keys(instance.data.fields)
-          .filter(name => {
-            const key = name.replace(/%nexus-slash%/g, "/");
-            return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
-          });
-      }
-      return [];
-    };
+    const promotedFields = instanceStore.getPromotedFields(instance);
+    const nonPromotedFields = instanceStore.getNonPromotedFields(instance);
 
     return (
       <div className={panelClassName()} data-id={this.props.id}>
@@ -243,6 +235,7 @@ export default class InstanceForm extends React.Component {
         <div
           onFocus={this.handleFocus}
           onClick={this.handleFocus}
+          onDoubleClick={isReadMode && !isMainInstance?this.handleOpenInstance:undefined}
           onChange={this.handleChange}
           onLoad={this.handleLoad}
         >
@@ -253,12 +246,14 @@ export default class InstanceForm extends React.Component {
               color={graphStore.colorScheme[instanceStore.nodeTypeMapping[nodeType]]}
               hasChanged={instance.hasChanged}/>
 
-            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getSummaryFields(instance)} />
-            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={getBodyFields(instance)} show={isMainInstance || isCurrentInstance || !isReadMode} />
+            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} />
+            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={isMainInstance || isCurrentInstance || !isReadMode} />
 
             <FooterPanel
               className={classes.panelFooter}
-              id={instance.data.fields.id?instance.data.fields.id.value.nexus_id:"<new>"} />
+              nexusId={instance.data.fields.id?instance.data.fields.id.nexus_id:"<new>"}
+              id={id}
+              showOpenActions={isCurrentInstance && !isMainInstance}/>
           </Form>
           <ConfirmCancelEditPanel
             show={instance.cancelChangesPending}
@@ -271,7 +266,7 @@ export default class InstanceForm extends React.Component {
           <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
         </div>
         }
-        <Glyphicon glyph="arrow-right" className="hightlightArrow" />
+        <FontAwesomeIcon className="hightlightArrow"  icon="arrow-right"/>
         <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
         <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
       </div>

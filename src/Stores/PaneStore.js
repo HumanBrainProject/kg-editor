@@ -19,14 +19,6 @@ export default class PaneStore {
   @action selectPane(id){
     this.selectedPane = id;
   }
-  @action selectNextPane(){
-    if (this.selectedPane) {
-      const idx = this.selectedIndex + 1;
-      if (idx > 0 & idx < this.panes.length) {
-        this.selectPane(this.panes[idx]);
-      }
-    }
-  }
   @action unregisterPane(id){
     remove(this.panes, paneId => paneId === id);
   }

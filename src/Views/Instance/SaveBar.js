@@ -1,9 +1,10 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import {Button, ButtonGroup, Glyphicon, Modal} from "react-bootstrap";
+import {Button, ButtonGroup, Modal} from "react-bootstrap";
 import { uniqueId } from "lodash";
 import { Scrollbars } from "react-custom-scrollbars";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import CompareChanges from "./CompareChanges";
 import instanceStore from "../../Stores/InstanceStore";
@@ -60,7 +61,6 @@ const styles = {
     marginTop:5
   },
   saveIcon: {
-    composes: "glyphicon glyphicon-record",
     color: "red",
     animation: `${animationId} 1.4s infinite linear`
   },
@@ -94,7 +94,14 @@ const styles = {
     marginTop:"20px"
   },
   compareModal:{
-    width:"90%"
+    width:"90%",
+    "@media screen and (min-width:1024px)": {
+      width:"900px",
+    },
+    "& .modal-body": {
+      height: "calc(95vh - 112px)",
+      padding: "3px 0"
+    }
   }
 };
 
@@ -147,30 +154,32 @@ export default class SavePanel extends React.Component{
     return(
       <div className={classes.container}>
         <Scrollbars autoHide>
-          <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><Glyphicon glyph={"save"}/>&nbsp;Save All</Button></h4>
+          <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
           <div className={classes.instances}>
             {instanceStore.comparedInstanceId &&
               <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
                 <Modal.Header closeButton>
-                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue()}
+                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http://schema.org/name").getValue()}
                 </Modal.Header>
                 <Modal.Body>
-                  <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+                  <Scrollbars autoHide>
+                    <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+                  </Scrollbars>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"refresh"}/>&nbsp;Revert the changes</Button>
-                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><Glyphicon glyph={"save"}/>&nbsp;Save this instance</Button>
+                  <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
+                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
                 </Modal.Footer>
               </Modal>
             }
             {!instanceStore.hasUnsavedChanges &&
               <div className={classes.noChanges}>
-                <div className={classes.allGreenIcon}><Glyphicon glyph={"ok"}/></div>
+                <div className={classes.allGreenIcon}><FontAwesomeIcon icon="check"/></div>
                 <div className={classes.allGreenText}>You have no unsaved modifications !</div>
               </div>
             }
             {changedInstances.map(([id, instance]) => {
-              const label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+              const label = instance.form.getField("http://schema.org/name").getValue();
               return(
                 <div className={classes.instance} key={instanceStore.getGeneratedKey(instance, "savePanel")}>
                   <div className={classes.type}>
@@ -178,12 +187,12 @@ export default class SavePanel extends React.Component{
                   </div>
                   <div className={classes.actions}>
                     {instance.isSaving?
-                      <span className={classes.saveIcon}></span>
+                      <FontAwesomeIcon className={classes.saveIcon} icon="dot-circle"/>
                       :
                       <ButtonGroup vertical>
-                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)}><Glyphicon glyph={"save"}/></Button>
-                        <Button bsSize="small" onClick={this.handleReset.bind(this, id)}><Glyphicon glyph={"refresh"}/></Button>
-                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)}><Glyphicon glyph={"search"}/></Button>
+                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
+                        <Button bsSize="small" onClick={this.handleReset.bind(this, id)} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
+                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
                       </ButtonGroup>
                     }
                   </div>
@@ -195,7 +204,7 @@ export default class SavePanel extends React.Component{
                   </div>
                   {instance.hasSaveError &&
                     <div className={classes.errors}>
-                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><Glyphicon glyph={"ok"}/></Button>
+                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><FontAwesomeIcon icon="check"/></Button>
                     </div>
                   }
                 </div>

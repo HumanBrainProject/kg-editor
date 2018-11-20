@@ -1,12 +1,10 @@
 import React from "react";
 import injectStyles from "react-jss";
-//import Slider from "rc-slider";
-//import "rc-slider/assets/index.css";
 import { observer } from "mobx-react";
-import { ForceGraph2D } from "react-force-graph";
+import ForceGraph2D from "react-force-graph-2d";
 import { debounce } from "lodash";
 import Color from "color";
-import { Glyphicon } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import graphStore from "../../../Stores/GraphStore";
 import routerStore from "../../../Stores/RouterStore";
@@ -58,6 +56,10 @@ export default class Graph extends React.Component {
     this.initialZoom = false;
   }
 
+  UNSAFE_componentWillReceiveProps(){
+    this.initialZoom = false;
+  }
+
   componentDidMount(){
     this.resizeDebounceFn = debounce(this.resizeWrapper, 250);
     window.addEventListener("resize", this.resizeDebounceFn);
@@ -83,18 +85,12 @@ export default class Graph extends React.Component {
     });
   }
 
-  changeValue(e) {
-    graphStore.setStep(e);
-    //TODO: handle that in the store
-    //graphStore.fetchGraph(this.props.instanceStore.mainInstanceId);
-  }
-
   handleNodeClick = (node) => {
     if(node.isGroup){
       graphStore.explodeNode(node);
-    } else {
-      routerStore.history.push("/instance/graph/"+node.id);
+    } else if(node.id !== graphStore.mainId){
       graphStore.reset();
+      routerStore.history.push("/instance/graph/"+node.id);
     }
   }
 
@@ -147,7 +143,7 @@ export default class Graph extends React.Component {
     if(node.isGroup){
       ctx.rect(node.x-6, node.y-6, 12, 12);
     } else {
-      ctx.arc(node.x, node.y, 6, 0, 2*Math.PI);
+      ctx.arc(node.x, node.y, node.isMainNode?10:6, 0, 2*Math.PI);
     }
 
     if(graphStore.highlightedNode){
@@ -159,6 +155,11 @@ export default class Graph extends React.Component {
     ctx.strokeStyle = new Color(graphStore.colorScheme[dataType]).darken(0.25).hex();
     ctx.fillStyle = graphStore.colorScheme[dataType];
 
+    if(node.isMainNode){
+      ctx.setLineDash([2, 0.5]);
+    } else {
+      ctx.setLineDash([]);
+    }
     ctx.stroke();
     ctx.fill();
     if(scale > 3){
@@ -229,8 +230,7 @@ export default class Graph extends React.Component {
           linkDirectionalArrowLength={3}
         />
         }
-        <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><Glyphicon glyph={"camera"}/></a>
-        {/*<Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />*/}
+        <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><FontAwesomeIcon icon="camera"/></a>
       </div>
     );
   }

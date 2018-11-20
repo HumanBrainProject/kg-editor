@@ -8,28 +8,33 @@ import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
 
 const nodeTypeMapping = {
-  "Dataset":"http://hbp.eu/minds#Dataset",
-  "Specimen group":"http://hbp.eu/minds#SpecimenGroup",
-  "Subject":"http://hbp.eu/minds#ExperimentSubject",
-  "Activity":"http://hbp.eu/minds#Activity",
-  "Person":"http://hbp.eu/minds#Person",
-  "PLA Component":"http://hbp.eu/minds#PLAComponent",
-  "Publication":"http://hbp.eu/minds#Publication",
-  "File Association":"http://hbp.eu/minds#FileAssociation",
-  "DOI":"http://hbp.eu/minds#DatasetDOI",
-  "Method":"http://hbp.eu/minds#ExperimentMethod",
-  "Reference space":"http://hbp.eu/minds#ReferenceSpace",
-  "Parcellation Region":"http://hbp.eu/minds#ParcellationRegion",
-  "Parcellation Atlas":"http://hbp.eu/minds#ParcellationAtlas",
-  "Embargo Status":"http://hbp.eu/minds#EmbargoStatus",
-  "Approval":"http://hbp.eu/minds#EthicsApproval",
-  "Protocol":"http://hbp.eu/minds#ExperimentProtocol",
-  "Preparation":"http://hbp.eu/minds#Preparation",
-  "Authority":"http://hbp.eu/minds#EthicsAuthority",
-  "Format":"http://hbp.eu/minds#Format",
-  "License Type":"http://hbp.eu/minds#LicenseInformation",
-  "Sample":"http://hbp.eu/minds#ExperimentSample",
-  "File":"http://hbp.eu/minds#File"
+  "Dataset":"https://schema.hbp.eu/minds/Dataset",
+  "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
+  "Subject":"https://schema.hbp.eu/minds/Subject",
+  "Activity":"https://schema.hbp.eu/minds/Activity",
+  "Person":"https://schema.hbp.eu/minds/Person",
+  "PLA Component":"https://schema.hbp.eu/minds/Placomponent",
+  "Publication":"https://schema.hbp.eu/minds/Publication",
+  "File Association":"https://schema.hbp.eu/minds/FileAssociation",
+  "DOI":"https://schema.hbp.eu/minds/DatasetDOI",
+  "Method":"https://schema.hbp.eu/minds/Method",
+  "Reference space":"https://schema.hbp.eu/minds/Referencespace",
+  "Parcellation Region":"https://schema.hbp.eu/minds/Parcellationregion",
+  "Parcellation Atlas":"https://schema.hbp.eu/minds/Parcellationatlas",
+  "Embargo Status":"https://schema.hbp.eu/minds/Embargostatus",
+  "Approval":"https://schema.hbp.eu/minds/Approval",
+  "Protocol":"https://schema.hbp.eu/minds/Protocol",
+  "Preparation":"https://schema.hbp.eu/minds/Preparation",
+  "Authority":"https://schema.hbp.eu/minds/Authority",
+  "Format":"https://schema.hbp.eu/minds/Format",
+  "License Type":"https://schema.hbp.eu/minds/Licensetype",
+  "Sample":"https://schema.hbp.eu/minds/ExperimentSample",
+  "File":"https://schema.hbp.eu/minds/File",
+  "Software agent":"https://schema.hbp.eu/minds/Softwareagent",
+  "Age category":"https://schema.hbp.eu/minds/Agecategory",
+  "Sex":"https://schema.hbp.eu/minds/Sex",
+  "Species":"https://schema.hbp.eu/minds/Species",
+  "Role":"https://schema.hbp.eu/minds/Role"
 };
 
 class InstanceStore {
@@ -55,6 +60,25 @@ class InstanceStore {
 
   get nodeTypeMapping(){
     return nodeTypeMapping;
+  }
+
+
+  getPromotedFields(instance) {
+    if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
+      return instance.data.ui_info.promotedFields
+        .filter(name => instance.data.fields[name]);
+    }
+    return [];
+  }
+
+  getNonPromotedFields(instance) {
+    if (instance && instance.data && instance.data.fields) {
+      return Object.keys(instance.data.fields)
+        .filter(key => {
+          return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
+        });
+    }
+    return [];
   }
 
   /**
@@ -114,9 +138,9 @@ class InstanceStore {
   async createNewInstance(path, name=""){
     this.isCreatingNewInstance = path;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name":name});
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
       this.isCreatingNewInstance = false;
-      return data.id;
+      return data.data.id;
     } catch(e){
       this.isCreatingNewInstance = false;
       this.instanceCreationError = e.message;
@@ -220,9 +244,10 @@ class InstanceStore {
 
       runInAction(async () => {
         const fieldsWithOptions = new Map();
+        const instanceData = data.data?data.data:{fields: {}};
         try {
-          for(let fieldKey in data.fields){
-            const instancesPath = data.fields[fieldKey].instancesPath;
+          for(let fieldKey in instanceData.fields){
+            const instancesPath = instanceData.fields[fieldKey].instancesPath;
             if(instancesPath){
               fieldsWithOptions.set(fieldKey, instancesPath);
               if(!this.optionsCache.has(instancesPath)){
@@ -246,8 +271,8 @@ class InstanceStore {
           instance.isFetching = false;
         }
 
-        instance.data = data;
-        instance.form = new FormStore(data);
+        instance.data = instanceData;
+        instance.form = new FormStore(instanceData);
 
         const fields = instance.form.getField();
         Object.entries(fields).forEach(([fieldKey, field]) => {
@@ -349,9 +374,9 @@ class InstanceStore {
           const option = options.find(o => o.id === instanceId);
           if (option) {
             if (instance.data.ui_info && instance.data.ui_info.labelField) {
-              const keyFieldName = instance.data.ui_info.labelField.replace(/\//g, "%nexus-slash%");
+              const keyFieldName = instance.data.ui_info.labelField;
               if (payload && payload[keyFieldName]) {
-                option.label = payload[keyFieldName];
+                option.name = payload[keyFieldName];
               }
             }
           }

@@ -43,7 +43,7 @@ export default class InstanceField extends React.Component{
         if (target) {
           target.scrollIntoViewIfNeeded();
         }
-        this.props.paneStore.selectNextPane();
+        this.props.paneStore.selectPane(`ChildrenOf${this.props.id}`);
       });
     }
   }
@@ -85,7 +85,7 @@ export default class InstanceField extends React.Component{
                   onFocus={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}
                   onMouseEnter={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}
                   onBlur={(event) => {event.stopPropagation(); this.handleToggleOffFieldHighlight(field, value);}}
-                  onMouseLeave={(event) => {event.stopPropagation(); this.handleToggleOffFieldHighlight(field, value);}}>{value.label}</button>
+                  onMouseLeave={(event) => {event.stopPropagation(); this.handleToggleOffFieldHighlight(field, value);}}>{value[field.mappingLabel]}</button>
               </span>
             )}
           </span>

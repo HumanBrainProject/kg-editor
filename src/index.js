@@ -3,10 +3,8 @@ import { render } from "react-dom";
 import { observer } from "mobx-react";
 import { Router, Route, Switch, matchPath } from "react-router-dom";
 import injectStyles from "react-jss";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faUserLock, faQuestionCircle, faHome, faSearch,
-  faCaretRight, faCaretDown, faCircleNotch, faCircle, faTimes,
-  faEdit, faProjectDiagram, faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faExclamationTriangle, faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle, faExpandArrowsAlt, faCompress, faEyeSlash, faExclamationCircle, faEnvelope, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+
+import "./Services/IconsImport";
 
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
@@ -24,10 +22,16 @@ import Help from "./Views/Help";
 import Statistics from "./Views/Statistics";
 import Search from "./Views/Search";
 import Instance from "./Views/Instance";
+import FetchingLoader from "./Components/FetchingLoader";
+import BGMessage from "./Components/BGMessage";
 
 import "babel-polyfill";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GlobalError from "./Views/GlobalError";
+import { FormStore } from "hbp-quickfire";
+import { Button } from "react-bootstrap";
+
+FormStore.setPathNodeSeparator("|");
 
 const styles = {
   "@global html, body, #root": {
@@ -79,6 +83,7 @@ const styles = {
   },
   logo: {
     padding: "10px",
+    cursor:"pointer",
     "& span": {
       color: "var(--ft-color-loud)",
       display: "inline-block",
@@ -86,6 +91,9 @@ const styles = {
       fontSize: "0.9em",
       borderLeft: "1px solid var(--border-color-ui-contrast5)",
       marginLeft:"10px"
+    },
+    "&:hover span": {
+      color: "var(--ft-color-louder)"
     }
   },
   status:{
@@ -135,6 +143,35 @@ const styles = {
     "100%":{
       "transform": "scale(1.1)"
     }
+  },
+  userProfileLoader:{
+    position:"absolute",
+    top:0,
+    left:0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    "& [class*=fetchingPanel]": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
+  },
+  userProfileError: {
+    color: "var(--ft-color-loud)"
+  },
+  userProfileErrorFooterBar: {
+    marginBottom: "10px",
+    width: "100%",
+    textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
+    "& button + button": {
+      marginLeft: "20px"
+    }
   }
 };
 
@@ -148,6 +185,7 @@ class App extends React.Component{
     routerStore.history.listen(location => {
       this.setState({currentLocation:location.pathname});
     });
+    this.kCode = {step:0, ref:[38,38,40,40,37,39,37,39,66,65]};
   }
 
   componentDidMount(){
@@ -165,6 +203,12 @@ class App extends React.Component{
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
         this.handleCloseInstance(matchInstanceTab.params.id);
+      }
+    } else {
+      this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode? this.kCode.step+1: 0;
+      if(this.kCode.step === this.kCode.ref.length){
+        this.kCode.step = 0;
+        appStore.setTheme("cupcake");
       }
     }
   }
@@ -191,6 +235,14 @@ class App extends React.Component{
     instanceStore.closeInstance(instanceId);
   }
 
+  handleGoToDashboard = () => {
+    routerStore.history.push("/");
+  }
+
+  handleRetryRetriveUserProfile = () => {
+    authStore.retriveUserProfile();
+  }
+
   render(){
     const {classes} = this.props;
     const {currentLocation} = this.state;
@@ -201,7 +253,8 @@ class App extends React.Component{
         <div className={classes.layout}>
           <Theme/>
           <div className={classes.tabs}>
-            <div className={classes.logo}>
+
+            <div className={`${classes.logo} layout-logo`} onClick={this.handleGoToDashboard}>
               <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
               <span>Knowledge Graph Editor</span>
             </div>
@@ -209,23 +262,23 @@ class App extends React.Component{
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {!authStore.isAuthenticated?
+                  {!authStore.isOIDCAuthenticated?
                     <Tab icon={"user-lock"} current={true}>Login</Tab>
                     :
-                    <React.Fragment>
-                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"}>Home</Tab>
-                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Search</Tab>
-                    </React.Fragment>
+                    authStore.isFullyAuthenticated?
+                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Browse</Tab>
+                      :null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
-                  {authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
+                  {authStore.isFullyAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
                     const instance = instanceStore.getInstance(instanceId);
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
                     if(!instance.isFetching && !instance.hasFetchError){
-                      label = instance.form.getField("http:%nexus-slash%%nexus-slash%schema.org%nexus-slash%name").getValue();
+                      let field = instance.form.getField("http://schema.org/name");
+                      label = field? field.getValue(): instanceId;
                       color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
                     }
                     if(!label){
@@ -247,7 +300,7 @@ class App extends React.Component{
                   })}
                 </div>
                 <div className={classes.fixedTabsRight}>
-                  {authStore.isAuthenticated &&
+                  {authStore.isFullyAuthenticated &&
                     <React.Fragment>
                       <Tab icon={"chart-bar"} current={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
                       <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
@@ -268,27 +321,48 @@ class App extends React.Component{
                 <SaveBar/>
               </div>
             }
-            {!authStore.isAuthenticated?
-              <Route component={Login} />
-              :appStore.globalError?
-                <Route component={GlobalError} />
+            {appStore.globalError?
+              <Route component={GlobalError} />
+              :
+              !authStore.isOIDCAuthenticated?
+                <Route component={Login} />
                 :
-                <Switch>
-                  <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
-                  <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
-                  <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
-                  <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+                authStore.isFullyAuthenticated?
+                  <Switch>
+                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
+                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
+                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
+                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
 
-                  <Route path="/search" exact={true} component={Search} />
-                  <Route path="/help" exact={true} component={Help} />
-                  <Route path="/kg-stats" exact={true} component={Statistics} />
-                  <Route path="/loginSuccess" exact={true} component={()=>null} />
-                  <Route path="/" exact={true} component={Home} />
-                  <Route component={NotFound} />
-                </Switch>
+                    <Route path="/search" exact={true} component={Search} />
+                    <Route path="/help" exact={true} component={Help} />
+                    <Route path="/kg-stats" exact={true} component={Statistics} />
+                    <Route path="/loginSuccess" exact={true} component={()=>null} />
+                    <Route path="/" exact={true} component={Home} />
+                    <Route component={NotFound} />
+                  </Switch>
+                  :null
             }
+            {authStore.isOIDCAuthenticated && !authStore.hasUserProfile && (
+              authStore.isRetrievingUserProfile?
+                <div className={classes.userProfileLoader}>
+                  <FetchingLoader>Retrieving user profile...</FetchingLoader>
+                </div>
+                :
+                authStore.userProfileError?
+                  <div  className={classes.userProfileError}>
+                    <BGMessage icon={"ban"}>
+                      {`There was a network problem retrieving user profile (${authStore.userProfileError}).
+If the problem persists, please contact the support.`}<br/><br/>
+                      <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
+                        <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                      </Button>
+                    </BGMessage>
+                  </div>
+                  :null
+            )}
           </div>
-          <div className={classes.status}>
+          <div className={`${classes.status} layout-status`}>
 
           </div>
         </div>
@@ -296,11 +370,5 @@ class App extends React.Component{
     );
   }
 }
-
-library.add(faUserLock, faQuestionCircle, faHome, faSearch, faCaretRight,
-  faCaretDown, faCircleNotch, faCircle, faTimes, faEdit, faProjectDiagram,
-  faCloudUploadAlt, faChartBar, faCodeBranch, faPencilAlt, faEye, faEyeSlash, faExclamationTriangle,
-  faUnlink, faBan, faRedoAlt, faMoneyCheck, faThumbsUp, faCheck, faFile, faPlus, faDotCircle,
-  faExpandArrowsAlt, faCompress, faExclamationCircle, faEnvelope, faSun, faMoon);
 
 render(<App/>, document.getElementById("root"));

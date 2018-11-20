@@ -68,7 +68,7 @@ export default class Hub extends React.Component{
   }
 
   handleCreateInstance = () => {
-    if(!searchStore.allLists){
+    if(!searchStore.isFetched.lists && !searchStore.isFetching.list){
       searchStore.fetchLists();
     }
     this.setState({showCreateModal: true});
@@ -135,12 +135,18 @@ export default class Hub extends React.Component{
             </Modal.Header>
             <Modal.Body>
               <div className={classes.newInstances}>
-                {searchStore.allLists.map(list => {
-                  return(
-                    <div key={list.path} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.path)}>
-                      {list.label}
-                    </div>
-                  );
+                {searchStore.lists.map(folder => {
+                  if(folder.folderType !== "NODETYPE"){
+                    return null;
+                  } else {
+                    return folder.lists.map(list => {
+                      return(
+                        <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
+                          {list.name}
+                        </div>
+                      );
+                    });
+                  }
                 })}
                 <div>
                   {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}

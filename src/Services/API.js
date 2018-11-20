@@ -17,7 +17,7 @@ const endpoints = {
   "deleteBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": (instance) => `/editor/api/instance/${instance}/bookmarks`,
-  "graph": (instance, step) => `/editor/api/graph/${instance}?step=${step}`
+  "graph": (instance) => `/api/instances/${instance}/graph`
 };
 
 class API {

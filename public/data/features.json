@@ -3,7 +3,7 @@
         {
             "version": "version 2.1",
             "features": [
-                "Integration / improvement of releasing screen\n\n![alt text](features/releasing-screen.png \"Releasing screen\")",
+                "Integration / improvement of releasing screen\n\n![https://www.youtube.com/embed/DchifxNvfZY|560|315](features/releasing-screen.png \"Releasing screen\")",
                 "Favorites / bookmarking feature\n\n![alt text](features/bookmarks.png \"Favorites / bookmarking feature\")",
                 "Counter for instances in search\n\n![alt text](features/counter-in-search.png \"Counter for instances in search\")"
             ]

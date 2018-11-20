@@ -12,6 +12,9 @@ import ThemeSwitcher from "./ThemeSwitcher";
 
 const styles = {
   container:{
+    display: "grid",
+    gridTemplateRows: "auto auto auto auto 1fr auto",
+    height: "100%"
   },
   action:{
     textAlign:"center",
@@ -86,7 +89,7 @@ export default class Hub extends React.Component{
   render(){
     const { classes } = this.props;
     return(
-      <div className={`${classes.container} widget`}>
+      <div className={`${classes.container}`}>
         <div className={classes.action} onClick={()=>routerStore.history.push("/search")}>
           <div className={classes.actionIcon}>
             <FontAwesomeIcon icon={"search"}/>
@@ -123,7 +126,7 @@ export default class Hub extends React.Component{
             Help
           </div>
         </div>
-
+        <div className={classes.action}></div>
         <div className={classes.action}>
           <ThemeSwitcher/>
         </div>

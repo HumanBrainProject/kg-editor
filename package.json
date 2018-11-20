@@ -16,6 +16,7 @@
     "lodash": "^4.17.10",
     "mobx": "^4.3.1",
     "mobx-react": "^5.0.0",
+    "nivo": "^0.31.0",
     "react": "^16.4.2",
     "react-bootstrap": "^0.32.1",
     "react-custom-scrollbars": "^4.2.1",

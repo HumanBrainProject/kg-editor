@@ -1,8 +1,8 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-import { Panel, Button } from "react-bootstrap";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Panel, Button, Overlay, Popover } from "react-bootstrap";
+import {uniqueId} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactMarkdown  from "react-markdown";
 
@@ -11,20 +11,26 @@ import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   container: {
+    padding: "15px",
     "& h3": {
       marginTop: "0"
-    },
-    "& .scroll-container": {
-      height: "calc(100% - 40px)"
     },
     "& img": {
       width: "calc(100% - 20px)"
     },
     "& ul.list": {
       height: "100%",
+      paddingLeft: "20px",
       listStyleType: "square",
       "& > li > ul": {
-        listStyleType: "disc"
+        paddingLeft: "20px",
+        listStyleType: "disc",
+        "& > li + li": {
+          marginTop: "15px"
+        },
+        "& > li img": {
+          cursor: "pointer"
+        }
       },
       "& > .panel": {
         margin: "0",
@@ -54,7 +60,13 @@ const styles = {
           marginTop: "-10px",
           padding: "0",
           "& > li > ul": {
-            listStyleType: "disc"
+            listStyleType: "disc",
+            "& > li + li": {
+              marginTop: "15px"
+            },
+            "& > li img": {
+              cursor: "pointer"
+            }
           }
         },
         "& > .panel-footer": {
@@ -101,7 +113,47 @@ const styles = {
   noFeaturesPanel:{
     extend:"featuresFetchErrorPanel",
     color:"var(--ft-color-loud)"
+  },
+  popOver: {
+    top: "50% !important",
+    left: "50% !important",
+    transform: "translate(-50%, -50%)",
+    maxWidth: "unset",
+    background: "var(--list-bg-hover)",
+    border: "1px solid var(--list-border-hover)",
+    "& .arrow": {
+      display: "none !important"
+    },
+    "& .popover-content": {
+      padding: "30px"
+    }
+  },
+  popOverCloseButton: {
+    position: "absolute",
+    top: "3px",
+    right: "3px",
+    color:"var(--ft-color-loud)",
+    backgroundColor: "transparent",
+    border: "transparent"
   }
+};
+
+const windowHeight = () => {
+  const w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName("body")[0];
+  return w.innerHeight || e.clientHeight || g.clientHeight;
+  //return $(window).height();
+};
+
+const windowWidth = () => {
+  const w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName("body")[0];
+  return w.innerWidth || e.clientWidth || g.clientWidth;
+  //return $(window).width();
 };
 
 @injectStyles(styles)
@@ -109,9 +161,45 @@ const styles = {
 export default class Features extends React.Component {
   constructor(props){
     super(props);
+    this.state = { pictureZoom: {src: null, width: 0, height: 0}};
     if(!featuresStore.isFetched && !featuresStore.isFetching){
       featuresStore.fetchFeatures();
     }
+  }
+
+  handlePictureClick = e => {
+    if (e.target.tagName === "IMG" && e.target.currentSrc) {
+      let src = e.target.currentSrc;
+      let width = e.target.naturalWidth;
+      let height = e.target.naturalHeight;
+      const wWidth = windowWidth() - 120;
+      const wheight = windowHeight() - 120;
+      if (width > wWidth && height > wheight) {
+        if (width/wWidth > height/wheight) {
+          width = wWidth + "px";
+          height = "auto";
+        } else {
+          width = "auto";
+          height = wheight + "px";
+        }
+      } else if (width > wWidth) {
+        width = wWidth + "px";
+        height = "auto";
+      } else if (height > wheight) {
+        width = "auto";
+        height = wheight + "px";
+      } else {
+        width = width + "px";
+        height = height  + "px";
+      }
+      this.setState({pictureZoom: {src: src, width: width, height: height}});
+    } else {
+      this.handlePopOverClose();
+    }
+  }
+
+  handlePopOverClose = () => {
+    this.setState({pictureZoom: {src: null, width: 0, height: 0}});
   }
 
   handleFetchFeaturesRetry = () => {
@@ -122,45 +210,52 @@ export default class Features extends React.Component {
     const { classes } = this.props;
     return (
       <div className={`${classes.container} widget`}>
-        <h3>Latest features:</h3>
+        <h3>Latest features</h3>
         {!featuresStore.fetchError?
           !featuresStore.isFetching?
             featuresStore.releases.length?
-              <div className="scroll-container">
-                <Scrollbars autoHide >
-                  <ul className="list">
-                    {featuresStore.latestReleases.map(release => (
-                      <li key={release.version}>
-                        <h4>{release.version}</h4>
-                        <ul>
-                          {release.features.map(feature => (
-                            <li key={feature}><ReactMarkdown source={feature} /></li>
-                          ))}
-                        </ul>
-                      </li>
-                    ))}
-                    <Panel>
-                      <Panel.Collapse>
-                        <Panel.Body>
-                          {featuresStore.olderReleases.map(release => (
-                            <li key={release.version}>
-                              <h4>{release.version}</h4>
-                              <ul>
-                                {release.features.map(feature => (
-                                  <li key={feature}><ReactMarkdown source={feature} /></li>
-                                ))}
-                              </ul>
-                            </li>
-                          ))}
-                        </Panel.Body>
-                      </Panel.Collapse>
-                      <Panel.Footer>
-                        <Panel.Toggle componentClass="a"><FontAwesomeIcon icon={"angle-down"}/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
-                      </Panel.Footer>
-                    </Panel>
-                  </ul>
-                </Scrollbars>
-              </div>
+              <ul className="list" onClick={this.handlePictureClick}>
+                {featuresStore.latestReleases.map(release => (
+                  <li key={release.version}>
+                    <h4>{release.version}</h4>
+                    <ul>
+                      {release.features.map(feature => (
+                        <li key={feature}><ReactMarkdown source={feature} /></li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+                <Panel>
+                  <Panel.Collapse>
+                    <Panel.Body>
+                      {featuresStore.olderReleases.map(release => (
+                        <li key={release.version}>
+                          <h4>{release.version}</h4>
+                          <ul>
+                            {release.features.map(feature => (
+                              <li key={feature}><ReactMarkdown source={feature} /></li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </Panel.Body>
+                  </Panel.Collapse>
+                  <Panel.Footer>
+                    <Panel.Toggle componentClass="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
+                  </Panel.Footer>
+                </Panel>
+                <Overlay
+                  show={!!this.state.pictureZoom.src}
+                  container={document.body}
+                  rootClose={true}
+                  onHide={this.handlePopOverClose.bind(this)}
+                >
+                  <Popover id={uniqueId("pictureZoom")} className={classes.popOver} positionTop="50%" positionLeft="50%">
+                    <img src={this.state.pictureZoom.src}  width={this.state.pictureZoom.width} height={this.state.pictureZoom.height}/>
+                    <button className={classes.popOverCloseButton} onClick={this.handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
+                  </Popover>
+                </Overlay>
+              </ul>
               :
               <div className={classes.noFeaturesPanel}>
                 <div>No list of features available.</div>

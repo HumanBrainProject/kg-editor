@@ -367,7 +367,7 @@ export default class List extends React.Component{
               </div>
               :
               <div className={`${classes.actions} is-nodetype`}>
-                <div className={classes.action} onClick={this.handleCreateInstance.bind(this, list.relatedNodeType)} title={`create a new ${list.name}`}>
+                <div className={classes.action} onClick={this.handleCreateInstance.bind(this, list.id)} title={`create a new ${list.name}`}>
                   <FontAwesomeIcon icon={"plus"}/>
                 </div>
               </div>

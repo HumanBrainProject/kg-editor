@@ -156,7 +156,7 @@ const windowWidth = () => {
   //return $(window).width();
 };
 
-const getSize = (width, height) => {
+const getPictureSize = (width, height) => {
   const wWidth = windowWidth() - 120;
   const wheight = windowHeight() - 120;
   if (isNaN(width) && isNaN(height)) {
@@ -182,15 +182,43 @@ const getSize = (width, height) => {
     height = wheight + "px";
   } else {
     if (width === 0) {
-      width = "auto"
+      width = "auto";
     } else {
       width = width + "px";
     }
     if (height === 0) {
-      height = "auto"
+      height = "auto";
     } else {
       height = height  + "px";
     }
+  }
+  return {
+    width: width,
+    height: height
+  };
+};
+
+const getVideoSize = (width, height) => {
+  const wWidth = windowWidth() - 120;
+  const wheight = windowHeight() - 120;
+  if (isNaN(width) || isNaN(height) || width === 0 || height === 0) {
+    width = 560;
+    height = 315;
+  }
+  if (width > wWidth && height > wheight) {
+    if (width/wWidth > height/wheight) {
+      height = Math.floor(wWidth/width * height) + "px";
+      width = wWidth + "px";
+    } else {
+      width = Math.floor(wheight/height * width) + "px";
+      height = wheight + "px";
+    }
+  } else if (width > wWidth) {
+    height = Math.floor(wWidth/width * height) + "px";
+    width = wWidth + "px";
+  } else if (height > wheight) {
+    width = Math.floor(wWidth/width * height) + "px";
+    height = wheight + "px";
   }
   return {
     width: width,
@@ -214,11 +242,11 @@ export default class Features extends React.Component {
       event.stopPropagation();
       const [videoUrl, videoWidth, videoHeight] = e.target.alt?e.target.alt.split("|"):null;
       if (videoUrl && videoUrl.indexOf("https://") === 0) {
-        const {width, height} = getSize(Number(videoWidth), Number(videoHeight));
+        const {width, height} = getVideoSize(Number(videoWidth), Number(videoHeight));
         this.setState({pictureZoom: {src: null, width: 0, height: 0}, video:{src: videoUrl, width: width, height:height}});
       } else {
         const src = e.target.currentSrc;
-        const {width, height} = getSize(e.target.naturalWidth, e.target.naturalHeight);
+        const {width, height} = getPictureSize(e.target.naturalWidth, e.target.naturalHeight);
         this.setState({pictureZoom: {src: src, width: width, height: height}, video:{src: null, width: 0, height: 0}});
       }
     } else {

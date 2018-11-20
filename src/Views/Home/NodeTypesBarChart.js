@@ -76,12 +76,7 @@ export default class NodeTypesBarChart extends React.Component {
                 colorBy="id"
                 enableGridY={false}
                 axisLeft={{
-                  "tickSize": 0,
-                  "tickPadding": 10,
-                  "tickRotation": 0,
-                  "legend": "nodeTypes",
-                  "legendPosition": "center",
-                  "legendOffset": -35
+                  "tickSize": 0
                 }}
                 axisBottom={null}
                 labelSkipWidth={12}

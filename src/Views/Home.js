@@ -29,6 +29,7 @@ const styles = {
       border: "1px solid var(--border-color-ui-contrast1)",
       color: "var(--ft-color-normal)",
       "& .widget": {
+        position: "relative",
         borderBottom: "1px solid var(--border-color-ui-contrast1)",
         color: "var(--ft-color-normal)",
         "&:last-child": {

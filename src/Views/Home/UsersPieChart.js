@@ -115,11 +115,11 @@ export default class UsersPieChart extends React.Component {
               />
               :
               <div className={classes.noStatisticsPanel}>
-                <div>No user statistics available.</div>
+                <div>No users statistics available.</div>
               </div>
             :
             <FetchingLoader>
-              Fetching user statistics
+              Fetching users statistics
             </FetchingLoader>
           :
           <div className={classes.statisticsFetchErrorPanel}>

@@ -20,9 +20,11 @@ class FeaturesStore{
         this.releases = (data && data.data)?data.data:[];
       });
     } catch (e) {
-      const message = e.message? e.message: e;
-      this.fetchError = `Error while retrieving list of features (${message})`;
-      this.isFetching = false;
+      runInAction(() => {
+        const message = e.message? e.message: e;
+        this.fetchError = `Error while retrieving list of features (${message})`;
+        this.isFetching = false;
+      });
     }
   }
 

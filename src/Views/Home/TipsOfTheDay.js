@@ -1,11 +1,8 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import tipsOfTheDayStore from "../../Stores/TipsOfTheDayStore";
-import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   container: {
@@ -17,7 +14,22 @@ const styles = {
   tip: {
     display: "flex",
     "& > div": {
-      flex: "1"
+      flex: "1",
+      "& .kbd": {
+        display: "inline-block",
+        margin: "0 0.1em",
+        padding: "0.1em 0.6em",
+        border: "1px solid #ccc",
+        borderRadius: "3px",
+        backgroundColor: "#f7f7f7",
+        fontFamily: "Arial,Helvetica,sans-serif",
+        fontSize: "11px",
+        lineHeight: "1.4",
+        color: "#333",
+        boxShadow: "0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset",
+        textShadow: "0 1px 0 #fff",
+        whiteSpace: "nowrap"
+      }
     },
     "& > button": {
       height: "100%",
@@ -32,20 +44,15 @@ const styles = {
       }
     }
   },
-  tipsOfTheDayFetchErrorPanel:{
+  noTipsOfTheDayPanel:{
     textAlign:"center",
     fontSize:"0.9em",
     wordBreak:"break-all",
     padding:"40px 20px",
-    "& .btn":{
-      minWidth:"140px",
-      marginTop:"20px"
-    },
-    color:"#e74c3c"
-  },
-  noTipsOfTheDayPanel:{
-    extend:"tipsOfTheDayFetchErrorPanel",
     color:"var(--ft-color-loud)"
+  },
+  bookmarkIcon: {
+    color: "var(--bookmark-on-color)"
   }
 };
 
@@ -55,17 +62,17 @@ export default class TipsOfTheDay extends React.Component {
   constructor(props){
     super(props);
     this.state = { currentIndex: 0 };
-    if(!tipsOfTheDayStore.isFetched && !tipsOfTheDayStore.isFetching){
-      tipsOfTheDayStore.fetchTipsOfTheDay();
-    }
-  }
-
-  handleFetchTipOfTheDayRetry = () => {
-    tipsOfTheDayStore.fetchFeatures();
+    this.tips = [
+      <span key="0">To open an instances list&#39;s item in a background tab press <span className="kbd">Ctrl</span> + click.</span>,
+      <span key="1">To create a new bookmark list click on the <FontAwesomeIcon icon="star" className={this.props.classes.bookmarkIcon} /> button of an instnce and type the name of the new desired bookmark list.</span>,
+      <span key="2">3rd tips of the day</span>,
+      <span key="3">4th tips of the day</span>,
+      <span key="4">5th tips of the day</span>
+    ];
   }
 
   handleShowNextTip = () => {
-    this.setState(state => ({currentIndex: (state.currentIndex + 1 === tipsOfTheDayStore.tips.length)?0:state.currentIndex + 1}));
+    this.setState(state => ({currentIndex: (state.currentIndex + 1 === this.tips.length)?0:state.currentIndex + 1}));
   }
 
   render(){
@@ -73,25 +80,14 @@ export default class TipsOfTheDay extends React.Component {
     return (
       <div className={`${classes.container} widget`}>
         <h3>Tips of the day</h3>
-        {!tipsOfTheDayStore.fetchError?
-          !tipsOfTheDayStore.isFetching?
-            tipsOfTheDayStore.tips.length?
-              <div className={classes.tip}>
-                <div>{tipsOfTheDayStore.tips[this.state.currentIndex]}</div>
-                <button onClick={this.handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>
-              </div>
-              :
-              <div className={classes.noTipsOfTheDayPanel}>
-                <div>No tips of the day available.</div>
-              </div>
-            :
-            <FetchingLoader>
-              Fetching tips of the day
-            </FetchingLoader>
+        {this.tips.length?
+          <div className={classes.tip}>
+            <div>{this.tips[this.state.currentIndex]}</div>
+            <button onClick={this.handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>
+          </div>
           :
-          <div className={classes.TipsOfTheDayFetchErrorPanel}>
-            <div>{tipsOfTheDayStore.fetchError}</div>
-            <Button bsStyle="primary" onClick={this.handleFetchTipOfTheDayRetry}>Retry</Button>
+          <div className={classes.noTipsOfTheDayPanel}>
+            <div>No tips of the day available.</div>
           </div>
         }
       </div>

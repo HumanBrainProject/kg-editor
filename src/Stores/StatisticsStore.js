@@ -72,7 +72,7 @@ class StatisticsStore{
           value: Math.round(Math.random() * 100)
         }))
         .sort((user1, user2) => user2.value - user1.value)
-        .filter((user, index) => index < 5)
+        .filter((user, index) => index < 5);
     }
     return stats;
   }

@@ -45,9 +45,11 @@ export default class KeyboardShortcuts extends React.Component {
         <h3>Keyboard shortcuts</h3>
         <ul>
           <li><span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</li>
+          <li><span className="kbd">Alt</span> + <span className="kbd">b</span> browse the instances.</li>
+          <li><span className="kbd">Alt</span> + <span className="kbd">n</span> create a new instance.</li>
           <li><span className="kbd">Ctrl</span> + <span className="kbd">w</span> to close current tab.</li>
-          <li><span className="kbd">Ctrl</span> + <span className="kbd">&#8592;</span> to active previous tab.</li>
-          <li><span className="kbd">Ctrl</span> + <span className="kbd">&#8594;</span> to active next tab.</li>
+          <li><span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</li>
+          <li><span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</li>
           <li><span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</li>
         </ul>
       </div>

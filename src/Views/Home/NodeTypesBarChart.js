@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
+import {uniqueId} from "lodash";
 import { Button } from "react-bootstrap";
 import { ResponsiveBar } from "nivo";
 
@@ -40,9 +41,22 @@ const styles = {
 export default class NodeTypesBarChart extends React.Component {
   constructor(props){
     super(props);
+    this.state = {key: uniqueId("key")};
     if(!statisticsStore.isFetched && !statisticsStore.isFetching){
       statisticsStore.fetchStatistics();
     }
+  }
+
+  handleResize = () => {
+    this.setState({key: uniqueId("key")});
+  }
+
+  componentDidMount = () => {
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener("resize", this.handleResize);
   }
 
   handleFetchStatisticsRetry = () => {
@@ -52,7 +66,7 @@ export default class NodeTypesBarChart extends React.Component {
   render(){
     const { classes } = this.props;
     return (
-      <div className={`${classes.container} widget`}>
+      <div key={this.state.key} className={`${classes.container} widget`}>
         <h3>Top 10 unreleased instances by nodeType</h3>
         {!statisticsStore.fetchError?
           !statisticsStore.isFetching?

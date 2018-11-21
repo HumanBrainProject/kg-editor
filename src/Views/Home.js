@@ -11,6 +11,8 @@ import NodeTypesBarChart from "./Home/NodeTypesBarChart";
 import UsersPieChart from "./Home/UsersPieChart";
 import authStore from "../Stores/AuthStore";
 
+const rootPath = window.rootPath || "";
+
 const styles = {
   container: {
     display: "grid",
@@ -67,7 +69,7 @@ const styles = {
       padding: "10px",
       borderColor: "transparent",
       background: "none",
-      backgroundImage: "url('/assets/graph.png')",
+      backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
       backgroundPosition: "50% 50%",
       "& h1": {
         position: "absolute",

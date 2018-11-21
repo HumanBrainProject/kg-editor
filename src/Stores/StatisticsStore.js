@@ -30,7 +30,7 @@ class StatisticsStore{
 
   @computed get nodeTypeStatistics() {
     let stats = [];
-    if (this.statistics && this.statistics.nodes.length) {
+    if (this.statistics && this.statistics.nodes && this.statistics.nodes.length) {
       stats = Object.values(
         this.statistics.nodes
           .filter(node => node.group === "minds" && node.label && node.label.indexOf("Placomponent") === -1)

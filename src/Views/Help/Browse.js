@@ -18,7 +18,7 @@ export default class HelpView extends React.Component{
         <h2>Access the feature</h2>
         <p>To access the <code>Browse</code> feature, you can use either the always present tab at the top of the window, or the quick access button on the dashboard.</p>
         <p>
-          <img src={`${window.rootPath}/assets/help/browse/access.png`}/>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/help/browse/access.png`}/>
         </p>
       </div>
     );

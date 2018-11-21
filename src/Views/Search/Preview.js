@@ -155,7 +155,7 @@ export default class Preview extends React.Component{
                   })}
                   <div className={`${classes.status}`}>
                     <div className={"release-status"}>
-                      <Status id={searchStore.selectedInstance.id} />
+                      <Status darkmode={true} id={searchStore.selectedInstance.id} />
                     </div>
                   </div>
                 </Form>

@@ -67,7 +67,7 @@ export default class NodeTypesBarChart extends React.Component {
     const { classes } = this.props;
     return (
       <div key={this.state.key} className={`${classes.container} widget`}>
-        <h3>Top 10 unreleased instances by nodeType</h3>
+        <h3>Top 10 unreleased instances by type</h3>
         {!statisticsStore.fetchError?
           !statisticsStore.isFetching?
             statisticsStore.nodeTypeStatistics.length?
@@ -138,11 +138,11 @@ export default class NodeTypesBarChart extends React.Component {
               />
               :
               <div className={classes.noStatisticsPanel}>
-                <div>No nodeTypes statistics available.</div>
+                <div>No instances statistics available.</div>
               </div>
             :
             <FetchingLoader>
-              Fetching nodeTypes statistics
+              Fetching instances statistics
             </FetchingLoader>
           :
           <div className={classes.statisticsFetchErrorPanel}>

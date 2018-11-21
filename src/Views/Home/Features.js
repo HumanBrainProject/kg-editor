@@ -231,23 +231,23 @@ const getVideoSize = (width, height) => {
 export default class Features extends React.Component {
   constructor(props){
     super(props);
-    this.state = { pictureZoom: {src: null, width: 0, height: 0}, video:{src: null, width: 0, height: 0} };
+    this.state = { zoom: {type: null, src: null, width: 0, height: 0}};
     if(!featuresStore.isFetched && !featuresStore.isFetching){
       featuresStore.fetchFeatures();
     }
   }
 
   handlePictureClick = e => {
-    if (e.target.tagName === "IMG" && e.target.currentSrc) {
+    if (e && e.target && e.target.tagName === "IMG" && e.target.currentSrc) {
       event.stopPropagation();
-      const [videoUrl, videoWidth, videoHeight] = e.target.alt?e.target.alt.split("|"):null;
-      if (videoUrl && videoUrl.indexOf("https://") === 0) {
-        const {width, height} = getVideoSize(Number(videoWidth), Number(videoHeight));
-        this.setState({pictureZoom: {src: null, width: 0, height: 0}, video:{src: videoUrl, width: width, height:height}});
+      const [altType, altSrc, altWidth, altHeight] = (typeof e.target.alt === "string")?e.target.alt.split("|"):[null, null, null, null];
+      if ((altType === "image" || altType === "video") && /^https?:\/\/.+$/.test(altSrc)) {
+        const {width, height} = getVideoSize(Number(altWidth), Number(altHeight));
+        this.setState({zoom: {type: altType, src: altSrc, width: width, height: height}});
       } else {
         const src = e.target.currentSrc;
-        const {width, height} = getPictureSize(e.target.naturalWidth, e.target.naturalHeight);
-        this.setState({pictureZoom: {src: src, width: width, height: height}, video:{src: null, width: 0, height: 0}});
+        const {width, height} = getPictureSize(Number(e.target.naturalWidth), Number(e.target.naturalHeight));
+        this.setState({zoom: {type: "image", src: src, width: width, height: height}});
       }
     } else {
       this.handlePopOverClose();
@@ -255,7 +255,7 @@ export default class Features extends React.Component {
   }
 
   handlePopOverClose = () => {
-    this.setState({pictureZoom: {src: null, width: 0, height: 0}, video:{src: null, width: 0, height: 0}});
+    this.setState({zoom: {type: null, src: null, width: 0, height: 0}});
   }
 
   handleFetchFeaturesRetry = () => {
@@ -301,16 +301,18 @@ export default class Features extends React.Component {
                   </Panel.Footer>
                 </Panel>
                 <Overlay
-                  show={!!this.state.pictureZoom.src || !!this.state.video.src}
+                  show={!!this.state.zoom.type}
                   container={document.body}
                   rootClose={true}
                   onHide={this.handlePopOverClose.bind(this)}
                 >
                   <Popover id={uniqueId("pictureZoom")} className={classes.popOver} positionTop="50%" positionLeft="50%">
-                    {this.state.video.src?
-                      <iframe width={this.state.video.width} height={this.state.video.height} src={this.state.video.src} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                    {this.state.zoom.type === "video"?
+                      <iframe width={this.state.zoom.width} height={this.state.zoom.height} src={this.state.zoom.src} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                       :
-                      <img src={this.state.pictureZoom.src}  width={this.state.pictureZoom.width} height={this.state.pictureZoom.height}/>
+                      this.state.zoom.type === "image"?
+                        <img src={this.state.zoom.src}  width={this.state.zoom.width} height={this.state.zoom.height}/>
+                        :null
                     }
                     <button className={classes.popOverCloseButton} onClick={this.handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
                   </Popover>

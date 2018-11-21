@@ -218,11 +218,19 @@ class App extends React.Component{
   handleGlobalShortcuts = (e) => {
     if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
       appStore.toggleTheme();
-    } else if(e.altKey && e.keyCode === 87){
+    } else if(e.altKey && e.keyCode === 66){ // w, browse
+      routerStore.history.push("/search");
+    } else if(e.altKey && e.keyCode === 87){ // w, close
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
         this.handleCloseInstance(matchInstanceTab.params.id);
       }
+    } else if(e.altKey && e.keyCode === 37){ // left arrow, previous
+      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+      this.handleFocusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
+    } else if(e.altKey && e.keyCode === 39){ // right arrow, next
+      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+      this.handleFocusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
     } else {
       this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode? this.kCode.step+1: 0;
       if(this.kCode.step === this.kCode.ref.length){
@@ -252,6 +260,54 @@ class App extends React.Component{
       }
     }
     instanceStore.closeInstance(instanceId);
+  }
+
+  handleFocusPreviousInstance(instanceId){
+    if(instanceId && matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) && matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+      if(instanceStore.openedInstances.size > 1){
+        let openedInstances = Array.from(instanceStore.openedInstances.keys());
+        let currentInstanceIndex = openedInstances.indexOf(instanceId);
+        let newInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1]: openedInstances[currentInstanceIndex-1];
+
+        let openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/search");
+      }
+    } else {
+      if(instanceStore.openedInstances.size > 1){
+        const openedInstances = Array.from(instanceStore.openedInstances.keys());
+        const newInstanceId = openedInstances[openedInstances.length - 1];
+        const openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/search");
+      }
+    }
+  }
+
+  handleFocusNextInstance(instanceId){
+    if(instanceId && matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) && matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+      if(instanceStore.openedInstances.size > 1){
+        let openedInstances = Array.from(instanceStore.openedInstances.keys());
+        let currentInstanceIndex = openedInstances.indexOf(instanceId);
+        let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0]: openedInstances[currentInstanceIndex+1];
+
+        let openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/search");
+      }
+    } else {
+      if(instanceStore.openedInstances.size > 1){
+        const openedInstances = Array.from(instanceStore.openedInstances.keys());
+        const newInstanceId = openedInstances[0];
+        const openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/search");
+      }
+    }
   }
 
   handleGoToDashboard = () => {

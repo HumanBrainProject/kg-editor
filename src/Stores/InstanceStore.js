@@ -47,6 +47,8 @@ class InstanceStore {
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
 
+  @observable showCreateModal = false;
+
   generatedKeys = new WeakMap();
 
   constructor(){
@@ -119,6 +121,11 @@ class InstanceStore {
     storedOpenedTabs.forEach(([id, viewMode]) => {
       this.openInstance(id, viewMode, viewMode !== "edit");
     });
+  }
+
+  @action
+  flushOpenedTabs(){
+    localStorage.removeItem("openedTabs");
   }
 
   @action
@@ -400,6 +407,11 @@ class InstanceStore {
   @action
   toggleSavebarDisplay(state){
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
+  }
+
+  @action
+  toggleShowCreateModal(state){
+    this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
 }
 

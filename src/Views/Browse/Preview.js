@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 
@@ -89,19 +89,19 @@ export default class Preview extends React.Component{
 
   handleOpenInstance(mode, event){
     if(event.metaKey || event.ctrlKey){
-      instanceStore.openInstance(searchStore.selectedInstance.id, mode);
+      instanceStore.openInstance(browseStore.selectedInstance.id, mode);
     } else {
-      routerStore.history.push(`/instance/${mode}/${searchStore.selectedInstance.id}`);
+      routerStore.history.push(`/instance/${mode}/${browseStore.selectedInstance.id}`);
     }
   }
 
   handleRetry = () => {
-    instanceStore.fetchInstanceData(searchStore.selectedInstance.id);
+    instanceStore.fetchInstanceData(browseStore.selectedInstance.id);
   }
 
   render(){
     const { classes } = this.props;
-    let selectedInstance = instanceStore.getInstance(searchStore.selectedInstance.id);
+    let selectedInstance = instanceStore.getInstance(browseStore.selectedInstance.id);
 
     const promotedFields = instanceStore.getPromotedFields(selectedInstance);
     const nonPromotedFields = instanceStore.getNonPromotedFields(selectedInstance);
@@ -130,32 +130,32 @@ export default class Preview extends React.Component{
                   </div>
                 </div>
                 <div className={classes.titlePanel}>
-                  <BookmarkStatus id={searchStore.selectedInstance.id} className={classes.bookmarkStatus} />
+                  <BookmarkStatus id={browseStore.selectedInstance.id} className={classes.bookmarkStatus} />
                   <span className={classes.title}>
-                    {searchStore.selectedInstance.name}
+                    {browseStore.selectedInstance.name}
                   </span>
                 </div>
                 <div className={classes.id}>
-                  Nexus ID: {searchStore.selectedInstance.id}
+                  Nexus ID: {browseStore.selectedInstance.id}
                 </div>
-                <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
+                <Form store={selectedInstance.form} key={browseStore.selectedInstance.id}>
                   {promotedFields.map(fieldKey => {
                     return(
-                      <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
                   })}
                   {nonPromotedFields.map(fieldKey => {
                     return(
-                      <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
                   })}
                   <div className={`${classes.status}`}>
                     <div className={"release-status"}>
-                      <Status id={searchStore.selectedInstance.id} />
+                      <Status id={browseStore.selectedInstance.id} />
                     </div>
                   </div>
                 </Form>

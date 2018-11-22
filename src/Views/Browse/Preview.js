@@ -72,6 +72,9 @@ const styles = {
   field:{
     marginBottom:"10px",
     wordBreak:"break-word"
+  },
+  duplicate:{
+    extend:"action"
   }
 };
 
@@ -93,6 +96,11 @@ export default class Preview extends React.Component{
     } else {
       routerStore.history.push(`/instance/${mode}/${browseStore.selectedInstance.id}`);
     }
+  }
+
+  handleDuplicateInstance = async () => {
+    let newInstanceId = await instanceStore.duplicateInstance(browseStore.selectedInstance.id);
+    routerStore.history.push("/instance/edit/"+newInstanceId);
   }
 
   handleRetry = () => {
@@ -159,6 +167,10 @@ export default class Preview extends React.Component{
                     </div>
                   </div>
                 </Form>
+
+                <div className={classes.duplicate} onClick={this.handleDuplicateInstance}>
+                  <FontAwesomeIcon icon="copy"/>&nbsp;&nbsp;Duplicate this instance
+                </div>
               </div>
               :
               <BGMessage icon={"ban"}>

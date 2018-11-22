@@ -168,7 +168,7 @@ export default class Graph extends React.Component {
       ctx.textAlign = "center";
       ctx.fillStyle = "black";
 
-      let label = node.title.split?node.title:"";
+      let label = node.title && node.title.split?node.title:"";
       if(!node.isGroup){
         label = `(${node.niceDataType}) ${label}`;
       }

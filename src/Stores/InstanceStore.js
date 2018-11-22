@@ -170,6 +170,26 @@ class InstanceStore {
   }
 
   @action
+  async duplicateInstance(fromInstanceId){
+    let instanceToCopy = this.getInstance(fromInstanceId);
+    let path = instanceToCopy.path;
+    let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
+    delete values.id;
+    if(values["http://schema.org/name"]){
+      values["http://schema.org/name"] = values["http://schema.org/name"]+" (Copy)";
+    }
+    this.isCreatingNewInstance = path;
+    try{
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), values);
+      this.isCreatingNewInstance = false;
+      return data.data.id;
+    } catch(e){
+      this.isCreatingNewInstance = false;
+      this.instanceCreationError = e.message;
+    }
+  }
+
+  @action
   setInstanceHighlight(instanceId, provenence) {
     if (this.instances.has(instanceId)) {
       this.instances.get(instanceId).highlight = provenence;

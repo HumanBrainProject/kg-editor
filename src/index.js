@@ -218,9 +218,15 @@ class App extends React.Component{
   handleGlobalShortcuts = (e) => {
     if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
       appStore.toggleTheme();
-    } else if(e.altKey && e.keyCode === 66){ // w, browse
-      routerStore.history.push("/search");
-    } else if(e.altKey && e.keyCode === 87){ // w, close
+    } else if(e.altKey && e.keyCode === 66){ // alt+b, browse
+      routerStore.history.push("/browse");
+    } else if(e.altKey && e.keyCode === 78){ // alt+n, new
+      this.handleCreateInstance();
+    } else if(e.altKey && e.keyCode === 68){ // alt+d, dashboard
+      routerStore.history.push("/");
+    } else if(e.keyCode === 112){ // F1, help
+      routerStore.history.push("/help");
+    } else if(e.altKey && e.keyCode === 87){ // alt+w, close
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
         this.handleCloseInstance(matchInstanceTab.params.id);
@@ -272,7 +278,7 @@ class App extends React.Component{
         let openedInstance = instanceStore.openedInstances.get(newInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
       } else {
-        routerStore.history.push("/search");
+        routerStore.history.push("/browse");
       }
     } else {
       if(instanceStore.openedInstances.size > 1){
@@ -281,7 +287,7 @@ class App extends React.Component{
         const openedInstance = instanceStore.openedInstances.get(newInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
       } else {
-        routerStore.history.push("/search");
+        routerStore.history.push("/browse");
       }
     }
   }
@@ -296,7 +302,7 @@ class App extends React.Component{
         let openedInstance = instanceStore.openedInstances.get(newInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
       } else {
-        routerStore.history.push("/search");
+        routerStore.history.push("/browse");
       }
     } else {
       if(instanceStore.openedInstances.size > 1){
@@ -305,7 +311,7 @@ class App extends React.Component{
         const openedInstance = instanceStore.openedInstances.get(newInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
       } else {
-        routerStore.history.push("/search");
+        routerStore.history.push("/browse");
       }
     }
   }
@@ -363,16 +369,13 @@ class App extends React.Component{
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {!authStore.isOIDCAuthenticated?
-                    <Tab icon={"user-lock"} current={true} label={"Login"}/>
-                    :
-                    authStore.isFullyAuthenticated?
-                      <React.Fragment>
-                        <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"} label={"Home"} hideLabel/>
-                        <Tab icon={"search"} current={matchPath(currentLocation, {path:"/browse", exact:"true"})} path={"/browse"} hideLabel label={"Browse"}/>
-                        <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"}/>
-                      </React.Fragment>
-                      :null
+                  {authStore.isFullyAuthenticated?
+                    <React.Fragment>
+                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"} label={"Home"} hideLabel/>
+                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/browse", exact:"true"})} path={"/browse"} hideLabel label={"Browse"}/>
+                      <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"}/>
+                    </React.Fragment>
+                    :null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
@@ -406,7 +409,7 @@ class App extends React.Component{
                   {authStore.isFullyAuthenticated &&
                     <React.Fragment>
                       <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"} hideLabel label={"Help"}/>
-                      <Tab icon={"sign-out-alt"} onClick={this.handleLogout} hideLabel label={"Logout"}/>
+                      <Tab icon={"user-lock"} onClick={this.handleLogout} hideLabel label={"Logout"}/>
                     </React.Fragment>
                   }
                 </div>

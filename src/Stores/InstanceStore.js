@@ -1,8 +1,10 @@
 import {observable, action, runInAction, computed} from "mobx";
 import { uniqueId } from "lodash";
+import { FormStore } from "hbp-quickfire";
+
 import console from "../Services/Logger";
 import API from "../Services/API";
-import { FormStore } from "hbp-quickfire";
+import { retrieveLastInstances, updateLastInstances} from "../Services/LastInstancesHelper";
 
 import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
@@ -46,6 +48,7 @@ class InstanceStore {
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
+  @observable lastViewedInstances = {};
 
   generatedKeys = new WeakMap();
 
@@ -56,6 +59,8 @@ class InstanceStore {
         this.restoreOpenedTabs(storedOpenedTabs);
       });
     }
+    this.lastViewedInstances = retrieveLastInstances("lastViewedInstances");
+    this.lastEditedInstances = retrieveLastInstances("lastEditedInstances");
   }
 
   get nodeTypeMapping(){
@@ -87,6 +92,7 @@ class InstanceStore {
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.setReadMode(readMode);
+    this.lastViewedInstances = updateLastInstances("lastViewedInstances", instanceId);
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;
     } else {
@@ -99,6 +105,24 @@ class InstanceStore {
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
     }
+  }
+
+  @action
+  getLastViewedInstances(nodeType) {
+    if (typeof nodeType !== "string") {
+      return [];
+    }
+    nodeType = nodeType.toLowerCase();
+    return (this.lastViewedInstances && this.lastViewedInstances[nodeType] && this.lastViewedInstances[nodeType].length)?this.lastViewedInstances[nodeType]:[];
+  }
+
+  @action
+  getLastEditedInstances(nodeType) {
+    if (typeof nodeType !== "string") {
+      return [];
+    }
+    nodeType = nodeType.toLowerCase();
+    return (this.lastEditedInstances && this.lastEditedInstances[nodeType] && this.lastEditedInstances[nodeType].length)?this.lastEditedInstances[nodeType]:[];
   }
 
   @action setInstanceViewMode(instanceId, mode){
@@ -355,6 +379,7 @@ class InstanceStore {
 
   @action
   async saveInstance(instanceId){
+    this.lastEditedInstances = updateLastInstances("lastEditedInstances", instanceId);
     const instance = this.instances.get(instanceId);
     instance.cancelChangesPending = false;
     instance.hasSaveError = false;

@@ -8,13 +8,13 @@ import MultiToggle from "../../Components/MultiToggle";
 
 const styles = {
   container:{
-    textAlign:"center",
-    marginBottom:"10px"
+    textAlign:"center"/*,
+    marginBottom:"10px"*/
   },
   icon:{
     color:"var(--ft-color-normal)",
     fontSize:"3em",
-    marginBottom:"10px"
+    marginBottom:"3px"//"10px"
   }
 };
 

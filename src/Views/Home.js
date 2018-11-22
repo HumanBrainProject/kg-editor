@@ -19,10 +19,12 @@ const styles = {
     height: "100%",
     width: "100%",
     gridGap: "10px",
-    gridTemplateColumns: "1fr 7fr 2fr",
+    gridTemplateColumns: "8fr 2fr",
     gridTemplateRows: "auto 1fr",
-    gridTemplateAreas: `"nav welcome features"
-                        "nav main features"`,
+    gridTemplateAreas: `"welcome nav"
+                        "main features"`,
+    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
+    backgroundPosition: "50% 50%",
     padding:"10px",
     "& .widget-panel":{
       width: "100%",
@@ -60,17 +62,19 @@ const styles = {
   },
   nav: {
     gridArea: "nav",
+    "&.widget-panel": {
+      border: 0,
+      background: "none"
+    }
   },
   welcome: {
     gridArea: "welcome",
     "&.widget-panel": {
-      height: "180px",
+      height: "220px",
       position: "relative",
       padding: "10px",
       borderColor: "transparent",
       background: "none",
-      backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
-      backgroundPosition: "50% 50%",
       "& h1": {
         position: "absolute",
         bottom: "0",
@@ -95,11 +99,11 @@ export default class Home extends React.Component{
     const { classes } =  this.props;
     return (
       <div className={classes.container}>
-        <div className={`${classes.nav} widget-panel`}>
-          <Hub/>
-        </div>
         <div className={`${classes.welcome} widget-panel`}>
           <h1>Welcome <span title={authStore.user.name}>{authStore.user.name.split(" ")[0]}</span></h1>
+        </div>
+        <div className={`${classes.nav} widget-panel`}>
+          <Hub/>
         </div>
         <div className={`${classes.main} widget-panel`}>
           <Scrollbars autoHide>

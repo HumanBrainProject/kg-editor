@@ -22,13 +22,13 @@ export default class HelpView extends React.Component{
         <h3>Common node types</h3>
         <p>In the “common node types”, you will find the most frequently used node types (e.g. : the “Dataset” node type). </p>
         <p>
-          <img className={"screenshot"} src={`${window.rootPath}/assets/help/browse/nodetypes/common-types.png`}/>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Nodetypes/common-types.png`}/>
         </p>
 
         <h3>Other node types</h3>
         <p>The “other node types” folder contains node types that most of the time, you won’t probably want to create or edit directly.</p>
         <p>
-          <img className={"screenshot"} src={`${window.rootPath}/assets/help/browse/nodetypes/other-types.png`}/>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Nodetypes/other-types.png`}/>
         </p>
 
         <h3>Create a new instance of a node type</h3>
@@ -37,17 +37,21 @@ export default class HelpView extends React.Component{
         <h2>Instances list</h2>
         <p>When you select a node type, it will show the list of corresponding instances. Scroll down this panel to load more items to the list.</p>
         <p>
-          <img className={"screenshot"} src={`${window.rootPath}/assets/help/browse/nodetypes/instances.png`}/>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Nodetypes/instances.png`}/>
         </p>
 
         <p>You can filter the results on their name by using the filter input.</p>
-        <p>(Screenshot)</p>
+        <p>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Nodetypes/filter.png`}/>
+        </p>
 
         <h2>Instance preview</h2>
         <p>Clicking on an item of the instances list will show you a preview of this instance content. From there you can open instances in different modes (see the “Open an instance” section of this help to learn more about this feature)</p>
-        <p>(Screenshot)</p>
+        <p>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Nodetypes/preview.png`}/>
+        </p>
 
-        <p>If you need to access frequently the same instances, you can create your own bookmark lists, Please consult the corresponding help section to learn more about the bookmarks feature.</p>
+        <p>If you need to access frequently the same instances, you can create your own bookmark lists. Please consult the corresponding help section to learn more about the bookmarks feature.</p>
       </div>
     );
   }

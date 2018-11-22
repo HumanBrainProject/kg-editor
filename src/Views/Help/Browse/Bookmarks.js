@@ -18,10 +18,16 @@ export default class HelpView extends React.Component{
 
         <h2>Associate an instance to bookmark lists</h2>
         <p>In the instances list of a given node type, a star icon appears on every item, letting you know if you have this instance bookmarked or not.</p>
-        <p>(Screenshot)</p>
+        <p>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Bookmarks/bookmark-icon.png`}/>
+        </p>
+
 
         <p>Clicking on this icon will bring a tooltip with a user input allowing you to add/remove the instance to/from a bookmark list, or create a new list.</p>
-        <p>(Screenshot)</p>
+        <p>
+          <img className={"screenshot"} src={`${window.rootPath}/assets/Help/Browse/Bookmarks/manage-bookmarks.png`}/>
+        </p>
+
       </div>
     );
   }

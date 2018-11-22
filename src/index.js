@@ -2,6 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import { observer } from "mobx-react";
 import { Router, Route, Switch, matchPath } from "react-router-dom";
+import { Modal } from "react-bootstrap";
 import injectStyles from "react-jss";
 
 import "./Services/IconsImport";
@@ -11,6 +12,7 @@ import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
 import instanceStore from "./Stores/InstanceStore";
 import graphStore from "./Stores/GraphStore";
+import browseStore from "./Stores/BrowseStore";
 
 import Tab from "./Components/Tab";
 import SaveBar from "./Views/Instance/SaveBar";
@@ -20,7 +22,7 @@ import Home from "./Views/Home";
 import Login from "./Views/Login";
 import Help from "./Views/Help";
 import Statistics from "./Views/Statistics";
-import Search from "./Views/Search";
+import Browse from "./Views/Browse";
 import Instance from "./Views/Instance";
 import FetchingLoader from "./Components/FetchingLoader";
 import BGMessage from "./Components/BGMessage";
@@ -172,6 +174,23 @@ const styles = {
     "& button + button": {
       marginLeft: "20px"
     }
+  },
+
+  newInstances:{
+    display:"grid",
+    gridTemplateColumns:"repeat(4, 1fr)",
+    textAlign:"center",
+    gridGap:"10px"
+  },
+  newInstance:{
+    fontSize:"1.1em",
+    fontWeight:"300",
+    lineHeight:"3em",
+    border:"1px solid #ccc",
+    cursor:"pointer",
+    "&:hover":{
+      background:"#f3f3f3"
+    }
   }
 };
 
@@ -199,11 +218,25 @@ class App extends React.Component{
   handleGlobalShortcuts = (e) => {
     if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
       appStore.toggleTheme();
-    } else if(e.altKey && e.keyCode === 87){
+    } else if(e.altKey && e.keyCode === 66){ // alt+b, browse
+      routerStore.history.push("/browse");
+    } else if(e.altKey && e.keyCode === 78){ // alt+n, new
+      this.handleCreateInstance();
+    } else if(e.altKey && e.keyCode === 68){ // alt+d, dashboard
+      routerStore.history.push("/");
+    } else if(e.keyCode === 112){ // F1, help
+      routerStore.history.push("/help");
+    } else if(e.altKey && e.keyCode === 87){ // alt+w, close
       let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
       if(matchInstanceTab){
         this.handleCloseInstance(matchInstanceTab.params.id);
       }
+    } else if(e.altKey && e.keyCode === 37){ // left arrow, previous
+      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+      this.handleFocusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
+    } else if(e.altKey && e.keyCode === 39){ // right arrow, next
+      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+      this.handleFocusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
     } else {
       this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode? this.kCode.step+1: 0;
       if(this.kCode.step === this.kCode.ref.length){
@@ -228,11 +261,59 @@ class App extends React.Component{
           let openedInstance = instanceStore.openedInstances.get(newInstanceId);
           routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
         } else {
-          routerStore.history.push("/search");
+          routerStore.history.push("/browse");
         }
       }
     }
     instanceStore.closeInstance(instanceId);
+  }
+
+  handleFocusPreviousInstance(instanceId){
+    if(instanceId && matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) && matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+      if(instanceStore.openedInstances.size > 1){
+        let openedInstances = Array.from(instanceStore.openedInstances.keys());
+        let currentInstanceIndex = openedInstances.indexOf(instanceId);
+        let newInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1]: openedInstances[currentInstanceIndex-1];
+
+        let openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/browse");
+      }
+    } else {
+      if(instanceStore.openedInstances.size > 1){
+        const openedInstances = Array.from(instanceStore.openedInstances.keys());
+        const newInstanceId = openedInstances[openedInstances.length - 1];
+        const openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/browse");
+      }
+    }
+  }
+
+  handleFocusNextInstance(instanceId){
+    if(instanceId && matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) && matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+      if(instanceStore.openedInstances.size > 1){
+        let openedInstances = Array.from(instanceStore.openedInstances.keys());
+        let currentInstanceIndex = openedInstances.indexOf(instanceId);
+        let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0]: openedInstances[currentInstanceIndex+1];
+
+        let openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/browse");
+      }
+    } else {
+      if(instanceStore.openedInstances.size > 1){
+        const openedInstances = Array.from(instanceStore.openedInstances.keys());
+        const newInstanceId = openedInstances[0];
+        const openedInstance = instanceStore.openedInstances.get(newInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+      } else {
+        routerStore.history.push("/browse");
+      }
+    }
   }
 
   handleGoToDashboard = () => {
@@ -241,6 +322,32 @@ class App extends React.Component{
 
   handleRetryRetriveUserProfile = () => {
     authStore.retriveUserProfile();
+  }
+
+  handleCreateInstance = () => {
+    if(!browseStore.isFetched.lists && !browseStore.isFetching.list){
+      browseStore.fetchLists();
+    }
+    instanceStore.toggleShowCreateModal();
+  }
+
+  handleHideCreateModal = () => {
+    instanceStore.toggleShowCreateModal();
+  }
+
+  async handleClickNewInstanceOfType(path){
+    let newInstanceId = await instanceStore.createNewInstance(path);
+    instanceStore.toggleShowCreateModal();
+    routerStore.history.push(`/instance/edit/${newInstanceId}`);
+  }
+
+  handleLogout = () => {
+    if(!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")){
+      instanceStore.flushOpenedTabs();
+      authStore.logout();
+      document.querySelector("#root").style.display = "none";
+      window.location.href = window.rootPath+"/";
+    }
   }
 
   render(){
@@ -262,12 +369,13 @@ class App extends React.Component{
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {!authStore.isOIDCAuthenticated?
-                    <Tab icon={"user-lock"} current={true}>Login</Tab>
-                    :
-                    authStore.isFullyAuthenticated?
-                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/search", exact:"true"})} path={"/search"}>Browse</Tab>
-                      :null
+                  {authStore.isFullyAuthenticated?
+                    <React.Fragment>
+                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"} label={"Home"} hideLabel/>
+                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/browse", exact:"true"})} path={"/browse"} hideLabel label={"Browse"}/>
+                      <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"}/>
+                    </React.Fragment>
+                    :null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
@@ -293,17 +401,15 @@ class App extends React.Component{
                         current={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
                         path={`/instance/${mode}/${instanceId}`}
                         onClose={this.handleCloseInstance.bind(this, instanceId)}
-                        fullText={label}>
-                        {label}
-                      </Tab>
+                        label={label}/>
                     );
                   })}
                 </div>
                 <div className={classes.fixedTabsRight}>
                   {authStore.isFullyAuthenticated &&
                     <React.Fragment>
-                      <Tab icon={"chart-bar"} current={matchPath(currentLocation, {path:"/kg-stats", exact:"true"})} path={"/kg-stats"}>Stats</Tab>
-                      <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"}>Help</Tab>
+                      <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"} hideLabel label={"Help"}/>
+                      <Tab icon={"user-lock"} onClick={this.handleLogout} hideLabel label={"Logout"}/>
                     </React.Fragment>
                   }
                 </div>
@@ -334,8 +440,8 @@ class App extends React.Component{
                     <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
                     <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
 
-                    <Route path="/search" exact={true} component={Search} />
-                    <Route path="/help" exact={false} component={Help} />
+                    <Route path="/browse" exact={true} component={Browse} />
+                    <Route path="/help" exact={true} component={Help} />
                     <Route path="/kg-stats" exact={true} component={Statistics} />
                     <Route path="/loginSuccess" exact={true} component={()=>null} />
                     <Route path="/" exact={true} component={Home} />
@@ -365,6 +471,34 @@ If the problem persists, please contact the support.`}<br/><br/>
           <div className={`${classes.status} layout-status`}>
 
           </div>
+          {instanceStore.showCreateModal && browseStore.allLists && !browseStore.isFetching.lists &&
+            <Modal show={true} onHide={this.handleHideCreateModal}>
+              <Modal.Header closeButton>
+                New Instance
+              </Modal.Header>
+              <Modal.Body>
+                <div className={classes.newInstances}>
+                  {browseStore.lists.map(folder => {
+                    if(folder.folderType !== "NODETYPE"){
+                      return null;
+                    } else {
+                      return folder.lists.map(list => {
+                        return(
+                          <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
+                            {list.name}
+                          </div>
+                        );
+                      });
+                    }
+                  })}
+                  <div>
+                    {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}
+                    {instanceStore.isCreatingNewInstance && <FetchingLoader>Creating new instance...</FetchingLoader>}
+                  </div>
+                </div>
+              </Modal.Body>
+            </Modal>
+          }
         </div>
       </Router>
     );

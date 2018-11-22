@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ButtonGroup, Button } from "react-bootstrap";
 import PopOverButton from "../../Components/PopOverButton";
 
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 
@@ -203,7 +203,7 @@ export default class List extends React.Component{
 
   handleSelect(list){
     if (this.currentlyEditedBookmarkList !== this.props.list && !this.state.showDeleteBookmarkDialog) {
-      searchStore.selectList(list);
+      browseStore.selectList(list);
     }
   }
   handelCancelActions() {
@@ -212,26 +212,26 @@ export default class List extends React.Component{
 
   handleEditBookmark(event) {
     event && event.stopPropagation();
-    searchStore.setCurrentlyEditedBookmarkList(this.props.list);
+    browseStore.setCurrentlyEditedBookmarkList(this.props.list);
   }
 
   handleCancelEditBookmark(event) {
     event && event.stopPropagation();
-    searchStore.revertBookmarkListChanges(this.props.list);
+    browseStore.revertBookmarkListChanges(this.props.list);
   }
 
   handleRevertEditBookmark(event) {
     event && event.stopPropagation();
-    searchStore.revertBookmarkListChanges(this.props.list);
+    browseStore.revertBookmarkListChanges(this.props.list);
   }
 
   handleRenameBookmark(event) {
     event && event.stopPropagation();
     const editName = this.editBookmarkNameRef.current.value.trim();
     if (this.props.list.name !== editName) {
-      searchStore.updateBookmarkList(this.props.list, {name: editName});
+      browseStore.updateBookmarkList(this.props.list, {name: editName});
     }
-    searchStore.cancelCurrentlyEditedBookmarkList(this.props.list);
+    browseStore.cancelCurrentlyEditedBookmarkList(this.props.list);
   }
 
   handleBookmarkNameKeyUp(event) {
@@ -251,12 +251,12 @@ export default class List extends React.Component{
   async handleDeleteBookmark(event) {
     event && event.stopPropagation();
     this.setState({ showDeleteBookmarkDialog: false });
-    searchStore.deleteBookmarkList(this.props.list);
+    browseStore.deleteBookmarkList(this.props.list);
   }
 
   handleCancelDeleteBookmark(event) {
     event && event.stopPropagation();
-    searchStore.cancelBookmarkListDeletion(this.props.list);
+    browseStore.cancelBookmarkListDeletion(this.props.list);
   }
 
   async handleCreateInstance(path, event){
@@ -267,9 +267,9 @@ export default class List extends React.Component{
 
   render(){
     const {classes, list} = this.props;
-    const selected = searchStore.selectedList === list;
-    const edited = searchStore.currentlyEditedBookmarkList === list;
-    if (list.type === searchStore.bookmarkListType) {
+    const selected = browseStore.selectedList === list;
+    const edited = browseStore.currentlyEditedBookmarkList === list;
+    if (list.type === browseStore.bookmarkListType) {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""} ${edited?"edited":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
@@ -355,7 +355,7 @@ export default class List extends React.Component{
           </React.Fragment>
         </div>
       );
-    } else if (list.type === searchStore.nodetypeType) {
+    } else if (list.type === browseStore.nodetypeType) {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>

@@ -50,6 +50,8 @@ class InstanceStore {
   @observable showSaveBar = false;
   @observable lastViewedInstances = {};
 
+  @observable showCreateModal = false;
+
   generatedKeys = new WeakMap();
 
   constructor(){
@@ -146,6 +148,11 @@ class InstanceStore {
   }
 
   @action
+  flushOpenedTabs(){
+    localStorage.removeItem("openedTabs");
+  }
+
+  @action
   getInstance(instanceId, forceFetch = false){
     if (!this.instances.has(instanceId) || forceFetch) {
       this.fetchInstanceData(instanceId);
@@ -183,6 +190,26 @@ class InstanceStore {
       return newInstanceId;
     } catch(e){
       return false;
+    }
+  }
+
+  @action
+  async duplicateInstance(fromInstanceId){
+    let instanceToCopy = this.getInstance(fromInstanceId);
+    let path = instanceToCopy.path;
+    let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
+    delete values.id;
+    if(values["http://schema.org/name"]){
+      values["http://schema.org/name"] = values["http://schema.org/name"]+" (Copy)";
+    }
+    this.isCreatingNewInstance = path;
+    try{
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), values);
+      this.isCreatingNewInstance = false;
+      return data.data.id;
+    } catch(e){
+      this.isCreatingNewInstance = false;
+      this.instanceCreationError = e.message;
     }
   }
 
@@ -425,6 +452,11 @@ class InstanceStore {
   @action
   toggleSavebarDisplay(state){
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
+  }
+
+  @action
+  toggleShowCreateModal(state){
+    this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
 }
 

@@ -48,6 +48,7 @@ import {faGlasses} from "@fortawesome/free-solid-svg-icons/faGlasses";
 import {faTimesCircle} from "@fortawesome/free-solid-svg-icons/faTimesCircle";
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
 import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
+import {faCopy} from "@fortawesome/free-solid-svg-icons/faCopy";
 
 library.add(
   faUserLock,
@@ -96,5 +97,6 @@ library.add(
   faGlasses,
   faTimesCircle,
   faAngleDown,
-  faAngleRight
+  faAngleRight,
+  faCopy
 );

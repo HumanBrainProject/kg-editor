@@ -2,12 +2,10 @@ import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Modal } from "react-bootstrap";
 
 import routerStore from "../../Stores/RouterStore";
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
-import FetchingLoader from "../../Components/FetchingLoader";
 import ThemeSwitcher from "./ThemeSwitcher";
 
 const styles = {
@@ -34,22 +32,6 @@ const styles = {
     textTransform:"uppercase",
     fontWeight:"bold"
   },
-  newInstances:{
-    display:"grid",
-    gridTemplateColumns:"repeat(4, 1fr)",
-    textAlign:"center",
-    gridGap:"10px"
-  },
-  newInstance:{
-    fontSize:"1.1em",
-    fontWeight:"300",
-    lineHeight:"3em",
-    border:"1px solid #ccc",
-    cursor:"pointer",
-    "&:hover":{
-      background:"#f3f3f3"
-    }
-  },
   overlay:{
     position:"absolute",
     top:0,
@@ -71,38 +53,28 @@ export default class Hub extends React.Component{
   }
 
   handleCreateInstance = () => {
-    if(!searchStore.isFetched.lists && !searchStore.isFetching.list){
-      searchStore.fetchLists();
+    if(!browseStore.isFetched.lists && !browseStore.isFetching.list){
+      browseStore.fetchLists();
     }
-    this.setState({showCreateModal: true});
-  }
-
-  handleHideCreateModal = () => {
-    this.setState({showCreateModal: false});
-  }
-
-  async handleClickNewInstanceOfType(path){
-    let newInstanceId = await instanceStore.createNewInstance(path);
-    routerStore.history.push(`/instance/edit/${newInstanceId}`);
+    instanceStore.toggleShowCreateModal();
   }
 
   render(){
     const { classes } = this.props;
     return(
       <div className={`${classes.container}`}>
-        <div className={classes.action} onClick={()=>routerStore.history.push("/search")}>
+        <div className={classes.action} onClick={()=>routerStore.history.push("/browse")}>
           <div className={classes.actionIcon}>
             <FontAwesomeIcon icon={"search"}/>
           </div>
           <div className={classes.actionText}>
-            Search instances
+            Browse instances
           </div>
         </div>
 
-
         <div className={classes.action} onClick={this.handleCreateInstance}>
           <div className={classes.actionIcon}>
-            <FontAwesomeIcon icon={searchStore.isFetching.lists?"circle-notch":"file"} spin={searchStore.isFetching.lists}/>
+            <FontAwesomeIcon icon={browseStore.isFetching.lists?"circle-notch":"file"} spin={browseStore.isFetching.lists}/>
           </div>
           <div className={classes.actionText}>
             New instance
@@ -130,35 +102,6 @@ export default class Hub extends React.Component{
         <div className={classes.action}>
           <ThemeSwitcher/>
         </div>
-
-        {this.state.showCreateModal && searchStore.allLists && !searchStore.isFetching.lists &&
-          <Modal show={true} onHide={this.handleHideCreateModal}>
-            <Modal.Header closeButton>
-              New Instance
-            </Modal.Header>
-            <Modal.Body>
-              <div className={classes.newInstances}>
-                {searchStore.lists.map(folder => {
-                  if(folder.folderType !== "NODETYPE"){
-                    return null;
-                  } else {
-                    return folder.lists.map(list => {
-                      return(
-                        <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                          {list.name}
-                        </div>
-                      );
-                    });
-                  }
-                })}
-                <div>
-                  {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}
-                  {instanceStore.isCreatingNewInstance && <FetchingLoader>Creating new instance...</FetchingLoader>}
-                </div>
-              </div>
-            </Modal.Body>
-          </Modal>
-        }
       </div>
     );
   }

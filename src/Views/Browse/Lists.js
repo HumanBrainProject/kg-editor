@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FetchingLoader from "../../Components/FetchingLoader";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 
 import List from "./List";
 
@@ -19,6 +19,9 @@ const styles = {
     display:"grid",
     gridTemplateRows:"auto 1fr"
   },
+  header:{
+    position:"relative"
+  },
   search:{
     borderRadius: "2px",
     backgroundColor: "var(--bg-color-blend-contrast1)",
@@ -26,9 +29,16 @@ const styles = {
     margin:"10px",
     width:"calc(100% - 20px)",
     border:"1px solid transparent",
+    paddingLeft:"30px",
     "&:focus":{
       borderColor: "rgba(64, 169, 243, 0.5)"
     }
+  },
+  searchIcon:{
+    position:"absolute",
+    top:"20px",
+    left:"20px",
+    color: "var(--ft-color-normal)",
   },
   folderName:{
     color:"var(--ft-color-quiet)",
@@ -67,52 +77,53 @@ const styles = {
 export default class Lists extends React.Component{
   constructor(props){
     super(props);
-    if(!searchStore.isFetched.lists && !searchStore.isFetching.lists){
-      searchStore.fetchLists();
+    if(!browseStore.isFetched.lists && !browseStore.isFetching.lists){
+      browseStore.fetchLists();
     }
   }
 
   handleFilterChange = event => {
-    searchStore.setListsFilter(event.target.value);
+    browseStore.setListsFilter(event.target.value);
   }
 
   handleToggleFolder (folder){
-    searchStore.toggleFolder(folder);
+    browseStore.toggleFolder(folder);
   }
 
   handleLoadRetry = () => {
-    searchStore.fetchLists();
+    browseStore.fetchLists();
   }
 
   render(){
     const {classes} = this.props;
-    searchStore.cancelCurrentlyEditedBookmarkList();
+    browseStore.cancelCurrentlyEditedBookmarkList();
     return(
       <div className={classes.container}>
-        {!searchStore.fetchError.lists?
-          !searchStore.isFetching.lists?
-            searchStore.lists.length?
+        {!browseStore.fetchError.lists?
+          !browseStore.isFetching.lists?
+            browseStore.lists.length?
               <React.Fragment>
                 <div className={classes.header}>
-                  <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Filter lists" type="text" value={searchStore.listsFilter} onChange={this.handleFilterChange}/>
+                  <input ref={ref => this.inputRef = ref} className={`form-control ${classes.search}`} placeholder="Filter lists" type="text" value={browseStore.listsFilter} onChange={this.handleFilterChange}/>
+                  <FontAwesomeIcon icon="search" className={classes.searchIcon}/>
                 </div>
                 <Scrollbars autoHide>
-                  {searchStore.listsFilter.trim()?
+                  {browseStore.listsFilter.trim()?
                     <div className="content">
                       <div className={classes.folder} key={"search-results"}>
                         <div className={classes.folderName}>
                           <FontAwesomeIcon fixedWidth icon={"search"}/> &nbsp;
-                          Search results for <span className={classes.folderSearch}>{`"${searchStore.listsFilter.trim()}"`}</span>
+                          Search results for <span className={classes.folderSearch}>{`"${browseStore.listsFilter.trim()}"`}</span>
                         </div>
                         <div className={classes.folderLists}>
-                          {searchStore.filteredLists.map(list => <List key={list.id} list={list} />)}
-                          {searchStore.filteredLists.length === 0 && <em className={classes.folderNoMatch}>No matches found</em>}
+                          {browseStore.filteredLists.map(list => <List key={list.id} list={list} />)}
+                          {browseStore.filteredLists.length === 0 && <em className={classes.folderNoMatch}>No matches found</em>}
                         </div>
                       </div>
                     </div>
                     :
 
-                    searchStore.lists.map(folder => {
+                    browseStore.lists.map(folder => {
                       return(
                         <div className={classes.folder} key={folder.folderName}>
                           <div className={classes.folderName} onClick={this.handleToggleFolder.bind(this,folder)}>
@@ -140,7 +151,7 @@ export default class Lists extends React.Component{
             </FetchingLoader>
           :
           <div className={classes.fetchErrorPanel}>
-            <div>{searchStore.fetchError.lists}</div>
+            <div>{browseStore.fetchError.lists}</div>
             <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
           </div>
         }

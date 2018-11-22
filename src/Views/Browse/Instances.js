@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import instanceStore from "../../Stores/InstanceStore";
@@ -32,6 +32,7 @@ const styles = {
     color: "var(--ft-color-loud)",
     width:"100%",
     border:"1px solid transparent",
+    paddingLeft:"30px",
     "&:focus":{
       borderColor: "rgba(64, 169, 243, 0.5)"
     },
@@ -161,7 +162,14 @@ const styles = {
     display:"grid",
     gridTemplateColumns:"1fr auto",
     gridGap:"10px",
-    padding:"10px"
+    padding:"10px",
+    position:"relative"
+  },
+  searchIcon:{
+    position:"absolute",
+    top:"20px",
+    left:"20px",
+    color: "var(--ft-color-normal)",
   },
 
   instanceCount:{
@@ -176,7 +184,7 @@ const styles = {
 @observer
 export default class Instances extends React.Component{
   handleFilterChange = event => {
-    searchStore.setInstancesFilter(event.target.value);
+    browseStore.setInstancesFilter(event.target.value);
   }
 
   handleStatusClick(instance){
@@ -187,7 +195,7 @@ export default class Instances extends React.Component{
     if(event.metaKey || event.ctrlKey){
       instanceStore.openInstance(instance.id);
     } else {
-      searchStore.selectInstance(instance);
+      browseStore.selectInstance(instance);
     }
   }
 
@@ -209,11 +217,11 @@ export default class Instances extends React.Component{
   }
 
   handleLoadMore = () => {
-    searchStore.fetchInstances(true);
+    browseStore.fetchInstances(true);
   }
 
   handleRetry = () => {
-    searchStore.fetchInstances();
+    browseStore.fetchInstances();
   }
 
   render = () => {
@@ -222,39 +230,40 @@ export default class Instances extends React.Component{
     return (
       <div className={classes.container}>
         <div className={classes.header}>
-          {searchStore.selectedList !== null &&
+          {browseStore.selectedList !== null &&
             <input ref={ref => this.inputRef = ref}
-              disabled={searchStore.selectedList === null}
+              disabled={browseStore.selectedList === null}
               className={`form-control ${classes.search}`}
-              placeholder={`Filter instances of ${searchStore.selectedList.name}`}
+              placeholder={`Filter instances of ${browseStore.selectedList.name}`}
               type="text"
-              value={searchStore.instancesFilter}
+              value={browseStore.instancesFilter}
               onChange={this.handleFilterChange} />}
-          {searchStore.selectedList !== null &&
+          {browseStore.selectedList !== null &&
             <div className={classes.instanceCount}>
-              {searchStore.totalInstances} Result{`${searchStore.totalInstances !== 0?"s":""}`}
+              {browseStore.totalInstances} Result{`${browseStore.totalInstances !== 0?"s":""}`}
             </div>}
+          {browseStore.selectedList !== null && <FontAwesomeIcon icon="search" className={classes.searchIcon}/>}
         </div>
         <Scrollbars autoHide>
-          {searchStore.selectedList ?
-            !searchStore.fetchError.instances ?
-              !searchStore.isFetching.instances ?
-                searchStore.instances.length ?
+          {browseStore.selectedList ?
+            !browseStore.fetchError.instances ?
+              !browseStore.isFetching.instances ?
+                browseStore.instances.length ?
                   <InfiniteScroll
                     threshold={400}
                     pageStart={0}
                     loadMore={this.handleLoadMore}
-                    hasMore={searchStore.canLoadMoreInstances}
+                    hasMore={browseStore.canLoadMoreInstances}
                     loader={<div className={classes.loader} key={0}><FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;<span>Loading more instances...</span></div>}
                     useWindow={false}>
                     <div className={classes.list}>
-                      {searchStore.instances.map(instance => {
+                      {browseStore.instances.map(instance => {
                         return (
                           <div key={instance.id}
-                            className={`${classes.listInstance} ${instance === searchStore.selectedInstance?"selected":""}`}
+                            className={`${classes.listInstance} ${instance === browseStore.selectedInstance?"selected":""}`}
                             onClick={this.handleInstanceClick.bind(this, instance)}
                             onDoubleClick={this.handleInstanceDoubleClick.bind(this, instance)}>
-                            <div className={classes.listType}>{searchStore.nodeTypeLabel}</div>
+                            <div className={classes.listType}>{browseStore.nodeTypeLabel}</div>
                             <div className={classes.listTitle}>
                               <Status id={instance.id} darkmode={true}/>
                               <BookmarkStatus id={instance.id} className="bookmarkStatus" />
@@ -284,7 +293,7 @@ export default class Instances extends React.Component{
                   :
                   <BGMessage icon={"unlink"}>
                     No instances could be found in this list
-                    {searchStore.instancesFilter && <div>with the search term {`"${searchStore.instancesFilter}"`}</div>}
+                    {browseStore.instancesFilter && <div>with the search term {`"${browseStore.instancesFilter}"`}</div>}
                   </BGMessage>
                 :
                 <FetchingLoader>
@@ -305,7 +314,7 @@ export default class Instances extends React.Component{
           }
         </Scrollbars>
         <div className={classes.preview}>
-          {searchStore.selectedInstance?
+          {browseStore.selectedInstance?
             <Preview/>
             :
             <BGMessage icon={"money-check"}>

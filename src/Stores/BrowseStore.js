@@ -8,7 +8,7 @@ import bookmarkStatusStore from "./BookmarkStatusStore";
 const bookmarkListType = "BOOKMARK";
 const nodetypeType = "NODETYPE";
 
-class SearchStore{
+class BrowseStore{
 
   @observable lists = [];
   @observable listsFilter = "";
@@ -330,4 +330,4 @@ class SearchStore{
   }
 }
 
-export default new SearchStore();
+export default new BrowseStore();

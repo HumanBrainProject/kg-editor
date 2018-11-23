@@ -134,9 +134,9 @@ export default class Home extends React.Component{
 
   render(){
     const { classes } =  this.props;
-    const lastEditedInstances = instanceStore.getLastEditedInstances();
-    const lastViewedInstances = instanceStore.getLastViewedInstances();
-    const lastBookmarkedInstances = bookmarkStatusStore.getLastBookmarkedInstances();
+    const lastEditedInstances = instanceStore.getLastEditedInstances(10, "dataset");
+    const lastViewedInstances = instanceStore.getLastViewedInstances(10, "dataset");
+    const lastBookmarkedInstances = bookmarkStatusStore.getLastBookmarkedInstances(10, "dataset");
     return (
       <div className={classes.container}>
         <div className={classes.welcome}>

@@ -1,9 +1,5 @@
 
-const lastInstancesMaxItems = 10;
-
-const nodeTypesToMonitor = [
-  "Dataset"
-];
+const maxItems = 100;
 
 export const retrieveLastInstances = key => {
   if (!key) {
@@ -32,9 +28,6 @@ export const updateLastInstances = (key, instanceId, remove) => {
     return lastInstances;
   }
   nodeType = nodeType.toLowerCase();
-  if (nodeTypesToMonitor.map(n => n.toLowerCase()).indexOf(nodeType) === -1) {
-    return lastInstances;
-  }
   let index = -1;
   lastInstances.some((instance, idx) => {
     if (instance.id === instanceId) {
@@ -45,7 +38,7 @@ export const updateLastInstances = (key, instanceId, remove) => {
   });
   if (index !== -1) {
     lastInstances.splice(index, 1);
-  } else if (lastInstances.length >= lastInstancesMaxItems) {
+  } else if (lastInstances.length >= maxItems) {
     lastInstances.pop();
   }
   if (!remove) {

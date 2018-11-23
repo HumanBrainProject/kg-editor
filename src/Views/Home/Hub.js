@@ -62,7 +62,7 @@ export default class Hub extends React.Component{
   render(){
     const { classes } = this.props;
     return(
-      <div className={`${classes.container}`}>
+      <div className={classes.container}>
         <div className={classes.action}></div>
         <div className={`${classes.action} statistics`} onClick={()=>routerStore.history.push("/kg-stats")}>
           <div className={classes.actionIcon}>

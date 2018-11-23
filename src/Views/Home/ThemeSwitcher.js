@@ -28,7 +28,7 @@ export default class ThemeSwitcher extends React.Component{
   render(){
     const { classes } = this.props;
     return(
-      <div className={`${classes.container}`}>
+      <div className={classes.container}>
         <div className={classes.icon}>
           <FontAwesomeIcon icon={appStore.currentTheme === "bright"? "sun": "moon"}/>
         </div>

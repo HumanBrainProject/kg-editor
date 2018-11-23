@@ -5,6 +5,9 @@ import {observer} from "mobx-react";
 const styles = {
   container: {
     padding: "15px",
+    background: "var(--bg-color-ui-contrast2)",
+    border: "1px solid var(--border-color-ui-contrast1)",
+    color: "var(--ft-color-normal)",
     "& h3": {
       marginTop: 0
     },
@@ -41,7 +44,7 @@ export default class KeyboardShortcuts extends React.Component {
   render(){
     const { classes } = this.props;
     return (
-      <div className={`${classes.container} widget`}>
+      <div className={classes.container}>
         <h3>Keyboard shortcuts</h3>
         <ul>
           <li><span className="kbd">Alt</span> + <span className="kbd">d</span> show dashboard.</li>

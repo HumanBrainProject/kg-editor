@@ -12,6 +12,9 @@ import FetchingLoader from "../../Components/FetchingLoader";
 const styles = {
   container: {
     padding: "15px",
+    background: "var(--bg-color-ui-contrast2)",
+    border: "1px solid var(--border-color-ui-contrast1)",
+    color: "var(--ft-color-normal)",
     "& h3": {
       marginTop: "0"
     },
@@ -265,7 +268,7 @@ export default class Features extends React.Component {
   render(){
     const { classes } = this.props;
     return (
-      <div className={`${classes.container} widget`}>
+      <div className={classes.container}>
         <h3>Latest features</h3>
         {!featuresStore.fetchError?
           !featuresStore.isFetching?

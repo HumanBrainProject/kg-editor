@@ -12,10 +12,12 @@ const styles = {
   container: {
     width: "100%",
     height: "400px",
-    padding: "10px",
+    padding: "15px",
+    background: "var(--bg-color-ui-contrast2)",
+    border: "1px solid var(--border-color-ui-contrast1)",
     color:"var(--ft-color-normal)",
     "& h3": {
-      margin: "10px 0 5px 0",
+      margin: "5px 0",
       textAlign: "center"
     }
   },
@@ -66,7 +68,7 @@ export default class NodeTypesBarChart extends React.Component {
   render(){
     const { classes } = this.props;
     return (
-      <div key={this.state.key} className={`${classes.container} widget`}>
+      <div key={this.state.key} className={classes.container}>
         <h3>Top 10 unreleased instances by type</h3>
         {!statisticsStore.fetchError?
           !statisticsStore.isFetching?

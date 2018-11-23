@@ -49,6 +49,7 @@ class InstanceStore {
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
   @observable lastViewedInstances = {};
+  @observable lastEditedInstances = {};
 
   @observable showCreateModal = false;
 

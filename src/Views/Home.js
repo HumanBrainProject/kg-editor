@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import Hub from "./Home/Hub";
-import LastInstances from "./Home/LastInstances";
+import Instances from "./Home/Instances";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
 import Features from "./Home/Features";
@@ -152,13 +152,13 @@ export default class Home extends React.Component{
               <UsersPieChart />
             </div>
             {lastEditedDatasets && !!lastEditedDatasets.length && (
-              <LastInstances title="Your last edited Datasets" list={lastEditedDatasets} />
+              <Instances title="Your last edited Datasets" list={lastEditedDatasets} />
             )}
             {lastViewedDatasets && !!lastViewedDatasets.length && (
-              <LastInstances title="Your last viewed Datasets" list={lastViewedDatasets} />
+              <Instances title="Your last viewed Datasets" list={lastViewedDatasets} />
             )}
             {lastBookmarkedDatasets && !!lastBookmarkedDatasets.length && (
-              <LastInstances title="Your last bookmarked Datasets" list={lastBookmarkedDatasets} />
+              <Instances title="Your last bookmarked Datasets" list={lastBookmarkedDatasets} />
             )}
           </Scrollbars>
         </div>

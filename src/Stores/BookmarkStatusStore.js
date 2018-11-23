@@ -241,10 +241,12 @@ class BookmarkStatusStore{
 @action
   getLastBookmarkedInstances(nodeType) {
     if (typeof nodeType !== "string") {
-      return [];
+      return this.lastBookmarkedInstances.map(instance => instance.id);
     }
     nodeType = nodeType.toLowerCase();
-    return (this.lastBookmarkedInstances && this.lastBookmarkedInstances[nodeType] && this.lastBookmarkedInstances[nodeType].length)?this.lastBookmarkedInstances[nodeType]:[];
+    return this.lastBookmarkedInstances
+      .filter(instance => instance.type === nodeType)
+      .map(instance => instance.id);
   }
 
 }

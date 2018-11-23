@@ -113,19 +113,23 @@ class InstanceStore {
   @action
   getLastViewedInstances(nodeType) {
     if (typeof nodeType !== "string") {
-      return [];
+      return this.lastViewedInstances.map(instance => instance.id);
     }
     nodeType = nodeType.toLowerCase();
-    return (this.lastViewedInstances && this.lastViewedInstances[nodeType] && this.lastViewedInstances[nodeType].length)?this.lastViewedInstances[nodeType]:[];
+    return this.lastViewedInstances
+      .filter(instance => instance.type === nodeType)
+      .map(instance => instance.id);
   }
 
   @action
   getLastEditedInstances(nodeType) {
     if (typeof nodeType !== "string") {
-      return [];
+      return this.lastEditedInstances.map(instance => instance.id);
     }
     nodeType = nodeType.toLowerCase();
-    return (this.lastEditedInstances && this.lastEditedInstances[nodeType] && this.lastEditedInstances[nodeType].length)?this.lastEditedInstances[nodeType]:[];
+    return this.lastEditedInstances
+      .filter(instance => instance.type === nodeType)
+      .map(instance => instance.id);
   }
 
   @action setInstanceViewMode(instanceId, mode){

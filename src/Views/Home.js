@@ -134,9 +134,9 @@ export default class Home extends React.Component{
 
   render(){
     const { classes } =  this.props;
-    const lastEditedDatasets = instanceStore.getLastEditedInstances("Dataset");
-    const lastViewedDatasets = instanceStore.getLastViewedInstances("Dataset");
-    const lastBookmarkedDatasets = bookmarkStatusStore.getLastBookmarkedInstances("Dataset");
+    const lastEditedInstances = instanceStore.getLastEditedInstances();
+    const lastViewedInstances = instanceStore.getLastViewedInstances();
+    const lastBookmarkedInstances = bookmarkStatusStore.getLastBookmarkedInstances();
     return (
       <div className={classes.container}>
         <div className={classes.welcome}>
@@ -151,14 +151,14 @@ export default class Home extends React.Component{
               <NodeTypesBarChart />
               <UsersPieChart />
             </div>
-            {lastEditedDatasets && !!lastEditedDatasets.length && (
-              <Instances title="Your last edited Datasets" list={lastEditedDatasets} />
+            {lastEditedInstances && !!lastEditedInstances.length && (
+              <Instances title="Your last edited instances" list={lastEditedInstances} />
             )}
-            {lastViewedDatasets && !!lastViewedDatasets.length && (
-              <Instances title="Your last viewed Datasets" list={lastViewedDatasets} />
+            {lastViewedInstances && !!lastViewedInstances.length && (
+              <Instances title="Your last viewed instances" list={lastViewedInstances} />
             )}
-            {lastBookmarkedDatasets && !!lastBookmarkedDatasets.length && (
-              <Instances title="Your last bookmarked Datasets" list={lastBookmarkedDatasets} />
+            {lastBookmarkedInstances && !!lastBookmarkedInstances.length && (
+              <Instances title="Your last bookmarked instances" list={lastBookmarkedInstances} />
             )}
           </Scrollbars>
         </div>

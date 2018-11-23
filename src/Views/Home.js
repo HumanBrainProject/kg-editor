@@ -71,6 +71,48 @@ const styles = {
         margin: "10px 0 0 0"
       }
     }
+  },
+  cat:{
+    position: "absolute",
+    bottom: "-145px",
+    left: "-480px",
+    transform: "scale(0.3)",
+    animation: "walk 180s linear infinite",
+    zIndex: 10000
+  },
+  "@keyframes walk": {
+    "0%":{
+      left: "-480px",
+      transform: "scale(0.3)"
+    },
+    "5%":{
+      left: "-480px",
+      transform: "scale(0.3)"
+    },
+    "45%":{
+      left: "calc(100% + 480px)",
+      transform: "scale(0.3)"
+    },
+    "50%":{
+      left: "calc(100% + 480px)",
+      transform: "scale(0.3)"
+    },
+    "51%":{
+      left: "calc(100% + 480px)",
+      transform: "scale(0.3) rotateY(180deg)"
+    },
+    "55%":{
+      left: "calc(100% + 480px)",
+      transform: "scale(0.3) rotateY(180deg)"
+    },
+    "95%":{
+      left: "-480px",
+      transform: "scale(0.3) rotateY(180deg)"
+    },
+    "100%":{
+      left: "-480px",
+      transform: "scale(0.3) rotateY(180deg)"
+    }
   }
 };
 
@@ -117,6 +159,7 @@ export default class Home extends React.Component{
           </Scrollbars>
         </div>
         <TipsOfTheDay />
+        <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
       </div>
     );
   }

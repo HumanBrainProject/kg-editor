@@ -11,6 +11,7 @@ import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   container: {
+    position: "relative",
     padding: "15px",
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast1)",

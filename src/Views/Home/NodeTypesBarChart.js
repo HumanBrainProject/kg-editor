@@ -10,6 +10,7 @@ import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   container: {
+    position: "relative",
     width: "100%",
     height: "400px",
     padding: "15px",

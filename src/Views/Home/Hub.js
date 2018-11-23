@@ -11,6 +11,7 @@ import ThemeSwitcher from "./ThemeSwitcher";
 const styles = {
   container:{
     display: "flex",
+    position: "relative",
     height: "100%"
   },
   action:{

@@ -106,18 +106,22 @@ const styles = {
       transform: "scale(0.3)"
     },
     "51%":{
+      top: "unset",
       left: "calc(100% + 480px)",
       transform: "scale(0.3) rotateY(180deg)"
     },
     "55%":{
+      top: "unset",
       left: "calc(100% + 480px)",
       transform: "scale(0.3) rotateY(180deg)"
     },
     "95%":{
+      top: "unset",
       left: "-480px",
       transform: "scale(0.3) rotateY(180deg)"
     },
     "100%":{
+      top: "unset",
       left: "-480px",
       transform: "scale(0.3) rotateY(180deg)"
     }

@@ -98,13 +98,13 @@ export default class Home extends React.Component{
               <UsersPieChart />
             </div>
             {lastEditedDatasets && !!lastEditedDatasets.length && (
-              <LastInstances title="Your last 10 edited Datasets" list={lastEditedDatasets} />
+              <LastInstances title="Your last edited Datasets" list={lastEditedDatasets} />
             )}
             {lastViewedDatasets && !!lastViewedDatasets.length && (
-              <LastInstances title="Your last 10 viewed Datasets" list={lastViewedDatasets} />
+              <LastInstances title="Your last viewed Datasets" list={lastViewedDatasets} />
             )}
             {lastBookmarkedDatasets && !!lastBookmarkedDatasets.length && (
-              <LastInstances title="Your last 10 bookmarked Datasets" list={lastBookmarkedDatasets} />
+              <LastInstances title="Your last bookmarked Datasets" list={lastBookmarkedDatasets} />
             )}
           </Scrollbars>
         </div>

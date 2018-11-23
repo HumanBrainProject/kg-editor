@@ -73,27 +73,35 @@ const styles = {
     }
   },
   cat:{
-    position: "absolute",
-    bottom: "-145px",
-    left: "-480px",
-    transform: "scale(0.3)",
-    animation: "walk 180s linear infinite",
-    zIndex: 10000
+    display: "none",
+    "@media screen and (min-width:1200px)": {
+      display: "block",
+      position: "absolute",
+      bottom: "-145px",
+      left: "-480px",
+      transform: "scale(0.3)",
+      animation: "walk 180s linear infinite",
+      zIndex: 10000
+    },
   },
   "@keyframes walk": {
     "0%":{
+      top: "-100px",
       left: "-480px",
       transform: "scale(0.3)"
     },
     "5%":{
+      top: "-100px",
       left: "-480px",
       transform: "scale(0.3)"
     },
     "45%":{
+      top: "-100px",
       left: "calc(100% + 480px)",
       transform: "scale(0.3)"
     },
     "50%":{
+      top: "-100px",
       left: "calc(100% + 480px)",
       transform: "scale(0.3)"
     },

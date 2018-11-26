@@ -65,7 +65,7 @@ export default class TipsOfTheDay extends React.Component {
   constructor(props){
     super(props);
     this.tips = [
-      <span key="1">to create a new bookmark list click on the <FontAwesomeIcon icon="star" className={this.props.classes.bookmarkIcon} /> button of an instnce and type the name of the new desired bookmark list.</span>,
+      <span key="1">to create a new bookmark list click on the <FontAwesomeIcon icon="star" className={this.props.classes.bookmarkIcon} /> button of an instance and type the name of the new desired bookmark list.</span>,
       <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
       <span key="3">press <span className="kbd">Alt</span> + <span className="kbd">b</span> to browse the instances.</span>,
       <span key="4">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,

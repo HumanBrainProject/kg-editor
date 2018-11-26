@@ -18,23 +18,30 @@ const rootPath = window.rootPath || "";
 
 const styles = {
   container: {
-    display: "grid",
-    height: "100%",
     width: "100%",
-    padding: "10px",
-    gridGap: "10px",
-    gridTemplateColumns: "8fr 2fr",
-    gridTemplateRows: "auto 1fr",
-    gridTemplateAreas: `"welcome nav"
-                        "main features"`,
+    height: "100%",
     backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
     backgroundPosition: "50% 50%",
     color: "var(--ft-color-normal)"
   },
+  panel: {
+    display: "grid",
+    width: "100%",
+    height: "100%",
+    padding: "10px",
+    gridGap: "10px",
+    gridTemplateColumns: "calc(80% - 10px) 20%",
+    gridTemplateRows: "auto auto",
+    gridTemplateAreas: `"welcome nav"
+                        "main features"`
+  },
   welcome: {
     gridArea: "welcome",
     position: "relative",
-    height: "220px",
+    height: "125px",
+    "@media screen and (min-height:1200px)": {
+      height: "220px"
+    },
     "& h1": {
       position: "absolute",
       bottom: "0",
@@ -131,7 +138,6 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Home extends React.Component{
-
   render(){
     const { classes } =  this.props;
     const lastEditedInstances = instanceStore.getLastEditedInstances(10, "dataset");
@@ -139,38 +145,38 @@ export default class Home extends React.Component{
     const lastBookmarkedInstances = bookmarkStatusStore.getLastBookmarkedInstances(10, "dataset");
     return (
       <div className={classes.container}>
-        <div className={classes.welcome}>
-          <h1>Welcome <span title={authStore.user.name}>{authStore.user.name.split(" ")[0]}</span></h1>
-        </div>
-        <div className={classes.nav}>
-          <Hub/>
-        </div>
-        <div className={classes.main}>
-          <Scrollbars autoHide>
-            <div className="widget-list">
-              <NodeTypesBarChart />
-              <UsersPieChart />
+        <Scrollbars autoHide>
+          <div className={classes.panel}>
+            <div className={classes.welcome}>
+              <h1>Welcome <span title={authStore.user.name}>{authStore.user.name.split(" ")[0]}</span></h1>
             </div>
-            {lastEditedInstances && !!lastEditedInstances.length && (
-              <Instances title="Your last edited instances" list={lastEditedInstances} />
-            )}
-            {lastViewedInstances && !!lastViewedInstances.length && (
-              <Instances title="Your last viewed instances" list={lastViewedInstances} />
-            )}
-            {lastBookmarkedInstances && !!lastBookmarkedInstances.length && (
-              <Instances title="Your last bookmarked instances" list={lastBookmarkedInstances} />
-            )}
-          </Scrollbars>
-        </div>
-        <div className={classes.features}>
-          <Scrollbars autoHide>
-            <div className="widget-list">
-              <KeyboardShortcuts />
-              <Features />
+            <div className={classes.nav}>
+              <Hub/>
             </div>
-          </Scrollbars>
-        </div>
-        <TipsOfTheDay />
+            <div className={classes.main}>
+              <div className="widget-list">
+                <NodeTypesBarChart />
+                <UsersPieChart />
+              </div>
+              {lastEditedInstances && !!lastEditedInstances.length && (
+                <Instances title="Your last edited instances" list={lastEditedInstances} />
+              )}
+              {lastViewedInstances && !!lastViewedInstances.length && (
+                <Instances title="Your last viewed instances" list={lastViewedInstances} />
+              )}
+              {lastBookmarkedInstances && !!lastBookmarkedInstances.length && (
+                <Instances title="Your last bookmarked instances" list={lastBookmarkedInstances} />
+              )}
+            </div>
+            <div className={classes.features}>
+              <div className="widget-list">
+                <KeyboardShortcuts />
+                <Features />
+              </div>
+            </div>
+          </div>
+          <TipsOfTheDay />
+        </Scrollbars>
         <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
       </div>
     );

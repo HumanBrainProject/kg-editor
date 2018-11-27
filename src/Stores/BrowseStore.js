@@ -195,13 +195,7 @@ class BrowseStore{
           this.isCreatingBookmarkList = false;
           this.newBookmarkListName = null;
           if (instanceIds) {
-            if(!isArray(instanceIds)){
-              instanceIds = [instanceIds];
-            }
-            instanceIds.forEach(instanceId => {
-              const instance = bookmarkStatusStore.getInstance(instanceId);
-              instance && instance.data && instance.data.bookmarkLists && instance.data.bookmarkLists.indexOf(data.id) === -1 && instance.data.bookmarkLists.push(data.id);
-            });
+            bookmarkStatusStore.updateStatus(instanceIds, data.id, true);
           }
         });
       } catch(e){

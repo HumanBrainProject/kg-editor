@@ -1,6 +1,6 @@
 import { observable, action, runInAction, computed } from "mobx";
 //import { debounce, uniqueId } from "lodash";
-import { isArray, debounce } from "lodash";
+import { debounce } from "lodash";
 
 import API from "../Services/API";
 import bookmarkStatusStore from "./BookmarkStatusStore";

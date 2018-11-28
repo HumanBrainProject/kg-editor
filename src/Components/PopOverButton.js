@@ -126,6 +126,12 @@ export default class PopOverButton extends React.Component{
     typeof this.props.onOk === "function" && this.props.onOk();
   }
 
+  componentWillUnmount() {
+    if (this.state.showPopOver) {
+      this.handlePopOverClose();
+    }
+  }
+
   render(){
     const { classes, className, buttonClassName, buttonTitle, iconComponent, iconProps, okComponent, okProps, cancelComponent, cancelProps, children } = this.props;
     const IconComponent = iconComponent;

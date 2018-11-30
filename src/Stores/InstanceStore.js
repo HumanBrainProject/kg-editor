@@ -4,8 +4,8 @@ import { FormStore } from "hbp-quickfire";
 
 import console from "../Services/Logger";
 import API from "../Services/API";
-import { retrieveLastInstances, updateLastInstances} from "../Services/LastInstancesHelper";
 
+import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
 
@@ -48,8 +48,6 @@ class InstanceStore {
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
-  @observable lastViewedInstances = {};
-  @observable lastEditedInstances = {};
 
   @observable showCreateModal = false;
 
@@ -62,8 +60,6 @@ class InstanceStore {
         this.restoreOpenedTabs(storedOpenedTabs);
       });
     }
-    this.lastViewedInstances = retrieveLastInstances("lastViewedInstances");
-    this.lastEditedInstances = retrieveLastInstances("lastEditedInstances");
   }
 
   get nodeTypeMapping(){
@@ -95,7 +91,7 @@ class InstanceStore {
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.setReadMode(readMode);
-    this.lastViewedInstances = updateLastInstances("lastViewedInstances", instanceId);
+    historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;
     } else {
@@ -108,34 +104,6 @@ class InstanceStore {
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
     }
-  }
-
-  @action
-  getLastViewedInstances(max=10, nodeType) {
-    if (typeof nodeType !== "string") {
-      return this.lastViewedInstances
-        .map(instance => instance.id)
-        .slice(0, isNaN(Number(max))?0:Number(max));
-    }
-    nodeType = nodeType.toLowerCase();
-    return this.lastViewedInstances
-      .filter(instance => instance.type === nodeType)
-      .map(instance => instance.id)
-      .slice(0, isNaN(Number(max))?0:Number(max));
-  }
-
-  @action
-  getLastEditedInstances(max=10, nodeType) {
-    if (typeof nodeType !== "string") {
-      return this.lastEditedInstances
-        .map(instance => instance.id)
-        .slice(0, isNaN(Number(max))?0:Number(max));
-    }
-    nodeType = nodeType.toLowerCase();
-    return this.lastEditedInstances
-      .filter(instance => instance.type === nodeType)
-      .map(instance => instance.id)
-      .slice(0, isNaN(Number(max))?0:Number(max));
   }
 
   @action setInstanceViewMode(instanceId, mode){
@@ -417,7 +385,7 @@ class InstanceStore {
 
   @action
   async saveInstance(instanceId){
-    this.lastEditedInstances = updateLastInstances("lastEditedInstances", instanceId);
+    historyStore.updateInstanceHistory(instanceId, "edited");
     const instance = this.instances.get(instanceId);
     instance.cancelChangesPending = false;
     instance.hasSaveError = false;

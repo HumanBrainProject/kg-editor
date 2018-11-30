@@ -4,20 +4,15 @@ import { isArray, debounce } from "lodash";
 
 import console from "../Services/Logger";
 import API from "../Services/API";
-import { retrieveLastInstances, updateLastInstances} from "../Services/LastInstancesHelper";
+import historyStore from "./HistoryStore";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
   @observable isFetching = false;
-  @observable lastBookmarkedInstances = {};
 
   processSize = 20;
   fetchQueue = [];
   fetchErrorQueue = [];
-
-  constructor(){
-    this.lastBookmarkedInstances = retrieveLastInstances("lastBookmarkedInstances");
-  }
 
   getInstance(id){
     return this.statuses.get(id);
@@ -77,7 +72,7 @@ class BookmarkStatusStore{
       if(this.statuses.has(id)){
         const status = this.statuses.get(id);
         if(status.hasChanged && !status.isSaving && !status.isFetching && !status.hasFetchError) {
-          this.lastBookmarkedInstances = updateLastInstances("lastBookmarkedInstances", id, !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length);
+          historyStore.updateInstanceHistory(id, "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length);
           try {
             status.hasSaveError = false;
             status.isSaving = true;
@@ -237,21 +232,6 @@ class BookmarkStatusStore{
       });
     }
   }
-
-@action
-  getLastBookmarkedInstances(max=10, nodeType) {
-    if (typeof nodeType !== "string") {
-      return this.lastBookmarkedInstances
-        .map(instance => instance.id)
-        .slice(0, isNaN(Number(max))?0:Number(max));
-    }
-    nodeType = nodeType.toLowerCase();
-    return this.lastBookmarkedInstances
-      .filter(instance => instance.type === nodeType)
-      .map(instance => instance.id)
-      .slice(0, isNaN(Number(max))?0:Number(max));
-  }
-
 }
 
 export default new BookmarkStatusStore();

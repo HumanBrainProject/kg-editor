@@ -4,15 +4,13 @@ import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import Hub from "./Home/Hub";
-import Instances from "./Home/Instances";
+import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
 import Features from "./Home/Features";
 import NodeTypesBarChart from "./Home/NodeTypesBarChart";
 import UsersPieChart from "./Home/UsersPieChart";
 import authStore from "../Stores/AuthStore";
-import instanceStore from "../Stores/InstanceStore";
-import bookmarkStatusStore from "../Stores/BookmarkStatusStore";
 
 const rootPath = window.rootPath || "";
 
@@ -140,9 +138,6 @@ const styles = {
 export default class Home extends React.Component{
   render(){
     const { classes } =  this.props;
-    const lastEditedInstances = instanceStore.getLastEditedInstances(10, "dataset");
-    const lastViewedInstances = instanceStore.getLastViewedInstances(10, "dataset");
-    const lastBookmarkedInstances = bookmarkStatusStore.getLastBookmarkedInstances(10, "dataset");
     return (
       <div className={classes.container}>
         <Scrollbars autoHide>
@@ -158,15 +153,7 @@ export default class Home extends React.Component{
                 <NodeTypesBarChart />
                 <UsersPieChart />
               </div>
-              {lastEditedInstances && !!lastEditedInstances.length && (
-                <Instances title="Your last edited instances" list={lastEditedInstances} />
-              )}
-              {lastViewedInstances && !!lastViewedInstances.length && (
-                <Instances title="Your last viewed instances" list={lastViewedInstances} />
-              )}
-              {lastBookmarkedInstances && !!lastBookmarkedInstances.length && (
-                <Instances title="Your last bookmarked instances" list={lastBookmarkedInstances} />
-              )}
+              <InstancesHistory />
             </div>
             <div className={classes.features}>
               <div className="widget-list">

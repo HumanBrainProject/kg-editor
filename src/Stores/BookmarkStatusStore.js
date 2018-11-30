@@ -43,7 +43,7 @@ class BookmarkStatusStore{
   }
 
   @action
-  updateStatus(instanceIds, bookmarkLists){
+  updateStatus(instanceIds, bookmarkLists, appendMode){
     if(!isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
@@ -54,9 +54,31 @@ class BookmarkStatusStore{
           if (!status.data) {
             status.data = {id: id, bookmarkLists: []};
           }
-          status.hasChanged = true;
-          status.previousBookmarkLists = toJS(status.data.bookmarkLists);
-          status.data.bookmarkLists = bookmarkLists||[];
+          if(!isArray(bookmarkLists)){
+            bookmarkLists = bookmarkLists?[bookmarkLists]:[];
+          }
+          if (appendMode) {
+            if (bookmarkLists.length) {
+              let hasChanged = false;
+              const previousBookmarkLists = (status.previousBookmarkLists && status.previousBookmarkLists.length)?status.previousBookmarkLists:toJS(status.data.bookmarkLists);
+              bookmarkLists.forEach(bookmarkId => {
+                if (status.data.bookmarkLists.indexOf(bookmarkId) === -1) {
+                  hasChanged = true;
+                  status.data.bookmarkLists.push(bookmarkId);
+                }
+              });
+              if (hasChanged) {
+                status.hasChanged = true;
+                status.previousBookmarkLists = previousBookmarkLists;
+              }
+            }
+          } else {
+            status.hasChanged = true;
+            if (!status.previousBookmarkLists || !status.previousBookmarkLists.length) {
+              status.previousBookmarkLists = toJS(status.data.bookmarkLists);
+            }
+            status.data.bookmarkLists = bookmarkLists||[];
+          }
         }
       }
     });

@@ -12,7 +12,7 @@ let styles = {
   },
   button: {
     position: "relative",
-    width: "20px",
+    minWidth: "1.1em",
     margin: 0,
     padding: 0,
     border: 0,
@@ -152,7 +152,7 @@ export default class PopOverButton extends React.Component{
         >
           <Popover id={this.popOverId} className={classes.popOver}>
             <PopOverContent onSizeChange={this.handlePopOverPosition.bind(this)}>
-              <div className={classes.popOverContent}>
+              <div className={classes.popOverContent} onClick={event => event.stopPropagation()}>
                 {children}
               </div>
               {(CancelComponent || OkComponent) && (

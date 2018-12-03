@@ -19,7 +19,8 @@ let styles = {
     background:"var(--bg-color-ui-contrast2)",
     textAlign:"center",
     color:"var(--ft-color-loud)",
-    border:"1px solid var(--ft-color-loud)",
+    //border:"1px solid var(--ft-color-loud)",
+    minWidth: "1.4em",
     "& .svg-inline--fa":{
       fontSize:"0.8em",
       verticalAlign:"baseline"

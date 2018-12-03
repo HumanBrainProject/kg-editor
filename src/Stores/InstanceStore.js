@@ -66,6 +66,12 @@ class InstanceStore {
     return nodeTypeMapping;
   }
 
+  get reverseNodeTypeMapping(){
+    return Object.entries(nodeTypeMapping).reduce((result, [label, type]) => {
+      result[type] = label;
+      return result;
+    }, {});
+  }
 
   getPromotedFields(instance) {
     if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {

@@ -103,7 +103,7 @@ export default class Instances extends React.Component{
     }
   }
 
-  handleInstanceActionClick(mode, instance){
+  handleInstanceActionClick(instance, mode){
     if (instance && instance.id) {
       routerStore.history.push(`/instance/${mode}/${instance.id}`);
     }

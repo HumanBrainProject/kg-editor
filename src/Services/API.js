@@ -8,6 +8,7 @@ const endpoints = {
   "nodeTypes": () => "/editor/api/nodetypes",
   "bookmarkListFolders": (mockup) => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
   "instances": (entity) => `/editor/api/instances/${entity}`,
+  "listedInstances": () => "/editor/api/instances",
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
   "instanceData": (instance) => `/editor/api/instance/${instance}`,
   "releaseData": (instance) => `/api/releases/${instance}/graph`,

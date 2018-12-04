@@ -1,9 +1,15 @@
-import {observable, action} from "mobx";
+import { observable, action, runInAction } from "mobx";
+
+import API from "../Services/API";
 
 const maxItems = 100;
 
 class HistoryStore {
   @observable instancesHistory = [];
+
+  @observable instances = [];
+  @observable isFetching = false;
+  @observable fetchError = null;
 
   constructor(){
     if (localStorage.getItem("instancesHistory")) {
@@ -79,6 +85,33 @@ class HistoryStore {
       }, {map: {}, history: []}).history
       .slice(0, isNaN(max) || max < 0?0:max);
   }
+
+  @action
+  async fetchInstances(list) {
+    if (!list.length) {
+      this.instances = [];
+      this.isFetching = false;
+      this.fetchError = null;
+    } else {
+      try {
+        this.instances = [];
+        this.isFetching = true;
+        this.fetchError = null;
+        const { data } = await API.axios.post(API.endpoints.listedInstances(), list);
+        runInAction(() => {
+          this.isFetching = false;
+          this.instances = (data && data.data)?data.data:[];
+        });
+      } catch (e) {
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          this.fetchError = `Error while retrieving history instances (${message})`;
+          this.isFetching = false;
+        });
+      }
+    }
+  }
+
 }
 
 export default new HistoryStore();

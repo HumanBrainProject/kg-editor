@@ -1,10 +1,14 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import historyStore from "../../Stores/HistoryStore";
 import appStore from "../../Stores/AppStore";
-import Instance from "./Instance";
+import instanceStore from "../../Stores/InstanceStore";
+import routerStore from "../../Stores/RouterStore";
+import InstanceRow from "../Instance/InstanceRow";
+import PopOverButton from "../../Components/PopOverButton";
 
 const nodeTypes = [
   "dataset",
@@ -68,46 +72,44 @@ const styles = {
       }
     }
   },
-  noHistory: {
+  message: {
     position: "relative",
     width: "100%",
     padding: "15px",
     border: "1px solid var(--border-color-ui-contrast1)",
     background: "var(--bg-color-ui-contrast2)",
     color: "var(--ft-color-normal)"
+  },
+  noHistory: {
+    extend: "message"
+  },
+  fetching: {
+    extend: "message",
+    "& span": {
+      paddingLeft: "10px"
+    }
+  },
+  fetchError: {
+    extend: "message",
+    "& span": {
+      paddingLeft: "10px"
+    }
+  },
+  textError: {
+    margin: 0,
+    wordBreak: "keep-all"
   }
 };
 
 @injectStyles(styles)
 @observer
 export default class InstancesHistory extends React.Component{
-
-  handleHistorySizeChange = event => {
-    appStore.setSizeHistorySetting(event.target.value);
+  constructor(props){
+    super(props);
+    this.fetchInstances();
   }
 
-  handleHistoryNodeTypeChange = event => {
-    appStore.setNodeTypeHistorySetting(event.target.value);
-  }
-
-  handleHistoryViewedFlagChange = event => {
-    appStore.toggleViewedFlagHistorySetting(event.target.checked);
-  }
-
-  handleHistoryEditedFlagChange = event => {
-    appStore.toggleEditedFlagHistorySetting(event.target.checked);
-  }
-
-  handleHistoryBookmarkedFlagChange = event => {
-    appStore.toggleBookmarkedFlagHistorySetting(event.target.checked);
-  }
-
-  handleHistoryReleasedFlagChange = event => {
-    appStore.toggleReleasedFlagHistorySetting(event.target.checked);
-  }
-
-  render(){
-    const { classes } = this.props;
+  fetchInstances = () => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((result, [eventType, eventValue]) => {
       if (eventValue) {
         result.push(eventType);
@@ -115,6 +117,59 @@ export default class InstancesHistory extends React.Component{
       return result;
     }, []);
     const history = historyStore.getFileredInstancesHistory(appStore.historySettings.nodeType, eventTypes, appStore.historySettings.size);
+    historyStore.fetchInstances(history);
+  }
+
+  handleHistorySizeChange = event => {
+    appStore.setSizeHistorySetting(event.target.value);
+    this.fetchInstances();
+  }
+
+  handleHistoryNodeTypeChange = event => {
+    appStore.setNodeTypeHistorySetting(event.target.value);
+    this.fetchInstances();
+  }
+
+  handleHistoryViewedFlagChange = event => {
+    appStore.toggleViewedFlagHistorySetting(event.target.checked);
+    this.fetchInstances();
+  }
+
+  handleHistoryEditedFlagChange = event => {
+    appStore.toggleEditedFlagHistorySetting(event.target.checked);
+    this.fetchInstances();
+  }
+
+  handleHistoryBookmarkedFlagChange = event => {
+    appStore.toggleBookmarkedFlagHistorySetting(event.target.checked);
+    this.fetchInstances();
+  }
+
+  handleHistoryReleasedFlagChange = event => {
+    appStore.toggleReleasedFlagHistorySetting(event.target.checked);
+    this.fetchInstances();
+  }
+
+  handleInstanceClick(instance){
+    if (instance && instance.id) {
+      routerStore.history.push(`/instance/view/${instance.id}`);
+    }
+  }
+
+  handleInstanceCtrlClick(instance){
+    if (instance && instance.id) {
+      instanceStore.openInstance(instance.id);
+    }
+  }
+
+  handleInstanceActionClick(instance, mode){
+    if (instance && instance.id) {
+      routerStore.history.push(`/instance/${mode}/${instance.id}`);
+    }
+  }
+
+  render(){
+    const { classes } = this.props;
     return(
       <div className={classes.container}>
         <div className="header">
@@ -142,18 +197,40 @@ export default class InstancesHistory extends React.Component{
             <li><input type="checkbox" checked={appStore.historySettings.eventTypes.released} onChange={this.handleHistoryReleasedFlagChange} />Released</li>
           </ul>
         </div>
-        {history.length?
-          <ul>
-            {history.map(instanceId => {
-              return (
-                <li key={instanceId}>
-                  <Instance instanceId={instanceId} />
-                </li>
-              );
-            })}
-          </ul>
+        {historyStore.isFetching?
+          <div className={classes.fetching}><FontAwesomeIcon icon="circle-notch" spin/><span>Fetching history {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"}s...</span></div>
           :
-          <div className={classes.noHistory}>No {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"} matches your filters in your history.</div>
+          historyStore.fetchError?
+            <div className={classes.fetchError}>
+              <PopOverButton
+                buttonClassName={classes.fetchErrorButton}
+                buttonTitle={`fetching history ${appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"}s failed, click for more information`}
+                iconComponent={FontAwesomeIcon}
+                iconProps={{icon: "exclamation-triangle"}}
+                okComponent={() => (
+                  <React.Fragment>
+                    <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
+                  </React.Fragment>
+                )}
+                onOk={this.fetchInstances}
+              >
+                <h5 className={classes.textError}>{historyStore.fetchError}</h5>
+              </PopOverButton>
+              <span>fetching history {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"}s failed.</span>
+            </div>
+            :
+            historyStore.instances.length?
+              <ul>
+                {historyStore.instances.map(instance => {
+                  return (
+                    <li key={instance.id}>
+                      <InstanceRow instance={instance} selected={false} onClick={this.handleInstanceClick}  onCtrlClick={this.handleInstanceCtrlClick}  onActionClick={this.handleInstanceActionClick} />
+                    </li>
+                  );
+                })}
+              </ul>
+              :
+              <div className={classes.noHistory}>No {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"} matches your filters in your history.</div>
         }
       </div>
     );

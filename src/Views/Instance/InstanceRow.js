@@ -69,9 +69,13 @@ const styles = {
       }
     }
   },
-  name: {
+  nodeType: {
     display: "inline-block",
-    paddingLeft: "8px",
+    opacity: "0.5",
+    paddingRight: "8px"
+  },
+  name: {
+    display: "inline",
     fontSize:"1.4em",
     fontWeight:"300",
     color:"var(--ft-color-louder)"
@@ -81,10 +85,6 @@ const styles = {
     whiteSpace:"nowrap",
     textOverflow:"ellipsis",
     marginTop:"10px"
-  },
-  nodeType: {
-    display: "inline-block",
-    opacity: "0.5"
   },
   actions: {
     position:"absolute",

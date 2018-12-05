@@ -1,0 +1,57 @@
+{
+    "TotalNumberOfReleasedDatasets": 393,
+    "TotalNumberOfDatasets": 171,
+    "AverageNumberOfDaysToReleaseADataset": 17,
+    "PerWeekStatistics": [
+        {
+            "period": "Dec 2",
+            "numberOfNewlyReleasedDatasets": 4,
+            "numberOfNewlyCreatedDatasets": 6
+        },
+        {
+            "period": "Nov 25",
+            "numberOfNewlyReleasedDatasets": 7,
+            "numberOfNewlyCreatedDatasets": 4
+        },
+        {
+            "period": "Nov 18",
+            "numberOfNewlyReleasedDatasets": 13,
+            "numberOfNewlyCreatedDatasets": 8
+        },
+        {
+            "period": "Nov 11",
+            "numberOfNewlyReleasedDatasets": 5,
+            "numberOfNewlyCreatedDatasets": 11
+        },
+        {
+            "period": "Nov 4",
+            "numberOfNewlyReleasedDatasets": 9,
+            "numberOfNewlyCreatedDatasets": 6
+        },
+        {
+            "period": "Oct 28",
+            "numberOfNewlyReleasedDatasets": 15,
+            "numberOfNewlyCreatedDatasets": 4
+        },
+        {
+            "period": "Oct 21",
+            "numberOfNewlyReleasedDatasets": 4,
+            "numberOfNewlyCreatedDatasets": 16
+        },
+        {
+            "period": "Oct 14",
+            "numberOfNewlyReleasedDatasets": 9,
+            "numberOfNewlyCreatedDatasets": 4
+        },
+        {
+            "period": "Oct 7",
+            "numberOfNewlyReleasedDatasets": 8,
+            "numberOfNewlyCreatedDatasets": 9
+        },
+        {
+            "period": "Sep 30",
+            "numberOfNewlyReleasedDatasets": 11,
+            "numberOfNewlyCreatedDatasets": 16
+        }
+    ]
+}

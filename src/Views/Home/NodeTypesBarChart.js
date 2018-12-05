@@ -5,7 +5,7 @@ import {uniqueId} from "lodash";
 import { Button } from "react-bootstrap";
 import { ResponsiveBar } from "nivo";
 
-import statisticsStore from "../../Stores/StatisticsStore";
+import structureStore from "../../Stores/StructureStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
@@ -45,8 +45,8 @@ export default class NodeTypesBarChart extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
-    if(!statisticsStore.isFetched && !statisticsStore.isFetching){
-      statisticsStore.fetchStatistics();
+    if(!structureStore.isFetched && !structureStore.isFetching){
+      structureStore.fetchStatistics();
     }
   }
 
@@ -63,7 +63,7 @@ export default class NodeTypesBarChart extends React.Component {
   }
 
   handleFetchStatisticsRetry = () => {
-    statisticsStore.fetchStatistics();
+    structureStore.fetchStatistics();
   }
 
   render(){
@@ -71,11 +71,11 @@ export default class NodeTypesBarChart extends React.Component {
     return (
       <div key={this.state.key} className={classes.container}>
         <h3>Top 10 unreleased instances by type</h3>
-        {!statisticsStore.fetchError?
-          !statisticsStore.isFetching?
-            statisticsStore.nodeTypeStatistics.length?
+        {!structureStore.fetchError?
+          !structureStore.isFetching?
+            structureStore.nodeTypeStatistics.length?
               <ResponsiveBar
-                data={statisticsStore.nodeTypeStatistics}
+                data={structureStore.nodeTypeStatistics}
                 keys={[
                   "released",
                   "unreleased"
@@ -149,7 +149,7 @@ export default class NodeTypesBarChart extends React.Component {
             </FetchingLoader>
           :
           <div className={classes.statisticsFetchErrorPanel}>
-            <div>{statisticsStore.fetchError}</div>
+            <div>{structureStore.fetchError}</div>
             <Button bsStyle="primary" onClick={this.handleFetchStatisticsRetry}>Retry</Button>
           </div>
         }

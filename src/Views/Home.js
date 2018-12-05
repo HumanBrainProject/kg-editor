@@ -8,8 +8,7 @@ import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
 import Features from "./Home/Features";
-import NodeTypesBarChart from "./Home/NodeTypesBarChart";
-import UsersPieChart from "./Home/UsersPieChart";
+import DatasetsStatistics from "./Home/DatasetsStatistics";
 import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
@@ -149,10 +148,7 @@ export default class Home extends React.Component{
               <Hub/>
             </div>
             <div className={classes.main}>
-              <div className="widget-list">
-                <NodeTypesBarChart />
-                <UsersPieChart />
-              </div>
+              <DatasetsStatistics />
               <InstancesHistory />
             </div>
             <div className={classes.features}>

@@ -8,6 +8,9 @@ import { ResponsiveBar } from "nivo";
 import statisticsStore from "../../Stores/StatisticsStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 
+// from https://github.com/plouc/nivo/blob/master/packages/core/src/lib/colors/index.js
+const palette = ["#e8c1a0", "#f47560", "#f1e15b", "#e8a838", "#61cdbb", "#97e3d5"];
+
 const styles = {
   container: {
     position: "relative",
@@ -171,8 +174,7 @@ export default class DatasetsStatistics extends React.Component {
                       }}
                       padding={0.3}
                       groupMode="grouped"
-                      colors="nivo"
-                      colorBy="id"
+                      colors={palette}
                       borderColor="inherit:darker(1.6)"
                       axisTop={null}
                       axisRight={null}
@@ -209,11 +211,6 @@ export default class DatasetsStatistics extends React.Component {
                           container: {
                             background: "var(--bg-color-ui-contrast1)"
                           }
-                        },
-                        legends: {
-                          container: {
-                            background: "var(--ft-color-normal)"
-                          }
                         }
                       }}
                       legends={[
@@ -229,6 +226,7 @@ export default class DatasetsStatistics extends React.Component {
                           "itemHeight": 20,
                           "itemDirection": "left-to-right",
                           "itemOpacity": 0.85,
+                          "itemTextColor": "var(--ft-color-normal)",
                           "symbolSize": 20,
                           "effects": [
                             {

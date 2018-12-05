@@ -6,6 +6,7 @@ import { FormStore } from "hbp-quickfire";
 
 import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
+import statusStore from "./StatusStore";
 
 const nodeTypeMapping = {
   "Dataset":"https://schema.hbp.eu/minds/Dataset",
@@ -414,6 +415,8 @@ class InstanceStore {
       instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
       instance.hasSaveError = true;
       instance.isSaving = false;
+    } finally {
+      statusStore.flush();
     }
   }
 

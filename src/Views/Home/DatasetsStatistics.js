@@ -139,8 +139,8 @@ export default class DatasetsStatistics extends React.Component {
     return series.map(serie => {
       return {
         "period": serie.period,
-        "newly released datasets": serie.numberOfNewlyReleasedDatasets,
-        "newly created datasets": serie.numberOfNewlyCreatedDatasets
+        "newly created datasets": serie.numberOfNewlyCreatedDatasets,
+        "newly released datasets": serie.numberOfNewlyReleasedDatasets
       };
     });
   }
@@ -159,8 +159,8 @@ export default class DatasetsStatistics extends React.Component {
                     <ResponsiveBar
                       data={this.getChartData(statisticsStore.statistics.PerWeekStatistics)}
                       keys={[
-                        "newly released datasets",
-                        "newly created datasets"
+                        "newly created datasets",
+                        "newly released datasets"
                       ]}
                       indexBy="period"
                       margin={{

@@ -40,7 +40,8 @@ const styles = {
     },
     "& .status": {
       marginRight: "10px",
-      opacity: 0.5
+      opacity: 0.5,
+      verticalAlign:"text-top"
     },
     "&.selected":{
       background:"var(--list-bg-selected)",
@@ -72,11 +73,12 @@ const styles = {
   nodeType: {
     display: "inline-block",
     opacity: "0.5",
-    paddingRight: "8px"
+    paddingRight: "8px",
+    verticalAlign: "text-bottom"
   },
   name: {
     display: "inline",
-    fontSize:"1.4em",
+    fontSize:"1.25em",
     fontWeight:"300",
     color:"var(--ft-color-louder)"
   },
@@ -84,7 +86,7 @@ const styles = {
     overflow:"hidden",
     whiteSpace:"nowrap",
     textOverflow:"ellipsis",
-    marginTop:"10px"
+    marginTop:"5px"
   },
   actions: {
     position:"absolute",

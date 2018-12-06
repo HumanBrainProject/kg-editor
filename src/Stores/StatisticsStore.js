@@ -1,23 +1,23 @@
-import { observable, action, runInAction, computed } from "mobx";
+import { observable, action, runInAction } from "mobx";
 import API from "../Services/API";
 
-class FeaturesStore{
+class StatisticsStore{
 
-  @observable releases = [];
+  @observable statistics = {};
   @observable isFetched = false;
   @observable isFetching = false;
   @observable fetchError = null;
 
   @action
-  async fetchFeatures() {
+  async fetchStatistics() {
     try {
       this.isFetching = true;
       this.fetchError = null;
-      const { data } = await API.axios.get(API.endpoints.features());
+      const { data } = await API.axios.get(API.endpoints.statistics());
       runInAction(() => {
         this.isFetched = true;
         this.isFetching = false;
-        this.releases = (data && data.data)?data.data:[];
+        this.statistics = data;
       });
     } catch (e) {
       runInAction(() => {
@@ -27,15 +27,6 @@ class FeaturesStore{
       });
     }
   }
-
-  @computed get latestReleases() {
-    return this.releases.slice(0, 3);
-  }
-
-  @computed get olderReleases() {
-    return this.releases.slice(3);
-  }
-
 }
 
-export default new FeaturesStore();
+export default new StatisticsStore();

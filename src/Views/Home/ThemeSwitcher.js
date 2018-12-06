@@ -8,13 +8,13 @@ import MultiToggle from "../../Components/MultiToggle";
 
 const styles = {
   container:{
-    textAlign:"center",
-    marginBottom:"10px"
+    textAlign:"center"/*,
+    marginBottom:"10px"*/
   },
   icon:{
     color:"var(--ft-color-normal)",
     fontSize:"3em",
-    marginBottom:"10px"
+    marginBottom:"3px"//"10px"
   }
 };
 
@@ -28,7 +28,7 @@ export default class ThemeSwitcher extends React.Component{
   render(){
     const { classes } = this.props;
     return(
-      <div className={`${classes.container}`}>
+      <div className={classes.container}>
         <div className={classes.icon}>
           <FontAwesomeIcon icon={appStore.currentTheme === "bright"? "sun": "moon"}/>
         </div>

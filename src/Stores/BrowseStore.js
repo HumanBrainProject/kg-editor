@@ -1,6 +1,6 @@
 import { observable, action, runInAction, computed } from "mobx";
 //import { debounce, uniqueId } from "lodash";
-import { isArray, debounce } from "lodash";
+import { debounce } from "lodash";
 
 import API from "../Services/API";
 import bookmarkStatusStore from "./BookmarkStatusStore";
@@ -8,7 +8,7 @@ import bookmarkStatusStore from "./BookmarkStatusStore";
 const bookmarkListType = "BOOKMARK";
 const nodetypeType = "NODETYPE";
 
-class SearchStore{
+class BrowseStore{
 
   @observable lists = [];
   @observable listsFilter = "";
@@ -195,13 +195,7 @@ class SearchStore{
           this.isCreatingBookmarkList = false;
           this.newBookmarkListName = null;
           if (instanceIds) {
-            if(!isArray(instanceIds)){
-              instanceIds = [instanceIds];
-            }
-            instanceIds.forEach(instanceId => {
-              const instance = bookmarkStatusStore.getInstance(instanceId);
-              instance && instance.data && instance.data.bookmarkLists && instance.data.bookmarkLists.indexOf(data.id) === -1 && instance.data.bookmarkLists.push(data.id);
-            });
+            bookmarkStatusStore.updateStatus(instanceIds, data.id, true);
           }
         });
       } catch(e){
@@ -330,4 +324,4 @@ class SearchStore{
   }
 }
 
-export default new SearchStore();
+export default new BrowseStore();

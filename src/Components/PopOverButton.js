@@ -12,7 +12,7 @@ let styles = {
   },
   button: {
     position: "relative",
-    width: "20px",
+    minWidth: "1.1em",
     margin: 0,
     padding: 0,
     border: 0,
@@ -124,6 +124,12 @@ export default class PopOverButton extends React.Component{
     event && event.stopPropagation();
     this.setState({showPopOver: false });
     typeof this.props.onOk === "function" && this.props.onOk();
+  }
+
+  componentWillUnmount() {
+    if (this.state.showPopOver) {
+      this.handlePopOverClose();
+    }
   }
 
   render(){

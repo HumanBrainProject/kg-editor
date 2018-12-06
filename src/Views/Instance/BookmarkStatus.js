@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { toJS } from "mobx";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 import bookmarkStatusStore from "../../Stores/BookmarkStatusStore";
 import BookmarkButton from "../../Components/BookmarkButton";
 import PopOverButton from "../../Components/PopOverButton";
@@ -19,7 +19,8 @@ let styles = {
     background:"var(--bg-color-ui-contrast2)",
     textAlign:"center",
     color:"var(--ft-color-loud)",
-    border:"1px solid var(--ft-color-loud)",
+    //border:"1px solid var(--ft-color-loud)",
+    minWidth: "1.4em",
     "& .svg-inline--fa":{
       fontSize:"0.8em",
       verticalAlign:"baseline"
@@ -64,7 +65,7 @@ export default class BookmarkStatus extends React.Component{
   }
 
   handleNewBookmark(name) { // , field, store) {
-    searchStore.createBookmarkList(name, this.props.id);
+    browseStore.createBookmarkList(name, this.props.id);
   }
 
   handleFetchRetry() {
@@ -83,7 +84,7 @@ export default class BookmarkStatus extends React.Component{
     const instanceStatus = bookmarkStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarkLists.length)?toJS(instanceStatus.data.bookmarkLists):[];
-    const bookmarkLists = toJS(searchStore.bookmarkLists);
+    const bookmarkLists = toJS(browseStore.bookmarkLists);
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?

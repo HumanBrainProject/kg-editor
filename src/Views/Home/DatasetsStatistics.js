@@ -15,6 +15,7 @@ const styles = {
   container: {
     position: "relative",
     width: "100%",
+    minHeight:"383px",
     padding: "15px",
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast1)",

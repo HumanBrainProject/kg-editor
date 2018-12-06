@@ -24,7 +24,6 @@ const styles = {
   panel: {
     display: "grid",
     width: "100%",
-    height: "100%",
     padding: "10px",
     gridGap: "10px",
     gridTemplateColumns: "calc(80% - 10px) 20%",
@@ -41,9 +40,9 @@ const styles = {
     },
     "& h1": {
       position: "absolute",
-      bottom: "0",
+      bottom: "10px",
       margin: "0",
-      fontSize: "6em"
+      fontSize: "4.5em"
     }
   },
   nav: {

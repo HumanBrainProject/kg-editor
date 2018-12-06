@@ -1,9 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
-import { uniqueId } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-const animationId = uniqueId("animationId");
 
 const styles = {
   panel: {
@@ -38,18 +35,6 @@ const styles = {
       }
     }
   },
-  icon: {
-    transformOrigin:"50% 44%",
-    animation: `${animationId} .7s infinite linear`
-  },
-  [`@keyframes ${animationId}`]: {
-    "from": {
-      transform: "scale(1) rotate(0deg)"
-    },
-    "to": {
-      transform: "scale(1) rotate(360deg)"
-    }
-  },
   label: {
     paddingLeft: "6px"
   }
@@ -64,7 +49,7 @@ export default class FetchingPanel extends React.Component{
     }
     return(
       <div className={classes.panel} inline={inline?"true":"false"}>
-        <FontAwesomeIcon className={classes.icon} icon="sync-alt"/>
+        <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
         <span className={classes.label}>Fetching instance...</span>
         <small>Nexus ID: {id}</small>
       </div>

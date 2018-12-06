@@ -417,7 +417,8 @@ class InstanceStore {
         instance.hasSaveError = false;
         instance.isSaving = false;
         console.debug("successfully saved", data);
-        const options = this.optionsCache.get(instance.path);
+        //We assume the options are already in cache :)
+        const options = this.optionsCache.cache.get(instance.path);
         if (options) {
           const option = options.find(o => o.id === instanceId);
           if (option) {

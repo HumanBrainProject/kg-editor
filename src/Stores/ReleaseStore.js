@@ -1,6 +1,7 @@
 import { observable, action, runInAction, computed } from "mobx";
 import API from "../Services/API";
 import statusStore from "./StatusStore";
+import historyStore from "./HistoryStore";
 import {uniq} from "lodash";
 
 export default class ReleaseStore{
@@ -149,6 +150,7 @@ export default class ReleaseStore{
         runInAction(()=>{
           this.savingLastEndedRequest = `(${node.type}) released successfully`;
           this.savingLastEndedNode = node;
+          historyStore.updateInstanceHistory(node["relativeUrl"], "released");
         });
       } catch(e){
         runInAction(()=>{
@@ -170,6 +172,7 @@ export default class ReleaseStore{
         runInAction(()=>{
           this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
           this.savingLastEndedNode = node;
+          historyStore.updateInstanceHistory(node["relativeUrl"], "released", true);
         });
       } catch(e){
         runInAction(()=>{

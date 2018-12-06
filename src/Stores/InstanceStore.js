@@ -1,9 +1,11 @@
 import {observable, action, runInAction, computed} from "mobx";
 import { uniqueId } from "lodash";
-import console from "../Services/Logger";
-import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
 
+import console from "../Services/Logger";
+import API from "../Services/API";
+
+import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
 
@@ -64,6 +66,12 @@ class InstanceStore {
     return nodeTypeMapping;
   }
 
+  get reverseNodeTypeMapping(){
+    return Object.entries(nodeTypeMapping).reduce((result, [label, type]) => {
+      result[type] = label;
+      return result;
+    }, {});
+  }
 
   getPromotedFields(instance) {
     if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
@@ -89,6 +97,7 @@ class InstanceStore {
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.setReadMode(readMode);
+    historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;
     } else {
@@ -382,6 +391,7 @@ class InstanceStore {
 
   @action
   async saveInstance(instanceId){
+    historyStore.updateInstanceHistory(instanceId, "edited");
     const instance = this.instances.get(instanceId);
     instance.cancelChangesPending = false;
     instance.hasSaveError = false;

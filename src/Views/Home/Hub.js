@@ -10,15 +10,27 @@ import ThemeSwitcher from "./ThemeSwitcher";
 
 const styles = {
   container:{
+    display: "flex",
+    position: "relative",
+    height: "100%"
   },
   action:{
+    alignSelf: "flex-end",
     textAlign:"center",
     padding:"10px",
-    borderBottom:"1px solid var(--border-color-ui-contrast1)",
     color:"var(--ft-color-normal)",
     cursor:"pointer",
     "&:hover":{
       color:"var(--ft-color-loud)"
+    },
+    "&:first-child": {
+      flex: 1
+    },
+    "&.statistics": {
+      paddingBottom: "13px",
+      "& $actionIcon": {
+        transform: "scale(1.35) translateY(-4px)"
+      }
     }
   },
   actionIcon:{
@@ -28,14 +40,6 @@ const styles = {
     fontSize:"0.9em",
     textTransform:"uppercase",
     fontWeight:"bold"
-  },
-  overlay:{
-    position:"absolute",
-    top:0,
-    left:0,
-    width:"100%",
-    height:"100%",
-    background:"rgba(255,255,255,0.75)"
   }
 };
 
@@ -59,27 +63,9 @@ export default class Hub extends React.Component{
   render(){
     const { classes } = this.props;
     return(
-      <div className={`${classes.container} widget`}>
-        <div className={classes.action} onClick={()=>routerStore.history.push("/browse")}>
-          <div className={classes.actionIcon}>
-            <FontAwesomeIcon icon={"search"}/>
-          </div>
-          <div className={classes.actionText}>
-            Browse instances
-          </div>
-        </div>
-
-
-        <div className={classes.action} onClick={this.handleCreateInstance}>
-          <div className={classes.actionIcon}>
-            <FontAwesomeIcon icon={browseStore.isFetching.lists?"circle-notch":"file"} spin={browseStore.isFetching.lists}/>
-          </div>
-          <div className={classes.actionText}>
-            New instance
-          </div>
-        </div>
-
-        <div className={classes.action} onClick={()=>routerStore.history.push("/kg-stats")}>
+      <div className={classes.container}>
+        <div className={classes.action}></div>
+        <div className={`${classes.action} statistics`} onClick={()=>routerStore.history.push("/kg-stats")}>
           <div className={classes.actionIcon}>
             <FontAwesomeIcon icon={"chart-bar"}/>
           </div>
@@ -87,16 +73,6 @@ export default class Hub extends React.Component{
             KG Statistics
           </div>
         </div>
-
-        <div className={classes.action} onClick={()=>routerStore.history.push("/help")}>
-          <div className={classes.actionIcon}>
-            <FontAwesomeIcon icon={"question-circle"}/>
-          </div>
-          <div className={classes.actionText}>
-            Help
-          </div>
-        </div>
-
         <div className={classes.action}>
           <ThemeSwitcher/>
         </div>

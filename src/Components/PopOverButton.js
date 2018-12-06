@@ -12,7 +12,7 @@ let styles = {
   },
   button: {
     position: "relative",
-    width: "20px",
+    minWidth: "1.1em",
     margin: 0,
     padding: 0,
     border: 0,

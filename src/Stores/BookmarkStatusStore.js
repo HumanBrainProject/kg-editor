@@ -1,8 +1,10 @@
 import { observable, action, runInAction } from "mobx";
 import { toJS } from "mobx";
 import { isArray, debounce } from "lodash";
+
 import console from "../Services/Logger";
 import API from "../Services/API";
+import historyStore from "./HistoryStore";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
@@ -92,6 +94,7 @@ class BookmarkStatusStore{
       if(this.statuses.has(id)){
         const status = this.statuses.get(id);
         if(status.hasChanged && !status.isSaving && !status.isFetching && !status.hasFetchError) {
+          historyStore.updateInstanceHistory(id, "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length);
           try {
             status.hasSaveError = false;
             status.isSaving = true;

@@ -152,7 +152,7 @@ export default class PopOverButton extends React.Component{
         >
           <Popover id={this.popOverId} className={classes.popOver}>
             <PopOverContent onSizeChange={this.handlePopOverPosition.bind(this)}>
-              <div className={classes.popOverContent} onClick={event => event.stopPropagation()}>
+              <div className={classes.popOverContent}>
                 {children}
               </div>
               {(CancelComponent || OkComponent) && (

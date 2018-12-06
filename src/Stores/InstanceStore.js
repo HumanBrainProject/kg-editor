@@ -10,6 +10,35 @@ import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 
+class OptionsCache{
+  @observable cache = new Map();
+  @observable promises = new Map();
+
+  get(path){
+    if(this.cache.has(path)){
+      return Promise.resolve(this.cache.get(path));
+    } else if(this.promises.has(path)){
+      return this.promises.get(path);
+    } else {
+      let promise = this.fetch(path);
+      this.promises.set(path, promise);
+      return this.promises.get(path);
+    }
+  }
+
+  async fetch(path){
+    try {
+      const { data } = await API.axios.get(API.endpoints.instances(path));
+      this.cache.set(path, (data && data.data)? data.data: []);
+      return this.cache.get(path);
+    } catch (e) {
+      const message = e.message?e.message:e;
+      this.cache.delete(path);
+      throw `Error while retrieving the list of ${path} (${message})`;
+    }
+  }
+}
+
 const nodeTypeMapping = {
   "Dataset":"https://schema.hbp.eu/minds/Dataset",
   "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
@@ -43,7 +72,6 @@ const nodeTypeMapping = {
 class InstanceStore {
   @observable instances = new Map();
   @observable openedInstances = new Map();
-  @observable optionsCache = new Map();
   @observable comparedInstanceId = null;
   @observable globalReadMode = true;
   @observable isCreatingNewInstance = false;
@@ -51,6 +79,8 @@ class InstanceStore {
   @observable showSaveBar = false;
 
   @observable showCreateModal = false;
+
+  optionsCache = new OptionsCache();
 
   generatedKeys = new WeakMap();
 
@@ -280,51 +310,31 @@ class InstanceStore {
       const { data } = await API.axios.get(API.endpoints.instanceData(path));
 
       runInAction(async () => {
-        const fieldsWithOptions = new Map();
         const instanceData = data.data?data.data:{fields: {}};
-        try {
-          for(let fieldKey in instanceData.fields){
-            const instancesPath = instanceData.fields[fieldKey].instancesPath;
-            if(instancesPath){
-              fieldsWithOptions.set(fieldKey, instancesPath);
-              if(!this.optionsCache.has(instancesPath)){
-                this.optionsCache.set(instancesPath, []);
-                try {
-                  const { data } = await API.axios.get(API.endpoints.instances(instancesPath));
-                  this.optionsCache.set(instancesPath, (data && data.data)? data.data: []);
-                } catch (e) {
-                  const label = data.fields[fieldKey].label?data.fields[fieldKey].label.toLowerCase():fieldKey;
-                  const message = e.message?e.message:e;
-                  this.optionsCache.delete(instancesPath);
-                  throw `Error while retrieving the list of ${label}${instancesPath} (${message})`;
-                }
-              }
-            }
-          }
-        } catch (e) {
-          instance.fetchError = e.message?e.message:e;
-          instance.hasFetchError = true;
-          instance.isFetched = false;
-          instance.isFetching = false;
-        }
 
         instance.data = instanceData;
         instance.form = new FormStore(instanceData);
-
         const fields = instance.form.getField();
-        Object.entries(fields).forEach(([fieldKey, field]) => {
-          if(fieldsWithOptions.has(fieldKey)){
-            field.options = this.optionsCache.get(fieldsWithOptions.get(fieldKey));
-            field.injectValue();
+
+        let optionsPromises = [];
+
+        Object.entries(fields).forEach(([, field]) => {
+          let path = field.instancesPath;
+          if(path){
+            optionsPromises.push(this.optionsCache.get(path).then(
+              (options) => {
+                field.updateOptions(options);
+              }
+            ));
           }
         });
 
-        instance.isFetching = false;
-        instance.isFetched = true;
-
-        this.memorizeInstanceInitialValues(instanceId);
-
-        instance.form.toggleReadMode(this.globalReadMode);
+        Promise.all(optionsPromises).then(() => {
+          instance.isFetching = false;
+          instance.isFetched = true;
+          this.memorizeInstanceInitialValues(instanceId);
+          instance.form.toggleReadMode(this.globalReadMode);
+        });
       });
     } catch (e) {
       const message = e.message?e.message:e;

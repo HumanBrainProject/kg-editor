@@ -44,10 +44,31 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)"
   },
-  stats: {
-    marginTop: "15px",
-    alignSelf: "flex-end",
-    "& table": {
+  tables: {
+    display: "flex",
+    "& table.legend": {
+      marginTop: "15px",
+      marginLeft: "5px",
+      borderCollapse: "separate",
+      borderSpacing: "10px 0",
+      "& td:first-child": {
+        "& div": {
+          height: "1em",
+          width: "1.5em",
+          border: "1px solid var(--ft-color-normal)"
+        }
+      },
+      "& td:last-child": {
+        width: "100%",
+        textAlign: "left",
+        whiteSpace: "nowrap"
+      }
+    },
+    "& .spacer": {
+      flex: 1
+    },
+    "& table.stats": {
+      marginTop: "15px",
       borderCollapse: "separate",
       borderSpacing: "10px 0",
       "& td:first-child": {
@@ -56,6 +77,16 @@ const styles = {
       "& td:last-child": {
         fontSize: "1.4em",
         textAlign: "right"
+      }
+    },
+    "@media screen and (min-width:1200px)": {
+      flexDirection: "column",
+      "& table.legend": {
+        marginTop: 0,
+        marginLeft: 0
+      },
+      "& table.stats": {
+        marginTop: 0
       }
     }
   },
@@ -73,6 +104,18 @@ const styles = {
   noStatisticsPanel:{
     extend:"statisticsFetchErrorPanel",
     color:"var(--ft-color-loud)"
+  },
+  warning: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: "90%",
+    transform: "translate(-50%, -50%)",
+    wordBreak: "keep-all",
+    fontSize: "3em",
+    fontWeight: "bold",
+    textAlign: "center",
+    textTransform: "uppercase"
   }
 };
 
@@ -168,7 +211,7 @@ export default class DatasetsStatistics extends React.Component {
                       indexBy="period"
                       margin={{
                         "top": 0,
-                        "right": 10,
+                        "right": 0,
                         "bottom": 32,
                         "left": 60
                       }}
@@ -244,8 +287,21 @@ export default class DatasetsStatistics extends React.Component {
                     <div className={classes.noChartData}>No chart data available.</div>
                   }
                 </div>
-                <div className={classes.stats}>
-                  <table>
+                <div className={classes.tables}>
+                  <table className="legend">
+                    <tbody>
+                      <tr>
+                        <td><div style={{background: palette[0]}}></div></td>
+                        <td>Newly created datasets</td>
+                      </tr>
+                      <tr>
+                        <td><div style={{background: palette[1]}}></div></td>
+                        <td>Newly released datasets</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div className="spacer"></div>
+                  <table className="stats">
                     <tbody>
                       <tr>
                         <td>Total datasets:</td>
@@ -262,6 +318,7 @@ export default class DatasetsStatistics extends React.Component {
                     </tbody>
                   </table>
                 </div>
+                <div className={classes.warning}>FAKE DATA - FOR DEMONSTRATION PURPOSES ONLY</div>
               </div>
               :
               <div className={classes.noStatisticsPanel}>

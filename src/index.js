@@ -153,7 +153,7 @@ const styles = {
     width: "100%",
     height: "100%",
     zIndex: 10000,
-    "& [class*=fetchingPanel]": {
+    "& .fetchingPanel": {
       width: "auto",
       padding: "30px",
       border: "1px solid var(--border-color-ui-contrast1)",

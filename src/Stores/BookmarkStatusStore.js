@@ -1,8 +1,10 @@
 import { observable, action, runInAction } from "mobx";
 import { toJS } from "mobx";
 import { isArray, debounce } from "lodash";
+
 import console from "../Services/Logger";
 import API from "../Services/API";
+import historyStore from "./HistoryStore";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
@@ -41,7 +43,7 @@ class BookmarkStatusStore{
   }
 
   @action
-  updateStatus(instanceIds, bookmarkLists){
+  updateStatus(instanceIds, bookmarkLists, appendMode){
     if(!isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
@@ -52,9 +54,31 @@ class BookmarkStatusStore{
           if (!status.data) {
             status.data = {id: id, bookmarkLists: []};
           }
-          status.hasChanged = true;
-          status.previousBookmarkLists = toJS(status.data.bookmarkLists);
-          status.data.bookmarkLists = bookmarkLists||[];
+          if(!isArray(bookmarkLists)){
+            bookmarkLists = bookmarkLists?[bookmarkLists]:[];
+          }
+          if (appendMode) {
+            if (bookmarkLists.length) {
+              let hasChanged = false;
+              const previousBookmarkLists = (status.previousBookmarkLists && status.previousBookmarkLists.length)?status.previousBookmarkLists:toJS(status.data.bookmarkLists);
+              bookmarkLists.forEach(bookmarkId => {
+                if (status.data.bookmarkLists.indexOf(bookmarkId) === -1) {
+                  hasChanged = true;
+                  status.data.bookmarkLists.push(bookmarkId);
+                }
+              });
+              if (hasChanged) {
+                status.hasChanged = true;
+                status.previousBookmarkLists = previousBookmarkLists;
+              }
+            }
+          } else {
+            status.hasChanged = true;
+            if (!status.previousBookmarkLists || !status.previousBookmarkLists.length) {
+              status.previousBookmarkLists = toJS(status.data.bookmarkLists);
+            }
+            status.data.bookmarkLists = bookmarkLists||[];
+          }
         }
       }
     });
@@ -70,6 +94,7 @@ class BookmarkStatusStore{
       if(this.statuses.has(id)){
         const status = this.statuses.get(id);
         if(status.hasChanged && !status.isSaving && !status.isFetching && !status.hasFetchError) {
+          historyStore.updateInstanceHistory(id, "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length);
           try {
             status.hasSaveError = false;
             status.isSaving = true;

@@ -15,7 +15,7 @@ export default class HelpView extends React.Component{
       <div className={classes.container}>
         <h1>Frequently asked questions</h1>
         <p>This section needs you.</p>
-        <p>You have a question or a suggestion for a useful information to mention about a feature of this application? Please contact us by email at : kg-team@humanbrainproject.eu</p>
+        <p>Do you have a question or a suggestion for a useful information to mention about a feature of this application? Please contact us by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, Link } from "react-router-dom";
+import { Route, Switch, NavLink, Redirect } from "react-router-dom";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -47,7 +47,10 @@ const styles = {
         margin:"10px 0 10px 20px",
         "& a":{
           fontSize:"1.2em",
-          color:"var(--ft-color-loud)",
+          color:"var(--ft-color-normal)",
+          "&.active":{
+            color:"var(--ft-color-louder)"
+          },
           "& .svg-inline--fa":{
             marginRight:"10px"
           }
@@ -67,8 +70,8 @@ const styles = {
       border:"5px solid #ccc",
       display:"block",
       borderRadius:"4px",
-      margin:"20px auto",
-      maxWidth:"80%"
+      margin:"20px 0",
+      maxWidth:"800px"
     },
     "& p":{
       margin:"10px 0"
@@ -85,39 +88,40 @@ export default class Instances extends React.Component{
       <div className={classes.container}>
         <div className={classes.navigation}>
           <ul>
-            <li><Link to={`${path}/introduction`}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</Link></li>
+            <li><NavLink to={`${path}/introduction`}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</NavLink></li>
             <li>
-              <Link to={`${path}/browse`}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</Link>
+              <NavLink to={`${path}/browse`}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
               <ul>
-                <li><Link to={`${path}/browse/nodetypes`}><FontAwesomeIcon fixedWidth icon="code-branch" transform={"flip-h rotate--90"}/>Nodetypes</Link></li>
-                <li><Link to={`${path}/browse/bookmarks`}><FontAwesomeIcon fixedWidth icon="star"/>Bookmarks</Link></li>
+                <li><NavLink to={`${path}/browse/nodetypes`}><FontAwesomeIcon fixedWidth icon="code-branch" transform={"flip-h rotate--90"}/>Nodetypes</NavLink></li>
+                <li><NavLink to={`${path}/browse/bookmarks`}><FontAwesomeIcon fixedWidth icon="star"/>Bookmarks</NavLink></li>
               </ul>
             </li>
-            <li><Link to={`${path}/create`}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</Link></li>
+            <li><NavLink to={`${path}/create`}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
             <li>
-              <Link to={`${path}/instance`}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</Link>
+              <NavLink to={`${path}/instance`}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</NavLink>
               <ul>
-                <li><Link to={`${path}/instance/view`}><FontAwesomeIcon fixedWidth icon="eye"/>View</Link></li>
+                <li><NavLink to={`${path}/instance/view`}><FontAwesomeIcon fixedWidth icon="eye"/>View</NavLink></li>
                 <li>
-                  <Link to={`${path}/instance/edit`}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</Link>
+                  <NavLink to={`${path}/instance/edit`}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</NavLink>
                   <ul>
-                    <li><Link to={`${path}/instance/edit/save`}><FontAwesomeIcon fixedWidth icon="save"/>Save</Link></li>
+                    <li><NavLink to={`${path}/instance/edit/save`}><FontAwesomeIcon fixedWidth icon="save"/>Save</NavLink></li>
                   </ul>
                 </li>
-                <li><Link to={`${path}/instance/graph`}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</Link></li>
-                <li><Link to={`${path}/instance/release`}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</Link></li>
+                <li><NavLink to={`${path}/instance/graph`}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</NavLink></li>
+                <li><NavLink to={`${path}/instance/release`}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</NavLink></li>
               </ul>
             </li>
-            <li><Link to={`${path}/statistics`}><FontAwesomeIcon fixedWidth icon="chart-bar"/>Statistics</Link></li>
-            <li><Link to={`${path}/settings`}><FontAwesomeIcon fixedWidth icon="cog"/>Settings</Link></li>
-            <li><Link to={`${path}/faq`}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</Link></li>
-            <li><Link to={`${path}/contact`}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</Link></li>
+            {/*<li><NavLink to={`${path}/statistics`}><FontAwesomeIcon fixedWidth icon="chart-bar"/>Statistics</NavLink></li>*/}
+            {/*<li><NavLink to={`${path}/settings`}><FontAwesomeIcon fixedWidth icon="cog"/>Settings</NavLink></li>*/}
+            <li><NavLink to={`${path}/faq`}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</NavLink></li>
+            <li><NavLink to={`${path}/contact`}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</NavLink></li>
           </ul>
         </div>
         <div className={classes.content}>
           <Scrollbars autoHide>
             <div className={classes.contentInner}>
               <Switch>
+                <Route exact path={`${path}`} render={()=><Redirect to={`${path}/introduction`}/>}/>
                 <Route path={`${path}/introduction`} exact={true} component={Introduction}/>
 
                 <Route path={`${path}/browse`} exact={true} component={Browse}/>
@@ -137,6 +141,7 @@ export default class Instances extends React.Component{
                 <Route path={`${path}/settings`} exact={true} component={Settings}/>
                 <Route path={`${path}/faq`} exact={true} component={FAQ}/>
                 <Route path={`${path}/contact`} exact={true} component={ContactTheSupport}/>
+
               </Switch>
             </div>
           </Scrollbars>

@@ -15,8 +15,6 @@ export default class HelpView extends React.Component{
       <div className={classes.container}>
         <h1>Browse by node type</h1>
 
-        <h2>Node types</h2>
-        <p>A node type is the type of an instance.</p>
         <p>In the search screen, you can browse the Knowledge Graph instances by node types. All of them are regrouped in two folders. </p>
 
         <h3>Common node types</h3>
@@ -32,7 +30,7 @@ export default class HelpView extends React.Component{
         </p>
 
         <h3>Create a new instance of a node type</h3>
-        <p>This screen lets you create an instance of a node type. When you hover a node type in the lists, a “+” button will appear. Click on it, and it will create a new instance of that datatype and open it in edit mode (See the “Open an instance” section for information about the different modes of opening instances).</p>
+        <p>This screen also lets you create an instance of a node type. When you hover a node type in the lists, a “+” button will appear. Click on it, and it will create a new instance of that datatype and open it in edit mode (See the “Open an instance” section for information about the different modes of opening instances).</p>
 
         <h2>Instances list</h2>
         <p>When you select a node type, it will show the list of corresponding instances. Scroll down this panel to load more items to the list.</p>

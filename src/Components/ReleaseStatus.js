@@ -1,6 +1,8 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { uniqueId } from "lodash";
 
 const styles = {
   status:{
@@ -52,6 +54,11 @@ const styles = {
 
 @injectStyles(styles)
 export default class ReleaseStatus extends React.Component{
+  constructor(props){
+    super(props);
+    this.tooltipId = uniqueId("release-tooltip");
+  }
+
   render(){
     const {classes, instanceStatus, childrenStatus} = this.props;
 
@@ -68,32 +75,49 @@ export default class ReleaseStatus extends React.Component{
         :"released";
 
     return(
-      <div className={`${classes.status} ${globalStatusClass} ${this.props.darkmode? "darkmode": ""}`}>
-        <div className={`${classes.instanceStatus} ${instanceStatusClass}`}>
-          {instanceStatus === "NOT_RELEASED"?
-            <FontAwesomeIcon icon="unlink"/>
-            :instanceStatus === "HAS_CHANGED"?
-              <FontAwesomeIcon icon="pencil-alt"/>
-              :instanceStatus === "RELEASED"?
-                <FontAwesomeIcon icon="check"/>
-                :
-                <strong>?</strong>
-          }
-        </div>
-        {childrenStatus !== null &&
-          <div className={`${classes.childrenStatus} ${childrenStatusClass}`}>
-            {childrenStatus === "NOT_RELEASED"?
+      <OverlayTrigger placement="top" overlay={
+        <Tooltip id={this.tooltipId}>
+          <div>
+            {instanceStatus === "NOT_RELEASED"?<span>This instance is <strong>not released</strong>.</span>:
+              instanceStatus === "HAS_CHANGED"?<span>This instance is <strong>different</strong> than its released version</span>:
+                <span>This instance is <strong>released</strong></span>}
+          </div>
+          {childrenStatus?
+            <div>
+              {childrenStatus === "NOT_RELEASED"?<span>At least one of this instance children is <strong>not released</strong></span>:
+                childrenStatus === "HAS_CHANGED"?<span>At least one of this instance is <strong>different</strong> than its released version</span>:
+                  <span>All of this instance children are <strong>released</strong></span>}
+            </div>
+            :null}
+        </Tooltip>
+      }>
+        <div className={`${classes.status} ${globalStatusClass} ${this.props.darkmode? "darkmode": ""}`}>
+          <div className={`${classes.instanceStatus} ${instanceStatusClass}`}>
+            {instanceStatus === "NOT_RELEASED"?
               <FontAwesomeIcon icon="unlink"/>
-              :childrenStatus === "HAS_CHANGED"?
+              :instanceStatus === "HAS_CHANGED"?
                 <FontAwesomeIcon icon="pencil-alt"/>
-                :childrenStatus === "RELEASED"?
+                :instanceStatus === "RELEASED"?
                   <FontAwesomeIcon icon="check"/>
                   :
                   <strong>?</strong>
             }
           </div>
-        }
-      </div>
+          {childrenStatus !== null &&
+            <div className={`${classes.childrenStatus} ${childrenStatusClass}`}>
+              {childrenStatus === "NOT_RELEASED"?
+                <FontAwesomeIcon icon="unlink"/>
+                :childrenStatus === "HAS_CHANGED"?
+                  <FontAwesomeIcon icon="pencil-alt"/>
+                  :childrenStatus === "RELEASED"?
+                    <FontAwesomeIcon icon="check"/>
+                    :
+                    <strong>?</strong>
+              }
+            </div>
+          }
+        </div>
+      </OverlayTrigger>
     );
   }
 }

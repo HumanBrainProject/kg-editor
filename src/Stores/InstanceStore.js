@@ -1,46 +1,86 @@
 import {observable, action, runInAction, computed} from "mobx";
 import { uniqueId } from "lodash";
-import console from "../Services/Logger";
-import API from "../Services/API";
 import { FormStore } from "hbp-quickfire";
 
+import console from "../Services/Logger";
+import API from "../Services/API";
+
+import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
 import authStore from "./AuthStore";
+import statusStore from "./StatusStore";
+
+class OptionsCache{
+  @observable cache = new Map();
+  @observable promises = new Map();
+
+  get(path){
+    if(this.cache.has(path)){
+      return Promise.resolve(this.cache.get(path));
+    } else if(this.promises.has(path)){
+      return this.promises.get(path);
+    } else {
+      let promise = this.fetch(path);
+      this.promises.set(path, promise);
+      return this.promises.get(path);
+    }
+  }
+
+  async fetch(path){
+    try {
+      const { data } = await API.axios.get(API.endpoints.instances(path));
+      this.cache.set(path, (data && data.data)? data.data: []);
+      return this.cache.get(path);
+    } catch (e) {
+      const message = e.message?e.message:e;
+      this.cache.delete(path);
+      throw `Error while retrieving the list of ${path} (${message})`;
+    }
+  }
+}
 
 const nodeTypeMapping = {
-  "Dataset":"http://hbp.eu/minds#Dataset",
-  "Specimen group":"http://hbp.eu/minds#SpecimenGroup",
-  "Subject":"http://hbp.eu/minds#ExperimentSubject",
-  "Activity":"http://hbp.eu/minds#Activity",
-  "Person":"http://hbp.eu/minds#Person",
-  "PLA Component":"http://hbp.eu/minds#PLAComponent",
-  "Publication":"http://hbp.eu/minds#Publication",
-  "File Association":"http://hbp.eu/minds#FileAssociation",
-  "DOI":"http://hbp.eu/minds#DatasetDOI",
-  "Method":"http://hbp.eu/minds#ExperimentMethod",
-  "Reference space":"http://hbp.eu/minds#ReferenceSpace",
-  "Parcellation Region":"http://hbp.eu/minds#ParcellationRegion",
-  "Parcellation Atlas":"http://hbp.eu/minds#ParcellationAtlas",
-  "Embargo Status":"http://hbp.eu/minds#EmbargoStatus",
-  "Approval":"http://hbp.eu/minds#EthicsApproval",
-  "Protocol":"http://hbp.eu/minds#ExperimentProtocol",
-  "Preparation":"http://hbp.eu/minds#Preparation",
-  "Authority":"http://hbp.eu/minds#EthicsAuthority",
-  "Format":"http://hbp.eu/minds#Format",
-  "License Type":"http://hbp.eu/minds#LicenseInformation",
-  "Sample":"http://hbp.eu/minds#ExperimentSample",
-  "File":"http://hbp.eu/minds#File"
+  "Dataset":"https://schema.hbp.eu/minds/Dataset",
+  "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
+  "Subject":"https://schema.hbp.eu/minds/Subject",
+  "Activity":"https://schema.hbp.eu/minds/Activity",
+  "Person":"https://schema.hbp.eu/minds/Person",
+  "PLA Component":"https://schema.hbp.eu/minds/Placomponent",
+  "Publication":"https://schema.hbp.eu/minds/Publication",
+  "File Association":"https://schema.hbp.eu/minds/FileAssociation",
+  "DOI":"https://schema.hbp.eu/minds/DatasetDOI",
+  "Method":"https://schema.hbp.eu/minds/Method",
+  "Reference space":"https://schema.hbp.eu/minds/Referencespace",
+  "Parcellation Region":"https://schema.hbp.eu/minds/Parcellationregion",
+  "Parcellation Atlas":"https://schema.hbp.eu/minds/Parcellationatlas",
+  "Embargo Status":"https://schema.hbp.eu/minds/Embargostatus",
+  "Approval":"https://schema.hbp.eu/minds/Approval",
+  "Protocol":"https://schema.hbp.eu/minds/Protocol",
+  "Preparation":"https://schema.hbp.eu/minds/Preparation",
+  "Authority":"https://schema.hbp.eu/minds/Authority",
+  "Format":"https://schema.hbp.eu/minds/Format",
+  "License Type":"https://schema.hbp.eu/minds/Licensetype",
+  "Sample":"https://schema.hbp.eu/minds/ExperimentSample",
+  "File":"https://schema.hbp.eu/minds/File",
+  "Software agent":"https://schema.hbp.eu/minds/Softwareagent",
+  "Age category":"https://schema.hbp.eu/minds/Agecategory",
+  "Sex":"https://schema.hbp.eu/minds/Sex",
+  "Species":"https://schema.hbp.eu/minds/Species",
+  "Role":"https://schema.hbp.eu/minds/Role"
 };
 
 class InstanceStore {
   @observable instances = new Map();
   @observable openedInstances = new Map();
-  @observable optionsCache = new Map();
   @observable comparedInstanceId = null;
   @observable globalReadMode = true;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
+
+  @observable showCreateModal = false;
+
+  optionsCache = new OptionsCache();
 
   generatedKeys = new WeakMap();
 
@@ -57,6 +97,12 @@ class InstanceStore {
     return nodeTypeMapping;
   }
 
+  get reverseNodeTypeMapping(){
+    return Object.entries(nodeTypeMapping).reduce((result, [label, type]) => {
+      result[type] = label;
+      return result;
+    }, {});
+  }
 
   getPromotedFields(instance) {
     if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
@@ -82,6 +128,7 @@ class InstanceStore {
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.setReadMode(readMode);
+    historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;
     } else {
@@ -117,6 +164,11 @@ class InstanceStore {
   }
 
   @action
+  flushOpenedTabs(){
+    localStorage.removeItem("openedTabs");
+  }
+
+  @action
   getInstance(instanceId, forceFetch = false){
     if (!this.instances.has(instanceId) || forceFetch) {
       this.fetchInstanceData(instanceId);
@@ -135,7 +187,7 @@ class InstanceStore {
     try{
       const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
       this.isCreatingNewInstance = false;
-      return data.id;
+      return data.data.id;
     } catch(e){
       this.isCreatingNewInstance = false;
       this.instanceCreationError = e.message;
@@ -154,6 +206,26 @@ class InstanceStore {
       return newInstanceId;
     } catch(e){
       return false;
+    }
+  }
+
+  @action
+  async duplicateInstance(fromInstanceId){
+    let instanceToCopy = this.getInstance(fromInstanceId);
+    let path = instanceToCopy.path;
+    let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
+    delete values.id;
+    if(values["http://schema.org/name"]){
+      values["http://schema.org/name"] = values["http://schema.org/name"]+" (Copy)";
+    }
+    this.isCreatingNewInstance = path;
+    try{
+      const { data } = await API.axios.post(API.endpoints.instanceData(path), values);
+      this.isCreatingNewInstance = false;
+      return data.data.id;
+    } catch(e){
+      this.isCreatingNewInstance = false;
+      this.instanceCreationError = e.message;
     }
   }
 
@@ -238,50 +310,31 @@ class InstanceStore {
       const { data } = await API.axios.get(API.endpoints.instanceData(path));
 
       runInAction(async () => {
-        const fieldsWithOptions = new Map();
-        try {
-          for(let fieldKey in data.fields){
-            const instancesPath = data.fields[fieldKey].instancesPath;
-            if(instancesPath){
-              fieldsWithOptions.set(fieldKey, instancesPath);
-              if(!this.optionsCache.has(instancesPath)){
-                this.optionsCache.set(instancesPath, []);
-                try {
-                  const { data } = await API.axios.get(API.endpoints.instances(instancesPath));
-                  this.optionsCache.set(instancesPath, (data && data.data)? data.data: []);
-                } catch (e) {
-                  const label = data.fields[fieldKey].label?data.fields[fieldKey].label.toLowerCase():fieldKey;
-                  const message = e.message?e.message:e;
-                  this.optionsCache.delete(instancesPath);
-                  throw `Error while retrieving the list of ${label}${instancesPath} (${message})`;
-                }
-              }
-            }
-          }
-        } catch (e) {
-          instance.fetchError = e.message?e.message:e;
-          instance.hasFetchError = true;
-          instance.isFetched = false;
-          instance.isFetching = false;
-        }
+        const instanceData = data.data?data.data:{fields: {}};
 
-        instance.data = data;
-        instance.form = new FormStore(data);
-
+        instance.data = instanceData;
+        instance.form = new FormStore(instanceData);
         const fields = instance.form.getField();
-        Object.entries(fields).forEach(([fieldKey, field]) => {
-          if(fieldsWithOptions.has(fieldKey)){
-            field.options = this.optionsCache.get(fieldsWithOptions.get(fieldKey));
-            field.injectValue();
+
+        let optionsPromises = [];
+
+        Object.entries(fields).forEach(([, field]) => {
+          let path = field.instancesPath;
+          if(path){
+            optionsPromises.push(this.optionsCache.get(path).then(
+              (options) => {
+                field.updateOptions(options);
+              }
+            ));
           }
         });
 
-        instance.isFetching = false;
-        instance.isFetched = true;
-
-        this.memorizeInstanceInitialValues(instanceId);
-
-        instance.form.toggleReadMode(this.globalReadMode);
+        Promise.all(optionsPromises).then(() => {
+          instance.isFetching = false;
+          instance.isFetched = true;
+          this.memorizeInstanceInitialValues(instanceId);
+          instance.form.toggleReadMode(this.globalReadMode);
+        });
       });
     } catch (e) {
       const message = e.message?e.message:e;
@@ -349,6 +402,7 @@ class InstanceStore {
 
   @action
   async saveInstance(instanceId){
+    historyStore.updateInstanceHistory(instanceId, "edited");
     const instance = this.instances.get(instanceId);
     instance.cancelChangesPending = false;
     instance.hasSaveError = false;
@@ -363,7 +417,8 @@ class InstanceStore {
         instance.hasSaveError = false;
         instance.isSaving = false;
         console.debug("successfully saved", data);
-        const options = this.optionsCache.get(instance.path);
+        //We assume the options are already in cache :)
+        const options = this.optionsCache.cache.get(instance.path);
         if (options) {
           const option = options.find(o => o.id === instanceId);
           if (option) {
@@ -381,6 +436,8 @@ class InstanceStore {
       instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
       instance.hasSaveError = true;
       instance.isSaving = false;
+    } finally {
+      statusStore.flush();
     }
   }
 
@@ -394,6 +451,11 @@ class InstanceStore {
   @action
   toggleSavebarDisplay(state){
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
+  }
+
+  @action
+  toggleShowCreateModal(state){
+    this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
 }
 

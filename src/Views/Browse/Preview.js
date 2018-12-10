@@ -6,17 +6,26 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import searchStore from "../../Stores/SearchStore";
+import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
+import BookmarkStatus from "../Instance/BookmarkStatus";
 
 const styles = {
   container:{
     padding:"10px"
+  },
+  content: {
+    "& .popover-popup": {
+      display: "none !important"
+    },
+    "&:hover .popover-popup": {
+      display: "block !important"
+    }
   },
   actions:{
     display:"grid",
@@ -43,10 +52,16 @@ const styles = {
     right:"10px",
     fontSize:"30px"
   },
+  bookmarkStatus: {
+    marginRight: "5px",
+    fontSize: "1em"
+  },
+  titlePanel:{
+    width:"calc(100% - 70px)"
+  },
   title:{
     fontSize:"1.5em",
-    fontWeight:"300",
-    width:"calc(100% - 70px)"
+    fontWeight:"300"
   },
   id:{
     fontSize:"0.75em",
@@ -57,6 +72,9 @@ const styles = {
   field:{
     marginBottom:"10px",
     wordBreak:"break-word"
+  },
+  duplicate:{
+    extend:"action"
   }
 };
 
@@ -74,19 +92,24 @@ export default class Preview extends React.Component{
 
   handleOpenInstance(mode, event){
     if(event.metaKey || event.ctrlKey){
-      instanceStore.openInstance(searchStore.selectedInstance.id, mode);
+      instanceStore.openInstance(browseStore.selectedInstance.id, mode);
     } else {
-      routerStore.history.push(`/instance/${mode}/${searchStore.selectedInstance.id}`);
+      routerStore.history.push(`/instance/${mode}/${browseStore.selectedInstance.id}`);
     }
   }
 
+  handleDuplicateInstance = async () => {
+    let newInstanceId = await instanceStore.duplicateInstance(browseStore.selectedInstance.id);
+    routerStore.history.push("/instance/edit/"+newInstanceId);
+  }
+
   handleRetry = () => {
-    instanceStore.fetchInstanceData(searchStore.selectedInstance.id);
+    instanceStore.fetchInstanceData(browseStore.selectedInstance.id);
   }
 
   render(){
     const { classes } = this.props;
-    let selectedInstance = instanceStore.getInstance(searchStore.selectedInstance.id);
+    let selectedInstance = instanceStore.getInstance(browseStore.selectedInstance.id);
 
     const promotedFields = instanceStore.getPromotedFields(selectedInstance);
     const nonPromotedFields = instanceStore.getNonPromotedFields(selectedInstance);
@@ -114,33 +137,40 @@ export default class Preview extends React.Component{
                     <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
                   </div>
                 </div>
-                <div className={classes.title}>
-                  {searchStore.selectedInstance.label}
+                <div className={classes.titlePanel}>
+                  <BookmarkStatus id={browseStore.selectedInstance.id} className={classes.bookmarkStatus} />
+                  <span className={classes.title}>
+                    {browseStore.selectedInstance.name}
+                  </span>
                 </div>
                 <div className={classes.id}>
-                  Nexus ID: {searchStore.selectedInstance.id}
+                  Nexus ID: {browseStore.selectedInstance.id}
                 </div>
-                <Form store={selectedInstance.form} key={searchStore.selectedInstance.id}>
+                <Form store={selectedInstance.form} key={browseStore.selectedInstance.id}>
                   {promotedFields.map(fieldKey => {
                     return(
-                      <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
                   })}
                   {nonPromotedFields.map(fieldKey => {
                     return(
-                      <div key={searchStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
                   })}
                   <div className={`${classes.status}`}>
                     <div className={"release-status"}>
-                      <Status id={searchStore.selectedInstance.id} darkmode={true}/>
+                      <Status darkmode={true} id={browseStore.selectedInstance.id} />
                     </div>
                   </div>
                 </Form>
+
+                <div className={classes.duplicate} onClick={this.handleDuplicateInstance}>
+                  <FontAwesomeIcon icon="copy"/>&nbsp;&nbsp;Duplicate this instance
+                </div>
               </div>
               :
               <BGMessage icon={"ban"}>

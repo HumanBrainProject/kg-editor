@@ -74,6 +74,9 @@ export default class Tab extends React.Component {
     if(this.props.path){
       routerStore.history.push(this.props.path);
     }
+    if(isFunction(this.props.onClick)){
+      this.props.onClick(e);
+    }
   }
 
   handleClose = (e) => {
@@ -84,15 +87,17 @@ export default class Tab extends React.Component {
   }
 
   render(){
-    const {classes, current, icon, onClose, iconColor, iconSpin} = this.props;
+    const {classes, current, icon, onClose, iconColor, iconSpin, hideLabel} = this.props;
     return (
       <div className={`${classes.container} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={this.handleClick}>
-        <div className={classes.icon} style={iconColor?{color:iconColor}:{}}>
-          {icon && <FontAwesomeIcon icon={icon} spin={iconSpin}/>}
+        <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={this.props.label}>
+          {icon && <FontAwesomeIcon fixedWidth icon={icon} spin={iconSpin}/>}
         </div>
-        <div className={classes.text} title={this.props.fullText}>
-          {this.props.children}
-        </div>
+        {hideLabel?null:
+          <div className={classes.text} title={this.props.label}>
+            {this.props.label}
+          </div>
+        }
         {onClose?
           <div className={classes.close} onClick={this.handleClose}>
             <FontAwesomeIcon icon={"times"}/>

@@ -7,29 +7,33 @@ import {find, remove, clone, pullAll, uniqueId, uniq, flatten} from "lodash";
 import palette from "google-palette";
 
 const nodeTypeWhitelist = [
-  "http://hbp.eu/minds#Dataset",
-  "http://hbp.eu/minds#SpecimenGroup",
-  "http://hbp.eu/minds#ExperimentSubject",
-  "http://hbp.eu/minds#Activity",
-  "http://hbp.eu/minds#Person",
-  "http://hbp.eu/minds#PLAComponent",
-  "http://hbp.eu/minds#Publication",
-  "http://hbp.eu/minds#FileAssociation",
-  "http://hbp.eu/minds#DatasetDOI",
-  "http://hbp.eu/minds#ExperimentMethod",
-  "http://hbp.eu/minds#ReferenceSpace",
-  "http://hbp.eu/minds#ParcellationRegion",
-  "http://hbp.eu/minds#ParcellationAtlas",
-  "http://hbp.eu/minds#EmbargoStatus",
-  "http://hbp.eu/minds#EthicsApproval",
-  "http://hbp.eu/minds#ExperimentProtocol",
-  "http://hbp.eu/minds#Preparation",
-  "http://hbp.eu/minds#EthicsAuthority",
-  "http://hbp.eu/minds#Format",
-  "http://hbp.eu/minds#LicenseInformation",
-  "http://hbp.eu/minds#ExperimentSample",
-  "http://hbp.eu/minds#File",
-  "http://hbp.eu/minds#Subject"
+  "https://schema.hbp.eu/minds/Dataset",
+  "https://schema.hbp.eu/minds/Specimengroup",
+  "https://schema.hbp.eu/minds/Subject",
+  "https://schema.hbp.eu/minds/Activity",
+  "https://schema.hbp.eu/minds/Person",
+  "https://schema.hbp.eu/minds/Placomponent",
+  "https://schema.hbp.eu/minds/Publication",
+  "https://schema.hbp.eu/minds/FileAssociation",
+  "https://schema.hbp.eu/minds/DatasetDOI",
+  "https://schema.hbp.eu/minds/Method",
+  "https://schema.hbp.eu/minds/Referencespace",
+  "https://schema.hbp.eu/minds/Parcellationregion",
+  "https://schema.hbp.eu/minds/Parcellationatlas",
+  "https://schema.hbp.eu/minds/Embargostatus",
+  "https://schema.hbp.eu/minds/Approval",
+  "https://schema.hbp.eu/minds/Protocol",
+  "https://schema.hbp.eu/minds/Preparation",
+  "https://schema.hbp.eu/minds/Authority",
+  "https://schema.hbp.eu/minds/Format",
+  "https://schema.hbp.eu/minds/Licensetype",
+  "https://schema.hbp.eu/minds/Sample",
+  "https://schema.hbp.eu/minds/File",
+  "https://schema.hbp.eu/minds/Softwareagent",
+  "https://schema.hbp.eu/minds/Agecategory",
+  "https://schema.hbp.eu/minds/Sex",
+  "https://schema.hbp.eu/minds/Species",
+  "https://schema.hbp.eu/minds/Role"
 ];
 
 const colorScheme = {};
@@ -38,7 +42,6 @@ let colorTable = palette("mpn65", nodeTypeWhitelist.length).map(color => "#"+col
 nodeTypeWhitelist.forEach((type, index) => {colorScheme[type] = colorTable[index];});
 
 class GraphStore {
-  @observable step = 2;
   @observable sidePanel = false;
   @observable typeStates = null;
   @observable expandedTypes = [];
@@ -97,7 +100,7 @@ class GraphStore {
     this.isFetched = false;
     this.isFetching = true;
     try {
-      const { data } = await API.axios.get(API.endpoints.graph(id, this.step));
+      const { data } = await API.axios.get(API.endpoints.graph(id));
       runInAction( ()=>{
         this.mainId = id;
         this.originalData = data;
@@ -134,13 +137,8 @@ class GraphStore {
       link.target = find(this.originalData.nodes, node => node.id === link.target);
     });
     this.originalData.nodes.forEach(node => {
-      node.niceDataType = node.dataType.replace("http://hbp.eu/minds#","");
+      node.niceDataType = node.dataType.replace("https://schema.hbp.eu/minds/","");
       node.isMainNode = node.id.includes(this.mainId);
-
-      console.log(this.mainId);
-      if(node.isMainNode){
-        console.log(this.mainId);
-      }
     });
 
     this.groupNodes = new Map();
@@ -157,7 +155,7 @@ class GraphStore {
         id:"Group_"+nodeType,
         dataType:"Group_"+nodeType,
         name:"Group_"+nodeType,
-        title:"Group of "+nodeType.replace("http://hbp.eu/minds#","")+" ("+nodesOfType.length+")",
+        title:"Group of "+nodeType.replace("https://schema.hbp.eu/minds/","")+" ("+nodesOfType.length+")",
         original_dataType:nodeType,
         isGroup:true,
         groupSize: nodesOfType.length
@@ -222,10 +220,6 @@ class GraphStore {
     if(clickedNode.isGroup){
       this.typeStates.set(clickedNode.original_dataType, "show");
     }
-  }
-
-  @action setStep(step){
-    this.step = step;
   }
 
   @action toggleSettingsPanel(state){

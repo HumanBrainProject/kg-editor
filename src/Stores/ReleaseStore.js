@@ -1,6 +1,8 @@
-import { observable, action, runInAction, computed, toJS } from "mobx";
+import { observable, action, runInAction, computed } from "mobx";
 import API from "../Services/API";
 import statusStore from "./StatusStore";
+import historyStore from "./HistoryStore";
+import {uniq} from "lodash";
 
 export default class ReleaseStore{
   @observable topInstanceId = null;
@@ -9,11 +11,18 @@ export default class ReleaseStore{
   @observable isFetching = false;
   @observable isFetched = false;
   @observable isSaving = false;
+  @observable savingTotal = 0;
+  @observable savingProgress = 0;
+  @observable savingErrors = [];
+  @observable savingLastEndedNode = null;
+  @observable savingLastEndedRequest = "";
 
   @observable fetchError = null;
   @observable saveError = null;
 
   @observable hlNode = null;
+
+  @observable nodesMap = null;
 
   constructor(instanceId){
     this.topInstanceId = instanceId;
@@ -81,6 +90,8 @@ export default class ReleaseStore{
     };
 
     rseek(this.instancesTree);
+    nodesByStatus.RELEASED = uniq(nodesByStatus.RELEASED);
+    nodesByStatus.NOT_RELEASED = uniq(nodesByStatus.NOT_RELEASED);
     return nodesByStatus;
   }
 
@@ -88,9 +99,11 @@ export default class ReleaseStore{
   async fetchReleaseData(){
     this.isFetched = false;
     this.isFetching = true;
+    this.fetchError = null;
     try{
       const { data } = await API.axios.get(API.endpoints.releaseData(this.topInstanceId));
       runInAction(()=>{
+        this.deduplicateNodes(data);
         this.populateStatuses(data);
         this.createPendingStatuses(data);
         this.populateStatuses(data, "pending_");
@@ -105,25 +118,101 @@ export default class ReleaseStore{
   }
 
   @action
+  deduplicateNodes(rootNode){
+    this.nodesMap = new Map();
+    let rseek = (node) => {
+      if(node.children){
+        node.children = node.children.map(child => {
+          rseek(child);
+          if(!this.nodesMap.has(child["@id"])){
+            this.nodesMap.set(child["@id"], child);
+          }
+          return this.nodesMap.get(child["@id"]);
+        });
+      }
+    };
+    rseek(rootNode);
+  }
+
   async commitStatusChanges(){
-    this.isSaving = true;
-    try{
-      const payload = toJS(this.getNodesToProceed()["RELEASED"]).map(node => {return {id:node["@id"], rev:node.rev};});
-      await API.axios.post(API.endpoints.doRelease(), payload);
-      runInAction(() => {
-        this.isSaving = false;
-        this.fetchReleaseData();
-        statusStore.flush();
-      });
-    } catch(e){
-      runInAction(()=>{
-        const message = e.message?e.message:e;
-        this.saveError = message;
-        this.isSaving = false;
-        this.fetchReleaseData();
-        statusStore.flush();
-      });
+    let nodesToProceed = this.getNodesToProceed();
+    this.savingProgress = 0;
+    this.savingTotal = nodesToProceed["NOT_RELEASED"].length + nodesToProceed["RELEASED"].length;
+    this.savingErrors = [];
+    if(!this.savingTotal){
+      return;
     }
+    this.isSaving = true;
+
+    nodesToProceed["RELEASED"].forEach(async (node) => {
+      try{
+        await API.axios.put(API.endpoints.doRelease(node["relativeUrl"], {}));
+        runInAction(()=>{
+          this.savingLastEndedRequest = `(${node.type}) released successfully`;
+          this.savingLastEndedNode = node;
+          historyStore.updateInstanceHistory(node["relativeUrl"], "released");
+        });
+      } catch(e){
+        runInAction(()=>{
+          this.savingErrors.push({node: node, message: e.message});
+          this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to release this instance`;
+          this.savingLastEndedNode = node;
+        });
+      } finally {
+        runInAction(()=>{
+          this.savingProgress++;
+          this.afterSave();
+        });
+      }
+    });
+
+    nodesToProceed["NOT_RELEASED"].forEach(async (node) => {
+      try{
+        await API.axios.delete(API.endpoints.doRelease(node["relativeUrl"], {}));
+        runInAction(()=>{
+          this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
+          this.savingLastEndedNode = node;
+          historyStore.updateInstanceHistory(node["relativeUrl"], "released", true);
+        });
+      } catch(e){
+        runInAction(()=>{
+          this.savingErrors.push({node: node, message: e.message});
+          this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to unrelease this instance`;
+          this.savingLastEndedNode = node;
+        });
+      } finally {
+        runInAction(()=>{
+          this.savingProgress++;
+          this.afterSave();
+        });
+      }
+    });
+  }
+
+  @action afterSave(){
+    if(this.savingErrors.length === 0 && this.savingProgress === this.savingTotal){
+      setTimeout(()=>{
+        runInAction(()=>{
+          this.isSaving = false;
+          statusStore.flush();
+          this.savingErrors = [];
+          this.savingTotal = 0;
+          this.savingProgress = 0;
+          this.fetchReleaseData();
+        });
+      }, 2000);
+    }
+  }
+
+  @action
+  dismissSaveError(){
+    this.isSaving = false;
+    statusStore.flush();
+    this.savingErrors = [];
+    this.savingTotal = 0;
+    this.savingProgress = 0;
+    this.fetchReleaseData();
+
   }
 
   @action
@@ -175,9 +264,5 @@ export default class ReleaseStore{
 
   @action toggleHLNode(node){
     this.hlNode = this.hlNode === node? null: node;
-  }
-
-  @action dismissSaveError(){
-    this.saveError = null;
   }
 }

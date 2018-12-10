@@ -85,12 +85,6 @@ export default class Graph extends React.Component {
     });
   }
 
-  changeValue(e) {
-    graphStore.setStep(e);
-    //TODO: handle that in the store
-    //graphStore.fetchGraph(this.props.instanceStore.mainInstanceId);
-  }
-
   handleNodeClick = (node) => {
     if(node.isGroup){
       graphStore.explodeNode(node);
@@ -174,7 +168,7 @@ export default class Graph extends React.Component {
       ctx.textAlign = "center";
       ctx.fillStyle = "black";
 
-      let label = node.title.split?node.title:"";
+      let label = node.title && node.title.split?node.title:"";
       if(!node.isGroup){
         label = `(${node.niceDataType}) ${label}`;
       }
@@ -237,7 +231,6 @@ export default class Graph extends React.Component {
         />
         }
         <a className={`${classes.capture} btn btn-primary`} onClick={this.handleCapture}><FontAwesomeIcon icon="camera"/></a>
-        {/*<Slider className={classes.slider} vertical min={1} step={1} max={5} onAfterChange={this.changeValue.bind(this)} defaultValue={2} />*/}
       </div>
     );
   }

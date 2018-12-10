@@ -25,9 +25,9 @@ export default class FetchingLoader extends React.Component{
     const { classes } = this.props;
 
     return (
-      <div className={classes.fetchingPanel}>
+      <div className={`${classes.fetchingPanel} fetchingPanel`}>
         <FontAwesomeIcon icon="circle-notch" spin/>
-        <span className={classes.fetchingLabel}>
+        <span className={`${classes.fetchingLabel} fetchingLabel`}>
           {this.props.children}
         </span>
       </div>

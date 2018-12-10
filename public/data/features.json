@@ -1,0 +1,36 @@
+{
+    "data": [
+        {
+            "version": "version 2.1",
+            "features": [
+                "Integration / improvement of releasing screen\n\n![alt text](features/releasing-screen.png \"Releasing screen\")",
+                "Favorites / bookmarking feature\n\n![alt text](features/bookmarks.png \"Favorites / bookmarking feature\")",
+                "Counter for instances in search\n\n![alt text](features/counter-in-search.png \"Counter for instances in search\")"
+            ]
+        },
+        {
+            "version": "version 2.0",
+            "features": [
+                "Instance changes comparison feature\n\n![alt text](features/instance-changes-comparison.png \"Instance changes comparison feature\")"
+            ]
+        },
+        {
+            "version": "version 1.9",
+            "features": [
+                "new tabbed layout "
+            ]
+        },
+        {
+            "version": "version 1.8",
+            "features": [
+                "new tabbed layout "
+            ]
+        },
+        {
+            "version": "version 1.7",
+            "features": [
+                "new tabbed layout "
+            ]
+        }   
+    ]
+}

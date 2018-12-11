@@ -78,6 +78,20 @@ const styles = {
       "& td:last-child": {
         fontSize: "1.4em",
         textAlign: "right"
+      },
+      "& td.fetching": {
+        position: "relative",
+        width: "300px",
+        height: "100px",
+        border: "1px solid var(--ft-color-normal)",
+        fontSize: "1em"
+      },
+      "& td.error": {
+        position: "relative",
+        width: "300px",
+        height: "100px",
+        border: "1px solid var(--ft-color-normal)",
+        fontSize: "1em"
       }
     },
     "@media screen and (min-width:1200px)": {
@@ -126,8 +140,11 @@ export default class DatasetsStatistics extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
-    if(!statisticsStore.isFetched && !statisticsStore.isFetching){
-      statisticsStore.fetchStatistics();
+    if(!statisticsStore.globalDatasetsStatistics.isFetched && !statisticsStore.globalDatasetsStatistics.isFetching){
+      statisticsStore.fetchGlobalDatasetsStatistics();
+    }
+    if(!statisticsStore.perWeekDatasetsStatistics.isFetched && !statisticsStore.perWeekDatasetsStatistics.isFetching){
+      statisticsStore.fetchPerWeekDatasetsStatistics();
     }
   }
 
@@ -143,8 +160,12 @@ export default class DatasetsStatistics extends React.Component {
     window.removeEventListener("resize", this.handleResize);
   }
 
-  handleFetchStatisticsRetry = () => {
-    statisticsStore.fetchStatistics();
+  handleFetchGlobalDatasetsStatisticsRetry = () => {
+    statisticsStore.fetchGlobalDatasetsStatistics();
+  }
+
+  handleFetchPerWeekDatasetsStatisticsRetry = () => {
+    statisticsStore.fetchPerWeekDatasetsStatistics();
   }
 
   getNumberOfDays = value => {
@@ -197,144 +218,162 @@ export default class DatasetsStatistics extends React.Component {
     return (
       <div key={this.state.key} className={classes.container}>
         <h3>Datasets Statistics</h3>
-        {!statisticsStore.fetchError?
-          !statisticsStore.isFetching?
-            statisticsStore.statistics?
-              <div className={classes.panel}>
-                <div className={`${classes.chart} ${statisticsStore.statistics.PerWeekStatistics && statisticsStore.statistics.PerWeekStatistics.length > 0?"":"frame"}`}>
-                  {statisticsStore.statistics.PerWeekStatistics && statisticsStore.statistics.PerWeekStatistics.length > 0?
-                    <ResponsiveBar
-                      data={this.getChartData(statisticsStore.statistics.PerWeekStatistics)}
-                      keys={[
-                        "newly created datasets",
-                        "newly released datasets"
-                      ]}
-                      indexBy="period"
-                      margin={{
-                        "top": 0,
-                        "right": 0,
-                        "bottom": 32,
-                        "left": 60
-                      }}
-                      padding={0.3}
-                      groupMode="grouped"
-                      colors={palette}
-                      borderColor="inherit:darker(1.6)"
-                      axisTop={null}
-                      axisRight={null}
-                      axisBottom={{
-                        "tickSize": 5,
-                        "tickPadding": 5,
-                        "tickRotation": 0
-                      }}
-                      axisLeft={{
-                        "tickSize": 5,
-                        "tickPadding": 5,
-                        "tickRotation": 0,
-                        "legend": "number of datasets",
-                        "legendPosition": "center",
-                        "legendOffset": -40
-                      }}
-                      labelSkipWidth={12}
-                      labelSkipHeight={12}
-                      labelTextColor="inherit:darker(1.6)"
-                      animate={true}
-                      motionStiffness={90}
-                      motionDamping={15}
-                      theme={{
-                        tick: {
-                          textColor: "var(--ft-color-normal)",
-                        },
-                        axis: {
-                          textColor: "var(--ft-color-normal)",
-                          fontSize: "14px",
-                          tickColor: "var(--ft-color-normal)",
-                          legendColor: "var(--ft-color-normal)"
-                        },
-                        tooltip: {
-                          container: {
-                            background: "var(--bg-color-ui-contrast1)"
-                          }
+        <div className={classes.panel}>
+          <div className={`${classes.chart} ${!statisticsStore.perWeekDatasetsStatistics.fetchError && !statisticsStore.perWeekDatasetsStatistics.isFetching && statisticsStore.perWeekDatasetsStatistics.data.length > 0?"":"frame"}`}>
+            {!statisticsStore.perWeekDatasetsStatistics.fetchError?
+              !statisticsStore.perWeekDatasetsStatistics.isFetching?
+                statisticsStore.perWeekDatasetsStatistics.data.length > 0?
+                  <ResponsiveBar
+                    data={this.getChartData(statisticsStore.perWeekDatasetsStatistics.data)}
+                    keys={[
+                      "newly created datasets",
+                      "newly released datasets"
+                    ]}
+                    indexBy="period"
+                    margin={{
+                      "top": 0,
+                      "right": 0,
+                      "bottom": 32,
+                      "left": 60
+                    }}
+                    padding={0.3}
+                    groupMode="grouped"
+                    colors={palette}
+                    borderColor="inherit:darker(1.6)"
+                    axisTop={null}
+                    axisRight={null}
+                    axisBottom={{
+                      "tickSize": 5,
+                      "tickPadding": 5,
+                      "tickRotation": 0
+                    }}
+                    axisLeft={{
+                      "tickSize": 5,
+                      "tickPadding": 5,
+                      "tickRotation": 0,
+                      "legend": "number of datasets",
+                      "legendPosition": "center",
+                      "legendOffset": -40
+                    }}
+                    labelSkipWidth={12}
+                    labelSkipHeight={12}
+                    labelTextColor="inherit:darker(1.6)"
+                    animate={true}
+                    motionStiffness={90}
+                    motionDamping={15}
+                    theme={{
+                      tick: {
+                        textColor: "var(--ft-color-normal)",
+                      },
+                      axis: {
+                        textColor: "var(--ft-color-normal)",
+                        fontSize: "14px",
+                        tickColor: "var(--ft-color-normal)",
+                        legendColor: "var(--ft-color-normal)"
+                      },
+                      tooltip: {
+                        container: {
+                          background: "var(--bg-color-ui-contrast1)"
                         }
-                      }}
-                      legends={[
-                        {
-                          "dataFrom": "keys",
-                          "anchor": "bottom-right",
-                          "direction": "column",
-                          "justify": false,
-                          "translateX": 120,
-                          "translateY": 0,
-                          "itemsSpacing": 2,
-                          "itemWidth": 100,
-                          "itemHeight": 20,
-                          "itemDirection": "left-to-right",
-                          "itemOpacity": 0.85,
-                          "itemTextColor": "var(--ft-color-normal)",
-                          "symbolSize": 20,
-                          "effects": [
-                            {
-                              "on": "hover",
-                              "style": {
-                                "itemOpacity": 1,
-                                "itemTextColor": "var(--ft-color-normal)"
-                              }
+                      }
+                    }}
+                    legends={[
+                      {
+                        "dataFrom": "keys",
+                        "anchor": "bottom-right",
+                        "direction": "column",
+                        "justify": false,
+                        "translateX": 120,
+                        "translateY": 0,
+                        "itemsSpacing": 2,
+                        "itemWidth": 100,
+                        "itemHeight": 20,
+                        "itemDirection": "left-to-right",
+                        "itemOpacity": 0.85,
+                        "itemTextColor": "var(--ft-color-normal)",
+                        "symbolSize": 20,
+                        "effects": [
+                          {
+                            "on": "hover",
+                            "style": {
+                              "itemOpacity": 1,
+                              "itemTextColor": "var(--ft-color-normal)"
                             }
-                          ]
-                        }
-                      ]}
-                    />
-                    :
-                    <div className={classes.noChartData}>No chart data available.</div>
-                  }
-                </div>
-                <div className={classes.tables}>
-                  <table className="legend">
-                    <tbody>
-                      <tr>
-                        <td><div style={{background: palette[0]}}></div></td>
-                        <td>Newly created datasets</td>
-                      </tr>
-                      <tr>
-                        <td><div style={{background: palette[1]}}></div></td>
-                        <td>Newly released datasets</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div className="spacer"></div>
-                  <table className="stats">
-                    <tbody>
+                          }
+                        ]
+                      }
+                    ]}
+                  />
+                  :
+                  <div className={classes.noChartData}>No chart data available.</div>
+                :
+                <FetchingLoader>
+                    Fetching per week datasets statistics
+                </FetchingLoader>
+              :
+              <div className={classes.statisticsFetchErrorPanel}>
+                <div>{statisticsStore.perWeekDatasetsStatistics.fetchError}</div>
+                <Button bsStyle="primary" onClick={this.handleFetchGlobalDatasetsStatisticsRetry}>Retry</Button>
+              </div>
+            }
+          </div>
+          <div className={classes.tables}>
+            <table className="legend">
+              {!statisticsStore.perWeekDatasetsStatistics.fetchError && !statisticsStore.perWeekDatasetsStatistics.isFetching && statisticsStore.perWeekDatasetsStatistics.data.length > 0 && (
+                <tbody>
+                  <tr>
+                    <td><div style={{background: palette[0]}}></div></td>
+                    <td>Newly created datasets</td>
+                  </tr>
+                  <tr>
+                    <td><div style={{background: palette[1]}}></div></td>
+                    <td>Newly released datasets</td>
+                  </tr>
+                </tbody>
+              )}
+            </table>
+            <div className="spacer"></div>
+            <table className="stats">
+              <tbody>
+                {!statisticsStore.globalDatasetsStatistics.fetchError?
+                  !statisticsStore.globalDatasetsStatistics.isFetching?
+                    <React.Fragment>
                       <tr>
                         <td>Total datasets:</td>
-                        <td>{statisticsStore.statistics.TotalNumberOfDatasets}</td>
+                        <td>{Number.isNaN(Number(statisticsStore.globalDatasetsStatistics.data.totalNumberOfDatasets))?"-":statisticsStore.globalDatasetsStatistics.data.totalNumberOfDatasets}</td>
                       </tr>
                       <tr>
                         <td>Total released datasets:</td>
-                        <td>{statisticsStore.statistics.TotalNumberOfReleasedDatasets}</td>
+                        <td>{Number.isNaN(Number(statisticsStore.globalDatasetsStatistics.data.totalNumberOfReleasedDatasets))?"-":statisticsStore.globalDatasetsStatistics.data.totalNumberOfReleasedDatasets}</td>
                       </tr>
                       <tr>
                         <td>Average time to release a dataset:</td>
-                        <td style={{color: this.getColorForNumberOfDays(statisticsStore.statistics.AverageNumberOfDaysToReleaseADataset)}}>{this.getNumberOfDays(statisticsStore.statistics.AverageNumberOfDaysToReleaseADataset)}</td>
+                        <td style={{color: this.getColorForNumberOfDays(statisticsStore.globalDatasetsStatistics.data.averageNumberOfDaysToReleaseADataset)}}>{this.getNumberOfDays(statisticsStore.globalDatasetsStatistics.data.averageNumberOfDaysToReleaseADataset)}</td>
                       </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className={classes.warning}>FAKE DATA - FOR DEMONSTRATION PURPOSES ONLY</div>
-              </div>
-              :
-              <div className={classes.noStatisticsPanel}>
-                <div>No instances statistics available.</div>
-              </div>
-            :
-            <FetchingLoader>
-              Fetching instances statistics
-            </FetchingLoader>
-          :
-          <div className={classes.statisticsFetchErrorPanel}>
-            <div>{statisticsStore.fetchError}</div>
-            <Button bsStyle="primary" onClick={this.handleFetchStatisticsRetry}>Retry</Button>
+                    </React.Fragment>
+                    :
+                    <tr>
+                      <td className="fetching">
+                        <FetchingLoader>
+                            Fetching datasets statistics
+                        </FetchingLoader>
+                      </td>
+                    </tr>
+                  :
+                  <tr>
+                    <td className="error">
+                      <div className={classes.statisticsFetchErrorPanel}>
+                        <div>{statisticsStore.globalDatasetsStatistics.fetchError}</div>
+                        <Button bsStyle="primary" onClick={this.handleFetchGlobalDatasetsStatisticsRetry}>Retry</Button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
-        }
+          <div className={classes.warning}>FAKE DATA - FOR DEMONSTRATION PURPOSES ONLY</div>
+        </div>
       </div>
     );
   }

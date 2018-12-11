@@ -12,6 +12,8 @@ import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 
+const rootPath = window.rootPath || "";
+
 const styles = {
   container: {
     position: "relative",

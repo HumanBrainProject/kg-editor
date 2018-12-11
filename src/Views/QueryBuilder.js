@@ -6,11 +6,13 @@ import {Button, Modal} from "react-bootstrap";
 import queryBuilderStore from "../Stores/QueryBuilderStore";
 import Field from "./QueryBuilder/Field";
 
+import ReactJson from "react-json-view";
+
 let styles = {
   container:{
     display:"grid",
     gridTemplateRows:"100%",
-    gridTemplateColumns:"1fr 1fr",
+    gridTemplateColumns:"1fr 1fr 1fr",
     gridGap:"10px",
     padding:"10px",
     height:"100%"
@@ -29,6 +31,12 @@ let styles = {
     fontSize:"0.8em",
     fontWeight:"normal",
     paddingLeft:"10px"
+  },
+  query:{
+    background:"rgb(50, 41, 49)",
+  },
+  result:{
+    background:"rgb(50, 41, 49)",
   }
 };
 
@@ -47,6 +55,10 @@ export default class QueryBuilder extends React.Component{
     queryBuilderStore.addField(schema);
   }
 
+  handleToggleRunStripVocab = () => {
+    queryBuilderStore.toggleRunStripVocab();
+  }
+
   render(){
     const {classes} = this.props;
     return(
@@ -63,10 +75,13 @@ export default class QueryBuilder extends React.Component{
                         <div className={classes.schemaSelectGroup} key={group}>
                           {group}
                           <div>
-                            {queryBuilderStore.getSortedSchemasByGroup(group).map(node => {
+                            {queryBuilderStore.getSortedSchemasByGroup(group).map(schema => {
+                              if(!schema.properties || !schema.properties.length){
+                                return null;
+                              }
                               return(
-                                <div className={classes.schemaSelectSchema} key={node.id} onClick={this.handleSelectRootSchema.bind(this, node)}>
-                                  {node.label}
+                                <div className={classes.schemaSelectSchema} key={schema.id} onClick={this.handleSelectRootSchema.bind(this, schema)}>
+                                  {schema.label}
                                 </div>
                               );
                             })}
@@ -86,9 +101,9 @@ export default class QueryBuilder extends React.Component{
                       <strong>Properties: </strong>
                       {queryBuilderStore.showModalFieldChoice.schema.canBe.map((schemaId)=>{
                         return(
-                          queryBuilderStore.findSchemaById(schemaId).props.filter(prop => !prop.canBe || !prop.canBe.length).map(propSchema => {
+                          queryBuilderStore.findSchemaById(schemaId).properties.filter(prop => !prop.canBe || !prop.canBe.length).map(propSchema => {
                             return (
-                              <div key={propSchema.id+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
+                              <div key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
                                 {propSchema.label}
                               </div>
                             );
@@ -101,9 +116,9 @@ export default class QueryBuilder extends React.Component{
                       <strong>Links: </strong>
                       {queryBuilderStore.showModalFieldChoice.schema.canBe.map((schemaId)=>{
                         return(
-                          queryBuilderStore.findSchemaById(schemaId).props.filter(prop => prop.canBe && prop.canBe.length).map(propSchema => {
+                          queryBuilderStore.findSchemaById(schemaId).properties.filter(prop => prop.canBe && prop.canBe.length).map(propSchema => {
                             return (
-                              <div key={propSchema.id+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
+                              <div key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
                                 {propSchema.label}
                                 ( {propSchema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")})
                               </div>
@@ -118,10 +133,16 @@ export default class QueryBuilder extends React.Component{
             }
           </div>
 
+          <div className={classes.query}>
+            {queryBuilderStore.rootField && <ReactJson onEdit={()=>{return false;}} collapsed={false} name={false} theme="hopscotch" src={queryBuilderStore.JSONQuery} />}
+          </div>
+
           <div className={classes.result}>
-            {queryBuilderStore.rootField && <pre>
-              {JSON.stringify(queryBuilderStore.JSONQuery,null,2)}
-            </pre>}
+            <Button onClick={()=>queryBuilderStore.executeQuery()}>
+              Try it
+            </Button>
+            Strip vocab : <input type="checkbox" onChange={this.handleToggleRunStripVocab} checked={queryBuilderStore.runStripVocab}/>
+            {queryBuilderStore.result && <ReactJson collapsed={1} name={false} theme="hopscotch" src={queryBuilderStore.result} />}
           </div>
         </div>
         :null

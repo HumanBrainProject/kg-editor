@@ -1,11 +1,12 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-import {Button} from "react-bootstrap";
+import {Button, Modal} from "react-bootstrap";
 
 import Fields from "./Fields";
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import MultiToggle from "../../Components/MultiToggle";
 
 let styles = {
   container:{
@@ -32,13 +33,22 @@ let styles = {
   },
   label:{
     padding:"10px",
-    margin:"2px",
+    margin:"1px",
     backgroundColor:"var(--bg-color-ui-contrast3)",
     position:"relative",
     zIndex:2
   },
+  rename:{
+    color:"var(--ft-color-louder)",
+    fontWeight:"bold"
+  },
   subFields:{
     paddingLeft:"20px"
+  },
+  optionsButton:{
+    position:"absolute",
+    right:"10px",
+    top:"9px"
   },
   addButton:{
     marginLeft:"20px",
@@ -63,6 +73,21 @@ export default class Field extends React.Component{
     queryBuilderStore.toggleShowModalFieldChoice(this.props.field);
   }
 
+  handleShowOptions = () => {
+    queryBuilderStore.toggleShowModalFieldOptions(this.props.field);
+  }
+
+  handleHideOptions = () => {
+    queryBuilderStore.toggleShowModalFieldOptions();
+  }
+
+  handleChangeRequired = (value) => {
+    this.props.field.setOption("required", value);
+  }
+  handleChangeName = (e) => {
+    this.props.field.setOption("alias", e.target.value);
+  }
+
   render(){
     const {classes, field} = this.props;
     return(
@@ -74,6 +99,15 @@ export default class Field extends React.Component{
           <span className={classes.canBe}>
             ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
           </span>}
+          {field.getOption("name")?
+            <span className={classes.rename}>
+              <FontAwesomeIcon icon="long-arrow-alt-right"/>&nbsp;
+              {field.getOption("name")}
+            </span>
+            :null}
+          <Button className={classes.optionsButton} bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleShowOptions}>
+            <FontAwesomeIcon icon="cog"/>
+          </Button>
         </div>
         <div className={classes.subFields}>
           <Fields field={field}/>
@@ -84,6 +118,34 @@ export default class Field extends React.Component{
               <FontAwesomeIcon icon={"plus-square"}/>
             </Button>
           </div>}
+
+        <Modal show={queryBuilderStore.showModalFieldOptions === field} onHide={this.handleHideOptions}>
+          <Modal.Header closeButton>
+            Options for field : {field.schema.label}
+          </Modal.Header>
+          <Modal.Body>
+            <div className={classes.option}>
+              <div className={classes.optionLabel}>
+                Target name
+              </div>
+              <div className={classes.optionInput}>
+                <input type="text" onChange={this.handleChangeName} value={field.getOption("alias") || ""} placeholder={field.schema.label}/>
+              </div>
+            </div>
+            <hr/>
+            <div className={classes.option}>
+              <div className={classes.optionLabel}>
+                Required
+              </div>
+              <div className={classes.optionInput}>
+                <MultiToggle selectedValue={field.getOption("required")} onChange={this.handleChangeRequired}>
+                  <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                  <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
+                </MultiToggle>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
     );
   }

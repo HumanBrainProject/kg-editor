@@ -1,16 +1,27 @@
 import axios from "axios";
 import {observable, action, computed} from "mobx";
 import {uniqueId, sortBy, groupBy} from "lodash";
+import API from "../Services/API";
 
 class Field {
   @observable schema = null;
   @observable id = 0;
   @observable alias = null;
   @observable fields = [];
+  @observable options = new Map();
 
-  constructor(schema){
+  constructor(schema, parent){
     this.schema = schema;
+    this.parent = parent;
     this.id = uniqueId("QueryBuilderField");
+  }
+
+  @action setOption(option, value){
+    this.options.set(option, value);
+  }
+
+  getOption(option){
+    return this.options.has(option)?this.options.get(option):null;
   }
 }
 
@@ -20,8 +31,12 @@ class QueryBuilderStore {
 
   @observable showModalSchemaChoice = false;
   @observable showModalFieldChoice = null;
+  @observable showModalFieldOptions = null;
 
   @observable schemasMap = new Map();
+
+  @observable runStripVocab = false;
+  @observable.shallow result = null;
 
   constructor(){
     this.fetchStructure();
@@ -58,7 +73,7 @@ class QueryBuilderStore {
       field = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
-    field.fields.push(new Field(schema));
+    field.fields.push(new Field(schema, field));
   }
 
   @action async fetchStructure(){
@@ -77,12 +92,20 @@ class QueryBuilderStore {
     this.showModalFieldChoice = field === undefined? null: field;
   }
 
+  @action toggleShowModalFieldOptions(field){
+    this.showModalFieldOptions = field === undefined? null: field;
+  }
+
+  @action toggleRunStripVocab(state){
+    this.runStripVocab = state !== undefined? !!state: !this.runStripVocab;
+  }
+
   @computed
   get JSONQuery(){
     let json = {
       "@context":{
-        "@vocab": "http://schema.hbp.eu/graph_query/",
-        "target":"http://schema.hbp.eu/mytarget/",
+        "@vocab": "https://schema.hbp.eu/graphQuery/",
+        "target":"https://schema.hbp.eu/mytarget/",
         "fieldname": {
           "@id": "fieldname",
           "@type": "@id"
@@ -91,11 +114,11 @@ class QueryBuilderStore {
           "@id": "relative_path",
           "@type": "@id"
         }
-      },
-      "root_schema":this.rootField.schema.id
+      }
     };
     this._processFields(json, this.rootField);
-    return json;
+    //Gets rid of the undefined values
+    return JSON.parse(JSON.stringify(json));
   }
 
   _processFields(json, field){
@@ -104,14 +127,26 @@ class QueryBuilderStore {
         json.fields = [];
       }
       let jsonField = {
-        "fieldname":"target:"+(field.alias || field.schema.label),
-        "relative_path":field.schema.id
+        "fieldname":"target:"+(field.getOption("alias") || field.schema.label),
+        "relative_path":{"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined},
+        "required":field.getOption("required") === true? true: undefined
       };
       json.fields.push(jsonField);
       if(field.fields && field.fields.length){
         this._processFields(jsonField, field);
       }
     });
+  }
+
+  @action
+  async executeQuery(){
+    try{
+      let payload = this.JSONQuery;
+      let response = await API.axios.post(API.endpoints.query(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/mytarget/":undefined), payload);
+      this.result = response.data;
+    } catch(e){
+      this.result = null;
+    }
   }
 }
 

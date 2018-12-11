@@ -439,6 +439,7 @@ class App extends React.Component{
                     <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
                     <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
                     <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage"/>)} />
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />

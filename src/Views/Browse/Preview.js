@@ -29,7 +29,7 @@ const styles = {
   },
   actions:{
     display:"grid",
-    gridTemplateColumns:"repeat(4, 1fr)",
+    gridTemplateColumns:"repeat(5, 1fr)",
     gridGap:"10px",
     marginBottom:"20px"
   },
@@ -135,6 +135,9 @@ export default class Preview extends React.Component{
                   </div>
                   <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release")}>
                     <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
+                  </div>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "manage")}>
+                    <FontAwesomeIcon icon="cog"/>&nbsp;&nbsp;Manage
                   </div>
                 </div>
                 <div className={classes.titlePanel}>

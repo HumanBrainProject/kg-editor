@@ -15,6 +15,14 @@ import BGMessage from "../../Components/BGMessage";
 const styles = {
   container: {
     position: "relative",
+    width: "100%",
+    height: "100%",
+    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
+    backgroundPosition: "50% 50%",
+    color: "var(--ft-color-loud)"
+  },
+  panel: {
+    position: "relative",
     width: "60%",
     height: "calc(100% - 40px)",
     margin:"20px 20%"
@@ -82,61 +90,63 @@ export default class InstanceMange extends React.Component{
     const promotedFields = instanceStore.getPromotedFields(instance);
 
     return (
-      <Scrollbars autoHide>
-        <div className={classes.container}>
-          {instance.isFetching?
-            <FetchingLoader>
-              <span>Fetching instance information...</span>
-            </FetchingLoader>
-            :!instance.hasFetchError?
-              <React.Fragment>
-                <div className={classes.content}>
-                  <h4>{instance.data.label}</h4>
-                  <div className={classes.id}>
-                    Nexus ID: {this.props.id}
+      <div className={classes.container}>
+        <Scrollbars autoHide>
+          <div className={classes.panel}>
+            {instance.isFetching?
+              <FetchingLoader>
+                <span>Fetching instance information...</span>
+              </FetchingLoader>
+              :!instance.hasFetchError?
+                <React.Fragment>
+                  <div className={classes.content}>
+                    <h4>{instance.data.label}</h4>
+                    <div className={classes.id}>
+                      Nexus ID: {this.props.id}
+                    </div>
+                    <Form store={instance.form} key={this.props.id}>
+                      {promotedFields.map(fieldKey => {
+                        return(
+                          <div key={this.props.id+fieldKey} className={classes.field}>
+                            <Field name={fieldKey}/>
+                          </div>
+                        );
+                      })}
+                    </Form>
                   </div>
-                  <Form store={instance.form} key={this.props.id}>
-                    {promotedFields.map(fieldKey => {
-                      return(
-                        <div key={this.props.id+fieldKey} className={classes.field}>
-                          <Field name={fieldKey}/>
-                        </div>
-                      );
-                    })}
-                  </Form>
-                </div>
-                <div className={classes.content}>
-                  <h4>Duplicate this instance</h4>
-                  <ul>
-                    <li>Be careful. After duplication both instances will look the same.</li>
-                    <li>After dupplication you should update the name &amp; description fields.</li>
-                  </ul>
-                  <Button bsStyle={"warning"} onClick={this.handleDuplicateInstance}>
-                    <FontAwesomeIcon icon={"copy"}/> &nbsp; Duplicate this instance
+                  <div className={classes.content}>
+                    <h4>Duplicate this instance</h4>
+                    <ul>
+                      <li>Be careful. After duplication both instances will look the same.</li>
+                      <li>After dupplication you should update the name &amp; description fields.</li>
+                    </ul>
+                    <Button bsStyle={"warning"} onClick={this.handleDuplicateInstance}>
+                      <FontAwesomeIcon icon={"copy"}/> &nbsp; Duplicate this instance
+                    </Button>
+                  </div>
+                  <div className={classes.content}>
+                    <h4>Delete this instance</h4>
+                    <p>
+                      <strong>Removed instances cannot be restored!</strong>
+                    </p>
+                    <Button bsStyle={"danger"} onClick={this.handleDeleteInstance}>
+                      <FontAwesomeIcon icon={"trash-alt"}/> &nbsp; Delete this instance
+                    </Button>
+                  </div>
+                </React.Fragment>
+                :
+                <BGMessage icon={"ban"}>
+                  There was a network problem fetching the instance.<br/>
+                  If the problem persists, please contact the support.<br/>
+                  <small>{instance.fetchError}</small><br/><br/>
+                  <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
+                    <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
                   </Button>
-                </div>
-                <div className={classes.content}>
-                  <h4>Delete this instance</h4>
-                  <p>
-                    <strong>Removed instances cannot be restored!</strong>
-                  </p>
-                  <Button bsStyle={"danger"} onClick={this.handleDeleteInstance}>
-                    <FontAwesomeIcon icon={"trash-alt"}/> &nbsp; Delete this instance
-                  </Button>
-                </div>
-              </React.Fragment>
-              :
-              <BGMessage icon={"ban"}>
-                There was a network problem fetching the instance.<br/>
-                If the problem persists, please contact the support.<br/>
-                <small>{instance.fetchError}</small><br/><br/>
-                <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
-                  <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
-                </Button>
-              </BGMessage>
-          }
-        </div>
-      </Scrollbars>
+                </BGMessage>
+            }
+          </div>
+        </Scrollbars>
+      </div>
     );
   }
 }

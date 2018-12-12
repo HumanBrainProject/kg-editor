@@ -6,6 +6,9 @@ import { observer } from "mobx-react";
 const styles = {
   container: {
     overflow: "hidden",
+    display: "grid",
+    gridTemplateRows:"1fr",
+    gridTemplateColumns:"1fr 0",
     position: "relative",
     height: "0",
     color: "var(--ft-color-louder)",
@@ -17,12 +20,38 @@ const styles = {
     animationDelay: "2.5s",
     animationFillMode: "forwards",
     animationTimingFunction: "ease-out",
+    "@media screen and (min-width:1300px)": {
+      gridTemplateColumns:"1fr 500px",
+    },
+    "& > div": {
+      position: "relative"
+    },
+    "& img": {
+      position: "absolute",
+      right: "-500px",
+      width: "100%",
+      height: "100%",
+      animationName: "animationImage",
+      animationDuration: "0.5s",
+      animationDelay: "7.5s",
+      animationFillMode: "forwards",
+      animationTimingFunction: "ease-out",
+    },
+    "& .animatedText": {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      width: "0px",
+      height: "0px"
+    },
     "& .text": {
       position: "absolute",
       top: "20px",
       left: "-340px",
-      fontFamily: "cursive",
-      fontSize: "34px",
+      fontFamily: "'Great Vibes', cursive",
+      fontSize: "40px",
+      whiteSpace: "nowrap",
+      wordBreak: "keep-all",
       animationName: "animationText",
       animationDuration: "0.5s",
       animationDelay: "3.5s",
@@ -32,9 +61,11 @@ const styles = {
     "& .text2": {
       position: "absolute",
       bottom: "20px",
-      right: "-520px",
-      fontFamily: "cursive",
-      fontSize: "34px",
+      right: "-1300px",
+      fontFamily: "'Great Vibes', cursive",
+      fontSize: "40px",
+      whiteSpace: "nowrap",
+      wordBreak: "keep-all",
       animationName: "animationText2",
       animationDuration: "0.5s",
       animationDelay: "7s",
@@ -42,70 +73,71 @@ const styles = {
       animationTimingFunction: "ease-out"
     },
     "& .letter": {
-      fontFamily: "cursive",
+      fontFamily: "'Great Vibes', cursive",
       fontSize: "120px",
+      letterSpacing: "1.0em",
       animationFillMode: "forwards",
       animationTimingFunction: "ease-out"
     },
     "& .m": {
       opacity: 0,
       position: "absolute",
-      top: "64px",
-      left: "334px",
+      transform: "translate(-150px, -80px)",
       color: "#ff2400",
       animationName: "animationM",
       animationDuration: "0.5s",
-      animationDelay: "4s"
+      animationDelay: "4s",
+      zIndex: 6
     },
     "& .i": {
       opacity: 0,
       position: "absolute",
-      top: "64px",
-      left: "453px",
+      transform: "translate(10px, -80px)",
       color: "#e8b71d",
       animationName: "animationI",
       animationDuration: "0.5s",
-      animationDelay: "4.5s"
+      animationDelay: "4.5s",
+      zIndex: 5
     },
     "& .l": {
       opacity: 0,
       position: "absolute",
-      top: "64px",
-      left: "489px",
+      transform: "translate(31px, -80px)",
       color: "#e3e81d",
       animationName: "animationL",
       animationDuration: "0.5s",
-      animationDelay: "5s"
+      animationDelay: "5s",
+      zIndex: 4
     },
     "& .i2": {
       opacity: 0,
       position: "absolute",
-      top: "64px",
-      left: "520px",
+      transform: "translate(56px, -80px)",
       color: "#1ddde8",
       animationName: "animationI2",
       animationDuration: "0.5s",
-      animationDelay: "5.5s"
+      animationDelay: "5.5s",
+      zIndex: 3
     },
     "& .c": {
       opacity: 0,
       position: "absolute",
-      top: "64px",
-      left: "556px",
+      transform: "translate(76px, -80px)",
       color: "#1de840",
       animationName: "animationC",
       animationDuration: "0.5s",
-      animationDelay: "6s"
+      animationDelay: "6s",
+      zIndex: 2
     },
     "& .a": {
       opacity: 0,
       position: "absolute",
-      top: "64px",
-      left: "602px",
+      transform: "translate(108px, -80px)",
       color: "#dd00f3",
       animationName: "animationA",
       animationDuration: "0.5s",
-      animationDelay: "6.5s"
+      animationDelay: "6.5s",
+      zIndex: 1
     }
   },
   ["@keyframes animationContainer"]: {
@@ -115,12 +147,12 @@ const styles = {
       background: "none"
     },
     "50%": {
-      height: "300px",
+      height: "375px",
       border: "1px solid transparent",
       background: "none"
     },
     "100%": {
-      height: "300px",
+      height: "375px",
       border: "1px solid var(--ft-color-louder)",
       background: "darkred"
     }
@@ -135,10 +167,18 @@ const styles = {
   },
   ["@keyframes animationText2"]: {
     "0%": {
-      right: "-520px",
+      right: "-1300px",
     },
     "100%": {
       right: "20px",
+    }
+  },
+  ["@keyframes animationImage"]: {
+    "0%": {
+      right: "-500px",
+    },
+    "100%": {
+      right: "0",
     }
   },
   ["@keyframes animationM"]: {
@@ -341,16 +381,24 @@ export default class Milica extends React.Component{
   render(){
     const { classes } = this.props;
     return(
-      <div className={classes.container}>
-        <div className="text">Thank you and goodbye</div>
-        <div className="letter m">M</div>
-        <div className="letter i">i</div>
-        <div className="letter l">l</div>
-        <div className="letter i2">i</div>
-        <div className="letter c">c</div>
-        <div className="letter a">a</div>
-        <div className="text2">all the best for your future endeavors</div>
-      </div>
+      <React.Fragment>
+        <link href="https://fonts.googleapis.com/css?family=Great+Vibes" rel="stylesheet" />
+        <div className={classes.container}>
+          <div>
+            <div className="text">Thank you and goodbye</div>
+            <div className="animatedText">
+              <div className="letter m">M</div>
+              <div className="letter i">i</div>
+              <div className="letter l">l</div>
+              <div className="letter i2">i</div>
+              <div className="letter c">c</div>
+              <div className="letter a">a</div>
+            </div>
+            <div className="text2">all the best for your future endeavors</div>
+          </div>
+          <div><img src="https://media.giphy.com/media/Kv1SbgEVphnA4/giphy.gif" /></div>
+        </div>
+      </React.Fragment>
     );
   }
 }

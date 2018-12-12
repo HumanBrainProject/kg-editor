@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import Hub from "./Home/Hub";
+import Milica from "./Home/Milica";
 import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
@@ -147,6 +148,7 @@ export default class Home extends React.Component{
               <Hub/>
             </div>
             <div className={classes.main}>
+              <Milica />
               <DatasetsStatistics />
               <InstancesHistory />
             </div>

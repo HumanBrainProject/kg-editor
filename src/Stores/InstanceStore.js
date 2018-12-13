@@ -37,6 +37,11 @@ class OptionsCache{
       throw `Error while retrieving the list of ${path} (${message})`;
     }
   }
+
+  @action flush(){
+    this.cache = new Map();
+    this.promises = new Map();
+  }
 }
 
 const nodeTypeMapping = {
@@ -123,6 +128,17 @@ class InstanceStore {
         });
     }
     return [];
+  }
+
+  @action flush(){
+    this.instances = new Map();
+    this.isCreatingNewInstance = false;
+    this.instanceCreationError = null;
+    this.showSaveBar = false;
+    this.instanceToDelete = null;
+    this.isDeletingInstance = false;
+    this.deleteInstanceError = null;
+    this.optionsCache.flush();
   }
 
   /**
@@ -239,11 +255,10 @@ class InstanceStore {
       this.isDeletingInstance = true;
       this.deleteInstanceError = null;
       try{
-        const {data} = await API.axios.delete(API.endpoints.indexing(instanceId), {});
+        await API.axios.delete(API.endpoints.indexing(instanceId), {});
         this.instanceToDelete = null;
         this.isDeletingInstance = false;
-        debugger;
-        // TODO flush store
+        //this.flush();
       } catch(e){
         const message = e.message?e.message:e;
         this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message})`;

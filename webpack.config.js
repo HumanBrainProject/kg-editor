@@ -46,6 +46,11 @@ module.exports = {
         target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
+      },
+      "/internal/**": {
+        target:"https://kg-dev.humanbrainproject.org",
+        secure:false,
+        changeOrigin: true
       }
     },
     historyApiFallback: {

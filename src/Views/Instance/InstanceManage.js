@@ -8,6 +8,7 @@ import { Form, Field } from "hbp-quickfire";
 
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
+import statusStore from "../../Stores/StatusStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
@@ -57,6 +58,9 @@ const styles = {
   field:{
     marginBottom:"10px",
     wordBreak:"break-word"
+  },
+  error: {
+    color: "#e74c3c"
   }
 };
 
@@ -66,14 +70,20 @@ export default class InstanceMange extends React.Component{
   constructor(props) {
     super(props);
     this.fetchInstance();
+    this.fetchStatus();
   }
 
-  fetchInstance(forceFetch = false){
+  fetchInstance = (forceFetch = false) => {
     instanceStore.getInstance(this.props.id, forceFetch);
   }
 
-  UNSAFE_componentWillReceiveProps(){
+  fetchStatus = () => {
+    statusStore.fetchStatus(this.props.id);
+  }
+
+  UNSAFE_componentWillReceiveProps(props){
     instanceStore.setReadMode(true);
+    statusStore.fetchStatus(props.id);
   }
 
   handleDuplicateInstance = async () => {
@@ -82,7 +92,7 @@ export default class InstanceMange extends React.Component{
   }
 
   handleDeleteInstance = async () => {
-
+    instanceStore.deleteInstance(this.props.id);
   }
 
   render(){
@@ -90,6 +100,7 @@ export default class InstanceMange extends React.Component{
 
     const instance = instanceStore.getInstance(this.props.id);
     const promotedFields = instanceStore.getPromotedFields(instance);
+    const status = statusStore.getInstance(this.props.id);
 
     return (
       <div className={classes.container}>
@@ -128,12 +139,32 @@ export default class InstanceMange extends React.Component{
                   </div>
                   <div className={classes.content}>
                     <h4>Delete this instance</h4>
-                    <p>
-                      <strong>Removed instances cannot be restored!</strong>
-                    </p>
-                    <Button bsStyle={"danger"} onClick={this.handleDeleteInstance}>
-                      <FontAwesomeIcon icon={"trash-alt"}/> &nbsp; Delete this instance
-                    </Button>
+                    {status && status.hasFetchError?
+                      <div className={classes.error}>
+                        <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
+                        <Button bsStyle="primary" onClick={this.fetchStatus}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+                      </div>
+                      :!status || !status.isFetched?
+                        <React.Fragment>
+                          <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Fetching instance release status
+                        </React.Fragment>
+                        :
+                        <React.Fragment>
+                          {status.data.status !== "NOT_RELEASED"?
+                            <ul>
+                              <li>This instance has been released and therefore cannot be deleted.</li>
+                              <li>If you still want to delete it you first have to unrelease it.</li>
+                            </ul>
+                            :
+                            <p>
+                              <strong>Be careful. Removed instances cannot be restored!</strong>
+                            </p>
+                          }
+                          <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "NOT_RELEASED"} >
+                            <FontAwesomeIcon icon={"trash-alt"}/>&nbsp;&nbsp; Delete this instance
+                          </Button>
+                        </React.Fragment>
+                    }
                   </div>
                 </React.Fragment>
                 :
@@ -142,7 +173,7 @@ export default class InstanceMange extends React.Component{
                   If the problem persists, please contact the support.<br/>
                   <small>{instance.fetchError}</small><br/><br/>
                   <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
-                    <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                    <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
                   </Button>
                 </BGMessage>
             }

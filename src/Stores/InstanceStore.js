@@ -77,6 +77,9 @@ class InstanceStore {
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
+  @observable instanceToDelete = null;
+  @observable isDeletingInstance = false;
+  @observable deleteInstanceError = null;
 
   @observable showCreateModal = false;
 
@@ -227,6 +230,37 @@ class InstanceStore {
       this.isCreatingNewInstance = false;
       this.instanceCreationError = e.message;
     }
+  }
+
+  @action
+  async deleteInstance(instanceId){
+    if (instanceId) {
+      this.instanceToDelete = instanceId;
+      this.isDeletingInstance = true;
+      this.deleteInstanceError = null;
+      try{
+        const {data} = await API.axios.delete(API.endpoints.indexing(instanceId), {});
+        this.instanceToDelete = null;
+        this.isDeletingInstance = false;
+        debugger;
+        // TODO flush store
+      } catch(e){
+        const message = e.message?e.message:e;
+        this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message})`;
+        this.isDeletingInstance = false;
+      }
+    }
+  }
+
+  @action
+  async retryDeleteInstance() {
+    this.deleteInstance(this.instanceToDelete);
+  }
+
+  @action
+  cancelDeleteInstance() {
+    this.instanceToDelete = null;
+    this.deleteInstanceError = null;
   }
 
   @action

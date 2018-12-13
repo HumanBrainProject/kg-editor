@@ -1,8 +1,5 @@
 {
-    "TotalNumberOfReleasedDatasets": 171,
-    "TotalNumberOfDatasets": 432,
-    "AverageNumberOfDaysToReleaseADataset": 17,
-    "PerWeekStatistics": [
+    "data": [
         {
             "period": "Sep 30",
             "numberOfNewlyReleasedDatasets": 6,

@@ -1,18 +1,23 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-import {Button, Modal} from "react-bootstrap";
+
+import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
 import Field from "./QueryBuilder/Field";
 
-import ReactJson from "react-json-view";
+import RootSchemaChoice from "./QueryBuilder/RootSchemaChoice";
+import Query from "./QueryBuilder/Query";
+import Options from "./QueryBuilder/Options";
+import Result from "./QueryBuilder/Result";
+import Tab from "../Components/Tab";
 
 let styles = {
   container:{
     display:"grid",
     gridTemplateRows:"100%",
-    gridTemplateColumns:"1fr 1fr 1fr",
+    gridTemplateColumns:"1fr 1fr",
     gridGap:"10px",
     padding:"10px",
     height:"100%"
@@ -22,41 +27,33 @@ let styles = {
     overflow:"auto",
     color:"var(--ft-color-normal)"
   },
-  schemaSelectGroup:{
-    fontSize:"1.25em",
-    fontWeight:"bold",
-    marginBottom:"10px"
+  tabbedPanel:{
+    display:"grid",
+    gridTemplateRows:"auto 1fr"
   },
-  schemaSelectSchema:{
-    fontSize:"0.8em",
-    fontWeight:"normal",
-    paddingLeft:"10px"
+  tabs:{
+    display:"grid",
+    gridTemplateColumns:"repeat(auto-fit, minmax(120px, 1fr))",
+    borderLeft:"1px solid var(--border-color-ui-contrast2)"
   },
-  query:{
-    background:"rgb(50, 41, 49)",
+  tabBody:{
+    border:"1px solid var(--border-color-ui-contrast2)",
+    borderTop:"none",
+    background:"rgb(39, 40, 34)"
   },
-  result:{
-    background:"rgb(50, 41, 49)",
+  tabBodyInner:{
+    padding:"10px"
   }
 };
 
 @injectStyles(styles)
 @observer
 export default class QueryBuilder extends React.Component{
-  handleChooseRootSchema = () => {
-    queryBuilderStore.toggleShowModalSchemaChoice();
+  handleSelectTab(tab){
+    queryBuilderStore.selectTab(tab);
   }
-
-  handleSelectRootSchema = (schema) => {
-    queryBuilderStore.selectRootSchema(schema);
-  }
-
-  handleAddField(schema){
-    queryBuilderStore.addField(schema);
-  }
-
-  handleToggleRunStripVocab = () => {
-    queryBuilderStore.toggleRunStripVocab();
+  handleCloseField = () => {
+    queryBuilderStore.closeFieldOptions();
   }
 
   render(){
@@ -65,84 +62,40 @@ export default class QueryBuilder extends React.Component{
       queryBuilderStore.structure?
         <div className={classes.container}>
           <div className={classes.schemas}>
-            {!queryBuilderStore.rootField?
-              <React.Fragment>
-                <Button onClick={this.handleChooseRootSchema}>Choose a root schema</Button>
-                <Modal show={queryBuilderStore.showModalSchemaChoice}>
-                  <Modal.Body>
-                    {queryBuilderStore.getSortedSchemaGroups().map(group => {
-                      return(
-                        <div className={classes.schemaSelectGroup} key={group}>
-                          {group}
-                          <div>
-                            {queryBuilderStore.getSortedSchemasByGroup(group).map(schema => {
-                              if(!schema.properties || !schema.properties.length){
-                                return null;
-                              }
-                              return(
-                                <div className={classes.schemaSelectSchema} key={schema.id} onClick={this.handleSelectRootSchema.bind(this, schema)}>
-                                  {schema.label}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </Modal.Body>
-                </Modal>
-              </React.Fragment>
-              :
+            {queryBuilderStore.rootField?
               <React.Fragment>
                 <Field field={queryBuilderStore.rootField}/>
-                {queryBuilderStore.showModalFieldChoice &&
-                  <Modal show={true}>
-                    <Modal.Body>
-                      <strong>Properties: </strong>
-                      {queryBuilderStore.showModalFieldChoice.schema.canBe.map((schemaId)=>{
-                        return(
-                          queryBuilderStore.findSchemaById(schemaId).properties.filter(prop => !prop.canBe || !prop.canBe.length).map(propSchema => {
-                            return (
-                              <div key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
-                                {propSchema.label}
-                              </div>
-                            );
-                          })
-                        );
-                      })}
-
-                      <hr/>
-
-                      <strong>Links: </strong>
-                      {queryBuilderStore.showModalFieldChoice.schema.canBe.map((schemaId)=>{
-                        return(
-                          queryBuilderStore.findSchemaById(schemaId).properties.filter(prop => prop.canBe && prop.canBe.length).map(propSchema => {
-                            return (
-                              <div key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
-                                {propSchema.label}
-                                ( {propSchema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")})
-                              </div>
-                            );
-                          })
-                        );
-                      })}
-                    </Modal.Body>
-                  </Modal>
-                }
               </React.Fragment>
-            }
+              :null}
           </div>
 
-          <div className={classes.query}>
-            {queryBuilderStore.rootField && <ReactJson onEdit={()=>{return false;}} collapsed={false} name={false} theme="hopscotch" src={queryBuilderStore.JSONQuery} />}
-          </div>
-
-          <div className={classes.result}>
-            <Button onClick={()=>queryBuilderStore.executeQuery()}>
-              Try it
-            </Button>
-            Strip vocab : <input type="checkbox" onChange={this.handleToggleRunStripVocab} checked={queryBuilderStore.runStripVocab}/>
-            {queryBuilderStore.result && <ReactJson collapsed={1} name={false} theme="hopscotch" src={queryBuilderStore.result} />}
+          <div className={classes.tabbedPanel}>
+            <div className={classes.tabs}>
+              {queryBuilderStore.rootField?
+                <React.Fragment>
+                  {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
+                  <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
+                  <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Result"} onClick={this.handleSelectTab.bind(this, "result")}/>
+                </React.Fragment>
+                :
+                <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
+              }
+            </div>
+            <div className={classes.tabBody}>
+              <Scrollbars autoHide>
+                <div className={classes.tabBodyInner}>
+                  {!queryBuilderStore.rootField?
+                    <RootSchemaChoice/>
+                    :queryBuilderStore.currentTab === "query"?
+                      <Query/>
+                      :queryBuilderStore.currentTab === "result"?
+                        <Result/>
+                        :queryBuilderStore.currentTab === "fieldOptions"?
+                          <Options/>
+                          :null}
+                </div>
+              </Scrollbars>
+            </div>
           </div>
         </div>
         :null

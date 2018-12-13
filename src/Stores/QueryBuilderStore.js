@@ -2,6 +2,7 @@ import axios from "axios";
 import {observable, action, computed} from "mobx";
 import {uniqueId, sortBy, groupBy} from "lodash";
 import API from "../Services/API";
+import {remove} from "lodash";
 
 class Field {
   @observable schema = null;
@@ -29,14 +30,13 @@ class QueryBuilderStore {
   @observable structure = null;
   @observable rootField = null;
 
-  @observable showModalSchemaChoice = false;
-  @observable showModalFieldChoice = null;
-  @observable showModalFieldOptions = null;
-
   @observable schemasMap = new Map();
 
-  @observable runStripVocab = false;
+  @observable runStripVocab = true;
   @observable.shallow result = null;
+
+  @observable currentTab = "query";
+  @observable currentField = null;
 
   constructor(){
     this.fetchStructure();
@@ -48,6 +48,7 @@ class QueryBuilderStore {
       label:schema.label,
       canBe:[schema.id]
     });
+    this.selectField(this.rootField);
   }
 
   @computed
@@ -68,12 +69,29 @@ class QueryBuilderStore {
   }
 
   @action
-  addField(schema, field){
+  addField(schema, field, gotoField = true){
     if(field === undefined) {
       field = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
-    field.fields.push(new Field(schema, field));
+    let newField = new Field(schema, field);
+    field.fields.push(newField);
+    if(gotoField){
+      this.selectField(newField);
+    }
+  }
+
+  @action
+  removeField(field){
+    if(this.rootField === field){
+      this.rootField = null;
+      this.closeFieldOptions();
+    } else {
+      if(field === this.currentField){
+        this.closeFieldOptions();
+      }
+      remove(field.parent.fields, parentField => field === parentField);
+    }
   }
 
   @action async fetchStructure(){
@@ -84,20 +102,22 @@ class QueryBuilderStore {
     });
   }
 
-  @action toggleShowModalSchemaChoice(state){
-    this.showModalSchemaChoice = state === undefined? !this.showModalSchemaChoice: !!state;
-  }
-
-  @action toggleShowModalFieldChoice(field){
-    this.showModalFieldChoice = field === undefined? null: field;
-  }
-
-  @action toggleShowModalFieldOptions(field){
-    this.showModalFieldOptions = field === undefined? null: field;
-  }
-
   @action toggleRunStripVocab(state){
     this.runStripVocab = state !== undefined? !!state: !this.runStripVocab;
+  }
+
+  @action selectTab(tab){
+    this.currentTab = tab;
+  }
+
+  @action selectField(field){
+    this.currentField = field;
+    this.currentTab = "fieldOptions";
+  }
+
+  @action closeFieldOptions(){
+    this.currentField = null;
+    this.currentTab = "query";
   }
 
   @computed

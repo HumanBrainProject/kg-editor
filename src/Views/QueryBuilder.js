@@ -11,7 +11,9 @@ import RootSchemaChoice from "./QueryBuilder/RootSchemaChoice";
 import Query from "./QueryBuilder/Query";
 import Options from "./QueryBuilder/Options";
 import Result from "./QueryBuilder/Result";
+import ResultTable from "./QueryBuilder/ResultTable";
 import Tab from "../Components/Tab";
+import BGMessage from "../Components/BGMessage";
 
 let styles = {
   container:{
@@ -23,7 +25,9 @@ let styles = {
     height:"100%"
   },
   schemas:{
-    background:"var(--bg-color-ui-contrast1)",
+    position:"relative",
+    background: "var(--bg-color-ui-contrast2)",
+    border: "1px solid var(--border-color-ui-contrast1)",
     overflow:"auto",
     color:"var(--ft-color-normal)"
   },
@@ -39,7 +43,7 @@ let styles = {
   tabBody:{
     border:"1px solid var(--border-color-ui-contrast2)",
     borderTop:"none",
-    background:"rgb(39, 40, 34)"
+    background:"var(--bg-color-ui-contrast2)"
   },
   tabBodyInner:{
     padding:"10px"
@@ -63,10 +67,10 @@ export default class QueryBuilder extends React.Component{
         <div className={classes.container}>
           <div className={classes.schemas}>
             {queryBuilderStore.rootField?
-              <React.Fragment>
-                <Field field={queryBuilderStore.rootField}/>
-              </React.Fragment>
-              :null}
+              <Field field={queryBuilderStore.rootField}/>
+              :<BGMessage icon={"blender-phone"}>
+                Please choose a root schema in the right panel
+              </BGMessage>}
           </div>
 
           <div className={classes.tabbedPanel}>
@@ -75,7 +79,8 @@ export default class QueryBuilder extends React.Component{
                 <React.Fragment>
                   {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
                   <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
-                  <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Result"} onClick={this.handleSelectTab.bind(this, "result")}/>
+                  <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")}/>
+                  <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")}/>
                 </React.Fragment>
                 :
                 <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
@@ -90,9 +95,11 @@ export default class QueryBuilder extends React.Component{
                       <Query/>
                       :queryBuilderStore.currentTab === "result"?
                         <Result/>
-                        :queryBuilderStore.currentTab === "fieldOptions"?
-                          <Options/>
-                          :null}
+                        :queryBuilderStore.currentTab === "resultTable"?
+                          <ResultTable/>
+                          :queryBuilderStore.currentTab === "fieldOptions"?
+                            <Options/>
+                            :null}
                 </div>
               </Scrollbars>
             </div>

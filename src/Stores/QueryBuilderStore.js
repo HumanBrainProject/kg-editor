@@ -1,5 +1,5 @@
 import axios from "axios";
-import {observable, action, computed} from "mobx";
+import {observable, action, computed, runInAction} from "mobx";
 import {uniqueId, sortBy, groupBy} from "lodash";
 import API from "../Services/API";
 import {remove} from "lodash";
@@ -18,7 +18,15 @@ class Field {
   }
 
   @action setOption(option, value){
-    this.options.set(option, value);
+    if(option === "flatten"){
+      if(value === true && this.fields.length === 1){
+        this.options.set(option, value);
+      } else if(value === null){
+        this.options.set(option, value);
+      }
+    } else {
+      this.options.set(option, value);
+    }
   }
 
   getOption(option){
@@ -33,7 +41,10 @@ class QueryBuilderStore {
   @observable schemasMap = new Map();
 
   @observable runStripVocab = true;
+  @observable resultSize = 20;
+  @observable resultStart = 0;
   @observable.shallow result = null;
+  @observable tableViewRoot = ["results"];
 
   @observable currentTab = "query";
   @observable currentField = null;
@@ -74,10 +85,12 @@ class QueryBuilderStore {
       field = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
-    let newField = new Field(schema, field);
-    field.fields.push(newField);
-    if(gotoField){
-      this.selectField(newField);
+    if(!field.getOption("flatten") || field.fields.length < 1){
+      let newField = new Field(schema, field);
+      field.fields.push(newField);
+      if(gotoField){
+        this.selectField(newField);
+      }
     }
   }
 
@@ -125,7 +138,7 @@ class QueryBuilderStore {
     let json = {
       "@context":{
         "@vocab": "https://schema.hbp.eu/graphQuery/",
-        "target":"https://schema.hbp.eu/mytarget/",
+        "query":"https://schema.hbp.eu/myQuery/",
         "fieldname": {
           "@id": "fieldname",
           "@type": "@id"
@@ -147,10 +160,21 @@ class QueryBuilderStore {
         json.fields = [];
       }
       let jsonField = {
-        "fieldname":"target:"+(field.getOption("alias") || field.schema.label),
+        "fieldname":"query:"+(field.getOption("alias") || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label),
         "relative_path":{"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined},
         "required":field.getOption("required") === true? true: undefined
       };
+      if(field.getOption("flatten")){
+        let topField = field;
+        jsonField.relative_path = [jsonField.relative_path];
+        while(field.getOption("flatten") && field.fields[0]){
+          field = field.fields[0];
+          jsonField.relative_path.push({"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined});
+          if(field.fields && field.fields.length){
+            jsonField.fieldname = "query:"+(topField.getOption("alias") || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label);
+          }
+        }
+      }
       json.fields.push(jsonField);
       if(field.fields && field.fields.length){
         this._processFields(jsonField, field);
@@ -162,11 +186,35 @@ class QueryBuilderStore {
   async executeQuery(){
     try{
       let payload = this.JSONQuery;
-      let response = await API.axios.post(API.endpoints.query(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/mytarget/":undefined), payload);
-      this.result = response.data;
+      let response = await API.axios.post(API.endpoints.query(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/myQuery/":undefined, this.resultSize, this.resultStart), payload);
+      runInAction(()=>{
+        this.tableViewRoot = ["results"];
+        this.result = response.data;
+      });
     } catch(e){
       this.result = null;
     }
+  }
+
+  @action
+  setResultSize(size){
+    this.resultSize = size;
+  }
+
+  @action
+  setResultStart(start){
+    this.resultStart = start;
+  }
+
+  @action
+  returnToTableViewRoot(index){
+    this.tableViewRoot = this.tableViewRoot.slice(0, index+1);
+  }
+
+  @action
+  appendTableViewRoot(index,key){
+    this.tableViewRoot.push(index);
+    this.tableViewRoot.push(key);
   }
 }
 

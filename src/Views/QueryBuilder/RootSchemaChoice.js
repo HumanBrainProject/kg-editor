@@ -10,12 +10,25 @@ let style = {
   schemaSelectGroup:{
     fontSize:"1.25em",
     fontWeight:"bold",
-    marginBottom:"10px"
+    marginBottom:"10px",
+    "& h3":{
+      paddingLeft:"10px"
+    }
   },
   schemaSelectSchema:{
     fontSize:"0.8em",
     fontWeight:"normal",
-    paddingLeft:"10px"
+    cursor: "pointer",
+    padding: "10px",
+    margin:"1px",
+    background:"var(--bg-color-ui-contrast1)",
+    "& small":{
+      color:"var(--ft-color-quiet)",
+      fontStyle:"italic"
+    },
+    "&:hover":{
+      background:"var(--bg-color-ui-contrast4)",
+    }
   },
 };
 
@@ -33,15 +46,12 @@ export default class RootSchemaChoice extends React.Component{
         {queryBuilderStore.getSortedSchemaGroups().map(group => {
           return(
             <div className={classes.schemaSelectGroup} key={group}>
-              {group}
+              <h3>{group}</h3>
               <div>
                 {queryBuilderStore.getSortedSchemasByGroup(group).map(schema => {
-                  if(!schema.properties || !schema.properties.length){
-                    return null;
-                  }
                   return(
                     <div className={classes.schemaSelectSchema} key={schema.id} onClick={this.handleSelectRootSchema.bind(this, schema)}>
-                      {schema.label}
+                      {schema.label} - <small>{schema.id}</small>
                     </div>
                   );
                 })}

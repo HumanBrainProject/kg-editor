@@ -589,45 +589,30 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/ethics/approval/v0.0.4"
-          ],
           "simpleAttributeName": "ethicsApproval",
           "attribute": "http://hbp.eu/minds#ethicsApproval",
           "label": "Ethics approval"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/ethics/authority/v0.0.4"
-          ],
           "simpleAttributeName": "ethicsAuthority",
           "attribute": "http://hbp.eu/minds#ethicsAuthority",
           "label": "Ethics authority"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/experiment/method/v0.0.4"
-          ],
           "simpleAttributeName": "methods",
           "attribute": "http://hbp.eu/minds#methods",
           "label": "Methods"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/preparation/v0.0.4"
-          ],
           "simpleAttributeName": "preparation",
           "attribute": "http://hbp.eu/minds#preparation",
           "label": "Preparation"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/experiment/protocol/v0.0.4"
-          ],
           "simpleAttributeName": "protocols",
           "attribute": "http://hbp.eu/minds#protocols",
           "label": "Protocols"
@@ -836,9 +821,6 @@
         },
         {
           "numOfOccurences": 23,
-          "canBe": [
-            "minds/core/dataset/v0.0.4"
-          ],
           "simpleAttributeName": "partOf",
           "attribute": "https://bbp-nexus.epfl.ch/vocabs/bbp/neurosciencegraph/core/v0.1.0/partOf",
           "label": "Part of"
@@ -881,13 +863,13 @@
       "label": "Dataset",
       "properties": [
         {
-          "numOfOccurences": 444,
+          "numOfOccurences": 445,
           "simpleAttributeName": "@id",
           "attribute": "@id",
           "label": "Id"
         },
         {
-          "numOfOccurences": 443,
+          "numOfOccurences": 444,
           "simpleAttributeName": "@type",
           "attribute": "@type",
           "label": "Type"
@@ -911,19 +893,19 @@
           "label": "Container url"
         },
         {
-          "numOfOccurences": 383,
+          "numOfOccurences": 384,
           "simpleAttributeName": "description",
           "attribute": "http://schema.org/description",
           "label": "Description"
         },
         {
-          "numOfOccurences": 443,
+          "numOfOccurences": 444,
           "simpleAttributeName": "identifier",
           "attribute": "http://schema.org/identifier",
           "label": "Identifier"
         },
         {
-          "numOfOccurences": 403,
+          "numOfOccurences": 404,
           "simpleAttributeName": "name",
           "attribute": "http://schema.org/name",
           "label": "Name"
@@ -935,13 +917,13 @@
           "label": "Qualified association"
         },
         {
-          "numOfOccurences": 160,
+          "numOfOccurences": 161,
           "simpleAttributeName": "alternatives",
           "attribute": "https://schema.hbp.eu/inference/alternatives",
           "label": "Alternatives"
         },
         {
-          "numOfOccurences": 318,
+          "numOfOccurences": 321,
           "canBe": [
             "minds/core/activity/v1.0.0"
           ],
@@ -950,7 +932,7 @@
           "label": "Activity"
         },
         {
-          "numOfOccurences": 309,
+          "numOfOccurences": 311,
           "canBe": [
             "minds/core/placomponent/v1.0.0"
           ],
@@ -965,7 +947,7 @@
           "label": "Container url"
         },
         {
-          "numOfOccurences": 313,
+          "numOfOccurences": 316,
           "canBe": [
             "minds/core/person/v1.0.0"
           ],
@@ -1001,7 +983,7 @@
           "label": "Doi"
         },
         {
-          "numOfOccurences": 321,
+          "numOfOccurences": 323,
           "canBe": [
             "minds/core/embargostatus/v1.0.0"
           ],
@@ -1016,7 +998,7 @@
           "label": "External datalink"
         },
         {
-          "numOfOccurences": 314,
+          "numOfOccurences": 316,
           "canBe": [
             "minds/core/format/v1.0.0"
           ],
@@ -1034,7 +1016,7 @@
           "label": "License"
         },
         {
-          "numOfOccurences": 312,
+          "numOfOccurences": 314,
           "canBe": [
             "licenses/core/information/v1.0.0"
           ],
@@ -1043,7 +1025,7 @@
           "label": "License info"
         },
         {
-          "numOfOccurences": 315,
+          "numOfOccurences": 317,
           "canBe": [
             "minds/core/person/v1.0.0"
           ],
@@ -1052,7 +1034,7 @@
           "label": "Owners"
         },
         {
-          "numOfOccurences": 105,
+          "numOfOccurences": 108,
           "canBe": [
             "minds/core/parcellationatlas/v1.0.0"
           ],
@@ -1061,7 +1043,7 @@
           "label": "Parcellation atlas"
         },
         {
-          "numOfOccurences": 311,
+          "numOfOccurences": 313,
           "canBe": [
             "minds/core/parcellationregion/v1.0.0"
           ],
@@ -1070,7 +1052,7 @@
           "label": "Parcellation region"
         },
         {
-          "numOfOccurences": 311,
+          "numOfOccurences": 313,
           "canBe": [
             "minds/core/publication/v1.0.0"
           ],
@@ -1079,7 +1061,7 @@
           "label": "Publications"
         },
         {
-          "numOfOccurences": 273,
+          "numOfOccurences": 275,
           "canBe": [
             "minds/core/referencespace/v1.0.0"
           ],
@@ -1094,7 +1076,7 @@
           "label": "Release date"
         },
         {
-          "numOfOccurences": 314,
+          "numOfOccurences": 316,
           "canBe": [
             "minds/core/specimengroup/v1.0.0"
           ],
@@ -1103,7 +1085,7 @@
           "label": "Specimen group"
         },
         {
-          "numOfOccurences": 16,
+          "numOfOccurences": 18,
           "simpleAttributeName": "reference",
           "attribute": "https://schema.hbp.eu/neuroglancer/reference",
           "label": "Reference"
@@ -1115,25 +1097,25 @@
           "label": "Immediate index"
         },
         {
-          "numOfOccurences": 395,
+          "numOfOccurences": 394,
           "simpleAttributeName": "indexedInArangoAt",
           "attribute": "https://schema.hbp.eu/provenance/indexedInArangoAt",
           "label": "Indexed in arango at"
         },
         {
-          "numOfOccurences": 428,
+          "numOfOccurences": 429,
           "simpleAttributeName": "lastModificationUserId",
           "attribute": "https://schema.hbp.eu/provenance/lastModificationUserId",
           "label": "Last modification user id"
         },
         {
-          "numOfOccurences": 431,
+          "numOfOccurences": 432,
           "simpleAttributeName": "modifiedAt",
           "attribute": "https://schema.hbp.eu/provenance/modifiedAt",
           "label": "Modified at"
         },
         {
-          "numOfOccurences": 444,
+          "numOfOccurences": 445,
           "simpleAttributeName": "relativeUrl",
           "attribute": "https://schema.hbp.eu/relativeUrl",
           "label": "Relative url"
@@ -1533,8 +1515,6 @@
         {
           "numOfOccurences": 22171,
           "canBe": [
-            "minds/core/placomponent/v0.0.4",
-            "minds/experiment/sample/v0.0.4",
             "minds/core/dataset/v0.0.4"
           ],
           "simpleAttributeName": "associated_entity",
@@ -1840,8 +1820,8 @@
         {
           "simplePropertyName": "parcellationAtlas",
           "canBe": [
-            "minds/experiment/sample/v1.0.0",
-            "minds/core/dataset/v1.0.0"
+            "minds/core/dataset/v1.0.0",
+            "minds/experiment/sample/v1.0.0"
           ],
           "attribute": "https://schema.hbp.eu/minds/parcellationAtlas",
           "reverse": true
@@ -2002,6 +1982,95 @@
       ]
     },
     {
+      "id": "licenses/core/information/v1.0.0",
+      "group": "licenses",
+      "label": "Information",
+      "properties": [
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "@id",
+          "attribute": "@id",
+          "label": "Id"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "@type",
+          "attribute": "@type",
+          "label": "Type"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "hashcode",
+          "attribute": "http://hbp.eu/internal#hashcode",
+          "label": "Hashcode"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "alternateName",
+          "attribute": "http://schema.org/alternateName",
+          "label": "Alternate name"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "identifier",
+          "attribute": "http://schema.org/identifier",
+          "label": "Identifier"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "name",
+          "attribute": "http://schema.org/name",
+          "label": "Name"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "url",
+          "attribute": "http://schema.org/url",
+          "label": "Url"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "indexedInArangoAt",
+          "attribute": "https://schema.hbp.eu/provenance/indexedInArangoAt",
+          "label": "Indexed in arango at"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "lastModificationUserId",
+          "attribute": "https://schema.hbp.eu/provenance/lastModificationUserId",
+          "label": "Last modification user id"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "modifiedAt",
+          "attribute": "https://schema.hbp.eu/provenance/modifiedAt",
+          "label": "Modified at"
+        },
+        {
+          "numOfOccurences": 6,
+          "simpleAttributeName": "relativeUrl",
+          "attribute": "https://schema.hbp.eu/relativeUrl",
+          "label": "Relative url"
+        },
+        {
+          "simplePropertyName": "instance",
+          "canBe": [
+            "releasing/prov/release/v0.0.2"
+          ],
+          "attribute": "https://schema.hbp.eu/release/instance",
+          "reverse": true
+        },
+        {
+          "simplePropertyName": "license_info",
+          "canBe": [
+            "minds/core/dataset/v1.0.0"
+          ],
+          "attribute": "https://schema.hbp.eu/minds/license_info",
+          "reverse": true
+        }
+      ]
+    },
+    {
       "id": "neuralactivity/experiment/brainslicing/v0.1.0",
       "group": "neuralactivity",
       "label": "Brainslicing",
@@ -2092,95 +2161,6 @@
           "simpleAttributeName": "relativeUrl",
           "attribute": "https://schema.hbp.eu/relativeUrl",
           "label": "Relative url"
-        }
-      ]
-    },
-    {
-      "id": "licenses/core/information/v1.0.0",
-      "group": "licenses",
-      "label": "Information",
-      "properties": [
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "@id",
-          "attribute": "@id",
-          "label": "Id"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "@type",
-          "attribute": "@type",
-          "label": "Type"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "hashcode",
-          "attribute": "http://hbp.eu/internal#hashcode",
-          "label": "Hashcode"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "alternateName",
-          "attribute": "http://schema.org/alternateName",
-          "label": "Alternate name"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "identifier",
-          "attribute": "http://schema.org/identifier",
-          "label": "Identifier"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "name",
-          "attribute": "http://schema.org/name",
-          "label": "Name"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "url",
-          "attribute": "http://schema.org/url",
-          "label": "Url"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "indexedInArangoAt",
-          "attribute": "https://schema.hbp.eu/provenance/indexedInArangoAt",
-          "label": "Indexed in arango at"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "lastModificationUserId",
-          "attribute": "https://schema.hbp.eu/provenance/lastModificationUserId",
-          "label": "Last modification user id"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "modifiedAt",
-          "attribute": "https://schema.hbp.eu/provenance/modifiedAt",
-          "label": "Modified at"
-        },
-        {
-          "numOfOccurences": 6,
-          "simpleAttributeName": "relativeUrl",
-          "attribute": "https://schema.hbp.eu/relativeUrl",
-          "label": "Relative url"
-        },
-        {
-          "simplePropertyName": "instance",
-          "canBe": [
-            "releasing/prov/release/v0.0.2"
-          ],
-          "attribute": "https://schema.hbp.eu/release/instance",
-          "reverse": true
-        },
-        {
-          "simplePropertyName": "license_info",
-          "canBe": [
-            "minds/core/dataset/v1.0.0"
-          ],
-          "attribute": "https://schema.hbp.eu/minds/license_info",
-          "reverse": true
         }
       ]
     },
@@ -2314,18 +2294,12 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/activity/v0.0.4"
-          ],
           "simpleAttributeName": "activity",
           "attribute": "http://hbp.eu/minds#activity",
           "label": "Activity"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/placomponent/v0.0.4"
-          ],
           "simpleAttributeName": "component",
           "attribute": "http://hbp.eu/minds#component",
           "label": "Component"
@@ -2338,9 +2312,6 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/person/v0.0.4"
-          ],
           "simpleAttributeName": "contributors",
           "attribute": "http://hbp.eu/minds#contributors",
           "label": "Contributors"
@@ -2365,54 +2336,36 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/embargostatus/v0.0.4"
-          ],
           "simpleAttributeName": "embargo_status",
           "attribute": "http://hbp.eu/minds#embargo_status",
           "label": "Embargo status"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/format/v0.0.4"
-          ],
           "simpleAttributeName": "formats",
           "attribute": "http://hbp.eu/minds#formats",
           "label": "Formats"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "licenses/core/information/v0.0.1"
-          ],
           "simpleAttributeName": "license_info",
           "attribute": "http://hbp.eu/minds#license_info",
           "label": "License info"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/person/v0.0.4"
-          ],
           "simpleAttributeName": "owners",
           "attribute": "http://hbp.eu/minds#owners",
           "label": "Owners"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/parcellationregion/v0.0.4"
-          ],
           "simpleAttributeName": "parcellationRegion",
           "attribute": "http://hbp.eu/minds#parcellationRegion",
           "label": "Parcellation region"
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/publication/v0.0.4"
-          ],
           "simpleAttributeName": "publications",
           "attribute": "http://hbp.eu/minds#publications",
           "label": "Publications"
@@ -2431,9 +2384,6 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/specimengroup/v0.0.4"
-          ],
           "simpleAttributeName": "specimen_group",
           "attribute": "http://hbp.eu/minds#specimen_group",
           "label": "Specimen group"
@@ -3206,9 +3156,6 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/dataset/v0.0.4"
-          ],
           "simpleAttributeName": "reference",
           "attribute": "http://hbp.eu/minds#reference",
           "label": "Reference"
@@ -3436,9 +3383,6 @@
         },
         {
           "numOfOccurences": 1,
-          "canBe": [
-            "minds/core/person/v0.0.4"
-          ],
           "simpleAttributeName": "parent",
           "attribute": "http://hbp.eu/manual#parent",
           "label": "Parent"
@@ -3879,9 +3823,8 @@
         {
           "numOfOccurences": 94,
           "canBe": [
-            "minds/core/person/v1.0.0",
             "minds/experiment/protocol/v1.0.0",
-            "minds/core/specimengroup/v1.0.0",
+            "minds/core/person/v1.0.0",
             "minds/experiment/subject/v1.0.0",
             "minds/core/format/v1.0.0",
             "minds/core/dataset/v1.0.0",
@@ -3890,17 +3833,15 @@
             "minds/core/agecategory/v1.0.0",
             "minds/experiment/sample/v1.0.0",
             "minds/ethics/authority/v1.0.0",
-            "minds/experiment/method/v1.0.0",
             "minds/core/licensetype/v1.0.0",
+            "minds/core/specimengroup/v1.0.0",
             "minds/core/placomponent/v1.0.0",
-            "minds/core/activity/v1.0.0",
             "minds/core/parcellationregion/v1.0.0",
+            "minds/core/activity/v1.0.0",
             "minds/core/preparation/v1.0.0",
             "minds/ethics/approval/v1.0.0",
-            "minds/core/embargostatus/v1.0.0",
+            "minds/experiment/method/v1.0.0",
             "minds/core/referencespace/v1.0.0",
-            "minds/prov/role/v1.0.0",
-            "minds/core/softwareagent/v1.0.0",
             "minds/core/publication/v1.0.0"
           ],
           "simpleAttributeName": "instance",
@@ -3941,28 +3882,7 @@
         {
           "numOfOccurences": 1,
           "canBe": [
-            "minds/core/format/v0.0.4",
-            "minds/core/method/v0.0.4",
-            "minds/core/preparation/v0.0.4",
-            "minds/core/agecategory/v0.0.4",
-            "minds/core/species/v0.0.4",
-            "minds/core/sex/v0.0.4",
-            "minds/core/referencespace/v0.0.4",
-            "minds/core/embargostatus/v0.0.4",
-            "minds/core/licensetype/v0.0.4",
-            "minds/core/parcellationatlas/v0.0.4",
-            "minds/experiment/method/v0.0.4",
-            "minds/experiment/protocol/v0.0.4",
-            "minds/core/activity/v0.0.4",
-            "minds/ethics/authority/v0.0.4",
-            "minds/core/specimengroup/v0.0.4",
-            "minds/experiment/subject/v0.0.4",
-            "minds/core/dataset/v0.0.4",
-            "minds/core/parcellationregion/v0.0.4",
-            "minds/core/person/v0.0.4",
-            "minds/core/publication/v0.0.4",
-            "minds/core/placomponent/v0.0.4",
-            "minds/experiment/sample/v0.0.4"
+            "minds/core/publication/v0.0.4"
           ],
           "simpleAttributeName": "releaseinstance",
           "attribute": "http://hbp.eu/minds#releaseinstance",
@@ -4471,9 +4391,6 @@
         },
         {
           "numOfOccurences": 2,
-          "canBe": [
-            "minds/core/person/v0.0.4"
-          ],
           "simpleAttributeName": "authors",
           "attribute": "http://hbp.eu/minds#authors",
           "label": "Authors"
@@ -4808,9 +4725,6 @@
         },
         {
           "numOfOccurences": 115,
-          "canBe": [
-            "minds/core/dataset/v0.0.4"
-          ],
           "simpleAttributeName": "doireference",
           "attribute": "http://hbp.eu/minds#doireference",
           "label": "Doireference"
@@ -5688,7 +5602,7 @@
           "label": "Identifier"
         },
         {
-          "numOfOccurences": 21,
+          "numOfOccurences": 25,
           "simpleAttributeName": "alternatives",
           "attribute": "https://schema.hbp.eu/inference/alternatives",
           "label": "Alternatives"
@@ -5708,8 +5622,7 @@
         {
           "numOfOccurences": 115,
           "canBe": [
-            "minds/core/dataset/v1.0.0",
-            "minds/core/dataset/v0.0.4"
+            "minds/core/dataset/v1.0.0"
           ],
           "simpleAttributeName": "doireference",
           "attribute": "https://schema.hbp.eu/minds/doireference",

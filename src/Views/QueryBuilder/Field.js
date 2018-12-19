@@ -32,7 +32,7 @@ let styles = {
   label:{
     padding:"10px",
     margin:"1px",
-    backgroundColor:"var(--bg-color-ui-contrast3)",
+    backgroundColor:"var(--bg-color-ui-contrast1)",
     position:"relative",
     zIndex:2,
     cursor:"pointer",

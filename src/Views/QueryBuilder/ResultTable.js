@@ -3,11 +3,12 @@ import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import { observer } from "mobx-react";
 import { toJS } from "mobx";
 import { Button, Table, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { get, isArray, isString } from "lodash";
+import { get, isArray, isString, isInteger } from "lodash";
 
 import injectStyles from "react-jss";
 import ResultOptions from "./ResultOptions";
 import routerStore from "../../Stores/RouterStore";
+import instanceStore from "../../Stores/InstanceStore";
 
 let styles = {
   container:{
@@ -35,6 +36,52 @@ let styles = {
     "[id^=result-tooltip-@id] .tooltip-inner":{
       wordBreak:"break-all"
     }
+  },
+
+  breadcrumb:{
+    overflow:"hidden",
+    marginBottom:"20px"
+  },
+  breadcrumbItem:{
+    float:"left",
+    background:"var(--list-bg-hover)",
+    height:"36px",
+    lineHeight:"36px",
+    padding:"0 20px 0 30px",
+    position:"relative",
+    border:"1px solid var(--border-color-ui-contrast2)",
+    "&::before":{
+      display:"block",
+      content:"''",
+      position:"absolute",
+      top:"5px",
+      left:"-13px",
+      height:"24px",
+      width:"24px",
+      transform:"rotate(45deg)",
+      background:"var(--list-bg-hover)",
+      borderTop:"1px solid var(--border-color-ui-contrast2)",
+      borderRight:"1px solid var(--border-color-ui-contrast2)",
+    },
+    "&:first-child::before":{
+      display:"none",
+    },
+    "&:first-child":{
+      padding:"0 20px 0 20px",
+    },
+    "&.clickable":{
+      cursor:"pointer",
+    },
+    "&.clickable:hover":{
+      background:"var(--list-bg-selected)",
+      "& + ::before":{
+        background:"var(--list-bg-selected)",
+      }
+    },
+    "&:last-child":{
+      background:"var(--list-bg-selected)",
+      cursor:"default",
+    }
   }
 };
 
@@ -49,9 +96,13 @@ export default class ResultTable extends React.Component{
     queryBuilderStore.appendTableViewRoot(index,key);
   }
 
-  handleClickValue(key, value){
+  handleClickValue(key, value, e){
     if(key === "relativeUrl"){
-      routerStore.history.push("/instance/view/"+value);
+      if(e.metaKey || e.ctrlKey){
+        instanceStore.openInstance(value);
+      } else {
+        routerStore.history.push("/instance/view/"+value);
+      }
     }
   }
 
@@ -61,18 +112,20 @@ export default class ResultTable extends React.Component{
     let subResult = {};
     if(queryBuilderStore.result){
       subResult = get(queryBuilderStore.result, toJS(queryBuilderStore.tableViewRoot));
-      objectKeys = isString(subResult[0])?[""]:Object.keys(subResult[0]);
+      objectKeys = !subResult.length || isString(subResult[0])?[""]:Object.keys(subResult[0]);
     }
     return(
       <div className={classes.container}>
         <ResultOptions/>
-        <hr/>
-        {queryBuilderStore.tableViewRoot.map((item, index) =>
-          <div key={index} onClick={isString(item)?this.handleBreadcrumbClick.bind(this, index):undefined}>
-            {item}
+        {queryBuilderStore.result &&
+          <div className={classes.breadcrumb}>
+            {queryBuilderStore.tableViewRoot.map((item, index) =>
+              <div className={`${classes.breadcrumbItem}${!isInteger(item)?" clickable":""}`} key={index} onClick={isString(item)?this.handleBreadcrumbClick.bind(this, index):undefined}>
+                {isInteger(item)?"#"+item:item} {index === 0?`(${queryBuilderStore.result.total})`:""}
+              </div>
+            )}
           </div>
-        )}
-        <hr/>
+        }
         {queryBuilderStore.result &&
           <Table>
             <thead>

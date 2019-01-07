@@ -60,8 +60,17 @@ export default class QueryBuilder extends React.Component{
     queryBuilderStore.closeFieldOptions();
   }
 
+  UNSAFE_componentWillUpdate(){
+    if(this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel){
+      //console.log(this.scrolledPanel,this.scrolledPanel.scrollTop);
+      this.scrolledPanel.scrollToTop();
+    }
+  }
+
   render(){
     const {classes} = this.props;
+    this.currentTab = queryBuilderStore.currentTab;
+
     return(
       queryBuilderStore.structure?
         <div className={classes.container}>
@@ -87,7 +96,7 @@ export default class QueryBuilder extends React.Component{
               }
             </div>
             <div className={classes.tabBody}>
-              <Scrollbars autoHide>
+              <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
                 <div className={classes.tabBodyInner}>
                   {!queryBuilderStore.rootField?
                     <RootSchemaChoice/>

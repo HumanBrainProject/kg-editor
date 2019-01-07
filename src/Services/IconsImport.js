@@ -57,6 +57,8 @@ import {faPollH} from "@fortawesome/free-solid-svg-icons/faPollH";
 import {faSatelliteDish} from "@fortawesome/free-solid-svg-icons/faSatelliteDish";
 import {faBlenderPhone} from "@fortawesome/free-solid-svg-icons/faBlenderPhone";
 import {faTable} from "@fortawesome/free-solid-svg-icons/faTable";
+import {faAsterisk} from "@fortawesome/free-solid-svg-icons/faAsterisk";
+import {faLevelDownAlt} from "@fortawesome/free-solid-svg-icons/faLevelDownAlt";
 
 library.add(
   faUserLock,
@@ -114,5 +116,7 @@ library.add(
   faPollH,
   faSatelliteDish,
   faBlenderPhone,
-  faTable
+  faTable,
+  faAsterisk,
+  faLevelDownAlt
 );

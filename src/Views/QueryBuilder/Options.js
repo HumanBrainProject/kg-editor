@@ -3,8 +3,8 @@ import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import { observer } from "mobx-react";
 import MultiToggle from "../../Components/MultiToggle";
 import injectStyles from "react-jss";
-import {Button} from "react-bootstrap";
 import {sortBy} from "lodash";
+import {FormControl} from "react-bootstrap";
 
 const style = {
   container:{
@@ -65,6 +65,22 @@ const style = {
       background:"var(--bg-color-ui-contrast3)",
       transform:"rotate(45deg)"
     }
+  },
+
+  option:{
+    marginBottom:"20px",
+    "&:last-child":{
+      marginBottom:0
+    }
+  },
+
+  optionLabel:{
+    fontWeight:"bold",
+    marginBottom:"5px",
+    "& small":{
+      fontWeight:"normal",
+      fontStyle:"italic"
+    }
   }
 };
 
@@ -74,10 +90,6 @@ export default class Options extends React.Component{
   handleAddField(schema, e){
     //Don't got to newly chosen field options if ctrl is pressed (or cmd)
     queryBuilderStore.addField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
-  }
-
-  handleRemoveField = () => {
-    queryBuilderStore.removeField(queryBuilderStore.currentField);
   }
 
   handleChangeRequired = (value) => {
@@ -97,44 +109,52 @@ export default class Options extends React.Component{
 
     return(
       <div className={classes.container}>
-        <div className={classes.fieldOptions}>
-          <Button className={"btn-block"} bsStyle={"danger"} onClick={this.handleRemoveField}>Remove</Button>
-          <div className={classes.option}>
-            <div className={classes.optionLabel}>
-              Target name
-            </div>
-            <div className={classes.optionInput}>
-              <input type="text"
-                onChange={this.handleChangeName}
-                value={queryBuilderStore.currentField.getOption("alias") || ""}
-                placeholder={queryBuilderStore.currentField.schema.simpleAttributeName || queryBuilderStore.currentField.schema.simplePropertyName || queryBuilderStore.currentField.schema.label}/>
-            </div>
+        {queryBuilderStore.currentField !== queryBuilderStore.rootField &&
+          <div className={classes.fieldOptions}>
+            { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
+              <div className={classes.option}>
+                <div className={classes.optionLabel}>
+                  Target name <small>(only applicable if parent field is not flattened)</small>
+                </div>
+                <div className={classes.optionInput}>
+                  <FormControl type="text"
+                    onChange={this.handleChangeName}
+                    value={queryBuilderStore.currentField.getOption("alias") || ""}
+                    placeholder={queryBuilderStore.currentField.schema.simpleAttributeName || queryBuilderStore.currentField.schema.simplePropertyName || queryBuilderStore.currentField.schema.label}/>
+                </div>
+              </div>
+            }
+
+            { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
+              <div className={classes.option}>
+                <div className={classes.optionLabel}>
+                  Required <small>(only applicable if parent field is not flattened)</small>
+                </div>
+                <div className={classes.optionInput}>
+                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("required")} onChange={this.handleChangeRequired}>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
+                  </MultiToggle>
+                </div>
+              </div>
+            }
+
+            {queryBuilderStore.currentField.schema.canBe
+              && queryBuilderStore.currentField !== queryBuilderStore.rootField
+              && <div className={classes.option}>
+                <div className={classes.optionLabel}>
+                  Flatten <small>(only applicable if this field has only one child field)</small>
+                </div>
+                <div className={classes.optionInput}>
+                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("flatten")} onChange={this.handleChangeFlatten}>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
+                  </MultiToggle>
+                </div>
+              </div>
+            }
           </div>
-          <hr/>
-          <div className={classes.option}>
-            <div className={classes.optionLabel}>
-              Required
-            </div>
-            <div className={classes.optionInput}>
-              <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("required")} onChange={this.handleChangeRequired}>
-                <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
-              </MultiToggle>
-            </div>
-          </div>
-          <hr/>
-          <div className={classes.option}>
-            <div className={classes.optionLabel}>
-              Flatten
-            </div>
-            <div className={classes.optionInput}>
-              <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("flatten")} onChange={this.handleChangeFlatten}>
-                <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
-              </MultiToggle>
-            </div>
-          </div>
-        </div>
+        }
 
         {queryBuilderStore.currentField.schema.canBe &&
           <div className={classes.fields}>

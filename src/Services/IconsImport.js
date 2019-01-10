@@ -50,6 +50,15 @@ import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
 import {faCog} from "@fortawesome/free-solid-svg-icons/faCog";
 import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
 import {faCopy} from "@fortawesome/free-solid-svg-icons/faCopy";
+import {faPlusSquare} from "@fortawesome/free-solid-svg-icons/faPlusSquare";
+import {faLongArrowAltRight} from "@fortawesome/free-solid-svg-icons/faLongArrowAltRight";
+import {faShoppingCart} from "@fortawesome/free-solid-svg-icons/faShoppingCart";
+import {faPollH} from "@fortawesome/free-solid-svg-icons/faPollH";
+import {faSatelliteDish} from "@fortawesome/free-solid-svg-icons/faSatelliteDish";
+import {faBlenderPhone} from "@fortawesome/free-solid-svg-icons/faBlenderPhone";
+import {faTable} from "@fortawesome/free-solid-svg-icons/faTable";
+import {faAsterisk} from "@fortawesome/free-solid-svg-icons/faAsterisk";
+import {faLevelDownAlt} from "@fortawesome/free-solid-svg-icons/faLevelDownAlt";
 
 library.add(
   faUserLock,
@@ -100,5 +109,14 @@ library.add(
   faAngleDown,
   faCog,
   faAngleRight,
-  faCopy
+  faCopy,
+  faPlusSquare,
+  faLongArrowAltRight,
+  faShoppingCart,
+  faPollH,
+  faSatelliteDish,
+  faBlenderPhone,
+  faTable,
+  faAsterisk,
+  faLevelDownAlt
 );

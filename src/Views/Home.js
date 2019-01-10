@@ -148,7 +148,6 @@ export default class Home extends React.Component{
               <Hub/>
             </div>
             <div className={classes.main}>
-              <Milica />
               <DatasetsStatistics />
               <InstancesHistory />
             </div>

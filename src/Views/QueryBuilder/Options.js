@@ -112,6 +112,7 @@ export default class Options extends React.Component{
         {queryBuilderStore.currentField !== queryBuilderStore.rootField &&
           <div className={classes.fieldOptions}>
             { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
+              !queryBuilderStore.currentField.parent.getOption("flatten") &&
               <div className={classes.option}>
                 <div className={classes.optionLabel}>
                   Target name <small>(only applicable if parent field is not flattened)</small>
@@ -120,12 +121,13 @@ export default class Options extends React.Component{
                   <FormControl type="text"
                     onChange={this.handleChangeName}
                     value={queryBuilderStore.currentField.getOption("alias") || ""}
-                    placeholder={queryBuilderStore.currentField.schema.simpleAttributeName || queryBuilderStore.currentField.schema.simplePropertyName || queryBuilderStore.currentField.schema.label}/>
+                    placeholder={queryBuilderStore.currentField.getDefaultAlias()}/>
                 </div>
               </div>
             }
 
             { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
+              !queryBuilderStore.currentField.parent.getOption("flatten") &&
               <div className={classes.option}>
                 <div className={classes.optionLabel}>
                   Required <small>(only applicable if parent field is not flattened)</small>
@@ -141,6 +143,7 @@ export default class Options extends React.Component{
 
             {queryBuilderStore.currentField.schema.canBe
               && queryBuilderStore.currentField !== queryBuilderStore.rootField
+              && queryBuilderStore.currentField.fields.length === 1
               && <div className={classes.option}>
                 <div className={classes.optionLabel}>
                   Flatten <small>(only applicable if this field has only one child field)</small>
@@ -157,6 +160,7 @@ export default class Options extends React.Component{
         }
 
         {queryBuilderStore.currentField.schema.canBe &&
+         !queryBuilderStore.currentField.getOption("flatten") &&
           <div className={classes.fields}>
             {queryBuilderStore.currentField.schema.canBe && queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
               return(
@@ -173,7 +177,9 @@ export default class Options extends React.Component{
               );
             })}
 
-            {queryBuilderStore.currentField.schema.canBe && queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
+            {queryBuilderStore.currentField.schema.canBe &&
+            !queryBuilderStore.currentField.getOption("flatten") &&
+            queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
               return(
                 <div key={schemaId}>
                   <h3>Links valid for {queryBuilderStore.findSchemaById(schemaId).label} <small> - {queryBuilderStore.findSchemaById(schemaId).id}</small></h3>

@@ -70,6 +70,10 @@ let styles = {
     color:"var(--ft-color-louder)",
     fontWeight:"bold"
   },
+  defaultname:{
+    color:"var(--ft-color-normal)",
+    fontStyle:"italic"
+  },
   subFields:{
     paddingLeft:"20px"
   },
@@ -119,11 +123,17 @@ export default class Field extends React.Component{
           <span className={classes.canBe}>
             ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
           </span>}
-          {field.getOption("alias")?
-            <span className={classes.rename}>
-              &nbsp;&nbsp;<FontAwesomeIcon icon="long-arrow-alt-right"/>&nbsp;&nbsp;
-              {field.getOption("alias")}
-            </span>
+          {field.parent && !field.parent.getOption("flatten")?
+            field.getOption("alias")?
+              <span className={classes.rename}>
+                &nbsp;&nbsp;<FontAwesomeIcon icon="long-arrow-alt-right"/>&nbsp;&nbsp;
+                {field.getOption("alias")}
+              </span>
+              :
+              <span className={classes.defaultname}>
+                &nbsp;&nbsp;<FontAwesomeIcon icon="long-arrow-alt-right"/>&nbsp;&nbsp;
+                {field.getDefaultAlias()}
+              </span>
             :null}
           <div className={classes.optionsButton}>
             <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleRemoveField}>

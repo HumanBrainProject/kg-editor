@@ -32,6 +32,14 @@ class Field {
   getOption(option){
     return this.options.has(option)?this.options.get(option):null;
   }
+
+  getDefaultAlias(){
+    let currentField = this;
+    while(currentField.getOption("flatten") && currentField.fields[0] && currentField.fields[0].schema.canBe){
+      currentField = currentField.fields[0];
+    }
+    return currentField.schema.simpleAttributeName || currentField.schema.simplePropertyName || currentField.schema.label;
+  }
 }
 
 class QueryBuilderStore {

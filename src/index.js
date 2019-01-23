@@ -34,6 +34,8 @@ import GlobalError from "./Views/GlobalError";
 import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
 
+import "./CustomFields";
+
 FormStore.setPathNodeSeparator("|");
 
 const styles = {

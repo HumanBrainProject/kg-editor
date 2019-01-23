@@ -309,32 +309,24 @@ class InstanceStore {
 
       const { data } = await API.axios.get(API.endpoints.instanceData(path));
 
-      runInAction(async () => {
+      runInAction(() => {
         const instanceData = data.data?data.data:{fields: {}};
-
         instance.data = instanceData;
-        instance.form = new FormStore(instanceData);
-        const fields = instance.form.getField();
-
-        let optionsPromises = [];
-
-        Object.entries(fields).forEach(([, field]) => {
-          let path = field.instancesPath;
-          if(path){
-            optionsPromises.push(this.optionsCache.get(path).then(
-              (options) => {
-                field.updateOptions(options);
-              }
-            ));
+        for(let fieldKey in instanceData.fields){
+          let field = instanceData.fields[fieldKey];
+          if(field.instancesPath){
+            field.optionsUrl = field.instancesPath;
+            field.type = "DynamicDropdown";
+            field.instanceType = instanceData.fields.id.value.path;
           }
-        });
+        }
+        instance.form = new FormStore(instanceData);
+        instance.form.registerAxiosInstance(API.axios);
 
-        Promise.all(optionsPromises).then(() => {
-          instance.isFetching = false;
-          instance.isFetched = true;
-          this.memorizeInstanceInitialValues(instanceId);
-          instance.form.toggleReadMode(this.globalReadMode);
-        });
+        instance.isFetching = false;
+        instance.isFetched = true;
+        this.memorizeInstanceInitialValues(instanceId);
+        instance.form.toggleReadMode(this.globalReadMode);
       });
     } catch (e) {
       const message = e.message?e.message:e;

@@ -75,7 +75,7 @@ export default class InstanceField extends React.Component{
         }
         return field.value;
 
-      } else if (field.type === "DropdownSelect") {
+      } else if (field.type === "DynamicDropdown") {
         return (
           <span className="quickfire-readmode-list">
             {field.value.map(value =>

@@ -1,11 +1,14 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
+import { get } from "mobx";
 import { FormGroup, Glyphicon, MenuItem, Alert } from "react-bootstrap";
-import { filter, difference, isFunction, isString } from "lodash";
+import { difference, isFunction, isString, uniq } from "lodash";
+import InfiniteScroll from "react-infinite-scroller";
 
-import FieldLabel from "hbp-quickfire/Components/FieldLabel";
+import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import injectStyles from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   values:{
@@ -48,6 +51,33 @@ const styles = {
     overflowY:"auto",
     "&.open":{
       display:"block"
+    },
+    position: "absolute",
+    top: "100%",
+    left: "0",
+    zIndex: "1000",
+    display: "none",
+    float: "left",
+    minWidth: "160px",
+    padding: "5px 0",
+    margin: "2px 0 0",
+    fontSize: "14px",
+    textAlign: "left",
+    backgroundColor: "#fff",
+    backgroundClip: "padding-box",
+    border: "1px solid rgba(0,0,0,.15)",
+    borderRadius: "4px",
+    boxShadow: "0 6px 12px rgba(0,0,0,.175)",
+    "& .dropdown-menu":{
+      position:"static",
+      display:"block",
+      float:"none",
+      width:"100%",
+      background:"none",
+      border:"none",
+      boxShadow:"none",
+      padding:0,
+      margin:0
     }
   },
   userInput:{
@@ -79,30 +109,6 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class DynamicDropdownField extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      userInputValue: ""
-    };
-    this.initField();
-  }
-
-  async initField() {
-    const { field, formStore } = this.props;
-    let { optionsUrl, cacheOptionsUrl } = field;
-    if (optionsUrl) {
-      field.updateOptions(await formStore.resolveURL(optionsUrl, cacheOptionsUrl));
-      this.triggerOnLoad();
-    }
-  }
-
-  triggerOnLoad = () => {
-    if(this.hiddenInputRef && this.hiddenInputRef.parentNode){
-      var event = new Event("load", { bubbles: true });
-      this.hiddenInputRef.dispatchEvent(event);
-    }
-  }
-
   //The only way to trigger an onChange event in React is to do the following
   //Basically changing the field value, bypassing the react setter and dispatching an "input"
   // event on a proper html input node
@@ -124,7 +130,7 @@ export default class DynamicDropdownField extends React.Component {
       if(isFunction(this.props.onAddCustomValue)){
         this.props.onAddCustomValue(e.target.value.trim(), field, this.props.formStore);
       }
-      this.setState({userInputValue: ""});
+      field.setUserInput("");
     } else if(!e.target.value && field.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
@@ -153,16 +159,17 @@ export default class DynamicDropdownField extends React.Component {
       return;
     }
     e.stopPropagation();
-    this.setState({ userInputValue: e.target.value });
+    this.props.field.setUserInput(e.target.value);
   }
 
   handleFocus = () => {
     if(this.props.field.disabled || this.props.field.readOnly){
       return;
     }
+    this.props.field.fetchOptions(true);
     this.inputRef.focus();
     this.listenClickOutHandler();
-    this.forceUpdate();
+    //this.forceUpdate();
   };
 
   closeDropdown(){
@@ -213,7 +220,7 @@ export default class DynamicDropdownField extends React.Component {
           this.beforeAddValue(option);
           this.triggerOnChange();
         }
-        this.setState({userInputValue:""});
+        field.setUserInput("");
         this.handleFocus();
       }
     } else if(e && (e.keyCode === 38 || e.keyCode === 40)){
@@ -249,7 +256,7 @@ export default class DynamicDropdownField extends React.Component {
   clickOutHandler = e => {
     if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
       this.unlistenClickOutHandler();
-      this.setState({userInputValue:""});
+      this.props.field.setUserInput("");
     }
   };
 
@@ -300,6 +307,10 @@ export default class DynamicDropdownField extends React.Component {
     }
   }
 
+  handleLoadMoreOptions = () => {
+    this.props.field.loadMoreOptions();
+  }
+
   render() {
     if(this.props.formStore.readMode || this.props.field.readMode){
       return this.renderReadMode();
@@ -312,13 +323,10 @@ export default class DynamicDropdownField extends React.Component {
     let dropdownClass = dropdownOpen? "open": "";
     dropdownClass += listPosition === "top" ? " "+classes.topList: "";
 
-    let regexSearch = new RegExp(this.state.userInputValue, "gi");
     let filteredOptions = [];
     if(dropdownOpen){
-      filteredOptions = filter(options, (option) => {
-        return option[mappingLabel].match(regexSearch);
-      });
-      filteredOptions = difference(filteredOptions, values);
+      filteredOptions = difference(options, values);
+      filteredOptions = uniq(filteredOptions);
     }
 
     return (
@@ -351,11 +359,11 @@ export default class DynamicDropdownField extends React.Component {
                   onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
                   onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
 
-                  title={value[mappingLabel]}>
+                  title={get(value, mappingLabel)}>
                   <span className={classes.valueDisplay}>
                     {isFunction(this.props.valueLabelRendering)?
                       this.props.valueLabelRendering(this.props.field, value):
-                      value[mappingLabel]}
+                      get(value, mappingLabel)}
                   </span>
                   <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
                 </div>
@@ -369,36 +377,51 @@ export default class DynamicDropdownField extends React.Component {
               onKeyDown={this.handleInputKeyStrokes}
               onChange={this.handleChangeUserInput}
               onFocus={this.handleFocus}
-              value={this.state.userInputValue}
+              value={this.props.field.userInput}
               disabled={readOnly || disabled || values.length >= max}/>
 
             <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
 
-            {dropdownOpen && (filteredOptions.length || this.state.userInputValue)?
-              <ul className={`quickfire-dropdown dropdown-menu ${classes.options} ${dropdownClass}`} ref={ref=>{this.optionsRef = ref;}}>
-                {!allowCustomValues && this.state.userInputValue && filteredOptions.length === 0?
-                  <MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
-                    <em>No options available for: </em> <strong>{this.state.userInputValue}</strong>
-                  </MenuItem>
-                  :null}
+            {dropdownOpen && (filteredOptions.length || this.props.field.userInput)?
+              <div className={`quickfire-dropdown ${classes.options} ${dropdownClass}`} ref={ref=>{this.optionsRef = ref;}}>
+                <InfiniteScroll
+                  element={"ul"}
+                  className={"dropdown-menu"}
+                  threshold={100}
+                  hasMore={this.props.field.hasMoreOptions()}
+                  loadMore={this.handleLoadMoreOptions}
+                  useWindow={false}>
+                  {!allowCustomValues && this.props.field.userInput && filteredOptions.length === 0?
+                    <MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
+                      <em>No options available for: </em> <strong>{this.props.field.userInput}</strong>
+                    </MenuItem>
+                    :null}
 
-                {allowCustomValues && this.state.userInputValue?
-                  <MenuItem className={"quickfire-dropdown-item"} key={this.state.userInputValue} onSelect={this.handleSelect.bind(this, this.state.userInputValue)}>
-                    <div tabIndex={-1} className={"option"} onKeyDown={this.handleSelect.bind(this, this.state.userInputValue)}>
-                      <em>Add a value: </em> <strong>{this.state.userInputValue}</strong>
-                    </div>
-                  </MenuItem>
-                  :null}
-                {filteredOptions.map(option => {
-                  return(
-                    <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
-                      <div tabIndex={-1} className={"option"} onKeyDown={this.handleSelect.bind(this, option)}>
-                        {option[mappingLabel]}
+                  {allowCustomValues && this.props.field.userInput?
+                    <MenuItem className={"quickfire-dropdown-item"} key={this.props.field.userInput} onSelect={this.handleSelect.bind(this, this.props.field.userInput)}>
+                      <div tabIndex={-1} className={"option"} onKeyDown={this.handleSelect.bind(this, this.props.field.userInput)}>
+                        <em>Add a value: </em> <strong>{this.props.field.userInput}</strong>
                       </div>
                     </MenuItem>
-                  );
-                })}
-              </ul>
+                    :null}
+                  {filteredOptions.map(option => {
+                    return(
+                      <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
+                        <div tabIndex={-1} className={"option"} onKeyDown={this.handleSelect.bind(this, option)}>
+                          {option[mappingLabel]}
+                        </div>
+                      </MenuItem>
+                    );
+                  })}
+                  {this.props.field.fetchingOptions?
+                    <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
+                      <div tabIndex={-1} className={"option"}>
+                        <FontAwesomeIcon spin icon="circle-notch"/>
+                      </div>
+                    </MenuItem>
+                    :null}
+                </InfiniteScroll>
+              </div>
               :null}
           </div>
           {validationErrors && <Alert bsStyle="danger">
@@ -431,7 +454,7 @@ export default class DynamicDropdownField extends React.Component {
                 <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className={"quickfire-readmode-item"}>
                   {isFunction(this.props.valueLabelRendering)?
                     this.props.valueLabelRendering(this.props.field, value):
-                    value[mappingLabel]}
+                    get(value, mappingLabel)}
                 </span>
               );
             })}

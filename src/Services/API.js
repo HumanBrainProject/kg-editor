@@ -22,7 +22,12 @@ const endpoints = {
   "deleteBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": (instance) => `/editor/api/instance/${instance}/bookmarks`,
-  "graph": (instance) => `/api/instances/${instance}/graph`
+  "graph": (instance) => `/api/instances/${instance}/graph`,
+  "query": function(rootInstancePath, vocab, size, start){
+    return `/query/${rootInstancePath}/instances${arguments.length > 1?"?":""}${
+      ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
+      ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
+      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;}
 };
 
 class API {

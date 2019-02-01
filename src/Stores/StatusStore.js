@@ -28,6 +28,7 @@ class StatusStore{
           isFetching: false,
           isFetched: false,
           hasFetchError: false,
+          fetchError: null,
           data: null
         });
         this.fetchQueue.push(id);
@@ -58,24 +59,31 @@ class StatusStore{
     this.isFetching = true;
     let toProcess = this.fetchQueue.splice(0, this.processSize);
     toProcess.forEach(id => {
-      this.statuses.get(id).isFetching = true;
+      const status = this.statuses.get(id);
+      status.isFetching = true;
+      status.hasFetchError = false;
+      status.fetchError = null;
     });
     try{
       let response = await API.axios.post(API.endpoints.releaseStatus(), toProcess);
       runInAction(() =>{
-        response.data.forEach(status => {
-          this.statuses.get(status.id).data = status;
-          this.statuses.get(status.id).isFetching = false;
-          this.statuses.get(status.id).isFetched = true;
+        response.data.forEach(responseStatus => {
+          const status = this.statuses.get(responseStatus.id);
+          status.data = responseStatus;
+          status.isFetching = false;
+          status.isFetched = true;
           this.isFetching = false;
           this.smartProcessQueue();
         });
       });
     } catch(e){
       runInAction(() =>{
+        const message = e.message? e.message: e;
         toProcess.forEach(id => {
-          this.statuses.get(id).isFetching = false;
-          this.statuses.get(id).hasFetchError = true;
+          const status = this.statuses.get(id);
+          status.isFetching = false;
+          status.hasFetchError = true;
+          status.fetchError = `Error while fetching instance status (${message})`;
         });
         this.isFetching = false;
         this.smartProcessQueue();

@@ -164,6 +164,11 @@ class BrowseStore{
   }
 
   @action
+  refreshFilter() {
+    this.applyInstancesFilter();
+  }
+
+  @action
   async createBookmarkList(name, instanceIds) {
     this.newBookmarkListName = name;
     this.bookmarkListCreationError = null;

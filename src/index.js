@@ -304,7 +304,7 @@ class App extends React.Component{
     instanceStore.toggleSavebarDisplay();
   }
 
-  handleRetryDeleteInstance = () => {
+  handleRetryDeleteInstance = async () => {
     instanceStore.retryDeleteInstance();
   }
 

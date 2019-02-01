@@ -7,8 +7,11 @@ import API from "../Services/API";
 
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
+import BrowseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
+import routerStore from "./RouterStore";
+import { matchPath } from "react-router-dom";
 
 class OptionsCache{
   @observable cache = new Map();
@@ -255,21 +258,45 @@ class InstanceStore {
       this.isDeletingInstance = true;
       this.deleteInstanceError = null;
       try{
-        await API.axios.delete(API.endpoints.indexing(instanceId), {});
-        this.instanceToDelete = null;
-        this.isDeletingInstance = false;
-        //this.flush();
+        await API.axios.delete(API.endpoints.instanceData(instanceId));
+        runInAction(() => {
+          this.instanceToDelete = null;
+          this.isDeletingInstance = false;
+          let nextLocation = null;
+          if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
+            if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+              if(this.openedInstances.size > 1){
+                let openedInstances = Array.from(this.openedInstances.keys());
+                let currentInstanceIndex = openedInstances.indexOf(instanceId);
+                let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
+
+                let openedInstance = this.openedInstances.get(newInstanceId);
+                nextLocation = `/instance/${openedInstance.viewMode}/${newInstanceId}`;
+              } else {
+                nextLocation = "/browse";
+              }
+            }
+          }
+          BrowseStore.refreshFilter();
+          this.closeInstance(instanceId);
+          this.flush();
+          if (nextLocation) {
+            routerStore.history.push(nextLocation);
+          }
+        });
       } catch(e){
-        const message = e.message?e.message:e;
-        this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message})`;
-        this.isDeletingInstance = false;
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message})`;
+          this.isDeletingInstance = false;
+        });
       }
     }
   }
 
   @action
   async retryDeleteInstance() {
-    this.deleteInstance(this.instanceToDelete);
+    return await this.deleteInstance(this.instanceToDelete);
   }
 
   @action

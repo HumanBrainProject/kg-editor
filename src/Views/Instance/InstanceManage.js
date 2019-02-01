@@ -93,6 +93,7 @@ export default class InstanceMange extends React.Component{
 
   handleDeleteInstance = async () => {
     instanceStore.deleteInstance(this.props.id);
+    //document.dispatchEvent(new KeyboardEvent("keydown", { keyCode: 87, altKey: true }));
   }
 
   render(){

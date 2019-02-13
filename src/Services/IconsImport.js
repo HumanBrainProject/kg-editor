@@ -1,6 +1,7 @@
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 
+import {faUser} from "@fortawesome/free-solid-svg-icons/faUser";
 import {faUserLock} from "@fortawesome/free-solid-svg-icons/faUserLock";
 import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons/faQuestionCircle";
 import {faHome} from "@fortawesome/free-solid-svg-icons/faHome";
@@ -61,6 +62,7 @@ import {faAsterisk} from "@fortawesome/free-solid-svg-icons/faAsterisk";
 import {faLevelDownAlt} from "@fortawesome/free-solid-svg-icons/faLevelDownAlt";
 
 library.add(
+  faUser,
   faUserLock,
   faQuestionCircle,
   faHome,

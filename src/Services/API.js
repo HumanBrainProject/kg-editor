@@ -3,6 +3,7 @@ import authStore from "../Stores/AuthStore";
 
 const endpoints = {
   "user": () => "/editor/api/user",
+  "users": () => "/editor/api/users",
   "features": () => `${window.rootPath}/data/features.json`,
   "structure": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,

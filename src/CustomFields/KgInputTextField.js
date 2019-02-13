@@ -25,7 +25,7 @@ const styles = {
   },
   alternatives: {
     marginLeft: "3px"
-  },
+  }
 };
 
 @injectStyles(styles)
@@ -78,7 +78,8 @@ export default class KgInputTextField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
-    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
+    const prototype = this.props.componentClass === "textarea"?window.HTMLTextAreaElement.prototype:window.HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(prototype, "value").set
       .call(this.inputRef, this.props.field.value);
     var event = new Event("input", { bubbles: true });
     this.inputRef.dispatchEvent(event);

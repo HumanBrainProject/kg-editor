@@ -409,10 +409,32 @@ class InstanceStore {
             ]
           }
         ];
+        instanceData.alternatives["http://schema.org/description"] = [
+          {
+            value: "This is an second alternative description.",
+            users: [
+              "8642", "9876"
+            ]
+          },
+          {
+            value: "This is an third alternative description.",
+            users: [
+              "2468"
+            ]
+          },
+          {
+            value: "This is an fourth alternative description.",
+            users: [
+              "12345"
+            ]
+          }
+        ];
         for(let fieldKey in instanceData.fields){
           let field = instanceData.fields[fieldKey];
           if(field.type === "InputText"){
             field.type = "KgInputText";
+          } else if(field.type === "TextArea"){
+            field.type = "KgTextArea";
           }
         }
         instance.form = new FormStore(instanceData);

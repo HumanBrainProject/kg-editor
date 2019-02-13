@@ -389,6 +389,32 @@ class InstanceStore {
         const instanceData = data.data?data.data:{fields: {}};
 
         instance.data = instanceData;
+        instanceData.alternatives["http://schema.org/name"] = [
+          {
+            value: "Alternative 2",
+            users: [
+              "12345"
+            ]
+          },
+          {
+            value: "Alternative 3",
+            users: [
+              "2468", "9876"
+            ]
+          },
+          {
+            value: "Alternative 4",
+            users: [
+              "8642"
+            ]
+          }
+        ];
+        for(let fieldKey in instanceData.fields){
+          let field = instanceData.fields[fieldKey];
+          if(field.type === "InputText"){
+            field.type = "KgInputText";
+          }
+        }
         instance.form = new FormStore(instanceData);
         const fields = instance.form.getField();
 

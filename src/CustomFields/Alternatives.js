@@ -48,7 +48,7 @@ export default class Alternatives extends React.Component {
       return;
     }
     if(e && e.keyCode === 40){ // Down
-      e.preventDefault();
+      e && e.preventDefault();
       const alternatives = this.alternativesRef.querySelectorAll(".option");
       let index = Array.prototype.indexOf.call(alternatives, e.target) + 1;
       if (index >= alternatives.length) {
@@ -56,7 +56,7 @@ export default class Alternatives extends React.Component {
       }
       alternatives[index].focus();
     } else if(e && e.keyCode === 38){ // Up
-      e.preventDefault();
+      e && e.preventDefault();
       const alternatives = this.alternativesRef.querySelectorAll(".option");
       let index = Array.prototype.indexOf.call(alternatives, e.target) - 1;
       if (index < 0) {
@@ -64,10 +64,10 @@ export default class Alternatives extends React.Component {
       }
       alternatives[index].focus();
     } else if(e && e.keyCode === 27) { //escape
-      e.preventDefault();
+      e && e.preventDefault();
       this.setState(state => state.open = false);
     } else if (alternative && (!e || (e && (!e.keyCode || e.keyCode === 13)))) { // enter
-      e.preventDefault();
+      e && e.preventDefault();
       typeof onSelect === "function" && onSelect(alternative.value);
       this.setState(state => state.open = false);
     }
@@ -79,7 +79,7 @@ export default class Alternatives extends React.Component {
       return;
     }
     if(e && e.keyCode === 40){ // Down
-      e.preventDefault();
+      e && e.preventDefault();
       const alternatives = this.alternativesRef.querySelectorAll(".option");
       let index = Array.prototype.indexOf.call(alternatives, e.target) + 1;
       if (index >= alternatives.length) {
@@ -87,7 +87,7 @@ export default class Alternatives extends React.Component {
       }
       alternatives[index].focus();
     } else if(e && e.keyCode === 38){ // Up
-      e.preventDefault();
+      e && e.preventDefault();
       const alternatives = this.alternativesRef.querySelectorAll(".option");
       let index = Array.prototype.indexOf.call(alternatives, e.target) - 1;
       if (index < 0) {
@@ -95,7 +95,7 @@ export default class Alternatives extends React.Component {
       }
       alternatives[index].focus();
     } else if(e && e.keyCode === 27) { //escape
-      e.preventDefault();
+      e && e.preventDefault();
       this.setState(state => state.open = false);
     }
   }

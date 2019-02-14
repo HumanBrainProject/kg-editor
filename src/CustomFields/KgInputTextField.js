@@ -195,6 +195,8 @@ export default class KgInputTextField extends React.Component {
 
     const { classes } = this.props;
 
+    const lines = typeof value === "string"?value.split("\n"):[];
+
     return (
       <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
         <FieldLabel field={this.props.field}/>
@@ -202,7 +204,7 @@ export default class KgInputTextField extends React.Component {
           this.props.readModeRendering(this.props.field)
           : this.props.componentClass === "textarea"?
             <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
-              {value.split("\n").map((line, index) => {
+              {lines.map((line, index) => {
                 return(
                   <p key={line+(""+index)}>{line}</p>
                 );

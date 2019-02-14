@@ -127,7 +127,7 @@ export default class Alternatives extends React.Component {
   }
 
   render() {
-    const {classes, className, list, show, disabled} = this.props;
+    const {classes, className, show, disabled, list, options} = this.props;
 
     if (!show || !list || !list.length) {
       return null;
@@ -140,15 +140,18 @@ export default class Alternatives extends React.Component {
           disabled={disabled}
           onKeyDown={this.handleInputKeyStrokes}
           onClick={this.handleToggle}>
-          {list.map(alternative => (
-            alternative.users.map(userId => (
-              <Avatar key={userId} userId={userId} />
-            ))))
-          }
+          {list.map(alternative => {
+            const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
+            return (
+              userIds.map(userId => (
+                <Avatar key={userId} userId={userId} />
+              ))
+            );
+          })}
         </button>
         <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} ref={ref=>{this.alternativesRef = ref;}}>
           {list.map(alternative => (
-            <Alternative key={alternative.value} alternative={alternative} onSelect={this.handleSelect}/>
+            <Alternative key={alternative.value} alternative={alternative} options={options} onSelect={this.handleSelect}/>
           ))}
         </ul>
       </div>

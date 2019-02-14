@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { MenuItem } from "react-bootstrap";
 
 import User from "./User";
+import Value from "./Value";
 
 const styles = {
   container: {
@@ -25,13 +26,15 @@ export default class Alternative extends React.Component {
   }
 
   render() {
-    const { classes, alternative } = this.props;
+    const { classes, alternative, options } = this.props;
+
+    const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
 
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect.bind(this, alternative)}>
         <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, alternative)}>
-          <strong>{alternative.value}</strong> <em><div className="parenthesis">(</div>{
-            alternative.users.map(userId => (
+          <strong><Value value={alternative.value} options={options} /></strong> <em><div className="parenthesis">(</div>{
+            userIds.map(userId => (
               <User key={userId} userId={userId} />
             ))
           }<div className="parenthesis">)</div></em>

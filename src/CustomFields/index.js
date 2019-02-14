@@ -9,10 +9,10 @@ FormStore.registerCustomField("KgTextArea", KgTextAreaField, FormStore.typesMapp
 export default {
   KgInputTextField:{
     component:KgInputTextField,
-    store:FormStore.typesMapping
+    store:FormStore.typesMapping.InputText
   },
   KgTextAreaField:{
     component:KgTextAreaField,
-    store:FormStore.typesMapping
+    store:FormStore.typesMapping.TextArea
   }
 };

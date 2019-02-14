@@ -109,10 +109,10 @@ export default class InstanceField extends React.Component{
     const field = instance.data.fields[name];
     const readOnlyMode = instanceStore.readOnlyMode;
     if (field) {
-      if (field.type === "TextArea")  {
+      if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
-      if (field.type === "DropdownSelect" && field.isLink) {
+      if (typeof field.type === "string" && field.type.includes("DropdownSelect") && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}

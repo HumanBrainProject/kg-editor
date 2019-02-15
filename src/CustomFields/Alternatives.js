@@ -150,9 +150,12 @@ export default class Alternatives extends React.Component {
           })}
         </button>
         <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} ref={ref=>{this.alternativesRef = ref;}}>
-          {list.map(alternative => (
-            <Alternative key={alternative.value} alternative={alternative} field={field} onSelect={this.handleSelect}/>
-          ))}
+          {list.map(alternative => {
+            const key = ((!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds).toString();
+            return (
+              <Alternative key={key} alternative={alternative} field={field} onSelect={this.handleSelect}/>
+            );
+          })}
         </ul>
       </div>
     );

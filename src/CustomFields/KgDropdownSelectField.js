@@ -261,16 +261,18 @@ export default class KgDropdownSelectField extends React.Component {
     }
   }
 
-
   handleAlternativeSelect = values => {
     let field = this.props.field;
     field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
-    this.getAlternativeOptions(values).forEach(value => this.beforeAddValue(value));
+    values.forEach(value => this.beforeAddValue(value));
     this.triggerOnChange();
   }
 
   getAlternativeOptions = value => {
-    const { options } = this.props;
+    const { options, mappingValue } = this.props.field;
+
+    const valueAttributeName = mappingValue?mappingValue:"id";
+
     if (!value) {
       return [];
     }
@@ -281,8 +283,8 @@ export default class KgDropdownSelectField extends React.Component {
 
     if (value.length) {
       return value.map(item => {
-        if (item.id && (options instanceof Array)) {
-          const option = options.find(option => option.id === item.id);
+        if (item[valueAttributeName] && (options instanceof Array)) {
+          const option = options.find(option => option[valueAttributeName] === item[valueAttributeName]);
           if (option) {
             return option;
           }
@@ -293,7 +295,7 @@ export default class KgDropdownSelectField extends React.Component {
     }
 
     if (value.id && (options instanceof Array)) {
-      const option = options.find(option => option.id === value.id);
+      const option = options.find(option => option[valueAttributeName] === value[valueAttributeName]);
       if (option) {
         return [option];
       }
@@ -394,7 +396,11 @@ export default class KgDropdownSelectField extends React.Component {
     }
 
     const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
-    const alternatives = (fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[];
+    const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
+      .map(alternative => ({
+        value: this.getAlternativeOptions(alternative.value),
+        userIds: alternative.userIds
+      }));
 
     return (
       <div ref={ref=>this.wrapperRef = ref}>
@@ -403,7 +409,7 @@ export default class KgDropdownSelectField extends React.Component {
           className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
           validationState={validationState}>
           <FieldLabel field={this.props.field}/>
-          <Alternatives className={classes.alternatives} show={!disabled && !readOnly && !!alternatives.length} disabled={disabled || readOnly} list={alternatives} options={options} onSelect={this.handleAlternativeSelect}  ref={ref=>this.alternativesRef = ref}/>
+          <Alternatives className={classes.alternatives} show={!disabled && !readOnly && !!alternatives.length} disabled={disabled || readOnly} list={alternatives} onSelect={this.handleAlternativeSelect}  ref={ref=>this.alternativesRef = ref}/>
           <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
             {values.map(value => {
               const label = value[mappingLabel] !== undefined?value[mappingLabel]:(value[mappingValue] !== undefined?value[mappingValue]:value.id);

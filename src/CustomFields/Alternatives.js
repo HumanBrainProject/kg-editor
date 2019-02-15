@@ -127,7 +127,7 @@ export default class Alternatives extends React.Component {
   }
 
   render() {
-    const {classes, className, show, disabled, list, options} = this.props;
+    const {classes, className, show, disabled, list, field} = this.props;
 
     if (!show || !list || !list.length) {
       return null;
@@ -151,7 +151,7 @@ export default class Alternatives extends React.Component {
         </button>
         <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} ref={ref=>{this.alternativesRef = ref;}}>
           {list.map(alternative => (
-            <Alternative key={alternative.value} alternative={alternative} options={options} onSelect={this.handleSelect}/>
+            <Alternative key={alternative.value} alternative={alternative} field={field} onSelect={this.handleSelect}/>
           ))}
         </ul>
       </div>

@@ -4,7 +4,7 @@ const Value = ({value, options, separator= "; "}) => {
     return null;
   }
 
-  if (typeof value !== "object" && !(value instanceof Array)) {
+  if (typeof value !== "object") {
     return value;
   }
 
@@ -12,7 +12,7 @@ const Value = ({value, options, separator= "; "}) => {
     return value.map((item, index) => {
       if (item.id && (options instanceof Array)) {
         const option = options.find(option => option.id === item.id);
-        if (option != undefined && option.name) {
+        if (option && option.name) {
           return (index?separator:"") + option.name;
         }
         return (index?separator:"") + item.id;
@@ -32,8 +32,8 @@ const Value = ({value, options, separator= "; "}) => {
 
   if (value.id && (options instanceof Array)) {
     const option = options.find(option => option.id === value.id);
-    if (option != undefined && option.label) {
-      return option.label;
+    if (option && option.name) {
+      return option.name;
     }
     return value.id;
   }

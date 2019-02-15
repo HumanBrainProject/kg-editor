@@ -389,6 +389,7 @@ class InstanceStore {
         const instanceData = data.data?data.data:{fields: {}};
 
         instance.data = instanceData;
+        /*
         instanceData.alternatives["http://schema.org/name"] = [
           {
             value: "Alternative 2",
@@ -464,6 +465,7 @@ class InstanceStore {
             userIds: ["2468", "8642"]
           }
         ];
+        */
         for(let fieldKey in instanceData.fields){
           let field = instanceData.fields[fieldKey];
           if(field.type === "InputText"){

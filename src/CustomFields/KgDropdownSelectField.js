@@ -6,7 +6,6 @@
  */
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { toJS } from "mobx";
 import { FormGroup, Glyphicon, MenuItem, Alert } from "react-bootstrap";
 import { filter, difference, isFunction, isString } from "lodash";
 

@@ -1,7 +1,7 @@
 import { observable, action, runInAction } from "mobx";
 import { isArray, debounce } from "lodash";
 
-import API from "../Services/API";
+//import API from "../Services/API";
 
 class UsersStore{
   @observable users = new Map();
@@ -94,7 +94,10 @@ class UsersStore{
         this.smartProcessQueue();
       });
       */
+      //
       // Mockup Data
+      //
+      /*
       const users = [
         {
           name: "Amunts, Katrin"
@@ -129,6 +132,29 @@ class UsersStore{
             picture: user.picture
           };
         })
+      };
+      */
+      //
+      // Mockup Data
+      //
+      const data = {
+        data: [
+          {
+            id: "305861",
+            name: "David Kunzmann",
+            picture: "https://pbs.twimg.com/profile_images/834400378812821504/8OXxtm6R_400x400.jpg"
+          },
+          {
+            id: "305670",
+            name: "Gilles Dénervaud",
+            picture: "https://storage.humanbrainproject.eu/ppics/avatar/305670/4de3f5c8-6ee4-4499-a7e5-51b3cfeb2f7f.jpeg"
+          },
+          {
+            id: "305629",
+            name: "Oliver Schmid",
+            picture: "https://storage.humanbrainproject.eu/ppics/avatar/305629/ffb8c644-c9a1-42da-a984-fb699e583b8a.jpeg"
+          }
+        ]
       };
       setTimeout(() => {
         runInAction(() =>{

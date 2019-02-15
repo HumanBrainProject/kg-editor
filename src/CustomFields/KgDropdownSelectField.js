@@ -178,8 +178,16 @@ export default class KgDropdownSelectField extends React.Component {
     this.setState({ userInputValue: e.target.value });
   }
 
-  handleFocus = () => {
+  handleFocus = e => {
     if(this.props.field.disabled || this.props.field.readOnly){
+      return;
+    }
+
+    if (this.wrapperRef
+      && this.alternativesRef && this.alternativesRef.props && this.alternativesRef.props.className
+      && this.wrapperRef.querySelector("." + this.alternativesRef.props.className)
+      && this.wrapperRef.querySelector("." + this.alternativesRef.props.className).contains(e.target)) {
+      this.closeDropdown();
       return;
     }
     this.inputRef.focus();
@@ -253,12 +261,46 @@ export default class KgDropdownSelectField extends React.Component {
     }
   }
 
-  handleAlternativeSelect = value => {
-    //this.removeValue()
-    //value.forEach(option => this.beforeAddValue(option));
-    const options = (value && value.length != undefined)?toJS(value):[];
-    this.setValue(options);
+
+  handleAlternativeSelect = values => {
+    let field = this.props.field;
+    field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
+    this.getAlternativeOptions(values).forEach(value => this.beforeAddValue(value));
     this.triggerOnChange();
+  }
+
+  getAlternativeOptions = value => {
+    const { options } = this.props;
+    if (!value) {
+      return [];
+    }
+
+    if (typeof value !== "object") {
+      return [value];
+    }
+
+    if (value.length) {
+      return value.map(item => {
+        if (item.id && (options instanceof Array)) {
+          const option = options.find(option => option.id === item.id);
+          if (option) {
+            return option;
+          }
+          return item;
+        }
+        return item;
+      });
+    }
+
+    if (value.id && (options instanceof Array)) {
+      const option = options.find(option => option.id === value.id);
+      if (option) {
+        return [option];
+      }
+      return [value];
+    }
+
+    return [];
   }
 
   handleDrop(droppedVal, e){
@@ -336,7 +378,7 @@ export default class KgDropdownSelectField extends React.Component {
     }
 
     let { classes, formStore } = this.props;
-    let { options, value: values, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = this.props.field;
+    let { options, value: values, mappingLabel, mappingValue, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = this.props.field;
 
     let dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     let dropdownClass = dropdownOpen? "open": "";
@@ -361,9 +403,10 @@ export default class KgDropdownSelectField extends React.Component {
           className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
           validationState={validationState}>
           <FieldLabel field={this.props.field}/>
-          <Alternatives className={classes.alternatives} show={!disabled && !readOnly && !!alternatives.length} disabled={disabled || readOnly} list={alternatives} options={options} onSelect={this.handleAlternativeSelect}/>
+          <Alternatives className={classes.alternatives} show={!disabled && !readOnly && !!alternatives.length} disabled={disabled || readOnly} list={alternatives} options={options} onSelect={this.handleAlternativeSelect}  ref={ref=>this.alternativesRef = ref}/>
           <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
             {values.map(value => {
+              const label = value[mappingLabel] !== undefined?value[mappingLabel]:(value[mappingValue] !== undefined?value[mappingValue]:value.id);
               return(
                 <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
                   tabIndex={"0"}
@@ -385,11 +428,12 @@ export default class KgDropdownSelectField extends React.Component {
                   onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
                   onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
 
-                  title={value[mappingLabel]}>
+                  title={label}>
                   <span className={classes.valueDisplay}>
                     {isFunction(this.props.valueLabelRendering)?
-                      this.props.valueLabelRendering(this.props.field, value):
-                      value[mappingLabel]}
+                      this.props.valueLabelRendering(this.props.field, value)
+                      :
+                      label}
                   </span>
                   <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
                 </div>

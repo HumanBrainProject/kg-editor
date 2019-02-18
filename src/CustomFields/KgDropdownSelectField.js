@@ -400,7 +400,7 @@ export default class KgDropdownSelectField extends React.Component {
         value: this.getAlternativeOptions(alternative.value),
         userIds: alternative.userIds
       }));
-      
+
     return (
       <div ref={ref=>this.wrapperRef = ref}>
         <FormGroup

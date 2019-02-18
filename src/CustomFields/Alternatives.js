@@ -52,13 +52,9 @@ export default class Alternatives extends React.Component {
   }
 
   handleToggle = e => {
-    const { parentContainerClassName } = this.props;
     e.preventDefault();
     if (!this.props.disabled) {
-      this.setState(state => ({
-        open: !state.open,
-        maxWidth: state.open?state.maxWidth:getContainerWidth(this.wrapperRef, parentContainerClassName)
-      }));
+      this.setState(state => ({ open: !state.open }));
     }
   }
 

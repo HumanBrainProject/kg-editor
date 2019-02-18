@@ -18,14 +18,18 @@ const styles = {
 export default class User extends React.Component {
 
   render() {
-    const {classes, userId, name, picture} = this.props;
+    const {classes, userId, name, picture, title} = this.props;
 
     if (!userId) {
       return null;
     }
 
     return (
-      <span className={`${classes.user} user`}><Avatar userId={userId} name={name} picture={picture} />{name?name:userId}</span>
+      <span className={`${classes.user} user`}><Avatar userId={userId} name={name} picture={picture} />{title?
+        <span title={title}>{name?name:userId}</span>
+        :
+        name?name:userId
+      }</span>
     );
   }
 }

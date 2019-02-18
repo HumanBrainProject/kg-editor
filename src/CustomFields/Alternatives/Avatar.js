@@ -9,7 +9,7 @@ export default class Avatar extends React.Component {
   constructor (props) {
     super(props);
     if (props.userId) {
-      UsersStore.fetchUsers(props.userId);
+      UsersStore.fetchUser(props.userId);
     }
   }
 
@@ -23,7 +23,7 @@ export default class Avatar extends React.Component {
     const user = UsersStore.getUser(userId);
 
     return (
-      <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />
+      <AvatarComponent userId={userId} name={user && user.displayName} picture={user && user.picture} />
     );
   }
 }

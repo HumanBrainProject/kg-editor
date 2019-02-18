@@ -9,7 +9,7 @@ export default class User extends React.Component {
   constructor (props) {
     super(props);
     if (props.userId) {
-      UsersStore.fetchUsers(props.userId);
+      UsersStore.fetchUser(props.userId);
     }
   }
 
@@ -22,8 +22,17 @@ export default class User extends React.Component {
 
     const user = UsersStore.getUser(userId);
 
+    const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
+      if (item && item.value && item.verified) {
+        if (item.primary || !email) {
+          return item;
+        }
+      }
+      return email;
+    }, null):null;
+
     return (
-      <UserComponent userId={userId} name={user && user.name} picture={user && user.picture} />
+      <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} title={email && email.value} />
     );
   }
 }

@@ -164,9 +164,14 @@ export default class KgInputTextField extends React.Component {
     const alternatives = (fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[];
 
     return (
-      <FormGroup className={`quickfire-field-input-text ${classes.container} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
+      <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
         <FieldLabel field={this.props.field}/>
-        <Alternatives className={classes.alternatives} show={!disabled && !readOnly && !!alternatives.length} disabled={disabled || readOnly} list={alternatives} onSelect={this.handleAlternativeSelect}/>
+        <Alternatives className={classes.alternatives}
+          show={!disabled && !readOnly && !!alternatives.length}
+          disabled={disabled || readOnly}
+          list={alternatives}
+          onSelect={this.handleAlternativeSelect}
+          parentContainerClassName="form-group" />
         {useVirtualClipboard?
           <InputGroup>
             {formControl()}

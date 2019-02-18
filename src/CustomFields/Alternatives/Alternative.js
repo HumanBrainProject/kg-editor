@@ -61,13 +61,13 @@ export default class Alternative extends React.Component {
   }
 
   render() {
-    const { classes, alternative, field } = this.props;
+    const { classes, alternative, field, className } = this.props;
 
     const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
 
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect.bind(this, alternative)}>
-        <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, alternative)}>
+        <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect.bind(this, alternative)}>
           <strong><Values value={alternative.value} field={field} /></strong> <em><div className="parenthesis">(</div>{
             userIds.map(userId => (
               <User key={userId} userId={userId} />

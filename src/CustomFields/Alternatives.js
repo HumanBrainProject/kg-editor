@@ -25,20 +25,40 @@ const styles = {
     "&.open":{
       display:"block"
     }
+  },
+  fixedWidthDropdownItem: {
+    wordWBreak: "normal",
+    whiteSpace: "normal"
   }
+};
+
+const getContainerWidth = (node, className) => {
+  if (node && className) {
+    while (node !== document.body && node.className && !node.className.includes(className)) {
+      node = node.parentNode;
+    }
+    if (node) {
+      return node.offsetWidth;
+    }
+  }
+  return null;
 };
 
 @injectStyles(styles)
 export default class Alternatives extends React.Component {
   constructor (props) {
     super(props);
-    this.state = { open: false };
+    this.state = { open: false, maxWidth:  null};
   }
 
   handleToggle = e => {
+    const { parentContainerClassName } = this.props;
     e.preventDefault();
     if (!this.props.disabled) {
-      this.setState(state => state.open = !state.open);
+      this.setState(state => ({
+        open: !state.open,
+        maxWidth: state.open?state.maxWidth:getContainerWidth(this.wrapperRef, parentContainerClassName)
+      }));
     }
   }
 
@@ -65,11 +85,11 @@ export default class Alternatives extends React.Component {
       alternatives[index].focus();
     } else if(e && e.keyCode === 27) { //escape
       e && e.preventDefault();
-      this.setState(state => state.open = false);
+      this.setState({ open: false });
     } else if (alternative && (!e || (e && (!e.keyCode || e.keyCode === 13)))) { // enter
       e && e.preventDefault();
       typeof onSelect === "function" && onSelect(alternative.value);
-      this.setState(state => state.open = false);
+      this.setState({ open: false });
     }
   }
 
@@ -96,13 +116,13 @@ export default class Alternatives extends React.Component {
       alternatives[index].focus();
     } else if(e && e.keyCode === 27) { //escape
       e && e.preventDefault();
-      this.setState(state => state.open = false);
+      this.setState({ open: false });
     }
   }
 
   clickOutHandler = e => {
     if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
-      this.setState(state => state.open = false);
+      this.setState({ open: false });
     }
   };
 
@@ -126,12 +146,36 @@ export default class Alternatives extends React.Component {
     this.unlistenClickOutHandler();
   }
 
+  componentDidUpdate() {
+    const { parentContainerClassName } = this.props;
+
+    if (this.state.open && !this.state.fixedWidth && this.wrapperRef) {
+      const width = getContainerWidth(this.wrapperRef, parentContainerClassName);
+      if (width && width > this.wrapperRef.offsetLeft) {
+        let maxWidth = width - this.wrapperRef.offsetLeft;
+        if (this.alternativesRef && this.alternativesRef.offsetWidth) {
+          if (this.alternativesRef.offsetWidth > maxWidth) {
+            this.setState({fixedWidth: maxWidth});
+          }
+        } else {
+          this.setState({fixedWidth: maxWidth});
+        }
+      }
+    }
+  }
+
   render() {
-    const {classes, className, show, disabled, list, field} = this.props;
+    const {classes, className, show, disabled, list, field } = this.props;
 
     if (!show || !list || !list.length) {
       return null;
     }
+
+    const style = this.state.fixedWidth?
+      {
+        width: this.state.fixedWidth + "px"
+      }
+      :{};
 
     return (
       <div className={`${classes.container} ${className?className:""}`} ref={ref=>this.wrapperRef=ref}>
@@ -149,11 +193,11 @@ export default class Alternatives extends React.Component {
             );
           })}
         </button>
-        <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} ref={ref=>{this.alternativesRef = ref;}}>
+        <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} style={style} ref={ref=>{this.alternativesRef = ref;}}>
           {list.map(alternative => {
             const key = ((!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds).toString();
             return (
-              <Alternative key={key} alternative={alternative} field={field} onSelect={this.handleSelect}/>
+              <Alternative key={key} alternative={alternative} field={field} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
             );
           })}
         </ul>

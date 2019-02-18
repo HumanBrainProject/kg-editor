@@ -378,8 +378,8 @@ export default class KgDropdownSelectField extends React.Component {
       return this.renderReadMode();
     }
 
-    let { classes, formStore } = this.props;
-    let { options, value: values, mappingLabel, mappingValue, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = this.props.field;
+    let { classes, formStore, field } = this.props;
+    let { options, value: values, mappingLabel, mappingValue, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
 
     let dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     let dropdownClass = dropdownOpen? "open": "";
@@ -400,7 +400,7 @@ export default class KgDropdownSelectField extends React.Component {
         value: this.getAlternativeOptions(alternative.value),
         userIds: alternative.userIds
       }));
-
+      
     return (
       <div ref={ref=>this.wrapperRef = ref}>
         <FormGroup
@@ -408,7 +408,14 @@ export default class KgDropdownSelectField extends React.Component {
           className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
           validationState={validationState}>
           <FieldLabel field={this.props.field}/>
-          <Alternatives className={classes.alternatives} show={!disabled && !readOnly && !!alternatives.length} disabled={disabled || readOnly} list={alternatives} onSelect={this.handleAlternativeSelect}  ref={ref=>this.alternativesRef = ref}/>
+          <Alternatives className={classes.alternatives}
+            show={!disabled && !readOnly && !!alternatives.length}
+            disabled={disabled || readOnly}
+            list={alternatives}
+            onSelect={this.handleAlternativeSelect}
+            field={field}
+            parentContainerClassName="form-group"
+            ref={ref=>this.alternativesRef = ref}/>
           <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
             {values.map(value => {
               const label = value[mappingLabel] !== undefined?value[mappingLabel]:(value[mappingValue] !== undefined?value[mappingValue]:value.id);

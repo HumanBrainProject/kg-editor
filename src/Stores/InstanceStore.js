@@ -389,6 +389,93 @@ class InstanceStore {
         const instanceData = data.data?data.data:{fields: {}};
 
         instance.data = instanceData;
+        /*
+        instanceData.alternatives["http://schema.org/name"] = [
+          {
+            value: "Alternative 2",
+            userIds: "12345"
+          },
+          {
+            value: "Alternative 3",
+            userIds: ["2468", "9876"]
+          },
+          {
+            value: "Alternative 4",
+            userIds: "8642"
+          }
+        ];
+        instanceData.alternatives["http://schema.org/description"] = [
+          {
+            value: "This is an second alternative description.",
+            userIds: ["8642", "9876"]
+          },
+          {
+            value: "This is an third alternative description.",
+            userIds: "2468"
+          },
+          {
+            value: "This is an fourth alternative description.",
+            userIds: "12345"
+          }
+        ];
+        instanceData.alternatives["http://schema.org/description"] = [
+          {
+            value: "This is an second alternative description.",
+            userIds: ["8642", "9876"]
+          },
+          {
+            value: "This is an third alternative description.",
+            userIds: "2468"
+          },
+          {
+            value: "This is an fourth alternative description.",
+            userIds: "12345"
+          }
+        ];
+        instanceData.alternatives["https://schema.hbp.eu/minds/contributors"] = [
+          {
+            value: [
+              {
+                id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
+              },
+              {
+                id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
+              },
+              {
+                id: "minds/core/person/v1.0.0/a79d7b48-8a57-433c-a9d6-50372bbc9ad2"
+              },
+              {
+                id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
+              }
+            ],
+            userIds: "12345"
+          },
+          {
+            value: [
+              {
+                id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
+              },
+              {
+                id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
+              },
+              {
+                id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
+              }
+            ],
+            userIds: ["2468", "8642"]
+          }
+        ];
+        */
+        for(let fieldKey in instanceData.fields){
+          let field = instanceData.fields[fieldKey];
+          if(field.type === "InputText"){
+            field.type = "KgInputText";
+          } else if(field.type === "TextArea"){
+            field.type = "KgTextArea";
+          } else if(field.type === "DropdownSelect"){
+            field.type = "KgDropdownSelect";
+          }
+        }
         instance.form = new FormStore(instanceData);
         const fields = instance.form.getField();
 

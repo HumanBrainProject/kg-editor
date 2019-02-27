@@ -66,7 +66,7 @@ export default class InstanceField extends React.Component{
 
   renderReadModeField = (field) => {
     if (field) {
-      if (field.type === "TextArea") {
+      if (typeof field.type === "string" && field.type.includes("TextArea")) {
         if (this.props.id !== this.props.mainInstanceId && this.props.id !== instanceStore.getCurrentInstanceId(this.props.mainInstanceId) && this.props.level !== 0) {
           if (field.value && field.value.length && field.value.length >= 200) {
             return field.value.substr(0,197) + "...";
@@ -75,7 +75,7 @@ export default class InstanceField extends React.Component{
         }
         return field.value;
 
-      } else if (field.type === "DropdownSelect") {
+      } else if (typeof field.type === "string" && field.type.includes("DropdownSelect")) {
         return (
           <span className="quickfire-readmode-list">
             {field.value.map(value =>
@@ -109,10 +109,10 @@ export default class InstanceField extends React.Component{
     const field = instance.data.fields[name];
     const readOnlyMode = instanceStore.readOnlyMode;
     if (field) {
-      if (field.type === "TextArea")  {
+      if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
-      if (field.type === "DropdownSelect" && field.isLink) {
+      if (typeof field.type === "string" && field.type.includes("DropdownSelect") && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}

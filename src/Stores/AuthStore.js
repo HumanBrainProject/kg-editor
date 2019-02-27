@@ -155,8 +155,10 @@ class AuthStore {
           this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
         });
       } catch (e) {
-        this.userProfileError = e.message?e.message:e;
-        this.isRetrievingUserProfile = false;
+        runInAction(() => {
+          this.userProfileError = e.message?e.message:e;
+          this.isRetrievingUserProfile = false;
+        });
       }
     }
   }

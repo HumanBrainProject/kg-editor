@@ -29,7 +29,7 @@ const styles = {
   },
   actions:{
     display:"grid",
-    gridTemplateColumns:"repeat(4, 1fr)",
+    gridTemplateColumns:"repeat(5, 1fr)",
     gridGap:"10px",
     marginBottom:"20px"
   },
@@ -98,11 +98,6 @@ export default class Preview extends React.Component{
     }
   }
 
-  handleDuplicateInstance = async () => {
-    let newInstanceId = await instanceStore.duplicateInstance(browseStore.selectedInstance.id);
-    routerStore.history.push("/instance/edit/"+newInstanceId);
-  }
-
   handleRetry = () => {
     instanceStore.fetchInstanceData(browseStore.selectedInstance.id);
   }
@@ -136,6 +131,9 @@ export default class Preview extends React.Component{
                   <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release")}>
                     <FontAwesomeIcon icon="cloud-upload-alt"/>&nbsp;&nbsp;Release
                   </div>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "manage")}>
+                    <FontAwesomeIcon icon="cog"/>&nbsp;&nbsp;Manage
+                  </div>
                 </div>
                 <div className={classes.titlePanel}>
                   <BookmarkStatus id={browseStore.selectedInstance.id} className={classes.bookmarkStatus} />
@@ -167,10 +165,6 @@ export default class Preview extends React.Component{
                     </div>
                   </div>
                 </Form>
-
-                <div className={classes.duplicate} onClick={this.handleDuplicateInstance}>
-                  <FontAwesomeIcon icon="copy"/>&nbsp;&nbsp;Duplicate this instance
-                </div>
               </div>
               :
               <BGMessage icon={"ban"}>

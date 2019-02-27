@@ -8,6 +8,7 @@ import routerStore from "../Stores/RouterStore";
 import InstanceForm from "./Instance/InstanceForm";
 import InstanceGraph from "./Instance/InstanceGraph";
 import InstanceRelease from "./Instance/InstanceRelease";
+import InstanceManage from "./Instance/InstanceManage";
 import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";
@@ -100,6 +101,9 @@ export default class Edit extends React.Component {
           <div className={`${classes.tab} ${openedInstance.viewMode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
             <FontAwesomeIcon icon="cloud-upload-alt"/>
           </div>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "manage"?"active":""}`} onClick={this.handleSelectMode.bind(this, "manage")}>
+            <FontAwesomeIcon icon="cog"/>
+          </div>
         </div>
         <div className={classes.body}>
           {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
@@ -117,7 +121,9 @@ export default class Edit extends React.Component {
               <InstanceGraph id={this.props.match.params.id}/>
               :openedInstance.viewMode === "release"?
                 <InstanceRelease id={this.props.match.params.id}/>
-                :null}
+                :openedInstance.viewMode === "manage"?
+                  <InstanceManage id={this.props.match.params.id}/>
+                  :null}
         </div>
         <div className={classes.sidebar}>
           <SaveBar/>

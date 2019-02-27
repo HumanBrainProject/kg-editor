@@ -7,8 +7,11 @@ import API from "../Services/API";
 
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
+import BrowseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
+import routerStore from "./RouterStore";
+import { matchPath } from "react-router-dom";
 
 class OptionsCache{
   @observable cache = new Map();
@@ -36,6 +39,11 @@ class OptionsCache{
       this.cache.delete(path);
       throw `Error while retrieving the list of ${path} (${message})`;
     }
+  }
+
+  @action flush(){
+    this.cache = new Map();
+    this.promises = new Map();
   }
 }
 
@@ -77,6 +85,9 @@ class InstanceStore {
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
+  @observable instanceToDelete = null;
+  @observable isDeletingInstance = false;
+  @observable deleteInstanceError = null;
 
   @observable showCreateModal = false;
 
@@ -120,6 +131,17 @@ class InstanceStore {
         });
     }
     return [];
+  }
+
+  @action flush(){
+    this.instances = new Map();
+    this.isCreatingNewInstance = false;
+    this.instanceCreationError = null;
+    this.showSaveBar = false;
+    this.instanceToDelete = null;
+    this.isDeletingInstance = false;
+    this.deleteInstanceError = null;
+    this.optionsCache.flush();
   }
 
   /**
@@ -230,6 +252,60 @@ class InstanceStore {
   }
 
   @action
+  async deleteInstance(instanceId){
+    if (instanceId) {
+      this.instanceToDelete = instanceId;
+      this.isDeletingInstance = true;
+      this.deleteInstanceError = null;
+      try{
+        await API.axios.delete(API.endpoints.instanceData(instanceId));
+        runInAction(() => {
+          this.instanceToDelete = null;
+          this.isDeletingInstance = false;
+          let nextLocation = null;
+          if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
+            if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+              if(this.openedInstances.size > 1){
+                let openedInstances = Array.from(this.openedInstances.keys());
+                let currentInstanceIndex = openedInstances.indexOf(instanceId);
+                let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
+
+                let openedInstance = this.openedInstances.get(newInstanceId);
+                nextLocation = `/instance/${openedInstance.viewMode}/${newInstanceId}`;
+              } else {
+                nextLocation = "/browse";
+              }
+            }
+          }
+          BrowseStore.refreshFilter();
+          this.closeInstance(instanceId);
+          this.flush();
+          if (nextLocation) {
+            routerStore.history.push(nextLocation);
+          }
+        });
+      } catch(e){
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message})`;
+          this.isDeletingInstance = false;
+        });
+      }
+    }
+  }
+
+  @action
+  async retryDeleteInstance() {
+    return await this.deleteInstance(this.instanceToDelete);
+  }
+
+  @action
+  cancelDeleteInstance() {
+    this.instanceToDelete = null;
+    this.deleteInstanceError = null;
+  }
+
+  @action
   setInstanceHighlight(instanceId, provenence) {
     if (this.instances.has(instanceId)) {
       this.instances.get(instanceId).highlight = provenence;
@@ -313,6 +389,93 @@ class InstanceStore {
         const instanceData = data.data?data.data:{fields: {}};
 
         instance.data = instanceData;
+        /*
+        instanceData.alternatives["http://schema.org/name"] = [
+          {
+            value: "Alternative 2",
+            userIds: "12345"
+          },
+          {
+            value: "Alternative 3",
+            userIds: ["2468", "9876"]
+          },
+          {
+            value: "Alternative 4",
+            userIds: "8642"
+          }
+        ];
+        instanceData.alternatives["http://schema.org/description"] = [
+          {
+            value: "This is an second alternative description.",
+            userIds: ["8642", "9876"]
+          },
+          {
+            value: "This is an third alternative description.",
+            userIds: "2468"
+          },
+          {
+            value: "This is an fourth alternative description.",
+            userIds: "12345"
+          }
+        ];
+        instanceData.alternatives["http://schema.org/description"] = [
+          {
+            value: "This is an second alternative description.",
+            userIds: ["8642", "9876"]
+          },
+          {
+            value: "This is an third alternative description.",
+            userIds: "2468"
+          },
+          {
+            value: "This is an fourth alternative description.",
+            userIds: "12345"
+          }
+        ];
+        instanceData.alternatives["https://schema.hbp.eu/minds/contributors"] = [
+          {
+            value: [
+              {
+                id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
+              },
+              {
+                id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
+              },
+              {
+                id: "minds/core/person/v1.0.0/a79d7b48-8a57-433c-a9d6-50372bbc9ad2"
+              },
+              {
+                id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
+              }
+            ],
+            userIds: "12345"
+          },
+          {
+            value: [
+              {
+                id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
+              },
+              {
+                id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
+              },
+              {
+                id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
+              }
+            ],
+            userIds: ["2468", "8642"]
+          }
+        ];
+        */
+        for(let fieldKey in instanceData.fields){
+          let field = instanceData.fields[fieldKey];
+          if(field.type === "InputText"){
+            field.type = "KgInputText";
+          } else if(field.type === "TextArea"){
+            field.type = "KgTextArea";
+          } else if(field.type === "DropdownSelect"){
+            field.type = "KgDropdownSelect";
+          }
+        }
         instance.form = new FormStore(instanceData);
         const fields = instance.form.getField();
 

@@ -92,9 +92,9 @@ const styles = {
     position:"absolute",
     top:"10px",
     right:"10px",
-    width:"100px",
+    width:"125px",
     display:"grid",
-    gridTemplateColumns:"repeat(4, 1fr)",
+    gridTemplateColumns:"repeat(5, 1fr)",
     opacity:0,
     "&:hover":{
       opacity:"1 !important"
@@ -194,6 +194,9 @@ export default class InstanceRow extends React.Component{
           </div>
           <div className={classes.action} onClick={this.handleAction.bind(this, "release", instance)}>
             <FontAwesomeIcon icon="cloud-upload-alt"/>
+          </div>
+          <div className={classes.action} onClick={this.handleAction.bind(this, "manage", instance)}>
+            <FontAwesomeIcon icon="cog"/>
           </div>
         </div>
         <BookmarkStatus id={instance.id} className="bookmarkStatus" />

@@ -34,6 +34,8 @@ import GlobalError from "./Views/GlobalError";
 import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
 
+import "./CustomFields";
+
 FormStore.setPathNodeSeparator("|");
 
 const styles = {
@@ -192,6 +194,59 @@ const styles = {
     "&:hover":{
       background:"#f3f3f3"
     }
+  },
+  deleteInstanceErrorModal: {
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "15px 25px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)"
+      }
+    }
+  },
+  deleteInstanceError: {
+    margin: "20px 0",
+    color: "#e74c3c"
+  },
+  deleteInstanceErrorFooterBar: {
+    marginBottom: "10px",
+    width: "100%",
+    textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
+    "& button + button": {
+      marginLeft: "20px"
+    }
+  },
+  deletingInstanceModal: {
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "30px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)",
+        "& .fetchingPanel": {
+          position: "unset",
+          top: "unset",
+          left: "unset",
+          width: "unset",
+          transform: "none",
+          wordBreak: "break-word",
+          "& .fetchingLabel": {
+            display: "inline"
+          }
+        }
+      }
+    }
   }
 };
 
@@ -249,6 +304,14 @@ class App extends React.Component{
 
   handleToggleSaveBar = () => {
     instanceStore.toggleSavebarDisplay();
+  }
+
+  handleRetryDeleteInstance = async () => {
+    instanceStore.retryDeleteInstance();
+  }
+
+  handleCancelDeleteInstance = () => {
+    instanceStore.cancelDeleteInstance();
   }
 
   handleCloseInstance(instanceId){
@@ -441,6 +504,7 @@ class App extends React.Component{
                     <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
                     <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
                     <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage"/>)} />
 
                     <Route path="/query-builder" exact={true} component={QueryBuilder} />
 
@@ -475,34 +539,61 @@ If the problem persists, please contact the support.`}<br/><br/>
           <div className={`${classes.status} layout-status`}>
 
           </div>
-          {instanceStore.showCreateModal && browseStore.allLists && !browseStore.isFetching.lists &&
-            <Modal show={true} onHide={this.handleHideCreateModal}>
-              <Modal.Header closeButton>
-                New Instance
-              </Modal.Header>
-              <Modal.Body>
-                <div className={classes.newInstances}>
-                  {browseStore.lists.map(folder => {
-                    if(folder.folderType !== "NODETYPE"){
-                      return null;
-                    } else {
-                      return folder.lists.map(list => {
-                        return(
-                          <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                            {list.name}
-                          </div>
-                        );
-                      });
-                    }
-                  })}
-                  <div>
-                    {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}
-                    {instanceStore.isCreatingNewInstance && <FetchingLoader>Creating new instance...</FetchingLoader>}
-                  </div>
+          {authStore.isFullyAuthenticated && (
+            <React.Fragment>
+              {instanceStore.showCreateModal && browseStore.allLists && !browseStore.isFetching.lists &&
+                <Modal show={true} onHide={this.handleHideCreateModal}>
+                  <Modal.Header closeButton>
+                    New Instance
+                  </Modal.Header>
+                  <Modal.Body>
+                    <div className={classes.newInstances}>
+                      {browseStore.lists.map(folder => {
+                        if(folder.folderType !== "NODETYPE"){
+                          return null;
+                        } else {
+                          return folder.lists.map(list => {
+                            return(
+                              <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
+                                {list.name}
+                              </div>
+                            );
+                          });
+                        }
+                      })}
+                      <div>
+                        {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}
+                        {instanceStore.isCreatingNewInstance && <FetchingLoader>Creating new instance...</FetchingLoader>}
+                      </div>
+                    </div>
+                  </Modal.Body>
+                </Modal>
+              }
+              {instanceStore.deleteInstanceError?
+                <div className={classes.deleteInstanceErrorModal}>
+                  <Modal.Dialog>
+                    <Modal.Body>
+                      <div className={classes.deleteInstanceError}>{instanceStore.deleteInstanceError}</div>
+                      <div className={classes.deleteInstanceErrorFooterBar}>
+                        <Button onClick={this.handleCancelDeleteInstance}>Cancel</Button>
+                        <Button bsStyle="primary" onClick={this.handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+                      </div>
+                    </Modal.Body>
+                  </Modal.Dialog>
                 </div>
-              </Modal.Body>
-            </Modal>
-          }
+                :
+                instanceStore.isDeletingInstance && !!instanceStore.instanceToDelete?
+                  <div className={classes.deletingInstanceModal}>
+                    <Modal.Dialog>
+                      <Modal.Body>
+                        <FetchingLoader>{`Deleting instance "${instanceStore.instanceToDelete}" ...`}</FetchingLoader>
+                      </Modal.Body>
+                    </Modal.Dialog>
+                  </div>
+                  :null
+              }
+            </React.Fragment>
+          )}
         </div>
       </Router>
     );

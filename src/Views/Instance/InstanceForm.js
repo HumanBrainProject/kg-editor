@@ -67,12 +67,12 @@ const styles = {
     "& > div:first-Child": {
       position: "relative"
     },
-    "&:not(.current).readMode.highlight": {
+    "&:not(.current).highlight": {
       backgroundColor: "#a5c7e9",
       borderColor: "#337ab7",
       color: "#143048"
     },
-    "& .hightlightArrow": {
+    "& .highlightArrow": {
       display: "none",
       position: "absolute",
       top: "50%",
@@ -81,7 +81,7 @@ const styles = {
       fontSize: "xx-large",
       transform: "translateY(-50%) scale(0.5,0.8)"
     },
-    "&:not(.current).readMode .hightlightArrow": {
+    "&:not(.current) .highlightArrow": {
       display: "inline",
       position: "absolute",
       top: "50%",
@@ -91,7 +91,7 @@ const styles = {
       transform: "translateY(-50%) scale(0.5,0.7)",
       transition: "color 0.25s ease-in-out"
     },
-    "&:not(.current).readMode.highlight .hightlightArrow": {
+    "&:not(.current).highlight .highlightArrow": {
       color: "#337ab7"
     },
     "&:not(.main) $panelHeader": {
@@ -266,7 +266,7 @@ export default class InstanceForm extends React.Component {
           <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
         </div>
         }
-        <FontAwesomeIcon className="hightlightArrow"  icon="arrow-right"/>
+        <FontAwesomeIcon className="highlightArrow"  icon="arrow-right"/>
         <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
         <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
       </div>

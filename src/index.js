@@ -191,6 +191,7 @@ const styles = {
     lineHeight:"3em",
     border:"1px solid #ccc",
     cursor:"pointer",
+    wordBreak: "break-word",
     "&:hover":{
       background:"#f3f3f3"
     }
@@ -547,18 +548,25 @@ If the problem persists, please contact the support.`}<br/><br/>
                     New Instance
                   </Modal.Header>
                   <Modal.Body>
-                    <div className={classes.newInstances}>
+                    <div>
                       {browseStore.lists.map(folder => {
                         if(folder.folderType !== "NODETYPE"){
                           return null;
                         } else {
-                          return folder.lists.map(list => {
-                            return(
-                              <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                                {list.name}
+                          return (
+                            <div>
+                              <h4>{folder.folderName}</h4>
+                              <div className={classes.newInstances}>
+                                {folder.lists.map(list => {
+                                  return(
+                                    <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
+                                      {list.name}
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            );
-                          });
+                            </div>
+                          );
                         }
                       })}
                       <div>

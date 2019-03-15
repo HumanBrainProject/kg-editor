@@ -27,7 +27,9 @@ const endpoints = {
     return `/query/${rootInstancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
-      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;}
+      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
+  "saveQuery": (rootInstancePath, queryId) => `/query/${rootInstancePath}/${queryId}`,
+  "listQueries": schemaId => `/query/${schemaId?"":""}`,
 };
 
 class API {

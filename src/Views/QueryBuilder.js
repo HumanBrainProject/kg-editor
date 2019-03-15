@@ -6,6 +6,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
 import Field from "./QueryBuilder/Field";
+import Queries from "./QueryBuilder/Queries";
 
 import RootSchemaChoice from "./QueryBuilder/RootSchemaChoice";
 import Query from "./QueryBuilder/Query";
@@ -18,22 +19,42 @@ import BGMessage from "../Components/BGMessage";
 let styles = {
   container:{
     display:"grid",
-    gridTemplateRows:"100%",
+    gridTemplateRows:"1fr 1fr 4fr",
     gridTemplateColumns:"1fr 1fr",
     gridGap:"10px",
     padding:"10px",
     height:"100%"
   },
   schemas:{
+    gridRowStart: "span 5",
     position:"relative",
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast1)",
     overflow:"auto",
     color:"var(--ft-color-normal)"
   },
+  myQueries: {
+    display: "none",
+    "&.show": {
+      display: "block"
+    }
+  },
+  othersQueries: {
+    display: "none",
+    "&.show": {
+      display: "block"
+    }
+  },
   tabbedPanel:{
     display:"grid",
-    gridTemplateRows:"auto 1fr"
+    gridTemplateRows:"auto 1fr",
+    gridRowStart: "span 5",
+    "&.hasMyQueries, &.hasOthersQueries": {
+      gridRowStart: "span 4",
+    },
+    "&.hasMyQueries.hasOthersQueries": {
+      gridRowStart: "span 3",
+    }
   },
   tabs:{
     display:"grid",
@@ -53,11 +74,20 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class QueryBuilder extends React.Component{
+  constructor(props) {
+    super(props);
+  }
   handleSelectTab(tab){
     queryBuilderStore.selectTab(tab);
   }
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
+  }
+  handleSelectQuery(query){
+    queryBuilderStore.selectQuery(query);
+  }
+  handleDeleteQuery(query){
+    window.console.log(query);
   }
 
   UNSAFE_componentWillUpdate(){
@@ -81,8 +111,13 @@ export default class QueryBuilder extends React.Component{
                 Please choose a root schema in the right panel
               </BGMessage>}
           </div>
-
-          <div className={classes.tabbedPanel}>
+          <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
+            <Queries title="My saved queries" list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} onDelete={this.handleDeleteQuery} />
+          </div>
+          <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
+            <Queries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} />
+          </div>
+          <div className={`${classes.tabbedPanel} ${queryBuilderStore.myQueries.length?"hasMyQueries":""} ${queryBuilderStore.othersQueries.length?"hasOthersQueries":""}`}>
             <div className={classes.tabs}>
               {queryBuilderStore.rootField?
                 <React.Fragment>

@@ -12,6 +12,10 @@ class Field {
   @observable alias = null;
   @observable fields = [];
   @observable options = new Map();
+  @observable isSaving = false;
+  @observable saveError = null;
+  @observable isRunning = false;
+  @observable runError = null;
 
   constructor(schema, parent){
     this.schema = schema;
@@ -286,15 +290,22 @@ class QueryBuilderStore {
 
   @action
   async executeQuery(){
-    try{
-      let payload = this.JSONQuery;
-      let response = await API.axios.post(API.endpoints.query(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/myQuery/":undefined, this.resultSize, this.resultStart), payload);
-      runInAction(()=>{
-        this.tableViewRoot = ["results"];
-        this.result = response.data;
-      });
-    } catch(e){
-      this.result = null;
+    if (!this.isRunning && !this.runError) {
+      this.isRunning = true;
+      try{
+        const payload = this.JSONQuery;
+        const response = await API.axios.post(API.endpoints.performQuery(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/myQuery/":undefined, this.resultSize, this.resultStart), payload);
+        runInAction(()=>{
+          this.tableViewRoot = ["results"];
+          this.result = response.data;
+          this.isRunning = false;
+        });
+      } catch(e){
+        const message = e.message?e.message:e;
+        this.result = null;
+        this.runError = `Error while executing query (${message})`;
+        this.isRunning = false;
+      }
     }
   }
 
@@ -320,15 +331,56 @@ class QueryBuilderStore {
   }
 
   @action
-  async saveQuery(queryId){
-    try{
-      const payload = this.JSONQuery;
-      const response = await API.axios.put(API.endpoints.saveQuery(this.rootField.schema.id, queryId), payload);
-      runInAction(()=>{
-        window.console.log(response);
-      });
-    } catch(e){
-      window.console.log(e);
+  async saveQuery(){
+    if (!this.isSaving && !this.saveError) {
+      this.isSaving = true;
+      const queryId = "12345";
+      try{
+        const payload = this.JSONQuery;
+        const response = await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
+        runInAction(()=>{
+          this.isSaving = false;
+          window.console.log(response);
+        });
+      } catch(e){
+        const message = e.message?e.message:e;
+        this.saveError = `Error while saving query "${queryId}" (${message})`;
+        this.isSaving = false;
+        window.console.log(e);
+      }
+    }
+  }
+
+  @action
+  cancelSaveQuery() {
+    if (!this.isSaving) {
+      this.saveError = null;
+    }
+  }
+
+  @action
+  async deleteQuery(query){
+    if (query && !query.isDeleting && !query.deleteError) {
+      query.isDeleting = true;
+      try{
+        const response = await API.axios.delete(API.endpoints.query(this.rootField.schema.id, query.id));
+        runInAction(()=>{
+          query.isDeleting = false;
+          window.console.log(response);
+        });
+      } catch(e){
+        const message = e.message?e.message:e;
+        query.deleteError = `Error while deleting query "${query.id}" (${message})`;
+        query.isDeleting = false;
+        window.console.log(e);
+      }
+    }
+  }
+
+  @action
+  cancelDeleteQuery(query) {
+    if (query && !query.isDeleting) {
+      query.deleteError = null;
     }
   }
 
@@ -352,7 +404,9 @@ class QueryBuilderStore {
                   user: jsonSpec._createdByUser,
                   specification: jsonSpec,
                   label: jsonSpec.label?jsonSpec.label:queryId,
-                  description: jsonSpec.description?jsonSpec.description:(this.specifications.length%2 === 0?"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.":"")
+                  description: jsonSpec.description?jsonSpec.description:(this.specifications.length%2 === 0?"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.":""),
+                  isDeleting: false,
+                  deleteError: null
                 });
               }
             }

@@ -23,13 +23,13 @@ const endpoints = {
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/api/instances/${instance}/graph`,
-  "query": function(rootInstancePath, vocab, size, start){
-    return `/query/${rootInstancePath}/instances${arguments.length > 1?"?":""}${
+  "performQuery": function(instancePath, vocab, size, start){
+    return `/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
-  "saveQuery": (rootInstancePath, queryId) => `/query/${rootInstancePath}/${queryId}`,
-  "listQueries": schemaId => `/query/${schemaId?"":""}`,
+  "query": (instancePath, queryId) => `/query/${instancePath}/${queryId}`,
+  "listQueries": instancePath => `/query/${instancePath?"":""}`,
 };
 
 class API {

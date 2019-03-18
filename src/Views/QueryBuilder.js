@@ -6,7 +6,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
 import Field from "./QueryBuilder/Field";
-import Queries from "./QueryBuilder/Queries";
+import SavedQueries from "./QueryBuilder/SavedQueries";
 
 import RootSchemaChoice from "./QueryBuilder/RootSchemaChoice";
 import Query from "./QueryBuilder/Query";
@@ -87,7 +87,10 @@ export default class QueryBuilder extends React.Component{
     queryBuilderStore.selectQuery(query);
   }
   handleDeleteQuery(query){
-    window.console.log(query);
+    queryBuilderStore.deleteQuery(query);
+  }
+  handleCancelDeleteQuery(query){
+    queryBuilderStore.cancelDeleteQuery(query);
   }
 
   UNSAFE_componentWillUpdate(){
@@ -112,10 +115,10 @@ export default class QueryBuilder extends React.Component{
               </BGMessage>}
           </div>
           <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
-            <Queries title="My saved queries" list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} onDelete={this.handleDeleteQuery} />
+            <SavedQueries title="My saved queries" list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} onDelete={this.handleDeleteQuery} onCancelDelete={this.handleCancelDeleteQuery} />
           </div>
           <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
-            <Queries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} />
+            <SavedQueries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} />
           </div>
           <div className={`${classes.tabbedPanel} ${queryBuilderStore.myQueries.length?"hasMyQueries":""} ${queryBuilderStore.othersQueries.length?"hasOthersQueries":""}`}>
             <div className={classes.tabs}>

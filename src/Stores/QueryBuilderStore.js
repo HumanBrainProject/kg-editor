@@ -12,10 +12,6 @@ class Field {
   @observable alias = null;
   @observable fields = [];
   @observable options = new Map();
-  @observable isSaving = false;
-  @observable saveError = null;
-  @observable isRunning = false;
-  @observable runError = null;
 
   constructor(schema, parent){
     this.schema = schema;
@@ -50,7 +46,15 @@ class Field {
 
 class QueryBuilderStore {
   @observable structure = null;
+  @observable queryId = "";
+  @observable label = "";
+  @observable description = "";
+  @observable sourceQuery = null;
   @observable rootField = null;
+  @observable isSaving = false;
+  @observable saveError = null;
+  @observable isRunning = false;
+  @observable runError = null;
 
   @observable specifications = [];
 
@@ -70,13 +74,23 @@ class QueryBuilderStore {
   }
 
   selectRootSchema(schema){
-    this.rootField = new Field({
-      id:schema.id,
-      label:schema.label,
-      canBe:[schema.id]
-    });
-    this.selectField(this.rootField);
-    this.fetchQueries();
+    if (!this.isSaving) {
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.sourceQuery = null;
+      this.rootField = new Field({
+        id:schema.id,
+        label:schema.label,
+        canBe:[schema.id]
+      });
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
+      this.selectField(this.rootField);
+      this.fetchQueries();
+    }
   }
 
   @computed
@@ -281,9 +295,18 @@ class QueryBuilderStore {
 
   @action
   selectQuery(query) {
-    if (this.rootField && this.rootField.schema && this.rootField.schema.id
+    if (!this.isSaving
+      && this.rootField && this.rootField.schema && this.rootField.schema.id
       && query && query.specification) {
+      this.queryId = query.id;
+      this.label = query.label;
+      this.description = query.description;
+      this.sourceQuery = query;
       this.rootField = this._processJsonSpecification(this.rootField.schema.id, query.specification);
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
       this.selectField(this.rootField);
     }
   }

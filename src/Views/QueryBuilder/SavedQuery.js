@@ -4,6 +4,7 @@ import {observer} from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
+import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import PopOverButton from "../../Components/PopOverButton";
 
 let styles = {
@@ -101,10 +102,10 @@ export default class SavedQuery extends React.Component{
   }
 
   handleSelect(event) {
-    const { query, onSelect} = this.props;
+    const { query } = this.props;
     event && event.stopPropagation();
     if (!query.deleteError && !query.isDeleting) {
-      typeof onSelect === "function" && onSelect(query);
+      queryBuilderStore.selectQuery(query);
     }
   }
 
@@ -114,10 +115,10 @@ export default class SavedQuery extends React.Component{
   }
 
   handleDelete(event) {
-    const { query, onDelete} = this.props;
+    const { query } = this.props;
     event && event.stopPropagation();
     this.setState({ showDeleteDialog: false });
-    typeof onDelete === "function" && onDelete(query);
+    queryBuilderStore.deleteQuery(query);
   }
 
   handleCloseDeleteDialog(event) {
@@ -126,32 +127,32 @@ export default class SavedQuery extends React.Component{
   }
 
   handleCancelDelete(event) {
-    const { query, onCancelDelete} = this.props;
+    const { query } = this.props;
     event && event.stopPropagation();
-    typeof onCancelDelete === "function" && onCancelDelete(query);
+    queryBuilderStore.cancelDeleteQuery(query);
   }
 
   render(){
-    const {classes, query, onDelete, onCancelDelete} = this.props;
+    const {classes, query, enableDelete } = this.props;
 
     return (
       <div className={`${classes.container} ${query.isDeleting?"is-deleting":""}`} key={query.id} onClick={this.handleSelect.bind(this)} onMouseLeave={this.handleCloseDeleteDialog.bind(this)} ref={ref=>this.wrapperRef = ref} >
         <div className={classes.name}>
           {query.label} - <small title="queryId">{query.id}</small>
-          {onDelete && !query.deleteError && !query.isDeleting && !this.state.showDeleteDialog && (
+          {enableDelete && !query.deleteError && !query.isDeleting && !this.state.showDeleteDialog && (
             <button className={classes.deleteButton} title="delete" onClick={this.handleConfirmDelete.bind(this)}><FontAwesomeIcon icon="times"/></button>
           )}
-          {onDelete && !query.deleteError && !query.isDeleting && (
+          {enableDelete && !query.deleteError && !query.isDeleting && (
             <div className={`${classes.deleteDialog} ${this.state.showDeleteDialog?"show":""}`}>
               <Button bsStyle="danger" bsSize="small" onClick={this.handleDelete.bind(this)}><FontAwesomeIcon icon="trash-alt"/>&nbsp;Delete</Button>
             </div>
           )}
-          {onDelete && !query.deleteError && query.isDeleting && (
+          {enableDelete && !query.deleteError && query.isDeleting && (
             <div className={classes.deleting} title={`deleting query ${query.id}...`}>
               <FontAwesomeIcon icon={"circle-notch"} spin/>
             </div>
           )}
-          {onCancelDelete && query.deleteError && (
+          {enableDelete && query.deleteError && (
             <PopOverButton
               className={classes.error}
               buttonClassName={classes.errorButton}

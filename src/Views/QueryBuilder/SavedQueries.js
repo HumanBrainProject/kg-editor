@@ -33,7 +33,7 @@ export default class SavedQueries extends React.Component{
   }
 
   render(){
-    const {classes, title, list, onSelect, onDelete, onCancelDelete} = this.props;
+    const {classes, title, list, enableDelete } = this.props;
 
     return (
       <div className={classes.container}>
@@ -45,7 +45,7 @@ export default class SavedQueries extends React.Component{
           :
           <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
             {list.map(query => (
-              <SavedQuery key={query.id} query={query} onSelect={onSelect} onDelete={onDelete} onCancelDelete={onCancelDelete} />
+              <SavedQuery key={query.id} query={query} enableDelete={enableDelete} />
             ))}
           </Scrollbars>
         }

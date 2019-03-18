@@ -83,16 +83,6 @@ export default class QueryBuilder extends React.Component{
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
   }
-  handleSelectQuery(query){
-    queryBuilderStore.selectQuery(query);
-  }
-  handleDeleteQuery(query){
-    queryBuilderStore.deleteQuery(query);
-  }
-  handleCancelDeleteQuery(query){
-    queryBuilderStore.cancelDeleteQuery(query);
-  }
-
   UNSAFE_componentWillUpdate(){
     if(this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel){
       //console.log(this.scrolledPanel,this.scrolledPanel.scrollTop);
@@ -115,7 +105,7 @@ export default class QueryBuilder extends React.Component{
               </BGMessage>}
           </div>
           <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
-            <SavedQueries title="My saved queries" list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} onDelete={this.handleDeleteQuery} onCancelDelete={this.handleCancelDeleteQuery} />
+            <SavedQueries title="My saved queries" list={queryBuilderStore.myQueries} enableDelete={true} />
           </div>
           <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
             <SavedQueries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} />

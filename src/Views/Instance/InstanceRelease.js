@@ -373,9 +373,6 @@ export default class InstanceRelease extends React.Component{
               <Button onClick={this.handleAllNodeChange.bind(this, node, null )} bsSize={"xsmall"}>
                 Do nothing
               </Button>
-              <Button onClick={this.handleAllNodeChange.bind(this, node, "NOT_RELEASED")} bsSize={"xsmall"}>
-                Unrelease
-              </Button>
             </ButtonGroup>
           </div>
         }

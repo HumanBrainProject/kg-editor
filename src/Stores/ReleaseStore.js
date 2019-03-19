@@ -105,7 +105,8 @@ export default class ReleaseStore{
       runInAction(()=>{
         this.deduplicateNodes(data);
         this.populateStatuses(data);
-        this.createPendingStatuses(data);
+        // Default release state
+        this.recursiveMarkNodeForChange(data, null); // "RELEASED"
         this.populateStatuses(data, "pending_");
         this.instancesTree = data;
         this.isFetched = true;
@@ -236,14 +237,6 @@ export default class ReleaseStore{
     }
 
     return node[prefix+"globalStatus"];
-  }
-
-  @action
-  createPendingStatuses(node){
-    node.pending_status = "RELEASED";
-    if(node.children && node.children.length > 0){
-      node.children.map(child => this.createPendingStatuses(child));
-    }
   }
 
   @action markNodeForChange(node, newStatus){

@@ -117,7 +117,7 @@ export default class Instances extends React.Component{
     browseStore.fetchInstances();
   }
 
-  render = () => {
+  render() {
     const { classes } = this.props;
 
     return (

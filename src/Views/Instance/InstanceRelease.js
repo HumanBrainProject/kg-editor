@@ -201,9 +201,12 @@ const styles = {
     width:"130px",
     height:"130px",
     outline:"none",
-    "&:focus, &:active, &:focus:active, &:hover":{
+    "&:focus, &:active, &:focus:active, &:hover, &[disabled], &[disabled]:focus, &[disabled]:active, &[disabled]:focus:active, &[disabled]:hover":{
       outline:"none",
       border:"15px solid var(--bg-color-ui-contrast2)"
+    },
+    "&[disabled]:focus, &[disabled]:active, &[disabled]:focus:active, &[disabled]:hover": {
+      cursor: "default"
     },
     border:"15px solid var(--bg-color-ui-contrast2)"
   },
@@ -410,7 +413,7 @@ export default class InstanceRelease extends React.Component{
                     <h4>Current state</h4>
                   </div>
                   <div className={classes.releaseActions}>
-                    <Button onClick={this.releaseStore.isSaving?undefined:this.handleProceed} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"}>
+                    <Button onClick={this.releaseStore.isSaving?undefined:this.handleProceed} disabled={this.releaseStore.isSaving || (treeStats.proceed_release === 0 && treeStats.proceed_unrelease === 0)} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"} title={this.releaseStore.isSaving?"Saving...":(treeStats.proceed_release === 0 && treeStats.proceed_unrelease === 0?"No pending changes to release":"Proceed")}>
                       <FontAwesomeIcon icon={this.releaseStore.isSaving?"circle-notch":"cloud-upload-alt"} spin={this.releaseStore.isSaving}/>
                       <div>{this.releaseStore.isSaving?"Saving...":"Proceed"}</div>
                     </Button>

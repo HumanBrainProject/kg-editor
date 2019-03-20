@@ -23,6 +23,7 @@ export default class ReleaseStore{
   @observable hlNode = null;
 
   @observable nodesMap = null;
+  @observable counter = 0;
 
   constructor(instanceId){
     this.topInstanceId = instanceId;
@@ -31,6 +32,10 @@ export default class ReleaseStore{
 
   @computed
   get treeStats(){
+    if (!this.isFetched) {
+      return null;
+    }
+
     const count = {
       total:0,
       released:0,
@@ -65,11 +70,12 @@ export default class ReleaseStore{
       }
 
       if(node.children && node.children.length > 0){
-        node.children.map(child => getStatsFromNode(child));
+        node.children.forEach(child => getStatsFromNode(child));
       }
     };
 
     getStatsFromNode(this.instancesTree);
+    window.console.log("count", count);
 
     return count;
   }
@@ -85,7 +91,7 @@ export default class ReleaseStore{
         nodesByStatus[node.pending_status].push(node);
       }
       if(node.children && node.children.length > 0){
-        node.children.map(child => rseek(child));
+        node.children.forEach(child => rseek(child));
       }
     };
 
@@ -235,23 +241,24 @@ export default class ReleaseStore{
       node[prefix+"childrenStatus"] = null;
       node[prefix+"globalStatus"] = node[prefix+"status"];
     }
-
     return node[prefix+"globalStatus"];
   }
 
   @action markNodeForChange(node, newStatus){
     node.pending_status = newStatus;
     this.populateStatuses(this.instancesTree, "pending_");
+    this.counter++;
   }
 
   @action markAllNodeForChange(node, newStatus){
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
     this.populateStatuses(this.instancesTree, "pending_");
+    this.counter++;
   }
   @action recursiveMarkNodeForChange(node, newStatus){
     node.pending_status = newStatus? newStatus: node.status;
     if(node.children && node.children.length > 0){
-      node.children.map(child => this.recursiveMarkNodeForChange(child, newStatus));
+      node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
     }
   }
 

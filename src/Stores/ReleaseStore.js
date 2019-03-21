@@ -22,8 +22,6 @@ export default class ReleaseStore{
 
   @observable hlNode = null;
 
-  @observable nodesMap = null;
-
   constructor(instanceId){
     this.topInstanceId = instanceId;
     this.fetchReleaseData();
@@ -31,6 +29,10 @@ export default class ReleaseStore{
 
   @computed
   get treeStats(){
+    if (!this.isFetched) {
+      return null;
+    }
+
     const count = {
       total:0,
       released:0,
@@ -65,7 +67,7 @@ export default class ReleaseStore{
       }
 
       if(node.children && node.children.length > 0){
-        node.children.map(child => getStatsFromNode(child));
+        node.children.forEach(child => getStatsFromNode(child));
       }
     };
 
@@ -85,7 +87,7 @@ export default class ReleaseStore{
         nodesByStatus[node.pending_status].push(node);
       }
       if(node.children && node.children.length > 0){
-        node.children.map(child => rseek(child));
+        node.children.forEach(child => rseek(child));
       }
     };
 
@@ -103,9 +105,9 @@ export default class ReleaseStore{
     try{
       const { data } = await API.axios.get(API.endpoints.releaseData(this.topInstanceId));
       runInAction(()=>{
-        this.deduplicateNodes(data);
         this.populateStatuses(data);
-        this.createPendingStatuses(data);
+        // Default release state
+        this.recursiveMarkNodeForChange(data, null); // "RELEASED"
         this.populateStatuses(data, "pending_");
         this.instancesTree = data;
         this.isFetched = true;
@@ -115,23 +117,6 @@ export default class ReleaseStore{
       const message = e.message?e.message:e;
       this.fetchError = message;
     }
-  }
-
-  @action
-  deduplicateNodes(rootNode){
-    this.nodesMap = new Map();
-    let rseek = (node) => {
-      if(node.children){
-        node.children = node.children.map(child => {
-          rseek(child);
-          if(!this.nodesMap.has(child["@id"])){
-            this.nodesMap.set(child["@id"], child);
-          }
-          return this.nodesMap.get(child["@id"]);
-        });
-      }
-    };
-    rseek(rootNode);
   }
 
   async commitStatusChanges(){
@@ -234,16 +219,7 @@ export default class ReleaseStore{
       node[prefix+"childrenStatus"] = null;
       node[prefix+"globalStatus"] = node[prefix+"status"];
     }
-
     return node[prefix+"globalStatus"];
-  }
-
-  @action
-  createPendingStatuses(node){
-    node.pending_status = "RELEASED";
-    if(node.children && node.children.length > 0){
-      node.children.map(child => this.createPendingStatuses(child));
-    }
   }
 
   @action markNodeForChange(node, newStatus){
@@ -258,7 +234,7 @@ export default class ReleaseStore{
   @action recursiveMarkNodeForChange(node, newStatus){
     node.pending_status = newStatus? newStatus: node.status;
     if(node.children && node.children.length > 0){
-      node.children.map(child => this.recursiveMarkNodeForChange(child, newStatus));
+      node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
     }
   }
 

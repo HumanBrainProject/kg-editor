@@ -82,7 +82,7 @@ export default class Search extends React.Component{
     browseStore.createBookmarkList(browseStore.newBookmarkListName);
   }
 
-  render = () => {
+  render() {
     const {classes} = this.props;
 
     return(

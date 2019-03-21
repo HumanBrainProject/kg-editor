@@ -2,7 +2,6 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { Button, ButtonGroup } from "react-bootstrap";
-import { uniqueId, fill } from "lodash";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -201,9 +200,12 @@ const styles = {
     width:"130px",
     height:"130px",
     outline:"none",
-    "&:focus, &:active, &:focus:active, &:hover":{
+    "&:focus, &:active, &:focus:active, &:hover, &[disabled], &[disabled]:focus, &[disabled]:active, &[disabled]:focus:active, &[disabled]:hover":{
       outline:"none",
       border:"15px solid var(--bg-color-ui-contrast2)"
+    },
+    "&[disabled]:focus, &[disabled]:active, &[disabled]:focus:active, &[disabled]:hover": {
+      cursor: "default"
     },
     border:"15px solid var(--bg-color-ui-contrast2)"
   },
@@ -281,6 +283,217 @@ const styles = {
 
 @injectStyles(styles)
 @observer
+class ReleaseAction extends React.Component {
+
+  handleProceed = () => {
+    const { releaseStore } = this.props;
+    if (!releaseStore.isSaving) {
+      releaseStore.commitStatusChanges();
+    }
+  }
+
+  render() {
+    const { classes, releaseStore } = this.props;
+
+    if (!releaseStore || !releaseStore.treeStats) {
+      return null;
+    }
+
+    return (
+      <React.Fragment>
+        <Button onClick={this.handleProceed} disabled={releaseStore.isSaving || (releaseStore.treeStats.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0)} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"} title={releaseStore.isSaving?"Saving...":(releaseStore.treeStats.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0?"No pending changes to release":"Proceed")}>
+          <FontAwesomeIcon icon={releaseStore.isSaving?"circle-notch":"cloud-upload-alt"} spin={releaseStore.isSaving}/>
+          <div>{releaseStore.isSaving?"Saving...":"Proceed"}</div>
+        </Button>
+        <div className={classes.treeStats}>
+          <div className={"section"}>
+            <h5>Pending changes:</h5>
+            <div className={"stat pending"}>
+              <div className={"name"}>Instances released</div>
+              <div className={"pending-count"}>{releaseStore.treeStats.proceed_release}</div>
+            </div>
+            <div className={"stat pending"}>
+              <div className={"name"}>Instances unreleased</div>
+              <div className={"pending-count"}>{releaseStore.treeStats.proceed_unrelease}</div>
+            </div>
+            <div className={"stat pending"}>
+              <div className={"name"}>Instances not modified</div>
+              <div className={"pending-count"}>{releaseStore.treeStats.proceed_do_nothing}</div>
+            </div>
+          </div>
+
+          <div className={"section"}>
+            <h5>Current state:</h5>
+            <div className={"stat"}>
+              <div className={"name"}>Released</div>
+              <div className={"bar released"}>
+                <div className={"bar-inner"} style={{width:`${releaseStore.treeStats.released/releaseStore.treeStats.total*100}%`}}></div>
+                <div className={"bar-label"}>{releaseStore.treeStats.released} / {releaseStore.treeStats.total}</div>
+              </div>
+            </div>
+            <div className={"stat"}>
+              <div className={"name"}>Not released</div>
+              <div className={"bar not-released"}>
+                <div className={"bar-inner"} style={{width:`${releaseStore.treeStats.not_released/releaseStore.treeStats.total*100}%`}}></div>
+                <div className={"bar-label"}>{releaseStore.treeStats.not_released} / {releaseStore.treeStats.total}</div>
+              </div>
+            </div>
+            <div className={"stat"}>
+              <div className={"name"}>Has changed</div>
+              <div className={"bar has-changed"}>
+                <div className={"bar-inner"} style={{width:`${releaseStore.treeStats.has_changed/releaseStore.treeStats.total*100}%`}}></div>
+                <div className={"bar-label"}>{releaseStore.treeStats.has_changed} / {releaseStore.treeStats.total}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className={"section"}>
+            <h5>Preview state:</h5>
+            <div className={"stat"}>
+              <div className={"name"}>Released</div>
+              <div className={"bar released"}>
+                <div className={"bar-inner"} style={{width:`${releaseStore.treeStats.pending_released/releaseStore.treeStats.total*100}%`}}></div>
+                <div className={"bar-label"}>{releaseStore.treeStats.pending_released} / {releaseStore.treeStats.total}</div>
+              </div>
+            </div>
+            <div className={"stat"}>
+              <div className={"name"}>Not released</div>
+              <div className={"bar not-released"}>
+                <div className={"bar-inner"} style={{width:`${releaseStore.treeStats.pending_not_released/releaseStore.treeStats.total*100}%`}}></div>
+                <div className={"bar-label"}>{releaseStore.treeStats.pending_not_released} / {releaseStore.treeStats.total}</div>
+              </div>
+            </div>
+            <div className={"stat"}>
+              <div className={"name"}>Has changed</div>
+              <div className={"bar has-changed"}>
+                <div className={"bar-inner"} style={{width:`${releaseStore.treeStats.pending_has_changed/releaseStore.treeStats.total*100}%`}}></div>
+                <div className={"bar-label"}>{releaseStore.treeStats.pending_has_changed} / {releaseStore.treeStats.total}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
+class ReleaseNodeToggle extends React.Component {
+
+  handleChange = status => {
+    const { node, releaseStore } = this.props;
+    releaseStore.markNodeForChange(node, status);
+  }
+
+  handleStopClick = e => {
+    e.stopPropagation();
+  }
+
+  render() {
+    const { classes, node, releaseStore } = this.props;
+
+    if (!node || !releaseStore) {
+      return null;
+    }
+
+    return(
+      <div className={`${classes.nodeActions} ${node.status==="NOT_RELEASED"?"no-unrelease":""}`} onClick={this.handleStopClick}>
+        <MultiToggle selectedValue={node.pending_status} onChange={this.handleChange}>
+          {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check"/>}
+          <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale/>
+          {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="unlink"/>}
+        </MultiToggle>
+      </div>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
+class ReleaseNodeAndChildrenToggle extends React.Component {
+
+  handleChange(status){
+    const { node, releaseStore } = this.props;
+    releaseStore.markAllNodeForChange(node, status);
+  }
+
+  render() {
+    const { classes, node, releaseStore } = this.props;
+
+    if (!node || !releaseStore) {
+      return null;
+    }
+
+    return(
+      <div className={classes.hlActions}>
+        <ButtonGroup>
+          <Button onClick={this.handleChange.bind(this, "RELEASED")} bsSize={"xsmall"}>
+                Release
+          </Button>
+          <Button onClick={this.handleChange.bind(this, null )} bsSize={"xsmall"}>
+                Do nothing
+          </Button>
+        </ButtonGroup>
+      </div>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
+class ReleaseNode extends React.Component {
+
+  handleHLNode(node, e){
+    const { releaseStore } = this.props;
+    e.stopPropagation();
+    releaseStore.toggleHLNode(node);
+  }
+
+  render() {
+    const { classes, node, prefix="", level=0, releaseStore } = this.props;
+
+    if (!node || !releaseStore) {
+      return null;
+    }
+
+    const statusClass = (node[prefix+"status"] === "NOT_RELEASED")? "not-released"
+      :(node[prefix+"status"] === "HAS_CHANGED")? "has-changed"
+        :"released";
+
+    return(
+      <div className={`node ${statusClass} ${releaseStore.hlNode === node?"highlighted":""}`}>
+        <div className="node-content" onClick={this.handleHLNode.bind(this, node)}>
+          <div className={"status-indicator"}>
+            <ReleaseStatus key={`${node[prefix+"status"]}-${node[prefix+"childrenStatus"]}`} instanceStatus={node[prefix+"status"]} childrenStatus={node[prefix+"childrenStatus"]}/>
+          </div>
+          <span className={"node-type"}>
+            ({node.type})
+          </span>
+          <span className={classes.label}>
+            {node.label}
+          </span>
+          {prefix === "" && (
+            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+          )}
+        </div>
+        {node.children && node.children.length > 0 &&
+          <div className={"children"}>
+            {node.children.map(child => (
+              <ReleaseNode key={`${level+1}-${child["@id"]}-${child[prefix+"status"]}`} node={child} prefix={prefix} level={level+1} releaseStore={releaseStore} classes={classes} />
+            ))}
+          </div>
+        }
+        {prefix === "" && releaseStore.hlNode === node && node.children && node.children.length > 0 && (
+          <ReleaseNodeAndChildrenToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+        )}
+      </div>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
 export default class InstanceRelease extends React.Component{
   constructor(props){
     super(props);
@@ -294,34 +507,6 @@ export default class InstanceRelease extends React.Component{
     }
   }
 
-  generateKey(o){
-    if(!this.keyMap.has(o)){
-      this.keyMap.set(o, uniqueId("release-node"));
-    }
-    return this.keyMap.get(o);
-  }
-
-  handleToggleChange(node, status){
-    this.releaseStore.markNodeForChange(node, status);
-  }
-
-  handleAllNodeChange(node, status){
-    this.releaseStore.markAllNodeForChange(node, status);
-  }
-
-  handleHLNode(node, e){
-    e.stopPropagation();
-    this.releaseStore.toggleHLNode(node);
-  }
-
-  handleStopToggleClick = (e) => {
-    e.stopPropagation();
-  }
-
-  handleProceed = () => {
-    this.releaseStore.commitStatusChanges();
-  }
-
   handleDismissSaveError = () => {
     this.releaseStore.dismissSaveError();
   }
@@ -330,62 +515,8 @@ export default class InstanceRelease extends React.Component{
     this.releaseStore.fetchReleaseData();
   }
 
-  renderNode(node, prefix = "", level = 0){
-    const { classes } = this.props;
-    let iterator = new Array(level);
-    fill(iterator, 0);
-    const statusClass = (node[prefix+"status"] === "NOT_RELEASED")? "not-released"
-      :(node[prefix+"status"] === "HAS_CHANGED")? "has-changed"
-        :"released";
-    return(
-      <div key={this.generateKey(node)} className={`node ${statusClass} ${this.releaseStore.hlNode === node?"highlighted":""}`}>
-        <div className="node-content" onClick={this.handleHLNode.bind(this, node)}>
-          <div className={"status-indicator"}>
-            <ReleaseStatus instanceStatus={node[prefix+"status"]} childrenStatus={node[prefix+"childrenStatus"]}/>
-          </div>
-          <span className={"node-type"}>
-            ({node.type})
-          </span>
-          <span className={classes.label}>
-            {node.label}
-          </span>
-          {prefix === "" &&
-            <div className={`${classes.nodeActions}${node.status==="NOT_RELEASED"?" no-unrelease":""}`} onClick={this.handleStopToggleClick}>
-              <MultiToggle selectedValue={node.pending_status} onChange={this.handleToggleChange.bind(this, node)}>
-                {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check"/>}
-                <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale/>
-                {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="unlink"/>}
-              </MultiToggle>
-            </div>
-          }
-        </div>
-        {node.children && node.children.length > 0 &&
-          <div className={"children"}>
-            {node.children.map(child => this.renderNode(child, prefix, level+1))}
-          </div>
-        }
-        {prefix === "" && this.releaseStore.hlNode === node && node.children && node.children.length > 0 &&
-          <div className={classes.hlActions}>
-            <ButtonGroup>
-              <Button onClick={this.handleAllNodeChange.bind(this, node, "RELEASED")} bsSize={"xsmall"}>
-                Release
-              </Button>
-              <Button onClick={this.handleAllNodeChange.bind(this, node, null )} bsSize={"xsmall"}>
-                Do nothing
-              </Button>
-              <Button onClick={this.handleAllNodeChange.bind(this, node, "NOT_RELEASED")} bsSize={"xsmall"}>
-                Unrelease
-              </Button>
-            </ButtonGroup>
-          </div>
-        }
-      </div>
-    );
-  }
-
   render(){
     const { classes } = this.props;
-    const treeStats = this.releaseStore.isFetched? this.releaseStore.treeStats: {};
 
     return (
       <div className={classes.container}>
@@ -413,86 +544,16 @@ export default class InstanceRelease extends React.Component{
                     <h4>Current state</h4>
                   </div>
                   <div className={classes.releaseActions}>
-                    <Button onClick={this.releaseStore.isSaving?undefined:this.handleProceed} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"}>
-                      <FontAwesomeIcon icon={this.releaseStore.isSaving?"circle-notch":"cloud-upload-alt"} spin={this.releaseStore.isSaving}/>
-                      <div>{this.releaseStore.isSaving?"Saving...":"Proceed"}</div>
-                    </Button>
-                    <div className={classes.treeStats}>
-                      <div className={"section"}>
-                        <h5>Pending changes:</h5>
-                        <div className={"stat pending"}>
-                          <div className={"name"}>Instances released</div>
-                          <div className={"pending-count"}>{treeStats.proceed_release}</div>
-                        </div>
-                        <div className={"stat pending"}>
-                          <div className={"name"}>Instances unreleased</div>
-                          <div className={"pending-count"}>{treeStats.proceed_unrelease}</div>
-                        </div>
-                        <div className={"stat pending"}>
-                          <div className={"name"}>Instances not modified</div>
-                          <div className={"pending-count"}>{treeStats.proceed_do_nothing}</div>
-                        </div>
-                      </div>
-
-                      <div className={"section"}>
-                        <h5>Current state:</h5>
-                        <div className={"stat"}>
-                          <div className={"name"}>Released</div>
-                          <div className={"bar released"}>
-                            <div className={"bar-inner"} style={{width:`${treeStats.released/treeStats.total*100}%`}}></div>
-                            <div className={"bar-label"}>{treeStats.released} / {treeStats.total}</div>
-                          </div>
-                        </div>
-                        <div className={"stat"}>
-                          <div className={"name"}>Not released</div>
-                          <div className={"bar not-released"}>
-                            <div className={"bar-inner"} style={{width:`${treeStats.not_released/treeStats.total*100}%`}}></div>
-                            <div className={"bar-label"}>{treeStats.not_released} / {treeStats.total}</div>
-                          </div>
-                        </div>
-                        <div className={"stat"}>
-                          <div className={"name"}>Has changed</div>
-                          <div className={"bar has-changed"}>
-                            <div className={"bar-inner"} style={{width:`${treeStats.has_changed/treeStats.total*100}%`}}></div>
-                            <div className={"bar-label"}>{treeStats.has_changed} / {treeStats.total}</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={"section"}>
-                        <h5>Preview state:</h5>
-                        <div className={"stat"}>
-                          <div className={"name"}>Released</div>
-                          <div className={"bar released"}>
-                            <div className={"bar-inner"} style={{width:`${treeStats.pending_released/treeStats.total*100}%`}}></div>
-                            <div className={"bar-label"}>{treeStats.pending_released} / {treeStats.total}</div>
-                          </div>
-                        </div>
-                        <div className={"stat"}>
-                          <div className={"name"}>Not released</div>
-                          <div className={"bar not-released"}>
-                            <div className={"bar-inner"} style={{width:`${treeStats.pending_not_released/treeStats.total*100}%`}}></div>
-                            <div className={"bar-label"}>{treeStats.pending_not_released} / {treeStats.total}</div>
-                          </div>
-                        </div>
-                        <div className={"stat"}>
-                          <div className={"name"}>Has changed</div>
-                          <div className={"bar has-changed"}>
-                            <div className={"bar-inner"} style={{width:`${treeStats.pending_has_changed/treeStats.total*100}%`}}></div>
-                            <div className={"bar-label"}>{treeStats.pending_has_changed} / {treeStats.total}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ReleaseAction releaseStore={this.releaseStore} />
                   </div>
                   <div className={classes.releaseInfos}>
                     <h4>Preview state</h4>
                   </div>
                   <div className={classes.tree}>
-                    {this.renderNode(this.releaseStore.instancesTree)}
+                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.status}`} node={this.releaseStore.instancesTree} releaseStore={this.releaseStore} />
                   </div>
                   <div className={classes.tree}>
-                    {this.renderNode(this.releaseStore.instancesTree, "pending_")}
+                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.pending_status}`} node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />
                   </div>
                   <SavingModal store={this.releaseStore}/>
                 </div>

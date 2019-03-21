@@ -22,9 +22,6 @@ export default class ReleaseStore{
 
   @observable hlNode = null;
 
-  @observable nodesMap = null;
-  @observable counter = 0;
-
   constructor(instanceId){
     this.topInstanceId = instanceId;
     this.fetchReleaseData();
@@ -75,7 +72,6 @@ export default class ReleaseStore{
     };
 
     getStatsFromNode(this.instancesTree);
-    window.console.log("count", count);
 
     return count;
   }
@@ -109,7 +105,6 @@ export default class ReleaseStore{
     try{
       const { data } = await API.axios.get(API.endpoints.releaseData(this.topInstanceId));
       runInAction(()=>{
-        this.deduplicateNodes(data);
         this.populateStatuses(data);
         // Default release state
         this.recursiveMarkNodeForChange(data, null); // "RELEASED"
@@ -122,23 +117,6 @@ export default class ReleaseStore{
       const message = e.message?e.message:e;
       this.fetchError = message;
     }
-  }
-
-  @action
-  deduplicateNodes(rootNode){
-    this.nodesMap = new Map();
-    let rseek = (node) => {
-      if(node.children){
-        node.children = node.children.map(child => {
-          rseek(child);
-          if(!this.nodesMap.has(child["@id"])){
-            this.nodesMap.set(child["@id"], child);
-          }
-          return this.nodesMap.get(child["@id"]);
-        });
-      }
-    };
-    rseek(rootNode);
   }
 
   async commitStatusChanges(){
@@ -247,13 +225,11 @@ export default class ReleaseStore{
   @action markNodeForChange(node, newStatus){
     node.pending_status = newStatus;
     this.populateStatuses(this.instancesTree, "pending_");
-    this.counter++;
   }
 
   @action markAllNodeForChange(node, newStatus){
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
     this.populateStatuses(this.instancesTree, "pending_");
-    this.counter++;
   }
   @action recursiveMarkNodeForChange(node, newStatus){
     node.pending_status = newStatus? newStatus: node.status;

@@ -280,6 +280,7 @@ const styles = {
     }
   }
 };
+
 @injectStyles(styles)
 @observer
 class ReleaseAction extends React.Component {
@@ -375,38 +376,78 @@ class ReleaseAction extends React.Component {
     );
   }
 }
+
 @injectStyles(styles)
 @observer
-class ReleaseNode extends React.Component {
+class ReleaseNodeToggle extends React.Component {
 
-  handleToggleChange(node, status){
-    const { releaseStore } = this.props;
+  handleChange = status => {
+    const { node, releaseStore } = this.props;
     releaseStore.markNodeForChange(node, status);
   }
 
-  handleAllNodeChange(node, status){
-    const { releaseStore } = this.props;
+  handleStopClick = e => {
+    e.stopPropagation();
+  }
+
+  render() {
+    const { classes, node, releaseStore } = this.props;
+
+    if (!node || !releaseStore) {
+      return null;
+    }
+
+    return(
+      <div className={`${classes.nodeActions} ${node.status==="NOT_RELEASED"?"no-unrelease":""}`} onClick={this.handleStopClick}>
+        <MultiToggle selectedValue={node.pending_status} onChange={this.handleChange}>
+          {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check"/>}
+          <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale/>
+          {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="unlink"/>}
+        </MultiToggle>
+      </div>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
+class ReleaseNodeAndChildrenToggle extends React.Component {
+
+  handleChange(status){
+    const { node, releaseStore } = this.props;
     releaseStore.markAllNodeForChange(node, status);
   }
+
+  render() {
+    const { classes, node, releaseStore } = this.props;
+
+    if (!node || !releaseStore) {
+      return null;
+    }
+
+    return(
+      <div className={classes.hlActions}>
+        <ButtonGroup>
+          <Button onClick={this.handleChange.bind(this, "RELEASED")} bsSize={"xsmall"}>
+                Release
+          </Button>
+          <Button onClick={this.handleChange.bind(this, null )} bsSize={"xsmall"}>
+                Do nothing
+          </Button>
+        </ButtonGroup>
+      </div>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
+class ReleaseNode extends React.Component {
 
   handleHLNode(node, e){
     const { releaseStore } = this.props;
     e.stopPropagation();
     releaseStore.toggleHLNode(node);
-  }
-
-  handleStopToggleClick = (e) => {
-    e.stopPropagation();
-  }
-
-  handleDismissSaveError = () => {
-    const { releaseStore } = this.props;
-    releaseStore.dismissSaveError();
-  }
-
-  handleRetryFetching = () => {
-    const { releaseStore } = this.props;
-    releaseStore.fetchReleaseData();
   }
 
   render() {
@@ -416,8 +457,6 @@ class ReleaseNode extends React.Component {
       return null;
     }
 
-    window.console.log(`${level}-${prefix}-${node["@id"]}`, node);
-
     const statusClass = (node[prefix+"status"] === "NOT_RELEASED")? "not-released"
       :(node[prefix+"status"] === "HAS_CHANGED")? "has-changed"
         :"released";
@@ -426,7 +465,7 @@ class ReleaseNode extends React.Component {
       <div className={`node ${statusClass} ${releaseStore.hlNode === node?"highlighted":""}`}>
         <div className="node-content" onClick={this.handleHLNode.bind(this, node)}>
           <div className={"status-indicator"}>
-            <ReleaseStatus instanceStatus={node[prefix+"status"]} childrenStatus={node[prefix+"childrenStatus"]}/>
+            <ReleaseStatus key={`${node[prefix+"status"]}-${node[prefix+"childrenStatus"]}`} instanceStatus={node[prefix+"status"]} childrenStatus={node[prefix+"childrenStatus"]}/>
           </div>
           <span className={"node-type"}>
             ({node.type})
@@ -434,35 +473,20 @@ class ReleaseNode extends React.Component {
           <span className={classes.label}>
             {node.label}
           </span>
-          {prefix === "" &&
-            <div className={`${classes.nodeActions}${node.status==="NOT_RELEASED"?" no-unrelease":""}`} onClick={this.handleStopToggleClick}>
-              <MultiToggle selectedValue={node.pending_status} onChange={this.handleToggleChange.bind(this, node)}>
-                {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check"/>}
-                <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale/>
-                {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="unlink"/>}
-              </MultiToggle>
-            </div>
-          }
+          {prefix === "" && (
+            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+          )}
         </div>
         {node.children && node.children.length > 0 &&
           <div className={"children"}>
-            {node.children.map((child, index) => (
-              <ReleaseNode key={`${level+1}-${prefix}-${child["@id"]}-${index}`} node={child} prefix={prefix} level={level+1} releaseStore={releaseStore} classes={classes} />
+            {node.children.map(child => (
+              <ReleaseNode key={`${level+1}-${child["@id"]}-${child[prefix+"status"]}`} node={child} prefix={prefix} level={level+1} releaseStore={releaseStore} classes={classes} />
             ))}
           </div>
         }
-        {prefix === "" && releaseStore.hlNode === node && node.children && node.children.length > 0 &&
-          <div className={classes.hlActions}>
-            <ButtonGroup>
-              <Button onClick={this.handleAllNodeChange.bind(this, node, "RELEASED")} bsSize={"xsmall"}>
-                Release
-              </Button>
-              <Button onClick={this.handleAllNodeChange.bind(this, node, null )} bsSize={"xsmall"}>
-                Do nothing
-              </Button>
-            </ButtonGroup>
-          </div>
-        }
+        {prefix === "" && releaseStore.hlNode === node && node.children && node.children.length > 0 && (
+          <ReleaseNodeAndChildrenToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+        )}
       </div>
     );
   }
@@ -481,6 +505,14 @@ export default class InstanceRelease extends React.Component{
     if(this.props.id !== newProps.id){
       this.releaseStore = new ReleaseStore(newProps.id);
     }
+  }
+
+  handleDismissSaveError = () => {
+    this.releaseStore.dismissSaveError();
+  }
+
+  handleRetryFetching = () => {
+    this.releaseStore.fetchReleaseData();
   }
 
   render(){
@@ -518,10 +550,10 @@ export default class InstanceRelease extends React.Component{
                     <h4>Preview state</h4>
                   </div>
                   <div className={classes.tree}>
-                    <ReleaseNode node={this.releaseStore.instancesTree} releaseStore={this.releaseStore} />
+                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.status}`} node={this.releaseStore.instancesTree} releaseStore={this.releaseStore} />
                   </div>
                   <div className={classes.tree}>
-                    <ReleaseNode node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />
+                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.pending_status}`} node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />
                   </div>
                   <SavingModal store={this.releaseStore}/>
                 </div>

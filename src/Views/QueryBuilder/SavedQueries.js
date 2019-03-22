@@ -14,7 +14,7 @@ let styles = {
     padding: "10px",
     background: "var(--bg-color-ui-contrast2)",
     color: "var(--ft-color-loud)",
-    "& h3": {
+    "& h4": {
       marginTop: 0,
       borderBottom: "1px solid var(--border-color-ui-contrast2)",
       paddingBottom: "10px"
@@ -38,7 +38,7 @@ export default class SavedQueries extends React.Component{
     return (
       <div className={classes.container}>
         {title && (
-          <h3>{title}</h3>
+          <h4>{title}</h4>
         )}
         {!list || !list.length?
           <div>no saved queries yet.</div>

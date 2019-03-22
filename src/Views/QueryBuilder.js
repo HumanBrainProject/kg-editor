@@ -5,11 +5,11 @@ import {observer} from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
-import Field from "./QueryBuilder/Field";
+import Query from "./QueryBuilder/Query";
 import SavedQueries from "./QueryBuilder/SavedQueries";
 
 import RootSchemaChoice from "./QueryBuilder/RootSchemaChoice";
-import Query from "./QueryBuilder/Query";
+import QuerySpecification from "./QueryBuilder/QuerySpecification";
 import Options from "./QueryBuilder/Options";
 import Result from "./QueryBuilder/Result";
 import ResultTable from "./QueryBuilder/ResultTable";
@@ -22,16 +22,12 @@ let styles = {
     gridTemplateRows:"1fr 1fr 4fr",
     gridTemplateColumns:"1fr 1fr",
     gridGap:"10px",
-    padding:"10px",
+    padding: "10px",
     height:"100%"
   },
-  schemas:{
+  query:{
     gridRowStart: "span 5",
-    position:"relative",
-    background: "var(--bg-color-ui-contrast2)",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    overflow:"auto",
-    color:"var(--ft-color-normal)"
+    position:"relative"
   },
   myQueries: {
     display: "none",
@@ -97,9 +93,9 @@ export default class QueryBuilder extends React.Component{
     return(
       queryBuilderStore.structure?
         <div className={classes.container}>
-          <div className={classes.schemas}>
+          <div className={classes.query}>
             {queryBuilderStore.rootField?
-              <Field field={queryBuilderStore.rootField}/>
+              <Query />
               :<BGMessage icon={"blender-phone"}>
                 Please choose a root schema in the right panel
               </BGMessage>}
@@ -129,7 +125,7 @@ export default class QueryBuilder extends React.Component{
                   {!queryBuilderStore.rootField?
                     <RootSchemaChoice/>
                     :queryBuilderStore.currentTab === "query"?
-                      <Query/>
+                      <QuerySpecification/>
                       :queryBuilderStore.currentTab === "result"?
                         <Result/>
                         :queryBuilderStore.currentTab === "resultTable"?

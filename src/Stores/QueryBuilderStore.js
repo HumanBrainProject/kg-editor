@@ -1,6 +1,6 @@
 import axios from "axios";
-import {observable, action, computed, runInAction} from "mobx";
-import {uniqueId, sortBy, groupBy} from "lodash";
+import {observable, action, computed, runInAction, toJS} from "mobx";
+import {uniqueId, sortBy, groupBy, isEqual} from "lodash";
 import API from "../Services/API";
 import {remove} from "lodash";
 
@@ -55,6 +55,7 @@ class QueryBuilderStore {
   @observable saveError = null;
   @observable isRunning = false;
   @observable runError = null;
+  @observable showSaveAsDialog = false;
 
   @observable specifications = [];
 
@@ -88,9 +89,51 @@ class QueryBuilderStore {
       this.saveError = null;
       this.isRunning = false;
       this.runError = null;
+      this.showSaveAsDialog = false;
       this.selectField(this.rootField);
       this.fetchQueries();
     }
+  }
+
+  @computed
+  get isQuerySaved(){
+    return this.sourceQuery !== null;
+  }
+
+  @computed
+  get isOneOfMySavedQueries(){
+    return this.sourceQuery !== null && this.sourceQuery.user === authStore.user.id;
+  }
+
+  @computed
+  get isValid(){
+    return !!this.rootField && !!this.rootField.fields && !!this.rootField.fields.length;
+  }
+
+  @computed
+  get queryIdAlreadyExists(){
+    const queryId = this.queryId.trim();
+    return this.myQueries.some(spec => spec.id === queryId);
+  }
+
+  @computed
+  get queryIdAlreadyInUse(){
+    const queryId = this.queryId.trim();
+    return this.othersQueries.some(spec => spec.id === queryId);
+  }
+
+  @computed
+  get isQueryIdValid(){
+    return this.queryId.trim() !== "";
+  }
+
+  @computed
+  get hasChanged(){
+    return this.isValid && (this.sourceQuery === null
+      || this.queryId !== this.sourceQuery.id
+      || this.label !== this.sourceQuery.label
+      || this.description !== this.sourceQuery.description
+      || isEqual(this.JSONQuery, toJS(this.sourceQuery.specification)));
   }
 
   @computed
@@ -145,7 +188,14 @@ class QueryBuilderStore {
   removeField(field){
     if(this.rootField === field){
       this.rootField = null;
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
       this.specifications = [];
+      this.saveError = null;
+      this.runError = null;
+      this.showSaveAsDialog = false;
+      this.sourceQuery = null;
       this.closeFieldOptions();
     } else {
       if(field === this.currentField){
@@ -256,7 +306,10 @@ class QueryBuilderStore {
             const reg = /^query:(.+)$/;
             const [ , alias] = reg.test(jsonField.fieldname)?jsonField.fieldname.match(reg):[null, null];
             if (alias && alias !== property.simpleAttributeName && alias !== property.simplePropertyName && alias !== property.label) {
-              parentField.setOption("alias", alias);
+              field.setOption("alias", alias);
+            }
+            if (jsonField.required) {
+              field.setOption("required", true);
             }
             parentField.fields.push(field);
             if (flattenChildId) {
@@ -277,9 +330,6 @@ class QueryBuilderStore {
   }
 
   _processJsonSpecification(schemaId, jsonSpecification) {
-    if (!jsonSpecification) {
-      return null;
-    }
     const schema = this.findSchemaById(schemaId);
     if (!schema) {
       return null;
@@ -289,7 +339,7 @@ class QueryBuilderStore {
       label:schema.label,
       canBe:[schema.id]
     });
-    this._processJsonSpecificationFields(rootField, jsonSpecification.fields);
+    this._processJsonSpecificationFields(rootField, jsonSpecification && jsonSpecification.fields);
     return rootField;
   }
 
@@ -307,13 +357,14 @@ class QueryBuilderStore {
       this.saveError = null;
       this.isRunning = false;
       this.runError = null;
+      this.showSaveAsDialog = false;
       this.selectField(this.rootField);
     }
   }
 
   @action
   async executeQuery(){
-    if (!this.isRunning && !this.runError) {
+    if (this.isValid && !this.isRunning && !this.runError) {
       this.isRunning = true;
       try{
         const payload = this.JSONQuery;
@@ -355,14 +406,38 @@ class QueryBuilderStore {
 
   @action
   async saveQuery(){
-    if (!this.isSaving && !this.saveError) {
+    if (this.isValid && this.isQueryIdValid && !this.queryIdAlreadyInUse && !this.isSaving && !this.saveError && !(this.sourceQuery && this.sourceQuery.isDeleting)) {
       this.isSaving = true;
-      const queryId = "12345";
+      if (this.sourceQuery && this.sourceQuery.deleteError) {
+        this.sourceQuery.deleteError = null;
+      }
+      const queryId = this.queryId.trim();
       try{
         const payload = this.JSONQuery;
         const response = await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
         runInAction(()=>{
           this.isSaving = false;
+          if (this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
+            this.sourceQuery.label = this.label;
+            this.sourceQuery.description = this.description;
+            this.sourceQuery.specification = this.JSONQuery;
+          } else if (this.queryIdAlreadyExists) {
+            this.sourceQuery = this.specifications.find(spec => spec.id === queryId);
+            this.sourceQuery.label = this.label;
+            this.sourceQuery.description = this.description;
+            this.sourceQuery.specification = this.JSONQuery;
+          } else {
+            this.sourceQuery = {
+              id: queryId,
+              user: authStore.user.id,
+              specification: this.JSONQuery,
+              label: this.label,
+              description: this.description,
+              isDeleting: false,
+              deleteError: null
+            };
+            this.specifications.push(this.sourceQuery);
+          }
           window.console.log(response);
         });
       } catch(e){
@@ -383,7 +458,7 @@ class QueryBuilderStore {
 
   @action
   async deleteQuery(query){
-    if (query && !query.isDeleting && !query.deleteError) {
+    if (query && !query.isDeleting && !query.deleteError && !(query === this.sourceQuery && this.isSaving)) {
       query.isDeleting = true;
       try{
         const response = await API.axios.delete(API.endpoints.query(this.rootField.schema.id, query.id));
@@ -407,6 +482,16 @@ class QueryBuilderStore {
     }
   }
 
+  _removeUnsupportedProperties(field) {
+    if (!field) {
+      return null;
+    }
+    if (field.relative_path) {
+      delete field.relative_path.reverse;
+    }
+    field.fields && field.fields.length && field.fields.forEach(f => this._removeUnsupportedProperties(f));
+  }
+
   @action
   async fetchQueries(){
     this.specifications = [];
@@ -422,10 +507,15 @@ class QueryBuilderStore {
               const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
               const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
               if (schemaId === this.rootField.schema.id) {
+                const fields = jsonSpec.fields;
+                this._removeUnsupportedProperties(fields);
                 this.specifications.push({
                   id: queryId,
                   user: jsonSpec._createdByUser,
-                  specification: jsonSpec,
+                  specification: {
+                    "@context": jsonSpec["@context"],
+                    fields: fields
+                  },
                   label: jsonSpec.label?jsonSpec.label:queryId,
                   description: jsonSpec.description?jsonSpec.description:(this.specifications.length%2 === 0?"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.":""),
                   isDeleting: false,

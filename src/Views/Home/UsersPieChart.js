@@ -5,7 +5,7 @@ import {uniqueId} from "lodash";
 import { Button } from "react-bootstrap";
 import { ResponsivePie } from "nivo";
 
-import structureStore from "../../Stores/StructureStore";
+import structureStatisticsStore from "../../Stores/StructureStatisticsStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
@@ -45,8 +45,8 @@ export default class UsersPieChart extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
-    if(!structureStore.isFetched && !structureStore.isFetching){
-      structureStore.fetchStatistics();
+    if(!structureStatisticsStore.isFetched && !structureStatisticsStore.isFetching){
+      structureStatisticsStore.fetchStatistics();
     }
   }
 
@@ -63,7 +63,7 @@ export default class UsersPieChart extends React.Component {
   }
 
   handleFetchStatisticsRetry = () => {
-    structureStore.fetchStatistics();
+    structureStatisticsStore.fetchStatistics();
   }
 
   render(){
@@ -71,11 +71,11 @@ export default class UsersPieChart extends React.Component {
     return (
       <div key={this.state.key} className={classes.container}>
         <h3>Top 5 active users</h3>
-        {!structureStore.fetchError?
-          !structureStore.isFetching?
-            structureStore.usersStatistics.length?
+        {!structureStatisticsStore.fetchError?
+          !structureStatisticsStore.isFetching?
+            structureStatisticsStore.usersStatistics.length?
               <ResponsivePie
-                data={structureStore.usersStatistics}
+                data={structureStatisticsStore.usersStatistics}
                 margin={{
                   "top": 30,
                   "right": 140,
@@ -140,7 +140,7 @@ export default class UsersPieChart extends React.Component {
             </FetchingLoader>
           :
           <div className={classes.statisticsFetchErrorPanel}>
-            <div>{structureStore.fetchError}</div>
+            <div>{structureStatisticsStore.fetchError}</div>
             <Button bsStyle="primary" onClick={this.handleFetchStatisticsRetry}>Retry</Button>
           </div>
         }

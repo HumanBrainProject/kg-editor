@@ -1,7 +1,7 @@
 import { observable, action, runInAction, computed } from "mobx";
 import API from "../Services/API";
 
-class StructureStore{
+class StructureStatisticsStore{
 
   @observable statistics = [];
   @observable isFetched = false;
@@ -13,7 +13,7 @@ class StructureStore{
     try {
       this.isFetching = true;
       this.fetchError = null;
-      const { data } = await API.axios.get(API.endpoints.structure());
+      const { data } = await API.axios.get(API.endpoints.statistics());
       runInAction(() => {
         this.isFetched = true;
         this.isFetching = false;
@@ -81,4 +81,4 @@ class StructureStore{
 
 }
 
-export default new StructureStore();
+export default new StructureStatisticsStore();

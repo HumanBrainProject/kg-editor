@@ -5,7 +5,7 @@ import {uniqueId} from "lodash";
 import { Button } from "react-bootstrap";
 import { ResponsiveBar } from "nivo";
 
-import structureStore from "../../Stores/StructureStore";
+import structureStatisticsStore from "../../Stores/StructureStatisticsStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
@@ -45,8 +45,8 @@ export default class NodeTypesBarChart extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
-    if(!structureStore.isFetched && !structureStore.isFetching){
-      structureStore.fetchStatistics();
+    if(!structureStatisticsStore.isFetched && !structureStatisticsStore.isFetching){
+      structureStatisticsStore.fetchStatistics();
     }
   }
 
@@ -63,7 +63,7 @@ export default class NodeTypesBarChart extends React.Component {
   }
 
   handleFetchStatisticsRetry = () => {
-    structureStore.fetchStatistics();
+    structureStatisticsStore.fetchStatistics();
   }
 
   render(){
@@ -71,11 +71,11 @@ export default class NodeTypesBarChart extends React.Component {
     return (
       <div key={this.state.key} className={classes.container}>
         <h3>Top 10 unreleased instances by type</h3>
-        {!structureStore.fetchError?
-          !structureStore.isFetching?
-            structureStore.nodeTypeStatistics.length?
+        {!structureStatisticsStore.fetchError?
+          !structureStatisticsStore.isFetching?
+            structureStatisticsStore.nodeTypeStatistics.length?
               <ResponsiveBar
-                data={structureStore.nodeTypeStatistics}
+                data={structureStatisticsStore.nodeTypeStatistics}
                 keys={[
                   "released",
                   "unreleased"
@@ -149,7 +149,7 @@ export default class NodeTypesBarChart extends React.Component {
             </FetchingLoader>
           :
           <div className={classes.statisticsFetchErrorPanel}>
-            <div>{structureStore.fetchError}</div>
+            <div>{structureStatisticsStore.fetchError}</div>
             <Button bsStyle="primary" onClick={this.handleFetchStatisticsRetry}>Retry</Button>
           </div>
         }

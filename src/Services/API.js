@@ -23,6 +23,7 @@ const endpoints = {
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/api/instances/${instance}/graph`,
+  "structure": () => "/api/structure?withLinks=true",
   "performQuery": function(instancePath, vocab, size, start){
     return `/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${

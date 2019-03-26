@@ -68,6 +68,8 @@ class QueryBuilderStore {
   @observable description = "";
   @observable sourceQuery = null;
   @observable rootField = null;
+  @observable fetchStuctureError = null;
+  @observable isFetchingStructure = false;
   @observable isSaving = false;
   @observable saveError = null;
   @observable isRunning = false;
@@ -151,6 +153,11 @@ class QueryBuilderStore {
 
   @computed
   get hasChanged(){
+    /*
+    if (this.sourceQuery) {
+      window.console.log(this.JSONQuery.fields, toJS(this.sourceQuery.fields), isEqual(this.JSONQuery.fields, toJS(this.sourceQuery.fields)));
+    }
+    */
     return this.isValid && (this.sourceQuery === null
       || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
       || this.label !== this.sourceQuery.label
@@ -229,12 +236,28 @@ class QueryBuilderStore {
     }
   }
 
+  @computed
+  get hasSchemas(){
+    return !this.fetchStuctureError && this.structure && this.structure.schemas && this.structure.schemas.length;
+  }
+
   @action async fetchStructure(){
-    let response = await axios.get(window.rootPath+"/mockup/QBStructure.json");
-    this.structure = response.data;
-    this.structure.schemas.forEach(schema => {
-      this.schemasMap.set(schema.id, schema);
-    });
+    this.isFetchingStructure = true;
+    this.fetchStuctureError = null;
+    try{
+      const response = await API.axios.get(API.endpoints.structure());
+      runInAction(() => {
+        this.isFetchingStructure = false;
+        this.structure = response.data;
+        this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => {
+          this.schemasMap.set(schema.id, schema);
+        });
+      });
+    } catch(e) {
+      const message = e.message?e.message:e;
+      this.fetchStuctureError = `Error while fetching api structure (${message})`;
+      this.isFetchingStructure = false;
+    }
   }
 
   @action toggleRunStripVocab(state){
@@ -477,7 +500,6 @@ class QueryBuilderStore {
         const message = e.message?e.message:e;
         this.saveError = `Error while saving query "${queryId}" (${message})`;
         this.isSaving = false;
-        window.console.log(e);
       }
     }
   }
@@ -509,7 +531,6 @@ class QueryBuilderStore {
         const message = e.message?e.message:e;
         query.deleteError = `Error while deleting query "${query.id}" (${message})`;
         query.isDeleting = false;
-        window.console.log(e);
       }
     }
   }
@@ -561,12 +582,13 @@ class QueryBuilderStore {
         runInAction(()=>{
           this.specifications = [];
           const jsonSpecifications = response && response.data && response.data.length?response.data:[];
-          const reg = /^(.+)\/(.+)\/(.+)\/v(\d+)\.(\d+)\.(\d+)\/(.+)$/;
+          //const reg = /^(.+)\/(.+)\/(.+)\/v(\d+)\.(\d+)\.(\d+)\/(.+)$/;
+          const reg = /^specification_queries\/(.+)-(.+)-(.+)-v(\d+)_(\d+)_(\d+)-(.+)$/;
           jsonSpecifications.forEach(jsonSpec => {
-            if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec["http://schema.org/identifier"])) {
-              const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec["http://schema.org/identifier"].match(reg);
+            if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec._id)) { //jsonSpec["http://schema.org/identifier"]
+              const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
               const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
-              if (isQueryIdValid(queryId) && schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) {
+              if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) { //isQueryIdValid(queryId) &&
                 const fields = jsonSpec.fields;
                 this._removeToBeIgnoredProperties(fields);
                 this.specifications.push({

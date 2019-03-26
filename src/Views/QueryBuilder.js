@@ -1,7 +1,8 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-
+import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
@@ -15,9 +16,28 @@ import Result from "./QueryBuilder/Result";
 import ResultTable from "./QueryBuilder/ResultTable";
 import Tab from "../Components/Tab";
 import BGMessage from "../Components/BGMessage";
+import FetchingLoader from "../Components/FetchingLoader";
 
 let styles = {
   container:{
+    width:"100%",
+    height:"100%",
+    color: "var(--ft-color-normal)",
+  },
+  structureLoader: {
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    "& .fetchingPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
+  },
+  layout:{
     display:"grid",
     gridTemplateRows:"1fr 1fr 4fr",
     gridTemplateColumns:"1fr 1fr",
@@ -79,6 +99,9 @@ export default class QueryBuilder extends React.Component{
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
   }
+  handleFetchStructure = () => {
+    queryBuilderStore.fetchStructure();
+  }
   UNSAFE_componentWillUpdate(){
     if(this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel){
       //console.log(this.scrolledPanel,this.scrolledPanel.scrollTop);
@@ -91,54 +114,82 @@ export default class QueryBuilder extends React.Component{
     this.currentTab = queryBuilderStore.currentTab;
 
     return(
-      queryBuilderStore.structure?
-        <div className={classes.container}>
-          <div className={classes.query}>
-            {queryBuilderStore.rootField?
-              <Query />
-              :<BGMessage icon={"blender-phone"}>
-                Please choose a root schema in the right panel
-              </BGMessage>}
+      <div className={classes.container}>
+        {queryBuilderStore.isFetchingStructure?
+          <div className={classes.structureLoader}>
+            <FetchingLoader>
+            Fetching api structure
+            </FetchingLoader>
           </div>
-          <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
-            <SavedQueries title="My saved queries" list={queryBuilderStore.myQueries} enableDelete={true} />
-          </div>
-          <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
-            <SavedQueries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} />
-          </div>
-          <div className={`${classes.tabbedPanel} ${queryBuilderStore.myQueries.length?"hasMyQueries":""} ${queryBuilderStore.othersQueries.length?"hasOthersQueries":""}`}>
-            <div className={classes.tabs}>
-              {queryBuilderStore.rootField?
-                <React.Fragment>
-                  {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
-                  <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
-                  <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")}/>
-                  <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")}/>
-                </React.Fragment>
-                :
-                <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
-              }
-            </div>
-            <div className={classes.tabBody}>
-              <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
-                <div className={classes.tabBodyInner}>
-                  {!queryBuilderStore.rootField?
-                    <RootSchemaChoice/>
-                    :queryBuilderStore.currentTab === "query"?
-                      <QuerySpecification/>
-                      :queryBuilderStore.currentTab === "result"?
-                        <Result/>
-                        :queryBuilderStore.currentTab === "resultTable"?
-                          <ResultTable/>
-                          :queryBuilderStore.currentTab === "fieldOptions"?
-                            <Options/>
-                            :null}
+          :
+          queryBuilderStore.fetchStuctureError?
+            <BGMessage icon={"ban"}>
+              There was a network problem fetching the api structure.<br/>
+              If the problem persists, please contact the support.<br/>
+              <small>{queryBuilderStore.fetchStuctureError}</small><br/><br/>
+              <Button bsStyle={"primary"} onClick={this.handleFetchStructure}>
+                <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+              </Button>
+            </BGMessage>
+            :
+            !queryBuilderStore.hasSchemas?
+              <BGMessage icon={"blender-phone"}>
+                No schemas available.<br/>
+                If the problem persists, please contact the support.<br/><br/>
+                <Button bsStyle={"primary"} onClick={this.handleFetchStructure}>
+                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                </Button>
+              </BGMessage>
+              :
+              <div className={classes.layout}>
+                <div className={classes.query}>
+                  {queryBuilderStore.rootField?
+                    <Query />
+                    :
+                    <BGMessage icon={"blender-phone"}>
+                  Please choose a root schema in the right panel
+                    </BGMessage>}
                 </div>
-              </Scrollbars>
-            </div>
-          </div>
-        </div>
-        :null
+                <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
+                  <SavedQueries title="My saved queries" list={queryBuilderStore.myQueries} enableDelete={true} />
+                </div>
+                <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
+                  <SavedQueries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} />
+                </div>
+                <div className={`${classes.tabbedPanel} ${queryBuilderStore.myQueries.length?"hasMyQueries":""} ${queryBuilderStore.othersQueries.length?"hasOthersQueries":""}`}>
+                  <div className={classes.tabs}>
+                    {queryBuilderStore.rootField?
+                      <React.Fragment>
+                        {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
+                        <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
+                        <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")}/>
+                        <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")}/>
+                      </React.Fragment>
+                      :
+                      <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
+                    }
+                  </div>
+                  <div className={classes.tabBody}>
+                    <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
+                      <div className={classes.tabBodyInner}>
+                        {!queryBuilderStore.rootField?
+                          <RootSchemaChoice/>
+                          :queryBuilderStore.currentTab === "query"?
+                            <QuerySpecification/>
+                            :queryBuilderStore.currentTab === "result"?
+                              <Result/>
+                              :queryBuilderStore.currentTab === "resultTable"?
+                                <ResultTable/>
+                                :queryBuilderStore.currentTab === "fieldOptions"?
+                                  <Options/>
+                                  :null}
+                      </div>
+                    </Scrollbars>
+                  </div>
+                </div>
+              </div>
+        }
+      </div>
     );
   }
 }

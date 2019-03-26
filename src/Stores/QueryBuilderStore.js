@@ -44,6 +44,23 @@ class Field {
   }
 }
 
+const forbiddenQueryIdChars = [" ", ".", ",", ";", "\"", "'", ":", "/", "\\", "@", "[", "]", "{", "}", "?", "*"];
+
+const isQueryIdValid = queryId => typeof queryId === "string" && queryId.trim() !== "" && !forbiddenQueryIdChars.some(value => queryId.includes(value));
+
+const defaultContext = {
+  "@vocab": "https://schema.hbp.eu/graphQuery/",
+  "query":"https://schema.hbp.eu/myQuery/",
+  "fieldname": {
+    "@id": "fieldname",
+    "@type": "@id"
+  },
+  "relative_path": {
+    "@id": "relative_path",
+    "@type": "@id"
+  }
+};
+
 class QueryBuilderStore {
   @observable structure = null;
   @observable queryId = "";
@@ -55,7 +72,7 @@ class QueryBuilderStore {
   @observable saveError = null;
   @observable isRunning = false;
   @observable runError = null;
-  @observable showSaveAsDialog = false;
+  @observable saveAsMode = false;
 
   @observable specifications = [];
 
@@ -74,11 +91,16 @@ class QueryBuilderStore {
     this.fetchStructure();
   }
 
+  get forbiddenQueryIdChars() {
+    return forbiddenQueryIdChars;
+  }
+
   selectRootSchema(schema){
     if (!this.isSaving) {
       this.queryId = "";
       this.label = "";
       this.description = "";
+      this.context = toJS(defaultContext);
       this.sourceQuery = null;
       this.rootField = new Field({
         id:schema.id,
@@ -89,7 +111,7 @@ class QueryBuilderStore {
       this.saveError = null;
       this.isRunning = false;
       this.runError = null;
-      this.showSaveAsDialog = false;
+      this.saveAsMode = false;
       this.selectField(this.rootField);
       this.fetchQueries();
     }
@@ -124,16 +146,16 @@ class QueryBuilderStore {
 
   @computed
   get isQueryIdValid(){
-    return this.queryId.trim() !== "";
+    return isQueryIdValid(this.queryId);
   }
 
   @computed
   get hasChanged(){
     return this.isValid && (this.sourceQuery === null
-      || this.queryId !== this.sourceQuery.id
+      || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
       || this.label !== this.sourceQuery.label
       || this.description !== this.sourceQuery.description
-      || !isEqual(this.JSONQuery, toJS(this.sourceQuery.specification)));
+      || !isEqual(this.JSONQuery.fields, toJS(this.sourceQuery.fields)));
   }
 
   @computed
@@ -191,10 +213,12 @@ class QueryBuilderStore {
       this.queryId = "";
       this.label = "";
       this.description = "";
+      this.sourceQuery = null;
+      this.context = null;
       this.specifications = [];
       this.saveError = null;
       this.runError = null;
-      this.showSaveAsDialog = false;
+      this.saveAsMode = false;
       this.sourceQuery = null;
       this.closeFieldOptions();
     } else {
@@ -233,19 +257,8 @@ class QueryBuilderStore {
 
   @computed
   get JSONQuery(){
-    let json = {
-      "@context":{
-        "@vocab": "https://schema.hbp.eu/graphQuery/",
-        "query":"https://schema.hbp.eu/myQuery/",
-        "fieldname": {
-          "@id": "fieldname",
-          "@type": "@id"
-        },
-        "relative_path": {
-          "@id": "relative_path",
-          "@type": "@id"
-        }
-      }
+    const json = {
+      "@context": toJS(this.context)
     };
     this._processFields(json, this.rootField);
     //Gets rid of the undefined values
@@ -329,7 +342,7 @@ class QueryBuilderStore {
     }
   }
 
-  _processJsonSpecification(schemaId, jsonSpecification) {
+  _processJsonSpecification(schemaId, fields) {
     const schema = this.findSchemaById(schemaId);
     if (!schema) {
       return null;
@@ -339,7 +352,7 @@ class QueryBuilderStore {
       label:schema.label,
       canBe:[schema.id]
     });
-    this._processJsonSpecificationFields(rootField, jsonSpecification && jsonSpecification.fields);
+    this._processJsonSpecificationFields(rootField, fields);
     return rootField;
   }
 
@@ -347,17 +360,18 @@ class QueryBuilderStore {
   selectQuery(query) {
     if (!this.isSaving
       && this.rootField && this.rootField.schema && this.rootField.schema.id
-      && query && query.specification && !query.isDeleting) {
-      this.queryId = query.id;
+      && query && query.fields && query.fields.length && !query.isDeleting) {
+      this.queryId = query.id + "-Copy";
       this.label = query.label;
       this.description = query.description;
       this.sourceQuery = query;
-      this.rootField = this._processJsonSpecification(this.rootField.schema.id, query.specification);
+      this.context = toJS(defaultContext);
+      this.rootField = this._processJsonSpecification(this.rootField.schema.id, query.fields);
       this.isSaving = false;
       this.saveError = null;
       this.isRunning = false;
       this.runError = null;
-      this.showSaveAsDialog = false;
+      this.saveAsMode = false;
       this.selectField(this.rootField);
     }
   }
@@ -423,21 +437,23 @@ class QueryBuilderStore {
       const queryId = this.queryId.trim();
       const label = this.label?this.label.trim():"";
       const description = this.description?this.description.trim():"";
-      try{
-        const payload = this.JSONQuery;
-        if (label) {
-          payload["label"] = label;
-        }
-        if (description) {
-          payload["description"] = description;
-        }
-        const response = await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
+      const payload = this.JSONQuery;
+      if (label) {
+        payload["label"] = label;
+      }
+      if (description) {
+        payload["description"] = description;
+      }
+      try {
+        await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
         runInAction(()=>{
           this.isSaving = false;
+          this.saveAsMode = false;
           if (this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
             this.sourceQuery.label = label;
             this.sourceQuery.description = description;
-            this.sourceQuery.specification = this.JSONQuery;
+            this.sourceQuery["@context"] = this.JSONQuery["@context"];
+            this.sourceQuery.fields = this.JSONQuery.fields;
           } else if (this.queryIdAlreadyExists) {
             this.sourceQuery = this.specifications.find(spec => spec.id === queryId);
             this.sourceQuery.label = label;
@@ -447,7 +463,8 @@ class QueryBuilderStore {
             this.sourceQuery = {
               id: queryId,
               user: authStore.user.id,
-              specification: this.JSONQuery,
+              "@context": this.JSONQuery["@context"],
+              fields: this.JSONQuery.fields,
               label: label,
               description: description,
               isDeleting: false,
@@ -455,7 +472,6 @@ class QueryBuilderStore {
             };
             this.specifications.push(this.sourceQuery);
           }
-          window.console.log(response);
         });
       } catch(e){
         const message = e.message?e.message:e;
@@ -478,10 +494,16 @@ class QueryBuilderStore {
     if (query && !query.isDeleting && !query.deleteError && !(query === this.sourceQuery && this.isSaving)) {
       query.isDeleting = true;
       try{
-        const response = await API.axios.delete(API.endpoints.query(this.rootField.schema.id, query.id));
+        await API.axios.delete(API.endpoints.query(this.rootField.schema.id, query.id));
         runInAction(()=>{
           query.isDeleting = false;
-          window.console.log(response);
+          if (query === this.sourceQuery ) {
+            this.sourceQuery = null;
+          }
+          const index = this.specifications.findIndex(spec => spec.id === query.id);
+          if (index !== -1) {
+            this.specifications.splice(index, 1);
+          }
         });
       } catch(e){
         const message = e.message?e.message:e;
@@ -539,21 +561,19 @@ class QueryBuilderStore {
         runInAction(()=>{
           this.specifications = [];
           const jsonSpecifications = response && response.data && response.data.length?response.data:[];
-          const reg = /^specification_queries\/(.+)-(.+)-(.+)-v(.+)_(.+)_(.+)-(.+)$/;
+          const reg = /^(.+)\/(.+)\/(.+)\/v(\d+)\.(\d+)\.(\d+)\/(.+)$/;
           jsonSpecifications.forEach(jsonSpec => {
-            if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec._id)) {
-              const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
+            if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec["http://schema.org/identifier"])) {
+              const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec["http://schema.org/identifier"].match(reg);
               const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
-              if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) {
+              if (isQueryIdValid(queryId) && schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) {
                 const fields = jsonSpec.fields;
                 this._removeToBeIgnoredProperties(fields);
                 this.specifications.push({
                   id: queryId,
                   user: jsonSpec._createdByUser,
-                  specification: {
-                    "@context": jsonSpec["@context"],
-                    fields: fields
-                  },
+                  "@context": jsonSpec["@context"],
+                  fields: fields,
                   label: jsonSpec.label?jsonSpec.label:"",
                   description: jsonSpec.description?jsonSpec.description:"",
                   isDeleting: false,

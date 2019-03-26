@@ -97,7 +97,6 @@ export default class Query extends React.Component{
   }
 
   handleSave = () => {
-    window.console.log("save");
     queryBuilderStore.saveQuery();
   }
 
@@ -106,11 +105,11 @@ export default class Query extends React.Component{
   }
 
   handleShowSaveDialog = () => {
-    window.console.log("show save dialog");
+    queryBuilderStore.saveAsMode = true;
   }
 
   handleHideSaveDialog = () => {
-    window.console.log("hide save dialog");
+    queryBuilderStore.saveAsMode = false;
   }
 
   render(){
@@ -123,23 +122,23 @@ export default class Query extends React.Component{
     return (
       <div className={classes.container}>
         <div className={`${classes.info} ${queryBuilderStore.isQuerySaved || queryBuilderStore.isValid?"available":""}`}>
-          {(queryBuilderStore.isQuerySaved || queryBuilderStore.showSaveAsDialog) && (
+          {(queryBuilderStore.isQuerySaved || queryBuilderStore.saveAsMode) && (
             <React.Fragment>
               <div>
                 <h4>QueryId :</h4>
                 <input
                   className={`form-control ${classes.input}`}
-                  disabled={!queryBuilderStore.showSaveAsDialog}
+                  disabled={!queryBuilderStore.saveAsMode}
                   placeholder={""}
                   type="text"
-                  value={queryBuilderStore.queryId}
+                  value={(queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode)?queryBuilderStore.sourceQuery.id:queryBuilderStore.queryId}
                   onChange={this.handleChangeQueryId} />
               </div>
               <div>
                 <h4>Label :</h4>
                 <input
                   className={`form-control ${classes.input}`}
-                  disabled={!(queryBuilderStore.showSaveAsDialog || queryBuilderStore.isOneOfMySavedQueries)}
+                  disabled={!(queryBuilderStore.saveAsMode || queryBuilderStore.isOneOfMySavedQueries)}
                   placeholder={""}
                   type="text"
                   value={queryBuilderStore.label}
@@ -149,7 +148,7 @@ export default class Query extends React.Component{
                 <h4>Description :</h4>
                 <textarea
                   className={`form-control ${classes.input}`}
-                  disabled={!(queryBuilderStore.showSaveAsDialog || queryBuilderStore.isOneOfMySavedQueries)}
+                  disabled={!(queryBuilderStore.saveAsMode || queryBuilderStore.isOneOfMySavedQueries)}
                   placeholder={""}
                   type="text"
                   value={queryBuilderStore.description}
@@ -159,7 +158,7 @@ export default class Query extends React.Component{
           )}
           {queryBuilderStore.isQuerySaved?
             queryBuilderStore.isOneOfMySavedQueries?
-              queryBuilderStore.showSaveAsDialog?
+              queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
                   <Button bsStyle="default" onClick={this.handleHideSaveDialog}>Cancel</Button>
                   <Button bsStyle="primary" disabled={!queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
@@ -169,11 +168,11 @@ export default class Query extends React.Component{
                   {queryBuilderStore.hasChanged && (
                     <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
-                  <Button bsStyle="default" disabled={!queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  <Button bsStyle="default" disabled={!queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
                   <Button bsStyle="primary" disabled={!queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
               :
-              queryBuilderStore.showSaveAsDialog?
+              queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
                   <Button bsStyle="default" onClick={this.handleHideSaveDialog}>Cancel</Button>
                   <Button bsStyle="primary" disabled={!queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
@@ -183,10 +182,10 @@ export default class Query extends React.Component{
                   {queryBuilderStore.hasChanged && (
                     <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
-                  <Button bsStyle="default" disabled={!queryBuilderStore.hasChanged || !queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  <Button bsStyle="default" disabled={!queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
                 </div>
             :
-            queryBuilderStore.showSaveAsDialog?
+            queryBuilderStore.saveAsMode?
               <div className={classes.save}>
                 <Button bsStyle="default" onClick={this.handleHideSaveDialog}>Cancel</Button>
                 <Button bsStyle="primary" disabled={!queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
@@ -194,7 +193,7 @@ export default class Query extends React.Component{
               :
               <div className={classes.save}>
                 <span className={classes.saveHelp}>Click on &quot;Save As&quot; to save your query.</span>
-                <Button bsStyle="default" disabled={!queryBuilderStore.hasChanged || !queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                <Button bsStyle="default" disabled={!queryBuilderStore.hasChanged} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
               </div>
           }
         </div>

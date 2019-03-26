@@ -1,4 +1,3 @@
-import axios from "axios";
 import {observable, action, computed, runInAction, toJS} from "mobx";
 import {uniqueId, sortBy, groupBy, isEqual} from "lodash";
 import API from "../Services/API";
@@ -70,6 +69,8 @@ class QueryBuilderStore {
   @observable rootField = null;
   @observable fetchStuctureError = null;
   @observable isFetchingStructure = false;
+  @observable fetchQueriesError = null;
+  @observable isFetchingQueries = false;
   @observable isSaving = false;
   @observable saveError = null;
   @observable isRunning = false;
@@ -577,6 +578,8 @@ class QueryBuilderStore {
   async fetchQueries(){
     this.specifications = [];
     if (this.rootField && this.rootField.schema && this.rootField.schema.id) {
+      this.isFetchingStructure = true;
+      this.fetchQueriesError = null;
       try{
         const response = await API.axios.get(API.endpoints.listQueries(this.rootField.id));
         runInAction(()=>{
@@ -604,9 +607,13 @@ class QueryBuilderStore {
               }
             }
           });
+          this.isFetchingStructure = false;
         });
       } catch(e) {
         this.specifications = [];
+        const message = e.message?e.message:e;
+        this.fetchQueriesError = `Error while fetching saved queries for "${this.rootField.id}" (${message})`;
+        this.isFetchingStructure = false;
         window.console.log(e);
       }
     }

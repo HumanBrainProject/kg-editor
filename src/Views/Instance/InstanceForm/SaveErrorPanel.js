@@ -39,7 +39,7 @@ const styles = {
     "& button + button, & a + button, & a + a": {
       marginLeft: "20px"
     }
-  },
+  }
 };
 
 @injectStyles(styles)

@@ -5,6 +5,7 @@ import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
+import FetchingLoader from "../../Components/FetchingLoader";
 import Field from "./Field";
 
 const styles = {
@@ -78,6 +79,52 @@ const styles = {
     overflow:"auto",
     color:"var(--ft-color-normal)"
   },
+  savingLoader:{
+    position:"fixed",
+    top:0,
+    left:0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    background: "var(--bg-color-blend-contrast1)",
+    "& .fetchingPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
+  },
+  saveErrorPanel: {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "100%",
+    height: "100%",
+    background: "var(--bg-color-blend-contrast1)",
+    zIndex: "1200",
+    "& > div": {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      minWidth: "220px",
+      transform: "translate(-50%, -50%)",
+      padding: "20px",
+      borderRadius: "5px",
+      background: "white",
+      textAlign: "center",
+      boxShadow: "2px 2px 4px #7f7a7a",
+      "& h4": {
+        margin: "0",
+        paddingBottom: "20px",
+        color: "red"
+      },
+      "& button + button, & a + button, & a + a": {
+        marginLeft: "20px"
+      }
+    }
+  }
 };
 
 @injectStyles(styles)
@@ -98,6 +145,10 @@ export default class Query extends React.Component{
 
   handleSave = () => {
     queryBuilderStore.saveQuery();
+  }
+
+  handleCancelSave = () => {
+    queryBuilderStore.cancelSaveQuery();
   }
 
   handleRevertChanges = () => {
@@ -200,6 +251,22 @@ export default class Query extends React.Component{
         <div className={classes.schemas}>
           <Field field={queryBuilderStore.rootField}/>
         </div>
+        {queryBuilderStore.isSaving && (
+          <div className={classes.savingLoader}>
+            <FetchingLoader>{`Saving query "${queryBuilderStore.queryId}"...`}</FetchingLoader>
+          </div>
+        )}
+        {queryBuilderStore.saveError && (
+          <div className={classes.saveErrorPanel}>
+            <div>
+              <h4>{queryBuilderStore.saveError}</h4>
+              <div>
+                <Button bsStyle="default" onClick={this.handleCancelSave}>Cancel</Button>
+                <Button bsStyle="primary" onClick={this.handleSave}>Retry</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

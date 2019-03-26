@@ -89,7 +89,7 @@ export default class Query extends React.Component{
   }
 
   handleChangeLabel = event => {
-    queryBuilderStore.queryId = event.target.value;
+    queryBuilderStore.label = event.target.value;
   }
 
   handleChangeDescription = event => {
@@ -98,10 +98,11 @@ export default class Query extends React.Component{
 
   handleSave = () => {
     window.console.log("save");
+    queryBuilderStore.saveQuery();
   }
 
   handleRevertChanges = () => {
-    window.console.log("revert");
+    queryBuilderStore.cancelChanges();
   }
 
   handleShowSaveDialog = () => {

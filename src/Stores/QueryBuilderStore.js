@@ -133,7 +133,7 @@ class QueryBuilderStore {
       || this.queryId !== this.sourceQuery.id
       || this.label !== this.sourceQuery.label
       || this.description !== this.sourceQuery.description
-      || isEqual(this.JSONQuery, toJS(this.sourceQuery.specification)));
+      || !isEqual(this.JSONQuery, toJS(this.sourceQuery.specification)));
   }
 
   @computed
@@ -347,7 +347,7 @@ class QueryBuilderStore {
   selectQuery(query) {
     if (!this.isSaving
       && this.rootField && this.rootField.schema && this.rootField.schema.id
-      && query && query.specification) {
+      && query && query.specification && !query.isDeleting) {
       this.queryId = query.id;
       this.label = query.label;
       this.description = query.description;
@@ -405,6 +405,15 @@ class QueryBuilderStore {
   }
 
   @action
+  cancelChanges() {
+    if (this.sourceQuery) {
+      this.selectQuery(this.sourceQuery);
+    } else if (!this.isSaving) {
+      this.rootField.fields = [];
+    }
+  }
+
+  @action
   async saveQuery(){
     if (this.isValid && this.isQueryIdValid && !this.queryIdAlreadyInUse && !this.isSaving && !this.saveError && !(this.sourceQuery && this.sourceQuery.isDeleting)) {
       this.isSaving = true;
@@ -412,27 +421,35 @@ class QueryBuilderStore {
         this.sourceQuery.deleteError = null;
       }
       const queryId = this.queryId.trim();
+      const label = this.label?this.label.trim():"";
+      const description = this.description?this.description.trim():"";
       try{
         const payload = this.JSONQuery;
+        if (label) {
+          payload["label"] = label;
+        }
+        if (description) {
+          payload["description"] = description;
+        }
         const response = await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
         runInAction(()=>{
           this.isSaving = false;
           if (this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
-            this.sourceQuery.label = this.label;
-            this.sourceQuery.description = this.description;
+            this.sourceQuery.label = label;
+            this.sourceQuery.description = description;
             this.sourceQuery.specification = this.JSONQuery;
           } else if (this.queryIdAlreadyExists) {
             this.sourceQuery = this.specifications.find(spec => spec.id === queryId);
-            this.sourceQuery.label = this.label;
-            this.sourceQuery.description = this.description;
+            this.sourceQuery.label = label;
+            this.sourceQuery.description = description;
             this.sourceQuery.specification = this.JSONQuery;
           } else {
             this.sourceQuery = {
               id: queryId,
               user: authStore.user.id,
               specification: this.JSONQuery,
-              label: this.label,
-              description: this.description,
+              label: label,
+              description: description,
               isDeleting: false,
               deleteError: null
             };
@@ -516,8 +533,8 @@ class QueryBuilderStore {
                     "@context": jsonSpec["@context"],
                     fields: fields
                   },
-                  label: jsonSpec.label?jsonSpec.label:queryId,
-                  description: jsonSpec.description?jsonSpec.description:(this.specifications.length%2 === 0?"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.":""),
+                  label: jsonSpec.label?jsonSpec.label:"",
+                  description: jsonSpec.description?jsonSpec.description:"",
                   isDeleting: false,
                   deleteError: null
                 });

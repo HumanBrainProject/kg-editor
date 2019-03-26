@@ -28,7 +28,7 @@ const endpoints = {
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
-  "query": (instancePath, queryId) => `/query/${instancePath}/${queryId}`,
+  "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
   "listQueries": instancePath => `/query/${instancePath?"":""}`,
 };
 

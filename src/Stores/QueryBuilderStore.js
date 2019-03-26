@@ -499,14 +499,35 @@ class QueryBuilderStore {
     }
   }
 
-  _removeUnsupportedProperties(field) {
+  _removeToBeIgnoredProperties = field => {
+    const toBeIgnoredProperties = [];
+    const toBeIgnoredRelativePathProperties = ["reverse"];
     if (!field) {
-      return null;
+      return;
     }
+    toBeIgnoredProperties.forEach(property => delete field[property]);
     if (field.relative_path) {
-      delete field.relative_path.reverse;
+      toBeIgnoredRelativePathProperties.forEach(property => delete field.relative_path[property]);
     }
-    field.fields && field.fields.length && field.fields.forEach(f => this._removeUnsupportedProperties(f));
+    field.fields && field.fields.length && field.fields.forEach(this._removeToBeIgnoredProperties);
+  }
+
+  _containsUnsupportedProperties = field => {
+    const unsupportedProperties = ["merge", "sort", "ensure_order"];
+    const unsupportedRelativePathProperties = [];
+    if (!field) {
+      return true;
+    }
+    if (unsupportedProperties.some(property => field[property] !== undefined)) {
+      return true;
+    }
+    if (field.relative_path && unsupportedRelativePathProperties.some(property => field.relative_path[property] !== undefined)) {
+      return true;
+    }
+    if (field.fields && field.fields.length) {
+      return field.fields.some(this._containsUnsupportedProperties);
+    }
+    return false;
   }
 
   @action
@@ -523,9 +544,9 @@ class QueryBuilderStore {
             if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec._id)) {
               const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
               const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
-              if (schemaId === this.rootField.schema.id) {
+              if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) {
                 const fields = jsonSpec.fields;
-                this._removeUnsupportedProperties(fields);
+                this._removeToBeIgnoredProperties(fields);
                 this.specifications.push({
                   id: queryId,
                   user: jsonSpec._createdByUser,

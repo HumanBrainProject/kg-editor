@@ -211,40 +211,40 @@ export default class Query extends React.Component{
             queryBuilderStore.isOneOfMySavedQueries?
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  <Button bsStyle="default" onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={!queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
                   {queryBuilderStore.hasChanged && (
                     <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
-                  <Button bsStyle="default" disabled={!queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
-                  <Button bsStyle="primary" disabled={!queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
               :
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  <Button bsStyle="default" onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={!queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
                   {queryBuilderStore.hasChanged && (
-                    <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
+                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
-                  <Button bsStyle="default" disabled={!queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
                 </div>
             :
             queryBuilderStore.saveAsMode?
               <div className={classes.save}>
-                <Button bsStyle="default" onClick={this.handleHideSaveDialog}>Cancel</Button>
-                <Button bsStyle="primary" disabled={!queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
+                <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
               </div>
               :
               <div className={classes.save}>
                 <span className={classes.saveHelp}>Click on &quot;Save As&quot; to save your query.</span>
-                <Button bsStyle="default" disabled={!queryBuilderStore.hasChanged} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
               </div>
           }
         </div>

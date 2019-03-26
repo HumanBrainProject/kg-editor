@@ -360,6 +360,8 @@ class QueryBuilderStore {
             if (isFlatten && field.fields && field.fields.length === 1) {
               field.setOption("flatten", true);
             }
+          } else {
+            window.console.log(`"${id}" schema is not available in current api structure and will be ignored.`);
           }
         }
       });
@@ -389,7 +391,7 @@ class QueryBuilderStore {
       this.label = query.label;
       this.description = query.description;
       this.sourceQuery = query;
-      this.context = toJS(defaultContext);
+      this.context = toJS(query.context);
       this.rootField = this._processJsonSpecification(this.rootField.schema.id, query.fields);
       this.isSaving = false;
       this.saveError = null;
@@ -471,14 +473,12 @@ class QueryBuilderStore {
       try {
         await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
         runInAction(()=>{
-          this.isSaving = false;
-          this.saveAsMode = false;
-          if (this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
+          if (!this.saveAsMode && this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
             this.sourceQuery.label = label;
             this.sourceQuery.description = description;
-            this.sourceQuery["@context"] = this.JSONQuery["@context"];
+            this.sourceQuery.context = this.JSONQuery["@context"];
             this.sourceQuery.fields = this.JSONQuery.fields;
-          } else if (this.queryIdAlreadyExists) {
+          } else if (!this.saveAsMode && this.queryIdAlreadyExists) {
             this.sourceQuery = this.specifications.find(spec => spec.id === queryId);
             this.sourceQuery.label = label;
             this.sourceQuery.description = description;
@@ -487,7 +487,7 @@ class QueryBuilderStore {
             this.sourceQuery = {
               id: queryId,
               user: authStore.user.id,
-              "@context": this.JSONQuery["@context"],
+              context: this.JSONQuery["@context"],
               fields: this.JSONQuery.fields,
               label: label,
               description: description,
@@ -496,6 +496,8 @@ class QueryBuilderStore {
             };
             this.specifications.push(this.sourceQuery);
           }
+          this.saveAsMode = false;
+          this.isSaving = false;
         });
       } catch(e){
         const message = e.message?e.message:e;
@@ -597,7 +599,7 @@ class QueryBuilderStore {
                 this.specifications.push({
                   id: queryId,
                   user: jsonSpec._createdByUser,
-                  "@context": jsonSpec["@context"],
+                  context: jsonSpec["@context"],
                   fields: fields,
                   label: jsonSpec.label?jsonSpec.label:"",
                   description: jsonSpec.description?jsonSpec.description:"",

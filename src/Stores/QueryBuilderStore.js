@@ -154,11 +154,9 @@ class QueryBuilderStore {
 
   @computed
   get hasChanged(){
-    /*
     if (this.sourceQuery) {
       window.console.log(this.JSONQuery.fields, toJS(this.sourceQuery.fields), isEqual(this.JSONQuery.fields, toJS(this.sourceQuery.fields)));
     }
-    */
     return this.isValid && (this.sourceQuery === null
       || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
       || this.label !== this.sourceQuery.label
@@ -321,8 +319,8 @@ class QueryBuilderStore {
     if (parentField && jsonFields && jsonFields.length) {
       jsonFields.forEach(jsonField => {
         const relativePath = jsonField["relative_path"];
-        const isFlatten = !!relativePath && relativePath.length !== undefined && relativePath.length >= 1;
-        const flattenChildId = isFlatten && relativePath[1] && relativePath[1]["@id"];
+        const isFlatten = !!relativePath && relativePath.length !== undefined && relativePath.length > 1;
+        const flattenRelativePath = !isFlatten?null:(relativePath.length > 2?relativePath.slice(1):relativePath[1]);
         const id = relativePath && (isFlatten?(relativePath[0] && relativePath[0]["@id"]):relativePath["@id"]);
         if (relativePath && id
           && parentField.schema && parentField.schema.canBe && parentField.schema.canBe.length) {
@@ -349,16 +347,19 @@ class QueryBuilderStore {
               field.setOption("required", true);
             }
             parentField.fields.push(field);
-            if (flattenChildId) {
-              this._processJsonSpecificationFields(field, [{
-                relative_path: {
-                  "@id": flattenChildId
+            if (isFlatten) {
+              const childrenJsonFields = [
+                {
+                  "relative_path": flattenRelativePath,
+                  fields: jsonField.fields
                 }
-              }]);
-            }
-            this._processJsonSpecificationFields(field, jsonField.fields);
-            if (isFlatten && field.fields && field.fields.length === 1) {
-              field.setOption("flatten", true);
+              ];
+              this._processJsonSpecificationFields(field, childrenJsonFields);
+              if (flattenRelativePath.length || field.fields && field.fields.length === 1) {
+                field.setOption("flatten", true);
+              }
+            } else {
+              this._processJsonSpecificationFields(field, jsonField.fields);
             }
           } else {
             window.console.log(`"${id}" schema is not available in current api structure and will be ignored.`);
@@ -378,7 +379,7 @@ class QueryBuilderStore {
       label:schema.label,
       canBe:[schema.id]
     });
-    this._processJsonSpecificationFields(rootField, fields);
+    this._processJsonSpecificationFields(rootField, toJS(fields));
     return rootField;
   }
 

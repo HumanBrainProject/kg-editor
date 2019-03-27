@@ -243,21 +243,23 @@ class QueryBuilderStore {
   }
 
   @action async fetchStructure(){
-    this.isFetchingStructure = true;
-    this.fetchStuctureError = null;
-    try{
-      const response = await API.axios.get(API.endpoints.structure());
-      runInAction(() => {
-        this.isFetchingStructure = false;
-        this.structure = response.data;
-        this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => {
-          this.schemasMap.set(schema.id, schema);
+    if (!this.isFetchingStructure) {
+      this.isFetchingStructure = true;
+      this.fetchStuctureError = null;
+      try{
+        const response = await API.axios.get(API.endpoints.structure());
+        runInAction(() => {
+          this.isFetchingStructure = false;
+          this.structure = response.data;
+          this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => {
+            this.schemasMap.set(schema.id, schema);
+          });
         });
-      });
-    } catch(e) {
-      const message = e.message?e.message:e;
-      this.fetchStuctureError = `Error while fetching api structure (${message})`;
-      this.isFetchingStructure = false;
+      } catch(e) {
+        const message = e.message?e.message:e;
+        this.fetchStuctureError = `Error while fetching api structure (${message})`;
+        this.isFetchingStructure = false;
+      }
     }
   }
 
@@ -548,21 +550,8 @@ class QueryBuilderStore {
     }
   }
 
-  _removeToBeIgnoredProperties = field => {
-    const toBeIgnoredProperties = [];
-    const toBeIgnoredRelativePathProperties = ["reverse"];
-    if (!field) {
-      return;
-    }
-    toBeIgnoredProperties.forEach(property => delete field[property]);
-    if (field.relative_path) {
-      toBeIgnoredRelativePathProperties.forEach(property => delete field.relative_path[property]);
-    }
-    field.fields && field.fields.length && field.fields.forEach(this._removeToBeIgnoredProperties);
-  }
-
   _containsUnsupportedProperties = field => {
-    const unsupportedProperties = ["merge", "sort", "ensure_order"];
+    const unsupportedProperties = ["merge", "filter", "sort", "ensure_order"];
     const unsupportedRelativePathProperties = [];
     if (!field) {
       return true;
@@ -598,7 +587,6 @@ class QueryBuilderStore {
               const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
               if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) { //isQueryIdValid(queryId) &&
                 const fields = jsonSpec.fields;
-                this._removeToBeIgnoredProperties(fields);
                 this.specifications.push({
                   id: queryId,
                   user: jsonSpec._createdByUser,

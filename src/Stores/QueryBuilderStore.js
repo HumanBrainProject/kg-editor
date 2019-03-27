@@ -154,9 +154,11 @@ class QueryBuilderStore {
 
   @computed
   get hasChanged(){
+    /*
     if (this.sourceQuery) {
       window.console.log(this.JSONQuery.fields, toJS(this.sourceQuery.fields), isEqual(this.JSONQuery.fields, toJS(this.sourceQuery.fields)));
     }
+    */
     return this.isValid && (this.sourceQuery === null
       || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
       || this.label !== this.sourceQuery.label

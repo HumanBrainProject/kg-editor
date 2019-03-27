@@ -30,7 +30,7 @@ let styles = {
     color: "var(--bookmark-off-color)",  // #e67e22 #e74c3c
   },
   saveErrorButton: {
-    color: "#e74c3c"
+    color: "var(--ft-color-error)"
   },
   textError: {
     margin: 0,

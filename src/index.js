@@ -213,7 +213,7 @@ const styles = {
   },
   deleteInstanceError: {
     margin: "20px 0",
-    color: "#e74c3c"
+    color: "var(--ft-color-error)"
   },
   deleteInstanceErrorFooterBar: {
     marginBottom: "10px",

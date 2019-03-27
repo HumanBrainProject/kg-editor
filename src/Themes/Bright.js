@@ -29,6 +29,8 @@ const styles = {
       "--ft-color-loud":"#444444",
       "--ft-color-louder":"#222222",
 
+      "--ft-color-error":"#e74c3c",
+
       "--pane-box-shadow":"rgba(0,0,0,0.3)",
 
       "--release-color-released":"rgb(52, 152, 219)",

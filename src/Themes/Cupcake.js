@@ -31,6 +31,8 @@ const styles = {
       "--ft-color-loud":new Color("#f6bec9").alpha(0.8).rgb().string(),
       "--ft-color-louder":new Color("#f6bec9").alpha(1).rgb().string(),
 
+      "--ft-color-error":"#e74c3c",
+
       "--pane-box-shadow":"#333",
 
       "--release-color-released":"rgb(52, 152, 219)",

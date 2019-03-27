@@ -29,6 +29,8 @@ const styles = {
       "--ft-color-loud":"rgb(224, 224, 224)",
       "--ft-color-louder":"rgb(244, 244, 244)",
 
+      "--ft-color-error":"#e74c3c",
+
       "--pane-box-shadow":"#333",
 
       "--release-color-released":"rgb(52, 152, 219)",

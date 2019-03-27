@@ -76,6 +76,9 @@ class QueryBuilderStore {
   @observable isRunning = false;
   @observable runError = null;
   @observable saveAsMode = false;
+  @observable showMyQueries = true;
+  @observable showOthersQueries = true;
+  @observable saveAsMode = false;
 
   @observable specifications = [];
 
@@ -570,44 +573,48 @@ class QueryBuilderStore {
 
   @action
   async fetchQueries(){
-    this.specifications = [];
-    if (this.rootField && this.rootField.schema && this.rootField.schema.id) {
-      this.isFetchingStructure = true;
+    if (!this.isFetchingQueries) {
+      this.specifications = [];
       this.fetchQueriesError = null;
-      try{
-        const response = await API.axios.get(API.endpoints.listQueries(this.rootField.id));
-        runInAction(()=>{
-          this.specifications = [];
-          const jsonSpecifications = response && response.data && response.data.length?response.data:[];
-          //const reg = /^(.+)\/(.+)\/(.+)\/v(\d+)\.(\d+)\.(\d+)\/(.+)$/;
-          const reg = /^specification_queries\/(.+)-(.+)-(.+)-v(\d+)_(\d+)_(\d+)-(.+)$/;
-          jsonSpecifications.forEach(jsonSpec => {
-            if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec._id)) { //jsonSpec["http://schema.org/identifier"]
-              const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
-              const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
-              if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) { //isQueryIdValid(queryId) &&
-                const fields = jsonSpec.fields;
-                this.specifications.push({
-                  id: queryId,
-                  user: jsonSpec._createdByUser,
-                  context: jsonSpec["@context"],
-                  fields: fields,
-                  label: jsonSpec.label?jsonSpec.label:"",
-                  description: jsonSpec.description?jsonSpec.description:"",
-                  isDeleting: false,
-                  deleteError: null
-                });
+      if (this.rootField && this.rootField.schema && this.rootField.schema.id) {
+        this.isFetchingQueries = true;
+        try{
+          const response = await API.axios.get(API.endpoints.listQueries(this.rootField.schema.id));
+          runInAction(()=>{
+            this.specifications = [];
+            this.showMyQueries = true;
+            this.showOthersQueries = true;
+            const jsonSpecifications = response && response.data && response.data.length?response.data:[];
+            //const reg = /^(.+)\/(.+)\/(.+)\/v(\d+)\.(\d+)\.(\d+)\/(.+)$/;
+            const reg = /^specification_queries\/(.+)-(.+)-(.+)-v(\d+)_(\d+)_(\d+)-(.+)$/;
+            jsonSpecifications.forEach(jsonSpec => {
+              if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec._id)) { //jsonSpec["http://schema.org/identifier"]
+                const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
+                const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
+                if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) { //isQueryIdValid(queryId) &&
+                  const fields = jsonSpec.fields;
+                  this.specifications.push({
+                    id: queryId,
+                    user: jsonSpec._createdByUser,
+                    context: jsonSpec["@context"],
+                    fields: fields,
+                    label: jsonSpec.label?jsonSpec.label:"",
+                    description: jsonSpec.description?jsonSpec.description:"",
+                    isDeleting: false,
+                    deleteError: null
+                  });
+                }
               }
-            }
+            });
+            this.isFetchingQueries = false;
           });
-          this.isFetchingStructure = false;
-        });
-      } catch(e) {
-        this.specifications = [];
-        const message = e.message?e.message:e;
-        this.fetchQueriesError = `Error while fetching saved queries for "${this.rootField.id}" (${message})`;
-        this.isFetchingStructure = false;
-        window.console.log(e);
+        } catch(e) {
+          this.specifications = [];
+          const message = e.message?e.message:e;
+          this.fetchQueriesError = `Error while fetching saved queries for "${this.rootField.id}" (${message})`;
+          this.isFetchingQueries = false;
+          window.console.log(e);
+        }
       }
     }
   }

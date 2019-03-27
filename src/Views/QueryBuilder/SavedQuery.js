@@ -77,7 +77,7 @@ let styles = {
     right:"-5px",
   },
   errorButton: {
-    color: "#e74c3c"
+    color: "var(--ft-color-error)"
   },
   textError: {
     margin: 0,

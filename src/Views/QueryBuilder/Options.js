@@ -28,7 +28,7 @@ const style = {
       "& small":{
         color:"var(--ft-color-quiet)",
         fontStyle:"italic"
-      },
+      }
     }
   },
 

@@ -234,10 +234,10 @@ export default class QueryBuilder extends React.Component{
                       :
                       <React.Fragment>
                         <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
-                          <SavedQueries title="My saved queries" list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} expanded={queryBuilderStore.showMyQueries} onExpandToggle={this.handleMyQueriesExpandToggle} enableDelete={true} />
+                          <SavedQueries title={`My saved queries${queryBuilderStore.rootField?(" for " + queryBuilderStore.rootField.schema.label):""}`} subTitle={queryBuilderStore.rootField?queryBuilderStore.rootField.schema.id:""} list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} expanded={queryBuilderStore.showMyQueries} onExpandToggle={this.handleMyQueriesExpandToggle} enableDelete={true} />
                         </div>
                         <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
-                          <SavedQueries title="Other users' queries" list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} expanded={queryBuilderStore.showOthersQueries} onExpandToggle={this.handleOthersQueriesExpandToggle} />
+                          <SavedQueries title={`Other users' queries${queryBuilderStore.rootField?(" for " + queryBuilderStore.rootField.schema.label):""}`} subTitle={queryBuilderStore.rootField?queryBuilderStore.rootField.schema.id:""} list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} expanded={queryBuilderStore.showOthersQueries} onExpandToggle={this.handleOthersQueriesExpandToggle} />
                         </div>
                       </React.Fragment>
                   }

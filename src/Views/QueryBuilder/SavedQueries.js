@@ -43,7 +43,11 @@ let styles = {
     "& h4": {
       display: "inline-block",
       margin: 0,
-      padding: 0
+      padding: 0,
+      "& small":{
+        color:"var(--ft-color-quiet)",
+        fontStyle:"italic"
+      }
     },
     "& button + h4": {
       margin: "0 0 0 6px"
@@ -62,7 +66,7 @@ export default class SavedQueries extends React.Component{
   }
 
   render(){
-    const {classes, title, list, expanded, onExpandToggle, enableDelete } = this.props;
+    const {classes, title, subTitle, list, expanded, onExpandToggle, enableDelete } = this.props;
 
     return (
       <div className={classes.container}>
@@ -71,7 +75,7 @@ export default class SavedQueries extends React.Component{
             {typeof onExpandToggle === "function" && (
               <button className={`${expanded !== false?"":"collapse"}`} onClick={onExpandToggle}><FontAwesomeIcon icon="angle-down"/></button>
             )}
-            <h4>{title}</h4>
+            <h4>{title}<small>{subTitle?(" - " + subTitle):""}</small></h4>
           </div>
         )}
         {expanded !== false || !title?

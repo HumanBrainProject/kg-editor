@@ -620,6 +620,7 @@ class QueryBuilderStore {
                   const fields = jsonSpec.fields;
                   this.specifications.push({
                     id: queryId,
+                    org: org,
                     user: jsonSpec._createdByUser,
                     context: jsonSpec["@context"],
                     fields: fields,

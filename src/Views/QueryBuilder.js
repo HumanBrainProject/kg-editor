@@ -271,6 +271,7 @@ export default class QueryBuilder extends React.Component{
                                 expanded={queryBuilderStore.showMyQueries}
                                 onExpandToggle={this.handleMyQueriesExpandToggle}
                                 onRefresh={this.handleFetchSavedQueries}
+                                showUser={false}
                                 enableDelete={true} />
                             </div>
                             <div className={`${classes.othersQueries} ${queryBuilderStore.hasOthersQueries?"show":""}`} >
@@ -281,7 +282,8 @@ export default class QueryBuilder extends React.Component{
                                 onSelect={this.handleSelectQuery}
                                 expanded={queryBuilderStore.showOthersQueries}
                                 onExpandToggle={this.handleOthersQueriesExpandToggle}
-                                onRefresh={this.handleFetchSavedQueries} />
+                                onRefresh={this.handleFetchSavedQueries}
+                                showUser={true} />
                             </div>
                           </React.Fragment>
                     :

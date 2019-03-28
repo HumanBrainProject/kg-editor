@@ -185,12 +185,13 @@ class BrowseStore{
       try{
         const { data } = await API.axios.post(API.endpoints.createBookmarkList(), {"name": name, "folderId": bookmarkListfolder.id});
         runInAction(() => {
+          const bookmarkData = data && data.data;
           /* Mockup Data
-          const data = { id: uniqueId(`id${new Date().getTime()}`, name: name) };
+          const bookmarkData = { id: uniqueId(`id${new Date().getTime()}`, name: name) };
           */
           bookmarkListfolder.lists.push({
-            id: data.id,
-            name: data.name?data.name:name,
+            id: bookmarkData.id,
+            name: bookmarkData.name?bookmarkData.name:name,
             type: bookmarkListfolder.folderType,
             isUpdating: false,
             updateError: null,
@@ -200,7 +201,7 @@ class BrowseStore{
           this.isCreatingBookmarkList = false;
           this.newBookmarkListName = null;
           if (instanceIds) {
-            bookmarkStatusStore.updateStatus(instanceIds, data.id, true);
+            bookmarkStatusStore.updateStatus(instanceIds, bookmarkData.id, true);
           }
         });
       } catch(e){

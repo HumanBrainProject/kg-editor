@@ -100,12 +100,13 @@ class UsersStore{
        user.fetchError = null;
        const { data } = await API.axios.get(API.endpoints.userInfo(userId));
        runInAction(() => {
-         user.username = data.username;
-         user.displayName = data.displayName;
-         user.givenName = data.givenName;
-         user.familyName = data.familyName;
-         user.emails = data.emails instanceof Array?data.emails:[];
-         user.picture = data.picture;
+         const userData = data && data.data;
+         user.username = userData.username;
+         user.displayName = userData.displayName;
+         user.givenName = userData.givenName;
+         user.familyName = userData.familyName;
+         user.emails = userData.emails instanceof Array?userData.emails:[];
+         user.picture = userData.picture;
          user.isFetching = false;
          user.isFetched = true;
        });

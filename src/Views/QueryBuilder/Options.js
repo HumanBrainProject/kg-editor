@@ -92,15 +92,26 @@ export default class Options extends React.Component{
     queryBuilderStore.addField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
   }
 
-  handleChangeRequired = (value) => {
+  handleChangeRequired = value => {
     queryBuilderStore.currentField.setOption("required", value);
   }
 
-  handleChangeFlatten= (value) => {
+  handleChangeSort = value => {
+    queryBuilderStore.currentField.setOption("sort", value);
+    if (value) {
+      queryBuilderStore.currentField.parent.fields.forEach(field => {
+        if (field !== queryBuilderStore.currentField) {
+          field.setOption("sort", null);
+        }
+      });
+    }
+  }
+
+  handleChangeFlatten= value => {
     queryBuilderStore.currentField.setOption("flatten", value);
   }
 
-  handleChangeName = (e) => {
+  handleChangeName = e => {
     queryBuilderStore.currentField.setOption("alias", e.target.value);
   }
 
@@ -134,6 +145,20 @@ export default class Options extends React.Component{
                 </div>
                 <div className={classes.optionInput}>
                   <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("required")} onChange={this.handleChangeRequired}>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
+                  </MultiToggle>
+                </div>
+              </div>
+            }
+
+            { !queryBuilderStore.currentField.schema.canBe &&
+              <div className={classes.option}>
+                <div className={classes.optionLabel}>
+                  Sort <small>(enabling sort on this field will disable sort on other fields)</small>
+                </div>
+                <div className={classes.optionInput}>
+                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("sort")} onChange={this.handleChangeSort}>
                     <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
                     <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
                   </MultiToggle>

@@ -327,7 +327,8 @@ class QueryBuilderStore {
       let jsonField = {
         "fieldname":"query:"+(field.getOption("alias") || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label),
         "relative_path":{"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined},
-        "required":field.getOption("required") === true? true: undefined
+        "required":field.getOption("required") === true? true: undefined,
+        "sort":field.getOption("sort") === true? true: undefined
       };
       if(field.getOption("flatten")){
         let topField = field;
@@ -377,6 +378,9 @@ class QueryBuilderStore {
             }
             if (jsonField.required) {
               field.setOption("required", true);
+            }
+            if (jsonField.sort) {
+              field.setOption("sort", true);
             }
             parentField.fields.push(field);
             if (isFlatten) {
@@ -579,7 +583,7 @@ class QueryBuilderStore {
   }
 
   _containsUnsupportedProperties = field => {
-    const unsupportedProperties = ["merge", "filter", "sort", "ensure_order"];
+    const unsupportedProperties = ["merge", "filter", "ensure_order"];
     const unsupportedRelativePathProperties = [];
     if (!field) {
       return true;

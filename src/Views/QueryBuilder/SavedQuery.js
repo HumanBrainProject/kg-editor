@@ -40,6 +40,15 @@ let styles = {
       fontStyle:"italic",
       textTransform: "none"
     },
+    "& .author": {
+      position: "absolute",
+      right: 0,
+      color: "var(--ft-color-normal)",
+      textTransform: "none",
+      "&.extra-padding":{
+        right: "20px"
+      }
+    }
   },
   deleteButton: {
     position: "absolute",
@@ -139,9 +148,9 @@ export default class SavedQuery extends React.Component{
     return (
       <div className={`${classes.container} ${query.isDeleting?"is-deleting":""}`} key={query.id} onClick={this.handleSelect.bind(this)} onMouseLeave={this.handleCloseDeleteDialog.bind(this)} ref={ref=>this.wrapperRef = ref} >
         <div className={classes.name}>
-          {query.label?query.label:query.id} - <small title="queryId">{query.id}</small>
+          <span>{query.label?query.label:query.id} - <small title="queryId">{query.id}</small></span>
           {showUser && (
-            <User key={query.user} org={query.org} userId={query.user} />
+            <span className={`author ${enableDelete?"extra-padding":""}`}>by user<User org={query.org} userId={query.user} /></span>
           )}
           {enableDelete && !query.deleteError && !query.isDeleting && !this.state.showDeleteDialog && (
             <button className={classes.deleteButton} title="delete" onClick={this.handleConfirmDelete.bind(this)}><FontAwesomeIcon icon="times"/></button>

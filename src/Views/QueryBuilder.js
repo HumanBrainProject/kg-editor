@@ -271,7 +271,6 @@ export default class QueryBuilder extends React.Component{
                                 expanded={queryBuilderStore.showMyQueries}
                                 onExpandToggle={this.handleMyQueriesExpandToggle}
                                 onRefresh={this.handleFetchSavedQueries}
-                                showUser={false}
                                 enableDelete={true} />
                             </div>
                             <div className={`${classes.othersQueries} ${queryBuilderStore.hasOthersQueries?"show":""}`} >

@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import FetchingLoader from "../../Components/FetchingLoader";
+import User from "../User";
 import Field from "./Field";
 
 const styles = {
@@ -19,7 +20,6 @@ const styles = {
   info: {
     display: "grid",
     gridTemplateColumns: "1fr 2fr",
-    gridRowGap: "20px",
     gridColumnGap: "30px",
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast1)",
@@ -38,6 +38,7 @@ const styles = {
   },
   description: {
     gridColumnStart: "span 2",
+    marginTop: "20px",
     "& textarea": {
       minWidth: "100%",
       maxWidth: "100%",
@@ -59,8 +60,14 @@ const styles = {
       cursor: "text"
     }
   },
+  author: {
+    gridColumnStart: "span 2",
+    marginTop: "6px",
+    color: "var(--ft-color-normal)"
+  },
   save: {
     gridColumnStart: "span 2",
+    marginTop: "20px",
     display: "flex",
     "& span": {
       color: "var(--ft-color-normal)"
@@ -210,6 +217,11 @@ export default class Query extends React.Component{
                   value={queryBuilderStore.description}
                   onChange={this.handleChangeDescription} />
               </div>
+              {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && !queryBuilderStore.isOneOfMySavedQueries && (
+                <div className={classes.author} >
+                  <span>by user<User org={queryBuilderStore.sourceQuery.org} userId={queryBuilderStore.sourceQuery.user} /></span>
+                </div>
+              )}
             </React.Fragment>
           )}
           {queryBuilderStore.isQuerySaved?

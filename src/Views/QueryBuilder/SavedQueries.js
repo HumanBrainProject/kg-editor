@@ -17,6 +17,9 @@ let styles = {
     color: "var(--ft-color-loud)",
     "& > div > div:first-child": {
       overflowX: "hidden !important"
+    },
+    "& > div > div:nth-child(2)": {
+      display: "none !important"
     }
   },
   title: {

@@ -107,6 +107,10 @@ export default class Options extends React.Component{
     }
   }
 
+  handleChangeEnsureOrder = value => {
+    queryBuilderStore.currentField.setOption("ensure_order", value);
+  }
+
   handleChangeFlatten= value => {
     queryBuilderStore.currentField.setOption("flatten", value);
   }
@@ -159,6 +163,21 @@ export default class Options extends React.Component{
                 </div>
                 <div className={classes.optionInput}>
                   <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("sort")} onChange={this.handleChangeSort}>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
+                  </MultiToggle>
+                </div>
+              </div>
+            }
+
+            { queryBuilderStore.currentField.schema.canBe &&
+              !queryBuilderStore.currentField.parent.getOption("flatten") &&
+              <div className={classes.option}>
+                <div className={classes.optionLabel}>
+                  Ensure original order <small>(only applicable if parent field is not flattened)</small>
+                </div>
+                <div className={classes.optionInput}>
+                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("ensure_order")} onChange={this.handleChangeEnsureOrder}>
                     <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
                     <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
                   </MultiToggle>

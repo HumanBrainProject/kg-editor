@@ -328,7 +328,8 @@ class QueryBuilderStore {
         "fieldname":"query:"+(field.getOption("alias") || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label),
         "relative_path":{"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined},
         "required":field.getOption("required") === true? true: undefined,
-        "sort":field.getOption("sort") === true? true: undefined
+        "sort":field.getOption("sort") === true? true: undefined,
+        "ensure_order":field.getOption("ensure_order") === true? true: undefined,
       };
       if(field.getOption("flatten")){
         let topField = field;
@@ -381,6 +382,9 @@ class QueryBuilderStore {
             }
             if (jsonField.sort) {
               field.setOption("sort", true);
+            }
+            if (jsonField.ensure_order) {
+              field.setOption("ensure_order", true);
             }
             parentField.fields.push(field);
             if (isFlatten) {
@@ -583,7 +587,7 @@ class QueryBuilderStore {
   }
 
   _containsUnsupportedProperties = field => {
-    const unsupportedProperties = ["merge", "filter", "ensure_order"];
+    const unsupportedProperties = ["merge", "filter"];
     const unsupportedRelativePathProperties = [];
     if (!field) {
       return true;

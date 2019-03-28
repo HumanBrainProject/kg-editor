@@ -43,6 +43,9 @@ const styles = {
       minWidth: "100%",
       maxWidth: "100%",
       minHeight: "10rem"
+    },
+    "& + $save": {
+      marginTop: "20px"
     }
   },
   input:{
@@ -63,11 +66,13 @@ const styles = {
   author: {
     gridColumnStart: "span 2",
     marginTop: "6px",
-    color: "var(--ft-color-normal)"
+    color: "var(--ft-color-normal)",
+    "& + $save": {
+      marginTop: "20px"
+    }
   },
   save: {
     gridColumnStart: "span 2",
-    marginTop: "20px",
     display: "flex",
     "& span": {
       color: "var(--ft-color-normal)"

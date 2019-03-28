@@ -136,12 +136,13 @@ const styles = {
 export default class Home extends React.Component{
   render(){
     const { classes } =  this.props;
+    const firstname = authStore.hasUserProfile && authStore.user && authStore.user.name?authStore.user.name.split(" ")[0]:"";
     return (
       <div className={classes.container}>
         <Scrollbars autoHide>
           <div className={classes.panel}>
             <div className={classes.welcome}>
-              <h1>Welcome <span title={authStore.user.name}>{authStore.user.name.split(" ")[0]}</span></h1>
+              <h1>Welcome <span title={authStore.user.name}>{firstname}</span></h1>
             </div>
             <div className={classes.nav}>
               <Hub/>

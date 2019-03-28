@@ -149,7 +149,7 @@ class AuthStore {
         */
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
-          this.user = data;
+          this.user = data && data.data;
           this.isRetrievingUserProfile = false;
           this.reloginResolve();
           this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});

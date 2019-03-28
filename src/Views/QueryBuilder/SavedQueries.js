@@ -20,6 +20,7 @@ let styles = {
     }
   },
   title: {
+    display: "flex",
     "&.withContent": {
       marginBottom: "10px",
       paddingBottom: "10px",
@@ -34,13 +35,19 @@ let styles = {
       outline: 0,
       "&:hover": {
         outline: 0
-      },
+      }
+    },
+    "& button.toggle-btn": {
       "&.collapse svg": {
         transform: "rotateX(180deg)",
         transition: "transform 0.3s ease"
+      },
+      "& + h4": {
+        margin: "0 0 0 6px"
       }
     },
     "& h4": {
+      flex: 1,
       display: "inline-block",
       margin: 0,
       padding: 0,
@@ -49,8 +56,8 @@ let styles = {
         fontStyle:"italic"
       }
     },
-    "& button + h4": {
-      margin: "0 0 0 6px"
+    "& button.refresh-btn": {
+      color: "var(--ft-color-normal)"
     }
   }
 };
@@ -66,16 +73,19 @@ export default class SavedQueries extends React.Component{
   }
 
   render(){
-    const {classes, title, subTitle, list, expanded, onExpandToggle, enableDelete } = this.props;
+    const {classes, title, subTitle, list, expanded, onExpandToggle, onRefresh, enableDelete } = this.props;
 
     return (
       <div className={classes.container}>
         {title && (
           <div className={`${classes.title} ${expanded !== false?"withContent":""}`}>
             {typeof onExpandToggle === "function" && (
-              <button className={`${expanded !== false?"":"collapse"}`} onClick={onExpandToggle}><FontAwesomeIcon icon="angle-down"/></button>
+              <button className={`toggle-btn ${expanded !== false?"":"collapse"}`} onClick={onExpandToggle}><FontAwesomeIcon icon="angle-down"/></button>
             )}
             <h4>{title}<small>{subTitle?(" - " + subTitle):""}</small></h4>
+            {typeof onRefresh === "function" && (
+              <button className="refresh-btn" onClick={onRefresh} title="Refresh"><FontAwesomeIcon icon="redo-alt"/></button>
+            )}
           </div>
         )}
         {expanded !== false || !title?

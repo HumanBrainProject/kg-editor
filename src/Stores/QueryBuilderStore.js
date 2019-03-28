@@ -124,6 +124,26 @@ class QueryBuilderStore {
   }
 
   @computed
+  get groupedSchemas(){
+    return groupBy(this.structure.schemas, "group");
+  }
+
+  @computed
+  get hasSchemas(){
+    return !this.fetchStuctureError && this.structure && this.structure.schemas && this.structure.schemas.length;
+  }
+
+  @computed
+  get hasRootSchema(){
+    return !!this.rootField && !!this.rootField.schema;
+  }
+
+  @computed
+  get rootSchema(){
+    return this.rootField && this.rootField.schema;
+  }
+
+  @computed
   get isQuerySaved(){
     return this.sourceQuery !== null;
   }
@@ -170,8 +190,18 @@ class QueryBuilderStore {
   }
 
   @computed
-  get groupedSchemas(){
-    return groupBy(this.structure.schemas, "group");
+  get hasQueries(){
+    return this.specifications.length;
+  }
+
+  @computed
+  get hasMyQueries(){
+    return this.myQueries.length > 0;
+  }
+
+  @computed
+  get hasOthersQueries(){
+    return this.othersQueries.length > 0;
   }
 
   @computed
@@ -238,11 +268,6 @@ class QueryBuilderStore {
       }
       remove(field.parent.fields, parentField => field === parentField);
     }
-  }
-
-  @computed
-  get hasSchemas(){
-    return !this.fetchStuctureError && this.structure && this.structure.schemas && this.structure.schemas.length;
   }
 
   @action async fetchStructure(){
@@ -606,6 +631,14 @@ class QueryBuilderStore {
                 }
               }
             });
+            if (this.sourceQuery) {
+              const query = this.specifications.find(spec => spec.id === this.sourceQuery.id);
+              if (query) {
+                this.sourceQuery = query;
+              } else {
+                this.sourceQuery = null;
+              }
+            }
             this.isFetchingQueries = false;
           });
         } catch(e) {

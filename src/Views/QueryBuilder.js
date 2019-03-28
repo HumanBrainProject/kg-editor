@@ -53,7 +53,7 @@ let styles = {
     gridTemplateRows:"1fr",
     gridGap:"10px",
     width:"100%",
-    "&.loading, &.error": {
+    "&.loading, &.error, &.noQueries": {
       gridTemplateRows:"auto 1fr",
     },
     "&.withMyQueriesOn, &.withOthersQueriesOn": {
@@ -78,8 +78,8 @@ let styles = {
   fetchingQueries: {
     position: "relative",
     padding: "10px",
-    border:"1px solid var(--border-color-ui-contrast2)",
-    background:"var(--bg-color-ui-contrast2)",
+    borderRadius: "4px",
+    background:"var(--bg-color-blend-contrast1)",
     color: "var(--ft-color-normal)",
     "& > span": {
       paddingLeft: "6px",
@@ -107,6 +107,28 @@ let styles = {
       textAlign: "right",
       "& button": {
         marginLeft: "10px"
+      }
+    }
+  },
+  noQueries: {
+    display: "flex",
+    position: "relative",
+    padding: "10px",
+    borderRadius: "4px",
+    background:"var(--bg-color-blend-contrast1)",
+    color: "var(--ft-color-normal)",
+    "& > span": {
+      flex: 1
+    },
+    "& > button": {
+      display: "inline-block",
+      margin: 0,
+      padding: 0,
+      border: 0,
+      background: "transparent",
+      outline: 0,
+      "&:hover": {
+        outline: 0
       }
     }
   },
@@ -210,40 +232,64 @@ export default class QueryBuilder extends React.Component{
               :
               <div className={classes.layout}>
                 <div className={classes.leftPanel}>
-                  {queryBuilderStore.rootField?
+                  {queryBuilderStore.hasRootSchema?
                     <Query />
                     :
                     <BGMessage icon={"blender-phone"}>
                       Please choose a root schema in the right panel
                     </BGMessage>}
                 </div>
-                <div className={`${classes.rightPanel} ${queryBuilderStore.isFetchingQueries?"loading":""} ${queryBuilderStore.fetchQueriesError?"error":""} ${queryBuilderStore.myQueries.length?(queryBuilderStore.showMyQueries?"withMyQueriesOn":"withMyQueriesOff"):""} ${queryBuilderStore.othersQueries.length?(queryBuilderStore.showOthersQueries?"withOthersQueriesOn":"withOthersQueriesOff"):""}`}>
-                  {queryBuilderStore.isFetchingQueries?
-                    <div className={classes.fetchingQueries} >
-                      <FontAwesomeIcon icon="circle-notch" spin/><span>{`Fetching saved queries for ${queryBuilderStore.rootField.schema.id}...`}</span>
-                    </div>
-                    :
-                    queryBuilderStore.fetchQueriesError?
-                      <div className={classes.fetchQueriesError} >
-                        <FontAwesomeIcon icon="exclamation-triangle"/><span>{queryBuilderStore.fetchQueriesError}</span>
-                        <div>
-                          <Button onClick={this.handleCancelFetchSavedQueries}><FontAwesomeIcon icon="times"/>&nbsp;Cancel</Button>
-                          <Button bsStyle="primary" onClick={this.handleFetchSavedQueries}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
-                        </div>
+                <div className={`${classes.rightPanel} ${queryBuilderStore.isFetchingQueries?"loading":""} ${queryBuilderStore.fetchQueriesError?"error":""} ${!queryBuilderStore.hasRootSchema || queryBuilderStore.hasQueries?"":"noQueries"} ${queryBuilderStore.hasMyQueries?(queryBuilderStore.showMyQueries?"withMyQueriesOn":"withMyQueriesOff"):""} ${queryBuilderStore.hasOthersQueries?(queryBuilderStore.showOthersQueries?"withOthersQueriesOn":"withOthersQueriesOff"):""}`}>
+                  {queryBuilderStore.hasRootSchema?
+                    queryBuilderStore.isFetchingQueries?
+                      <div className={classes.fetchingQueries} >
+                        <FontAwesomeIcon icon="circle-notch" spin/><span>{`Fetching saved queries for ${queryBuilderStore.rootSchema.id}...`}</span>
                       </div>
                       :
-                      <React.Fragment>
-                        <div className={`${classes.myQueries} ${queryBuilderStore.myQueries.length?"show":""}`} >
-                          <SavedQueries title={`My saved queries${queryBuilderStore.rootField?(" for " + queryBuilderStore.rootField.schema.label):""}`} subTitle={queryBuilderStore.rootField?queryBuilderStore.rootField.schema.id:""} list={queryBuilderStore.myQueries} onSelect={this.handleSelectQuery} expanded={queryBuilderStore.showMyQueries} onExpandToggle={this.handleMyQueriesExpandToggle} enableDelete={true} />
+                      queryBuilderStore.fetchQueriesError?
+                        <div className={classes.fetchQueriesError} >
+                          <FontAwesomeIcon icon="exclamation-triangle"/><span>{queryBuilderStore.fetchQueriesError}</span>
+                          <div>
+                            <Button onClick={this.handleCancelFetchSavedQueries}><FontAwesomeIcon icon="times"/>&nbsp;Cancel</Button>
+                            <Button bsStyle="primary" onClick={this.handleFetchSavedQueries}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+                          </div>
                         </div>
-                        <div className={`${classes.othersQueries} ${queryBuilderStore.othersQueries.length?"show":""}`} >
-                          <SavedQueries title={`Other users' queries${queryBuilderStore.rootField?(" for " + queryBuilderStore.rootField.schema.label):""}`} subTitle={queryBuilderStore.rootField?queryBuilderStore.rootField.schema.id:""} list={queryBuilderStore.othersQueries} onSelect={this.handleSelectQuery} expanded={queryBuilderStore.showOthersQueries} onExpandToggle={this.handleOthersQueriesExpandToggle} />
-                        </div>
-                      </React.Fragment>
+                        :
+                        !queryBuilderStore.hasQueries?
+                          <div className={classes.noQueries} >
+                            <span>No saved queries available for {queryBuilderStore.rootSchema.label}<small> - {queryBuilderStore.rootSchema.id}</small></span>
+                            <button onClick={this.handleFetchSavedQueries} title="Refresh"><FontAwesomeIcon icon="redo-alt"/></button>
+                          </div>
+                          :
+                          <React.Fragment>
+                            <div className={`${classes.myQueries} ${queryBuilderStore.hasMyQueries?"show":""}`} >
+                              <SavedQueries
+                                title={`My saved queries for ${queryBuilderStore.rootSchema.label}`}
+                                subTitle={queryBuilderStore.rootSchema.id}
+                                list={queryBuilderStore.myQueries}
+                                onSelect={this.handleSelectQuery}
+                                expanded={queryBuilderStore.showMyQueries}
+                                onExpandToggle={this.handleMyQueriesExpandToggle}
+                                onRefresh={this.handleFetchSavedQueries}
+                                enableDelete={true} />
+                            </div>
+                            <div className={`${classes.othersQueries} ${queryBuilderStore.hasOthersQueries?"show":""}`} >
+                              <SavedQueries
+                                title={`Other users' queries for ${queryBuilderStore.rootSchema.label}`}
+                                subTitle={queryBuilderStore.rootSchema.id}
+                                list={queryBuilderStore.othersQueries}
+                                onSelect={this.handleSelectQuery}
+                                expanded={queryBuilderStore.showOthersQueries}
+                                onExpandToggle={this.handleOthersQueriesExpandToggle}
+                                onRefresh={this.handleFetchSavedQueries} />
+                            </div>
+                          </React.Fragment>
+                    :
+                    null
                   }
                   <div className={classes.tabbedPanel}>
                     <div className={classes.tabs}>
-                      {queryBuilderStore.rootField?
+                      {queryBuilderStore.hasRootSchema?
                         <React.Fragment>
                           {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
                           <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
@@ -257,7 +303,7 @@ export default class QueryBuilder extends React.Component{
                     <div className={classes.tabBody}>
                       <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
                         <div className={classes.tabBodyInner}>
-                          {!queryBuilderStore.rootField?
+                          {!queryBuilderStore.hasRootSchema?
                             <RootSchemaChoice/>
                             :queryBuilderStore.currentTab === "query"?
                               <QuerySpecification/>

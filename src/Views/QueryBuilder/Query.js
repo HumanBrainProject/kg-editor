@@ -216,13 +216,13 @@ export default class Query extends React.Component{
             queryBuilderStore.isOneOfMySavedQueries?
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootField.schema.id}/{queryBuilderStore.queryId}</small>
+                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
                   <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootField.schema.id}/{queryBuilderStore.sourceQuery.id}</small>
+                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}</small>
                   {queryBuilderStore.hasChanged && (
                     <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
@@ -232,13 +232,13 @@ export default class Query extends React.Component{
               :
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootField.schema.id}/{queryBuilderStore.queryId}</small>
+                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
                   <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootField.schema.id}/{queryBuilderStore.sourceQuery.id}</small>
+                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}</small>
                   {queryBuilderStore.hasChanged && (
                     <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
@@ -247,7 +247,7 @@ export default class Query extends React.Component{
             :
             queryBuilderStore.saveAsMode?
               <div className={classes.save}>
-                <small>query api: /query/{queryBuilderStore.rootField.schema.id}/{queryBuilderStore.queryId}</small>
+                <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
                 <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
                 <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
               </div>

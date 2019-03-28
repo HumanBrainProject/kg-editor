@@ -1,8 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import AvatarComponent from "../../Components/Avatar";
-import UsersStore from "../../Stores/UsersStore";
+import AvatarComponent from "../Components/Avatar";
+import UsersStore from "../Stores/UsersStore";
 
 @observer
 export default class Avatar extends React.Component {

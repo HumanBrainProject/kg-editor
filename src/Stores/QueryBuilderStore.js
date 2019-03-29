@@ -43,10 +43,6 @@ class Field {
   }
 }
 
-const forbiddenQueryIdChars = [" ", ".", ",", ";", "\"", "'", ":", "/", "\\", "@", "[", "]", "{", "}", "?", "*"];
-
-const isQueryIdValid = queryId => typeof queryId === "string" && queryId.trim() !== "" && !forbiddenQueryIdChars.some(value => queryId.includes(value));
-
 const defaultContext = {
   "@vocab": "https://schema.hbp.eu/graphQuery/",
   "query":"https://schema.hbp.eu/myQuery/",
@@ -97,8 +93,12 @@ class QueryBuilderStore {
     this.fetchStructure();
   }
 
-  get forbiddenQueryIdChars() {
-    return forbiddenQueryIdChars;
+  get queryIdRegex() {
+    return /^[A-Za-z0-9_\-]+$/;
+  }
+
+  get queryIdPattern() {
+    return this.queryIdRegex.source;
   }
 
   selectRootSchema(schema){
@@ -160,19 +160,18 @@ class QueryBuilderStore {
 
   @computed
   get queryIdAlreadyExists(){
-    const queryId = this.queryId.trim();
-    return this.myQueries.some(spec => spec.id === queryId);
+    return this.myQueries.some(spec => spec.id === this.queryId);
   }
 
   @computed
   get queryIdAlreadyInUse(){
-    const queryId = this.queryId.trim();
-    return this.othersQueries.some(spec => spec.id === queryId);
+    return this.othersQueries.some(spec => spec.id === this.queryId);
   }
 
   @computed
   get isQueryIdValid(){
-    return isQueryIdValid(this.queryId);
+    window.console.log(this.queryIdRegex.test(this.queryId));
+    return this.queryIdRegex.test(this.queryId);
   }
 
   @computed
@@ -501,7 +500,7 @@ class QueryBuilderStore {
       if (this.sourceQuery && this.sourceQuery.deleteError) {
         this.sourceQuery.deleteError = null;
       }
-      const queryId = this.queryId.trim();
+      const queryId = this.queryId;
       const label = this.label?this.label.trim():"";
       const description = this.description?this.description.trim():"";
       const payload = this.JSONQuery;

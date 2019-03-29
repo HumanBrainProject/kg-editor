@@ -63,6 +63,11 @@ const styles = {
       cursor: "text"
     }
   },
+  queryIdError: {
+    gridColumnStart: "span 2",
+    marginTop: "6px",
+    color: "var(--ft-color-error)"
+  },
   author: {
     gridColumnStart: "span 2",
     marginTop: "6px",
@@ -193,9 +198,11 @@ export default class Query extends React.Component{
           {(queryBuilderStore.isQuerySaved || queryBuilderStore.saveAsMode) && (
             <React.Fragment>
               <div>
-                <h4>QueryId :</h4>
+                <h4>Query :</h4>
                 <input
                   className={`form-control ${classes.input}`}
+                  required="required"
+                  pattern={queryBuilderStore.queryIdPattern}
                   disabled={!queryBuilderStore.saveAsMode}
                   placeholder={""}
                   type="text"
@@ -212,6 +219,21 @@ export default class Query extends React.Component{
                   value={queryBuilderStore.label}
                   onChange={this.handleChangeLabel} />
               </div>
+              {queryBuilderStore.saveAsMode && !queryBuilderStore.isQueryIdValid && queryBuilderStore.queryId !== "" && (
+                <div className={classes.queryIdError}>
+                  <FontAwesomeIcon icon="exclamation-triangle"/>&nbsp;&quot;{queryBuilderStore.queryId}&quot; is not a valid query name. It should not be empty. Accepted characters are a to z small or capital letters, numbers, minus and underscore!
+                </div>
+              )}
+              {queryBuilderStore.saveAsMode && queryBuilderStore.isQueryIdValid && queryBuilderStore.queryIdAlreadyInUse && (
+                <div className={classes.queryIdError}>
+                  <FontAwesomeIcon icon="exclamation-triangle"/>&nbsp;A query named &quot;{queryBuilderStore.queryId}&quot; already exists. Please choose another name!
+                </div>
+              )}
+              {queryBuilderStore.saveAsMode && queryBuilderStore.isQueryIdValid && queryBuilderStore.queryIdAlreadyExists && (
+                <div className={classes.queryIdError}>
+                  <FontAwesomeIcon icon="exclamation-triangle"/>&nbsp;You already created a query named &quot;{queryBuilderStore.queryId}&quot;. Please choose another name!
+                </div>
+              )}
               <div className={classes.description}>
                 <h4>Description :</h4>
                 <textarea
@@ -233,9 +255,13 @@ export default class Query extends React.Component{
             queryBuilderStore.isOneOfMySavedQueries?
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
+                  {(queryBuilderStore.isQueryIdValid && !queryBuilderStore.queryIdAlreadyInUse && !queryBuilderStore.queryIdAlreadyExists)?
+                    <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
+                    :
+                    <small></small>
+                  }
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
@@ -249,9 +275,13 @@ export default class Query extends React.Component{
               :
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
+                  {(queryBuilderStore.isQueryIdValid && !queryBuilderStore.queryIdAlreadyInUse && !queryBuilderStore.queryIdAlreadyExists)?
+                    <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
+                    :
+                    <small></small>
+                  }
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>

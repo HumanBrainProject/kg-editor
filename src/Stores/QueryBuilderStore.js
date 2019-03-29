@@ -94,7 +94,7 @@ class QueryBuilderStore {
   }
 
   get queryIdRegex() {
-    return /^[A-Za-z0-9_\-]+$/;
+    return /^[A-Za-z0-9_-]+$/;
   }
 
   get queryIdPattern() {

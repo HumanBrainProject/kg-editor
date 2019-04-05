@@ -2,46 +2,9 @@ import {observable, action, computed, runInAction, toJS} from "mobx";
 import {uniqueId, sortBy, groupBy, isEqual} from "lodash";
 import API from "../Services/API";
 import {remove} from "lodash";
+import jsonld from "jsonld";
 
 import authStore from "./AuthStore";
-
-class Field {
-  @observable schema = null;
-  @observable id = 0;
-  @observable alias = null;
-  @observable fields = [];
-  @observable options = new Map();
-
-  constructor(schema, parent){
-    this.schema = schema;
-    this.parent = parent;
-    this.id = uniqueId("QueryBuilderField");
-  }
-
-  @action setOption(option, value){
-    if(option === "flatten"){
-      if(value === true && this.fields.length === 1){
-        this.options.set(option, value);
-      } else if(value === null){
-        this.options.set(option, value);
-      }
-    } else {
-      this.options.set(option, value);
-    }
-  }
-
-  getOption(option){
-    return this.options.has(option)?this.options.get(option):null;
-  }
-
-  getDefaultAlias(){
-    let currentField = this;
-    while(currentField.getOption("flatten") && currentField.fields[0] && currentField.fields[0].schema.canBe){
-      currentField = currentField.fields[0];
-    }
-    return currentField.schema.simpleAttributeName || currentField.schema.simplePropertyName || currentField.schema.label;
-  }
-}
 
 const defaultContext = {
   "@vocab": "https://schema.hbp.eu/graphQuery/",
@@ -55,6 +18,94 @@ const defaultContext = {
     "@type": "@id"
   }
 };
+
+const rootFieldReservedProperties = ["root_schema", "_id", "_key", "_rev", "_createdByUser", "@context", "fields", "label", "description"];
+const fieldReservedProperties = ["fieldname", "relative_path", "fields"];
+
+const defaultOptions = [
+  {
+    name: "required",
+    value: undefined
+  },
+  {
+    name: "sort",
+    value: undefined
+  },
+  {
+    name: "ensure_order",
+    value: undefined
+  }
+];
+
+class Field {
+  @observable schema = null;
+  @observable fields = [];
+  @observable alias = null;
+  @observable isFlattened = false;
+  @observable optionsMap = new Map();
+  @observable unrecognized = null;
+
+  constructor(schema, parent){
+    this.schema = schema;
+    this.parent = parent;
+    defaultOptions.forEach(option => this.optionsMap.set(option.name, option.value));
+  }
+
+  @computed
+  get options(){
+    return Array.from(this.optionsMap).map(([name, value]) => ({
+      name: name,
+      value: toJS(value)
+    }));
+  }
+
+  getOption(name){
+    return this.optionsMap.has(name)?this.optionsMap.get(name):undefined;
+  }
+
+  @action setOption(name, value){ //}, preventRecursivity){
+    this.optionsMap.set(name, value);
+    // TODO: uncomment
+    /*
+    if (name === "sort" && value && !preventRecursivity) {
+      this.parent.fields.forEach(field => {
+        if (field !== this) {
+          field.setOption("sort", undefined, true);
+        }
+      });
+    }
+    */
+  }
+
+  @computed
+  get _key(){
+    if (this.alias) {
+      return this.alias;
+    }
+    return this.schema && this.schema.attribute;
+  }
+
+  @computed
+  get _uniqueKey(){
+    if (this.parent && this.parent.fields && this.parent.fields.length) {
+      if (this.parent.fields.some(field => field !== this && field._key === this._key)) {
+        return uniqueId("QueryBuilderField_" + this._key);
+      }
+    }
+    return this._key;
+  }
+
+  getDefaultAlias(){
+    let currentField = this;
+    while(currentField.isFlattened && currentField.fields[0] && currentField.fields[0].schema && currentField.fields[0].schema.canBe){
+      currentField = currentField.fields[0];
+    }
+    if (!currentField.schema) {
+      return "";
+    }
+    return currentField.schema.simpleAttributeName || currentField.schema.simplePropertyName || currentField.schema.label || "";
+  }
+}
 
 class QueryBuilderStore {
   @observable structure = null;
@@ -170,7 +221,7 @@ class QueryBuilderStore {
 
   @computed
   get isQueryIdValid(){
-    window.console.log(this.queryIdRegex.test(this.queryId));
+    //window.console.log(this.queryIdRegex.test(this.queryId));
     return this.queryIdRegex.test(this.queryId);
   }
 
@@ -178,14 +229,26 @@ class QueryBuilderStore {
   get hasChanged(){
     /*
     if (this.sourceQuery) {
-      window.console.log(this.JSONQuery.fields, toJS(this.sourceQuery.fields), isEqual(this.JSONQuery.fields, toJS(this.sourceQuery.fields)));
+      if (!isEqual(this.JSONQueryFields, toJS(this.sourceQuery.fields))) {
+        //window.console.log("Fields:", this.JSONQueryFields, toJS(this.sourceQuery.fields));
+        this.JSONQueryFields.forEach((field, index) => {
+          const origin = this.sourceQuery.fields[index];
+          if (!isEqual(field, toJS(origin))) {
+            window.console.log("Field:", field, toJS(origin));
+          }
+        });
+      }
+      if (!isEqual(this.JSONQueryProperties, toJS(this.sourceQuery.properties))) {
+        window.console.log("Properties:", this.JSONQueryProperties, toJS(this.sourceQuery.properties));
+      }
     }
     */
     return this.isValid && (this.sourceQuery === null
       || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
       || this.label !== this.sourceQuery.label
       || this.description !== this.sourceQuery.description
-      || !isEqual(this.JSONQuery.fields, toJS(this.sourceQuery.fields)));
+      || !isEqual(this.JSONQueryFields, toJS(this.sourceQuery.fields))
+      || !isEqual(this.JSONQueryProperties, toJS(this.sourceQuery.properties)));
   }
 
   @computed
@@ -232,14 +295,14 @@ class QueryBuilderStore {
   }
 
   @action
-  addField(schema, field, gotoField = true){
-    if(field === undefined) {
-      field = this.showModalFieldChoice || this.rootField;
+  addField(schema, parent, gotoField = true){
+    if(parent === undefined) {
+      parent = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
-    if(!field.getOption("flatten") || field.fields.length < 1){
-      let newField = new Field(schema, field);
-      field.fields.push(newField);
+    if(!parent.isFlattened || parent.fields.length < 1){
+      let newField = new Field(schema, parent);
+      parent.fields.push(newField);
       if(gotoField){
         this.selectField(newField);
       }
@@ -309,107 +372,191 @@ class QueryBuilderStore {
   }
 
   @computed
-  get JSONQuery(){
-    const json = {
-      "@context": toJS(this.context)
-    };
+  get JSONQueryFields(){
+    const json = {};
     this._processFields(json, this.rootField);
+    if (!json.fields) {
+      return undefined;
+    }
     //Gets rid of the undefined values
-    return JSON.parse(JSON.stringify(json));
+    return JSON.parse(JSON.stringify(json.fields));
   }
 
-  _processFields(json, field){
-    field.fields.forEach(field => {
-      if(json.fields === undefined){
-        json.fields = [];
+  @computed
+  get JSONQueryProperties(){
+    const json = {};
+    this.rootField.options.forEach(({name, value}) => {
+      const cleanValue = toJS(value);
+      if (cleanValue !== undefined) {
+        json[name] = cleanValue;
       }
-      let jsonField = {
-        "fieldname":"query:"+(field.getOption("alias") || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label),
-        "relative_path":{"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined},
-        "required":field.getOption("required") === true? true: undefined,
-        "sort":field.getOption("sort") === true? true: undefined,
-        "ensure_order":field.getOption("ensure_order") === true? true: undefined,
-      };
-      if(field.getOption("flatten")){
-        let topField = field;
+    });
+    return json;
+  }
+
+  @computed
+  get JSONQuery(){
+    const json = this.JSONQueryProperties;
+    json["@context"] = toJS(this.context);
+    if (this.JSONQueryFields) {
+      json.fields = this.JSONQueryFields;
+    }
+    return json;
+  }
+
+  _processFields(json, field) {
+    const jsonFields = [];
+    field.fields.forEach(field => {
+      let jsonField = {};
+      jsonField.fieldname = (field.namespace?field.namespace:"query") + ":" + (field.alias || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label);
+      if (field.schema.attribute)  {
+        const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName)?(field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)):field.schema.attribute;
+        if (field.schema.reverse) {
+          jsonField.relative_path = {
+            "@id": relativePath,
+            "reverse": true
+          };
+        } else {
+          jsonField.relative_path = relativePath;
+        }
+      }
+      field.options.forEach(({name, value}) => jsonField[name] = toJS(value));
+      if (field.isFlattened) {
+        const topField = field;
         jsonField.relative_path = [jsonField.relative_path];
-        while(field.getOption("flatten") && field.fields[0]){
+        while (field.isFlattened && field.fields[0]) {
           field = field.fields[0];
-          jsonField.relative_path.push({"@id":field.schema.attribute, "reverse":field.schema.reverse === true? true: undefined});
-          if(field.fields && field.fields.length){
-            jsonField.fieldname = "query:"+(topField.getOption("alias") || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label);
+          const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName)?(field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)):field.schema.attribute;
+          if (field.schema.reverse) {
+            jsonField.relative_path.push(
+              {
+                "@id": relativePath,
+                "reverse": true
+              }
+            );
+          } else {
+            jsonField.relative_path.push(relativePath);
+          }
+          if (field.fields && field.fields.length) {
+            jsonField.fieldname = (topField.namespace?topField.namespace:"query") + ":" + (topField.alias || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label);
           }
         }
       }
-      json.fields.push(jsonField);
       if(field.fields && field.fields.length){
         this._processFields(jsonField, field);
       }
+      jsonFields.push(jsonField);
     });
+    if (jsonFields.length > 1) {
+      json.fields = jsonFields;
+    } else if (jsonFields.length === 1) {
+      json.fields = jsonFields[0];
+    }
   }
 
   _processJsonSpecificationFields(parentField, jsonFields) {
     if (parentField && jsonFields && jsonFields.length) {
+      const namespaceReg = /^(.+):(.+)$/;
+      const attributeReg = /^https?:\/\/.+\/(.+)$/;
       jsonFields.forEach(jsonField => {
-        const relativePath = jsonField["relative_path"];
-        const isFlatten = !!relativePath && relativePath.length !== undefined && relativePath.length > 1;
-        const flattenRelativePath = !isFlatten?null:(relativePath.length > 2?relativePath.slice(1):relativePath[1]);
-        const id = relativePath && (isFlatten?(relativePath[0] && relativePath[0]["@id"]):relativePath["@id"]);
-        if (relativePath && id
-          && parentField.schema && parentField.schema.canBe && parentField.schema.canBe.length) {
-          let property = null;
-          parentField.schema.canBe.some(schemaId => {
-            const schema = this.findSchemaById(schemaId);
-            if (schema && schema.properties && schema.properties.length) {
-              property = schema.properties.find(property => property.attribute === id);
-              return !!property;
-            }
-            return false;
-          });
-          if (property) {
-            if (!parentField.fields || parentField.fields.length === undefined) {
-              parentField.fields = [];
-            }
-            const field = new Field(property, parentField);
-            const reg = /^query:(.+)$/;
-            const [ , alias] = reg.test(jsonField.fieldname)?jsonField.fieldname.match(reg):[null, null];
-            if (alias && alias !== property.simpleAttributeName && alias !== property.simplePropertyName && alias !== property.label) {
-              field.setOption("alias", alias);
-            }
-            if (jsonField.required) {
-              field.setOption("required", true);
-            }
-            if (jsonField.sort) {
-              field.setOption("sort", true);
-            }
-            if (jsonField.ensure_order) {
-              field.setOption("ensure_order", true);
-            }
-            parentField.fields.push(field);
-            if (isFlatten) {
-              const childrenJsonFields = [
-                {
-                  "relative_path": flattenRelativePath,
-                  fields: jsonField.fields
-                }
-              ];
-              this._processJsonSpecificationFields(field, childrenJsonFields);
-              if (flattenRelativePath.length || field.fields && field.fields.length === 1) {
-                field.setOption("flatten", true);
-              }
-            } else {
-              this._processJsonSpecificationFields(field, jsonField.fields);
-            }
-          } else {
-            window.console.log(`"${id}" schema is not available in current api structure and will be ignored.`);
+        if (!parentField.fields || parentField.fields.length === undefined) {
+          parentField.fields = [];
+        }
+        let field = null;
+        if (jsonField.relative_path) {
+          const jsonRP = jsonField.relative_path;
+          let isUnknown = false;
+          const isFlattened = !!jsonRP && typeof jsonRP !== "string" && jsonRP.length !== undefined && jsonRP.length > 1;
+          const relativePath = jsonRP && (typeof jsonRP === "string"?jsonRP:(isFlattened?(jsonRP[0] && (typeof jsonRP[0] === "string"?jsonRP[0]:jsonRP[0]["@id"])):(typeof jsonRP === "string"?jsonRP:jsonRP["@id"])));
+          const reverse = jsonRP && (typeof jsonRP === "string"?false:(isFlattened?(jsonRP[0] && (typeof jsonRP[0] === "string"?false:jsonRP[0].reverse)):(typeof jsonRP === "string"?false:jsonRP.reverse)));
+          let attribute = null;
+          let attributeNamespace = null;
+          let simpleAttributeName = null;
+          if (attributeReg.test(relativePath)) {
+            attribute = relativePath;
+            [, simpleAttributeName] = relativePath.match(attributeReg);
+
+          } else if (namespaceReg.test(relativePath)) {
+            [, attributeNamespace, simpleAttributeName] = relativePath.match(namespaceReg);
+            attribute = this.context && this.context[attributeNamespace]?this.context[attributeNamespace] + simpleAttributeName:null;
+          } else if (relativePath === "@id") {
+            attribute = relativePath;
           }
+          let property = null;
+          if (attribute && parentField.schema && parentField.schema.canBe && parentField.schema.canBe.length) {
+            parentField.schema.canBe.some(schemaId => {
+              const schema = this.findSchemaById(schemaId);
+              if (schema && schema.properties && schema.properties.length) {
+                property = schema.properties.find(property => property.attribute === attribute);
+                return !!property;
+              }
+              return false;
+            });
+          }
+          if (!property) {
+            isUnknown = true;
+            property = {
+              attribute: attribute,
+              attributeNamespace: attributeNamespace,
+              simpleAttributeName: simpleAttributeName,
+              reverse: reverse
+            };
+          } else if (attributeNamespace) {
+            property.attributeNamespace = attributeNamespace;
+          }
+          field = new Field(property, parentField);
+          field.isUnknown = isUnknown;
+          field.isFlattened = isFlattened;
+          field.schema.reverse = reverse; // TODO: remove
+        }
+
+        if (jsonField.merge) {
+          if (!field) {
+            field = new Field({}, parentField);
+          }
+          field.isMerge = true;
+          field.isUnknown = true;
+        }
+
+        if (!field) {
+          window.console.log("Unknown field: ", jsonField, "possible schemas: ", toJS(parentField.schema.canBe));
+          field = new Field({}, parentField);
+          field.isInvalid = true;
+          field.isUnknown = true;
+        }
+        const [ , namespace, fieldname] = namespaceReg.test(jsonField.fieldname)?jsonField.fieldname.match(namespaceReg):[null, null, null];
+        if (namespace) {
+          field.namespace = namespace;
+        }
+        if (fieldname && fieldname !== field.schema.simpleAttributeName && fieldname !== field.schema.simplePropertyName && fieldname !== field.schema.label) {
+          field.alias = fieldname;
+        }
+        Object.entries(jsonField).forEach(([name, value]) => {
+          if (!fieldReservedProperties.includes(name)) {
+            field.setOption(name, value);
+          }
+        });
+        parentField.fields.push(field);
+        if (field.isFlattened) {
+          const flattenRelativePath = jsonField.relative_path.length > 2?jsonField.relative_path.slice(1):jsonField.relative_path[1];
+          const childrenJsonFields = [
+            {
+              relative_path: flattenRelativePath,
+              fields: jsonField.fields
+            }
+          ];
+          this._processJsonSpecificationFields(field, childrenJsonFields);
+          if (flattenRelativePath.length || field.fields && field.fields.length === 1) {
+            field.isflattened = true;
+          }
+        } else if (jsonField.fields) {
+          this._processJsonSpecificationFields(field, jsonField.fields instanceof Array?jsonField.fields:[jsonField.fields]);
         }
       });
     }
   }
 
-  _processJsonSpecification(schemaId, fields) {
-    const schema = this.findSchemaById(schemaId);
+  _processJsonSpecification(schema, fields, properties) {
     if (!schema) {
       return null;
     }
@@ -418,7 +565,8 @@ class QueryBuilderStore {
       label:schema.label,
       canBe:[schema.id]
     });
-    this._processJsonSpecificationFields(rootField, toJS(fields));
+    this._processJsonSpecificationFields(rootField, fields);
+    properties && Object.entries(properties).forEach(([name, value]) => rootField.setOption(name, value));
     return rootField;
   }
 
@@ -432,7 +580,7 @@ class QueryBuilderStore {
       this.description = query.description;
       this.sourceQuery = query;
       this.context = toJS(query.context);
-      this.rootField = this._processJsonSpecification(this.rootField.schema.id, query.fields);
+      this.rootField = this._processJsonSpecification(toJS(this.rootField.schema), toJS(query.fields), toJS(query.properties));
       this.isSaving = false;
       this.saveError = null;
       this.isRunning = false;
@@ -517,7 +665,8 @@ class QueryBuilderStore {
             this.sourceQuery.label = label;
             this.sourceQuery.description = description;
             this.sourceQuery.context = this.JSONQuery["@context"];
-            this.sourceQuery.fields = this.JSONQuery.fields;
+            this.sourceQuery.fields = this.JSONQueryFields;
+            this.sourceQuery.properties = this.JSONQueryProperties;
           } else if (!this.saveAsMode && this.queryIdAlreadyExists) {
             this.sourceQuery = this.specifications.find(spec => spec.id === queryId);
             this.sourceQuery.label = label;
@@ -528,7 +677,8 @@ class QueryBuilderStore {
               id: queryId,
               user: authStore.user.id,
               context: this.JSONQuery["@context"],
-              fields: this.JSONQuery.fields,
+              fields: this.JSONQueryFields,
+              properties: this.JSONQueryProperties,
               label: label,
               description: description,
               isDeleting: false,
@@ -585,24 +735,6 @@ class QueryBuilderStore {
     }
   }
 
-  _containsUnsupportedProperties = field => {
-    const unsupportedProperties = ["merge", "filter"];
-    const unsupportedRelativePathProperties = [];
-    if (!field) {
-      return true;
-    }
-    if (unsupportedProperties.some(property => field[property] !== undefined)) {
-      return true;
-    }
-    if (field.relative_path && unsupportedRelativePathProperties.some(property => field.relative_path[property] !== undefined)) {
-      return true;
-    }
-    if (field.fields && field.fields.length) {
-      return field.fields.some(this._containsUnsupportedProperties);
-    }
-    return false;
-  }
-
   @action
   async fetchQueries(){
     if (!this.isFetchingQueries) {
@@ -623,18 +755,38 @@ class QueryBuilderStore {
               if (jsonSpec && jsonSpec["@context"] && jsonSpec.fields && jsonSpec.fields.length && reg.test(jsonSpec._id)) { //jsonSpec["http://schema.org/identifier"]
                 const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
                 const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
-                if (schemaId === this.rootField.schema.id && !this._containsUnsupportedProperties(jsonSpec, queryId)) { //isQueryIdValid(queryId) &&
-                  const fields = jsonSpec.fields;
-                  this.specifications.push({
-                    id: queryId,
-                    org: org,
-                    user: jsonSpec._createdByUser,
-                    context: jsonSpec["@context"],
-                    fields: fields,
-                    label: jsonSpec.label?jsonSpec.label:"",
-                    description: jsonSpec.description?jsonSpec.description:"",
-                    isDeleting: false,
-                    deleteError: null
+                if (schemaId === this.rootField.schema.id) { //isQueryIdValid(queryId) &&
+                  jsonld.expand(jsonSpec, (expandErr, expanded) => {
+                    if (!expandErr) {
+                      jsonld.compact(expanded, jsonSpec["@context"], (compactErr, compacted)  =>{
+                        if (!compactErr) {
+                          //window.console.log(compacted);
+                          this.specifications.push({
+                            id: queryId,
+                            org: org,
+                            user: jsonSpec._createdByUser,
+                            context: compacted["@context"],
+                            fields: compacted.fields,
+                            properties: Object.entries(compacted)
+                              .filter(([name, ]) => !rootFieldReservedProperties.includes(name))
+                              .reduce((result, [name, value]) => {
+                                result[name] = value;
+                                return result;
+                              }, {}),
+                            label: jsonSpec.label?jsonSpec.label:"",
+                            description: jsonSpec.description?jsonSpec.description:"",
+                            isDeleting: false,
+                            deleteError: null
+                          });
+                        }
+                        else{
+                          window.console.log("error: was not able to compact JSON-LD", compactErr);
+                        }
+                      });
+                    }
+                    else{
+                      window.console.log("error: was not able to expand JSON-LD", expandErr);
+                    }
                   });
                 }
               }

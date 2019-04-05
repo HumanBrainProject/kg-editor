@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -98,7 +99,6 @@ const styles = {
     position:"relative",
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast1)",
-    overflow:"auto",
     color:"var(--ft-color-normal)"
   },
   savingLoader:{
@@ -244,7 +244,7 @@ export default class Query extends React.Component{
                   value={queryBuilderStore.description}
                   onChange={this.handleChangeDescription} />
               </div>
-              {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && !queryBuilderStore.isOneOfMySavedQueries && (
+              {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && !queryBuilderStore.isOneOfMySavedQueries && queryBuilderStore.sourceQuery.org && queryBuilderStore.sourceQuery.user && (
                 <div className={classes.author} >
                   <span>by user<User org={queryBuilderStore.sourceQuery.org} userId={queryBuilderStore.sourceQuery.user} /></span>
                 </div>
@@ -306,7 +306,9 @@ export default class Query extends React.Component{
           }
         </div>
         <div className={classes.schemas}>
-          <Field field={queryBuilderStore.rootField}/>
+          <Scrollbars autoHide>
+            <Field field={queryBuilderStore.rootField} />
+          </Scrollbars>
         </div>
         {queryBuilderStore.isSaving && (
           <div className={classes.savingLoader}>

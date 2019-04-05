@@ -149,7 +149,7 @@ export default class SavedQuery extends React.Component{
       <div className={`${classes.container} ${query.isDeleting?"is-deleting":""}`} key={query.id} onClick={this.handleSelect.bind(this)} onMouseLeave={this.handleCloseDeleteDialog.bind(this)} ref={ref=>this.wrapperRef = ref} >
         <div className={classes.name}>
           <span>{query.label?query.label:query.id} - <small title="queryId">{query.id}</small></span>
-          {showUser && (
+          {showUser && query.user && query.org && (
             <span className={`author ${enableDelete?"extra-padding":""}`}>by user<User org={query.org} userId={query.user} /></span>
           )}
           {enableDelete && !query.deleteError && !query.isDeleting && !this.state.showDeleteDialog && (

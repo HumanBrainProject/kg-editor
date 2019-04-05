@@ -18,7 +18,7 @@ export default class Fields extends React.Component{
       <div className={classes.container}>
         {field.fields.map(field => {
           return(
-            <Field field={field} key={field.id}/>
+            <Field field={field} key={field._uniqueKey}/>
           );
         })}
       </div>

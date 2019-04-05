@@ -30,6 +30,13 @@ const styles = {
       "--ft-color-louder":"#222222",
 
       "--ft-color-error":"#e74c3c",
+      "--bg-color-error-quiet":"#5b130b",
+      "--bg-color-error-normal":"#ac2415",
+      "--bg-color-error-loud":"#ac2415",
+
+      "--bg-color-warn-quiet":"#473600",
+      "--bg-color-warn-normal":"#8f6b00",
+      "--bg-color-warn-loud":"#b88a00",
 
       "--pane-box-shadow":"rgba(0,0,0,0.3)",
 

@@ -4,7 +4,10 @@ import { observer } from "mobx-react";
 import MultiToggle from "../../Components/MultiToggle";
 import injectStyles from "react-jss";
 import {sortBy} from "lodash";
-import {FormControl} from "react-bootstrap";
+import {FormControl, Button} from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactJson from "react-json-view";
+import ThemeRJV from "./ThemeRJV";
 
 const style = {
   container:{
@@ -71,9 +74,37 @@ const style = {
     marginBottom:"20px",
     "&:last-child":{
       marginBottom:0
+    },
+    "&.unsupported": {
+      display: "flex",
+      "& button": {
+        alignSelf: "flex-start",
+        display: "inline-block",
+        margin: "0 5px 0 0",
+        background: "var(--bg-color-ui-contrast1)",
+        color: "var(--ft-color-loud)",
+        borderColor: "var(--bg-color-ui-contrast1)",
+        "&:hover": {
+          background: "var(--bg-color-ui-contrast1)",
+          color: "var(--ft-color-louder)",
+          borderColor: "var(--bg-color-ui-contrast1)"
+        }
+      },
+      "& $optionLabel": {
+        alignSelf: "flex-start",
+        display: "inline"
+      },
+      "& strong": {
+        flex: 1,
+        display: "inline-block",
+        fontWeight: "normal",
+        color: "var(--ft-color-loud)",
+        "& .react-json-view": {
+          backgroundColor: "transparent !important"
+        }
+      }
     }
   },
-
   optionLabel:{
     fontWeight:"bold",
     marginBottom:"5px",
@@ -81,6 +112,26 @@ const style = {
       fontWeight:"normal",
       fontStyle:"italic"
     }
+  },
+  stringValue: {
+    color: "rgb(253, 151, 31)"
+  },
+  boolValue: {
+    color: "rgb(174, 129, 255)"
+  },
+  intValue: {
+    color: "rgb(204, 102, 51)"
+  },
+  floatValue: {
+    color: "rgb(84, 159, 61)"
+  },
+  dateValue: {
+    color: "rgb(45, 89, 168)"
+  },
+  typeValue: {
+    fontSize: "11px",
+    marginRight: "4px",
+    opacity: "0.8"
   }
 };
 
@@ -92,31 +143,16 @@ export default class Options extends React.Component{
     queryBuilderStore.addField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
   }
 
-  handleChangeRequired = value => {
-    queryBuilderStore.currentField.setOption("required", value);
-  }
-
-  handleChangeSort = value => {
-    queryBuilderStore.currentField.setOption("sort", value);
-    if (value) {
-      queryBuilderStore.currentField.parent.fields.forEach(field => {
-        if (field !== queryBuilderStore.currentField) {
-          field.setOption("sort", null);
-        }
-      });
-    }
-  }
-
-  handleChangeEnsureOrder = value => {
-    queryBuilderStore.currentField.setOption("ensure_order", value);
-  }
-
-  handleChangeFlatten= value => {
-    queryBuilderStore.currentField.setOption("flatten", value);
+  handleChangeFlatten = value => {
+    queryBuilderStore.currentField.isFlattened = !!value;
   }
 
   handleChangeName = e => {
-    queryBuilderStore.currentField.setOption("alias", e.target.value);
+    queryBuilderStore.currentField.alias = e.target.value;
+  }
+
+  handleChangeOption = (name, value) => {
+    queryBuilderStore.currentField.setOption(name, value);
   }
 
   render(){
@@ -124,10 +160,9 @@ export default class Options extends React.Component{
 
     return(
       <div className={classes.container}>
-        {queryBuilderStore.currentField !== queryBuilderStore.rootField &&
-          <div className={classes.fieldOptions}>
-            { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
-              !queryBuilderStore.currentField.parent.getOption("flatten") &&
+        <div className={classes.fieldOptions}>
+          { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
+              !queryBuilderStore.currentField.parent.isFlattened &&
               <div className={classes.option}>
                 <div className={classes.optionLabel}>
                   Target name <small>(only applicable if parent field is not flattened)</small>
@@ -135,76 +170,117 @@ export default class Options extends React.Component{
                 <div className={classes.optionInput}>
                   <FormControl type="text"
                     onChange={this.handleChangeName}
-                    value={queryBuilderStore.currentField.getOption("alias") || ""}
+                    value={queryBuilderStore.currentField.alias || ""}
                     placeholder={queryBuilderStore.currentField.getDefaultAlias()}/>
                 </div>
               </div>
-            }
+          }
 
-            { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
-              !queryBuilderStore.currentField.parent.getOption("flatten") &&
-              <div className={classes.option}>
-                <div className={classes.optionLabel}>
-                  Required <small>(only applicable if parent field is not flattened)</small>
+          {queryBuilderStore.currentField.options.map(({name, value}) => {
+            if (name === "required") {
+              if (queryBuilderStore.currentField !== queryBuilderStore.rootField
+                   && !queryBuilderStore.currentField.parent.isFlattened) {
+                return (
+                  <div key={name} className={classes.option}>
+                    <div className={classes.optionLabel}>
+                        Required <small>(only applicable if parent field is not flattened)</small>
+                    </div>
+                    <div className={classes.optionInput}>
+                      <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
+                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
+                      </MultiToggle>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            } else if (name === "sort") {
+              if (queryBuilderStore.currentField !== queryBuilderStore.rootField
+                  && !queryBuilderStore.currentField.parent.isFlattened) {
+                return (
+                  <div key={name} className={classes.option}>
+                    <div className={classes.optionLabel}>
+                        Sort <small>(enabling sort on this field will disable sort on other fields)</small>
+                    </div>
+                    <div className={classes.optionInput}>
+                      <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
+                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
+                      </MultiToggle>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            } else if (name === "ensure_order") {
+              if (queryBuilderStore.currentField !== queryBuilderStore.rootField
+                  && queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe
+                  && !queryBuilderStore.currentField.parent.isFlattened) {
+                return (
+                  <div key={name} className={classes.option}>
+                    <div className={classes.optionLabel}>
+                        Ensure original order <small>(only applicable if parent field is not flattened)</small>
+                    </div>
+                    <div className={classes.optionInput}>
+                      <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
+                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
+                      </MultiToggle>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            } else if (value !== undefined) {
+              return (
+                <div key={name} className={`${classes.option} unsupported`}>
+                  <Button bsSize="xsmall" bsStyle="default" onClick={this.handleChangeOption.bind(this, name, undefined)} title={name === "merge"?`"${name}" property cannot be deleted`:`delete property "${name}"`} disabled={name === "merge"} >
+                    <FontAwesomeIcon icon="times"/>
+                  </Button>
+                  <div className={classes.optionLabel}>{name}:&nbsp;</div>
+                  <strong>
+                    {typeof value === "string"?
+                      <div className={classes.stringValue}><span className={classes.typeValue}>string</span>&quot;{value}&quot;</div>
+                      :
+                      typeof value === "boolean"?
+                        <div className={classes.boolValue}><span className={classes.typeValue}>bool</span>{value?"true":"false"}</div>
+                        :
+                        typeof value === "number"?
+                          Number.isInteger(value)?
+                            <div className={classes.intValue}><span className={classes.typeValue}>int</span>{value}</div>
+                            :
+                            <div className={classes.floatValue}><span className={classes.typeValue}>float</span>{value}</div>
+                          :
+                          <ReactJson collapsed={true} name={false} theme={ThemeRJV} src={value} enableClipboard={false}/>
+                    }
+                  </strong>
                 </div>
-                <div className={classes.optionInput}>
-                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("required")} onChange={this.handleChangeRequired}>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
-                  </MultiToggle>
-                </div>
-              </div>
+              );
+            } else {
+              return null;
             }
+          })}
 
-            { !queryBuilderStore.currentField.schema.canBe &&
-              <div className={classes.option}>
-                <div className={classes.optionLabel}>
-                  Sort <small>(enabling sort on this field will disable sort on other fields)</small>
-                </div>
-                <div className={classes.optionInput}>
-                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("sort")} onChange={this.handleChangeSort}>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
-                  </MultiToggle>
-                </div>
-              </div>
-            }
-
-            { queryBuilderStore.currentField.schema.canBe &&
-              !queryBuilderStore.currentField.parent.getOption("flatten") &&
-              <div className={classes.option}>
-                <div className={classes.optionLabel}>
-                  Ensure original order <small>(only applicable if parent field is not flattened)</small>
-                </div>
-                <div className={classes.optionInput}>
-                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("ensure_order")} onChange={this.handleChangeEnsureOrder}>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
-                  </MultiToggle>
-                </div>
-              </div>
-            }
-
-            {queryBuilderStore.currentField.schema.canBe
-              && queryBuilderStore.currentField !== queryBuilderStore.rootField
+          {queryBuilderStore.currentField !== queryBuilderStore.rootField
+              && queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe
               && queryBuilderStore.currentField.fields.length === 1
               && <div className={classes.option}>
                 <div className={classes.optionLabel}>
                   Flatten <small>(only applicable if this field has only one child field)</small>
                 </div>
                 <div className={classes.optionInput}>
-                  <MultiToggle selectedValue={queryBuilderStore.currentField.getOption("flatten")} onChange={this.handleChangeFlatten}>
+                  <MultiToggle selectedValue={queryBuilderStore.currentField.isFlattened} onChange={this.handleChangeFlatten}>
                     <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={null}/>
+                    <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={false}/>
                   </MultiToggle>
                 </div>
               </div>
-            }
-          </div>
-        }
+          }
+        </div>
 
-        {queryBuilderStore.currentField.schema.canBe &&
-         !queryBuilderStore.currentField.getOption("flatten") &&
+        {queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe &&
+         !queryBuilderStore.currentField.isFlattened &&
           <div className={classes.fields}>
             {queryBuilderStore.currentField.schema.canBe && queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
               return(
@@ -221,8 +297,8 @@ export default class Options extends React.Component{
               );
             })}
 
-            {queryBuilderStore.currentField.schema.canBe &&
-            !queryBuilderStore.currentField.getOption("flatten") &&
+            {queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe &&
+            !queryBuilderStore.currentField.isFlattened &&
             queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
               return(
                 <div key={schemaId}>

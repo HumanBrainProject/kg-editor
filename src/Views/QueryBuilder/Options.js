@@ -197,7 +197,7 @@ export default class Options extends React.Component{
               return null;
             } else if (name === "sort") {
               if (queryBuilderStore.currentField !== queryBuilderStore.rootField
-                  && !queryBuilderStore.currentField.parent.isFlattened) {
+                  && !queryBuilderStore.currentField.schema.canBe) {
                 return (
                   <div key={name} className={classes.option}>
                     <div className={classes.optionLabel}>
@@ -215,7 +215,7 @@ export default class Options extends React.Component{
               return null;
             } else if (name === "ensure_order") {
               if (queryBuilderStore.currentField !== queryBuilderStore.rootField
-                  && queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe
+                  && queryBuilderStore.currentField.schema.canBe
                   && !queryBuilderStore.currentField.parent.isFlattened) {
                 return (
                   <div key={name} className={classes.option}>
@@ -263,11 +263,12 @@ export default class Options extends React.Component{
           })}
 
           {queryBuilderStore.currentField !== queryBuilderStore.rootField
-              && queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe
-              && queryBuilderStore.currentField.fields.length === 1
-              && <div className={classes.option}>
+            && queryBuilderStore.currentField.schema.canBe
+            && queryBuilderStore.currentField.fields.length === 1
+            && (
+              <div className={classes.option}>
                 <div className={classes.optionLabel}>
-                  Flatten <small>(only applicable if this field has only one child field)</small>
+                Flatten <small>(only applicable if this field has only one child field)</small>
                 </div>
                 <div className={classes.optionInput}>
                   <MultiToggle selectedValue={queryBuilderStore.currentField.isFlattened} onChange={this.handleChangeFlatten}>
@@ -276,10 +277,10 @@ export default class Options extends React.Component{
                   </MultiToggle>
                 </div>
               </div>
-          }
+            )}
         </div>
 
-        {queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe &&
+        {queryBuilderStore.currentField.schema.canBe &&
          !queryBuilderStore.currentField.isFlattened &&
           <div className={classes.fields}>
             {queryBuilderStore.currentField.schema.canBe && queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
@@ -297,7 +298,7 @@ export default class Options extends React.Component{
               );
             })}
 
-            {queryBuilderStore.currentField.schema && queryBuilderStore.currentField.schema.canBe &&
+            {queryBuilderStore.currentField.schema.canBe &&
             !queryBuilderStore.currentField.isFlattened &&
             queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
               return(

@@ -401,7 +401,7 @@ export default class Query extends React.Component{
                         })}
                       </pre>
                     </Scrollbars>
-                    </div>
+                  </div>
                 </Modal.Body>
               </Modal>
         }

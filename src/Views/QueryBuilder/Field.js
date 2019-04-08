@@ -142,7 +142,19 @@ export default class Field extends React.Component{
             </span>
           )}
           {field.isMerge?
-            <FontAwesomeIcon transform="shrink-8" icon="sitemap"/>
+            <React.Fragment>
+              <FontAwesomeIcon transform="shrink-8" icon="sitemap"/>
+              {!field.parent && (
+                <React.Fragment>
+                  &nbsp;&nbsp;{field.schema.label}&nbsp;
+                  {field.schema.canBe && field.schema.canBe.length && (
+                    <span className={classes.canBe}>
+                      ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
+                    </span>
+                  )}
+                </React.Fragment>
+              )}
+            </React.Fragment>
             :
             field.isUnknown?
               <React.Fragment>
@@ -153,9 +165,9 @@ export default class Field extends React.Component{
               <React.Fragment>
                 {field.schema.label}&nbsp;
                 {field.schema.canBe && field.schema.canBe.length &&
-              <span className={classes.canBe}>
-                ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
-              </span>}
+                <span className={classes.canBe}>
+                  ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
+                </span>}
               </React.Fragment>
           }
           {field.parent && !field.parent.isFlattened && (

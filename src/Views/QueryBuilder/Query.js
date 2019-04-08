@@ -1,9 +1,11 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import { Button } from "react-bootstrap";
+import {Button, Modal} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars";
+import Color from "color";
+const jsdiff = require("diff");
 
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -146,6 +148,48 @@ const styles = {
         marginLeft: "20px"
       }
     }
+  },
+  compareModal:{
+    width:"90%",
+    "@media screen and (min-width:1024px)": {
+      width:"900px",
+    },
+    "& .modal-body": {
+      height: "calc(95vh - 112px)",
+      padding: "3px 0"
+    }
+  },
+  comparison:{
+    height: "100%",
+    padding: "20px",
+    "& pre": {
+      border: 0,
+      margin: 0,
+      padding: 0,
+      display: "inline",
+      background: "transparent",
+      wordBreak: "break-word",
+      overflowWrap: "anywhere",
+      "& span": {
+        whiteSpace: "pre-wrap"
+      }
+    }
+  },
+  removed:{
+    background:new Color("#e74c3c").lighten(0.6).hex(),
+    textDecoration: "line-through",
+    "& + $added": {
+      marginLeft: "3px"
+    }
+  },
+  added:{
+    background:new Color("#2ecc71").lighten(0.6).hex(),
+    "& + $removed": {
+      marginLeft: "3px"
+    }
+  },
+  unchanged: {
+
   }
 };
 
@@ -185,6 +229,10 @@ export default class Query extends React.Component{
     queryBuilderStore.saveAsMode = false;
   }
 
+  handleToggleCompareChanges = () => {
+    queryBuilderStore.compareChanges = !queryBuilderStore.compareChanges;
+  };
+
   render(){
     const { classes } = this.props;
 
@@ -192,9 +240,11 @@ export default class Query extends React.Component{
       return null;
     }
 
+    const diff = jsdiff.diffJson(queryBuilderStore.JSONSourceQuery, queryBuilderStore.JSONQuery);
+
     return (
       <div className={classes.container}>
-        <div className={`${classes.info} ${queryBuilderStore.isQuerySaved || queryBuilderStore.isValid?"available":""}`}>
+        <div className={`${classes.info} ${queryBuilderStore.isQuerySaved || !queryBuilderStore.isQueryEmpty?"available":""}`}>
           {(queryBuilderStore.isQuerySaved || queryBuilderStore.saveAsMode) && (
             <React.Fragment>
               <div>
@@ -261,16 +311,19 @@ export default class Query extends React.Component{
                     <small></small>
                   }
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
                   <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}</small>
                   {queryBuilderStore.hasChanged && (
+                    <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
+                  )}
+                  {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies &&  (
                     <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
-                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
               :
               queryBuilderStore.saveAsMode?
@@ -281,22 +334,25 @@ export default class Query extends React.Component{
                     <small></small>
                   }
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
                   <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}</small>
                   {queryBuilderStore.hasChanged && (
+                    <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
+                  )}
+                  {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies && (
                     <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
                   )}
-                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.isValid} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
                 </div>
             :
             queryBuilderStore.saveAsMode?
               <div className={classes.save}>
                 <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
                 <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || !queryBuilderStore.isValid || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
               </div>
               :
               <div className={classes.save}>
@@ -326,6 +382,29 @@ export default class Query extends React.Component{
             </div>
           </div>
         )}
+        {queryBuilderStore.compareChanges &&
+              <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleToggleCompareChanges}>
+                <Modal.Header closeButton>
+                  <strong>{queryBuilderStore.queryId}</strong>
+                </Modal.Header>
+                <Modal.Body>
+                  <div className={classes.comparison}>
+                    <Scrollbars autoHide>
+                      <pre>
+                        {diff.map(part => {
+                          if (!part.value) {
+                            return null;
+                          }
+                          return (
+                            <span key={part.value} className={part.added?classes.added:part.removed?classes.removed:classes.unchanged}>{part.value}</span>
+                          );
+                        })}
+                      </pre>
+                    </Scrollbars>
+                    </div>
+                </Modal.Body>
+              </Modal>
+        }
       </div>
     );
   }

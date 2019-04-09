@@ -35,6 +35,7 @@ const styles = {
       }
     },
     "& h4": {
+      display: "inline-block",
       marginTop: 0,
       marginBottom: "8px"
     }
@@ -98,10 +99,29 @@ const styles = {
   save: {
     gridColumnStart: "span 2",
     display: "flex",
-    "& span": {
+    "&.collapsed": {
+      display: "block",
+      textAlign: "right",
+      "@media screen and (min-width:1600px)": {
+        display: "flex"
+      },
+      "& > div, & > span": {
+        marginBottom: "10px",
+        paddingBottom: "10px",
+        borderBottom: "1px solid var(--ft-color-quiet)",
+        "@media screen and (min-width:1600px)": {
+          marginBottom: 0,
+          paddingBottom: 0,
+          borderBottom: 0
+        }
+      }
+    },
+    "& > div, & > span": {
       flex: 1,
-      paddingTop: "6px",
       color: "var(--ft-color-normal)"
+    },
+    "& > span": {
+      paddingTop: "6px",
     },
     "& button": {
       marginLeft: "10px"
@@ -211,6 +231,49 @@ const styles = {
     position:"absolute",
     right:"12px",
     top:"9px"
+  },
+  collapsedHeader: {
+    display: "flex",
+    color: "var(--ft-color-loud)",
+    "& button": {
+      "margin": "0 !important",
+      "& svg": {
+        transform: "rotateX(180deg)"
+      }
+    },
+    "& h4": {
+      display: "inline",
+      alignSelf: "center",
+      margin: 0,
+      padding: 0
+    },
+    "& input": {
+      display: "inline",
+      width: "auto",
+      padding: "6px",
+      "& + button": {
+        margin: "6px !important",
+        position: "absolute",
+        top: "10px",
+        right: "6px",
+        "@media screen and (min-width:1600px)": {
+          position: "relative",
+          top: "unset",
+          right: "unset"
+        }
+      }
+    }
+  },
+  fontAwesomeIconButton: {
+    display: "inline-block",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    background: "transparent",
+    outline: 0,
+    "&:hover": {
+      outline: 0
+    }
   }
 };
 
@@ -262,6 +325,10 @@ export default class Query extends React.Component{
     queryBuilderStore.setAsNewQuery();
   };
 
+  handleHeaderToggle= () => {
+    queryBuilderStore.showHeader = !queryBuilderStore.showHeader;
+  };
+
   render(){
     const { classes } = this.props;
 
@@ -274,9 +341,14 @@ export default class Query extends React.Component{
     return (
       <div className={classes.container}>
         <div className={`${classes.info} ${queryBuilderStore.isQuerySaved || !queryBuilderStore.isQueryEmpty?"available":""}`}>
-          {(queryBuilderStore.isQuerySaved || queryBuilderStore.saveAsMode) && (
+          {((queryBuilderStore.isQuerySaved && queryBuilderStore.showHeader) || queryBuilderStore.saveAsMode) && (
             <React.Fragment>
               <div>
+                {!queryBuilderStore.saveAsMode && (
+                  <React.Fragment>
+                    <button className={classes.fontAwesomeIconButton} onClick={this.handleHeaderToggle}><FontAwesomeIcon icon="angle-down"/></button>&nbsp;&nbsp;
+                  </React.Fragment>
+                )}
                 <h4>Query :</h4>
                 <input
                   className={`form-control ${classes.input}`}
@@ -330,7 +402,7 @@ export default class Query extends React.Component{
               )}
             </React.Fragment>
           )}
-          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && (
+          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && queryBuilderStore.showHeader && (
             <div className={classes.links}>
               <h6>To go further: </h6>
               <ul>
@@ -346,59 +418,91 @@ export default class Query extends React.Component{
               </ul>
             </div>
           )}
-          {queryBuilderStore.isQuerySaved?
-            queryBuilderStore.isOneOfMySavedQueries?
-              queryBuilderStore.saveAsMode?
-                <div className={classes.save}>
-                  <span></span>
-                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
-                </div>
+          <div className={`${classes.save} ${queryBuilderStore.showHeader?"expanded":"collapsed"}`}>
+            {queryBuilderStore.isQuerySaved?
+              queryBuilderStore.isOneOfMySavedQueries?
+                queryBuilderStore.saveAsMode?
+                  <React.Fragment>
+                    <div></div>
+                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
+                    <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  </React.Fragment>
+                  :
+                  <React.Fragment>
+                    <div>
+                      {!queryBuilderStore.showHeader && (
+                        <div className={classes.collapsedHeader}>
+                          <button className={classes.fontAwesomeIconButton} onClick={this.handleHeaderToggle}><FontAwesomeIcon icon="angle-down"/></button>
+                          &nbsp;&nbsp;<h4>Query :</h4>
+                          &nbsp;&nbsp;<input
+                            className={`form-control ${classes.input}`}
+                            disabled={true}
+                            type="text"
+                            value={queryBuilderStore.sourceQuery.id} />
+                          &nbsp;&nbsp;<Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleNewQuery} disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} title="Detach as a new query">
+                            <FontAwesomeIcon icon="times"/>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    {queryBuilderStore.hasChanged && (
+                      <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
+                    )}
+                    {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies &&  (
+                      <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Undo changes</Button>
+                    )}
+                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                    <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  </React.Fragment>
                 :
-                <div className={classes.save}>
-                  <span></span>
-                  {queryBuilderStore.hasChanged && (
-                    <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
-                  )}
-                  {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies &&  (
-                    <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Undo changes</Button>
-                  )}
-                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
-                </div>
+                queryBuilderStore.saveAsMode?
+                  <React.Fragment>
+                    <div></div>
+                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
+                    <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                  </React.Fragment>
+                  :
+                  <React.Fragment>
+                    <div>
+                      {!queryBuilderStore.showHeader && (
+                        <div className={classes.collapsedHeader}>
+                          <button className={classes.fontAwesomeIconButton} onClick={this.handleHeaderToggle}><FontAwesomeIcon icon="angle-down"/></button>
+                          &nbsp;&nbsp;<h4>Query :</h4>
+                          &nbsp;&nbsp;<input
+                            className={`form-control ${classes.input}`}
+                            disabled={true}
+                            type="text"
+                            value={queryBuilderStore.sourceQuery.id} />
+                          &nbsp;&nbsp;<Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleNewQuery} disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} title="Detach as a new query">
+                            <FontAwesomeIcon icon="times"/>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    {queryBuilderStore.hasChanged && (
+                      <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
+                    )}
+                    {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies && (
+                      <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Undo changes</Button>
+                    )}
+                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                  </React.Fragment>
               :
               queryBuilderStore.saveAsMode?
-                <div className={classes.save}>
-                  <span></span>
+                <React.Fragment>
+                  <div></div>
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
-                </div>
+                  <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
+                </React.Fragment>
                 :
-                <div className={classes.save}>
-                  <span></span>
-                  {queryBuilderStore.hasChanged && (
-                    <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
-                  )}
-                  {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies && (
-                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Undo changes</Button>
-                  )}
-                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
-                </div>
-            :
-            queryBuilderStore.saveAsMode?
-              <div className={classes.save}>
-                <span></span>
-                <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
-                <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
-              </div>
-              :
-              <div className={classes.save}>
-                <span><span className={classes.tip}><FontAwesomeIcon icon={"lightbulb"} />&nbsp;&nbsp;Click on &quot;Save As&quot; to save your query.</span></span>
-                <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleResetQuery}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Reset</Button>
-                <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
-              </div>
-          }
-          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && (
+                <React.Fragment>
+                  <span><span className={classes.tip}><FontAwesomeIcon icon={"lightbulb"} />&nbsp;&nbsp;Click on &quot;Save As&quot; to save your query.</span></span>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleResetQuery}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Reset</Button>
+                  <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
+                </React.Fragment>
+            }
+          </div>
+          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && queryBuilderStore.showHeader && (
             <div className={classes.newQueryButton}>
               <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleNewQuery} disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} title="Detach as a new query">
                 <FontAwesomeIcon icon="times"/>

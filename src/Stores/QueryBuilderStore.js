@@ -132,6 +132,7 @@ class QueryBuilderStore {
   @observable isRunning = false;
   @observable runError = null;
   @observable saveAsMode = false;
+  @observable showHeader = true;
   @observable showQueries = false;
   @observable showMyQueries = true;
   @observable showOthersQueries = true;
@@ -183,6 +184,10 @@ class QueryBuilderStore {
       this.isRunning = false;
       this.runError = null;
       this.saveAsMode = false;
+      this.showHeader = true;
+      this.showQueries = false;
+      this.showMyQueries = true;
+      this.showOthersQueries = true;
       this.selectField(this.rootField);
       this.fetchQueries();
     }
@@ -203,6 +208,10 @@ class QueryBuilderStore {
       this.isRunning = false;
       this.runError = null;
       this.saveAsMode = false;
+      this.showHeader = true;
+      this.showQueries = false;
+      this.showMyQueries = true;
+      this.showOthersQueries = true;
       this.selectField(this.rootField);
     }
   }
@@ -219,7 +228,11 @@ class QueryBuilderStore {
       this.saveError = null;
       this.isRunning = false;
       this.runError = null;
+      this.showHeader = true;
       this.saveAsMode = false;
+      this.showQueries = false;
+      this.showMyQueries = true;
+      this.showOthersQueries = true;
     }
   }
 
@@ -670,6 +683,9 @@ class QueryBuilderStore {
       this.queryId = query.id + "-Copy";
       this.label = query.label;
       this.description = query.description;
+      if (this.sourceQuery !== query) { // reset
+        this.showHeader = true;
+      }
       this.sourceQuery = query;
       this.context = toJS(query.context);
       this.rootField = this._processJsonSpecification(toJS(this.rootField.schema), toJS(query.fields), toJS(query.properties));
@@ -678,6 +694,7 @@ class QueryBuilderStore {
       this.isRunning = false;
       this.runError = null;
       this.saveAsMode = false;
+      this.showQueries = false;
       this.selectField(this.rootField);
       this.savedQueryHasInconsistencies = this.hasQueryChanged;
     }

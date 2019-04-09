@@ -79,19 +79,29 @@ const styles = {
       marginTop: "20px"
     }
   },
+  links: {
+    gridColumnStart: "span 2",
+    marginTop: "10px",
+    color: "var(--ft-color-normal)",
+    "& a, & a:visited, &a:active": {
+      color: "var(--ft-color-loud)",
+      "&:hover": {
+        color: "var(--ft-color-louder)",
+      }
+    },
+    "& + $save": {
+      marginTop: "10px",
+      paddingTop: "10px",
+      borderTop: "1px solid var(--ft-color-quiet)"
+    }
+  },
   save: {
     gridColumnStart: "span 2",
     display: "flex",
     "& span": {
-      color: "var(--ft-color-normal)"
-    },
-    "& small": {
-      color:"var(--ft-color-quiet)",
-      fontStyle:"italic"
-    },
-    "& small, & span": {
       flex: 1,
-      paddingTop: "6px"
+      paddingTop: "6px",
+      color: "var(--ft-color-normal)"
     },
     "& button": {
       marginLeft: "10px"
@@ -320,21 +330,33 @@ export default class Query extends React.Component{
               )}
             </React.Fragment>
           )}
+          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && (
+            <div className={classes.links}>
+              <h6>To go further: </h6>
+              <ul>
+                <li>
+                  <a href="/apidoc/index.html?url=/apispec/spring%3Fgroup%3D0_public%0A#/query-api/executeStoredQueryUsingGET_2" rel="noopener noreferrer" target="_blank">Service API documentation</a> to query {queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}
+                </li>
+                <li>
+                  Get <a href={`/query/${queryBuilderStore.rootSchema.id}/${queryBuilderStore.sourceQuery.id}/python`} rel="noopener noreferrer" target="_blank">python code</a> for this stored query
+                </li>
+                <li>
+                  Get <a href={`/query/${queryBuilderStore.rootSchema.id}/${queryBuilderStore.sourceQuery.id}/python/pip`}rel="noopener noreferrer" target="_blank">PyPi compatible python code</a> for this stored query
+                </li>
+              </ul>
+            </div>
+          )}
           {queryBuilderStore.isQuerySaved?
             queryBuilderStore.isOneOfMySavedQueries?
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  {(queryBuilderStore.isQueryIdValid && !queryBuilderStore.queryIdAlreadyInUse && !queryBuilderStore.queryIdAlreadyExists)?
-                    <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
-                    :
-                    <small></small>
-                  }
+                  <span></span>
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
                   <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}</small>
+                  <span></span>
                   {queryBuilderStore.hasChanged && (
                     <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
                   )}
@@ -347,17 +369,13 @@ export default class Query extends React.Component{
               :
               queryBuilderStore.saveAsMode?
                 <div className={classes.save}>
-                  {(queryBuilderStore.isQueryIdValid && !queryBuilderStore.queryIdAlreadyInUse && !queryBuilderStore.queryIdAlreadyExists)?
-                    <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
-                    :
-                    <small></small>
-                  }
+                  <span></span>
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
                   <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || queryBuilderStore.queryIdAlreadyExists} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
                 </div>
                 :
                 <div className={classes.save}>
-                  <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.sourceQuery.id}</small>
+                  <span></span>
                   {queryBuilderStore.hasChanged && (
                     <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
                   )}
@@ -369,7 +387,7 @@ export default class Query extends React.Component{
             :
             queryBuilderStore.saveAsMode?
               <div className={classes.save}>
-                <small>query api: /query/{queryBuilderStore.rootSchema.id}/{queryBuilderStore.queryId}</small>
+                <span></span>
                 <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleHideSaveDialog}>Cancel</Button>
                 <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
               </div>

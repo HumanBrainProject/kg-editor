@@ -38,6 +38,9 @@ const styles = {
       "--bg-color-warn-normal":"#8f6b00",
       "--bg-color-warn-loud":"#b88a00",
 
+      "--ft-color-info":"#24282a",
+      "--bg-color-info-normal":"#ffc107",
+
       "--pane-box-shadow":"#333",
 
       "--release-color-released":"rgb(52, 152, 219)",

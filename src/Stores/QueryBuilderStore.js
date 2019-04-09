@@ -162,6 +162,7 @@ class QueryBuilderStore {
     return this.queryIdRegex.source;
   }
 
+  @action
   selectRootSchema(schema){
     if (!this.isSaving) {
       this.queryId = "";
@@ -182,6 +183,41 @@ class QueryBuilderStore {
       this.saveAsMode = false;
       this.selectField(this.rootField);
       this.fetchQueries();
+    }
+  }
+
+  @action
+  resetRootSchema(){
+    if (!this.isSaving) {
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.context = toJS(defaultContext);
+      this.sourceQuery = null;
+      this.savedQueryHasInconsistencies = false;
+      this.rootField = new Field(this.rootField.schema);
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
+      this.saveAsMode = false;
+      this.selectField(this.rootField);
+    }
+  }
+
+  @action
+  setAsNewQuery(){
+    if (!this.isSaving) {
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.sourceQuery = null;
+      this.savedQueryHasInconsistencies = false;
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
+      this.saveAsMode = false;
     }
   }
 

@@ -190,6 +190,17 @@ const styles = {
   },
   unchanged: {
 
+  },
+  tip: {
+    padding: "10px",
+    borderRadius: "4px",
+    background:"var(--bg-color-ui-contrast4)",
+    color: "var(--ft-color-normal)"
+  },
+  newQueryButton: {
+    position:"absolute",
+    right:"12px",
+    top:"9px"
   }
 };
 
@@ -231,6 +242,14 @@ export default class Query extends React.Component{
 
   handleToggleCompareChanges = () => {
     queryBuilderStore.compareChanges = !queryBuilderStore.compareChanges;
+  };
+
+  handleResetQuery = () => {
+    queryBuilderStore.resetRootSchema();
+  };
+
+  handleNewQuery = () => {
+    queryBuilderStore.setAsNewQuery();
   };
 
   render(){
@@ -320,7 +339,7 @@ export default class Query extends React.Component{
                     <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
                   )}
                   {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies &&  (
-                    <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
+                    <Button bsStyle="default" onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Undo changes</Button>
                   )}
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
                   <Button bsStyle="primary" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged || queryBuilderStore.isQueryEmpty || !queryBuilderStore.isQueryIdValid || queryBuilderStore.queryIdAlreadyInUse || (queryBuilderStore.sourceQuery && queryBuilderStore.sourceQuery.isDeleting)} onClick={this.handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save</Button>
@@ -343,7 +362,7 @@ export default class Query extends React.Component{
                     <Button disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasQueryChanged}  onClick={this.handleToggleCompareChanges}><FontAwesomeIcon icon="glasses"/>&nbsp;Compare</Button>
                   )}
                   {queryBuilderStore.hasChanged && !queryBuilderStore.savedQueryHasInconsistencies && (
-                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert unsaved changes</Button>
+                    <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleRevertChanges}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Undo changes</Button>
                   )}
                   <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || queryBuilderStore.isQueryEmpty} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
                 </div>
@@ -356,10 +375,18 @@ export default class Query extends React.Component{
               </div>
               :
               <div className={classes.save}>
-                <span>Click on &quot;Save As&quot; to save your query.</span>
+                <span><span className={classes.tip}><FontAwesomeIcon icon={"lightbulb"} />&nbsp;&nbsp;Click on &quot;Save As&quot; to save your query.</span></span>
+                <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} onClick={this.handleResetQuery}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Reset</Button>
                 <Button bsStyle="default" disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError || !queryBuilderStore.hasChanged} onClick={this.handleShowSaveDialog}><FontAwesomeIcon icon="save"/>&nbsp;Save As</Button>
               </div>
           }
+          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && (
+            <div className={classes.newQueryButton}>
+              <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleNewQuery} disabled={queryBuilderStore.isSaving || !!queryBuilderStore.saveError} title="Detach as a new query">
+                <FontAwesomeIcon icon="times"/>
+              </Button>
+            </div>
+          )}
         </div>
         <div className={classes.schemas}>
           <Scrollbars autoHide>

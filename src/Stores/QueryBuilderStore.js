@@ -132,6 +132,7 @@ class QueryBuilderStore {
   @observable isRunning = false;
   @observable runError = null;
   @observable saveAsMode = false;
+  @observable showQueries = false;
   @observable showMyQueries = true;
   @observable showOthersQueries = true;
   @observable saveAsMode = false;
@@ -149,6 +150,7 @@ class QueryBuilderStore {
 
   @observable currentTab = "query";
   @observable currentField = null;
+
 
   constructor(){
     this.fetchStructure();

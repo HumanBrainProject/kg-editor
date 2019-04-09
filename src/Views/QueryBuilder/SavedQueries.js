@@ -46,7 +46,8 @@ let styles = {
         transition: "transform 0.3s ease"
       },
       "& + h4": {
-        margin: "0 0 0 6px"
+        margin: "0 0 0 6px",
+        cursor: "pointer"
       }
     },
     "& h4": {
@@ -85,7 +86,7 @@ export default class SavedQueries extends React.Component{
             {typeof onExpandToggle === "function" && (
               <button className={`toggle-btn ${expanded !== false?"":"collapse"}`} onClick={onExpandToggle}><FontAwesomeIcon icon="angle-down"/></button>
             )}
-            <h4>{title}<small>{subTitle?(" - " + subTitle):""}</small></h4>
+            <h4 onClick={onExpandToggle}>{title}<small>{subTitle?(" - " + subTitle):""}</small></h4>
             {typeof onRefresh === "function" && (
               <button className="refresh-btn" onClick={onRefresh} title="Refresh"><FontAwesomeIcon icon="redo-alt"/></button>
             )}

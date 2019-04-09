@@ -7,7 +7,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
 import Query from "./QueryBuilder/Query";
-import SavedQueries from "./QueryBuilder/SavedQueries";
+import QueriesDrawer from "./QueryBuilder/QueriesDrawer";
 
 import RootSchemaChoice from "./QueryBuilder/RootSchemaChoice";
 import QuerySpecification from "./QueryBuilder/QuerySpecification";
@@ -47,103 +47,6 @@ let styles = {
   leftPanel:{
     position:"relative"
   },
-  rightPanel:{
-    position:"relative",
-    display:"grid",
-    gridTemplateRows:"1fr",
-    gridGap:"10px",
-    width:"100%",
-    "&.loading, &.error, &.noQueries": {
-      gridTemplateRows:"auto 1fr",
-    },
-    "&.withMyQueriesOn, &.withOthersQueriesOn": {
-      gridTemplateRows:"1fr 4fr",
-    },
-    "&.withMyQueriesOff, &.withOthersQueriesOff": {
-      gridTemplateRows:"auto 1fr",
-    },
-    "&.withMyQueriesOn.withOthersQueriesOn": {
-      gridTemplateRows:"1fr 1fr 3fr",
-    },
-    "&.withMyQueriesOff.withOthersQueriesOff": {
-      gridTemplateRows:"auto auto 1fr",
-    },
-    "&.withMyQueriesOn.withOthersQueriesOff": {
-      gridTemplateRows:"1fr auto 4fr",
-    },
-    "&.withMyQueriesOff.withOthersQueriesOn": {
-      gridTemplateRows:"auto 1fr 4fr",
-    }
-  },
-  fetchingQueries: {
-    position: "relative",
-    padding: "10px",
-    borderRadius: "4px",
-    background:"var(--bg-color-blend-contrast1)",
-    color: "var(--ft-color-normal)",
-    "& > span": {
-      paddingLeft: "6px",
-      display:"inline-block"
-    }
-  },
-  fetchQueriesError: {
-    display: "flex",
-    position: "relative",
-    padding: "10px",
-    border:"1px solid var(--border-color-ui-contrast2)",
-    background:"var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-error)",
-    "& > svg": {
-      marginTop: "8px",
-    },
-    "& > span": {
-      marginTop: "6px",
-      paddingLeft: "6px",
-      overflow:"hidden",
-      textOverflow:"ellipsis",
-    },
-    "& > div": {
-      flex: 1,
-      textAlign: "right",
-      "& button": {
-        marginLeft: "10px"
-      }
-    }
-  },
-  noQueries: {
-    display: "flex",
-    position: "relative",
-    padding: "10px",
-    borderRadius: "4px",
-    background:"var(--bg-color-blend-contrast1)",
-    color: "var(--ft-color-normal)",
-    "& > span": {
-      flex: 1
-    },
-    "& > button": {
-      display: "inline-block",
-      margin: 0,
-      padding: 0,
-      border: 0,
-      background: "transparent",
-      outline: 0,
-      "&:hover": {
-        outline: 0
-      }
-    }
-  },
-  myQueries: {
-    display: "none",
-    "&.show": {
-      display: "block"
-    }
-  },
-  othersQueries: {
-    display: "none",
-    "&.show": {
-      display: "block"
-    }
-  },
   tabbedPanel:{
     display:"grid",
     gridTemplateRows:"auto 1fr"
@@ -178,19 +81,6 @@ export default class QueryBuilder extends React.Component{
   handleFetchStructure = () => {
     queryBuilderStore.fetchStructure();
   }
-  handleFetchSavedQueries = () => {
-    queryBuilderStore.fetchQueries();
-  }
-  handleCancelFetchSavedQueries = () => {
-    queryBuilderStore.fetchQueriesError = null;
-  }
-  handleMyQueriesExpandToggle = () => {
-    queryBuilderStore.showMyQueries = !queryBuilderStore.showMyQueries;
-  }
-  handleOthersQueriesExpandToggle = () => {
-    queryBuilderStore.showOthersQueries = !queryBuilderStore.showOthersQueries;
-  }
-
   UNSAFE_componentWillUpdate(){
     if(this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel){
       //console.log(this.scrolledPanel,this.scrolledPanel.scrollTop);
@@ -239,87 +129,40 @@ export default class QueryBuilder extends React.Component{
                       Please choose a root schema in the right panel
                     </BGMessage>}
                 </div>
-                <div className={`${classes.rightPanel} ${queryBuilderStore.isFetchingQueries?"loading":""} ${queryBuilderStore.fetchQueriesError?"error":""} ${!queryBuilderStore.hasRootSchema || queryBuilderStore.hasQueries?"":"noQueries"} ${queryBuilderStore.hasMyQueries?(queryBuilderStore.showMyQueries?"withMyQueriesOn":"withMyQueriesOff"):""} ${queryBuilderStore.hasOthersQueries?(queryBuilderStore.showOthersQueries?"withOthersQueriesOn":"withOthersQueriesOff"):""}`}>
-                  {queryBuilderStore.hasRootSchema?
-                    queryBuilderStore.isFetchingQueries?
-                      <div className={classes.fetchingQueries} >
-                        <FontAwesomeIcon icon="circle-notch" spin/><span>{`Fetching saved queries for ${queryBuilderStore.rootSchema.id}...`}</span>
-                      </div>
+                <div className={classes.tabbedPanel}>
+                  <div className={classes.tabs}>
+                    {queryBuilderStore.hasRootSchema?
+                      <React.Fragment>
+                        {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
+                        <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
+                        <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")}/>
+                        <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")}/>
+                      </React.Fragment>
                       :
-                      queryBuilderStore.fetchQueriesError?
-                        <div className={classes.fetchQueriesError} >
-                          <FontAwesomeIcon icon="exclamation-triangle"/><span>{queryBuilderStore.fetchQueriesError}</span>
-                          <div>
-                            <Button onClick={this.handleCancelFetchSavedQueries}><FontAwesomeIcon icon="times"/>&nbsp;Cancel</Button>
-                            <Button bsStyle="primary" onClick={this.handleFetchSavedQueries}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
-                          </div>
-                        </div>
-                        :
-                        !queryBuilderStore.hasQueries?
-                          <div className={classes.noQueries} >
-                            <span>No saved queries available for {queryBuilderStore.rootSchema.label}<small> - {queryBuilderStore.rootSchema.id}</small></span>
-                            <button onClick={this.handleFetchSavedQueries} title="Refresh"><FontAwesomeIcon icon="redo-alt"/></button>
-                          </div>
-                          :
-                          <React.Fragment>
-                            <div className={`${classes.myQueries} ${queryBuilderStore.hasMyQueries?"show":""}`} >
-                              <SavedQueries
-                                title={`My saved queries for ${queryBuilderStore.rootSchema.label}`}
-                                subTitle={queryBuilderStore.rootSchema.id}
-                                list={queryBuilderStore.myQueries}
-                                onSelect={this.handleSelectQuery}
-                                expanded={queryBuilderStore.showMyQueries}
-                                onExpandToggle={this.handleMyQueriesExpandToggle}
-                                onRefresh={this.handleFetchSavedQueries}
-                                enableDelete={true} />
-                            </div>
-                            <div className={`${classes.othersQueries} ${queryBuilderStore.hasOthersQueries?"show":""}`} >
-                              <SavedQueries
-                                title={`Other users' queries for ${queryBuilderStore.rootSchema.label}`}
-                                subTitle={queryBuilderStore.rootSchema.id}
-                                list={queryBuilderStore.othersQueries}
-                                onSelect={this.handleSelectQuery}
-                                expanded={queryBuilderStore.showOthersQueries}
-                                onExpandToggle={this.handleOthersQueriesExpandToggle}
-                                onRefresh={this.handleFetchSavedQueries}
-                                showUser={true} />
-                            </div>
-                          </React.Fragment>
-                    :
-                    null
-                  }
-                  <div className={classes.tabbedPanel}>
-                    <div className={classes.tabs}>
-                      {queryBuilderStore.hasRootSchema?
-                        <React.Fragment>
-                          {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
-                          <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
-                          <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")}/>
-                          <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")}/>
-                        </React.Fragment>
-                        :
-                        <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
-                      }
-                    </div>
-                    <div className={classes.tabBody}>
-                      <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
-                        <div className={classes.tabBodyInner}>
-                          {!queryBuilderStore.hasRootSchema?
-                            <RootSchemaChoice/>
-                            :queryBuilderStore.currentTab === "query"?
-                              <QuerySpecification/>
-                              :queryBuilderStore.currentTab === "result"?
-                                <Result/>
-                                :queryBuilderStore.currentTab === "resultTable"?
-                                  <ResultTable/>
-                                  :queryBuilderStore.currentTab === "fieldOptions"?
-                                    <Options/>
-                                    :null}
-                        </div>
-                      </Scrollbars>
-                    </div>
+                      <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
+                    }
+                  </div>
+                  <div className={classes.tabBody}>
+                    <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
+                      <div className={classes.tabBodyInner}>
+                        {!queryBuilderStore.hasRootSchema?
+                          <RootSchemaChoice/>
+                          :queryBuilderStore.currentTab === "query"?
+                            <QuerySpecification/>
+                            :queryBuilderStore.currentTab === "result"?
+                              <Result/>
+                              :queryBuilderStore.currentTab === "resultTable"?
+                                <ResultTable/>
+                                :queryBuilderStore.currentTab === "fieldOptions"?
+                                  <Options/>
+                                  :null}
+                      </div>
+                    </Scrollbars>
                   </div>
                 </div>
+                {queryBuilderStore.hasRootSchema && (
+                  <QueriesDrawer />
+                )}
               </div>
         }
       </div>

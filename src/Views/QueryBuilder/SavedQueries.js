@@ -11,24 +11,35 @@ let styles = {
     display:"grid",
     gridTemplateRows:"auto 1fr",
     height: "100%",
-    border: "1px solid var(--border-color-ui-contrast2)",
+    border: "1px solid var(--border-color-ui-contrast5)",
+    borderRadius: "10px 10px 0 0",
     padding: "10px",
-    background: "var(--bg-color-ui-contrast2)",
+    background: "var(--bg-color-ui-contrast3)",
     color: "var(--ft-color-loud)",
+    transition: "border-radius 0.3s ease",
     "& > div > div:first-child": {
       overflowX: "hidden !important"
     },
     "& > div > div:nth-child(2)": {
       display: "none !important"
+    },
+    "&.collapsed": {
+      borderRadius: 0,
+      "& $title": {
+        marginBottom: 0,
+        paddingBottom: 0,
+        borderBottom: 0
+      },
+      "& $toggleButton": {
+        transform: "rotateX(180deg)"
+      }
     }
   },
   title: {
     display: "flex",
-    "&.withContent": {
-      marginBottom: "10px",
-      paddingBottom: "10px",
-      borderBottom: "1px solid var(--border-color-ui-contrast2)"
-    },
+    marginBottom: "10px",
+    paddingBottom: "10px",
+    borderBottom: "1px solid var(--border-color-ui-contrast5)",
     "& button": {
       display: "inline-block",
       margin: 0,
@@ -38,16 +49,6 @@ let styles = {
       outline: 0,
       "&:hover": {
         outline: 0
-      }
-    },
-    "& button.toggle-btn": {
-      "&.collapse svg": {
-        transform: "rotateX(180deg)",
-        transition: "transform 0.3s ease"
-      },
-      "& + h4": {
-        margin: "0 0 0 6px",
-        cursor: "pointer"
       }
     },
     "& h4": {
@@ -62,6 +63,15 @@ let styles = {
     },
     "& button.refresh-btn": {
       color: "var(--ft-color-normal)"
+    }
+  },
+  toggleButton: {
+    "& svg": {
+      transition: "transform 0.3s ease"
+    },
+    "& + h4": {
+      margin: "0 0 0 6px",
+      cursor: "pointer"
     }
   }
 };
@@ -80,11 +90,11 @@ export default class SavedQueries extends React.Component{
     const {classes, title, subTitle, list, expanded, onExpandToggle, onRefresh, showUser, enableDelete } = this.props;
 
     return (
-      <div className={classes.container}>
+      <div className={`${classes.container} ${expanded !== false?"":"collapsed"}`}>
         {title && (
-          <div className={`${classes.title} ${expanded !== false?"withContent":""}`}>
+          <div className={classes.title}>
             {typeof onExpandToggle === "function" && (
-              <button className={`toggle-btn ${expanded !== false?"":"collapse"}`} onClick={onExpandToggle}><FontAwesomeIcon icon="angle-down"/></button>
+              <button className={`toggle-btn ${classes.toggleButton}`} onClick={onExpandToggle}><FontAwesomeIcon icon="angle-down"/></button>
             )}
             <h4 onClick={onExpandToggle}>{title}<small>{subTitle?(" - " + subTitle):""}</small></h4>
             {typeof onRefresh === "function" && (

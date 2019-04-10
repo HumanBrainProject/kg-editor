@@ -16,9 +16,9 @@ let styles = {
     width: "var(--container-width)",
     height: "calc(100% - 30px)",
     padding: "15px 15px",
-    border: "1px solid var(--border-color-ui-contrast1)",
+    border: "1px solid var(--border-color-ui-contrast5)",
     borderRadius: "0 0 0 10px",
-    background: "var(--bg-color-ui-contrast2)",
+    background: "var(--bg-color-ui-contrast3)",
     color: "var(--ft-color-normal)",
     overflow: "visible",
     transition: "right 0.5s cubic-bezier(.34,1.06,.63,.93)",
@@ -36,14 +36,14 @@ let styles = {
     lineHeight: "40px",
     margin: 0,
     padding: 0,
-    border: "1px solid var(--border-color-ui-contrast1)",
+    border: "1px solid var(--border-color-ui-contrast5)",
     borderRight: "none",
     borderRadius: "10px 0 0 10px",
-    background: "var(--bg-color-ui-contrast2)",
+    background: "var(--bg-color-ui-contrast3)",
     appearance: "none",
     outline: "none",
     fontSize: "20px",
-    color: "var(--ft-color-normal)",
+    color: "var(--ft-color-loud)",
     textAlign: "center"
   },
   panel: {
@@ -58,7 +58,7 @@ let styles = {
         flex: 1
       },
       "& + div": {
-        marginTop: "10px"
+        marginTop: "15px"
       }
     }
   },

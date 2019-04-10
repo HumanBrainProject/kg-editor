@@ -99,7 +99,7 @@ const styles = {
   save: {
     gridColumnStart: "span 2",
     display: "flex",
-    "&.collapsed": {
+    "&.split": {
       display: "block",
       textAlign: "right",
       "@media screen and (min-width:1600px)": {
@@ -113,6 +113,17 @@ const styles = {
           marginBottom: 0,
           paddingBottom: 0,
           borderBottom: 0
+        }
+      },
+      "& $collapsedHeader input + button": {
+        margin: "6px !important",
+        position: "absolute",
+        top: "10px",
+        right: "6px",
+        "@media screen and (min-width:1600px)": {
+          position: "relative",
+          top: "unset",
+          right: "unset"
         }
       }
     },
@@ -252,15 +263,7 @@ const styles = {
       width: "auto",
       padding: "6px",
       "& + button": {
-        margin: "6px !important",
-        position: "absolute",
-        top: "10px",
-        right: "6px",
-        "@media screen and (min-width:1600px)": {
-          position: "relative",
-          top: "unset",
-          right: "unset"
-        }
+        margin: "6px !important"
       }
     }
   },
@@ -402,7 +405,7 @@ export default class Query extends React.Component{
               )}
             </React.Fragment>
           )}
-          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && queryBuilderStore.showHeader && (
+          {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && queryBuilderStore.showHeader && !queryBuilderStore.hasQueryChanged && (
             <div className={classes.links}>
               <h6>To go further: </h6>
               <ul>
@@ -418,7 +421,7 @@ export default class Query extends React.Component{
               </ul>
             </div>
           )}
-          <div className={`${classes.save} ${queryBuilderStore.showHeader?"expanded":"collapsed"}`}>
+          <div className={`${classes.save} ${queryBuilderStore.showHeader || !queryBuilderStore.hasQueryChanged?"":"split"}`}>
             {queryBuilderStore.isQuerySaved?
               queryBuilderStore.isOneOfMySavedQueries?
                 queryBuilderStore.saveAsMode?

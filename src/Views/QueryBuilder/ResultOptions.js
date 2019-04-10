@@ -42,6 +42,10 @@ export default class ResultOptions extends React.Component{
     queryBuilderStore.setResultStart(field.getValue());
   }
 
+  handlExecuteQuery = () => {
+    queryBuilderStore.executeQuery();
+  }
+
   render(){
     const { classes } = this.props;
     return(
@@ -59,7 +63,7 @@ export default class ResultOptions extends React.Component{
             <p>Strip vocab : <input type="checkbox" onChange={this.handleToggleRunStripVocab} checked={queryBuilderStore.runStripVocab}/></p>
           </Col>
           <Col xs={12}>
-            <Button bsStyle={"primary"} className={"btn-block"} disabled={queryBuilderStore.isQueryEmpty} onClick={()=>queryBuilderStore.executeQuery()} title={!queryBuilderStore.isQueryEmpty?"Run it":"The current query specification is not valid/complete. Please select at least one field."}>
+            <Button bsStyle={"primary"} className={"btn-block"} disabled={queryBuilderStore.isQueryEmpty} onClick={this.handlExecuteQuery} title={!queryBuilderStore.isQueryEmpty?"Run it":"The current query specification is not valid/complete. Please select at least one field."}>
               Run it
             </Button>
           </Col>

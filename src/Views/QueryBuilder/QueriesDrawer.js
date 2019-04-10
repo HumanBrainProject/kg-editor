@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import SavedQueries from "./SavedQueries";
 
-let styles = {
+const styles = {
   container:{
     "--container-width": "40%",
     position: "absolute",

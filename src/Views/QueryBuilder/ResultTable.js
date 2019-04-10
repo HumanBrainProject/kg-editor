@@ -1,16 +1,19 @@
 import React from "react";
-import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import { observer } from "mobx-react";
 import { toJS } from "mobx";
+import injectStyles from "react-jss";
 import { Button, Table, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { get, isArray, isString, isInteger } from "lodash";
 
-import injectStyles from "react-jss";
+import queryBuilderStore from "../../Stores/QueryBuilderStore";
+import BGMessage from "../../Components/BGMessage";
+import FetchingLoader from "../../Components/FetchingLoader";
 import ResultOptions from "./ResultOptions";
 import routerStore from "../../Stores/RouterStore";
 import instanceStore from "../../Stores/InstanceStore";
 
-let styles = {
+const styles = {
   container:{
     color:"var(--ft-color-loud)",
     "& td":{
@@ -21,6 +24,19 @@ let styles = {
     },
     "& table":{
       tableLayout:"fixed"
+    }
+  },
+  fetchingPanel: {
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    "& .fetchingPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
     }
   },
   value:{
@@ -106,6 +122,14 @@ export default class ResultTable extends React.Component{
     }
   }
 
+  handlExecuteQuery = () => {
+    queryBuilderStore.executeQuery();
+  }
+
+  handlClearError = () => {
+    queryBuilderStore.runError = null;
+  }
+
   render(){
     const {classes} = this.props;
     let objectKeys = [];
@@ -117,56 +141,80 @@ export default class ResultTable extends React.Component{
     return(
       <div className={classes.container}>
         <ResultOptions/>
-        {queryBuilderStore.result &&
-          <div className={classes.breadcrumb}>
-            {queryBuilderStore.tableViewRoot.map((item, index) =>
-              <div className={`${classes.breadcrumbItem}${!isInteger(item)?" clickable":""}`} key={index} onClick={isString(item)?this.handleBreadcrumbClick.bind(this, index):undefined}>
-                {isInteger(item)?"#"+item:item} {index === 0?`(${queryBuilderStore.result.total})`:""}
-              </div>
-            )}
+        {queryBuilderStore.isRunning?
+          <div className={classes.fetchingPanel}>
+            <FetchingLoader>
+            Fetching query...
+            </FetchingLoader>
           </div>
-        }
-        {queryBuilderStore.result &&
-          <Table>
-            <thead>
-              <tr>
-                <th>#</th>
-                {objectKeys.map( key =>
-                  <th key={key}>{key}</th>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {subResult.map((row, index) =>
-                <tr key={"row"+index}>
-                  <th>{index}</th>
-                  {isString(row)?
-                    <td>{row}</td>:
-                    objectKeys.map(key =>
-                      <td key={key+index}>
-                        {isArray(row[key])?
-                          row[key].length?
-                            <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleOpenCollection.bind(this, index, key)}>
-                              Collection ({row[key].length})
-                            </Button>
-                            :<em>empty collection</em>
-                          :<OverlayTrigger placement="top" overlay={
-                            <Tooltip id={`result-tooltip-${key}-${index}`}>
-                              {row[key]}
-                            </Tooltip>}>
-                            <div className={classes.value} onClick={this.handleClickValue.bind(this, key, row[key])}>
-                              {row[key]}
-                              <Tooltip placement="top" id={`result-tooltip-${key}-${index}-2`}>
-                                {row[key]}
-                              </Tooltip>
-                            </div>
-                          </OverlayTrigger>
-                        }
-                      </td>)}
-                </tr>
-              )}
-            </tbody>
-          </Table>
+          :
+          queryBuilderStore.runError?
+            <BGMessage icon={"ban"}>
+              There was a network problem fetching the query.<br/>
+              If the problem persists, please contact the support.<br/>
+              <small>{queryBuilderStore.runError}</small><br/><br/>
+              {queryBuilderStore.isQueryEmpty?
+                <Button bsStyle={"primary"} onClick={this.handlClearError}>
+                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; OK
+                </Button>
+                :
+                <Button bsStyle={"primary"} onClick={this.handlExecuteQuery}>
+                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                </Button>
+              }
+            </BGMessage>
+            :
+            queryBuilderStore.result && (
+              <React.Fragment>
+                <div className={classes.breadcrumb}>
+                  {queryBuilderStore.tableViewRoot.map((item, index) =>
+                    <div className={`${classes.breadcrumbItem}${!isInteger(item)?" clickable":""}`} key={index} onClick={isString(item)?this.handleBreadcrumbClick.bind(this, index):undefined}>
+                      {isInteger(item)?"#"+item:item} {index === 0?`(${queryBuilderStore.result.total})`:""}
+                    </div>
+                  )}
+                </div>
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      {objectKeys.map( key =>
+                        <th key={key}>{key}</th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {subResult.map((row, index) =>
+                      <tr key={"row"+index}>
+                        <th>{index}</th>
+                        {isString(row)?
+                          <td>{row}</td>:
+                          objectKeys.map(key =>
+                            <td key={key+index}>
+                              {isArray(row[key])?
+                                row[key].length?
+                                  <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleOpenCollection.bind(this, index, key)}>
+                                  Collection ({row[key].length})
+                                  </Button>
+                                  :<em>empty collection</em>
+                                :<OverlayTrigger placement="top" overlay={
+                                  <Tooltip id={`result-tooltip-${key}-${index}`}>
+                                    {row[key]}
+                                  </Tooltip>}>
+                                  <div className={classes.value} onClick={this.handleClickValue.bind(this, key, row[key])}>
+                                    {row[key]}
+                                    <Tooltip placement="top" id={`result-tooltip-${key}-${index}-2`}>
+                                      {row[key]}
+                                    </Tooltip>
+                                  </div>
+                                </OverlayTrigger>
+                              }
+                            </td>)}
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </React.Fragment>
+            )
         }
       </div>
     );

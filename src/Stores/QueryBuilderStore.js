@@ -188,6 +188,7 @@ class QueryBuilderStore {
       this.showQueries = false;
       this.showMyQueries = true;
       this.showOthersQueries = true;
+      this.result = null;
       this.selectField(this.rootField);
       this.fetchQueries();
     }
@@ -212,6 +213,7 @@ class QueryBuilderStore {
       this.showQueries = false;
       this.showMyQueries = true;
       this.showOthersQueries = true;
+      this.result = null;
       this.selectField(this.rootField);
     }
   }
@@ -268,6 +270,7 @@ class QueryBuilderStore {
 
   @computed
   get isQueryEmpty(){
+    //return !this.rootField || !((this.rootField.fields && this.rootField.fields.length) || this.rootField.isMerge);
     return !this.rootField || !this.rootField.fields || !this.rootField.fields.length;
   }
 
@@ -695,6 +698,7 @@ class QueryBuilderStore {
       this.runError = null;
       this.saveAsMode = false;
       this.showQueries = false;
+      this.result = null;
       this.selectField(this.rootField);
       this.savedQueryHasInconsistencies = this.hasQueryChanged;
     }
@@ -704,6 +708,7 @@ class QueryBuilderStore {
   async executeQuery(){
     if (!this.isQueryEmpty && !this.isRunning && !this.runError) {
       this.isRunning = true;
+      this.result = null;
       try{
         const payload = this.JSONQuery;
         const response = await API.axios.post(API.endpoints.performQuery(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/myQuery/":undefined, this.resultSize, this.resultStart), payload);

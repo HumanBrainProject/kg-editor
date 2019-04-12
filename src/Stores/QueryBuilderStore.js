@@ -13,6 +13,10 @@ const defaultContext = {
     "@id": "fieldname",
     "@type": "@id"
   },
+  "merge": {
+    "@type": "@id",
+    "@id": "merge"
+  },
   "relative_path": {
     "@id": "relative_path",
     "@type": "@id"
@@ -527,7 +531,7 @@ class QueryBuilderStore {
       const newField = new Field({}, parent);
       newField.isMerge = true;
       newField.isInvalid = true;
-      newField.aliasError = true;
+      newField.alias = uniqueId("field");
       if (!parent.fields || parent.fields.length === undefined) {
         parent.fields = [];
       }
@@ -545,7 +549,6 @@ class QueryBuilderStore {
       this.showModalFieldChoice = null;
     }
     if (parent.isRootMerge) {
-      parent.isInvalid = false;
       const newField = new Field(schema, parent);
       newField.isMerge = true;
       newField.isFlattened = !!newField.lookups.length;
@@ -553,6 +556,7 @@ class QueryBuilderStore {
         parent.merge = [];
       }
       parent.merge.push(newField);
+      parent.isInvalid = (parent.merge.length < 2);
       if(gotoField){
         this.selectField(newField);
       }
@@ -581,7 +585,7 @@ class QueryBuilderStore {
       }
       if (field.isMerge && field.parentIsRootMerge) {
         remove(field.parent.merge, parentField => field === parentField);
-        field.parent.isInvalid = (field.parent.merge.length === 0);
+        field.parent.isInvalid = (field.parent.merge.length < 2);
       } else {
         remove(field.parent.fields, parentField => field === parentField);
       }

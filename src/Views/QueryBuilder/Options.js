@@ -149,6 +149,11 @@ export default class Options extends React.Component{
     queryBuilderStore.addField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
   }
 
+  handleAddMergeField(schema, e){
+    //Don't got to newly chosen field options if ctrl is pressed (or cmd)
+    queryBuilderStore.addMergeField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
+  }
+
   handleChangeFlatten = value => {
     queryBuilderStore.currentField.isFlattened = !!value;
   }
@@ -298,6 +303,36 @@ export default class Options extends React.Component{
               </div>
             )}
         </div>
+
+        {queryBuilderStore.currentField.isRootMerge
+          && queryBuilderStore.currentField !== queryBuilderStore.rootField
+          && (
+            <div className={classes.fields}>
+              {queryBuilderStore.currentFieldParentLookupsAttributes.map(({id, label, properties}) => (
+                <div key={id}>
+                  <h3>Merge attributes valid for {label} <small> - {id}</small></h3>
+                  {properties.map(propSchema => (
+                    <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeField.bind(this, propSchema)}>
+                      {propSchema.label} - <small>{propSchema.attribute}</small>
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+              {queryBuilderStore.currentFieldParentLookupsLinks.map(({id, label, properties}) => (
+                <div key={id}>
+                  <h3>Merge links valid for {label} <small> - {id}</small></h3>
+                  {properties.map(propSchema => (
+                    <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeField.bind(this, propSchema)}>
+                      {propSchema.label} - <small>{propSchema.attribute}</small>
+                      &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label).join(", ")} )
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )
+        }
 
         {(!queryBuilderStore.currentField.isFlattened
           || (queryBuilderStore.currentField.isMerge

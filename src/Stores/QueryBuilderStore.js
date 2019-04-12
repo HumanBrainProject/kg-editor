@@ -220,6 +220,48 @@ class QueryBuilderStore {
     return this.queryIdRegex.source;
   }
 
+  getLookupsAttributes(lookups) {
+    if (!lookups || !lookups.length) {
+      return [];
+    }
+    const result = [];
+    lookups.forEach(schemaId => {
+      const schema = this.findSchemaById(schemaId);
+      const lookup = {
+        id: schema.id,
+        label: schema.label,
+        properties: schema.properties
+          .filter(prop => !prop.canBe || !prop.canBe.length)
+          .sort((a, b) => a.label < b.label?-1: a.label > b.label?1:0)
+      };
+      if (lookup.properties.length) {
+        result.push(lookup);
+      }
+    });
+    return result;
+  }
+
+  getLookupsLinks(lookups) {
+    if (!lookups || !lookups.length) {
+      return [];
+    }
+    const result = [];
+    lookups.forEach(schemaId => {
+      const schema = this.findSchemaById(schemaId);
+      const lookup = {
+        id: schema.id,
+        label: schema.label,
+        properties: schema.properties
+          .filter(prop => prop.canBe && !!prop.canBe.length)
+          .sort((a, b) => a.label < b.label?-1: a.label > b.label?1:0)
+      };
+      if (lookup.properties.length) {
+        result.push(lookup);
+      }
+    });
+    return result;
+  }
+
   @computed
   get currentFieldLookups() {
     if (!this.currentField) {
@@ -230,30 +272,30 @@ class QueryBuilderStore {
 
   @computed
   get currentFieldLookupsAttributes() {
-    return this.currentFieldLookups.map(schemaId => {
-      const schema = this.findSchemaById(schemaId);
-      return {
-        id: schema.id,
-        label: schema.label,
-        properties: schema.properties
-          .filter(prop => !prop.canBe || !prop.canBe.length)
-          .sort((a, b) => a.label < b.label?-1: a.label > b.label?1:0)
-      };
-    });
+    return this.getLookupsAttributes(this.currentFieldLookups);
   }
 
   @computed
   get currentFieldLookupsLinks() {
-    return this.currentFieldLookups.map(schemaId => {
-      const schema = this.findSchemaById(schemaId);
-      return {
-        id: schema.id,
-        label: schema.label,
-        properties: schema.properties
-          .filter(prop => prop.canBe && !!prop.canBe.length)
-          .sort((a, b) => a.label < b.label?-1: a.label > b.label?1:0)
-      };
-    });
+    return this.getLookupsLinks(this.currentFieldLookups);
+  }
+
+  @computed
+  get currentFieldParentLookups() {
+    if (!this.currentField || !this.currentField.parent) {
+      return [];
+    }
+    return this.currentField.parent.lookups;
+  }
+
+  @computed
+  get currentFieldParentLookupsAttributes() {
+    return this.getLookupsAttributes(this.currentFieldParentLookups);
+  }
+
+  @computed
+  get currentFieldParentLookupsLinks() {
+    return this.getLookupsLinks(this.currentFieldParentLookups);
   }
 
   @action
@@ -460,8 +502,31 @@ class QueryBuilderStore {
       this.showModalFieldChoice = null;
     }
     if(!parent.isFlattened || parent.fields.length < 1){
-      let newField = new Field(schema, parent);
+      const newField = new Field(schema, parent);
+      if (!parent.fields || parent.fields.length === undefined) {
+        parent.fields = [];
+      }
       parent.fields.push(newField);
+      if(gotoField){
+        this.selectField(newField);
+      }
+    }
+  }
+
+  @action
+  addMergeField(schema, parent, gotoField = true){
+    if(parent === undefined) {
+      parent = this.showModalFieldChoice || this.rootField;
+      this.showModalFieldChoice = null;
+    }
+    if (parent.isRootMerge) {
+      const newField = new Field(schema, parent);
+      newField.isMerge = true;
+      newField.isFlattened = true;
+      if (!parent.merge || parent.merge.length === undefined) {
+        parent.merge = [];
+      }
+      parent.merge.push(newField);
       if(gotoField){
         this.selectField(newField);
       }

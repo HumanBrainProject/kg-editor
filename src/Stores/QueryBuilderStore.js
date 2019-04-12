@@ -133,6 +133,18 @@ class Field {
   }
 
   @computed
+  get rootMerge() {
+    if (!this.isMerge) {
+      return null;
+    }
+    let field = this;
+    while (field && !field.isRootMerge) {
+      field = field.parent;
+    }
+    return field;
+  }
+
+  @computed
   get hasMergeChild() {
     return this.isRootMerge?(this.merge && !!this.merge.length):(this.fields && !!this.fields.length);
   }
@@ -515,6 +527,10 @@ class QueryBuilderStore {
         parent.fields = [];
       }
       parent.fields.push(newField);
+      const rootMerge = newField.rootMerge;
+      if (rootMerge) {
+        this.checkMergeFields(rootMerge);
+      }
       if(gotoField){
         this.selectField(newField);
       }
@@ -542,6 +558,25 @@ class QueryBuilderStore {
     }
   }
 
+  checkMergeFields(parent) {
+    if (parent.isRootMerge) {
+      parent.fields.forEach(field => {
+        let isInvalid = true;
+        parent.lookups.some(schemaId => {
+          const schema = this.findSchemaById(schemaId);
+          if (schema && schema.properties && schema.properties.length) {
+            if (schema.properties.find(property => property.attribute === field.schema.attribute && ((!field.schema.canBe && !property.canBe) || (isEqual(toJS(field.schema.canBe), toJS(property.canBe)))))) {
+              isInvalid = false;
+              return true;
+            }
+          }
+          return false;
+        });
+        field.isInvalid = isInvalid;
+      });
+    }
+  }
+
   @action
   addMergeChildField(schema, parent, gotoField = true){
     if(parent === undefined) {
@@ -557,6 +592,7 @@ class QueryBuilderStore {
       }
       parent.merge.push(newField);
       parent.isInvalid = (parent.merge.length < 2);
+      this.checkMergeFields(parent);
       if(gotoField){
         this.selectField(newField);
       }
@@ -586,8 +622,13 @@ class QueryBuilderStore {
       if (field.isMerge && field.parentIsRootMerge) {
         remove(field.parent.merge, parentField => field === parentField);
         field.parent.isInvalid = (field.parent.merge.length < 2);
+        this.checkMergeFields(field.parent);
       } else {
         remove(field.parent.fields, parentField => field === parentField);
+        const rootMerge = field.rootMerge;
+        if (rootMerge) {
+          this.checkMergeFields(rootMerge);
+        }
       }
     }
   }

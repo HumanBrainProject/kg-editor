@@ -181,7 +181,14 @@ export default class Field extends React.Component{
                   &nbsp;&nbsp;{field.schema.label}&nbsp;
                   {field.schema.canBe && !!field.schema.canBe.length && (
                     <span className={classes.canBe}>
-                      ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
+                      ( {field.schema.canBe.map(schemaId => {
+                        const schema = queryBuilderStore.findSchemaById(schemaId);
+                        return (
+                          <React.Fragment key={schemaId}>
+                            <span title={schemaId}>{(schema && schema.label) || schemaId}</span>&nbsp;
+                          </React.Fragment>
+                        );
+                      })} )
                     </span>
                   )}
                 </React.Fragment>
@@ -201,7 +208,14 @@ export default class Field extends React.Component{
                 {field.schema.label}&nbsp;
                 {!field.isRootMerge && field.schema.canBe && !!field.schema.canBe.length && (
                   <span className={classes.canBe}>
-                    ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
+                    ( {field.schema.canBe.map(schemaId => {
+                      const schema = queryBuilderStore.findSchemaById(schemaId);
+                      return (
+                        <React.Fragment key={schemaId}>
+                          <span title={schemaId}>{(schema && schema.label) || schemaId}</span>&nbsp;
+                        </React.Fragment>
+                      );
+                    })} )
                   </span>
                 )}
               </React.Fragment>

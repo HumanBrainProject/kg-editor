@@ -151,11 +151,11 @@ export default class Field extends React.Component{
     const hasFlattenedParent = field.parent && field.parent.isFlattened;
 
     return(
-      <div className={`${classes.container} ${field.isMerge?"is-merge":""} ${field.isRootMerge?"is-root-merge":""} ${field.isMerge && !field.isRootMerge?"is-child-merge":""} ${field.isMerge && field.parentIsRootMerge?"parent-is-root-merge":""} ${isFlattened?"flattened":""} ${hasFlattenedParent?"has-flattened-parent":""}`}>
+      <div className={`${classes.container} ${field.isMerge?"is-merge":""} ${field.isRootMerge?"is-root-merge":""} ${field.isMerge && !field.isRootMerge?"is-child-merge":""} ${(field.isMerge && field.parentIsRootMerge)?"parent-is-root-merge":""} ${isFlattened?"flattened":""} ${hasFlattenedParent?"has-flattened-parent":""}`}>
         {hasFlattenedParent &&
           <div className={classes.verticalLineExtraPath}></div>
         }
-        <div className={`${classes.label} ${field.isUnknown?"is-unknown":""} ${field.isInvalid || field.aliasError?"is-invalid":""} ${field === queryBuilderStore.currentField?"selected":""}`} onClick={this.handleSelectField}>
+        <div className={`${classes.label} ${field.isUnknown?"is-unknown":""} ${(field.isInvalid || field.aliasError)?"is-invalid":""} ${field === queryBuilderStore.currentField?"selected":""}`} onClick={this.handleSelectField}>
           {field.isMerge && field.parentIsRootMerge && (
             <div className={classes.parentIsRootMerge}>
               <FontAwesomeIcon icon="long-arrow-alt-right"/>

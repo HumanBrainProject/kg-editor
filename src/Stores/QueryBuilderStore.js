@@ -518,12 +518,34 @@ class QueryBuilderStore {
   }
 
   @action
-  addMergeField(schema, parent, gotoField = true){
+  addMergeField(parent, gotoField = true){
+    if(parent === undefined) {
+      parent = this.showModalFieldChoice || this.rootField;
+      this.showModalFieldChoice = null;
+    }
+    if (!parent.isRootMerge && parent !== this.rootFields) {
+      const newField = new Field({}, parent);
+      newField.isMerge = true;
+      newField.isInvalid = true;
+      newField.aliasError = true;
+      if (!parent.fields || parent.fields.length === undefined) {
+        parent.fields = [];
+      }
+      parent.fields.push(newField);
+      if(gotoField){
+        this.selectField(newField);
+      }
+    }
+  }
+
+  @action
+  addMergeChildField(schema, parent, gotoField = true){
     if(parent === undefined) {
       parent = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
     if (parent.isRootMerge) {
+      parent.isInvalid = false;
       const newField = new Field(schema, parent);
       newField.isMerge = true;
       newField.isFlattened = !!newField.lookups.length;

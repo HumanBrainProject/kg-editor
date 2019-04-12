@@ -149,9 +149,14 @@ export default class Options extends React.Component{
     queryBuilderStore.addField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
   }
 
-  handleAddMergeField(schema, e){
+  handleAddMergeField(e){
     //Don't got to newly chosen field options if ctrl is pressed (or cmd)
-    queryBuilderStore.addMergeField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
+    queryBuilderStore.addMergeField(queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
+  }
+
+  handleAddMergeChildField(schema, e){
+    //Don't got to newly chosen field options if ctrl is pressed (or cmd)
+    queryBuilderStore.addMergeChildField(schema, queryBuilderStore.currentField, !e.ctrlKey && !e.metaKey);
   }
 
   handleChangeFlatten = value => {
@@ -183,7 +188,7 @@ export default class Options extends React.Component{
                   </div>
                   :
                   <div className={classes.optionLabel}>
-                        Target name <small>(only applicable if parent field is not flattened)</small>
+                    Target name <small>(only applicable if parent field is not flattened)</small>
                   </div>
                 }
                 <div className={classes.optionInput}>
@@ -210,7 +215,7 @@ export default class Options extends React.Component{
               && (
                 <div key={name} className={classes.option}>
                   <div className={classes.optionLabel}>
-                      Required <small>(only applicable if parent field is not flattened)</small>
+                    Required <small>(only applicable if parent field is not flattened)</small>
                   </div>
                   <div className={classes.optionInput}>
                     <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
@@ -245,7 +250,7 @@ export default class Options extends React.Component{
               && (
                 <div key={name} className={classes.option}>
                   <div className={classes.optionLabel}>
-                      Ensure original order <small>(only applicable if parent field is not flattened)</small>
+                    Ensure original order <small>(only applicable if parent field is not flattened)</small>
                   </div>
                   <div className={classes.optionInput}>
                     <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
@@ -292,7 +297,7 @@ export default class Options extends React.Component{
             && (
               <div className={classes.option}>
                 <div className={classes.optionLabel}>
-                Flatten <small>(only applicable if this field has only one child field)</small>
+                  Flatten <small>(only applicable if this field has only one child field)</small>
                 </div>
                 <div className={classes.optionInput}>
                   <MultiToggle selectedValue={queryBuilderStore.currentField.isFlattened} onChange={this.handleChangeFlatten}>
@@ -304,6 +309,17 @@ export default class Options extends React.Component{
             )}
         </div>
 
+        {!queryBuilderStore.currentField.isMerge
+          && queryBuilderStore.currentField !== queryBuilderStore.rootFields
+          && (queryBuilderStore.currentFieldLookupsLinks && !!queryBuilderStore.currentFieldLookupsLinks.length)
+          && (
+            <div className={classes.option}>
+              <div className={classes.optionLabel}>
+                <Button onClick={this.handleAddMergeField.bind(this)}>Add a merge field</Button>
+              </div>
+            </div>
+          )}
+
         {queryBuilderStore.currentField.isRootMerge
           && queryBuilderStore.currentField !== queryBuilderStore.rootField
           && (
@@ -312,7 +328,7 @@ export default class Options extends React.Component{
                 <div key={id}>
                   <h3>Merge attributes valid for {label} <small> - {id}</small></h3>
                   {properties.map(propSchema => (
-                    <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeField.bind(this, propSchema)}>
+                    <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeChildField.bind(this, propSchema)}>
                       {propSchema.label} - <small>{propSchema.attribute}</small>
                     </div>
                   ))}
@@ -323,7 +339,7 @@ export default class Options extends React.Component{
                 <div key={id}>
                   <h3>Merge links valid for {label} <small> - {id}</small></h3>
                   {properties.map(propSchema => (
-                    <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeField.bind(this, propSchema)}>
+                    <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeChildField.bind(this, propSchema)}>
                       {propSchema.label} - <small>{propSchema.attribute}</small>
                       &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label).join(", ")} )
                     </div>

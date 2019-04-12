@@ -503,6 +503,10 @@ class QueryBuilderStore {
     }
     if(!parent.isFlattened || parent.fields.length < 1){
       const newField = new Field(schema, parent);
+      if (parent.isMerge && !parent.isRootMerge) {
+        newField.isMerge = true;
+        newField.isFlattened = !!newField.lookups.length;
+      }
       if (!parent.fields || parent.fields.length === undefined) {
         parent.fields = [];
       }
@@ -522,7 +526,7 @@ class QueryBuilderStore {
     if (parent.isRootMerge) {
       const newField = new Field(schema, parent);
       newField.isMerge = true;
-      newField.isFlattened = true;
+      newField.isFlattened = !!newField.lookups.length;
       if (!parent.merge || parent.merge.length === undefined) {
         parent.merge = [];
       }

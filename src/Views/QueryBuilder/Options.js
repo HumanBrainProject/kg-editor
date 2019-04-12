@@ -3,7 +3,6 @@ import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import { observer } from "mobx-react";
 import MultiToggle from "../../Components/MultiToggle";
 import injectStyles from "react-jss";
-import {sortBy} from "lodash";
 import {FormControl, Button} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactJson from "react-json-view";
@@ -111,6 +110,9 @@ const style = {
     "& small":{
       fontWeight:"normal",
       fontStyle:"italic"
+    },
+    "& strong": {
+      color: "var(--ft-color-loud)"
     }
   },
   stringValue: {
@@ -132,6 +134,10 @@ const style = {
     fontSize: "11px",
     marginRight: "4px",
     opacity: "0.8"
+  },
+  aliasError: {
+    marginTop: "6px",
+    color: "var(--ft-color-error)"
   }
 };
 
@@ -148,7 +154,7 @@ export default class Options extends React.Component{
   }
 
   handleChangeName = e => {
-    queryBuilderStore.currentField.alias = e.target.value;
+    queryBuilderStore.currentField.setAlias(e.target.value);
   }
 
   handleChangeOption = (name, value) => {
@@ -161,47 +167,62 @@ export default class Options extends React.Component{
     return(
       <div className={classes.container}>
         <div className={classes.fieldOptions}>
-          { queryBuilderStore.currentField !== queryBuilderStore.rootField &&
-              !queryBuilderStore.currentField.parent.isFlattened &&
+          {queryBuilderStore.currentField !== queryBuilderStore.rootField
+            && !queryBuilderStore.currentField.parent.isFlattened
+            && (!queryBuilderStore.currentField.isMerge || queryBuilderStore.currentField.isRootMerge)
+            && (
               <div className={classes.option}>
-                <div className={classes.optionLabel}>
-                  Target name <small>(only applicable if parent field is not flattened)</small>
-                </div>
+                {queryBuilderStore.currentField.isRootMerge?
+                  <div className={classes.optionLabel}>
+                    <strong><FontAwesomeIcon transform="shrink-8" icon="asterisk"/></strong>Merge name
+                  </div>
+                  :
+                  <div className={classes.optionLabel}>
+                        Target name <small>(only applicable if parent field is not flattened)</small>
+                  </div>
+                }
                 <div className={classes.optionInput}>
                   <FormControl type="text"
                     onChange={this.handleChangeName}
+                    required={queryBuilderStore.currentField.isRootMerge}
                     value={queryBuilderStore.currentField.alias || ""}
                     placeholder={queryBuilderStore.currentField.getDefaultAlias()}/>
+                  {queryBuilderStore.currentField.aliasError && (
+                    <div className={classes.aliasError}>
+                      <FontAwesomeIcon icon="exclamation-triangle"/>&nbsp;Empty value is not accepted
+                    </div>
+                  )}
                 </div>
               </div>
+            )
           }
 
           {queryBuilderStore.currentField.options.map(({name, value}) => {
             if (name === "required") {
-              if (queryBuilderStore.currentField !== queryBuilderStore.rootField
-                   && !queryBuilderStore.currentField.parent.isFlattened) {
-                return (
-                  <div key={name} className={classes.option}>
-                    <div className={classes.optionLabel}>
-                        Required <small>(only applicable if parent field is not flattened)</small>
-                    </div>
-                    <div className={classes.optionInput}>
-                      <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
-                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
-                      </MultiToggle>
-                    </div>
+              return queryBuilderStore.currentField !== queryBuilderStore.rootField
+              && !queryBuilderStore.currentField.parent.isFlattened
+              && (!queryBuilderStore.currentField.isMerge || queryBuilderStore.currentField.isRootMerge)
+              && (
+                <div key={name} className={classes.option}>
+                  <div className={classes.optionLabel}>
+                      Required <small>(only applicable if parent field is not flattened)</small>
                   </div>
-                );
-              }
-              return null;
+                  <div className={classes.optionInput}>
+                    <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
+                      <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                      <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
+                    </MultiToggle>
+                  </div>
+                </div>
+              );
             } else if (name === "sort") {
-              if (queryBuilderStore.currentField !== queryBuilderStore.rootField
-                  && !queryBuilderStore.currentField.schema.canBe) {
-                return (
+              return queryBuilderStore.currentField !== queryBuilderStore.rootField
+              && !(queryBuilderStore.currentFieldLookupsLinks && !!queryBuilderStore.currentFieldLookupsLinks.length)
+                && !queryBuilderStore.currentField.isMerge
+                && (
                   <div key={name} className={classes.option}>
                     <div className={classes.optionLabel}>
-                        Sort <small>(enabling sort on this field will disable sort on other fields)</small>
+                      Sort <small>(enabling sort on this field will disable sort on other fields)</small>
                     </div>
                     <div className={classes.optionInput}>
                       <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
@@ -211,28 +232,25 @@ export default class Options extends React.Component{
                     </div>
                   </div>
                 );
-              }
-              return null;
             } else if (name === "ensure_order") {
-              if (queryBuilderStore.currentField !== queryBuilderStore.rootField
-                  && queryBuilderStore.currentField.schema.canBe
-                  && !queryBuilderStore.currentField.parent.isFlattened) {
-                return (
-                  <div key={name} className={classes.option}>
-                    <div className={classes.optionLabel}>
-                        Ensure original order <small>(only applicable if parent field is not flattened)</small>
-                    </div>
-                    <div className={classes.optionInput}>
-                      <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
-                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
-                        <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
-                      </MultiToggle>
-                    </div>
+              return queryBuilderStore.currentField !== queryBuilderStore.rootField
+              && (queryBuilderStore.currentFieldLookupsLinks && !!queryBuilderStore.currentFieldLookupsLinks.length)
+              && !queryBuilderStore.currentField.parent.isFlattened
+              && (!queryBuilderStore.currentField.isMerge || queryBuilderStore.currentField.isRootMerge)
+              && (
+                <div key={name} className={classes.option}>
+                  <div className={classes.optionLabel}>
+                      Ensure original order <small>(only applicable if parent field is not flattened)</small>
                   </div>
-                );
-              }
-              return null;
-            } else if (value !== undefined) {
+                  <div className={classes.optionInput}>
+                    <MultiToggle selectedValue={value} onChange={this.handleChangeOption.bind(this, name)}>
+                      <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true}/>
+                      <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={undefined}/>
+                    </MultiToggle>
+                  </div>
+                </div>
+              );
+            } else if (value !== undefined && (!queryBuilderStore.currentField.isMerge || queryBuilderStore.currentField.isRootMerge)) {
               return (
                 <div key={name} className={`${classes.option} unsupported`}>
                   <Button bsSize="xsmall" bsStyle="default" onClick={this.handleChangeOption.bind(this, name, undefined)} title={name === "merge"?`"${name}" property cannot be deleted`:`delete property "${name}"`} disabled={name === "merge"} >
@@ -263,8 +281,9 @@ export default class Options extends React.Component{
           })}
 
           {queryBuilderStore.currentField !== queryBuilderStore.rootField
-            && queryBuilderStore.currentField.schema.canBe
+            && (queryBuilderStore.currentFieldLookupsLinks && !!queryBuilderStore.currentFieldLookupsLinks.length)
             && queryBuilderStore.currentField.fields.length === 1
+            && !queryBuilderStore.currentField.isMerge
             && (
               <div className={classes.option}>
                 <div className={classes.optionLabel}>
@@ -280,43 +299,38 @@ export default class Options extends React.Component{
             )}
         </div>
 
-        {queryBuilderStore.currentField.schema.canBe &&
-         !queryBuilderStore.currentField.isFlattened &&
+        {(!queryBuilderStore.currentField.isFlattened
+          || (queryBuilderStore.currentField.isMerge
+                && (queryBuilderStore.currentField.isRootMerge
+                    || (!queryBuilderStore.currentField.isRootMerge && (!queryBuilderStore.currentField.fields || !queryBuilderStore.currentField.fields.length))
+                )
+          )
+        ) && (
           <div className={classes.fields}>
-            {queryBuilderStore.currentField.schema.canBe && queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
-              return(
-                <div key={schemaId}>
-                  <h3>Attributes valid for {queryBuilderStore.findSchemaById(schemaId).label} <small> - {queryBuilderStore.findSchemaById(schemaId).id}</small></h3>
-                  {sortBy(queryBuilderStore.findSchemaById(schemaId).properties.filter(prop => !prop.canBe || !prop.canBe.length), ["label"]).map(propSchema => {
-                    return (
-                      <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
-                        {propSchema.label} - <small>{propSchema.attribute}</small>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+            {queryBuilderStore.currentFieldLookupsAttributes.map(({id, label, properties}) => (
+              <div key={id}>
+                <h3>Attributes valid for {label} <small> - {id}</small></h3>
+                {properties.map(propSchema => (
+                  <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
+                    {propSchema.label} - <small>{propSchema.attribute}</small>
+                  </div>
+                ))}
+              </div>
+            ))}
 
-            {queryBuilderStore.currentField.schema.canBe &&
-            !queryBuilderStore.currentField.isFlattened &&
-            queryBuilderStore.currentField.schema.canBe.map((schemaId)=>{
-              return(
-                <div key={schemaId}>
-                  <h3>Links valid for {queryBuilderStore.findSchemaById(schemaId).label} <small> - {queryBuilderStore.findSchemaById(schemaId).id}</small></h3>
-                  {sortBy(queryBuilderStore.findSchemaById(schemaId).properties.filter(prop => prop.canBe && prop.canBe.length), ["label"]).map(propSchema => {
-                    return (
-                      <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
-                        {propSchema.label} - <small>{propSchema.attribute}</small>
-                        &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label).join(", ")} )
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+            {queryBuilderStore.currentFieldLookupsLinks.map(({id, label, properties}) => (
+              <div key={id}>
+                <h3>Links valid for {label} <small> - {id}</small></h3>
+                {properties.map(propSchema => (
+                  <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddField.bind(this, propSchema)}>
+                    {propSchema.label} - <small>{propSchema.attribute}</small>
+                      &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label).join(", ")} )
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
-        }
+        )}
       </div>
     );
   }

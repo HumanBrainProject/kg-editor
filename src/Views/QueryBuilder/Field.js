@@ -29,11 +29,22 @@ let styles = {
       height:"0",
       borderTop:"1px dashed #ccc"
     },
-    "&.flattenedParent::after":{
+    "&.has-flattened-parent::after":{
       borderTop:"3px solid #40a9f3"
+    },
+    "&.parent-is-root-merge": {
+      "&::before": {
+        marginLeft: "10px"
+      },
+      "& > $label": {
+        marginLeft: "10px"
+      },
+      "& > $subFields": {
+        marginLeft: "10px"
+      }
     }
   },
-  hasFlattenedParentExtraBox:{
+  verticalLineExtraPath:{
     display:"block",
     content:"''",
     position:"absolute",
@@ -71,7 +82,7 @@ let styles = {
         backgroundColor:"var(--bg-color-warn-loud)"
       }
     },
-    "&.is-unknown.is-invalid": {
+    "&.is-invalid, &.is-unknown.is-invalid": {
       backgroundColor:"var(--bg-color-error-quiet)",
       "&&.selected": {
         backgroundColor:"var(--bg-color-error-normal)"
@@ -79,10 +90,24 @@ let styles = {
       "&:hover, &.selected:hover": {
         backgroundColor:"var(--bg-color-error-loud)"
       }
-    },
-    "& svg[data-icon=sitemap]": {
-      transform: "scale(2) rotateZ(90deg)",
-      color: "var(--ft-color-louder)"
+    }
+  },
+  merge: {
+    color: "greenyellow",
+    "& svg": {
+      transform: "scale(2) rotateZ(90deg)"
+    }
+  },
+  parentIsRootMerge: {
+    position: "absolute",
+    width: "6px",
+    height: "6px",
+    marginTop: "7px",
+    marginLeft: "-16px",
+    background: "greenyellow",
+    color: "greenyellow",
+    "& svg": {
+      transform: "scaleX(1.1) translate(-12px, -7px)rotateZ(180deg)"
     }
   },
   required:{
@@ -126,11 +151,16 @@ export default class Field extends React.Component{
     const hasFlattenedParent = field.parent && field.parent.isFlattened;
 
     return(
-      <div className={`${classes.container}${isFlattened?" flattened":""}${hasFlattenedParent?" flattenedParent":""}`}>
+      <div className={`${classes.container} ${field.isMerge?"is-merge":""} ${field.isRootMerge?"is-root-merge":""} ${field.isMerge && !field.isRootMerge?"is-child-merge":""} ${field.isMerge && field.parentIsRootMerge?"parent-is-root-merge":""} ${isFlattened?"flattened":""} ${hasFlattenedParent?"has-flattened-parent":""}`}>
         {hasFlattenedParent &&
-          <div className={classes.hasFlattenedParentExtraBox}></div>
+          <div className={classes.verticalLineExtraPath}></div>
         }
-        <div className={`${classes.label} ${field.isUnknown?"is-unknown":""} ${field.isInvalid?"is-invalid":""} ${field === queryBuilderStore.currentField?"selected":""}`} onClick={this.handleSelectField}>
+        <div className={`${classes.label} ${field.isUnknown?"is-unknown":""} ${field.isInvalid || field.aliasError?"is-invalid":""} ${field === queryBuilderStore.currentField?"selected":""}`} onClick={this.handleSelectField}>
+          {field.isMerge && field.parentIsRootMerge && (
+            <div className={classes.parentIsRootMerge}>
+              <FontAwesomeIcon icon="long-arrow-alt-right"/>
+            </div>
+          )}
           {field.isFlattened && (
             <span className={classes.required}>
               <FontAwesomeIcon transform="flip-h" icon="level-down-alt"/>&nbsp;&nbsp;
@@ -141,13 +171,15 @@ export default class Field extends React.Component{
               <FontAwesomeIcon transform="shrink-8" icon="asterisk"/>&nbsp;&nbsp;
             </span>
           )}
-          {field.isMerge?
+          {field.isRootMerge?
             <React.Fragment>
-              <FontAwesomeIcon transform="shrink-8" icon="sitemap"/>
+              <span className={classes.merge} title="merge">
+                <FontAwesomeIcon transform="shrink-8" icon="sitemap"/>
+              </span>
               {!field.parent && (
                 <React.Fragment>
                   &nbsp;&nbsp;{field.schema.label}&nbsp;
-                  {field.schema.canBe && field.schema.canBe.length && (
+                  {field.schema.canBe && !!field.schema.canBe.length && (
                     <span className={classes.canBe}>
                       ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
                     </span>
@@ -157,20 +189,24 @@ export default class Field extends React.Component{
             </React.Fragment>
             :
             field.isUnknown?
-              <React.Fragment>
-                {field.schema.simpleAttributeName}&nbsp;
-                <span className={classes.canBe} title={field.schema.attribute}>( {field.schema.attributeNamespace?field.schema.attributeNamespace:field.schema.attribute} )</span>
-              </React.Fragment>
+              field.schema.simpleAttributeName?
+                <React.Fragment>
+                  {field.schema.simpleAttributeName}&nbsp;
+                  <span className={classes.canBe} title={field.schema.attribute}>( {field.schema.attributeNamespace?field.schema.attributeNamespace:field.schema.attribute} )</span>
+                </React.Fragment>
+                :
+                field.schema.attribute
               :
               <React.Fragment>
                 {field.schema.label}&nbsp;
-                {field.schema.canBe && field.schema.canBe.length &&
-                <span className={classes.canBe}>
-                  ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
-                </span>}
+                {!field.isRootMerge && field.schema.canBe && !!field.schema.canBe.length && (
+                  <span className={classes.canBe}>
+                    ( {field.schema.canBe.map(schemaId => queryBuilderStore.findSchemaById(schemaId).label+" ")} )
+                  </span>
+                )}
               </React.Fragment>
           }
-          {field.parent && !field.parent.isFlattened && (
+          {field.parent && !field.parent.isFlattened && (!field.isMerge || field.isRootMerge) && (
             field.alias?
               <span className={classes.rename}>
                 &nbsp;&nbsp;<FontAwesomeIcon icon="long-arrow-alt-right"/>&nbsp;&nbsp;

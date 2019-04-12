@@ -16,9 +16,14 @@ export default class Fields extends React.Component{
     const {classes, field} = this.props;
     return(
       <div className={classes.container}>
-        {field.fields.map(field => {
+        {field.merge && !!field.merge.length && field.merge.map(field => {
           return(
-            <Field field={field} key={field._uniqueKey}/>
+            <Field field={field} key={`merge_${field._uniqueKey}`} />
+          );
+        })}
+        {field.fields && !!field.fields.length && field.fields.map(field => {
+          return(
+            <Field field={field} key={`field_${field._uniqueKey}`} />
           );
         })}
       </div>

@@ -561,18 +561,18 @@ class QueryBuilderStore {
   checkMergeFields(parent) {
     if (parent.isRootMerge) {
       parent.fields.forEach(field => {
-        let isInvalid = true;
+        let isUnknown = true;
         parent.lookups.some(schemaId => {
           const schema = this.findSchemaById(schemaId);
           if (schema && schema.properties && schema.properties.length) {
             if (schema.properties.find(property => property.attribute === field.schema.attribute && ((!field.schema.canBe && !property.canBe) || (isEqual(toJS(field.schema.canBe), toJS(property.canBe)))))) {
-              isInvalid = false;
+              isUnknown = false;
               return true;
             }
           }
           return false;
         });
-        field.isInvalid = isInvalid;
+        field.isUnknown = isUnknown;
       });
     }
   }
@@ -1082,8 +1082,9 @@ class QueryBuilderStore {
 
   @action
   async executeQuery(){
-    if (!this.isQueryEmpty && !this.isRunning && !this.runError) {
+    if (!this.isQueryEmpty && !this.isRunning) {
       this.isRunning = true;
+      this.runError = false;
       this.result = null;
       try{
         const payload = this.JSONQuery;

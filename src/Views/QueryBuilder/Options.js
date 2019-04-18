@@ -31,6 +31,13 @@ const style = {
         color:"var(--ft-color-quiet)",
         fontStyle:"italic"
       }
+    },
+    "& .merge": {
+      "& h3": {
+        "& strong": {
+          color: "greenyellow"
+        }
+      }
     }
   },
 
@@ -325,8 +332,8 @@ export default class Options extends React.Component{
           && (
             <div className={classes.fields}>
               {queryBuilderStore.currentFieldParentLookupsAttributes.map(({id, label, properties}) => (
-                <div key={id}>
-                  <h3>Merge attributes valid for {label} <small> - {id}</small></h3>
+                <div className="merge" key={id}>
+                  <h3><strong>Merge</strong> attributes valid for {label} <small> - {id}</small></h3>
                   {properties.map(propSchema => (
                     <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeChildField.bind(this, propSchema)}>
                       {propSchema.label} - <small>{propSchema.attribute}</small>
@@ -336,8 +343,8 @@ export default class Options extends React.Component{
               ))}
 
               {queryBuilderStore.currentFieldParentLookupsLinks.map(({id, label, properties}) => (
-                <div key={id}>
-                  <h3>Merge links valid for {label} <small> - {id}</small></h3>
+                <div className="merge" key={id}>
+                  <h3><strong>Merge</strong> links valid for {label} <small> - {id}</small></h3>
                   {properties.map(propSchema => (
                     <div className={classes.property} key={propSchema.attribute+(propSchema.reverse?"reverse":"")} onClick={this.handleAddMergeChildField.bind(this, propSchema)}>
                       {propSchema.label} - <small>{propSchema.attribute}</small>

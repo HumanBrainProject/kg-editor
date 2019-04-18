@@ -193,6 +193,7 @@ class QueryBuilderStore {
   @observable label = "";
   @observable description = "";
   @observable sourceQuery = null;
+  @observable context = null;
   @observable rootField = null;
   @observable fetchStuctureError = null;
   @observable isFetchingStructure = false;
@@ -544,6 +545,9 @@ class QueryBuilderStore {
       this.showModalFieldChoice = null;
     }
     if (!parent.isRootMerge && parent !== this.rootFields) {
+      if (!this.context.merge) {
+        this.context.merge = toJS(defaultContext.merge);
+      }
       const newField = new Field({}, parent);
       newField.isMerge = true;
       newField.isInvalid = true;

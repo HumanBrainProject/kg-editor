@@ -741,7 +741,7 @@ class QueryBuilderStore {
       let mergeField = field;
       while (mergeField) {
         if (mergeField.schema.attribute)  {
-          const attribute = (!attributeReg.test(mergeField.schema.attribute) && modelReg.test(mergeField.schema.attribute))?("/" + mergeField.schema.attribute.match(modelReg).splice(1,1)[0]):mergeField.schema.attribute;
+          const attribute = (!attributeReg.test(mergeField.schema.attribute) && modelReg.test(mergeField.schema.attribute))?("/" + mergeField.schema.attribute.match(modelReg)[1]):mergeField.schema.attribute;
           const relativePath = mergeField.schema.attributeNamespace && (mergeField.schema.simpleAttributeName || mergeField.schema.simplePropertyName)?(mergeField.schema.attributeNamespace + ":" + (mergeField.schema.simpleAttributeName || mergeField.schema.simplePropertyName)):attribute;
           if (mergeField.schema.reverse) {
             jsonMergeFields.push({
@@ -777,7 +777,7 @@ class QueryBuilderStore {
       let jsonField = {};
       jsonField.fieldname = (field.namespace?field.namespace:"query") + ":" + ((field.alias && field.alias.trim()) || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label || uniqueId("field"));
       if (field.schema.attribute)  {
-        const attribute = (!attributeReg.test(field.schema.attribute) && modelReg.test(field.schema.attribute))?("/" + field.schema.attribute.match(modelReg).splice(1,1)[0]):field.schema.attribute;
+        const attribute = (!attributeReg.test(field.schema.attribute) && modelReg.test(field.schema.attribute))?("/" + field.schema.attribute.match(modelReg)[1]):field.schema.attribute;
         const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName)?(field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)):attribute;
         if (field.schema.reverse) {
           jsonField.relative_path = {
@@ -855,7 +855,7 @@ class QueryBuilderStore {
             [, attributeNamespace, simpleAttributeName] = relativePath.match(namespaceReg);
             attribute = this.context && this.context[attributeNamespace]?this.context[attributeNamespace] + simpleAttributeName:null;
           } else if (modelReg.test(relativePath)) {
-            attribute = relativePath.match(modelReg).splice(1,1)[0];
+            attribute = relativePath.match(modelReg)[1];
           } else if (relativePath === "@id") {
             attribute = relativePath;
           }
@@ -970,7 +970,7 @@ class QueryBuilderStore {
             [, attributeNamespace, simpleAttributeName] = relativePath.match(namespaceReg);
             attribute = this.context && this.context[attributeNamespace]?this.context[attributeNamespace] + simpleAttributeName:null;
           } else if (modelReg.test(relativePath)) {
-            attribute = relativePath.match(modelReg).splice(1,1)[0];
+            attribute = relativePath.match(modelReg)[1];
           } else if (relativePath === "@id") {
             attribute = relativePath;
           }

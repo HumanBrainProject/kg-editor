@@ -18,10 +18,13 @@ const styles = {
       color: "#143048"
     },
     "& .quickfire-field-input-text.quickfire-readmode, & .quickfire-field-dropdown-select.quickfire-readmode": {
-      marginBottom: "5px"
-    },
-    "& .quickfire-field-input-text.quickfire-readmode label.quickfire-label, & .quickfire-field-dropdown-select.quickfire-readmode label.quickfire-label": {
-      marginBottom: "0"
+      marginBottom: "5px",
+      "& label.quickfire-label": {
+        marginBottom: "0",
+        "& + p": {
+          whiteSpace: "pre"
+        }
+      }
     },
     "& .quickfire-field-disabled.quickfire-empty-field, .quickfire-field-readonly.quickfire-empty-field": {
       display: "none"
@@ -67,15 +70,19 @@ export default class InstanceField extends React.Component{
   renderReadModeField = (field) => {
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
+        /*
         if (this.props.id !== this.props.mainInstanceId && this.props.id !== instanceStore.getCurrentInstanceId(this.props.mainInstanceId) && this.props.level !== 0) {
           if (field.value && field.value.length && field.value.length >= 200) {
             return field.value.substr(0,197) + "...";
           }
           return field.value;
         }
-        return field.value;
-
-      } else if (typeof field.type === "string" && field.type.includes("DropdownSelect")) {
+        */
+        return (
+          <p>{field.value}</p>
+        );
+      }
+      if (typeof field.type === "string" && field.type.includes("DropdownSelect")) {
         return (
           <span className="quickfire-readmode-list">
             {field.value.map(value =>

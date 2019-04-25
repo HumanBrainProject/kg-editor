@@ -247,7 +247,7 @@ export default class InstanceForm extends React.Component {
               hasChanged={instance.hasChanged}/>
 
             <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} />
-            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={isMainInstance || isCurrentInstance || !isReadMode} />
+            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} />
 
             <FooterPanel
               className={classes.panelFooter}

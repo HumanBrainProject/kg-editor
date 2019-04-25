@@ -18,7 +18,7 @@ const styles = {
       color:"#f39c12"
     },
     "&.not-released":{
-      color:"#e74c3c"
+      color: "var(--ft-color-error)"
     },
     display:"grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",

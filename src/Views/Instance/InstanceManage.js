@@ -60,7 +60,7 @@ const styles = {
     wordBreak:"break-word"
   },
   error: {
-    color: "#e74c3c"
+    color: "var(--ft-color-error)"
   }
 };
 

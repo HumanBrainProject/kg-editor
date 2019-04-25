@@ -1,8 +1,8 @@
 import React from "react";
 import injectStyles from "react-jss";
 
-import Avatar from "./Alternatives/Avatar";
-import Alternative from "./Alternatives/Alternative";
+import Avatar from "../Views/Avatar";
+import Alternative from "./Alternative";
 
 const styles = {
   container: {

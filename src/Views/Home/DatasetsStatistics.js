@@ -114,7 +114,7 @@ const styles = {
       minWidth:"140px",
       marginTop:"20px"
     },
-    color:"#e74c3c"
+    color: "var(--ft-color-error)"
   },
   noStatisticsPanel:{
     extend:"statisticsFetchErrorPanel",

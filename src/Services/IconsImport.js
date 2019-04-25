@@ -60,6 +60,7 @@ import {faBlenderPhone} from "@fortawesome/free-solid-svg-icons/faBlenderPhone";
 import {faTable} from "@fortawesome/free-solid-svg-icons/faTable";
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons/faAsterisk";
 import {faLevelDownAlt} from "@fortawesome/free-solid-svg-icons/faLevelDownAlt";
+import {faSitemap} from "@fortawesome/free-solid-svg-icons/faSitemap";
 
 library.add(
   faUser,
@@ -120,5 +121,6 @@ library.add(
   faBlenderPhone,
   faTable,
   faAsterisk,
-  faLevelDownAlt
+  faLevelDownAlt,
+  faSitemap
 );

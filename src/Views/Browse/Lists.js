@@ -64,7 +64,7 @@ const styles = {
       width:"100%",
       marginTop:"20px"
     },
-    color:"#e74c3c"
+    color: "var(--ft-color-error)"
   },
   noResultPanel:{
     extend:"fetchErrorPanel",

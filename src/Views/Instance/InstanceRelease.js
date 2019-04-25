@@ -150,7 +150,7 @@ const styles = {
     }
   },
   removeIcon:{
-    color: "#e74c3c",
+    color: "var(--ft-color-error)",
     fontSize:"1.5em",
     marginLeft:"10px",
     opacity:0.25,

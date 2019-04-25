@@ -5,7 +5,7 @@ const endpoints = {
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "features": () => `${window.rootPath}/data/features.json`,
-  "structure": () => "/statistics/structure.json",
+  "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
   "globalDatasetsStatistics": () => `${window.rootPath}/data/mockups/globalDatasetsStatistics.json`,
   "nodeTypes": () => "/editor/api/nodetypes",
@@ -23,11 +23,14 @@ const endpoints = {
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/api/instances/${instance}/graph`,
-  "query": function(rootInstancePath, vocab, size, start){
-    return `/query/${rootInstancePath}/instances${arguments.length > 1?"?":""}${
+  "structure": () => "/api/structure?withLinks=true",
+  "performQuery": function(instancePath, vocab, size, start){
+    return `/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
-      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;}
+      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
+  "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
+  "listQueries": instancePath => `/query/${instancePath?"":""}`,
 };
 
 class API {

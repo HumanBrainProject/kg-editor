@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { MenuItem } from "react-bootstrap";
 
-import User from "./User";
+import User from "../Views/User";
 
 const Value = ({value, field}) => {
 

@@ -13,6 +13,7 @@
     "diff": "^3.5.0",
     "google-palette": "^1.1.0",
     "hbp-quickfire": "^1.0.20",
+    "jsonld": "~1.5.4",
     "lodash": "^4.17.11",
     "mobx": "^4.9.3",
     "mobx-react": "^5.4.3",

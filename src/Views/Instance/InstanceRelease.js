@@ -12,6 +12,7 @@ import ReleaseStatus from "../../Components/ReleaseStatus";
 import MultiToggle from "../../Components/MultiToggle";
 import BGMessage from "../../Components/BGMessage";
 import SavingModal from "./InstanceRelease/SavingModal";
+import ClientPreviewModal from "./InstanceRelease/ClientPreviewModal";
 
 const styles = {
   container: {
@@ -278,6 +279,10 @@ const styles = {
         }
       }
     }
+  },
+  previewIcon:{
+    fontSize: "2.5em",
+    textAlign: "center"
   }
 };
 
@@ -499,6 +504,9 @@ export default class InstanceRelease extends React.Component{
     super(props);
     this.releaseStore = new ReleaseStore(props.id);
     this.keyMap = new WeakMap();
+    this.state = {
+      showModal: false
+    }
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
@@ -515,6 +523,16 @@ export default class InstanceRelease extends React.Component{
     this.releaseStore.fetchReleaseData();
   }
 
+  handleOpenModal = () => {
+    this.setState({showModal: true});
+  }
+
+  handleCloseModal = () => {
+    this.setState({showModal: false});
+  }
+
+
+ 
   render(){
     const { classes } = this.props;
 
@@ -544,6 +562,7 @@ export default class InstanceRelease extends React.Component{
                     <h4>Current state</h4>
                   </div>
                   <div className={classes.releaseActions}>
+                    <div onClick={this.handleOpenModal} className={classes.previewIcon}><FontAwesomeIcon style={{verticalAlign:"top"}} icon="eye" /></div>
                     <ReleaseAction releaseStore={this.releaseStore} />
                   </div>
                   <div className={classes.releaseInfos}>
@@ -556,6 +575,7 @@ export default class InstanceRelease extends React.Component{
                     <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.pending_status}`} node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />
                   </div>
                   <SavingModal store={this.releaseStore}/>
+                  <ClientPreviewModal store={this.releaseStore} show={this.state.showModal} handleClose={this.handleCloseModal} />
                 </div>
               }
             </Scrollbars>

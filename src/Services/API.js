@@ -31,6 +31,7 @@ const endpoints = {
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
   "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
   "listQueries": instancePath => `/query/${instancePath?"":""}`,
+  "clientInstancePreview": instancePath => `/instances/${instancePath}`,
 };
 
 class API {

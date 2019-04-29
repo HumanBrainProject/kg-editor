@@ -32,37 +32,32 @@ module.exports = {
     open: true,
     proxy: {
       "/query/**": {
-        // target:"https://kg-int.humanbrainproject.org",
-        target:"http://localhost:8444",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       },
       "/api/**": {
-        // target:"https://kg-int.humanbrainproject.org",
-        target:"http://localhost:8444",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       },
       "/editor/api/**": {
-        // target:"https://kg-int.humanbrainproject.org",
-        target:"http://localhost:9000",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       },
       "/statistics": {
-        target:"https://kg-int.humanbrainproject.org",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       },
       "/internal/**": {
-        // target:"https://kg-int.humanbrainproject.org",
-        target:"http://localhost:8444",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       },
       "/instances/**":{
-        // target:"https://kg-int.humanbrainproject.org",
-        target:"http://localhost:9000",
+        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       }

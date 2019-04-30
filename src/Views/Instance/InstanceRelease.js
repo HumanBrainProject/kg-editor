@@ -282,7 +282,11 @@ const styles = {
   },
   previewIcon:{
     fontSize: "2.5em",
-    textAlign: "center"
+    textAlign: "center",
+    cursor:"pointer",
+    "& :hover":{
+      color:"lightgrey"
+    }
   }
 };
 
@@ -506,7 +510,7 @@ export default class InstanceRelease extends React.Component{
     this.keyMap = new WeakMap();
     this.state = {
       showModal: false
-    }
+    };
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
@@ -531,8 +535,6 @@ export default class InstanceRelease extends React.Component{
     this.setState({showModal: false});
   }
 
-
- 
   render(){
     const { classes } = this.props;
 

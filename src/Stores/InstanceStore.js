@@ -47,7 +47,7 @@ class OptionsCache{
   }
 }
 
-const nodeTypeMapping = {
+const _nodeTypeMapping = {
   "Dataset":"https://schema.hbp.eu/minds/Dataset",
   "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
   "Subject":"https://schema.hbp.eu/minds/Subject",
@@ -77,10 +77,69 @@ const nodeTypeMapping = {
   "Role":"https://schema.hbp.eu/minds/Role"
 };
 
+export function nodeTypeMapping() {
+  return _nodeTypeMapping;
+}
+
+let _reverseNodeTypeMapping = null;
+export function reverseNodeTypeMapping(){
+  if (_reverseNodeTypeMapping) {
+    return _reverseNodeTypeMapping;
+  }
+  return Object.entries(_nodeTypeMapping).reduce((result, [label, type]) => {
+    result[type] = label;
+    return result;
+  }, {});
+}
+
+class Instance {
+  @observable instanceId = null;
+  @observable data = null;
+  @observable form = null;
+  @observable cancelChangesPending = null;
+  @observable fetchError = null;
+  @observable hasFetchError = false;
+  @observable saveError = null;
+  @observable hasSaveError = false;
+  @observable isSaving = false;
+  @observable hasChanged = false;
+  @observable isFetching = false;
+  @observable isFetched = false;
+  @observable highlight = null;
+  @observable path = "";
+
+  constructor(instanceId, path="") {
+    this.instanceId = instanceId;
+    this.path = path?path:"";
+  }
+
+  @computed
+  get promotedFields() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
+      return this.data.ui_info.promotedFields
+        .filter(name => this.data.fields[name]);
+    }
+    return [];
+  }
+
+  computed
+  get nonPromotedFields() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
+      return Object.keys(this.data.fields)
+        .filter(key => {
+          return !this.data.ui_info || !this.data.ui_info.promotedFields || !this.data.ui_info.promotedFields.includes(key);
+        });
+    }
+    return [];
+  }
+}
+
 class InstanceStore {
+  @observable databaseScope = null;
   @observable instances = new Map();
   @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
+  @observable comparedWithReleasedVersionInstance = null;
   @observable globalReadMode = true;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
@@ -95,42 +154,14 @@ class InstanceStore {
 
   generatedKeys = new WeakMap();
 
-  constructor(){
+  constructor(databaseScope=null) {
+    this.databaseScope = databaseScope?databaseScope:null;
     if(localStorage.getItem("openedTabs")){
       let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
       authStore.reloginPromise.then(()=>{
         this.restoreOpenedTabs(storedOpenedTabs);
       });
     }
-  }
-
-  get nodeTypeMapping(){
-    return nodeTypeMapping;
-  }
-
-  get reverseNodeTypeMapping(){
-    return Object.entries(nodeTypeMapping).reduce((result, [label, type]) => {
-      result[type] = label;
-      return result;
-    }, {});
-  }
-
-  getPromotedFields(instance) {
-    if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
-      return instance.data.ui_info.promotedFields
-        .filter(name => instance.data.fields[name]);
-    }
-    return [];
-  }
-
-  getNonPromotedFields(instance) {
-    if (instance && instance.data && instance.data.fields) {
-      return Object.keys(instance.data.fields)
-        .filter(key => {
-          return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
-        });
-    }
-    return [];
   }
 
   @action flush(){
@@ -207,7 +238,7 @@ class InstanceStore {
   async createNewInstance(path, name=""){
     this.isCreatingNewInstance = path;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
+      const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), {"http://schema.org/name":name});
       this.isCreatingNewInstance = false;
       return data.data.id;
     } catch(e){
@@ -242,7 +273,7 @@ class InstanceStore {
     }
     this.isCreatingNewInstance = path;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), values);
+      const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), values);
       this.isCreatingNewInstance = false;
       return data.data.id;
     } catch(e){
@@ -258,7 +289,7 @@ class InstanceStore {
       this.isDeletingInstance = true;
       this.deleteInstanceError = null;
       try{
-        await API.axios.delete(API.endpoints.instanceData(instanceId));
+        await API.axios.delete(API.endpoints.instanceData(instanceId, this.databaseScope));
         runInAction(() => {
           this.instanceToDelete = null;
           this.isDeletingInstance = false;
@@ -317,6 +348,11 @@ class InstanceStore {
     this.comparedInstanceId = instanceId;
   }
 
+  @action
+  setComparedWithReleasedVersionInstance(instanceId){
+    this.comparedWithReleasedVersionInstance = instanceId;
+  }
+
   getGeneratedKey(from, namespace){
     if(!this.generatedKeys.has(from)){
       this.generatedKeys.set(from, uniqueId(namespace));
@@ -361,29 +397,17 @@ class InstanceStore {
       instance.hasSaveError = false;
     } else {
       const [organization, domain, schema, version, ] = instanceId.split("/");
-      this.instances.set(instanceId, {
-        data: null,
-        form: null,
-        cancelChangesPending: null,
-        fetchError: null,
-        hasFetchError: false,
-        saveError: null,
-        hasSaveError: false,
-        isSaving: false,
-        hasChanged: false,
-        isFetching: true,
-        isFetched: false,
-        highlight: null,
-        path: (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:""
-      });
-      instance = this.instances.get(instanceId);
+      const path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
+      instance = new Instance(instanceId, path);
+      this.instances.set(instanceId, instance);
+      instance.isFetching = true;
     }
 
     try {
       let path = instanceId;
       console.debug("fetch instance " + path + ".");
 
-      const { data } = await API.axios.get(API.endpoints.instanceData(path));
+      const { data } = await API.axios.get(API.endpoints.instanceData(path, this.databaseScope));
 
       runInAction(async () => {
         const instanceData = data.data?data.data:{fields: {}};
@@ -573,7 +597,7 @@ class InstanceStore {
 
     try {
       const payload = instance.form.getValues();
-      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), payload);
+      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId, this.databaseScope), payload);
       runInAction(() => {
         instance.hasChanged = false;
         instance.saveError = null;
@@ -621,5 +645,9 @@ class InstanceStore {
     this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
 }
+
+export const createInstanceStore = (databaseScope=null) => {
+  return new InstanceStore(databaseScope);
+};
 
 export default new InstanceStore();

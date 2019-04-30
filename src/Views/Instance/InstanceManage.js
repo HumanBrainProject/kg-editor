@@ -100,7 +100,7 @@ export default class InstanceMange extends React.Component{
     const { classes } = this.props;
 
     const instance = instanceStore.getInstance(this.props.id);
-    const promotedFields = instanceStore.getPromotedFields(instance);
+    const promotedFields = instance.promotedFields;
     const status = statusStore.getInstance(this.props.id);
 
     return (

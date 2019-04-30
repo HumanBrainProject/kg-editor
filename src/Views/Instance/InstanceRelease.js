@@ -564,7 +564,7 @@ export default class InstanceRelease extends React.Component{
                     <h4>Current state</h4>
                   </div>
                   <div className={classes.releaseActions}>
-                    <div onClick={this.handleOpenModal} className={classes.previewIcon}><FontAwesomeIcon style={{verticalAlign:"top"}} icon="eye" /></div>
+                    <div onClick={this.handleOpenModal} className={classes.previewIcon}><FontAwesomeIcon style={{verticalAlign:"top"}} title="Preview in KG Search" icon="eye" /></div>
                     <ReleaseAction releaseStore={this.releaseStore} />
                   </div>
                   <div className={classes.releaseInfos}>

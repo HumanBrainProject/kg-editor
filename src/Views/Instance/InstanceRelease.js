@@ -112,7 +112,20 @@ const styles = {
     "& .status-indicator":{
       display:"inline-block",
       verticalAlign:"middle",
-      marginRight:"4px"
+      "& > div:first-child":{
+        display:"block",
+        position:"relative",
+        zIndex:"5",
+        boxShadow:"2px 2px 1px var(--release-status-box-shadow)"
+      },
+      "& > div:not(:first-child)":{
+        position: "relative",
+        top: "-3px",
+        left:"7px",
+        display: "block",
+        zIndex: "3",
+        marginRight:"8px"
+      },
     },
     "& .child-icon":{
       color:"black",
@@ -128,7 +141,8 @@ const styles = {
       verticalAlign:"middle",
       fontWeight:"bold",
       color:"var(--ft-color-loud)",
-      marginRight:"5px"
+      marginRight:"5px",
+      marginLeft:"8px"
     }
   },
   releasePreview:{
@@ -465,7 +479,8 @@ class ReleaseNode extends React.Component {
       <div className={`node ${statusClass} ${releaseStore.hlNode === node?"highlighted":""}`}>
         <div className="node-content" onClick={this.handleHLNode.bind(this, node)}>
           <div className={"status-indicator"}>
-            <ReleaseStatus key={`${node[prefix+"status"]}-${node[prefix+"childrenStatus"]}`} instanceStatus={node[prefix+"status"]} childrenStatus={node[prefix+"childrenStatus"]}/>
+            <ReleaseStatus key={`${node[prefix+"status"]}`} instanceStatus={node[prefix+"status"]} isChildren={false} />
+            {node[prefix+"childrenStatus"] != null? <ReleaseStatus key={`${node[prefix+"childrenStatus"]}`} instanceStatus={node[prefix+"childrenStatus"]} isChildren={true}/>:<div></div>}
           </div>
           <span className={"node-type"}>
             ({node.type})

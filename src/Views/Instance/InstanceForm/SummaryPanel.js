@@ -11,10 +11,10 @@ const styles = {
 @injectStyles(styles)
 export default class SummaryPanel extends React.Component{
   render(){
-    const { classes, className, level, id, instance, fields, mainInstanceId } = this.props;
+    const { classes, className, level, id, instance, fields, mainInstanceId, disableLinks } = this.props;
     return(
       <div className={`${classes.panel} ${className}`}>
-        {fields.map(name => <InstanceField key={id+name} name={name} level={level} id={id} instance={instance} mainInstanceId={mainInstanceId}/>)}
+        {fields.map(name => <InstanceField key={id+name} name={name} level={level} id={id} instance={instance} mainInstanceId={mainInstanceId} disableLinks={disableLinks} />)}
       </div>
     );
   }

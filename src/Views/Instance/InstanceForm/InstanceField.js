@@ -22,7 +22,7 @@ const styles = {
       "& label.quickfire-label": {
         marginBottom: "0",
         "& + p": {
-          whiteSpace: "pre"
+          whiteSpace: "pre-wrap"
         }
       }
     },
@@ -112,9 +112,8 @@ export default class InstanceField extends React.Component{
   }
 
   render(){
-    const { classes, name, instance } = this.props;
+    const { classes, name, instance, disableLinks } = this.props;
     const field = instance.data.fields[name];
-    const readOnlyMode = instanceStore.readOnlyMode;
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
@@ -126,7 +125,7 @@ export default class InstanceField extends React.Component{
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
           onValueBlur={this.handleToggleOffFieldHighlight}
           onValueMouseLeave={this.handleToggleOffFieldHighlight}
-          readModeRendering={readOnlyMode?undefined:this.renderReadModeField}
+          readModeRendering={disableLinks?undefined:this.renderReadModeField}
           onAddCustomValue={field.allowCustomValues?this.addCustomValueHandler:undefined} />;
       }
       return <Field name={name} className={classes.field} />;

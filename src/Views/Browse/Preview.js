@@ -1,6 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
+import showdown from "showdown";
+import xssFilter from "showdown-xss-filter";
 import { Form, Field } from "hbp-quickfire";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
@@ -14,6 +16,8 @@ import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
 import BookmarkStatus from "../Instance/BookmarkStatus";
+
+const converter = new showdown.Converter({extensions: [xssFilter]});
 
 const styles = {
   container:{
@@ -106,11 +110,19 @@ export default class Preview extends React.Component{
     instanceStore.fetchInstanceData(browseStore.selectedInstance.id);
   }
 
+  markdownDescriptionRendering = field => {
+    const markdownEval = converter.makeHtml(field.getValue());
+    return(
+      <span dangerouslySetInnerHTML={{__html:markdownEval}}></span>
+    );
+  }
+
   render(){
     const { classes } = this.props;
     let selectedInstance = instanceStore.getInstance(browseStore.selectedInstance.id);
 
     const promotedFields = selectedInstance.promotedFields;
+    const promotedFieldsWithMarkdown = selectedInstance.promotedFieldsWithMarkdown;
     const nonPromotedFields = selectedInstance.nonPromotedFields;
     const metadata = selectedInstance.metadata;
 
@@ -152,8 +164,11 @@ export default class Preview extends React.Component{
                 <Form store={selectedInstance.form} key={browseStore.selectedInstance.id}>
                   {promotedFields.map(fieldKey => {
                     return(
-                      <div key={browseStore.selectedInstance.id+fieldKey} className={classes.field}>
-                        <Field name={fieldKey}/>
+                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
+                        {promotedFieldsWithMarkdown.includes(fieldKey) ?
+                          <Field name={fieldKey} readModeRendering={this.markdownDescriptionRendering}/>:
+                          <Field name={fieldKey}/>
+                        }
                       </div>
                     );
                   })}

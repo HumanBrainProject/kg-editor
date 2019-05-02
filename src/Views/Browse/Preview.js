@@ -110,8 +110,8 @@ export default class Preview extends React.Component{
     const { classes } = this.props;
     let selectedInstance = instanceStore.getInstance(browseStore.selectedInstance.id);
 
-    const promotedFields = instanceStore.getPromotedFields(selectedInstance);
-    const nonPromotedFields = instanceStore.getNonPromotedFields(selectedInstance);
+    const promotedFields = selectedInstance.promotedFields;
+    const nonPromotedFields = selectedInstance.nonPromotedFields;
     const metadata = instanceStore.getMetadata(selectedInstance);
 
     return(

@@ -246,8 +246,8 @@ export default class InstanceForm extends React.Component {
               color={graphStore.colorScheme[nodeTypeMapping()[nodeType]]}
               hasChanged={instance.hasChanged}/>
 
-            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} />
-            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={isMainInstance || isCurrentInstance || !isReadMode} />
+            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
+            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
 
             <FooterPanel
               className={classes.panelFooter}

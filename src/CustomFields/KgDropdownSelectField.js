@@ -78,7 +78,7 @@ const styles = {
       content: "':\\00a0'"
     },
     "& .quickfire-readmode-item:not(:last-child):after":{
-      content: "',\\00a0'"
+      content: "';\\00a0'"
     }
   },
   alternatives: {

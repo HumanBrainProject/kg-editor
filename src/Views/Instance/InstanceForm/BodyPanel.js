@@ -20,12 +20,12 @@ const styles = {
 @injectStyles(styles)
 export default class BodyPanel extends React.Component{
   render(){
-    const { classes, className,  show, level, id, instance, fields, mainInstanceId } = this.props;
+    const { classes, className,  show, level, id, instance, fields, mainInstanceId, disableLinks } = this.props;
     return(
       <Panel className={`${classes.panel} ${className}`} expanded={show} onToggle={() => {}}>
         <Panel.Collapse>
           <Panel.Body>
-            {fields.map(name => <InstanceField key={id+name} name={name} level={level} id={id} instance={instance} mainInstanceId={mainInstanceId}/>)}
+            {fields.map(name => <InstanceField key={id+name} name={name} level={level} id={id} instance={instance} mainInstanceId={mainInstanceId} disableLinks={disableLinks} />)}
           </Panel.Body>
         </Panel.Collapse>
       </Panel>

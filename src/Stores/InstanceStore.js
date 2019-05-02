@@ -77,6 +77,14 @@ const nodeTypeMapping = {
   "Role":"https://schema.hbp.eu/minds/Role"
 };
 
+const metadataTypeMapping = {
+  "createdBy": "Created by",
+  "createdAt": "Created at",
+  "lastUpdateAt": "Last update at",
+  "lastUpdateBy":  "Last update by",
+  "numberOfEdits": "Number of edits"
+};
+
 class InstanceStore {
   @observable instances = new Map();
   @observable openedInstances = new Map();
@@ -129,6 +137,24 @@ class InstanceStore {
         .filter(key => {
           return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
         });
+    }
+    return [];
+  }
+
+  getMetadata(instance) {
+    if (instance && instance.data && instance.data.metadata) {
+      let result = [];
+      let metadata = instance.data.metadata;
+      Object.keys(metadata).forEach(key => {
+        if (key == "lastUpdateAt" || key == "createdAt") {
+          let d = new Date(metadata[key]);
+          result.push({"label": metadataTypeMapping[key], "value": d.toLocaleString()});
+        } else {
+          result.push({"label": metadataTypeMapping[key], "value": metadata[key]});
+        }
+      }
+      );
+      return result;
     }
     return [];
   }

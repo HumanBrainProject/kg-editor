@@ -63,6 +63,10 @@ const styles = {
     fontSize:"1.5em",
     fontWeight:"300"
   },
+  metadataTitle: {
+    display: "inline-block",
+    marginBottom: "10px"
+  },
   id:{
     fontSize:"0.75em",
     color:"var(--ft-color-normal)",
@@ -108,6 +112,7 @@ export default class Preview extends React.Component{
 
     const promotedFields = instanceStore.getPromotedFields(selectedInstance);
     const nonPromotedFields = instanceStore.getNonPromotedFields(selectedInstance);
+    const metadata = instanceStore.getMetadata(selectedInstance);
 
     return(
       <Scrollbars autoHide>
@@ -159,6 +164,16 @@ export default class Preview extends React.Component{
                       </div>
                     );
                   })}
+                  {metadata.length > 0 ?
+                    <div className={classes.content}>
+                      <hr />
+                      <span className={`${classes.title} ${classes.metadataTitle}`}> Metadata </span>
+                      {metadata.map(field =>
+                        <div key={browseStore.selectedInstanceId+field.label} className={classes.field}>
+                          <label>{field.label}: </label> {field.value}
+                        </div>
+                      )}
+                    </div>:null}
                   <div className={`${classes.status}`}>
                     <div className={"release-status"}>
                       <Status darkmode={true} id={browseStore.selectedInstance.id} />

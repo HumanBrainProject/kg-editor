@@ -1,11 +1,12 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { Button, ButtonGroup } from "react-bootstrap";
+import { Button, ButtonGroup, Modal } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import ReleaseStore from "../../Stores/ReleaseStore";
+import instanceStore from "../../Stores/InstanceStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import ReleaseStatus from "../../Components/ReleaseStatus";
@@ -13,6 +14,7 @@ import MultiToggle from "../../Components/MultiToggle";
 import BGMessage from "../../Components/BGMessage";
 import SavingModal from "./InstanceRelease/SavingModal";
 import ClientPreviewModal from "./InstanceRelease/ClientPreviewModal";
+import CompareWithReleasedVersionChanges from "./CompareWithReleasedVersionChanges";
 
 const styles = {
   container: {
@@ -95,6 +97,8 @@ const styles = {
       }
     },
     "& .node-content":{
+      display: "grid",
+      gridTemplateColumns: "auto auto 1fr auto auto",
       padding: "8px",
       position:"relative",
       border:"2px solid var(--bg-color-ui-contrast2)",
@@ -139,15 +143,18 @@ const styles = {
     padding:"10px"
   },
   label:{
-    display:"inline-block",
-    verticalAlign:"middle",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis"
   },
   nodeActions:{
-    position:"absolute",
-    top:7,
-    right:10,
+    height: 0,
+    marginTop: "-1px",
+    "&.no-release":{
+      marginLeft:"24px"
+    },
     "&.no-unrelease":{
-      right:"34px"
+      marginRight:"24px"
     }
   },
   removeIcon:{
@@ -280,6 +287,32 @@ const styles = {
       }
     }
   },
+  compareButton: {
+    margin: "0 10px",
+    height: "20px",
+    "& button": {
+      marginTop: "-3px",
+      padding: "4px 10px 5px 10px",
+      border: "transparent",
+      background: "var(--bg-color-ui-contrast4)",
+      color: "var(--ft-color-normal)"
+    }
+  },
+  compareModal: {
+    width:"90%",
+    "@media screen and (min-width:1024px)": {
+      width:"900px",
+    },
+    "& .modal-header": {
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      textOverflow: "ellipsis"
+    },
+    "& .modal-body": {
+      height: "calc(95vh - 112px)",
+      padding: "3px 0"
+    }
+  },
   previewIcon:{
     fontSize: "2.5em",
     textAlign: "center",
@@ -396,7 +429,7 @@ class ReleaseNodeToggle extends React.Component {
   }
 
   handleStopClick = e => {
-    e.stopPropagation();
+    e && e.stopPropagation();
   }
 
   render() {
@@ -407,7 +440,7 @@ class ReleaseNodeToggle extends React.Component {
     }
 
     return(
-      <div className={`${classes.nodeActions} ${node.status==="NOT_RELEASED"?"no-unrelease":""}`} onClick={this.handleStopClick}>
+      <div className={`${classes.nodeActions} ${node.status==="RELEASED"?"no-release":""} ${node.status==="NOT_RELEASED"?"no-unrelease":""}`} onClick={this.handleStopClick}>
         <MultiToggle selectedValue={node.pending_status} onChange={this.handleChange}>
           {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check"/>}
           <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale/>
@@ -453,9 +486,14 @@ class ReleaseNodeAndChildrenToggle extends React.Component {
 @observer
 class ReleaseNode extends React.Component {
 
+  handleShowCompare(node, e){
+    e && e.stopPropagation();
+    instanceStore.setComparedWithReleasedVersionInstance(node);
+  }
+
   handleHLNode(node, e){
     const { releaseStore } = this.props;
-    e.stopPropagation();
+    e && e.stopPropagation();
     releaseStore.toggleHLNode(node);
   }
 
@@ -483,7 +521,12 @@ class ReleaseNode extends React.Component {
             {node.label}
           </span>
           {prefix === "" && (
-            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+            <React.Fragment>
+              <div  className={classes.compareButton}>
+                <Button bsSize="small" onClick={this.handleShowCompare.bind(this, node)} title="compare the changes with released vesion"><FontAwesomeIcon icon="glasses"/></Button>
+              </div>
+              <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+            </React.Fragment>
           )}
         </div>
         {node.children && node.children.length > 0 &&
@@ -517,6 +560,11 @@ export default class InstanceRelease extends React.Component{
     if(this.props.id !== newProps.id){
       this.releaseStore = new ReleaseStore(newProps.id);
     }
+  }
+
+  handleShowCompare(node, e){
+    e && e.stopPropagation();
+    instanceStore.setComparedWithReleasedVersionInstance(node);
   }
 
   handleDismissSaveError = () => {
@@ -577,6 +625,21 @@ export default class InstanceRelease extends React.Component{
                     <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.pending_status}`} node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />
                   </div>
                   <SavingModal store={this.releaseStore}/>
+                  {instanceStore.comparedWithReleasedVersionInstance && instanceStore.comparedWithReleasedVersionInstance.relativeUrl &&
+                    <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
+                      <Modal.Header closeButton>
+                        Compare with the released version of <strong>{instanceStore.comparedWithReleasedVersionInstance.type}&nbsp;{instanceStore.comparedWithReleasedVersionInstance.label}</strong>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <Scrollbars autoHide>
+                          <CompareWithReleasedVersionChanges instanceId={instanceStore.comparedWithReleasedVersionInstance.relativeUrl} status={instanceStore.comparedWithReleasedVersionInstance.status}/>
+                        </Scrollbars>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this,null)}><FontAwesomeIcon icon="times"/>&nbsp;Close</Button>
+                      </Modal.Footer>
+                    </Modal>
+                  }
                   <ClientPreviewModal store={this.releaseStore} show={this.state.showModal} handleClose={this.handleCloseModal} />
                 </div>
               }

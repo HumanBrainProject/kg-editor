@@ -13,7 +13,7 @@ const endpoints = {
   "instances": entity => `/editor/api/instances/${entity}`,
   "listedInstances": () => "/editor/api/instances",
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "instanceData": instance => `/editor/api/instance/${instance}`,
+  "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
   "releaseData": instance => `/api/releases/${instance}/graph`,
   "doRelease": instance => `/api/releases/${instance}`,
   "releaseStatus": () => "/api/releases",

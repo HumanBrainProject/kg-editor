@@ -4,7 +4,15 @@ import CompareFieldValueChanges from "./CompareFieldValueChanges";
 
 const styles = {
   container:{
-    marginBottom: "5px"
+    margin: "0 0 5px 0",
+    padding: 0,
+    border: 0,
+    background: "transparent",
+    overflowWrap: "anywhere",
+    fontFamily: "unset",
+    fontSize: "unset"
+    //,
+    //textAlign: "justify"
   },
   label: {
     marginBottom: 0,
@@ -24,10 +32,10 @@ export default class CompareFieldChanges extends React.Component{
       return null;
     }
     return (
-      <div className={classes.container}>
+      <pre className={classes.container}>
         <label className={classes.label}>{field.label}</label>
         <CompareFieldValueChanges mappingLabel={field.mappingLabel} beforeValue={beforeValue} afterValue={afterValue}/>
-      </div>
+      </pre>
     );
   }
 }

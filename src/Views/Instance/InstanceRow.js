@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import instanceStore from "../../Stores/InstanceStore";
+import { reverseNodeTypeMapping } from "../../Stores/InstanceStore";
 import graphStore from "../../Stores/GraphStore";
 
 import Status from "./Status";
@@ -166,9 +166,9 @@ export default class InstanceRow extends React.Component{
 
   render(){
     const { classes, instance, selected } = this.props;
-    //const color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.type]];
+    //const color = graphStore.colorScheme[nodeTypeMapping()[instance.type]];
     const color = graphStore.colorScheme[instance.dataType];
-    const dataTypeLabel = instanceStore.reverseNodeTypeMapping[instance.dataType];
+    const dataTypeLabel = reverseNodeTypeMapping()[instance.dataType];
 
     return(
       <div className={`${classes.container} ${selected?"selected":""}`}

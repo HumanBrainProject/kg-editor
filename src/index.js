@@ -10,7 +10,7 @@ import "./Services/IconsImport";
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
-import instanceStore from "./Stores/InstanceStore";
+import instanceStore, { nodeTypeMapping } from "./Stores/InstanceStore";
 import graphStore from "./Stores/GraphStore";
 import browseStore from "./Stores/BrowseStore";
 
@@ -454,7 +454,7 @@ class App extends React.Component{
                     if(!instance.isFetching && !instance.hasFetchError){
                       let field = instance.form.getField("http://schema.org/name");
                       label = field? field.getValue(): instanceId;
-                      color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
+                      color = graphStore.colorScheme[nodeTypeMapping()[instance.data.label]];
                     }
                     if(!label){
                       label = instanceId;

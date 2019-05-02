@@ -6,7 +6,8 @@ const jsdiff = require("diff");
 
 const styles = {
   container:{
-    wordBreak: "keep-all"
+    wordBreak: "keep-all",
+    whiteSpace: "pre-wrap"
   },
   removed:{
     background:new Color("#e74c3c").lighten(0.6).hex(),

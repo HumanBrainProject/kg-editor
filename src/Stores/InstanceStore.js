@@ -134,6 +134,14 @@ class Instance {
   }
 }
 
+const metadataTypeMapping = {
+  "createdBy": "Created by",
+  "createdAt": "Created at",
+  "lastUpdateAt": "Last update at",
+  "lastUpdateBy":  "Last update by",
+  "numberOfEdits": "Number of edits"
+};
+
 class InstanceStore {
   @observable databaseScope = null;
   @observable instances = new Map();
@@ -162,6 +170,24 @@ class InstanceStore {
         this.restoreOpenedTabs(storedOpenedTabs);
       });
     }
+  }
+
+  getMetadata(instance) {
+    if (instance && instance.data && instance.data.metadata) {
+      let result = [];
+      let metadata = instance.data.metadata;
+      Object.keys(metadata).forEach(key => {
+        if (key == "lastUpdateAt" || key == "createdAt") {
+          let d = new Date(metadata[key]);
+          result.push({"label": metadataTypeMapping[key], "value": d.toLocaleString()});
+        } else {
+          result.push({"label": metadataTypeMapping[key], "value": metadata[key]});
+        }
+      }
+      );
+      return result;
+    }
+    return [];
   }
 
   @action flush(){

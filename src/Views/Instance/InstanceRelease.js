@@ -112,16 +112,16 @@ const styles = {
     "& .status-indicator":{
       display:"inline-block",
       verticalAlign:"middle",
-      "& > div:first-child":{
-        display:"block",
-        position:"relative",
-        zIndex:"5",
-        boxShadow:"2px 2px 1px var(--release-status-box-shadow)"
-      },
-      "& > div:not(:first-child)":{
+      "& > div:first-child": {
+        display: "block",
         position: "relative",
-        top: "-3px",
-        left:"7px",
+        zIndex: "5",
+        boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)"
+      },
+      "& > div:not(:first-child)": {
+        position: "relative",
+        top: "-0.3em",
+        left: "0.6em",
         display: "block",
         zIndex: "3",
         marginRight:"8px"
@@ -480,7 +480,6 @@ class ReleaseNode extends React.Component {
         <div className="node-content" onClick={this.handleHLNode.bind(this, node)}>
           <div className={"status-indicator"}>
             <ReleaseStatus key={`${node[prefix+"status"]}`} instanceStatus={node[prefix+"status"]} isChildren={false} />
-            {node[prefix+"childrenStatus"] != null? <ReleaseStatus key={`${node[prefix+"childrenStatus"]}`} instanceStatus={node[prefix+"childrenStatus"]} isChildren={true}/>:<div></div>}
           </div>
           <span className={"node-type"}>
             ({node.type})

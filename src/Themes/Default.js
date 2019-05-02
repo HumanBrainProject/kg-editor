@@ -42,7 +42,7 @@ const styles = {
       "--bg-color-info-normal":"#ffc107",
 
       "--pane-box-shadow":"#333",
-      "--release-status-box-shadow":"#33333382",
+      "--release-status-box-shadow":"#00000080",
       "--release-color-released":"rgb(52, 152, 219)",
       "--release-bg-released":"rgba(52, 152, 219, 0.25)",
       "--release-color-not-released":"rgb(231, 76, 60)",

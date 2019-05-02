@@ -5,6 +5,7 @@ import API from "../Services/API";
 class StatusStore{
   @observable statuses = new Map();
   @observable isFetching = false;
+  @observable isFetchingChildren = false;
 
   processSize = 20;
   fetchQueue = [];
@@ -60,20 +61,21 @@ class StatusStore{
   @action
   smartProcessQueueChildren(){
     if(this.fetchQueueChildren.length <= 0){
-      this._debouncedProcessQueue.cancel();
+      this._debouncedProcessQueueChildren.cancel();
     } else if(this.fetchQueueChildren.length < this.processSize){
-      this._debouncedProcessQueue();
+      this._debouncedProcessQueueChildren();
     } else {
-      this._debouncedProcessQueue.cancel();
-      this.processQueue();
+      this._debouncedProcessQueueChildren.cancel();
+      this.processQueueChildren();
     }
   }
 
   _debouncedProcessQueue = debounce(()=>{this.processQueue();}, 250);
+  _debouncedProcessQueueChildren = debounce(()=>{this.processQueueChildren();}, 250);
 
   @action
   async processQueue(){
-    if(this.isFetching || this.isFetchingChildren){
+    if(this.isFetching){
       return;
     }
     this.isFetching = true;
@@ -84,15 +86,6 @@ class StatusStore{
       status.hasFetchError = false;
       status.fetchError = null;
     });
-
-    let toProcessChildren = this.fetchQueueChildren.splice(0, this.processSize);
-    toProcess.forEach(id => {
-      const status = this.statuses.get(id);
-      status.isFetchingChildren = true;
-      status.hasFetchErrorChildren = false;
-      status.fetchErrorChildren = null;
-    });
-
     try{
       let response = await API.axios.post(API.endpoints.releaseStatusTopInstance(), toProcess);
       runInAction(() =>{
@@ -118,6 +111,22 @@ class StatusStore{
         this.smartProcessQueue();
       });
     }
+    
+  }
+
+  @action
+  async processQueueChildren(){
+    if(this.isFetchingChildren){
+      return;
+    }
+    this.isFetchingChildren = true;
+    let toProcessChildren = this.fetchQueueChildren.splice(0, this.processSize);
+    toProcessChildren.forEach(id => {
+      const status = this.statuses.get(id);
+      status.isFetchingChildren = true;
+      status.hasFetchErrorChildren = false;
+      status.fetchErrorChildren = null;
+    });
     try {
       let responseChildren = await API.axios.post(API.endpoints.releaseStatusChildren(), toProcessChildren);
       runInAction(() =>{
@@ -133,7 +142,7 @@ class StatusStore{
     }catch(e){
       runInAction(() =>{
         const message = e.message? e.message: e;
-        toProcess.forEach(id => {
+        toProcessChildren.forEach(id => {
           const status = this.statuses.get(id);
           status.isFetchingChildren = false;
           status.hasFetchErrorChildren = true;
@@ -145,5 +154,8 @@ class StatusStore{
     }
   }
 }
+
+
+
 
 export default new StatusStore();

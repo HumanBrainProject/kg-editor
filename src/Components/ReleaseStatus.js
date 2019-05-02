@@ -8,24 +8,39 @@ const styles = {
   status: {
     borderRadius: "0.14em",
     width: "2.5em",
-    background: "currentColor",
     textAlign: "center",
-    color: "#337ab7",
     opacity: 1,
     padding: "2px",
     lineHeight: "normal",
+    background: "currentColor",
+    "&.released ":{
+      color: "#337ab7",
+    },
     "&.has-changed": {
-      color: "#f39c12"
+      color: "#f39c12",
     },
     "&.not-released": {
-      color: "var(--ft-color-error)"
+      color: "var(--ft-color-error)",
+    },
+    "&.released.high-contrast $instanceStatus":{
+      color: "#337ab7",
+    },
+    "&.has-changed.high-contrast $instanceStatus": {
+      color: "#f39c12",
+    },
+    "&.not-released.high-contrast $instanceStatus": {
+      color: "var(--ft-color-error)",
     },
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",
     "&.darkmode $instanceStatus": {
       color: "var(--bg-color-ui-contrast2)"
+    },
+    "&.high-contrast $instanceStatus":{
+      backgroundColor: "var(--bg-color-ui-contrast2)"
     }
   },
+  
 
   instanceStatus: {
     color: "white",
@@ -37,7 +52,8 @@ const styles = {
       "& .svg-inline--fa": {
         fontSize: "0.8em"
       },
-    }
+    },
+
   },
 };
 
@@ -49,11 +65,15 @@ export default class ReleaseStatus extends React.Component {
   }
 
   render() {
-    const { classes, instanceStatus, isChildren } = this.props;
+    const { classes, instanceStatus, isChildren, highContrastChildren } = this.props;
 
     const instanceStatusClass = (instanceStatus === "NOT_RELEASED") ? "not-released"
       : (instanceStatus === "HAS_CHANGED") ? "has-changed"
         : "released";
+    
+    const hightContrast = highContrastChildren && isChildren? "high-contrast": "";
+    
+
     return (
       <OverlayTrigger placement="top" overlay={
         <Tooltip id={this.tooltipId}>
@@ -71,8 +91,8 @@ export default class ReleaseStatus extends React.Component {
         </Tooltip>
       }>
         {!isChildren || (isChildren && instanceStatus) ?
-          <div className={`${classes.status} ${instanceStatusClass} ${this.props.darkmode ? "darkmode" : ""}`}>
-            <div className={`${classes.instanceStatus} ${instanceStatusClass}`}>
+          <div className={`${classes.status} ${instanceStatusClass} ${hightContrast} ${this.props.darkmode && !highContrastChildren ? "darkmode" : ""} `}>
+            <div className={`${classes.instanceStatus}  `}>
               {instanceStatus === "NOT_RELEASED" ?
                 <FontAwesomeIcon icon="unlink" />
                 : instanceStatus === "HAS_CHANGED" ?

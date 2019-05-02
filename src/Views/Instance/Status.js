@@ -14,12 +14,12 @@ let styles = {
       display: "block",
       position: "relative",
       zIndex: "5",
-      boxShadow: "2px 2px 1px var(--release-status-box-shadow)"
+      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)"
     },
     "& > div:not(:first-child)": {
       position: "relative",
-      top: "-3px",
-      left: "7px",
+      top: "-0.3em",
+      left: "0.6em",
       display: "block",
       zIndex: "3"
     },
@@ -75,7 +75,7 @@ export default class Status extends React.Component {
               <FontAwesomeIcon icon={"circle-notch"} spin />
             </div>
             :
-            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.childrenStatus ? instanceStatus.data.childrenStatus : null} isChildren={true} />
+            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.childrenStatus ? instanceStatus.data.childrenStatus : null} highContrastChildren={true} isChildren={true} />
         }
       </div>
     );

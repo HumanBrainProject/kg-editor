@@ -13,10 +13,11 @@ const endpoints = {
   "instances": entity => `/editor/api/instances/${entity}`,
   "listedInstances": () => "/editor/api/instances",
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "instanceData": instance => `/editor/api/instance/${instance}`,
+  "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
   "releaseData": instance => `/api/releases/${instance}/graph`,
   "doRelease": instance => `/api/releases/${instance}`,
-  "releaseStatus": () => "/api/releases",
+  "releaseStatusTopInstance": () => "/api/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
+  "releaseStatusChildren": () => "/api/releases?releaseTreeScope=CHILDREN_ONLY",
   "createBookmarkList": () => "/editor/api/bookmarkList",
   "updateBookmarkList": id => `/editor/api/bookmarkList/${id}`,
   "deleteBookmarkList": id => `/editor/api/bookmarkList/${id}`,
@@ -31,6 +32,7 @@ const endpoints = {
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
   "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
   "listQueries": instancePath => `/query/${instancePath?"":""}`,
+  "clientInstancePreview": instancePath => `/instances/${instancePath}`,
 };
 
 class API {

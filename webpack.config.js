@@ -42,8 +42,8 @@ module.exports = {
         changeOrigin: true
       },
       "/editor/api/**": {
-        //target:"https://kg-dev.humanbrainproject.org",
-        target:"http://localhost:9000",
+        target:"https://kg-dev.humanbrainproject.org",
+        //target:"http://localhost:9000",
         secure:false,
         changeOrigin: true
       },
@@ -53,6 +53,11 @@ module.exports = {
         changeOrigin: true
       },
       "/internal/**": {
+        target:"https://kg-dev.humanbrainproject.org",
+        secure:false,
+        changeOrigin: true
+      },
+      "/instances/**":{
         target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true

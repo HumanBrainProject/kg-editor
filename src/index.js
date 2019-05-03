@@ -13,7 +13,7 @@ import "./Services/IconsImport";
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
-import instanceStore, { nodeTypeMapping } from "./Stores/InstanceStore";
+import instanceStore from "./Stores/InstanceStore";
 import graphStore from "./Stores/GraphStore";
 import browseStore from "./Stores/BrowseStore";
 
@@ -441,7 +441,7 @@ class App extends React.Component{
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field? field.getValue(): instanceId;
-                      color = graphStore.colorScheme[nodeTypeMapping()[instance.data.label]];
+                      color = graphStore.colorScheme[instance.data.label];
                     }
                     if(!label){
                       label = instanceId;

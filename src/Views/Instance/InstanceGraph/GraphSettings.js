@@ -125,32 +125,30 @@ export default class GraphSettings extends React.Component{
         <Scrollbars autoHide>
           {graphStore.isFetched ?
             <div className={classes.nodeList}>
-              {graphStore.nodeTypeWhitelist.concat().sort().map(nodeType => {
-                let nodesOfType = graphStore.findNodesByType(nodeType);
-                let isDisabled = graphStore.typeStates.get(nodeType) === "none";
-                let isExpanded = graphStore.expandedTypes.indexOf(nodeType) !== -1;
-                let isGrouped = graphStore.typeStates.get(nodeType) === "group";
+              {graphStore.sortedNodeTypes.map(nodeType => {
+                const nodesOfType = graphStore.findNodesByType(nodeType.type);
+                const typeState = graphStore.typeStates.get(nodeType.type);
+                const isDisabled = typeState === "none";
+                const isExpanded = graphStore.expandedTypes.indexOf(nodeType.type) !== -1;
+                const isGrouped = typeState === "group";
+                const backgroundColor = graphStore.colorScheme[nodeType.label];
+                const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return(
-                  <div className={`${classes.nodeType}${
-                    isDisabled? " disabled":""
-                  }${
-                    isExpanded? " expanded":""
-                  }`} key={nodeType}>
-                    <Glyphicon glyph={isExpanded? "chevron-down": "chevron-right"} className={classes.expandButton} onClick={this.handleExpandClick.bind(this, nodeType)}/>
-                    <div className={classes.legend} style={{borderRadius: isGrouped? "0": "50%", background:graphStore.colorScheme[nodeType], borderColor:new Color(graphStore.colorScheme[nodeType]).darken(0.25).hex()}}/>
-                    <div className={classes.nodeTypeLabel} onMouseOver={
-                      isGrouped? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType))
-                        : undefined} onMouseOut={this.handleNodeHover.bind(this, null)}>
-                      {nodeType.replace("https://schema.hbp.eu/minds/","")}
-                    </div>
+                  <div className={`${classes.nodeType} ${isDisabled?"disabled":""} ${isExpanded?"expanded":""}`} key={nodeType.type}>
+                    <Glyphicon glyph={isExpanded? "chevron-down": "chevron-right"} className={classes.expandButton} onClick={this.handleExpandClick.bind(this, nodeType.type)}/>
+                    <div className={classes.legend} style={{borderRadius: isGrouped? "0": "50%", background: backgroundColor, borderColor: borderColor}}/>
+                    <div className={classes.nodeTypeLabel}
+                      onMouseOver={isGrouped?this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.type)):undefined}
+                      onMouseOut={this.handleNodeHover.bind(this, null)}
+                    >{nodeType.label}</div>
                     <div className={classes.nodeTypeActions}>
-                      {!isDisabled?
-                        <MultiToggle selectedValue={graphStore.typeStates.get(nodeType)} onChange={this.handleChange.bind(this, nodeType)}>
-                          {graphStore.groupNodes.has(nodeType) && <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"compress"} value="group"/>}
-                          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={graphStore.groupNodes.has(nodeType)?"expand-arrows-alt":"eye"} value="show"/>
+                      {!isDisabled && (
+                        <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.type)}>
+                          {graphStore.groupNodes.has(nodeType.type) && <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"compress"} value="group"/>}
+                          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={graphStore.groupNodes.has(nodeType.type)?"expand-arrows-alt":"eye"} value="show"/>
                           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"eye-slash"} value="hide"/>
                         </MultiToggle>
-                        :null}
+                      )}
                     </div>
                     {isExpanded?
                       <div className={classes.nodeTypeInstances}>

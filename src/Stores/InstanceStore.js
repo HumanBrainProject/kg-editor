@@ -47,51 +47,6 @@ class OptionsCache{
   }
 }
 
-const _nodeTypeMapping = {
-  "Dataset":"https://schema.hbp.eu/minds/Dataset",
-  "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
-  "Subject":"https://schema.hbp.eu/minds/Subject",
-  "Activity":"https://schema.hbp.eu/minds/Activity",
-  "Person":"https://schema.hbp.eu/minds/Person",
-  "PLA Component":"https://schema.hbp.eu/minds/Placomponent",
-  "Publication":"https://schema.hbp.eu/minds/Publication",
-  "File Association":"https://schema.hbp.eu/minds/FileAssociation",
-  "DOI":"https://schema.hbp.eu/minds/DatasetDOI",
-  "Method":"https://schema.hbp.eu/minds/Method",
-  "Reference space":"https://schema.hbp.eu/minds/Referencespace",
-  "Parcellation Region":"https://schema.hbp.eu/minds/Parcellationregion",
-  "Parcellation Atlas":"https://schema.hbp.eu/minds/Parcellationatlas",
-  "Embargo Status":"https://schema.hbp.eu/minds/Embargostatus",
-  "Approval":"https://schema.hbp.eu/minds/Approval",
-  "Protocol":"https://schema.hbp.eu/minds/Protocol",
-  "Preparation":"https://schema.hbp.eu/minds/Preparation",
-  "Authority":"https://schema.hbp.eu/minds/Authority",
-  "Format":"https://schema.hbp.eu/minds/Format",
-  "License Type":"https://schema.hbp.eu/minds/Licensetype",
-  "Sample":"https://schema.hbp.eu/minds/ExperimentSample",
-  "File":"https://schema.hbp.eu/minds/File",
-  "Software agent":"https://schema.hbp.eu/minds/Softwareagent",
-  "Age category":"https://schema.hbp.eu/minds/Agecategory",
-  "Sex":"https://schema.hbp.eu/minds/Sex",
-  "Species":"https://schema.hbp.eu/minds/Species",
-  "Role":"https://schema.hbp.eu/minds/Role"
-};
-
-export function nodeTypeMapping() {
-  return _nodeTypeMapping;
-}
-
-let _reverseNodeTypeMapping = null;
-export function reverseNodeTypeMapping(){
-  if (_reverseNodeTypeMapping) {
-    return _reverseNodeTypeMapping;
-  }
-  return Object.entries(_nodeTypeMapping).reduce((result, [label, type]) => {
-    result[type] = label;
-    return result;
-  }, {});
-}
-
 class Instance {
   @observable instanceId = null;
   @observable data = null;

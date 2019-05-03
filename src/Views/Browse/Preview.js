@@ -49,8 +49,8 @@ const styles = {
   status:{
     position:"absolute",
     top:"65px",
-    right:"10px",
-    fontSize:"30px"
+    right:"25px",
+    fontSize:"25px"
   },
   bookmarkStatus: {
     marginRight: "5px",

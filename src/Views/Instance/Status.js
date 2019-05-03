@@ -7,51 +7,75 @@ import statusStore from "../../Stores/StatusStore";
 import ReleaseStatus from "../../Components/ReleaseStatus";
 
 let styles = {
-  container:{
-    display:"inline-block",
-    fontSize:"0.75em"
+  container: {
+    fontSize: "0.75em",
+    display: "inline-block",
+    "& > div:first-child": {
+      display: "block",
+      position: "relative",
+      zIndex: "5",
+      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)"
+    },
+    "& > div:not(:first-child)": {
+      position: "relative",
+      top: "-0.3em",
+      left: "0.6em",
+      display: "block",
+      zIndex: "3"
+    },
   },
-  loader:{
-    borderRadius:"0.14em",
-    width:"2.5em",
-    background:"var(--bg-color-ui-contrast2)",
-    textAlign:"center",
-    color:"var(--ft-color-loud)",
-    border:"1px solid var(--ft-color-loud)",
-    "& .svg-inline--fa":{
-      fontSize:"0.8em",
-      verticalAlign:"baseline"
+  loader: {
+    borderRadius: "0.14em",
+    width: "2.5em",
+    background: "var(--bg-color-ui-contrast2)",
+    textAlign: "center",
+    color: "var(--ft-color-loud)",
+    border: "1px solid var(--ft-color-loud)",
+    "& .svg-inline--fa": {
+      fontSize: "0.8em",
+      verticalAlign: "baseline"
     }
   }
 };
 
 @injectStyles(styles)
 @observer
-export default class Status extends React.Component{
-  constructor(props){
+export default class Status extends React.Component {
+  constructor(props) {
     super(props);
     statusStore.fetchStatus(this.props.id);
   }
 
-  UNSAFE_componentWillReceiveProps(newProps){
+  UNSAFE_componentWillReceiveProps(newProps) {
     statusStore.fetchStatus(newProps.id);
   }
 
-  render(){
+  render() {
     let instanceStatus = statusStore.getInstance(this.props.id);
     const { classes } = this.props;
-    return(
+    return (
       <div className={`${classes.container} status`}>
-        {instanceStatus.hasFetchError?
+        {instanceStatus.hasFetchError ?
           <div className={classes.loader}>
-            <FontAwesomeIcon icon={"question-circle"}/>
+            <FontAwesomeIcon icon={"question-circle"} />
           </div>
-          :!instanceStatus.isFetched?
+          : !instanceStatus.isFetched ?
             <div className={classes.loader}>
-              <FontAwesomeIcon icon={"circle-notch"} spin/>
+              <FontAwesomeIcon icon={"circle-notch"} spin />
             </div>
             :
-            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.status} childrenStatus={instanceStatus.data.childrenStatus? instanceStatus.data.childrenStatus: null}/>
+            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.status} isChildren={false} />
+        }
+        {instanceStatus.hasFetchErrorChildren ?
+          <div className={classes.loader}>
+            <FontAwesomeIcon icon={"question-circle"} />
+          </div>
+          : !instanceStatus.isFetchedChildren ?
+            <div className={classes.loader}>
+              <FontAwesomeIcon icon={"circle-notch"} spin />
+            </div>
+            :
+            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.childrenStatus ? instanceStatus.data.childrenStatus : null} highContrastChildren={true} isChildren={true} />
         }
       </div>
     );

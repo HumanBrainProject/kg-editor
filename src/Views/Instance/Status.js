@@ -10,7 +10,12 @@ let styles = {
   container: {
     fontSize: "0.75em",
     display: "inline-block",
-    "& > div:first-child": {
+    "& > div:only-child": {
+      display: "block",
+      position: "relative",
+      zIndex: "5",
+    },
+    "& > div:first-child:not(:only-of-type)": {
       display: "block",
       position: "relative",
       zIndex: "5",

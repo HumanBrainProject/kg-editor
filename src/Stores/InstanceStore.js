@@ -205,14 +205,37 @@ class InstanceStore {
 
   @action
   async createNewInstance(path, name=""){
-    this.isCreatingNewInstance = path;
-    try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
+    if (BrowseStore.isFetched.lists) {
+      const list = BrowseStore.getListById(path);
+      if (list) {
+        const labelField = list && list.uiSpec && list.uiSpec.labelField;
+        if (!name || (name && labelField)) {
+          this.isCreatingNewInstance = path;
+          try{
+            const payload = {};
+            if (labelField) {
+              payload[labelField] = name;
+            }
+            const { data } = await API.axios.post(API.endpoints.instanceData(path), payload);
+            this.isCreatingNewInstance = false;
+            return data.data.id;
+          } catch(e){
+            this.isCreatingNewInstance = false;
+            this.instanceCreationError = e.message;
+          }
+        } else {
+          this.isCreatingNewInstance = false;
+          this.instanceCreationError = `Error: labelField is not defined for ${path} type!`;
+        }
+      } else {
+        // Should never happen: UI should ensure to propose only available types
+        this.isCreatingNewInstance = false;
+        this.instanceCreationError = `Error: type ${path} is not available!`;
+      }
+    } else {
+      // Should never happen: UI should ensure we the list has been fetch before calling createNewInstance
       this.isCreatingNewInstance = false;
-      return data.data.id;
-    } catch(e){
-      this.isCreatingNewInstance = false;
-      this.instanceCreationError = e.message;
+      this.instanceCreationError = "Error: instances types are not available!";
     }
   }
 
@@ -237,8 +260,9 @@ class InstanceStore {
     let path = instanceToCopy.path;
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
-    if(values["http://schema.org/name"]){
-      values["http://schema.org/name"] = values["http://schema.org/name"]+" (Copy)";
+    const labelField = instanceToCopy.data && instanceToCopy.data.ui_info && instanceToCopy.data.ui_info.labelField;
+    if(labelField) {
+      values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
     }
     this.isCreatingNewInstance = path;
     try{

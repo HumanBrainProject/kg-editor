@@ -3,6 +3,9 @@ import { render } from "react-dom";
 import { observer } from "mobx-react";
 import { Router, Route, Switch, matchPath } from "react-router-dom";
 import { Modal } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FormStore } from "hbp-quickfire";
+import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
 
 import "./Services/IconsImport";
@@ -24,16 +27,13 @@ import Help from "./Views/Help";
 import Statistics from "./Views/Statistics";
 import Browse from "./Views/Browse";
 import Instance from "./Views/Instance";
+import NewInstance from "./Views/NewInstance";
 import QueryBuilder from "./Views/QueryBuilder";
 import FetchingLoader from "./Components/FetchingLoader";
 import BGMessage from "./Components/BGMessage";
+import GlobalError from "./Views/GlobalError";
 
 import "babel-polyfill";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import GlobalError from "./Views/GlobalError";
-import { FormStore } from "hbp-quickfire";
-import { Button } from "react-bootstrap";
-
 import "./CustomFields";
 
 FormStore.setPathNodeSeparator("|");
@@ -179,24 +179,6 @@ const styles = {
       marginLeft: "20px"
     }
   },
-
-  newInstances:{
-    display:"grid",
-    gridTemplateColumns:"repeat(4, 1fr)",
-    textAlign:"center",
-    gridGap:"10px"
-  },
-  newInstance:{
-    fontSize:"1.1em",
-    fontWeight:"300",
-    lineHeight:"3em",
-    border:"1px solid #ccc",
-    cursor:"pointer",
-    wordBreak: "break-word",
-    "&:hover":{
-      background:"#f3f3f3"
-    }
-  },
   deleteInstanceErrorModal: {
     "& .modal-dialog": {
       top: "35%",
@@ -248,6 +230,16 @@ const styles = {
           }
         }
       }
+    }
+  },
+  newInstanceModal:{
+    width:"90%",
+    "@media screen and (min-width:1024px)": {
+      width:"900px",
+    },
+    "& .modal-body": {
+      height: "calc(95vh - 52px)",
+      padding: "3px 0",
     }
   }
 };
@@ -401,12 +393,6 @@ class App extends React.Component{
     instanceStore.toggleShowCreateModal();
   }
 
-  async handleClickNewInstanceOfType(path){
-    let newInstanceId = await instanceStore.createNewInstance(path);
-    instanceStore.toggleShowCreateModal();
-    routerStore.history.push(`/instance/edit/${newInstanceId}`);
-  }
-
   handleLogout = () => {
     if(!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")){
       instanceStore.flushOpenedTabs();
@@ -452,7 +438,8 @@ class App extends React.Component{
                     let label;
                     let color = undefined;
                     if(!instance.isFetching && !instance.hasFetchError){
-                      let field = instance.form.getField("http://schema.org/name");
+                      const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+                      const field = labelField && instance.form.getField(labelField);
                       label = field? field.getValue(): instanceId;
                       color = graphStore.colorScheme[instanceStore.nodeTypeMapping[instance.data.label]];
                     }
@@ -529,7 +516,7 @@ class App extends React.Component{
                   <div  className={classes.userProfileError}>
                     <BGMessage icon={"ban"}>
                       {`There was a network problem retrieving user profile (${authStore.userProfileError}).
-If the problem persists, please contact the support.`}<br/><br/>
+                      If the problem persists, please contact the support.`}<br/><br/>
                       <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
                         <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
                       </Button>
@@ -543,38 +530,13 @@ If the problem persists, please contact the support.`}<br/><br/>
           </div>
           {authStore.isFullyAuthenticated && (
             <React.Fragment>
-              {instanceStore.showCreateModal && browseStore.allLists && !browseStore.isFetching.lists &&
-                <Modal show={true} onHide={this.handleHideCreateModal}>
+              {instanceStore.showCreateModal &&
+                <Modal dialogClassName={classes.newInstanceModal} show={true} onHide={this.handleHideCreateModal}>
                   <Modal.Header closeButton>
                     New Instance
                   </Modal.Header>
                   <Modal.Body>
-                    <div>
-                      {browseStore.lists.map(folder => {
-                        if(folder.folderType !== "NODETYPE"){
-                          return null;
-                        } else {
-                          return (
-                            <div>
-                              <h4>{folder.folderName}</h4>
-                              <div className={classes.newInstances}>
-                                {folder.lists.map(list => {
-                                  return(
-                                    <div key={list.id} className={classes.newInstance} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                                      {list.name}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        }
-                      })}
-                      <div>
-                        {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}
-                        {instanceStore.isCreatingNewInstance && <FetchingLoader>Creating new instance...</FetchingLoader>}
-                      </div>
-                    </div>
+                    <NewInstance onCancel={this.handleHideCreateModal} />
                   </Modal.Body>
                 </Modal>
               }

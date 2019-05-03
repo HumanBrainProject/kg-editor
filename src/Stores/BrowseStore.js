@@ -49,6 +49,10 @@ class BrowseStore{
     return nodetypeType;
   }
 
+  getListById = id => {
+    return this.allLists.find(list => list.id === id);
+  }
+
   @action setListsFilter(filter){
     this.listsFilter = filter;
   }

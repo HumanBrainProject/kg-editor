@@ -7,7 +7,7 @@ import API from "../Services/API";
 
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
-import BrowseStore from "./BrowseStore";
+import browseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
@@ -217,8 +217,8 @@ class InstanceStore {
 
   @action
   async createNewInstance(path, name=""){
-    if (BrowseStore.isFetched.lists) {
-      const list = BrowseStore.getListById(path);
+    if (browseStore.isFetched.lists) {
+      const list = browseStore.getListById(path);
       if (list) {
         const labelField = list && list.uiSpec && list.uiSpec.labelField;
         if (!name || (name && labelField)) {
@@ -313,7 +313,7 @@ class InstanceStore {
               }
             }
           }
-          BrowseStore.refreshFilter();
+          browseStore.refreshFilter();
           this.closeInstance(instanceId);
           this.flush();
           if (nextLocation) {

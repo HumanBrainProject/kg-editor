@@ -13,7 +13,7 @@ const styles = {
     padding: "2px",
     lineHeight: "normal",
     background: "currentColor",
-    "&.released ":{
+    "&.released ": {
       color: "#337ab7",
     },
     "&.has-changed": {
@@ -22,7 +22,7 @@ const styles = {
     "&.not-released": {
       color: "var(--ft-color-error)",
     },
-    "&.released.high-contrast $instanceStatus":{
+    "&.released.high-contrast $instanceStatus": {
       color: "#337ab7",
     },
     "&.has-changed.high-contrast $instanceStatus": {
@@ -36,11 +36,11 @@ const styles = {
     "&.darkmode $instanceStatus": {
       color: "var(--bg-color-ui-contrast2)"
     },
-    "&.high-contrast $instanceStatus":{
+    "&.high-contrast $instanceStatus": {
       backgroundColor: "var(--bg-color-ui-contrast2)"
     }
   },
-  
+
 
   instanceStatus: {
     color: "white",
@@ -70,9 +70,9 @@ export default class ReleaseStatus extends React.Component {
     const instanceStatusClass = (instanceStatus === "NOT_RELEASED") ? "not-released"
       : (instanceStatus === "HAS_CHANGED") ? "has-changed"
         : "released";
-    
-    const hightContrast = highContrastChildren && isChildren? "high-contrast": "";
-    
+
+    const hightContrast = highContrastChildren && isChildren ? "high-contrast" : "";
+
 
     return (
       <OverlayTrigger placement="top" overlay={

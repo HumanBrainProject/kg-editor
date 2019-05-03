@@ -146,8 +146,7 @@ const styles = {
       verticalAlign:"middle",
       fontWeight:"bold",
       color:"var(--ft-color-loud)",
-      marginRight:"5px",
-      marginLeft:"8px"
+      margin: "3px 5px 0 8px"
     }
   },
   releasePreview:{

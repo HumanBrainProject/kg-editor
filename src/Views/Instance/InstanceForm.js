@@ -6,7 +6,7 @@ import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import instanceStore from "../../Stores/InstanceStore";
-import graphStore from "../../Stores/GraphStore";
+import browseStore from "../../Stores/BrowseStore";
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -243,7 +243,7 @@ export default class InstanceForm extends React.Component {
             <HeaderPanel
               className={classes.panelHeader}
               nodeType={nodeType}
-              color={graphStore.colorScheme[nodeType]}
+              color={browseStore.colorScheme[nodeType]}
               hasChanged={instance.hasChanged}/>
 
             <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />

@@ -8,7 +8,6 @@ import { Button } from "react-bootstrap";
 import browseStore from "../Stores/BrowseStore";
 import instanceStore from "../Stores/InstanceStore";
 import routerStore from "../Stores/RouterStore";
-import graphStore from "../Stores/GraphStore";
 
 import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
@@ -102,7 +101,7 @@ export default class NewInstance extends React.Component {
                   <h4>{folder.folderName}</h4>
                   <div className={classes.list}>
                     {folder.lists.map(list => {
-                      const color = graphStore.colorScheme[list.name];
+                      const color = browseStore.colorScheme[list.name];
                       return(
                         <div key={list.id} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
                           <div className={classes.icon} style={color ? { color: color } : {}}>

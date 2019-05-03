@@ -9,6 +9,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
+import browseStore from "../../../Stores/BrowseStore";
 
 const styles = {
   container:{
@@ -125,27 +126,27 @@ export default class GraphSettings extends React.Component{
         <Scrollbars autoHide>
           {graphStore.isFetched ?
             <div className={classes.nodeList}>
-              {graphStore.sortedNodeTypes.map(nodeType => {
-                const nodesOfType = graphStore.findNodesByType(nodeType.type);
-                const typeState = graphStore.typeStates.get(nodeType.type);
+              {browseStore.sortedNodeTypes.map(nodeType => {
+                const nodesOfType = graphStore.findNodesByType(nodeType.dataType);
+                const typeState = graphStore.typeStates.get(nodeType.dataType);
                 const isDisabled = typeState === "none";
-                const isExpanded = graphStore.expandedTypes.indexOf(nodeType.type) !== -1;
+                const isExpanded = graphStore.expandedTypes.indexOf(nodeType.dataType) !== -1;
                 const isGrouped = typeState === "group";
-                const backgroundColor = graphStore.colorScheme[nodeType.label];
+                const backgroundColor = browseStore.colorScheme[nodeType.label];
                 const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return(
-                  <div className={`${classes.nodeType} ${isDisabled?"disabled":""} ${isExpanded?"expanded":""}`} key={nodeType.type}>
-                    <Glyphicon glyph={isExpanded? "chevron-down": "chevron-right"} className={classes.expandButton} onClick={this.handleExpandClick.bind(this, nodeType.type)}/>
+                  <div className={`${classes.nodeType} ${isDisabled?"disabled":""} ${isExpanded?"expanded":""}`} key={nodeType.dataType}>
+                    <Glyphicon glyph={isExpanded? "chevron-down": "chevron-right"} className={classes.expandButton} onClick={this.handleExpandClick.bind(this, nodeType.dataType)}/>
                     <div className={classes.legend} style={{borderRadius: isGrouped? "0": "50%", background: backgroundColor, borderColor: borderColor}}/>
                     <div className={classes.nodeTypeLabel}
-                      onMouseOver={isGrouped?this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.type)):undefined}
+                      onMouseOver={isGrouped?this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.dataType)):undefined}
                       onMouseOut={this.handleNodeHover.bind(this, null)}
                     >{nodeType.label}</div>
                     <div className={classes.nodeTypeActions}>
                       {!isDisabled && (
-                        <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.type)}>
-                          {graphStore.groupNodes.has(nodeType.type) && <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"compress"} value="group"/>}
-                          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={graphStore.groupNodes.has(nodeType.type)?"expand-arrows-alt":"eye"} value="show"/>
+                        <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.dataType)}>
+                          {graphStore.groupNodes.has(nodeType.dataType) && <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"compress"} value="group"/>}
+                          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={graphStore.groupNodes.has(nodeType.dataType)?"expand-arrows-alt":"eye"} value="show"/>
                           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"eye-slash"} value="hide"/>
                         </MultiToggle>
                       )}

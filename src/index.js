@@ -14,7 +14,6 @@ import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
 import instanceStore from "./Stores/InstanceStore";
-import graphStore from "./Stores/GraphStore";
 import browseStore from "./Stores/BrowseStore";
 
 import Tab from "./Components/Tab";
@@ -441,7 +440,7 @@ class App extends React.Component{
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field? field.getValue(): instanceId;
-                      color = graphStore.colorScheme[instance.data.label];
+                      color = browseStore.colorScheme[instance.data.label];
                     }
                     if(!label){
                       label = instanceId;

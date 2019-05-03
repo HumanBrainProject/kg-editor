@@ -1,121 +1,10 @@
-import { observable, action, computed, runInAction } from "mobx";
+import { observable, action, runInAction } from "mobx";
+import {find, remove, clone, pullAll, uniqueId, uniq, flatten} from "lodash";
+
 import API from "../Services/API";
 import console from "../Services/Logger";
 
-import {find, remove, clone, pullAll, uniqueId, uniq, flatten} from "lodash";
-
-import palette from "google-palette";
-
-const nodeTypes = [
-  {
-    "label": "Dataset",
-    "type": "https://schema.hbp.eu/minds/Dataset"
-  },
-  {
-    "label": "Specimen group",
-    "type": "https://schema.hbp.eu/minds/Specimengroup"
-  },
-  {
-    "label": "Subject",
-    "type": "https://schema.hbp.eu/minds/Subject"
-  },
-  {
-    "label": "Activity",
-    "type": "https://schema.hbp.eu/minds/Activity"
-  },
-  {
-    "label": "Person",
-    "type": "https://schema.hbp.eu/minds/Person"
-  },
-  {
-    "label": "PLA Component",
-    "type": "https://schema.hbp.eu/minds/Placomponent"
-  },
-  {
-    "label": "Publication",
-    "type": "https://schema.hbp.eu/minds/Publication"
-  },
-  {
-    "label": "File Association",
-    "type": "https://schema.hbp.eu/minds/FileAssociation"
-  },
-  {
-    "label": "DOI",
-    "type": "https://schema.hbp.eu/minds/DatasetDOI"
-  },
-  {
-    "label": "Method",
-    "type": "https://schema.hbp.eu/minds/Method"
-  },
-  {
-    "label": "Reference space",
-    "type": "https://schema.hbp.eu/minds/Referencespace"
-  },
-  {
-    "label": "Parcellation Region",
-    "type": "https://schema.hbp.eu/minds/Parcellationregion"
-  },
-  {
-    "label": "Parcellation Atlas",
-    "type": "https://schema.hbp.eu/minds/Parcellationatlas"
-  },
-  {
-    "label": "Embargo Status",
-    "type": "https://schema.hbp.eu/minds/Embargostatus"
-  },
-  {
-    "label": "Approval",
-    "type": "https://schema.hbp.eu/minds/Approval"
-  },
-  {
-    "label": "Protocol",
-    "type": "https://schema.hbp.eu/minds/Protocol"
-  },
-  {
-    "label": "Preparation",
-    "type": "https://schema.hbp.eu/minds/Preparation"
-  },
-  {
-    "label": "Authority",
-    "type": "https://schema.hbp.eu/minds/Authority"
-  },
-  {
-    "label": "Format",
-    "type": "https://schema.hbp.eu/minds/Format"
-  },
-  {
-    "label": "License Type",
-    "type": "https://schema.hbp.eu/minds/Licensetype"
-  },
-  {
-    "label": "Sample",
-    "type": "https://schema.hbp.eu/minds/ExperimentSample"
-  },
-  {
-    "label": "File",
-    "type": "https://schema.hbp.eu/minds/File"
-  },
-  {
-    "label": "Software agent",
-    "type": "https://schema.hbp.eu/minds/Softwareagent"
-  },
-  {
-    "label": "Age category",
-    "type": "https://schema.hbp.eu/minds/Agecategory"
-  },
-  {
-    "label": "Sex",
-    "type": "https://schema.hbp.eu/minds/Sex"
-  },
-  {
-    "label": "Species",
-    "type": "https://schema.hbp.eu/minds/Species"
-  },
-  {
-    "label": "Role",
-    "type": "https://schema.hbp.eu/minds/Role"
-  }
-];
+import BrowseStore from "../Stores/BrowseStore";
 
 class GraphStore {
   @observable sidePanel = false;
@@ -124,35 +13,12 @@ class GraphStore {
   @observable isFetching = false;
   @observable isFetched = false;
   @observable mainId = null;
-  @observable nodeTypes = nodeTypes;
 
   originalData = null;
   groupNodes = null;
   highlightedNode = null;
   connectedNodes = null;
   connectedLinks = null;
-
-  @computed
-  get sortedNodeTypes(){
-    return this.nodeTypes.concat().sort((a, b) => a.type < b.type?-1: a.type > b.type?1:0);
-  }
-
-  @computed
-  get nodeTypeLabels(){
-    return this.nodeTypes.reduce((result, nodeType) => {
-      result[nodeType.type] = nodeType.label;
-      return result;
-    }, {});
-  }
-
-  @computed
-  get colorScheme(){
-    const colorPalette = palette("mpn65", this.nodeTypes.length);
-    return this.nodeTypes.reduce((result, type, index) => {
-      result[type.label] = "#" + colorPalette[index];
-      return result;
-    },{});
-  }
 
   findNodesByType(type){
     return this.originalData.nodes.filter(node => node.dataType === type);
@@ -223,7 +89,7 @@ class GraphStore {
 
   @action filterOriginalData(){
     //Remove nodes that are not whitelisted
-    remove(this.originalData.nodes, node => !this.nodeTypes.some(nodeType => nodeType.type === node.dataType));
+    remove(this.originalData.nodes, node => !BrowseStore.nodeTypes.some(nodeType => nodeType.dataType === node.dataType));
     remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
 
     //Transform links source and target reference to actual node objects
@@ -232,33 +98,33 @@ class GraphStore {
       link.target = find(this.originalData.nodes, node => node.id === link.target);
     });
     this.originalData.nodes.forEach(node => {
-      node.dataTypeLabel = this.nodeTypeLabels[node.dataType]; //node.dataType.replace("https://schema.hbp.eu/minds/","");
+      node.dataTypeLabel = BrowseStore.nodeTypeLabels[node.dataType]; //node.dataType.replace("https://schema.hbp.eu/minds/","");
       node.isMainNode = node.id.includes(this.mainId);
     });
 
     this.groupNodes = new Map();
     this.typeStates = new Map();
     //Create group nodes
-    this.nodeTypes.forEach(nodeType => {
-      let nodesOfType = this.findNodesByType(nodeType.type);
+    BrowseStore.nodeTypes.forEach(nodeType => {
+      let nodesOfType = this.findNodesByType(nodeType.dataType);
       if(nodesOfType.length <= 1){
-        this.typeStates.set(nodeType.type, nodesOfType.length===1?"show":"none");
+        this.typeStates.set(nodeType.dataType, nodesOfType.length===1?"show":"none");
         return;
       }
 
       let groupNode = {
-        id:"Group_"+nodeType.type,
-        dataType:"Group_"+nodeType.type,
-        name:"Group_"+nodeType.type,
+        id:"Group_"+nodeType.dataType,
+        dataType:"Group_"+nodeType.dataType,
+        name:"Group_"+nodeType.dataType,
         title:"Group of "+nodeType.label+" ("+nodesOfType.length+")",
-        original_dataType:nodeType.type,
+        original_dataType:nodeType.dataType,
         dataTypeLabel:nodeType.label,
         isGroup:true,
         groupSize: nodesOfType.length
       };
 
-      this.groupNodes.set(nodeType.type, groupNode);
-      this.typeStates.set(nodeType.type, "group");
+      this.groupNodes.set(nodeType.dataType, groupNode);
+      this.typeStates.set(nodeType.dataType, "group");
       this.originalData.nodes.push(groupNode);
     });
 

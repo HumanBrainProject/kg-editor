@@ -104,7 +104,7 @@ export default class ReleaseStatus extends React.Component {
               }
             </div>
           </div>
-          : <div></div>}
+          : <span></span>}
       </OverlayTrigger>
     );
   }

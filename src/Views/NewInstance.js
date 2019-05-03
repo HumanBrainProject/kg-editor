@@ -8,6 +8,7 @@ import { Button } from "react-bootstrap";
 import browseStore from "../Stores/BrowseStore";
 import instanceStore from "../Stores/InstanceStore";
 import routerStore from "../Stores/RouterStore";
+import graphStore from "../Stores/GraphStore";
 
 import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
@@ -28,19 +29,25 @@ const styles = {
   list:{
     display:"grid",
     gridTemplateColumns:"repeat(4, 1fr)",
-    textAlign:"center",
     gridGap:"10px"
   },
   type:{
+    display: "grid",
+    gridTemplateColumns: "auto 1fr",
+    gridGap: "8px",
+    position: "relative",
+    padding: "10px",
     fontSize:"1.1em",
     fontWeight:"300",
-    lineHeight:"3em",
     border:"1px solid #ccc",
     cursor:"pointer",
     wordBreak: "break-word",
     "&:hover":{
       background:"#f3f3f3"
     }
+  },
+  icon: {
+    alignSelf: "center"
   }
 };
 
@@ -95,9 +102,12 @@ export default class NewInstance extends React.Component {
                   <h4>{folder.folderName}</h4>
                   <div className={classes.list}>
                     {folder.lists.map(list => {
+                      const color = graphStore.colorScheme[list.name];
                       return(
                         <div key={list.id} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                          {list.name}
+                          <div className={classes.icon} style={color ? { color: color } : {}}>
+                            <FontAwesomeIcon fixedWidth icon="circle" />
+                          </div>{list.name}
                         </div>
                       );
                     })}

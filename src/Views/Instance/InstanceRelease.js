@@ -13,6 +13,7 @@ import ReleaseStatus from "../../Components/ReleaseStatus";
 import MultiToggle from "../../Components/MultiToggle";
 import BGMessage from "../../Components/BGMessage";
 import SavingModal from "./InstanceRelease/SavingModal";
+import ClientPreviewModal from "./InstanceRelease/ClientPreviewModal";
 import CompareWithReleasedVersionChanges from "./CompareWithReleasedVersionChanges";
 
 const styles = {
@@ -132,7 +133,6 @@ const styles = {
       verticalAlign:"middle",
       fontWeight:"bold",
       color:"var(--ft-color-loud)",
-      marginTop: "3px",
       marginRight:"5px"
     }
   },
@@ -311,6 +311,14 @@ const styles = {
     "& .modal-body": {
       height: "calc(95vh - 112px)",
       padding: "3px 0"
+    }
+  },
+  previewIcon:{
+    fontSize: "2.5em",
+    textAlign: "center",
+    cursor:"pointer",
+    "& :hover":{
+      color:"lightgrey"
     }
   }
 };
@@ -543,6 +551,9 @@ export default class InstanceRelease extends React.Component{
     super(props);
     this.releaseStore = new ReleaseStore(props.id);
     this.keyMap = new WeakMap();
+    this.state = {
+      showModal: false
+    };
   }
 
   UNSAFE_componentWillReceiveProps(newProps){
@@ -562,6 +573,14 @@ export default class InstanceRelease extends React.Component{
 
   handleRetryFetching = () => {
     this.releaseStore.fetchReleaseData();
+  }
+
+  handleOpenModal = () => {
+    this.setState({showModal: true});
+  }
+
+  handleCloseModal = () => {
+    this.setState({showModal: false});
   }
 
   render(){
@@ -593,6 +612,7 @@ export default class InstanceRelease extends React.Component{
                     <h4>Current state</h4>
                   </div>
                   <div className={classes.releaseActions}>
+                    <div onClick={this.handleOpenModal} className={classes.previewIcon}><FontAwesomeIcon style={{verticalAlign:"top"}} title="Preview in KG Search" icon="eye" /></div>
                     <ReleaseAction releaseStore={this.releaseStore} />
                   </div>
                   <div className={classes.releaseInfos}>
@@ -620,6 +640,7 @@ export default class InstanceRelease extends React.Component{
                       </Modal.Footer>
                     </Modal>
                   }
+                  <ClientPreviewModal store={this.releaseStore} show={this.state.showModal} handleClose={this.handleCloseModal} />
                 </div>
               }
             </Scrollbars>

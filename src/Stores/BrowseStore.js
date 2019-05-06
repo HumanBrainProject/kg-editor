@@ -6,8 +6,8 @@ import { debounce } from "lodash";
 import API from "../Services/API";
 import bookmarkStatusStore from "./BookmarkStatusStore";
 
-const bookmarkListType = "BOOKMARK";
-const nodetypeType = "NODETYPE";
+const LIST_TYPE_BOOKMARK = "BOOKMARK";
+const LIST_TYPE_DATATYPE = "NODETYPE";
 
 class BrowseStore{
 
@@ -43,11 +43,11 @@ class BrowseStore{
   pageSize = 20;
 
   get bookmarkListType() {
-    return bookmarkListType;
+    return LIST_TYPE_BOOKMARK;
   }
 
   get nodetypeType() {
-    return nodetypeType;
+    return LIST_TYPE_DATATYPE;
   }
 
   getListById = id => {
@@ -72,7 +72,7 @@ class BrowseStore{
 
   @computed get nodetypeLists(){
     return this.lists.reduce((list, folder) => {
-      if (folder.folderType !== this.nodetypeType) { return list; }
+      if (folder.folderType !== LIST_TYPE_DATATYPE) { return list; }
       list.push(...folder.lists);
       return list;
     }, []);
@@ -80,7 +80,7 @@ class BrowseStore{
 
   @computed get bookmarkLists(){
     return this.lists.reduce((list, folder) => {
-      if (folder.folderType !== this.bookmarkListType) { return list; }
+      if (folder.folderType !== LIST_TYPE_BOOKMARK) { return list; }
       list.push(...folder.lists);
       return list;
     }, []);
@@ -101,7 +101,9 @@ class BrowseStore{
           folder.expand = true;
           folder.lists.forEach(list => {
             list.type = folder.folderType;
-            if (folder.folderType === this.bookmarkListType) {
+            list.isBookmarkList = folder.folderType === LIST_TYPE_BOOKMARK;
+            list.isDataTypeList = folder.folderType === LIST_TYPE_DATATYPE;
+            if (list.isBookmarkList) {
               list.isUpdating = false;
               list.updateError = null;
               list.isDeleting = false;
@@ -188,7 +190,7 @@ class BrowseStore{
     this.isCreatingBookmarkList = true;
     let bookmarkListfolder = null;
     this.lists.some((folder) => {
-      if (folder.folderType === this.bookmarkListType) {
+      if (folder.folderType === LIST_TYPE_BOOKMARK) {
         bookmarkListfolder = folder;
         return true;
       }
@@ -225,7 +227,7 @@ class BrowseStore{
       }
     } else {
       this.isCreatingBookmarkList = false;
-      this.bookmarkListCreationError = `Failed to create new bookmarkList ${name}. No folder of type this.bookmarkListType found.`;
+      this.bookmarkListCreationError = `Failed to create new bookmarkList ${name}. No folder of type ${LIST_TYPE_BOOKMARK} found.`;
     }
   }
 
@@ -243,7 +245,7 @@ class BrowseStore{
     list.isUpdating = true;
     /* TODO: check non empty and no dupplicate name
     this.lists.some(folder => {
-      if (folder.folderType === this.bookmarkListType) {
+      if (folder.folderType === LIST_TYPE_BOOKMARK) {
         folder.lists.some(bookmark => {
           if (bookmark.id === list.id) {
             bookmark.editName = null;
@@ -299,7 +301,7 @@ class BrowseStore{
       runInAction(() => {
         list.isDeleting = false;
         this.lists.some(folder => {
-          if (folder.folderType === this.bookmarkListType) {
+          if (folder.folderType === LIST_TYPE_BOOKMARK) {
             const index = folder.lists.findIndex(bookmark => bookmark.id === list.id);
             if (index !== -1) {
               folder.lists.splice(index, 1);

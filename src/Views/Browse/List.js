@@ -270,7 +270,7 @@ export default class List extends React.Component{
     const {classes, list} = this.props;
     const selected = browseStore.selectedList === list;
     const edited = browseStore.currentlyEditedBookmarkList === list;
-    if (list.type === browseStore.bookmarkListType) {
+    if (list.isBookmarkList) {
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""} ${edited?"edited":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
@@ -356,7 +356,7 @@ export default class List extends React.Component{
           </React.Fragment>
         </div>
       );
-    } else if (list.type === browseStore.nodetypeType) {
+    } else if (list.isDataTypeList) {
       const color = dataTypesStore.colorScheme[list.name];
       return (
         <div key={list.id} className={`${classes.container} ${selected?"selected":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>

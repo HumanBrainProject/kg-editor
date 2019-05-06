@@ -4,7 +4,7 @@ import {find, remove, clone, pullAll, uniqueId, uniq, flatten} from "lodash";
 import API from "../Services/API";
 import console from "../Services/Logger";
 
-import browseStore from "../Stores/BrowseStore";
+import dataTypesStore from "../Stores/DataTypesStore";
 
 class GraphStore {
   @observable sidePanel = false;
@@ -89,7 +89,7 @@ class GraphStore {
 
   @action filterOriginalData(){
     //Remove nodes that are not whitelisted
-    remove(this.originalData.nodes, node => !browseStore.nodeTypes.some(nodeType => nodeType.dataType === node.dataType));
+    remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => nodeType.dataType === node.dataType));
     remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
 
     //Transform links source and target reference to actual node objects
@@ -98,14 +98,14 @@ class GraphStore {
       link.target = find(this.originalData.nodes, node => node.id === link.target);
     });
     this.originalData.nodes.forEach(node => {
-      node.dataTypeLabel = browseStore.nodeTypeLabels[node.dataType]; //node.dataType.replace("https://schema.hbp.eu/minds/","");
+      node.dataTypeLabel = dataTypesStore.dataTypeLabels[node.dataType]; //node.dataType.replace("https://schema.hbp.eu/minds/","");
       node.isMainNode = node.id.includes(this.mainId);
     });
 
     this.groupNodes = new Map();
     this.typeStates = new Map();
     //Create group nodes
-    browseStore.nodeTypes.forEach(nodeType => {
+    dataTypesStore.dataTypes.forEach(nodeType => {
       let nodesOfType = this.findNodesByType(nodeType.dataType);
       if(nodesOfType.length <= 1){
         this.typeStates.set(nodeType.dataType, nodesOfType.length===1?"show":"none");

@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import browseStore from "../../Stores/BrowseStore";
+import dataTypesStore from "../../Stores/DataTypesStore";
 
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
@@ -169,7 +169,7 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    const color = browseStore.colorScheme[instance.label];
+    const color = dataTypesStore.colorScheme[instance.label];
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}

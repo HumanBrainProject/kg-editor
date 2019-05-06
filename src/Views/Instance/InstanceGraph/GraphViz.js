@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import browseStore from "../../../Stores/BrowseStore";
+import dataTypesStore from "../../../Stores/DataTypesStore";
 import graphStore from "../../../Stores/GraphStore";
 import routerStore from "../../../Stores/RouterStore";
 
@@ -150,7 +150,7 @@ export default class Graph extends React.Component {
         ctx.globalAlpha = 0.1;
       }
     }
-    const color = browseStore.colorScheme[node.dataTypeLabel];
+    const color = dataTypesStore.colorScheme[node.dataTypeLabel];
     ctx.strokeStyle = new Color(color).darken(0.25).hex();
     ctx.fillStyle = color;
 

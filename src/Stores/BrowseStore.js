@@ -1,7 +1,6 @@
 import { observable, action, runInAction, computed } from "mobx";
 //import { debounce, uniqueId } from "lodash";
 import { debounce } from "lodash";
-import palette from "google-palette";
 
 
 import API from "../Services/API";
@@ -9,117 +8,6 @@ import bookmarkStatusStore from "./BookmarkStatusStore";
 
 const bookmarkListType = "BOOKMARK";
 const nodetypeType = "NODETYPE";
-
-const nodeTypes = [
-  {
-    "label": "Dataset",
-    "dataType": "https://schema.hbp.eu/minds/Dataset"
-  },
-  {
-    "label": "Specimen group",
-    "dataType": "https://schema.hbp.eu/minds/Specimengroup"
-  },
-  {
-    "label": "Subject",
-    "dataType": "https://schema.hbp.eu/minds/Subject"
-  },
-  {
-    "label": "Activity",
-    "dataType": "https://schema.hbp.eu/minds/Activity"
-  },
-  {
-    "label": "Person",
-    "dataType": "https://schema.hbp.eu/minds/Person"
-  },
-  {
-    "label": "PLA Component",
-    "dataType": "https://schema.hbp.eu/minds/Placomponent"
-  },
-  {
-    "label": "Publication",
-    "dataType": "https://schema.hbp.eu/minds/Publication"
-  },
-  {
-    "label": "File Association",
-    "dataType": "https://schema.hbp.eu/minds/FileAssociation"
-  },
-  {
-    "label": "DOI",
-    "dataType": "https://schema.hbp.eu/minds/DatasetDOI"
-  },
-  {
-    "label": "Method",
-    "dataType": "https://schema.hbp.eu/minds/Method"
-  },
-  {
-    "label": "Reference space",
-    "dataType": "https://schema.hbp.eu/minds/Referencespace"
-  },
-  {
-    "label": "Parcellation Region",
-    "dataType": "https://schema.hbp.eu/minds/Parcellationregion"
-  },
-  {
-    "label": "Parcellation Atlas",
-    "dataType": "https://schema.hbp.eu/minds/Parcellationatlas"
-  },
-  {
-    "label": "Embargo Status",
-    "dataType": "https://schema.hbp.eu/minds/Embargostatus"
-  },
-  {
-    "label": "Approval",
-    "dataType": "https://schema.hbp.eu/minds/Approval"
-  },
-  {
-    "label": "Protocol",
-    "dataType": "https://schema.hbp.eu/minds/Protocol"
-  },
-  {
-    "label": "Preparation",
-    "dataType": "https://schema.hbp.eu/minds/Preparation"
-  },
-  {
-    "label": "Authority",
-    "dataType": "https://schema.hbp.eu/minds/Authority"
-  },
-  {
-    "label": "Format",
-    "dataType": "https://schema.hbp.eu/minds/Format"
-  },
-  {
-    "label": "License Type",
-    "dataType": "https://schema.hbp.eu/minds/Licensetype"
-  },
-  {
-    "label": "Sample",
-    "dataType": "https://schema.hbp.eu/minds/ExperimentSample"
-  },
-  {
-    "label": "File",
-    "dataType": "https://schema.hbp.eu/minds/File"
-  },
-  {
-    "label": "Software agent",
-    "dataType": "https://schema.hbp.eu/minds/Softwareagent"
-  },
-  {
-    "label": "Age category",
-    "dataType": "https://schema.hbp.eu/minds/Agecategory"
-  },
-  {
-    "label": "Sex",
-    "dataType": "https://schema.hbp.eu/minds/Sex"
-  },
-  {
-    "label": "Species",
-    "dataType": "https://schema.hbp.eu/minds/Species"
-  },
-  {
-    "label": "Role",
-    "dataType": "https://schema.hbp.eu/minds/Role"
-  }
-];
 
 class BrowseStore{
 
@@ -196,33 +84,6 @@ class BrowseStore{
       list.push(...folder.lists);
       return list;
     }, []);
-  }
-
-  @computed
-  get nodeTypes(){
-    return nodeTypes;
-  }
-
-  @computed
-  get sortedNodeTypes(){
-    return this.nodeTypes.concat().sort((a, b) => a.dataType < b.dataType?-1: a.dataType > b.dataType?1:0);
-  }
-
-  @computed
-  get nodeTypeLabels(){
-    return this.nodeTypes.reduce((result, nodeType) => {
-      result[nodeType.dataType] = nodeType.label;
-      return result;
-    }, {});
-  }
-
-  @computed
-  get colorScheme(){
-    const colorPalette = palette("mpn65", this.nodeTypes.length);
-    return this.nodeTypes.reduce((result, type, index) => {
-      result[type.label] = "#" + colorPalette[index];
-      return result;
-    },{});
   }
 
   @action

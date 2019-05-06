@@ -8,8 +8,8 @@ import {Glyphicon} from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
+import dataTypesStore from "../../../Stores/DataTypesStore";
 import graphStore from "../../../Stores/GraphStore";
-import browseStore from "../../../Stores/BrowseStore";
 
 const styles = {
   container:{
@@ -126,13 +126,13 @@ export default class GraphSettings extends React.Component{
         <Scrollbars autoHide>
           {graphStore.isFetched ?
             <div className={classes.nodeList}>
-              {browseStore.sortedNodeTypes.map(nodeType => {
+              {dataTypesStore.sortedDataTypes.map(nodeType => {
                 const nodesOfType = graphStore.findNodesByType(nodeType.dataType);
                 const typeState = graphStore.typeStates.get(nodeType.dataType);
                 const isDisabled = typeState === "none";
                 const isExpanded = graphStore.expandedTypes.indexOf(nodeType.dataType) !== -1;
                 const isGrouped = typeState === "group";
-                const backgroundColor = browseStore.colorScheme[nodeType.label];
+                const backgroundColor = dataTypesStore.colorScheme[nodeType.label];
                 const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return(
                   <div className={`${classes.nodeType} ${isDisabled?"disabled":""} ${isExpanded?"expanded":""}`} key={nodeType.dataType}>

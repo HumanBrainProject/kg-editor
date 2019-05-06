@@ -8,7 +8,6 @@ const endpoints = {
   "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
   "globalDatasetsStatistics": () => `${window.rootPath}/data/mockups/globalDatasetsStatistics.json`,
-  "nodeTypes": () => "/editor/api/nodetypes",
   "bookmarkListFolders": mockup => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
   "instances": entity => `/editor/api/instances/${entity}`,
   "listedInstances": () => "/editor/api/instances",

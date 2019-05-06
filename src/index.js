@@ -233,6 +233,7 @@ const styles = {
     }
   },
   newInstanceModal:{
+    overflow: "hidden",
     width:"90%",
     "@media screen and (min-width:1024px)": {
       width:"900px",

@@ -5,8 +5,8 @@ import { Form } from "hbp-quickfire";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import instanceStore, { nodeTypeMapping } from "../../Stores/InstanceStore";
-import graphStore from "../../Stores/GraphStore";
+import dataTypesStore from "../../Stores/DataTypesStore";
+import instanceStore from "../../Stores/InstanceStore";
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -243,7 +243,7 @@ export default class InstanceForm extends React.Component {
             <HeaderPanel
               className={classes.panelHeader}
               nodeType={nodeType}
-              color={graphStore.colorScheme[nodeTypeMapping()[nodeType]]}
+              color={dataTypesStore.colorScheme[nodeType]}
               hasChanged={instance.hasChanged}/>
 
             <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />

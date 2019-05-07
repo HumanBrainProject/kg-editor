@@ -2,8 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { reverseNodeTypeMapping } from "../../Stores/InstanceStore";
-import graphStore from "../../Stores/GraphStore";
+import dataTypesStore from "../../Stores/DataTypesStore";
 
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
@@ -170,17 +169,14 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    //const color = graphStore.colorScheme[nodeTypeMapping()[instance.type]];
-    const color = graphStore.colorScheme[instance.dataType];
-    const dataTypeLabel = reverseNodeTypeMapping()[instance.dataType];
-
+    const color = dataTypesStore.colorScheme[instance.label];
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}
         onDoubleClick={this.handleDoubleClick.bind(this, instance)} >
         <div className={classes.statusAndNameRow}>
           <Status id={instance.id} darkmode={true} />
-          <div className={classes.nodeType} style={color ? { color: color } : {}} title={dataTypeLabel}>
+          <div className={classes.nodeType} style={color ? { color: color } : {}} title={instance.label}>
             <FontAwesomeIcon fixedWidth icon="circle" />
           </div>
           <div className={classes.name}>{instance.name}</div>

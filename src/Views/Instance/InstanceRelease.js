@@ -131,14 +131,13 @@ const styles = {
       transformOrigin: "50% 41%",
       marginRight: "5px"
     },
-    "& .node-type": {
-      fontSize: "0.75em",
-      display: "inline-block",
-      verticalAlign: "middle",
-      fontWeight: "bold",
-      color: "var(--ft-color-loud)",
-      marginRight: "5px",
-      marginLeft: "8px"
+    "& .node-type":{
+      fontSize:"0.75em",
+      display:"inline-block",
+      verticalAlign:"middle",
+      fontWeight:"bold",
+      color:"var(--ft-color-loud)",
+      margin: "3px 5px 0 8px"
     }
   },
   releasePreview: {

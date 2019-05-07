@@ -6,6 +6,7 @@ import { debounce } from "lodash";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import dataTypesStore from "../../../Stores/DataTypesStore";
 import graphStore from "../../../Stores/GraphStore";
 import routerStore from "../../../Stores/RouterStore";
 
@@ -137,8 +138,6 @@ export default class Graph extends React.Component {
   }
 
   _paintNode = (node, ctx, scale) => {
-    let dataType = node.original_dataType || node.dataType;
-
     ctx.beginPath();
     if(node.isGroup){
       ctx.rect(node.x-6, node.y-6, 12, 12);
@@ -151,9 +150,9 @@ export default class Graph extends React.Component {
         ctx.globalAlpha = 0.1;
       }
     }
-
-    ctx.strokeStyle = new Color(graphStore.colorScheme[dataType]).darken(0.25).hex();
-    ctx.fillStyle = graphStore.colorScheme[dataType];
+    const color = dataTypesStore.colorScheme[node.dataTypeLabel];
+    ctx.strokeStyle = new Color(color).darken(0.25).hex();
+    ctx.fillStyle = color;
 
     if(node.isMainNode){
       ctx.setLineDash([2, 0.5]);
@@ -170,7 +169,7 @@ export default class Graph extends React.Component {
 
       let label = node.title && node.title.split?node.title:"";
       if(!node.isGroup){
-        label = `(${node.niceDataType}) ${label}`;
+        label = `(${node.dataTypeLabel}) ${label}`;
       }
 
       this._wrapText(ctx, label, node.x, node.y, 10, 1.3, node);

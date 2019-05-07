@@ -7,7 +7,7 @@ import API from "../Services/API";
 
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
-import BrowseStore from "./BrowseStore";
+import browseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
@@ -47,51 +47,6 @@ class OptionsCache{
   }
 }
 
-const _nodeTypeMapping = {
-  "Dataset":"https://schema.hbp.eu/minds/Dataset",
-  "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
-  "Subject":"https://schema.hbp.eu/minds/Subject",
-  "Activity":"https://schema.hbp.eu/minds/Activity",
-  "Person":"https://schema.hbp.eu/minds/Person",
-  "PLA Component":"https://schema.hbp.eu/minds/Placomponent",
-  "Publication":"https://schema.hbp.eu/minds/Publication",
-  "File Association":"https://schema.hbp.eu/minds/FileAssociation",
-  "DOI":"https://schema.hbp.eu/minds/DatasetDOI",
-  "Method":"https://schema.hbp.eu/minds/Method",
-  "Reference space":"https://schema.hbp.eu/minds/Referencespace",
-  "Parcellation Region":"https://schema.hbp.eu/minds/Parcellationregion",
-  "Parcellation Atlas":"https://schema.hbp.eu/minds/Parcellationatlas",
-  "Embargo Status":"https://schema.hbp.eu/minds/Embargostatus",
-  "Approval":"https://schema.hbp.eu/minds/Approval",
-  "Protocol":"https://schema.hbp.eu/minds/Protocol",
-  "Preparation":"https://schema.hbp.eu/minds/Preparation",
-  "Authority":"https://schema.hbp.eu/minds/Authority",
-  "Format":"https://schema.hbp.eu/minds/Format",
-  "License Type":"https://schema.hbp.eu/minds/Licensetype",
-  "Sample":"https://schema.hbp.eu/minds/ExperimentSample",
-  "File":"https://schema.hbp.eu/minds/File",
-  "Software agent":"https://schema.hbp.eu/minds/Softwareagent",
-  "Age category":"https://schema.hbp.eu/minds/Agecategory",
-  "Sex":"https://schema.hbp.eu/minds/Sex",
-  "Species":"https://schema.hbp.eu/minds/Species",
-  "Role":"https://schema.hbp.eu/minds/Role"
-};
-
-export function nodeTypeMapping() {
-  return _nodeTypeMapping;
-}
-
-let _reverseNodeTypeMapping = null;
-export function reverseNodeTypeMapping(){
-  if (_reverseNodeTypeMapping) {
-    return _reverseNodeTypeMapping;
-  }
-  return Object.entries(_nodeTypeMapping).reduce((result, [label, type]) => {
-    result[type] = label;
-    return result;
-  }, {});
-}
-
 class Instance {
   @observable instanceId = null;
   @observable data = null;
@@ -122,7 +77,7 @@ class Instance {
     return [];
   }
 
-  computed
+  @computed
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
       return Object.keys(this.data.fields)
@@ -262,14 +217,37 @@ class InstanceStore {
 
   @action
   async createNewInstance(path, name=""){
-    this.isCreatingNewInstance = path;
-    try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), {"http://schema.org/name":name});
+    if (browseStore.isFetched.lists) {
+      const list = browseStore.getListById(path);
+      if (list) {
+        const labelField = list && list.uiSpec && list.uiSpec.labelField;
+        if (!name || (name && labelField)) {
+          this.isCreatingNewInstance = path;
+          try{
+            const payload = {};
+            if (labelField) {
+              payload[labelField] = name;
+            }
+            const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), payload);
+            this.isCreatingNewInstance = false;
+            return data.data.id;
+          } catch(e){
+            this.isCreatingNewInstance = false;
+            this.instanceCreationError = e.message;
+          }
+        } else {
+          this.isCreatingNewInstance = false;
+          this.instanceCreationError = `Error: labelField is not defined for ${path} type!`;
+        }
+      } else {
+        // Should never happen: UI should ensure to propose only available types
+        this.isCreatingNewInstance = false;
+        this.instanceCreationError = `Error: type ${path} is not available!`;
+      }
+    } else {
+      // Should never happen: UI should ensure we the list has been fetch before calling createNewInstance
       this.isCreatingNewInstance = false;
-      return data.data.id;
-    } catch(e){
-      this.isCreatingNewInstance = false;
-      this.instanceCreationError = e.message;
+      this.instanceCreationError = "Error: instances types are not available!";
     }
   }
 
@@ -294,8 +272,9 @@ class InstanceStore {
     let path = instanceToCopy.path;
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
-    if(values["http://schema.org/name"]){
-      values["http://schema.org/name"] = values["http://schema.org/name"]+" (Copy)";
+    const labelField = instanceToCopy.data && instanceToCopy.data.ui_info && instanceToCopy.data.ui_info.labelField;
+    if(labelField) {
+      values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
     }
     this.isCreatingNewInstance = path;
     try{
@@ -334,7 +313,7 @@ class InstanceStore {
               }
             }
           }
-          BrowseStore.refreshFilter();
+          browseStore.refreshFilter();
           this.closeInstance(instanceId);
           this.flush();
           if (nextLocation) {

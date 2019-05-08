@@ -396,9 +396,11 @@ export default class KgDropdownSelectField extends React.Component {
 
     const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
     const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
+      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
       .map(alternative => ({
         value: this.getAlternativeOptions(alternative.value),
-        userIds: alternative.userIds
+        userIds: alternative.userIds,
+        selected: !!alternative.selected
       }));
 
     return (

@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { MenuItem } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Views/User";
 
@@ -45,9 +46,19 @@ const styles = {
     "& .option em .user + .user:before": {
       content: "'; '"
     },
+    "& .option": {
+      position: "relative",
+      paddingLeft: "3px",
+    },
     "& .option .parenthesis": {
       display: "inline-block",
       transform: "scaleY(1.4)"
+    },
+    "& .selected": {
+      position: "absolute",
+      top: "50%",
+      left: "-15px",
+      transform: "translateY(-50%)"
     }
   }
 };
@@ -73,6 +84,10 @@ export default class Alternative extends React.Component {
               <User key={userId} userId={userId} />
             ))
           }<div className="parenthesis">)</div></em>
+          {alternative.selected?
+            <FontAwesomeIcon icon="check" className="selected" />
+            :null
+          }
         </div>
       </MenuItem>
     );

@@ -10,6 +10,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import routerStore from "../../../Stores/RouterStore";
 import dataTypesStore from "../../../Stores/DataTypesStore";
 import graphStore from "../../../Stores/GraphStore";
+import structureStore from "../../../Stores/StructureStore";
 
 const styles = {
   container: {
@@ -141,7 +142,7 @@ export default class GraphSettings extends React.Component {
                     <div className={classes.nodeTypeLabel}
                       onMouseOver={isGrouped ? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.schema)) : undefined}
                       onMouseOut={this.handleNodeHover.bind(this, null)}
-                    >{this.props.structureStore.findLabelBySchema(nodeType.schema)}</div>
+                    >{structureStore.findLabelBySchema(nodeType.schema)}</div>
                     <div className={classes.nodeTypeActions}>
                       {!isDisabled && (
                         <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.schema)}>

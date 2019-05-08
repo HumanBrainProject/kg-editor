@@ -1,4 +1,4 @@
-import { computed } from "mobx";
+import { computed, action } from "mobx";
 import palette from "google-palette";
 
 import structureStore from "./StructureStore";
@@ -29,7 +29,7 @@ const dataTypes = [
     "schema": "minds/core/fileassociation/v1.0.0"
   },
   {
-    "schema": "minds/core/doi/v1.0.0"
+    "schema": "datacite/core/doi/v1.0.0"
   },
   {
     "schema": "minds/experiment/method/v1.0.0"
@@ -83,7 +83,7 @@ const dataTypes = [
     "schema": "minds/core/species/v1.0.0",
   },
   {
-    "schema": "minds/core/role/v1.0.0",
+    "schema": "minds/prov/role/v1.0.0",
   }
 ];
 
@@ -132,9 +132,10 @@ class DataTypesStore {
 
   }
 
+  @action
   colorPalletteBySchema(schema) {
     let color = this.colorScheme[schema];
-    if (!color) {
+    if (!color && structureStore.findLabelBySchema(schema)) {
       color = this.colorPaletteByLabel[structureStore.findLabelBySchema(schema)];
     }
     return color;

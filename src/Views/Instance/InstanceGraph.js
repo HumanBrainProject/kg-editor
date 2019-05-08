@@ -3,7 +3,6 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 
 import graphStore from "../../Stores/GraphStore";
-import structureStore from "../../Stores/StructureStore";
 import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -59,14 +58,14 @@ export default class GraphInstance extends React.Component {
           {graphStore.isFetching ?
             <FetchingLoader>Fetching visualization data...</FetchingLoader>
             :
-            <GraphViz structureStore={structureStore} />
+            <GraphViz />
           }
         </div>
         <div className={classes.settings}>
           {graphStore.isFetching ?
             <FetchingLoader>Fetching data...</FetchingLoader>
             :
-            <GraphSettings structureStore={structureStore} />
+            <GraphSettings />
           }
         </div>
       </div>

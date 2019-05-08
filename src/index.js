@@ -16,6 +16,7 @@ import routerStore from "./Stores/RouterStore";
 import dataTypesStore from "./Stores/DataTypesStore";
 import instanceStore from "./Stores/InstanceStore";
 import browseStore from "./Stores/BrowseStore";
+import structureStore from "./Stores/StructureStore";
 
 import Tab from "./Components/Tab";
 import SaveBar from "./Views/Instance/SaveBar";
@@ -45,7 +46,7 @@ const styles = {
     textRendering: "optimizeLegibility",
     "-webkit-font-smoothing": "antialiased",
     "-webkit-tap-highlight-color": "transparent",
-    fontFamily:"Lato, sans-serif"
+    fontFamily: "Lato, sans-serif"
   },
   "@global *": {
     boxSizing: "border-box"
@@ -55,104 +56,104 @@ const styles = {
     userSelect: "none"
   },
 
-  layout:{
+  layout: {
     height: "100vh",
-    display:"grid",
-    overflow:"hidden",
-    gridTemplateColumns:"1fr",
-    gridTemplateRows:"auto 1fr 20px"
+    display: "grid",
+    overflow: "hidden",
+    gridTemplateColumns: "1fr",
+    gridTemplateRows: "auto 1fr 20px"
   },
   tabs: {
     background: "var(--bg-color-ui-contrast1)",
-    display:"grid",
-    gridTemplateRows:"1fr",
-    gridTemplateColumns:"auto auto 1fr auto"
+    display: "grid",
+    gridTemplateRows: "1fr",
+    gridTemplateColumns: "auto auto 1fr auto"
   },
-  fixedTabsLeft:{
-    display:"grid",
-    gridTemplateColumns:"repeat(6, auto)"
+  fixedTabsLeft: {
+    display: "grid",
+    gridTemplateColumns: "repeat(6, auto)"
   },
-  dynamicTabs:{
-    display:"grid",
-    gridTemplateColumns:"repeat(auto-fit, minmax(120px, 0.5fr))"
+  dynamicTabs: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 0.5fr))"
   },
-  fixedTabsRight:{
-    display:"grid",
-    gridTemplateColumns:"repeat(6, auto)"
+  fixedTabsRight: {
+    display: "grid",
+    gridTemplateColumns: "repeat(6, auto)"
   },
   body: {
     position: "relative",
-    overflow:"hidden",
+    overflow: "hidden",
     background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
     backgroundSize: "200%"
   },
   logo: {
     padding: "10px",
-    cursor:"pointer",
+    cursor: "pointer",
     "& span": {
       color: "var(--ft-color-loud)",
       display: "inline-block",
       paddingLeft: "10px",
       fontSize: "0.9em",
       borderLeft: "1px solid var(--border-color-ui-contrast5)",
-      marginLeft:"10px"
+      marginLeft: "10px"
     },
     "&:hover span": {
       color: "var(--ft-color-louder)"
     }
   },
-  status:{
+  status: {
     background: "var(--bg-color-ui-contrast1)"
   },
-  savebar:{
-    position:"absolute",
-    top:0,
-    right:"-400px",
-    width:"400px",
-    background:"var(--bg-color-ui-contrast3)",
-    borderLeft:"1px solid var(--border-color-ui-contrast1)",
-    color:"var(--ft-color-loud)",
-    height:"100%",
-    zIndex:2,
-    transition:"right 0.25s ease",
-    "&.show":{
-      right:"0",
+  savebar: {
+    position: "absolute",
+    top: 0,
+    right: "-400px",
+    width: "400px",
+    background: "var(--bg-color-ui-contrast3)",
+    borderLeft: "1px solid var(--border-color-ui-contrast1)",
+    color: "var(--ft-color-loud)",
+    height: "100%",
+    zIndex: 2,
+    transition: "right 0.25s ease",
+    "&.show": {
+      right: "0",
     }
   },
-  savebarToggle:{
-    cursor:"pointer",
-    position:"absolute",
-    bottom:"10px",
-    right:"100%",
-    background:"linear-gradient(90deg, var(--bg-color-ui-contrast1), var(--bg-color-ui-contrast3))",
-    borderRadius:"3px 0 0 3px",
-    padding:"10px",
-    border:"1px solid var(--border-color-ui-contrast1)",
-    borderRight:"none",
-    textAlign:"center",
-    color:"#e67e22",
-    "&:hover":{
-      background:"var(--bg-color-ui-contrast3)"
+  savebarToggle: {
+    cursor: "pointer",
+    position: "absolute",
+    bottom: "10px",
+    right: "100%",
+    background: "linear-gradient(90deg, var(--bg-color-ui-contrast1), var(--bg-color-ui-contrast3))",
+    borderRadius: "3px 0 0 3px",
+    padding: "10px",
+    border: "1px solid var(--border-color-ui-contrast1)",
+    borderRight: "none",
+    textAlign: "center",
+    color: "#e67e22",
+    "&:hover": {
+      background: "var(--bg-color-ui-contrast3)"
     }
   },
-  savebarToggleIcon:{
+  savebarToggleIcon: {
     animation: "pulse 2s linear infinite"
   },
   "@keyframes pulse": {
-    "0%":{
+    "0%": {
       "transform": "scale(1.1)"
     },
-    "50%":{
+    "50%": {
       "transform": "scale(0.8)"
     },
-    "100%":{
+    "100%": {
       "transform": "scale(1.1)"
     }
   },
-  userProfileLoader:{
-    position:"fixed",
-    top:0,
-    left:0,
+  userProfileLoader: {
+    position: "fixed",
+    top: 0,
+    left: 0,
     width: "100%",
     height: "100%",
     zIndex: 10000,
@@ -232,11 +233,11 @@ const styles = {
       }
     }
   },
-  newInstanceModal:{
+  newInstanceModal: {
     overflow: "hidden",
-    width:"90%",
+    width: "90%",
     "@media screen and (min-width:1024px)": {
-      width:"900px",
+      width: "900px",
     },
     "& .modal-body": {
       height: "calc(95vh - 52px)",
@@ -247,50 +248,50 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-class App extends React.Component{
+class App extends React.Component {
   constructor(props) {
     super(props);
     authStore.tryAuthenticate();
-    this.state = {currentLocation: routerStore.history.location.pathname};
+    this.state = { currentLocation: routerStore.history.location.pathname };
     routerStore.history.listen(location => {
-      this.setState({currentLocation:location.pathname});
+      this.setState({ currentLocation: location.pathname });
     });
-    this.kCode = {step:0, ref:[38,38,40,40,37,39,37,39,66,65]};
+    this.kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     document.addEventListener("keydown", this.handleGlobalShortcuts);
   }
 
-  componentDidCatch(error, info){
+  componentDidCatch(error, info) {
     appStore.setGlobalError(error, info);
   }
 
   handleGlobalShortcuts = (e) => {
-    if((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84){
+    if ((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84) {
       appStore.toggleTheme();
-    } else if(e.altKey && e.keyCode === 66){ // alt+b, browse
+    } else if (e.altKey && e.keyCode === 66) { // alt+b, browse
       routerStore.history.push("/browse");
-    } else if(e.altKey && e.keyCode === 78){ // alt+n, new
+    } else if (e.altKey && e.keyCode === 78) { // alt+n, new
       this.handleCreateInstance();
-    } else if(e.altKey && e.keyCode === 68){ // alt+d, dashboard
+    } else if (e.altKey && e.keyCode === 68) { // alt+d, dashboard
       routerStore.history.push("/");
-    } else if(e.keyCode === 112){ // F1, help
+    } else if (e.keyCode === 112) { // F1, help
       routerStore.history.push("/help");
-    } else if(e.altKey && e.keyCode === 87){ // alt+w, close
-      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
-      if(matchInstanceTab){
+    } else if (e.altKey && e.keyCode === 87) { // alt+w, close
+      let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
+      if (matchInstanceTab) {
         this.handleCloseInstance(matchInstanceTab.params.id);
       }
-    } else if(e.altKey && e.keyCode === 37){ // left arrow, previous
-      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+    } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
+      let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
       this.handleFocusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
-    } else if(e.altKey && e.keyCode === 39){ // right arrow, next
-      let matchInstanceTab = matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"});
+    } else if (e.altKey && e.keyCode === 39) { // right arrow, next
+      let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
       this.handleFocusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
     } else {
-      this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode? this.kCode.step+1: 0;
-      if(this.kCode.step === this.kCode.ref.length){
+      this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode ? this.kCode.step + 1 : 0;
+      if (this.kCode.step === this.kCode.ref.length) {
         this.kCode.step = 0;
         appStore.setTheme("cupcake");
       }
@@ -309,13 +310,13 @@ class App extends React.Component{
     instanceStore.cancelDeleteInstance();
   }
 
-  handleCloseInstance(instanceId){
-    if(matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"})){
-      if(matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
-        if(instanceStore.openedInstances.size > 1){
+  handleCloseInstance(instanceId) {
+    if (matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" })) {
+      if (matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
+        if (instanceStore.openedInstances.size > 1) {
           let openedInstances = Array.from(instanceStore.openedInstances.keys());
           let currentInstanceIndex = openedInstances.indexOf(instanceId);
-          let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
+          let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
           let openedInstance = instanceStore.openedInstances.get(newInstanceId);
           routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
@@ -327,12 +328,12 @@ class App extends React.Component{
     instanceStore.closeInstance(instanceId);
   }
 
-  handleFocusPreviousInstance(instanceId){
-    if(instanceId && matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) && matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
-      if(instanceStore.openedInstances.size > 1){
+  handleFocusPreviousInstance(instanceId) {
+    if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
+      if (instanceStore.openedInstances.size > 1) {
         let openedInstances = Array.from(instanceStore.openedInstances.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1]: openedInstances[currentInstanceIndex-1];
+        let newInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
         let openedInstance = instanceStore.openedInstances.get(newInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
@@ -340,7 +341,7 @@ class App extends React.Component{
         routerStore.history.push("/browse");
       }
     } else {
-      if(instanceStore.openedInstances.size > 1){
+      if (instanceStore.openedInstances.size > 1) {
         const openedInstances = Array.from(instanceStore.openedInstances.keys());
         const newInstanceId = openedInstances[openedInstances.length - 1];
         const openedInstance = instanceStore.openedInstances.get(newInstanceId);
@@ -351,12 +352,12 @@ class App extends React.Component{
     }
   }
 
-  handleFocusNextInstance(instanceId){
-    if(instanceId && matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) && matchPath(this.state.currentLocation, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
-      if(instanceStore.openedInstances.size > 1){
+  handleFocusNextInstance(instanceId) {
+    if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
+      if (instanceStore.openedInstances.size > 1) {
         let openedInstances = Array.from(instanceStore.openedInstances.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0]: openedInstances[currentInstanceIndex+1];
+        let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
         let openedInstance = instanceStore.openedInstances.get(newInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
@@ -364,7 +365,7 @@ class App extends React.Component{
         routerStore.history.push("/browse");
       }
     } else {
-      if(instanceStore.openedInstances.size > 1){
+      if (instanceStore.openedInstances.size > 1) {
         const openedInstances = Array.from(instanceStore.openedInstances.keys());
         const newInstanceId = openedInstances[0];
         const openedInstance = instanceStore.openedInstances.get(newInstanceId);
@@ -384,7 +385,7 @@ class App extends React.Component{
   }
 
   handleCreateInstance = () => {
-    if(!browseStore.isFetched.lists && !browseStore.isFetching.list){
+    if (!browseStore.isFetched.lists && !browseStore.isFetching.list) {
       browseStore.fetchLists();
     }
     instanceStore.toggleShowCreateModal();
@@ -395,23 +396,23 @@ class App extends React.Component{
   }
 
   handleLogout = () => {
-    if(!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")){
+    if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       instanceStore.flushOpenedTabs();
       authStore.logout();
       document.querySelector("#root").style.display = "none";
-      window.location.href = window.rootPath+"/";
+      window.location.href = window.rootPath + "/";
     }
   }
 
-  render(){
-    const {classes} = this.props;
-    const {currentLocation} = this.state;
+  render() {
+    const { classes } = this.props;
+    const { currentLocation } = this.state;
     const Theme = appStore.availableThemes[appStore.currentTheme];
 
-    return(
+    return (
       <Router history={routerStore.history}>
         <div className={classes.layout}>
-          <Theme/>
+          <Theme />
           <div className={classes.tabs}>
 
             <div className={`${classes.logo} layout-logo`} onClick={this.handleGoToDashboard}>
@@ -422,14 +423,14 @@ class App extends React.Component{
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {authStore.isFullyAuthenticated?
+                  {authStore.isFullyAuthenticated ?
                     <React.Fragment>
-                      <Tab icon={"home"} current={matchPath(currentLocation, {path:"/", exact:"true"})} path={"/"} label={"Home"} hideLabel/>
-                      <Tab icon={"search"} current={matchPath(currentLocation, {path:"/browse", exact:"true"})} path={"/browse"} hideLabel label={"Browse"}/>
-                      <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"}/>
-                      <Tab icon={"blender-phone"} current={matchPath(currentLocation, {path:"/query-builder", exact:"true"})} path={"/query-builder"} hideLabel label={"Query Builder"}/>
+                      <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
+                      <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
+                      <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
+                      <Tab icon={"blender-phone"} current={matchPath(currentLocation, { path: "/query-builder", exact: "true" })} path={"/query-builder"} hideLabel label={"Query Builder"} />
                     </React.Fragment>
-                    :null
+                    : null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
@@ -438,33 +439,33 @@ class App extends React.Component{
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
-                    if(!instance.isFetching && !instance.hasFetchError){
+                    if (!instance.isFetching && !instance.hasFetchError) {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
-                      label = field? field.getValue(): instanceId;
+                      label = field ? field.getValue() : instanceId;
                       color = dataTypesStore.colorScheme[instance.data.label];
                     }
-                    if(!label){
+                    if (!label) {
                       label = instanceId;
                     }
                     return (
                       <Tab
                         key={instanceId}
-                        icon={instance.isFetching?"circle-notch":"circle"}
+                        icon={instance.isFetching ? "circle-notch" : "circle"}
                         iconSpin={instance.isFetching}
                         iconColor={color}
-                        current={matchPath(currentLocation, {path:`/instance/${mode}/${instanceId}`, exact:"true"})}
+                        current={matchPath(currentLocation, { path: `/instance/${mode}/${instanceId}`, exact: "true" })}
                         path={`/instance/${mode}/${instanceId}`}
                         onClose={this.handleCloseInstance.bind(this, instanceId)}
-                        label={label}/>
+                        label={label} />
                     );
                   })}
                 </div>
                 <div className={classes.fixedTabsRight}>
                   {authStore.isFullyAuthenticated &&
                     <React.Fragment>
-                      <Tab icon={"question-circle"} current={matchPath(currentLocation, {path:"/help", exact:"true"})} path={"/help"} hideLabel label={"Help"}/>
-                      <Tab icon={"user-lock"} onClick={this.handleLogout} hideLabel label={"Logout"}/>
+                      <Tab icon={"question-circle"} current={matchPath(currentLocation, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
+                      <Tab icon={"user-lock"} onClick={this.handleLogout} hideLabel label={"Logout"} />
                     </React.Fragment>
                   }
                 </div>
@@ -472,58 +473,58 @@ class App extends React.Component{
             }
           </div>
           <div className={classes.body}>
-            {instanceStore.hasUnsavedChanges && !matchPath(this.state.currentLocation, {path:"/instance/:mode/:id*", exact:"true"}) &&
-              <div className={`${classes.savebar} ${instanceStore.showSaveBar?"show":""}`}>
+            {instanceStore.hasUnsavedChanges && !matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) &&
+              <div className={`${classes.savebar} ${instanceStore.showSaveBar ? "show" : ""}`}>
                 <div className={classes.savebarToggle} onClick={this.handleToggleSaveBar}>
-                  <FontAwesomeIcon className={classes.savebarToggleIcon} icon={"exclamation-triangle"}/>&nbsp;
-                  <FontAwesomeIcon icon={"caret-down"}/>&nbsp;
-                  <FontAwesomeIcon icon={"pencil-alt"}/>
+                  <FontAwesomeIcon className={classes.savebarToggleIcon} icon={"exclamation-triangle"} />&nbsp;
+                  <FontAwesomeIcon icon={"caret-down"} />&nbsp;
+                  <FontAwesomeIcon icon={"pencil-alt"} />
                 </div>
-                <SaveBar/>
+                <SaveBar />
               </div>
             }
-            {appStore.globalError?
+            {appStore.globalError ?
               <Route component={GlobalError} />
               :
-              !authStore.isOIDCAuthenticated?
+              !authStore.isOIDCAuthenticated ?
                 <Route component={Login} />
                 :
-                authStore.isFullyAuthenticated?
+                authStore.isFullyAuthenticated ?
                   <Switch>
-                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
-                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
-                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
-                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
-                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage"/>)} />
+                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
+                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
+                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
+                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
+                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
 
                     <Route path="/query-builder" exact={true} component={QueryBuilder} />
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />
                     <Route path="/kg-stats" exact={true} component={Statistics} />
-                    <Route path="/loginSuccess" exact={true} component={()=>null} />
+                    <Route path="/loginSuccess" exact={true} component={() => null} />
                     <Route path="/" exact={true} component={Home} />
                     <Route component={NotFound} />
                   </Switch>
-                  :null
+                  : null
             }
             {authStore.isOIDCAuthenticated && !authStore.hasUserProfile && (
-              authStore.isRetrievingUserProfile?
+              authStore.isRetrievingUserProfile ?
                 <div className={classes.userProfileLoader}>
                   <FetchingLoader>Retrieving user profile...</FetchingLoader>
                 </div>
                 :
-                authStore.userProfileError?
-                  <div  className={classes.userProfileError}>
+                authStore.userProfileError ?
+                  <div className={classes.userProfileError}>
                     <BGMessage icon={"ban"}>
                       {`There was a network problem retrieving user profile (${authStore.userProfileError}).
-                      If the problem persists, please contact the support.`}<br/><br/>
+                      If the problem persists, please contact the support.`}<br /><br />
                       <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
-                        <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+                        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
                       </Button>
                     </BGMessage>
                   </div>
-                  :null
+                  : null
             )}
           </div>
           <div className={`${classes.status} layout-status`}>
@@ -541,20 +542,20 @@ class App extends React.Component{
                   </Modal.Body>
                 </Modal>
               }
-              {instanceStore.deleteInstanceError?
+              {instanceStore.deleteInstanceError ?
                 <div className={classes.deleteInstanceErrorModal}>
                   <Modal.Dialog>
                     <Modal.Body>
                       <div className={classes.deleteInstanceError}>{instanceStore.deleteInstanceError}</div>
                       <div className={classes.deleteInstanceErrorFooterBar}>
                         <Button onClick={this.handleCancelDeleteInstance}>Cancel</Button>
-                        <Button bsStyle="primary" onClick={this.handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+                        <Button bsStyle="primary" onClick={this.handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
                       </div>
                     </Modal.Body>
                   </Modal.Dialog>
                 </div>
                 :
-                instanceStore.isDeletingInstance && !!instanceStore.instanceToDelete?
+                instanceStore.isDeletingInstance && !!instanceStore.instanceToDelete ?
                   <div className={classes.deletingInstanceModal}>
                     <Modal.Dialog>
                       <Modal.Body>
@@ -562,7 +563,7 @@ class App extends React.Component{
                       </Modal.Body>
                     </Modal.Dialog>
                   </div>
-                  :null
+                  : null
               }
             </React.Fragment>
           )}
@@ -572,4 +573,4 @@ class App extends React.Component{
   }
 }
 
-render(<App/>, document.getElementById("root"));
+render(<App />, document.getElementById("root"));

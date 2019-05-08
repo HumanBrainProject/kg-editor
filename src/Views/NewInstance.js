@@ -102,7 +102,7 @@ export default class NewInstance extends React.Component {
                   <h4>{folder.folderName}</h4>
                   <div className={classes.list}>
                     {folder.lists.map(list => {
-                      const color = dataTypesStore.colorScheme[list.id];
+                      const color = dataTypesStore.colorPalletteBySchema(list.id);
                       return (
                         <div key={list.id} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
                           <div className={classes.icon} style={color ? { color: color } : {}}>

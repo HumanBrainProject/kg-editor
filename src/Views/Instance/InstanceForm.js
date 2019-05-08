@@ -243,7 +243,7 @@ export default class InstanceForm extends React.Component {
               <HeaderPanel
                 className={classes.panelHeader}
                 nodeType={nodeType}
-                color={dataTypesStore.colorScheme[nodeType]}
+                color={dataTypesStore.colorPalletteBySchema(nodeType)}
                 hasChanged={instance.hasChanged} />
 
               <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />

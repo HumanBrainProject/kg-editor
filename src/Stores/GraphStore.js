@@ -115,6 +115,7 @@ class GraphStore {
       let groupNode = {
         id: "Group_" + nodeType.schema,
         name: "Group_" + label,
+        schemas: "Group_" + nodeType.schema,
         title: "Group of " + label + " (" + nodesOfType.length + ")",
         original_schema: nodeType.schema,
         schemaLabel: label,

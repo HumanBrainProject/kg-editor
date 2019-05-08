@@ -89,6 +89,8 @@ const dataTypes = [
 
 class DataTypesStore {
 
+  colorPaletteByLabel = new Map();
+
   @computed
   get dataTypes() {
     return dataTypes;
@@ -122,9 +124,20 @@ class DataTypesStore {
   get colorScheme() {
     const colorPalette = palette("mpn65", this.dataTypeLabelList.length);
     return this.dataTypeLabelList.reduce((result, schema, index) => {
-      result[schema] = "#" + colorPalette[index];
+      let color = "#" + colorPalette[index];
+      result[schema] = color;
+      this.colorPaletteByLabel[structureStore.findLabelBySchema(schema)] = color;
       return result;
     }, {});
+
+  }
+
+  colorPalletteBySchema(schema) {
+    let color = this.colorScheme[schema];
+    if (!color) {
+      color = this.colorPaletteByLabel[structureStore.findLabelBySchema(schema)];
+    }
+    return color;
   }
 }
 

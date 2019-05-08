@@ -357,7 +357,7 @@ export default class List extends React.Component {
         </div>
       );
     } else if (list.isDataTypeList) {
-      const color = dataTypesStore.colorScheme[list.id];
+      const color = dataTypesStore.colorPalletteBySchema(list.id);
       return (
         <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>

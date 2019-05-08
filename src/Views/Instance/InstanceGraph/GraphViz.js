@@ -150,7 +150,7 @@ export default class Graph extends React.Component {
         ctx.globalAlpha = 0.1;
       }
     }
-    const color = dataTypesStore.colorScheme[node.schemas];
+    const color = dataTypesStore.colorPalletteBySchema(node.original_schema ? node.original_schema : node.schemas);
     ctx.strokeStyle = new Color(color).darken(0.25).hex();
     ctx.fillStyle = color;
 
@@ -218,7 +218,7 @@ export default class Graph extends React.Component {
             height={this.state.graphHeight}
             graphData={data}
             nodeAutoColorBy={d => d.schemas}
-            nodeLabel={node => this.props.structureStore.findLabelBySchema(node.schema)}
+            nodeLabel={node => this.props.structureStore.findLabelBySchema(node.schemas)}
             nodeCanvasObject={this._paintNode}
             onNodeClick={this.handleNodeClick}
             onNodeHover={this.handleNodeHover}

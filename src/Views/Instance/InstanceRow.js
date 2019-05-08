@@ -169,8 +169,7 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    console.log("Schema?", instance);
-    const color = dataTypesStore.colorScheme[instance.schema];
+    const color = dataTypesStore.colorPalletteBySchema(instance.schema);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}

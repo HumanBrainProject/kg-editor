@@ -443,7 +443,7 @@ class App extends React.Component {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = dataTypesStore.colorScheme[instance.data.fields.id.value.path];
+                      color = dataTypesStore.colorPalletteBySchema(instance.data.fields.id.value.path);
                     }
                     if (!label) {
                       label = instanceId;

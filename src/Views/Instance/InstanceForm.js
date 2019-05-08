@@ -131,7 +131,7 @@ export default class InstanceForm extends React.Component {
     this.fetchInstance();
   }
 
-  fetchInstance(forceFetch = false){
+  fetchInstance(forceFetch = false) {
     instanceStore.getInstance(this.props.id, forceFetch);
   }
 
@@ -142,7 +142,7 @@ export default class InstanceForm extends React.Component {
   }
 
   handleOpenInstance = (e) => {
-    if((e.metaKey || e.ctrlKey)){
+    if ((e.metaKey || e.ctrlKey)) {
       instanceStore.openInstance(this.props.id);
     } else {
       routerStore.history.push(`/instance/view/${this.props.id}`);
@@ -201,7 +201,7 @@ export default class InstanceForm extends React.Component {
 
     const [, , schema, ,] = id.split("/");
 
-    const nodeType = instance.isFetched && instance.data && instance.data.label || schema;
+    const nodeType = instance.isFetched && instance.data && instance.data.fields.id.value.path || schema;
 
     const isMainInstance = id === mainInstanceId;
     const isCurrentInstance = id === instanceStore.getCurrentInstanceId(mainInstanceId);
@@ -232,41 +232,41 @@ export default class InstanceForm extends React.Component {
     return (
       <div className={panelClassName()} data-id={this.props.id}>
         {!instance.hasFetchError && !instance.isFetching &&
-        <div
-          onFocus={this.handleFocus}
-          onClick={this.handleFocus}
-          onDoubleClick={isReadMode && !isMainInstance?this.handleOpenInstance:undefined}
-          onChange={this.handleChange}
-          onLoad={this.handleLoad}
-        >
-          <Form store={instance.form} key={mainInstanceId}>
-            <HeaderPanel
-              className={classes.panelHeader}
-              nodeType={nodeType}
-              color={dataTypesStore.colorScheme[nodeType]}
-              hasChanged={instance.hasChanged}/>
+          <div
+            onFocus={this.handleFocus}
+            onClick={this.handleFocus}
+            onDoubleClick={isReadMode && !isMainInstance ? this.handleOpenInstance : undefined}
+            onChange={this.handleChange}
+            onLoad={this.handleLoad}
+          >
+            <Form store={instance.form} key={mainInstanceId}>
+              <HeaderPanel
+                className={classes.panelHeader}
+                nodeType={nodeType}
+                color={dataTypesStore.colorScheme[nodeType]}
+                hasChanged={instance.hasChanged} />
 
-            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
-            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
+              <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
+              <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
 
-            <FooterPanel
-              className={classes.panelFooter}
-              nexusId={instance.data.fields.id?instance.data.fields.id.nexus_id:"<new>"}
-              id={id}
-              showOpenActions={isCurrentInstance && !isMainInstance}/>
-          </Form>
-          <ConfirmCancelEditPanel
-            show={instance.cancelChangesPending}
-            text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
-            onConfirm={this.handleConfirmCancelEdit}
-            onCancel={this.handleContinueEditing}
-            inline={!isMainInstance} />
-          <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
-          <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance}/>
-          <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
-        </div>
+              <FooterPanel
+                className={classes.panelFooter}
+                nexusId={instance.data.fields.id ? instance.data.fields.id.nexus_id : "<new>"}
+                id={id}
+                showOpenActions={isCurrentInstance && !isMainInstance} />
+            </Form>
+            <ConfirmCancelEditPanel
+              show={instance.cancelChangesPending}
+              text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
+              onConfirm={this.handleConfirmCancelEdit}
+              onCancel={this.handleContinueEditing}
+              inline={!isMainInstance} />
+            <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
+            <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance} />
+            <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
+          </div>
         }
-        <FontAwesomeIcon className="highlightArrow"  icon="arrow-right"/>
+        <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
         <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
         <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
       </div>

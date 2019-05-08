@@ -8,7 +8,7 @@ class StructureStore {
 	@observable fetchStuctureError = null;
 	@observable isFetchingStructure = false;
 	@observable schemasMap = new Map();
-	schemasLabel = new Map();
+	@observable schemasLabel = new Map();
 
 	@computed
 	get groupedSchemas() {
@@ -52,7 +52,6 @@ class StructureStore {
 					this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => {
 						this.schemasMap.set(schema.id, schema);
 						this.schemasLabel.set(schema.id, schema.label);
-						this.sc
 					});
 				});
 			} catch (e) {

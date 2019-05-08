@@ -150,7 +150,7 @@ export default class Graph extends React.Component {
         ctx.globalAlpha = 0.1;
       }
     }
-    const color = dataTypesStore.colorScheme[node.dataTypeLabel];
+    const color = dataTypesStore.colorScheme[node.schemas];
     ctx.strokeStyle = new Color(color).darken(0.25).hex();
     ctx.fillStyle = color;
 
@@ -169,7 +169,7 @@ export default class Graph extends React.Component {
 
       let label = node.title && node.title.split ? node.title : "";
       if (!node.isGroup) {
-        label = `(${node.dataTypeLabel}) ${label}`;
+        label = `(${node.schemaLabel}) ${label}`;
       }
 
       this._wrapText(ctx, label, node.x, node.y, 10, 1.3, node);
@@ -217,8 +217,8 @@ export default class Graph extends React.Component {
             width={this.state.graphWidth}
             height={this.state.graphHeight}
             graphData={data}
-            nodeAutoColorBy={d => d.schema}
-            nodeLabel={node => node.schema}
+            nodeAutoColorBy={d => d.schemas}
+            nodeLabel={node => this.props.structureStore.findLabelBySchema(node.schema)}
             nodeCanvasObject={this._paintNode}
             onNodeClick={this.handleNodeClick}
             onNodeHover={this.handleNodeHover}

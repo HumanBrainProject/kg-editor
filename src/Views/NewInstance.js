@@ -14,8 +14,8 @@ import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 
 const styles = {
-  container:{
-    height:"100%",
+  container: {
+    height: "100%",
     "& > div": {
       height: "100%"
     },
@@ -26,24 +26,24 @@ const styles = {
   lists: {
     padding: "15px"
   },
-  list:{
-    display:"grid",
-    gridTemplateColumns:"repeat(4, 1fr)",
-    gridGap:"10px"
+  list: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gridGap: "10px"
   },
-  type:{
+  type: {
     display: "grid",
     gridTemplateColumns: "auto 1fr",
     gridGap: "8px",
     position: "relative",
     padding: "10px",
-    fontSize:"1.1em",
-    fontWeight:"300",
-    border:"1px solid #ccc",
-    cursor:"pointer",
+    fontSize: "1.1em",
+    fontWeight: "300",
+    border: "1px solid #ccc",
+    cursor: "pointer",
     wordBreak: "break-word",
-    "&:hover":{
-      background:"#f3f3f3"
+    "&:hover": {
+      background: "#f3f3f3"
     }
   },
   icon: {
@@ -56,7 +56,7 @@ const styles = {
 export default class NewInstance extends React.Component {
   constructor(props) {
     super(props);
-    if(!browseStore.isFetched.lists && !browseStore.isFetching.lists){
+    if (!browseStore.isFetched.lists && !browseStore.isFetching.lists) {
       browseStore.fetchLists();
     }
   }
@@ -65,33 +65,33 @@ export default class NewInstance extends React.Component {
     browseStore.fetchLists();
   }
 
-  async handleClickNewInstanceOfType(path){
+  async handleClickNewInstanceOfType(path) {
     let newInstanceId = await instanceStore.createNewInstance(path);
     instanceStore.toggleShowCreateModal();
     routerStore.history.push(`/instance/edit/${newInstanceId}`);
   }
 
   render() {
-    const {classes, onCancel} = this.props;
+    const { classes, onCancel } = this.props;
 
     return (
       <div className={classes.container}>
-        {browseStore.isFetching.lists?
+        {browseStore.isFetching.lists ?
           <FetchingLoader>Fetching data types...</FetchingLoader>
           :
-          browseStore.fetchError.lists?
+          browseStore.fetchError.lists ?
             <BGMessage icon={"ban"}>
-            There was a network problem fetching data types.<br/>
-            If the problem persists, please contact the support.<br/>
-              <small>{browseStore.fetchError.lists}</small><br/><br/>
+              There was a network problem fetching data types.<br />
+              If the problem persists, please contact the support.<br />
+              <small>{browseStore.fetchError.lists}</small><br /><br />
               <div>
                 {typeof onCancel === "function" && (
                   <Button onClick={onCancel}>
-                    <FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Close
+                    <FontAwesomeIcon icon={"times"} />&nbsp;&nbsp; Close
                   </Button>
                 )}
                 <Button bsStyle={"primary"} onClick={this.handleFetchInstanceTypes}>
-                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                  <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
                 </Button>
               </div>
             </BGMessage>
@@ -102,8 +102,8 @@ export default class NewInstance extends React.Component {
                   <h4>{folder.folderName}</h4>
                   <div className={classes.list}>
                     {folder.lists.map(list => {
-                      const color = dataTypesStore.colorScheme[list.name];
-                      return(
+                      const color = dataTypesStore.colorScheme[list.id];
+                      return (
                         <div key={list.id} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
                           <div className={classes.icon} style={color ? { color: color } : {}}>
                             <FontAwesomeIcon fixedWidth icon="circle" />

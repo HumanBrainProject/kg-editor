@@ -127,26 +127,26 @@ export default class GraphSettings extends React.Component {
           {graphStore.isFetched ?
             <div className={classes.nodeList}>
               {dataTypesStore.sortedDataTypes.map(nodeType => {
-                const nodesOfType = graphStore.findNodesByLabel(nodeType.label);
-                const typeState = graphStore.typeStates.get(nodeType.label);
+                const nodesOfType = graphStore.findNodesBySchema(nodeType.schema);
+                const typeState = graphStore.typeStates.get(nodeType.schema);
                 const isDisabled = typeState === "none";
-                const isExpanded = graphStore.expandedTypes.indexOf(nodeType.label) !== -1;
+                const isExpanded = graphStore.expandedTypes.indexOf(nodeType.schema) !== -1;
                 const isGrouped = typeState === "group";
-                const backgroundColor = dataTypesStore.colorScheme[nodeType.label];
+                const backgroundColor = dataTypesStore.colorScheme[nodeType.schema];
                 const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return (
-                  <div className={`${classes.nodeType} ${isDisabled ? "disabled" : ""} ${isExpanded ? "expanded" : ""}`} key={nodeType.label}>
-                    <Glyphicon glyph={isExpanded ? "chevron-down" : "chevron-right"} className={classes.expandButton} onClick={this.handleExpandClick.bind(this, nodeType.label)} />
+                  <div className={`${classes.nodeType} ${isDisabled ? "disabled" : ""} ${isExpanded ? "expanded" : ""}`} key={nodeType.schema}>
+                    <Glyphicon glyph={isExpanded ? "chevron-down" : "chevron-right"} className={classes.expandButton} onClick={this.handleExpandClick.bind(this, nodeType.schema)} />
                     <div className={classes.legend} style={{ borderRadius: isGrouped ? "0" : "50%", background: backgroundColor, borderColor: borderColor }} />
                     <div className={classes.nodeTypeLabel}
-                      onMouseOver={isGrouped ? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.label)) : undefined}
+                      onMouseOver={isGrouped ? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.schema)) : undefined}
                       onMouseOut={this.handleNodeHover.bind(this, null)}
-                    >{nodeType.label}</div>
+                    >{this.props.structureStore.findLabelBySchema(nodeType.schema)}</div>
                     <div className={classes.nodeTypeActions}>
                       {!isDisabled && (
-                        <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.label)}>
-                          {graphStore.groupNodes.has(nodeType.label) && <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"compress"} value="group" />}
-                          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={graphStore.groupNodes.has(nodeType.label) ? "expand-arrows-alt" : "eye"} value="show" />
+                        <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.schema)}>
+                          {graphStore.groupNodes.has(nodeType.schema) && <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"compress"} value="group" />}
+                          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={graphStore.groupNodes.has(nodeType.schema) ? "expand-arrows-alt" : "eye"} value="show" />
                           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"eye-slash"} value="hide" />
                         </MultiToggle>
                       )}

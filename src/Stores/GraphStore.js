@@ -25,14 +25,6 @@ class GraphStore {
     return this.originalData.nodes.filter(node => node.schemas === schema);
   }
 
-  findNodesByLabel(label) {
-    return this.originalData.nodes.filter(node => structureStore.findLabelBySchema(node.schemas) === label);
-  }
-
-  findLinksByLabel(label) {
-    return this.originalData.links.filter(link => structureStore.findLabelBySchema(link.source.schemas) === label || structureStore.findLabelBySchema(link.target.schemas) === label);
-  }
-
   findLinksBySourceSchema(schema) {
     return this.originalData.links.filter(link => link.source.schemas === schema);
   }
@@ -58,9 +50,8 @@ class GraphStore {
   }
 
   @action hlNode(node) {
-    console.log("HLNODE", node);
-    if (node !== null && this.typeStates.get(structureStore.findLabelBySchema(node.schemas)) === "group") {
-      node = this.groupNodes.get(structureStore.findLabelBySchema(node.schemas));
+    if (node !== null && this.typeStates.get(node.schemas) === "group") {
+      node = this.groupNodes.get(node.schemas);
     }
     this.highlightedNode = node;
     this.connectedNodes = node !== null ? this.findConnectedNodes(node) : [];
@@ -99,7 +90,7 @@ class GraphStore {
 
   @action filterOriginalData() {
     //Remove nodes that are not whitelisted
-    remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => nodeType.label === structureStore.findLabelBySchema(node.schemas)));
+    remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => nodeType.schema === node.schemas));
     remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
     //Transform links source and target reference to actual node objects
     this.originalData.links.forEach(link => {
@@ -107,7 +98,7 @@ class GraphStore {
       link.target = find(this.originalData.nodes, node => node.id === link.target);
     });
     this.originalData.nodes.forEach(node => {
-      node.dataTypeLabel = structureStore.findLabelBySchema(node.schemas); //node.dataType.replace("https://schema.hbp.eu/minds/","");
+      node.schemaLabel = structureStore.findLabelBySchema(node.schemas); //node.dataType.replace("https://schema.hbp.eu/minds/","");
       node.isMainNode = node.id.includes(this.mainId);
     });
 
@@ -115,31 +106,30 @@ class GraphStore {
     this.typeStates = new Map();
     //Create group nodes
     dataTypesStore.dataTypes.forEach(nodeType => {
-      let nodesOfType = this.findNodesByLabel(nodeType.label);
+      let nodesOfType = this.findNodesBySchema(nodeType.schema);
       if (nodesOfType.length <= 1) {
-        this.typeStates.set(nodeType.label, nodesOfType.length === 1 ? "show" : "none");
+        this.typeStates.set(nodeType.schema, nodesOfType.length === 1 ? "show" : "none");
         return;
       }
-
+      let label = structureStore.findLabelBySchema(nodeType.schema);
       let groupNode = {
-        id: "Group_" + nodeType.label,
-        dataType: "Group_" + nodeType.label,
-        name: "Group_" + nodeType.label,
-        title: "Group of " + nodeType.label + " (" + nodesOfType.length + ")",
-        original_dataType: nodeType.label,
-        dataTypeLabel: nodeType.label,
+        id: "Group_" + nodeType.schema,
+        name: "Group_" + label,
+        title: "Group of " + label + " (" + nodesOfType.length + ")",
+        original_schema: nodeType.schema,
+        schemaLabel: label,
         isGroup: true,
         groupSize: nodesOfType.length
       };
 
-      this.groupNodes.set(nodeType.label, groupNode);
-      this.typeStates.set(nodeType.label, "group");
+      this.groupNodes.set(nodeType.schema, groupNode);
+      this.typeStates.set(nodeType.schema, "group");
       this.originalData.nodes.push(groupNode);
     });
 
     this.originalData.links.forEach(link => {
-      let sourceGroupNode = this.groupNodes.get(structureStore.findLabelBySchema(link.source.schemas));
-      let targetGroupNode = this.groupNodes.get(structureStore.findLabelBySchema(link.target.schemas));
+      let sourceGroupNode = this.groupNodes.get(link.source.schemas);
+      let targetGroupNode = this.groupNodes.get(link.target.schemas);
 
       if (sourceGroupNode && this.findLinksBySourceAndTarget(sourceGroupNode, link.target).length === 0) {
         let newLink = clone(link);
@@ -175,12 +165,12 @@ class GraphStore {
 
     this.typeStates.forEach((state, type) => {
       if (state === "group" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesByLabel(type));
-        pullAll(graphData.links, this.findLinksByLabel(type));
+        pullAll(graphData.nodes, this.findNodesBySchema(type));
+        pullAll(graphData.links, this.findLinksBySchema(type));
       }
       if (state === "show" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesByLabel("Group_" + type));
-        pullAll(graphData.links, this.findLinksByLabel("Group_" + type));
+        pullAll(graphData.nodes, this.findNodesBySchema("Group_" + type));
+        pullAll(graphData.links, this.findLinksBySchema("Group_" + type));
       }
     });
 
@@ -189,7 +179,7 @@ class GraphStore {
 
   @action explodeNode(clickedNode) {
     if (clickedNode.isGroup) {
-      this.typeStates.set(clickedNode.original_dataType, "show");
+      this.typeStates.set(clickedNode.original_schema, "show");
     }
   }
 

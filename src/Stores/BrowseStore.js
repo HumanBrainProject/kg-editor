@@ -208,6 +208,8 @@ class BrowseStore{
             id: bookmarkData.id,
             name: bookmarkData.name?bookmarkData.name:name,
             type: bookmarkListfolder.folderType,
+            isBookmarkList: true,
+            isDataTypeList: false,
             isUpdating: false,
             updateError: null,
             isDeleting: false,

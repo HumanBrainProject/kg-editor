@@ -63,10 +63,18 @@ class Instance {
   @observable highlight = null;
   @observable path = "";
 
+  instancesToSetNull = [];
+
   constructor(instanceId, path="") {
     this.instanceId = instanceId;
     this.path = path?path:"";
   }
+
+  @action setNullableInstances(id) {
+    this.instancesToSetNull.indexOf(id) === -1 ?
+      this.instancesToSetNull.push(id):null;
+  }
+
 
   @computed
   get promotedFields() {
@@ -602,6 +610,9 @@ class InstanceStore {
 
     try {
       const payload = instance.form.getValues();
+      if (instance.instancesToSetNull.length > 0) {
+        instance.instancesToSetNull.forEach(key=> payload[key] = null);
+      }
       const { data } = await API.axios.put(API.endpoints.instanceData(instanceId, this.databaseScope), payload);
       runInAction(() => {
         instance.hasChanged = false;

@@ -89,6 +89,13 @@ export default class Alternatives extends React.Component {
     }
   }
 
+  handleClick = e => {
+    const { onClick } = this.props;
+    e && e.preventDefault();
+    typeof onClick === "function" && onClick();
+    this.setState({ open: false });
+  }
+
   handleInputKeyStrokes = e => {
     const { disabled } = this.props;
     if (disabled) {
@@ -193,7 +200,7 @@ export default class Alternatives extends React.Component {
           {list.map(alternative => {
             const key = ((!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds).toString();
             return (
-              <Alternative key={key} alternative={alternative} field={field} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
+              <Alternative key={key} alternative={alternative} field={field} onClick={this.handleClick} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
             );
           })}
         </ul>

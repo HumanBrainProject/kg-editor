@@ -622,12 +622,16 @@ class InstanceStore {
             }
           }
         }
+        // To refresh alternatives
+        this.getInstance(instanceId, true);
       });
     } catch (e) {
-      const message = e.message?e.message:e;
-      instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
-      instance.hasSaveError = true;
-      instance.isSaving = false;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
+        instance.hasSaveError = true;
+        instance.isSaving = false;
+      });
     } finally {
       statusStore.flush();
     }

@@ -17,6 +17,8 @@ import clipboard from "hbp-quickfire/lib/Stores/ClipboardStore";
 
 import Alternatives from "./Alternatives";
 
+import instanceStore from "../Stores/InstanceStore";
+
 const styles = {
   readMode: {
     "& .quickfire-label:after":{
@@ -78,7 +80,16 @@ export default class KgInputTextField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
     const prototype = this.props.componentClass === "textarea"?window.HTMLTextAreaElement.prototype:window.HTMLInputElement.prototype;
+    if (this.props.field.value === null) {
+      Object.getOwnPropertyDescriptor(prototype, "disabled").set
+        .call(this.inputRef, true);
+      selectedInstance.setNullableInstances(this.props.field.path.substr(1));
+    } else {
+      Object.getOwnPropertyDescriptor(prototype, "disabled").set
+        .call(this.inputRef, false);
+    }
     Object.getOwnPropertyDescriptor(prototype, "value").set
       .call(this.inputRef, this.props.field.value);
     var event = new Event("input", { bubbles: true });
@@ -100,6 +111,12 @@ export default class KgInputTextField extends React.Component {
 
   handleAlternativeSelect = value => {
     this.beforeSetValue(value);
+    this.triggerOnChange();
+  }
+
+  handleRemoveSuggestion = () => {
+    let _value = null;
+    this.beforeSetValue(_value);
     this.triggerOnChange();
   }
 
@@ -141,6 +158,9 @@ export default class KgInputTextField extends React.Component {
       path
     } = this.props.field;
 
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    let isAlternativeDisabled = selectedInstance.instancesToSetNull.includes(path.substr(1));
+
     const style = this.getStyle();
 
     const formControl = () => (
@@ -174,9 +194,10 @@ export default class KgInputTextField extends React.Component {
         <FieldLabel field={this.props.field}/>
         <Alternatives className={classes.alternatives}
           show={!disabled && !readOnly && !!alternatives.length}
-          disabled={disabled || readOnly}
+          disabled={disabled || readOnly || isAlternativeDisabled}
           list={alternatives}
           onSelect={this.handleAlternativeSelect}
+          onClick={this.handleRemoveSuggestion}
           parentContainerClassName="form-group" />
         {useVirtualClipboard?
           <InputGroup>

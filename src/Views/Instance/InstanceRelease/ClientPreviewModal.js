@@ -35,7 +35,7 @@ let styles = {
 export default class ClientPreviewModal extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.url = API.endpoints.clientInstancePreview(props.store.topInstanceId) + "?group=curated";
+    this.url = window.location.protocol + "//" + window.location.host + "/webapp?group=curated&search=false#" + props.store.topInstanceId
   }
 
   render() {

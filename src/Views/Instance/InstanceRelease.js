@@ -131,12 +131,12 @@ const styles = {
       transformOrigin: "50% 41%",
       marginRight: "5px"
     },
-    "& .node-type":{
-      fontSize:"0.75em",
-      display:"inline-block",
-      verticalAlign:"middle",
-      fontWeight:"bold",
-      color:"var(--ft-color-loud)",
+    "& .node-type": {
+      fontSize: "0.75em",
+      display: "inline-block",
+      verticalAlign: "middle",
+      fontWeight: "bold",
+      color: "var(--ft-color-loud)",
       margin: "3px 5px 0 8px"
     }
   },
@@ -527,9 +527,9 @@ class ReleaseNode extends React.Component {
           {prefix === "" && (
             <React.Fragment>
               <div className={classes.compareButton}>
-              {node.isAssociation === true?
-                <Button bsSize="small" title="linking instances are not available for preview" disabled><FontAwesomeIcon icon="glasses" /></Button>:
-                <Button bsSize="small" onClick={this.handleShowCompare.bind(this, node)} title="compare the changes with released vesion"><FontAwesomeIcon icon="glasses" /></Button>
+                {node.isAssociation === true ?
+                  <Button bsSize="small" title="linking instances are not available for preview" disabled><FontAwesomeIcon icon="glasses" /></Button> :
+                  <Button bsSize="small" onClick={this.handleShowCompare.bind(this, node)} title="compare the changes with released vesion"><FontAwesomeIcon icon="glasses" /></Button>
                 }
               </div>
               <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />

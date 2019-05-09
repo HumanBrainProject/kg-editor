@@ -47,9 +47,19 @@ const styles = {
     "& .option em .user + .user:before": {
       content: "'; '"
     },
+    "& .option": {
+      position: "relative",
+      paddingLeft: "3px",
+    },
     "& .option .parenthesis": {
       display: "inline-block",
       transform: "scaleY(1.4)"
+    },
+    "& .selected": {
+      position: "absolute",
+      top: "50%",
+      left: "-15px",
+      transform: "translateY(-50%)"
     }
   },
   removeIcon: {
@@ -87,6 +97,10 @@ export default class Alternative extends React.Component {
               <User key={userId} userId={userId} />
             ))
           }<div className="parenthesis">)</div></em>
+          {alternative.selected?
+            <FontAwesomeIcon icon="check" className="selected" />
+            :null
+          }
           {userIds.map(userId => currentUserId === userId ? <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleClick} icon="times" /></span>:null)}
         </div>
       </MenuItem>

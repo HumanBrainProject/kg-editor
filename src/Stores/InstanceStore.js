@@ -423,7 +423,7 @@ class InstanceStore {
       const { data } = await API.axios.get(API.endpoints.instanceData(path, this.databaseScope));
 
       runInAction(async () => {
-        const instanceData = data.data?data.data:{fields: {}};
+        const instanceData = data.data?data.data:{fields: {}, alternatives: []};
 
         instance.data = instanceData;
         /*
@@ -537,11 +537,13 @@ class InstanceStore {
         });
       });
     } catch (e) {
-      const message = e.message?e.message:e;
-      instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
-      instance.hasFetchError = true;
-      instance.isFetched = false;
-      instance.isFetching = false;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
+        instance.hasFetchError = true;
+        instance.isFetched = false;
+        instance.isFetching = false;
+      });
     }
     return instance;
   }

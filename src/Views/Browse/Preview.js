@@ -112,7 +112,7 @@ export default class Preview extends React.Component{
 
     const promotedFields = selectedInstance.promotedFields;
     const nonPromotedFields = selectedInstance.nonPromotedFields;
-    const metadata = instanceStore.getMetadata(selectedInstance);
+    const metadata = selectedInstance.metadata;
 
     return(
       <Scrollbars autoHide>
@@ -152,14 +152,14 @@ export default class Preview extends React.Component{
                 <Form store={selectedInstance.form} key={browseStore.selectedInstance.id}>
                   {promotedFields.map(fieldKey => {
                     return(
-                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstance.id+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
                   })}
                   {nonPromotedFields.map(fieldKey => {
                     return(
-                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstance.id+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
@@ -169,7 +169,7 @@ export default class Preview extends React.Component{
                       <hr />
                       <span className={`${classes.title} ${classes.metadataTitle}`}> Metadata </span>
                       {metadata.map(field =>
-                        <div key={browseStore.selectedInstanceId+field.label} className={classes.field}>
+                        <div key={browseStore.selectedInstance.id+field.label} className={classes.field}>
                           <label>{field.label}: </label> {field.value}
                         </div>
                       )}

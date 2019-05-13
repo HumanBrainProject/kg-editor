@@ -95,15 +95,22 @@ class Instance {
     }
     return [];
   }
-}
 
-const metadataTypeMapping = {
-  "createdBy": "Created by",
-  "createdAt": "Created at",
-  "lastUpdateAt": "Last update at",
-  "lastUpdateBy":  "Last update by",
-  "numberOfEdits": "Number of edits"
-};
+  @computed
+  get metadata() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.metadata) {
+      let metadata = this.data.metadata;
+      return Object.keys(metadata).map(key => {
+        if(key == "lastUpdateAt" || key == "createdAt") {
+          let d = new Date(metadata[key]["value"]);
+          metadata[key]["value"] = d.toLocaleString();
+        }
+        return metadata[key];
+      });
+    }
+    return [];
+  }
+}
 
 class InstanceStore {
   @observable databaseScope = null;
@@ -133,24 +140,6 @@ class InstanceStore {
         this.restoreOpenedTabs(storedOpenedTabs);
       });
     }
-  }
-
-  getMetadata(instance) {
-    if (instance && instance.data && instance.data.metadata) {
-      let result = [];
-      let metadata = instance.data.metadata;
-      Object.keys(metadata).forEach(key => {
-        if (key == "lastUpdateAt" || key == "createdAt") {
-          let d = new Date(metadata[key]);
-          result.push({"label": metadataTypeMapping[key], "value": d.toLocaleString()});
-        } else {
-          result.push({"label": metadataTypeMapping[key], "value": metadata[key]});
-        }
-      }
-      );
-      return result;
-    }
-    return [];
   }
 
   @action flush(){

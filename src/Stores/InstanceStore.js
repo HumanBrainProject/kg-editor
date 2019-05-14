@@ -86,6 +86,18 @@ class Instance {
   }
 
   @computed
+  get promotedFieldsWithMarkdown() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
+      let promotedFields = this.data.ui_info.promotedFields
+        .filter(name => this.data.fields[name]);
+      return promotedFields.filter(field =>
+        this.data.fields[field]["markdown"] === true
+      );
+    }
+    return [];
+  }
+
+  @computed
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
       return Object.keys(this.data.fields)

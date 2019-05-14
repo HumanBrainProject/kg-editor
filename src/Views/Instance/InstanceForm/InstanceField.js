@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Field } from "hbp-quickfire";
 import instanceStore from "../../../Stores/InstanceStore";
+import RenderMarkdownField from "../../../Components/Markdown";
 
 const styles = {
   field: {
@@ -79,7 +80,8 @@ export default class InstanceField extends React.Component{
         }
         */
         return (
-          <p>{field.value}</p>
+          field.markdown === true ? <RenderMarkdownField value={field.value}/>:
+            <p>{field.value}</p>
         );
       }
       if (typeof field.type === "string" && field.type.includes("DropdownSelect")) {

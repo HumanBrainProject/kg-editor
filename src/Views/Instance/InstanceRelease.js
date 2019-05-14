@@ -5,6 +5,7 @@ import { Button, ButtonGroup, Modal } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import routerStore from "../../Stores/RouterStore";
 import ReleaseStore from "../../Stores/ReleaseStore";
 import instanceStore from "../../Stores/InstanceStore";
 
@@ -94,16 +95,54 @@ const styles = {
           top: 0,
           left: "-14px"
         }
+      },
+      "& .node-actions": {
+        position: "absolute",
+        top: "7px",
+        right: "90px",
+        width: "50px",
+        display: "grid",
+        gridTemplateColumns: "repeat(2, 1fr)",
+        opacity: 0,
+        "&:hover": {
+          opacity: "1 !important"
+        },
+        "& .node-action": {
+          fontSize: "0.9em",
+          lineHeight: "27px",
+          textAlign: "center",
+          backgroundColor: "var(--bg-color-ui-contrast2)",
+          color: "var(--ft-color-normal)",
+          cursor: "pointer",
+          "&.disabled": {
+            color: "var(--ft-color-quiet)",
+            cursor: "not-allowed"
+          },
+          "&:hover:not(.disabled)": {
+            color: "var(--ft-color-loud)"
+          },
+          "&:first-child": {
+            borderRadius: "4px 0 0 4px"
+          },
+          "&:last-child": {
+            borderRadius: "0 4px 4px 0"
+          }
+        }
       }
     },
     "& .node-content": {
       display: "grid",
-      gridTemplateColumns: "auto auto 1fr auto auto",
+      gridTemplateColumns: "auto auto 1fr auto",
       padding: "8px",
       position: "relative",
       border: "2px solid var(--bg-color-ui-contrast2)",
       transition: "background 0.25s ease",
-      marginLeft: "-32px"
+      marginLeft: "-32px",
+      "&:hover": {
+        "& + .node-actions": {
+          opacity: 0.75
+        }
+      }
     },
     "& .node.released > .node-content": {
       backgroundColor: "var(--release-bg-released)"
@@ -289,17 +328,6 @@ const styles = {
           }
         }
       }
-    }
-  },
-  compareButton: {
-    margin: "0 10px",
-    height: "20px",
-    "& button": {
-      marginTop: "-3px",
-      padding: "4px 10px 5px 10px",
-      border: "transparent",
-      background: "var(--bg-color-ui-contrast4)",
-      color: "var(--ft-color-normal)"
     }
   },
   compareModal: {
@@ -490,6 +518,18 @@ class ReleaseNodeAndChildrenToggle extends React.Component {
 @observer
 class ReleaseNode extends React.Component {
 
+  handleAction(mode, instanceId, e) {
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.target)) {
+      return;
+    }
+    if (e.metaKey || e.ctrlKey) {
+      instanceStore.openInstance(instanceId);
+    } else {
+      routerStore.history.push(`/instance/${mode}/${instanceId}`);
+    }
+  }
+
   handleShowCompare(node, e) {
     e && e.stopPropagation();
     instanceStore.setComparedWithReleasedVersionInstance(node);
@@ -525,17 +565,15 @@ class ReleaseNode extends React.Component {
             {node.label}
           </span>
           {prefix === "" && (
-            <React.Fragment>
-              <div className={classes.compareButton}>
-                {node.isAssociation === true ?
-                  <Button bsSize="small" title="linking instances are not available for preview" disabled><FontAwesomeIcon icon="glasses" /></Button> :
-                  <Button bsSize="small" onClick={this.handleShowCompare.bind(this, node)} title="compare the changes with released vesion"><FontAwesomeIcon icon="glasses" /></Button>
-                }
-              </div>
-              <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
-            </React.Fragment>
+            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
           )}
         </div>
+        {prefix === "" && (
+          <div className="node-actions">
+            <div className="node-action" onClick={this.handleAction.bind(this, "view", node.relativeUrl)} title={`view ${node.type} ${node.label}`}><FontAwesomeIcon icon="eye" /></div>
+            <div className={`node-action ${node.isAssociation?"disabled":""}`} onClick={node.isAssociation?null:this.handleShowCompare.bind(this, node)} title={node.isAssociation?"linking instances are not available for preview":"compare the changes with released vesion"}><FontAwesomeIcon icon="glasses" /></div>
+          </div>
+        )}
         {node.children && node.children.length > 0 &&
           <div className={"children"}>
             {node.children.map(child => (

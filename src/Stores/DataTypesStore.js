@@ -1,155 +1,144 @@
-import { computed } from "mobx";
+import { computed, action } from "mobx";
 import palette from "google-palette";
+
+import structureStore from "./StructureStore";
 
 const dataTypes = [
   {
-    "label": "Dataset",
-    "dataType": "https://schema.hbp.eu/minds/Dataset"
+    "schema": "minds/core/dataset/v1.0.0"
   },
   {
-    "label": "Specimen group",
-    "dataType": "https://schema.hbp.eu/minds/Specimengroup"
+    "schema": "minds/core/specimengroup/v1.0.0"
   },
   {
-    "label": "Subject",
-    "dataType": "https://schema.hbp.eu/minds/Subject"
+    "schema": "minds/experiment/subject/v1.0.0"
   },
   {
-    "label": "Activity",
-    "dataType": "https://schema.hbp.eu/minds/Activity"
+    "schema": "minds/core/activity/v1.0.0"
   },
   {
-    "label": "Person",
-    "dataType": "https://schema.hbp.eu/minds/Person"
+    "schema": "minds/core/person/v1.0.0"
   },
   {
-    "label": "PLA Component",
-    "dataType": "https://schema.hbp.eu/minds/Placomponent"
+    "schema": "minds/core/placomponent/v1.0.0"
   },
   {
-    "label": "Publication",
-    "dataType": "https://schema.hbp.eu/minds/Publication"
+    "schema": "minds/core/publication/v1.0.0"
   },
   {
-    "label": "File Association",
-    "dataType": "https://schema.hbp.eu/minds/FileAssociation"
+    "schema": "minds/core/fileassociation/v1.0.0"
   },
   {
-    "label": "DOI",
-    "dataType": "https://schema.hbp.eu/minds/DatasetDOI"
+    "schema": "datacite/core/doi/v1.0.0"
   },
   {
-    "label": "Method",
-    "dataType": "https://schema.hbp.eu/minds/Method"
+    "schema": "minds/experiment/method/v1.0.0"
   },
   {
-    "label": "Reference space",
-    "dataType": "https://schema.hbp.eu/minds/Referencespace"
+    "schema": "minds/core/referencespace/v1.0.0"
   },
   {
-    "label": "Parcellation Region",
-    "dataType": "https://schema.hbp.eu/minds/Parcellationregion"
+    "schema": "minds/core/parcellationregion/v1.0.0",
   },
   {
-    "label": "Parcellation Atlas",
-    "dataType": "https://schema.hbp.eu/minds/Parcellationatlas"
+    "schema": "minds/core/parcellationatlas/v1.0.0",
   },
   {
-    "label": "Embargo Status",
-    "dataType": "https://schema.hbp.eu/minds/Embargostatus"
+    "schema": "minds/core/embargostatus/v1.0.0",
   },
   {
-    "label": "Approval",
-    "dataType": "https://schema.hbp.eu/minds/Approval"
+    "schema": "minds/ethics/approval/v1.0.0",
   },
   {
-    "label": "Protocol",
-    "dataType": "https://schema.hbp.eu/minds/Protocol"
+    "schema": "minds/experiment/protocol/v1.0.0",
   },
   {
-    "label": "Preparation",
-    "dataType": "https://schema.hbp.eu/minds/Preparation"
+    "schema": "minds/core/preparation/v1.0.0",
   },
   {
-    "label": "Authority",
-    "dataType": "https://schema.hbp.eu/minds/Authority"
+    "schema": "minds/ethics/authority/v1.0.0",
   },
   {
-    "label": "Format",
-    "dataType": "https://schema.hbp.eu/minds/Format"
+    "schema": "minds/core/format/v1.0.0",
   },
   {
-    "label": "License Type",
-    "dataType": "https://schema.hbp.eu/minds/Licensetype"
+    "schema": "minds/core/licensetype/v1.0.0",
   },
   {
-    "label": "Sample",
-    "dataType": "https://schema.hbp.eu/minds/ExperimentSample"
+    "schema": "minds/experiment/sample/v1.0.0",
   },
   {
-    "label": "File",
-    "dataType": "https://schema.hbp.eu/minds/File"
+    "schema": "cscs/core/file/v1.0.0",
   },
   {
-    "label": "Software agent",
-    "dataType": "https://schema.hbp.eu/minds/Softwareagent"
+    "schema": "minds/core/softwareagent/v1.0.0",
   },
   {
-    "label": "Age category",
-    "dataType": "https://schema.hbp.eu/minds/Agecategory"
+    "schema": "minds/core/agecategory/v1.0.0",
   },
   {
-    "label": "Sex",
-    "dataType": "https://schema.hbp.eu/minds/Sex"
+    "schema": "minds/core/sex/v1.0.0"
   },
   {
-    "label": "Species",
-    "dataType": "https://schema.hbp.eu/minds/Species"
+    "schema": "minds/core/species/v1.0.0",
   },
   {
-    "label": "Role",
-    "dataType": "https://schema.hbp.eu/minds/Role"
+    "schema": "minds/prov/role/v1.0.0",
   }
 ];
 
-class DataTypesStore{
+class DataTypesStore {
+
+  colorPaletteByLabel = new Map();
 
   @computed
-  get dataTypes(){
+  get dataTypes() {
     return dataTypes;
   }
 
   @computed
-  get sortedDataTypes(){
-    return this.dataTypes.concat().sort((a, b) => a.dataType < b.dataType?-1: a.dataType > b.dataType?1:0);
+  get sortedDataTypes() {
+    return this.dataTypes.concat().sort((a, b) => a.schema < b.schema ? -1 : a.schema > b.schema ? 1 : 0);
   }
 
   @computed
-  get dataTypeLabelList(){
-    return this.dataTypes.reduce((result, {label}) => {
-      if (!result.map[label]) {
-        result.map[label] = true;
-        result.list.push(label);
+  get dataTypeLabelList() {
+    return this.dataTypes.reduce((result, { schema }) => {
+      if (!result.map[schema]) {
+        result.map[schema] = true;
+        result.list.push(schema);
       }
       return result;
-    }, {list: [], map: {}}).list;
+    }, { list: [], map: {} }).list;
   }
 
   @computed
-  get dataTypeLabels(){
-    return this.dataTypes.reduce((result, nodeType) => {
-      result[nodeType.dataType] = nodeType.label;
+  get dataTypeLabels() {
+    return structureStore.groupedSchemas.reduce((result, nodeType) => {
+      result[nodeType.schema] = structureStore.findLabelBySchema(nodeType.schema);
       return result;
     }, {});
   }
 
   @computed
-  get colorScheme(){
+  get colorScheme() {
     const colorPalette = palette("mpn65", this.dataTypeLabelList.length);
-    return this.dataTypeLabelList.reduce((result, label, index) => {
-      result[label] = "#" + colorPalette[index];
+    return this.dataTypeLabelList.reduce((result, schema, index) => {
+      let color = "#" + colorPalette[index];
+      result[schema] = color;
+      this.colorPaletteByLabel[structureStore.findLabelBySchema(schema)] = color;
       return result;
-    },{});
+    }, {});
+
+  }
+
+  @action
+  colorPalletteBySchema(schema) {
+    let color = this.colorScheme[schema];
+    if (!color && structureStore.findLabelBySchema(schema)) {
+      color = this.colorPaletteByLabel[structureStore.findLabelBySchema(schema)];
+    }
+    return color;
   }
 }
 

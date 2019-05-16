@@ -14,6 +14,7 @@ import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import Status from "../Instance/Status";
 import BookmarkStatus from "../Instance/BookmarkStatus";
+import RenderMarkdownField from "../../Components/Markdown";
 
 const styles = {
   container:{
@@ -106,13 +107,16 @@ export default class Preview extends React.Component{
     instanceStore.fetchInstanceData(browseStore.selectedInstance.id);
   }
 
+  markdownDescriptionRendering = field => <RenderMarkdownField value={field.getValue()}/>
+
   render(){
     const { classes } = this.props;
     let selectedInstance = instanceStore.getInstance(browseStore.selectedInstance.id);
 
     const promotedFields = selectedInstance.promotedFields;
+    const promotedFieldsWithMarkdown = selectedInstance.promotedFieldsWithMarkdown;
     const nonPromotedFields = selectedInstance.nonPromotedFields;
-    const metadata = instanceStore.getMetadata(selectedInstance);
+    const metadata = selectedInstance.metadata;
 
     return(
       <Scrollbars autoHide>
@@ -153,13 +157,16 @@ export default class Preview extends React.Component{
                   {promotedFields.map(fieldKey => {
                     return(
                       <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
-                        <Field name={fieldKey}/>
+                        {promotedFieldsWithMarkdown.includes(fieldKey) ?
+                          <Field name={fieldKey} readModeRendering={this.markdownDescriptionRendering}/>:
+                          <Field name={fieldKey}/>
+                        }
                       </div>
                     );
                   })}
                   {nonPromotedFields.map(fieldKey => {
                     return(
-                      <div key={browseStore.selectedInstanceId+fieldKey} className={classes.field}>
+                      <div key={browseStore.selectedInstance.id+fieldKey} className={classes.field}>
                         <Field name={fieldKey}/>
                       </div>
                     );
@@ -169,7 +176,7 @@ export default class Preview extends React.Component{
                       <hr />
                       <span className={`${classes.title} ${classes.metadataTitle}`}> Metadata </span>
                       {metadata.map(field =>
-                        <div key={browseStore.selectedInstanceId+field.label} className={classes.field}>
+                        <div key={browseStore.selectedInstance.id+field.label} className={classes.field}>
                           <label>{field.label}: </label> {field.value}
                         </div>
                       )}

@@ -12,6 +12,7 @@ import { filter, difference, isFunction, isString } from "lodash";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import Alternatives from "./Alternatives";
+import instanceStore from "../Stores/InstanceStore";
 
 import injectStyles from "react-jss";
 
@@ -129,11 +130,31 @@ export default class KgDropdownSelectField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
-    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
-      .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
+    this.handleNodesStyles(false, this.props.field.getValue(false));
     var event = new Event("input", { bubbles: true });
     this.hiddenInputRef.dispatchEvent(event);
   }
+
+  triggerRemoveSuggestionOnChange = () => {
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    selectedInstance.setNullableInstances(this.props.field.path.substr(1));
+
+    this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
+    this.handleNodesStyles(true, []);
+    var event = new Event("input", { bubbles: true });
+    this.hiddenInputRef.dispatchEvent(event);
+    this.inputRef.dispatchEvent(event);
+  }
+
+  handleNodesStyles(isDisabled, value){
+    const prototype = window.HTMLInputElement.prototype;
+    isDisabled ? this.inputRef.parentNode.setAttribute("disabled", isDisabled):this.inputRef.parentNode.removeAttribute("disabled");
+    Object.getOwnPropertyDescriptor(prototype, "disabled").set
+      .call(this.inputRef, isDisabled);
+    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
+      .call(this.hiddenInputRef, JSON.stringify(value));
+  }
+
 
   handleInputKeyStrokes = e => {
     let field = this.props.field;
@@ -267,6 +288,12 @@ export default class KgDropdownSelectField extends React.Component {
     this.triggerOnChange();
   }
 
+  handleRemoveSuggestion = () => {
+    let field = this.props.field;
+    field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
+    this.triggerRemoveSuggestionOnChange();
+  }
+
   getAlternativeOptions = value => {
     const { options, mappingValue } = this.props.field;
 
@@ -381,6 +408,9 @@ export default class KgDropdownSelectField extends React.Component {
     let { classes, formStore, field } = this.props;
     let { options, value: values, mappingLabel, mappingValue, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
 
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    let isAlternativeDisabled = selectedInstance.instancesToSetNull.includes(path.substr(1));
+
     let dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     let dropdownClass = dropdownOpen? "open": "";
     dropdownClass += listPosition === "top" ? " "+classes.topList: "";
@@ -396,9 +426,11 @@ export default class KgDropdownSelectField extends React.Component {
 
     const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
     const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
+      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
       .map(alternative => ({
         value: this.getAlternativeOptions(alternative.value),
-        userIds: alternative.userIds
+        userIds: alternative.userIds,
+        selected: !!alternative.selected
       }));
 
     return (
@@ -410,9 +442,10 @@ export default class KgDropdownSelectField extends React.Component {
           <FieldLabel field={this.props.field}/>
           <Alternatives className={classes.alternatives}
             show={!disabled && !readOnly && !!alternatives.length}
-            disabled={disabled || readOnly}
+            disabled={disabled || readOnly || isAlternativeDisabled}
             list={alternatives}
             onSelect={this.handleAlternativeSelect}
+            onClick={this.handleRemoveSuggestion}
             field={field}
             parentContainerClassName="form-group"
             ref={ref=>this.alternativesRef = ref}/>

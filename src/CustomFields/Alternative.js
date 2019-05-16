@@ -1,8 +1,10 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { MenuItem } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Views/User";
+import authStore from "../Stores/AuthStore";
 
 const Value = ({value, field}) => {
 
@@ -45,19 +47,38 @@ const styles = {
     "& .option em .user + .user:before": {
       content: "'; '"
     },
+    "& .option": {
+      position: "relative",
+      paddingLeft: "3px",
+    },
     "& .option .parenthesis": {
       display: "inline-block",
       transform: "scaleY(1.4)"
+    },
+    "& .selected": {
+      position: "absolute",
+      top: "50%",
+      left: "-15px",
+      transform: "translateY(-50%)"
     }
+  },
+  removeIcon: {
+    marginLeft: "1%"
   }
 };
 
 @injectStyles(styles)
 export default class Alternative extends React.Component {
 
-  handleSelect = (alternative, event) => {
+  handleSelect = alternative => event => {
     const { onSelect } = this.props;
     typeof onSelect === "function" && onSelect(alternative, event);
+  }
+
+  handleClick = event => {
+    event.stopPropagation();
+    const { onClick } = this.props;
+    typeof onClick === "function" && onClick(event);
   }
 
   render() {
@@ -65,14 +86,22 @@ export default class Alternative extends React.Component {
 
     const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
 
+    const currentUserId = authStore.user.id;
+
     return (
-      <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect.bind(this, alternative)}>
-        <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect.bind(this, alternative)}>
-          <strong><Values value={alternative.value} field={field} /></strong> <em><div className="parenthesis">(</div>{
+      <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
+        <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect(alternative)}>
+          <strong>
+            <Values value={alternative.value} field={field} /></strong> <em><div className="parenthesis">(</div>{
             userIds.map(userId => (
               <User key={userId} userId={userId} />
             ))
           }<div className="parenthesis">)</div></em>
+          {alternative.selected?
+            <FontAwesomeIcon icon="check" className="selected" />
+            :null
+          }
+          {userIds.map(userId => currentUserId === userId ? <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleClick} icon="times" /></span>:null)}
         </div>
       </MenuItem>
     );

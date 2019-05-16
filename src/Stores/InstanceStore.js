@@ -63,16 +63,40 @@ class Instance {
   @observable highlight = null;
   @observable path = "";
 
+  instancesToSetNull = [];
+
   constructor(instanceId, path="") {
     this.instanceId = instanceId;
     this.path = path?path:"";
   }
+
+  clearNullableInstances() {
+    this.instancesToSetNull.length = 0;
+  }
+
+  @action setNullableInstances(id) {
+    this.instancesToSetNull.indexOf(id) === -1 ?
+      this.instancesToSetNull.push(id):null;
+  }
+
 
   @computed
   get promotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
       return this.data.ui_info.promotedFields
         .filter(name => this.data.fields[name]);
+    }
+    return [];
+  }
+
+  @computed
+  get promotedFieldsWithMarkdown() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
+      let promotedFields = this.data.ui_info.promotedFields
+        .filter(name => this.data.fields[name]);
+      return promotedFields.filter(field =>
+        this.data.fields[field]["markdown"] === true
+      );
     }
     return [];
   }
@@ -87,15 +111,22 @@ class Instance {
     }
     return [];
   }
-}
 
-const metadataTypeMapping = {
-  "createdBy": "Created by",
-  "createdAt": "Created at",
-  "lastUpdateAt": "Last update at",
-  "lastUpdateBy":  "Last update by",
-  "numberOfEdits": "Number of edits"
-};
+  @computed
+  get metadata() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.metadata) {
+      let metadata = this.data.metadata;
+      return Object.keys(metadata).map(key => {
+        if(key == "lastUpdateAt" || key == "createdAt") {
+          let d = new Date(metadata[key]["value"]);
+          metadata[key]["value"] = d.toLocaleString();
+        }
+        return metadata[key];
+      });
+    }
+    return [];
+  }
+}
 
 class InstanceStore {
   @observable databaseScope = null;
@@ -125,24 +156,6 @@ class InstanceStore {
         this.restoreOpenedTabs(storedOpenedTabs);
       });
     }
-  }
-
-  getMetadata(instance) {
-    if (instance && instance.data && instance.data.metadata) {
-      let result = [];
-      let metadata = instance.data.metadata;
-      Object.keys(metadata).forEach(key => {
-        if (key == "lastUpdateAt" || key == "createdAt") {
-          let d = new Date(metadata[key]);
-          result.push({"label": metadataTypeMapping[key], "value": d.toLocaleString()});
-        } else {
-          result.push({"label": metadataTypeMapping[key], "value": metadata[key]});
-        }
-      }
-      );
-      return result;
-    }
-    return [];
   }
 
   @action flush(){
@@ -415,7 +428,7 @@ class InstanceStore {
       const { data } = await API.axios.get(API.endpoints.instanceData(path, this.databaseScope));
 
       runInAction(async () => {
-        const instanceData = data.data?data.data:{fields: {}};
+        const instanceData = data.data?data.data:{fields: {}, alternatives: []};
 
         instance.data = instanceData;
         /*
@@ -529,11 +542,13 @@ class InstanceStore {
         });
       });
     } catch (e) {
-      const message = e.message?e.message:e;
-      instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
-      instance.hasFetchError = true;
-      instance.isFetched = false;
-      instance.isFetching = false;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
+        instance.hasFetchError = true;
+        instance.isFetched = false;
+        instance.isFetching = false;
+      });
     }
     return instance;
   }
@@ -602,6 +617,9 @@ class InstanceStore {
 
     try {
       const payload = instance.form.getValues();
+      if (instance.instancesToSetNull.length > 0) {
+        instance.instancesToSetNull.forEach(key=> payload[key] = null);
+      }
       const { data } = await API.axios.put(API.endpoints.instanceData(instanceId, this.databaseScope), payload);
       runInAction(() => {
         instance.hasChanged = false;
@@ -622,14 +640,19 @@ class InstanceStore {
             }
           }
         }
+        // To refresh alternatives
+        this.getInstance(instanceId, true);
       });
     } catch (e) {
-      const message = e.message?e.message:e;
-      instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
-      instance.hasSaveError = true;
-      instance.isSaving = false;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
+        instance.hasSaveError = true;
+        instance.isSaving = false;
+      });
     } finally {
       statusStore.flush();
+      instance.clearNullableInstances();
     }
   }
 

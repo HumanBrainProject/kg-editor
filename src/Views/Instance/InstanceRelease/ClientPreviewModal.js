@@ -3,7 +3,6 @@ import { Modal, Button } from "react-bootstrap";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import Iframe from "react-iframe";
-import API from "../../../Services/API";
 
 let styles = {
   frameContainer: {
@@ -35,7 +34,7 @@ let styles = {
 export default class ClientPreviewModal extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.url = API.endpoints.clientInstancePreview(props.store.topInstanceId) + "?group=curated";
+    this.url = window.location.protocol + "//" + window.location.host + "/webapp?group=curated&search=false#" + props.store.topInstanceId;
   }
 
   render() {

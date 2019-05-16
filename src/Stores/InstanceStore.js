@@ -70,6 +70,10 @@ class Instance {
     this.path = path?path:"";
   }
 
+  clearNullableInstances() {
+    this.instancesToSetNull.length = 0;
+  }
+
   @action setNullableInstances(id) {
     this.instancesToSetNull.indexOf(id) === -1 ?
       this.instancesToSetNull.push(id):null;
@@ -648,6 +652,7 @@ class InstanceStore {
       });
     } finally {
       statusStore.flush();
+      instance.clearNullableInstances();
     }
   }
 

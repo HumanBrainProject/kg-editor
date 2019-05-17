@@ -231,11 +231,7 @@ export default class Search extends React.Component{
   }
 
   render() {
-    const { classes, org } = this.props;
-
-    if (!org) {
-      return null;
-    }
+    const { classes } = this.props;
 
     const showTotalSearchCount = usersStore.isSearchFetched && usersStore.totalSearchCount !== undefined && (!usersStore.searchFetchError || usersStore.totalSearchCount !== 0);
 

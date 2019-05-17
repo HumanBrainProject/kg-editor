@@ -1,6 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import User from "../../User";
 
 const styles = {
@@ -8,7 +10,7 @@ const styles = {
     position: "relative",
     display: "grid",
     overflow: "hidden",
-    gridTemplateColumns: "20px 1fr 30px",
+    gridTemplateColumns: "1fr 30px",
     gridTemplateRows: "auto",
     alignItems: "center",
     width: "100%",
@@ -84,7 +86,8 @@ export default class Reviewer extends React.Component{
 
     return (
       <div className={classes.container}>
-        <User userId={review.userId} />
+        <User key={review.userId}  userId={review.userId} />
+        <button title="cancel invitation" onClick={this.handleCancelInvitation.bind(this, review.userId)}><FontAwesomeIcon icon="times"/></button>
       </div>
     );
   }

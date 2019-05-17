@@ -8,7 +8,7 @@ import UsersStore from "../Stores/UsersStore";
 export default class User extends React.Component {
   constructor (props) {
     super(props);
-    if (props.org && props.userId) {
+    if (props.userId) {
       UsersStore.fetchUser(props.userId);
     }
   }

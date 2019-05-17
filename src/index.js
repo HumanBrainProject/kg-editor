@@ -16,7 +16,6 @@ import routerStore from "./Stores/RouterStore";
 import dataTypesStore from "./Stores/DataTypesStore";
 import instanceStore from "./Stores/InstanceStore";
 import browseStore from "./Stores/BrowseStore";
-import structureStore from "./Stores/StructureStore";
 
 import Tab from "./Components/Tab";
 import SaveBar from "./Views/Instance/SaveBar";

@@ -1,5 +1,5 @@
 import { observable, action, computed, runInAction, toJS } from "mobx";
-import { uniqueId, sortBy, groupBy, isEqual } from "lodash";
+import { uniqueId, isEqual } from "lodash";
 import API from "../Services/API";
 import { remove } from "lodash";
 import jsonld from "jsonld";
@@ -1137,7 +1137,7 @@ class QueryBuilderStore {
             this.sourceQuery.description = payload.description;
             this.sourceQuery.context = payload["@context"];
             this.sourceQuery.merge = payload.merge,
-              this.sourceQuery.fields = payload.fields;
+            this.sourceQuery.fields = payload.fields;
             this.sourceQuery.properties = getProperties(payload);
           } else if (!this.saveAsMode && this.queryIdAlreadyExists) {
             this.sourceQuery = this.specifications.find(spec => spec.id === queryId);

@@ -365,31 +365,31 @@ export default class Options extends React.Component {
             )
           )
         ) && (
-            <div className={classes.fields}>
-              {queryBuilderStore.currentFieldLookupsAttributes.map(({ id, label, properties }) => (
-                <div key={id}>
-                  <h3>Attributes valid for {label} <small> - {id}</small></h3>
-                  {properties.map(propSchema => (
-                    <div className={classes.property} key={propSchema.attribute + (propSchema.reverse ? "reverse" : "")} onClick={this.handleAddField.bind(this, propSchema)}>
-                      {propSchema.label} - <small>{propSchema.attribute}</small>
-                    </div>
-                  ))}
-                </div>
-              ))}
+          <div className={classes.fields}>
+            {queryBuilderStore.currentFieldLookupsAttributes.map(({ id, label, properties }) => (
+              <div key={id}>
+                <h3>Attributes valid for {label} <small> - {id}</small></h3>
+                {properties.map(propSchema => (
+                  <div className={classes.property} key={propSchema.attribute + (propSchema.reverse ? "reverse" : "")} onClick={this.handleAddField.bind(this, propSchema)}>
+                    {propSchema.label} - <small>{propSchema.attribute}</small>
+                  </div>
+                ))}
+              </div>
+            ))}
 
-              {queryBuilderStore.currentFieldLookupsLinks.map(({ id, label, properties }) => (
-                <div key={id}>
-                  <h3>Links valid for {label} <small> - {id}</small></h3>
-                  {properties.map(propSchema => (
-                    <div className={classes.property} key={propSchema.attribute + (propSchema.reverse ? "reverse" : "")} onClick={this.handleAddField.bind(this, propSchema)}>
-                      {propSchema.label} - <small>{propSchema.attribute}</small>
+            {queryBuilderStore.currentFieldLookupsLinks.map(({ id, label, properties }) => (
+              <div key={id}>
+                <h3>Links valid for {label} <small> - {id}</small></h3>
+                {properties.map(propSchema => (
+                  <div className={classes.property} key={propSchema.attribute + (propSchema.reverse ? "reverse" : "")} onClick={this.handleAddField.bind(this, propSchema)}>
+                    {propSchema.label} - <small>{propSchema.attribute}</small>
                       &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => structureStore.findSchemaById(schemaId).label).join(", ")} )
                   </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   }

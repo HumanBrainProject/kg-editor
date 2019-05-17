@@ -62,7 +62,8 @@
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "webpack --mode production -p --config webpack.config.prod.js",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "fix_lint": "eslint --fix src/"
   },
   "repository": "https://github.com/HumanBrainProject/kg-editor-ui.git",
   "license": "Apache-2.0"

@@ -116,10 +116,11 @@ export default class NewInstance extends React.Component {
               ))}
             </Scrollbars>
         }
-        <div>
-          {instanceStore.isCreatingNewInstance && <div className={classes.overlay}></div>}
-          {instanceStore.isCreatingNewInstance && <FetchingLoader>Creating new instance...</FetchingLoader>}
-        </div>
+        {instanceStore.isCreatingNewInstance ?
+          <div>
+            {<div className={classes.overlay}></div>}
+            {<FetchingLoader>Creating new instance...</FetchingLoader>}
+          </div>:null}
       </div>
     );
   }

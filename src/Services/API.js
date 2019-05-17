@@ -4,6 +4,9 @@ import authStore from "../Stores/AuthStore";
 const endpoints = {
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
+  "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
+  "instanceReviews": instance => `/api/scopes/${instance}`,
+  "instanceReviewsByUser": (instance, user) => `/api/scopes/${instance}/${user}`,
   "features": () => `${window.rootPath}/data/features.json`,
   "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,

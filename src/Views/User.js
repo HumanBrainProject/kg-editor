@@ -8,7 +8,7 @@ import UsersStore from "../Stores/UsersStore";
 export default class User extends React.Component {
   constructor (props) {
     super(props);
-    if (props.userId) {
+    if (props.org && props.userId) {
       UsersStore.fetchUser(props.userId);
     }
   }
@@ -19,6 +19,7 @@ export default class User extends React.Component {
     if (!userId) {
       return null;
     }
+
 
     const user = UsersStore.getUser(userId);
 
@@ -32,7 +33,7 @@ export default class User extends React.Component {
     }, null):null;
 
     return (
-      <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} title={email && email.value} />
+      <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />
     );
   }
 }

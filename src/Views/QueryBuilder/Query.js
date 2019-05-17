@@ -400,7 +400,7 @@ export default class Query extends React.Component{
               </div>
               {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && !queryBuilderStore.isOneOfMySavedQueries && queryBuilderStore.sourceQuery.org && queryBuilderStore.sourceQuery.user && (
                 <div className={classes.author} >
-                  <span>by user<User org={queryBuilderStore.sourceQuery.org} userId={queryBuilderStore.sourceQuery.user} /></span>
+                  <span>by user<User userId={queryBuilderStore.sourceQuery.user} /></span>
                 </div>
               )}
             </React.Fragment>

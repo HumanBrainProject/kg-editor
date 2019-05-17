@@ -9,7 +9,7 @@ const styles = {
       border: 0,
       borderRadius: "50%"
     },
-    "&.devault": {
+    "&.default": {
       transform: "scale(1.35)"
     }
   }

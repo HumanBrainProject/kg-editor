@@ -1,11 +1,12 @@
 import React from "react";
-import { observer } from "mobx-react";
+import {observer} from "mobx-react";
 import injectStyles from "react-jss";
 
 import instanceStore from "../Stores/InstanceStore";
 import routerStore from "../Stores/RouterStore";
 
 import InstanceForm from "./Instance/InstanceForm";
+import InstanceInvite from "./Instance/InstanceInvite";
 import InstanceGraph from "./Instance/InstanceGraph";
 import InstanceRelease from "./Instance/InstanceRelease";
 import InstanceManage from "./Instance/InstanceManage";
@@ -13,56 +14,56 @@ import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";
 import SaveBar from "./Instance/SaveBar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const styles = {
-  container:{
-    display:"grid",
-    height:"100%",
-    gridTemplateRows:"100%",
-    gridTemplateColumns:"50px 1fr 400px",
-    "&.hide-savebar":{
-      gridTemplateColumns:"50px 1fr",
-      "& $sidebar":{
-        display:"none"
+  container: {
+    display: "grid",
+    height: "100%",
+    gridTemplateRows: "100%",
+    gridTemplateColumns: "50px 1fr 400px",
+    "&.hide-savebar": {
+      gridTemplateColumns: "50px 1fr",
+      "& $sidebar": {
+        display: "none"
       }
     }
   },
-  tabs:{
-    borderRight:"1px solid var(--border-color-ui-contrast1)",
-    background:"var(--bg-color-ui-contrast2)"
+  tabs: {
+    borderRight: "1px solid var(--border-color-ui-contrast1)",
+    background: "var(--bg-color-ui-contrast2)"
   },
-  tab:{
-    color:"var(--ft-color-normal)",
-    borderLeft:"2px solid transparent",
-    opacity:"0.5",
-    cursor:"pointer",
-    height:"50px",
-    lineHeight:"50px",
-    fontSize:"1.75em",
-    textAlign:"center",
-    "&:hover":{
-      background:"var(--list-bg-hover)",
-      borderColor:"var(--list-border-hover)",
-      color:"var(--ft-color-loud)",
-      opacity:"1",
+  tab: {
+    color: "var(--ft-color-normal)",
+    borderLeft: "2px solid transparent",
+    opacity: "0.5",
+    cursor: "pointer",
+    height: "50px",
+    lineHeight: "50px",
+    fontSize: "1.75em",
+    textAlign: "center",
+    "&:hover": {
+      background: "var(--list-bg-hover)",
+      borderColor: "var(--list-border-hover)",
+      color: "var(--ft-color-loud)",
+      opacity: "1",
     },
-    "&.active":{
-      background:"var(--list-bg-selected)",
-      borderColor:"var(--list-border-selected)",
-      color:"var(--ft-color-loud)",
-      opacity:"1",
+    "&.active": {
+      background: "var(--list-bg-selected)",
+      borderColor: "var(--list-border-selected)",
+      color: "var(--ft-color-loud)",
+      opacity: "1",
     }
   },
-  body:{
-    position:"relative",
-    overflow:"hidden"
+  body: {
+    position: "relative",
+    overflow: "hidden"
   },
-  sidebar:{
-    background:"var(--bg-color-ui-contrast2)",
-    borderLeft:"1px solid var(--border-color-ui-contrast1)",
-    overflow:"auto",
-    color:"var(--ft-color-loud)"
+  sidebar: {
+    background: "var(--bg-color-ui-contrast2)",
+    borderLeft: "1px solid var(--border-color-ui-contrast1)",
+    overflow: "auto",
+    color: "var(--ft-color-loud)"
   }
 };
 
@@ -74,11 +75,11 @@ export default class Edit extends React.Component {
     this.UNSAFE_componentWillReceiveProps(this.props);
   }
 
-  UNSAFE_componentWillReceiveProps(newProps){
+  UNSAFE_componentWillReceiveProps(newProps) {
     instanceStore.openInstance(newProps.match.params.id, newProps.mode, newProps.mode !== "edit");
   }
 
-  handleSelectMode(mode){
+  handleSelectMode(mode) {
     routerStore.history.push(`/instance/${mode}/${this.props.match.params.id}`);
   }
 
@@ -95,7 +96,10 @@ export default class Edit extends React.Component {
           <div className={`${classes.tab} ${openedInstance.viewMode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
             <FontAwesomeIcon icon="pencil-alt"/>
           </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "graph"?"active":""}`} onClick={this.handleSelectMode.bind(this, "graph")}>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "invite" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "invite")}>
+            <FontAwesomeIcon icon="user-edit"/>
+          </div>
+          <div className={`${classes.tab} ${openedInstance.viewMode === "graph" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "graph")}>
             <FontAwesomeIcon icon="project-diagram"/>
           </div>
           <div className={`${classes.tab} ${openedInstance.viewMode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
@@ -117,13 +121,15 @@ export default class Edit extends React.Component {
                   :null}
               </React.Fragment>
             </PaneContainer>
-            :openedInstance.viewMode === "graph"?
-              <InstanceGraph id={this.props.match.params.id}/>
-              :openedInstance.viewMode === "release"?
-                <InstanceRelease id={this.props.match.params.id}/>
-                :openedInstance.viewMode === "manage"?
-                  <InstanceManage id={this.props.match.params.id}/>
-                  :null}
+            : openedInstance.viewMode === "invite" ?
+              <InstanceInvite id={this.props.match.params.id}/>
+              : openedInstance.viewMode === "graph" ?
+                <InstanceGraph id={this.props.match.params.id}/>
+                : openedInstance.viewMode === "release" ?
+                  <InstanceRelease id={this.props.match.params.id}/>
+                  : openedInstance.viewMode === "manage" ?
+                    <InstanceManage id={this.props.match.params.id}/>
+                    : null}
         </div>
         <div className={classes.sidebar}>
           <SaveBar/>

@@ -191,9 +191,6 @@ export default class InstanceRow extends React.Component {
           <div className={classes.action} onClick={this.handleAction.bind(this, "edit", instance)}>
             <FontAwesomeIcon icon="pencil-alt" />
           </div>
-          <div className={classes.action} onClick={this.handleAction.bind(this, "invite", instance)} title="Invite people to make suggestions">
-            <FontAwesomeIcon icon="user-edit"/>
-          </div>
           <div className={classes.action} onClick={this.handleAction.bind(this, "graph", instance)}>
             <FontAwesomeIcon icon="project-diagram" />
           </div>

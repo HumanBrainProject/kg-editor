@@ -1,11 +1,12 @@
 import React from "react";
 import injectStyles from "react-jss";
-import {observer} from "mobx-react";
+import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import queryBuilderStore from "../Stores/QueryBuilderStore";
+import structureStore from "../Stores/StructureStore";
 import Query from "./QueryBuilder/Query";
 import QueriesDrawer from "./QueryBuilder/QueriesDrawer";
 
@@ -19,9 +20,9 @@ import BGMessage from "../Components/BGMessage";
 import FetchingLoader from "../Components/FetchingLoader";
 
 let styles = {
-  container:{
-    width:"100%",
-    height:"100%",
+  container: {
+    width: "100%",
+    height: "100%",
     color: "var(--ft-color-normal)",
   },
   structureLoader: {
@@ -37,92 +38,92 @@ let styles = {
       background: "var(--list-bg-hover)"
     }
   },
-  layout:{
-    display:"grid",
-    gridTemplateColumns:"1fr 1fr",
-    gridGap:"10px",
+  layout: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gridGap: "10px",
     padding: "10px",
-    height:"100%"
+    height: "100%"
   },
-  leftPanel:{
-    position:"relative"
+  leftPanel: {
+    position: "relative"
   },
-  tabbedPanel:{
-    display:"grid",
-    gridTemplateRows:"auto 1fr"
+  tabbedPanel: {
+    display: "grid",
+    gridTemplateRows: "auto 1fr"
   },
-  tabs:{
-    display:"grid",
-    gridTemplateColumns:"repeat(auto-fit, minmax(120px, 1fr))",
-    borderLeft:"1px solid var(--border-color-ui-contrast2)"
+  tabs: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+    borderLeft: "1px solid var(--border-color-ui-contrast2)"
   },
-  tabBody:{
-    border:"1px solid var(--border-color-ui-contrast2)",
-    borderTop:"none",
-    background:"var(--bg-color-ui-contrast2)"
+  tabBody: {
+    border: "1px solid var(--border-color-ui-contrast2)",
+    borderTop: "none",
+    background: "var(--bg-color-ui-contrast2)"
   },
-  tabBodyInner:{
-    padding:"10px"
+  tabBodyInner: {
+    padding: "10px"
   }
 };
 
 @injectStyles(styles)
 @observer
-export default class QueryBuilder extends React.Component{
+export default class QueryBuilder extends React.Component {
   constructor(props) {
     super(props);
   }
-  handleSelectTab(tab){
+  handleSelectTab(tab) {
     queryBuilderStore.selectTab(tab);
   }
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
   }
   handleFetchStructure = () => {
-    queryBuilderStore.fetchStructure();
+    structureStore.fetchStructure();
   }
-  UNSAFE_componentWillUpdate(){
-    if(this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel){
+  UNSAFE_componentWillUpdate() {
+    if (this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel) {
       //console.log(this.scrolledPanel,this.scrolledPanel.scrollTop);
       this.scrolledPanel.scrollToTop();
     }
   }
 
-  render(){
-    const {classes} = this.props;
+  render() {
+    const { classes } = this.props;
     this.currentTab = queryBuilderStore.currentTab;
 
-    return(
+    return (
       <div className={classes.container}>
-        {queryBuilderStore.isFetchingStructure?
+        {structureStore.isFetchingStructure ?
           <div className={classes.structureLoader}>
             <FetchingLoader>
-            Fetching api structure
+              Fetching api structure
             </FetchingLoader>
           </div>
           :
-          queryBuilderStore.fetchStuctureError?
+          structureStore.fetchStuctureError ?
             <BGMessage icon={"ban"}>
-              There was a network problem fetching the api structure.<br/>
-              If the problem persists, please contact the support.<br/>
-              <small>{queryBuilderStore.fetchStuctureError}</small><br/><br/>
+              There was a network problem fetching the api structure.<br />
+              If the problem persists, please contact the support.<br />
+              <small>{structureStore.fetchStuctureError}</small><br /><br />
               <Button bsStyle={"primary"} onClick={this.handleFetchStructure}>
-                <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
               </Button>
             </BGMessage>
             :
-            !queryBuilderStore.hasSchemas?
+            !structureStore.hasSchemas ?
               <BGMessage icon={"blender-phone"}>
-                No schemas available.<br/>
-                If the problem persists, please contact the support.<br/><br/>
+                No schemas available.<br />
+                If the problem persists, please contact the support.<br /><br />
                 <Button bsStyle={"primary"} onClick={this.handleFetchStructure}>
-                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                  <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
                 </Button>
               </BGMessage>
               :
               <div className={classes.layout}>
                 <div className={classes.leftPanel}>
-                  {queryBuilderStore.hasRootSchema?
+                  {queryBuilderStore.hasRootSchema ?
                     <Query />
                     :
                     <BGMessage icon={"blender-phone"}>
@@ -131,31 +132,31 @@ export default class QueryBuilder extends React.Component{
                 </div>
                 <div className={classes.tabbedPanel}>
                   <div className={classes.tabs}>
-                    {queryBuilderStore.hasRootSchema?
+                    {queryBuilderStore.hasRootSchema ?
                       <React.Fragment>
-                        {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")}/>}
-                        <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")}/>
-                        <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")}/>
-                        <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")}/>
+                        {queryBuilderStore.currentField && <Tab icon={"cog"} current={queryBuilderStore.currentTab === "fieldOptions"} label={"Field options"} onClose={this.handleCloseField} onClick={this.handleSelectTab.bind(this, "fieldOptions")} />}
+                        <Tab icon={"shopping-cart"} current={queryBuilderStore.currentTab === "query"} label={"Query specification"} onClick={this.handleSelectTab.bind(this, "query")} />
+                        <Tab icon={"poll-h"} current={queryBuilderStore.currentTab === "result"} label={"Results: JSON View"} onClick={this.handleSelectTab.bind(this, "result")} />
+                        <Tab icon={"table"} current={queryBuilderStore.currentTab === "resultTable"} label={"Results: Table View"} onClick={this.handleSelectTab.bind(this, "resultTable")} />
                       </React.Fragment>
                       :
-                      <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"}/>
+                      <Tab icon={"shopping-cart"} current={true} label={"Choose a root schema"} />
                     }
                   </div>
                   <div className={classes.tabBody}>
                     <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
                       <div className={classes.tabBodyInner}>
-                        {!queryBuilderStore.hasRootSchema?
-                          <RootSchemaChoice/>
-                          :queryBuilderStore.currentTab === "query"?
-                            <QuerySpecification/>
-                            :queryBuilderStore.currentTab === "result"?
-                              <Result/>
-                              :queryBuilderStore.currentTab === "resultTable"?
-                                <ResultTable/>
-                                :queryBuilderStore.currentTab === "fieldOptions"?
-                                  <Options/>
-                                  :null}
+                        {!queryBuilderStore.hasRootSchema ?
+                          <RootSchemaChoice />
+                          : queryBuilderStore.currentTab === "query" ?
+                            <QuerySpecification />
+                            : queryBuilderStore.currentTab === "result" ?
+                              <Result />
+                              : queryBuilderStore.currentTab === "resultTable" ?
+                                <ResultTable />
+                                : queryBuilderStore.currentTab === "fieldOptions" ?
+                                  <Options />
+                                  : null}
                       </div>
                     </Scrollbars>
                   </div>

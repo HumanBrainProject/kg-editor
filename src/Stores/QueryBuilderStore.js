@@ -1,14 +1,15 @@
-import {observable, action, computed, runInAction, toJS} from "mobx";
-import {uniqueId, sortBy, groupBy, isEqual} from "lodash";
+import { observable, action, computed, runInAction, toJS } from "mobx";
+import { uniqueId, isEqual } from "lodash";
 import API from "../Services/API";
-import {remove} from "lodash";
+import { remove } from "lodash";
 import jsonld from "jsonld";
 
 import authStore from "./AuthStore";
+import structureStore from "./StructureStore";
 
 const defaultContext = {
   "@vocab": "https://schema.hbp.eu/graphQuery/",
-  "query":"https://schema.hbp.eu/myQuery/",
+  "query": "https://schema.hbp.eu/myQuery/",
   "fieldname": {
     "@id": "fieldname",
     "@type": "@id"
@@ -50,7 +51,7 @@ const getProperties = query => {
     return {};
   }
   return Object.entries(query)
-    .filter(([name, ]) => !rootFieldReservedProperties.includes(name))
+    .filter(([name,]) => !rootFieldReservedProperties.includes(name))
     .reduce((result, [name, value]) => {
       result[name] = value;
       return result;
@@ -69,7 +70,7 @@ class Field {
   @observable isInvalid = null;
   @observable aliasError = null;
 
-  constructor(schema, parent){
+  constructor(schema, parent) {
     this.schema = schema;
     this.parent = parent;
     defaultOptions.forEach(option => this.optionsMap.set(option.name, option.value));
@@ -82,18 +83,18 @@ class Field {
   }
 
   @computed
-  get options(){
+  get options() {
     return Array.from(this.optionsMap).map(([name, value]) => ({
       name: name,
       value: toJS(value)
     }));
   }
 
-  getOption(name){
-    return this.optionsMap.has(name)?this.optionsMap.get(name):undefined;
+  getOption(name) {
+    return this.optionsMap.has(name) ? this.optionsMap.get(name) : undefined;
   }
 
-  @action setOption(name, value, preventRecursivity){
+  @action setOption(name, value, preventRecursivity) {
     this.optionsMap.set(name, value);
     if (name === "sort" && value && !preventRecursivity) {
       this.parent.fields.forEach(field => {
@@ -105,7 +106,7 @@ class Field {
   }
 
   @computed
-  get _key(){
+  get _key() {
     if (this.alias) {
       return this.alias;
     }
@@ -113,7 +114,7 @@ class Field {
   }
 
   @computed
-  get _uniqueKey(){
+  get _uniqueKey() {
     if (this.parent && this.parent.fields && this.parent.fields.length) {
       if (this.parent.fields.some(field => field !== this && field._key === this._key)) {
         return uniqueId("QueryBuilderField_" + this._key);
@@ -146,7 +147,7 @@ class Field {
 
   @computed
   get hasMergeChild() {
-    return this.isRootMerge?(this.merge && !!this.merge.length):(this.fields && !!this.fields.length);
+    return this.isRootMerge ? (this.merge && !!this.merge.length) : (this.fields && !!this.fields.length);
   }
 
   @computed
@@ -172,12 +173,12 @@ class Field {
       });
       return canBe;
     }
-    return (this.schema && this.schema.canBe && !!this.schema.canBe)?this.schema.canBe:[];
+    return (this.schema && this.schema.canBe && !!this.schema.canBe) ? this.schema.canBe : [];
   }
 
-  getDefaultAlias(){
+  getDefaultAlias() {
     let currentField = this;
-    while(currentField.isFlattened && currentField.fields[0] && currentField.fields[0].schema && currentField.fields[0].schema.canBe){
+    while (currentField.isFlattened && currentField.fields[0] && currentField.fields[0].schema && currentField.fields[0].schema.canBe) {
       currentField = currentField.fields[0];
     }
     if (!currentField.schema) {
@@ -188,15 +189,15 @@ class Field {
 }
 
 class QueryBuilderStore {
-  @observable structure = null;
+  // @observable structure = null;
   @observable queryId = "";
   @observable label = "";
   @observable description = "";
   @observable sourceQuery = null;
   @observable context = null;
   @observable rootField = null;
-  @observable fetchStuctureError = null;
-  @observable isFetchingStructure = false;
+  // @observable fetchStuctureError = null;
+  // @observable isFetchingStructure = false;
   @observable fetchQueriesError = null;
   @observable isFetchingQueries = false;
   @observable isSaving = false;
@@ -240,13 +241,13 @@ class QueryBuilderStore {
     }
     const result = [];
     lookups.forEach(schemaId => {
-      const schema = this.findSchemaById(schemaId);
+      const schema = structureStore.findSchemaById(schemaId);
       const lookup = {
         id: schema.id,
         label: schema.label,
         properties: schema.properties
           .filter(prop => !prop.canBe || !prop.canBe.length)
-          .sort((a, b) => a.label < b.label?-1: a.label > b.label?1:0)
+          .sort((a, b) => a.label < b.label ? -1 : a.label > b.label ? 1 : 0)
       };
       if (lookup.properties.length) {
         result.push(lookup);
@@ -261,13 +262,13 @@ class QueryBuilderStore {
     }
     const result = [];
     lookups.forEach(schemaId => {
-      const schema = this.findSchemaById(schemaId);
+      const schema = structureStore.findSchemaById(schemaId);
       const lookup = {
         id: schema.id,
         label: schema.label,
         properties: schema.properties
           .filter(prop => prop.canBe && !!prop.canBe.length)
-          .sort((a, b) => a.label < b.label?-1: a.label > b.label?1:0)
+          .sort((a, b) => a.label < b.label ? -1 : a.label > b.label ? 1 : 0)
       };
       if (lookup.properties.length) {
         result.push(lookup);
@@ -320,7 +321,7 @@ class QueryBuilderStore {
   }
 
   @action
-  selectRootSchema(schema){
+  selectRootSchema(schema) {
     if (!this.isSaving) {
       this.queryId = "";
       this.label = "";
@@ -329,9 +330,9 @@ class QueryBuilderStore {
       this.sourceQuery = null;
       this.savedQueryHasInconsistencies = false;
       this.rootField = new Field({
-        id:schema.id,
-        label:schema.label,
-        canBe:[schema.id]
+        id: schema.id,
+        label: schema.label,
+        canBe: [schema.id]
       });
       this.isSaving = false;
       this.saveError = null;
@@ -349,7 +350,7 @@ class QueryBuilderStore {
   }
 
   @action
-  resetRootSchema(){
+  resetRootSchema() {
     if (!this.isSaving) {
       this.queryId = "";
       this.label = "";
@@ -373,7 +374,7 @@ class QueryBuilderStore {
   }
 
   @action
-  setAsNewQuery(){
+  setAsNewQuery() {
     if (!this.isSaving) {
       this.queryId = "";
       this.label = "";
@@ -393,59 +394,49 @@ class QueryBuilderStore {
   }
 
   @computed
-  get groupedSchemas(){
-    return groupBy(this.structure.schemas, "group");
-  }
-
-  @computed
-  get hasSchemas(){
-    return !this.fetchStuctureError && this.structure && this.structure.schemas && this.structure.schemas.length;
-  }
-
-  @computed
-  get hasRootSchema(){
+  get hasRootSchema() {
     return !!this.rootField && !!this.rootField.schema;
   }
 
   @computed
-  get rootSchema(){
+  get rootSchema() {
     return this.rootField && this.rootField.schema;
   }
 
   @computed
-  get isQuerySaved(){
+  get isQuerySaved() {
     return this.sourceQuery !== null;
   }
 
   @computed
-  get isOneOfMySavedQueries(){
+  get isOneOfMySavedQueries() {
     return this.sourceQuery !== null && this.sourceQuery.user === authStore.user.id;
   }
 
   @computed
-  get isQueryEmpty(){
+  get isQueryEmpty() {
     //return !this.rootField || !((this.rootField.fields && this.rootField.fields.length) || this.rootField.isMerge);
     return !this.rootField || !this.rootField.fields || !this.rootField.fields.length;
   }
 
   @computed
-  get queryIdAlreadyExists(){
+  get queryIdAlreadyExists() {
     return this.myQueries.some(spec => spec.id === this.queryId);
   }
 
   @computed
-  get queryIdAlreadyInUse(){
+  get queryIdAlreadyInUse() {
     return this.othersQueries.some(spec => spec.id === this.queryId);
   }
 
   @computed
-  get isQueryIdValid(){
+  get isQueryIdValid() {
     //window.console.log(this.queryIdRegex.test(this.queryId));
     return this.queryIdRegex.test(this.queryId);
   }
 
   @computed
-  get hasQueryChanged(){
+  get hasQueryChanged() {
     /*
     if (this.sourceQuery) {
       if (!isEqual(this.JSONQueryFields, toJS(this.sourceQuery.fields))) {
@@ -466,30 +457,30 @@ class QueryBuilderStore {
   }
 
   @computed
-  get hasChanged(){
+  get hasChanged() {
     return (!this.isQueryEmpty && (this.sourceQuery === null
-            || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
-            || this.hasQueryChanged))
-          || (this.isQueryEmpty && this.sourceQuery);
+      || (this.saveAsMode && this.queryId !== this.sourceQuery.id)
+      || this.hasQueryChanged))
+      || (this.isQueryEmpty && this.sourceQuery);
   }
 
   @computed
-  get hasQueries(){
+  get hasQueries() {
     return this.specifications.length > 0;
   }
 
   @computed
-  get hasMyQueries(){
+  get hasMyQueries() {
     return this.myQueries.length > 0;
   }
 
   @computed
-  get hasOthersQueries(){
+  get hasOthersQueries() {
     return this.othersQueries.length > 0;
   }
 
   @computed
-  get myQueries(){
+  get myQueries() {
     if (authStore.hasUserProfile) {
       return this.specifications.filter(spec => spec.user === authStore.user.id).sort((a, b) => a.label - b.label);
     }
@@ -497,32 +488,20 @@ class QueryBuilderStore {
   }
 
   @computed
-  get othersQueries(){
+  get othersQueries() {
     if (authStore.hasUserProfile) {
       return this.specifications.filter(spec => spec.user !== authStore.user.id).sort((a, b) => a.label - b.label);
     }
     return this.specifications.sort((a, b) => a.label - b.label);
   }
 
-  getSortedSchemaGroups(){
-    return Object.keys(this.groupedSchemas).sort();
-  }
-
-  getSortedSchemasByGroup(group){
-    return sortBy(this.groupedSchemas[group], ["label"]);
-  }
-
-  findSchemaById(id){
-    return this.schemasMap.get(id);
-  }
-
   @action
-  addField(schema, parent, gotoField = true){
-    if(parent === undefined) {
+  addField(schema, parent, gotoField = true) {
+    if (parent === undefined) {
       parent = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
-    if(!parent.isFlattened || parent.fields.length < 1){
+    if (!parent.isFlattened || parent.fields.length < 1) {
       const newField = new Field(schema, parent);
       if (parent.isMerge && !parent.isRootMerge) {
         newField.isMerge = true;
@@ -536,15 +515,15 @@ class QueryBuilderStore {
       if (rootMerge) {
         this.checkMergeFields(rootMerge);
       }
-      if(gotoField){
+      if (gotoField) {
         this.selectField(newField);
       }
     }
   }
 
   @action
-  addMergeField(parent, gotoField = true){
-    if(parent === undefined) {
+  addMergeField(parent, gotoField = true) {
+    if (parent === undefined) {
       parent = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
@@ -560,7 +539,7 @@ class QueryBuilderStore {
         parent.fields = [];
       }
       parent.fields.push(newField);
-      if(gotoField){
+      if (gotoField) {
         this.selectField(newField);
       }
     }
@@ -571,7 +550,7 @@ class QueryBuilderStore {
       parent.fields.forEach(field => {
         let isUnknown = true;
         parent.lookups.some(schemaId => {
-          const schema = this.findSchemaById(schemaId);
+          const schema = structureStore.findSchemaById(schemaId);
           if (schema && schema.properties && schema.properties.length) {
             if (schema.properties.find(property => property.attribute === field.schema.attribute && ((!field.schema.canBe && !property.canBe) || (isEqual(toJS(field.schema.canBe), toJS(property.canBe)))))) {
               isUnknown = false;
@@ -586,8 +565,8 @@ class QueryBuilderStore {
   }
 
   @action
-  addMergeChildField(schema, parent, gotoField = true){
-    if(parent === undefined) {
+  addMergeChildField(schema, parent, gotoField = true) {
+    if (parent === undefined) {
       parent = this.showModalFieldChoice || this.rootField;
       this.showModalFieldChoice = null;
     }
@@ -601,15 +580,15 @@ class QueryBuilderStore {
       parent.merge.push(newField);
       parent.isInvalid = (parent.merge.length < 2);
       this.checkMergeFields(parent);
-      if(gotoField){
+      if (gotoField) {
         this.selectField(newField);
       }
     }
   }
 
   @action
-  removeField(field){
-    if(field === this.rootField){
+  removeField(field) {
+    if (field === this.rootField) {
       this.rootField = null;
       this.queryId = "";
       this.label = "";
@@ -624,7 +603,7 @@ class QueryBuilderStore {
       this.savedQueryHasInconsistencies = false;
       this.closeFieldOptions();
     } else {
-      if(field === this.currentField){
+      if (field === this.currentField) {
         this.closeFieldOptions();
       }
       if (field.isMerge && field.parentIsRootMerge) {
@@ -662,26 +641,26 @@ class QueryBuilderStore {
     }
   }
 
-  @action toggleRunStripVocab(state){
-    this.runStripVocab = state !== undefined? !!state: !this.runStripVocab;
+  @action toggleRunStripVocab(state) {
+    this.runStripVocab = state !== undefined ? !!state : !this.runStripVocab;
   }
 
-  @action selectTab(tab){
+  @action selectTab(tab) {
     this.currentTab = tab;
   }
 
-  @action selectField(field){
+  @action selectField(field) {
     this.currentField = field;
     this.currentTab = "fieldOptions";
   }
 
-  @action closeFieldOptions(){
+  @action closeFieldOptions() {
     this.currentField = null;
     this.currentTab = "query";
   }
 
   @computed
-  get JSONQueryFields(){
+  get JSONQueryFields() {
     const json = {};
     if (this.rootField.merge) {
       this._processMergeFields(json, this.rootField.merge);
@@ -695,16 +674,16 @@ class QueryBuilderStore {
   }
 
   @computed
-  get JSONQueryProperties(){
+  get JSONQueryProperties() {
     const json = {};
-    this.rootField.options.forEach(({name, value}) => {
+    this.rootField.options.forEach(({ name, value }) => {
       const cleanValue = toJS(value);
       if (cleanValue !== undefined) {
         json[name] = cleanValue;
       }
     });
-    const label = this.label?this.label.trim():"";
-    const description = this.description?this.description.trim():"";
+    const label = this.label ? this.label.trim() : "";
+    const description = this.description ? this.description.trim() : "";
     if (label) {
       json["label"] = label;
     }
@@ -715,12 +694,12 @@ class QueryBuilderStore {
   }
 
   @computed
-  get JSONQuery(){
-    return Object.assign({}, {"@context": toJS(this.context)}, this.JSONQueryProperties, this.JSONQueryFields?{fields: this.JSONQueryFields}:{});
+  get JSONQuery() {
+    return Object.assign({}, { "@context": toJS(this.context) }, this.JSONQueryProperties, this.JSONQueryFields ? { fields: this.JSONQueryFields } : {});
   }
 
   @computed
-  get JSONSourceQuery(){
+  get JSONSourceQuery() {
     if (!this.sourceQuery) {
       return null;
     }
@@ -744,9 +723,9 @@ class QueryBuilderStore {
       let jsonMergeFields = [];
       let mergeField = field;
       while (mergeField) {
-        if (mergeField.schema.attribute)  {
-          const attribute = (!attributeReg.test(mergeField.schema.attribute) && modelReg.test(mergeField.schema.attribute))?("/" + mergeField.schema.attribute.match(modelReg)[1]):mergeField.schema.attribute;
-          const relativePath = mergeField.schema.attributeNamespace && (mergeField.schema.simpleAttributeName || mergeField.schema.simplePropertyName)?(mergeField.schema.attributeNamespace + ":" + (mergeField.schema.simpleAttributeName || mergeField.schema.simplePropertyName)):attribute;
+        if (mergeField.schema.attribute) {
+          const attribute = (!attributeReg.test(mergeField.schema.attribute) && modelReg.test(mergeField.schema.attribute)) ? ("/" + mergeField.schema.attribute.match(modelReg)[1]) : mergeField.schema.attribute;
+          const relativePath = mergeField.schema.attributeNamespace && (mergeField.schema.simpleAttributeName || mergeField.schema.simplePropertyName) ? (mergeField.schema.attributeNamespace + ":" + (mergeField.schema.simpleAttributeName || mergeField.schema.simplePropertyName)) : attribute;
           if (mergeField.schema.reverse) {
             jsonMergeFields.push({
               "@id": relativePath,
@@ -779,10 +758,10 @@ class QueryBuilderStore {
     const jsonFields = [];
     field.fields && !!field.fields.length && field.fields.forEach(field => {
       let jsonField = {};
-      jsonField.fieldname = (field.namespace?field.namespace:"query") + ":" + ((field.alias && field.alias.trim()) || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label || uniqueId("field"));
-      if (field.schema.attribute)  {
-        const attribute = (!attributeReg.test(field.schema.attribute) && modelReg.test(field.schema.attribute))?("/" + field.schema.attribute.match(modelReg)[1]):field.schema.attribute;
-        const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName)?(field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)):attribute;
+      jsonField.fieldname = (field.namespace ? field.namespace : "query") + ":" + ((field.alias && field.alias.trim()) || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label || uniqueId("field"));
+      if (field.schema.attribute) {
+        const attribute = (!attributeReg.test(field.schema.attribute) && modelReg.test(field.schema.attribute)) ? ("/" + field.schema.attribute.match(modelReg)[1]) : field.schema.attribute;
+        const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName) ? (field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)) : attribute;
         if (field.schema.reverse) {
           jsonField.relative_path = {
             "@id": relativePath,
@@ -792,7 +771,7 @@ class QueryBuilderStore {
           jsonField.relative_path = relativePath;
         }
       }
-      field.options.forEach(({name, value}) => jsonField[name] = toJS(value));
+      field.options.forEach(({ name, value }) => jsonField[name] = toJS(value));
       if (field.merge) {
         this._processMergeFields(jsonField, field.merge);
       }
@@ -801,7 +780,7 @@ class QueryBuilderStore {
         jsonField.relative_path = [jsonField.relative_path];
         while (field.isFlattened && field.fields[0]) {
           field = field.fields[0];
-          const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName)?(field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)):field.schema.attribute;
+          const relativePath = field.schema.attributeNamespace && (field.schema.simpleAttributeName || field.schema.simplePropertyName) ? (field.schema.attributeNamespace + ":" + (field.schema.simpleAttributeName || field.schema.simplePropertyName)) : field.schema.attribute;
           if (field.schema.reverse) {
             jsonField.relative_path.push(
               {
@@ -813,14 +792,14 @@ class QueryBuilderStore {
             jsonField.relative_path.push(relativePath);
           }
           if (field.fields && field.fields.length) {
-            jsonField.fieldname = (topField.namespace?topField.namespace:"query") + ":" + (topField.alias || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label);
+            jsonField.fieldname = (topField.namespace ? topField.namespace : "query") + ":" + (topField.alias || field.schema.simpleAttributeName || field.schema.simplePropertyName || field.schema.label);
           }
           if (field.optionsMap.get("sort")) {
             jsonField["sort"] = true;
           }
         }
       }
-      if(field.fields && field.fields.length){
+      if (field.fields && field.fields.length) {
         this._processFields(jsonField, field);
       }
       jsonFields.push(jsonField);
@@ -846,8 +825,8 @@ class QueryBuilderStore {
           const jsonRP = jsonField.relative_path;
           let isUnknown = false;
           const isFlattened = !!jsonRP && typeof jsonRP !== "string" && jsonRP.length !== undefined && jsonRP.length > 1;
-          const relativePath = jsonRP && (typeof jsonRP === "string"?jsonRP:(isFlattened?(jsonRP[0] && (typeof jsonRP[0] === "string"?jsonRP[0]:jsonRP[0]["@id"])):(typeof jsonRP === "string"?jsonRP:jsonRP["@id"])));
-          const reverse = jsonRP && (typeof jsonRP === "string"?false:(isFlattened?(jsonRP[0] && (typeof jsonRP[0] === "string"?false:jsonRP[0].reverse)):(typeof jsonRP === "string"?false:jsonRP.reverse)));
+          const relativePath = jsonRP && (typeof jsonRP === "string" ? jsonRP : (isFlattened ? (jsonRP[0] && (typeof jsonRP[0] === "string" ? jsonRP[0] : jsonRP[0]["@id"])) : (typeof jsonRP === "string" ? jsonRP : jsonRP["@id"])));
+          const reverse = jsonRP && (typeof jsonRP === "string" ? false : (isFlattened ? (jsonRP[0] && (typeof jsonRP[0] === "string" ? false : jsonRP[0].reverse)) : (typeof jsonRP === "string" ? false : jsonRP.reverse)));
           let attribute = null;
           let attributeNamespace = null;
           let simpleAttributeName = null;
@@ -857,7 +836,7 @@ class QueryBuilderStore {
 
           } else if (namespaceReg.test(relativePath)) {
             [, attributeNamespace, simpleAttributeName] = relativePath.match(namespaceReg);
-            attribute = this.context && this.context[attributeNamespace]?this.context[attributeNamespace] + simpleAttributeName:null;
+            attribute = this.context && this.context[attributeNamespace] ? this.context[attributeNamespace] + simpleAttributeName : null;
           } else if (modelReg.test(relativePath)) {
             attribute = relativePath.match(modelReg)[1];
           } else if (relativePath === "@id") {
@@ -866,7 +845,7 @@ class QueryBuilderStore {
           let property = null;
           if (attribute) {
             parentField.lookups.some(schemaId => {
-              const schema = this.findSchemaById(schemaId);
+              const schema = structureStore.findSchemaById(schemaId);
               if (schema && schema.properties && schema.properties.length) {
                 property = schema.properties.find(property => property.attribute === attribute && (!jsonField.fields || (jsonField.fields && property.canBe)));
                 if (property) {
@@ -898,7 +877,7 @@ class QueryBuilderStore {
             field = new Field({}, parentField);
           }
           field.isMerge = true;
-          this._processJsonSpecificationMergeFields(field, jsonField.merge instanceof Array?jsonField.merge:[jsonField.merge]);
+          this._processJsonSpecificationMergeFields(field, jsonField.merge instanceof Array ? jsonField.merge : [jsonField.merge]);
         }
         if (!field) {
           window.console.log("Unknown field: ", jsonField, "possible schemas: ", toJS(parentField.schema.canBe));
@@ -909,7 +888,7 @@ class QueryBuilderStore {
         if ((jsonField.merge && jsonField.relative_path) || (!jsonField.merge && !jsonField.relative_path)) {
           field.isInvalid = true;
         }
-        const [ , namespace, fieldname] = namespaceReg.test(jsonField.fieldname)?jsonField.fieldname.match(namespaceReg):[null, null, null];
+        const [, namespace, fieldname] = namespaceReg.test(jsonField.fieldname) ? jsonField.fieldname.match(namespaceReg) : [null, null, null];
         if (namespace) {
           field.namespace = namespace;
         }
@@ -926,7 +905,7 @@ class QueryBuilderStore {
         }
         parentField.fields.push(field);
         if (field.isFlattened) {
-          const flattenRelativePath = jsonField.relative_path.length > 2?jsonField.relative_path.slice(1):jsonField.relative_path[1];
+          const flattenRelativePath = jsonField.relative_path.length > 2 ? jsonField.relative_path.slice(1) : jsonField.relative_path[1];
           const childrenJsonFields = [
             {
               relative_path: flattenRelativePath,
@@ -941,7 +920,7 @@ class QueryBuilderStore {
             field.isflattened = true;
           }
         } else if (jsonField.fields) {
-          this._processJsonSpecificationFields(field, jsonField.fields instanceof Array?jsonField.fields:[jsonField.fields]);
+          this._processJsonSpecificationFields(field, jsonField.fields instanceof Array ? jsonField.fields : [jsonField.fields]);
         }
       });
     }
@@ -961,8 +940,8 @@ class QueryBuilderStore {
           const jsonRP = jsonField.relative_path;
           let isUnknown = false;
           const isFlattened = !!jsonRP && typeof jsonRP !== "string" && jsonRP.length !== undefined && jsonRP.length > 1;
-          const relativePath = jsonRP && (typeof jsonRP === "string"?jsonRP:(isFlattened?(jsonRP[0] && (typeof jsonRP[0] === "string"?jsonRP[0]:jsonRP[0]["@id"])):(typeof jsonRP === "string"?jsonRP:jsonRP["@id"])));
-          const reverse = jsonRP && (typeof jsonRP === "string"?false:(isFlattened?(jsonRP[0] && (typeof jsonRP[0] === "string"?false:jsonRP[0].reverse)):(typeof jsonRP === "string"?false:jsonRP.reverse)));
+          const relativePath = jsonRP && (typeof jsonRP === "string" ? jsonRP : (isFlattened ? (jsonRP[0] && (typeof jsonRP[0] === "string" ? jsonRP[0] : jsonRP[0]["@id"])) : (typeof jsonRP === "string" ? jsonRP : jsonRP["@id"])));
+          const reverse = jsonRP && (typeof jsonRP === "string" ? false : (isFlattened ? (jsonRP[0] && (typeof jsonRP[0] === "string" ? false : jsonRP[0].reverse)) : (typeof jsonRP === "string" ? false : jsonRP.reverse)));
           let attribute = null;
           let attributeNamespace = null;
           let simpleAttributeName = null;
@@ -972,17 +951,17 @@ class QueryBuilderStore {
 
           } else if (namespaceReg.test(relativePath)) {
             [, attributeNamespace, simpleAttributeName] = relativePath.match(namespaceReg);
-            attribute = this.context && this.context[attributeNamespace]?this.context[attributeNamespace] + simpleAttributeName:null;
+            attribute = this.context && this.context[attributeNamespace] ? this.context[attributeNamespace] + simpleAttributeName : null;
           } else if (modelReg.test(relativePath)) {
             attribute = relativePath.match(modelReg)[1];
           } else if (relativePath === "@id") {
             attribute = relativePath;
           }
           let property = null;
-          const parentFieldLookup = (parentField.isRootMerge && parentField.parent)?parentField.parent:parentField;
+          const parentFieldLookup = (parentField.isRootMerge && parentField.parent) ? parentField.parent : parentField;
           if (attribute && parentFieldLookup.schema && parentFieldLookup.schema.canBe && parentFieldLookup.schema.canBe.length) {
             parentFieldLookup.schema.canBe.some(schemaId => {
-              const schema = this.findSchemaById(schemaId);
+              const schema = structureStore.findSchemaById(schemaId);
               if (schema && schema.properties && schema.properties.length) {
                 property = schema.properties.find(property => property.attribute === attribute && (!jsonField.fields || (jsonField.fields && property.canBe)));
                 if (property) {
@@ -1028,7 +1007,7 @@ class QueryBuilderStore {
           parentField.fields.push(field);
         }
         if (field.isFlattened) {
-          const flattenRelativePath = jsonField.relative_path.length > 2?jsonField.relative_path.slice(1):jsonField.relative_path[1];
+          const flattenRelativePath = jsonField.relative_path.length > 2 ? jsonField.relative_path.slice(1) : jsonField.relative_path[1];
           const childrenJsonFields = [
             {
               relative_path: flattenRelativePath
@@ -1048,14 +1027,14 @@ class QueryBuilderStore {
       return null;
     }
     const rootField = new Field({
-      id:schema.id,
-      label:schema.label,
-      canBe:[schema.id]
+      id: schema.id,
+      label: schema.label,
+      canBe: [schema.id]
     });
     if (merge) {
       rootField.isMerge = true;
       rootField.isInvalid = true;
-      this._processJsonSpecificationMergeFields(rootField, merge instanceof Array?merge:[merge]);
+      this._processJsonSpecificationMergeFields(rootField, merge instanceof Array ? merge : [merge]);
     }
     this._processJsonSpecificationFields(rootField, fields);
     properties && Object.entries(properties).forEach(([name, value]) => rootField.setOption(name, value));
@@ -1089,21 +1068,21 @@ class QueryBuilderStore {
   }
 
   @action
-  async executeQuery(){
+  async executeQuery() {
     if (!this.isQueryEmpty && !this.isRunning) {
       this.isRunning = true;
       this.runError = false;
       this.result = null;
-      try{
+      try {
         const payload = this.JSONQuery;
-        const response = await API.axios.post(API.endpoints.performQuery(this.rootField.schema.id, this.runStripVocab?"https://schema.hbp.eu/myQuery/":undefined, this.resultSize, this.resultStart), payload);
-        runInAction(()=>{
+        const response = await API.axios.post(API.endpoints.performQuery(this.rootField.schema.id, this.runStripVocab ? "https://schema.hbp.eu/myQuery/" : undefined, this.resultSize, this.resultStart), payload);
+        runInAction(() => {
           this.tableViewRoot = ["results"];
           this.result = response.data;
           this.isRunning = false;
         });
-      } catch(e){
-        const message = e.message?e.message:e;
+      } catch (e) {
+        const message = e.message ? e.message : e;
         this.result = null;
         this.runError = `Error while executing query (${message})`;
         this.isRunning = false;
@@ -1112,22 +1091,22 @@ class QueryBuilderStore {
   }
 
   @action
-  setResultSize(size){
+  setResultSize(size) {
     this.resultSize = size;
   }
 
   @action
-  setResultStart(start){
+  setResultStart(start) {
     this.resultStart = start;
   }
 
   @action
-  returnToTableViewRoot(index){
-    this.tableViewRoot = this.tableViewRoot.slice(0, index+1);
+  returnToTableViewRoot(index) {
+    this.tableViewRoot = this.tableViewRoot.slice(0, index + 1);
   }
 
   @action
-  appendTableViewRoot(index,key){
+  appendTableViewRoot(index, key) {
     this.tableViewRoot.push(index);
     this.tableViewRoot.push(key);
   }
@@ -1142,17 +1121,17 @@ class QueryBuilderStore {
   }
 
   @action
-  async saveQuery(){
+  async saveQuery() {
     if (!this.isQueryEmpty && this.isQueryIdValid && !this.queryIdAlreadyInUse && !this.isSaving && !this.saveError && !(this.sourceQuery && this.sourceQuery.isDeleting)) {
       this.isSaving = true;
       if (this.sourceQuery && this.sourceQuery.deleteError) {
         this.sourceQuery.deleteError = null;
       }
-      const queryId = this.saveAsMode?this.queryId:this.sourceQuery.id;
+      const queryId = this.saveAsMode ? this.queryId : this.sourceQuery.id;
       const payload = this.JSONQuery;
       try {
         await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
-        runInAction(()=>{
+        runInAction(() => {
           if (!this.saveAsMode && this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
             this.sourceQuery.label = payload.label;
             this.sourceQuery.description = payload.description;
@@ -1183,8 +1162,8 @@ class QueryBuilderStore {
           this.saveAsMode = false;
           this.isSaving = false;
         });
-      } catch(e){
-        const message = e.message?e.message:e;
+      } catch (e) {
+        const message = e.message ? e.message : e;
         this.saveError = `Error while saving query "${queryId}" (${message})`;
         this.isSaving = false;
       }
@@ -1199,14 +1178,14 @@ class QueryBuilderStore {
   }
 
   @action
-  async deleteQuery(query){
+  async deleteQuery(query) {
     if (query && !query.isDeleting && !query.deleteError && !(query === this.sourceQuery && this.isSaving)) {
       query.isDeleting = true;
-      try{
+      try {
         await API.axios.delete(API.endpoints.query(this.rootField.schema.id, query.id));
-        runInAction(()=>{
+        runInAction(() => {
           query.isDeleting = false;
-          if (query === this.sourceQuery ) {
+          if (query === this.sourceQuery) {
             this.sourceQuery = null;
           }
           const index = this.specifications.findIndex(spec => spec.id === query.id);
@@ -1214,8 +1193,8 @@ class QueryBuilderStore {
             this.specifications.splice(index, 1);
           }
         });
-      } catch(e){
-        const message = e.message?e.message:e;
+      } catch (e) {
+        const message = e.message ? e.message : e;
         query.deleteError = `Error while deleting query "${query.id}" (${message})`;
         query.isDeleting = false;
       }
@@ -1230,29 +1209,29 @@ class QueryBuilderStore {
   }
 
   @action
-  async fetchQueries(){
+  async fetchQueries() {
     if (!this.isFetchingQueries) {
       this.specifications = [];
       this.fetchQueriesError = null;
       if (this.rootField && this.rootField.schema && this.rootField.schema.id) {
         this.isFetchingQueries = true;
-        try{
+        try {
           const response = await API.axios.get(API.endpoints.listQueries(this.rootField.schema.id));
-          runInAction(()=>{
+          runInAction(() => {
             this.specifications = [];
             this.showMyQueries = true;
             this.showOthersQueries = true;
-            const jsonSpecifications = response && response.data && response.data.length?response.data:[];
+            const jsonSpecifications = response && response.data && response.data.length ? response.data : [];
             //const reg = /^(.+)\/(.+)\/(.+)\/v(\d+)\.(\d+)\.(\d+)\/(.+)$/;
             const reg = /^specification_queries\/(.+)-(.+)-(.+)-v(\d+)_(\d+)_(\d+)-(.+)$/;
             jsonSpecifications.forEach(jsonSpec => {
               if (jsonSpec && jsonSpec["@context"] && reg.test(jsonSpec._id)) { //jsonSpec["http://schema.org/identifier"]
-                const [ , org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
+                const [, org, domain, schemaName, vMn, vmn, vpn, queryId] = jsonSpec._id.match(reg);
                 const schemaId = `${org}/${domain}/${schemaName}/v${vMn}.${vmn}.${vpn}`;
                 if (schemaId === this.rootField.schema.id) { //isQueryIdValid(queryId) &&
                   jsonld.expand(jsonSpec, (expandErr, expanded) => {
                     if (!expandErr) {
-                      jsonld.compact(expanded, jsonSpec["@context"], (compactErr, compacted)  =>{
+                      jsonld.compact(expanded, jsonSpec["@context"], (compactErr, compacted) => {
                         if (!compactErr) {
                           //window.console.log(compacted);
                           this.specifications.push({
@@ -1263,18 +1242,18 @@ class QueryBuilderStore {
                             merge: compacted.merge,
                             fields: compacted.fields,
                             properties: getProperties(compacted),
-                            label: jsonSpec.label?jsonSpec.label:"",
-                            description: jsonSpec.description?jsonSpec.description:"",
+                            label: jsonSpec.label ? jsonSpec.label : "",
+                            description: jsonSpec.description ? jsonSpec.description : "",
                             isDeleting: false,
                             deleteError: null
                           });
                         }
-                        else{
+                        else {
                           window.console.log("error: was not able to compact JSON-LD", compactErr);
                         }
                       });
                     }
-                    else{
+                    else {
                       window.console.log("error: was not able to expand JSON-LD", expandErr);
                     }
                   });
@@ -1291,9 +1270,9 @@ class QueryBuilderStore {
             }
             this.isFetchingQueries = false;
           });
-        } catch(e) {
+        } catch (e) {
           this.specifications = [];
-          const message = e.message?e.message:e;
+          const message = e.message ? e.message : e;
           this.fetchQueriesError = `Error while fetching saved queries for "${this.rootField.id}" (${message})`;
           this.isFetchingQueries = false;
         }

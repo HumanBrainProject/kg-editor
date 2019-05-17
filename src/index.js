@@ -241,6 +241,8 @@ const styles = {
     "& .modal-body": {
       height: "calc(95vh - 52px)",
       padding: "3px 0",
+      maxHeight: "calc(100vh - 210px)",
+      overflowY: "auto"
     }
   }
 };

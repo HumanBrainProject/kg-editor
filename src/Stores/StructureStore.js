@@ -1,7 +1,6 @@
-import {observable, action, computed, runInAction} from "mobx";
-import {sortBy, groupBy} from "lodash";
+import { observable, action, computed, runInAction } from "mobx";
+import { sortBy, groupBy } from "lodash";
 import API from "../Services/API";
-
 
 class StructureStore {
   @observable structure = null;
@@ -17,7 +16,12 @@ class StructureStore {
 
   @computed
   get hasSchemas() {
-    return !this.fetchStuctureError && this.structure && this.structure.schemas && this.structure.schemas.length;
+    return (
+      !this.fetchStuctureError &&
+      this.structure &&
+      this.structure.schemas &&
+      this.structure.schemas.length
+    );
   }
 
   constructor() {
@@ -50,10 +54,13 @@ class StructureStore {
         runInAction(() => {
           this.isFetchingStructure = false;
           this.structure = response.data;
-          this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => {
-            this.schemasMap.set(schema.id, schema);
-            this.schemasLabel.set(schema.id, schema.label);
-          });
+          this.structure &&
+            this.structure.schemas &&
+            this.structure.schemas.length &&
+            this.structure.schemas.forEach(schema => {
+              this.schemasMap.set(schema.id, schema);
+              this.schemasLabel.set(schema.id, schema.label);
+            });
         });
       } catch (e) {
         const message = e.message ? e.message : e;

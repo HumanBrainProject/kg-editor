@@ -383,7 +383,7 @@ export default class Options extends React.Component {
                 {properties.map(propSchema => (
                   <div className={classes.property} key={propSchema.attribute + (propSchema.reverse ? "reverse" : "")} onClick={this.handleAddField.bind(this, propSchema)}>
                     {propSchema.label} - <small>{propSchema.attribute}</small>
-                      &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => structureStore.findSchemaById(schemaId).label).join(", ")} )
+                    &nbsp;&nbsp;( can be: {propSchema.canBe.map(schemaId => structureStore.findSchemaById(schemaId).label).join(", ")} )
                   </div>
                 ))}
               </div>

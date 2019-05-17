@@ -45,9 +45,6 @@ export default class NodeTypesBarChart extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
-    if(!structureStatisticsStore.isFetched && !structureStatisticsStore.isFetching){
-      structureStatisticsStore.fetchStatistics();
-    }
   }
 
   handleResize = () => {
@@ -56,6 +53,9 @@ export default class NodeTypesBarChart extends React.Component {
 
   componentDidMount = () => {
     window.addEventListener("resize", this.handleResize);
+    if(!structureStatisticsStore.isFetched && !structureStatisticsStore.isFetching){
+      structureStatisticsStore.fetchStatistics();
+    }
   }
 
   componentWillUnmount = () => {

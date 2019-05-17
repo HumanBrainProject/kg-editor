@@ -53,8 +53,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Reviewers extends React.Component{
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     this.fetchInstanceReviews();
   }
 

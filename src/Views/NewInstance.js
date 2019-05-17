@@ -54,8 +54,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class NewInstance extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     if (!browseStore.isFetched.lists && !browseStore.isFetching.lists) {
       browseStore.fetchLists();
     }

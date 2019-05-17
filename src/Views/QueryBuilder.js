@@ -70,9 +70,6 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class QueryBuilder extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   handleSelectTab(tab) {
     queryBuilderStore.selectTab(tab);
   }

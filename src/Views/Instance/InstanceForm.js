@@ -126,8 +126,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class InstanceForm extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     this.fetchInstance();
   }
 

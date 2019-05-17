@@ -6,10 +6,9 @@ import UsersStore from "../Stores/UsersStore";
 
 @observer
 export default class User extends React.Component {
-  constructor (props) {
-    super(props);
-    if (props.userId) {
-      UsersStore.fetchUser(props.userId);
+  componentDidMount() {
+    if (this.props.userId) {
+      UsersStore.fetchUser(this.props.userId);
     }
   }
 

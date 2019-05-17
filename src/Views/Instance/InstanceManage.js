@@ -67,8 +67,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class InstanceMange extends React.Component{
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     this.fetchInstance();
     this.fetchStatus();
   }

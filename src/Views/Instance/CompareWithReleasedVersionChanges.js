@@ -26,20 +26,23 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
   constructor(props){
     super(props);
     this.releasedInstanceStore = createInstanceStore("RELEASED");
-    if (props.instanceId) {
-      if (props.status !== "NOT_RELEASED") {
-        this.releasedInstanceStore.getInstance(props.instanceId, true);
+  }
+
+  componentDidMount() {
+    if (this.props.instanceId) {
+      if (this.props.status !== "NOT_RELEASED") {
+        this.releasedInstanceStore.getInstance(this.props.instanceId, true);
       }
-      instanceStore.getInstance(props.instanceId);
+      instanceStore.getInstance(this.props.instanceId);
     }
   }
 
-  UNSAFE_componentWillReceiveProps(newProps){
-    if(newProps.instanceId && this.props.instanceId !== newProps.instanceId) {
-      if (newProps.status !== "NOT_RELEASED") {
-        this.releasedInstanceStore.getInstance(newProps.instanceId, true);
+  componentDidUpdate(prevProps) {
+    if(this.props.instanceId && prevProps.instanceId !== this.props.instanceId) {
+      if (this.props.status !== "NOT_RELEASED") {
+        this.releasedInstanceStore.getInstance(this.props.instanceId, true);
       }
-      instanceStore.getInstance(newProps.instanceId);
+      instanceStore.getInstance(this.props.instanceId);
     }
   }
 

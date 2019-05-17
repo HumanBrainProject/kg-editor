@@ -134,6 +134,9 @@ export default class Preview extends React.Component{
                   <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit")}>
                     <FontAwesomeIcon icon="pencil-alt"/>&nbsp;&nbsp;Edit
                   </div>
+                  <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "invite")}>
+                    <FontAwesomeIcon icon="user-edit"/>&nbsp;&nbsp;Invite
+                  </div>
                   <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph")}>
                     <FontAwesomeIcon icon="project-diagram"/>&nbsp;&nbsp;Explore
                   </div>

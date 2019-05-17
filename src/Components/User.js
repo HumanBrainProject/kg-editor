@@ -10,6 +10,9 @@ const styles = {
     },
     "& .avatar.picture": {
       margin: "0 2px 0 5px"
+    },
+    "& .name:not(.is-curator)":  {
+      color: "#337ab7"
     }
   }
 };
@@ -18,7 +21,7 @@ const styles = {
 export default class User extends React.Component {
 
   render() {
-    const {classes, userId, name, picture, title} = this.props;
+    const {classes, userId, name, picture, isCurator, title} = this.props;
 
     if (!userId) {
       return null;
@@ -26,9 +29,9 @@ export default class User extends React.Component {
 
     return (
       <span className={`${classes.user} user`}><Avatar userId={userId} name={name} picture={picture} />{title?
-        <span title={title}>{name?name:userId}</span>
+        <span className={`name ${isCurator?"is-curator":""} `} title={title}>{name?name:userId}</span>
         :
-        name?name:userId
+        <span className={`name" ${isCurator?"is-curator":""} `} >{name?name:userId}</span>
       }</span>
     );
   }

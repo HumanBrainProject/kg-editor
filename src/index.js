@@ -492,12 +492,12 @@ class App extends React.Component {
                 :
                 authStore.isFullyAuthenticated ?
                   <Switch>
-                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
-                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
-                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
-                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
-                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
-
+                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
+                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
+                    <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite"/>)} />
+                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
+                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
+                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage"/>)} />
                     <Route path="/query-builder" exact={true} component={QueryBuilder} />
 
                     <Route path="/browse" exact={true} component={Browse} />

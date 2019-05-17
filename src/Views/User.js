@@ -20,6 +20,7 @@ export default class User extends React.Component {
       return null;
     }
 
+
     const user = UsersStore.getUser(userId);
 
     const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
@@ -32,7 +33,7 @@ export default class User extends React.Component {
     }, null):null;
 
     return (
-      <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} title={email && email.value} />
+      <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />
     );
   }
 }

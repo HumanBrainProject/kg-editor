@@ -171,7 +171,7 @@ export default class KgInputTextField extends React.Component {
         componentClass={this.props.componentClass}
         onChange={this.handleChange}
         inputRef={ref=>this.inputRef = ref}
-        disabled={disabled}
+        disabled={disabled || isAlternativeDisabled}
         readOnly={readOnly}
         placeholder={placeholder}
         style={style}

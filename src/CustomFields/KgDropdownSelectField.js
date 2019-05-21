@@ -151,7 +151,7 @@ export default class KgDropdownSelectField extends React.Component {
     isDisabled ? this.inputRef.parentNode.setAttribute("disabled", isDisabled):this.inputRef.parentNode.removeAttribute("disabled");
     Object.getOwnPropertyDescriptor(prototype, "disabled").set
       .call(this.inputRef, isDisabled);
-    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
+    Object.getOwnPropertyDescriptor(prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(value));
   }
 
@@ -449,7 +449,7 @@ export default class KgDropdownSelectField extends React.Component {
             field={field}
             parentContainerClassName="form-group"
             ref={ref=>this.alternativesRef = ref}/>
-          <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
+          <div disabled={disabled || isAlternativeDisabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
             {values.map(value => {
               const label = value[mappingLabel] !== undefined?value[mappingLabel]:(value[mappingValue] !== undefined?value[mappingValue]:value.id);
               return(
@@ -493,7 +493,7 @@ export default class KgDropdownSelectField extends React.Component {
               onChange={this.handleChangeUserInput}
               onFocus={this.handleFocus}
               value={this.state.userInputValue}
-              disabled={readOnly || disabled || values.length >= max}/>
+              disabled={readOnly || disabled || values.length >= max || isAlternativeDisabled}/>
 
             <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
 

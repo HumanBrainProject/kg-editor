@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { Button, ButtonGroup, Modal } from "react-bootstrap";
+import { Button, ButtonGroup, Modal, Alert } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -454,10 +454,14 @@ class ReleaseAction extends React.Component {
 @injectStyles(styles)
 @observer
 class ReleaseNodeToggle extends React.Component {
-
   handleChange = status => {
-    const { node, releaseStore } = this.props;
+    const { node, releaseStore, messages } = this.props;
     releaseStore.markNodeForChange(node, status);
+    let relativeUrl = node.relativeUrl.substr(0, node.relativeUrl.lastIndexOf("/"));
+    if(Object.keys(messages).includes(relativeUrl)) {
+      status == "RELEASED" ? releaseStore.handleWarning(relativeUrl, messages[relativeUrl]["release"]):
+        releaseStore.handleWarning(relativeUrl, messages[relativeUrl]["unrelease"]);
+    }
   }
 
   handleStopClick = e => {
@@ -488,8 +492,14 @@ class ReleaseNodeToggle extends React.Component {
 class ReleaseNodeAndChildrenToggle extends React.Component {
 
   handleChange(status) {
-    const { node, releaseStore } = this.props;
+    const { node, releaseStore, messages } = this.props;
     releaseStore.markAllNodeForChange(node, status);
+    node.children && node.children.length > 0 ? node.children.forEach(child => {
+      let relativeUrl = child.relativeUrl.substr(0, child.relativeUrl.lastIndexOf("/"));
+      if(Object.keys(messages).includes(relativeUrl)) {
+        status == "RELEASED" ? releaseStore.handleWarning(relativeUrl, messages[relativeUrl]["release"]):null;
+      }
+    }):null;
   }
 
   render() {
@@ -542,7 +552,7 @@ class ReleaseNode extends React.Component {
   }
 
   render() {
-    const { classes, node, prefix = "", level = 0, releaseStore } = this.props;
+    const { classes, node, prefix = "", level = 0, releaseStore, messages } = this.props;
 
     if (!node || !releaseStore) {
       return null;
@@ -565,7 +575,7 @@ class ReleaseNode extends React.Component {
             {node.label}
           </span>
           {prefix === "" && (
-            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} messages={messages} />
           )}
         </div>
         {prefix === "" && (
@@ -577,12 +587,12 @@ class ReleaseNode extends React.Component {
         {node.children && node.children.length > 0 &&
           <div className={"children"}>
             {node.children.map(child => (
-              <ReleaseNode key={`${level + 1}-${child["@id"]}-${child[prefix + "status"]}`} node={child} prefix={prefix} level={level + 1} releaseStore={releaseStore} classes={classes} />
+              <ReleaseNode key={`${level + 1}-${child["@id"]}-${child[prefix + "status"]}`} node={child} prefix={prefix} level={level + 1} releaseStore={releaseStore} classes={classes} messages={messages} />
             ))}
           </div>
         }
         {prefix === "" && releaseStore.hlNode === node && node.children && node.children.length > 0 && (
-          <ReleaseNodeAndChildrenToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} />
+          <ReleaseNodeAndChildrenToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} messages={messages}/>
         )}
       </div>
     );
@@ -628,8 +638,20 @@ export default class InstanceRelease extends React.Component {
     this.setState({ showModal: false });
   }
 
+  getMessagesFromSpecs = fields => {
+    let messages = {};
+    fields && Object.values(fields).forEach(item => {
+      if(item.instancesPath && item.hasOwnProperty("messages")) {
+        messages[item.instancesPath] = item["messages"];
+      }
+    });
+    return messages;
+  }
+
   render() {
     const { classes } = this.props;
+    let instanceSpecs = instanceStore.getInstance(this.props.id);
+    let specsWithMessages = instanceSpecs && instanceSpecs.data? this.getMessagesFromSpecs(instanceSpecs.data.fields):null;
 
     return (
       <div className={classes.container}>
@@ -655,6 +677,12 @@ export default class InstanceRelease extends React.Component {
                 <div className={classes.releasePreview}>
                   <div className={classes.globalActions}>
                     <h4>Current state</h4>
+                    {this.releaseStore.hasWarning ?
+                      [...this.releaseStore.warningMessages.values()].map((message,index) =>
+                        <Alert key={`${message}-${index}`} style={{background:"var(--release-color-has-changed)", color:"black", borderColor:"transparent"}}>
+                          {message}
+                        </Alert>):null
+                    }
                   </div>
                   <div className={classes.releaseActions}>
                     <div onClick={this.handleOpenModal} className={classes.previewIcon}><FontAwesomeIcon style={{ verticalAlign: "top" }} title="Preview in KG Search" icon="eye" /></div>
@@ -664,7 +692,7 @@ export default class InstanceRelease extends React.Component {
                     <h4>Preview state</h4>
                   </div>
                   <div className={classes.tree}>
-                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.status}`} node={this.releaseStore.instancesTree} releaseStore={this.releaseStore} />
+                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.status}`} node={this.releaseStore.instancesTree} releaseStore={this.releaseStore} messages={specsWithMessages}/>
                   </div>
                   <div className={classes.tree}>
                     <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.pending_status}`} node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />

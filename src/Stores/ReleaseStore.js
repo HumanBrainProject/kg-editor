@@ -11,6 +11,8 @@ export default class ReleaseStore{
   @observable isFetching = false;
   @observable isFetched = false;
   @observable isSaving = false;
+  @observable hasWarning = false;
+  @observable warningMessages = new Map();
   @observable savingTotal = 0;
   @observable savingProgress = 0;
   @observable savingErrors = [];
@@ -174,7 +176,8 @@ export default class ReleaseStore{
     });
   }
 
-  @action afterSave(){
+  @action
+  afterSave(){
     if(this.savingErrors.length === 0 && this.savingProgress === this.savingTotal){
       setTimeout(()=>{
         runInAction(()=>{
@@ -183,6 +186,7 @@ export default class ReleaseStore{
           this.savingErrors = [];
           this.savingTotal = 0;
           this.savingProgress = 0;
+          this.hasWarning = false;
           this.fetchReleaseData();
         });
       }, 2000);
@@ -222,16 +226,20 @@ export default class ReleaseStore{
     return node[prefix+"globalStatus"];
   }
 
-  @action markNodeForChange(node, newStatus){
+  @action
+  markNodeForChange(node, newStatus){
     node.pending_status = newStatus;
     this.populateStatuses(this.instancesTree, "pending_");
   }
 
-  @action markAllNodeForChange(node, newStatus){
+  @action
+  markAllNodeForChange(node, newStatus){
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
     this.populateStatuses(this.instancesTree, "pending_");
   }
-  @action recursiveMarkNodeForChange(node, newStatus){
+
+  @action
+  recursiveMarkNodeForChange(node, newStatus){
     node.pending_status = newStatus? newStatus: node.status;
     if(node.children && node.children.length > 0){
       node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
@@ -240,5 +248,11 @@ export default class ReleaseStore{
 
   @action toggleHLNode(node){
     this.hlNode = this.hlNode === node? null: node;
+  }
+
+  @action
+  handleWarning(key, message) {
+    message ? this.hasWarning = true : this.hasWarning = false;
+    this.warningMessages.set(key, message);
   }
 }

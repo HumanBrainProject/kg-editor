@@ -118,6 +118,12 @@ export default class KgDropdownSelectField extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    selectedInstance.instancesToSetNull.length === 0 ?
+      this.inputRef.parentNode.removeAttribute("style"):null;
+  }
+
   triggerOnLoad = () => {
     if(this.hiddenInputRef && this.hiddenInputRef.parentNode){
       var event = new Event("load", { bubbles: true });
@@ -130,7 +136,7 @@ export default class KgDropdownSelectField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
-    this.handleNodesStyles(false, this.props.field.getValue(false));
+    this.handleNodesStyles(this.props.field.getValue(false));
     var event = new Event("input", { bubbles: true });
     this.hiddenInputRef.dispatchEvent(event);
   }
@@ -138,23 +144,17 @@ export default class KgDropdownSelectField extends React.Component {
   triggerRemoveSuggestionOnChange = () => {
     let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
     selectedInstance.setNullableInstances(this.props.field.path.substr(1));
-
     this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
-    this.handleNodesStyles(true, []);
-    var event = new Event("input", { bubbles: true });
+    this.handleNodesStyles(this.props.field.getValue(false));
+    let event = new Event("input", { bubbles: true });
     this.hiddenInputRef.dispatchEvent(event);
-    this.inputRef.dispatchEvent(event);
   }
 
-  handleNodesStyles(isDisabled, value){
+  handleNodesStyles(value){
     const prototype = window.HTMLInputElement.prototype;
-    isDisabled ? this.inputRef.parentNode.setAttribute("disabled", isDisabled):this.inputRef.parentNode.removeAttribute("disabled");
-    Object.getOwnPropertyDescriptor(prototype, "disabled").set
-      .call(this.inputRef, isDisabled);
     Object.getOwnPropertyDescriptor(prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(value));
   }
-
 
   handleInputKeyStrokes = e => {
     let field = this.props.field;
@@ -493,7 +493,7 @@ export default class KgDropdownSelectField extends React.Component {
               onChange={this.handleChangeUserInput}
               onFocus={this.handleFocus}
               value={this.state.userInputValue}
-              disabled={readOnly || disabled || values.length >= max || isAlternativeDisabled}/>
+              disabled={readOnly || disabled || values.length >= max}/>
 
             <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
 

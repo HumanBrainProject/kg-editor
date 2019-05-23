@@ -236,6 +236,9 @@ export default class Features extends React.Component {
   constructor(props){
     super(props);
     this.state = { zoom: {type: null, src: null, width: 0, height: 0}};
+  }
+
+  componentDidMount() {
     if(!featuresStore.isFetched && !featuresStore.isFetching){
       featuresStore.fetchFeatures();
     }

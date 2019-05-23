@@ -52,8 +52,10 @@ export default class BookmarkStatus extends React.Component{
     this.handleSaveRetry = this.handleSaveRetry.bind(this);
   }
 
-  UNSAFE_componentWillReceiveProps(newProps){
-    bookmarkStatusStore.fetchStatus(newProps.id);
+  componentDidUpdate(prevProps) {
+    if(prevProps.id !== this.props.id) {
+      bookmarkStatusStore.fetchStatus(this.props.id);
+    }
   }
 
   handleBookmarksSave() {

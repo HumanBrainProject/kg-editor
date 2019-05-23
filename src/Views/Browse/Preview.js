@@ -91,10 +91,6 @@ export default class Preview extends React.Component{
     instanceStore.setReadMode(true);
   }
 
-  UNSAFE_componentWillReceiveProps(){
-    instanceStore.setReadMode(true);
-  }
-
   handleOpenInstance(mode, event){
     if(event.metaKey || event.ctrlKey){
       instanceStore.openInstance(browseStore.selectedInstance.id, mode);

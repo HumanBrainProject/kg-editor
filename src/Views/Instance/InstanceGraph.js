@@ -38,14 +38,13 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class GraphInstance extends React.Component {
-  constructor(props) {
-    super(props);
-    graphStore.fetchGraph(props.id);
+  componentDidMount() {
+    graphStore.fetchGraph(this.props.id);
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
-    if (newProps.id !== this.props.id) {
-      graphStore.fetchGraph(newProps.id);
+  componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      graphStore.fetchGraph(this.props.id);
     }
   }
 

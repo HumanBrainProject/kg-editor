@@ -72,11 +72,11 @@ const styles = {
 export default class Edit extends React.Component {
   constructor(props) {
     super(props);
-    this.UNSAFE_componentWillReceiveProps(this.props);
+    instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
-    instanceStore.openInstance(newProps.match.params.id, newProps.mode, newProps.mode !== "edit");
+  componentDidUpdate() {
+    instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
   }
 
   handleSelectMode(mode) {
@@ -88,53 +88,54 @@ export default class Edit extends React.Component {
     const openedInstance = instanceStore.openedInstances.get(this.props.match.params.id);
 
     return (
-      <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
-        <div className={classes.tabs}>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "view"?"active":""}`} onClick={this.handleSelectMode.bind(this, "view")}>
-            <FontAwesomeIcon icon="eye"/>
+      openedInstance ?
+        <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
+          <div className={classes.tabs}>
+            <div className={`${classes.tab} ${openedInstance.viewMode === "view"?"active":""}`} onClick={this.handleSelectMode.bind(this, "view")}>
+              <FontAwesomeIcon icon="eye"/>
+            </div>
+            <div className={`${classes.tab} ${openedInstance.viewMode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
+              <FontAwesomeIcon icon="pencil-alt"/>
+            </div>
+            <div className={`${classes.tab} ${openedInstance.viewMode === "invite" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "invite")}>
+              <FontAwesomeIcon icon="user-edit"/>
+            </div>
+            <div className={`${classes.tab} ${openedInstance.viewMode === "graph" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "graph")}>
+              <FontAwesomeIcon icon="project-diagram"/>
+            </div>
+            <div className={`${classes.tab} ${openedInstance.viewMode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
+              <FontAwesomeIcon icon="cloud-upload-alt"/>
+            </div>
+            <div className={`${classes.tab} ${openedInstance.viewMode === "manage"?"active":""}`} onClick={this.handleSelectMode.bind(this, "manage")}>
+              <FontAwesomeIcon icon="cog"/>
+            </div>
           </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
-            <FontAwesomeIcon icon="pencil-alt"/>
+          <div className={classes.body}>
+            {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
+              <PaneContainer key={this.props.match.params.id} paneStore={openedInstance.paneStore}>
+                <React.Fragment>
+                  <Pane paneId={this.props.match.params.id} key={this.props.match.params.id}>
+                    <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
+                  </Pane>
+                  {!instanceStore.getInstance(this.props.match.params.id).hasFetchError?
+                    <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
+                    :null}
+                </React.Fragment>
+              </PaneContainer>
+              : openedInstance.viewMode === "invite" ?
+                <InstanceInvite id={this.props.match.params.id}/>
+                : openedInstance.viewMode === "graph" ?
+                  <InstanceGraph id={this.props.match.params.id}/>
+                  : openedInstance.viewMode === "release" ?
+                    <InstanceRelease id={this.props.match.params.id}/>
+                    : openedInstance.viewMode === "manage" ?
+                      <InstanceManage id={this.props.match.params.id}/>
+                      : null}
           </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "invite" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "invite")}>
-            <FontAwesomeIcon icon="user-edit"/>
+          <div className={classes.sidebar}>
+            <SaveBar/>
           </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "graph" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "graph")}>
-            <FontAwesomeIcon icon="project-diagram"/>
-          </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
-            <FontAwesomeIcon icon="cloud-upload-alt"/>
-          </div>
-          <div className={`${classes.tab} ${openedInstance.viewMode === "manage"?"active":""}`} onClick={this.handleSelectMode.bind(this, "manage")}>
-            <FontAwesomeIcon icon="cog"/>
-          </div>
-        </div>
-        <div className={classes.body}>
-          {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
-            <PaneContainer key={this.props.match.params.id} paneStore={openedInstance.paneStore}>
-              <React.Fragment>
-                <Pane paneId={this.props.match.params.id} key={this.props.match.params.id}>
-                  <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
-                </Pane>
-                {!instanceStore.getInstance(this.props.match.params.id).hasFetchError?
-                  <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
-                  :null}
-              </React.Fragment>
-            </PaneContainer>
-            : openedInstance.viewMode === "invite" ?
-              <InstanceInvite id={this.props.match.params.id}/>
-              : openedInstance.viewMode === "graph" ?
-                <InstanceGraph id={this.props.match.params.id}/>
-                : openedInstance.viewMode === "release" ?
-                  <InstanceRelease id={this.props.match.params.id}/>
-                  : openedInstance.viewMode === "manage" ?
-                    <InstanceManage id={this.props.match.params.id}/>
-                    : null}
-        </div>
-        <div className={classes.sidebar}>
-          <SaveBar/>
-        </div>
-      </div>
+        </div>:null
     );
   }
 }

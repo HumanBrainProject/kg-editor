@@ -44,8 +44,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class InstanceInvite extends React.Component{
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     this.fetchInstance();
   }
 

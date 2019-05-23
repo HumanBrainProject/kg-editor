@@ -6,21 +6,27 @@ import UsersStore from "../Stores/UsersStore";
 
 @observer
 export default class User extends React.Component {
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user:null
+    };
+  }
+
+  async componentDidMount() {
     if (this.props.userId) {
-      UsersStore.fetchUser(this.props.userId);
+      try {
+        const response = await UsersStore.fetchUser(this.props.userId);
+        this.setState({ user: response });
+      } catch (error) {
+        this.setState({user:null});
+      }
     }
   }
 
   render() {
     const { userId } = this.props;
-
-    if (!userId) {
-      return null;
-    }
-
-
-    const user = UsersStore.getUser(userId);
+    const user = this.state.user;
 
     const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
       if (item && item.value && item.verified) {
@@ -32,7 +38,7 @@ export default class User extends React.Component {
     }, null):null;
 
     return (
-      <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />
+      userId ? <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />: null
     );
   }
 }

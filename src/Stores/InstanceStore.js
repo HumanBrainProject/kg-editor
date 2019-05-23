@@ -600,6 +600,7 @@ class InstanceStore {
     instance.cancelChangesPending = false;
     instance.saveError = null;
     instance.hasSaveError = false;
+    instance.clearNullableInstances();
   }
 
   @action

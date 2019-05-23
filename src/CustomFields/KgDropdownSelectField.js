@@ -120,7 +120,7 @@ export default class KgDropdownSelectField extends React.Component {
 
   componentDidUpdate() {
     let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    selectedInstance.instancesToSetNull.length === 0 ?
+    selectedInstance.instancesToSetNull.length === 0  && this.inputRef?
       this.inputRef.parentNode.removeAttribute("style"):null;
   }
 

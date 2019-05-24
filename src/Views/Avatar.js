@@ -6,23 +6,29 @@ import UsersStore from "../Stores/UsersStore";
 
 @observer
 export default class Avatar extends React.Component {
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user:null
+    };
+  }
+
+  async componentDidMount() {
     if (this.props.userId) {
-      UsersStore.fetchUser(this.props.userId);
+      try {
+        const response = await UsersStore.fetchUser(this.props.userId);
+        this.setState({ user: response });
+      } catch (error) {
+        this.setState({user:null});
+      }
     }
   }
 
   render() {
     const { userId } = this.props;
 
-    if (!userId) {
-      return null;
-    }
-
-    const user = UsersStore.getUser(userId);
-
     return (
-      <AvatarComponent userId={userId} name={user && user.displayName} picture={user && user.picture} />
+      userId ? <AvatarComponent userId={userId} name={this.state.user && this.state.user.displayName} picture={this.state.user && this.state.user.picture} />:null
     );
   }
 }

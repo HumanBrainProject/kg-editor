@@ -58,10 +58,6 @@ export default class Graph extends React.Component {
     this.initialZoom = false;
   }
 
-  UNSAFE_componentWillReceiveProps() {
-    this.initialZoom = false;
-  }
-
   componentDidMount() {
     this.resizeDebounceFn = debounce(this.resizeWrapper, 250);
     window.addEventListener("resize", this.resizeDebounceFn);

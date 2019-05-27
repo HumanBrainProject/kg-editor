@@ -80,7 +80,7 @@ let styles = {
 @observer
 export default class SavedQueries extends React.Component{
 
-  UNSAFE_componentWillUpdate(){
+  handleUpdate = () => {
     if(this.scrolledPanel){
       this.scrolledPanel.scrollToTop();
     }
@@ -106,7 +106,7 @@ export default class SavedQueries extends React.Component{
           !list || !list.length?
             <div>no saved queries yet.</div>
             :
-            <Scrollbars autoHide ref={ref => this.scrolledPanel = ref}>
+            <Scrollbars autoHide onUpdate={this.handleUpdate} ref={ref => this.scrolledPanel = ref}>
               {list.map(query => (
                 <SavedQuery key={query.id} query={query} showUser={showUser} enableDelete={enableDelete} />
               ))}

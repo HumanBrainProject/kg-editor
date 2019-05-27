@@ -120,7 +120,7 @@ export default class KgDropdownSelectField extends React.Component {
 
   componentDidUpdate() {
     let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    selectedInstance.instancesToSetNull.length === 0  && this.inputRef?
+    selectedInstance.fieldsToSetAsNull.length === 0  && this.inputRef?
       this.inputRef.parentNode.removeAttribute("style"):null;
   }
 
@@ -143,7 +143,7 @@ export default class KgDropdownSelectField extends React.Component {
 
   triggerRemoveSuggestionOnChange = () => {
     let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    selectedInstance.setNullableInstances(this.props.field.path.substr(1));
+    selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
     this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
     this.handleNodesStyles(this.props.field.getValue(false));
     let event = new Event("input", { bubbles: true });
@@ -409,7 +409,7 @@ export default class KgDropdownSelectField extends React.Component {
     let { options, value: values, mappingLabel, mappingValue, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
 
     let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    let isAlternativeDisabled = selectedInstance.instancesToSetNull.includes(path.substr(1));
+    let isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     let dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     let dropdownClass = dropdownOpen? "open": "";

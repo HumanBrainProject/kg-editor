@@ -159,83 +159,7 @@ class Instance {
         field.type = "KgDropdownSelect";
       }
     }
-    /*
-    data.alternatives["http://schema.org/name"] = [
-      {
-        value: "Alternative 2",
-        userIds: "12345"
-      },
-      {
-        value: "Alternative 3",
-        userIds: ["2468", "9876"]
-      },
-      {
-        value: "Alternative 4",
-        userIds: "8642"
-      }
-    ];
-    data.alternatives["http://schema.org/description"] = [
-      {
-        value: "This is an second alternative description.",
-        userIds: ["8642", "9876"]
-      },
-      {
-        value: "This is an third alternative description.",
-        userIds: "2468"
-      },
-      {
-        value: "This is an fourth alternative description.",
-        userIds: "12345"
-      }
-    ];
-    data.alternatives["http://schema.org/description"] = [
-      {
-        value: "This is an second alternative description.",
-        userIds: ["8642", "9876"]
-      },
-      {
-        value: "This is an third alternative description.",
-        userIds: "2468"
-      },
-      {
-        value: "This is an fourth alternative description.",
-        userIds: "12345"
-      }
-    ];
-    data.alternatives["https://schema.hbp.eu/minds/contributors"] = [
-      {
-        value: [
-          {
-            id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
-          },
-          {
-            id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
-          },
-          {
-            id: "minds/core/person/v1.0.0/a79d7b48-8a57-433c-a9d6-50372bbc9ad2"
-          },
-          {
-            id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
-          }
-        ],
-        userIds: "12345"
-      },
-      {
-        value: [
-          {
-            id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
-          },
-          {
-            id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
-          },
-          {
-            id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
-          }
-        ],
-        userIds: ["2468", "8642"]
-      }
-    ];
-    */
+
     return data;
   }
 
@@ -385,6 +309,7 @@ class Instance {
 class InstanceStore {
   @observable databaseScope = null;
   @observable instances = new Map();
+  @observable instancesForPreview = new Map();
   @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
   @observable comparedWithReleasedVersionInstance = null;
@@ -481,6 +406,10 @@ class InstanceStore {
       return instance;
     }
     return this.instances.get(instanceId);
+  }
+
+  hasInstanceForPreview(instanceId){
+    return this.instancesForPreview.has(instanceId);
   }
 
   @computed
@@ -655,6 +584,107 @@ class InstanceStore {
 
   doesInstanceHaveLinkedInstancesInUnsavedState = (instance) => {
     return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
+  }
+
+  @action
+  async fetchInstanceForPreview(instanceId) {
+    let instance = null;
+    if(this.instancesForPreview.has(instanceId)) {
+      instance = this.instancesForPreview.get(instanceId);
+      if (instance.isFetching) {
+        return instance;
+      }
+      instance.cancelChangesPending = false;
+      instance.isFetching = true;
+      instance.isSaving = false;
+      instance.isFetched = false;
+      instance.fetchError = null;
+      instance.hasFetchError = false;
+      instance.saveError = null;
+      instance.hasSaveError = false;
+    } else {
+      const [organization, domain, schema, version, ] = instanceId.split("/");
+      const path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
+      instance = new Instance(instanceId, path);
+      this.instancesForPreview.set(instanceId, instance);
+      instance.isFetching = true;
+    }
+
+    try {
+      let path = instanceId;
+
+      const { data } = await API.axios.get(API.endpoints.instanceData(path, this.databaseScope));
+
+      runInAction(async () => {
+        const instanceData = data.data?data.data:{fields: {}, alternatives: []};
+
+        instance.data = instanceData;
+
+        for(let fieldKey in instanceData.fields){
+          let field = instanceData.fields[fieldKey];
+          if(field.type === "InputText"){
+            field.type = "KgInputText";
+          } else if(field.type === "TextArea"){
+            field.type = "KgTextArea";
+          } else if(field.type === "DropdownSelect"){
+            field.type = "KgDropdownSelect";
+          }
+        }
+
+        instance.form = new FormStore(instanceData);
+        const fields = instance.form.getField();
+
+        let idsList = [] ;
+        Object.values(instanceData.fields).forEach(value=>{
+          if(value.instancesPath && value.value.length > 0) {
+            value.value.forEach(v => idsList.push(v.id));
+          }
+        });
+
+        const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
+        runInAction(async () => {
+          if(result) {
+            const res = result.data.data.reduce((acc, current) => {
+              if(!acc[current.schema]) {
+                acc[current.schema] = [];
+              }
+              acc[current.schema].push(current);
+              return acc;
+            },{});
+
+            Object.entries(fields).forEach(([, field]) => {
+              let path = field.instancesPath;
+              if(path){
+                Object.keys(res).forEach(key => {
+                  if(key == path) {
+                    field.updateOptions(res[key]);
+                  }
+                });
+              }
+            });
+          }
+
+          instance.isFetching = false;
+          instance.isFetched = true;
+          this.memorizeInstanceInitialValues(instanceId, true);
+          instance.form.toggleReadMode(this.globalReadMode);
+        });
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
+        instance.hasFetchError = true;
+        instance.isFetched = false;
+        instance.isFetching = false;
+      });
+    }
+    return instance;
+  }
+
+  memorizeInstanceInitialValues(instanceId, preview=false){
+    const instance = preview ? this.instancesForPreview.get(instanceId):this.instances.get(instanceId);
+    instance.initialValues = instance.form.getValues();
   }
 
   @action

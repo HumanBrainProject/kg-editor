@@ -182,7 +182,7 @@ export default class Instances extends React.Component{
         </Scrollbars>
         <div className={classes.preview}>
           {browseStore.selectedInstance?
-            <Preview/>
+            <Preview selectedInstanceId={browseStore.selectedInstance.id}/>
             :
             <BGMessage icon={"money-check"}>
               Select an instance to display its preview here.

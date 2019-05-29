@@ -62,23 +62,17 @@ class Instance {
   @observable isFetched = false;
   @observable highlight = null;
   @observable path = "";
-
-  instancesToSetNull = [];
+  @observable fieldsToSetAsNull = [];
 
   constructor(instanceId, path="") {
     this.instanceId = instanceId;
     this.path = path?path:"";
   }
 
-  clearNullableInstances() {
-    this.instancesToSetNull.length = 0;
+  @action setFieldAsNull(id) {
+    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
+    this.hasChanged = true;
   }
-
-  @action setNullableInstances(id) {
-    this.instancesToSetNull.indexOf(id) === -1 ?
-      this.instancesToSetNull.push(id):null;
-  }
-
 
   @computed
   get promotedFields() {
@@ -600,7 +594,7 @@ class InstanceStore {
     instance.cancelChangesPending = false;
     instance.saveError = null;
     instance.hasSaveError = false;
-    instance.clearNullableInstances();
+    instance.fieldsToSetAsNull = [];
   }
 
   @action
@@ -618,12 +612,13 @@ class InstanceStore {
 
     try {
       const payload = instance.form.getValues();
-      if (instance.instancesToSetNull.length > 0) {
-        instance.instancesToSetNull.forEach(key=> payload[key] = null);
+      if (instance.fieldsToSetAsNull.length > 0) {
+        instance.fieldsToSetAsNull.forEach(key => payload[key] = null);
       }
       const { data } = await API.axios.put(API.endpoints.instanceData(instanceId, this.databaseScope), payload);
       runInAction(() => {
         instance.hasChanged = false;
+        instance.fieldsToSetAsNull = [];
         instance.saveError = null;
         instance.hasSaveError = false;
         instance.isSaving = false;
@@ -653,7 +648,6 @@ class InstanceStore {
       });
     } finally {
       statusStore.flush();
-      instance.clearNullableInstances();
     }
   }
 

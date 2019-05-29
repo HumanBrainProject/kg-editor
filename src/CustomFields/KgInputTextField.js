@@ -85,7 +85,7 @@ export default class KgInputTextField extends React.Component {
     if (this.props.field.value === null) {
       Object.getOwnPropertyDescriptor(prototype, "disabled").set
         .call(this.inputRef, true);
-      selectedInstance.setNullableInstances(this.props.field.path.substr(1));
+      selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
     } else {
       Object.getOwnPropertyDescriptor(prototype, "disabled").set
         .call(this.inputRef, false);
@@ -159,7 +159,7 @@ export default class KgInputTextField extends React.Component {
     } = this.props.field;
 
     let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    let isAlternativeDisabled = selectedInstance.instancesToSetNull.includes(path.substr(1));
+    let isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     const style = this.getStyle();
 

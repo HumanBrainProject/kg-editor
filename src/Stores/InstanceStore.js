@@ -127,6 +127,17 @@ class Instance {
     return [];
   }
 
+  @computed
+  get isReadMode() {
+    return !this.isFetched || (this.form && this.form.readMode);
+  }
+
+  @computed
+  get nodeType() {
+    const [ , , schema, , ] = this.instanceId?this.instanceId.split("/"):[ null, null, null, null, null];
+    return this.isFetched && this.data && this.data.fields && this.data.fields.id && this.data.fields.id.value && this.data.fields.id.value.path || schema;
+  }
+
   @action
   setReadMode(readMode){
     if (this.isFetched) {
@@ -420,6 +431,9 @@ class InstanceStore {
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.setReadMode(readMode);
+    if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
+      browseStore.fetchLists();
+    }
     historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;

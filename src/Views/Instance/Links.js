@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 import instanceStore from "../../Stores/InstanceStore";
+import browseStore from "../../Stores/BrowseStore";
 
 const styles = {
   pane: {
@@ -28,10 +29,15 @@ class Links extends React.Component{
 
   render(){
     const {classes, mainInstanceId } = this.props;
-    let linkKeys = [];
     const instance = instanceStore.getInstance(this.props.id);
+
+    if (!instance.isReadMode && !browseStore.isFetched.lists) {
+      return null;
+    }
+
     const mainInstance = instanceStore.openedInstances.get(mainInstanceId);
     const currentInstancePath = mainInstance.currentInstancePath;
+    let linkKeys = [];
     if(instance.isFetched){
       linkKeys = Object.keys(instance.data.fields).filter(fieldKey => {
         return instance.form.getField(fieldKey).isLink && instance.form.getField(fieldKey).getValue().length > 0;

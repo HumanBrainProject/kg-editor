@@ -4,9 +4,14 @@ import { observer } from "mobx-react";
 import { Form } from "hbp-quickfire";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
 
+import routerStore from "../../Stores/RouterStore";
 import dataTypesStore from "../../Stores/DataTypesStore";
+import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
+import FetchingLoader from "../../Components/FetchingLoader";
+import BGMessage from "../../Components/BGMessage";
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -17,7 +22,6 @@ import FetchingPanel from "./InstanceForm/FetchingPanel";
 import SavingPanel from "./InstanceForm/SavingPanel";
 import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
-import routerStore from "../../Stores/RouterStore";
 
 const styles = {
   panelHeader: {
@@ -138,6 +142,10 @@ export default class InstanceForm extends React.Component {
     instanceStore.getInstance(this.props.id, forceFetch);
   }
 
+  handleListLoadRetry = () => {
+    browseStore.fetchLists();
+  }
+
   handleFocus = () => {
     if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
       instanceStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
@@ -204,18 +212,12 @@ export default class InstanceForm extends React.Component {
       return null;
     }
 
-    const isReadMode = !instance.isFetched || (instance.form && instance.form.readMode);
-
-    const [, , schema, ,] = id.split("/");
-
-    const nodeType = instance.isFetched && instance.data && instance.data.fields.id.value.path || schema;
-
     const isMainInstance = id === mainInstanceId;
     const isCurrentInstance = id === instanceStore.getCurrentInstanceId(mainInstanceId);
 
     const panelClassName = () => {
       let className = classes.panel;
-      if (isReadMode) {
+      if (instance.isReadMode) {
         className += " readMode";
       }
       if (isCurrentInstance) {
@@ -245,42 +247,56 @@ export default class InstanceForm extends React.Component {
             <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
             :
             instance.isFetched?
-              <React.Fragment>
-                <div
-                  onFocus={this.handleFocus}
-                  onClick={this.handleFocus}
-                  onDoubleClick={isReadMode && !isMainInstance ? this.handleOpenInstance : undefined}
-                  onChange={this.handleChange}
-                  onLoad={this.handleLoad}
-                >
-                  <Form store={instance.form} key={mainInstanceId}>
-                    <HeaderPanel
-                      className={classes.panelHeader}
-                      nodeType={nodeType}
-                      color={dataTypesStore.colorPalletteBySchema(nodeType)}
-                      hasChanged={instance.hasChanged} />
+              (!instance.isReadMode && browseStore.fetchError.lists)?
+                <BGMessage icon={"ban"}>
+                  {`There was a network problem fetching the instances types (${browseStore.fetchError.lists}).
+                  If the problem persists, please contact the support.`}<br /><br />
+                  <Button bsStyle={"primary"} onClick={this.handleListLoadRetry}>
+                    <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+                  </Button>
+                </BGMessage>
+                :
+                (!instance.isReadMode && browseStore.isFetching.lists)?
+                  <FetchingLoader>
+                    Fetching instances types...
+                  </FetchingLoader>
+                  :
+                  <React.Fragment>
+                    <div
+                      onFocus={this.handleFocus}
+                      onClick={this.handleFocus}
+                      onDoubleClick={instance.isReadMode && !isMainInstance ? this.handleOpenInstance : undefined}
+                      onChange={this.handleChange}
+                      onLoad={this.handleLoad}
+                    >
+                      <Form store={instance.form} key={mainInstanceId}>
+                        <HeaderPanel
+                          className={classes.panelHeader}
+                          nodeType={instance.nodeType}
+                          color={dataTypesStore.colorPalletteBySchema(instance.nodeType)}
+                          hasChanged={instance.hasChanged} />
 
-                    <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
-                    <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
+                        <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
+                        <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
 
-                    <FooterPanel
-                      className={classes.panelFooter}
-                      nexusId={instance.data.fields.id ? instance.data.fields.id.nexus_id : "<new>"}
-                      id={id}
-                      showOpenActions={isCurrentInstance && !isMainInstance} />
-                  </Form>
-                  <ConfirmCancelEditPanel
-                    show={instance.cancelChangesPending}
-                    text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
-                    onConfirm={this.handleConfirmCancelEdit}
-                    onCancel={this.handleContinueEditing}
-                    inline={!isMainInstance} />
-                  <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
-                  <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance} />
-                  <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
-                </div>
-                <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
-              </React.Fragment>
+                        <FooterPanel
+                          className={classes.panelFooter}
+                          nexusId={instance.data.fields.id ? instance.data.fields.id.nexus_id : "<new>"}
+                          id={id}
+                          showOpenActions={isCurrentInstance && !isMainInstance} />
+                      </Form>
+                      <ConfirmCancelEditPanel
+                        show={instance.cancelChangesPending}
+                        text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
+                        onConfirm={this.handleConfirmCancelEdit}
+                        onCancel={this.handleContinueEditing}
+                        inline={!isMainInstance} />
+                      <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
+                      <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance} />
+                      <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
+                    </div>
+                    <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
+                  </React.Fragment>
               :
               null
         }

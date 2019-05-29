@@ -219,7 +219,7 @@ const styles = {
         color: "var(--ft-color-loud)",
         background: "var(--list-bg-hover)",
         "& .fetchingPanel": {
-          position: "unset",
+          position: "unset !important",
           top: "unset",
           left: "unset",
           width: "unset",

@@ -66,14 +66,15 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceMange extends React.Component{
+export default class InstanceManage extends React.Component{
   componentDidMount() {
     this.fetchInstance();
     this.fetchStatus();
   }
 
   fetchInstance = (forceFetch = false) => {
-    instanceStore.getInstance(this.props.id, forceFetch);
+    const instance = instanceStore.getInstance(this.props.id);
+    instance.fetch(forceFetch);
   }
 
   fetchStatus = () => {

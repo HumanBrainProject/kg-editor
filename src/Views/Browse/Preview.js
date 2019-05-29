@@ -100,7 +100,8 @@ export default class Preview extends React.Component{
   }
 
   handleRetry = () => {
-    instanceStore.fetchInstanceData(browseStore.selectedInstance.id);
+    const instance = instanceStore.getInstance(browseStore.selectedInstance.id);
+    instance.fetch(true);
   }
 
   markdownDescriptionRendering = field => <RenderMarkdownField value={field.getValue()}/>

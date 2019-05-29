@@ -14,6 +14,18 @@ const styles = {
 @injectStyles(styles)
 @observer
 class Links extends React.Component{
+
+  componentDidUpdate(prevProps) {
+    if(this.props.id && prevProps.id !== this.props.id) {
+      this.fetchInstanceData();
+    }
+  }
+
+  fetchInstanceData = () => {
+    const instance = instanceStore.getInstance(this.props.id);
+    instance.fetch();
+  }
+
   render(){
     const {classes, mainInstanceId } = this.props;
     let linkKeys = [];

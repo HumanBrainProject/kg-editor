@@ -62,8 +62,7 @@ class Instance {
   @observable isFetching = false;
   @observable isFetched = false;
   @observable highlight = null;
-
-  instancesToSetNull = [];
+  @observable fieldsToSetAsNull = [];
 
   constructor(instanceId, instanceStore) {
     this.instanceId = instanceId;
@@ -76,13 +75,9 @@ class Instance {
     this.initialValues = this.form.getValues();
   }
 
-  clearNullableInstances() {
-    this.instancesToSetNull.length = 0;
-  }
-
-  @action setNullableInstances(id) {
-    this.instancesToSetNull.indexOf(id) === -1 ?
-      this.instancesToSetNull.push(id):null;
+  @action setFieldAsNull(id) {
+    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
+    this.hasChanged = true;
   }
 
   @computed
@@ -324,7 +319,7 @@ class Instance {
             this.saveError = null;
             this.hasSaveError = false;
             this.isSaving = false;
-            this.clearNullableInstances();
+            this.fieldsToSetAsNull = [];
             console.debug("successfully saved", data);
           });
           return data;
@@ -373,7 +368,7 @@ class Instance {
     this.cancelChangesPending = false;
     this.saveError = null;
     this.hasSaveError = false;
-    this.clearNullableInstances();
+    this.fieldsToSetAsNull = [];
   }
 
 }

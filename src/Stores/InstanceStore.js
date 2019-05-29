@@ -588,27 +588,7 @@ class InstanceStore {
 
   @action
   async fetchInstanceForPreview(instanceId) {
-    let instance = null;
-    if(this.instancesForPreview.has(instanceId)) {
-      instance = this.instancesForPreview.get(instanceId);
-      if (instance.isFetching) {
-        return instance;
-      }
-      instance.cancelChangesPending = false;
-      instance.isFetching = true;
-      instance.isSaving = false;
-      instance.isFetched = false;
-      instance.fetchError = null;
-      instance.hasFetchError = false;
-      instance.saveError = null;
-      instance.hasSaveError = false;
-    } else {
-      const [organization, domain, schema, version, ] = instanceId.split("/");
-      const path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
-      instance = new Instance(instanceId, path);
-      this.instancesForPreview.set(instanceId, instance);
-      instance.isFetching = true;
-    }
+    let instance = this.initInstance(instanceId, true);
 
     try {
       let path = instanceId;
@@ -620,18 +600,7 @@ class InstanceStore {
 
         instance.data = instanceData;
 
-        for(let fieldKey in instanceData.fields){
-          let field = instanceData.fields[fieldKey];
-          if(field.type === "InputText"){
-            field.type = "KgInputText";
-          } else if(field.type === "TextArea"){
-            field.type = "KgTextArea";
-          } else if(field.type === "DropdownSelect"){
-            field.type = "KgDropdownSelect";
-          }
-        }
-
-        instance.form = new FormStore(instanceData);
+        instance.form = this.constructFormStore(instanceData);
         const fields = instance.form.getField();
 
         let idsList = [] ;
@@ -678,6 +647,33 @@ class InstanceStore {
         instance.isFetched = false;
         instance.isFetching = false;
       });
+    }
+    return instance;
+  }
+
+  @action
+  initInstance(instanceId, preview=false) {
+    let instance = null;
+    let instances = preview ? this.instancesForPreview:this.instances;
+    if(instances.has(instanceId)) {
+      instance = instances.get(instanceId);
+      if (instance.isFetching) {
+        return instance;
+      }
+      instance.cancelChangesPending = false;
+      instance.isFetching = true;
+      instance.isSaving = false;
+      instance.isFetched = false;
+      instance.fetchError = null;
+      instance.hasFetchError = false;
+      instance.saveError = null;
+      instance.hasSaveError = false;
+    } else {
+      const [organization, domain, schema, version, ] = instanceId.split("/");
+      const path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
+      instance = new Instance(instanceId, path);
+      instances.set(instanceId, instance);
+      instance.isFetching = true;
     }
     return instance;
   }

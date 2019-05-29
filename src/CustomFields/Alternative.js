@@ -85,8 +85,7 @@ export default class Alternative extends React.Component {
     const { classes, alternative, field, className } = this.props;
 
     const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
-
-    const currentUserId = authStore.user.id;
+    const isOwnAlternative = userIds.includes(authStore.user.id);
 
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
@@ -101,7 +100,9 @@ export default class Alternative extends React.Component {
             <FontAwesomeIcon icon="check" className="selected" />
             :null
           }
-          {userIds.map(userId => currentUserId === userId ? <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleClick} icon="times" /></span>:null)}
+          {isOwnAlternative && (
+            <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleClick} icon="times" /></span>
+          )}
         </div>
       </MenuItem>
     );

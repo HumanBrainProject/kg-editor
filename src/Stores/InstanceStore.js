@@ -589,7 +589,6 @@ class InstanceStore {
   @action
   async fetchInstanceForPreview(instanceId) {
     let instance = this.initInstance(instanceId, true);
-
     try {
       let path = instanceId;
 
@@ -610,48 +609,60 @@ class InstanceStore {
           }
         });
 
-        const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
-        runInAction(async () => {
-          if(result) {
-            const res = result.data.data.reduce((acc, current) => {
-              if(!acc[current.schema]) {
-                acc[current.schema] = [];
-              }
-              acc[current.schema].push(current);
-              return acc;
-            },{});
+        try {
+          const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
+          runInAction(() => {
+            if(result) {
+              const res = result.data.data.reduce((acc, current) => {
+                if(!acc[current.schema]) {
+                  acc[current.schema] = [];
+                }
+                acc[current.schema].push(current);
+                return acc;
+              },{});
 
-            Object.entries(fields).forEach(([, field]) => {
-              let path = field.instancesPath;
-              if(path){
-                Object.keys(res).forEach(key => {
-                  if(key == path) {
-                    field.updateOptions(res[key]);
-                  }
-                });
-              }
-            });
-          }
+              Object.entries(fields).forEach(([, field]) => {
+                let path = field.instancesPath;
+                if(path){
+                  Object.keys(res).forEach(key => {
+                    if(key == path) {
+                      field.updateOptions(res[key]);
+                    }
+                  });
+                }
+              });
+            }
 
-          instance.isFetching = false;
-          instance.isFetched = true;
-          this.memorizeInstanceInitialValues(instanceId, true);
-          instance.form.toggleReadMode(this.globalReadMode);
-        });
+            instance.isFetching = false;
+            instance.isFetched = true;
+            this.memorizeInstanceInitialValues(instanceId, true);
+            instance.form.toggleReadMode(this.globalReadMode);
+          });
+        } catch(e) {
+          runInAction(() => {
+            this.errorInstance(instance, e);
+          });
+        }
       });
     } catch (e) {
       runInAction(() => {
-        const message = e.message?e.message:e;
-        instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
-        instance.hasFetchError = true;
-        instance.isFetched = false;
-        instance.isFetching = false;
+        this.errorInstance(instance, e);
       });
     }
     return instance;
   }
 
   @action
+  errorInstance(instance, e) {
+    const message = e.message?e.message:e;
+    instance.fetchError = `Error while retrieving instance "${instance.instanceId}" (${message})`;
+    instance.hasFetchError = true;
+    instance.isFetched = false;
+    instance.isFetching = false;
+  }
+
+  @action
+
   initInstance(instanceId, preview=false) {
     let instance = null;
     let instances = preview ? this.instancesForPreview:this.instances;

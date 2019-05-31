@@ -145,6 +145,100 @@ class Instance {
     }
   }
 
+  normalizeData(data) {
+    if (!data) {
+      return {fields: [], alternatives: []};
+    }
+    for(let fieldKey in data.fields) {
+      let field = data.fields[fieldKey];
+      if(field.type === "InputText"){
+        field.type = "KgInputText";
+      } else if(field.type === "TextArea"){
+        field.type = "KgTextArea";
+      } else if(field.type === "DropdownSelect"){
+        field.type = "KgDropdownSelect";
+      }
+    }
+    /*
+    data.alternatives["http://schema.org/name"] = [
+      {
+        value: "Alternative 2",
+        userIds: "12345"
+      },
+      {
+        value: "Alternative 3",
+        userIds: ["2468", "9876"]
+      },
+      {
+        value: "Alternative 4",
+        userIds: "8642"
+      }
+    ];
+    data.alternatives["http://schema.org/description"] = [
+      {
+        value: "This is an second alternative description.",
+        userIds: ["8642", "9876"]
+      },
+      {
+        value: "This is an third alternative description.",
+        userIds: "2468"
+      },
+      {
+        value: "This is an fourth alternative description.",
+        userIds: "12345"
+      }
+    ];
+    data.alternatives["http://schema.org/description"] = [
+      {
+        value: "This is an second alternative description.",
+        userIds: ["8642", "9876"]
+      },
+      {
+        value: "This is an third alternative description.",
+        userIds: "2468"
+      },
+      {
+        value: "This is an fourth alternative description.",
+        userIds: "12345"
+      }
+    ];
+    data.alternatives["https://schema.hbp.eu/minds/contributors"] = [
+      {
+        value: [
+          {
+            id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
+          },
+          {
+            id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
+          },
+          {
+            id: "minds/core/person/v1.0.0/a79d7b48-8a57-433c-a9d6-50372bbc9ad2"
+          },
+          {
+            id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
+          }
+        ],
+        userIds: "12345"
+      },
+      {
+        value: [
+          {
+            id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
+          },
+          {
+            id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
+          },
+          {
+            id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
+          }
+        ],
+        userIds: ["2468", "8642"]
+      }
+    ];
+    */
+    return data;
+  }
+
   @action
   async fetch(forceFetch=false) {
     if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
@@ -161,150 +255,52 @@ class Instance {
 
     console.debug("fetch instance " + this.instanceId + ".");
     try {
-      await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope))
-        .then(({data}) => (data && data.data)?data.data:{fields: {}, alternatives: []})
-        .then(data => {
-          for(let fieldKey in data.fields){
-            let field = data.fields[fieldKey];
-            if(field.type === "InputText"){
-              field.type = "KgInputText";
-            } else if(field.type === "TextArea"){
-              field.type = "KgTextArea";
-            } else if(field.type === "DropdownSelect"){
-              field.type = "KgDropdownSelect";
-            }
-          }
-          /*
-          data.alternatives["http://schema.org/name"] = [
-            {
-              value: "Alternative 2",
-              userIds: "12345"
-            },
-            {
-              value: "Alternative 3",
-              userIds: ["2468", "9876"]
-            },
-            {
-              value: "Alternative 4",
-              userIds: "8642"
-            }
-          ];
-          data.alternatives["http://schema.org/description"] = [
-            {
-              value: "This is an second alternative description.",
-              userIds: ["8642", "9876"]
-            },
-            {
-              value: "This is an third alternative description.",
-              userIds: "2468"
-            },
-            {
-              value: "This is an fourth alternative description.",
-              userIds: "12345"
-            }
-          ];
-          data.alternatives["http://schema.org/description"] = [
-            {
-              value: "This is an second alternative description.",
-              userIds: ["8642", "9876"]
-            },
-            {
-              value: "This is an third alternative description.",
-              userIds: "2468"
-            },
-            {
-              value: "This is an fourth alternative description.",
-              userIds: "12345"
-            }
-          ];
-          data.alternatives["https://schema.hbp.eu/minds/contributors"] = [
-            {
-              value: [
-                {
-                  id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
-                },
-                {
-                  id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
-                },
-                {
-                  id: "minds/core/person/v1.0.0/a79d7b48-8a57-433c-a9d6-50372bbc9ad2"
-                },
-                {
-                  id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
-                }
-              ],
-              userIds: "12345"
-            },
-            {
-              value: [
-                {
-                  id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
-                },
-                {
-                  id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
-                },
-                {
-                  id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
-                }
-              ],
-              userIds: ["2468", "8642"]
-            }
-          ];
-          */
-          return data;
-        })
-        .then(data => {
-          runInAction(async () => {
-            this.data = data;
-            this.form = new FormStore(data);
-            const fields = this.form.getField();
+      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
+      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
+      runInAction(async () => {
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        const fields = this.form.getField();
 
-            const optionsPromises = [];
-            Object.entries(fields).forEach(([, field]) => {
-              const path = field.instancesPath;
-              if (path) {
-                optionsPromises.push(this.instanceStore.optionsCache.get(path).then(
-                  options => {
-                    field.updateOptions(options);
-                  }
-                ));
+        const optionsPromises = [];
+        Object.entries(fields).forEach(([, field]) => {
+          const path = field.instancesPath;
+          if (path) {
+            optionsPromises.push(this.instanceStore.optionsCache.get(path).then(
+              options => {
+                field.updateOptions(options);
               }
-            });
-
-            Promise.all(optionsPromises)
-              .then(() => {
-                runInAction(() => {
-                  this.isFetching = false;
-                  this.isFetched = true;
-                  this.memorizeInstanceInitialValues();
-                  this.form.toggleReadMode(this.instanceStore.globalReadMode);
-                });
-              })
-              .catch(e => {
-                runInAction(() => {
-                  const message = e.message?e.message:e;
-                  this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-                  this.hasFetchError = true;
-                  this.isFetched = false;
-                  this.isFetching = false;
-                });
-                return e;
-              });
-          });
-          return data;
-        })
-        .catch(e => {
-          runInAction(() => {
-            const message = e.message?e.message:e;
-            this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-            this.hasFetchError = true;
-            this.isFetched = false;
-            this.isFetching = false;
-          });
-          return e;
+            ));
+          }
         });
+
+        Promise.all(optionsPromises)
+          .then(() => {
+            runInAction(() => {
+              this.isFetching = false;
+              this.isFetched = true;
+              this.memorizeInstanceInitialValues();
+              this.form.toggleReadMode(this.instanceStore.globalReadMode);
+            });
+          })
+          .catch(e => {
+            runInAction(() => {
+              const message = e.message?e.message:e;
+              this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+              this.hasFetchError = true;
+              this.isFetched = false;
+              this.isFetching = false;
+            });
+          });
+      });
     } catch (e) {
-      // error already catched in promise
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+        this.hasFetchError = true;
+        this.isFetched = false;
+        this.isFetching = false;
+      });
     }
   }
 
@@ -318,42 +314,44 @@ class Instance {
     this.isSaving = true;
 
     const payload = this.form.getValues();
-    if (this.instancesToSetNull.length > 0) {
-      this.instancesToSetNull.forEach(key=> payload[key] = null);
+    if (this.fieldsToSetAsNull.length > 0) {
+      this.fieldsToSetAsNull.forEach(key=> payload[key] = null);
     }
 
     try {
-      API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload)
-        .then(data => {
-          runInAction(() => {
-            this.hasChanged = false;
-            this.saveError = null;
-            this.hasSaveError = false;
-            this.isSaving = false;
-            this.fieldsToSetAsNull = [];
-            console.debug("successfully saved", data);
-          });
-          return data;
-        })
-        .then(data => {
-        //We assume the options are already in cache :)
-          const options = this.optionsCache.cache.get(this.path);
-          if (options) {
-            const option = options.find(o => o.id === this.instanceId);
-            if (option) {
-              if (this.data.ui_info && this.data.ui_info.labelField) {
-                const keyFieldName = this.data.ui_info.labelField;
-                if (payload && payload[keyFieldName]) {
-                  option.name = payload[keyFieldName];
-                }
-              }
-            }
+      const data = API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
+      runInAction(() => {
+        this.hasChanged = false;
+        this.saveError = null;
+        this.hasSaveError = false;
+        this.isSaving = false;
+        this.fieldsToSetAsNull = [];
+        console.debug("successfully saved", data);
+      });
+      //We assume the options are already in cache :)
+      let option = null;
+      const keyFieldName = (this.data && this.data.fields && this.data.ui_info && this.data.ui_info.labelField)?this.data.ui_info.labelField:null;
+      if (keyFieldName) {
+        const options = this.instanceStore.optionsCache.cache.get(this.path);
+        if (options) {
+          option = options.find(o => o.id === this.instanceId);
+          // user saved value
+          if (option && payload) {
+            option.name = payload[keyFieldName];
           }
-          return data;
+        }
+      }
+      // Because of alternatives fetch again the data
+      // let's give time (1s) to the servers to refresh their state
+      setTimeout(async () => {
+        await this.fetch(true);
+        runInAction(() => {
+          if (keyFieldName && option && !this.fetchError && this.data && this.data.fields && this.data.fields[keyFieldName]) {
+            // value retrieved from server
+            option.name = this.data.fields[keyFieldName].value;
+          }
         });
-      // To refresh alternatives
-      this.fetch(true);
-
+      }, 1000);
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;

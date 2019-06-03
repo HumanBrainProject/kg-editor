@@ -28,12 +28,17 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
     this.releasedInstanceStore = createInstanceStore("RELEASED");
   }
 
+  fetchInstanceData = () => {
+    const instance = instanceStore.getInstance(this.props.instanceId);
+    instance.fetch();
+  }
+
   componentDidMount() {
     if (this.props.instanceId) {
       if (this.props.status !== "NOT_RELEASED") {
         this.releasedInstanceStore.getInstance(this.props.instanceId, true);
       }
-      instanceStore.getInstance(this.props.instanceId);
+      this.fetchInstanceData();
     }
   }
 
@@ -42,7 +47,7 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
       if (this.props.status !== "NOT_RELEASED") {
         this.releasedInstanceStore.getInstance(this.props.instanceId, true);
       }
-      instanceStore.getInstance(this.props.instanceId);
+      this.fetchInstanceData();
     }
   }
 
@@ -51,7 +56,7 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
   }
 
   handleRetryFetchInstance = () => {
-    instanceStore.getInstance(this.props.instanceId, true);
+    this.fetchInstanceData();
   }
 
   handleRetryFetchReleasedInstance = () => {

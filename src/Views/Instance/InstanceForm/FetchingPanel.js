@@ -15,7 +15,7 @@ const styles = {
       }
     },
     "&[inline='false']": {
-      position: "absolute",
+      position: "absolute !important",
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",

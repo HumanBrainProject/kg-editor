@@ -111,10 +111,14 @@ export default class SavePanel extends React.Component{
   handleSaveAll = () => {
     Array.from(instanceStore.instances.entries())
       .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
-      .forEach(([id, ]) => instanceStore.saveInstance(id));
+      .forEach(([id, ]) => {
+        const instance = instanceStore.getInstance(id);
+        instance.save();
+      });
   }
   handleSave(instanceId){
-    instanceStore.saveInstance(instanceId);
+    const instance = instanceStore.getInstance(instanceId);
+    instance.save();
     instanceStore.setComparedInstance(null);
   }
   handleReset(instanceId){
@@ -122,7 +126,8 @@ export default class SavePanel extends React.Component{
     instanceStore.setComparedInstance(null);
   }
   handleDismissSaveError(instanceId){
-    instanceStore.cancelSaveInstance(instanceId);
+    const instance = this.getInstance(instanceId);
+    instance.cancelSave();
   }
   handleShowCompare(instanceId){
     instanceStore.setComparedInstance(instanceId);

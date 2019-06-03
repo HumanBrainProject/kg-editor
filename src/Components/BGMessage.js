@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const styles = {
   container:{
-    position:"absolute",
+    position:"absolute !important",
     top:"50%",
     left:"50%",
     transform:"translate(-50%,-200px)",

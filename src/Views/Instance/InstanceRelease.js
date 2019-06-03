@@ -617,6 +617,23 @@ export default class InstanceRelease extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.id) {
+      this.fetchInstanceData();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if(this.props.id && prevProps.id !== this.props.id) {
+      this.fetchInstanceData();
+    }
+  }
+
+  fetchInstanceData = () => {
+    const instance = instanceStore.getInstance(this.props.id);
+    instance.fetch();
+  }
+
   handleShowCompare(node, e) {
     e && e.stopPropagation();
     instanceStore.setComparedWithReleasedVersionInstance(node);

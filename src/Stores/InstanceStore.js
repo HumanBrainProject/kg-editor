@@ -165,26 +165,13 @@ class Instance {
 
   @action
   async fetch(forceFetch=false) {
-    if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
-      return;
-    }
-    this.cancelChangesPending = false;
-    this.isFetching = true;
-    this.isSaving = false;
-    this.isFetched = false;
-    this.fetchError = null;
-    this.hasFetchError = false;
-    this.saveError = null;
-    this.hasSaveError = false;
+    this.setDefaultInstanceState(forceFetch);
 
-    console.debug("fetch instance " + this.instanceId + ".");
     try {
       const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
       const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
       runInAction(async () => {
-        this.data = normalizedData;
-        this.form = new FormStore(normalizedData);
-        const fields = this.form.getField();
+        const fields = this.getFields(normalizedData);
 
         const optionsPromises = [];
         Object.entries(fields).forEach(([, field]) => {
@@ -209,23 +196,106 @@ class Instance {
           })
           .catch(e => {
             runInAction(() => {
-              const message = e.message?e.message:e;
-              this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-              this.hasFetchError = true;
-              this.isFetched = false;
-              this.isFetching = false;
+              this.errorInstance(e);
             });
           });
       });
     } catch (e) {
       runInAction(() => {
-        const message = e.message?e.message:e;
-        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-        this.hasFetchError = true;
-        this.isFetched = false;
-        this.isFetching = false;
+        this.errorInstance(e);
       });
     }
+  }
+
+  @action
+  async fetchInstanceDataForPreview() {
+    this.setDefaultInstanceState(false);
+
+    try {
+      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.databaseScope));
+      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
+      runInAction(async () => {
+        const fields = this.getFields(normalizedData);
+
+        let idsList = [] ;
+        Object.values(normalizedData.fields).forEach(value=>{
+          if(value.instancesPath && value.value.length > 0) {
+            value.value.forEach(v => idsList.push(v.id));
+          }
+        });
+
+        try {
+          const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
+          runInAction(() => {
+            if(result) {
+              const res = result.data.data.reduce((acc, current) => {
+                if(!acc[current.schema]) {
+                  acc[current.schema] = [];
+                }
+                acc[current.schema].push(current);
+                return acc;
+              },{});
+
+              Object.entries(fields).forEach(([, field]) => {
+                let path = field.instancesPath;
+                if(path){
+                  Object.keys(res).forEach(key => {
+                    if(key == path) {
+                      field.updateOptions(res[key]);
+                    }
+                  });
+                }
+              });
+            }
+
+            this.isFetching = false;
+            this.isFetched = true;
+            this.memorizeInstanceInitialValues();
+            this.form.toggleReadMode(this.globalReadMode);
+          });
+        } catch(e) {
+          runInAction(() => {
+            this.errorInstance(e);
+          });
+        }
+      });
+    } catch (e) {
+      runInAction(() => {
+        this.errorInstance(e);
+      });
+    }
+  }
+
+  @action
+  errorInstance(e) {
+    const message = e.message?e.message:e;
+    this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+    this.hasFetchError = true;
+    this.isFetched = false;
+    this.isFetching = false;
+  }
+
+  @action
+  getFields(normalizedData) {
+    this.data = normalizedData;
+    this.form = new FormStore(normalizedData);
+    return this.form.getField();
+  }
+
+  @action
+  setDefaultInstanceState(forceFetch) {
+    if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
+      return;
+    }
+
+    this.cancelChangesPending = false;
+    this.isFetching = true;
+    this.isSaving = false;
+    this.isFetched = false;
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.saveError = null;
+    this.hasSaveError = false;
   }
 
   @action
@@ -243,7 +313,7 @@ class Instance {
     }
 
     try {
-      const data = API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
+      const data = await API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
       runInAction(() => {
         this.hasChanged = false;
         this.saveError = null;
@@ -406,6 +476,16 @@ class InstanceStore {
       return instance;
     }
     return this.instances.get(instanceId);
+  }
+
+  @action
+  getInstanceForPreview(instanceId){
+    if (!this.instancesForPreview.has(instanceId)) {
+      const instance = new Instance(instanceId, this);
+      this.instancesForPreview.set(instanceId, instance);
+      return instance;
+    }
+    return this.instancesForPreview.get(instanceId);
   }
 
   hasInstanceForPreview(instanceId){
@@ -584,114 +664,6 @@ class InstanceStore {
 
   doesInstanceHaveLinkedInstancesInUnsavedState = (instance) => {
     return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
-  }
-
-  @action
-  async fetchInstanceForPreview(instanceId) {
-    let instance = this.initInstance(instanceId, true);
-    try {
-      let path = instanceId;
-
-      const { data } = await API.axios.get(API.endpoints.instanceData(path, this.databaseScope));
-
-      runInAction(async () => {
-        const instanceData = data.data?data.data:{fields: {}, alternatives: []};
-
-        instance.data = instanceData;
-
-        instance.form = this.constructFormStore(instanceData);
-        const fields = instance.form.getField();
-
-        let idsList = [] ;
-        Object.values(instanceData.fields).forEach(value=>{
-          if(value.instancesPath && value.value.length > 0) {
-            value.value.forEach(v => idsList.push(v.id));
-          }
-        });
-
-        try {
-          const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
-          runInAction(() => {
-            if(result) {
-              const res = result.data.data.reduce((acc, current) => {
-                if(!acc[current.schema]) {
-                  acc[current.schema] = [];
-                }
-                acc[current.schema].push(current);
-                return acc;
-              },{});
-
-              Object.entries(fields).forEach(([, field]) => {
-                let path = field.instancesPath;
-                if(path){
-                  Object.keys(res).forEach(key => {
-                    if(key == path) {
-                      field.updateOptions(res[key]);
-                    }
-                  });
-                }
-              });
-            }
-
-            instance.isFetching = false;
-            instance.isFetched = true;
-            this.memorizeInstanceInitialValues(instanceId, true);
-            instance.form.toggleReadMode(this.globalReadMode);
-          });
-        } catch(e) {
-          runInAction(() => {
-            this.errorInstance(instance, e);
-          });
-        }
-      });
-    } catch (e) {
-      runInAction(() => {
-        this.errorInstance(instance, e);
-      });
-    }
-    return instance;
-  }
-
-  @action
-  errorInstance(instance, e) {
-    const message = e.message?e.message:e;
-    instance.fetchError = `Error while retrieving instance "${instance.instanceId}" (${message})`;
-    instance.hasFetchError = true;
-    instance.isFetched = false;
-    instance.isFetching = false;
-  }
-
-  @action
-
-  initInstance(instanceId, preview=false) {
-    let instance = null;
-    let instances = preview ? this.instancesForPreview:this.instances;
-    if(instances.has(instanceId)) {
-      instance = instances.get(instanceId);
-      if (instance.isFetching) {
-        return instance;
-      }
-      instance.cancelChangesPending = false;
-      instance.isFetching = true;
-      instance.isSaving = false;
-      instance.isFetched = false;
-      instance.fetchError = null;
-      instance.hasFetchError = false;
-      instance.saveError = null;
-      instance.hasSaveError = false;
-    } else {
-      const [organization, domain, schema, version, ] = instanceId.split("/");
-      const path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
-      instance = new Instance(instanceId, path);
-      instances.set(instanceId, instance);
-      instance.isFetching = true;
-    }
-    return instance;
-  }
-
-  memorizeInstanceInitialValues(instanceId, preview=false){
-    const instance = preview ? this.instancesForPreview.get(instanceId):this.instances.get(instanceId);
-    instance.initialValues = instance.form.getValues();
   }
 
   @action

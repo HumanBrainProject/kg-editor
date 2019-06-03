@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 
@@ -92,31 +91,33 @@ export default class Preview extends React.Component {
   }
 
   componentDidMount() {
-    instanceStore.fetchInstanceForPreview(browseStore.selectedInstance.id);
+    const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
+    instance.fetchInstanceDataForPreview();
   }
 
   componentDidUpdate(prevProps) {
     if (
       prevProps.selectedInstanceId !== this.props.selectedInstanceId &&
-      !instanceStore.hasInstanceForPreview(browseStore.selectedInstance.id)
+      !instanceStore.hasInstanceForPreview(this.props.selectedInstanceId)
     ) {
-      instanceStore.fetchInstanceForPreview(browseStore.selectedInstance.id);
+      const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
+      instance.fetchInstanceDataForPreview();
     }
   }
 
   handleOpenInstance(mode, event) {
     if (event.metaKey || event.ctrlKey) {
-      instanceStore.openInstance(browseStore.selectedInstance.id, mode);
+      instanceStore.openInstance(this.props.selectedInstanceId, mode);
     } else {
       routerStore.history.push(
-        `/instance/${mode}/${browseStore.selectedInstance.id}`
+        `/instance/${mode}/${this.props.selectedInstanceId}`
       );
     }
   }
 
   handleRetry = () => {
-    const instance = instanceStore.getInstance(browseStore.selectedInstance.id);
-    instance.fetch(true);
+    const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
+    instance.fetchInstanceDataForPreview();
   }
 
   markdownDescriptionRendering = field => (
@@ -124,9 +125,9 @@ export default class Preview extends React.Component {
   );
 
   render() {
-    const { classes } = this.props;
+    const { classes, selectedInstanceId, selectedInstanceName } = this.props;
     let selectedInstance = instanceStore.instancesForPreview.get(
-      browseStore.selectedInstance.id
+      selectedInstanceId
     );
 
     const promotedFields = selectedInstance && selectedInstance.promotedFields;
@@ -191,24 +192,24 @@ export default class Preview extends React.Component {
               </div>
               <div className={classes.titlePanel}>
                 <BookmarkStatus
-                  id={browseStore.selectedInstance.id}
+                  id={selectedInstanceId}
                   className={classes.bookmarkStatus}
                 />
                 <span className={classes.title}>
-                  {browseStore.selectedInstance.name}
+                  {selectedInstanceName}
                 </span>
               </div>
               <div className={classes.id}>
-                Nexus ID: {browseStore.selectedInstance.id}
+                Nexus ID: {selectedInstanceId}
               </div>
               <Form
                 store={selectedInstance.form}
-                key={browseStore.selectedInstance.id}
+                key={selectedInstanceId}
               >
                 {promotedFields.map(fieldKey => {
                   return (
                     <div
-                      key={browseStore.selectedInstanceId + fieldKey}
+                      key={selectedInstanceId + fieldKey}
                       className={classes.field}
                     >
                       {promotedFieldsWithMarkdown.includes(fieldKey) ? (
@@ -225,7 +226,7 @@ export default class Preview extends React.Component {
                 {nonPromotedFields.map(fieldKey => {
                   return (
                     <div
-                      key={browseStore.selectedInstance.id + fieldKey}
+                      key={selectedInstanceId + fieldKey}
                       className={classes.field}
                     >
                       <Field name={fieldKey} />
@@ -243,7 +244,7 @@ export default class Preview extends React.Component {
                     </span>
                     {metadata.map(field => (
                       <div
-                        key={browseStore.selectedInstance.id + field.label}
+                        key={selectedInstanceId + field.label}
                         className={classes.field}
                       >
                         <label>{field.label}: </label> {field.value}
@@ -255,7 +256,7 @@ export default class Preview extends React.Component {
                   <div className={"release-status"}>
                     <Status
                       darkmode={true}
-                      id={browseStore.selectedInstance.id}
+                      id={selectedInstanceId}
                     />
                   </div>
                 </div>

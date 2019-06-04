@@ -91,8 +91,10 @@ export default class Preview extends React.Component {
   }
 
   componentDidMount() {
-    const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
-    instance.fetchInstanceDataForPreview();
+    if(!instanceStore.hasInstanceForPreview(this.props.selectedInstanceId)) {
+      const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
+      instance.fetchInstanceDataForPreview();
+    }
   }
 
   componentDidUpdate(prevProps) {

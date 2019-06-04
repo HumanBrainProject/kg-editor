@@ -165,13 +165,26 @@ class Instance {
 
   @action
   async fetch(forceFetch=false) {
-    this.setDefaultInstanceState(forceFetch);
+    if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
+      return;
+    }
+
+    this.cancelChangesPending = false;
+    this.isFetching = true;
+    this.isSaving = false;
+    this.isFetched = false;
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.saveError = null;
+    this.hasSaveError = false;
 
     try {
       const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
       const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
       runInAction(async () => {
-        const fields = this.getFields(normalizedData);
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        const fields =  this.form.getField();
 
         const optionsPromises = [];
         Object.entries(fields).forEach(([, field]) => {
@@ -196,26 +209,47 @@ class Instance {
           })
           .catch(e => {
             runInAction(() => {
-              this.errorInstance(e);
+              const message = e.message?e.message:e;
+              this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+              this.hasFetchError = true;
+              this.isFetched = false;
+              this.isFetching = false;
             });
           });
       });
     } catch (e) {
       runInAction(() => {
-        this.errorInstance(e);
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+        this.hasFetchError = true;
+        this.isFetched = false;
+        this.isFetching = false;
       });
     }
   }
 
   @action
   async fetchInstanceDataForPreview() {
-    this.setDefaultInstanceState(false);
+    if (this.isFetching || (this.isFetched && !this.fetchError)) {
+      return;
+    }
+
+    this.cancelChangesPending = false;
+    this.isFetching = true;
+    this.isSaving = false;
+    this.isFetched = false;
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.saveError = null;
+    this.hasSaveError = false;
 
     try {
       const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.databaseScope));
       const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
       runInAction(async () => {
-        const fields = this.getFields(normalizedData);
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        const fields =  this.form.getField();
 
         let idsList = [] ;
         Object.values(normalizedData.fields).forEach(value=>{
@@ -255,47 +289,23 @@ class Instance {
           });
         } catch(e) {
           runInAction(() => {
-            this.errorInstance(e);
+            const message = e.message?e.message:e;
+            this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+            this.hasFetchError = true;
+            this.isFetched = false;
+            this.isFetching = false;
           });
         }
       });
     } catch (e) {
       runInAction(() => {
-        this.errorInstance(e);
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+        this.hasFetchError = true;
+        this.isFetched = false;
+        this.isFetching = false;
       });
     }
-  }
-
-  @action
-  errorInstance(e) {
-    const message = e.message?e.message:e;
-    this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-    this.hasFetchError = true;
-    this.isFetched = false;
-    this.isFetching = false;
-  }
-
-  @action
-  getFields(normalizedData) {
-    this.data = normalizedData;
-    this.form = new FormStore(normalizedData);
-    return this.form.getField();
-  }
-
-  @action
-  setDefaultInstanceState(forceFetch) {
-    if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
-      return;
-    }
-
-    this.cancelChangesPending = false;
-    this.isFetching = true;
-    this.isSaving = false;
-    this.isFetched = false;
-    this.fetchError = null;
-    this.hasFetchError = false;
-    this.saveError = null;
-    this.hasSaveError = false;
   }
 
   @action

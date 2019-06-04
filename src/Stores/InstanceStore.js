@@ -159,83 +159,7 @@ class Instance {
         field.type = "KgDropdownSelect";
       }
     }
-    /*
-    data.alternatives["http://schema.org/name"] = [
-      {
-        value: "Alternative 2",
-        userIds: "12345"
-      },
-      {
-        value: "Alternative 3",
-        userIds: ["2468", "9876"]
-      },
-      {
-        value: "Alternative 4",
-        userIds: "8642"
-      }
-    ];
-    data.alternatives["http://schema.org/description"] = [
-      {
-        value: "This is an second alternative description.",
-        userIds: ["8642", "9876"]
-      },
-      {
-        value: "This is an third alternative description.",
-        userIds: "2468"
-      },
-      {
-        value: "This is an fourth alternative description.",
-        userIds: "12345"
-      }
-    ];
-    data.alternatives["http://schema.org/description"] = [
-      {
-        value: "This is an second alternative description.",
-        userIds: ["8642", "9876"]
-      },
-      {
-        value: "This is an third alternative description.",
-        userIds: "2468"
-      },
-      {
-        value: "This is an fourth alternative description.",
-        userIds: "12345"
-      }
-    ];
-    data.alternatives["https://schema.hbp.eu/minds/contributors"] = [
-      {
-        value: [
-          {
-            id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
-          },
-          {
-            id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
-          },
-          {
-            id: "minds/core/person/v1.0.0/a79d7b48-8a57-433c-a9d6-50372bbc9ad2"
-          },
-          {
-            id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
-          }
-        ],
-        userIds: "12345"
-      },
-      {
-        value: [
-          {
-            id: "minds/core/person/v1.0.0/4283f0b4-2fef-4a80-a9de-bd2d512161cb"
-          },
-          {
-            id: "minds/core/person/v1.0.0/36d56617-e253-4b9c-94cc-f74a869c2411"
-          },
-          {
-            id: "minds/core/person/v1.0.0/949aa9a5-ae01-4de3-847a-74b65543a2e3"
-          }
-        ],
-        userIds: ["2468", "8642"]
-      }
-    ];
-    */
+
     return data;
   }
 
@@ -244,6 +168,7 @@ class Instance {
     if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
       return;
     }
+
     this.cancelChangesPending = false;
     this.isFetching = true;
     this.isSaving = false;
@@ -253,14 +178,13 @@ class Instance {
     this.saveError = null;
     this.hasSaveError = false;
 
-    console.debug("fetch instance " + this.instanceId + ".");
     try {
       const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
       const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
       runInAction(async () => {
         this.data = normalizedData;
         this.form = new FormStore(normalizedData);
-        const fields = this.form.getField();
+        const fields =  this.form.getField();
 
         const optionsPromises = [];
         Object.entries(fields).forEach(([, field]) => {
@@ -305,6 +229,86 @@ class Instance {
   }
 
   @action
+  async fetchInstanceDataForPreview() {
+    if (this.isFetching || (this.isFetched && !this.fetchError)) {
+      return;
+    }
+
+    this.cancelChangesPending = false;
+    this.isFetching = true;
+    this.isSaving = false;
+    this.isFetched = false;
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.saveError = null;
+    this.hasSaveError = false;
+
+    try {
+      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.databaseScope));
+      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
+      runInAction(async () => {
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        const fields =  this.form.getField();
+
+        let idsList = [] ;
+        Object.values(normalizedData.fields).forEach(value=>{
+          if(value.instancesPath && value.value.length > 0) {
+            value.value.forEach(v => idsList.push(v.id));
+          }
+        });
+
+        try {
+          const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
+          runInAction(() => {
+            if(result) {
+              const res = result.data.data.reduce((acc, current) => {
+                if(!acc[current.schema]) {
+                  acc[current.schema] = [];
+                }
+                acc[current.schema].push(current);
+                return acc;
+              },{});
+
+              Object.entries(fields).forEach(([, field]) => {
+                let path = field.instancesPath;
+                if(path){
+                  Object.keys(res).forEach(key => {
+                    if(key == path) {
+                      field.updateOptions(res[key]);
+                    }
+                  });
+                }
+              });
+            }
+
+            this.isFetching = false;
+            this.isFetched = true;
+            this.memorizeInstanceInitialValues();
+            this.form.toggleReadMode(this.globalReadMode);
+          });
+        } catch(e) {
+          runInAction(() => {
+            const message = e.message?e.message:e;
+            this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+            this.hasFetchError = true;
+            this.isFetched = false;
+            this.isFetching = false;
+          });
+        }
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+        this.hasFetchError = true;
+        this.isFetched = false;
+        this.isFetching = false;
+      });
+    }
+  }
+
+  @action
   async save() {
 
     historyStore.updateInstanceHistory(this.instanceId, "edited");
@@ -319,7 +323,7 @@ class Instance {
     }
 
     try {
-      const data = API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
+      const data = await API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
       runInAction(() => {
         this.hasChanged = false;
         this.saveError = null;
@@ -385,6 +389,7 @@ class Instance {
 class InstanceStore {
   @observable databaseScope = null;
   @observable instances = new Map();
+  @observable instancesForPreview = new Map();
   @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
   @observable comparedWithReleasedVersionInstance = null;
@@ -481,6 +486,20 @@ class InstanceStore {
       return instance;
     }
     return this.instances.get(instanceId);
+  }
+
+  @action
+  getInstanceForPreview(instanceId){
+    if (!this.instancesForPreview.has(instanceId)) {
+      const instance = new Instance(instanceId, this);
+      this.instancesForPreview.set(instanceId, instance);
+      return instance;
+    }
+    return this.instancesForPreview.get(instanceId);
+  }
+
+  hasInstanceForPreview(instanceId){
+    return this.instancesForPreview.has(instanceId);
   }
 
   @computed

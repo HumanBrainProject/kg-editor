@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const styles = {
   fetchErrorPanel: {
-    position: "absolute",
+    position: "absolute !important",
     top: "50%",
     left: "50%",
     padding: "20px",

@@ -30,7 +30,7 @@ let styles = {
     color: "var(--bookmark-off-color)",  // #e67e22 #e74c3c
   },
   saveErrorButton: {
-    color: "#e74c3c"
+    color: "var(--ft-color-error)"
   },
   textError: {
     margin: 0,
@@ -52,8 +52,10 @@ export default class BookmarkStatus extends React.Component{
     this.handleSaveRetry = this.handleSaveRetry.bind(this);
   }
 
-  UNSAFE_componentWillReceiveProps(newProps){
-    bookmarkStatusStore.fetchStatus(newProps.id);
+  componentDidUpdate(prevProps) {
+    if(prevProps.id !== this.props.id) {
+      bookmarkStatusStore.fetchStatus(this.props.id);
+    }
   }
 
   handleBookmarksSave() {

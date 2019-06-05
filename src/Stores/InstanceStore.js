@@ -7,8 +7,11 @@ import API from "../Services/API";
 
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
+import browseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
+import routerStore from "./RouterStore";
+import { matchPath } from "react-router-dom";
 
 class OptionsCache{
   @observable cache = new Map();
@@ -20,7 +23,7 @@ class OptionsCache{
     } else if(this.promises.has(path)){
       return this.promises.get(path);
     } else {
-      let promise = this.fetch(path);
+      const promise = this.fetch(path);
       this.promises.set(path, promise);
       return this.promises.get(path);
     }
@@ -37,46 +40,372 @@ class OptionsCache{
       throw `Error while retrieving the list of ${path} (${message})`;
     }
   }
+
+  @action flush(){
+    this.cache = new Map();
+    this.promises = new Map();
+  }
 }
 
-const nodeTypeMapping = {
-  "Dataset":"https://schema.hbp.eu/minds/Dataset",
-  "Specimen group":"https://schema.hbp.eu/minds/Specimengroup",
-  "Subject":"https://schema.hbp.eu/minds/Subject",
-  "Activity":"https://schema.hbp.eu/minds/Activity",
-  "Person":"https://schema.hbp.eu/minds/Person",
-  "PLA Component":"https://schema.hbp.eu/minds/Placomponent",
-  "Publication":"https://schema.hbp.eu/minds/Publication",
-  "File Association":"https://schema.hbp.eu/minds/FileAssociation",
-  "DOI":"https://schema.hbp.eu/minds/DatasetDOI",
-  "Method":"https://schema.hbp.eu/minds/Method",
-  "Reference space":"https://schema.hbp.eu/minds/Referencespace",
-  "Parcellation Region":"https://schema.hbp.eu/minds/Parcellationregion",
-  "Parcellation Atlas":"https://schema.hbp.eu/minds/Parcellationatlas",
-  "Embargo Status":"https://schema.hbp.eu/minds/Embargostatus",
-  "Approval":"https://schema.hbp.eu/minds/Approval",
-  "Protocol":"https://schema.hbp.eu/minds/Protocol",
-  "Preparation":"https://schema.hbp.eu/minds/Preparation",
-  "Authority":"https://schema.hbp.eu/minds/Authority",
-  "Format":"https://schema.hbp.eu/minds/Format",
-  "License Type":"https://schema.hbp.eu/minds/Licensetype",
-  "Sample":"https://schema.hbp.eu/minds/ExperimentSample",
-  "File":"https://schema.hbp.eu/minds/File",
-  "Software agent":"https://schema.hbp.eu/minds/Softwareagent",
-  "Age category":"https://schema.hbp.eu/minds/Agecategory",
-  "Sex":"https://schema.hbp.eu/minds/Sex",
-  "Species":"https://schema.hbp.eu/minds/Species",
-  "Role":"https://schema.hbp.eu/minds/Role"
-};
+class Instance {
+  @observable instanceId = null;
+  @observable path = "";
+  @observable data = null;
+  @observable form = null;
+  @observable cancelChangesPending = null;
+  @observable fetchError = null;
+  @observable hasFetchError = false;
+  @observable saveError = null;
+  @observable hasSaveError = false;
+  @observable isSaving = false;
+  @observable hasChanged = false;
+  @observable isFetching = false;
+  @observable isFetched = false;
+  @observable highlight = null;
+  @observable fieldsToSetAsNull = [];
+
+  constructor(instanceId, instanceStore) {
+    this.instanceId = instanceId;
+    const [organization, domain, schema, version, ] = instanceId.split("/");
+    this.path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
+    this.instanceStore = instanceStore;
+  }
+
+  memorizeInstanceInitialValues() {
+    this.initialValues = this.form.getValues();
+  }
+
+  @action setFieldAsNull(id) {
+    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
+    this.hasChanged = true;
+  }
+
+  @computed
+  get promotedFields() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
+      return this.data.ui_info.promotedFields
+        .filter(name => this.data.fields[name]);
+    }
+    return [];
+  }
+
+  @computed
+  get promotedFieldsWithMarkdown() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
+      let promotedFields = this.data.ui_info.promotedFields
+        .filter(name => this.data.fields[name]);
+      return promotedFields.filter(field =>
+        this.data.fields[field]["markdown"] === true
+      );
+    }
+    return [];
+  }
+
+  @computed
+  get nonPromotedFields() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
+      return Object.keys(this.data.fields)
+        .filter(key => {
+          return !this.data.ui_info || !this.data.ui_info.promotedFields || !this.data.ui_info.promotedFields.includes(key);
+        });
+    }
+    return [];
+  }
+
+  @computed
+  get metadata() {
+    if (this.isFetched && !this.fetchError && this.data && this.data.metadata) {
+      let metadata = this.data.metadata;
+      return Object.keys(metadata).map(key => {
+        if(key == "lastUpdateAt" || key == "createdAt") {
+          let d = new Date(metadata[key]["value"]);
+          metadata[key]["value"] = d.toLocaleString();
+        }
+        return metadata[key];
+      });
+    }
+    return [];
+  }
+
+  @computed
+  get isReadMode() {
+    return !this.isFetched || (this.form && this.form.readMode);
+  }
+
+  @computed
+  get nodeType() {
+    const [ , , schema, , ] = this.instanceId?this.instanceId.split("/"):[ null, null, null, null, null];
+    return this.isFetched && this.data && this.data.fields && this.data.fields.id && this.data.fields.id.value && this.data.fields.id.value.path || schema;
+  }
+
+  @action
+  setReadMode(readMode){
+    if (this.isFetched) {
+      this.form.toggleReadMode(!!readMode);
+    }
+  }
+
+  normalizeData(data) {
+    if (!data) {
+      return {fields: [], alternatives: []};
+    }
+    for(let fieldKey in data.fields) {
+      let field = data.fields[fieldKey];
+      if(field.type === "InputText"){
+        field.type = "KgInputText";
+      } else if(field.type === "TextArea"){
+        field.type = "KgTextArea";
+      } else if(field.type === "DropdownSelect"){
+        if(field.instancesPath === "cscs/core/file/v1.0.0"){ // TODO: To be changed
+          field.type = "DynamicDropdown";
+          field.optionsUrl = field.instancesPath;
+          field.instanceType = data.fields.id.value.path;
+        } else {
+          field.type = "KgDropdownSelect";
+        }
+      }
+    }
+
+    return data;
+  }
+
+  @action
+  async fetch(forceFetch=false) {
+    if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
+      return;
+    }
+
+    this.cancelChangesPending = false;
+    this.isFetching = true;
+    this.isSaving = false;
+    this.isFetched = false;
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.saveError = null;
+    this.hasSaveError = false;
+
+    try {
+      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
+      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
+      runInAction(async () => {
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        const fields =  this.form.getField();
+
+        const optionsPromises = [];
+        Object.entries(fields).forEach(([, field]) => {
+          const path = field.instancesPath;
+          if (path && field.type !== "DynamicDropdown") {
+            optionsPromises.push(this.instanceStore.optionsCache.get(path).then(
+              options => {
+                field.updateOptions(options);
+              }
+            ));
+          }
+        });
+
+        Promise.all(optionsPromises)
+          .then(() => {
+            runInAction(() => {
+              this.isFetching = false;
+              this.isFetched = true;
+              this.memorizeInstanceInitialValues();
+              this.form.toggleReadMode(this.instanceStore.globalReadMode);
+            });
+          })
+          .catch(e => {
+            runInAction(() => {
+              const message = e.message?e.message:e;
+              this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+              this.hasFetchError = true;
+              this.isFetched = false;
+              this.isFetching = false;
+            });
+          });
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+        this.hasFetchError = true;
+        this.isFetched = false;
+        this.isFetching = false;
+      });
+    }
+  }
+
+  @action
+  async fetchInstanceDataForPreview() {
+    if (this.isFetching || (this.isFetched && !this.fetchError)) {
+      return;
+    }
+
+    this.cancelChangesPending = false;
+    this.isFetching = true;
+    this.isSaving = false;
+    this.isFetched = false;
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.saveError = null;
+    this.hasSaveError = false;
+
+    try {
+      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.databaseScope));
+      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
+      runInAction(async () => {
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        const fields =  this.form.getField();
+
+        let idsList = [] ;
+        Object.values(normalizedData.fields).forEach(value=>{
+          if(value.instancesPath && value.value.length > 0 && value.type !== "DynamicDropdown") {
+            value.value.forEach(v => idsList.push(v.id));
+          }
+        });
+
+        try {
+          const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
+          runInAction(() => {
+            if(result) {
+              const res = result.data.data.reduce((acc, current) => {
+                if(!acc[current.schema]) {
+                  acc[current.schema] = [];
+                }
+                acc[current.schema].push(current);
+                return acc;
+              },{});
+
+              Object.entries(fields).forEach(([, field]) => {
+                let path = field.instancesPath;
+                if(path){
+                  Object.keys(res).forEach(key => {
+                    if(key == path) {
+                      field.updateOptions(res[key]);
+                    }
+                  });
+                }
+              });
+            }
+
+            this.isFetching = false;
+            this.isFetched = true;
+            this.memorizeInstanceInitialValues();
+            this.form.toggleReadMode(this.globalReadMode);
+          });
+        } catch(e) {
+          runInAction(() => {
+            const message = e.message?e.message:e;
+            this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+            this.hasFetchError = true;
+            this.isFetched = false;
+            this.isFetching = false;
+          });
+        }
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+        this.hasFetchError = true;
+        this.isFetched = false;
+        this.isFetching = false;
+      });
+    }
+  }
+
+  @action
+  async save() {
+
+    historyStore.updateInstanceHistory(this.instanceId, "edited");
+
+    this.cancelChangesPending = false;
+    this.hasSaveError = false;
+    this.isSaving = true;
+
+    const payload = this.form.getValues();
+    if (this.fieldsToSetAsNull.length > 0) {
+      this.fieldsToSetAsNull.forEach(key=> payload[key] = null);
+    }
+
+    try {
+      const data = await API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
+      runInAction(() => {
+        this.hasChanged = false;
+        this.saveError = null;
+        this.hasSaveError = false;
+        this.isSaving = false;
+        this.fieldsToSetAsNull = [];
+        console.debug("successfully saved", data);
+      });
+      //We assume the options are already in cache :)
+      let option = null;
+      const keyFieldName = (this.data && this.data.fields && this.data.ui_info && this.data.ui_info.labelField)?this.data.ui_info.labelField:null;
+      if (keyFieldName) {
+        const options = this.instanceStore.optionsCache.cache.get(this.path);
+        if (options) {
+          option = options.find(o => o.id === this.instanceId);
+          // user saved value
+          if (option && payload) {
+            option.name = payload[keyFieldName];
+          }
+        }
+      }
+      // Because of alternatives fetch again the data
+      // let's give time (1s) to the servers to refresh their state
+      setTimeout(async () => {
+        await this.fetch(true);
+        runInAction(() => {
+          if (keyFieldName && option && !this.fetchError && this.data && this.data.fields && this.data.fields[keyFieldName]) {
+            // value retrieved from server
+            option.name = this.data.fields[keyFieldName].value;
+          }
+        });
+      }, 1000);
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.saveError = `Error while saving instance "${this.instanceId}" (${message})`;
+        this.hasSaveError = true;
+        this.isSaving = false;
+      });
+    } finally {
+      statusStore.flush();
+    }
+  }
+
+  @action
+  cancelSave(){
+    this.saveError = null;
+    this.hasSaveError = false;
+  }
+
+  @action
+  cancelChanges(){
+    this.form && this.form.injectValues(this.initialValues);
+    this.hasChanged = false;
+    this.cancelChangesPending = false;
+    this.saveError = null;
+    this.hasSaveError = false;
+    this.fieldsToSetAsNull = [];
+  }
+
+}
 
 class InstanceStore {
+  @observable databaseScope = null;
   @observable instances = new Map();
+  @observable instancesForPreview = new Map();
   @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
+  @observable comparedWithReleasedVersionInstance = null;
   @observable globalReadMode = true;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
+  @observable instanceToDelete = null;
+  @observable isDeletingInstance = false;
+  @observable deleteInstanceError = null;
 
   @observable showCreateModal = false;
 
@@ -84,7 +413,8 @@ class InstanceStore {
 
   generatedKeys = new WeakMap();
 
-  constructor(){
+  constructor(databaseScope=null) {
+    this.databaseScope = databaseScope?databaseScope:null;
     if(localStorage.getItem("openedTabs")){
       let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
       authStore.reloginPromise.then(()=>{
@@ -93,33 +423,15 @@ class InstanceStore {
     }
   }
 
-  get nodeTypeMapping(){
-    return nodeTypeMapping;
-  }
-
-  get reverseNodeTypeMapping(){
-    return Object.entries(nodeTypeMapping).reduce((result, [label, type]) => {
-      result[type] = label;
-      return result;
-    }, {});
-  }
-
-  getPromotedFields(instance) {
-    if (instance && instance.data && instance.data.fields && instance.data.ui_info && instance.data.ui_info.promotedFields) {
-      return instance.data.ui_info.promotedFields
-        .filter(name => instance.data.fields[name]);
-    }
-    return [];
-  }
-
-  getNonPromotedFields(instance) {
-    if (instance && instance.data && instance.data.fields) {
-      return Object.keys(instance.data.fields)
-        .filter(key => {
-          return !instance.data.ui_info || !instance.data.ui_info.promotedFields || !instance.data.ui_info.promotedFields.includes(key);
-        });
-    }
-    return [];
+  @action flush(){
+    this.instances = new Map();
+    this.isCreatingNewInstance = false;
+    this.instanceCreationError = null;
+    this.showSaveBar = false;
+    this.instanceToDelete = null;
+    this.isDeletingInstance = false;
+    this.deleteInstanceError = null;
+    this.optionsCache.flush();
   }
 
   /**
@@ -128,6 +440,9 @@ class InstanceStore {
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.setReadMode(readMode);
+    if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
+      browseStore.fetchLists();
+    }
     historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;
@@ -137,7 +452,8 @@ class InstanceStore {
         viewMode: viewMode,
         paneStore: new PaneStore()
       });
-      this.getInstance(instanceId);
+      const instance = this.getInstance(instanceId);
+      instance.fetch();
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
     }
@@ -169,11 +485,27 @@ class InstanceStore {
   }
 
   @action
-  getInstance(instanceId, forceFetch = false){
-    if (!this.instances.has(instanceId) || forceFetch) {
-      this.fetchInstanceData(instanceId);
+  getInstance(instanceId){
+    if (!this.instances.has(instanceId)) {
+      const instance = new Instance(instanceId, this);
+      this.instances.set(instanceId, instance);
+      return instance;
     }
     return this.instances.get(instanceId);
+  }
+
+  @action
+  getInstanceForPreview(instanceId){
+    if (!this.instancesForPreview.has(instanceId)) {
+      const instance = new Instance(instanceId, this);
+      this.instancesForPreview.set(instanceId, instance);
+      return instance;
+    }
+    return this.instancesForPreview.get(instanceId);
+  }
+
+  hasInstanceForPreview(instanceId){
+    return this.instancesForPreview.has(instanceId);
   }
 
   @computed
@@ -183,14 +515,37 @@ class InstanceStore {
 
   @action
   async createNewInstance(path, name=""){
-    this.isCreatingNewInstance = path;
-    try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), {"http://schema.org/name":name});
+    if (browseStore.isFetched.lists) {
+      const list = browseStore.getListById(path);
+      if (list) {
+        const labelField = list && list.uiSpec && list.uiSpec.labelField;
+        if (!name || (name && labelField)) {
+          this.isCreatingNewInstance = path;
+          try{
+            const payload = {};
+            if (labelField) {
+              payload[labelField] = name;
+            }
+            const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), payload);
+            this.isCreatingNewInstance = false;
+            return data.data.id;
+          } catch(e){
+            this.isCreatingNewInstance = false;
+            this.instanceCreationError = e.message;
+          }
+        } else {
+          this.isCreatingNewInstance = false;
+          this.instanceCreationError = `Error: labelField is not defined for ${path} type!`;
+        }
+      } else {
+        // Should never happen: UI should ensure to propose only available types
+        this.isCreatingNewInstance = false;
+        this.instanceCreationError = `Error: type ${path} is not available!`;
+      }
+    } else {
+      // Should never happen: UI should ensure we the list has been fetch before calling createNewInstance
       this.isCreatingNewInstance = false;
-      return data.data.id;
-    } catch(e){
-      this.isCreatingNewInstance = false;
-      this.instanceCreationError = e.message;
+      this.instanceCreationError = "Error: instances types are not available!";
     }
   }
 
@@ -215,18 +570,73 @@ class InstanceStore {
     let path = instanceToCopy.path;
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
-    if(values["http://schema.org/name"]){
-      values["http://schema.org/name"] = values["http://schema.org/name"]+" (Copy)";
+    const labelField = instanceToCopy.data && instanceToCopy.data.ui_info && instanceToCopy.data.ui_info.labelField;
+    if(labelField) {
+      values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
     }
     this.isCreatingNewInstance = path;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path), values);
+      const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), values);
       this.isCreatingNewInstance = false;
       return data.data.id;
     } catch(e){
       this.isCreatingNewInstance = false;
       this.instanceCreationError = e.message;
     }
+  }
+
+  @action
+  async deleteInstance(instanceId){
+    if (instanceId) {
+      this.instanceToDelete = instanceId;
+      this.isDeletingInstance = true;
+      this.deleteInstanceError = null;
+      try{
+        await API.axios.delete(API.endpoints.instanceData(instanceId, this.databaseScope));
+        runInAction(() => {
+          this.instanceToDelete = null;
+          this.isDeletingInstance = false;
+          let nextLocation = null;
+          if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
+            if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+              if(this.openedInstances.size > 1){
+                let openedInstances = Array.from(this.openedInstances.keys());
+                let currentInstanceIndex = openedInstances.indexOf(instanceId);
+                let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
+
+                let openedInstance = this.openedInstances.get(newInstanceId);
+                nextLocation = `/instance/${openedInstance.viewMode}/${newInstanceId}`;
+              } else {
+                nextLocation = "/browse";
+              }
+            }
+          }
+          browseStore.refreshFilter();
+          this.closeInstance(instanceId);
+          this.flush();
+          if (nextLocation) {
+            routerStore.history.push(nextLocation);
+          }
+        });
+      } catch(e){
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message})`;
+          this.isDeletingInstance = false;
+        });
+      }
+    }
+  }
+
+  @action
+  async retryDeleteInstance() {
+    return await this.deleteInstance(this.instanceToDelete);
+  }
+
+  @action
+  cancelDeleteInstance() {
+    this.instanceToDelete = null;
+    this.deleteInstanceError = null;
   }
 
   @action
@@ -239,6 +649,11 @@ class InstanceStore {
   @action
   setComparedInstance(instanceId){
     this.comparedInstanceId = instanceId;
+  }
+
+  @action
+  setComparedWithReleasedVersionInstance(instanceId){
+    this.comparedWithReleasedVersionInstance = instanceId;
   }
 
   getGeneratedKey(from, namespace){
@@ -268,82 +683,6 @@ class InstanceStore {
   }
 
   @action
-  async fetchInstanceData(instanceId) {
-    let instance = null;
-    if(this.instances.has(instanceId)) {
-      instance = this.instances.get(instanceId);
-      if (instance.isFetching) {
-        return instance;
-      }
-      instance.cancelChangesPending = false;
-      instance.isFetching = true;
-      instance.isSaving = false;
-      instance.isFetched = false;
-      instance.fetchError = null;
-      instance.hasFetchError = false;
-      instance.saveError = null;
-      instance.hasSaveError = false;
-    } else {
-      const [organization, domain, schema, version, ] = instanceId.split("/");
-      this.instances.set(instanceId, {
-        data: null,
-        form: null,
-        cancelChangesPending: null,
-        fetchError: null,
-        hasFetchError: false,
-        saveError: null,
-        hasSaveError: false,
-        isSaving: false,
-        hasChanged: false,
-        isFetching: true,
-        isFetched: false,
-        highlight: null,
-        path: (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:""
-      });
-      instance = this.instances.get(instanceId);
-    }
-
-    try {
-      let path = instanceId;
-      console.debug("fetch instance " + path + ".");
-
-      const { data } = await API.axios.get(API.endpoints.instanceData(path));
-
-      runInAction(() => {
-        const instanceData = data.data?data.data:{fields: {}};
-        instance.data = instanceData;
-        for(let fieldKey in instanceData.fields){
-          let field = instanceData.fields[fieldKey];
-          if(field.instancesPath){
-            field.optionsUrl = field.instancesPath;
-            field.type = "DynamicDropdown";
-            field.instanceType = instanceData.fields.id.value.path;
-          }
-        }
-        instance.form = new FormStore(instanceData);
-        instance.form.registerAxiosInstance(API.axios);
-
-        instance.isFetching = false;
-        instance.isFetched = true;
-        this.memorizeInstanceInitialValues(instanceId);
-        instance.form.toggleReadMode(this.globalReadMode);
-      });
-    } catch (e) {
-      const message = e.message?e.message:e;
-      instance.fetchError = `Error while retrieving instance "${instanceId}" (${message})`;
-      instance.hasFetchError = true;
-      instance.isFetched = false;
-      instance.isFetching = false;
-    }
-    return instance;
-  }
-
-  memorizeInstanceInitialValues(instanceId){
-    const instance = this.instances.get(instanceId);
-    instance.initialValues = instance.form.getValues();
-  }
-
-  @action
   setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
     let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
     currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
@@ -357,16 +696,12 @@ class InstanceStore {
   @action
   setReadMode(readMode){
     this.globalReadMode = readMode;
-    this.instances.forEach((instance) => {
-      if (instance.isFetched) {
-        instance.form.toggleReadMode(readMode);
-      }
-    });
+    this.instances.forEach(instance => instance.setReadMode(readMode));
   }
 
   @action
   instanceHasChanged(instanceId){
-    const instance = this.instances.get(instanceId);
+    const instance = this.getInstance(instanceId);
     if(!instance.hasChanged){
       instance.hasChanged = true;
     }
@@ -374,70 +709,17 @@ class InstanceStore {
 
   @action
   cancelInstanceChanges(instanceId){
-    this.instances.get(instanceId).cancelChangesPending = true;
+    this.getInstance(instanceId).cancelChangesPending = true;
   }
 
   @action
   confirmCancelInstanceChanges(instanceId){
-    const instance = this.instances.get(instanceId);
-    instance.form.injectValues(instance.initialValues);
-    instance.hasChanged = false;
-    instance.cancelChangesPending = false;
-    instance.saveError = null;
-    instance.hasSaveError = false;
+    this.getInstance(instanceId).cancelChanges();
   }
 
   @action
   abortCancelInstanceChange(instanceId){
     this.instances.get(instanceId).cancelChangesPending = false;
-  }
-
-  @action
-  async saveInstance(instanceId){
-    historyStore.updateInstanceHistory(instanceId, "edited");
-    const instance = this.instances.get(instanceId);
-    instance.cancelChangesPending = false;
-    instance.hasSaveError = false;
-    instance.isSaving = true;
-
-    try {
-      const payload = instance.form.getValues();
-      const { data } = await API.axios.put(API.endpoints.instanceData(instanceId), payload);
-      runInAction(() => {
-        instance.hasChanged = false;
-        instance.saveError = null;
-        instance.hasSaveError = false;
-        instance.isSaving = false;
-        console.debug("successfully saved", data);
-        //We assume the options are already in cache :)
-        const options = this.optionsCache.cache.get(instance.path);
-        if (options) {
-          const option = options.find(o => o.id === instanceId);
-          if (option) {
-            if (instance.data.ui_info && instance.data.ui_info.labelField) {
-              const keyFieldName = instance.data.ui_info.labelField;
-              if (payload && payload[keyFieldName]) {
-                option.name = payload[keyFieldName];
-              }
-            }
-          }
-        }
-      });
-    } catch (e) {
-      const message = e.message?e.message:e;
-      instance.saveError = `Error while saving instance "${instanceId}" (${message})`;
-      instance.hasSaveError = true;
-      instance.isSaving = false;
-    } finally {
-      statusStore.flush();
-    }
-  }
-
-  @action
-  cancelSaveInstance(instanceId){
-    const instance = this.instances.get(instanceId);
-    instance.saveError = null;
-    instance.hasSaveError = false;
   }
 
   @action
@@ -450,5 +732,9 @@ class InstanceStore {
     this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
 }
+
+export const createInstanceStore = (databaseScope=null) => {
+  return new InstanceStore(databaseScope);
+};
 
 export default new InstanceStore();

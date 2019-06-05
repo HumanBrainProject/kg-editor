@@ -84,8 +84,9 @@ class OptionsPool{
   @action
   async fetchOptions(url, field, search, start, size, mappingValue, requestBody){
     const optionsSet = [];
-    let response = await API.axios.post(API.endpoints.suggestions(url, field, start, size, search), requestBody);
-    response.data.results.forEach(option => {
+    const { data } = await API.axios.get(API.endpoints.suggestions(url, field, start, size, search, true), requestBody); // TODO: use real api
+    //const response = await API.axios.post(API.endpoints.suggestions(url, field, start, size, search, false), requestBody);
+    data && data.data.forEach(option => {
       if(!this.options.has(option[mappingValue])){
         this.options.set(option[mappingValue], option);
       } else {
@@ -96,7 +97,7 @@ class OptionsPool{
       }
       optionsSet.push(this.options.get(option[mappingValue]));
     });
-    return {options:optionsSet, total:response.data.total};
+    return {options:optionsSet, total:data.total};
   }
 }
 

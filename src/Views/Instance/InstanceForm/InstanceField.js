@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Field } from "hbp-quickfire";
 import instanceStore from "../../../Stores/InstanceStore";
+import RenderMarkdownField from "../../../Components/Markdown";
 
 const styles = {
   field: {
@@ -18,10 +19,13 @@ const styles = {
       color: "#143048"
     },
     "& .quickfire-field-input-text.quickfire-readmode, & .quickfire-field-dropdown-select.quickfire-readmode": {
-      marginBottom: "5px"
-    },
-    "& .quickfire-field-input-text.quickfire-readmode label.quickfire-label, & .quickfire-field-dropdown-select.quickfire-readmode label.quickfire-label": {
-      marginBottom: "0"
+      marginBottom: "5px",
+      "& label.quickfire-label": {
+        marginBottom: "0",
+        "& + p": {
+          whiteSpace: "pre-wrap"
+        }
+      }
     },
     "& .quickfire-field-disabled.quickfire-empty-field, .quickfire-field-readonly.quickfire-empty-field": {
       display: "none"
@@ -66,16 +70,21 @@ export default class InstanceField extends React.Component{
 
   renderReadModeField = (field) => {
     if (field) {
-      if (field.type === "TextArea") {
+      if (typeof field.type === "string" && field.type.includes("TextArea")) {
+        /*
         if (this.props.id !== this.props.mainInstanceId && this.props.id !== instanceStore.getCurrentInstanceId(this.props.mainInstanceId) && this.props.level !== 0) {
           if (field.value && field.value.length && field.value.length >= 200) {
             return field.value.substr(0,197) + "...";
           }
           return field.value;
         }
-        return field.value;
-
-      } else if (field.type === "DynamicDropdown") {
+        */
+        return (
+          field.markdown === true ? <RenderMarkdownField value={field.value}/>:
+            <p>{field.value}</p>
+        );
+      }
+      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown")) {
         return (
           <span className="quickfire-readmode-list">
             {field.value.map(value =>
@@ -105,21 +114,20 @@ export default class InstanceField extends React.Component{
   }
 
   render(){
-    const { classes, name, instance } = this.props;
+    const { classes, name, instance, disableLinks } = this.props;
     const field = instance.data.fields[name];
-    const readOnlyMode = instanceStore.readOnlyMode;
     if (field) {
-      if (field.type === "TextArea")  {
+      if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
-      if (field.type === "DropdownSelect" && field.isLink) {
+      if (typeof field.type === "string" && field.type.includes("DropdownSelect") && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
           onValueBlur={this.handleToggleOffFieldHighlight}
           onValueMouseLeave={this.handleToggleOffFieldHighlight}
-          readModeRendering={readOnlyMode?undefined:this.renderReadModeField}
+          readModeRendering={disableLinks?undefined:this.renderReadModeField}
           onAddCustomValue={field.allowCustomValues?this.addCustomValueHandler:undefined} />;
       }
       return <Field name={name} className={classes.field} />;

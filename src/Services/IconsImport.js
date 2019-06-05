@@ -1,7 +1,12 @@
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 
+import {faUser} from "@fortawesome/free-solid-svg-icons/faUser";
 import {faUserLock} from "@fortawesome/free-solid-svg-icons/faUserLock";
+import {faUserEdit} from "@fortawesome/free-solid-svg-icons/faUserEdit";
+import {faUserCheck} from "@fortawesome/free-solid-svg-icons/faUserCheck";
+import {faUserClock} from "@fortawesome/free-solid-svg-icons/faUserClock";
+import {faUserPlus} from "@fortawesome/free-solid-svg-icons/faUserPlus";
 import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons/faQuestionCircle";
 import {faHome} from "@fortawesome/free-solid-svg-icons/faHome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons/faSearch";
@@ -59,9 +64,15 @@ import {faBlenderPhone} from "@fortawesome/free-solid-svg-icons/faBlenderPhone";
 import {faTable} from "@fortawesome/free-solid-svg-icons/faTable";
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons/faAsterisk";
 import {faLevelDownAlt} from "@fortawesome/free-solid-svg-icons/faLevelDownAlt";
+import {faSitemap} from "@fortawesome/free-solid-svg-icons/faSitemap";
 
 library.add(
+  faUser,
   faUserLock,
+  faUserEdit,
+  faUserCheck,
+  faUserClock,
+  faUserPlus,
   faQuestionCircle,
   faHome,
   faSearch,
@@ -118,5 +129,6 @@ library.add(
   faBlenderPhone,
   faTable,
   faAsterisk,
-  faLevelDownAlt
+  faLevelDownAlt,
+  faSitemap
 );

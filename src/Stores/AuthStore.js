@@ -149,14 +149,16 @@ class AuthStore {
         */
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
-          this.user = data;
+          this.user = data && data.data;
           this.isRetrievingUserProfile = false;
           this.reloginResolve();
           this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
         });
       } catch (e) {
-        this.userProfileError = e.message?e.message:e;
-        this.isRetrievingUserProfile = false;
+        runInAction(() => {
+          this.userProfileError = e.message?e.message:e;
+          this.isRetrievingUserProfile = false;
+        });
       }
     }
   }

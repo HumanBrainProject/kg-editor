@@ -112,7 +112,7 @@ const styles = {
       minWidth:"140px",
       marginTop:"20px"
     },
-    color:"#e74c3c"
+    color: "var(--ft-color-error)"
   },
   noFeaturesPanel:{
     extend:"featuresFetchErrorPanel",
@@ -236,6 +236,9 @@ export default class Features extends React.Component {
   constructor(props){
     super(props);
     this.state = { zoom: {type: null, src: null, width: 0, height: 0}};
+  }
+
+  componentDidMount() {
     if(!featuresStore.isFetched && !featuresStore.isFetching){
       featuresStore.fetchFeatures();
     }

@@ -114,7 +114,7 @@ const styles = {
       minWidth:"140px",
       marginTop:"20px"
     },
-    color:"#e74c3c"
+    color: "var(--ft-color-error)"
   },
   noStatisticsPanel:{
     extend:"statisticsFetchErrorPanel",
@@ -140,12 +140,6 @@ export default class DatasetsStatistics extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
-    if(!statisticsStore.globalDatasetsStatistics.isFetched && !statisticsStore.globalDatasetsStatistics.isFetching){
-      statisticsStore.fetchGlobalDatasetsStatistics();
-    }
-    if(!statisticsStore.perWeekDatasetsStatistics.isFetched && !statisticsStore.perWeekDatasetsStatistics.isFetching){
-      statisticsStore.fetchPerWeekDatasetsStatistics();
-    }
   }
 
   handleResize = () => {
@@ -154,6 +148,12 @@ export default class DatasetsStatistics extends React.Component {
 
   componentDidMount = () => {
     window.addEventListener("resize", this.handleResize);
+    if(!statisticsStore.globalDatasetsStatistics.isFetched && !statisticsStore.globalDatasetsStatistics.isFetching){
+      statisticsStore.fetchGlobalDatasetsStatistics();
+    }
+    if(!statisticsStore.perWeekDatasetsStatistics.isFetched && !statisticsStore.perWeekDatasetsStatistics.isFetching){
+      statisticsStore.fetchPerWeekDatasetsStatistics();
+    }
   }
 
   componentWillUnmount = () => {

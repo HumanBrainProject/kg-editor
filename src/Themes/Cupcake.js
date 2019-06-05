@@ -31,8 +31,20 @@ const styles = {
       "--ft-color-loud":new Color("#f6bec9").alpha(0.8).rgb().string(),
       "--ft-color-louder":new Color("#f6bec9").alpha(1).rgb().string(),
 
-      "--pane-box-shadow":"#333",
+      "--ft-color-error":"#e74c3c",
+      "--bg-color-error-quiet":"#5b130b",
+      "--bg-color-error-normal":"#ac2415",
+      "--bg-color-error-loud":"#ac2415",
 
+      "--bg-color-warn-quiet":"#473600",
+      "--bg-color-warn-normal":"#8f6b00",
+      "--bg-color-warn-loud":"#b88a00",
+
+      "--ft-color-info":"#24282a",
+      "--bg-color-info-normal":"#ffc107",
+
+      "--pane-box-shadow":"#333",
+      "--release-status-box-shadow":"#00000080",
       "--release-color-released":"rgb(52, 152, 219)",
       "--release-bg-released":"rgba(52, 152, 219, 0.25)",
       "--release-color-not-released":"rgb(231, 76, 60)",

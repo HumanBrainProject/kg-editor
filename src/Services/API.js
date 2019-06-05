@@ -3,31 +3,39 @@ import authStore from "../Stores/AuthStore";
 
 const endpoints = {
   "user": () => "/editor/api/user",
+  "userInfo": user => `/editor/api/review/user/${user}`,
+  "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
+  "instanceReviews": instance => `/api/scopes/${instance}`,
+  "instanceReviewsByUser": (instance, user) => `/api/scopes/${instance}/${user}`,
   "features": () => `${window.rootPath}/data/features.json`,
-  "structure": () => "/statistics/structure.json",
+  "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
   "globalDatasetsStatistics": () => `${window.rootPath}/data/mockups/globalDatasetsStatistics.json`,
-  "nodeTypes": () => "/editor/api/nodetypes",
-  "bookmarkListFolders": (mockup) => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
-  "instances": (entity) => `/editor/api/instances/${entity}`,
+  "bookmarkListFolders": mockup => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
+  "instances": entity => `/editor/api/instances/${entity}`,
   "listedInstances": () => "/editor/api/instances",
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "suggestions": (entity, field, start, size, search) => `/api/suggestion/${entity}/fields?field=${encodeURIComponent(field)}&start=${start}&size=${size}&search=${search}`,
-  "instanceData": (instance) => `/editor/api/instance/${instance}`,
-  "releaseData": (instance) => `/api/releases/${instance}/graph`,
-  "doRelease": (instance) => `/api/releases/${instance}`,
-  "releaseStatus": () => "/api/releases",
+  "suggestions": (entity, field, start, size, search, mockup) => mockup?`${window.rootPath}/data/mockups/files.json`:`/editor/api/suggestion/${entity}/fields?field=${encodeURIComponent(field)}&start=${start}&size=${size}&search=${search}`,
+  "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
+  "releaseData": instance => `/api/releases/${instance}/graph`,
+  "doRelease": instance => `/api/releases/${instance}`,
+  "releaseStatusTopInstance": () => "/api/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
+  "releaseStatusChildren": () => "/api/releases?releaseTreeScope=CHILDREN_ONLY",
   "createBookmarkList": () => "/editor/api/bookmarkList",
-  "updateBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
-  "deleteBookmarkList": (id) => `/editor/api/bookmarkList/${id}`,
+  "updateBookmarkList": id => `/editor/api/bookmarkList/${id}`,
+  "deleteBookmarkList": id => `/editor/api/bookmarkList/${id}`,
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
-  "setInstanceBookmarkLists": (instance) => `/editor/api/instance/${instance}/bookmarks`,
-  "graph": (instance) => `/api/instances/${instance}/graph`,
-  "query": function(rootInstancePath, vocab, size, start){
-    return `/query/${rootInstancePath}/instances${arguments.length > 1?"?":""}${
+  "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
+  "graph": instance => `/api/instances/${instance}/graph`,
+  "structure": () => "/api/structure?withLinks=true",
+  "performQuery": function(instancePath, vocab, size, start){
+    return `/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
-      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;}
+      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}`;},
+  "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
+  "listQueries": instancePath => `/query/${instancePath?"":""}`,
+  "clientInstancePreview": instancePath => `/instances/${instancePath}`,
 };
 
 class API {

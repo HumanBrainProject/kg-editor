@@ -111,10 +111,14 @@ export default class SavePanel extends React.Component{
   handleSaveAll = () => {
     Array.from(instanceStore.instances.entries())
       .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
-      .forEach(([id, ]) => instanceStore.saveInstance(id));
+      .forEach(([id, ]) => {
+        const instance = instanceStore.getInstance(id);
+        instance.save();
+      });
   }
   handleSave(instanceId){
-    instanceStore.saveInstance(instanceId);
+    const instance = instanceStore.getInstance(instanceId);
+    instance.save();
     instanceStore.setComparedInstance(null);
   }
   handleReset(instanceId){
@@ -122,7 +126,8 @@ export default class SavePanel extends React.Component{
     instanceStore.setComparedInstance(null);
   }
   handleDismissSaveError(instanceId){
-    instanceStore.cancelSaveInstance(instanceId);
+    const instance = this.getInstance(instanceId);
+    instance.cancelSave();
   }
   handleShowCompare(instanceId){
     instanceStore.setComparedInstance(instanceId);
@@ -150,7 +155,8 @@ export default class SavePanel extends React.Component{
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
 
     const comparedInstance = instanceStore.comparedInstanceId?instanceStore.getInstance(instanceStore.comparedInstanceId):null;
-
+    const comparedInstanceLabelField = comparedInstance && comparedInstance.data && comparedInstance.data.ui_info && comparedInstance.data.ui_info.labelField;
+    const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.form?comparedInstance.form.getField(comparedInstanceLabelField).getValue():"";
     return(
       <div className={classes.container}>
         <Scrollbars autoHide>
@@ -159,7 +165,7 @@ export default class SavePanel extends React.Component{
             {instanceStore.comparedInstanceId &&
               <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
                 <Modal.Header closeButton>
-                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstance.form.getField("http://schema.org/name").getValue()}
+                  <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstanceLabel}
                 </Modal.Header>
                 <Modal.Body>
                   <Scrollbars autoHide>
@@ -179,7 +185,8 @@ export default class SavePanel extends React.Component{
               </div>
             }
             {changedInstances.map(([id, instance]) => {
-              const label = instance.form.getField("http://schema.org/name").getValue();
+              const labelField = instance && instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+              const label = labelField && instance && instance.form?instance.form.getField(labelField).getValue():"";
               return(
                 <div className={classes.instance} key={instanceStore.getGeneratedKey(instance, "savePanel")}>
                   <div className={classes.type}>

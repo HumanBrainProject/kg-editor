@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 import instanceStore from "../../Stores/InstanceStore";
+import browseStore from "../../Stores/BrowseStore";
 
 const styles = {
   pane: {
@@ -14,10 +15,29 @@ const styles = {
 @injectStyles(styles)
 @observer
 class Links extends React.Component{
-  render(){
-    const {classes, mainInstanceId} = this.props;
-    let linkKeys = [];
+
+  componentDidUpdate(prevProps) {
+    if(this.props.id && prevProps.id !== this.props.id) {
+      this.fetchInstanceData();
+    }
+  }
+
+  fetchInstanceData = () => {
     const instance = instanceStore.getInstance(this.props.id);
+    instance.fetch();
+  }
+
+  render(){
+    const {classes, mainInstanceId } = this.props;
+    const instance = instanceStore.getInstance(this.props.id);
+
+    if (!instance.isReadMode && !browseStore.isFetched.lists) {
+      return null;
+    }
+
+    const mainInstance = instanceStore.openedInstances.get(mainInstanceId);
+    const currentInstancePath = mainInstance.currentInstancePath;
+    let linkKeys = [];
     if(instance.isFetched){
       linkKeys = Object.keys(instance.data.fields).filter(fieldKey => {
         return instance.form.getField(fieldKey).isLink && instance.form.getField(fieldKey).getValue().length > 0;
@@ -47,10 +67,10 @@ class Links extends React.Component{
           :
           null
         }
-        {instanceStore.openedInstances.get(mainInstanceId).currentInstancePath.length-1 >= this.props.level &&
+        {currentInstancePath.length-1 >= this.props.level &&
           <DecoratedLinks
             level={this.props.level+1}
-            id={instanceStore.openedInstances.get(mainInstanceId).currentInstancePath[this.props.level]}
+            id={currentInstancePath[this.props.level]}
             mainInstanceId={mainInstanceId} />
         }
       </React.Fragment>

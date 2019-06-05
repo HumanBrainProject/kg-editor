@@ -1,8 +1,6 @@
 import {observable, action, runInAction, computed} from "mobx";
 import { uniqueId } from "lodash";
 import { FormStore } from "hbp-quickfire";
-
-import console from "../Services/Logger";
 import API from "../Services/API";
 
 import historyStore from "./HistoryStore";
@@ -209,21 +207,13 @@ class Instance {
           })
           .catch(e => {
             runInAction(() => {
-              const message = e.message?e.message:e;
-              this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-              this.hasFetchError = true;
-              this.isFetched = false;
-              this.isFetching = false;
+              this.errorInstance(e);
             });
           });
       });
     } catch (e) {
       runInAction(() => {
-        const message = e.message?e.message:e;
-        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-        this.hasFetchError = true;
-        this.isFetched = false;
-        this.isFetching = false;
+        this.errorInstance(e);
       });
     }
   }
@@ -289,28 +279,28 @@ class Instance {
           });
         } catch(e) {
           runInAction(() => {
-            const message = e.message?e.message:e;
-            this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-            this.hasFetchError = true;
-            this.isFetched = false;
-            this.isFetching = false;
+            this.errorInstance(e);
           });
         }
       });
     } catch (e) {
       runInAction(() => {
-        const message = e.message?e.message:e;
-        this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
-        this.hasFetchError = true;
-        this.isFetched = false;
-        this.isFetching = false;
+        this.errorInstance(e);
       });
     }
   }
 
   @action
-  async save() {
+  errorInstance(e) {
+    const message = e.message?e.message:e;
+    this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message})`;
+    this.hasFetchError = true;
+    this.isFetched = false;
+    this.isFetching = false;
+  }
 
+  @action
+  async save() {
     historyStore.updateInstanceHistory(this.instanceId, "edited");
 
     this.cancelChangesPending = false;
@@ -323,16 +313,16 @@ class Instance {
     }
 
     try {
-      const data = await API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
+      const { data } = await API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
       runInAction(() => {
         this.hasChanged = false;
         this.saveError = null;
         this.hasSaveError = false;
         this.isSaving = false;
         this.fieldsToSetAsNull = [];
-        console.debug("successfully saved", data);
+        this.data = data.data;
       });
-      //We assume the options are already in cache :)
+
       let option = null;
       const keyFieldName = (this.data && this.data.fields && this.data.ui_info && this.data.ui_info.labelField)?this.data.ui_info.labelField:null;
       if (keyFieldName) {
@@ -345,17 +335,8 @@ class Instance {
           }
         }
       }
-      // Because of alternatives fetch again the data
-      // let's give time (1s) to the servers to refresh their state
-      setTimeout(async () => {
-        await this.fetch(true);
-        runInAction(() => {
-          if (keyFieldName && option && !this.fetchError && this.data && this.data.fields && this.data.fields[keyFieldName]) {
-            // value retrieved from server
-            option.name = this.data.fields[keyFieldName].value;
-          }
-        });
-      }, 1000);
+
+      this.fetch(true);
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;

@@ -6,7 +6,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import routerStore from "../../Stores/RouterStore";
-import ReleaseStore from "../../Stores/ReleaseStore";
+import releaseStore from "../../Stores/ReleaseStore";
 import instanceStore from "../../Stores/InstanceStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -44,7 +44,8 @@ const styles = {
       top: 0,
       left: -14,
       background: "transparent",
-      backgroundImage: "radial-gradient(circle at 0 100%, rgba(46, 204, 113, 0) 14px, #2ecc71 15px)",
+      backgroundImage:
+        "radial-gradient(circle at 0 100%, rgba(46, 204, 113, 0) 14px, #2ecc71 15px)",
       backgroundSize: "50% 50%",
       backgroundRepeat: "no-repeat",
       borderTop: "3px solid #2ecc71",
@@ -59,7 +60,8 @@ const styles = {
       top: 0,
       right: -29,
       background: "transparent",
-      backgroundImage: "radial-gradient(circle at 100% 100%, rgba(46, 204, 113, 0) 14px, #2ecc71 15px)",
+      backgroundImage:
+        "radial-gradient(circle at 100% 100%, rgba(46, 204, 113, 0) 14px, #2ecc71 15px)",
       backgroundSize: "50% 50%",
       backgroundRepeat: "no-repeat",
       borderTop: "3px solid #2ecc71",
@@ -159,7 +161,7 @@ const styles = {
       "& > div:first-child": {
         display: "block",
         position: "relative",
-        zIndex: "5",
+        zIndex: "5"
       }
     },
     "& .child-icon": {
@@ -333,7 +335,7 @@ const styles = {
   compareModal: {
     width: "90%",
     "@media screen and (min-width:1024px)": {
-      width: "900px",
+      width: "900px"
     },
     "& .modal-header": {
       overflow: "hidden",
@@ -358,13 +360,12 @@ const styles = {
 @injectStyles(styles)
 @observer
 class ReleaseAction extends React.Component {
-
   handleProceed = () => {
     const { releaseStore } = this.props;
     if (!releaseStore.isSaving) {
       releaseStore.commitStatusChanges();
     }
-  }
+  };
 
   render() {
     const { classes, releaseStore } = this.props;
@@ -375,8 +376,28 @@ class ReleaseAction extends React.Component {
 
     return (
       <React.Fragment>
-        <Button onClick={this.handleProceed} disabled={releaseStore.isSaving || (releaseStore.treeStats.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0)} bsClass={`${classes.releaseButton} btn btn-primary`} bsStyle={"primary"} title={releaseStore.isSaving ? "Saving..." : (releaseStore.treeStats.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0 ? "No pending changes to release" : "Proceed")}>
-          <FontAwesomeIcon icon={releaseStore.isSaving ? "circle-notch" : "cloud-upload-alt"} spin={releaseStore.isSaving} />
+        <Button
+          onClick={this.handleProceed}
+          disabled={
+            releaseStore.isSaving ||
+            (releaseStore.treeStats.proceed_release === 0 &&
+              releaseStore.treeStats.proceed_unrelease === 0)
+          }
+          bsClass={`${classes.releaseButton} btn btn-primary`}
+          bsStyle={"primary"}
+          title={
+            releaseStore.isSaving
+              ? "Saving..."
+              : releaseStore.treeStats.proceed_release === 0 &&
+                releaseStore.treeStats.proceed_unrelease === 0
+                ? "No pending changes to release"
+                : "Proceed"
+          }
+        >
+          <FontAwesomeIcon
+            icon={releaseStore.isSaving ? "circle-notch" : "cloud-upload-alt"}
+            spin={releaseStore.isSaving}
+          />
           <div>{releaseStore.isSaving ? "Saving..." : "Proceed"}</div>
         </Button>
         <div className={classes.treeStats}>
@@ -384,15 +405,21 @@ class ReleaseAction extends React.Component {
             <h5>Pending changes:</h5>
             <div className={"stat pending"}>
               <div className={"name"}>Instances released</div>
-              <div className={"pending-count"}>{releaseStore.treeStats.proceed_release}</div>
+              <div className={"pending-count"}>
+                {releaseStore.treeStats.proceed_release}
+              </div>
             </div>
             <div className={"stat pending"}>
               <div className={"name"}>Instances unreleased</div>
-              <div className={"pending-count"}>{releaseStore.treeStats.proceed_unrelease}</div>
+              <div className={"pending-count"}>
+                {releaseStore.treeStats.proceed_unrelease}
+              </div>
             </div>
             <div className={"stat pending"}>
               <div className={"name"}>Instances not modified</div>
-              <div className={"pending-count"}>{releaseStore.treeStats.proceed_do_nothing}</div>
+              <div className={"pending-count"}>
+                {releaseStore.treeStats.proceed_do_nothing}
+              </div>
             </div>
           </div>
 
@@ -401,22 +428,52 @@ class ReleaseAction extends React.Component {
             <div className={"stat"}>
               <div className={"name"}>Released</div>
               <div className={"bar released"}>
-                <div className={"bar-inner"} style={{ width: `${releaseStore.treeStats.released / releaseStore.treeStats.total * 100}%` }}></div>
-                <div className={"bar-label"}>{releaseStore.treeStats.released} / {releaseStore.treeStats.total}</div>
+                <div
+                  className={"bar-inner"}
+                  style={{
+                    width: `${(releaseStore.treeStats.released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+                  }}
+                />
+                <div className={"bar-label"}>
+                  {releaseStore.treeStats.released} /{" "}
+                  {releaseStore.treeStats.total}
+                </div>
               </div>
             </div>
             <div className={"stat"}>
               <div className={"name"}>Not released</div>
               <div className={"bar not-released"}>
-                <div className={"bar-inner"} style={{ width: `${releaseStore.treeStats.not_released / releaseStore.treeStats.total * 100}%` }}></div>
-                <div className={"bar-label"}>{releaseStore.treeStats.not_released} / {releaseStore.treeStats.total}</div>
+                <div
+                  className={"bar-inner"}
+                  style={{
+                    width: `${(releaseStore.treeStats.not_released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+                  }}
+                />
+                <div className={"bar-label"}>
+                  {releaseStore.treeStats.not_released} /{" "}
+                  {releaseStore.treeStats.total}
+                </div>
               </div>
             </div>
             <div className={"stat"}>
               <div className={"name"}>Has changed</div>
               <div className={"bar has-changed"}>
-                <div className={"bar-inner"} style={{ width: `${releaseStore.treeStats.has_changed / releaseStore.treeStats.total * 100}%` }}></div>
-                <div className={"bar-label"}>{releaseStore.treeStats.has_changed} / {releaseStore.treeStats.total}</div>
+                <div
+                  className={"bar-inner"}
+                  style={{
+                    width: `${(releaseStore.treeStats.has_changed /
+                      releaseStore.treeStats.total) *
+                      100}%`
+                  }}
+                />
+                <div className={"bar-label"}>
+                  {releaseStore.treeStats.has_changed} /{" "}
+                  {releaseStore.treeStats.total}
+                </div>
               </div>
             </div>
           </div>
@@ -426,22 +483,52 @@ class ReleaseAction extends React.Component {
             <div className={"stat"}>
               <div className={"name"}>Released</div>
               <div className={"bar released"}>
-                <div className={"bar-inner"} style={{ width: `${releaseStore.treeStats.pending_released / releaseStore.treeStats.total * 100}%` }}></div>
-                <div className={"bar-label"}>{releaseStore.treeStats.pending_released} / {releaseStore.treeStats.total}</div>
+                <div
+                  className={"bar-inner"}
+                  style={{
+                    width: `${(releaseStore.treeStats.pending_released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+                  }}
+                />
+                <div className={"bar-label"}>
+                  {releaseStore.treeStats.pending_released} /{" "}
+                  {releaseStore.treeStats.total}
+                </div>
               </div>
             </div>
             <div className={"stat"}>
               <div className={"name"}>Not released</div>
               <div className={"bar not-released"}>
-                <div className={"bar-inner"} style={{ width: `${releaseStore.treeStats.pending_not_released / releaseStore.treeStats.total * 100}%` }}></div>
-                <div className={"bar-label"}>{releaseStore.treeStats.pending_not_released} / {releaseStore.treeStats.total}</div>
+                <div
+                  className={"bar-inner"}
+                  style={{
+                    width: `${(releaseStore.treeStats.pending_not_released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+                  }}
+                />
+                <div className={"bar-label"}>
+                  {releaseStore.treeStats.pending_not_released} /{" "}
+                  {releaseStore.treeStats.total}
+                </div>
               </div>
             </div>
             <div className={"stat"}>
               <div className={"name"}>Has changed</div>
               <div className={"bar has-changed"}>
-                <div className={"bar-inner"} style={{ width: `${releaseStore.treeStats.pending_has_changed / releaseStore.treeStats.total * 100}%` }}></div>
-                <div className={"bar-label"}>{releaseStore.treeStats.pending_has_changed} / {releaseStore.treeStats.total}</div>
+                <div
+                  className={"bar-inner"}
+                  style={{
+                    width: `${(releaseStore.treeStats.pending_has_changed /
+                      releaseStore.treeStats.total) *
+                      100}%`
+                  }}
+                />
+                <div className={"bar-label"}>
+                  {releaseStore.treeStats.pending_has_changed} /{" "}
+                  {releaseStore.treeStats.total}
+                </div>
               </div>
             </div>
           </div>
@@ -457,16 +544,26 @@ class ReleaseNodeToggle extends React.Component {
   handleChange = status => {
     const { node, releaseStore, messages } = this.props;
     releaseStore.markNodeForChange(node, status);
-    let relativeUrl = node.relativeUrl.substr(0, node.relativeUrl.lastIndexOf("/"));
-    if(Object.keys(messages).includes(relativeUrl)) {
-      status == "RELEASED" ? releaseStore.handleWarning(relativeUrl, messages[relativeUrl]["release"]):
-        releaseStore.handleWarning(relativeUrl, messages[relativeUrl]["unrelease"]);
+    let relativeUrl = node.relativeUrl.substr(
+      0,
+      node.relativeUrl.lastIndexOf("/")
+    );
+    if (Object.keys(messages).includes(relativeUrl)) {
+      status == "RELEASED"
+        ? releaseStore.handleWarning(
+          relativeUrl,
+          messages[relativeUrl]["release"]
+        )
+        : releaseStore.handleWarning(
+          relativeUrl,
+          messages[relativeUrl]["unrelease"]
+        );
     }
-  }
+  };
 
   handleStopClick = e => {
     e && e.stopPropagation();
-  }
+  };
 
   render() {
     const { classes, node, releaseStore } = this.props;
@@ -476,11 +573,36 @@ class ReleaseNodeToggle extends React.Component {
     }
 
     return (
-      <div className={`${classes.nodeActions} ${node.status === "RELEASED" ? "no-release" : ""} ${node.status === "NOT_RELEASED" ? "no-unrelease" : ""}`} onClick={this.handleStopClick}>
-        <MultiToggle selectedValue={node.pending_status} onChange={this.handleChange}>
-          {node.status !== "RELEASED" && <MultiToggle.Toggle color={"#3498db"} value={"RELEASED"} icon="check" />}
-          <MultiToggle.Toggle color={"#999"} value={node.status} icon="dot-circle" noscale />
-          {node.status !== "NOT_RELEASED" && <MultiToggle.Toggle color={"#e74c3c"} value={"NOT_RELEASED"} icon="unlink" />}
+      <div
+        className={`${classes.nodeActions} ${
+          node.status === "RELEASED" ? "no-release" : ""
+        } ${node.status === "NOT_RELEASED" ? "no-unrelease" : ""}`}
+        onClick={this.handleStopClick}
+      >
+        <MultiToggle
+          selectedValue={node.pending_status}
+          onChange={this.handleChange}
+        >
+          {node.status !== "RELEASED" && (
+            <MultiToggle.Toggle
+              color={"#3498db"}
+              value={"RELEASED"}
+              icon="check"
+            />
+          )}
+          <MultiToggle.Toggle
+            color={"#999"}
+            value={node.status}
+            icon="dot-circle"
+            noscale
+          />
+          {node.status !== "NOT_RELEASED" && (
+            <MultiToggle.Toggle
+              color={"#e74c3c"}
+              value={"NOT_RELEASED"}
+              icon="unlink"
+            />
+          )}
         </MultiToggle>
       </div>
     );
@@ -490,16 +612,25 @@ class ReleaseNodeToggle extends React.Component {
 @injectStyles(styles)
 @observer
 class ReleaseNodeAndChildrenToggle extends React.Component {
-
   handleChange(status) {
     const { node, releaseStore, messages } = this.props;
     releaseStore.markAllNodeForChange(node, status);
-    node.children && node.children.length > 0 ? node.children.forEach(child => {
-      let relativeUrl = child.relativeUrl.substr(0, child.relativeUrl.lastIndexOf("/"));
-      if(Object.keys(messages).includes(relativeUrl)) {
-        status == "RELEASED" ? releaseStore.handleWarning(relativeUrl, messages[relativeUrl]["release"]):null;
-      }
-    }):null;
+    node.children && node.children.length > 0
+      ? node.children.forEach(child => {
+        let relativeUrl = child.relativeUrl.substr(
+          0,
+          child.relativeUrl.lastIndexOf("/")
+        );
+        if (Object.keys(messages).includes(relativeUrl)) {
+          status == "RELEASED"
+            ? releaseStore.handleWarning(
+              relativeUrl,
+              messages[relativeUrl]["release"]
+            )
+            : null;
+        }
+      })
+      : null;
   }
 
   render() {
@@ -512,10 +643,16 @@ class ReleaseNodeAndChildrenToggle extends React.Component {
     return (
       <div className={classes.hlActions}>
         <ButtonGroup>
-          <Button onClick={this.handleChange.bind(this, "RELEASED")} bsSize={"xsmall"}>
+          <Button
+            onClick={this.handleChange.bind(this, "RELEASED")}
+            bsSize={"xsmall"}
+          >
             Release
           </Button>
-          <Button onClick={this.handleChange.bind(this, null)} bsSize={"xsmall"}>
+          <Button
+            onClick={this.handleChange.bind(this, null)}
+            bsSize={"xsmall"}
+          >
             Do nothing
           </Button>
         </ButtonGroup>
@@ -527,7 +664,6 @@ class ReleaseNodeAndChildrenToggle extends React.Component {
 @injectStyles(styles)
 @observer
 class ReleaseNode extends React.Component {
-
   handleAction(mode, instanceId, e) {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.target)) {
@@ -552,47 +688,111 @@ class ReleaseNode extends React.Component {
   }
 
   render() {
-    const { classes, node, prefix = "", level = 0, releaseStore, messages } = this.props;
+    const {
+      classes,
+      node,
+      prefix = "",
+      level = 0,
+      releaseStore,
+      messages
+    } = this.props;
 
     if (!node || !releaseStore) {
       return null;
     }
 
-    const statusClass = (node[prefix + "status"] === "NOT_RELEASED") ? "not-released"
-      : (node[prefix + "status"] === "HAS_CHANGED") ? "has-changed"
-        : "released";
+    const statusClass =
+      node[prefix + "status"] === "NOT_RELEASED"
+        ? "not-released"
+        : node[prefix + "status"] === "HAS_CHANGED"
+          ? "has-changed"
+          : "released";
 
     return (
-      <div className={`node ${statusClass} ${releaseStore.hlNode === node ? "highlighted" : ""}`}>
-        <div className="node-content" onClick={this.handleHLNode.bind(this, node)}>
+      <div
+        className={`node ${statusClass} ${
+          releaseStore.hlNode === node ? "highlighted" : ""
+        }`}
+      >
+        <div
+          className="node-content"
+          onClick={this.handleHLNode.bind(this, node)}
+        >
           <div className={"status-indicator"}>
-            <ReleaseStatus key={`${node[prefix + "status"]}`} instanceStatus={node[prefix + "status"]} isChildren={false} />
+            <ReleaseStatus
+              key={`${node[prefix + "status"]}`}
+              instanceStatus={node[prefix + "status"]}
+              isChildren={false}
+            />
           </div>
-          <span className={"node-type"}>
-            ({node.type})
-          </span>
-          <span className={classes.label}>
-            {node.label}
-          </span>
+          <span className={"node-type"}>({node.type})</span>
+          <span className={classes.label}>{node.label}</span>
           {prefix === "" && (
-            <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} messages={messages} />
+            <ReleaseNodeToggle
+              key={`${node.pending_status}-${node.pending_childrenStatus}-${
+                node.pending_globalStatus
+              }`}
+              node={node}
+              releaseStore={releaseStore}
+              classes={classes}
+              messages={messages}
+            />
           )}
         </div>
         {prefix === "" && (
           <div className="node-actions">
-            <div className="node-action" onClick={this.handleAction.bind(this, "view", node.relativeUrl)} title={`view ${node.type} ${node.label}`}><FontAwesomeIcon icon="eye" /></div>
-            <div className={`node-action ${node.isAssociation?"disabled":""}`} onClick={node.isAssociation?null:this.handleShowCompare.bind(this, node)} title={node.isAssociation?"linking instances are not available for preview":"compare the changes with released vesion"}><FontAwesomeIcon icon="glasses" /></div>
+            <div
+              className="node-action"
+              onClick={this.handleAction.bind(this, "view", node.relativeUrl)}
+              title={`view ${node.type} ${node.label}`}
+            >
+              <FontAwesomeIcon icon="eye" />
+            </div>
+            <div
+              className={`node-action ${node.isAssociation ? "disabled" : ""}`}
+              onClick={
+                node.isAssociation
+                  ? null
+                  : this.handleShowCompare.bind(this, node)
+              }
+              title={
+                node.isAssociation
+                  ? "linking instances are not available for preview"
+                  : "compare the changes with released vesion"
+              }
+            >
+              <FontAwesomeIcon icon="glasses" />
+            </div>
           </div>
         )}
-        {node.children && node.children.length > 0 &&
+        {node.children && node.children.length > 0 && (
           <div className={"children"}>
             {node.children.map(child => (
-              <ReleaseNode key={`${level + 1}-${child["@id"]}-${child[prefix + "status"]}`} node={child} prefix={prefix} level={level + 1} releaseStore={releaseStore} classes={classes} messages={messages} />
+              <ReleaseNode
+                key={`${level + 1}-${child["@id"]}-${child[prefix + "status"]}`}
+                node={child}
+                prefix={prefix}
+                level={level + 1}
+                releaseStore={releaseStore}
+                classes={classes}
+                messages={messages}
+              />
             ))}
           </div>
-        }
-        {prefix === "" && releaseStore.hlNode === node && node.children && node.children.length > 0 && (
-          <ReleaseNodeAndChildrenToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} releaseStore={releaseStore} classes={classes} messages={messages}/>
+        )}
+        {prefix === "" &&
+          releaseStore.hlNode === node &&
+          node.children &&
+          node.children.length > 0 && (
+          <ReleaseNodeAndChildrenToggle
+            key={`${node.pending_status}-${node.pending_childrenStatus}-${
+              node.pending_globalStatus
+            }`}
+            node={node}
+            releaseStore={releaseStore}
+            classes={classes}
+            messages={messages}
+          />
         )}
       </div>
     );
@@ -604,34 +804,21 @@ class ReleaseNode extends React.Component {
 export default class InstanceRelease extends React.Component {
   constructor(props) {
     super(props);
-    this.releaseStore = new ReleaseStore(props.id);
-    this.keyMap = new WeakMap();
     this.state = {
       showModal: false
     };
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
-    if (this.props.id !== newProps.id) {
-      this.releaseStore = new ReleaseStore(newProps.id);
-    }
-  }
-
   componentDidMount() {
-    if (this.props.id) {
-      this.fetchInstanceData();
-    }
+    releaseStore.setTopInstanceId(this.props.id);
+    releaseStore.fetchReleaseData();
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props.id && prevProps.id !== this.props.id) {
-      this.fetchInstanceData();
+    if (this.props.id !== prevProps.id) {
+      releaseStore.setTopInstanceId(this.props.id);
+      releaseStore.fetchReleaseData();
     }
-  }
-
-  fetchInstanceData = () => {
-    const instance = instanceStore.getInstance(this.props.id);
-    instance.fetch();
   }
 
   handleShowCompare(node, e) {
@@ -640,102 +827,196 @@ export default class InstanceRelease extends React.Component {
   }
 
   handleDismissSaveError = () => {
-    this.releaseStore.dismissSaveError();
-  }
+    releaseStore.dismissSaveError();
+  };
 
   handleRetryFetching = () => {
-    this.releaseStore.fetchReleaseData();
-  }
+    releaseStore.fetchReleaseData();
+  };
 
   handleOpenModal = () => {
     this.setState({ showModal: true });
-  }
+  };
 
   handleCloseModal = () => {
     this.setState({ showModal: false });
-  }
+  };
 
   getMessagesFromSpecs = fields => {
     let messages = {};
-    fields && Object.values(fields).forEach(item => {
-      if(item.instancesPath && item.hasOwnProperty("messages")) {
-        messages[item.instancesPath] = item["messages"];
-      }
-    });
+    fields &&
+      Object.values(fields).forEach(item => {
+        if (item.instancesPath && item.hasOwnProperty("messages")) {
+          messages[item.instancesPath] = item["messages"];
+        }
+      });
     return messages;
-  }
+  };
 
   render() {
     const { classes } = this.props;
-    let instanceSpecs = instanceStore.getInstance(this.props.id);
-    let specsWithMessages = instanceSpecs && instanceSpecs.data? this.getMessagesFromSpecs(instanceSpecs.data.fields):null;
+    let instanceSpecs = instanceStore.instances.get(this.props.id);
+    let specsWithMessages =
+      instanceSpecs && instanceSpecs.data
+        ? this.getMessagesFromSpecs(instanceSpecs.data.fields)
+        : null;
 
-    return (
+    return releaseStore ? (
       <div className={classes.container}>
-        {this.releaseStore.saveError ?
+        {releaseStore.saveError ? (
           <BGMessage icon="ban">
-            There has been an error while releasing one or more instances.<br />
-            Please try again or contact our support if the problem persists.<br /><br />
-            <small>{this.releaseStore.saveError}</small><br /><br />
-            <Button bsStyle="primary" onClick={this.handleDismissSaveError}>OK</Button>
+            There has been an error while releasing one or more instances.
+            <br />
+            Please try again or contact our support if the problem persists.
+            <br />
+            <br />
+            <small>{releaseStore.saveError}</small>
+            <br />
+            <br />
+            <Button bsStyle="primary" onClick={this.handleDismissSaveError}>
+              OK
+            </Button>
           </BGMessage>
-          : this.releaseStore.fetchError ?
-            <BGMessage icon="ban">
-              There has been an error while fetching the release data for this instance.<br />
-              Please try again or contact our support if the problem persists.<br /><br />
-              <small>{this.releaseStore.fetchError}</small><br /><br />
-              <Button bsStyle="primary" onClick={this.handleRetryFetching}>Retry</Button>
-            </BGMessage>
-            :
-            <Scrollbars autoHide>
-              {this.releaseStore.isFetching ?
-                <FetchingLoader><span>Fetching release data...</span></FetchingLoader>
-                :
-                <div className={classes.releasePreview}>
-                  <div className={classes.globalActions}>
-                    <h4>Current state</h4>
-                    {this.releaseStore.hasWarning ?
-                      [...this.releaseStore.warningMessages.values()].map((message,index) =>
-                        <Alert key={`${message}-${index}`} style={{background:"var(--release-color-has-changed)", color:"black", borderColor:"transparent"}}>
+        ) : releaseStore.fetchError ? (
+          <BGMessage icon="ban">
+            There has been an error while fetching the release data for this
+            instance.
+            <br />
+            Please try again or contact our support if the problem persists.
+            <br />
+            <br />
+            <small>{releaseStore.fetchError}</small>
+            <br />
+            <br />
+            <Button bsStyle="primary" onClick={this.handleRetryFetching}>
+              Retry
+            </Button>
+          </BGMessage>
+        ) : (
+          <Scrollbars autoHide>
+            {releaseStore.isFetching ? (
+              <FetchingLoader>
+                <span>Fetching release data...</span>
+              </FetchingLoader>
+            ) : (
+              <div className={classes.releasePreview}>
+                <div className={classes.globalActions}>
+                  <h4>Current state</h4>
+                  {releaseStore.hasWarning
+                    ? [...releaseStore.warningMessages.values()].map(
+                      (message, index) => (
+                        <Alert
+                          key={`${message}-${index}`}
+                          style={{
+                            background: "var(--release-color-has-changed)",
+                            color: "black",
+                            borderColor: "transparent"
+                          }}
+                        >
                           {message}
-                        </Alert>):null
-                    }
-                  </div>
-                  <div className={classes.releaseActions}>
-                    <div onClick={this.handleOpenModal} className={classes.previewIcon}><FontAwesomeIcon style={{ verticalAlign: "top" }} title="Preview in KG Search" icon="eye" /></div>
-                    <ReleaseAction releaseStore={this.releaseStore} />
-                  </div>
-                  <div className={classes.releaseInfos}>
-                    <h4>Preview state</h4>
-                  </div>
-                  <div className={classes.tree}>
-                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.status}`} node={this.releaseStore.instancesTree} releaseStore={this.releaseStore} messages={specsWithMessages}/>
-                  </div>
-                  <div className={classes.tree}>
-                    <ReleaseNode key={`0-${this.releaseStore.instancesTree["@id"]}-${this.releaseStore.instancesTree.pending_status}`} node={this.releaseStore.instancesTree} prefix={"pending_"} releaseStore={this.releaseStore} />
-                  </div>
-                  <SavingModal store={this.releaseStore} />
-                  {instanceStore.comparedWithReleasedVersionInstance && instanceStore.comparedWithReleasedVersionInstance.relativeUrl &&
-                    <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this, null)}>
-                      <Modal.Header closeButton>
-                        Compare with the released version of <strong>{instanceStore.comparedWithReleasedVersionInstance.type}&nbsp;{instanceStore.comparedWithReleasedVersionInstance.label}</strong>
-                      </Modal.Header>
-                      <Modal.Body>
-                        <Scrollbars autoHide>
-                          <CompareWithReleasedVersionChanges instanceId={instanceStore.comparedWithReleasedVersionInstance.relativeUrl} status={instanceStore.comparedWithReleasedVersionInstance.status} />
-                        </Scrollbars>
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, null)}><FontAwesomeIcon icon="times" />&nbsp;Close</Button>
-                      </Modal.Footer>
-                    </Modal>
-                  }
-                  <ClientPreviewModal store={this.releaseStore} show={this.state.showModal} handleClose={this.handleCloseModal} />
+                        </Alert>
+                      )
+                    )
+                    : null}
                 </div>
-              }
-            </Scrollbars>
-        }
+                <div className={classes.releaseActions}>
+                  <div
+                    onClick={this.handleOpenModal}
+                    className={classes.previewIcon}
+                  >
+                    <FontAwesomeIcon
+                      style={{ verticalAlign: "top" }}
+                      title="Preview in KG Search"
+                      icon="eye"
+                    />
+                  </div>
+                  <ReleaseAction releaseStore={releaseStore} />
+                </div>
+                <div className={classes.releaseInfos}>
+                  <h4>Preview state</h4>
+                </div>
+                <div className={classes.tree}>
+                  {releaseStore.instancesTree ? (
+                    <ReleaseNode
+                      key={`0-${releaseStore.instancesTree["@id"]}-${
+                        releaseStore.instancesTree.status
+                      }`}
+                      node={releaseStore.instancesTree}
+                      releaseStore={releaseStore}
+                      messages={specsWithMessages}
+                    />
+                  ) : null}
+                </div>
+                <div className={classes.tree}>
+                  {releaseStore.instancesTree ? (
+                    <ReleaseNode
+                      key={`0-${releaseStore.instancesTree["@id"]}-${
+                        releaseStore.instancesTree.pending_status
+                      }`}
+                      node={releaseStore.instancesTree}
+                      prefix={"pending_"}
+                      releaseStore={releaseStore}
+                    />
+                  ) : null}
+                </div>
+                <SavingModal store={releaseStore} />
+                {instanceStore.comparedWithReleasedVersionInstance &&
+                  instanceStore.comparedWithReleasedVersionInstance
+                    .relativeUrl && (
+                  <Modal
+                    show={true}
+                    dialogClassName={classes.compareModal}
+                    onHide={this.handleShowCompare.bind(this, null)}
+                  >
+                    <Modal.Header closeButton>
+                      Compare with the released version of{" "}
+                      <strong>
+                        {
+                          instanceStore.comparedWithReleasedVersionInstance
+                            .type
+                        }
+                        &nbsp;
+                        {
+                          instanceStore.comparedWithReleasedVersionInstance
+                            .label
+                        }
+                      </strong>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <Scrollbars autoHide>
+                        <CompareWithReleasedVersionChanges
+                          instanceId={
+                            instanceStore.comparedWithReleasedVersionInstance
+                              .relativeUrl
+                          }
+                          status={
+                            instanceStore.comparedWithReleasedVersionInstance
+                              .status
+                          }
+                        />
+                      </Scrollbars>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        bsSize="small"
+                        onClick={this.handleShowCompare.bind(this, null)}
+                      >
+                        <FontAwesomeIcon icon="times" />
+                        &nbsp;Close
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+                )}
+                <ClientPreviewModal
+                  store={releaseStore}
+                  show={this.state.showModal}
+                  handleClose={this.handleCloseModal}
+                />
+              </div>
+            )}
+          </Scrollbars>
+        )}
       </div>
-    );
+    ) : null;
   }
 }

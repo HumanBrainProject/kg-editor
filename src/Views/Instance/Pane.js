@@ -70,7 +70,7 @@ export default class Pane extends React.Component {
   }
 
   restorePointerEvents = debounce(() => {
-    this.paneRef.style.pointerEvents = "auto";
+    this.paneRef ? this.paneRef.style.pointerEvents = "auto":null;
   }, 1000);
 
   handleFocus = () => {

@@ -46,15 +46,19 @@ const styles = {
 export default class InstanceInvite extends React.Component{
   componentDidMount() {
     this.fetchInstance();
+    instanceStore.setReadMode(true);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.id !== prevProps.id) {
+      this.fetchInstance(true);
+      instanceStore.setReadMode(true);
+    }
   }
 
   fetchInstance = (forceFetch = false) => {
     const instance = instanceStore.getInstance(this.props.id);
     instance.fetch(forceFetch);
-  }
-
-  UNSAFE_componentWillReceiveProps(){
-    instanceStore.setReadMode(true);
   }
 
   render(){

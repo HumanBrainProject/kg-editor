@@ -72,6 +72,7 @@ let styles = {
 export default class QueryBuilder extends React.Component {
   handleSelectTab(tab) {
     queryBuilderStore.selectTab(tab);
+    this.scrolledPanel.scrollToTop();
   }
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
@@ -79,16 +80,9 @@ export default class QueryBuilder extends React.Component {
   handleFetchStructure = () => {
     structureStore.fetchStructure();
   }
-  UNSAFE_componentWillUpdate() {
-    if (this.currentTab !== queryBuilderStore.currentTab && this.scrolledPanel) {
-      //console.log(this.scrolledPanel,this.scrolledPanel.scrollTop);
-      this.scrolledPanel.scrollToTop();
-    }
-  }
 
   render() {
     const { classes } = this.props;
-    this.currentTab = queryBuilderStore.currentTab;
 
     return (
       <div className={classes.container}>

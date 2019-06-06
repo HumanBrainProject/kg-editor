@@ -46,7 +46,6 @@ class OptionsPool{
     toProcess.forEach(identifier => {
       set(this.options.get(identifier), "isFetching", true);
     });
-
     try{
       let response = await API.axios.post(API.endpoints.listedInstances(), toProcess);
       runInAction(() =>{
@@ -152,6 +151,11 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
       }
       this.addValue(optionsPool.getOption(value, this.mappingValue));
     });
+  }
+
+  @action
+  getOption(value) {
+    return optionsPool.getOption(value, this.mappingValue);
   }
 
   @action

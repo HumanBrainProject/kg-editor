@@ -1,11 +1,14 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { get } from "mobx";
+import { get, toJS } from "mobx";
 import { FormGroup, Glyphicon, MenuItem, Alert } from "react-bootstrap";
 import { difference, isFunction, isString, uniq } from "lodash";
 import InfiniteScroll from "react-infinite-scroller";
 
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
+
+import Alternatives from "./Alternatives";
+import instanceStore from "../Stores/InstanceStore";
 
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -102,6 +105,9 @@ const styles = {
     "& .quickfire-readmode-item:not(:last-child):after":{
       content: "',\\00a0'"
     }
+  },
+  alternatives: {
+    marginLeft: "3px"
   }
 };
 
@@ -109,6 +115,13 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class DynamicDropdownField extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { alternatives: []};
+  }
+
+
+
   //The only way to trigger an onChange event in React is to do the following
   //Basically changing the field value, bypassing the react setter and dispatching an "input"
   // event on a proper html input node
@@ -118,6 +131,21 @@ export default class DynamicDropdownField extends React.Component {
       .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
     var event = new Event("input", { bubbles: true });
     this.hiddenInputRef.dispatchEvent(event);
+  }
+
+  triggerRemoveSuggestionOnChange = () => {
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
+    this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
+    this.handleNodesStyles(this.props.field.getValue(false));
+    let event = new Event("input", { bubbles: true });
+    this.hiddenInputRef.dispatchEvent(event);
+  }
+
+  handleNodesStyles(value){
+    const prototype = window.HTMLInputElement.prototype;
+    Object.getOwnPropertyDescriptor(prototype, "value").set
+      .call(this.hiddenInputRef, JSON.stringify(value));
   }
 
   handleInputKeyStrokes = e => {
@@ -162,8 +190,15 @@ export default class DynamicDropdownField extends React.Component {
     this.props.field.setUserInput(e.target.value);
   }
 
-  handleFocus = () => {
+  handleFocus = e => {
     if(this.props.field.disabled || this.props.field.readOnly){
+      return;
+    }
+    if (e && e.target && this.wrapperRef
+      && this.alternativesRef && this.alternativesRef.props && this.alternativesRef.props.className
+      && this.wrapperRef.querySelector("." + this.alternativesRef.props.className)
+      && this.wrapperRef.querySelector("." + this.alternativesRef.props.className).contains(e.target)) {
+      this.closeDropdown();
       return;
     }
     this.props.field.fetchOptions(true);
@@ -238,6 +273,74 @@ export default class DynamicDropdownField extends React.Component {
     }
   }
 
+  handleAlternativeSelect = values => {
+    let field = this.props.field;
+    field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
+    values.forEach(value => this.beforeAddValue(value));
+    this.triggerOnChange();
+  }
+
+  handleRemoveSuggestion = () => {
+    let field = this.props.field;
+    field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
+    this.triggerRemoveSuggestionOnChange();
+  }
+
+  getAlternativeOptions = value => {
+    const { field } = this.props;
+    const { options, mappingValue } = field;
+    const valueAttributeName = mappingValue?mappingValue:"id";
+
+    if (!value) {
+      return [];
+    }
+
+    if (typeof value !== "object") {
+      return [value];
+    }
+
+    if (value.length) {
+      return value.map(item => {
+        if (item[valueAttributeName]) {
+          if (options instanceof Array) {
+            const option = options.find(option => option[valueAttributeName] === item[valueAttributeName]);
+            if (option) {
+              return option;
+            }
+          }
+          return field.getOption(item);
+        }
+        return item;
+      });
+    }
+
+    if (value[valueAttributeName]) {
+      if (options instanceof Array) {
+        const option = options.find(option => option[valueAttributeName] === value[valueAttributeName]);
+        if (option) {
+          return [option];
+        }
+      }
+      return [field.getOption(value)];
+    }
+
+    return [];
+  }
+
+  getAlternatives = () => {
+    const { formStore, field: { path} } = this.props;
+
+    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
+    const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
+      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
+      .map(alternative => ({
+        value: this.getAlternativeOptions(alternative.value),
+        userIds: alternative.userIds,
+        selected: !!alternative.selected
+      }));
+    this.setState({alternatives: alternatives});
+  }
+
   handleDrop(droppedVal, e){
     let field = this.props.field;
     if(field.disabled || field.readOnly){
@@ -274,6 +377,16 @@ export default class DynamicDropdownField extends React.Component {
 
   componentWillUnmount(){
     this.unlistenClickOutHandler();
+  }
+
+  componentDidMount(){
+    this.getAlternatives();
+  }
+
+  componentDidUpdate(prevProps){
+    if (this.props.formStore && this.props.formStore.structure && (!prevProps.formStore || !prevProps.formStore.structure || (JSON.stringify(toJS(this.props.formStore.structure.alternatives)) !== JSON.stringify(toJS(prevProps.formStore.structure.alternatives))))) {
+      this.getAlternatives();
+    }
   }
 
   beforeAddValue(value){
@@ -316,8 +429,11 @@ export default class DynamicDropdownField extends React.Component {
       return this.renderReadMode();
     }
 
-    let { classes, formStore } = this.props;
-    let { options, value: values, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState } = this.props.field;
+    let { classes, formStore, field } = this.props;
+    let { options, value: values, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = this.props.field;
+
+    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    let isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     let dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     let dropdownClass = dropdownOpen? "open": "";
@@ -336,6 +452,15 @@ export default class DynamicDropdownField extends React.Component {
           className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
           validationState={validationState}>
           <FieldLabel field={this.props.field}/>
+          <Alternatives className={classes.alternatives}
+            show={!disabled && !readOnly && !!this.state.alternatives.length}
+            disabled={disabled || readOnly || isAlternativeDisabled}
+            list={this.state.alternatives}
+            onSelect={this.handleAlternativeSelect}
+            onClick={this.handleRemoveSuggestion}
+            field={field}
+            parentContainerClassName="form-group"
+            ref={ref=>this.alternativesRef = ref}/>
           <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
             {values.map(value => {
               return(

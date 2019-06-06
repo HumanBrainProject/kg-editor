@@ -165,6 +165,10 @@ class Instance {
         }
       }
     }
+    data.alternatives["https://schema.hbp.eu/minds/file"] = [
+      {userIds: ["303708"], selected: true, value: [{id: "cscs/core/file/v1.0.0/48fef830-594a-4648-9d72-cb2bac94768d"}, {id: "cscs/core/file/v1.0.0/4ae29867-0ad6-4d26-92b8-e08fe7313f5b"}]},
+      {userIds: ["305670"], selected: false, value: {id: "cscs/core/file/v1.0.0/48fef830-594a-4648-9d72-cb2bac94768d"}}
+    ];
 
     return data;
   }

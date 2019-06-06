@@ -46,20 +46,16 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class Status extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     statusStore.fetchStatus(this.props.id);
-  }
-
-  UNSAFE_componentWillReceiveProps(newProps) {
-    statusStore.fetchStatus(newProps.id);
   }
 
   render() {
     let instanceStatus = statusStore.getInstance(this.props.id);
     const { classes } = this.props;
+
     return (
-      <div className={`${classes.container} status`}>
+      instanceStatus ?<div className={`${classes.container} status`}>
         {instanceStatus.hasFetchError ?
           <div className={classes.loader}>
             <FontAwesomeIcon icon={"question-circle"} />
@@ -82,7 +78,7 @@ export default class Status extends React.Component {
             :
             <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.childrenStatus ? instanceStatus.data.childrenStatus : null} highContrastChildren={true} isChildren={true} />
         }
-      </div>
+      </div>:null
     );
   }
 }

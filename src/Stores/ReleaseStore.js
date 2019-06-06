@@ -4,7 +4,7 @@ import statusStore from "./StatusStore";
 import historyStore from "./HistoryStore";
 import {uniq} from "lodash";
 
-export default class ReleaseStore{
+class ReleaseStore{
   @observable topInstanceId = null;
   @observable instancesTree = null;
 
@@ -23,11 +23,6 @@ export default class ReleaseStore{
   @observable saveError = null;
 
   @observable hlNode = null;
-
-  constructor(instanceId){
-    this.topInstanceId = instanceId;
-    this.fetchReleaseData();
-  }
 
   @computed
   get treeStats(){
@@ -97,6 +92,11 @@ export default class ReleaseStore{
     nodesByStatus.RELEASED = uniq(nodesByStatus.RELEASED);
     nodesByStatus.NOT_RELEASED = uniq(nodesByStatus.NOT_RELEASED);
     return nodesByStatus;
+  }
+
+  @action
+  setTopInstanceId(instanceId) {
+    this.topInstanceId = instanceId;
   }
 
   @action
@@ -256,3 +256,4 @@ export default class ReleaseStore{
     this.warningMessages.set(key, message);
   }
 }
+export default new ReleaseStore();

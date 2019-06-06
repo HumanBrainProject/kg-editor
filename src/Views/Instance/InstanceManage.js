@@ -78,12 +78,8 @@ export default class InstanceManage extends React.Component{
   }
 
   fetchStatus = () => {
-    statusStore.fetchStatus(this.props.id);
-  }
-
-  UNSAFE_componentWillReceiveProps(props){
     instanceStore.setReadMode(true);
-    statusStore.fetchStatus(props.id);
+    statusStore.fetchStatus(this.props.id);
   }
 
   handleDuplicateInstance = async () => {
@@ -93,7 +89,6 @@ export default class InstanceManage extends React.Component{
 
   handleDeleteInstance = async () => {
     instanceStore.deleteInstance(this.props.id);
-    //document.dispatchEvent(new KeyboardEvent("keydown", { keyCode: 87, altKey: true }));
   }
 
   render(){

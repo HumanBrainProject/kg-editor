@@ -424,6 +424,19 @@ export default class DynamicDropdownField extends React.Component {
     this.props.field.loadMoreOptions();
   }
 
+  valueLabelRendering = (field, value) => {
+    const instance = instanceStore.getInstance(value.id);
+    const labelFieldName = instance && instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+    const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
+    if (instance.isFetched && labelField) {
+      return labelField.value;
+    }
+    return isFunction(this.props.valueLabelRendering)?
+      this.props.valueLabelRendering(this.props.field, value)
+      :
+      get(value, this.props.field.mappingLabel);
+  }
+
   render() {
     if(this.props.formStore.readMode || this.props.field.readMode){
       return this.renderReadMode();
@@ -483,13 +496,8 @@ export default class DynamicDropdownField extends React.Component {
                   onMouseOut={this.handleTagInteraction.bind(this, "MouseOut", value)}
                   onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
                   onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
-
                   title={get(value, mappingLabel)}>
-                  <span className={classes.valueDisplay}>
-                    {isFunction(this.props.valueLabelRendering)?
-                      this.props.valueLabelRendering(this.props.field, value):
-                      get(value, mappingLabel)}
-                  </span>
+                  <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
                   <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
                 </div>
               );

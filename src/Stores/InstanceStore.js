@@ -153,21 +153,17 @@ class Instance {
         field.type = "KgInputText";
       } else if(field.type === "TextArea"){
         field.type = "KgTextArea";
+      /*
       } else if(field.type === "DropdownSelect"){
-        if(field.instancesPath === "cscs/core/file/v1.0.0"){ // TODO: To be changed
-          field.type = "DynamicDropdown";
-          field.optionsUrl = field.instancesPath;
-          field.instanceType = data.fields.id.value.path;
-        } else {
-          field.type = "KgDropdownSelect";
-        }
+        field.type = "KgDropdownSelect";
+      }
+      */
+      } else if(field.type === "DropdownSelect"){
+        field.type = "DynamicDropdown";
+        field.optionsUrl = field.instancesPath;
+        field.instanceType = data.fields.id.value.path;
       }
     }
-    data.alternatives["https://schema.hbp.eu/minds/file"] = [
-      {userIds: ["303708"], selected: true, value: [{id: "cscs/core/file/v1.0.0/48fef830-594a-4648-9d72-cb2bac94768d"}, {id: "cscs/core/file/v1.0.0/4ae29867-0ad6-4d26-92b8-e08fe7313f5b"}]},
-      {userIds: ["305670"], selected: false, value: {id: "cscs/core/file/v1.0.0/48fef830-594a-4648-9d72-cb2bac94768d"}}
-    ];
-
     return data;
   }
 

@@ -83,9 +83,8 @@ class OptionsPool{
   @action
   async fetchOptions(url, field, search, start, size, mappingValue, requestBody){
     const optionsSet = [];
-    const { data } = await API.axios.get(API.endpoints.suggestions(url, field, start, size, search, true), requestBody); // TODO: use real api
-    //const response = await API.axios.post(API.endpoints.suggestions(url, field, start, size, search, false), requestBody);
-    data && data.data.forEach(option => {
+    const { data } = await API.axios.post(API.endpoints.suggestions(url, field, start, size, search), requestBody);
+    data && data.results.forEach(option => {
       if(!this.options.has(option[mappingValue])){
         this.options.set(option[mappingValue], option);
       } else {
@@ -158,6 +157,28 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     return optionsPool.getOption(value, this.mappingValue);
   }
 
+  cleanPaylod = payload => {
+    if (!payload) {
+      return null;
+    }
+    if (payload instanceof Array) {
+      const result = [];
+      payload.forEach(i => result.push(this.cleanPaylod(i)));
+      return result;
+    }
+    if (typeof payload === "object") {
+      const excludedAttributes = ["isFetching", "fetchError"];
+      const result = {};
+      Object.entries(payload).forEach(([name, value]) => {
+        if (!excludedAttributes.includes(name)) {
+          result[name] = this.cleanPaylod(value);
+        }
+      });
+      return result;
+    }
+    return payload;
+  }
+
   @action
   async fetchOptions(append){
     if(this.fetchingOptions){
@@ -165,7 +186,8 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     }
     this.fetchingOptions = true;
     this.optionsPageStart = append?this.options.length:0;
-    let {options, total}= await optionsPool.fetchOptions(this.instanceType, this.path.replace(FormStore.getPathNodeSeparator(),""), this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, this.store.getValues());
+    const payload = this.cleanPaylod(this.store.getValues());
+    let {options, total}= await optionsPool.fetchOptions(this.instanceType, this.path.replace(FormStore.getPathNodeSeparator(),""), this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
     runInAction(()=>{
       if(append){
         this.options = this.options.concat(options);

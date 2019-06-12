@@ -29,6 +29,26 @@ const styles = {
     },
     "& .quickfire-field-disabled.quickfire-empty-field, .quickfire-field-readonly.quickfire-empty-field": {
       display: "none"
+    },
+    "& .quickfire-field-checkbox .quickfire-label": {
+      "&:after": {
+        display: "none"
+      },
+      "& + .checkbox": {
+        display: "inline-block",
+        margin: "0 0 0 4px",
+        verticalAlign: "middle",
+        "& label input[type=checkbox]": {
+          fontSize: "16px"
+        }
+      },
+      "& + span": {
+        verticalAlign: "text-bottom",
+        "& input[type=checkbox]": {
+          fontSize: "16px",
+          marginTop: "0"
+        }
+      }
     }
   }
 };

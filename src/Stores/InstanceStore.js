@@ -293,7 +293,7 @@ class Instance {
   @action
   errorInstance(e) {
     const message = e.message?e.message:e;
-    const errorMessage = e.response && e.response.status !== 500 ? e.response.data:null;
+    const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
     this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message}) ${errorMessage}`;
     this.hasFetchError = true;
     this.isFetched = false;
@@ -341,8 +341,8 @@ class Instance {
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;
-        const errorMessage = e.response && e.response.status !== 500 ? e.response.data:null;
-        this.fetchError = `Error while saving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+        const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+        this.saveError = `Error while saving instance "${this.instanceId}" (${message}) ${errorMessage}`;
         this.hasSaveError = true;
         this.isSaving = false;
       });
@@ -598,7 +598,7 @@ class InstanceStore {
       } catch(e){
         runInAction(() => {
           const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:null;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
           this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message}) ${errorMessage}`;
           this.isDeletingInstance = false;
         });

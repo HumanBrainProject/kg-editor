@@ -181,7 +181,6 @@ export default class InstanceForm extends React.Component {
 
   handleConfirmCancelEdit = (e) => {
     e && e.stopPropagation();
-    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, true);
     if (this.instance && this.instance.hasChanged) {
       instanceStore.confirmCancelInstanceChanges(this.props.id);
     }
@@ -199,9 +198,8 @@ export default class InstanceForm extends React.Component {
 
   handleCancelSave = (e) => {
     e && e.stopPropagation();
-    const instance = this.getInstance(this.props.id);
+    const instance = instanceStore.getInstance(this.props.id);
     instance.cancelSave();
-    instanceStore.toggleReadMode(this.props.mainInstanceId, this.props.id, this.props.level, false);
   }
 
   render() {

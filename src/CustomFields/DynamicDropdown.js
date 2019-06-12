@@ -425,11 +425,13 @@ export default class DynamicDropdownField extends React.Component {
   }
 
   valueLabelRendering = (field, value) => {
-    const instance = instanceStore.getInstance(value.id);
-    const labelFieldName = instance && instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
-    const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
-    if (instance.isFetched && labelField) {
-      return labelField.value;
+    if (instanceStore.hasInstance(value.id)) {
+      const instance = instanceStore.getInstance(value.id);
+      const labelFieldName = instance && instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+      const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
+      if (instance.isFetched && labelField) {
+        return labelField.value;
+      }
     }
     return isFunction(this.props.valueLabelRendering)?
       this.props.valueLabelRendering(this.props.field, value)

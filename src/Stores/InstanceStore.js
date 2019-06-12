@@ -184,8 +184,8 @@ class Instance {
 
     try {
       const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
+      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
       runInAction(() => {
-        const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
         this.data = normalizedData;
         this.form = new FormStore(normalizedData);
         this.isFetching = false;
@@ -479,6 +479,11 @@ class InstanceStore {
   @action
   flushOpenedTabs(){
     localStorage.removeItem("openedTabs");
+  }
+
+  @action
+  hasInstance(instanceId){
+    return this.instances.has(instanceId);
   }
 
   @action

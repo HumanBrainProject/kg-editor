@@ -81,9 +81,9 @@ class OptionsPool{
   }
 
   @action
-  async fetchOptions(url, field, search, start, size, mappingValue, requestBody){
+  async fetchOptions(url, field, type, search, start, size, mappingValue, requestBody){
     const optionsSet = [];
-    const { data } = await API.axios.post(API.endpoints.suggestions(url, field, start, size, search), requestBody);
+    const { data } = await API.axios.post(API.endpoints.suggestions(url, field, type, start, size, search), requestBody);
     data && data.results.forEach(option => {
       if(!this.options.has(option[mappingValue])){
         this.options.set(option[mappingValue], option);
@@ -187,7 +187,7 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     this.fetchingOptions = true;
     this.optionsPageStart = append?this.options.length:0;
     const payload = this.cleanPaylod(this.store.getValues());
-    let {options, total}= await optionsPool.fetchOptions(this.instanceType, this.path.replace(FormStore.getPathNodeSeparator(),""), this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
+    let {options, total}= await optionsPool.fetchOptions(this.instanceType, this.path.replace(FormStore.getPathNodeSeparator(),""), this.instancesPath, this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
     runInAction(()=>{
       if(append){
         this.options = this.options.concat(options);

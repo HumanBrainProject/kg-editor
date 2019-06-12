@@ -15,7 +15,7 @@ const endpoints = {
   "instances": entity => `/editor/api/instances/${entity}`,
   "listedInstances": () => "/editor/api/instances",
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "suggestions": (entity, field, start, size, search) => `/api/suggestion/${entity}/fields?field=${encodeURIComponent(field)}&start=${start}&size=${size}&search=${search}`,
+  "suggestions": (entity, field, type, start, size, search) => `/api/suggestion/${entity}/fields?field=${encodeURIComponent(field)}&type=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
   "releaseData": instance => `/api/releases/${instance}/graph`,
   "doRelease": instance => `/api/releases/${instance}`,

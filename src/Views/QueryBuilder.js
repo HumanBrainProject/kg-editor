@@ -70,6 +70,9 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class QueryBuilder extends React.Component {
+  fetchStructure(forceFetch=false) {
+    structureStore.fetchStructure(!!forceFetch);
+  }
   handleSelectTab(tab) {
     queryBuilderStore.selectTab(tab);
     this.scrolledPanel.scrollToTop();
@@ -77,8 +80,8 @@ export default class QueryBuilder extends React.Component {
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
   }
-  handleFetchStructure = () => {
-    structureStore.fetchStructure();
+  handleRetryFetchStructure = () => {
+    this.fetchStructure(true);
   }
 
   render() {
@@ -98,7 +101,7 @@ export default class QueryBuilder extends React.Component {
               There was a network problem fetching the api structure.<br />
               If the problem persists, please contact the support.<br />
               <small>{structureStore.fetchStuctureError}</small><br /><br />
-              <Button bsStyle={"primary"} onClick={this.handleFetchStructure}>
+              <Button bsStyle={"primary"} onClick={this.handleRetryFetchStructure}>
                 <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
               </Button>
             </BGMessage>
@@ -107,7 +110,7 @@ export default class QueryBuilder extends React.Component {
               <BGMessage icon={"blender-phone"}>
                 No schemas available.<br />
                 If the problem persists, please contact the support.<br /><br />
-                <Button bsStyle={"primary"} onClick={this.handleFetchStructure}>
+                <Button bsStyle={"primary"} onClick={this.handleRetryFetchStructure}>
                   <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
                 </Button>
               </BGMessage>

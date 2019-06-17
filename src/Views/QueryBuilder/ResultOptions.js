@@ -27,6 +27,8 @@ const styles = {
   }
 };
 
+const scopeOptions =  [{label: "Released", value: "RELEASED" }, {label: "Curated", value: "INFERRED"}];
+
 @injectStyles(styles)
 @observer
 export default class ResultOptions extends React.Component{
@@ -46,16 +48,31 @@ export default class ResultOptions extends React.Component{
     queryBuilderStore.executeQuery();
   }
 
+  handleChangeScope = (event, field) => {
+    queryBuilderStore.setDatabaseScope(field.getValue());
+  }
+
   render(){
     const { classes } = this.props;
     return(
       <div className={classes.container}>
         <Row>
           <Col xs={6}>
-            <SingleField value={queryBuilderStore.resultSize} defaultValue={20} label="size" type="InputText" inputType="number" onChange={this.handleChangeSize}/>
+            <SingleField value={queryBuilderStore.resultSize} defaultValue={20} label="Size" type="InputText" inputType="number" onChange={this.handleChangeSize}/>
           </Col>
           <Col xs={6}>
-            <SingleField value={queryBuilderStore.resultStart} defaultValue={0} label="start" type="InputText" inputType="number" onChange={this.handleChangeStart}/>
+            <SingleField value={queryBuilderStore.resultStart} defaultValue={0} label="Start" type="InputText" inputType="number" onChange={this.handleChangeStart}/>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={12}>
+            <SingleField
+              key={queryBuilderStore.databaseScope}
+              value={queryBuilderStore.databaseScope}
+              options={scopeOptions}
+              label="Select space"
+              type="Select"
+              onChange={this.handleChangeScope} />
           </Col>
         </Row>
         <Row>

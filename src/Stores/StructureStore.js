@@ -6,12 +6,15 @@ class StructureStore {
   @observable structure = null;
   @observable fetchStuctureError = null;
   @observable isFetchingStructure = false;
-  @observable schemasMap = new Map();
-  @observable schemasLabel = new Map();
 
   @computed
   get groupedSchemas() {
     return groupBy(this.structure.schemas, "group");
+  }
+
+  @computed
+  get sortedGroupedSchemas() {
+    return Object.keys(this.groupedSchemas).sort();
   }
 
   @computed
@@ -24,12 +27,22 @@ class StructureStore {
     );
   }
 
-  constructor() {
-    this.fetchStructure();
+  @computed
+  get schemasMap() {
+    const map = new Map();
+    this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => map.set(schema.id, schema));
+    return map;
   }
 
-  getSortedSchemaGroups() {
-    return Object.keys(this.groupedSchemas).sort();
+  @computed
+  get schemasLabel() {
+    const map = new Map();
+    this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => map.set(schema.id, schema.label));
+    return map;
+  }
+
+  constructor() {
+    this.fetchStructure();
   }
 
   getSortedSchemasByGroup(group) {
@@ -45,8 +58,8 @@ class StructureStore {
   }
 
   @action
-  async fetchStructure() {
-    if (!this.isFetchingStructure) {
+  async fetchStructure(forceFetch=false) {
+    if (!this.isFetchingStructure && (!this.structure || !!forceFetch)) {
       this.isFetchingStructure = true;
       this.fetchStuctureError = null;
       try {
@@ -54,13 +67,6 @@ class StructureStore {
         runInAction(() => {
           this.isFetchingStructure = false;
           this.structure = response.data;
-          this.structure &&
-            this.structure.schemas &&
-            this.structure.schemas.length &&
-            this.structure.schemas.forEach(schema => {
-              this.schemasMap.set(schema.id, schema);
-              this.schemasLabel.set(schema.id, schema.label);
-            });
         });
       } catch (e) {
         const message = e.message ? e.message : e;

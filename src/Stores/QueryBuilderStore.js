@@ -189,15 +189,12 @@ class Field {
 }
 
 class QueryBuilderStore {
-  // @observable structure = null;
   @observable queryId = "";
   @observable label = "";
   @observable description = "";
   @observable sourceQuery = null;
   @observable context = null;
   @observable rootField = null;
-  // @observable fetchStuctureError = null;
-  // @observable isFetchingStructure = false;
   @observable fetchQueriesError = null;
   @observable isFetchingQueries = false;
   @observable isSaving = false;
@@ -224,7 +221,7 @@ class QueryBuilderStore {
   @observable currentField = null;
 
   constructor(){
-    this.fetchStructure();
+    structureStore.fetchStructure();
   }
 
   get queryIdRegex() {
@@ -275,13 +272,6 @@ class QueryBuilderStore {
       }
     });
     return result;
-  }
-
-  @computed
-  get schemasMap() {
-    const map = new Map();
-    this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => map.set(schema.id, schema));
-    return map;
   }
 
   @computed
@@ -616,27 +606,6 @@ class QueryBuilderStore {
         if (rootMerge) {
           this.checkMergeFields(rootMerge);
         }
-      }
-    }
-  }
-
-  @action async fetchStructure(){
-    if (!this.isFetchingStructure) {
-      this.isFetchingStructure = true;
-      this.fetchStuctureError = null;
-      try{
-        const response = await API.axios.get(API.endpoints.structure());
-        runInAction(() => {
-          this.isFetchingStructure = false;
-          // normalize
-          this.structure = response.data && {
-            schemas: (!response.data.schemas || !response.data.schemas.length)?[]:response.data.schemas.filter(schema => schema.group && schema.properties)
-          };
-        });
-      } catch(e) {
-        const message = e.message?e.message:e;
-        this.fetchStuctureError = `Error while fetching api structure (${message})`;
-        this.isFetchingStructure = false;
       }
     }
   }

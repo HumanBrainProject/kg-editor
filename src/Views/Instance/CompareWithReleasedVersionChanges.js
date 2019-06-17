@@ -118,7 +118,7 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
               <BGMessage icon={"ban"}>
                 There was a network problem fetching the instance {instanceId}.<br/>
                 If the problem persists, please contact the support.<br/>
-                <small>{instanceBefore.fetchError}</small><br/><br/>
+                <small>{instanceBefore && instanceBefore.fetchError}</small><br/><br/>
                 <div>
                   <Button onClick={this.handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
                   <Button bsStyle={"primary"} onClick={this.handleRetryFetchInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>

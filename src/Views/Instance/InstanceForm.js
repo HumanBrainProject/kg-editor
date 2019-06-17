@@ -139,7 +139,8 @@ export default class InstanceForm extends React.Component {
   }
 
   fetchInstance(forceFetch = false) {
-    instanceStore.getInstance(this.props.id, forceFetch);
+    const instance = instanceStore.getInstance(this.props.id);
+    instance.fetch(forceFetch);
   }
 
   handleListLoadRetry = () => {

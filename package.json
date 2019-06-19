@@ -21,6 +21,7 @@
     "react": "^16.8.4",
     "react-bootstrap": "^0.32.1",
     "react-custom-scrollbars": "^4.2.1",
+    "react-copy-to-clipboard": "5.0.1",
     "react-dom": "^16.8.4",
     "react-force-graph-2d": "^1.6.1",
     "react-iframe": "^1.8.0",

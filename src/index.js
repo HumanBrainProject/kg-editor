@@ -38,6 +38,8 @@ import GlobalError from "./Views/GlobalError";
 import "babel-polyfill";
 import "./CustomFields";
 
+import "./CustomFields";
+
 FormStore.setPathNodeSeparator("|");
 
 const styles = {

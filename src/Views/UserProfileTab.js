@@ -3,6 +3,8 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { Overlay, Popover, Button } from "react-bootstrap";
 import {uniqueId} from "lodash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import authStore from "../Stores/AuthStore";
 import instanceStore from "../Stores/InstanceStore";
@@ -43,24 +45,30 @@ let styles = {
   popOverContent: {
     display: "grid",
     gridTemplateRows: "1fr",
-    gridTemplateColumns: "auto auto",
+    gridTemplateColumns: "auto 1fr",
     gridGap: "20px",
     margin: "15px",
     color:"var(--ft-color-normal)"
   },
   popOverFooterBar: {
+    display: "grid",
+    gridTemplateRows: "1fr",
+    gridTemplateColumns: "auto auto",
+    gridGap: "20px",
     width: "100%",
     padding: "8px 15px",
     borderTop: "1px solid var(--border-color-ui-contrast1)",
     background: "var(--bg-color-blend-contrast1)",
-    textAlign: "right",
     wordBreak: "keep-all",
     whiteSpace: "nowrap",
-    "& button": {
-      borderRadius: "2px",
-      "& + button": {
-        marginLeft: "20px"
+    "& > div": {
+      textAlign: "left",
+      "& + div": {
+        textAlign: "right"
       }
+    },
+    "& button": {
+      borderRadius: "2px"
     }
   },
   name: {
@@ -72,6 +80,26 @@ let styles = {
   accountBtn: {
     borderRadius: "2px",
     marginTop: "25px"
+  },
+  tokenCopiedBar: {
+    width: "100%",
+    height: 0,
+    background: "var(--list-bg-hover)",
+    overflow: "hidden",
+    transition: "height .3s ease-in-out",
+    "&.show": {
+      height: "48px",
+      "& $tokenCopied": {
+        transform: "translateY(0)",
+      }
+    }
+  },
+  tokenCopied: {
+    margin: "8px 15px",
+    padding: "6px 0",
+    color: "var(--release-color-highlight)",
+    transition: "transform .3s ease-in-out",
+    transform: "translateY(-48px)"
   }
 };
 
@@ -114,7 +142,7 @@ class PopOverContent extends React.Component {
 export default class UserProfileTab extends React.Component{
   constructor(props){
     super(props);
-    this.state = { showPopOver: false, popOverPosition: "bottom" };
+    this.state = { showPopOver: false, popOverPosition: "bottom", tokenCopied: null };
     this.popOverId = uniqueId("popover");
     this.buttonRef = React.createRef();
   }
@@ -138,10 +166,10 @@ export default class UserProfileTab extends React.Component{
     this.setState({showPopOver: false });
   }
 
-  componentWillUnmount() {
-    if (this.state.showPopOver) {
-      this.handlePopOverClose();
-    }
+  handleCopyToken = () => {
+    clearTimeout(this.state.tokenCopied);
+    const timer = setTimeout(() => this.setState({tokenCopied:null}), 2000);
+    this.setState({tokenCopied: timer});
   }
 
   handleLogout = () => {
@@ -150,6 +178,12 @@ export default class UserProfileTab extends React.Component{
       authStore.logout();
       document.querySelector("#root").style.display = "none";
       window.location.href = window.rootPath + "/";
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.state.showPopOver) {
+      this.handlePopOverClose();
     }
   }
 
@@ -184,7 +218,17 @@ export default class UserProfileTab extends React.Component{
                 </div>
               </div>
               <div className={classes.popOverFooterBar}>
-                <Button onClick={this.handleLogout}>Logout</Button>
+                <div>
+                  <CopyToClipboard text={authStore.accessToken} onCopy={this.handleCopyToken}>
+                    <Button>Copy token to clipboard</Button>
+                  </CopyToClipboard>
+                </div>
+                <div>
+                  <Button onClick={this.handleLogout}>Logout</Button>
+                </div>
+              </div>
+              <div className={`${classes.tokenCopiedBar} ${this.state.tokenCopied?"show":""}`}>
+                <div className={classes.tokenCopied}><FontAwesomeIcon icon={"check"} />&nbsp;Token copied to clipboard!</div>
               </div>
             </PopOverContent>
           </Popover>

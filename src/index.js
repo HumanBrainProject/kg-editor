@@ -9,7 +9,6 @@ import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
 
 import "./Services/IconsImport";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
@@ -267,8 +266,8 @@ class App extends React.Component {
     super(props);
     authStore.tryAuthenticate();
     this.state = {
-      currentLocation: routerStore.history.location.pathname,
-      tokenCopied: false };
+      currentLocation: routerStore.history.location.pathname
+    };
     routerStore.history.listen(location => {
       this.setState({ currentLocation: location.pathname });
     });
@@ -411,15 +410,6 @@ class App extends React.Component {
     instanceStore.toggleShowCreateModal();
   }
 
-  handleDismissAlert = () => {
-    this.setState({tokenCopied: false});
-  }
-
-  handleCopyToken = () => {
-    this.setState({tokenCopied: true});
-    setTimeout(() => this.setState({tokenCopied:false}), 2000);
-  }
-
   handleLogout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       instanceStore.flushOpenedTabs();
@@ -488,13 +478,7 @@ class App extends React.Component {
                 <div className={classes.fixedTabsRight}>
                   {authStore.isFullyAuthenticated &&
                     <React.Fragment>
-                      {this.state.tokenCopied ?
-                        <Tab  label={"Token copied to clipboard!"} icon={"check"} iconColor={"rgb(102, 166, 30)"} onClose={this.handleDismissAlert}/>
-                        :null}
                       <Tab icon={"question-circle"} current={matchPath(currentLocation, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
-                      <CopyToClipboard text={authStore.accessToken} onCopy={this.handleCopyToken}>
-                        <Tab icon={"copy"} hideLabel label={"Copy token to clipboard"} />
-                      </CopyToClipboard>
                       <UserProfileTab className={classes.userProfileTab} size={32}/>
                     </React.Fragment>
                   }

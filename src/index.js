@@ -20,6 +20,7 @@ import browseStore from "./Stores/BrowseStore";
 
 import Tab from "./Components/Tab";
 import SaveBar from "./Views/Instance/SaveBar";
+import UserProfileTab from "./Views/UserProfileTab";
 
 import NotFound from "./Views/NotFound";
 import Home from "./Views/Home";
@@ -179,6 +180,15 @@ const styles = {
     "& button + button": {
       marginLeft: "20px"
     }
+  },
+  userProfileTab: {
+    width:"50px",
+    height:"50px",
+    lineHeight:"50px",
+    color:"var(--ft-color-normal)",
+    background:"var(--bg-color-ui-contrast2)",
+    border:"1px solid var(--border-color-ui-contrast2)",
+    borderLeft:"none"
   },
   deleteInstanceErrorModal: {
     "& .modal-dialog": {
@@ -416,7 +426,6 @@ class App extends React.Component {
       window.location.href = window.rootPath + "/";
     }
   }
-
   render() {
     const { classes } = this.props;
     const { currentLocation } = this.state;
@@ -484,7 +493,7 @@ class App extends React.Component {
                       <CopyToClipboard text={authStore.accessToken} onCopy={this.handleCopyToken}>
                         <Tab icon={"copy"} hideLabel label={"Copy token to clipboard"} />
                       </CopyToClipboard>
-                      <Tab icon={"user-lock"} onClick={this.handleLogout} hideLabel label={"Logout"} />
+                      <UserProfileTab className={classes.userProfileTab} size={32}/>
                     </React.Fragment>
                   }
                 </div>

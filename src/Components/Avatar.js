@@ -19,7 +19,7 @@ const styles = {
 export default class Avatar extends React.Component {
 
   render() {
-    const {classes, userId, name, picture} = this.props;
+    const {classes, userId, name, picture, size=20} = this.props;
 
     if (!userId) {
       return null;
@@ -27,7 +27,7 @@ export default class Avatar extends React.Component {
 
     if (picture) {
       return (
-        <img alt={name?name:userId} width="20" height="20" src={picture} title={name?name:userId} className={`${classes.avatar} avatar picture`} />
+        <img alt={name?name:userId} width={size} height={size} src={picture} title={name?name:userId} className={`${classes.avatar} avatar picture`} />
       );
     }
 

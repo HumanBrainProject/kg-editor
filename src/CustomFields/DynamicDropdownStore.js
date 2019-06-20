@@ -1,15 +1,17 @@
-import { observable, action, runInAction, set } from "mobx";
+import { observable, action, runInAction, get, set } from "mobx";
 import { find, union, debounce } from "lodash";
 import console from "../Services/Logger";
 import { FormStore } from "hbp-quickfire";
+
 import API from "../Services/API";
+import instanceStore from "../Stores/InstanceStore";
 
 class OptionsPool{
   @observable options = new Map();
   optionsQueue = new Map();
   queueThreshold = 20;
   queueTimeout = 250;
-  isFetchingQueue = false;
+  @observable isFetchingQueue = false;
 
   getOption(value, mappingValue){
     if(this.options.has(value[mappingValue])){
@@ -50,17 +52,18 @@ class OptionsPool{
       let response = await API.axios.post(API.endpoints.listedInstances(), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          let mappingValue = this.optionsQueue.get(identifier).mappingValue;
-          let option = find(response.data.data, (item) => item[mappingValue] === identifier);
-          if(option){
-            Object.keys(option).forEach(key => {
+          const option = this.options.get(identifier);
+          const mappingValue = this.optionsQueue.get(identifier).mappingValue;
+          const optionData = find(response.data.data, (item) => item[mappingValue] === identifier);
+          if(optionData){
+            Object.keys(optionData).forEach(key => {
               if(key === mappingValue){return;}
-              set(this.options.get(identifier), key, option[key]);
+              set(option, key, optionData[key]);
             });
           } else {
-            set(this.options.get(identifier), "fetchError", true);
+            set(option, "fetchError", true);
           }
-          set(this.options.get(identifier), "isFetching", false);
+          set(option, "isFetching", false);
           this.optionsQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
@@ -70,8 +73,9 @@ class OptionsPool{
       console.error(e);
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          set(this.options.get(identifier), "fetchError", true);
-          set(this.options.get(identifier), "isFetching", false);
+          const option = this.options.get(identifier);
+          set(option, "fetchError", true);
+          set(option, "isFetching", false);
           this.optionsQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
@@ -177,6 +181,21 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
       return result;
     }
     return payload;
+  }
+
+  valueLabelRendering = (field, value, valueLabelRendering) => {
+    if (instanceStore.hasInstance(value.id)) {
+      const instance = instanceStore.getInstance(value.id);
+      const labelFieldName = instance && instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+      const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
+      if (instance.isFetched && labelField) {
+        return labelField.value;
+      }
+    }
+    return typeof valueLabelRendering === "function"?
+      valueLabelRendering(field, value)
+      :
+      get(value, field.mappingLabel);
   }
 
   @action

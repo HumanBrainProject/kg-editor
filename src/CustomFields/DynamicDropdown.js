@@ -117,7 +117,7 @@ const styles = {
 export default class DynamicDropdownField extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { alternatives: []};
+    this.state = { alternatives: [] };
   }
 
 
@@ -425,18 +425,30 @@ export default class DynamicDropdownField extends React.Component {
   }
 
   valueLabelRendering = (field, value) => {
-    if (instanceStore.hasInstance(value.id)) {
-      const instance = instanceStore.getInstance(value.id);
-      const labelFieldName = instance && instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
-      const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
-      if (instance.isFetched && labelField) {
-        return labelField.value;
-      }
-    }
-    return isFunction(this.props.valueLabelRendering)?
-      this.props.valueLabelRendering(this.props.field, value)
-      :
-      get(value, this.props.field.mappingLabel);
+    return field.valueLabelRendering(field, value, this.props.valueLabelRendering);
+  }
+
+  renderReadMode(){
+    const { classes, field, readModeRendering } = this.props;
+    const { value, disabled, readOnly } = field;
+
+    return (
+      <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+        <FieldLabel field={field}/>
+        {isFunction(readModeRendering)?
+          this.props.readModeRendering(field)
+          :
+          <span className={"quickfire-readmode-list"}>
+            {value.map(value => (
+              <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className={"quickfire-readmode-item"}>
+                {this.valueLabelRendering(field, value)}
+              </span>
+            ))}
+          </span>
+        }
+        <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
+      </div>
+    );
   }
 
   render() {
@@ -444,15 +456,14 @@ export default class DynamicDropdownField extends React.Component {
       return this.renderReadMode();
     }
 
-    let { classes, formStore, field } = this.props;
-    let { options, value: values, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = this.props.field;
+    const { classes, formStore, field } = this.props;
+    const { options, value: values, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
 
-    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    let isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
+    const selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    const isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
-    let dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
-    let dropdownClass = dropdownOpen? "open": "";
-    dropdownClass += listPosition === "top" ? " "+classes.topList: "";
+    const dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
+    const dropdownClass = (dropdownOpen? "open": "") + (listPosition === "top"?" " + classes.topList: "");
 
     let filteredOptions = [];
     if(dropdownOpen){
@@ -563,39 +574,6 @@ export default class DynamicDropdownField extends React.Component {
             {validationErrors.map(error => <p key={error}>{error}</p>)}
           </Alert>}
         </FormGroup>
-      </div>
-    );
-  }
-
-  renderReadMode(){
-    let {
-      value,
-      mappingLabel,
-      disabled,
-      readOnly
-    } = this.props.field;
-
-    const {classes} = this.props;
-
-    return (
-      <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
-        <FieldLabel field={this.props.field}/>
-        {isFunction(this.props.readModeRendering)?
-          this.props.readModeRendering(this.props.field)
-          :
-          <span className={"quickfire-readmode-list"}>
-            {value.map(value => {
-              return (
-                <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className={"quickfire-readmode-item"}>
-                  {isFunction(this.props.valueLabelRendering)?
-                    this.props.valueLabelRendering(this.props.field, value):
-                    get(value, mappingLabel)}
-                </span>
-              );
-            })}
-          </span>
-        }
-        <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
       </div>
     );
   }

@@ -70,14 +70,13 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Edit extends React.Component {
-  componentDidMount() {
+  constructor(props) {
+    super(props);
     instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
-      instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
-    }
+  componentDidUpdate() {
+    instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
   }
 
   handleSelectMode(mode) {
@@ -86,8 +85,7 @@ export default class Edit extends React.Component {
 
   render() {
     const {classes} = this.props;
-    const openedInstance = this.props.match.params.id?instanceStore.openedInstances.get(this.props.match.params.id):null;
-    const instance = this.props.match.params.id?instanceStore.getInstance(this.props.match.params.id):null;
+    const openedInstance = instanceStore.openedInstances.get(this.props.match.params.id);
 
     return (
       openedInstance ?
@@ -119,7 +117,7 @@ export default class Edit extends React.Component {
                   <Pane paneId={this.props.match.params.id} key={this.props.match.params.id}>
                     <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
                   </Pane>
-                  {!instance.hasFetchError?
+                  {!instanceStore.getInstance(this.props.match.params.id).hasFetchError?
                     <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
                     :null}
                 </React.Fragment>

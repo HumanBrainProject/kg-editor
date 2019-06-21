@@ -13,11 +13,11 @@ class OptionsPool{
   queueTimeout = 250;
   @observable isFetchingQueue = false;
 
-  getOption(value, mappingValue){
+  getOption(value, mappingValue, mappingLabel){
     if(this.options.has(value[mappingValue])){
       return this.options.get(value[mappingValue]);
     } else {
-      this.optionsQueue.set(value[mappingValue], {mappingValue: mappingValue});
+      this.optionsQueue.set(value[mappingValue], {mappingValue: mappingValue, mappingLabel: mappingLabel});
       this.options.set(value[mappingValue],{[mappingValue]:value[mappingValue], isFetching:false});
       this.processQueue();
     }
@@ -53,7 +53,9 @@ class OptionsPool{
       runInAction(() =>{
         toProcess.forEach(identifier => {
           const option = this.options.get(identifier);
-          const mappingValue = this.optionsQueue.get(identifier).mappingValue;
+          const optionQueueItem = this.optionsQueue.get(identifier);
+          const mappingValue = optionQueueItem.mappingValue;
+          const mappingLabel = optionQueueItem.mappingLabel;
           const optionData = find(response.data.data, (item) => item[mappingValue] === identifier);
           if(optionData){
             Object.keys(optionData).forEach(key => {
@@ -61,7 +63,7 @@ class OptionsPool{
               set(option, key, optionData[key]);
             });
           } else {
-            set(option, "name", "Not found");
+            set(option, mappingLabel, "Not found");
             set(option, "fetchError", true);
           }
           set(option, "isFetching", false);
@@ -153,13 +155,13 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
       if(!value || this.value.length >= this.max){
         return;
       }
-      this.addValue(optionsPool.getOption(value, this.mappingValue));
+      this.addValue(optionsPool.getOption(value, this.mappingValue, this.mappingLabel));
     });
   }
 
   @action
   getOption(value) {
-    return optionsPool.getOption(value, this.mappingValue);
+    return optionsPool.getOption(value, this.mappingValue, this.mappingLabel);
   }
 
   valueLabelRendering = (field, value, valueLabelRendering) => {

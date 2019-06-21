@@ -25,7 +25,7 @@ export default class HeaderPanel extends React.Component{
   render(){
     const { classes, className, nodeType, color, hasChanged } = this.props;
     return(
-      <div className={`${classes ? classes.panel : ""} ${className ? className : ""}`}>
+      <div className={`${classes.panel} ${className ? className : ""}`}>
         <Row>
           <Col xs={12}>
             <h6>

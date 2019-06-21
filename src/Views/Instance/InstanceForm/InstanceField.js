@@ -84,7 +84,7 @@ export default class InstanceField extends React.Component{
       instanceStore.setInstanceHighlight(value.id, field.label);
       const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
       if (target && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
-        target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView  ({behavior:"smooth", block:"center"});
+        target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
       }
     }
   }

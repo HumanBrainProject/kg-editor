@@ -50,6 +50,13 @@ const styles = {
         }
       }
     }
+  },
+  notFound:{
+    fontStyle: "italic",
+    backgroundColor: "lightgrey",
+    "&:hover":{
+      backgroundColor: "lightgrey"
+    }
   }
 };
 
@@ -77,7 +84,7 @@ export default class InstanceField extends React.Component{
       instanceStore.setInstanceHighlight(value.id, field.label);
       const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
       if (target && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
-        target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
+        target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView  ({behavior:"smooth", block:"center"});
       }
     }
   }
@@ -89,6 +96,7 @@ export default class InstanceField extends React.Component{
   }
 
   renderReadModeField = field => {
+    const { classes } = this.props;
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         /*
@@ -115,7 +123,7 @@ export default class InstanceField extends React.Component{
           <span className="quickfire-readmode-list">
             {field.value.map(value =>
               <span key={field.store.getGeneratedKey(value, "dropdown-read-item")} className="quickfire-readmode-item">
-                <button type="button" className="btn btn-xs btn-default"
+                <button type="button" className={`btn btn-xs btn-default ${value.fetchError ? classes.notFound : ""}`}
                   onClick={(event) => {event.stopPropagation(); this.handleFieldFocus(field, value);}}
                   onFocus={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}
                   onMouseEnter={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}

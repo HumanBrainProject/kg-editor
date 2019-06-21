@@ -314,7 +314,12 @@ class Instance {
   errorInstance(e) {
     const message = e.message?e.message:e;
     const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-    this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+    if(e.response.status === 404){
+      this.fetchError = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+    }
+    else {
+      this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+    }
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;

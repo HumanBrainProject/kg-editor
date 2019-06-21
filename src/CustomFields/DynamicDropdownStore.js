@@ -61,6 +61,7 @@ class OptionsPool{
               set(option, key, optionData[key]);
             });
           } else {
+            set(option, "name", "Not found");
             set(option, "fetchError", true);
           }
           set(option, "isFetching", false);

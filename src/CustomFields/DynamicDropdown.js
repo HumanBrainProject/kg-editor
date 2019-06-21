@@ -48,6 +48,13 @@ const styles = {
       opacity:1
     }
   },
+  notFound:{
+    fontStyle: "italic",
+    backgroundColor: "lightgrey",
+    "&:hover":{
+      backgroundColor: "lightgrey"
+    }
+  },
   options:{
     width:"100%",
     maxHeight:"33vh",
@@ -440,7 +447,7 @@ export default class DynamicDropdownField extends React.Component {
           :
           <span className={"quickfire-readmode-list"}>
             {value.map(value => (
-              <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className={"quickfire-readmode-item"}>
+              <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className="quickfire-readmode-item">
                 {this.valueLabelRendering(field, value)}
               </span>
             ))}
@@ -492,7 +499,7 @@ export default class DynamicDropdownField extends React.Component {
               return(
                 <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
                   tabIndex={"0"}
-                  className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""}`}
+                  className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""} ${value.fetchError ? classes.notFound : ""}`}
                   disabled={disabled}
                   readOnly={readOnly}
                   draggable={true}

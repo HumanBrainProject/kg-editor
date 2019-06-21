@@ -2,6 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import HeaderPanel from "./HeaderPanel";
 
 const styles = {
   fetchErrorPanel: {
@@ -73,6 +74,7 @@ export default class FetchErrorPanel extends React.Component{
         </div>
         :
         <div className={classes.inlineFetchErrorPanel}>
+          <HeaderPanel className={classes.panelHeader} />
           <h5>{error}</h5>
           <small>Nexus ID: {id}</small>
           <div>

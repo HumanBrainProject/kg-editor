@@ -25,11 +25,11 @@ export default class HeaderPanel extends React.Component{
   render(){
     const { classes, className, nodeType, color, hasChanged } = this.props;
     return(
-      <div className={`${classes.panel} ${className}`}>
+      <div className={`${classes.panel} ${className ? className : ""}`}>
         <Row>
           <Col xs={12}>
             <h6>
-              <FontAwesomeIcon icon={"circle"} color={color?color:undefined}/>&nbsp;&nbsp;<span>{nodeType}</span>
+              <FontAwesomeIcon icon={"circle"} color={color?color:undefined}/>&nbsp;&nbsp;<span>{nodeType ? nodeType : "Unknown"}</span>
             </h6>
           </Col>
         </Row>

@@ -132,7 +132,7 @@ const styles = {
 export default class InstanceForm extends React.Component {
   constructor(props) {
     super(props);
-    this.instance = props.id?instanceStore.getInstance(props.id):null;
+    this.instance = props.id?instanceStore.getInstance(props.id):null; //.getInstance(props.id):null;
   }
   componentDidMount() {
     this.instance && this.instance.fetch(true);

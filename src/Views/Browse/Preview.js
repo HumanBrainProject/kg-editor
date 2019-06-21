@@ -110,20 +110,20 @@ export default class Preview extends React.Component {
     instanceStore.setReadMode(true);
   }
 
-  componentDidMount() {
-    if(!instanceStore.hasInstanceForPreview(this.props.selectedInstanceId)) {
-      const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
-      instance.fetchInstanceDataForPreview();
+  fetchInstance() {
+    if (this.props.selectedInstanceId) {
+      const instance = instanceStore.getInstance(this.props.selectedInstanceId);
+      instance.fetch();
     }
   }
 
+  componentDidMount() {
+    this.fetchInstance();
+  }
+
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.selectedInstanceId !== this.props.selectedInstanceId &&
-      !instanceStore.hasInstanceForPreview(this.props.selectedInstanceId)
-    ) {
-      const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
-      instance.fetchInstanceDataForPreview();
+    if (prevProps.selectedInstanceId !== this.props.selectedInstanceId) {
+      this.fetchInstance();
     }
   }
 
@@ -138,8 +138,7 @@ export default class Preview extends React.Component {
   }
 
   handleRetry = () => {
-    const instance = instanceStore.getInstanceForPreview(this.props.selectedInstanceId);
-    instance.fetchInstanceDataForPreview();
+    this.fetchInstance();
   }
 
   markdownDescriptionRendering = field => (
@@ -148,9 +147,7 @@ export default class Preview extends React.Component {
 
   render() {
     const { classes, selectedInstanceId, selectedInstanceName } = this.props;
-    let selectedInstance = instanceStore.instancesForPreview.get(
-      selectedInstanceId
-    );
+    const selectedInstance = selectedInstanceId?instanceStore.getInstance(selectedInstanceId):null;
 
     const promotedFields = selectedInstance && selectedInstance.promotedFields;
     const promotedFieldsWithMarkdown =
@@ -162,7 +159,7 @@ export default class Preview extends React.Component {
     return selectedInstance ? (
       <Scrollbars autoHide>
         <div className={classes.container}>
-          {selectedInstance.isFetching ? (
+          {(!selectedInstance.isFetched || selectedInstance.isFetching)? (
             <FetchingLoader>
               <span>Fetching instance information...</span>
             </FetchingLoader>

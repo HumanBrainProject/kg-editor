@@ -50,6 +50,13 @@ const styles = {
         }
       }
     }
+  },
+  notFound:{
+    fontStyle: "italic",
+    backgroundColor: "lightgrey",
+    "&:hover":{
+      backgroundColor: "lightgrey"
+    }
   }
 };
 
@@ -88,7 +95,8 @@ export default class InstanceField extends React.Component{
     }
   }
 
-  renderReadModeField = (field) => {
+  renderReadModeField = field => {
+    const { classes } = this.props;
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         /*
@@ -104,17 +112,23 @@ export default class InstanceField extends React.Component{
             <p>{field.value}</p>
         );
       }
-      if (typeof field.type === "string" && field.type.includes("DropdownSelect")) {
+      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown")) {
+        const valueLabelRendering = (field, value) => {
+          if (typeof field.valueLabelRendering === "function") {
+            return field.valueLabelRendering(field, value);
+          }
+          return value[field.mappingLabel];
+        };
         return (
           <span className="quickfire-readmode-list">
             {field.value.map(value =>
-              <span key={value.id} className="quickfire-readmode-item">
-                <button type="button" className="btn btn-xs btn-default"
+              <span key={field.store.getGeneratedKey(value, "dropdown-read-item")} className="quickfire-readmode-item">
+                <button type="button" className={`btn btn-xs btn-default ${value.fetchError ? classes.notFound : ""}`}
                   onClick={(event) => {event.stopPropagation(); this.handleFieldFocus(field, value);}}
                   onFocus={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}
                   onMouseEnter={(event) => {event.stopPropagation(); this.handleToggleOnFieldHighlight(field, value);}}
                   onBlur={(event) => {event.stopPropagation(); this.handleToggleOffFieldHighlight(field, value);}}
-                  onMouseLeave={(event) => {event.stopPropagation(); this.handleToggleOffFieldHighlight(field, value);}}>{value[field.mappingLabel]}</button>
+                  onMouseLeave={(event) => {event.stopPropagation(); this.handleToggleOffFieldHighlight(field, value);}}>{valueLabelRendering(field, value)}</button>
               </span>
             )}
           </span>
@@ -140,7 +154,7 @@ export default class InstanceField extends React.Component{
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
-      if (typeof field.type === "string" && field.type.includes("DropdownSelect") && field.isLink) {
+      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}

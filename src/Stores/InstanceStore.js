@@ -153,11 +153,17 @@ class Instance {
         field.type = "KgInputText";
       } else if(field.type === "TextArea"){
         field.type = "KgTextArea";
+      /*
       } else if(field.type === "DropdownSelect"){
         field.type = "KgDropdownSelect";
       }
+      */
+      } else if(field.type === "DropdownSelect"){
+        field.type = "DynamicDropdown";
+        field.optionsUrl = field.instancesPath;
+        field.instanceType = data.fields.id.value.path;
+      }
     }
-
     return data;
   }
 
@@ -179,15 +185,25 @@ class Instance {
     try {
       const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
       const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
+      runInAction(() => {
+        this.data = normalizedData;
+        this.form = new FormStore(normalizedData);
+        this.isFetching = false;
+        this.isFetched = true;
+        this.memorizeInstanceInitialValues();
+        this.form.toggleReadMode(this.instanceStore.globalReadMode);
+      });
+      // With non DynamicDropdown
+      /*
       runInAction(async () => {
+        const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
         this.data = normalizedData;
         this.form = new FormStore(normalizedData);
         const fields =  this.form.getField();
-
         const optionsPromises = [];
         Object.entries(fields).forEach(([, field]) => {
           const path = field.instancesPath;
-          if (path) {
+          if (path && field.type !== "DynamicDropdown") {
             optionsPromises.push(this.instanceStore.optionsCache.get(path).then(
               options => {
                 field.updateOptions(options);
@@ -211,6 +227,7 @@ class Instance {
             });
           });
       });
+      */
     } catch (e) {
       runInAction(() => {
         this.errorInstance(e);
@@ -218,6 +235,8 @@ class Instance {
     }
   }
 
+  // Was only needed with non DynamicDropdown in Preview
+  /*
   @action
   async fetchInstanceDataForPreview() {
     if (this.isFetching || (this.isFetched && !this.fetchError)) {
@@ -243,7 +262,7 @@ class Instance {
 
         let idsList = [] ;
         Object.values(normalizedData.fields).forEach(value=>{
-          if(value.instancesPath && value.value.length > 0) {
+          if(value.instancesPath && value.value.length > 0 && value.type !== "DynamicDropdown") {
             value.value.forEach(v => idsList.push(v.id));
           }
         });
@@ -289,12 +308,18 @@ class Instance {
       });
     }
   }
+  */
 
   @action
   errorInstance(e) {
     const message = e.message?e.message:e;
     const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-    this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+    if(e.response.status === 404){
+      this.fetchError = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+    }
+    else {
+      this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+    }
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;
@@ -462,6 +487,11 @@ class InstanceStore {
   }
 
   @action
+  hasInstance(instanceId){
+    return this.instances.has(instanceId);
+  }
+
+  @action
   getInstance(instanceId){
     if (!this.instances.has(instanceId)) {
       const instance = new Instance(instanceId, this);
@@ -471,6 +501,7 @@ class InstanceStore {
     return this.instances.get(instanceId);
   }
 
+  /*
   @action
   getInstanceForPreview(instanceId){
     if (!this.instancesForPreview.has(instanceId)) {
@@ -484,6 +515,7 @@ class InstanceStore {
   hasInstanceForPreview(instanceId){
     return this.instancesForPreview.has(instanceId);
   }
+  */
 
   @computed
   get hasUnsavedChanges(){

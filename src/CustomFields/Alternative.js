@@ -16,9 +16,18 @@ const Value = ({value, field}) => {
   const valueAttributeName = (field && field.mappingValue)?field.mappingValue:"id";
 
   if (typeof value === "object") {
-    return value[labelAttributeName]?value[labelAttributeName]:(value[valueAttributeName]?value[valueAttributeName]:null);
+    return (
+      value[labelAttributeName] ?
+        value[labelAttributeName] :
+        (value[valueAttributeName] ?
+          (valueAttributeName == "id" ?
+            <React.Fragment>
+              {value[valueAttributeName]}
+              <em><span style={{color:"red"}}>(Deleted)</span></em>
+            </React.Fragment>:value[valueAttributeName]):null
+        )
+    );
   }
-
   return value;
 };
 
@@ -27,7 +36,6 @@ const Values = ({value, field, separator= "; "}) => {
   if (typeof value === "object" && value.length) {
 
     const valueAttributeName = (field && field.mappingValue)?field.mappingValue:"id";
-
     return value.map((item, index) => {
       return(
         <React.Fragment key={typeof item === "object"?(item[valueAttributeName]?item[valueAttributeName]:index):item}>

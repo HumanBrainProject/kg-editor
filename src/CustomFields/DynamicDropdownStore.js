@@ -161,28 +161,6 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     return optionsPool.getOption(value, this.mappingValue);
   }
 
-  cleanPaylod = payload => {
-    if (!payload) {
-      return null;
-    }
-    if (payload instanceof Array) {
-      const result = [];
-      payload.forEach(i => result.push(this.cleanPaylod(i)));
-      return result;
-    }
-    if (typeof payload === "object") {
-      const excludedAttributes = ["isFetching", "fetchError"];
-      const result = {};
-      Object.entries(payload).forEach(([name, value]) => {
-        if (!excludedAttributes.includes(name)) {
-          result[name] = this.cleanPaylod(value);
-        }
-      });
-      return result;
-    }
-    return payload;
-  }
-
   valueLabelRendering = (field, value, valueLabelRendering) => {
     if (instanceStore.hasInstance(value.id)) {
       const instance = instanceStore.getInstance(value.id);
@@ -205,7 +183,7 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     }
     this.fetchingOptions = true;
     this.optionsPageStart = append?this.options.length:0;
-    const payload = this.cleanPaylod(this.store.getValues());
+    const payload = this.store.getValues();
     let {options, total}= await optionsPool.fetchOptions(this.instanceType, this.path.replace(FormStore.getPathNodeSeparator(),""), this.instancesPath, this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
     runInAction(()=>{
       if(append){

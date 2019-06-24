@@ -264,19 +264,15 @@ class BrowseStore{
     try {
       const { data } = await API.axios.put(API.endpoints.updateBookmarkList(list.id), {"name": newProps.name});
       runInAction(() => {
-        /* Mockup Data
-        if ((Math.floor(Math.random() * 10) % 2) === 0) {
-          throw "Error 501";
-        }
-        const data = { id: list.id, name: name };
-        */
-        list.name = data.name;
+        list.name = data && data.data ? data.data.name:null;
         list.isUpdating = false;
       });
     } catch (e) {
-      list.updateError = e.message?e.message:e;
-      list.isUpdating = false;
-      return false;
+      runInAction(() => {
+        list.updateError = e.message?e.message:e;
+        list.isUpdating = false;
+        return false;
+      })
     }
   }
 

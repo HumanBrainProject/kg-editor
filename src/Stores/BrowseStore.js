@@ -272,7 +272,7 @@ class BrowseStore{
         list.updateError = e.message?e.message:e;
         list.isUpdating = false;
         return false;
-      })
+      });
     }
   }
 

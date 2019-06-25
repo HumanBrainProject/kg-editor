@@ -2,10 +2,11 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import dataTypesStore from "../../Stores/DataTypesStore";
+import structureStore from "../../Stores/StructureStore";
 
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
+import { observer } from "mobx-react";
 
 const styles = {
   container: {
@@ -129,8 +130,8 @@ const styles = {
 };
 
 @injectStyles(styles)
+@observer
 export default class InstanceRow extends React.Component {
-
   handleClick(instance, event) {
     event.stopPropagation();
     if (!event.currentTarget.contains(event.target)) {
@@ -169,7 +170,7 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    const color = dataTypesStore.colorPalletteBySchema(instance.schema);
+    const color = structureStore.colorPalletteBySchema(instance.schema);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}

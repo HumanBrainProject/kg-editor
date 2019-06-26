@@ -28,10 +28,8 @@ class Links extends React.Component{
   }
 
   fetchInstance = (forceFetch = false) => {
-    if (this.props.id) {
-      const instance = instanceStore.createInstanceOrGet(this.props.id);
-      instance.fetch(forceFetch);
-    }
+    const instance = instanceStore.createInstanceOrGet(this.props.id);
+    instance.fetch(forceFetch);
   }
 
   render(){

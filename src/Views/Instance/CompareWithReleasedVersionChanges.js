@@ -47,10 +47,8 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
   }
 
   fetchInstance = (forceFetch=false) => {
-    if (this.props.instanceId) {
-      const instance = instanceStore.createInstanceOrGet(this.props.instanceId);
-      instance.fetch(forceFetch);
-    }
+    const instance = instanceStore.createInstanceOrGet(this.props.instanceId);
+    instance.fetch(forceFetch);
   }
 
   handleCloseComparison = () => {

@@ -82,16 +82,12 @@ export default class InstanceManage extends React.Component{
   }
 
   fetchInstance = (forceFetch = false) => {
-    if (this.props.id) {
-      const instance = instanceStore.createInstanceOrGet(this.props.id);
-      instance.fetch(forceFetch);
-    }
+    const instance = instanceStore.createInstanceOrGet(this.props.id);
+    instance.fetch(forceFetch);
   }
 
   fetchStatus = () => {
-    if (this.props.id) {
-      statusStore.fetchStatus(this.props.id);
-    }
+    statusStore.fetchStatus(this.props.id);
   }
 
   handleDuplicateInstance = async () => {

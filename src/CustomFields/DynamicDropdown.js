@@ -88,6 +88,12 @@ const styles = {
       boxShadow:"none",
       padding:0,
       margin:0
+    },
+    "& .quickfire-dropdown-item .option": {
+      position: "relative"
+    },
+    "& .quickfire-dropdown-item:hover $preview": {
+      display: "block"
     }
   },
   userInput:{
@@ -115,6 +121,18 @@ const styles = {
   },
   alternatives: {
     marginLeft: "3px"
+  },
+  preview: {
+    display: "none",
+    position: "absolute",
+    top: "50%",
+    right: "-10px",
+    borderRadius: "2px",
+    background: "var(--bg-color-ui-contrast2)",
+    color: "var(--ft-color-louder)",
+    padding: "3px 6px",
+    cursor: "pointer",
+    transform: "translateY(-50%)"
   }
 };
 
@@ -141,8 +159,8 @@ export default class DynamicDropdownField extends React.Component {
   }
 
   triggerRemoveSuggestionOnChange = () => {
-    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
+    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    selectedInstance && selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
     this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
     this.handleNodesStyles(this.props.field.getValue(false));
     let event = new Event("input", { bubbles: true });
@@ -216,6 +234,7 @@ export default class DynamicDropdownField extends React.Component {
 
   closeDropdown(){
     this.wrapperRef = null;
+    instanceStore.togglePreviewInstance();
     this.forceUpdate();
   }
 
@@ -246,6 +265,7 @@ export default class DynamicDropdownField extends React.Component {
     if(field.disabled || field.readOnly){
       return;
     }
+    instanceStore.togglePreviewInstance();
     if(!e || (e && (!e.keyCode || e.keyCode === 13))){
       //If this function call doesn't send an event (->React Bootstrap OnSelect callback)
       //Or if it comes from a keyboard event associated with the "Enter" key
@@ -367,6 +387,7 @@ export default class DynamicDropdownField extends React.Component {
     if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
       this.unlistenClickOutHandler();
       this.props.field.setUserInput("");
+      instanceStore.togglePreviewInstance();
     }
   };
 
@@ -431,6 +452,11 @@ export default class DynamicDropdownField extends React.Component {
     this.props.field.loadMoreOptions();
   }
 
+  handleOptionPreview = (instanceId, instanceName, event) => {
+    event && event.stopPropagation();
+    instanceStore.togglePreviewInstance(instanceId, instanceName);
+  }
+
   valueLabelRendering = (field, value) => {
     return field.valueLabelRendering(field, value, this.props.valueLabelRendering);
   }
@@ -464,10 +490,10 @@ export default class DynamicDropdownField extends React.Component {
     }
 
     const { classes, formStore, field } = this.props;
-    const { options, value: values, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
+    const { options, value: values, mappingValue, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
 
-    const selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    const isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
+    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     const dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     const dropdownClass = (dropdownOpen? "open": "") + (listPosition === "top"?" " + classes.topList: "");
@@ -495,33 +521,31 @@ export default class DynamicDropdownField extends React.Component {
             parentContainerClassName="form-group"
             ref={ref=>this.alternativesRef = ref}/>
           <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
-            {values.map(value => {
-              return(
-                <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
-                  tabIndex={"0"}
-                  className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""} ${value.fetchError ? classes.notFound : ""}`}
-                  disabled={disabled}
-                  readOnly={readOnly}
-                  draggable={true}
-                  onDragEnd={()=>this.draggedValue = null}
-                  onDragStart={()=>this.draggedValue = value}
-                  onDragOver={e=>e.preventDefault()}
-                  onDrop={this.handleDrop.bind(this, value)}
-                  onKeyDown={this.handleRemoveBackspace.bind(this, value)}
+            {values.map(value => (
+              <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
+                tabIndex={"0"}
+                className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""} ${value.fetchError ? classes.notFound : ""}`}
+                disabled={disabled}
+                readOnly={readOnly}
+                draggable={true}
+                onDragEnd={()=>this.draggedValue = null}
+                onDragStart={()=>this.draggedValue = value}
+                onDragOver={e=>e.preventDefault()}
+                onDrop={this.handleDrop.bind(this, value)}
+                onKeyDown={this.handleRemoveBackspace.bind(this, value)}
 
-                  onClick={this.handleTagInteraction.bind(this, "Click", value)}
-                  onFocus={this.handleTagInteraction.bind(this, "Focus", value)}
-                  onBlur={this.handleTagInteraction.bind(this, "Blur", value)}
-                  onMouseOver={this.handleTagInteraction.bind(this, "MouseOver", value)}
-                  onMouseOut={this.handleTagInteraction.bind(this, "MouseOut", value)}
-                  onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
-                  onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
-                  title={get(value, mappingLabel)}>
-                  <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
-                  <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
-                </div>
-              );
-            })}
+                onClick={this.handleTagInteraction.bind(this, "Click", value)}
+                onFocus={this.handleTagInteraction.bind(this, "Focus", value)}
+                onBlur={this.handleTagInteraction.bind(this, "Blur", value)}
+                onMouseOver={this.handleTagInteraction.bind(this, "MouseOver", value)}
+                onMouseOut={this.handleTagInteraction.bind(this, "MouseOut", value)}
+                onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
+                onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
+                title={get(value, mappingLabel)}>
+                <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
+                <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
+              </div>
+            ))}
 
             <input className={`quickfire-user-input ${classes.userInput}`}
               onDrop={this.handleDrop.bind(this, null)}
@@ -552,7 +576,7 @@ export default class DynamicDropdownField extends React.Component {
 
                   {allowCustomValues && this.props.field.userInput?
                     <MenuItem className={"quickfire-dropdown-item"} key={this.props.field.userInput} onSelect={this.handleSelect.bind(this, this.props.field.userInput)}>
-                      <div tabIndex={-1} className={"option"} onKeyDown={this.handleSelect.bind(this, this.props.field.userInput)}>
+                      <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, this.props.field.userInput)}>
                         <em>Add a value: </em> <strong>{this.props.field.userInput}</strong>
                       </div>
                     </MenuItem>
@@ -560,15 +584,18 @@ export default class DynamicDropdownField extends React.Component {
                   {filteredOptions.map(option => {
                     return(
                       <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
-                        <div tabIndex={-1} className={"option"} onKeyDown={this.handleSelect.bind(this, option)}>
+                        <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, option)}>
                           {option[mappingLabel]}
+                          <div className={classes.preview} title="preview" onClick={this.handleOptionPreview.bind(this, option[mappingValue], option[mappingLabel])}>
+                            <FontAwesomeIcon icon="eye" />
+                          </div>
                         </div>
                       </MenuItem>
                     );
                   })}
                   {this.props.field.fetchingOptions?
                     <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
-                      <div tabIndex={-1} className={"option"}>
+                      <div tabIndex={-1} className="option">
                         <FontAwesomeIcon spin icon="circle-notch"/>
                       </div>
                     </MenuItem>

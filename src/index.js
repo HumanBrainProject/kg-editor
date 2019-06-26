@@ -449,11 +449,11 @@ class App extends React.Component {
                 </div>
                 <div className={classes.dynamicTabs}>
                   {authStore.isFullyAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
-                    const instance = instanceStore.getInstance(instanceId);
+                    const instance = instanceStore.instances.get(instanceId);
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
-                    if (!instance.isFetching && !instance.hasFetchError) {
+                    if (instance && !instance.isFetching && !instance.hasFetchError) {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;

@@ -112,22 +112,24 @@ export default class SavePanel extends React.Component{
     Array.from(instanceStore.instances.entries())
       .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
       .forEach(([id, ]) => {
-        const instance = instanceStore.getInstance(id);
-        instance.save();
+        const instance = instanceStore.instances.get(id);
+        instance && instance.save();
       });
   }
   handleSave(instanceId){
-    const instance = instanceStore.getInstance(instanceId);
-    instance.save();
-    instanceStore.setComparedInstance(null);
+    const instance = instanceStore.instances.get(instanceId);
+    if (instance) {
+      instance.save();
+      instanceStore.setComparedInstance(null);
+    }
   }
   handleReset(instanceId){
     instanceStore.confirmCancelInstanceChanges(instanceId);
     instanceStore.setComparedInstance(null);
   }
   handleDismissSaveError(instanceId){
-    const instance = this.getInstance(instanceId);
-    instance.cancelSave();
+    const instance = instanceStore.instances.get(instanceId);
+    instance && instance.cancelSave();
   }
   handleShowCompare(instanceId){
     instanceStore.setComparedInstance(instanceId);
@@ -154,7 +156,7 @@ export default class SavePanel extends React.Component{
     const { classes } = this.props;
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
 
-    const comparedInstance = instanceStore.comparedInstanceId?instanceStore.getInstance(instanceStore.comparedInstanceId):null;
+    const comparedInstance = instanceStore.comparedInstanceId?instanceStore.instances.get(instanceStore.comparedInstanceId):null;
     const comparedInstanceLabelField = comparedInstance && comparedInstance.data && comparedInstance.data.ui_info && comparedInstance.data.ui_info.labelField;
     const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.form?comparedInstance.form.getField(comparedInstanceLabelField).getValue():"";
     return(
@@ -162,7 +164,7 @@ export default class SavePanel extends React.Component{
         <Scrollbars autoHide>
           <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={this.handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
           <div className={classes.instances}>
-            {instanceStore.comparedInstanceId &&
+            {comparedInstance &&
               <Modal show={true} dialogClassName={classes.compareModal} onHide={this.handleShowCompare.bind(this,null)}>
                 <Modal.Header closeButton>
                   <strong>({comparedInstance.data.label})</strong>&nbsp;{comparedInstanceLabel}

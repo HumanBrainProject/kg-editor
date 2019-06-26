@@ -130,17 +130,23 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class InstanceForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.instance = props.id?instanceStore.getInstance(props.id):null; //.getInstance(props.id):null;
-  }
   componentDidMount() {
-    this.instance && this.instance.fetch(true);
+    if (this.props.id) {
+      this.fetchInstance();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.id && this.props.id !== prevProps.id) {
+      this.fetchInstance();
+    }
   }
 
   fetchInstance(forceFetch = false) {
-    const instance = instanceStore.getInstance(this.props.id);
-    instance.fetch(forceFetch);
+    if (this.props.id) {
+      const instance = instanceStore.createInstanceOrGet(this.props.id);
+      instance.fetch(forceFetch);
+    }
   }
 
   handleListLoadRetry = () => {
@@ -171,7 +177,8 @@ export default class InstanceForm extends React.Component {
 
   handleCancelEdit = (e) => {
     e && e.stopPropagation();
-    if (this.instance) {
+    const instance = this.instanceStore.instances.get(this.props.id);
+    if (instance) {
       if (this.instance.hasChanged) {
         instanceStore.cancelInstanceChanges(this.props.id);
       } else {
@@ -182,7 +189,8 @@ export default class InstanceForm extends React.Component {
 
   handleConfirmCancelEdit = (e) => {
     e && e.stopPropagation();
-    if (this.instance && this.instance.hasChanged) {
+    const instance = this.instanceStore.instances.get(this.props.id);
+    if (instance && instance.hasChanged) {
       instanceStore.confirmCancelInstanceChanges(this.props.id);
     }
   }
@@ -199,14 +207,14 @@ export default class InstanceForm extends React.Component {
 
   handleCancelSave = (e) => {
     e && e.stopPropagation();
-    const instance = instanceStore.getInstance(this.props.id);
-    instance.cancelSave();
+    const instance = instanceStore.instances.get(this.props.id);
+    instance && instance.cancelSave();
   }
 
   render() {
     const { classes, mainInstanceId, id } = this.props;
-    const instance = this.instance;
 
+    const instance = instanceStore.instances.get(this.props.id);
     if (!instance) {
       return null;
     }

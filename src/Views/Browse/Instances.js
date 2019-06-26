@@ -11,7 +11,7 @@ import browseStore from "../../Stores/BrowseStore";
 import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import instanceStore from "../../Stores/InstanceStore";
-import Preview from "./Preview";
+import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
 import InstanceRow from "../Instance/InstanceRow";
 
@@ -182,7 +182,7 @@ export default class Instances extends React.Component{
         </Scrollbars>
         <div className={classes.preview}>
           {browseStore.selectedInstance?
-            <Preview selectedInstanceId={browseStore.selectedInstance.id} selectedInstanceName={browseStore.selectedInstance.name}/>
+            <Preview instanceId={browseStore.selectedInstance.id} instanceName={browseStore.selectedInstance.name}/>
             :
             <BGMessage icon={"money-check"}>
               Select an instance to display its preview here.

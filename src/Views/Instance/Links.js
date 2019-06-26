@@ -15,23 +15,30 @@ const styles = {
 @injectStyles(styles)
 @observer
 class Links extends React.Component{
-
-  componentDidUpdate(prevProps) {
-    if(this.props.id && prevProps.id !== this.props.id) {
-      this.fetchInstanceData();
+  componentDidMount() {
+    if (this.props.id) {
+      this.fetchInstance();
     }
   }
 
-  fetchInstanceData = () => {
-    const instance = instanceStore.getInstance(this.props.id);
-    instance.fetch();
+  componentDidUpdate(prevProps) {
+    if(this.props.id && prevProps.id !== this.props.id) {
+      this.fetchInstance();
+    }
+  }
+
+  fetchInstance = (forceFetch = false) => {
+    if (this.props.id) {
+      const instance = instanceStore.createInstanceOrGet(this.props.id);
+      instance.fetch(forceFetch);
+    }
   }
 
   render(){
     const {classes, mainInstanceId } = this.props;
-    const instance = instanceStore.getInstance(this.props.id);
 
-    if (!instance.isReadMode && !browseStore.isFetched.lists) {
+    const instance = instanceStore.instances.get(this.props.id);
+    if (!instance || (!instance.isReadMode && !browseStore.isFetched.lists)) {
       return null;
     }
 

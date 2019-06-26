@@ -17,7 +17,10 @@ const styles = {
 export default class CompareChanges extends React.Component{
   render(){
     const { classes } = this.props;
-    const instance = instanceStore.getInstance(this.props.instanceId);
+    const instance = instanceStore.instances.get(this.props.instanceId);
+    if (!instance) {
+      return null;
+    }
 
     const formStoreBefore = new FormStore(toJS(instance.form.structure));
     formStoreBefore.injectValues(instance.initialValues);

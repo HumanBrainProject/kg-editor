@@ -45,26 +45,33 @@ const styles = {
 @observer
 export default class InstanceInvite extends React.Component{
   componentDidMount() {
-    this.fetchInstance();
-    instanceStore.setReadMode(true);
+    if (this.props.id) {
+      this.fetchInstance();
+      instanceStore.setReadMode(true);
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.id !== prevProps.id) {
+    if (this.props.id && this.props.id !== prevProps.id) {
       this.fetchInstance(true);
       instanceStore.setReadMode(true);
     }
   }
 
   fetchInstance = (forceFetch = false) => {
-    const instance = instanceStore.getInstance(this.props.id);
-    instance.fetch(forceFetch);
+    if (this.props.id) {
+      const instance = instanceStore.createInstanceOrGet(this.props.id);
+      instance.fetch(forceFetch);
+    }
   }
 
   render(){
     const { classes } = this.props;
 
-    const instance = instanceStore.getInstance(this.props.id);
+    const instance = instanceStore.instances.get(this.props.id);
+    if (!instance) {
+      return null;
+    }
 
     return (
       <div className={classes.container}>

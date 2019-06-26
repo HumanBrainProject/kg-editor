@@ -68,18 +68,30 @@ const styles = {
 @observer
 export default class InstanceManage extends React.Component{
   componentDidMount() {
-    this.fetchInstance();
-    this.fetchStatus();
+    if (this.props.id) {
+      this.fetchInstance();
+      this.fetchStatus();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.id && this.props.id !== prevProps.id) {
+      this.fetchInstance();
+      this.fetchStatus();
+    }
   }
 
   fetchInstance = (forceFetch = false) => {
-    const instance = instanceStore.getInstance(this.props.id);
-    instance.fetch(forceFetch);
+    if (this.props.id) {
+      const instance = instanceStore.createInstanceOrGet(this.props.id);
+      instance.fetch(forceFetch);
+    }
   }
 
   fetchStatus = () => {
-    instanceStore.setReadMode(true);
-    statusStore.fetchStatus(this.props.id);
+    if (this.props.id) {
+      statusStore.fetchStatus(this.props.id);
+    }
   }
 
   handleDuplicateInstance = async () => {
@@ -94,7 +106,11 @@ export default class InstanceManage extends React.Component{
   render(){
     const { classes } = this.props;
 
-    const instance = instanceStore.getInstance(this.props.id);
+    const instance = instanceStore.instances.get(this.props.id);
+    if (!instance) {
+      return null;
+    }
+
     const promotedFields = instance.promotedFields;
     const status = statusStore.getInstance(this.props.id);
 
@@ -113,7 +129,7 @@ export default class InstanceManage extends React.Component{
                     <div className={classes.id}>
                       Nexus ID: {this.props.id}
                     </div>
-                    <Form store={instance.form} key={this.props.id}>
+                    <Form store={instance.readModeFormStore} key={this.props.id}>
                       {promotedFields.map(fieldKey => {
                         return(
                           <div key={this.props.id+fieldKey} className={classes.field}>

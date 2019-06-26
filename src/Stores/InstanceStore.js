@@ -1,4 +1,4 @@
-import {observable, action, runInAction, computed} from "mobx";
+import {observable, action, runInAction, computed, toJS} from "mobx";
 import { uniqueId } from "lodash";
 import { FormStore } from "hbp-quickfire";
 import API from "../Services/API";
@@ -81,31 +81,20 @@ class Instance {
   @computed
   get promotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
-      return this.data.ui_info.promotedFields
-        .filter(name => this.data.fields[name]);
+      return this.data.ui_info.promotedFields.filter(name => this.data.fields[name]);
     }
     return [];
   }
 
   @computed
   get promotedFieldsWithMarkdown() {
-    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
-      let promotedFields = this.data.ui_info.promotedFields
-        .filter(name => this.data.fields[name]);
-      return promotedFields.filter(field =>
-        this.data.fields[field]["markdown"] === true
-      );
-    }
-    return [];
+    return this.promotedFields.filter(name => this.data.fields[name]["markdown"]);
   }
 
   @computed
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
-      return Object.keys(this.data.fields)
-        .filter(key => {
-          return !this.data.ui_info || !this.data.ui_info.promotedFields || !this.data.ui_info.promotedFields.includes(key);
-        });
+      return Object.keys(this.data.fields).filter(key => !this.data.ui_info || !this.data.ui_info.promotedFields || !this.data.ui_info.promotedFields.includes(key));
     }
     return [];
   }
@@ -113,7 +102,7 @@ class Instance {
   @computed
   get metadata() {
     if (this.isFetched && !this.fetchError && this.data && this.data.metadata) {
-      let metadata = this.data.metadata;
+      let metadata = toJS(this.data.metadata);
       return Object.keys(metadata).map(key => {
         if(key == "lastUpdateAt" || key == "createdAt") {
           let d = new Date(metadata[key]["value"]);
@@ -143,6 +132,13 @@ class Instance {
     }
   }
 
+  @computed
+  get readModeFormStore() {
+    const formStore = new FormStore(toJS(this.data));
+    formStore.toggleReadMode(true);
+    return formStore;
+  }
+
   normalizeData(data) {
     if (!data) {
       return {fields: [], alternatives: []};
@@ -153,11 +149,6 @@ class Instance {
         field.type = "KgInputText";
       } else if(field.type === "TextArea"){
         field.type = "KgTextArea";
-      /*
-      } else if(field.type === "DropdownSelect"){
-        field.type = "KgDropdownSelect";
-      }
-      */
       } else if(field.type === "DropdownSelect"){
         field.type = "DynamicDropdown";
         field.optionsUrl = field.instancesPath;
@@ -193,122 +184,12 @@ class Instance {
         this.memorizeInstanceInitialValues();
         this.form.toggleReadMode(this.instanceStore.globalReadMode);
       });
-      // With non DynamicDropdown
-      /*
-      runInAction(async () => {
-        const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
-        this.data = normalizedData;
-        this.form = new FormStore(normalizedData);
-        const fields =  this.form.getField();
-        const optionsPromises = [];
-        Object.entries(fields).forEach(([, field]) => {
-          const path = field.instancesPath;
-          if (path && field.type !== "DynamicDropdown") {
-            optionsPromises.push(this.instanceStore.optionsCache.get(path).then(
-              options => {
-                field.updateOptions(options);
-              }
-            ));
-          }
-        });
-
-        Promise.all(optionsPromises)
-          .then(() => {
-            runInAction(() => {
-              this.isFetching = false;
-              this.isFetched = true;
-              this.memorizeInstanceInitialValues();
-              this.form.toggleReadMode(this.instanceStore.globalReadMode);
-            });
-          })
-          .catch(e => {
-            runInAction(() => {
-              this.errorInstance(e);
-            });
-          });
-      });
-      */
     } catch (e) {
       runInAction(() => {
         this.errorInstance(e);
       });
     }
   }
-
-  // Was only needed with non DynamicDropdown in Preview
-  /*
-  @action
-  async fetchInstanceDataForPreview() {
-    if (this.isFetching || (this.isFetched && !this.fetchError)) {
-      return;
-    }
-
-    this.cancelChangesPending = false;
-    this.isFetching = true;
-    this.isSaving = false;
-    this.isFetched = false;
-    this.fetchError = null;
-    this.hasFetchError = false;
-    this.saveError = null;
-    this.hasSaveError = false;
-
-    try {
-      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.databaseScope));
-      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
-      runInAction(async () => {
-        this.data = normalizedData;
-        this.form = new FormStore(normalizedData);
-        const fields =  this.form.getField();
-
-        let idsList = [] ;
-        Object.values(normalizedData.fields).forEach(value=>{
-          if(value.instancesPath && value.value.length > 0 && value.type !== "DynamicDropdown") {
-            value.value.forEach(v => idsList.push(v.id));
-          }
-        });
-
-        try {
-          const result = idsList.length > 0 ? await API.axios.post(API.endpoints.listedInstances(), idsList):null;
-          runInAction(() => {
-            if(result) {
-              const res = result.data.data.reduce((acc, current) => {
-                if(!acc[current.schema]) {
-                  acc[current.schema] = [];
-                }
-                acc[current.schema].push(current);
-                return acc;
-              },{});
-
-              Object.entries(fields).forEach(([, field]) => {
-                let path = field.instancesPath;
-                if(path){
-                  Object.keys(res).forEach(key => {
-                    if(key == path) {
-                      field.updateOptions(res[key]);
-                    }
-                  });
-                }
-              });
-            }
-
-            this.isFetching = false;
-            this.isFetched = true;
-            this.memorizeInstanceInitialValues();
-            this.form.toggleReadMode(this.globalReadMode);
-          });
-        } catch(e) {
-          runInAction(() => {
-            this.errorInstance(e);
-          });
-        }
-      });
-    } catch (e) {
-      runInAction(() => {
-        this.errorInstance(e);
-      });
-    }
-  }
-  */
 
   @action
   errorInstance(e) {
@@ -397,10 +278,11 @@ class Instance {
 class InstanceStore {
   @observable databaseScope = null;
   @observable instances = new Map();
-  @observable instancesForPreview = new Map();
+  //@observable instancesForPreview = new Map();
   @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
   @observable comparedWithReleasedVersionInstance = null;
+  @observable previewInstance = null;
   @observable globalReadMode = true;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
@@ -454,7 +336,7 @@ class InstanceStore {
         viewMode: viewMode,
         paneStore: new PaneStore()
       });
-      const instance = this.getInstance(instanceId);
+      const instance = this.createInstanceOrGet(instanceId);
       instance.fetch();
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
@@ -487,12 +369,7 @@ class InstanceStore {
   }
 
   @action
-  hasInstance(instanceId){
-    return this.instances.has(instanceId);
-  }
-
-  @action
-  getInstance(instanceId){
+  createInstanceOrGet(instanceId){
     if (!this.instances.has(instanceId)) {
       const instance = new Instance(instanceId, this);
       this.instances.set(instanceId, instance);
@@ -500,22 +377,6 @@ class InstanceStore {
     }
     return this.instances.get(instanceId);
   }
-
-  /*
-  @action
-  getInstanceForPreview(instanceId){
-    if (!this.instancesForPreview.has(instanceId)) {
-      const instance = new Instance(instanceId, this);
-      this.instancesForPreview.set(instanceId, instance);
-      return instance;
-    }
-    return this.instancesForPreview.get(instanceId);
-  }
-
-  hasInstanceForPreview(instanceId){
-    return this.instancesForPreview.has(instanceId);
-  }
-  */
 
   @computed
   get hasUnsavedChanges(){
@@ -575,7 +436,7 @@ class InstanceStore {
 
   @action
   async duplicateInstance(fromInstanceId){
-    let instanceToCopy = this.getInstance(fromInstanceId);
+    let instanceToCopy = this.instances.get(fromInstanceId);
     let path = instanceToCopy.path;
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
@@ -711,7 +572,7 @@ class InstanceStore {
 
   @action
   instanceHasChanged(instanceId){
-    const instance = this.getInstance(instanceId);
+    const instance = this.instances.get(instanceId);
     if(!instance.hasChanged){
       instance.hasChanged = true;
     }
@@ -719,12 +580,12 @@ class InstanceStore {
 
   @action
   cancelInstanceChanges(instanceId){
-    this.getInstance(instanceId).cancelChangesPending = true;
+    this.instances.get(instanceId).cancelChangesPending = true;
   }
 
   @action
   confirmCancelInstanceChanges(instanceId){
-    this.getInstance(instanceId).cancelChanges();
+    this.instances.get(instanceId).cancelChanges();
   }
 
   @action
@@ -741,6 +602,16 @@ class InstanceStore {
   toggleShowCreateModal(state){
     this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
+
+  @action
+  togglePreviewInstance(instanceId, instanceName) {
+    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
+      this.previewInstance = null;
+    } else {
+      this.previewInstance = {id: instanceId, name: instanceName};
+    }
+  }
+
 }
 
 export const createInstanceStore = (databaseScope=null) => {

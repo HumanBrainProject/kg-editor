@@ -80,9 +80,9 @@ export default class KgInputTextField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
-    const selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
+    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
     const prototype = this.props.componentClass === "textarea"?window.HTMLTextAreaElement.prototype:window.HTMLInputElement.prototype;
-    if (this.props.field.value === null) {
+    if (selectedInstance && this.props.field.value === null) {
       Object.getOwnPropertyDescriptor(prototype, "disabled").set
         .call(this.inputRef, true);
       selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
@@ -158,8 +158,8 @@ export default class KgInputTextField extends React.Component {
       path
     } = this.props.field;
 
-    let selectedInstance = instanceStore.getInstance(this.props.formStore.structure.fields.id.nexus_id);
-    let isAlternativeDisabled = selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
+    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    let isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     const style = this.getStyle();
 

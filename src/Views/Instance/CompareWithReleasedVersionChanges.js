@@ -28,27 +28,27 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
     this.releasedInstanceStore = createInstanceStore("RELEASED");
   }
 
-  fetchInstanceData = () => {
-    const instance = instanceStore.getInstance(this.props.instanceId);
-    instance.fetch();
-  }
-
   componentDidMount() {
     if (this.props.instanceId) {
       if (this.props.status !== "NOT_RELEASED") {
-        this.releasedInstanceStore.getInstance(this.props.instanceId, true);
+        this.releasedInstanceStore.createInstanceOrGet(this.props.instanceId, true);
       }
-      this.fetchInstanceData();
+      this.fetchInstance();
     }
   }
 
   componentDidUpdate(prevProps) {
     if(this.props.instanceId && prevProps.instanceId !== this.props.instanceId) {
       if (this.props.status !== "NOT_RELEASED") {
-        this.releasedInstanceStore.getInstance(this.props.instanceId, true);
+        this.releasedInstanceStore.createInstanceOrGet(this.props.instanceId, true);
       }
-      this.fetchInstanceData();
+      this.fetchInstance();
     }
+  }
+
+  fetchInstance = (forceFetch=false) => {
+    const instance = instanceStore.createInstanceOrGet(this.props.instanceId);
+    instance.fetch(forceFetch);
   }
 
   handleCloseComparison = () => {
@@ -56,7 +56,7 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
   }
 
   handleRetryFetchInstance = () => {
-    this.fetchInstanceData();
+    this.fetchInstance(true);
   }
 
   handleRetryFetchReleasedInstance = () => {
@@ -72,8 +72,12 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
       window.console.log("Error: instanceId is null. Could not compare instance with released version!");
       return null;
     }
-    const instanceBefore = status !== "NOT_RELEASED"?this.releasedInstanceStore.getInstance(instanceId):null;
-    const instanceAfter = instanceStore.getInstance(instanceId);
+    const instanceBefore = status !== "NOT_RELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
+    const instanceAfter = instanceStore.instances.get(instanceId);
+
+    if (!instanceAfter) {
+      return null;
+    }
 
     let beforeValues = {};
     let afterValues = {};

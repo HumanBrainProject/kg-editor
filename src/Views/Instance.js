@@ -14,6 +14,7 @@ import Pane from "./Instance/Pane";
 import Links from "./Instance/Links";
 import PaneContainer from "./Instance/PaneContainer";
 import SaveBar from "./Instance/SaveBar";
+import Preview from "./Preview";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const styles = {
@@ -60,10 +61,43 @@ const styles = {
     overflow: "hidden"
   },
   sidebar: {
+    position: "relative",
     background: "var(--bg-color-ui-contrast2)",
     borderLeft: "1px solid var(--border-color-ui-contrast1)",
     overflow: "auto",
     color: "var(--ft-color-loud)"
+  },
+  previewPanel: {
+    position: "absolute",
+    top: 0,
+    right: "-600px",
+    maxWidth: "45%",
+    width: "600px",
+    height: "100%",
+    color: "var(--ft-color-loud)",
+    background: "var(--bg-color-ui-contrast2)",
+    border: 0,
+    borderLeft: "1px solid var(--border-color-ui-contrast1)",
+    borderTopLeftRadius: "10px",
+    borderBottomLeftRadius: "10px",
+    transition: "right 0.3s ease-in-out",
+    zIndex: 3,
+    "&.show": {
+      right: 0
+    },
+    "& h3": {
+      margin: "10px 10px 0 10px"
+    }
+  },
+  closePreviewBtn: {
+    position: "absolute",
+    top: "5px",
+    right: "5px",
+    width: "28px",
+    height: "30px",
+    padding: "5px",
+    textAlign: "center",
+    cursor: "pointer"
   }
 };
 
@@ -84,13 +118,25 @@ export default class Edit extends React.Component {
     routerStore.history.push(`/instance/${mode}/${this.props.match.params.id}`);
   }
 
+  handleHidePreview = () => {
+    instanceStore.togglePreviewInstance();
+  }
+
   render() {
     const {classes} = this.props;
     const openedInstance = this.props.match.params.id?instanceStore.openedInstances.get(this.props.match.params.id):null;
-    const instance = this.props.match.params.id?instanceStore.getInstance(this.props.match.params.id):null;
+
+    if (!openedInstance) {
+      return null;
+    }
+
+    const instance = this.props.match.params.id?instanceStore.instances.get(this.props.match.params.id):null;
+    if (!instance) {
+      return null;
+    }
 
     return (
-      openedInstance ?
+      <React.Fragment>
         <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
           <div className={classes.tabs}>
             <div className={`${classes.tab} ${openedInstance.viewMode === "view"?"active":""}`} onClick={this.handleSelectMode.bind(this, "view")}>
@@ -137,7 +183,19 @@ export default class Edit extends React.Component {
           <div className={classes.sidebar}>
             <SaveBar/>
           </div>
-        </div>:null
+        </div>
+        <div className={`${classes.previewPanel} ${instanceStore.previewInstance?"show":""}`}>
+          {instanceStore.previewInstance && (
+            <React.Fragment>
+              <h3>Preview</h3>
+              <Preview instanceId={instanceStore.previewInstance.id} instanceName={instanceStore.previewInstance.name} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showNodeType={true} showStatus={false} />
+              <div className={classes.closePreviewBtn} title="close preview" onClick={this.handleHidePreview}>
+                <FontAwesomeIcon icon={"times"} />
+              </div>
+            </React.Fragment>
+          )}
+        </div>
+      </React.Fragment>
     );
   }
 }

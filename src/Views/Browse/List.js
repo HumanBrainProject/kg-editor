@@ -57,6 +57,10 @@ const styles = {
     },
     "&.edited": {
       padding: "0 5px 0 30px"
+    },
+    "&.disabled": {
+      pointerEvents: "none",
+      opacity: "0.8"
     }
   },
   icon: {
@@ -272,7 +276,7 @@ export default class List extends React.Component {
     const edited = browseStore.currentlyEditedBookmarkList === list;
     if (list.isBookmarkList) {
       return (
-        <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""} ${edited ? "edited" : ""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
+        <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""} ${edited ? "edited" : ""} ${browseStore.isFetching.instances?"disabled":""}`} onClick={this.handleSelect.bind(this, list)} onMouseLeave={this.handelCancelActions.bind(this)} >
           <React.Fragment>
             <FontAwesomeIcon icon={"star"} className={`${classes.icon} ${classes.bookmarkIcon}`} />
             {edited && !list.updateError && !list.deleteError ?
@@ -359,7 +363,7 @@ export default class List extends React.Component {
     } else if (list.isDataTypeList) {
       const color = dataTypesStore.colorPalletteBySchema(list.id);
       return (
-        <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
+        <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>
             {color ?
               <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.nodetypeIcon}`} style={{ color: color }} />
@@ -383,7 +387,7 @@ export default class List extends React.Component {
       );
     } else { // smartlist
       return (
-        <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
+        <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <FontAwesomeIcon icon={"lightbulb"} className={`${classes.icon} ${classes.smartlistIcon}`} />
           <span>{list.name}</span>
         </div>

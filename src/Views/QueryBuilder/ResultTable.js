@@ -140,7 +140,6 @@ class ResultValue extends React.Component {
           result = value[n];
           return true;
         }
-        return false;
       });
       return result;
     }

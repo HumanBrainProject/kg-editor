@@ -4,7 +4,7 @@ import { toJS } from "mobx";
 import injectStyles from "react-jss";
 import { Button, Table, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { get, isArray, isString, isInteger } from "lodash";
+import { get, isObject, isArray, isString, isInteger } from "lodash";
 
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import BGMessage from "../../Components/BGMessage";
@@ -22,8 +22,11 @@ const styles = {
     "& th:first-child":{
       width:"40px"
     },
-    "& table":{
-      tableLayout:"fixed"
+    "& table.table":{
+      tableLayout:"fixed",
+      "&>thead>tr>th": {
+        wordBreak: "break-word"
+      }
     }
   },
   fetchingPanel: {
@@ -43,7 +46,10 @@ const styles = {
     width:"100%",
     overflow:"hidden",
     textOverflow:"ellipsis",
-    whiteSpace:"nowrap"
+    whiteSpace:"nowrap",
+    "&.is-link": {
+      cursor: "pointer"
+    }
   },
   "@global":{
     "[id^=result-tooltip-] .tooltip-inner":{
@@ -103,23 +109,101 @@ const styles = {
 
 @injectStyles(styles)
 @observer
+class ResultValue extends React.Component {
+
+  handleOpenCollection = () => {
+    const {name, index} = this.props;
+    queryBuilderStore.appendTableViewRoot(index,name);
+  }
+
+  handleClickValue = e => {
+    const link = this.link;
+    if (link) {
+      if(e.metaKey || e.ctrlKey){
+        instanceStore.openInstance(link);
+      } else {
+        routerStore.history.push("/instance/view/"+link);
+      }
+    }
+  }
+
+  get link() {
+    const {name, value} = this.props;
+    const reg = /^https?:\/\/[^.]+\.[^.]+\.[^.]+\/relativeUrl$/;
+    if (name === "relativeUrl" || reg.test(name)) {
+      return value;
+    }
+    if (isObject(value)) {
+      let result = null;
+      Object.keys(value).some(n => {
+        if (n === "relativeUrl" || reg.test(n)) {
+          result = value[n];
+          return true;
+        }
+        return false;
+      });
+      return result;
+    }
+    return null;
+  }
+
+  render() {
+    const {classes, name, index, value} = this.props;
+
+    if (isArray(value)) {
+      if (!value.length) {
+        return (
+          <em>empty collection</em>
+        );
+      }
+      return (
+        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleOpenCollection}>
+          Collection ({value.length})
+        </Button>
+      );
+    }
+
+    const link = this.link;
+
+    return (
+      <OverlayTrigger placement="top" overlay={
+        <Tooltip id={`result-tooltip-${name}-${index}`}>
+          {isObject(value)?
+            this.link?
+              this.link
+              :
+              <em>{JSON.stringify(value)}</em>
+            :value
+          }
+        </Tooltip>}>
+        <div className={`${classes.value} ${link?"is-link":""}`} onClick={link?this.handleClickValue:undefined}>
+          {isObject(value)?
+            link?
+              link
+              :
+              <em>object</em>
+            :value
+          }
+          <Tooltip placement="top" id={`result-tooltip-${name}-${index}-2`}>
+            {isObject(value)?
+              link?
+                link
+                :
+                <em>{JSON.stringify(value)}</em>
+              :value
+            }
+          </Tooltip>
+        </div>
+      </OverlayTrigger>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
 export default class ResultTable extends React.Component{
   handleBreadcrumbClick(index){
     queryBuilderStore.returnToTableViewRoot(index);
-  }
-
-  handleOpenCollection(index, key){
-    queryBuilderStore.appendTableViewRoot(index,key);
-  }
-
-  handleClickValue(key, value, e){
-    if(key === "relativeUrl"){
-      if(e.metaKey || e.ctrlKey){
-        instanceStore.openInstance(value);
-      } else {
-        routerStore.history.push("/instance/view/"+value);
-      }
-    }
   }
 
   handlExecuteQuery = () => {
@@ -187,28 +271,14 @@ export default class ResultTable extends React.Component{
                       <tr key={"row"+index}>
                         <th>{index}</th>
                         {isString(row)?
-                          <td>{row}</td>:
-                          objectKeys.map(key =>
-                            <td key={key+index}>
-                              {isArray(row[key])?
-                                row[key].length?
-                                  <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleOpenCollection.bind(this, index, key)}>
-                                  Collection ({row[key].length})
-                                  </Button>
-                                  :<em>empty collection</em>
-                                :<OverlayTrigger placement="top" overlay={
-                                  <Tooltip id={`result-tooltip-${key}-${index}`}>
-                                    {row[key]}
-                                  </Tooltip>}>
-                                  <div className={classes.value} onClick={this.handleClickValue.bind(this, key, row[key])}>
-                                    {row[key]}
-                                    <Tooltip placement="top" id={`result-tooltip-${key}-${index}-2`}>
-                                      {row[key]}
-                                    </Tooltip>
-                                  </div>
-                                </OverlayTrigger>
-                              }
-                            </td>)}
+                          <td>{row}</td>
+                          :
+                          objectKeys.map(name => (
+                            <td key={name+index}>
+                              <ResultValue name={name} index={index} value={row[name]} />
+                            </td>
+                          ))
+                        }
                       </tr>
                     )}
                   </tbody>

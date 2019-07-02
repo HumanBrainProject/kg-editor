@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed, toJS} from "mobx";
-import { uniqueId } from "lodash";
+import { uniqueId, find, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 import API from "../Services/API";
 
@@ -10,40 +10,6 @@ import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import { matchPath } from "react-router-dom";
-
-class OptionsCache{
-  @observable cache = new Map();
-  @observable promises = new Map();
-
-  get(path){
-    if(this.cache.has(path)){
-      return Promise.resolve(this.cache.get(path));
-    } else if(this.promises.has(path)){
-      return this.promises.get(path);
-    } else {
-      const promise = this.fetch(path);
-      this.promises.set(path, promise);
-      return this.promises.get(path);
-    }
-  }
-
-  async fetch(path){
-    try {
-      const { data } = await API.axios.get(API.endpoints.instances(path));
-      this.cache.set(path, (data && data.data)? data.data: []);
-      return this.cache.get(path);
-    } catch (e) {
-      const message = e.message?e.message:e;
-      this.cache.delete(path);
-      throw `Error while retrieving the list of ${path} (${message})`;
-    }
-  }
-
-  @action flush(){
-    this.cache = new Map();
-    this.promises = new Map();
-  }
-}
 
 class Instance {
   @observable instanceId = null;
@@ -159,35 +125,9 @@ class Instance {
   }
 
   @action
-  async fetch(forceFetch=false) {
-    if (this.isFetching || (this.isFetched && !this.fetchError && !forceFetch)) {
-      return;
-    }
-
-    this.cancelChangesPending = false;
-    this.isFetching = true;
-    this.isSaving = false;
-    this.isFetched = false;
-    this.fetchError = null;
-    this.hasFetchError = false;
-    this.saveError = null;
-    this.hasSaveError = false;
-
-    try {
-      const { data } = await API.axios.get(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope));
-      const normalizedData = this.normalizeData((data && data.data)?data.data:{fields: [], alternatives: []});
-      runInAction(() => {
-        this.data = normalizedData;
-        this.form = new FormStore(normalizedData);
-        this.isFetching = false;
-        this.isFetched = true;
-        this.memorizeInstanceInitialValues();
-        this.form.toggleReadMode(this.instanceStore.globalReadMode);
-      });
-    } catch (e) {
-      runInAction(() => {
-        this.errorInstance(e);
-      });
+  fetch(forceFetch=false) {
+    if(!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
+      this.instanceStore.fetchInstance(this);
     }
   }
 
@@ -195,7 +135,7 @@ class Instance {
   errorInstance(e) {
     const message = e.message?e.message:e;
     const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-    if(e.response.status === 404){
+    if(e.response && e.response.status === 404){
       this.fetchError = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
     }
     else {
@@ -229,19 +169,6 @@ class Instance {
         this.fieldsToSetAsNull = [];
         this.data = data.data;
       });
-
-      let option = null;
-      const keyFieldName = (this.data && this.data.fields && this.data.ui_info && this.data.ui_info.labelField)?this.data.ui_info.labelField:null;
-      if (keyFieldName) {
-        const options = this.instanceStore.optionsCache.cache.get(this.path);
-        if (options) {
-          option = options.find(o => o.id === this.instanceId);
-          // user saved value
-          if (option && payload) {
-            option.name = payload[keyFieldName];
-          }
-        }
-      }
 
       this.fetch(true);
     } catch (e) {
@@ -290,9 +217,11 @@ class InstanceStore {
   @observable isDeletingInstance = false;
   @observable deleteInstanceError = null;
 
-  @observable showCreateModal = false;
+  instancesQueue = new Map();
+  queueThreshold = 1000;
+  queueTimeout = 250;
 
-  optionsCache = new OptionsCache();
+  @observable showCreateModal = false;
 
   generatedKeys = new WeakMap();
 
@@ -306,6 +235,85 @@ class InstanceStore {
     }
   }
 
+  fetchInstance(instance){
+    if(!this.instancesQueue.has(instance.instanceId)){
+      this.instancesQueue.set(instance.instanceId, instance);
+      this.processQueue();
+    }
+  }
+
+  @action
+  processQueue(){
+    if(this.instancesQueue.size <= 0){
+      this._debouncedFetchQueue.cancel();
+    } else if(this.instancesQueue.size < this.queueThreshold){
+      this._debouncedFetchQueue();
+    } else if(!this.isFetchingQueue){
+      this._debouncedFetchQueue.cancel();
+      this.fetchQueue();
+    }
+  }
+
+  _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+
+  @action
+  async fetchQueue(){
+    if(this.isFetchingQueue){
+      return;
+    }
+    this.isFetchingQueue = true;
+    let toProcess = Array.from(this.instancesQueue.keys()).splice(0, this.queueThreshold);
+    toProcess.forEach(identifier => {
+      const instance = this.instances.get(identifier);
+      instance.cancelChangesPending = false;
+      instance.isFetching = true;
+      instance.isSaving = false;
+      instance.isFetched = false;
+      instance.fetchError = null;
+      instance.hasFetchError = false;
+      instance.saveError = null;
+      instance.hasSaveError = false;
+    });
+    try{
+      let response = await API.axios.post(API.endpoints.listedInstances(true), toProcess);
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          const instance = this.instances.get(identifier);
+          const data = find(response.data.data, (item) => item.fields.id.nexus_id === instance.instanceId);
+          if(data){
+            const normalizedData = instance.normalizeData(data?data:{fields: [], alternatives: []});
+            instance.data = normalizedData;
+            instance.form = new FormStore(normalizedData);
+            instance.isFetching = false;
+            instance.isFetched = true;
+            instance.memorizeInstanceInitialValues();
+            instance.form.toggleReadMode(instance.instanceStore.globalReadMode);
+          } else {
+            const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+            instance.errorInstance(message);
+            instance.isFetching = false;
+            instance.isFetched = false;
+          }
+          this.instancesQueue.delete(identifier);
+        });
+        this.isFetchingQueue = false;
+        this.processQueue();
+      });
+    } catch(e){
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          const instance = this.instances.get(identifier);
+          instance.errorInstance(e);
+          instance.isFetching = false;
+          instance.isFetched = false;
+          this.optionsQueue.delete(identifier);
+        });
+        this.isFetchingQueue = false;
+        this.processQueue();
+      });
+    }
+  }
+
   @action flush(){
     this.instances = new Map();
     this.isCreatingNewInstance = false;
@@ -314,7 +322,6 @@ class InstanceStore {
     this.instanceToDelete = null;
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
-    this.optionsCache.flush();
   }
 
   /**

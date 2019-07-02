@@ -9,7 +9,7 @@ import instanceStore from "../Stores/InstanceStore";
 class OptionsPool{
   @observable options = new Map();
   optionsQueue = new Map();
-  queueThreshold = 20;
+  queueThreshold = 5000;
   queueTimeout = 250;
   @observable isFetchingQueue = false;
 

@@ -351,6 +351,11 @@ class InstanceStore {
     this.syncStoredOpenedTabs();
   }
 
+  @action closeAllInstances(){
+    this.openedInstances.clear();
+    this.syncStoredOpenedTabs();
+  }
+
   syncStoredOpenedTabs(){
     localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
   }

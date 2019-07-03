@@ -67,34 +67,31 @@ export default class InstanceInvite extends React.Component{
     const { classes } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
-    if (!instance) {
-      return null;
-    }
-
     return (
-      <div className={classes.container}>
-        <div className={classes.panel}>
-          {instance.isFetching?
-            <FetchingLoader>
-              <span>Fetching instance information...</span>
-            </FetchingLoader>
-            :!instance.hasFetchError?
-              <React.Fragment>
-                <Instance instance={instance} />
-                <Reviewers id={this.props.id} />
-              </React.Fragment>
-              :
-              <BGMessage icon={"ban"} className={classes.error}>
-                There was a network problem fetching the instance.<br/>
-                If the problem persists, please contact the support.<br/>
-                <small>{instance.fetchError}</small><br/><br/>
-                <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
-                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
-                </Button>
-              </BGMessage>
-          }
-        </div>
-      </div>
+      instance  && instance.data ?
+        <div className={classes.container}>
+          <div className={classes.panel}>
+            {instance.isFetching?
+              <FetchingLoader>
+                <span>Fetching instance information...</span>
+              </FetchingLoader>
+              :!instance.hasFetchError?
+                <React.Fragment>
+                  <Instance instance={instance} />
+                  <Reviewers id={this.props.id} />
+                </React.Fragment>
+                :
+                <BGMessage icon={"ban"} className={classes.error}>
+                  There was a network problem fetching the instance.<br/>
+                  If the problem persists, please contact the support.<br/>
+                  <small>{instance.fetchError}</small><br/><br/>
+                  <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
+                    <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                  </Button>
+                </BGMessage>
+            }
+          </div>
+        </div>:null
     );
   }
 }

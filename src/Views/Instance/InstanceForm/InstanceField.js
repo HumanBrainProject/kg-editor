@@ -71,7 +71,7 @@ export default class InstanceField extends React.Component{
       setTimeout(() => {
         instanceStore.setCurrentInstanceId(this.props.mainInstanceId, value.id, this.props.level + 1);
         const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
-        if (target && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
+        if (target && target.childNodes && target.childNodes[0] && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
           target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
         }
         this.props.paneStore.selectPane(`ChildrenOf${this.props.id}`);
@@ -83,7 +83,7 @@ export default class InstanceField extends React.Component{
     if (field && field.isLink && value && value.id) {
       instanceStore.setInstanceHighlight(value.id, field.label);
       const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
-      if (target && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
+      if (target && target.childNodes && target.childNodes[0] && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
         target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
       }
     }

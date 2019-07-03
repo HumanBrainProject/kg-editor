@@ -66,6 +66,35 @@ class Instance {
   }
 
   @computed
+  get linkedIds() {
+    let linkKeys = [];
+    if(this.isFetched){
+      linkKeys = Object.keys(this.data.fields).filter(fieldKey => {
+        return this.form.getField(fieldKey).isLink && this.form.getField(fieldKey).getValue().length > 0;
+      });
+    }
+
+    let ids = [];
+    linkKeys.map(fieldKey => {
+      let fieldObj = this.form.getField(fieldKey);
+      if(fieldObj.isLink && fieldObj.value.length > 0){
+        fieldObj.value.map(value => {
+          ids.push(value[fieldObj.mappingValue]);
+        });
+      }
+    });
+
+    let allIds = [this.instanceId];
+    ids.forEach(i=> {
+      if(this.instanceStore.instances.has(i)) {
+        const inst = this.instanceStore.instances.get(i);
+        allIds = [...allIds, ...inst.linkedIds];
+      }
+    });
+    return Array.from(new Set(allIds));
+  }
+
+  @computed
   get metadata() {
     if (this.isFetched && !this.fetchError && this.data && this.data.metadata) {
       let metadata = toJS(this.data.metadata);
@@ -264,37 +293,41 @@ class InstanceStore {
     this.isFetchingQueue = true;
     let toProcess = Array.from(this.instancesQueue.keys()).splice(0, this.queueThreshold);
     toProcess.forEach(identifier => {
-      const instance = this.instances.get(identifier);
-      instance.cancelChangesPending = false;
-      instance.isFetching = true;
-      instance.isSaving = false;
-      instance.isFetched = false;
-      instance.fetchError = null;
-      instance.hasFetchError = false;
-      instance.saveError = null;
-      instance.hasSaveError = false;
+      if(this.instances.has(identifier)) {
+        const instance = this.instances.get(identifier);
+        instance.cancelChangesPending = false;
+        instance.isFetching = true;
+        instance.isSaving = false;
+        instance.isFetched = false;
+        instance.fetchError = null;
+        instance.hasFetchError = false;
+        instance.saveError = null;
+        instance.hasSaveError = false;
+      }
     });
     try{
       let response = await API.axios.post(API.endpoints.listedInstances(true), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          const instance = this.instances.get(identifier);
-          const data = find(response.data.data, (item) => item.fields.id.nexus_id === instance.instanceId);
-          if(data){
-            const normalizedData = instance.normalizeData(data?data:{fields: [], alternatives: []});
-            instance.data = normalizedData;
-            instance.form = new FormStore(normalizedData);
-            instance.isFetching = false;
-            instance.isFetched = true;
-            instance.memorizeInstanceInitialValues();
-            instance.form.toggleReadMode(instance.instanceStore.globalReadMode);
-          } else {
-            const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
-            instance.errorInstance(message);
-            instance.isFetching = false;
-            instance.isFetched = false;
+          if(this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            const data = find(response.data.data, (item) => item.fields.id.nexus_id === instance.instanceId);
+            if(data){
+              const normalizedData = instance.normalizeData(data?data:{fields: [], alternatives: []});
+              instance.data = normalizedData;
+              instance.form = new FormStore(normalizedData);
+              instance.isFetching = false;
+              instance.isFetched = true;
+              instance.memorizeInstanceInitialValues();
+              instance.form.toggleReadMode(instance.instanceStore.globalReadMode);
+            } else {
+              const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+              instance.errorInstance(message);
+              instance.isFetching = false;
+              instance.isFetched = false;
+            }
+            this.instancesQueue.delete(identifier);
           }
-          this.instancesQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
         this.processQueue();
@@ -302,11 +335,13 @@ class InstanceStore {
     } catch(e){
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          const instance = this.instances.get(identifier);
-          instance.errorInstance(e);
-          instance.isFetching = false;
-          instance.isFetched = false;
-          this.optionsQueue.delete(identifier);
+          if(this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            instance.errorInstance(e);
+            instance.isFetching = false;
+            instance.isFetched = false;
+            this.optionsQueue.delete(identifier);
+          }
         });
         this.isFetchingQueue = false;
         this.processQueue();
@@ -349,13 +384,38 @@ class InstanceStore {
     }
   }
 
-  @action setInstanceViewMode(instanceId, mode){
+  @action
+  setInstanceViewMode(instanceId, mode){
     this.openedInstances.get(instanceId).viewMode = mode;
   }
 
-  @action closeInstance(instanceId){
+  @action
+  closeInstance(instanceId){
     this.openedInstances.delete(instanceId);
     this.syncStoredOpenedTabs();
+  }
+
+  @action
+  removeUnusedInstances(instanceId, instancesToBeDeleted) {
+    const instancesToBeKept = this.getOpenedInstancesExceptCurrent(instanceId);
+    instancesToBeDeleted.forEach(i => {
+      const instance = this.instances.get(i);
+      if(!instance.isFetching && !instancesToBeKept.includes(i)) {
+        this.instances.delete(i);
+      }
+    });
+  }
+
+  getOpenedInstancesExceptCurrent(instanceId) {
+    let result = [];
+    Array.from(this.openedInstances.keys()).forEach(id => {
+      if(id !== instanceId){
+        const instance = this.instances.get(id);
+        const instancesToBeKept = instance.linkedIds;
+        result = [...result, ...instancesToBeKept];
+      }
+    });
+    return Array.from(new Set(result));
   }
 
   syncStoredOpenedTabs(){

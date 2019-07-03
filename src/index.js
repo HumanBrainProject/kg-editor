@@ -341,6 +341,9 @@ class App extends React.Component {
       }
     }
     instanceStore.closeInstance(instanceId);
+    const instance = instanceStore.instances.get(instanceId);
+    const instancesToBeDeleted = instance.linkedIds;
+    instanceStore.removeUnusedInstances(instanceId, instancesToBeDeleted);
   }
 
   handleFocusPreviousInstance(instanceId) {

@@ -41,15 +41,8 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class BookmarkStatus extends React.Component{
-  constructor(props){
-    super(props);
+  componentDidMount() {
     bookmarkStatusStore.fetchStatus(this.props.id);
-    this.handleBookmarksSave = this.handleBookmarksSave.bind(this);
-    this.handleBookmarksChange = this.handleBookmarksChange.bind(this);
-    this.handleNewBookmark = this.handleNewBookmark.bind(this);
-    this.handleFetchRetry = this.handleFetchRetry.bind(this);
-    this.handleSaveCancel = this.handleSaveCancel.bind(this);
-    this.handleSaveRetry = this.handleSaveRetry.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -58,29 +51,17 @@ export default class BookmarkStatus extends React.Component{
     }
   }
 
-  handleBookmarksSave() {
-    bookmarkStatusStore.saveStatus(this.props.id);
-  }
+  handleBookmarksSave = () => bookmarkStatusStore.saveStatus(this.props.id);
 
-  handleBookmarksChange(bookmarkLists) {
-    bookmarkStatusStore.updateStatus(this.props.id, bookmarkLists);
-  }
+  handleBookmarksChange = bookmarkLists => bookmarkStatusStore.updateStatus(this.props.id, bookmarkLists);
 
-  handleNewBookmark(name) { // , field, store) {
-    browseStore.createBookmarkList(name, this.props.id);
-  }
+  handleNewBookmark = name => browseStore.createBookmarkList(name, this.props.id);
 
-  handleFetchRetry() {
-    bookmarkStatusStore.retryFetchStatus();
-  }
+  handleFetchRetry = () => bookmarkStatusStore.retryFetchStatus();
 
-  handleSaveCancel() {
-    bookmarkStatusStore.revertSaveStatus(this.props.id);
-  }
+  handleSaveCancel = () => bookmarkStatusStore.revertSaveStatus(this.props.id);
 
-  handleSaveRetry() {
-    bookmarkStatusStore.saveStatus(this.props.id);
-  }
+  handleSaveRetry = () => bookmarkStatusStore.saveStatus(this.props.id);
 
   render(){
     const instanceStatus = bookmarkStatusStore.getInstance(this.props.id);
@@ -88,53 +69,54 @@ export default class BookmarkStatus extends React.Component{
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarkLists.length)?toJS(instanceStatus.data.bookmarkLists):[];
     const bookmarkLists = toJS(browseStore.bookmarkLists);
     return(
-      <div className={`${classes.container} ${className?className:""}`}>
-        {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?
-          <div className={classes.loader} title="retrieving favrorite status">
-            <FontAwesomeIcon icon="circle-notch" spin/>
-          </div>
-          :
-          instanceStatus.hasFetchError?
-            <PopOverButton
-              buttonClassName={classes.fetchErrorButton}
-              buttonTitle="favrorite status unknown, click for more information"
-              iconComponent={FontAwesomeIcon}
-              iconProps={{icon: "question-circle"}}
-              okComponent={() => (
-                <React.Fragment>
-                  <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
-                </React.Fragment>
-              )}
-              onOk={this.handleFetchRetry}
-            >
-              <h5 className={classes.textError}>{instanceStatus.fetchError}</h5>
-            </PopOverButton>
+      instanceStatus?
+        <div className={`${classes.container} ${className?className:""}`}>
+          {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?
+            <div className={classes.loader} title="retrieving favrorite status">
+              <FontAwesomeIcon icon="circle-notch" spin/>
+            </div>
             :
-            instanceStatus.hasSaveError?
+            instanceStatus.hasFetchError?
               <PopOverButton
-                buttonClassName={classes.saveErrorButton}
-                buttonTitle="failed to save bookmark, click for more information"
+                buttonClassName={classes.fetchErrorButton}
+                buttonTitle="favrorite status unknown, click for more information"
                 iconComponent={FontAwesomeIcon}
-                iconProps={{icon: "exclamation-triangle"}}
+                iconProps={{icon: "question-circle"}}
                 okComponent={() => (
                   <React.Fragment>
                     <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
                   </React.Fragment>
                 )}
-                onOk={this.handleSaveRetry}
-                cancelComponent={() => (
-                  <React.Fragment>
-                    <FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert
-                  </React.Fragment>
-                )}
-                onCancel={this.handleSaveCancel}
+                onOk={this.handleFetchRetry}
               >
-                <h5 className={classes.textError}>{instanceStatus.saveError}</h5>
+                <h5 className={classes.textError}>{instanceStatus.fetchError}</h5>
               </PopOverButton>
               :
-              <BookmarkButton values={values} list={bookmarkLists} onSave={this.handleBookmarksSave} onChange={this.handleBookmarksChange} onNew={this.handleNewBookmark} />
-        }
-      </div>
+              instanceStatus.hasSaveError?
+                <PopOverButton
+                  buttonClassName={classes.saveErrorButton}
+                  buttonTitle="failed to save bookmark, click for more information"
+                  iconComponent={FontAwesomeIcon}
+                  iconProps={{icon: "exclamation-triangle"}}
+                  okComponent={() => (
+                    <React.Fragment>
+                      <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
+                    </React.Fragment>
+                  )}
+                  onOk={this.handleSaveRetry}
+                  cancelComponent={() => (
+                    <React.Fragment>
+                      <FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert
+                    </React.Fragment>
+                  )}
+                  onCancel={this.handleSaveCancel}
+                >
+                  <h5 className={classes.textError}>{instanceStatus.saveError}</h5>
+                </PopOverButton>
+                :
+                <BookmarkButton values={values} list={bookmarkLists} onSave={this.handleBookmarksSave} onChange={this.handleBookmarksChange} onNew={this.handleNewBookmark} />
+          }
+        </div>:null
     );
   }
 }

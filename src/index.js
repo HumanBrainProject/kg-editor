@@ -13,7 +13,7 @@ import "./Services/IconsImport";
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
-import dataTypesStore from "./Stores/DataTypesStore";
+import structureStore from "./Stores/StructureStore";
 import instanceStore from "./Stores/InstanceStore";
 import browseStore from "./Stores/BrowseStore";
 
@@ -294,9 +294,13 @@ class App extends React.Component {
     } else if (e.keyCode === 112) { // F1, help
       routerStore.history.push("/help");
     } else if (e.altKey && e.keyCode === 87) { // alt+w, close
-      let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
-      if (matchInstanceTab) {
-        this.handleCloseInstance(matchInstanceTab.params.id);
+      if (e.shiftKey) { // alt+shift+w, close all
+        this.handleCloseAllInstances();
+      } else {
+        let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
+        if (matchInstanceTab) {
+          this.handleCloseInstance(matchInstanceTab.params.id);
+        }
       }
     } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
       let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
@@ -344,6 +348,16 @@ class App extends React.Component {
     const instance = instanceStore.instances.get(instanceId);
     const instancesToBeDeleted = instance.linkedIds;
     instanceStore.removeUnusedInstances(instanceId, instancesToBeDeleted);
+  }
+
+  handleCloseAllInstances() {
+    if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
+       || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
+       || matchPath(this.state.currentLocation, { path: "/query-builder", exact: "true" })
+       || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
+      routerStore.history.push("/browse");
+    }
+    instanceStore.closeAllInstances();
   }
 
   handleFocusPreviousInstance(instanceId) {
@@ -425,7 +439,6 @@ class App extends React.Component {
     const { classes } = this.props;
     const { currentLocation } = this.state;
     const Theme = appStore.availableThemes[appStore.currentTheme];
-
     return (
       <Router history={routerStore.history}>
         <div className={classes.layout}>
@@ -460,7 +473,7 @@ class App extends React.Component {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = instance.data && dataTypesStore.colorPalletteBySchema(instance.data.fields.id.value.path);
+                      color = instance.data && structureStore.colorPalletteBySchema(instance.data.fields.id.value.path);
                     }
                     if (!label) {
                       label = instanceId;

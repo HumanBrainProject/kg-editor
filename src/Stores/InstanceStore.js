@@ -371,6 +371,7 @@ class InstanceStore {
     historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
       this.openedInstances.get(instanceId).viewMode = viewMode;
+      this.syncStoredOpenedTabs();
     } else {
       this.openedInstances.set(instanceId, {
         currentInstancePath: [],
@@ -416,6 +417,10 @@ class InstanceStore {
       }
     });
     return Array.from(new Set(result));
+
+  @action closeAllInstances(){
+    this.openedInstances.clear();
+    this.syncStoredOpenedTabs();
   }
 
   syncStoredOpenedTabs(){

@@ -133,7 +133,7 @@ export default class GraphSettings extends React.Component {
                 const isDisabled = typeState === "none";
                 const isExpanded = graphStore.expandedTypes.indexOf(nodeType.schema) !== -1;
                 const isGrouped = typeState === "group";
-                const backgroundColor = dataTypesStore.colorPalletteBySchema(nodeType.schema);
+                const backgroundColor = structureStore.colorPalletteBySchema(nodeType.schema);
                 const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return (
                   <div className={`${classes.nodeType} ${isDisabled ? "disabled" : ""} ${isExpanded ? "expanded" : ""}`} key={nodeType.schema}>

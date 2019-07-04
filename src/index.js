@@ -341,6 +341,7 @@ class App extends React.Component {
           routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
         } else {
           routerStore.history.push("/browse");
+          browseStore.clearSelectedInstance();
         }
       }
     }

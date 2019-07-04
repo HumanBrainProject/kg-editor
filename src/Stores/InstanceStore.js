@@ -410,15 +410,17 @@ class InstanceStore {
   getOpenedInstancesExceptCurrent(instanceId) {
     let result = [];
     Array.from(this.openedInstances.keys()).forEach(id => {
-      if(id !== instanceId){
+      if (id !== instanceId) {
         const instance = this.instances.get(id);
         const instancesToBeKept = instance.linkedIds;
         result = [...result, ...instancesToBeKept];
       }
     });
     return Array.from(new Set(result));
+  }
 
-  @action closeAllInstances(){
+  @action
+  closeAllInstances(){
     this.openedInstances.clear();
     this.syncStoredOpenedTabs();
   }

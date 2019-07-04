@@ -137,6 +137,10 @@ class BrowseStore{
     this.selectedInstance = selectedInstance;
   }
 
+  @action clearSelectedInstance() {
+    this.selectedInstance = null;
+  }
+
   @action setInstancesFilter(filter){
     this.instancesFilter = filter;
     this.isFetching.instances = true;

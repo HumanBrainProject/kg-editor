@@ -103,91 +103,87 @@ export default class InstanceManage extends React.Component{
     const { classes } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
-    if (!instance) {
-      return null;
-    }
-
-    const promotedFields = instance.promotedFields;
-    const status = statusStore.getInstance(this.props.id);
-
+    const promotedFields = instance && instance.promotedFields;
+    const status = instance &&  statusStore.getInstance(this.props.id);
     return (
-      <div className={classes.container}>
-        <Scrollbars autoHide>
-          <div className={classes.panel}>
-            {instance.isFetching?
-              <FetchingLoader>
-                <span>Fetching instance information...</span>
-              </FetchingLoader>
-              :!instance.hasFetchError?
-                <React.Fragment>
-                  <div className={classes.content}>
-                    <h4>{instance.data.label}</h4>
-                    <div className={classes.id}>
-                      Nexus ID: {this.props.id}
-                    </div>
-                    <Form store={instance.readModeFormStore} key={this.props.id}>
-                      {promotedFields.map(fieldKey => {
-                        return(
-                          <div key={this.props.id+fieldKey} className={classes.field}>
-                            <Field name={fieldKey}/>
-                          </div>
-                        );
-                      })}
-                    </Form>
-                  </div>
-                  <div className={classes.content}>
-                    <h4>Duplicate this instance</h4>
-                    <ul>
-                      <li>Be careful. After duplication both instances will look the same.</li>
-                      <li>After dupplication you should update the name &amp; description fields.</li>
-                    </ul>
-                    <Button bsStyle={"warning"} onClick={this.handleDuplicateInstance}>
-                      <FontAwesomeIcon icon={"copy"}/> &nbsp; Duplicate this instance
-                    </Button>
-                  </div>
-                  <div className={classes.content}>
-                    <h4>Delete this instance</h4>
-                    {status && status.hasFetchError?
-                      <div className={classes.error}>
-                        <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
-                        <Button bsStyle="primary" onClick={this.fetchStatus}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+      instance && instance.data ?
+        <div className={classes.container}>
+          <Scrollbars autoHide>
+            <div className={classes.panel}>
+              {instance.isFetching?
+                <FetchingLoader>
+                  <span>Fetching instance information...</span>
+                </FetchingLoader>
+                :!instance.hasFetchError?
+                  <React.Fragment>
+                    <div className={classes.content}>
+                      <h4>{instance.data.label}</h4>
+                      <div className={classes.id}>
+                        Nexus ID: {this.props.id}
                       </div>
-                      :!status || !status.isFetched?
-                        <React.Fragment>
-                          <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Fetching instance release status
-                        </React.Fragment>
-                        :
-                        <React.Fragment>
-                          {status.data.status !== "NOT_RELEASED"?
-                            <ul>
-                              <li>This instance has been released and therefore cannot be deleted.</li>
-                              <li>If you still want to delete it you first have to unrelease it.</li>
-                            </ul>
-                            :
-                            <p>
-                              <strong>Be careful. Removed instances cannot be restored!</strong>
-                            </p>
-                          }
-                          <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "NOT_RELEASED"} >
-                            <FontAwesomeIcon icon={"trash-alt"}/>&nbsp;&nbsp; Delete this instance
-                          </Button>
-                        </React.Fragment>
-                    }
-                  </div>
-                </React.Fragment>
-                :
-                <BGMessage icon={"ban"}>
-                  There was a network problem fetching the instance.<br/>
-                  If the problem persists, please contact the support.<br/>
-                  <small>{instance.fetchError}</small><br/><br/>
-                  <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
-                    <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
-                  </Button>
-                </BGMessage>
-            }
-          </div>
-        </Scrollbars>
-      </div>
+                      <Form store={instance.readModeFormStore} key={this.props.id}>
+                        {promotedFields.map(fieldKey => {
+                          return(
+                            <div key={this.props.id+fieldKey} className={classes.field}>
+                              <Field name={fieldKey}/>
+                            </div>
+                          );
+                        })}
+                      </Form>
+                    </div>
+                    <div className={classes.content}>
+                      <h4>Duplicate this instance</h4>
+                      <ul>
+                        <li>Be careful. After duplication both instances will look the same.</li>
+                        <li>After dupplication you should update the name &amp; description fields.</li>
+                      </ul>
+                      <Button bsStyle={"warning"} onClick={this.handleDuplicateInstance}>
+                        <FontAwesomeIcon icon={"copy"}/> &nbsp; Duplicate this instance
+                      </Button>
+                    </div>
+                    <div className={classes.content}>
+                      <h4>Delete this instance</h4>
+                      {status && status.hasFetchError?
+                        <div className={classes.error}>
+                          <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
+                          <Button bsStyle="primary" onClick={this.fetchStatus}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+                        </div>
+                        :!status || !status.isFetched?
+                          <React.Fragment>
+                            <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Fetching instance release status
+                          </React.Fragment>
+                          :
+                          <React.Fragment>
+                            {status.data.status !== "NOT_RELEASED"?
+                              <ul>
+                                <li>This instance has been released and therefore cannot be deleted.</li>
+                                <li>If you still want to delete it you first have to unrelease it.</li>
+                              </ul>
+                              :
+                              <p>
+                                <strong>Be careful. Removed instances cannot be restored!</strong>
+                              </p>
+                            }
+                            <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "NOT_RELEASED"} >
+                              <FontAwesomeIcon icon={"trash-alt"}/>&nbsp;&nbsp; Delete this instance
+                            </Button>
+                          </React.Fragment>
+                      }
+                    </div>
+                  </React.Fragment>
+                  :
+                  <BGMessage icon={"ban"}>
+                    There was a network problem fetching the instance.<br/>
+                    If the problem persists, please contact the support.<br/>
+                    <small>{instance.fetchError}</small><br/><br/>
+                    <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
+                      <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                    </Button>
+                  </BGMessage>
+              }
+            </div>
+          </Scrollbars>
+        </div>:null
     );
   }
 }

@@ -71,9 +71,10 @@ export default class TipsOfTheDay extends React.Component {
       <span key="4">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,
       <span key="5">press <span className="kbd">Alt</span> + <span className="kbd">n</span> to create a new instance.</span>,
       <span key="6">press <span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</span>,
-      <span key="7">press <span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</span>,
-      <span key="8">press <span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</span>,
-      <span key="9">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
+      <span key="7">press <span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</span>,
+      <span key="8">press <span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</span>,
+      <span key="9">press <span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</span>,
+      <span key="10">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
     ];
     this.state = { currentIndex: Math.floor(Math.random() * 10) % this.tips.length };
   }

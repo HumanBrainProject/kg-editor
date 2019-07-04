@@ -13,7 +13,7 @@ import "./Services/IconsImport";
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
-import dataTypesStore from "./Stores/DataTypesStore";
+import structureStore from "./Stores/StructureStore";
 import instanceStore from "./Stores/InstanceStore";
 import browseStore from "./Stores/BrowseStore";
 
@@ -436,7 +436,6 @@ class App extends React.Component {
     const { classes } = this.props;
     const { currentLocation } = this.state;
     const Theme = appStore.availableThemes[appStore.currentTheme];
-
     return (
       <Router history={routerStore.history}>
         <div className={classes.layout}>
@@ -471,7 +470,7 @@ class App extends React.Component {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = instance.data && dataTypesStore.colorPalletteBySchema(instance.data.fields.id.value.path);
+                      color = instance.data && structureStore.colorPalletteBySchema(instance.data.fields.id.value.path);
                     }
                     if (!label) {
                       label = instanceId;

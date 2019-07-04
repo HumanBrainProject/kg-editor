@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ButtonGroup, Button } from "react-bootstrap";
 import PopOverButton from "../../Components/PopOverButton";
 
-import dataTypesStore from "../../Stores/DataTypesStore";
+import structureStore from "../../Stores/StructureStore";
 import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
@@ -357,7 +357,7 @@ export default class List extends React.Component {
         </div>
       );
     } else if (list.isDataTypeList) {
-      const color = dataTypesStore.colorPalletteBySchema(list.id);
+      const color = structureStore.colorPalletteBySchema(list.id);
       return (
         <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>

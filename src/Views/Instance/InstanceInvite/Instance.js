@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Row, Col } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import { Form, Field } from "hbp-quickfire";
-import dataTypesStore from "../../../Stores/DataTypesStore";
+import structureStore from "../../../Stores/StructureStore";
 
 
 const styles = {
@@ -76,7 +76,7 @@ export default class InstanceInvite extends React.Component{
 
     const nodeType = instance.data && instance.data.label;
 
-    const color = dataTypesStore.colorScheme[nodeType];
+    const color = structureStore.colorPalletteBySchema(instance.path);
 
     const nexusId = instance.data.fields.id?instance.data.fields.id.nexus_id:"<new>";
 

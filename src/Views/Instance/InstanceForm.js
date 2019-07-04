@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
 import routerStore from "../../Stores/RouterStore";
-import dataTypesStore from "../../Stores/DataTypesStore";
+import structureStore from "../../Stores/StructureStore";
 import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -280,7 +280,7 @@ export default class InstanceForm extends React.Component {
                         <HeaderPanel
                           className={classes.panelHeader}
                           nodeType={instance.nodeType}
-                          color={dataTypesStore.colorPalletteBySchema(instance.nodeType)}
+                          color={structureStore.colorPalletteBySchema(instance.nodeType)}
                           hasChanged={instance.hasChanged} />
 
                         <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />

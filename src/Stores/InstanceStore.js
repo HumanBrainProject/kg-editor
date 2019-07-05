@@ -144,8 +144,10 @@ class Instance {
         field.type = "KgInputText";
       } else if(field.type === "TextArea"){
         field.type = "KgTextArea";
-      } else if(field.type === "DropdownSelect"){
-        field.type = "DynamicDropdown";
+      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
+        if(field.type === "DropdownSelect") {
+          field.type = "DynamicDropdown";
+        }
         field.optionsUrl = field.instancesPath;
         field.instanceType = data.fields.id.value.path;
       }

@@ -34,6 +34,7 @@ import QueryBuilder from "./Views/QueryBuilder";
 import FetchingLoader from "./Components/FetchingLoader";
 import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
+import * as Sentry from '@sentry/browser';
 
 import "babel-polyfill";
 import "./CustomFields";
@@ -182,13 +183,13 @@ const styles = {
     }
   },
   userProfileTab: {
-    width:"50px",
-    height:"50px",
-    lineHeight:"50px",
-    color:"var(--ft-color-normal)",
-    background:"var(--bg-color-ui-contrast2)",
-    border:"1px solid var(--border-color-ui-contrast2)",
-    borderLeft:"none"
+    width: "50px",
+    height: "50px",
+    lineHeight: "50px",
+    color: "var(--ft-color-normal)",
+    background: "var(--bg-color-ui-contrast2)",
+    border: "1px solid var(--border-color-ui-contrast2)",
+    borderLeft: "none"
   },
   deleteInstanceErrorModal: {
     "& .modal-dialog": {
@@ -275,7 +276,12 @@ class App extends React.Component {
 
   componentDidMount() {
     document.addEventListener("keydown", this.handleGlobalShortcuts);
+    // Init of sentry (logs) bucket
+    Sentry.init({
+      dsn: "http://cc401d2be03846d9939c10d7fcae403a@127.0.0.1:9898/4"
+    });
   }
+
 
   componentDidCatch(error, info) {
     appStore.setGlobalError(error, info);
@@ -495,7 +501,7 @@ class App extends React.Component {
                   {authStore.isFullyAuthenticated &&
                     <React.Fragment>
                       <Tab icon={"question-circle"} current={matchPath(currentLocation, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
-                      <UserProfileTab className={classes.userProfileTab} size={32}/>
+                      <UserProfileTab className={classes.userProfileTab} size={32} />
                     </React.Fragment>
                   }
                 </div>
@@ -521,12 +527,12 @@ class App extends React.Component {
                 :
                 authStore.isFullyAuthenticated ?
                   <Switch>
-                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view"/>)} />
-                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit"/>)} />
-                    <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite"/>)} />
-                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph"/>)} />
-                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release"/>)} />
-                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage"/>)} />
+                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
+                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
+                    <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
+                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
+                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
+                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
                     <Route path="/query-builder" exact={true} component={QueryBuilder} />
 
                     <Route path="/browse" exact={true} component={Browse} />

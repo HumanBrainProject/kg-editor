@@ -84,7 +84,20 @@ const dataTypes = [
   },
   {
     "schema": "neuroglancer/viewer/neuroglancer/v1.0.0"
+  },
+  {
+    "schema": "demo/core/dataset/v1.0.0"
+  },
+  {
+    "schema": "demo/core/person/v1.0.0"
+  },
+  {
+    "schema": "demo/core/subject/v1.0.0"
+  },
+  {
+    "schema": "demo/core/file/v1.0.0"
   }
+
 ];
 
 class DataTypesStore {

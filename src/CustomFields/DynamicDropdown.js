@@ -454,7 +454,8 @@ export default class DynamicDropdownField extends React.Component {
 
   handleOptionPreview = (instanceId, instanceName, event) => {
     event && event.stopPropagation();
-    instanceStore.togglePreviewInstance(instanceId, instanceName);
+    const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showNodeType:true, showStatus:false };
+    instanceStore.togglePreviewInstance(instanceId, instanceName, options);
   }
 
   valueLabelRendering = (field, value) => {

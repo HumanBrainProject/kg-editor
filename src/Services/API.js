@@ -17,6 +17,7 @@ const endpoints = {
   "suggestions": (entity, field, type, start, size, search) => `/api/suggestion/${entity}/fields?field=${encodeURIComponent(field)}&type=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
   "releaseData": instance => `/api/releases/${instance}/graph`,
+  "messages": () => "/editor/api/directives/messages",
   "doRelease": instance => `/api/releases/${instance}`,
   "releaseStatusTopInstance": () => "/api/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/api/releases?releaseTreeScope=CHILDREN_ONLY",

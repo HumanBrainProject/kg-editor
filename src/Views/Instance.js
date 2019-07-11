@@ -115,6 +115,7 @@ export default class Edit extends React.Component {
   }
 
   handleSelectMode(mode) {
+    instanceStore.togglePreviewInstance();
     routerStore.history.push(`/instance/${mode}/${this.props.match.params.id}`);
   }
 
@@ -188,7 +189,13 @@ export default class Edit extends React.Component {
           {instanceStore.previewInstance && (
             <React.Fragment>
               <h3>Preview</h3>
-              <Preview instanceId={instanceStore.previewInstance.id} instanceName={instanceStore.previewInstance.name} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showNodeType={true} showStatus={false} />
+              <Preview instanceId={instanceStore.previewInstance.id}
+                instanceName={instanceStore.previewInstance.name}
+                showEmptyFields={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showEmptyFields}
+                showAction={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showAction}
+                showBookmarkStatus={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showBookmarkStatus}
+                showNodeType={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showNodeType}
+                showStatus={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showStatus} />
               <div className={classes.closePreviewBtn} title="close preview" onClick={this.handleHidePreview}>
                 <FontAwesomeIcon icon={"times"} />
               </div>

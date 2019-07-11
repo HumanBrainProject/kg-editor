@@ -11,18 +11,20 @@ class ReleaseStore{
   @observable isFetching = false;
   @observable isFetched = false;
   @observable isSaving = false;
-  @observable hasWarning = false;
-  @observable warningMessages = new Map();
   @observable savingTotal = 0;
   @observable savingProgress = 0;
   @observable savingErrors = [];
   @observable savingLastEndedNode = null;
   @observable savingLastEndedRequest = "";
+  @observable hasWarning = false;
 
   @observable fetchError = null;
   @observable saveError = null;
 
-  @observable hlNode = null;
+  @observable warningMessages = new Map();
+  @observable fetchWarningMessagesError = null;
+  @observable isWarningMessagesFetched = false;
+  @observable isFetchingWarningMessages = false;
 
   @computed
   get treeStats(){
@@ -73,6 +75,20 @@ class ReleaseStore{
     return count;
   }
 
+  @computed
+  get instanceList() {
+    const result = [];
+    this.instancesTree && this.processChildrenInstanceList(this.instancesTree, result, 0);
+    return result;
+  }
+
+  processChildrenInstanceList(node, result, level) {
+    const obj = { node: node, level:level };
+    result.push(obj);
+    node.children && node.children.forEach(child => this.processChildrenInstanceList(child, result, level+1));
+    return result;
+  }
+
   getNodesToProceed(){
     const nodesByStatus = {
       "RELEASED": [],
@@ -107,10 +123,19 @@ class ReleaseStore{
     try{
       const { data } = await API.axios.get(API.endpoints.releaseData(this.topInstanceId));
       runInAction(()=>{
+        const setNodeTypes = node => {
+          const typePath = node.relativeUrl.substr(
+            0,
+            node.relativeUrl.lastIndexOf("/")
+          );
+          node.typePath = typePath;
+          node.children && node.children.forEach(child => setNodeTypes(child));
+        };
         this.populateStatuses(data);
         // Default release state
         this.recursiveMarkNodeForChange(data, null); // "RELEASED"
         this.populateStatuses(data, "pending_");
+        setNodeTypes(data);
         this.instancesTree = data;
         this.isFetched = true;
         this.isFetching = false;
@@ -118,6 +143,44 @@ class ReleaseStore{
     } catch(e){
       const message = e.message?e.message:e;
       this.fetchError = message;
+    }
+  }
+
+
+  @action
+  async fetchWarningMessages() {
+    if(this.isFetchingWarningMessages || this.isWarningMessagesFetched) {
+      return;
+    }
+    this.isFetchingWarningMessages = true;
+    this.fetchWarningMessagesError = null;
+    this.warningMessages.clear();
+    try {
+      const { data } = await API.axios.get(API.endpoints.messages());
+      // const data = {
+      //   data: {
+      //       "datacite/core/doi/v1.0.0": {
+      //         release: "By releasing a DOI, you trigger the official registration of a DOI in an external system including specific meta-data",
+      //         unrelease: "Attention! Unreleasing a DOI does not remove it from the external registry - your DOI is still findable by external systems!"
+      //       },
+      //       "minds/core/activity/v1.0.0": {
+      //         release: "Test",
+      //         unrelease: "Test unrelease"
+      //       }
+      //     }
+      // };
+      runInAction(() => {
+        Object.entries(data.data).forEach(([typePath, messages]) => {
+          this.warningMessages.set(typePath, {releaseFlags:new Map(), messages: messages});
+        });
+        this.isWarningMessagesFetched = true;
+        this.isFetchingWarningMessages = false;
+      });
+    } catch(e) {
+      const message = e.message?e.message:e;
+      this.fetchWarningMessagesError = message;
+      this.isWarningMessagesFetched = false;
+      this.isFetchingWarningMessages = false;
     }
   }
 
@@ -201,7 +264,6 @@ class ReleaseStore{
     this.savingTotal = 0;
     this.savingProgress = 0;
     this.fetchReleaseData();
-
   }
 
   @action
@@ -241,19 +303,48 @@ class ReleaseStore{
   @action
   recursiveMarkNodeForChange(node, newStatus){
     node.pending_status = newStatus? newStatus: node.status;
+    this.handleWarning(node, node.pending_status);
     if(node.children && node.children.length > 0){
       node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
     }
   }
 
-  @action toggleHLNode(node){
-    this.hlNode = this.hlNode === node? null: node;
+  @computed
+  get visibleWarningMessages() {
+    let results = [];
+    this.warningMessages.forEach(message =>{
+      let release = 0;
+      let unrelease = 0;
+      message.releaseFlags.forEach(flag => {
+        flag ? release++ : unrelease++;
+      });
+      if(release) {
+        results.push(message.messages.release);
+      }
+      if(unrelease) {
+        results.push(message.messages.unrelease);
+      }
+    });
+    return results;
   }
 
   @action
-  handleWarning(key, message) {
-    message ? this.hasWarning = true : this.hasWarning = false;
-    this.warningMessages.set(key, message);
+  clearWarningMessages() {
+    this.warningMessages.forEach(message => message.releaseFlags.clear());
+  }
+
+  @action
+  handleWarning(node, newStatus) {
+    if(this.warningMessages.has(node.typePath)) {
+      const messages = this.warningMessages.get(node.typePath);
+      if(newStatus === "RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "NOT_RELEASED")))  {
+        messages.releaseFlags.set(node.relativeUrl, true);
+      } else if(newStatus === "NOT_RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "RELEASED"))) {
+        messages.releaseFlags.set(node.relativeUrl, false);
+      } else {
+        messages.releaseFlags.delete(node.relativeUrl);
+      }
+    }
   }
 }
 export default new ReleaseStore();

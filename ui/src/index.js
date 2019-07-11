@@ -280,10 +280,13 @@ class App extends React.Component {
   componentDidMount() {
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
-    let sentryUrl = Cookies.get("sentry-url");
+
+    let sentryUrl = Cookies.get("sentry_url");
+    console.debug("Sentry url", sentryUrl);
     if (sentryUrl) {
+      console.debug("Init sentry", sentryUrl);
       Sentry.init({
-        dsn: Cookies.get("sentry-url")
+        dsn: sentryUrl
       });
     }
   }

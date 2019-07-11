@@ -278,7 +278,7 @@ class App extends React.Component {
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
     Sentry.init({
-      dsn: "http://cc401d2be03846d9939c10d7fcae403a@127.0.0.1:9898/4"
+      dsn: process.env.SENTRY_URL
     });
   }
 
@@ -358,9 +358,9 @@ class App extends React.Component {
 
   handleCloseAllInstances() {
     if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
-       || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
-       || matchPath(this.state.currentLocation, { path: "/query-builder", exact: "true" })
-       || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
+      || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
+      || matchPath(this.state.currentLocation, { path: "/query-builder", exact: "true" })
+      || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
       routerStore.history.push("/browse");
     }
     instanceStore.closeAllInstances();

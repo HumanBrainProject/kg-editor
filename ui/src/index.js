@@ -8,6 +8,7 @@ import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
 import "react-virtualized/styles.css";
+import Cookies from "js-cookie";
 
 import "./Services/IconsImport";
 
@@ -34,7 +35,7 @@ import QueryBuilder from "./Views/QueryBuilder";
 import FetchingLoader from "./Components/FetchingLoader";
 import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
-import * as Sentry from '@sentry/browser';
+import * as Sentry from "@sentry/browser";
 
 import "babel-polyfill";
 import "./CustomFields";
@@ -274,12 +275,17 @@ class App extends React.Component {
     this.kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
   }
 
+
+
   componentDidMount() {
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
-    Sentry.init({
-      dsn: process.env.SENTRY_URL
-    });
+    let sentryUrl = Cookies.get("sentry-url");
+    if (sentryUrl) {
+      Sentry.init({
+        dsn: Cookies.get("sentry-url")
+      });
+    }
   }
 
 

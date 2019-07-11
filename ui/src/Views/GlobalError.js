@@ -5,7 +5,7 @@ import { Button } from "react-bootstrap";
 import appStore from "../Stores/AppStore";
 import BGMessage from "../Components/BGMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as Sentry from '@sentry/browser';
+import * as Sentry from "@sentry/browser";
 
 const styles = {
   container: {

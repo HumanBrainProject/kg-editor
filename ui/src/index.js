@@ -7,8 +7,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
+
 import "react-virtualized/styles.css";
-import Cookies from "js-cookie";
+
+import Cookies from 'universal-cookie';
 
 import "./Services/IconsImport";
 
@@ -280,8 +282,8 @@ class App extends React.Component {
   componentDidMount() {
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
-
-    let sentryUrl = Cookies.get("sentry_url");
+    const cookies = new Cookies();
+    const sentryUrl = cookies.get("sentry_url");
     console.debug("Sentry url", sentryUrl);
     if (sentryUrl) {
       console.debug("Init sentry", sentryUrl);

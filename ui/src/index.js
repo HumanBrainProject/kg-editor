@@ -284,9 +284,7 @@ class App extends React.Component {
     // Init of sentry (logs) bucket
     const cookies = new Cookies();
     const sentryUrl = cookies.get("sentry_url");
-    console.debug("Sentry url", sentryUrl);
     if (sentryUrl) {
-      console.debug("Init sentry", sentryUrl);
       Sentry.init({
         dsn: sentryUrl
       });

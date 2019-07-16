@@ -38,7 +38,6 @@ export default class ReleaseList extends React.Component {
 
   componentWillUnmount(){
     window.removeEventListener("resize", this.setDimensions);
-    this.wrapperRef && this.wrapperRef.parentNode.parentNode.removeEventListener("resize", this.setDimensions);
   }
 
   setDimensions = () => {

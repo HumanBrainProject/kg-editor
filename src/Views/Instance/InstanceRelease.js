@@ -144,7 +144,7 @@ export default class InstanceRelease extends React.Component {
               <div className={classes.action}>
                 <ReleaseAction />
               </div>
-              <SavingModal store={releaseStore} />
+              <SavingModal />
               {instanceStore.comparedWithReleasedVersionInstance &&
                   instanceStore.comparedWithReleasedVersionInstance
                     .relativeUrl && (

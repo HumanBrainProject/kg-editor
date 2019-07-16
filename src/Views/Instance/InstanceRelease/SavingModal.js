@@ -3,6 +3,7 @@ import {Modal, ProgressBar, Button} from "react-bootstrap";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import releaseStore from "../../../Stores/ReleaseStore";
 
 let styles = {
   lastEndedOperation:{
@@ -30,6 +31,11 @@ let styles = {
   },
   errors:{
     marginTop:"10px"
+  },
+  absoluteProgress: {
+    fontSize: "12px",
+    transform: "translateY(-10px)",
+    marginTop: "-10px"
   }
 };
 
@@ -37,36 +43,41 @@ let styles = {
 @observer
 export default class SavingModal extends React.Component{
   handleDismissSavingReport = () => {
-    this.props.store.dismissSaveError();
+    releaseStore.dismissSaveError();
+  }
+
+  handleStop = () => {
+    releaseStore.stopRelease();
   }
 
   render(){
-    const {store, classes} = this.props;
+    const {classes} = this.props;
     return(
-      <Modal show={store.isSaving}>
+      <Modal show={releaseStore.isSaving}>
         <Modal.Body>
           <ProgressBar
-            active={store.savingProgress !== store.savingTotal}
-            now={store.savingTotal <= 0? 100: Math.round(store.savingProgress/store.savingTotal*100)}
-            label={`${store.savingTotal <= 0? 100: Math.round(store.savingProgress/store.savingTotal*100)}%`} />
-          {store.savingProgress !== store.savingTotal?
+            active={releaseStore.savingProgress !== releaseStore.savingTotal}
+            now={releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}
+            label={`${releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}%`} />
+          <div className={classes.absoluteProgress}>{releaseStore.savingProgress} / {releaseStore.savingTotal}</div>
+          {releaseStore.savingProgress !== releaseStore.savingTotal?
             <React.Fragment>
               <div className={classes.lastEndedInstance}>
-                {store.savingLastEndedNode && store.savingLastEndedNode.label}
+                {releaseStore.savingLastEndedNode && releaseStore.savingLastEndedNode.label}
               </div>
               <div className={classes.lastEndedOperation}>
-                {store.savingLastEndedRequest}
+                {releaseStore.savingLastEndedRequest}
               </div>
             </React.Fragment>
-            :store.savingErrors.length === 0?
+            :releaseStore.savingErrors.length === 0?
               <div className={classes.reloadRelease}>
                 <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Reloading current instance release status
               </div>
               :null
           }
-          {store.savingErrors.length > 0 &&
+          {releaseStore.savingErrors.length > 0 &&
             <div className={classes.errors}>
-              {store.savingErrors.map(error => {
+              {releaseStore.savingErrors.map(error => {
                 return(
                   <div key={error.id} className={classes.error}>
                     <FontAwesomeIcon icon={"times-circle"}/>&nbsp;
@@ -78,9 +89,11 @@ export default class SavingModal extends React.Component{
             </div>
           }
         </Modal.Body>
-        {store.savingErrors.length > 0 && store.savingProgress === store.savingTotal &&
+        {releaseStore.savingErrors.length > 0 && releaseStore.savingProgress === releaseStore.savingTotal ?
           <Modal.Footer>
             <Button bsStyle="primary" onClick={this.handleDismissSavingReport}>Dismiss</Button>
+          </Modal.Footer> : <Modal.Footer>
+            <Button bsStyle="danger" onClick={this.handleStop}>Stop</Button>
           </Modal.Footer>
         }
       </Modal>

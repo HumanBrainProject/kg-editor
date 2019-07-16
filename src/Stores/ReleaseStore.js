@@ -25,6 +25,12 @@ class ReleaseStore{
   @observable fetchWarningMessagesError = null;
   @observable isWarningMessagesFetched = false;
   @observable isFetchingWarningMessages = false;
+  @observable isStopped = false;
+
+  @action
+  stopRelease() {
+    this.isStopped = true;
+  }
 
   @computed
   get treeStats(){
@@ -184,64 +190,79 @@ class ReleaseStore{
     }
   }
 
+  @action
   async commitStatusChanges(){
     let nodesToProceed = this.getNodesToProceed();
     this.savingProgress = 0;
     this.savingTotal = nodesToProceed["NOT_RELEASED"].length + nodesToProceed["RELEASED"].length;
     this.savingErrors = [];
+    this.isStopped = false;
     if(!this.savingTotal){
       return;
     }
+    this.savingLastEndedRequest = "Initializing actions...";
     this.isSaving = true;
 
-    nodesToProceed["RELEASED"].forEach(async (node) => {
-      try{
-        await API.axios.put(API.endpoints.doRelease(node["relativeUrl"], {}));
-        runInAction(()=>{
-          this.savingLastEndedRequest = `(${node.type}) released successfully`;
-          this.savingLastEndedNode = node;
-          historyStore.updateInstanceHistory(node["relativeUrl"], "released");
-        });
-      } catch(e){
-        runInAction(()=>{
-          this.savingErrors.push({node: node, message: e.message});
-          this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to release this instance`;
-          this.savingLastEndedNode = node;
-        });
-      } finally {
-        runInAction(()=>{
-          this.savingProgress++;
-          this.afterSave();
-        });
-      }
-    });
+    for(let i=0; i<nodesToProceed["RELEASED"].length && !this.isStopped; i++) {
+      const node = nodesToProceed["RELEASED"][i];
+      await this.releaseNode(node);
+    }
 
-    nodesToProceed["NOT_RELEASED"].forEach(async (node) => {
-      try{
-        await API.axios.delete(API.endpoints.doRelease(node["relativeUrl"], {}));
-        runInAction(()=>{
-          this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
-          this.savingLastEndedNode = node;
-          historyStore.updateInstanceHistory(node["relativeUrl"], "released", true);
-        });
-      } catch(e){
-        runInAction(()=>{
-          this.savingErrors.push({node: node, message: e.message});
-          this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to unrelease this instance`;
-          this.savingLastEndedNode = node;
-        });
-      } finally {
-        runInAction(()=>{
-          this.savingProgress++;
-          this.afterSave();
-        });
-      }
-    });
+    for(let i=0; i<nodesToProceed["NOT_RELEASED"].length && !this.isStopped; i++) {
+      const node = nodesToProceed["NOT_RELEASED"][i];
+      await this.unreleaseNode(node);
+    }
+
+    this.afterSave();
+  }
+
+  @action
+  async releaseNode(node) {
+    try {
+      await API.axios.put(API.endpoints.doRelease(node["relativeUrl"], {}));
+      runInAction(()=>{
+        this.savingLastEndedRequest = `(${node.type}) released successfully`;
+        this.savingLastEndedNode = node;
+        historyStore.updateInstanceHistory(node["relativeUrl"], "released");
+      });
+    } catch(e){
+      runInAction(()=>{
+        this.savingErrors.push({node: node, message: e.message});
+        this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to release this instance`;
+        this.savingLastEndedNode = node;
+      });
+    } finally {
+      runInAction(()=>{
+        this.savingProgress++;
+      });
+    }
+  }
+
+  @action
+  async unreleaseNode(node) {
+    try {
+      await API.axios.delete(API.endpoints.doRelease(node["relativeUrl"], {}));
+      runInAction(()=>{
+        this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
+        this.savingLastEndedNode = node;
+        historyStore.updateInstanceHistory(node["relativeUrl"], "released", true);
+      });
+    } catch(e){
+      runInAction(()=>{
+        this.savingErrors.push({node: node, message: e.message});
+        this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to unrelease this instance`;
+        this.savingLastEndedNode = node;
+      });
+    } finally {
+      runInAction(()=>{
+        this.savingProgress++;
+      });
+    }
   }
 
   @action
   afterSave(){
-    if(this.savingErrors.length === 0 && this.savingProgress === this.savingTotal){
+    if((this.savingErrors.length === 0 && this.savingProgress === this.savingTotal) || this.isStopped){
       setTimeout(()=>{
         runInAction(()=>{
           this.isSaving = false;
@@ -250,6 +271,7 @@ class ReleaseStore{
           this.savingTotal = 0;
           this.savingProgress = 0;
           this.hasWarning = false;
+          this.clearWarningMessages();
           this.fetchReleaseData();
         });
       }, 2000);
@@ -318,10 +340,10 @@ class ReleaseStore{
       message.releaseFlags.forEach(flag => {
         flag ? release++ : unrelease++;
       });
-      if(release) {
+      if(release && message.messages.release) {
         results.push(message.messages.release);
       }
-      if(unrelease) {
+      if(unrelease && message.messages.unrelease) {
         results.push(message.messages.unrelease);
       }
     });

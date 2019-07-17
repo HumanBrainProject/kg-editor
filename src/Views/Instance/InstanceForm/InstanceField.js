@@ -65,6 +65,15 @@ const styles = {
 @observer
 export default class InstanceField extends React.Component{
 
+  componentDidMount() {
+    const { instance, name } = this.props;
+    const field = instance.data.fields[name];
+    if(field && field.type === "KgTable") {
+      const store = instance.form.structure.fields[name];
+      store.isInteractive = true;
+    }
+  }
+
   handleFieldFocus = (field, value) => {
     if (field && field.isLink && value && value.id) {
       this.handleToggleOffFieldHighlight(field, value);
@@ -153,6 +162,12 @@ export default class InstanceField extends React.Component{
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
+      }
+      if(field.type === "KgTable") {
+        return <Field name={name} className={classes.field}
+          onValueClick={this.handleFieldFocus}
+          onValueMouseEnter={this.handleToggleOnFieldHighlight}
+          onValueMouseLeave={this.handleToggleOffFieldHighlight}  />;
       }
       if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) {
         return <Field name={name} className={classes.field}

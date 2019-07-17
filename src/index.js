@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
+import "react-virtualized/styles.css";
 
 import "./Services/IconsImport";
 
@@ -35,8 +36,6 @@ import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
 
 import "babel-polyfill";
-import "./CustomFields";
-
 import "./CustomFields";
 
 FormStore.setPathNodeSeparator("|");

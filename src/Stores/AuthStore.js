@@ -1,4 +1,4 @@
-import console from "../Services/Logger";
+// import console from "../Services/Logger";
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
 
@@ -106,14 +106,14 @@ class AuthStore {
     }
     clearTimeout(sessionTimer);
     sessionTimer = setTimeout(() => {
-      console.log("session is expiring...");
+      // console.log("session is expiring...");
       this.logout();
     }, this.session.expiryTimestamp -(new Date()).getTime());
   }
 
   @action
   logout() {
-    console.log("logout");
+    // console.log("logout");
     clearTimeout(sessionTimer);
     this.session = null;
     this.expiredToken = true;
@@ -177,14 +177,14 @@ class AuthStore {
       };
       this.startSessionTimer();
 
-      console.log ("retrieved oid from url: ", this.session);
+      // console.log ("retrieved oid from url: ", this.session);
       localStorage.setItem(oidLocalStorageKey, JSON.stringify(this.session));
 
-      const uri = atob(state);
-      console.log ("retrieved stateKey: ", uri);
+      // const uri = atob(state);
+      // console.log ("retrieved stateKey: ", uri);
     } else {
       const oidStoredState = JSON.parse(localStorage.getItem(oidLocalStorageKey));
-      console.log ("retrieved oid from localStorage: ", oidStoredState);
+      // console.log ("retrieved oid from localStorage: ", oidStoredState);
 
       if (oidStoredState && oidStoredState.expiryTimestamp && new Date() < oidStoredState.expiryTimestamp) {
         this.session = oidStoredState;

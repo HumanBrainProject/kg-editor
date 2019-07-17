@@ -57,12 +57,23 @@ class Links extends React.Component{
               if(fieldObj.isLink && fieldObj.value.length > 0){
                 return (
                   <div key={fieldObj.label} data-provenence={fieldObj.label}>
-                    <h4>{fieldObj.label}</h4>
-                    {fieldObj.value.map(value => {
+                    <h4>{fieldObj.label}{fieldObj.type === "KgTable"?
+                      <em style={{fontWeight:"lighter"}}>
+                        (showing {fieldObj.visibleInstancesCount} out of {fieldObj.instances.length})</em>:null}
+                    </h4>
+                    {fieldObj.value.map((value, index) => {
                       const id = value[fieldObj.mappingValue];
-                      return (
-                        <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
-                      );
+                      if(fieldObj.type === "KgTable") {
+                        if(index < fieldObj.defaultVisibleInstances || fieldObj.instancesMap.get(id).show){
+                          return (
+                            <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
+                          );
+                        }
+                      } else {
+                        return (
+                          <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
+                        );
+                      }
                     })}
                   </div>
                 );

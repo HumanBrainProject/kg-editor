@@ -6,7 +6,7 @@ import { Button } from "react-bootstrap";
 
 import instanceStore from "../../Stores/InstanceStore";
 
-import Instance from "./InstanceInvite/Instance";
+import Preview from "../Preview";
 import Reviewers from "./InstanceInvite/Reviewers";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
@@ -38,6 +38,10 @@ const styles = {
     gridTemplateRows: "1fr",
     gridTemplateColumns: "1fr 33%",
     gridColumnGap: "20px"
+  },
+  preview: {
+    backgroundColor: "var(--bg-color-ui-contrast2)",
+    color: "var(--ft-color-normal)"
   }
 };
 
@@ -68,7 +72,7 @@ export default class InstanceInvite extends React.Component{
 
     const instance = instanceStore.instances.get(this.props.id);
     return (
-      instance  && instance.data ?
+      instance && instance.data ?
         <div className={classes.container}>
           <div className={classes.panel}>
             {instance.isFetching?
@@ -77,7 +81,7 @@ export default class InstanceInvite extends React.Component{
               </FetchingLoader>
               :!instance.hasFetchError?
                 <React.Fragment>
-                  <Instance instance={instance} />
+                  <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showNodeType={true} showStatus={false} showMetaData={false} />
                   <Reviewers id={this.props.id} />
                 </React.Fragment>
                 :

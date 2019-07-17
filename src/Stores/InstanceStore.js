@@ -45,6 +45,23 @@ class Instance {
   }
 
   @computed
+  get labelField() {
+    return (this.isFetched && this.data.ui_info)?this.data.ui_info.labelField:null;
+  }
+
+  @computed
+  get name() {
+    if (this.isFetched && this.labelField && this.data.fields) {
+      const field = this.data.fields[this.labelField];
+      if (field && field.value) {
+        return field.value;
+      }
+    }
+    return "";
+  }
+
+
+  @computed
   get promotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
       return this.data.ui_info.promotedFields.filter(name => this.data.fields[name]);

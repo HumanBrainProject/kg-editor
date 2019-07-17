@@ -134,7 +134,7 @@ export default class Preview extends React.Component {
   );
 
   render() {
-    const { classes, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showNodeType=false, showStatus=true, showMetaData=true } = this.props;
+    const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showNodeType=false, showStatus=true, showMetaData=true } = this.props;
 
     const instance = instanceId?instanceStore.instances.get(instanceId):null;
     if (!instance) {
@@ -147,9 +147,8 @@ export default class Preview extends React.Component {
     const nonPromotedFields =
       instance && instance.nonPromotedFields;
     const color = showNodeType?structureStore.colorPalletteBySchema(instance.path):null;
-
     return (
-      <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}`}>
+      <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
         {(!instance.isFetched || instance.isFetching)? (
           <FetchingLoader>
             <span>Fetching instance information...</span>
@@ -170,7 +169,7 @@ export default class Preview extends React.Component {
                   </div>
                 )}
                 <span className={classes.title}>
-                  {instanceName}
+                  {instanceName?instanceName:instance.name}
                 </span>
                 {showStatus && (
                   <div className={`${classes.status}`}>

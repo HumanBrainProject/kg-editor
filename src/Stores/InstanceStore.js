@@ -383,6 +383,7 @@ class InstanceStore {
    * We keep track in that store of which instances are opened
    */
   @action openInstance(instanceId, viewMode = "view", readMode = true){
+    this.togglePreviewInstance();
     this.setReadMode(readMode);
     if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
       browseStore.fetchLists();
@@ -696,11 +697,11 @@ class InstanceStore {
   }
 
   @action
-  togglePreviewInstance(instanceId, instanceName) {
+  togglePreviewInstance(instanceId, instanceName, options) {
     if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
       this.previewInstance = null;
     } else {
-      this.previewInstance = {id: instanceId, name: instanceName};
+      this.previewInstance = {id: instanceId, name: instanceName, options: options};
     }
   }
 

@@ -43,7 +43,7 @@ module.exports = {
       },
       "/editor/api/**": {
         target:"https://kg-dev.humanbrainproject.org",
-        //target:"http://localhost:9000",
+        // target:"http://localhost:9000",
         secure:false,
         changeOrigin: true
       },

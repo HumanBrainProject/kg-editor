@@ -24,7 +24,6 @@ const styles = {
     gridTemplateColumns:"1fr 33%",
     gridTemplateRows:"auto 1fr"
   },
-
   search:{
     borderRadius: "2px",
     backgroundColor: "var(--bg-color-blend-contrast1)",
@@ -39,7 +38,6 @@ const styles = {
       backgroundColor: "var(--bg-color-blend-contrast1)",
     }
   },
-
   preview:{
     position:"relative",
     gridRow:"1 / span 2",
@@ -49,21 +47,18 @@ const styles = {
     overflow:"auto",
     color:"var(--ft-color-loud)"
   },
-
   loader:{
     textAlign:"center",
     margin:"20px 0 30px",
     fontSize:"1.25em",
     fontWeight:"300"
   },
-
   list:{
     "& ul": {
       listStyleType: "none",
       padding:"1px 11px 1px 11px"
     }
   },
-
   header:{
     display:"grid",
     gridTemplateColumns:"1fr auto",
@@ -77,7 +72,6 @@ const styles = {
     left:"20px",
     color: "var(--ft-color-normal)",
   },
-
   instanceCount:{
     color: "var(--ft-color-normal)",
     lineHeight:"34px",

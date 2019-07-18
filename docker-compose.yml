@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'

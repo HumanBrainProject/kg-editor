@@ -325,7 +325,7 @@ class InstanceStore {
       }
     });
     try{
-      let response = await API.axios.post(API.endpoints.listedInstances(true), toProcess);
+      let response = await API.axios.post(API.endpoints.listedInstances(true, this.databaseScope), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
@@ -359,7 +359,7 @@ class InstanceStore {
             instance.errorInstance(e);
             instance.isFetching = false;
             instance.isFetched = false;
-            this.optionsQueue.delete(identifier);
+            this.instancesQueue.delete(identifier);
           }
         });
         this.isFetchingQueue = false;

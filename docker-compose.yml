@@ -1,9 +1,25 @@
+    
 version: '3.7'
 
 services:
-  ui:
+  kg-editor-ui:
     build:
       context: ./ui
       dockerfile: Dockerfile
     ports:
-      - '80:80'
+      - '8080:80'
+  kg-editor-service:
+    restart: "always"
+    stdin_open: true
+    environment:
+      - AUTH_ENDPOINT=${AUTH_ENDPOINT}
+      - CREDENTIALS_PATH=${CREDENTIALS_PATH}
+      - ELASTICSEARCH_ENDPOINT=${ELASTICSEARCH_ENDPOINT}
+      - HBP_URL=${HBP_URL}
+      - KG_QUERY_ENDPOINT=${KG_QUERY_ENDPOINT}
+      - NEXUS_NAMESPACE=${NEXUS_NAMESPACE}
+      - NEXUS_IAM=${NEXUS_IAM}
+      - SECRET_KEY=${SECRET_KEY}
+    build:
+      context: ./service
+      dockerfile: Dockerfile

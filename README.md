@@ -85,7 +85,7 @@ server {
         proxy_set_header Allow-Control-Allow-Methods "GET, PUT, POST, DELETE, OPTIONS";
         proxy_set_header Access-Control-Allow-Origin "*";
         proxy_set_header Content-Security-Policy "frame-ancestors 'self' <any-application-url-to-enable-csp>";
-        proxy_set_header Access-Control-Allow-Headers "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-    With, nonce, index-hint";
+        proxy_set_header Access-Control-Allow-Headers "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With";
     }
 }
 

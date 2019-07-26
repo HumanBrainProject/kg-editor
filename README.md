@@ -38,13 +38,13 @@ An example of a docker-compose.yml file could look like this:
 version: '3.7'
 
 services:
-  <name-of-the-kg-editor-ui-container>::
+  <name-of-the-kg-editor-ui-container>:
     build:
       context: ./ui
       dockerfile: Dockerfile
     ports:
       - '8080:80'
-  <name-of-the-kg-service-container>:
+  <name-of-the-kg-editor-service-container>:
     restart: "always"
     stdin_open: true
     environment:
@@ -65,7 +65,7 @@ and an example of an nginx.conf file could look like this:
 
 ```
 upstream api_server {
-  server   <name-of-the-kg-service-container>:9000;
+  server   <name-of-the-kg-editor-service-container>:9000;
 }
 
 server {

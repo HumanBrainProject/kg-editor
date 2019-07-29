@@ -30,7 +30,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
@@ -81,6 +81,66 @@ class EditorService @Inject()(
           case _ => Left(APIEditorError(res.status, res.body))
         }
       }
+  }
+
+  def retrieveInstanceGraph(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getGraph(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def getInstanceScope(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsArray]] = {
+    val result = instanceApiService
+      .getScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def retrieveInstanceRelease(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getRelease(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def retrieveStructure(
+    withLinks: Boolean,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getStructure(wSClient, config.kgQueryEndpoint, token, withLinks)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def releaseInstance(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    val result = instanceApiService
+      .putReleaseInstance(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(()) => Right(())
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
   }
 
   def insertInstance(

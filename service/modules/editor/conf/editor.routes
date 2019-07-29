@@ -55,6 +55,44 @@ DELETE    /instance/:org/:domain/:schema/:version/:id                  controlle
 POST    /instances                 controllers.EditorController.getInstancesByIds(allFields:Boolean?=false)
 
 
+###
+#  summary: get scope of an instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance to get scope
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance to get scope
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance to get scope
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to get scope
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /scopes/:org/:domain/:schema/:version/:id                  controllers.EditorController.getInstanceScope(org: String, domain:String, schema: String, version:String, id: String)
+
 
 ###
 #  summary: get messages from ui directive
@@ -148,6 +186,132 @@ GET /instances/:org/:domain/:schema/:version        controllers.EditorUserContro
 #    type: string
 ###
 GET    /instance/:org/:domain/:schema/:version                  controllers.EditorController.getEmptyForm(org: String, domain:String, schema: String, version:String)
+
+###
+#  summary: return the graph payload for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /instance/:org/:domain/:schema/:version/:id/graph                  controllers.EditorController.getInstanceGraph(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: return the release payload for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /instance/:org/:domain/:schema/:version/:id/release                  controllers.EditorController.getInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: do release  for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+PUT    /release/:org/:domain/:schema/:version/:id                  controllers.EditorController.putInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: Get the current structure
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET   /structure                                                             controllers.EditorController.getStructure(withLinks:Boolean?=false)
+
 
 ###
 #  summary: update an instance

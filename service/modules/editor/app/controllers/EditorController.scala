@@ -25,7 +25,7 @@ import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
-import play.api.mvc._
+import play.api.mvc.{Action, _}
 import services._
 import services.specification.{FormOp, FormService}
 
@@ -58,6 +58,18 @@ class EditorController @Inject()(
         .map {
           case Right(()) => Ok("Instance has been deleted")
           case Left(err) => err.toResult
+        }
+        .runToFuture
+    }
+
+  def getInstanceScope(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
+      editorService
+        .getInstanceScope(nexusInstanceReference, request.userToken)
+        .map {
+          case Left(err) => err.toResult
+          case Right(value) => Ok(value)
         }
         .runToFuture
     }
@@ -120,6 +132,63 @@ class EditorController @Inject()(
         }
       }
       .runToFuture
+  }
+
+  def getInstanceGraph(
+    org: String,
+    domain: String,
+    datatype: String,
+    version: String,
+    id: String
+  ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+      val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
+      editorService
+        .retrieveInstanceGraph(nexusInstanceReference, request.userToken)
+        .map{
+          case Left(err) => err.toResult
+          case Right(value) => Ok(value)
+        }.runToFuture
+    }
+
+  def getInstanceRelease(
+    org: String,
+    domain: String,
+    datatype: String,
+    version: String,
+    id: String
+  ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+    val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
+    editorService
+      .retrieveInstanceRelease(nexusInstanceReference, request.userToken)
+      .map{
+        case Left(err) => err.toResult
+        case Right(value) => Ok(value)
+      }.runToFuture
+  }
+
+  def getStructure(withLinks: Boolean): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+    editorService
+      .retrieveStructure(withLinks, request.userToken)
+      .map{
+        case Left(err) => err.toResult
+        case Right(value) => Ok(value)
+      }.runToFuture
+  }
+
+  def putInstanceRelease(
+   org: String,
+   domain: String,
+   datatype: String,
+   version: String,
+   id: String
+  ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+    val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
+    editorService
+      .releaseInstance(nexusInstanceReference, request.userToken)
+      .map{
+        case Left(err) => err.toResult
+        case Right(()) => Ok("Instance has been released")
+      }.runToFuture
   }
 
 

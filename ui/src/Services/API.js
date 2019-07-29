@@ -35,7 +35,7 @@ const endpoints = {
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}${
       ""}${databaseScope?`databaseScope=${databaseScope}`:"" }`;},
   "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
-  "listQueries": instancePath => `/query/${instancePath?"":""}`
+  "listQueries": () => "/query"
 };
 
 class API {

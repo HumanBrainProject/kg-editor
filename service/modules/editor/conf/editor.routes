@@ -390,6 +390,44 @@ GET    /instance/:org/:domain/:schema/:version/:id/release                  cont
 PUT    /release/:org/:domain/:schema/:version/:id                  controllers.EditorController.putInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
 
 ###
+#  summary: do unrelease  for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+DELETE    /release/:org/:domain/:schema/:version/:id                  controllers.EditorController.deleteInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
+
+###
 #  summary: Get the current structure
 #  parameters:
 #  - in: header
@@ -412,6 +450,201 @@ GET   /structure                                                             con
 #    type: string
 ###
 POST /releases                  controllers.EditorController.postReleaseInstance(releaseTreeScope:String?="")
+
+###
+#  summary: Return query
+#  tags:
+#    - editor
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET /query                  controllers.EditorController.getQuery()
+
+###
+#tags:
+#  - editor
+#summary: Returns the result of query
+#parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+#  - name: org
+#    in: path
+#    description: organization the instance to retrieve
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance to retrieve
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance to retrieve
+#    required: true
+#    type: string
+#  - in: path
+#    name: id
+#    description: Id of the bookmark list
+#    required: true
+#    type: string
+#  - name: from
+#    in: path
+#    description: the offset of the pagination
+#    required: false
+#    type: int
+#  - name: size
+#    in: path
+#    description: the size of the page
+#    required: false
+#    type: int
+#  - name: search
+#    in: path
+#    description: the search query only applied for the name of the instance
+#    required: false
+#    type: string
+#responses:
+#  '200':
+#    description: Ok
+###
+POST /query/:org/:domain/:schema/:version/instances                     controllers.EditorController.performQuery(org: String, domain:String, schema: String, version:String, vocab:Option[String], size:Int=20, start:Int=0, databaseScope: Option[String])
+
+###
+#  summary: Delete saved query
+#  tags:
+#    - editor
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: queryId
+#    in: path
+#    description: the query id
+#    required: true
+#    type: string
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+DELETE /query/:org/:domain/:schema/:version/:queryId                  controllers.EditorController.deleteQuery(org: String, domain:String, schema: String, version:String, queryId: String)
+
+###
+#  summary: Save query
+#  tags:
+#    - editor
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: queryId
+#    in: path
+#    description: the query id
+#    required: true
+#    type: string
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+PUT /query/:org/:domain/:schema/:version/:queryId                  controllers.EditorController.saveQuery(org: String, domain:String, schema: String, version:String, queryId: String)
+
+###
+#  summary: Return suggestions
+#  tags:
+#    - editor
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: start
+#    in: path
+#    description: param to start
+#    required: true
+#    type: string
+#  - name: size
+#    in: path
+#    description: total size returned
+#    required: true
+#    type: string
+#  - name: search
+#    in: path
+#    description: search query
+#    required: true
+#    type: string
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST /suggestions/:org/:domain/:schema/:version/fields                  controllers.EditorController.getSuggestions(org: String, domain: String, schema: String, version: String, field: String, fieldType: String, start: Int=0, size: Int=50, search: String?="")
+
+
 
 ###
 #  summary: update an instance

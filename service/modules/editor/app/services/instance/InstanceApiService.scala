@@ -230,23 +230,36 @@ trait InstanceApiService {
     }
   }
 
-  def getStructure(
+  def postSuggestions(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    instancePath: NexusPath,
     token: AccessToken,
-    withLinks: Boolean,
-    serviceClient: ServiceClient = EditorClient
+    field: String,
+    fieldType: String,
+    start: Int,
+    size: Int,
+    search: String,
+    payload: JsObject,
+    serviceClient: ServiceClient = EditorClient,
+    clientExtensionId: Option[String] = None
   )(
     implicit OIDCAuthService: OIDCAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/api/structure")
-      .addQueryStringParameters("withLinks" -> withLinks.toString)
-      .withHttpHeaders(AUTHORIZATION -> token.token, "client" -> serviceClient.client)
+      .url(s"$apiBaseEndpoint/api/suggestion/${instancePath}/fields")
+      .withHttpHeaders(AUTHORIZATION -> token.token)
+      .addQueryStringParameters(
+        "field"  -> field,
+        "type"   -> fieldType,
+        "start"  -> start.toString,
+        "size"   -> size.toString,
+        "search" -> search
+      )
     val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
+      case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
+      case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
     }
     r.map { res =>
       res.status match {
@@ -256,6 +269,26 @@ trait InstanceApiService {
       }
     }
 
+  }
+
+  def getStructure(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    withLinks: Boolean,
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/api/structure")
+      .addQueryStringParameters("withLinks" -> withLinks.toString)
+      .withHttpHeaders("client" -> serviceClient.client)
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK =>
+          Right(res.json.as[JsObject])
+        case _ => Left(res)
+      }
+    }
   }
 
   def get(
@@ -339,6 +372,31 @@ trait InstanceApiService {
       res.status match {
         case OK | CREATED => Right(())
         case _            => Left(res)
+      }
+    }
+  }
+
+  def deleteRelease(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    nexusInstance: NexusInstanceReference,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient
+  )(
+    implicit OIDCAuthService: OIDCAuthService,
+    clientCredentials: CredentialsService
+  ): Task[Either[WSResponse, Unit]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${nexusInstance.toString}")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "client" -> serviceClient.client)
+    val r = token match {
+      case BasicAccessToken(_)   => Task.deferFuture(q.delete())
+      case RefreshAccessToken(_) => AuthHttpClient.deleteWithRetry(q)
+    }
+    r.map { res =>
+      res.status match {
+        case OK | NO_CONTENT => Right(())
+        case _               => Left(res)
       }
     }
   }

@@ -86,16 +86,16 @@ trait InstanceApiService {
   }
 
   def getScope(
-           wSClient: WSClient,
-           apiBaseEndpoint: String,
-           nexusInstance: NexusInstanceReference,
-           token: AccessToken,
-           serviceClient: ServiceClient = EditorClient,
-           clientExtensionId: Option[String] = None
-         )(
-           implicit OIDCAuthService: OIDCAuthService,
-           clientCredentials: CredentialsService
-         ): Task[Either[WSResponse, JsArray]] = {
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    nexusInstance: NexusInstanceReference,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient,
+    clientExtensionId: Option[String] = None
+  )(
+    implicit OIDCAuthService: OIDCAuthService,
+    clientCredentials: CredentialsService
+  ): Task[Either[WSResponse, JsArray]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
       .url(s"$apiBaseEndpoint/api/scopes/${nexusInstance.toString}")
@@ -110,6 +110,64 @@ trait InstanceApiService {
         case OK =>
           Right(res.json.as[JsArray])
         case _ => Left(res)
+      }
+    }
+  }
+
+  def addUserToScope(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    nexusInstance: NexusInstanceReference,
+    user: String,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient,
+    clientExtensionId: Option[String] = None
+  )(
+    implicit OIDCAuthService: OIDCAuthService,
+    clientCredentials: CredentialsService
+  ): Task[Either[WSResponse, Unit]] = {
+    val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/api/scopes/${nexusInstance.toString}/${user}")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "client" -> serviceClient.client)
+      .addQueryStringParameters(params)
+    val r = token match {
+      case BasicAccessToken(_)   => Task.deferFuture(q.put(""))
+      case RefreshAccessToken(_) => AuthHttpClient.putWithRetry(q, "")
+    }
+    r.map { res =>
+      res.status match {
+        case OK | CREATED => Right(())
+        case _            => Left(res)
+      }
+    }
+  }
+
+  def removeUserOfScope(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    nexusInstance: NexusInstanceReference,
+    user: String,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient,
+    clientExtensionId: Option[String] = None
+  )(
+    implicit OIDCAuthService: OIDCAuthService,
+    clientCredentials: CredentialsService
+  ): Task[Either[WSResponse, Unit]] = {
+    val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/api/scopes/${nexusInstance.toString}/${user}")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "client" -> serviceClient.client)
+      .addQueryStringParameters(params)
+    val r = token match {
+      case BasicAccessToken(_)   => Task.deferFuture(q.delete())
+      case RefreshAccessToken(_) => AuthHttpClient.deleteWithRetry(q)
+    }
+    r.map { res =>
+      res.status match {
+        case OK | NO_CONTENT => Right(())
+        case _               => Left(res)
       }
     }
   }
@@ -173,14 +231,14 @@ trait InstanceApiService {
   }
 
   def getStructure(
-     wSClient: WSClient,
-     apiBaseEndpoint: String,
-     token: AccessToken,
-     withLinks: Boolean,
-     serviceClient: ServiceClient = EditorClient
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    withLinks: Boolean,
+    serviceClient: ServiceClient = EditorClient
   )(
-   implicit OIDCAuthService: OIDCAuthService,
-   clientCredentials: CredentialsService
+    implicit OIDCAuthService: OIDCAuthService,
+    clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/api/structure")
@@ -259,16 +317,16 @@ trait InstanceApiService {
   }
 
   def putReleaseInstance(
-     wSClient: WSClient,
-     apiBaseEndpoint: String,
-     nexusInstance: NexusInstanceReference,
-     token: AccessToken,
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    nexusInstance: NexusInstanceReference,
+    token: AccessToken,
 //     userId: String,
-     serviceClient: ServiceClient = EditorClient
-   )(
-     implicit OIDCAuthService: OIDCAuthService,
-     clientCredentials: CredentialsService
-   ): Task[Either[WSResponse, Unit]] = {
+    serviceClient: ServiceClient = EditorClient
+  )(
+    implicit OIDCAuthService: OIDCAuthService,
+    clientCredentials: CredentialsService
+  ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${nexusInstance.toString}")
       .addHttpHeaders(AUTHORIZATION -> token.token, "client" -> serviceClient.client)
@@ -284,7 +342,6 @@ trait InstanceApiService {
       }
     }
   }
-
 
   def delete(
     wSClient: WSClient,

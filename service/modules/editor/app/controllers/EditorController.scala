@@ -74,6 +74,30 @@ class EditorController @Inject()(
         .runToFuture
     }
 
+  def addUserToInstanceScope(org: String, domain: String, schema: String, version: String, id: String, user: String): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
+      editorService
+        .addUserToInstanceScope(nexusInstanceReference, user, request.userToken)
+        .map {
+          case Left(err) => err.toResult
+          case Right(()) => Ok(s"user ${user} has been added to instance ${org}/${domain}/${schema}/${version}/${id}' scope")
+        }
+        .runToFuture
+    }
+
+  def removeUserOfInstanceScope(org: String, domain: String, schema: String, version: String, id: String, user: String): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
+      editorService
+        .removeUserOfInstanceScope(nexusInstanceReference, user, request.userToken)
+        .map {
+          case Left(err) => err.toResult
+          case Right(()) => Ok(s"user ${user} has been removed from instance ${org}/${domain}/${schema}/${version}/${id}' scope")
+        }
+        .runToFuture
+    }
+
   private def getMetaDataByIds(
     ls: Seq[NexusInstance],
     formRegistry: FormRegistry[UISpec]

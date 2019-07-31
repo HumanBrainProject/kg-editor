@@ -62,7 +62,7 @@ POST    /instances                 controllers.EditorController.getInstancesById
 #  parameters:
 #  - name: org
 #    in: path
-#    description: organization the instance to get scope
+#    description: organization of the instance to get scope
 #    required: true
 #    type: string
 #  - name: domain
@@ -72,7 +72,7 @@ POST    /instances                 controllers.EditorController.getInstancesById
 #    type: string
 #  - name: schema
 #    in: path
-#    description: schema name
+#    description: schema name of the instance to get scope
 #    required: true
 #    type: string
 #  - name: version
@@ -92,6 +92,94 @@ POST    /instances                 controllers.EditorController.getInstancesById
 #    type: string
 ###
 GET    /scopes/:org/:domain/:schema/:version/:id                  controllers.EditorController.getInstanceScope(org: String, domain:String, schema: String, version:String, id: String)
+
+
+###
+#  summary: add user to the scope of an instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization of the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name of the instance
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance
+#    required: true
+#    type: string
+#  - name: user
+#    in: path
+#    description: the user to be added to the instance' scope
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+PUT    /scopes/:org/:domain/:schema/:version/:id/:user                 controllers.EditorController.addUserToInstanceScope(org: String, domain:String, schema: String, version:String, id: String, user: String)
+
+
+###
+#  summary: remove user of the scope of an instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization of the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name of the instance
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance
+#    required: true
+#    type: string
+#  - name: user
+#    in: path
+#    description: the user to be added to the instance' scope
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+DELETE    /scopes/:org/:domain/:schema/:version/:id/:user                 controllers.EditorController.removeUserOfInstanceScope(org: String, domain:String, schema: String, version:String, id: String, user: String)
 
 
 ###

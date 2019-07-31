@@ -141,14 +141,15 @@ class EditorController @Inject()(
     version: String,
     id: String
   ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-      val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
-      editorService
-        .retrieveInstanceGraph(nexusInstanceReference, request.userToken)
-        .map{
-          case Left(err) => err.toResult
-          case Right(value) => Ok(value)
-        }.runToFuture
-    }
+    val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
+    editorService
+      .retrieveInstanceGraph(nexusInstanceReference, request.userToken)
+      .map {
+        case Left(err)    => err.toResult
+        case Right(value) => Ok(value)
+      }
+      .runToFuture
+  }
 
   def getInstanceRelease(
     org: String,
@@ -160,37 +161,58 @@ class EditorController @Inject()(
     val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
     editorService
       .retrieveInstanceRelease(nexusInstanceReference, request.userToken)
-      .map{
-        case Left(err) => err.toResult
+      .map {
+        case Left(err)    => err.toResult
         case Right(value) => Ok(value)
-      }.runToFuture
+      }
+      .runToFuture
   }
 
   def getStructure(withLinks: Boolean): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     editorService
       .retrieveStructure(withLinks, request.userToken)
-      .map{
-        case Left(err) => err.toResult
+      .map {
+        case Left(err)    => err.toResult
         case Right(value) => Ok(value)
-      }.runToFuture
+      }
+      .runToFuture
+  }
+
+  def postReleaseInstance(releaseTreeScope: String): Action[AnyContent] = authenticatedUserAction.async {
+    implicit request =>
+      val listOfIds = for {
+        bodyContent <- request.body.asJson
+        ids         <- bodyContent.asOpt[List[String]]
+      } yield ids.map(NexusInstanceReference.fromUrl)
+      listOfIds match {
+        case Some(ids) =>
+          editorService
+            .retrieveReleaseStatus(ids, releaseTreeScope, request.userToken)
+            .map {
+              case Left(err)    => err.toResult
+              case Right(value) => Ok(value)
+            }.runToFuture
+        case None => Task.pure(BadRequest("Missing body content")).runToFuture
+      }
+
   }
 
   def putInstanceRelease(
-   org: String,
-   domain: String,
-   datatype: String,
-   version: String,
-   id: String
+    org: String,
+    domain: String,
+    datatype: String,
+    version: String,
+    id: String
   ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
     editorService
       .releaseInstance(nexusInstanceReference, request.userToken)
-      .map{
+      .map {
         case Left(err) => err.toResult
         case Right(()) => Ok("Instance has been released")
-      }.runToFuture
+      }
+      .runToFuture
   }
-
 
   class MapWrites[T]()(implicit writes: Writes[T]) extends Writes[Map[NexusPath, T]] {
 
@@ -206,18 +228,16 @@ class EditorController @Inject()(
     formService
       .getRegistries()
       .map { registries =>
-        val instancesWithMessages = registries
-          .formRegistry
-          .registry
+        val instancesWithMessages = registries.formRegistry.registry
           .foldLeft(Map[NexusPath, JsObject]()) {
-            case (acc, (k,v)) =>
+            case (acc, (k, v)) =>
               val m = for {
                 directive <- v.uiDirective
-                messages <- (directive \ "messages").asOpt[JsObject]
+                messages  <- (directive \ "messages").asOpt[JsObject]
               } yield messages
               m match {
                 case Some(message) => acc.updated(k, message)
-                case None => acc
+                case None          => acc
               }
           }
 
@@ -225,7 +245,6 @@ class EditorController @Inject()(
       }
       .runToFuture
   }
-
 
   def getInstanceNumberOfAvailableRevisions(
     org: String,
@@ -256,6 +275,7 @@ class EditorController @Inject()(
 
   /**
     * Entry point when updating an instance
+    *
     * @param org The organization of the instance
     * @param domain The domain of the instance
     * @param schema The schema of the instance
@@ -315,6 +335,7 @@ class EditorController @Inject()(
 
   /**
     * Creation of a new instance in the editor
+    *
     * @param org The organization of the instance
     * @param domain The domain of the instance
     * @param schema The schema of the instance
@@ -369,6 +390,7 @@ class EditorController @Inject()(
 
   /**
     * Returns an empty form for a specific instance type
+    *
     * @param org The organization of the instance
     * @param domain The domain of the instance
     * @param schema The schema of the instance

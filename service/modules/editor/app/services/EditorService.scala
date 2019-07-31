@@ -89,19 +89,7 @@ class EditorService @Inject()(
   ): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
       .getGraph(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def getInstanceScope(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsArray]] = {
-    val result = instanceApiService
-      .getScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
+    result.map{
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
@@ -110,10 +98,10 @@ class EditorService @Inject()(
   def retrieveInstanceRelease(
     nexusInstanceReference: NexusInstanceReference,
     token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] = {
+  ):Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
       .getRelease(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
+    result.map{
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
@@ -125,7 +113,7 @@ class EditorService @Inject()(
   ): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
       .getStructure(wSClient, config.kgQueryEndpoint, token, withLinks)
-    result.map {
+    result.map{
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
@@ -134,7 +122,7 @@ class EditorService @Inject()(
   def releaseInstance(
     nexusInstanceReference: NexusInstanceReference,
     token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
+  ):Task[Either[APIEditorError, Unit]] = {
     val result = instanceApiService
       .putReleaseInstance(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
     result.map {
@@ -142,6 +130,32 @@ class EditorService @Inject()(
       case Left(res) => Left(APIEditorError(res.status, res.body))
     }
   }
+
+  def retrieveReleaseStatus(
+    instanceIds: List[NexusInstanceReference],
+    releaseTreeScope: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsArray]] = {
+    val result = instanceApiService
+      .getReleaseStatus(wSClient, config.kgQueryEndpoint, instanceIds, token, releaseTreeScope)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def getInstanceScope(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ):Task[Either[APIEditorError, JsArray]] = {
+    val result = instanceApiService
+      .getScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
 
   def insertInstance(
     newInstance: NexusInstance,

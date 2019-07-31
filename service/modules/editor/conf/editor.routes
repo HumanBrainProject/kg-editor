@@ -312,6 +312,18 @@ PUT    /release/:org/:domain/:schema/:version/:id                  controllers.E
 ###
 GET   /structure                                                             controllers.EditorController.getStructure(withLinks:Boolean?=false)
 
+###
+#  summary: Return TOP_INSTANCE_ONLY status
+#  tags:
+#    - editor
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST /releases                  controllers.EditorController.postReleaseInstance(releaseTreeScope:String?="")
 
 ###
 #  summary: update an instance

@@ -30,7 +30,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
@@ -80,6 +80,184 @@ class EditorService @Inject()(
             )
           case _ => Left(APIEditorError(res.status, res.body))
         }
+      }
+  }
+
+  def retrieveInstanceGraph(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getGraph(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def retrieveInstanceRelease(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getRelease(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def retrieveStructure(
+    withLinks: Boolean
+  ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getStructure(wSClient, config.kgQueryEndpoint, withLinks)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def releaseInstance(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    val result = instanceApiService
+      .putReleaseInstance(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(()) => Right(())
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def unreleaseInstance(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    val result = instanceApiService
+      .deleteRelease(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(()) => Right(())
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def retrieveReleaseStatus(
+    instanceIds: List[NexusInstanceReference],
+    releaseTreeScope: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsArray]] = {
+    val result = instanceApiService
+      .getReleaseStatus(wSClient, config.kgQueryEndpoint, instanceIds, token, releaseTreeScope)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def getInstanceScope(
+    nexusInstanceReference: NexusInstanceReference,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsArray]] = {
+    val result = instanceApiService
+      .getScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def addUserToInstanceScope(
+    nexusInstanceReference: NexusInstanceReference,
+    user: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    val result = instanceApiService
+      .addUserToScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, user, token)
+    result.map {
+      case Right(()) => Right(())
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def removeUserOfInstanceScope(
+    nexusInstanceReference: NexusInstanceReference,
+    user: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    val result = instanceApiService
+      .removeUserOfScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, user, token)
+    result.map {
+      case Right(()) => Right(())
+      case Left(res) => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def retrieveQuery(
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsArray]] = {
+    val result = queryService
+      .getQuery(wSClient, config.kgQueryEndpoint, token)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
+  def deleteQuery(
+    instancePath: NexusPath,
+    queryId: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    queryService.delete(wSClient, config.kgQueryEndpoint, instancePath, queryId, token)
+  }
+
+  def saveQuery(
+    instancePath: NexusPath,
+    queryId: String,
+    payload: JsObject,
+    token: AccessToken
+  ): Task[Either[APIEditorError, Unit]] = {
+    queryService
+      .putQuery(wSClient, config.kgQueryEndpoint, instancePath, queryId, payload, token)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
+      }
+  }
+
+  def doQuery(
+    instancePath: NexusPath,
+    vocab: Option[String],
+    size: Int,
+    start: Int,
+    databaseScope: Option[String],
+    payload: JsObject,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    queryService
+      .postQuery(wSClient, config.kgQueryEndpoint, instancePath, vocab, size, start, databaseScope, payload, token)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
+      }
+  }
+
+  def retrieveSuggestions(
+    instancePath: NexusPath,
+    field: String,
+    fieldType: String,
+    size: Int,
+    start: Int,
+    search: String,
+    payload: JsObject,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] = {
+    instanceApiService
+      .postSuggestions(wSClient, config.kgQueryEndpoint, instancePath, token, field, fieldType, size, start, search, payload)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
   }
 

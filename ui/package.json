@@ -8,6 +8,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/react-fontawesome": "^0.1.4",
+    "@sentry/browser": "^5.4.3",
     "babel-polyfill": "^6.26.0",
     "color": "^3.1.2",
     "diff": "^3.5.0",
@@ -33,7 +34,8 @@
     "react-router-dom": "^4.3.1",
     "react-virtualized": "^9.21.1",
     "showdown": "^1.8.6",
-    "showdown-xss-filter": "^0.2.0"
+    "showdown-xss-filter": "^0.2.0",
+    "universal-cookie": "^4.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

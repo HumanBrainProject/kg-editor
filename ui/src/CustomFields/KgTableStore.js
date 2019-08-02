@@ -128,7 +128,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         runInAction(() =>{
           toProcess.forEach(identifier => {
             const instance = this.instancesMap.get(identifier);
-            set(instance, "fetchError", e.message?e.message:e);
+            set(instance, "fetchError", `Error fetching instance ${identifier} (${e.message?e.message:e})`);
             set(instance, "isFetching", false);
             this.instancesQueue.delete(identifier);
           });

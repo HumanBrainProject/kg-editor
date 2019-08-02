@@ -1,47 +1,98 @@
-# KG Service
+# KG Editor
 
-This service is a Play framework application which requires the latest SBT installation.
+This service is a combination of a Play framework application which requires the latest SBT installation and a React application.
 
-## Production deployement
+# Installation
 
-To create a binary for production; in the root folder run.
+In order to install kg-editor and develop locally all you need to do is the following:
+
+First clone the project
 
 ```
-sbt stage
+git clone https://github.com/HumanBrainProject/kg-editor.git
 ```
 
-The binary can be found in the `target/universal/stage/bin` folder.
-
-To run the application you havbe to specify a secret and a file for the running PID for example :
+then install the kg-service:
 ```
-target/universal/stage/bin/kg_service -Dpidfile.path=/var/run/kg-service.pid -Dplay.http.secret.key=myapplicationsecret
+cd kg-editor/service
+sbt clean
+sbt complile 
+sbt run
 ```
-You can specify the port with the `-Dhttp.port` option (e.g. `target/universal/stage/bin/kg_service  -Dhttp.port=8080`).
 
-## Modules
+and finally install the ui and run the dev server:
+```
+cd kg-editor/ui
+npm install
+npm start
+```
 
-### Common
+# Deployment
 
-This modules contains code used by other modules in this project.
+In order to deploy kg-editor with your own configuration you would need to override docker-compose.yml and nginx.conf
+located in ui/nginx.conf
 
-### Authentication
+An example of a docker-compose.yml file could look like this:
 
-This modules allows authentication through OIDC.
-The authentication modules also check for accessbile index in the nexus ElasticSearch instance.
-This is used for example by the proxy module in order to query the indices authorized by a OIDC group.
+```
+version: '3.7'
 
-### Nexus
+services:
+  <name-of-the-kg-editor-ui-container>:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+  <name-of-the-kg-editor-service-container>:
+    restart: "always"
+    stdin_open: true
+    environment:
+      - AUTH_ENDPOINT=${AUTH_ENDPOINT}
+      - CREDENTIALS_PATH=${CREDENTIALS_PATH}
+      - ELASTICSEARCH_ENDPOINT=${ELASTICSEARCH_ENDPOINT}
+      - HBP_URL=${HBP_URL}
+      - KG_QUERY_ENDPOINT=${KG_QUERY_ENDPOINT}
+      - NEXUS_NAMESPACE=${NEXUS_NAMESPACE}
+      - NEXUS_IAM=${NEXUS_IAM}
+      - SECRET_KEY=${SECRET_KEY}
+    build:
+      context: ./service
+      dockerfile: Dockerfile
+```
 
-All the helpers and API wrapper for the Nexus API can be found in this project.
+and an example of an nginx.conf file could look like this:
 
-### Proxy
+```
+upstream api_server {
+  server   <name-of-the-kg-editor-service-container>:9000;
+}
 
-This service handles the call to our search ui project.
+server {
+    listen       80;
+    server_name  _;
 
-### Editor
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+        try_files $uri /index.html;                 
+    }
 
-This service provides an API for our editor ui.
+    location /editor/api {
+        proxy_pass http://api_server;
+        proxy_set_header Host $http_host;
+        proxy_pass_request_headers on;
+        proxy_set_header Allow-Control-Allow-Methods "GET, PUT, POST, DELETE, OPTIONS";
+        proxy_set_header Access-Control-Allow-Origin "*";
+        proxy_set_header Content-Security-Policy "frame-ancestors 'self' <any-application-url-to-enable-csp>";
+        proxy_set_header Access-Control-Allow-Headers "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With";
+    }
+}
 
-### Data_import
-
-Anything related to data import is found in this modules.
+```
+Finally you need to run
+```
+docker-compose build
+docker-compose up
+```
+and you are ready to go!

@@ -40,7 +40,7 @@ class EditorService @Inject()(
   config: ConfigurationService,
   formService: FormService
 )(
-  implicit OIDCAuthService: TokenAuthService,
+  implicit TokenAuthService: TokenAuthService,
   clientCredentials: CredentialsService
 ) {
 

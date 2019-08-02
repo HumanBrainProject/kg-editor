@@ -36,7 +36,7 @@ class EditorController @Inject()(
   cc: ControllerComponents,
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
-  oIDCAuthService: TokenAuthService,
+  TokenAuthService: TokenAuthService,
   config: ConfigurationService,
   nexusService: NexusService,
   iAMAuthService: IAMAuthService,

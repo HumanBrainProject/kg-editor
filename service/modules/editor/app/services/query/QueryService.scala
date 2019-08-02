@@ -39,7 +39,7 @@ trait QueryService {
     queryId: String,
     token: AccessToken
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     credentials: CredentialsService
   ): Task[Either[APIEditorError, Unit]] = {
     val q = wSClient
@@ -65,7 +65,7 @@ trait QueryService {
     payload: JsObject,
     token: AccessToken
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     credentials: CredentialsService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
@@ -94,7 +94,7 @@ trait QueryService {
     payload: JsObject,
     token: AccessToken
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     credentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
     val v = vocab.map("vocab" -> _).getOrElse("" -> "")
@@ -121,7 +121,7 @@ trait QueryService {
     apiEndpoint: String,
     token: AccessToken
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     credentials: CredentialsService
   ): Task[Either[WSResponse, JsArray]] = {
     val q = wSClient

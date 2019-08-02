@@ -64,7 +64,7 @@ trait InstanceApiService {
     token: AccessToken,
     releaseTreeScope: String
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsArray]] = {
     val payload = Json.toJson(instanceIds.map(i => i.toString)).as[JsArray]
@@ -93,7 +93,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsArray]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
@@ -123,7 +123,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, Unit]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
@@ -152,7 +152,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, Unit]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
@@ -180,7 +180,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
@@ -209,7 +209,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
@@ -244,7 +244,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
@@ -357,7 +357,7 @@ trait InstanceApiService {
 //     userId: String,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
@@ -383,7 +383,7 @@ trait InstanceApiService {
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: OIDCAuthService,
+    implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient

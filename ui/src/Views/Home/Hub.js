@@ -65,14 +65,14 @@ export default class Hub extends React.Component{
     return(
       <div className={classes.container}>
         <div className={classes.action}></div>
-        <div className={`${classes.action} statistics`} onClick={()=>routerStore.history.push("/kg-stats")}>
+        {/* <div className={`${classes.action} statistics`} onClick={()=>routerStore.history.push("/kg-stats")}>
           <div className={classes.actionIcon}>
             <FontAwesomeIcon icon={"chart-bar"}/>
           </div>
           <div className={classes.actionText}>
             KG Statistics
           </div>
-        </div>
+        </div> */}
         <div className={classes.action}>
           <ThemeSwitcher/>
         </div>

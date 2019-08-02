@@ -31,33 +31,8 @@ module.exports = {
     port: 3000,
     open: true,
     proxy: {
-      "/query/**": {
-        target:"https://kg-dev.humanbrainproject.org",
-        secure:false,
-        changeOrigin: true
-      },
-      "/api/**": {
-        target:"https://kg-dev.humanbrainproject.org",
-        secure:false,
-        changeOrigin: true
-      },
       "/editor/api/**": {
         target:"http://localhost:9000",
-        secure:false,
-        changeOrigin: true
-      },
-      "/statistics": {
-        target:"https://kg-dev.humanbrainproject.org",
-        secure:false,
-        changeOrigin: true
-      },
-      "/internal/**": {
-        target:"https://kg-dev.humanbrainproject.org",
-        secure:false,
-        changeOrigin: true
-      },
-      "/instances/**":{
-        target:"https://kg-dev.humanbrainproject.org",
         secure:false,
         changeOrigin: true
       }

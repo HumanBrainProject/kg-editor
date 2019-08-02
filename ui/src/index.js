@@ -26,7 +26,7 @@ import NotFound from "./Views/NotFound";
 import Home from "./Views/Home";
 import Login from "./Views/Login";
 import Help from "./Views/Help";
-import Statistics from "./Views/Statistics";
+// import Statistics from "./Views/Statistics";
 import Browse from "./Views/Browse";
 import Instance from "./Views/Instance";
 import NewInstance from "./Views/NewInstance";
@@ -531,7 +531,7 @@ class App extends React.Component {
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />
-                    <Route path="/kg-stats" exact={true} component={Statistics} />
+                    {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
                     <Route path="/loginSuccess" exact={true} component={() => null} />
                     <Route path="/" exact={true} component={Home} />
                     <Route component={NotFound} />

@@ -29,12 +29,12 @@ const endpoints = {
   "graph": instance => `/editor/api/instance/${instance}/graph`,
   "structure": () => "/editor/api/structure?withLinks=true",
   "performQuery": function(instancePath, vocab, size, start, databaseScope){
-    return `/editor/query/${instancePath}/instances${arguments.length > 1?"?":""}${
+    return `/editor/api/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}${
       ""}${databaseScope?`databaseScope=${databaseScope}`:"" }`;},
-  "query": (instancePath, queryId) => `/editor/query/${instancePath}/${encodeURIComponent(queryId)}`,
+  "query": (instancePath, queryId) => `/editor/api/query/${instancePath}/${encodeURIComponent(queryId)}`,
   "listQueries": () => "/editor/api/query"
 };
 

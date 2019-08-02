@@ -5,8 +5,8 @@ const endpoints = {
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
-  "instanceReviews": instance => `/api/scopes/${instance}`,
-  "instanceReviewsByUser": (instance, user) => `/api/scopes/${instance}/${user}`,
+  "instanceReviews": instance => `/editor/api/scopes/${instance}`,
+  "instanceReviewsByUser": (instance, user) => `/editor/api/scopes/${instance}/${user}`,
   "features": () => `${window.rootPath}/data/features.json`,
   "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
@@ -14,29 +14,28 @@ const endpoints = {
   "bookmarkListFolders": mockup => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
   "listedInstances": (allFields=false) => `/editor/api/instances?allFields=${allFields}`,
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
-  "suggestions": (entity, field, type, start, size, search) => `/api/suggestion/${entity}/fields?field=${encodeURIComponent(field)}&type=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
+  "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
-  "releaseData": instance => `/api/releases/${instance}/graph`,
+  "releaseData": instance => `/editor/api/instance/${instance}/release`,
   "messages": () => "/editor/api/directives/messages",
-  "doRelease": instance => `/api/releases/${instance}`,
-  "releaseStatusTopInstance": () => "/api/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
-  "releaseStatusChildren": () => "/api/releases?releaseTreeScope=CHILDREN_ONLY",
+  "doRelease": instance => `/editor/api/release/${instance}`,
+  "releaseStatusTopInstance": () => "/editor/api/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
+  "releaseStatusChildren": () => "/editor/api/releases?releaseTreeScope=CHILDREN_ONLY",
   "createBookmarkList": () => "/editor/api/bookmarkList",
   "updateBookmarkList": id => `/editor/api/bookmarkList/${id}`,
   "deleteBookmarkList": id => `/editor/api/bookmarkList/${id}`,
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
-  "graph": instance => `/api/instances/${instance}/graph`,
-  "structure": () => "/api/structure?withLinks=true",
+  "graph": instance => `/editor/api/instance/${instance}/graph`,
+  "structure": () => "/editor/api/structure?withLinks=true",
   "performQuery": function(instancePath, vocab, size, start, databaseScope){
-    return `/query/${instancePath}/instances${arguments.length > 1?"?":""}${
+    return `/editor/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
       ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
       ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}${
       ""}${databaseScope?`databaseScope=${databaseScope}`:"" }`;},
-  "query": (instancePath, queryId) => `/query/${instancePath}/${encodeURIComponent(queryId)}`,
-  "listQueries": instancePath => `/query/${instancePath?"":""}`,
-  "clientInstancePreview": instancePath => `/instances/${instancePath}`,
+  "query": (instancePath, queryId) => `/editor/query/${instancePath}/${encodeURIComponent(queryId)}`,
+  "listQueries": () => "/editor/api/query"
 };
 
 class API {

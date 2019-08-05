@@ -1,9 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import routerStore from "../../Stores/RouterStore";
 import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import ThemeSwitcher from "./ThemeSwitcher";

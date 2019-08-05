@@ -10,7 +10,7 @@ import injectStyles from "react-jss";
 
 import "react-virtualized/styles.css";
 
-import Cookies from 'universal-cookie';
+import Cookies from "universal-cookie";
 
 import "./Services/IconsImport";
 

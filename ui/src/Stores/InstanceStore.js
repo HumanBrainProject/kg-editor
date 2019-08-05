@@ -27,12 +27,27 @@ class Instance {
   @observable isFetched = false;
   @observable highlight = null;
   @observable fieldsToSetAsNull = [];
+  @observable fieldErrorsMap = new Map();
 
   constructor(instanceId, instanceStore) {
     this.instanceId = instanceId;
     const [organization, domain, schema, version, ] = instanceId.split("/");
     this.path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
     this.instanceStore = instanceStore;
+  }
+
+  @computed
+  get hasFieldErrors() {
+    return this.fieldErrors.length;
+  }
+
+  @computed
+  get fieldErrors() {
+    return Array.from(this.fieldErrorsMap.values());
+  }
+
+  @action setFieldError(field) {
+    this.fieldErrorsMap.set(field.path.substr(1), field);
   }
 
   memorizeInstanceInitialValues() {
@@ -129,6 +144,24 @@ class Instance {
   @computed
   get isReadMode() {
     return !this.isFetched || (this.form && this.form.readMode);
+  }
+
+  @computed
+  get shortId() {
+    const s = this.instanceId?this.instanceId.split("/"):[];
+    if (s.length === 5) {
+      return s[4];
+    }
+    return "";
+  }
+
+  @computed
+  get schemaName() {
+    const s = this.instanceId?this.instanceId.split("/"):[];
+    if (s.length === 5) {
+      return s[2].charAt(0).toUpperCase() + s[2].slice(1);
+    }
+    return "";
   }
 
   @computed
@@ -322,6 +355,7 @@ class InstanceStore {
         instance.hasFetchError = false;
         instance.saveError = null;
         instance.hasSaveError = false;
+        instance.fieldErrorsMap = new Map();
       }
     });
     try{

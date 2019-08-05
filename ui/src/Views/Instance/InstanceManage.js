@@ -12,6 +12,7 @@ import statusStore from "../../Stores/StatusStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
+import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 
 const rootPath = window.rootPath || "";
 
@@ -121,15 +122,16 @@ export default class InstanceManage extends React.Component{
                       <div className={classes.id}>
                         Nexus ID: {this.props.id}
                       </div>
-                      <Form store={instance.readModeFormStore} key={this.props.id}>
-                        {promotedFields.map(fieldKey => {
-                          return(
-                            <div key={this.props.id+fieldKey} className={classes.field}>
-                              <Field name={fieldKey}/>
-                            </div>
-                          );
-                        })}
-                      </Form>
+                      {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
+                        <Form store={instance.readModeFormStore} key={this.props.id}>
+                          {promotedFields.map(fieldKey => {
+                            return(
+                              <div key={this.props.id+fieldKey} className={classes.field}>
+                                <Field name={fieldKey}/>
+                              </div>
+                            );
+                          })}
+                        </Form>}
                     </div>
                     <div className={classes.content}>
                       <h4>Duplicate this instance</h4>

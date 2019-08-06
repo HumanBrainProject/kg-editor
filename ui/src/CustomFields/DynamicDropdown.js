@@ -12,6 +12,7 @@ import instanceStore from "../Stores/InstanceStore";
 
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import FieldError from "./FieldError";
 
 const styles = {
   values:{
@@ -467,21 +468,23 @@ export default class DynamicDropdownField extends React.Component {
     const { value, disabled, readOnly } = field;
 
     return (
-      <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
-        <FieldLabel field={field}/>
-        {isFunction(readModeRendering)?
-          this.props.readModeRendering(field)
-          :
-          <span className={"quickfire-readmode-list"}>
-            {value.map(value => (
-              <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className="quickfire-readmode-item">
-                {this.valueLabelRendering(field, value)}
-              </span>
-            ))}
-          </span>
-        }
-        <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
-      </div>
+      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+        <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+          <FieldLabel field={field}/>
+          {isFunction(readModeRendering)?
+            this.props.readModeRendering(field)
+            :
+            <span className={"quickfire-readmode-list"}>
+              {value.map(value => (
+                <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className="quickfire-readmode-item">
+                  {this.valueLabelRendering(field, value)}
+                </span>
+              ))}
+            </span>
+          }
+          <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
+        </div>
+      </FieldError>
     );
   }
 
@@ -506,110 +509,112 @@ export default class DynamicDropdownField extends React.Component {
     }
 
     return (
-      <div ref={ref=>this.wrapperRef = ref}>
-        <FormGroup
-          onClick={this.handleFocus}
-          className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
-          validationState={validationState}>
-          <FieldLabel field={this.props.field}/>
-          <Alternatives className={classes.alternatives}
-            show={!disabled && !readOnly && !!this.state.alternatives.length}
-            disabled={disabled || readOnly || isAlternativeDisabled}
-            list={this.state.alternatives}
-            onSelect={this.handleAlternativeSelect}
-            onClick={this.handleRemoveSuggestion}
-            field={field}
-            parentContainerClassName="form-group"
-            ref={ref=>this.alternativesRef = ref}/>
-          <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
-            {values.map(value => (
-              <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
-                tabIndex={"0"}
-                className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""} ${value.fetchError ? classes.notFound : ""}`}
-                disabled={disabled}
-                readOnly={readOnly}
-                draggable={true}
-                onDragEnd={()=>this.draggedValue = null}
-                onDragStart={()=>this.draggedValue = value}
+      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+        <div ref={ref=>this.wrapperRef = ref}>
+          <FormGroup
+            onClick={this.handleFocus}
+            className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
+            validationState={validationState}>
+            <FieldLabel field={this.props.field}/>
+            <Alternatives className={classes.alternatives}
+              show={!disabled && !readOnly && !!this.state.alternatives.length}
+              disabled={disabled || readOnly || isAlternativeDisabled}
+              list={this.state.alternatives}
+              onSelect={this.handleAlternativeSelect}
+              onClick={this.handleRemoveSuggestion}
+              field={field}
+              parentContainerClassName="form-group"
+              ref={ref=>this.alternativesRef = ref}/>
+            <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
+              {values.map(value => (
+                <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
+                  tabIndex={"0"}
+                  className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""} ${value.fetchError ? classes.notFound : ""}`}
+                  disabled={disabled}
+                  readOnly={readOnly}
+                  draggable={true}
+                  onDragEnd={()=>this.draggedValue = null}
+                  onDragStart={()=>this.draggedValue = value}
+                  onDragOver={e=>e.preventDefault()}
+                  onDrop={this.handleDrop.bind(this, value)}
+                  onKeyDown={this.handleRemoveBackspace.bind(this, value)}
+
+                  onClick={this.handleTagInteraction.bind(this, "Click", value)}
+                  onFocus={this.handleTagInteraction.bind(this, "Focus", value)}
+                  onBlur={this.handleTagInteraction.bind(this, "Blur", value)}
+                  onMouseOver={this.handleTagInteraction.bind(this, "MouseOver", value)}
+                  onMouseOut={this.handleTagInteraction.bind(this, "MouseOut", value)}
+                  onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
+                  onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
+                  title={get(value, mappingLabel)}>
+                  <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
+                  <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
+                </div>
+              ))}
+
+              <input className={`quickfire-user-input ${classes.userInput}`}
+                onDrop={this.handleDrop.bind(this, null)}
                 onDragOver={e=>e.preventDefault()}
-                onDrop={this.handleDrop.bind(this, value)}
-                onKeyDown={this.handleRemoveBackspace.bind(this, value)}
+                ref={ref=>this.inputRef=ref} type="text"
+                onKeyDown={this.handleInputKeyStrokes}
+                onChange={this.handleChangeUserInput}
+                onFocus={this.handleFocus}
+                value={this.props.field.userInput}
+                disabled={readOnly || disabled || values.length >= max}/>
 
-                onClick={this.handleTagInteraction.bind(this, "Click", value)}
-                onFocus={this.handleTagInteraction.bind(this, "Focus", value)}
-                onBlur={this.handleTagInteraction.bind(this, "Blur", value)}
-                onMouseOver={this.handleTagInteraction.bind(this, "MouseOver", value)}
-                onMouseOut={this.handleTagInteraction.bind(this, "MouseOut", value)}
-                onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
-                onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
-                title={get(value, mappingLabel)}>
-                <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
-                <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
-              </div>
-            ))}
+              <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
 
-            <input className={`quickfire-user-input ${classes.userInput}`}
-              onDrop={this.handleDrop.bind(this, null)}
-              onDragOver={e=>e.preventDefault()}
-              ref={ref=>this.inputRef=ref} type="text"
-              onKeyDown={this.handleInputKeyStrokes}
-              onChange={this.handleChangeUserInput}
-              onFocus={this.handleFocus}
-              value={this.props.field.userInput}
-              disabled={readOnly || disabled || values.length >= max}/>
+              {dropdownOpen && (filteredOptions.length || this.props.field.userInput)?
+                <div className={`quickfire-dropdown ${classes.options} ${dropdownClass}`} ref={ref=>{this.optionsRef = ref;}}>
+                  <InfiniteScroll
+                    element={"ul"}
+                    className={"dropdown-menu"}
+                    threshold={100}
+                    hasMore={this.props.field.hasMoreOptions()}
+                    loadMore={this.handleLoadMoreOptions}
+                    useWindow={false}>
+                    {!allowCustomValues && this.props.field.userInput && filteredOptions.length === 0?
+                      <MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
+                        <em>No options available for: </em> <strong>{this.props.field.userInput}</strong>
+                      </MenuItem>
+                      :null}
 
-            <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
-
-            {dropdownOpen && (filteredOptions.length || this.props.field.userInput)?
-              <div className={`quickfire-dropdown ${classes.options} ${dropdownClass}`} ref={ref=>{this.optionsRef = ref;}}>
-                <InfiniteScroll
-                  element={"ul"}
-                  className={"dropdown-menu"}
-                  threshold={100}
-                  hasMore={this.props.field.hasMoreOptions()}
-                  loadMore={this.handleLoadMoreOptions}
-                  useWindow={false}>
-                  {!allowCustomValues && this.props.field.userInput && filteredOptions.length === 0?
-                    <MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
-                      <em>No options available for: </em> <strong>{this.props.field.userInput}</strong>
-                    </MenuItem>
-                    :null}
-
-                  {allowCustomValues && this.props.field.userInput?
-                    <MenuItem className={"quickfire-dropdown-item"} key={this.props.field.userInput} onSelect={this.handleSelect.bind(this, this.props.field.userInput)}>
-                      <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, this.props.field.userInput)}>
-                        <em>Add a value: </em> <strong>{this.props.field.userInput}</strong>
-                      </div>
-                    </MenuItem>
-                    :null}
-                  {filteredOptions.map(option => {
-                    return(
-                      <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
-                        <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, option)}>
-                          {option[mappingLabel]}
-                          <div className={classes.preview} title="preview" onClick={this.handleOptionPreview.bind(this, option[mappingValue], option[mappingLabel])}>
-                            <FontAwesomeIcon icon="eye" />
-                          </div>
+                    {allowCustomValues && this.props.field.userInput?
+                      <MenuItem className={"quickfire-dropdown-item"} key={this.props.field.userInput} onSelect={this.handleSelect.bind(this, this.props.field.userInput)}>
+                        <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, this.props.field.userInput)}>
+                          <em>Add a value: </em> <strong>{this.props.field.userInput}</strong>
                         </div>
                       </MenuItem>
-                    );
-                  })}
-                  {this.props.field.fetchingOptions?
-                    <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
-                      <div tabIndex={-1} className="option">
-                        <FontAwesomeIcon spin icon="circle-notch"/>
-                      </div>
-                    </MenuItem>
-                    :null}
-                </InfiniteScroll>
-              </div>
-              :null}
-          </div>
-          {validationErrors && <Alert bsStyle="danger">
-            {validationErrors.map(error => <p key={error}>{error}</p>)}
-          </Alert>}
-        </FormGroup>
-      </div>
+                      :null}
+                    {filteredOptions.map(option => {
+                      return(
+                        <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
+                          <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, option)}>
+                            {option[mappingLabel]}
+                            <div className={classes.preview} title="preview" onClick={this.handleOptionPreview.bind(this, option[mappingValue], option[mappingLabel])}>
+                              <FontAwesomeIcon icon="eye" />
+                            </div>
+                          </div>
+                        </MenuItem>
+                      );
+                    })}
+                    {this.props.field.fetchingOptions?
+                      <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
+                        <div tabIndex={-1} className="option">
+                          <FontAwesomeIcon spin icon="circle-notch"/>
+                        </div>
+                      </MenuItem>
+                      :null}
+                  </InfiniteScroll>
+                </div>
+                :null}
+            </div>
+            {validationErrors && <Alert bsStyle="danger">
+              {validationErrors.map(error => <p key={error}>{error}</p>)}
+            </Alert>}
+          </FormGroup>
+        </div>
+      </FieldError>
     );
   }
 }

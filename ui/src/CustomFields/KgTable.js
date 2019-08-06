@@ -11,6 +11,7 @@ import {Button} from "react-bootstrap";
 
 import FetchingLoader from "../Components/FetchingLoader";
 import instanceStore from "../Stores/InstanceStore";
+import FieldError from "./FieldError";
 
 const styles = {
   container: {
@@ -476,44 +477,45 @@ export default class KgTable extends React.Component {
     }
 
     return (
-      <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
-        <div ref={ref=>this.dropDownRef = ref}>
-          <FormGroup
-            onClick={this.handleFocus}
-            className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.kgDropdown}`}
-            validationState={validationState}>
-            <FieldLabel field={field}/>
-            <div className={classes.kgTable}>
-              <Table
-                width={this.state.containerWidth}
-                height={300}
-                headerHeight={20}
-                rowHeight={30}
-                rowClassName={this._rowClassName}
-                rowCount={field.list.length}
-                rowGetter={({ index }) => field.list[index]}
-                onRowClick={this.onRowClick}
-                onRowMouseOver={this.onRowMouseOver}
-                onRowMouseOut={this.onRowMouseOut}
-                rowRenderer={this.rowRenderer}
-                scrollToIndex={this.state.scrollToIndex-1}
-              >
-                {field.columns.map((col,index) =>{
-                  const isLastCell = index === field.columns.length-1;
-                  return(
-                    <Column
-                      label={col.label}
-                      dataKey={col.name}
-                      key={col.name}
-                      flexGrow={isLastCell ? 0:1}
-                      flexShrink={isLastCell ? 1:0}
-                      width={20}
-                      cellRenderer={this.cellRenderer(index)}
-                    />
-                  );}
-                )}
-              </Table>
-              {!this.props.formStore.readMode && !this.props.field.readMode &&
+      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+        <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
+          <div ref={ref=>this.dropDownRef = ref}>
+            <FormGroup
+              onClick={this.handleFocus}
+              className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.kgDropdown}`}
+              validationState={validationState}>
+              <FieldLabel field={field}/>
+              <div className={classes.kgTable}>
+                <Table
+                  width={this.state.containerWidth}
+                  height={300}
+                  headerHeight={20}
+                  rowHeight={30}
+                  rowClassName={this._rowClassName}
+                  rowCount={field.list.length}
+                  rowGetter={({ index }) => field.list[index]}
+                  onRowClick={this.onRowClick}
+                  onRowMouseOver={this.onRowMouseOver}
+                  onRowMouseOut={this.onRowMouseOut}
+                  rowRenderer={this.rowRenderer}
+                  scrollToIndex={this.state.scrollToIndex-1}
+                >
+                  {field.columns.map((col,index) =>{
+                    const isLastCell = index === field.columns.length-1;
+                    return(
+                      <Column
+                        label={col.label}
+                        dataKey={col.name}
+                        key={col.name}
+                        flexGrow={isLastCell ? 0:1}
+                        flexShrink={isLastCell ? 1:0}
+                        width={20}
+                        cellRenderer={this.cellRenderer(index)}
+                      />
+                    );}
+                  )}
+                </Table>
+                {!this.props.formStore.readMode && !this.props.field.readMode &&
                   <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
                     <input className={`quickfire-user-input ${classes.userInput}`}
                       onDragOver={e=>e.preventDefault()}
@@ -573,23 +575,24 @@ export default class KgTable extends React.Component {
                       </div>
                       :null}
                   </div>}
-            </div>
-            {validationErrors && <Alert bsStyle="danger">
-              {validationErrors.map(error => <p key={error}>{error}</p>)}
-            </Alert>}
-            {!field.list.length &&
+              </div>
+              {validationErrors && <Alert bsStyle="danger">
+                {validationErrors.map(error => <p key={error}>{error}</p>)}
+              </Alert>}
+              {!field.list.length &&
             <div className={classes.emptyMessage}>
               <span className={classes.emptyMessageLabel}>
                 No {instanceTypeLabel} available
               </span>
             </div>}
-          </FormGroup>
-        </div>
-        {!field.isInitialized && field.list.length > 0 &&
+            </FormGroup>
+          </div>
+          {!field.isInitialized && field.list.length > 0 &&
           <FetchingLoader>
             <span>Fetching content...</span>
           </FetchingLoader>}
-      </div>
+        </div>
+      </FieldError>
     );
   }
 }

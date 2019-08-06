@@ -1,14 +1,15 @@
-import { FormStore, Components } from "hbp-quickfire";
+import { FormStore } from "hbp-quickfire";
 import KgInputTextField from "./KgInputTextField";
 import KgTextAreaField from "./KgTextAreaField";
 import KgTable from "./KgTable";
 import DynamicDropdown from "./DynamicDropdown";
+import KgAnnotatedInputTextField from "./KgAnnotatedInputText";
 import DynamicDropdownStore from "./DynamicDropdownStore";
 import KgTableStore from "./KgTableStore";
 import KgAnnotatedInputTextStore from "./KgAnnotatedInputTextStore";
 
 FormStore.registerCustomField("KgInputText", KgInputTextField, FormStore.typesMapping.InputText);
-FormStore.registerCustomField("KgAnnotatedInputTextField",  Components.InputTextMultiple, KgAnnotatedInputTextStore);
+FormStore.registerCustomField("KgAnnotatedInputTextField",  KgAnnotatedInputTextField, KgAnnotatedInputTextStore);
 FormStore.registerCustomField("KgTextArea", KgTextAreaField, FormStore.typesMapping.TextArea);
 FormStore.registerCustomField("DynamicDropdown", DynamicDropdown, DynamicDropdownStore);
 FormStore.registerCustomField("KgTable", KgTable, KgTableStore);
@@ -19,7 +20,7 @@ export default {
     store:FormStore.typesMapping.InputText
   },
   KgAnnotatedInputTextField: {
-    component:Components.InputTextMultiple,
+    component:KgAnnotatedInputTextField,
     store:KgAnnotatedInputTextStore
   },
   KgTextAreaField:{

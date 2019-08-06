@@ -22,6 +22,7 @@ import FetchingPanel from "./InstanceForm/FetchingPanel";
 import SavingPanel from "./InstanceForm/SavingPanel";
 import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
+import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 
 const styles = {
   panelHeader: {
@@ -283,9 +284,12 @@ export default class InstanceForm extends React.Component {
                           color={structureStore.colorPalletteBySchema(instance.nodeType)}
                           hasChanged={instance.hasChanged} />
 
-                        <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
-                        <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
-
+                        {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
+                          <React.Fragment>
+                            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
+                            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
+                          </React.Fragment>
+                        }
                         <FooterPanel
                           className={classes.panelFooter}
                           nexusId={instance.data.fields.id ? instance.data.fields.id.nexus_id : "<new>"}

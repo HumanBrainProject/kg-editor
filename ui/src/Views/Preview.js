@@ -15,6 +15,7 @@ import Status from "./Instance/Status";
 import BookmarkStatus from "./Instance/BookmarkStatus";
 import RenderMarkdownField from "../Components/Markdown";
 import Actions from "./Preview/Actions";
+import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 
 const styles = {
   container: {
@@ -101,6 +102,9 @@ const styles = {
   },
   duplicate: {
     extend: "action"
+  },
+  errorReport: {
+    margin: "10px"
   }
 };
 
@@ -185,57 +189,58 @@ export default class Preview extends React.Component {
               </div>
             </div>
             <Scrollbars autoHide>
-              <Form
-                store={instance.readModeFormStore}
-                key={instanceId}
-              >
-                {promotedFields.map(fieldKey => {
-                  return (
-                    <div
-                      key={instanceId + fieldKey}
-                      className={classes.field}
-                    >
-                      {promotedFieldsWithMarkdown.includes(fieldKey) ? (
-                        <Field
-                          name={fieldKey}
-                          readModeRendering={this.markdownDescriptionRendering}
-                        />
-                      ) : (
-                        <Field name={fieldKey} />
-                      )}
-                    </div>
-                  );
-                })}
-                {nonPromotedFields.map(fieldKey => {
-                  return (
-                    <div
-                      key={instanceId + fieldKey}
-                      className={classes.field}
-                    >
-                      <Field name={fieldKey} />
-                    </div>
-                  );
-                })}
-                {showMetaData && instance.metadata && instance.metadata.length > 0 && (
-                  <div>
-                    <hr />
-                    <span
-                      className={`${classes.title} ${classes.metadataTitle}`}
-                    >
-                      {" "}
-                      Metadata{" "}
-                    </span>
-                    {instance.metadata.map(field => (
+              {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
+                <Form
+                  store={instance.readModeFormStore}
+                  key={instanceId}
+                >
+                  {promotedFields.map(fieldKey => {
+                    return (
                       <div
-                        key={instanceId + field.label}
+                        key={instanceId + fieldKey}
                         className={classes.field}
                       >
-                        <label>{field.label}: </label> {field.value}
+                        {promotedFieldsWithMarkdown.includes(fieldKey) ? (
+                          <Field
+                            name={fieldKey}
+                            readModeRendering={this.markdownDescriptionRendering}
+                          />
+                        ) : (
+                          <Field name={fieldKey} />
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </Form>
+                    );
+                  })}
+                  {nonPromotedFields.map(fieldKey => {
+                    return (
+                      <div
+                        key={instanceId + fieldKey}
+                        className={classes.field}
+                      >
+                        <Field name={fieldKey} />
+                      </div>
+                    );
+                  })}
+                  {showMetaData && instance.metadata && instance.metadata.length > 0 && (
+                    <div>
+                      <hr />
+                      <span
+                        className={`${classes.title} ${classes.metadataTitle}`}
+                      >
+                        {" "}
+                      Metadata{" "}
+                      </span>
+                      {instance.metadata.map(field => (
+                        <div
+                          key={instanceId + field.label}
+                          className={classes.field}
+                        >
+                          <label>{field.label}: </label> {field.value}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Form>}
             </Scrollbars>
           </div>
         ) : (

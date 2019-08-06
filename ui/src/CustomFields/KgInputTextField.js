@@ -18,6 +18,7 @@ import clipboard from "hbp-quickfire/lib/Stores/ClipboardStore";
 import Alternatives from "./Alternatives";
 
 import instanceStore from "../Stores/InstanceStore";
+import FieldError from "./FieldError";
 
 const styles = {
   readMode: {
@@ -190,31 +191,33 @@ export default class KgInputTextField extends React.Component {
       }));
 
     return (
-      <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
-        <FieldLabel field={this.props.field}/>
-        <Alternatives className={classes.alternatives}
-          show={!disabled && !readOnly && !!alternatives.length}
-          disabled={disabled || readOnly || isAlternativeDisabled}
-          list={alternatives}
-          onSelect={this.handleAlternativeSelect}
-          onClick={this.handleRemoveSuggestion}
-          parentContainerClassName="form-group" />
-        {useVirtualClipboard?
-          <InputGroup>
-            {formControl()}
-            <InputGroup.Button>
-              <Button className={"quickfire-paste-button"} onClick={this.handlePaste}>
-                <Glyphicon glyph="paste"/>
-              </Button>
-            </InputGroup.Button>
-          </InputGroup>
-          :
-          formControl()
-        }
-        {validationErrors && <Alert bsStyle="danger">
-          {validationErrors.map(error => <p key={error}>{error}</p>)}
-        </Alert>}
-      </FormGroup>
+      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+        <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
+          <FieldLabel field={this.props.field}/>
+          <Alternatives className={classes.alternatives}
+            show={!disabled && !readOnly && !!alternatives.length}
+            disabled={disabled || readOnly || isAlternativeDisabled}
+            list={alternatives}
+            onSelect={this.handleAlternativeSelect}
+            onClick={this.handleRemoveSuggestion}
+            parentContainerClassName="form-group" />
+          {useVirtualClipboard?
+            <InputGroup>
+              {formControl()}
+              <InputGroup.Button>
+                <Button className={"quickfire-paste-button"} onClick={this.handlePaste}>
+                  <Glyphicon glyph="paste"/>
+                </Button>
+              </InputGroup.Button>
+            </InputGroup>
+            :
+            formControl()
+          }
+          {validationErrors && <Alert bsStyle="danger">
+            {validationErrors.map(error => <p key={error}>{error}</p>)}
+          </Alert>}
+        </FormGroup>
+      </FieldError>
     );
   }
 
@@ -230,22 +233,24 @@ export default class KgInputTextField extends React.Component {
     const lines = typeof value === "string"?value.split("\n"):[];
 
     return (
-      <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
-        <FieldLabel field={this.props.field}/>
-        {isFunction(this.props.readModeRendering)?
-          this.props.readModeRendering(this.props.field)
-          : this.props.componentClass === "textarea"?
-            <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
-              {lines.map((line, index) => {
-                return(
-                  <p key={line+(""+index)}>{line}</p>
-                );
-              })}
-            </div>
-            :
-            <span className="quickfire-readmode-value">&nbsp;{value}</span>
-        }
-      </div>
+      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+          <FieldLabel field={this.props.field}/>
+          {isFunction(this.props.readModeRendering)?
+            this.props.readModeRendering(this.props.field)
+            : this.props.componentClass === "textarea"?
+              <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
+                {lines.map((line, index) => {
+                  return(
+                    <p key={line+(""+index)}>{line}</p>
+                  );
+                })}
+              </div>
+              :
+              <span className="quickfire-readmode-value">&nbsp;{value}</span>
+          }
+        </div>
+      </FieldError>
     );
   }
 }

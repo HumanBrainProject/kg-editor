@@ -101,7 +101,7 @@ class IDMAPIService @Inject()(
     searchTerm: String,
     token: AccessToken
   ): Task[Either[WSResponse, (List[IDMUser], Pagination)]] = {
-    val url = s"${config.idmApiEndpoint}/user/search"
+    val url = s"${config.idmApiEndpoint}/user/searchByText"
     if (!searchTerm.isEmpty) {
       Task
         .deferFuture {
@@ -109,11 +109,9 @@ class IDMAPIService @Inject()(
             .url(url)
             .addHttpHeaders(AUTHORIZATION -> token.token)
             .addQueryStringParameters(
-              "pageSize"    -> size.toString,
-              "displayName" -> s"*$searchTerm*",
-              "email"       -> s"*$searchTerm*",
-              "username"    -> s"*$searchTerm*",
-              "sort"        -> "displayName,asc"
+              "pageSize" -> size.toString,
+              "str"      -> searchTerm,
+              "sort"     -> "displayName,asc"
             )
             .get()
         }

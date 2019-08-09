@@ -3,8 +3,8 @@ import { debounce } from "lodash";
 
 import API from "../Services/API";
 
-
 class UsersStore {
+
   @observable users = new Map();
 
   @observable isFetchingSearch = false;
@@ -141,14 +141,14 @@ class UsersStore {
         user.isFetching = true;
         user.hasFetchError = false;
         user.fetchError = null;
-        const {data} = await API.axios.get(API.endpoints.userInfo(userId));
+        const { data } = await API.axios.get(API.endpoints.userInfo(userId));
         runInAction(() => {
           const userData = data && data.data;
           user.username = userData && userData.username;
           user.displayName = userData && userData.displayName;
           user.givenName = userData && userData.givenName;
           user.familyName = userData && userData.familyName;
-          user.emails = userData && userData.emails instanceof Array?userData.emails:[];
+          user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
           user.picture = userData && userData.picture;
           user.isCurator = !!userData && !!userData.isCurator;
           user.isFetching = false;
@@ -174,11 +174,10 @@ class UsersStore {
     return user;
   }
 
-  @action setSearchFilter(queryString, excludedUsers=[]){
+  @action setSearchFilter(queryString, excludedUsers = []) {
     if (!queryString) {
       queryString = "";
     }
-    queryString = queryString.trim(" ").toLowerCase();
     if (queryString === "") {
       this.clearSearch();
     } else if (queryString !== this.searchFilter.queryString) {
@@ -229,7 +228,7 @@ class UsersStore {
         this.isFetchingSearch = true;
         this.searchFetchError = null;
 
-        const {data} = await API.axios.get(API.endpoints.reviewUsers(this.searchPageStart * this.searchPageSize, this.searchPageSize, this.searchFilter.queryString));
+        const { data } = await API.axios.get(API.endpoints.reviewUsers(this.searchPageStart * this.searchPageSize, this.searchPageSize, this.searchFilter.queryString));
         runInAction(() => {
           if (!this.hasSearchFilter) {
             this.clearSearch();

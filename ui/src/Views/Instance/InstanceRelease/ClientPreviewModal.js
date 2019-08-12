@@ -34,7 +34,7 @@ let styles = {
 export default class ClientPreviewModal extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.url = "https://kg.humanbrainproject.eu/instances/" + props.store.topInstanceId;
+    this.url = "https://kg.humanbrainproject.eu/webapp?group=curated&search=false#" + props.store.topInstanceId;
   }
 
   render() {

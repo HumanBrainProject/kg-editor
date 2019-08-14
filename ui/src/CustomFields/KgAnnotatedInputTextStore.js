@@ -1,9 +1,9 @@
-import { observable, action, isObservableArray } from "mobx";
-import { union, isArray } from "lodash";
+import { observable, action } from "mobx";
+import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{
-  @observable value = [];
+  @observable value = null;
   @observable defaultValue = [];
   @observable max = Infinity;
   @observable useVirtualClipboard = false;
@@ -22,13 +22,18 @@ export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.De
 
   @action
   injectValue(value){
-    if((this.emptyToNull && value === null) || !value){
-      this.value = this.__emptyValue();
-    } else if(!isObservableArray(value) && !isArray(value)){
-      this.value = [value["@id"]];
-    } else {
-      this.value = value.map(i=> i["@id"]);
+    if(value !== undefined){
+      this.registerProvidedValue(value, true);
     }
+    this.value = this.__emptyValue();
+
+    const providedValue = this.getProvidedValue();
+    providedValue.forEach(value => {
+      if(!value || !value["@id"] || this.value.length >= this.max){
+        return;
+      }
+      this.value.push(value["@id"]);
+    });
   }
 
   getValue(){

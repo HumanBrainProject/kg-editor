@@ -1,5 +1,5 @@
-import { observable, action, isObservableArray } from "mobx";
-import { union, isArray } from "lodash";
+import { observable, action } from "mobx";
+import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{

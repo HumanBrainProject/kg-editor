@@ -79,13 +79,6 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class SavedQueries extends React.Component{
-
-  handleUpdate = () => {
-    if(this.scrolledPanel){
-      this.scrolledPanel.scrollToTop();
-    }
-  }
-
   render(){
     const {classes, title, subTitle, list, expanded, onExpandToggle, onRefresh, showUser, enableDelete } = this.props;
 
@@ -106,7 +99,7 @@ export default class SavedQueries extends React.Component{
           !list || !list.length?
             <div>no saved queries yet.</div>
             :
-            <Scrollbars autoHide onUpdate={this.handleUpdate} ref={ref => this.scrolledPanel = ref}>
+            <Scrollbars autoHide>
               {list.map(query => (
                 <SavedQuery key={query.id} query={query} showUser={showUser} enableDelete={enableDelete} />
               ))}

@@ -42,7 +42,6 @@ class EditorUserController @Inject()(
   editorService: EditorService,
   editorUserService: EditorUserService,
   editorUserListService: EditorBookmarkService,
-  nexusService: NexusService,
   oIDCAuthService: TokenAuthService,
   formService: FormService
 )(implicit ec: ExecutionContext)

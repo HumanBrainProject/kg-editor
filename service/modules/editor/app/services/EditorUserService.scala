@@ -62,7 +62,6 @@ object UserRequestMap {
 class EditorUserService @Inject()(
   config: ConfigurationService,
   wSClient: WSClient,
-  nexusService: NexusService,
   @NamedCache("editor-userinfo-cache") cache: AsyncCacheApi,
 )(
   implicit oIDCAuthService: TokenAuthService,

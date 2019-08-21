@@ -1,2 +1,0 @@
-# Export service
-  GET     /export                         controllers.ExportContainerController.exportContainer(container: String, filter: Option[String])

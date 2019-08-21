@@ -31,7 +31,6 @@ import scala.concurrent.duration.FiniteDuration
 
 class TokenAuthService @Inject()(
   config: ConfigurationService,
-  eSService: ESService,
   credentialsService: CredentialsService,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi,
   ws: WSClient

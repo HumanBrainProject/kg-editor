@@ -30,18 +30,7 @@ This modules allows authentication through OIDC.
 The authentication modules also check for accessbile index in the nexus ElasticSearch instance.
 This is used for example by the proxy module in order to query the indices authorized by a OIDC group.
 
-### Nexus
-
-All the helpers and API wrapper for the Nexus API can be found in this project.
-
-### Proxy
-
-This service handles the call to our search ui project.
-
 ### Editor
 
 This service provides an API for our editor ui.
 
-### Data_import
-
-Anything related to data import is found in this modules.

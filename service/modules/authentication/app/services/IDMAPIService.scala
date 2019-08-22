@@ -16,7 +16,6 @@
 package services
 
 import com.google.inject.Inject
-import helpers.ESHelper
 import models.user.{Group, IDMUser}
 import models.{AccessToken, BasicAccessToken, MindsGroupSpec, Pagination, RefreshAccessToken, UserGroup}
 import monix.eval.Task
@@ -30,7 +29,6 @@ import play.api.libs.ws.{WSClient, WSResponse}
 class IDMAPIService @Inject()(
   WSClient: WSClient,
   config: ConfigurationService,
-  esService: ESService,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi
 )(
   implicit OIDCAuthService: TokenAuthService,
@@ -193,33 +191,6 @@ class IDMAPIService @Inject()(
           log.error(s"Could not fetch user groups - Status:${res.status} - Content:${res.body}")
           List()
       }
-    }
-  }
-
-  /**
-    * From a UserInfo object returns the index accessible in ES
-    * @param userInfo The user info
-    * @return A list of accessible index in ES
-    */
-  def groups(userInfo: Option[IDMUser]): Task[List[UserGroup]] = {
-    userInfo match {
-      case Some(info) =>
-        for {
-          esIndices <- esService.getEsIndices()
-        } yield {
-          val kgIndices = esIndices.filter(_.startsWith("kg_")).map(_.substring(3))
-          val nexusGroups = info.groups
-          val resultingGroups = ESHelper.filterNexusGroups(nexusGroups).filter(group => kgIndices.contains(group))
-          log.debug(esIndices + "\n" + kgIndices + "\n " + nexusGroups)
-          resultingGroups.toList.map { groupName =>
-            if (MindsGroupSpec.group.contains(groupName)) {
-              UserGroup(groupName, Some(MindsGroupSpec.v))
-            } else {
-              UserGroup(groupName, None)
-            }
-          }
-        }
-      case _ => Task.pure(List())
     }
   }
 

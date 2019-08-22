@@ -38,7 +38,6 @@ class EditorController @Inject()(
   editorService: EditorService,
   TokenAuthService: TokenAuthService,
   config: ConfigurationService,
-  nexusService: NexusService,
   iAMAuthService: IAMAuthService,
   formService: FormService,
   metadataService: MetadataService,

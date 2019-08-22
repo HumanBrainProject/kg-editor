@@ -6,33 +6,21 @@ import scala.concurrent.duration.FiniteDuration
 
 object ConfigMock {
   val nexusEndpoint: String = "http://www.nexus.com"
-  val reconcileEndpoint: String = "http://www.reconcile.com"
-  val blazegraphNameSpace: String = "kg"
-  val idm = "https://services.humanbrainproject.eu/idm/v1/api"
-  val userInfo = "https://userinfo.com"
-  val esHost = "https://eshost.com"
-  val reconciledPrefix = "reconciled"
-  val editorPrefix = "editor"
-  val kgQueryEndpoint = "kgqueryEndpoint"
-  val refreshTokenFile = "/opt/tokenfolder"
-  val authEndpoint = "auth.com"
-  val cacheExpiration = FiniteDuration(10, "min")
   val nexusIam = "nexus-iam.com"
+  val authEndpoint = "auth.com"
+  val refreshTokenFile = "/opt/tokenfolder"
+  val kgQueryEndpoint = "kgqueryEndpoint"
+  val editorSubspace = "editor"
+  val cacheExpiration = FiniteDuration(10, "min")
 
   val fakeApplicationConfig = GuiceApplicationBuilder().configure(
     "play.http.filters" -> "play.api.http.NoHttpFilters",
     "nexus.endpoint" -> nexusEndpoint,
-    "reconcile.endpoint" -> reconcileEndpoint,
-    "blazegraph.namespace" -> blazegraphNameSpace,
-    "idm.api" -> idm,
-    "auth.userinfo" -> userInfo,
-    "es.host" -> esHost,
-    "nexus.reconciled.prefix" -> reconciledPrefix,
-    "nexus.editor.prefix" -> editorPrefix,
-    "kgquery.endpoint" -> kgQueryEndpoint,
-    "auth.refreshTokenFile" -> refreshTokenFile,
+    "nexus.iam" -> nexusIam,
     "auth.endpoint"-> authEndpoint,
-    "proxy.cache.expiration" -> cacheExpiration.toMillis,
-    "nexus.iam" -> nexusIam
+    "auth.refreshTokenFile" -> refreshTokenFile,
+    "kgquery.endpoint" -> kgQueryEndpoint,
+    "editor.subspace" -> editorSubspace,
+    "cache.expiration" -> cacheExpiration.toMillis
   )
 }

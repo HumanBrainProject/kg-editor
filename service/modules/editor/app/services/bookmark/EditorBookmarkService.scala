@@ -40,7 +40,6 @@ import services.specification.FormOp
 class EditorBookmarkService @Inject()(
   config: ConfigurationService,
   wSClient: WSClient,
-  nexusService: NexusService
 )(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService)
     extends EditorBookmarkServiceInterface {
   val logger = Logger(this.getClass)

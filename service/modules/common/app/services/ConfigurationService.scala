@@ -22,17 +22,13 @@ import scala.concurrent.duration.FiniteDuration
 
 @Singleton
 class ConfigurationService @Inject()(configuration: Configuration) {
-  val esHost: String = configuration.get[String]("es.host")
   val refreshTokenFile: String = configuration.get[String]("auth.refreshTokenFile")
   val oidcEndpoint = s"${configuration.get[String]("auth.endpoint")}/oidc"
-  val oidcUserInfoEndpoint = s"$oidcEndpoint/userinfo"
   val oidcTokenEndpoint = s"$oidcEndpoint/token"
-  val cacheExpiration: FiniteDuration = configuration.get[FiniteDuration]("proxy.cache.expiration")
-  val blazegraphNameSpace: String = configuration.getOptional[String]("blazegraph.namespace").getOrElse("kg")
+  val cacheExpiration: FiniteDuration = configuration.get[FiniteDuration]("cache.expiration")
 
   val nexusEndpoint: String =
     configuration.getOptional[String]("nexus.endpoint").getOrElse("https://nexus-dev.humanbrainproject.org")
-  val reconciledPrefix: String = configuration.getOptional[String]("nexus.reconciled.prefix").getOrElse("reconciled")
   val editorPrefix: String = configuration.getOptional[String]("nexus.editor.prefix").getOrElse("editor")
 
   val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
@@ -40,6 +36,5 @@ class ConfigurationService @Inject()(configuration: Configuration) {
   val authEndpoint = configuration.get[String]("auth.endpoint")
   val idmApiEndpoint = s"$authEndpoint/idm/v1/api"
   val editorSubSpace = configuration.getOptional[String]("editor.subspace").getOrElse("editor")
-  val hbpUrl = configuration.getOptional[String]("hbp.url").getOrElse("https://kg.humanbrainproject.eu/webapp")
 
 }

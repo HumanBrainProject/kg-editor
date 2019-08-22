@@ -8,14 +8,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8080:80'
+    networks:
+      - backend
   kg-editor-service:
     restart: "always"
     stdin_open: true
     environment:
       - AUTH_ENDPOINT=${AUTH_ENDPOINT}
       - CREDENTIALS_PATH=${CREDENTIALS_PATH}
-      - ELASTICSEARCH_ENDPOINT=${ELASTICSEARCH_ENDPOINT}
-      - HBP_URL=${HBP_URL}
       - KG_QUERY_ENDPOINT=${KG_QUERY_ENDPOINT}
       - NEXUS_NAMESPACE=${NEXUS_NAMESPACE}
       - NEXUS_IAM=${NEXUS_IAM}
@@ -23,3 +23,11 @@ services:
     build:
       context: ./service
       dockerfile: Dockerfile
+    networks:
+      - backend
+
+networks:
+ backend:
+   driver: bridge
+   driver_opts:
+     com.docker.network.driver.mtu: 1400

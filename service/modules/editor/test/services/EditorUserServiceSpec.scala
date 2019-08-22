@@ -80,13 +80,12 @@ class EditorUserServiceSpec
       }
       val oidcService = mock[TokenAuthService]
       val clientCred = mock[CredentialsService]
-      val nexusService = mock[NexusService]
       val configService = mock[ConfigurationService]
       val cache = mock[AsyncCacheApi]
       val actorSystem = mock[ActorSystem]
       when(cache.get[EditorUser](id)).thenReturn(Future(None))
       val service =
-        new EditorUserService(configService, ws, nexusService, cache)(
+        new EditorUserService(configService, ws, cache)(
           oidcService,
           clientCred,
           actorSystem
@@ -120,14 +119,13 @@ class EditorUserServiceSpec
           }
       }
       val oidcService = mock[TokenAuthService]
-      val nexusService = mock[NexusService]
       val configService = mock[ConfigurationService]
       val clientCred = mock[CredentialsService]
       val cache = mock[AsyncCacheApi]
       val actorSystem = mock[ActorSystem]
       when(cache.get[EditorUser](id)).thenReturn(Future(None))
       val service =
-        new EditorUserService(configService, ws, nexusService, cache)(
+        new EditorUserService(configService, ws, cache)(
           oidcService,
           clientCred,
           actorSystem

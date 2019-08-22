@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - '8080:80'
+    networks:
+      - backend
   kg-editor-service:
     restart: "always"
     stdin_open: true
@@ -21,3 +23,11 @@ services:
     build:
       context: ./service
       dockerfile: Dockerfile
+    networks:
+      - backend
+
+networks:
+ backend:
+   driver: bridge
+   driver_opts:
+     com.docker.network.driver.mtu: 1400

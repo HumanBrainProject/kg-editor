@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit
 
 import com.google.inject.Inject
 import models.RefreshAccessToken
-
 import monix.eval.Task
 import play.api.Logger
 import play.api.cache.{AsyncCacheApi, NamedCache}

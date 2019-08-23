@@ -17,13 +17,13 @@ package services
 
 import com.google.inject.Inject
 import models.user.{Group, IDMUser}
-import models.{AccessToken, BasicAccessToken, MindsGroupSpec, Pagination, RefreshAccessToken, UserGroup}
+import models.{AccessToken, BasicAccessToken, Pagination, RefreshAccessToken}
 import monix.eval.Task
 import org.slf4j.LoggerFactory
 import play.api.cache.{AsyncCacheApi, NamedCache}
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status._
-import play.api.libs.json.{JsPath, JsValue}
+import play.api.libs.json.JsValue
 import play.api.libs.ws.{WSClient, WSResponse}
 
 class IDMAPIService @Inject()(

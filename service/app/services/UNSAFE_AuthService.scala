@@ -19,7 +19,7 @@ package services
 import monix.eval.Task
 import play.api.mvc.Headers
 
-trait AuthService {
+trait UNSAFE_AuthService {
   type U
 
   def getUserInfo(headers: Headers): Task[U]

@@ -1,4 +1,16 @@
 ###
+#  summary: Get the login page
+#  parameters:
+#  - name: redirectUri
+#    in: path
+#    description: redirectUri when authentication is successful
+#    required: true
+#    type: string
+###
+GET   /login                                                             controllers.EditorController.getLogin(redirectUri: String)
+
+
+###
 #  summary: Delete a specific entity
 #  tags:
 #    - editor

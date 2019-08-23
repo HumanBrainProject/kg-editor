@@ -50,6 +50,17 @@ class EditorService @Inject()(
 
   object queryService extends QueryService
 
+  def retrieveLogin(
+                     redirectUri: String
+                   ): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getStructure(wSClient, config.kgQueryEndpoint, redirectUri)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
   def retrievePreviewInstances(
     nexusPath: NexusPath,
     formRegistry: FormRegistry[UISpec],

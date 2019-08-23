@@ -49,6 +49,16 @@ class EditorController @Inject()(
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
+  def getLogin(redirectUri: String): Action[AnyContent] = Action.async { implicit request =>
+    editorService
+      .retrieveLogin(redirectUri)
+      .map {
+        case Left(err)    => err.toResult
+        case Right(value) => Ok(value)
+      }
+      .runToFuture
+  }
+
   def deleteInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)

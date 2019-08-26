@@ -1,3 +1,5 @@
+package services
+
 /*
  *   Copyright (c) 2018, EPFL/Human Brain Project PCO
  *
@@ -13,11 +15,10 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+import com.google.inject.AbstractModule
+import services.specification.FormService
 
-import com.google.inject.Inject
-import play.api.http.DefaultHttpFilters
-import play.filters.gzip.GzipFilter
-
-class Filters @Inject()(
-  gzipFilter: GzipFilter
-) extends DefaultHttpFilters(gzipFilter)
+class Module extends AbstractModule {
+  override def configure(): Unit =
+    bind(classOf[FormService]).asEagerSingleton()
+}

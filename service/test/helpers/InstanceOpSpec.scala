@@ -228,8 +228,10 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
           "description" -> "description",
           "activities"  -> JsArray(),
           "contributors" -> Json.toJson(
-            "james",
-            "jane"
+            List(
+              "james",
+              "jane"
+            )
           )
         )
       )
@@ -241,8 +243,10 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
           Json.obj(
             "activities" -> JsArray(),
             "contributors" -> Json.toJson(
-              "james",
-              "jane"
+              List(
+                "james",
+                "jane"
+              )
             )
           )
         )
@@ -278,8 +282,10 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
           "description" -> "description",
           "activities"  -> JsArray(),
           "contributors" -> Json.toJson(
-            "james",
-            "jane"
+            List(
+              "james",
+              "jane"
+            )
           )
         )
       )

@@ -1,21 +1,30 @@
+/*
+ *   Copyright (c) 2018, EPFL/Human Brain Project PCO
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 package services
 
-import helpers.ConfigMock
 import mockws.MockWSHelpers
 import models._
 import models.specification._
 import org.scalatest.Matchers._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.libs.json.{JsObject, JsString, JsValue, Json}
-import play.api.libs.ws.WSClient
-import play.api.test.Injecting
+import play.api.libs.json.{JsObject, JsString, Json}
 import services.specification.{FormOp, FormService}
 
-class FormServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockWSHelpers with MockitoSugar with Injecting {
-  override def fakeApplication(): Application = ConfigMock.fakeApplicationConfig.build()
+class FormServiceSpec extends PlaySpec with MockWSHelpers with MockitoSugar {
 
   "getFormStructure" should {
     "return a form with the instance content" in {
@@ -70,9 +79,6 @@ class FormServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockWSHelpe
           )
         )
       )
-
-      val config = new ConfigurationService(fakeApplication().configuration)
-      val mockWs = mock[WSClient]
       val data = Json.parse(s"""{
            |    "@context": "https://nexus-dev.humanbrainproject.org/v0/contexts/nexus/core/resource/v0.3.0",
            |    "@id": "https://nexus-dev.humanbrainproject.org/v0/data/${originalDatatype.toString()}/$id",
@@ -131,10 +137,9 @@ class FormServiceSpec extends PlaySpec with GuiceOneAppPerSuite with MockWSHelpe
           |  "alternatives": {}
           |}
         """.stripMargin)
-      val mapRes = res.as[Map[String, JsValue]]
-      val mapExpected = expected.as[Map[String, JsValue]]
-      mapRes should contain theSameElementsAs mapExpected
-
+      val mapRes = res.as[JsObject].values
+      val mapExpected = expected.as[JsObject].values
+      mapRes should contain theSameElementsAs (mapExpected)
     }
   }
 

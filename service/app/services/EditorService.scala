@@ -57,7 +57,7 @@ class EditorService @Inject()(
     size: Option[Int],
     search: String,
     token: AccessToken
-  ): Task[Either[APIEditorError, (List[PreviewInstance], Long)]] = {
+  ): Task[Either[APIEditorError, (List[PreviewInstance], Long)]] =
     queryService
       .getInstances(
         wSClient,
@@ -81,7 +81,6 @@ class EditorService @Inject()(
           case _ => Left(APIEditorError(res.status, res.body))
         }
       }
-  }
 
   def retrieveInstanceGraph(
     nexusInstanceReference: NexusInstanceReference,
@@ -208,23 +207,21 @@ class EditorService @Inject()(
     instancePath: NexusPath,
     queryId: String,
     token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
+  ): Task[Either[APIEditorError, Unit]] =
     queryService.delete(wSClient, config.kgQueryEndpoint, instancePath, queryId, token)
-  }
 
   def saveQuery(
     instancePath: NexusPath,
     queryId: String,
     payload: JsObject,
     token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
+  ): Task[Either[APIEditorError, Unit]] =
     queryService
       .putQuery(wSClient, config.kgQueryEndpoint, instancePath, queryId, payload, token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
-  }
 
   def doQuery(
     instancePath: NexusPath,
@@ -234,14 +231,13 @@ class EditorService @Inject()(
     databaseScope: Option[String],
     payload: JsObject,
     token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] = {
+  ): Task[Either[APIEditorError, JsObject]] =
     queryService
       .postQuery(wSClient, config.kgQueryEndpoint, instancePath, vocab, size, start, databaseScope, payload, token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
-  }
 
   def retrieveSuggestions(
     instancePath: NexusPath,
@@ -252,14 +248,24 @@ class EditorService @Inject()(
     search: String,
     payload: JsObject,
     token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] = {
+  ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .postSuggestions(wSClient, config.kgQueryEndpoint, instancePath, token, field, fieldType, size, start, search, payload)
+      .postSuggestions(
+        wSClient,
+        config.kgQueryEndpoint,
+        instancePath,
+        token,
+        field,
+        fieldType,
+        size,
+        start,
+        search,
+        payload
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
-  }
 
   def insertInstance(
     newInstance: NexusInstance,
@@ -320,7 +326,7 @@ class EditorService @Inject()(
     user: IDMUser,
     token: AccessToken,
     reverseLinkService: ReverseLinkService
-  ): Task[Either[APIEditorMultiError, Unit]] = {
+  ): Task[Either[APIEditorMultiError, Unit]] =
     form match {
       case Some(json) =>
         formService.getRegistries().flatMap { registries =>
@@ -349,7 +355,6 @@ class EditorService @Inject()(
       case None =>
         Task.pure(Left(APIEditorMultiError(BAD_REQUEST, List(APIEditorError(BAD_REQUEST, "No content provided")))))
     }
-  }
 
   /**
     * Return a instance by its nexus ID
@@ -365,7 +370,7 @@ class EditorService @Inject()(
     token: AccessToken,
     queryRegistry: FormRegistry[QuerySpec],
     databaseScope: Option[String] = None
-  ): Task[Either[APIEditorError, NexusInstance]] = {
+  ): Task[Either[APIEditorError, NexusInstance]] =
     queryRegistry.registry.get(nexusInstanceReference.nexusPath) match {
       case Some(querySpec) =>
         queryService
@@ -398,14 +403,13 @@ class EditorService @Inject()(
             case Right(instance) => Right(instance)
           }
     }
-  }
 
   def deleteLinkingInstance(
     from: NexusInstanceReference,
     to: NexusInstanceReference,
     linkingInstancePath: NexusPath,
     token: AccessToken
-  ): Task[Either[APIEditorMultiError, Unit]] = {
+  ): Task[Either[APIEditorMultiError, Unit]] =
     instanceApiService
       .getLinkingInstance(wSClient, config.kgQueryEndpoint, from, to, linkingInstancePath, token)
       .flatMap {
@@ -432,7 +436,6 @@ class EditorService @Inject()(
             }
         case Left(res) => Task.pure(Left(APIEditorMultiError.fromResponse(res.status, res.body)))
       }
-  }
 
   def generateDiffAndUpdateInstance(
     instanceRef: NexusInstanceReference,
@@ -496,7 +499,7 @@ class EditorService @Inject()(
     token: AccessToken,
     queryId: String,
     databaseScope: Option[String] = None
-  ): Task[Either[APIEditorError, Seq[NexusInstance]]] = {
+  ): Task[Either[APIEditorError, Seq[NexusInstance]]] =
     instanceApiService
       .getByIdList(
         wSClient,
@@ -536,14 +539,12 @@ class EditorService @Inject()(
           case _ => Left(APIEditorError(res.status, res.body))
         }
       }
-  }
 
   def deleteInstance(
     nexusInstanceReference: NexusInstanceReference,
     token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
+  ): Task[Either[APIEditorError, Unit]] =
     instanceApiService.deleteEditorInstance(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
-  }
 
 }
 
@@ -572,18 +573,17 @@ object EditorService {
     InstanceOp.removeEmptyFieldsNotInOriginal(cleanedOriginalInstance, diff)
   }
 
-  def getIdForPayload(instance: JsValue): Option[(JsValue, String)] = {
+  def getIdForPayload(instance: JsValue): Option[(JsValue, String)] =
     if ((instance \ EditorService.atId).isDefined) {
-      Some(instance, (instance \ EditorService.atId).get.as[String])
+      Some((instance, (instance \ EditorService.atId).get.as[String]))
     } else if ((instance \ EditorService.relativeURL).isDefined) {
-      Some(instance, (instance \ EditorService.relativeURL).get.as[String])
+      Some((instance, (instance \ EditorService.relativeURL).get.as[String]))
     } else if ((instance \ EditorService.editorId).isDefined) {
-      Some(instance, (instance \ EditorService.editorId).get.as[String])
+      Some((instance, (instance \ EditorService.editorId).get.as[String]))
     } else if ((instance \ EditorService.simpleId).isDefined) {
-      Some(instance, (instance \ EditorService.simpleId).get.as[String])
+      Some((instance, (instance \ EditorService.simpleId).get.as[String]))
     } else {
       None
     }
-  }
 
 }

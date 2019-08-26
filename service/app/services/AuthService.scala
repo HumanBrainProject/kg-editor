@@ -8,13 +8,13 @@ import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
 
 class AuthService @Inject()(
-                             wSClient: WSClient,
-                             config: ConfigurationService
-                           ) {
+  wSClient: WSClient,
+  config: ConfigurationService
+) {
 
   def getLogin(
-                redirectUri: String
-              ): Task[Either[APIEditorError, JsObject]] = {
+    redirectUri: String
+  ): Task[Either[APIEditorError, JsObject]] = {
     val q = wSClient
       .url(s"${config.kgAuthEndpoint}/login")
       .addQueryStringParameters("redirectUri" -> redirectUri.toString)

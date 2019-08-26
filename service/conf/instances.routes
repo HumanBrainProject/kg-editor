@@ -1,0 +1,459 @@
+###
+#  summary: Delete a specific entity
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance to delete
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance to delete
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance to delete
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to delete
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+DELETE    /:org/:domain/:schema/:version/:id                  controllers.EditorController.deleteInstance(org: String, domain:String, schema: String, version:String, id: String)
+
+
+###
+#  summary: get a list of entities
+#  tags:
+#    - editor
+#  parameters:
+#  - in: body
+#    description: A list of IDs
+#    required: true
+#    type: array
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST    /                 controllers.EditorController.getInstancesByIds(allFields:Boolean?=false, databaseScope: Option[String])
+
+###
+#tags:
+#  - editor
+#summary: Returns the instances  by schema - paginated - filterable
+#parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+#  - name: org
+#    in: path
+#    description: organization the instance to retrieve
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance to retrieve
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance to retrieve
+#    required: true
+#    type: string
+#  - name: from
+#    in: path
+#    description: the offset of the pagination
+#    required: false
+#    type: int
+#  - name: size
+#    in: path
+#    description: the size of the page
+#    required: false
+#    type: int
+#  - name: search
+#    in: path
+#    description: the search query only applied for the name of the instance
+#    required: false
+#    type: string
+#    responses:
+#      '200':
+#        description: Ok
+###
+GET /:org/:domain/:schema/:version        controllers.EditorUserController.getInstancesOfBookmarkListBySchema(org: String, domain:String, schema: String, version:String, from:Option[Int], size:Option[Int], search:String?="")
+
+###
+#  summary: return a an empty form for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST    /:org/:domain/:schema/:version                  controllers.EditorController.getEmptyForm(org: String, domain:String, schema: String, version:String)
+
+###
+#  summary: return the graph payload for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /:org/:domain/:schema/:version/:id/graph                  controllers.EditorController.getInstanceGraph(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: return the release payload for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /:org/:domain/:schema/:version/:id/release                  controllers.EditorController.getInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: do release  for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+PUT    /:org/:domain/:schema/:version/:id/release               controllers.EditorController.putInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: do unrelease  for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+DELETE    /:org/:domain/:schema/:version/:id/release                  controllers.EditorController.deleteInstanceRelease(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: Return TOP_INSTANCE_ONLY status
+#  tags:
+#    - editor
+#  parameters:
+#  - name: releaseTreeScope
+#    in: path
+#    description: TOP_INSTANCE_ONLY or CHILDREN_ONLY
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST /releases                  controllers.EditorController.postReleaseInstance(releaseTreeScope:String?="")
+
+###
+#  summary: update an instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance to update
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance to update
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance to update
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to update
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+PUT   /:org/:domain/:schema/:version/:id                   controllers.EditorController.updateInstance(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#  summary: create a new instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance to create
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance to create
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance to create
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST   /:org/:domain/:schema/:version                  controllers.EditorController.createInstance(org: String, domain:String, schema: String, version:String)
+
+###
+#  summary: Get the number of revisions available for a specific instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: id
+#    in: path
+#    description: the UUID of the instance
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /:org/:domain/:schema/:version/:id/revisions                         controllers.EditorController.getInstanceNumberOfAvailableRevisions(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#tags:
+#  - editor
+#summary: Bind an instance to multiple bookmarks
+#parameters:
+#  - in: path
+#    name: org
+#    type: string
+#    required: true
+#  - in: path
+#    name: domain
+#    type: string
+#    required: true
+#  - in: path
+#    name: schema
+#    type: string
+#    required: true
+#  - in: path
+#    name: version
+#    type: string
+#    required: true
+#  - in: path
+#    name: id
+#    type: string
+#    required: true
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+#  - in: body
+#    description: A list of bookmark IDs
+#    required: false
+#    type: array
+#responses:
+#  '200':
+#    description: Ok
+###
+PUT /:org/:domain/:schema/:version/:id/bookmarks       controllers.EditorUserController.updateBookmarks(org: String, domain:String, schema: String, version:String, id: String)
+

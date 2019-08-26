@@ -1,0 +1,62 @@
+###
+#tags:
+#  - editor
+#summary: Creates a bookmark list for the current user and returns its ID
+#parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: true
+#    type: string
+#  - in: body
+#    name: name
+#    description: The new bookmark list's name
+#    required: true
+#    type: string
+#  - in: body
+#    name: folderId
+#    description: The folder to which to bookmark list will be held
+#    required: true
+#    type: string
+#responses:
+#  '201':
+#    description: Created
+###
+POST /                                          controllers.EditorUserController.createBookmarkList
+
+###
+#tags:
+#  - editor
+#summary: Update a bookmark list name
+#parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: true
+#    type: string
+#  - in: body
+#    name: name
+#    description: The new bookmark list's name
+#    required: true
+#    type: string
+#responses:
+#  '204':
+#    description: No Content
+###
+PUT /:org/:domain/:schema/:version/:id                                         controllers.EditorUserController.updateBookmarkList(org: String, domain:String, schema: String, version:String, id: String)
+
+###
+#tags:
+#  - editor
+#summary: Delete a bookmark list and all its bookmarks
+#parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: true
+#    type: string
+#responses:
+#  '204':
+#    description: No Content
+###
+DELETE /:org/:domain/:schema/:version/:id                                          controllers.EditorUserController.deleteBookmarkList(org: String, domain:String, schema: String, version:String, id: String)

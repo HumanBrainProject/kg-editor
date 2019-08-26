@@ -1,0 +1,47 @@
+###
+#  summary: Return suggestions
+#  tags:
+#    - editor
+#  - name: org
+#    in: path
+#    description: organization the instance
+#    required: true
+#    type: string
+#  - name: domain
+#    in: path
+#    description: domain of the instance
+#    required: true
+#    type: string
+#  - name: schema
+#    in: path
+#    description: schema name
+#    required: true
+#    type: string
+#  - name: version
+#    in: path
+#    description: version of the instance
+#    required: true
+#    type: string
+#  - name: start
+#    in: path
+#    description: param to start
+#    required: true
+#    type: string
+#  - name: size
+#    in: path
+#    description: total size returned
+#    required: true
+#    type: string
+#  - name: search
+#    in: path
+#    description: search query
+#    required: true
+#    type: string
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST /:org/:domain/:schema/:version/fields                  controllers.EditorController.getSuggestions(org: String, domain: String, schema: String, version: String, field: String, fieldType: String, start: Int=0, size: Int=50, search: String?="")

@@ -127,7 +127,7 @@ class ReleaseStore{
     this.isFetching = true;
     this.fetchError = null;
     try{
-      const { data } = await API.axios.get(API.endpoints.releaseData(this.topInstanceId));
+      const { data } = await API.axios.get(API.endpoints.release(this.topInstanceId));
       runInAction(()=>{
         const setNodeTypes = node => {
           const typePath = node.relativeUrl.substr(
@@ -219,7 +219,7 @@ class ReleaseStore{
   @action
   async releaseNode(node) {
     try {
-      await API.axios.put(API.endpoints.doRelease(node["relativeUrl"], {}));
+      await API.axios.put(API.endpoints.release(node["relativeUrl"], {}));
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.type}) released successfully`;
         this.savingLastEndedNode = node;
@@ -241,7 +241,7 @@ class ReleaseStore{
   @action
   async unreleaseNode(node) {
     try {
-      await API.axios.delete(API.endpoints.doRelease(node["relativeUrl"], {}));
+      await API.axios.delete(API.endpoints.release(node["relativeUrl"], {}));
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
         this.savingLastEndedNode = node;

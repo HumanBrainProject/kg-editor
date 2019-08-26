@@ -9,6 +9,7 @@ object ConfigMock {
   val nexusIam = "nexus-iam.com"
   val authEndpoint = "auth.com"
   val refreshTokenFile = "/opt/tokenfolder"
+  val kgAuthEndpoint = "kgauthEndpoint"
   val kgQueryEndpoint = "kgqueryEndpoint"
   val editorSubspace = "editor"
   val cacheExpiration = FiniteDuration(10, "min")
@@ -19,6 +20,7 @@ object ConfigMock {
     "nexus.iam" -> nexusIam,
     "auth.endpoint"-> authEndpoint,
     "auth.refreshTokenFile" -> refreshTokenFile,
+    "kgauth.endpoint" -> kgAuthEndpoint,
     "kgquery.endpoint" -> kgQueryEndpoint,
     "editor.subspace" -> editorSubspace,
     "cache.expiration" -> cacheExpiration.toMillis

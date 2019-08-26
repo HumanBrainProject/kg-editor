@@ -1,0 +1,10 @@
+###
+#  summary: Get the current structure
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET   /                                                             controllers.EditorController.getStructure(withLinks:Boolean?=false)

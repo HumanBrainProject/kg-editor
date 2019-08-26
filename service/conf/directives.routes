@@ -1,0 +1,6 @@
+###
+#  summary: get messages from ui directive
+#  tags:
+#    - editor
+###
+GET    /messages                controllers.EditorController.getUiDirectivesMessages()

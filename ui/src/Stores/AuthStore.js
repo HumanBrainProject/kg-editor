@@ -2,23 +2,7 @@
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
 
-const oidConnectServerUri = "https://services.humanbrainproject.eu/oidc/authorize";
-const oidClientId = "nexus-kg-search";
 const oidLocalStorageKey = "hbp.kg-editor.oid";
-
-const generateRandomKey = () => {
-  let key = "";
-  const chars = "ABCDEF0123456789";
-  for (let i=0; i<4; i++) {
-    if (key !== "") {
-      key += "-";
-    }
-    for (let j=0; j<5; j++) {
-      key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-  }
-  return key;
-};
 
 const getKey = (hash, key) => {
   if (typeof hash !== "string" || typeof key !== "string") {
@@ -43,9 +27,6 @@ const getKey = (hash, key) => {
   return value;
 };
 
-let rootPath = window.rootPath || "";
-let redirectUri = `${window.location.protocol}//${window.location.host}${rootPath}/loginSuccess`;
-let stateKey = btoa(redirectUri);
 let sessionTimer = null;
 
 class AuthStore {
@@ -92,12 +73,6 @@ class AuthStore {
 
   get hasExpired() {
     return this.session === null || (new Date() - this.session.expiryTimestamp) > 0;
-  }
-
-  get loginUrl() {
-    const nonceKey = generateRandomKey();
-    const url = `${oidConnectServerUri}?response_type=id_token%20token&client_id=${oidClientId}&redirect_uri=${escape(redirectUri)}&scope=openid%20profile&state=${stateKey}&nonce=${nonceKey}`;
-    return url;
   }
 
   startSessionTimer() {
@@ -167,7 +142,7 @@ class AuthStore {
   async tryAuthenticate() {
     const hash = window.location.hash;
     const accessToken = getKey(hash, "access_token");
-    const state = getKey(hash, "state");
+    const state = getKey(hash, "session_state");
     const expiresIn = getKey(hash, "expires_in");
 
     if (accessToken && state && expiresIn) {

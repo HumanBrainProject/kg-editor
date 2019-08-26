@@ -3,9 +3,9 @@ package services
 import com.google.inject.Inject
 import models.errors.APIEditorError
 import monix.eval.Task
-import play.api.http.Status.OK
-import play.api.libs.json.JsObject
-import play.api.libs.ws.WSClient
+
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.http.Status._
 
 class AuthService @Inject()(
                              wSClient: WSClient,
@@ -14,15 +14,16 @@ class AuthService @Inject()(
 
   def getLogin(
                 redirectUri: String
-              ): Task[Either[APIEditorError, JsObject]] = {
+              ): Task[Either[APIEditorError, WSResponse]] = {
     val q = wSClient
-      .url(s"${config.kgAuthEndpoint}/login")
-      .addQueryStringParameters("redirectUri" -> redirectUri.toString)
+      .url(s"${config.kgAuthEndpoint}/auth/login")
+      .withFollowRedirects(false)
+      .addQueryStringParameters("redirect_uri" -> redirectUri.toString)
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
-        case OK =>
-          Right(res.json.as[JsObject])
+        case TEMPORARY_REDIRECT =>
+          Right(res)
         case _ => Left(APIEditorError(res.status, res.body))
       }
     }

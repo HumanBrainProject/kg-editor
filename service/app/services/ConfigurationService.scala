@@ -31,8 +31,8 @@ class ConfigurationService @Inject()(configuration: Configuration) {
     configuration.getOptional[String]("nexus.endpoint").getOrElse("https://nexus-dev.humanbrainproject.org")
   val editorPrefix: String = configuration.getOptional[String]("nexus.editor.prefix").getOrElse("editor")
 
-  val kgAuthEndpoint: String = configuration.getOptional[String]("kgauth.endpoint").getOrElse("http://localhost:8110") /* KG-CORE: http://localhost:8190 */
-  val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
+  val kgAuthEndpoint: String = configuration.getOptional[String]("kgauth.endpoint").getOrElse("http://localhost:8120")
+  val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600") /* KG-CORE: http://localhost:8190 */
   val iamEndpoint = configuration.get[String]("nexus.iam")
   val authEndpoint = configuration.get[String]("auth.endpoint")
   val idmApiEndpoint = s"$authEndpoint/idm/v1/api"

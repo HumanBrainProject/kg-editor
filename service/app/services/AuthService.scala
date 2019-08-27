@@ -16,7 +16,7 @@ class AuthService @Inject()(
                 redirectUri: String
               ): Task[Either[APIEditorError, WSResponse]] = {
     val q = wSClient
-      .url(s"${config.kgCoreEndpoint}/auth/login")
+      .url(s"${config.kgCoreEndpoint}/users/login")
       .withFollowRedirects(false)
       .addQueryStringParameters("redirect_uri" -> redirectUri.toString)
     val r = Task.deferFuture(q.get())

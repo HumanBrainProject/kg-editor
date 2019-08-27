@@ -14,10 +14,14 @@
  *   limitations under the License.
  */
 
-import com.google.inject.Inject
-import play.api.http.DefaultHttpFilters
-import play.filters.gzip.GzipFilter
+package services
 
-class Filters @Inject()(
-  gzipFilter: GzipFilter
-) extends DefaultHttpFilters(gzipFilter)
+import monix.eval.Task
+import play.api.mvc.Headers
+
+trait UNSAFE_AuthService {
+  type U
+
+  def getUserInfo(headers: Headers): Task[U]
+
+}

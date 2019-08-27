@@ -1,0 +1,11 @@
+###
+#  summary: Get the login page
+#  parameters:
+#  - name: redirect_uri
+#    in: path
+#    description: redirectUri when authentication is successful
+#    required: true
+#    type: string
+###
+GET   /login                                                             controllers.AuthController.getLogin(redirect_uri: String)
+

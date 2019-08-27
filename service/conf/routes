@@ -3,15 +3,50 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+# KG Editor Auth Routes
+-> /editor/api/auth auth.Routes
+
+# KG Editor BookmarkList Routes
+-> /editor/api/bookmarkList bookmarkList.Routes
+
+# KG Editor BookmarkListFolders Routes
+-> /editor/api/bookmarkListFolders bookmarkListFolders.Routes
+
+# KG Editor BookmarkListInstances Routes
+-> /editor/api/bookmarkListInstances bookmarkListInstances.Routes
+
+# KG Editor Bookmarks Routes
+-> /editor/api/bookmarks bookmarks.Routes
+
+# KG Editor Directives Routes
+-> /editor/api/directives directives.Routes
+
+# KG Editor Instances Routes
+-> /editor/api/instances instances.Routes
+
+# KG Editor Query Routes
+-> /editor/api/query query.Routes
+
+# KG Editor Review Routes
+-> /editor/api/review review.Routes
+
+# KG Editor Scopes Routes
+-> /editor/api/scopes scopes.Routes
+
+# KG Editor Structure Routes
+-> /editor/api/structure structure.Routes
+
+# KG Editor Suggestions Routes
+-> /editor/api/suggestions suggestions.Routes
+
+# KG Editor Specifications Routes
+-> /editor/api/specifications specifications.Routes
+
+# KG Editor User Routes
+-> /editor/api/user user.Routes
+
 # Admin services
 -> /admin admin.Routes
-
-# KG Editor routes
--> /editor/api editor.Routes
-
-# Monitoring
-### NoDocs ###
-GET     /metrics                    com.github.stijndehaes.playprometheusfilters.controllers.PrometheusController.getMetrics
 
 #Swagger
 ### NoDocs ###

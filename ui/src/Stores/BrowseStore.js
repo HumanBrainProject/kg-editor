@@ -202,7 +202,7 @@ class BrowseStore{
     });
     if (bookmarkListfolder) {
       try{
-        const { data } = await API.axios.post(API.endpoints.createBookmarkList(), {"name": name, "folderId": bookmarkListfolder.id});
+        const { data } = await API.axios.post(API.endpoints.bookmarkList(), {"name": name, "folderId": bookmarkListfolder.id});
         runInAction(() => {
           const bookmarkData = data && data.data;
           /* Mockup Data
@@ -266,7 +266,7 @@ class BrowseStore{
     });
     */
     try {
-      const { data } = await API.axios.put(API.endpoints.updateBookmarkList(list.id), {"name": newProps.name});
+      const { data } = await API.axios.put(API.endpoints.bookmarkList(list.id), {"name": newProps.name});
       runInAction(() => {
         list.name = data && data.data ? data.data.name:null;
         list.isUpdating = false;
@@ -294,7 +294,7 @@ class BrowseStore{
     list.deleteError = null;
     list.isDeleting = true;
     try {
-      await API.axios.delete(API.endpoints.deleteBookmarkList(list.id));
+      await API.axios.delete(API.endpoints.bookmarkList(list.id));
       /*
       if ((Math.floor(Math.random() * 10) % 2) === 0) {
         throw "Error 501";

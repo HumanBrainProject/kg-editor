@@ -1,7 +1,10 @@
 import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
+const redirectUri = `${window.location.protocol}//${window.location.host}${window.rootPath || ""}/loginSuccess`;
+
 const endpoints = {
+  "login": () => `/editor/api/auth/login?redirect_uri=${escape(redirectUri)}`,
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
@@ -15,18 +18,15 @@ const endpoints = {
   "listedInstances": (allFields=false, databaseScope=null) => `/editor/api/instances?allFields=${allFields}${databaseScope?("&databaseScope=" + databaseScope):""}`,
   "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
-  "instanceData": (instance, databaseScope=null) => `/editor/api/instance/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
-  "releaseData": instance => `/editor/api/instance/${instance}/release`,
+  "instanceData": (instance, databaseScope=null) => `/editor/api/instances/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
+  "release": instance => `/editor/api/instances/${instance}/release`,
   "messages": () => "/editor/api/directives/messages",
-  "doRelease": instance => `/editor/api/release/${instance}`,
-  "releaseStatusTopInstance": () => "/editor/api/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
-  "releaseStatusChildren": () => "/editor/api/releases?releaseTreeScope=CHILDREN_ONLY",
-  "createBookmarkList": () => "/editor/api/bookmarkList",
-  "updateBookmarkList": id => `/editor/api/bookmarkList/${id}`,
-  "deleteBookmarkList": id => `/editor/api/bookmarkList/${id}`,
+  "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
+  "releaseStatusChildren": () => "/editor/api/instances/releases?releaseTreeScope=CHILDREN_ONLY",
+  "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
   "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
-  "graph": instance => `/editor/api/instance/${instance}/graph`,
+  "graph": instance => `/editor/api/instances/${instance}/graph`,
   "structure": () => "/editor/api/structure?withLinks=true",
   "performQuery": function(instancePath, vocab, size, start, databaseScope){
     return `/editor/api/query/${instancePath}/instances${arguments.length > 1?"?":""}${

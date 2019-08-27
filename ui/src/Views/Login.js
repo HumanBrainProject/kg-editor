@@ -1,5 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
+import API from "../Services/API";
 import authStore from "../Stores/AuthStore";
 import { Button } from "react-bootstrap";
 
@@ -66,7 +67,7 @@ export default class Login extends React.Component {
           </div>
         }
         {this.state.showFrame &&
-          <iframe className={classes.oidFrame} frameBorder="0" src={authStore.loginUrl} />
+          <iframe className={classes.oidFrame} frameBorder="0" src={API.endpoints.login()} />
         }
       </div>
     );

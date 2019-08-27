@@ -15,10 +15,10 @@ object ConfigMock {
   val cacheExpiration = FiniteDuration(10, "min")
 
   val fakeApplicationConfig = GuiceApplicationBuilder().configure(
-    "play.http.filters" -> "play.api.http.NoHttpFilters",
-    "nexus.endpoint" -> nexusEndpoint,
-    "nexus.iam" -> nexusIam,
-    "auth.endpoint"-> authEndpoint,
+    "play.http.filters"     -> "play.api.http.NoHttpFilters",
+    "nexus.endpoint"        -> nexusEndpoint,
+    "nexus.iam"             -> nexusIam,
+    "auth.endpoint"         -> authEndpoint,
     "auth.refreshTokenFile" -> refreshTokenFile,
     "kgcore.endpoint" -> kgCoreEndpoint,
     "kgquery.endpoint" -> kgQueryEndpoint,

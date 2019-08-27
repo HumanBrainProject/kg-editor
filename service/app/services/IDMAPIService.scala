@@ -37,7 +37,7 @@ class IDMAPIService @Inject()(
   private val log = LoggerFactory.getLogger(this.getClass)
   object cacheService extends CacheService
 
-  def getUserInfoFromID(userId: String, token: AccessToken): Task[Option[IDMUser]] = {
+  def getUserInfoFromID(userId: String, token: AccessToken): Task[Option[IDMUser]] =
     if (userId.isEmpty) {
       Task.pure(None)
     } else {
@@ -57,13 +57,11 @@ class IDMAPIService @Inject()(
         }
       } yield user
     }
-  }
 
-  def getUserInfo(token: BasicAccessToken): Task[Option[IDMUser]] = {
+  def getUserInfo(token: BasicAccessToken): Task[Option[IDMUser]] =
     getUserInfoWithCache(token)
-  }
 
-  private def getUserInfoWithCache(token: BasicAccessToken): Task[Option[IDMUser]] = {
+  private def getUserInfoWithCache(token: BasicAccessToken): Task[Option[IDMUser]] =
     cacheService.getOrElse[IDMUser](cache, token.token) {
       getUserInfoFromToken(token).map {
         case Some(userInfo) =>
@@ -73,7 +71,6 @@ class IDMAPIService @Inject()(
           None
       }
     }
-  }
 
   private def getUserInfoFromToken(token: BasicAccessToken): Task[Option[IDMUser]] = {
     val userRequest = WSClient.url(s"${config.idmApiEndpoint}/user/me").addHttpHeaders(AUTHORIZATION -> token.token)
@@ -131,19 +128,18 @@ class IDMAPIService @Inject()(
                 )
                 .map { users =>
                   val pagination = (res.json \ "page").as[Pagination]
-                  Right(users, pagination)
+                  Right((users, pagination))
                 }
             case _ => Task.pure(Left(res))
           }
         }
     } else {
-      Task.pure(Right(List(), Pagination.empty))
+      Task.pure(Right((List(), Pagination.empty)))
     }
   }
 
-  private def isUserPartOfGroups(user: IDMUser, groups: List[String]): Boolean = {
+  private def isUserPartOfGroups(user: IDMUser, groups: List[String]): Boolean =
     groups.forall(s => user.groups.exists(g => g.name.equals(s)))
-  }
 
   def hasUserGroups(
     user: IDMUser,
@@ -169,11 +165,10 @@ class IDMAPIService @Inject()(
   def getUserGroups(
     userId: String,
     token: AccessToken,
-  ): Task[List[Group]] = {
+  ): Task[List[Group]] =
     for {
       userGroups <- getGroups(userId, token)
     } yield userGroups
-  }
 
   private def getGroups(userId: String, token: AccessToken): Task[List[Group]] = {
     val url = s"${config.idmApiEndpoint}/user/$userId/member-groups"

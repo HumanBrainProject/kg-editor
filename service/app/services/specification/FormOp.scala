@@ -25,7 +25,7 @@ import play.api.libs.json._
 
 object FormOp {
 
-  def removeKey(jsValue: JsValue): JsValue = {
+  def removeKey(jsValue: JsValue): JsValue =
     if (jsValue.validateOpt[JsObject].isSuccess) {
       if (jsValue.toString() == "null") {
         JsNull
@@ -43,9 +43,8 @@ object FormOp {
     } else {
       jsValue
     }
-  }
 
-  def transformToArray(key: String, data: JsValue): JsArray = {
+  def transformToArray(key: String, data: JsValue): JsArray =
     if ((data \ key).validate[JsArray].isSuccess) {
       Json
         .toJson((data \ key).as[JsArray].value.map { js =>
@@ -65,11 +64,9 @@ object FormOp {
         JsArray()
       }
     }
-  }
 
-  def buildEditableEntityTypesFromRegistry(registry: FormRegistry[UISpec]): List[(NexusPath, UISpec)] = {
+  def buildEditableEntityTypesFromRegistry(registry: FormRegistry[UISpec]): List[(NexusPath, UISpec)] =
     registry.registry.toSeq.sortWith { case (jsO1, jsO2) => jsO1._1.toString() < jsO2._1.toString() }.toList
-  }
 
   def buildInstanceFromForm(
     original: NexusInstance,
@@ -225,13 +222,19 @@ object FormOp {
     }
   }
 
-  def fillFormTemplate(fields: JsValue, formTemplate: UISpec, alternatives: JsObject = Json.obj()): JsValue = {
-    val alt = stripAlternativeVocab(alternatives)
-    Json.obj("fields" -> fields) +
-    ("label", JsString(formTemplate.label)) +
-    ("editable", JsBoolean(formTemplate.isEditable.getOrElse(true))) +
-    ("ui_info", formTemplate.uiInfo.map(Json.toJson(_)).getOrElse(Json.obj())) +
-    ("alternatives", alt)
+  def fillFormTemplate(fields: JsValue, formTemplate: UISpec, alternatives: JsObject = JsObject.empty): JsValue = {
+    val alt: JsObject = stripAlternativeVocab(alternatives)
+    val uiInfo: JsValue = formTemplate.uiInfo match {
+      case Some(value) => Json.toJson(value)
+      case None        => JsObject.empty
+    }
+    Json.obj(
+      "fields"       -> fields,
+      "label"        -> JsString(formTemplate.label),
+      "editable"     -> JsBoolean(formTemplate.isEditable.getOrElse(true)),
+      "ui_info"      -> uiInfo,
+      "alternatives" -> alt
+    )
   }
 
   def stripAlternativeVocab(jsObject: JsObject): JsObject = {
@@ -269,7 +272,7 @@ object FormOp {
     Json.toJson(m).as[JsObject]
   }
 
-  def formatAlternativeLinks(jsValue: JsValue): JsValue = {
+  def formatAlternativeLinks(jsValue: JsValue): JsValue =
     jsValue match {
       case j if j.validate[JsArray].isSuccess =>
         Json.toJson(j.as[JsArray].value.map { js =>
@@ -291,7 +294,6 @@ object FormOp {
         }
       case j => j
     }
-  }
 
   def editableEntities(user: IDMUser, formRegistry: FormRegistry[UISpec]): List[(NexusPath, UISpec)] = {
     val registry = FormRegistry.filterOrgs(formRegistry, user.groups)

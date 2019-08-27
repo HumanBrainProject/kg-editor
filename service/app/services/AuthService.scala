@@ -8,9 +8,9 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.http.Status._
 
 class AuthService @Inject()(
-                             wSClient: WSClient,
-                             config: ConfigurationService
-                           ) {
+  wSClient: WSClient,
+  config: ConfigurationService
+) {
 
   def getLogin(
                 redirectUri: String

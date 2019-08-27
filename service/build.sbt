@@ -1,3 +1,18 @@
+/*
+ *   Copyright (c) 2019, EPFL/Human Brain Project PCO
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 val library = new {
 
   val Version = new {
@@ -40,12 +55,9 @@ val baseDependencies = Seq(
   ehcache
 )
 
-
-val scalacOptionsCompile = Seq(
-  "-Ypartial-unification",
-)
 val scalacOptionsAll = Seq(
-  "-encoding", "UTF-8",
+  "-encoding",
+  "UTF-8",
   "-unchecked",
   "-deprecation",
   "-Xfuture",
@@ -53,8 +65,10 @@ val scalacOptionsAll = Seq(
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",
-  "-Ywarn-unused"
+  "-Ywarn-unused",
+  "-Ypartial-unification"
 )
+
 val settings: Seq[Setting[_]] = Seq(
   organization := "eu.humanbrainproject",
   name := """kg-service""",
@@ -66,8 +80,7 @@ val settings: Seq[Setting[_]] = Seq(
     Resolver.jcenterRepo
   ),
   routesGenerator := InjectedRoutesGenerator,
-  scalacOptions ++= scalacOptionsCompile ++scalacOptionsAll
-
+  scalacOptions ++= scalacOptionsAll
 )
 
 lazy val kg_service = (project in file("."))
@@ -75,5 +88,7 @@ lazy val kg_service = (project in file("."))
   .enablePlugins(PlayScala)
 
 sources in (Compile, doc) := Seq.empty
+
+scalafmtOnCompile := true
 
 publishArtifact in (Compile, packageDoc) := false

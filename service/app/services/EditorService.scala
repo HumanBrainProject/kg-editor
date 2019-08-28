@@ -35,11 +35,7 @@ import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
 
-class EditorService @Inject()(
-  wSClient: WSClient,
-  config: ConfigurationService,
-  formService: FormService
-)(
+class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, formService: FormService)(
   implicit TokenAuthService: TokenAuthService,
   clientCredentials: CredentialsService
 ) {
@@ -106,9 +102,7 @@ class EditorService @Inject()(
     }
   }
 
-  def retrieveStructure(
-    withLinks: Boolean
-  ): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveStructure(withLinks: Boolean): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
       .getStructure(wSClient, config.kgQueryEndpoint, withLinks)
     result.map {
@@ -192,9 +186,7 @@ class EditorService @Inject()(
     }
   }
 
-  def retrieveQuery(
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsArray]] = {
+  def retrieveQuery(token: AccessToken): Task[Either[APIEditorError, JsArray]] = {
     val result = queryService
       .getQuery(wSClient, config.kgQueryEndpoint, token)
     result.map {
@@ -203,11 +195,7 @@ class EditorService @Inject()(
     }
   }
 
-  def deleteQuery(
-    instancePath: NexusPath,
-    queryId: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] =
+  def deleteQuery(instancePath: NexusPath, queryId: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
     queryService.delete(wSClient, config.kgQueryEndpoint, instancePath, queryId, token)
 
   def saveQuery(
@@ -335,21 +323,9 @@ class EditorService @Inject()(
                 if spec.getFieldsAsMap.values.exists(p => p.isReverse.getOrElse(false)) |
                 spec.getFieldsAsMap.values.exists(p => p.isLinkingInstance.getOrElse(false)) =>
               reverseLinkService
-                .generateDiffAndUpdateInstanceWithReverseLink(
-                  instanceRef,
-                  json,
-                  token,
-                  user,
-                  registries
-                )
+                .generateDiffAndUpdateInstanceWithReverseLink(instanceRef, json, token, user, registries)
             case _ =>
-              generateDiffAndUpdateInstance(
-                instanceRef,
-                json,
-                token,
-                user,
-                registries
-              )
+              generateDiffAndUpdateInstance(instanceRef, json, token, user, registries)
           }
         }
       case None =>
@@ -423,7 +399,7 @@ class EditorService @Inject()(
                     .map[Either[APIEditorError, Unit]] {
                       case Left(res) => Left(APIEditorError(res.status, res.body))
                       case Right(_)  => Right(())
-                  }
+                    }
               )
             )
             .map { f =>
@@ -519,13 +495,11 @@ class EditorService @Inject()(
               .map(EditorService.getIdForPayload)
               .sequence match {
               case Some(listOfIds) =>
-                Right(
-                  listOfIds.map {
-                    case (instance, id) =>
-                      val ref = NexusInstanceReference.fromUrl(id)
-                      NexusInstance(Some(ref.id), ref.nexusPath, instance.as[JsObject])
-                  }
-                )
+                Right(listOfIds.map {
+                  case (instance, id) =>
+                    val ref = NexusInstanceReference.fromUrl(id)
+                    NexusInstance(Some(ref.id), ref.nexusPath, instance.as[JsObject])
+                })
               case None =>
                 Left(
                   APIEditorError(

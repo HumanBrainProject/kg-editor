@@ -60,7 +60,7 @@ class SpecificationController @Inject()(
 
 object SpecificationController {
 
-  def getExampleValue(fieldSpec: EditorFieldSpecification, baseEndpoint: String): JsValue = {
+  def getExampleValue(fieldSpec: EditorFieldSpecification, baseEndpoint: String): JsValue =
     fieldSpec.fieldType match {
       case DropdownSelect if fieldSpec.isLink.exists(identity) =>
         val url = fieldSpec.instancesPath match {
@@ -75,11 +75,8 @@ object SpecificationController {
       case TextArea       => JsString("Large text area")
       case InputText      => JsString("Single line text input")
       case GenericType(_) if fieldSpec.isLinkingInstance.exists(identity) =>
-        JsString(
-          s"Reverse instance: this value should be set in the instance -> ${fieldSpec.instancesPath
-            .fold("path/of/the/linkinginstance")(identity)}"
-        )
+        JsString(s"Reverse instance: this value should be set in the instance -> ${fieldSpec.instancesPath
+          .fold("path/of/the/linkinginstance")(identity)}")
       case GenericType(s) => JsString(s"No example available for this field of type $s")
     }
-  }
 }

@@ -7,14 +7,9 @@ import monix.eval.Task
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.http.Status._
 
-class AuthService @Inject()(
-  wSClient: WSClient,
-  config: ConfigurationService
-) {
+class AuthService @Inject()(wSClient: WSClient, config: ConfigurationService) {
 
-  def getLogin(
-                redirectUri: String
-              ): Task[Either[APIEditorError, WSResponse]] = {
+  def getLogin(redirectUri: String): Task[Either[APIEditorError, WSResponse]] = {
     val q = wSClient
       .url(s"${config.kgCoreEndpoint}/users/login")
       .withFollowRedirects(false)

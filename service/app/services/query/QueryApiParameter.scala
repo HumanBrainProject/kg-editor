@@ -22,12 +22,12 @@ final case class QueryApiParameter(
   size: Option[Int] = None,
   search: String = "",
   vocab: Option[String] = Some(QueryConstants.DEFAULT_VOCAB),
-  databaseScope: Option[String] = None,
+  databaseScope: Option[String] = None
 ) {
   private def l =
     List(START -> from, SIZE -> size, SEARCH -> Some(search), VOCAB -> vocab, DATABASE_SCOPE -> databaseScope)
 
-  def toParams: List[(String, String)] = {
+  def toParams: List[(String, String)] =
     l.foldLeft(List[(String, String)]()) {
       case (acc, el) =>
         el._2 match {
@@ -35,5 +35,4 @@ final case class QueryApiParameter(
           case _       => acc
         }
     }
-  }
 }

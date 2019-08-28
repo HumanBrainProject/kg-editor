@@ -31,8 +31,8 @@ object FormOp {
         JsNull
       } else {
         val correctedObj = jsValue
-          .as[JsObject] - "description" - "name" - "status" - "childrenStatus" - UiConstants.DATATYPE -
-        s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}" - UiConstants.LABEL - UiConstants.SCHEMA
+            .as[JsObject] - "description" - "name" - "status" - "childrenStatus" - UiConstants.DATATYPE -
+          s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}" - UiConstants.LABEL - UiConstants.SCHEMA
         val res = correctedObj.value.map {
           case (k, v) => k -> removeKey(v)
         }
@@ -143,13 +143,7 @@ object FormOp {
               }
           }
       }
-    EditorInstance(
-      NexusInstance(
-        Some(instanceRef.id),
-        instanceRef.nexusPath,
-        Json.toJson(m).as[JsObject]
-      )
-    )
+    EditorInstance(NexusInstance(Some(instanceRef.id), instanceRef.nexusPath, Json.toJson(m).as[JsObject]))
   }
 
   def getFormStructure(entityType: NexusPath, data: JsValue, formRegistry: FormRegistry[UISpec]): JsValue = {
@@ -180,9 +174,8 @@ object FormOp {
 
   private def fillFields(formTemplate: UISpec, data: JsValue, entityType: NexusPath): JsObject = {
     val nexusId = (data \ s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}").as[String]
-    val idFields = Json.obj(
-      "id" -> Json.obj("value" -> Json.obj("path" -> entityType.toString()), "nexus_id" -> JsString(nexusId))
-    )
+    val idFields =
+      Json.obj("id" -> Json.obj("value" -> Json.obj("path" -> entityType.toString()), "nexus_id" -> JsString(nexusId)))
     formTemplate.getFieldsAsLinkedMap.foldLeft(idFields) {
       case (filledTemplate, (id, fieldContent)) =>
         val idWithouNameSpace = id.replace(EditorConstants.META, "")
@@ -266,7 +259,7 @@ object FormOp {
                 })
               } else {
                 js
-            }
+              }
           )
     }
     Json.toJson(m).as[JsObject]

@@ -24,7 +24,7 @@ import cats.syntax.either._
 import cats.syntax.option._
 import com.google.inject.Inject
 import constants.EditorConstants
-import models.AccessToken
+import models.{AccessToken, BasicAccessToken}
 import models.errors.APIEditorError
 import models.instance.{NexusInstance, NexusInstanceReference}
 import models.specification.QuerySpec
@@ -35,39 +35,34 @@ import play.api.Logger
 import play.api.cache.{AsyncCacheApi, NamedCache}
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
+import play.api.http.HeaderNames._
 
 import scala.concurrent.duration._
 
 object UserRequestMap {
   private val m = new ConcurrentHashMap[String, (DateTime, Task[Either[APIEditorError, EditorUser]])]
 
-  def put(key: String, value: Task[Either[APIEditorError, EditorUser]]): Task[Either[APIEditorError, EditorUser]] = {
+  def put(key: String, value: Task[Either[APIEditorError, EditorUser]]): Task[Either[APIEditorError, EditorUser]] =
     this.m.put(key, (DateTime.now, value))._2
-  }
 
   def get(key: String): Option[Task[Either[APIEditorError, EditorUser]]] = {
     val f = this.m.get(key)
     if (f != null) f._2.some else None
   }
 
-  def cleanMap: Unit = {
+  def cleanMap: Unit =
     this.m.values().removeIf(p => p._1 <= DateTime.now.minus(600000L))
-  }
 
 }
 
 class EditorUserService @Inject()(
   config: ConfigurationService,
   wSClient: WSClient,
-  @NamedCache("editor-userinfo-cache") cache: AsyncCacheApi,
-)(
-  implicit oIDCAuthService: TokenAuthService,
-  credentials: CredentialsService,
-  actorSystem: ActorSystem
-) {
+  @NamedCache("editor-userinfo-cache") cache: AsyncCacheApi
+)(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService, actorSystem: ActorSystem) {
   val logger = Logger(this.getClass)
 
   object instanceApiService extends InstanceApiService
@@ -81,7 +76,20 @@ class EditorUserService @Inject()(
       UserRequestMap.cleanMap
     }
 
-  def getUser(user: IDMUser, token: AccessToken): Task[Either[APIEditorError, Option[EditorUser]]] = {
+  def getUserProfile(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
+    val q = wSClient
+      .url(s"${config.kgCoreEndpoint}/users/profile")
+      .withHttpHeaders(AUTHORIZATION -> token.token)
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(APIEditorError(res.status, res.body))
+      }
+    }
+  }
+
+  def getUser(user: IDMUser, token: AccessToken): Task[Either[APIEditorError, Option[EditorUser]]] =
     cacheService.get[EditorUser](cache, user.id).flatMap {
       case None =>
         queryService
@@ -117,7 +125,6 @@ class EditorUserService @Inject()(
           }
       case Some(user) => Task.pure(user.some.asRight)
     }
-  }
 
   private def cacheUser(userId: String, user: IDMUser): EditorUser = {
     val editorUser = EditorUser(NexusInstanceReference.fromUrl(userId), user)
@@ -147,17 +154,14 @@ class EditorUserService @Inject()(
                 case Left(e) => Task.pure(e.asLeft)
               }
             }.memoize
-            UserRequestMap.put(
-              user.id.toString,
-              task
-            )
+            UserRequestMap.put(user.id.toString, task)
             scheduler
             task
         }
       case Left(e) => Task.pure(e.asLeft)
     }
 
-  def createUser(user: IDMUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] = {
+  def createUser(user: IDMUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] =
     instanceApiService
       .post(
         wSClient,
@@ -172,9 +176,8 @@ class EditorUserService @Inject()(
           logger.error(s"Could not create the user with ID ${user.id} - ${res.body}")
           APIEditorError(res.status, res.body).asLeft
       }
-  }
 
-  def deleteUser(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
+  def deleteUser(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, Unit]] =
     instanceApiService
       .delete(wSClient, config.kgQueryEndpoint, editorUser.nexusId, token)
       .map {
@@ -183,15 +186,11 @@ class EditorUserService @Inject()(
           logger.error(s"Could not delete the user with ID ${editorUser.nexusId.toString} - ${res.body}")
           APIEditorError(res.status, res.body).asLeft
       }
-  }
 }
 
 object EditorUserService {
 
-  def userToNexusStruct(userId: String): JsObject = {
-    Json.obj(
-      EditorConstants.EDITORNAMESPACE + EditorConstants.USERID -> userId
-    )
-  }
+  def userToNexusStruct(userId: String): JsObject =
+    Json.obj(EditorConstants.EDITORNAMESPACE + EditorConstants.USERID -> userId)
 
 }

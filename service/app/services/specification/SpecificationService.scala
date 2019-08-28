@@ -73,7 +73,7 @@ class SpecificationService @Inject()(
     }
   }
 
-  private def getOrCreateSpecificationAndSpecificationFields(token: RefreshAccessToken): Task[Done] = {
+  private def getOrCreateSpecificationAndSpecificationFields(token: RefreshAccessToken): Task[Done] =
     runQuery(s"${specFieldIdQueryPath.toString}/$specFieldIdQueryId/instances", token)
       .flatMap { specFieldResult =>
         specFieldResult.status match {
@@ -118,7 +118,6 @@ class SpecificationService @Inject()(
             Task.pure(Done)
         }
       }
-  }
 
   private def getSpecifications(
     fieldsIdMap: Map[String, NexusInstanceReference],
@@ -182,7 +181,7 @@ class SpecificationService @Inject()(
     }
   }
 
-  private def createInitialMapOfSpecificationIds(json: JsValue): Map[String, NexusInstanceReference] = {
+  private def createInitialMapOfSpecificationIds(json: JsValue): Map[String, NexusInstanceReference] =
     (json \ "results").as[List[JsObject]].foldLeft(Map[String, NexusInstanceReference]()) {
       case (l, obj) =>
         if (obj.value.get("identifier").isDefined && obj.value("identifier") != JsNull) {
@@ -205,16 +204,21 @@ class SpecificationService @Inject()(
           l
         }
     }
-  }
 
   private def getListOfFiles(dir: File): List[File] =
-    if (dir.exists()) { dir.listFiles.filter(_.isFile).toList } else List()
+    if (dir.exists()) {
+      dir.listFiles.filter(_.isFile).toList
+    } else List()
 
   private def fetchFile(folder: String): List[SpecificationFile] = {
     val folderPath = env.getFile(s"conf/resources/$folder")
     getListOfFiles(folderPath).map { file =>
       val stream = new FileInputStream(file)
-      val json = try { Json.parse(stream) } finally { stream.close() }
+      val json = try {
+        Json.parse(stream)
+      } finally {
+        stream.close()
+      }
       SpecificationFile((json \ EditorConstants.METAIDENTIFIER).as[String], json.as[JsObject])
     }
   }
@@ -249,7 +253,7 @@ class SpecificationService @Inject()(
   private def getSpecificationQueries(
     folder: String,
     token: RefreshAccessToken
-  ): Task[(List[SpecificationFile], List[SpecificationFile])] = {
+  ): Task[(List[SpecificationFile], List[SpecificationFile])] =
     fetchFile(folder).foldLeft(Task.pure((List[SpecificationFile](), List[SpecificationFile]()))) {
       case (previousFuture, file) =>
         val queryId = NexusInstanceReference.fromUrl(file.id)
@@ -266,13 +270,11 @@ class SpecificationService @Inject()(
             }
         }
     }
-  }
 
-  def fetchSpecificationQueries(token: RefreshAccessToken): Task[List[NexusInstanceReference]] = {
+  def fetchSpecificationQueries(token: RefreshAccessToken): Task[List[NexusInstanceReference]] =
     getSpecificationQueries("SpecificationQueries", token).map { l =>
       l._1.map(f => NexusInstanceReference.fromUrl(f.id))
     }
-  }
 
   private def createSpecificationQueries(
     folder: String,
@@ -305,7 +307,7 @@ class SpecificationService @Inject()(
     }
   }
 
-  def fetchSpecifications(token: RefreshAccessToken): Task[WSResponse] = {
+  def fetchSpecifications(token: RefreshAccessToken): Task[WSResponse] =
     Task.deferFuture(
       WSClient
         .url(s"${config.kgQueryEndpoint}/query/meta/minds/specification/v0.0.1/specificationQuery/instances")
@@ -313,12 +315,8 @@ class SpecificationService @Inject()(
         .addQueryStringParameters(QueryConstants.VOCAB -> EditorConstants.META)
         .get()
     )
-  }
 
-  private def runQuery(
-    queryPath: String,
-    token: RefreshAccessToken,
-  ): Task[WSResponse] = {
+  private def runQuery(queryPath: String, token: RefreshAccessToken): Task[WSResponse] =
     Task.deferFuture(
       WSClient
         .url(s"${config.kgQueryEndpoint}/query/$queryPath")
@@ -326,6 +324,5 @@ class SpecificationService @Inject()(
         .addQueryStringParameters(QueryConstants.VOCAB -> QueryConstants.DEFAULT_VOCAB)
         .get()
     )
-  }
 
 }

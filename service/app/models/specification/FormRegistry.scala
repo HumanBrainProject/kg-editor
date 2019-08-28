@@ -22,11 +22,8 @@ final case class FormRegistry[A](registry: Map[NexusPath, A])
 
 object FormRegistry {
 
-  def filterOrgs(formRegistry: FormRegistry[UISpec], orgs: List[Group]): FormRegistry[UISpec] = {
-    formRegistry.copy(
-      registry = formRegistry.registry.filter {
-        case (path, _) => orgs.exists(g => g.name.equals(s"nexus-${path.org}"))
-      }
-    )
-  }
+  def filterOrgs(formRegistry: FormRegistry[UISpec], orgs: List[Group]): FormRegistry[UISpec] =
+    formRegistry.copy(registry = formRegistry.registry.filter {
+      case (path, _) => orgs.exists(g => g.name.equals(s"nexus-${path.org}"))
+    })
 }

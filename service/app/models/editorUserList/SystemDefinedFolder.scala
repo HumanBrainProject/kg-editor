@@ -18,12 +18,7 @@ package models.editorUserList
 object SystemDefinedFolder {
   private val defaultFolderID = "DEFAULT"
   private val folders: Map[String, BookmarkListFolder] = Map(
-    defaultFolderID -> BookmarkListFolder(
-      None,
-      "Other node types",
-      NODETYPEFOLDER,
-      List()
-    )
+    defaultFolderID -> BookmarkListFolder(None, "Other node types", NODETYPEFOLDER, List())
   )
 
   def getFolder(name: String): Option[BookmarkListFolder] = folders.get(name.toUpperCase)

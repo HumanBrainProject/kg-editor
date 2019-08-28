@@ -29,19 +29,13 @@ final case class DeleteLinkingInstanceCommand(
   token: AccessToken
 ) extends Command {
   private val log = Logger(this.getClass)
-  override def execute(): Task[Either[APIEditorError, Unit]] = {
+  override def execute(): Task[Either[APIEditorError, Unit]] =
     editorService
-      .deleteLinkingInstance(
-        from,
-        to,
-        linkingInstancePath,
-        token
-      )
+      .deleteLinkingInstance(from, to, linkingInstancePath, token)
       .map {
         case Left(errors) =>
           log.error(s"Could not delete all linking instances ${errors.content.mkString("\n")}")
           Left(errors.content.head)
         case Right(()) => Right(())
       }
-  }
 }

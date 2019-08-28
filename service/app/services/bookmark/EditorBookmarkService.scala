@@ -37,11 +37,10 @@ import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.FormOp
 
-class EditorBookmarkService @Inject()(
-  config: ConfigurationService,
-  wSClient: WSClient,
-)(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService)
-    extends EditorBookmarkServiceInterface {
+class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient)(
+  implicit OIDCAuthService: TokenAuthService,
+  clientCredentials: CredentialsService
+) extends EditorBookmarkServiceInterface {
   val logger = Logger(this.getClass)
 
   object instanceApiService extends InstanceApiService
@@ -51,7 +50,7 @@ class EditorBookmarkService @Inject()(
     editorUser: EditorUser,
     formRegistry: FormRegistry[UISpec],
     token: AccessToken
-  ): Task[Either[APIEditorError, List[BookmarkListFolder]]] = {
+  ): Task[Either[APIEditorError, List[BookmarkListFolder]]] =
     queryService
       .getInstancesWithId(
         wSClient,
@@ -75,7 +74,6 @@ class EditorBookmarkService @Inject()(
             Left(APIEditorError(res.status, res.body))
         }
       }
-  }
 
   /**
     * Get folder containing static list of bookmarklist
@@ -83,33 +81,19 @@ class EditorBookmarkService @Inject()(
     * @param formRegistry The form containing all the entities information
     * @return a list of bookmark folder
     */
-  private def getEditableEntities(
-    user: IDMUser,
-    formRegistry: FormRegistry[UISpec]
-  ): List[BookmarkListFolder] = {
+  private def getEditableEntities(user: IDMUser, formRegistry: FormRegistry[UISpec]): List[BookmarkListFolder] = {
     val allEditableEntities = FormOp
       .editableEntities(user, formRegistry)
       .foldLeft(SystemDefinedFolder.getFolders) {
         case (acc, (path, uiSpec)) =>
-          val userList = BookmarkList(
-            path.toString(),
-            uiSpec.label,
-            uiSpec.isEditable,
-            uiSpec.uiInfo,
-            uiSpec.color
-          )
+          val userList = BookmarkList(path.toString(), uiSpec.label, uiSpec.isEditable, uiSpec.uiInfo, uiSpec.color)
           uiSpec.folderID match {
             case Some(id) =>
               acc.get(id) match {
                 case Some(folder) =>
                   acc.updated(id, folder.copy(userLists = userList :: folder.userLists))
                 case None =>
-                  val f = BookmarkListFolder(
-                    None,
-                    uiSpec.folderName.getOrElse(id),
-                    NODETYPEFOLDER,
-                    List(userList)
-                  )
+                  val f = BookmarkListFolder(None, uiSpec.folderName.getOrElse(id), NODETYPEFOLDER, List(userList))
                   acc.updated(id, f)
               }
             case None => SystemDefinedFolder.addToDefaultFolder(acc, userList)
@@ -200,7 +184,7 @@ class EditorBookmarkService @Inject()(
   def getBookmarkListById(
     instanceReference: NexusInstanceReference,
     token: AccessToken
-  ): Task[Either[APIEditorError, (BookmarkList, String)]] = {
+  ): Task[Either[APIEditorError, (BookmarkList, String)]] =
     queryService
       .getInstancesWithId(
         wSClient,
@@ -225,7 +209,6 @@ class EditorBookmarkService @Inject()(
             Left(APIEditorError(res.status, res.body))
         }
       }
-  }
 
   def updateBookmarkList(
     bookmarkList: BookmarkList,
@@ -234,7 +217,7 @@ class EditorBookmarkService @Inject()(
     newDate: Option[String],
     userId: String,
     token: AccessToken
-  ): Task[Either[APIEditorError, BookmarkList]] = {
+  ): Task[Either[APIEditorError, BookmarkList]] =
     instanceApiService
       .put(
         wSClient,
@@ -254,20 +237,14 @@ class EditorBookmarkService @Inject()(
         case Right(()) => Right(bookmarkList)
         case Left(err) => Left(APIEditorError(err.status, err.body))
       }
-  }
 
-  def deleteBookmarkList(
-    bookmarkRef: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
+  def deleteBookmarkList(bookmarkRef: NexusInstanceReference, token: AccessToken): Task[Either[APIEditorError, Unit]] =
     queryService
       .getInstancesWithId(
         wSClient,
         config.kgQueryEndpoint,
         bookmarkRef,
-        QuerySpec(
-          Json.parse(EditorBookmarkService.kgQueryGetBookmarksForDeletion(bookmarkRef.nexusPath)).as[JsObject]
-        ),
+        QuerySpec(Json.parse(EditorBookmarkService.kgQueryGetBookmarksForDeletion(bookmarkRef.nexusPath)).as[JsObject]),
         token,
         QueryApiParameter()
       )
@@ -288,12 +265,7 @@ class EditorBookmarkService @Inject()(
                 logger.debug("All the bookmarks are deleted. We can safely delete the bookmark list")
                 // Delete the bookmark list
                 instanceApiService
-                  .delete(
-                    wSClient,
-                    config.kgQueryEndpoint,
-                    bookmarkRef,
-                    token
-                  )
+                  .delete(wSClient, config.kgQueryEndpoint, bookmarkRef, token)
                   .map {
                     case Right(()) => Right(())
                     case Left(r)   => Left(APIEditorError(r.status, r.body))
@@ -315,7 +287,6 @@ class EditorBookmarkService @Inject()(
             Task.pure(Left(APIEditorError(INTERNAL_SERVER_ERROR, "Could not fetch data to delete ")))
         }
       }
-  }
 
   def addInstanceToBookmarkLists(
     instanceReference: NexusInstanceReference,
@@ -351,7 +322,7 @@ class EditorBookmarkService @Inject()(
     bookmarksListFromUser: List[NexusInstanceReference],
     editorUser: EditorUser,
     token: AccessToken
-  ): Task[List[Either[APIEditorError, Unit]]] = {
+  ): Task[List[Either[APIEditorError, Unit]]] =
     queryService
       .getInstancesWithId(
         wSClient,
@@ -397,7 +368,6 @@ class EditorBookmarkService @Inject()(
             Task.pure(List(Left(APIEditorError(res.status, res.body))))
         }
       }
-  }
 
   def removeInstanceFromBookmarkLists(
     instanceRef: NexusInstanceReference,
@@ -407,12 +377,7 @@ class EditorBookmarkService @Inject()(
     // Get the ids of the bookmarks
     val queries = bookmarkIds.map { id =>
       instanceApiService
-        .delete(
-          wSClient,
-          config.kgQueryEndpoint,
-          id,
-          token
-        )
+        .delete(wSClient, config.kgQueryEndpoint, id, token)
         .map {
           case Left(response) => Left(APIEditorError(response.status, response.body))
           case Right(s)       => Right(s)
@@ -425,17 +390,16 @@ class EditorBookmarkService @Inject()(
     instanceIds: List[NexusInstanceReference],
     editorUser: EditorUser,
     token: AccessToken
-  ): Task[List[(NexusInstanceReference, Either[APIEditorError, List[BookmarkList]])]] = {
+  ): Task[List[(NexusInstanceReference, Either[APIEditorError, List[BookmarkList]])]] =
     Task.gather(instanceIds.map { ids =>
       retrieveBookmarkListSingleInstance(ids, editorUser, token)
     })
-  }
 
   private def retrieveBookmarkListSingleInstance(
     instanceReference: NexusInstanceReference,
     editorUser: EditorUser,
     token: AccessToken
-  ): Task[(NexusInstanceReference, Either[APIEditorError, List[BookmarkList]])] = {
+  ): Task[(NexusInstanceReference, Either[APIEditorError, List[BookmarkList]])] =
     queryService
       .getInstancesWithId(
         wSClient,
@@ -461,7 +425,6 @@ class EditorBookmarkService @Inject()(
           case _ => (instanceReference, Left(APIEditorError(res.status, res.body)))
         }
       }
-  }
 
 }
 
@@ -698,12 +661,11 @@ object EditorBookmarkService {
        |}
      """.stripMargin
 
-  def bookmarkToNexusStruct(instanceLink: String, userBookMarkListNexusId: String): JsObject = {
+  def bookmarkToNexusStruct(instanceLink: String, userBookMarkListNexusId: String): JsObject =
     Json.obj(
       EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLIST         -> Json.obj("@id" -> s"$userBookMarkListNexusId"),
       EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKINSTANCELINK -> Json.obj("@id" -> s"$instanceLink")
     )
-  }
 
   def bookmarkListToNexusStruct(name: String, userFolderId: String, newDate: Option[String] = None): JsObject =
     newDate match {
@@ -720,13 +682,12 @@ object EditorBookmarkService {
         )
     }
 
-  def bookmarkListFolderToNexusStruct(name: String, userNexusId: String, folderType: FolderType): JsObject = {
+  def bookmarkListFolderToNexusStruct(name: String, userNexusId: String, folderType: FolderType): JsObject =
     Json.obj(
       SchemaFieldsConstants.NAME                                   -> name,
       EditorConstants.EDITORNAMESPACE + EditorConstants.USER       -> Json.obj("@id" -> s"$userNexusId"),
       EditorConstants.EDITORNAMESPACE + EditorConstants.FOLDERTYPE -> folderType.t
     )
-  }
 
   implicit object JsEither {
     implicit def eitherReads[A, B](implicit A: Reads[A], B: Reads[B]): Reads[Either[A, B]] =

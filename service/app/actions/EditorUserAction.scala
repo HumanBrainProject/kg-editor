@@ -69,7 +69,7 @@ object EditorUserAction {
     new ActionRefiner[UserRequest, EditorUserRequest] {
       def executionContext: ExecutionContext = ec
 
-      def refine[A](input: UserRequest[A]): Future[Either[Result, EditorUserRequest[A]]] = {
+      def refine[A](input: UserRequest[A]): Future[Either[Result, EditorUserRequest[A]]] =
         editorUserService
           .getUser(input.user, input.userToken)
           .map {
@@ -80,7 +80,6 @@ object EditorUserAction {
               Left(InternalServerError("An error occurred while fetching user information"))
           }
           .runToFuture
-      }
     }
 
   def isCurator(user: IDMUser, org: String): Boolean = {
@@ -93,18 +92,15 @@ object EditorUserAction {
     user.groups.exists(g => g.name.equals("nexus-curators") || g.name.matches(s"^nexus-$curatorOrg-curator$$"))
   }
 
-  def curatorUserAction(
-    org: String
-  )(implicit ec: ExecutionContext): ActionFilter[EditorUserRequest] =
+  def curatorUserAction(org: String)(implicit ec: ExecutionContext): ActionFilter[EditorUserRequest] =
     new ActionFilter[EditorUserRequest] {
       def executionContext: ExecutionContext = ec
 
-      def filter[A](input: EditorUserRequest[A]): Future[Option[Result]] = {
+      def filter[A](input: EditorUserRequest[A]): Future[Option[Result]] =
         Future.successful(if (isCurator(input.editorUser.user, org)) {
           None
         } else {
           Some(Forbidden("You do not have sufficient access rights to proceed"))
         })
-      }
     }
 }

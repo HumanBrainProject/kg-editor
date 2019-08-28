@@ -18,13 +18,11 @@ package models
 
 final case class NexusPath(org: String, domain: String, schema: String, version: String) {
 
-  override def toString(): String = {
+  override def toString(): String =
     Seq(org, domain, schema, version).mkString("/")
-  }
 
-  def withSpecificSubspace(subspace: String): NexusPath = {
+  def withSpecificSubspace(subspace: String): NexusPath =
     this.copy(org = org + subspace)
-  }
 
   /**
     * This method returns the path of the instance with the original organization instead of the reconciled space
@@ -53,22 +51,18 @@ final case class NexusPath(org: String, domain: String, schema: String, version:
     NexusPath(NexusPath.addSuffixToOrg(this.org, reconciledSuffix), this.domain, this.schema, this.version)
   }
 
-  def isReconciled(reconciledSuffix: String): Boolean = {
+  def isReconciled(reconciledSuffix: String): Boolean =
     this.org.endsWith(reconciledSuffix)
-  }
 }
 
 object NexusPath {
 
-  def apply(args: Seq[String]): NexusPath = {
+  def apply(args: Seq[String]): NexusPath =
     NexusPath(args(0), args(1), args(2), args(3))
-  }
 
-  def apply(fullPath: String): NexusPath = {
+  def apply(fullPath: String): NexusPath =
     NexusPath(fullPath.split("/"))
-  }
 
-  def addSuffixToOrg(org: String, reconciledSuffix: String): String = {
+  def addSuffixToOrg(org: String, reconciledSuffix: String): String =
     org + reconciledSuffix
-  }
 }

@@ -35,7 +35,7 @@ object NexusInstanceReference {
     NexusInstanceReference(nexusType, path._2.substring(1))
   }
 
-  private def getIdfromURL(url: String): String = {
+  private def getIdfromURL(url: String): String =
     if (url contains "v0/data/") {
       url.split("v0/data/").tail.head
     } else {
@@ -45,7 +45,6 @@ object NexusInstanceReference {
         throw new Exception(s"Could not extract id from url - $url")
       }
     }
-  }
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._

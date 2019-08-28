@@ -22,9 +22,8 @@ import play.api.libs.json._
 
 final case class NexusInstance(nexusUUID: Option[String], nexusPath: NexusPath, content: JsObject) {
 
-  def id(): Option[String] = {
+  def id(): Option[String] =
     this.nexusUUID.map(s => s"${this.nexusPath}/${s}")
-  }
 
   def getField(fieldName: String): Option[JsValue] = content.value.get(fieldName)
 

@@ -20,14 +20,18 @@ import models.BasicAccessToken
 import play.api.http.HeaderNames._
 import play.api.mvc.Request
 
-object OIDCHelper {
+object AuthenticationHelper {
 
   /**
     * Retrieve the user's token from a request
     * @param request the request
     * @return A String containing the token or an empty String
     */
-  def getTokenFromRequest[A](request: Request[A]): BasicAccessToken = {
-    BasicAccessToken(request.headers.toMap.getOrElse(AUTHORIZATION, Seq("")).head)
+  def getTokenFromRequest[A](request: Request[A]): Option[BasicAccessToken] = {
+    val token = request.headers.toSimpleMap.get(AUTHORIZATION)
+    token match {
+      case Some(t) => Some(BasicAccessToken(t))
+      case None    => None
+    }
   }
 }

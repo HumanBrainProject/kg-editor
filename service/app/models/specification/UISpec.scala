@@ -32,17 +32,15 @@ final case class UISpec(
   refreshSpecification: Option[Boolean] = None
 ) {
 
-  def getFieldsAsLinkedMap: mutable.LinkedHashMap[String, EditorFieldSpecification] = {
+  def getFieldsAsLinkedMap: mutable.LinkedHashMap[String, EditorFieldSpecification] =
     mutable.LinkedHashMap[String, EditorFieldSpecification](fields map { f =>
       (f.key, f)
     }: _*)
-  }
 
-  def getFieldsAsMap: Map[String, EditorFieldSpecification] = {
+  def getFieldsAsMap: Map[String, EditorFieldSpecification] =
     Map[String, EditorFieldSpecification](fields map { f =>
       (f.key, f)
     }: _*)
-  }
 }
 
 object UISpec {
@@ -54,7 +52,7 @@ object UISpec {
     (JsPath \ "label").read[String] and
     (JsPath \ "fields").read[List[EditorFieldSpecification]] and
     (JsPath \ "ui_info").readNullable[UIInfo] and
-      (JsPath \ "uiDirective").readNullable[JsObject] and
+    (JsPath \ "uiDirective").readNullable[JsObject] and
     (JsPath \ "editable").readNullable[Boolean] and
     (JsPath \ "color").readNullable[String] and
     (JsPath \ "folderID").readNullable[String] and
@@ -66,7 +64,7 @@ object UISpec {
     (JsPath \ "label").write[String] and
     (JsPath \ "fields").write[List[EditorFieldSpecification]] and
     (JsPath \ "ui_info").writeNullable[UIInfo] and
-      (JsPath \ "uiDirective").writeNullable[JsObject] and
+    (JsPath \ "uiDirective").writeNullable[JsObject] and
     (JsPath \ "editable").writeNullable[Boolean] and
     (JsPath \ "color").writeNullable[String] and
     (JsPath \ "folderID").writeNullable[String] and

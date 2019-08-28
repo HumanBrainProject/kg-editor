@@ -32,13 +32,7 @@ import scala.concurrent.ExecutionContext
 
 trait QueryService {
 
-  def delete(
-    wSClient: WSClient,
-    apiEndpoint: String,
-    instancePath: NexusPath,
-    queryId: String,
-    token: AccessToken
-  )(
+  def delete(wSClient: WSClient, apiEndpoint: String, instancePath: NexusPath, queryId: String, token: AccessToken)(
     implicit OIDCAuthService: TokenAuthService,
     credentials: CredentialsService
   ): Task[Either[APIEditorError, Unit]] = {
@@ -64,10 +58,7 @@ trait QueryService {
     queryId: String,
     payload: JsObject,
     token: AccessToken
-  )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[Either[WSResponse, Unit]] = {
+  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath.toString}/${queryId}")
       .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
@@ -87,17 +78,14 @@ trait QueryService {
     wSClient: WSClient,
     apiEndpoint: String,
     instancePath: NexusPath,
-    vocab:Option[String] = None,
-    size:Int,
-    start:Int,
+    vocab: Option[String] = None,
+    size: Int,
+    start: Int,
     databaseScope: Option[String] = None,
     payload: JsObject,
     token: AccessToken
-  )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[Either[WSResponse, JsObject]] = {
-    val v = vocab.map("vocab" -> _).getOrElse("" -> "")
+  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[Either[WSResponse, JsObject]] = {
+    val v = vocab.map("vocab"                       -> _).getOrElse("" -> "")
     val dbScope = databaseScope.map("databaseScope" -> _).getOrElse("" -> "")
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath}/instances")
@@ -116,11 +104,7 @@ trait QueryService {
     }
   }
 
-  def getQuery(
-    wSClient: WSClient,
-    apiEndpoint: String,
-    token: AccessToken
-  )(
+  def getQuery(wSClient: WSClient, apiEndpoint: String, token: AccessToken)(
     implicit OIDCAuthService: TokenAuthService,
     credentials: CredentialsService
   ): Task[Either[WSResponse, JsArray]] = {
@@ -147,10 +131,7 @@ trait QueryService {
     query: QuerySpec,
     token: AccessToken,
     queryApiParameters: QueryApiParameter
-  )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[WSResponse] = {
+  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
     query match {
       case QuerySpec(_, Some(queryId)) =>
         val q = wSClient
@@ -175,7 +156,6 @@ trait QueryService {
           case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
         }
     }
-  }
 
   def getInstances(
     wSClient: WSClient,
@@ -185,10 +165,7 @@ trait QueryService {
     token: AccessToken,
     queryApiParameters: QueryApiParameter,
     parameters: Map[String, String] = Map()
-  )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[WSResponse] = {
+  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
     query match {
       case QuerySpec(_, Some(queryId)) =>
         val q = wSClient
@@ -209,5 +186,4 @@ trait QueryService {
           case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
         }
     }
-  }
 }

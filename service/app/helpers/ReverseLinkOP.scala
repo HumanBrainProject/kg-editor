@@ -39,9 +39,7 @@ object ReverseLinkOP {
         .toJson(
           instance
             .contentToMap()
-            .filterNot(
-              k => predicate(instanceFieldsSpecs(k._1))
-            )
+            .filterNot(k => predicate(instanceFieldsSpecs(k._1)))
         )
         .as[JsObject]
     )
@@ -51,7 +49,7 @@ object ReverseLinkOP {
     currentInstanceDisplayed: NexusInstance,
     linkName: String,
     ids: List[NexusLink]
-  ): (List[NexusLink], List[NexusLink]) = {
+  ): (List[NexusLink], List[NexusLink]) =
     currentInstanceDisplayed.content.value.get(linkName) match {
       case Some(currentReverseField) =>
         val currentLinks = currentReverseField.asOpt[JsObject] match {
@@ -60,9 +58,7 @@ object ReverseLinkOP {
           case None =>
             currentReverseField
               .asOpt[JsArray]
-              .map(
-                _.value.map(js => NexusLink(NexusInstanceReference.fromUrl((js.as[JsObject] \ "id").as[String])))
-              )
+              .map(_.value.map(js => NexusLink(NexusInstanceReference.fromUrl((js.as[JsObject] \ "id").as[String]))))
               .getOrElse(List())
               .toList
         }
@@ -71,7 +67,6 @@ object ReverseLinkOP {
         (added.toList, removed.toList)
       case None => (ids, List())
     }
-  }
 
   /**
     *   Add or delete a reverse link
@@ -172,7 +167,7 @@ object ReverseLinkOP {
     fieldValue: JsValue,
     currentInstanceRef: NexusInstanceReference,
     targetField: String
-  ): Either[String, List[NexusLink]] = {
+  ): Either[String, List[NexusLink]] =
     fieldValue match {
       case _ if fieldValue.validate[List[NexusLink]].isSuccess =>
         Right(NexusLink(currentInstanceRef) :: fieldValue.as[List[NexusLink]])
@@ -181,13 +176,12 @@ object ReverseLinkOP {
       case l if l == JsObject.empty || l == JsArray.empty => Right(List(NexusLink(currentInstanceRef)))
       case _                                              => Left("Cannot read reverse link type")
     }
-  }
 
   def removeLink(
     fieldValue: JsValue,
     currentInstanceRef: NexusInstanceReference,
-    targetField: String,
-  ): Either[String, Some[List[NexusLink]]] = {
+    targetField: String
+  ): Either[String, Some[List[NexusLink]]] =
     fieldValue match {
       case _ if fieldValue.validate[List[NexusLink]].isSuccess =>
         Right(Some((fieldValue.as[List[NexusLink]].toSet - NexusLink(currentInstanceRef)).toList))
@@ -195,5 +189,4 @@ object ReverseLinkOP {
         Right(Some((Set(fieldValue.as[NexusLink]) - NexusLink(currentInstanceRef)).toList))
       case _ => Left("Cannot read reverse link type")
     }
-  }
 }

@@ -53,16 +53,10 @@ class ReverseLinkService @Inject()(
         val updateToBeStored =
           EditorService.computeUpdateTobeStored(currentInstanceDisplayed, updateFromUser, config.nexusEndpoint)
         val fieldsSpec = registries.formRegistry.registry(updateToBeStored.nexusInstance.nexusPath).getFieldsAsMap
-        val instanceWithoutReversLink = ReverseLinkOP.removeLinksFromInstance(
-          updateToBeStored,
-          fieldsSpec,
-          e => e.isReverse.getOrElse(false)
-        )
-        val instanceWithoutLinkingInstance = ReverseLinkOP.removeLinksFromInstance(
-          instanceWithoutReversLink,
-          fieldsSpec,
-          e => e.isLinkingInstance.getOrElse(false)
-        )
+        val instanceWithoutReversLink =
+          ReverseLinkOP.removeLinksFromInstance(updateToBeStored, fieldsSpec, e => e.isReverse.getOrElse(false))
+        val instanceWithoutLinkingInstance = ReverseLinkOP
+          .removeLinksFromInstance(instanceWithoutReversLink, fieldsSpec, e => e.isLinkingInstance.getOrElse(false))
         val reverseLinksToUpdated = updateReverseInstance(
           updateToBeStored,
           fieldsSpec,
@@ -107,9 +101,7 @@ class ReverseLinkService @Inject()(
         case None =>
           reverseField._2
             .asOpt[JsArray]
-            .map(
-              _.value.map(_.as[NexusLink])
-            )
+            .map(_.value.map(_.as[NexusLink]))
             .getOrElse(List())
       }
       (reverseField._1, fullIds.toList)
@@ -126,12 +118,8 @@ class ReverseLinkService @Inject()(
     queryRegistry: FormRegistry[QuerySpec],
     baseUrl: String,
     token: AccessToken
-  ): List[Task[Either[APIEditorError, Command]]] = {
-    filterLinks(
-      updateToBeStored,
-      fieldsSpec,
-      e => e.isReverse.getOrElse(false)
-    ).flatMap {
+  ): List[Task[Either[APIEditorError, Command]]] =
+    filterLinks(updateToBeStored, fieldsSpec, e => e.isReverse.getOrElse(false)).flatMap {
       case (reverseField, ids) =>
         fieldsSpec(reverseField).reverseTargetField match {
           case Some(fieldName) =>
@@ -150,7 +138,6 @@ class ReverseLinkService @Inject()(
           case None => List()
         }
     }
-  }
 
   /**
     *  Generate a list of Commands to add or delete a linking instance
@@ -168,12 +155,8 @@ class ReverseLinkService @Inject()(
     instanceRef: NexusInstanceReference,
     user: Option[User],
     token: AccessToken
-  ): List[Command] = {
-    filterLinks(
-      updateToBeStored,
-      fieldsSpec,
-      e => e.isLinkingInstance.getOrElse(false)
-    ).flatMap {
+  ): List[Command] =
+    filterLinks(updateToBeStored, fieldsSpec, e => e.isLinkingInstance.getOrElse(false)).flatMap {
       case (reverseField, ids) =>
         val opt = for {
           linkingInstanceType    <- fieldsSpec(reverseField).linkingInstanceType
@@ -194,32 +177,23 @@ class ReverseLinkService @Inject()(
                 config.nexusEndpoint,
                 user,
                 token
-            )
+              )
           ) ::: removed.map(
-            id =>
-              DeleteLinkingInstanceCommand(
-                instanceRef,
-                id.ref,
-                linkingInstancePath,
-                editorService,
-                token
-            )
+            id => DeleteLinkingInstanceCommand(instanceRef, id.ref, linkingInstancePath, editorService, token)
           )
         }
         opt.getOrElse(List())
     }
-  }
 
   /**
     *  Process the command either ADD or DELETE
     * @param c The command to execute
     * @return
     */
-  private def processCommand(c: Task[Either[APIEditorError, Command]]): Task[Either[APIEditorError, Unit]] = {
+  private def processCommand(c: Task[Either[APIEditorError, Command]]): Task[Either[APIEditorError, Unit]] =
     c.flatMap {
       case Left(err)      => Task.pure(Left(err))
       case Right(command) => command.execute()
     }
-  }
 
 }

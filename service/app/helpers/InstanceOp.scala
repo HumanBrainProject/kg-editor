@@ -29,10 +29,7 @@ object InstanceOp {
 
   type UpdateInfo = (Option[String], Int, String, EditorInstance)
 
-  def buildDiffEntity(
-    currentInstance: NexusInstance,
-    newValue: NexusInstance,
-  ): EditorInstance = {
+  def buildDiffEntity(currentInstance: NexusInstance, newValue: NexusInstance): EditorInstance = {
 
     val patch: JsonMergePatch = JsonMergeDiff.diff(currentInstance.content, newValue.content)
     val deleted = patch.toJson
@@ -84,8 +81,7 @@ object InstanceOp {
     jsArray: JsArray,
     dataType: String,
     formRegistry: FormRegistry[UISpec]
-  ): List[PreviewInstance] = {
-
+  ): List[PreviewInstance] =
     jsArray.value.map { el =>
       val url = (el \ JsonLDConstants.ID).as[String]
       val name: String = (el \ SchemaFieldsConstants.NAME)
@@ -106,7 +102,6 @@ object InstanceOp {
         formRegistry.registry.get(instanceRef.nexusPath).map(_.label).getOrElse(instanceRef.nexusPath.toString())
       PreviewInstance(instanceRef, name, dataType, Some(description), Some(label))
     }.toList
-  }
 
   def addDefaultFields(instance: NexusInstance, formRegistry: FormRegistry[UISpec]): NexusInstance = {
     val m = formRegistry.registry(instance.nexusPath).getFieldsAsMap.map {
@@ -128,11 +123,10 @@ object InstanceOp {
   }
 
   def removeEmptyFieldsNotInOriginal(originalInstance: NexusInstance, updates: EditorInstance): EditorInstance = {
-    def compareUniqueElementObject(l: JsValue, r: JsValue): Boolean = {
+    def compareUniqueElementObject(l: JsValue, r: JsValue): Boolean =
       r.asOpt[List[JsObject]].isDefined && r.as[List[JsObject]].size == 1 &&
       l.asOpt[JsObject].isDefined &&
       r.as[List[JsObject]].head == l.as[JsObject]
-    }
 
     val contentUpdate = updates.contentToMap().filter {
       case (k, v) =>
@@ -154,13 +148,12 @@ object InstanceOp {
     updates.copy(nexusInstance = updates.nexusInstance.copy(content = Json.toJson(contentUpdate).as[JsObject]))
   }
 
-  def removeInternalFields(instance: NexusInstance): NexusInstance = {
+  def removeInternalFields(instance: NexusInstance): NexusInstance =
     instance.copy(
       content = FormOp.removeKey(instance.content).as[JsObject] -
-      s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}" -
-      s"${EditorConstants.INFERENCESPACE}${EditorConstants.ALTERNATIVES}" -
-      JsonLDConstants.ID - JsonLDConstants.TYPE - "https://schema.hbp.eu/inference/extends"
+        s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}" -
+        s"${EditorConstants.INFERENCESPACE}${EditorConstants.ALTERNATIVES}" -
+        JsonLDConstants.ID - JsonLDConstants.TYPE - "https://schema.hbp.eu/inference/extends"
     )
-  }
 
 }

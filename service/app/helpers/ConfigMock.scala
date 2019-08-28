@@ -20,9 +20,9 @@ object ConfigMock {
     "nexus.iam"             -> nexusIam,
     "auth.endpoint"         -> authEndpoint,
     "auth.refreshTokenFile" -> refreshTokenFile,
-    "kgcore.endpoint" -> kgCoreEndpoint,
-    "kgquery.endpoint" -> kgQueryEndpoint,
-    "editor.subspace" -> editorSubspace,
-    "cache.expiration" -> cacheExpiration.toMillis
+    "kgcore.endpoint"       -> kgCoreEndpoint,
+    "kgquery.endpoint"      -> kgQueryEndpoint,
+    "editor.subspace"       -> editorSubspace,
+    "cache.expiration"      -> cacheExpiration.toMillis
   )
 }

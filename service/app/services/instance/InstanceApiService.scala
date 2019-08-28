@@ -41,10 +41,7 @@ trait InstanceApiService {
     token: AccessToken,
     queryId: String,
     queryApiParameters: QueryApiParameter
-  )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
-  ): Task[WSResponse] = {
+  )(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService): Task[WSResponse] = {
 
     val payload = Json.toJson(instanceIds.map(i => i.toString)).as[JsArray]
     val q = wSClient

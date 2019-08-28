@@ -28,7 +28,7 @@ class IAMAuthService @Inject()(wSClient: WSClient, config: ConfigurationService)
     path: String,
     parameters: Seq[(String, String)],
     token: AccessToken
-  ): Task[Either[WSResponse, List[IAMAcl]]] = {
+  ): Task[Either[WSResponse, List[IAMAcl]]] =
     Task
       .deferFuture(
         wSClient
@@ -43,12 +43,10 @@ class IAMAuthService @Inject()(wSClient: WSClient, config: ConfigurationService)
           case _  => Left(res)
         }
       }
-  }
 }
 
 object IAMAuthService {
 
-  def hasAccess(acls: List[IAMAcl], iAMPermission: IAMPermission): Boolean = {
+  def hasAccess(acls: List[IAMAcl], iAMPermission: IAMPermission): Boolean =
     acls.flatMap(_.permissions).contains(iAMPermission)
-  }
 }

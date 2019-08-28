@@ -30,10 +30,7 @@ class IDMAPIService @Inject()(
   WSClient: WSClient,
   config: ConfigurationService,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi
-)(
-  implicit OIDCAuthService: TokenAuthService,
-  clientCredentials: CredentialsService
-) {
+)(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService) {
   private val log = LoggerFactory.getLogger(this.getClass)
   object cacheService extends CacheService
 
@@ -103,11 +100,7 @@ class IDMAPIService @Inject()(
           WSClient
             .url(url)
             .addHttpHeaders(AUTHORIZATION -> token.token)
-            .addQueryStringParameters(
-              "pageSize" -> size.toString,
-              "str"      -> searchTerm,
-              "sort"     -> "displayName,asc"
-            )
+            .addQueryStringParameters("pageSize" -> size.toString, "str" -> searchTerm, "sort" -> "displayName,asc")
             .get()
         }
         .flatMap { res =>
@@ -141,11 +134,7 @@ class IDMAPIService @Inject()(
   private def isUserPartOfGroups(user: IDMUser, groups: List[String]): Boolean =
     groups.forall(s => user.groups.exists(g => g.name.equals(s)))
 
-  def hasUserGroups(
-    user: IDMUser,
-    groups: List[String],
-    token: AccessToken
-  ): Task[Either[WSResponse, Boolean]] = {
+  def hasUserGroups(user: IDMUser, groups: List[String], token: AccessToken): Task[Either[WSResponse, Boolean]] = {
     val url = s"${config.idmApiEndpoint}/user/${user.id}/member-groups"
     val queryGroups: List[(String, String)] = groups.map("name" -> _)
     val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token).addQueryStringParameters(queryGroups: _*)
@@ -162,10 +151,7 @@ class IDMAPIService @Inject()(
 
   }
 
-  def getUserGroups(
-    userId: String,
-    token: AccessToken,
-  ): Task[List[Group]] =
+  def getUserGroups(userId: String, token: AccessToken): Task[List[Group]] =
     for {
       userGroups <- getGroups(userId, token)
     } yield userGroups

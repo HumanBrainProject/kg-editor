@@ -23,10 +23,10 @@ import play.api.libs.ws.{BodyWritable, WSRequest, WSResponse}
 
 object AuthHttpClient {
 
-  def postWithRetry[T: BodyWritable](request: WSRequest, body: T)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[WSResponse] = {
+  def postWithRetry[T: BodyWritable](
+    request: WSRequest,
+    body: T
+  )(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
     Task.deferFuture(request.post(body)).flatMap { res =>
       res.status match {
         case UNAUTHORIZED =>
@@ -37,12 +37,11 @@ object AuthHttpClient {
         case _ => Task.pure(res)
       }
     }
-  }
 
-  def putWithRetry[T: BodyWritable](request: WSRequest, body: T)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[WSResponse] = {
+  def putWithRetry[T: BodyWritable](
+    request: WSRequest,
+    body: T
+  )(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
     Task.deferFuture(request.put(body)).flatMap { res =>
       res.status match {
         case UNAUTHORIZED =>
@@ -53,12 +52,10 @@ object AuthHttpClient {
         case _ => Task.pure(res)
       }
     }
-  }
 
-  def getWithRetry(request: WSRequest)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[WSResponse] = {
+  def getWithRetry(
+    request: WSRequest
+  )(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
     Task.deferFuture(request.get()).flatMap { res =>
       res.status match {
         case UNAUTHORIZED =>
@@ -69,12 +66,10 @@ object AuthHttpClient {
         case _ => Task.pure(res)
       }
     }
-  }
 
-  def deleteWithRetry(request: WSRequest)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[WSResponse] = {
+  def deleteWithRetry(
+    request: WSRequest
+  )(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
     Task.deferFuture(request.delete()).flatMap { res =>
       res.status match {
         case UNAUTHORIZED =>
@@ -85,7 +80,6 @@ object AuthHttpClient {
         case _ => Task.pure(res)
       }
     }
-  }
 
   def refreshToken(request: WSRequest, refreshedToken: AccessToken): WSRequest = {
     val headers = request.headers.updated(AUTHORIZATION, Seq(refreshedToken.token))

@@ -60,7 +60,7 @@ class FormService @Inject()(
       loadFormConfiguration()
     }
 
-  private final def loadFormConfiguration(): Task[FormRegistries] = {
+  final private def loadFormConfiguration(): Task[FormRegistries] = {
     logger.info("Form Service INITIALIZATION --- Starting to load specification")
     OIDCAuthService.getTechAccessToken(true).flatMap { token =>
       Task
@@ -84,14 +84,13 @@ class FormService @Inject()(
     }
   }
 
-  def shouldReloadSpecification(path: NexusPath): Task[Boolean] = {
+  def shouldReloadSpecification(path: NexusPath): Task[Boolean] =
     this.getRegistries().map { registries =>
       registries.formRegistry.registry
         .get(path)
         .map(spec => spec.refreshSpecification.exists(identity))
         .exists(identity)
     }
-  }
 
 }
 
@@ -110,11 +109,9 @@ object FormService {
       systemQueries  <- specificationService.fetchSpecificationQueries(token)
       uiSpecResponse <- specificationService.fetchSpecifications(token)
     } yield {
-      val completeQueries = FormRegistry(
-        systemQueries.foldLeft(formRegistries.queryRegistry.registry) {
-          case (acc, el) => acc.updated(el.nexusPath, QuerySpec(Json.obj(), Some(el.id)))
-        }
-      )
+      val completeQueries = FormRegistry(systemQueries.foldLeft(formRegistries.queryRegistry.registry) {
+        case (acc, el) => acc.updated(el.nexusPath, QuerySpec(Json.obj(), Some(el.id)))
+      })
 
       val uiSpecFromDB = uiSpecResponse.status match {
         case OK => (uiSpecResponse.json \ "results").as[List[JsObject]]
@@ -124,8 +121,8 @@ object FormService {
           )
           List()
       }
-      val uiSpecRegistry = formRegistries.formRegistry.copy(
-        registry = uiSpecFromDB.foldLeft(formRegistries.formRegistry.registry) {
+      val uiSpecRegistry =
+        formRegistries.formRegistry.copy(registry = uiSpecFromDB.foldLeft(formRegistries.formRegistry.registry) {
           case (acc, el) =>
             if ((el \ "targetType").asOpt[String].isDefined) {
               val path = NexusPath((el \ "targetType").as[String])
@@ -133,33 +130,28 @@ object FormService {
             } else {
               acc
             }
-        }
-      )
+        })
       FormRegistries(uiSpecRegistry, completeQueries)
     }
   }
 
-  def extractRegistries(js: List[JsObject]): FormRegistries = {
+  def extractRegistries(js: List[JsObject]): FormRegistries =
     FormRegistries(extractToRegistry[UISpec](js, "uiSpec"), extractToRegistry[QuerySpec](js, "query"))
-  }
 
-  private def extractToRegistry[A](js: List[JsObject], field: String)(implicit r: Reads[A]): FormRegistry[A] = {
-    FormRegistry(
-      js.foldLeft(Map[NexusPath, A]()) {
-        case (acc, el) =>
-          val listOfMap = (el \ field)
-            .asOpt[JsObject]
-            .map { f =>
-              for {
-                (org, json)  <- f.value
-                (domain, d)  <- json.as[JsObject].value
-                (schema, s)  <- d.as[JsObject].value
-                (version, v) <- s.as[JsObject].value
-              } yield NexusPath(org, domain, schema, version) -> v.as[A](r)
-            }
-            .getOrElse(List())
-          acc ++ listOfMap
-      }
-    )
-  }
+  private def extractToRegistry[A](js: List[JsObject], field: String)(implicit r: Reads[A]): FormRegistry[A] =
+    FormRegistry(js.foldLeft(Map[NexusPath, A]()) {
+      case (acc, el) =>
+        val listOfMap = (el \ field)
+          .asOpt[JsObject]
+          .map { f =>
+            for {
+              (org, json)  <- f.value
+              (domain, d)  <- json.as[JsObject].value
+              (schema, s)  <- d.as[JsObject].value
+              (version, v) <- s.as[JsObject].value
+            } yield NexusPath(org, domain, schema, version) -> v.as[A](r)
+          }
+          .getOrElse(List())
+        acc ++ listOfMap
+    })
 }

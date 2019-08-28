@@ -11,12 +11,12 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 
 class AuthController @Inject()(
-                                cc: ControllerComponents,
-                                authService: AuthService,
-                                config: ConfigurationService,
-                                formService: FormService,
-                              )(implicit ec: ExecutionContext)
-  extends AbstractController(cc) {
+  cc: ControllerComponents,
+  authService: AuthService,
+  config: ConfigurationService,
+  formService: FormService
+)(implicit ec: ExecutionContext)
+    extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 
@@ -26,7 +26,7 @@ class AuthController @Inject()(
     authService
       .getLogin(redirect_uri)
       .map {
-        case Left(err)    => err.toResult
+        case Left(err) => err.toResult
         case Right(value) =>
           val location = value.header("Location")
           location match {

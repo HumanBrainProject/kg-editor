@@ -10,4 +10,4 @@
 #    200:
 #      description: "Ok"
 ###
-GET   /                                             controllers.EditorUserController.getOrCreateCurrentUser
+GET   /                                             controllers.EditorUserController.getUserProfile

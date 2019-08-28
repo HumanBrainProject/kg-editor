@@ -44,10 +44,8 @@ final case class AddLinkingInstanceCommand(
       .insertInstance(NexusInstance(None, linkingInstancePath, linkingInstance.toNexusFormat), user, token)
       .map {
         case Right(i) =>
-          log.debug(
-            s"Added linking instance with id ${linkingInstancePath
-              .toString()}/${i.id}, from ${targetId.ref.toString} - to ${currentInstanceRef.toString}"
-          )
+          log.debug(s"Added linking instance with id ${linkingInstancePath
+            .toString()}/${i.id}, from ${targetId.ref.toString} - to ${currentInstanceRef.toString}")
           Right(())
         case Left(err) =>
           log.error(s"Could not add linking instance with to ${currentInstanceRef.toString}")

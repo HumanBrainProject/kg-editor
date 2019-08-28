@@ -40,7 +40,7 @@ class TokenAuthService @Inject()(
 
   object cacheService extends CacheService
 
-  def getTechAccessToken(forceRefresh: Boolean = false): Task[RefreshAccessToken] = {
+  def getTechAccessToken(forceRefresh: Boolean = false): Task[RefreshAccessToken] =
     if (forceRefresh) {
       val clientCred = credentialsService.getClientCredentials()
       refreshAccessToken(clientCred)
@@ -52,9 +52,8 @@ class TokenAuthService @Inject()(
           refreshAccessToken(clientCred)
       }
     }
-  }
 
-  def refreshAccessToken(clientCredentials: ClientCredentials): Task[RefreshAccessToken] = {
+  def refreshAccessToken(clientCredentials: ClientCredentials): Task[RefreshAccessToken] =
     Task
       .deferFuture {
         ws.url(config.oidcTokenEndpoint)
@@ -77,5 +76,4 @@ class TokenAuthService @Inject()(
             throw new Exception("Could not fetch access token for tech account")
         }
       }
-  }
 }

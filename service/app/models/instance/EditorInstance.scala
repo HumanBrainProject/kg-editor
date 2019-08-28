@@ -22,9 +22,8 @@ import play.api.libs.json._
 
 final case class EditorInstance(nexusInstance: NexusInstance) {
 
-  def contentToMap(): Map[String, JsValue] = {
+  def contentToMap(): Map[String, JsValue] =
     this.nexusInstance.content.fields.toMap
-  }
 }
 
 object EditorInstance {

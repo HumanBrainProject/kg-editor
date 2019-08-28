@@ -20,7 +20,7 @@ import play.api.libs.json._
 
 final case class LinkingInstance(to: String, from: String, linkingInstanceType: String) {
 
-  def toNexusFormat: JsObject = {
+  def toNexusFormat: JsObject =
     Json.obj(
       InternalSchemaFieldsConstants.LINKINGINSTANCE_FROM -> Json.obj(JsonLDConstants.ID -> from),
       InternalSchemaFieldsConstants.LINKINGINSTANCE_TO   -> Json.obj(JsonLDConstants.ID -> to),
@@ -28,5 +28,4 @@ final case class LinkingInstance(to: String, from: String, linkingInstanceType: 
         Seq(JsString(linkingInstanceType), JsString(InternalSchemaFieldsConstants.LINKINGINSTANCE_TYPE))
       )
     )
-  }
 }

@@ -17,7 +17,8 @@
 package models
 
 import com.google.inject.Inject
-import helpers.OIDCHelper
+import helpers.AuthenticationHelper
+import models.user.IDMUser
 import monix.eval.Task
 import monix.execution.Scheduler
 import play.api.mvc.Results._
@@ -30,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * Cobbled this together from:
   * https://www.playframework.com/documentation/2.6.x/ScalaActionsComposition#Authentication
   */
-class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default, authprovider: IDMAPIService)(
+class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default)(
   implicit val executionContext: ExecutionContext
 ) extends ActionBuilder[UserRequest, AnyContent] {
   implicit val scheduler: Scheduler = monix.execution.Scheduler.Implicits.global
@@ -43,17 +44,13 @@ class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default, authpro
     * @return The play action with the user info or Unauthorized
     */
   override def invokeBlock[A](request: Request[A], block: (UserRequest[A]) => Future[Result]): Future[Result] = {
-    val token = OIDCHelper.getTokenFromRequest[A](request)
-    authprovider
-      .getUserInfo(token)
-      .flatMap { user =>
-        if (user.isDefined) {
-          Task.deferFuture(block(new UserRequest(user.get, request, token)))
-        } else {
-          Task.pure(Unauthorized("You must be logged in to execute this request"))
-        }
-      }
-      .runToFuture
+    val token = AuthenticationHelper.getTokenFromRequest[A](request)
+    val result = token match {
+      case Some(t) =>
+        Task.deferFuture(block(new UserRequest(new IDMUser("1", "", "", "", "", Some(""), None), request, t))) /* TODO: remove user  from UserRequest */
+      case None => Task.pure(Unauthorized("You must be logged in to execute this request"))
+    }
+    result.runToFuture
   }
 
 }

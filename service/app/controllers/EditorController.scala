@@ -116,7 +116,7 @@ class EditorController @Inject()(
   private def getMetaDataByIds(
     ls: Seq[NexusInstance],
     formRegistry: FormRegistry[UISpec]
-  ): List[Task[Option[JsObject]]] = {
+  ): List[Task[Option[JsObject]]] =
     ls.groupBy(_.id().get)
       .map {
         case (_, v) =>
@@ -135,60 +135,56 @@ class EditorController @Inject()(
           formService
       }
       .toList
-  }
 
-  def getInstancesByIds(allFields: Boolean, databaseScope: Option[String]): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    val listOfIds = for {
-      bodyContent <- request.body.asJson
-      ids         <- bodyContent.asOpt[List[String]]
-    } yield ids.map(NexusInstanceReference.fromUrl)
-    formService
-      .getRegistries()
-      .flatMap { registries =>
-        listOfIds match {
-          case Some(ids) =>
-            editorService
-              .retrieveInstancesByIds(ids, request.userToken, if (allFields) "editorFull" else "editorPreview", databaseScope)
-              .flatMap {
-                case Left(err) => Task.pure(err.toResult)
-                case Right(ls) =>
-                  if (allFields) {
-                    val listOfIds: List[Task[Option[JsObject]]] = getMetaDataByIds(ls, registries.formRegistry)
-                    Task.sequence(listOfIds).map { l =>
-                      val jsonList = l.collect { case Some(r) => r }
-                      Ok(Json.toJson(EditorResponseObject(Json.toJson(jsonList))))
+  def getInstancesByIds(allFields: Boolean, databaseScope: Option[String]): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val listOfIds = for {
+        bodyContent <- request.body.asJson
+        ids         <- bodyContent.asOpt[List[String]]
+      } yield ids.map(NexusInstanceReference.fromUrl)
+      formService
+        .getRegistries()
+        .flatMap { registries =>
+          listOfIds match {
+            case Some(ids) =>
+              editorService
+                .retrieveInstancesByIds(
+                  ids,
+                  request.userToken,
+                  if (allFields) "editorFull" else "editorPreview",
+                  databaseScope
+                )
+                .flatMap {
+                  case Left(err) => Task.pure(err.toResult)
+                  case Right(ls) =>
+                    if (allFields) {
+                      val listOfIds: List[Task[Option[JsObject]]] = getMetaDataByIds(ls, registries.formRegistry)
+                      Task.sequence(listOfIds).map { l =>
+                        val jsonList = l.collect { case Some(r) => r }
+                        Ok(Json.toJson(EditorResponseObject(Json.toJson(jsonList))))
+                      }
+                    } else {
+                      val previews = ls.map(i => i.content.as[PreviewInstance].setLabel(registries.formRegistry)).toList
+                      Task.pure(Ok(Json.toJson(EditorResponseObject(Json.toJson(previews)))))
                     }
-                  } else {
-                    val previews = ls.map(i => i.content.as[PreviewInstance].setLabel(registries.formRegistry)).toList
-                    Task.pure(
-                      Ok(
-                        Json.toJson(EditorResponseObject(Json.toJson(previews)))
-                      )
-                    )
-                  }
-              }
-          case None => Task.pure(BadRequest("Missing body content"))
+                }
+            case None => Task.pure(BadRequest("Missing body content"))
+          }
         }
-      }
-      .runToFuture
-  }
+        .runToFuture
+    }
 
-  def getInstanceGraph(
-    org: String,
-    domain: String,
-    datatype: String,
-    version: String,
-    id: String
-  ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
-    editorService
-      .retrieveInstanceGraph(nexusInstanceReference, request.userToken)
-      .map {
-        case Left(err)    => err.toResult
-        case Right(value) => Ok(value)
-      }
-      .runToFuture
-  }
+  def getInstanceGraph(org: String, domain: String, datatype: String, version: String, id: String): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
+      editorService
+        .retrieveInstanceGraph(nexusInstanceReference, request.userToken)
+        .map {
+          case Left(err)    => err.toResult
+          case Right(value) => Ok(value)
+        }
+        .runToFuture
+    }
 
   def getInstanceRelease(
     org: String,
@@ -326,7 +322,16 @@ class EditorController @Inject()(
     bodyContent match {
       case Some(content) =>
         editorService
-          .retrieveSuggestions(instancePath, field, fieldType, size, start, search, content.as[JsObject], request.userToken)
+          .retrieveSuggestions(
+            instancePath,
+            field,
+            fieldType,
+            size,
+            start,
+            search,
+            content.as[JsObject],
+            request.userToken
+          )
           .map {
             case Right(value) => Ok(value)
             case Left(err)    => err.toResult
@@ -410,9 +415,7 @@ class EditorController @Inject()(
             .retrieveInstance(nexusInstanceRef, request.userToken, registries.queryRegistry)
             .flatMap[Result] {
               case Left(error) =>
-                Task.pure(
-                  error.toResult
-                )
+                Task.pure(error.toResult)
               case Right(originalInstance) =>
                 val nbRevision = (originalInstance.content \ "nxv:rev").as[JsNumber]
                 Task.pure(Ok(Json.obj("available_revisions" -> nbRevision, "path" -> id)))
@@ -445,11 +448,7 @@ class EditorController @Inject()(
                   .flatMap {
                     case Right(instance) =>
                       FormOp
-                        .getFormStructure(
-                          instanceRef.nexusPath,
-                          instance.content,
-                          registries.formRegistry
-                        ) match {
+                        .getFormStructure(instanceRef.nexusPath, instance.content, registries.formRegistry) match {
                         case JsNull =>
                           Task.pure(NotImplemented("Form not implemented"))
                         case instanceForm =>
@@ -462,11 +461,7 @@ class EditorController @Inject()(
                               }
                           }
                           specFlush.map { _ =>
-                            Ok(
-                              Json.toJson(
-                                EditorResponseObject(instanceForm.as[JsObject])
-                              )
-                            )
+                            Ok(Json.toJson(EditorResponseObject(instanceForm.as[JsObject])))
                           }
                       }
                     case Left(error) =>
@@ -490,12 +485,7 @@ class EditorController @Inject()(
     * @param version The version of the schema
     * @return 201 Created
     */
-  def createInstance(
-    org: String,
-    domain: String,
-    schema: String,
-    version: String
-  ): Action[AnyContent] =
+  def createInstance(org: String, domain: String, schema: String, version: String): Action[AnyContent] =
     (authenticatedUserAction andThen EditorUserAction.editorUserWriteAction(org, config.editorPrefix, iAMAuthService))
       .async { implicit request =>
         val instancePath = NexusPath(org, domain, schema, version)

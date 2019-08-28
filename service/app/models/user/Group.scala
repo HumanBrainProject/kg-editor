@@ -30,9 +30,6 @@ object Group {
   )(Group.apply _)
 
   implicit val writerUserGroup = new Writes[Group] {
-    override def writes(o: Group): JsValue = Json.obj(
-      nameLabel        -> o.name,
-      descriptionLabel -> o.description,
-    )
+    override def writes(o: Group): JsValue = Json.obj(nameLabel -> o.name, descriptionLabel -> o.description)
   }
 }

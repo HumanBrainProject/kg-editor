@@ -25,12 +25,7 @@ trait APIEditorErrorInterface[T] extends PlayError[T] {
 final case class APIEditorError(override val status: Int, override val content: String)
     extends APIEditorErrorInterface[String] {
 
-  override def toJson: JsValue = Json.obj(
-    "error" -> Json.obj(
-      "status"  -> status,
-      "message" -> content
-    )
-  )
+  override def toJson: JsValue = Json.obj("error" -> Json.obj("status" -> status, "message" -> content))
 
   override def toString: String = s"Status: $status - message: $content"
 }
@@ -41,23 +36,16 @@ object APIEditorError {
 
   implicit val userListWrites: Writes[APIEditorError] = new Writes[APIEditorError] {
 
-    def writes(error: APIEditorError): JsValue = {
-      Json.obj(
-        "error" -> Json.obj(
-          "status"  -> error.status,
-          "message" -> error.content
-        )
-      )
-    }
+    def writes(error: APIEditorError): JsValue =
+      Json.obj("error" -> Json.obj("status" -> error.status, "message" -> error.content))
   }
 }
 
 final case class APIEditorMultiError(override val status: Int, override val content: List[APIEditorError])
     extends APIEditorErrorInterface[List[_]] {
 
-  override def toJson: JsValue = Json.obj(
-    "error" -> Json.toJson(content.map(m => Json.obj("status" -> m.status, "message" -> m.content)))
-  )
+  override def toJson: JsValue =
+    Json.obj("error" -> Json.toJson(content.map(m => Json.obj("status" -> m.status, "message" -> m.content))))
 }
 
 object APIEditorMultiError {

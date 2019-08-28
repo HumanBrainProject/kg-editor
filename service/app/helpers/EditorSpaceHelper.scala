@@ -21,7 +21,7 @@ import models.user.IDMUser
 object EditorSpaceHelper {
   private val editorSuffix = "editor"
 
-  def nexusEditorContext(org: String): String = {
+  def nexusEditorContext(org: String): String =
     if (org != "manual") {
       s""""${org}":"http://hbp.eu/${org}#",
          |"manual":"http://hbp.eu/manual#",
@@ -29,7 +29,6 @@ object EditorSpaceHelper {
     } else {
       s""""${org}":"http://hbp.eu/${org}#","""
     }
-  }
 
   /**
     * Check if the group is an editor group
@@ -37,11 +36,9 @@ object EditorSpaceHelper {
     * @param hintedGroup The group the user wants to use
     * @return true if the group is an editor group
     */
-  def isEditorGroup(userInfo: IDMUser, hintedGroup: String): Boolean = {
+  def isEditorGroup(userInfo: IDMUser, hintedGroup: String): Boolean =
     userInfo.groups.exists(g => g.name.equals(s"nexus-${hintedGroup}"))
-  }
 
-  def getGroupName(group: String, suffix: String): String = {
+  def getGroupName(group: String, suffix: String): String =
     s"$group$suffix"
-  }
 }

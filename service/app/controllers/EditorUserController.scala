@@ -18,6 +18,7 @@ package controllers
 
 import actions.EditorUserAction
 import com.google.inject.Inject
+import helpers.AuthenticationHelper
 import models.editorUserList.BOOKMARKFOLDER
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference
@@ -53,11 +54,10 @@ class EditorUserController @Inject()(
 
   private def getOrCreateUserWithUserFolder(
     token: AccessToken
-  )(implicit request: UserRequest[AnyContent]): Task[Either[APIEditorError, EditorUser]] = {
+  )(implicit request: UserRequest[AnyContent]): Task[Either[APIEditorError, EditorUser]] =
     editorUserService.getOrCreateUser(request.user, token) { postCreation }
-  }
 
-  def postCreation(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] = {
+  def postCreation(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] =
     editorUserListService.createBookmarkListFolder(editorUser, "My Bookmarks", token, BOOKMARKFOLDER).flatMap {
       case Right(_) =>
         Task.pure(Right(editorUser))
@@ -70,6 +70,15 @@ class EditorUserController @Inject()(
             Left(error)
         }
     }
+
+  def getUserProfile(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+    editorUserService
+      .getUserProfile(request.userToken)
+      .map {
+        case Right(value) => Ok(value)
+        case Left(error)  => error.toResult
+      }
+      .runToFuture
   }
 
   def getOrCreateCurrentUser(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
@@ -113,14 +122,7 @@ class EditorUserController @Inject()(
       .getRegistries()
       .flatMap { registries =>
         editorService
-          .retrievePreviewInstances(
-            nexusPath,
-            registries.formRegistry,
-            from,
-            size,
-            search,
-            request.userToken
-          )
+          .retrievePreviewInstances(nexusPath, registries.formRegistry, from, size, search, request.userToken)
           .map {
             case Right((data, count)) =>
               registries.formRegistry.registry.get(nexusPath) match {
@@ -182,7 +184,7 @@ class EditorUserController @Inject()(
     domain: String,
     datatype: String,
     version: String,
-    id: String,
+    id: String
   ): Action[AnyContent] =
     (authenticatedUserAction andThen EditorUserAction.editorUserAction(editorUserService)).async { implicit request =>
       val opts = for {

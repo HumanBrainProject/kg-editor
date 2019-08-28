@@ -35,7 +35,6 @@ object Pagination {
     (JsPath \ "number").write[Int]
   )(unlift(Pagination.unapply))
 
-  def empty: Pagination = {
+  def empty: Pagination =
     Pagination(0, 0, 0, 0)
-  }
 }

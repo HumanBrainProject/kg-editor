@@ -1,10 +1,10 @@
 import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
-const redirectUri = `${window.location.protocol}//${window.location.host}${window.rootPath || ""}/loginSuccess`;
+const redirectUri = () => `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
 
 const endpoints = {
-  "login": () => `/editor/api/auth/login?redirect_uri=${escape(redirectUri)}`,
+  "login": () => `/editor/api/auth/login?redirect_uri=${escape(redirectUri())}`,
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,

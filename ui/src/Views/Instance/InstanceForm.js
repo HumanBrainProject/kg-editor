@@ -281,7 +281,7 @@ export default class InstanceForm extends React.Component {
                         <HeaderPanel
                           className={classes.panelHeader}
                           nodeType={instance.nodeType}
-                          color={structureStore.colorPalletteBySchema(instance.nodeType)}
+                          color={structureStore.colorPalletteByType(instance.nodeType)}
                           hasChanged={instance.hasChanged} />
 
                         {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:

@@ -104,7 +104,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   def retrieveStructure(withLinks: Boolean): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getStructure(wSClient, config.kgQueryEndpoint, withLinks)
+      .getStructure(wSClient, config.kgCoreEndpoint, withLinks)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))

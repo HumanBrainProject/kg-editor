@@ -196,7 +196,7 @@ export default class UserProfileTab extends React.Component{
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         <button className={classes.button} onClick={this.handleButtonClick.bind(this)} title="Account" ref={this.buttonRef}>
-          <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={size} />
+          <Avatar userId={authStore.user.id} name={authStore.user.displayName} picture={authStore.user.picture} size={size} />
         </button>
         <Overlay
           show={this.state.showPopOver}
@@ -210,9 +210,9 @@ export default class UserProfileTab extends React.Component{
           <Popover id={this.popOverId} className={classes.popOver}>
             <PopOverContent onSizeChange={this.handlePopOverPosition.bind(this)}>
               <div className={classes.popOverContent}>
-                <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={100} />
+                <Avatar userId={authStore.user.id} name={authStore.user.displayName} picture={authStore.user.picture} size={100} />
                 <div>
-                  <div className={classes.name}>{authStore.user.name}</div>
+                  <div className={classes.name}>{authStore.user.displayName}</div>
                   <div className={classes.email}>{authStore.user.email}</div>
                   <Button bsStyle="primary" className={classes.accountBtn} href="https://collab.humanbrainproject.eu/#/me" title="https://collab.humanbrainproject.eu/#/me" rel="noopener noreferrer" target="_blank">Account</Button>
                 </div>

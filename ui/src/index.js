@@ -427,8 +427,8 @@ class App extends React.Component {
     routerStore.history.push("/");
   }
 
-  handleRetryRetriveUserProfile = () => {
-    authStore.retriveUserProfile();
+  handleRetryretrieveUserProfile = () => {
+    authStore.retrieveUserProfile();
   }
 
   handleCreateInstance = () => {
@@ -488,7 +488,7 @@ class App extends React.Component {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = instance.data && structureStore.colorPalletteBySchema(instance.data.fields.id.value.path);
+                      color = instance.data && structureStore.colorPalletteByType(instance.data.fields.id.value.path);
                     }
                     if (!label) {
                       label = instanceId;
@@ -531,7 +531,7 @@ class App extends React.Component {
             {appStore.globalError ?
               <Route component={GlobalError} />
               :
-              !authStore.isOIDCAuthenticated ?
+              !authStore.isAuthenticated ?
                 <Route component={Login} />
                 :
                 authStore.isFullyAuthenticated ?
@@ -547,13 +547,12 @@ class App extends React.Component {
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />
                     {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                    <Route path="/loginSuccess" exact={true} component={() => null} />
                     <Route path="/" exact={true} component={Home} />
                     <Route component={NotFound} />
                   </Switch>
                   : null
             }
-            {authStore.isOIDCAuthenticated && !authStore.hasUserProfile && (
+            {authStore.isAuthenticated && !authStore.hasUserProfile && (
               authStore.isRetrievingUserProfile ?
                 <div className={classes.userProfileLoader}>
                   <FetchingLoader>Retrieving user profile...</FetchingLoader>
@@ -564,7 +563,7 @@ class App extends React.Component {
                     <BGMessage icon={"ban"}>
                       {`There was a network problem retrieving user profile (${authStore.userProfileError}).
                       If the problem persists, please contact the support.`}<br /><br />
-                      <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
+                      <Button bsStyle={"primary"} onClick={this.handleRetryretrieveUserProfile}>
                         <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
                       </Button>
                     </BGMessage>

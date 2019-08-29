@@ -150,7 +150,7 @@ export default class Preview extends React.Component {
       instance && instance.promotedFieldsWithMarkdown;
     const nonPromotedFields =
       instance && instance.nonPromotedFields;
-    const color = showNodeType?structureStore.colorPalletteBySchema(instance.path):null;
+    const color = showNodeType?structureStore.colorPalletteByType(instance.path):null;
     return (
       <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
         {(!instance.isFetched || instance.isFetching)? (

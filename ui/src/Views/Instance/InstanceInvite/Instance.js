@@ -76,7 +76,7 @@ export default class InstanceInvite extends React.Component{
 
     const nodeType = instance.data && instance.data.label;
 
-    const color = structureStore.colorPalletteBySchema(instance.path);
+    const color = structureStore.colorPalletteByType(instance.path);
 
     const nexusId = instance.data.fields.id?instance.data.fields.id.nexus_id:"<new>";
 

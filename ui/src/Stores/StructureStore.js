@@ -5,7 +5,7 @@ import palette from "google-palette";
 
 class StructureStore {
   @observable colorPaletteByLabel = new Map();
-  @observable structure = null;
+  @observable types = [];
   @observable fetchStuctureError = null;
   @observable isFetchingStructure = false;
   colorPalette = null;
@@ -15,65 +15,62 @@ class StructureStore {
   }
 
   @computed
-  get groupedSchemas() {
-    return groupBy(this.structure.schemas, "group");
+  get groupedTypes() {
+    return groupBy(this.types, "group");
   }
 
   @computed
-  get sortedGroupedSchemas() {
-    return Object.keys(this.groupedSchemas).sort();
+  get sortedGroupedTypes() {
+    return Object.keys(this.groupedTypes).sort();
   }
 
   @computed
-  get hasSchemas() {
+  get hasTypes() {
     return (
-      !this.fetchStuctureError &&
-      this.structure &&
-      this.structure.schemas &&
-      this.structure.schemas.length
+      !this.fetchStuctureError && this.types.length
     );
   }
 
   @computed
-  get schemasMap() {
+  get typesMap() {
     const map = new Map();
-    this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => map.set(schema.id, schema));
+    this.types.forEach(type => map.set(type.id, type));
     return map;
   }
 
   @computed
-  get schemasLabel() {
+  get typesLabel() {
     const map = new Map();
-    this.structure && this.structure.schemas && this.structure.schemas.length && this.structure.schemas.forEach(schema => map.set(schema.id, schema.label));
+    this.types.forEach(type => map.set(type.id, type.label));
     return map;
   }
 
-  getSortedSchemasByGroup(group) {
-    return sortBy(this.groupedSchemas[group], ["label"]);
+  getSortedTypesByGroup(group) {
+    return sortBy(this.groupedTypes[group], ["label"]);
   }
 
-  findSchemaById(id) {
-    return this.schemasMap.get(id);
+  findTypeById(id) {
+    return this.typesMap.get(id);
   }
 
-  findLabelBySchema(schema) {
-    return this.schemasLabel.get(schema);
+  findLabelByType(type) {
+    return this.typesLabel.get(type);
   }
 
   @action
   async fetchStructure(forceFetch=false) {
-    if (!this.isFetchingStructure && (!this.structure || !!forceFetch)) {
+    if (!this.isFetchingStructure && (!this.types.length || !!forceFetch)) {
       this.isFetchingStructure = true;
       this.fetchStuctureError = null;
       try {
         const response = await API.axios.get(API.endpoints.structure());
-        let schemas = response.data && response.data.schemas.map(schema=>schema.id);
         runInAction(() => {
-          this.structure = response.data;
-          this.colorPalette = palette("tol-dv", schemas.length);
-          schemas.forEach((schema, index) => {
+          this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
+          const typeNames = this.types.map(type=>type.id);
+          this.colorPalette = palette("tol-dv", typeNames.length);
+          typeNames.forEach((name, index) => {
             let color = "#" + this.colorPalette[index];
-            this.colorPaletteByLabel[this.findLabelBySchema(schema)] = color;
+            this.colorPaletteByLabel[this.findLabelByType(name)] = color;
           });
           this.isFetchingStructure = false;
         });
@@ -85,8 +82,8 @@ class StructureStore {
     }
   }
 
-  colorPalletteBySchema(schema) {
-    return this.colorPaletteByLabel[this.findLabelBySchema(schema)];
+  colorPalletteByType(type) {
+    return this.colorPaletteByLabel[this.findLabelByType(type)];
   }
 }
 

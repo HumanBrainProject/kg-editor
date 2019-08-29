@@ -361,7 +361,7 @@ export default class List extends React.Component {
         </div>
       );
     } else if (list.isDataTypeList) {
-      const color = structureStore.colorPalletteBySchema(list.id);
+      const color = structureStore.colorPalletteByType(list.id);
       return (
         <div key={list.id} className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`} onClick={this.handleSelect.bind(this, list)} title={list.relatedNodeType}>
           <React.Fragment>

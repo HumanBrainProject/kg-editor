@@ -13,6 +13,9 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
+import com.typesafe.sbt.packager.docker._
+
 val library = new {
 
   val Version = new {
@@ -76,19 +79,21 @@ val settings: Seq[Setting[_]] = Seq(
   scalaVersion := "2.12.9",
   libraryDependencies ++= baseDependencies,
   resolvers ++= Seq(
-    "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/",
-    Resolver.jcenterRepo
-  ),
+      "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/",
+      Resolver.jcenterRepo
+    ),
   routesGenerator := InjectedRoutesGenerator,
   scalacOptions ++= scalacOptionsAll
 )
 
 lazy val kg_service = (project in file("."))
   .settings(settings)
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, DockerPlugin)
 
 sources in (Compile, doc) := Seq.empty
 
 scalafmtOnCompile := true
 
 publishArtifact in (Compile, packageDoc) := false
+
+dockerBaseImage := "openjdk:8"

@@ -28,6 +28,27 @@ const getKey = (hash, key) => {
   return value;
 };
 
+const userKeys = {
+  id: "@id",
+  username: "http://schema.org/alternateName",
+  email: "http://schema.org/email",
+  displayName: "http://schema.org/name",
+  givenName: "http://schema.org/givenName",
+  familyName: "http://schema.org/familyName"
+};
+
+const mapUserProfile = data => {
+  const user = {};
+  if (data && data.data) {
+    Object.entries(userKeys).forEach(([name, fullyQualifiedName]) => {
+      if (data.data[fullyQualifiedName]) {
+        user[name] = data.data[fullyQualifiedName];
+      }
+    });
+  }
+  return user;
+};
+
 class AuthStore {
   @observable session = null;
   @observable user = null;
@@ -89,7 +110,7 @@ class AuthStore {
         */
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
-          this.user = data && data.data;
+          this.user = mapUserProfile(data);
           this.isRetrievingUserProfile = false;
         });
       } catch (e) {

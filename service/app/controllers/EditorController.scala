@@ -17,7 +17,9 @@
 package controllers
 
 import actions.EditorUserAction
+import constants.EditorConstants
 import javax.inject.{Inject, Singleton}
+import constants._
 import models._
 import models.instance._
 import models.specification.{FormRegistry, UISpec}
@@ -136,6 +138,59 @@ class EditorController @Inject()(
       }
       .toList
 
+  def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val listOfIds = for {
+        bodyContent <- request.body.asJson
+        ids         <- bodyContent.asOpt[List[String]]
+      } yield ids
+      val result = listOfIds match {
+        case Some(ids) =>
+          if (allFields) {
+            editorService
+              .retrieveInstances(ids, request.userToken, databaseScope, metadata)
+              .map {
+                case Right(value) => Ok(value)
+                case Left(err)    => err.toResult
+              }
+          } else {
+            for {
+              typeInfo <- editorService.retrieveTypes(
+                s"${EditorConstants.EDITORNAMESPACE}typeInfo",
+                request.userToken,
+                metadata
+              )
+              instances <- editorService.retrieveInstances(ids, request.userToken, databaseScope, metadata)
+            } yield {
+              (typeInfo, instances) match {
+                case (Right(typeInfoResult), Right(instancesResult)) =>
+                  val typeInfos = (typeInfoResult \ "data").as[List[JsObject]].foldLeft(Map[String, JsObject]()) {
+                    case (map, js) =>
+                      map.updated((js \ s"${EditorConstants.EDITORNAMESPACE}describedType").as[String], js)
+                  }
+                  val res = (instancesResult \ "data").as[JsArray].value.toList.map { instance =>
+                    val promotedFieldsList = (instance \ "@type").as[List[String]].flatMap { typeName =>
+                      val promotedFieldsListOpt = for {
+                        typeInfoRes <- typeInfos.get(typeName)
+                        promotedFieldsArray <- (typeInfoRes \ s"${EditorConstants.EDITORNAMESPACE}promotedFields")
+                          .asOpt[List[String]]
+                      } yield promotedFieldsArray
+                      promotedFieldsListOpt.getOrElse(List())
+                    }
+                    promotedFieldsList.distinct.foldLeft(Map[String, JsObject]()) {
+                      case (map, promotedField) => map.updated(promotedField, (instance \ promotedField).as[JsObject])
+                    }
+                  }
+                  Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
+                case _ => InternalServerError("Something went wrong! Please try again!")
+              }
+            }
+          }
+        case None => Task.pure(BadRequest("Wrong body content!"))
+      }
+      result.runToFuture
+    }
+
   def getInstancesByIds(allFields: Boolean, databaseScope: Option[String]): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val listOfIds = for {
@@ -160,7 +215,9 @@ class EditorController @Inject()(
                     if (allFields) {
                       val listOfIds: List[Task[Option[JsObject]]] = getMetaDataByIds(ls, registries.formRegistry)
                       Task.sequence(listOfIds).map { l =>
-                        val jsonList = l.collect { case Some(r) => r }
+                        val jsonList = l.collect {
+                          case Some(r) => r
+                        }
                         Ok(Json.toJson(EditorResponseObject(Json.toJson(jsonList))))
                       }
                     } else {
@@ -427,11 +484,11 @@ class EditorController @Inject()(
   /**
     * Entry point when updating an instance
     *
-    * @param org The organization of the instance
-    * @param domain The domain of the instance
-    * @param schema The schema of the instance
+    * @param org     The organization of the instance
+    * @param domain  The domain of the instance
+    * @param schema  The schema of the instance
     * @param version The version of the schema
-    * @param id The id of the instance
+    * @param id      The id of the instance
     * @return A result with the instance updated or an error message
     */
   def updateInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
@@ -479,9 +536,9 @@ class EditorController @Inject()(
   /**
     * Creation of a new instance in the editor
     *
-    * @param org The organization of the instance
-    * @param domain The domain of the instance
-    * @param schema The schema of the instance
+    * @param org     The organization of the instance
+    * @param domain  The domain of the instance
+    * @param schema  The schema of the instance
     * @param version The version of the schema
     * @return 201 Created
     */
@@ -529,9 +586,9 @@ class EditorController @Inject()(
   /**
     * Returns an empty form for a specific instance type
     *
-    * @param org The organization of the instance
-    * @param domain The domain of the instance
-    * @param schema The schema of the instance
+    * @param org     The organization of the instance
+    * @param domain  The domain of the instance
+    * @param schema  The schema of the instance
     * @param version The version of the schema
     * @return 200
     */

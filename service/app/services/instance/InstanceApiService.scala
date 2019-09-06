@@ -54,6 +54,52 @@ trait InstanceApiService {
     }
   }
 
+  def getInstances(
+    wsClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    instanceIds: List[String],
+    databaseScope: Option[String] = None,
+    metadata: Boolean
+  ): Task[Either[WSResponse, JsObject]] = {
+    val payload = Json.toJson(instanceIds)
+    val dbScope = databaseScope.map("databaseScope" -> _).getOrElse("" -> "")
+    val q = wsClient
+      .url(s"${apiBaseEndpoint}/instances/subset")
+      .withHttpHeaders(AUTHORIZATION -> token.token)
+      .addQueryStringParameters(dbScope)
+      .addQueryStringParameters("metadata" -> metadata.toString)
+      .addQueryStringParameters("stage" -> "LIVE")
+    val r = Task.deferFuture(q.post(payload))
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
+
+  def getTypes(
+    wsClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    typeOfInstance: String,
+    metadata: Boolean
+  ): Task[Either[WSResponse, JsObject]] = {
+    val q = wsClient
+      .url(s"${apiBaseEndpoint}/instances")
+      .withHttpHeaders(AUTHORIZATION -> token.token)
+      .addQueryStringParameters("type" -> typeOfInstance)
+      .addQueryStringParameters("metadata" -> metadata.toString)
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
+
   def getReleaseStatus(
     wSClient: WSClient,
     apiBaseEndpoint: String,
@@ -275,7 +321,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/structure/")
+      .url(s"$apiBaseEndpoint/types/structure/")
       .addQueryStringParameters("withLinks" -> withLinks.toString)
       .withHttpHeaders("client" -> serviceClient.client)
     val r = Task.deferFuture(q.get())
@@ -351,7 +397,7 @@ trait InstanceApiService {
     apiBaseEndpoint: String,
     nexusInstance: NexusInstanceReference,
     token: AccessToken,
-//     userId: String,
+    //     userId: String,
     serviceClient: ServiceClient = EditorClient
   )(
     implicit OIDCAuthService: TokenAuthService,
@@ -360,7 +406,7 @@ trait InstanceApiService {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${nexusInstance.toString}")
       .addHttpHeaders(AUTHORIZATION -> token.token, "client" -> serviceClient.client)
-//      .addQueryStringParameters("clientIdExtension" -> userId)
+    //      .addQueryStringParameters("clientIdExtension" -> userId)
     val r = token match {
       case BasicAccessToken(_)   => Task.deferFuture(q.put(""))
       case RefreshAccessToken(_) => AuthHttpClient.putWithRetry(q, "")

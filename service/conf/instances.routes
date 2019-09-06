@@ -54,6 +54,24 @@ DELETE    /:org/:domain/:schema/:version/:id                  controllers.Editor
 ###
 POST    /                 controllers.EditorController.getInstancesByIds(allFields:Boolean?=false, databaseScope: Option[String])
 
+
+###
+#  summary: get a list of entities
+#  tags:
+#    - editor
+#  parameters:
+#  - in: body
+#    description: A list of IDs
+#    required: true
+#    type: array
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST    /list                 controllers.EditorController.getInstances(allFields:Boolean?=false, databaseScope: Option[String], metadata:Boolean?=false)
+
 ###
 #tags:
 #  - editor

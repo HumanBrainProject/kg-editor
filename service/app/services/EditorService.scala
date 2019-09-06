@@ -470,6 +470,31 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
           }
       }
 
+  def retrieveInstances(
+    instanceIds: List[String],
+    token: AccessToken,
+    databaseScope: Option[String] = None,
+    metadata: Boolean
+  ): Task[Either[APIEditorError, JsObject]] =
+    instanceApiService
+      .getInstances(wSClient, config.kgCoreEndpoint, token, instanceIds, databaseScope, metadata)
+      .map {
+        case Right(value) => Right(value)
+        case Left(res)    => Left(APIEditorError(res.status, res.body))
+      }
+
+  def retrieveTypes(
+    typeOfInstance: String,
+    token: AccessToken,
+    metadata: Boolean
+  ): Task[Either[APIEditorError, JsObject]] =
+    instanceApiService
+      .getTypes(wSClient, config.kgCoreEndpoint, token, typeOfInstance, metadata)
+      .map {
+        case Right(value) => Right(value)
+        case Left(res)    => Left(APIEditorError(res.status, res.body))
+      }
+
   def retrieveInstancesByIds(
     instanceIds: List[NexusInstanceReference],
     token: AccessToken,

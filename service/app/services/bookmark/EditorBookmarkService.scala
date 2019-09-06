@@ -663,30 +663,38 @@ object EditorBookmarkService {
 
   def bookmarkToNexusStruct(instanceLink: String, userBookMarkListNexusId: String): JsObject =
     Json.obj(
-      EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLIST         -> Json.obj("@id" -> s"$userBookMarkListNexusId"),
-      EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKINSTANCELINK -> Json.obj("@id" -> s"$instanceLink")
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKLIST -> Json.obj(
+        "@id" -> s"$userBookMarkListNexusId"
+      ),
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKINSTANCELINK -> Json.obj(
+        "@id" -> s"$instanceLink"
+      )
     )
 
   def bookmarkListToNexusStruct(name: String, userFolderId: String, newDate: Option[String] = None): JsObject =
     newDate match {
       case Some(d) =>
         Json.obj(
-          SchemaFieldsConstants.NAME                                           -> name,
-          EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj("@id" -> s"$userFolderId"),
-          SchemaFieldsConstants.lastUpdate                                     -> d
+          SchemaFieldsConstants.NAME -> name,
+          EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj(
+            "@id" -> s"$userFolderId"
+          ),
+          SchemaFieldsConstants.lastUpdate -> d
         )
       case None =>
         Json.obj(
-          SchemaFieldsConstants.NAME                                           -> name,
-          EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj("@id" -> s"$userFolderId")
+          SchemaFieldsConstants.NAME -> name,
+          EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj(
+            "@id" -> s"$userFolderId"
+          )
         )
     }
 
   def bookmarkListFolderToNexusStruct(name: String, userNexusId: String, folderType: FolderType): JsObject =
     Json.obj(
-      SchemaFieldsConstants.NAME                                   -> name,
-      EditorConstants.EDITORNAMESPACE + EditorConstants.USER       -> Json.obj("@id" -> s"$userNexusId"),
-      EditorConstants.EDITORNAMESPACE + EditorConstants.FOLDERTYPE -> folderType.t
+      SchemaFieldsConstants.NAME                                          -> name,
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.USER       -> Json.obj("@id" -> s"$userNexusId"),
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.FOLDERTYPE -> folderType.t
     )
 
   implicit object JsEither {

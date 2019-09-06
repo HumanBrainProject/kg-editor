@@ -78,7 +78,7 @@ class EditorUserService @Inject()(
 
   def getUserProfile(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val q = wSClient
-      .url(s"${config.kgCoreEndpoint}/users/profile")
+      .url(s"${config.kgCoreEndpoint}/users/me")
       .withHttpHeaders(AUTHORIZATION -> token.token)
     val r = Task.deferFuture(q.get())
     r.map { res =>
@@ -191,6 +191,6 @@ class EditorUserService @Inject()(
 object EditorUserService {
 
   def userToNexusStruct(userId: String): JsObject =
-    Json.obj(EditorConstants.EDITORNAMESPACE + EditorConstants.USERID -> userId)
+    Json.obj(EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.USERID -> userId)
 
 }

@@ -177,7 +177,10 @@ class EditorController @Inject()(
                       } yield promotedFieldsArray
                       promotedFieldsListOpt.getOrElse(List())
                     }
-                    promotedFieldsList.distinct.foldLeft(Map[String, JsObject]()) {
+                    val initMap = Map[String, JsValue]()
+                      .updated("@type", (instance \ "@type").as[JsArray])
+                      .updated("@id", (instance \ "@id").as[JsString])
+                    promotedFieldsList.distinct.foldLeft(initMap) {
                       case (map, promotedField) => map.updated(promotedField, (instance \ promotedField).as[JsObject])
                     }
                   }

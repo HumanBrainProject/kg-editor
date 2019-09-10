@@ -4,10 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react";
 import { Modal, Button } from "react-bootstrap";
 
-import Lists from "./Browse/Lists";
 import Instances from "./Browse/Instances";
 import browseStore from "../Stores/BrowseStore";
 import FetchingLoader from "../Components/FetchingLoader";
+import NavigationPanel from "./Browse/NavigationPanel";
 
 const styles = {
   container: {
@@ -87,7 +87,8 @@ export default class Search extends React.Component{
 
     return(
       <div className={classes.container}>
-        <Lists/>
+        {/* <Lists/> */}
+        <NavigationPanel />
         <Instances/>
         <Modal
           dialogClassName={classes.modal}

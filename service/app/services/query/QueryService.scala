@@ -186,4 +186,28 @@ trait QueryService {
           case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
         }
     }
+
+  def getBookmarks(
+    wSClient: WSClient,
+    apiEndpoint: String,
+    query: QuerySpec,
+    token: AccessToken,
+    queryApiParameters: QueryApiParameter,
+    parameters: Map[String, String] = Map()
+  )(implicit OIDCAuthService: TokenAuthService): Task[WSResponse] =
+    query match {
+      case QuerySpec(_, Some(queryId)) =>
+        val q = wSClient
+          .url(s"$apiEndpoint/queries/$queryId/instances")
+          .addQueryStringParameters(queryApiParameters.toParams: _*)
+          .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
+        Task.deferFuture(q.get())
+      case QuerySpec(payload, None) =>
+        val q = wSClient
+          .url(s"$apiEndpoint/queries")
+          .addQueryStringParameters(queryApiParameters.toParams: _*)
+          .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
+        Task.deferFuture(q.post(payload))
+    }
+
 }

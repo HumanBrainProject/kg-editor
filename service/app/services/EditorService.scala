@@ -489,7 +489,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     metadata: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getTypes(wSClient, config.kgCoreEndpoint, token, typeOfInstance, metadata)
+      .getInstancesByType(wSClient, config.kgCoreEndpoint, token, typeOfInstance, metadata)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))

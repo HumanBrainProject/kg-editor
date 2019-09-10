@@ -1,7 +1,5 @@
 import { observable, action, runInAction, computed } from "mobx";
-//import { debounce, uniqueId } from "lodash";
 import { debounce } from "lodash";
-
 
 import API from "../Services/API";
 import bookmarkStatusStore from "./BookmarkStatusStore";
@@ -42,48 +40,12 @@ class BrowseStore{
   pageStart = 0;
   pageSize = 20;
 
-  get bookmarkListType() {
-    return LIST_TYPE_BOOKMARK;
-  }
-
-  get nodetypeType() {
-    return LIST_TYPE_DATATYPE;
-  }
-
   getListById = id => {
     return this.allLists.find(list => list.id === id);
   }
 
   @action setListsFilter(filter){
     this.listsFilter = filter;
-  }
-
-  @computed get filteredLists(){
-    const term = this.listsFilter.trim().toLowerCase();
-    return this.allLists.filter(list => list.name.toLowerCase().includes(term));
-  }
-
-  @computed get allLists(){
-    return this.lists.reduce((list, folder) => {
-      list.push(...folder.lists);
-      return list;
-    }, []);
-  }
-
-  @computed get nodetypeLists(){
-    return this.lists.reduce((list, folder) => {
-      if (folder.folderType !== LIST_TYPE_DATATYPE) { return list; }
-      list.push(...folder.lists);
-      return list;
-    }, []);
-  }
-
-  @computed get bookmarkLists(){
-    return this.lists.reduce((list, folder) => {
-      if (folder.folderType !== LIST_TYPE_BOOKMARK) { return list; }
-      list.push(...folder.lists);
-      return list;
-    }, []);
   }
 
   @action
@@ -121,10 +83,6 @@ class BrowseStore{
         this.isFetching.lists = false;
       });
     }
-  }
-
-  @action toggleFolder(folder, state){
-    folder.expand = state !== undefined? !!state: !folder.expand;
   }
 
   @action selectList(list){
@@ -185,56 +143,6 @@ class BrowseStore{
   @action
   refreshFilter() {
     this.applyInstancesFilter();
-  }
-
-  @action
-  async createBookmarkList(name, instanceIds) {
-    this.newBookmarkListName = name;
-    this.bookmarkListCreationError = null;
-    this.isCreatingBookmarkList = true;
-    let bookmarkListfolder = null;
-    this.lists.some((folder) => {
-      if (folder.folderType === LIST_TYPE_BOOKMARK) {
-        bookmarkListfolder = folder;
-        return true;
-      }
-      return false;
-    });
-    if (bookmarkListfolder) {
-      try{
-        const { data } = await API.axios.post(API.endpoints.bookmarkList(), {"name": name, "folderId": bookmarkListfolder.id});
-        runInAction(() => {
-          const bookmarkData = data && data.data;
-          /* Mockup Data
-          const bookmarkData = { id: uniqueId(`id${new Date().getTime()}`, name: name) };
-          */
-          bookmarkListfolder.lists.push({
-            id: bookmarkData.id,
-            name: bookmarkData.name?bookmarkData.name:name,
-            type: bookmarkListfolder.folderType,
-            isBookmarkList: true,
-            isDataTypeList: false,
-            isUpdating: false,
-            updateError: null,
-            isDeleting: false,
-            deleteError: null
-          });
-          this.isCreatingBookmarkList = false;
-          this.newBookmarkListName = null;
-          if (instanceIds) {
-            bookmarkStatusStore.updateStatus(instanceIds, bookmarkData.id, true);
-          }
-        });
-      } catch(e){
-        runInAction(() => {
-          this.isCreatingBookmarkList = false;
-          this.bookmarkListCreationError = e.message?e.message:e;
-        });
-      }
-    } else {
-      this.isCreatingBookmarkList = false;
-      this.bookmarkListCreationError = `Failed to create new bookmarkList ${name}. No folder of type ${LIST_TYPE_BOOKMARK} found.`;
-    }
   }
 
   @action

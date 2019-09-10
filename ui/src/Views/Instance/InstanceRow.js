@@ -170,21 +170,27 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    const color = structureStore.colorPalletteByType(instance.schema);
+    const [,,primaryField, secondaryField] = Object.keys(instance); // TODO:Consider changing destruction style
+    const result = {
+      primaryField: instance[primaryField]["https://schema.hbp.eu/value"],
+      secondaryField: instance[secondaryField] && instance[secondaryField]["https://schema.hbp.eu/value"]
+    };
+    const id = instance["@id"];
+    const type = instance["@type"][0];
+    const color = structureStore.colorPalletteByType(type);
+    const label = structureStore.findLabelByType(type);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}
         onDoubleClick={this.handleDoubleClick.bind(this, instance)} >
         <div className={classes.statusAndNameRow}>
-          <Status id={instance.id} darkmode={true} />
-          <div className={classes.nodeType} style={color ? { color: color } : {}} title={instance.label}>
+          <Status id={id} darkmode={true} />
+          <div className={classes.nodeType} style={color ? { color: color } : {}} title={label}>
             <FontAwesomeIcon fixedWidth icon="circle" />
           </div>
-          <div className={classes.name}>{instance.name}</div>
+          <div className={classes.name}>{result.primaryField}</div>
         </div>
-        {!!instance.description && (
-          <div className={classes.description}>{instance.description}</div>
-        )}
+        {result.secondaryField && <div className={classes.description}>{result.secondaryField}</div>}
         <div className={classes.actions}>
           <div className={classes.action} onClick={this.handleAction.bind(this, "view", instance)}>
             <FontAwesomeIcon icon="eye" />
@@ -202,7 +208,7 @@ export default class InstanceRow extends React.Component {
             <FontAwesomeIcon icon="cog" />
           </div>
         </div>
-        <BookmarkStatus id={instance.id} className="bookmarkStatus" />
+        <BookmarkStatus id={id} className="bookmarkStatus" />
         <div className={classes.separator}></div>
       </div>
     );

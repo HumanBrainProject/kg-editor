@@ -138,6 +138,7 @@ class EditorController @Inject()(
       }
       .toList
 
+//  TODO: Deprecate either this one or getInstancesByIds
   def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val listOfIds = for {

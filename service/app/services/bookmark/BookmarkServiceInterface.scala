@@ -24,7 +24,7 @@ import models.user.EditorUser
 import monix.eval.Task
 import play.api.libs.ws.WSResponse
 
-trait EditorBookmarkServiceInterface {
+trait BookmarkServiceInterface {
 
   /**
     * Return the user bookmark list containing  user defined and static lists

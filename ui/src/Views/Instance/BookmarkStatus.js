@@ -7,6 +7,7 @@ import browseStore from "../../Stores/BrowseStore";
 import bookmarkStatusStore from "../../Stores/BookmarkStatusStore";
 import BookmarkButton from "../../Components/BookmarkButton";
 import PopOverButton from "../../Components/PopOverButton";
+import bookmarkStore from "../../Stores/BookmarkStore";
 
 let styles = {
   container:{
@@ -67,7 +68,7 @@ export default class BookmarkStatus extends React.Component{
     const instanceStatus = bookmarkStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarkLists.length)?toJS(instanceStatus.data.bookmarkLists):[];
-    const bookmarkLists = toJS(browseStore.bookmarkLists);
+    const bookmarkLists = bookmarkStore.list;
     return(
       instanceStatus?
         <div className={`${classes.container} ${className?className:""}`}>

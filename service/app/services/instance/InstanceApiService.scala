@@ -79,7 +79,7 @@ trait InstanceApiService {
     }
   }
 
-  def getTypes(
+  def getInstancesByType(
     wsClient: WSClient,
     apiBaseEndpoint: String,
     token: AccessToken,

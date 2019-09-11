@@ -1,10 +1,11 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import navigationStore from "../../Stores/NavigationStore";
+import browseStore from "../../Stores/BrowseStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Bookmarks from "./Bookmarks";
 import { Scrollbars } from "react-custom-scrollbars";
+import bookmarkStore from "../../Stores/BookmarkStore";
 
 const styles = {
   container: {
@@ -35,6 +36,9 @@ const styles = {
     top: "20px",
     left: "20px",
     color: "var(--ft-color-normal)",
+  },
+  noMatch: {
+    padding: "0 15px"
   }
 };
 
@@ -42,11 +46,13 @@ const styles = {
 @observer
 export default class NavigationPanel extends React.Component {
   handleFilterChange = event => {
-    navigationStore.setBrowseFilterTerm(event.target.value);
+    browseStore.setNavigationFilterTerm(event.target.value);
   }
 
   render() {
     const { classes } = this.props;
+    const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
+    const typeList = [];
     return (
       <div className={classes.container}>
         <div className={classes.header}>
@@ -55,11 +61,14 @@ export default class NavigationPanel extends React.Component {
             className={`form-control ${classes.search}`}
             placeholder="Filter lists"
             type="text"
-            value={navigationStore.browseFilterTerm}
+            value={browseStore.navigationFilter}
             onChange={this.handleFilterChange} />
           <FontAwesomeIcon icon="search" className={classes.searchIcon} />
         </div>
         <Scrollbars autoHide>
+          {browseStore.navigationFilter.trim() &&
+              bookmarkList.length === 0 && typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
+          }
           <Bookmarks />
         </Scrollbars>
       </div>

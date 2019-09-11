@@ -25,7 +25,6 @@ const endpoints = {
   "releaseStatusChildren": () => "/editor/api/instances/releases?releaseTreeScope=CHILDREN_ONLY",
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
   "bookmarks": () => "/editor/api/bookmarks",
-  "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
   "structure": () => "/editor/api/structure?withLinks=true",

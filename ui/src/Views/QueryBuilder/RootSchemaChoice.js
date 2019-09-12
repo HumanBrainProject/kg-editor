@@ -44,15 +44,15 @@ export default class RootSchemaChoice extends React.Component {
     const { classes } = this.props;
     return (
       <div className={classes.container}>
-        {structureStore.sortedGroupedTypes.map(group => {
+        {structureStore.typesBySpace.map(space => {
           return (
-            <div className={classes.schemaSelectGroup} key={group}>
-              <h3>{group}</h3>
+            <div className={classes.schemaSelectGroup} key={space.name}>
+              <h3>{space.name}</h3>
               <div>
-                {structureStore.getSortedTypesByGroup(group).map(schema => {
+                {space.types.map(type => {
                   return (
-                    <div className={classes.schemaSelectSchema} key={schema.id} onClick={this.handleSelectRootSchema.bind(this, schema)}>
-                      {schema.label} - <small>{schema.id}</small>
+                    <div className={classes.schemaSelectSchema} key={type.id} onClick={this.handleSelectRootSchema.bind(this, type.id)}>
+                      {type.label} - <small>{type.id}</small>
                     </div>
                   );
                 })}

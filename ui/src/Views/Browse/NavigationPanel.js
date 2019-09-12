@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Bookmarks from "./Bookmarks";
 import { Scrollbars } from "react-custom-scrollbars";
 import bookmarkStore from "../../Stores/BookmarkStore";
+import Types from "./Types";
+import structureStore from "../../Stores/StructureStore";
 
 const styles = {
   container: {
@@ -52,7 +54,7 @@ export default class NavigationPanel extends React.Component {
   render() {
     const { classes } = this.props;
     const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
-    const typeList = [];
+    const typeList = structureStore.filteredList(browseStore.navigationFilter);
     return (
       <div className={classes.container}>
         <div className={classes.header}>
@@ -70,6 +72,7 @@ export default class NavigationPanel extends React.Component {
               bookmarkList.length === 0 && typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
           }
           <Bookmarks />
+          <Types />
         </Scrollbars>
       </div>
     );

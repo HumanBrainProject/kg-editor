@@ -1,5 +1,5 @@
 import { observable, action, computed, runInAction } from "mobx";
-import { sortBy, groupBy } from "lodash";
+import { groupBy } from "lodash";
 import API from "../Services/API";
 import palette from "google-palette";
 
@@ -14,14 +14,22 @@ class StructureStore {
     this.fetchStructure();
   }
 
-  @computed
-  get groupedTypes() {
-    return groupBy(this.types, "group");
+  filteredList(term) {
+    if(term.trim()) {
+      return this.typesBySpace.reduce((acc, space) => {
+        const types = space.types.filter(type => type.label.toLowerCase().includes(term.trim().toLowerCase()));
+        if(types.length) {
+          acc.push({label: space.label, types: types});
+        }
+        return acc;
+      },[]);
+    }
+    return this.typesBySpace;
   }
 
   @computed
-  get sortedGroupedTypes() {
-    return Object.keys(this.groupedTypes).sort();
+  get typesBySpace() {
+    return Object.entries(groupBy(this.types, "space")).map(([label, types]) => ({label: label, types: types}));
   }
 
   @computed
@@ -45,10 +53,6 @@ class StructureStore {
     return map;
   }
 
-  getSortedTypesByGroup(group) {
-    return sortBy(this.groupedTypes[group], ["label"]);
-  }
-
   findTypeById(id) {
     return this.typesMap.get(id);
   }
@@ -66,11 +70,11 @@ class StructureStore {
         const response = await API.axios.get(API.endpoints.structure());
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
-          const typeNames = this.types.map(type=>type.id);
-          this.colorPalette = palette("tol-dv", typeNames.length);
-          typeNames.forEach((name, index) => {
+          this.colorPalette = palette("tol-dv", this.types.length);
+          this.types.forEach((type, index) => {
             let color = "#" + this.colorPalette[index];
-            this.colorPaletteByLabel[this.findLabelByType(name)] = color;
+            this.colorPaletteByLabel[this.findLabelByType(type.id)] = color;
+            type.color = color;
           });
           this.isFetchingStructure = false;
         });

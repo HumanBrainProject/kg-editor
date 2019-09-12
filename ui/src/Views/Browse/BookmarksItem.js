@@ -177,48 +177,48 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class BookmarkItem extends React.Component {
+export default class BookmarksItem extends React.Component {
   constructor(props) {
     super(props);
     this.editBookmarkNameRef = React.createRef();
     this.state = { showDeleteBookmarkDialog: false, showBookmarks: true };
   }
 
-  handleSelect(bookmark) {
+  handleSelect = () => {
     if (bookmarkStore.currentlyEditedBookmark !== this.props.bookmark && !this.state.showDeleteBookmarkDialog) {
-      browseStore.selectItem(bookmark);
+      browseStore.selectItem(this.props.bookmark);
     }
   }
 
-  handelCancelActions() {
+  handelCancelActions = ()  => {
     this.setState({ showDeleteBookmarkDialog: false });
   }
 
-  handleEditBookmark(event) {
+  handleEditBookmark = event =>  {
     event && event.stopPropagation();
     bookmarkStore.setCurrentlyEditedBookmark(this.props.bookmark);
   }
 
-  handleCancelEditBookmark(event) {
+  handleCancelEditBookmark = event => {
     event && event.stopPropagation();
     bookmarkStore.revertBookmarkChanges(this.props.bookmark);
   }
 
-  handleRevertEditBookmark(event) {
+  handleRevertEditBookmark = event => {
     event && event.stopPropagation();
     bookmarkStore.revertBookmarkChanges(this.props.bookmark);
   }
 
-  handleRenameBookmark(event) {
+  handleRenameBookmark = event => {
     event && event.stopPropagation();
     const editName = this.editBookmarkNameRef.current.value.trim();
-    if (this.props.bookmark.name !== editName) {
+    if (this.props.bookmark.label !== editName) {
       bookmarkStore.updateBookmark(this.props.bookmark, { name: editName });
     }
     bookmarkStore.cancelCurrentlyEditedBookmark(this.props.bookmark);
   }
 
-  handleBookmarkNameKeyUp(event) {
+  handleBookmarkNameKeyUp = event =>{
     event && event.stopPropagation();
     if (event.keyCode === 27) {
       this.handleCancelEditBookmark();
@@ -227,18 +227,18 @@ export default class BookmarkItem extends React.Component {
     }
   }
 
-  handleConfirmDeleteBookmark(event) {
+  handleConfirmDeleteBookmark = event => {
     event && event.stopPropagation();
     this.setState({ showDeleteBookmarkDialog: true });
   }
 
-  async handleDeleteBookmark(event) {
+  handleDeleteBookmark = event => {
     event && event.stopPropagation();
     this.setState({ showDeleteBookmarkDialog: false });
     bookmarkStore.deleteBookmark(this.props.bookmark);
   }
 
-  handleCancelDeleteBookmark(event) {
+  handleCancelDeleteBookmark = event => {
     event && event.stopPropagation();
     bookmarkStore.cancelBookmarkDeletion(this.props.bookmark);
   }
@@ -248,19 +248,25 @@ export default class BookmarkItem extends React.Component {
     const selected = browseStore.selectedItem === bookmark;
     const edited = bookmarkStore.currentlyEditedBookmark === bookmark;
     return (
-      <div key={bookmark.id} className={`${classes.container} ${selected ? "selected" : ""} ${edited ? "edited" : ""} ${browseStore.isFetching ? "disabled" : ""}`} onClick={this.handleSelect.bind(this, bookmark)} onMouseLeave={this.handelCancelActions.bind(this)} >
+      <div key={bookmark.id}
+        className={`${classes.container} ${selected ? "selected" : ""} ${edited ? "edited" : ""} ${bookmarkStore.isFetching ? "disabled" : ""}`}
+        onClick={this.handleSelect}
+        onMouseLeave={this.handelCancelActions} >
         <React.Fragment>
           <FontAwesomeIcon icon={"star"} className={`${classes.icon} ${classes.bookmarkIcon}`} />
           {edited && !bookmark.updateError && !bookmark.deleteError ?
             <div className={classes.editBookmark}>
-              <input type="text" className={`form-control ${classes.editBookmarkName}`} defaultValue={bookmark.editName} autoFocus={true} onKeyUp={this.handleBookmarkNameKeyUp.bind(this)} ref={this.editBookmarkNameRef} />
+              <input type="text" className={`form-control ${classes.editBookmarkName}`}
+                defaultValue={bookmark.editName} autoFocus={true}
+                onKeyUp={this.handleBookmarkNameKeyUp}
+                ref={this.editBookmarkNameRef} />
               <ButtonGroup>
-                <Button bsStyle="primary" bsSize="small" onClick={this.handleRenameBookmark.bind(this)} title="confirm rename"><FontAwesomeIcon icon="check" /></Button>
-                <Button bsSize="small" onClick={this.handleCancelEditBookmark.bind(this)} title="cancel rename"><FontAwesomeIcon icon="undo" /></Button>
+                <Button bsStyle="primary" bsSize="small" onClick={this.handleRenameBookmark} title="confirm rename"><FontAwesomeIcon icon="check" /></Button>
+                <Button bsSize="small" onClick={this.handleCancelEditBookmark} title="cancel rename"><FontAwesomeIcon icon="undo" /></Button>
               </ButtonGroup>
             </div>
             :
-            <span>{bookmark.editName ? bookmark.editName : bookmark.name}</span>
+            <span>{bookmark.editName ? bookmark.editName : bookmark.label}</span>
           }
           {bookmark.updateError ?
             <PopOverButton
@@ -274,15 +280,15 @@ export default class BookmarkItem extends React.Component {
                   <FontAwesomeIcon icon="redo-alt" />&nbsp;Retry
                 </React.Fragment>
               )}
-              onOk={this.handleEditBookmark.bind(this)}
+              onOk={this.handleEditBookmark}
               cancelComponent={() => (
                 <React.Fragment>
                   <FontAwesomeIcon icon="undo-alt" />&nbsp;Cancel
                 </React.Fragment>
               )}
-              onCancel={this.handleRevertEditBookmark.bind(this)}
+              onCancel={this.handleRevertEditBookmark}
             >
-              <h5 className={classes.textError}>{`Failed to rename bookmark "${bookmark.name}" into "${bookmark.editName}" (${bookmark.updateError})`}</h5>
+              <h5 className={classes.textError}>{`Failed to rename bookmark "${bookmark.label}" into "${bookmark.editName}" (${bookmark.updateError})`}</h5>
             </PopOverButton>
             :
             bookmark.deleteError ?
@@ -297,15 +303,15 @@ export default class BookmarkItem extends React.Component {
                     <FontAwesomeIcon icon="redo-alt" />&nbsp;Retry
                   </React.Fragment>
                 )}
-                onOk={this.handleDeleteBookmark.bind(this)}
+                onOk={this.handleDeleteBookmark}
                 cancelComponent={() => (
                   <React.Fragment>
                     <FontAwesomeIcon icon="undo-alt" />&nbsp;Cancel
                   </React.Fragment>
                 )}
-                onCancel={this.handleCancelDeleteBookmark.bind(this)}
+                onCancel={this.handleCancelDeleteBookmark}
               >
-                <h5 className={classes.textError}>{`Failed to delete bookmark "${bookmark.name}" (${bookmark.deleteError})`}</h5>
+                <h5 className={classes.textError}>{`Failed to delete bookmark "${bookmark.label}" (${bookmark.deleteError})`}</h5>
               </PopOverButton>
               :
               bookmark.isUpdating || bookmark.isDeleting ?
@@ -316,15 +322,15 @@ export default class BookmarkItem extends React.Component {
                 !edited && !bookmark.updateError && !bookmark.deleteError && (
                   <React.Fragment>
                     <div className={classes.actions}>
-                      <div className={classes.action} onClick={this.handleEditBookmark.bind(this)} title="rename">
+                      <div className={classes.action} onClick={this.handleEditBookmark} title="rename">
                         <FontAwesomeIcon icon="pencil-alt" />
                       </div>
-                      <div className={classes.action} onClick={this.handleConfirmDeleteBookmark.bind(this)} title="delete">
+                      <div className={classes.action} onClick={this.handleConfirmDeleteBookmark} title="delete">
                         <FontAwesomeIcon icon="trash-alt" />
                       </div>
                     </div>
                     <div className={`${classes.deleteBookmarkDialog} ${this.state.showDeleteBookmarkDialog ? "show" : ""}`}>
-                      <Button bsStyle="danger" bsSize="small" onClick={this.handleDeleteBookmark.bind(this)}><FontAwesomeIcon icon="trash-alt" />&nbsp;Delete</Button>
+                      <Button bsStyle="danger" bsSize="small" onClick={this.handleDeleteBookmark}><FontAwesomeIcon icon="trash-alt" />&nbsp;Delete</Button>
                     </div>
                   </React.Fragment>
                 )

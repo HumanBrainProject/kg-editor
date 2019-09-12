@@ -7,7 +7,7 @@ import FetchingLoader from "../../Components/FetchingLoader";
 
 import bookmarkStore from "../../Stores/BookmarkStore";
 import browseStore from "../../Stores/BrowseStore";
-import BookmarkItem from "./BookmarkItem";
+import BookmarksItem from "./BookmarksItem";
 
 const styles = {
   folderName: {
@@ -64,7 +64,7 @@ export default class Bookmarks extends React.Component {
               <div className={classes.folderName} onClick={this.handleToggleBookmarks}>
                 <FontAwesomeIcon fixedWidth icon={this.state.showBookmarks ? "caret-down" : "caret-right"} /> &nbsp; My Bookmarks
               </div>
-              {this.state.showBookmarks && list.map(bookmark => <BookmarkItem key={bookmark.id} bookmark={bookmark}/>)}
+              {this.state.showBookmarks && list.map(bookmark => <BookmarksItem key={bookmark.id} bookmark={bookmark}/>)}
             </div>
           :
           <FetchingLoader>

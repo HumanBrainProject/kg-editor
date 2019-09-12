@@ -121,7 +121,7 @@ export default class Instances extends React.Component{
             <input ref={ref => this.inputRef = ref}
               disabled={browseStore.selectedItem === null}
               className={`form-control ${classes.search}`}
-              placeholder={`Filter instances of ${browseStore.selectedItem.name}`}
+              placeholder={`Filter instances of ${browseStore.selectedItem.label}`}
               type="text"
               value={browseStore.instancesFilter}
               onChange={this.handleFilterChange} />}

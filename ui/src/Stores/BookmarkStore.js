@@ -23,7 +23,7 @@ class BookmarkStore {
 
   filteredList(term) {
     if(term.trim()) {
-      return this.list.filter(bookmark => bookmark.name.toLowerCase().includes(term.trim().toLowerCase()));
+      return this.list.filter(bookmark => bookmark.label.toLowerCase().includes(term.trim().toLowerCase()));
     }
     return this.list;
   }
@@ -38,7 +38,7 @@ class BookmarkStore {
   setCurrentlyEditedBookmark(bookmark) {
     if (bookmark && !bookmark.isUpdating && !bookmark.isDeleting) {
       if (!bookmark.updateError) {
-        bookmark.editName = bookmark.name;
+        bookmark.editName = bookmark.label;
       }
       bookmark.updateError = null;
       this.currentlyEditedBookmark = bookmark;
@@ -147,7 +147,7 @@ class BookmarkStore {
     try {
       const { data } = await API.axios.put(API.endpoints.bookmarkList(bookmark.id), { name: newProps.name });
       runInAction(() => {
-        bookmark.name = data && data.data ? data.data.name : null;
+        bookmark.label = data && data.data ? data.data.label : null;
         bookmark.isUpdating = false;
       });
     } catch (e) {

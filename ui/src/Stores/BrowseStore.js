@@ -63,6 +63,9 @@ class BrowseStore{
 
   @action
   async fetchInstances(loadMore = false) {
+    if(!this.selectedItem) {
+      return;
+    }
     try {
       if(loadMore){
         this.pageStart++;

@@ -88,7 +88,6 @@ export default class Search extends React.Component{
 
     return(
       <div className={classes.container}>
-        {/* <Lists/> */}
         <NavigationPanel />
         <Instances/>
         <Modal

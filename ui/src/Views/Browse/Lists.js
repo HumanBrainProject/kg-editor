@@ -9,7 +9,6 @@ import { Scrollbars } from "react-custom-scrollbars";
 import browseStore from "../../Stores/BrowseStore";
 
 import List from "./List";
-import bookmarkStore from "../../Stores/BookmarkStore";
 
 const styles = {
   container:{

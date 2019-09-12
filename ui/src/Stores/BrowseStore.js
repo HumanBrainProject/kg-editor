@@ -73,19 +73,36 @@ class BrowseStore{
         this.pageStart = 0;
         this.isFetching.instances = true;
         this.selectedInstance = null;
+        this.instances = [];
       }
       this.fetchError.instances = null;
-      const { data } = await API.axios.get(API.endpoints.listInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
-      runInAction(() => {
-        this.isFetching.instances = false;
-        if(loadMore){
-          this.instances = [...this.instances, ...((data && data.data)?data.data:[])];
-        } else {
-          this.instances = (data && data.data)?data.data:[];
+      if(this.selectedItem.list) {
+        if(this.selectedItem.list.length > 0) {
+          const { data } = await API.axios.post(API.endpoints.listedInstances(), this.selectedItem.list);
+          runInAction(() => {
+            this.isFetching.instances = false;
+            if(loadMore){
+              this.instances = [...this.instances, ...((data && data.data)?data.data:[])];
+            } else {
+              this.instances = (data && data.data)?data.data:[];
+            }
+            this.canLoadMoreInstances = this.instances.length < data.total;
+            this.totalInstances = data.total;
+          });
         }
-        this.canLoadMoreInstances = this.instances.length < data.total;
-        this.totalInstances = data.total;
-      });
+      } else {
+        const { data } = await API.axios.get(API.endpoints.listInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
+        runInAction(() => {
+          this.isFetching.instances = false;
+          if(loadMore){
+            this.instances = [...this.instances, ...((data && data.data)?data.data:[])];
+          } else {
+            this.instances = (data && data.data)?data.data:[];
+          }
+          this.canLoadMoreInstances = this.instances.length < data.total;
+          this.totalInstances = data.total;
+        });
+      }
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;

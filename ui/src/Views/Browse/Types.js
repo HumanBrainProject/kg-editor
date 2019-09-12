@@ -1,9 +1,11 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
+import { Button } from "react-bootstrap";
 import structureStore from "../../Stores/StructureStore";
 import TypesSpace from "./TypesSpace";
 import browseStore from "../../Stores/BrowseStore";
+import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   folderName: {
@@ -34,19 +36,22 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Types extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showBookmarks: true
-    };
-  }
-
-  handleToggleType = () => this.setState((state) => ({ showBookmarks: !state.showBookmarks }));
-
   render() {
+    const {classes} = this.props;
     const list = structureStore.filteredList(browseStore.navigationFilter);
     return (
-      list.map(space =><TypesSpace key={space.label} space={space} />)
+      !structureStore.fetchStuctureError ?
+        !structureStore.isFetchingStructure ?
+          list.map(space =><TypesSpace key={space.label} space={space} />)
+          :
+          <FetchingLoader>
+            Fetching types
+          </FetchingLoader>
+        :
+        <div className={classes.fetchErrorPanel}>
+          <div>{structureStore.fetchStuctureError}</div>
+          <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
+        </div>
     );
   }
 }

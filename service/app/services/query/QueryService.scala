@@ -187,7 +187,7 @@ trait QueryService {
         }
     }
 
-  def getBookmarks(
+  def getQueryResults(
     wSClient: WSClient,
     apiEndpoint: String,
     query: QuerySpec,

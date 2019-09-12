@@ -78,7 +78,7 @@ class BrowseStore{
       this.fetchError.instances = null;
       if(this.selectedItem.list) {
         if(this.selectedItem.list.length > 0) {
-          const { data } = await API.axios.post(API.endpoints.listedInstances(), this.selectedItem.list);
+          const { data } = await API.axios.get(API.endpoints.filterBookmarkInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
           runInAction(() => {
             this.isFetching.instances = false;
             if(loadMore){
@@ -91,7 +91,7 @@ class BrowseStore{
           });
         }
       } else {
-        const { data } = await API.axios.get(API.endpoints.listInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
+        const { data } = await API.axios.get(API.endpoints.searchInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
         runInAction(() => {
           this.isFetching.instances = false;
           if(loadMore){

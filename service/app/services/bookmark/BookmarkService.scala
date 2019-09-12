@@ -131,7 +131,7 @@ class BookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient
 
   def getBookmarks(token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     queryService
-      .getBookmarks(
+      .getQueryResults(
         wSClient,
         config.kgCoreEndpoint,
         QuerySpec(

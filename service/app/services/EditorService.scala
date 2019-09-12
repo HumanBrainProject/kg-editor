@@ -20,17 +20,20 @@ import com.google.inject.Inject
 import constants._
 import helpers._
 import cats.implicits._
+import constants.QueryConstants.{SEARCH, SIZE, START}
 import models.errors.{APIEditorError, APIEditorMultiError}
 import models.instance._
 import models.specification.{FormRegistry, QuerySpec, UISpec}
 import models.user.{IDMUser, User}
-import models.{AccessToken, NexusPath}
+import models.{AccessToken, BasicAccessToken, NexusPath, RefreshAccessToken}
 import monix.eval.Task
 import org.joda.time.DateTime
 import play.api.Logger
+import play.api.http.HeaderNames.{AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
+import services.bookmark.BookmarkService
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
@@ -147,6 +150,56 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
   }
+
+  def getBookmarkInstances(
+    bookmarkId: String,
+    from: Option[Int],
+    size: Option[Int],
+    search: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] =
+    queryService
+      .getQueryResults(
+        wSClient,
+        config.kgCoreEndpoint,
+        QuerySpec(
+          Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
+          Option("bookmarkInstances")
+        ),
+        token,
+        QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
+      )
+      .map { res =>
+        res.status match {
+          case OK => Right(res.json.as[JsObject])
+          case _  => Left(APIEditorError(res.status, res.body))
+        }
+      }
+
+  def doSearchInstances(
+    typeId: Option[String],
+    from: Option[Int],
+    size: Option[Int],
+    search: String,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] =
+    queryService
+      .getQueryResults(
+        wSClient,
+        config.kgCoreEndpoint,
+        QuerySpec(
+          Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
+          Option("searchInstances")
+        ),
+        token,
+        QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
+      )
+      .map { res =>
+        res.status match {
+          case OK => Right(res.json.as[JsObject])
+          case _  => Left(APIEditorError(res.status, res.body))
+        }
+      }
 
   def getInstanceScope(
     nexusInstanceReference: NexusInstanceReference,

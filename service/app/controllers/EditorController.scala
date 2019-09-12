@@ -138,7 +138,7 @@ class EditorController @Inject()(
       }
       .toList
 
-//  TODO: Deprecate either this one or getInstancesByIds
+  //  TODO: Deprecate either this one or getInstancesByIds
   def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val listOfIds = for {
@@ -193,6 +193,38 @@ class EditorController @Inject()(
         case None => Task.pure(BadRequest("Wrong body content!"))
       }
       result.runToFuture
+    }
+
+  def filterBookmarkInstances(
+    bookmarkId: String,
+    from: Option[Int],
+    size: Option[Int],
+    search: String
+  ): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      editorService
+        .getBookmarkInstances(bookmarkId, from, size, search, request.userToken)
+        .map {
+          case Right(value) => Ok(value)
+          case Left(error)  => error.toResult
+        }
+        .runToFuture
+    }
+
+  def searchInstances(
+    typeId: Option[String],
+    from: Option[Int],
+    size: Option[Int],
+    search: String
+  ): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      editorService
+        .doSearchInstances(typeId, from, size, search, request.userToken)
+        .map {
+          case Right(value) => Ok(value)
+          case Left(error)  => error.toResult
+        }
+        .runToFuture
     }
 
   def getInstancesByIds(allFields: Boolean, databaseScope: Option[String]): Action[AnyContent] =

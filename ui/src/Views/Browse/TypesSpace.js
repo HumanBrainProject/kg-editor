@@ -45,8 +45,6 @@ export default class TypesSpace extends React.Component {
 
   handleToggleType = () => this.setState((state) => ({ showTypes: !state.showTypes }));
 
-  handleLoadRetry = () => bookmarkStore.fetch();
-
   render() {
     const { classes, space } = this.props;
     return (

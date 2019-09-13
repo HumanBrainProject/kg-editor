@@ -15,7 +15,6 @@ const endpoints = {
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
   "globalDatasetsStatistics": () => `${window.rootPath}/data/mockups/globalDatasetsStatistics.json`,
   "listedInstances": (allFields=false, databaseScope=null) => `/editor/api/instances/list?allFields=${allFields}${databaseScope?("&databaseScope=" + databaseScope):""}`,
-  // "searchInstances": (from, size, search) => `/editor/api/instances/list?allFields=false`,
   "filterBookmarkInstances": (id, from, size, search) => `/editor/api/instances/filter?bookmarkId=${id}&from=${from}&size=${size}&search=${search}`,
   "searchInstances": (id, from, size, search) => `/editor/api/instances/search?typeId=${id}&from=${from}&size=${size}&search=${search}`,
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,

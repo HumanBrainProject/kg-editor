@@ -27,4 +27,4 @@ sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
 
 scalacOptions += "-Ypartial-unification"
-scalacOptions += "-target:11"
+scalacOptions += "-target:jvm-1.11"

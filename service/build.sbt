@@ -26,4 +26,5 @@ sources in (Compile, doc) := Seq.empty
 
 publishArtifact in (Compile, packageDoc) := false
 
-scalacOptions += "-Ypartial-unification -target:11"
+scalacOptions += "-Ypartial-unification"
+scalacOptions += "-target:11"

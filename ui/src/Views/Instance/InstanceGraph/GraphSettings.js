@@ -133,7 +133,7 @@ export default class GraphSettings extends React.Component {
                 const isDisabled = typeState === "none";
                 const isExpanded = graphStore.expandedTypes.indexOf(nodeType.schema) !== -1;
                 const isGrouped = typeState === "group";
-                const backgroundColor = structureStore.colorPalletteBySchema(nodeType.schema);
+                const backgroundColor = structureStore.colorPalletteByType(nodeType.schema);
                 const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return (
                   <div className={`${classes.nodeType} ${isDisabled ? "disabled" : ""} ${isExpanded ? "expanded" : ""}`} key={nodeType.schema}>
@@ -142,7 +142,7 @@ export default class GraphSettings extends React.Component {
                     <div className={classes.nodeTypeLabel}
                       onMouseOver={isGrouped ? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.schema)) : undefined}
                       onMouseOut={this.handleNodeHover.bind(this, null)}
-                    >{structureStore.findLabelBySchema(nodeType.schema)}</div>
+                    >{structureStore.findLabelByType(nodeType.schema)}</div>
                     <div className={classes.nodeTypeActions}>
                       {!isDisabled && (
                         <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.schema)}>

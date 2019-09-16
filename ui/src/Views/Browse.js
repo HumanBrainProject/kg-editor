@@ -4,10 +4,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react";
 import { Modal, Button } from "react-bootstrap";
 
-import Lists from "./Browse/Lists";
 import Instances from "./Browse/Instances";
 import browseStore from "../Stores/BrowseStore";
 import FetchingLoader from "../Components/FetchingLoader";
+import NavigationPanel from "./Browse/NavigationPanel";
+import bookmarkStore from "../Stores/BookmarkStore";
 
 const styles = {
   container: {
@@ -74,12 +75,12 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Search extends React.Component{
-  handleDismissBookmarkListCreationError = () => {
-    browseStore.dismissBookmarkListCreationError();
+  handleDismissBookmarkCreationError = () => {
+    bookmarkStore.dismissBookmarkCreationError();
   }
 
-  handleRetryCreateNewBookmarkList= () => {
-    browseStore.createBookmarkList(browseStore.newBookmarkListName);
+  handleRetryCreateNewBookmark= () => {
+    bookmarkStore.createBookmark(bookmarkStore.newBookmarkName);
   }
 
   render() {
@@ -87,28 +88,28 @@ export default class Search extends React.Component{
 
     return(
       <div className={classes.container}>
-        <Lists/>
+        <NavigationPanel />
         <Instances/>
         <Modal
           dialogClassName={classes.modal}
           show={!!browseStore.bookmarkListCreationError}
           keyboard={true}
           autoFocus={true}
-          onHide={this.handleDismissBookmarkListCreationError.bind(this)}
+          onHide={this.handleDismissBookmarkCreationError}
           backdrop={false}
         >
           <Modal.Header
             closeButton={true}
           />
-          <Modal.Body>{`Creation of bookmark list "${browseStore.newBookmarkListName}" failed (${browseStore.bookmarkListCreationError}).`} </Modal.Body>
+          <Modal.Body>{`Creation of bookmark list "${bookmarkStore.newBookmarkName}" failed (${bookmarkStore.bookmarkCreationError}).`} </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.handleDismissBookmarkListCreationError.bind(this)}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel</Button>
-            <Button bsStyle="primary" onClick={this.handleDismissBookmarkListCreationError.bind(this)}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+            <Button onClick={this.handleDismissBookmarkCreationError}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel</Button>
+            <Button bsStyle="primary" onClick={this.handleDismissBookmarkCreationError}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
           </Modal.Footer>
         </Modal>
-        {browseStore.isCreatingBookmarkList && (
+        {bookmarkStore.isCreatingBookmark && (
           <div className={classes.loader}>
-            <FetchingLoader>{`Creating a bookmark list "${browseStore.newBookmarkListName}"...`}</FetchingLoader>
+            <FetchingLoader>{`Creating a bookmark list "${bookmarkStore.newBookmarkName}"...`}</FetchingLoader>
           </div>
         )}
       </div>

@@ -30,7 +30,7 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{AnyContent, _}
 import services._
-import services.bookmark.EditorBookmarkService
+import services.bookmark.BookmarkService
 import services.query.QueryService
 import services.specification.FormService
 
@@ -42,7 +42,7 @@ class EditorUserController @Inject()(
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
   editorUserService: EditorUserService,
-  editorUserListService: EditorBookmarkService,
+  editorUserListService: BookmarkService,
   oIDCAuthService: TokenAuthService,
   formService: FormService
 )(implicit ec: ExecutionContext)
@@ -265,7 +265,7 @@ class EditorUserController @Inject()(
 
   def retrieveBookmarks: Action[AnyContent] =
     (authenticatedUserAction andThen EditorUserAction.editorUserAction(editorUserService)).async { implicit request =>
-      import EditorBookmarkService.JsEither._
+      import BookmarkService.JsEither._
       val instanceList = for {
         json      <- request.body.asJson
         instances <- json.asOpt[List[String]]

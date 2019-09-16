@@ -106,7 +106,7 @@ export default class QueryBuilder extends React.Component {
               </Button>
             </BGMessage>
             :
-            !structureStore.hasSchemas ?
+            !structureStore.hasTypes ?
               <BGMessage icon={"blender-phone"}>
                 No schemas available.<br />
                 If the problem persists, please contact the support.<br /><br />

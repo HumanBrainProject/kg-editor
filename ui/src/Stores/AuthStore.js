@@ -2,7 +2,8 @@
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
 
-const oidLocalStorageKey = "hbp.kg-editor.oid";
+const authLocalStorageKey = "hbp.kg-editor.auth";
+const stateLocalStorageKey = "hbp.kg-editor.state";
 
 const getKey = (hash, key) => {
   if (typeof hash !== "string" || typeof key !== "string") {
@@ -27,28 +28,38 @@ const getKey = (hash, key) => {
   return value;
 };
 
-let sessionTimer = null;
+const userKeys = {
+  id: "@id",
+  username: "http://schema.org/alternateName",
+  email: "http://schema.org/email",
+  displayName: "http://schema.org/name",
+  givenName: "http://schema.org/givenName",
+  familyName: "http://schema.org/familyName"
+};
+
+const mapUserProfile = data => {
+  const user = {};
+  if (data && data.data) {
+    Object.entries(userKeys).forEach(([name, fullyQualifiedName]) => {
+      if (data.data[fullyQualifiedName]) {
+        user[name] = data.data[fullyQualifiedName];
+      }
+    });
+  }
+  return user;
+};
 
 class AuthStore {
   @observable session = null;
   @observable user = null;
   @observable isRetrievingUserProfile = false;
   @observable userProfileError = false;
-  reloginResolve = null;
-  reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
   expiredToken = false;
 
   constructor(){
     if(Storage === undefined){
       throw "The browser must support WebStorage API";
     }
-
-    window.addEventListener("storage", (e) => {
-      if(e.key !== oidLocalStorageKey){
-        return;
-      }
-      this.tryAuthenticate();
-    });
   }
 
   @computed
@@ -57,7 +68,7 @@ class AuthStore {
   }
 
   @computed
-  get isOIDCAuthenticated() {
+  get isAuthenticated() {
     return !this.hasExpired;
   }
 
@@ -68,51 +79,26 @@ class AuthStore {
 
   @computed
   get isFullyAuthenticated() {
-    return this.isOIDCAuthenticated && this.hasUserProfile;
+    return this.isAuthenticated && this.hasUserProfile;
   }
 
   get hasExpired() {
     return this.session === null || (new Date() - this.session.expiryTimestamp) > 0;
   }
 
-  startSessionTimer() {
-    if (this.hasExpired) {
-      return;
-    }
-    clearTimeout(sessionTimer);
-    sessionTimer = setTimeout(() => {
-      // console.log("session is expiring...");
-      this.logout();
-    }, this.session.expiryTimestamp -(new Date()).getTime());
-  }
-
   @action
   logout() {
     // console.log("logout");
-    clearTimeout(sessionTimer);
     this.session = null;
     this.expiredToken = true;
     this.user = null;
     if (typeof Storage !== "undefined" ) {
-      localStorage.removeItem(oidLocalStorageKey);
+      localStorage.removeItem(authLocalStorageKey);
     }
-    return this.reloginPromise;
-  }
-
-  listenForLogin(){
-    window.addEventListener("message", this.loginSuccessHandler);
   }
 
   @action
-  loginSuccessHandler(e){
-    if(e.data === "LOGIN_SUCCESS"){
-      this.tryAuthenticate();
-    }
-    window.removeEventListener("message", this.loginSuccessHandler);
-  }
-
-  @action
-  async retriveUserProfile() {
+  async retrieveUserProfile() {
     if (!this.hasExpired && !this.user) {
       this.userProfileError = false;
       this.isRetrievingUserProfile = true;
@@ -124,10 +110,8 @@ class AuthStore {
         */
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
-          this.user = data && data.data;
+          this.user = mapUserProfile(data);
           this.isRetrievingUserProfile = false;
-          this.reloginResolve();
-          this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
         });
       } catch (e) {
         runInAction(() => {
@@ -138,8 +122,17 @@ class AuthStore {
     }
   }
 
+
+  storeState = () => {
+    const state = {
+      hash: window.location.hash,
+      search: window.location.search
+    };
+    localStorage.setItem(stateLocalStorageKey, JSON.stringify(state));
+  }
+
   @action
-  async tryAuthenticate() {
+  tryAuthenticate() {
     const hash = window.location.hash;
     const accessToken = getKey(hash, "access_token");
     const state = getKey(hash, "session_state");
@@ -150,29 +143,26 @@ class AuthStore {
         accessToken: accessToken,
         expiryTimestamp: new Date().getTime() + 1000 * (Number(expiresIn) - 60)
       };
-      this.startSessionTimer();
 
-      // console.log ("retrieved oid from url: ", this.session);
-      localStorage.setItem(oidLocalStorageKey, JSON.stringify(this.session));
+      // console.log ("retrieved auth from url: ", this.session);
+      localStorage.setItem(authLocalStorageKey, JSON.stringify(this.session));
 
-      // const uri = atob(state);
-      // console.log ("retrieved stateKey: ", uri);
+      const state = JSON.parse(localStorage.getItem(stateLocalStorageKey));
+      let startHistory = window.location.protocol + "//" + window.location.host + window.location.pathname + state.search + state.hash;
+      const historyState = window.history.state;
+      window.history.replaceState(historyState, "Knowledge Graph Editor", startHistory);
+
+      //TODO: change route to whatever it was before
+      this.retrieveUserProfile();
     } else {
-      const oidStoredState = JSON.parse(localStorage.getItem(oidLocalStorageKey));
-      // console.log ("retrieved oid from localStorage: ", oidStoredState);
+      const authStoredState = JSON.parse(localStorage.getItem(authLocalStorageKey));
+      // console.log ("retrieved oid from localStorage: ", authStoredState);
 
-      if (oidStoredState && oidStoredState.expiryTimestamp && new Date() < oidStoredState.expiryTimestamp) {
-        this.session = oidStoredState;
-        this.startSessionTimer();
-      } else if(this.session){
-        this.logout();
+      if (authStoredState && authStoredState.expiryTimestamp && new Date() < authStoredState.expiryTimestamp) {
+        this.session = authStoredState;
+        this.retrieveUserProfile();
       }
-
     }
-
-    this.retriveUserProfile();
-
-    return this.session? this.session.accessToken: null;
   }
 }
 export default new AuthStore();

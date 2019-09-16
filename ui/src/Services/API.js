@@ -1,10 +1,10 @@
 import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
-const redirectUri = `${window.location.protocol}//${window.location.host}${window.rootPath || ""}/loginSuccess`;
+const redirectUri = () => `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
 
 const endpoints = {
-  "login": () => `/editor/api/auth/login?redirect_uri=${escape(redirectUri)}`,
+  "login": () => `/editor/api/auth/login?redirect_uri=${escape(redirectUri())}`,
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
@@ -14,9 +14,9 @@ const endpoints = {
   "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
   "globalDatasetsStatistics": () => `${window.rootPath}/data/mockups/globalDatasetsStatistics.json`,
-  "bookmarkListFolders": mockup => mockup?`${window.rootPath}/data/mockups/lists.json`:"/editor/api/bookmarkListFolders",
-  "listedInstances": (allFields=false, databaseScope=null) => `/editor/api/instances?allFields=${allFields}${databaseScope?("&databaseScope=" + databaseScope):""}`,
-  "listInstances": (entity, from, size, search) => `/editor/api/bookmarkListInstances/${entity}?from=${from}&size=${size}&search=${search}`,
+  "listedInstances": (allFields=false, databaseScope=null) => `/editor/api/instances/list?allFields=${allFields}${databaseScope?("&databaseScope=" + databaseScope):""}`,
+  "filterBookmarkInstances": (id, from, size, search) => `/editor/api/instances/filter?bookmarkId=${id}&from=${from}&size=${size}&search=${search}`,
+  "searchInstances": (id, from, size, search) => `/editor/api/instances/search?typeId=${id}&from=${from}&size=${size}&search=${search}`,
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instanceData": (instance, databaseScope=null) => `/editor/api/instances/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
   "release": instance => `/editor/api/instances/${instance}/release`,
@@ -24,7 +24,7 @@ const endpoints = {
   "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/editor/api/instances/releases?releaseTreeScope=CHILDREN_ONLY",
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
-  "listInstancesBookmarkLists": () => "/editor/api/bookmarks",
+  "bookmarks": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
   "structure": () => "/editor/api/structure?withLinks=true",

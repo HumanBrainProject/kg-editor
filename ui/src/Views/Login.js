@@ -2,7 +2,6 @@ import React from "react";
 import injectStyles from "react-jss";
 import API from "../Services/API";
 import authStore from "../Stores/AuthStore";
-import { Button } from "react-bootstrap";
 
 const styles = {
   container: {
@@ -38,10 +37,8 @@ const styles = {
 export default class Login extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = { showFrame: false };
+    authStore.storeState();
   }
-
   render() {
     const { classes } = this.props;
     return (
@@ -54,7 +51,7 @@ export default class Login extends React.Component {
               Click on the following button to ask a new one and continue with your session.
             </p>
             <div>
-              <Button bsStyle={"primary"} onClick={this.showFrame.bind(this)}>Re-Login</Button>
+              <a className="btn btn-primary" href={API.endpoints.login()}>Re-Login</a>
             </div>
           </div>
           :
@@ -62,18 +59,11 @@ export default class Login extends React.Component {
             <h3>Welcome to Knowledge Graph Editor</h3>
             <p>Please login to continue.</p>
             <div>
-              <Button bsStyle={"primary"} onClick={this.showFrame.bind(this)}>Login</Button>
+              <a className="btn btn-primary" href={API.endpoints.login()}>Login</a>
             </div>
           </div>
         }
-        {this.state.showFrame &&
-          <iframe className={classes.oidFrame} frameBorder="0" src={API.endpoints.login()} />
-        }
       </div>
     );
-  }
-
-  showFrame() {
-    this.setState({ showFrame: true });
   }
 }

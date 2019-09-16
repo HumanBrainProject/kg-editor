@@ -98,7 +98,7 @@ class GraphStore {
       link.target = find(this.originalData.nodes, node => node.id === link.target);
     });
     this.originalData.nodes.forEach(node => {
-      node.schemaLabel = structureStore.findLabelBySchema(node.schemas); //node.dataType.replace("https://schema.hbp.eu/minds/","");
+      node.schemaLabel = structureStore.findLabelByType(node.schemas); //node.dataType.replace("https://schema.hbp.eu/minds/","");
       node.isMainNode = node.id.includes(this.mainId);
     });
 
@@ -111,7 +111,7 @@ class GraphStore {
         this.typeStates.set(nodeType.schema, nodesOfType.length === 1 ? "show" : "none");
         return;
       }
-      let label = structureStore.findLabelBySchema(nodeType.schema);
+      let label = structureStore.findLabelByType(nodeType.schema);
       let groupNode = {
         id: "Group_" + nodeType.schema,
         name: "Group_" + label,

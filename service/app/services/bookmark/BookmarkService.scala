@@ -37,13 +37,14 @@ import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.FormOp
 
-class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient)(
+class BookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient)(
   implicit OIDCAuthService: TokenAuthService,
   clientCredentials: CredentialsService
-) extends EditorBookmarkServiceInterface {
+) extends BookmarkServiceInterface {
   val logger = Logger(this.getClass)
 
   object instanceApiService extends InstanceApiService
+
   object queryService extends QueryService
 
   def getUserBookmarkLists(
@@ -56,9 +57,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
         wSClient,
         config.kgQueryEndpoint,
         editorUser.nexusId,
-        QuerySpec(
-          Json.parse(EditorBookmarkService.kgQueryGetUserFoldersQuery(EditorConstants.editorUserPath)).as[JsObject]
-        ),
+        QuerySpec(Json.parse(BookmarkService.kgQueryGetUserFoldersQuery(EditorConstants.editorUserPath)).as[JsObject]),
         token,
         QueryApiParameter()
       )
@@ -77,7 +76,8 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
 
   /**
     * Get folder containing static list of bookmarklist
-    * @param user Nexus user is needed in order to retriev correct access right to entity types
+    *
+    * @param user         Nexus user is needed in order to retriev correct access right to entity types
     * @param formRegistry The form containing all the entities information
     * @return a list of bookmark folder
     */
@@ -129,13 +129,32 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
     }
   }
 
+  def getBookmarks(token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+    queryService
+      .getQueryResults(
+        wSClient,
+        config.kgCoreEndpoint,
+        QuerySpec(
+          Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
+          Option("bookmark")
+        ),
+        token,
+        QueryApiParameter()
+      )
+      .map { res =>
+        res.status match {
+          case OK => Right(res.json.as[JsObject])
+          case _  => Left(APIEditorError(res.status, res.body))
+        }
+      }
+
   def createBookmarkListFolder(
     user: EditorUser,
     name: String,
     token: AccessToken,
     folderType: FolderType = BOOKMARKFOLDER
   ): Task[Either[APIEditorError, BookmarkListFolder]] = {
-    val payload = EditorBookmarkService.bookmarkListFolderToNexusStruct(
+    val payload = BookmarkService.bookmarkListFolderToNexusStruct(
       name,
       s"${config.nexusEndpoint}/v0/data/${user.nexusId}",
       folderType
@@ -163,7 +182,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
     token: AccessToken
   ): Task[Either[APIEditorError, BookmarkList]] = {
     val payload =
-      EditorBookmarkService.bookmarkListToNexusStruct(bookmarkListName, s"${config.nexusEndpoint}/v0/data/$folderId")
+      BookmarkService.bookmarkListToNexusStruct(bookmarkListName, s"${config.nexusEndpoint}/v0/data/$folderId")
     instanceApiService
       .post(
         wSClient,
@@ -191,7 +210,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
         config.kgQueryEndpoint,
         instanceReference,
         QuerySpec(
-          Json.parse(EditorBookmarkService.kgQueryGetBookmarkListByIdQuery(instanceReference.nexusPath)).as[JsObject]
+          Json.parse(BookmarkService.kgQueryGetBookmarkListByIdQuery(instanceReference.nexusPath)).as[JsObject]
         ),
         token,
         QueryApiParameter()
@@ -227,7 +246,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
           NexusInstance(
             Some(bookmarkListRef.id),
             bookmarkListRef.nexusPath,
-            EditorBookmarkService.bookmarkListToNexusStruct(bookmarkList.name, userFolderId, newDate)
+            BookmarkService.bookmarkListToNexusStruct(bookmarkList.name, userFolderId, newDate)
           )
         ),
         token,
@@ -244,7 +263,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
         wSClient,
         config.kgQueryEndpoint,
         bookmarkRef,
-        QuerySpec(Json.parse(EditorBookmarkService.kgQueryGetBookmarksForDeletion(bookmarkRef.nexusPath)).as[JsObject]),
+        QuerySpec(Json.parse(BookmarkService.kgQueryGetBookmarksForDeletion(bookmarkRef.nexusPath)).as[JsObject]),
         token,
         QueryApiParameter()
       )
@@ -294,7 +313,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
     token: AccessToken
   ): Task[List[Either[APIEditorError, Unit]]] = {
     val queries = bookmarkListIds.map { ref =>
-      val toInsert = EditorBookmarkService
+      val toInsert = BookmarkService
         .bookmarkToNexusStruct(
           s"${config.nexusEndpoint}/v0/data/${instanceReference.toString}",
           s"${config.nexusEndpoint}/v0/data/${ref.toString}"
@@ -330,7 +349,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
         instanceRef,
         QuerySpec(
           Json
-            .parse(EditorBookmarkService.kgQueryGetInstanceBookmarksAndBookmarkList(instanceRef.nexusPath))
+            .parse(BookmarkService.kgQueryGetInstanceBookmarksAndBookmarkList(instanceRef.nexusPath))
             .as[JsObject]
         ),
         token,
@@ -406,7 +425,7 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
         config.kgQueryEndpoint,
         instanceReference,
         QuerySpec(
-          Json.parse(EditorBookmarkService.kgQueryGetInstanceBookmarkLists(instanceReference.nexusPath)).as[JsObject]
+          Json.parse(BookmarkService.kgQueryGetInstanceBookmarkLists(instanceReference.nexusPath)).as[JsObject]
         ),
         token,
         QueryApiParameter()
@@ -428,57 +447,58 @@ class EditorBookmarkService @Inject()(config: ConfigurationService, wSClient: WS
 
 }
 
-object EditorBookmarkService {
+object BookmarkService {
 
-  def kgQueryGetUserFoldersQuery(userPath: NexusPath, context: String = EditorConstants.context): String = s"""
-     |{
-     |  "@context": $context,
-     |  "schema:name": "",
-     |  "root_schema": "nexus_instance:${userPath.toString()}",
-     |  "fields": [
-     |    {
-     |        "fieldname": "userFolders",
-     |        "relative_path": {
-     |            "@id": "hbpkg:${EditorConstants.USER}",
-     |            "reverse":true
-     |        },
-     |        "fields": [
-     |           {
-     |             "fieldname": "folderName",
-     |             "relative_path": "schema:name",
-     |             "required": true
-     |           },
-     |           {
-     |             "fieldname": "id",
-     |             "relative_path": "base:${EditorConstants.RELATIVEURL}",
-     |             "required": true
-     |           },
-     |           {
-     |             "fieldname": "folderType",
-     |             "relative_path": "hbpkg:${EditorConstants.FOLDERTYPE}",
-     |             "required": true
-     |           },
-     |           {
-     |             "fieldname": "lists",
-     |             "relative_path": {
-     |                 "@id": "hbpkg:${EditorConstants.BOOKMARKLISTFOLDER}",
-     |                 "reverse":true
-     |               },
-     |               "fields":[
-     |               		{
-     |               			"fieldname":"id",
-     |               			"relative_path": "base:${EditorConstants.RELATIVEURL}"
-     |               		},
-     |                  {
-     |               			"fieldname":"name",
-     |               			"relative_path": "schema:name"
-     |               		}
-     |              ]
-     |          }
-     |        ]
-     |     }
-     |  ]
-     |}
+  def kgQueryGetUserFoldersQuery(userPath: NexusPath, context: String = EditorConstants.context): String =
+    s"""
+       |{
+       |  "@context": $context,
+       |  "schema:name": "",
+       |  "root_schema": "nexus_instance:${userPath.toString()}",
+       |  "fields": [
+       |    {
+       |        "fieldname": "userFolders",
+       |        "relative_path": {
+       |            "@id": "hbpkg:${EditorConstants.USER}",
+       |            "reverse":true
+       |        },
+       |        "fields": [
+       |           {
+       |             "fieldname": "folderName",
+       |             "relative_path": "schema:name",
+       |             "required": true
+       |           },
+       |           {
+       |             "fieldname": "id",
+       |             "relative_path": "base:${EditorConstants.RELATIVEURL}",
+       |             "required": true
+       |           },
+       |           {
+       |             "fieldname": "folderType",
+       |             "relative_path": "hbpkg:${EditorConstants.FOLDERTYPE}",
+       |             "required": true
+       |           },
+       |           {
+       |             "fieldname": "lists",
+       |             "relative_path": {
+       |                 "@id": "hbpkg:${EditorConstants.BOOKMARKLISTFOLDER}",
+       |                 "reverse":true
+       |               },
+       |               "fields":[
+       |               		{
+       |               			"fieldname":"id",
+       |               			"relative_path": "base:${EditorConstants.RELATIVEURL}"
+       |               		},
+       |                  {
+       |               			"fieldname":"name",
+       |               			"relative_path": "schema:name"
+       |               		}
+       |              ]
+       |          }
+       |        ]
+       |     }
+       |  ]
+       |}
     """.stripMargin
 
   def kgQueryGetInstanceBookmarksAndBookmarkList(
@@ -486,44 +506,44 @@ object EditorBookmarkService {
     context: String = EditorConstants.context
   ): String =
     s"""
-    |{
-    |  "@context": $context,
-    |  "schema:name": "",
-    |  "root_schema": "nexus_instance:${instancePath.toString()}",
-    |  "fields": [
-    |    {
-    |      "fieldname": "bookmarks",
-    |      "relative_path": {
-    |        "@id": "hbpkg:${EditorConstants.BOOKMARKINSTANCELINK}",
-    |        "reverse": true
-    |      },
-    |      "fields": [
-    |        {
-    |          "fieldname": "id",
-    |          "relative_path": "base:${EditorConstants.RELATIVEURL}"
-    |        },
-    |        {
-    |          "fieldname": "bookmarkListId",
-    |          "required":true,
-    |          "relative_path": [
-    |            "hbpkg:${EditorConstants.BOOKMARKLIST}",
-    |            "base:${EditorConstants.RELATIVEURL}"
-    |          ]
-    |        },
-    |        {
-    |          "fieldname": "${EditorConstants.USERID}",
-    |          "required":true,
-    |          "relative_path": [
-    |            "hbpkg:${EditorConstants.BOOKMARKLIST}",
-    |            "hbpkg:${EditorConstants.BOOKMARKLISTFOLDER}",
-    |            "hbpkg:${EditorConstants.USER}",
-    |            "hbpkg:${EditorConstants.USERID}"
-    |          ]
-    |        }
-    |      ]
-    |    }
-    |  ]
-    |}
+       |{
+       |  "@context": $context,
+       |  "schema:name": "",
+       |  "root_schema": "nexus_instance:${instancePath.toString()}",
+       |  "fields": [
+       |    {
+       |      "fieldname": "bookmarks",
+       |      "relative_path": {
+       |        "@id": "hbpkg:${EditorConstants.BOOKMARKINSTANCELINK}",
+       |        "reverse": true
+       |      },
+       |      "fields": [
+       |        {
+       |          "fieldname": "id",
+       |          "relative_path": "base:${EditorConstants.RELATIVEURL}"
+       |        },
+       |        {
+       |          "fieldname": "bookmarkListId",
+       |          "required":true,
+       |          "relative_path": [
+       |            "hbpkg:${EditorConstants.BOOKMARKLIST}",
+       |            "base:${EditorConstants.RELATIVEURL}"
+       |          ]
+       |        },
+       |        {
+       |          "fieldname": "${EditorConstants.USERID}",
+       |          "required":true,
+       |          "relative_path": [
+       |            "hbpkg:${EditorConstants.BOOKMARKLIST}",
+       |            "hbpkg:${EditorConstants.BOOKMARKLISTFOLDER}",
+       |            "hbpkg:${EditorConstants.USER}",
+       |            "hbpkg:${EditorConstants.USERID}"
+       |          ]
+       |        }
+       |      ]
+       |    }
+       |  ]
+       |}
     """.stripMargin
 
   def kgQueryGetInstanceBookmarkLists(instancePath: NexusPath, context: String = EditorConstants.context): String =
@@ -581,7 +601,7 @@ object EditorBookmarkService {
        |        {
        |          "fieldname":"id",
        |          "relative_path":"base:${EditorConstants.RELATIVEURL}"
-     |          }
+       |          }
        |       ]
        |    },
        |    {
@@ -661,32 +681,69 @@ object EditorBookmarkService {
        |}
      """.stripMargin
 
+  //  TODO: Change this to a query that fetches the bookmarks by user
+  def kgQueryGetBookmarksByUser(context: String = EditorConstants.context): String =
+    s"""
+       |{
+       |  "@context": $context,
+       |  "schema:name": "",
+       |  "root_schema": "nexus_instance:test",
+       |  "fields": [
+       |  {
+       |       "fieldname":"originalId",
+       |       "relative_path": "base:${EditorConstants.RELATIVEURL}"
+       |       },
+       |    {
+       |        "fieldname": "bookmarks",
+       |        "relative_path": {
+       |            "@id": "hbpkg:${EditorConstants.BOOKMARKLIST}",
+       |            "reverse":true
+       |        },
+       |        "fields":[
+       |               		{
+       |               			"fieldname":"originalId",
+       |               			"relative_path": "base:${EditorConstants.RELATIVEURL}"
+       |               		}
+       |              ]
+       |     }
+       |  ]
+       |}
+     """.stripMargin
+
   def bookmarkToNexusStruct(instanceLink: String, userBookMarkListNexusId: String): JsObject =
     Json.obj(
-      EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLIST         -> Json.obj("@id" -> s"$userBookMarkListNexusId"),
-      EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKINSTANCELINK -> Json.obj("@id" -> s"$instanceLink")
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKLIST -> Json.obj(
+        "@id" -> s"$userBookMarkListNexusId"
+      ),
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKINSTANCELINK -> Json.obj(
+        "@id" -> s"$instanceLink"
+      )
     )
 
   def bookmarkListToNexusStruct(name: String, userFolderId: String, newDate: Option[String] = None): JsObject =
     newDate match {
       case Some(d) =>
         Json.obj(
-          SchemaFieldsConstants.NAME                                           -> name,
-          EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj("@id" -> s"$userFolderId"),
-          SchemaFieldsConstants.lastUpdate                                     -> d
+          SchemaFieldsConstants.NAME -> name,
+          EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj(
+            "@id" -> s"$userFolderId"
+          ),
+          SchemaFieldsConstants.lastUpdate -> d
         )
       case None =>
         Json.obj(
-          SchemaFieldsConstants.NAME                                           -> name,
-          EditorConstants.EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj("@id" -> s"$userFolderId")
+          SchemaFieldsConstants.NAME -> name,
+          EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.BOOKMARKLISTFOLDER -> Json.obj(
+            "@id" -> s"$userFolderId"
+          )
         )
     }
 
   def bookmarkListFolderToNexusStruct(name: String, userNexusId: String, folderType: FolderType): JsObject =
     Json.obj(
-      SchemaFieldsConstants.NAME                                   -> name,
-      EditorConstants.EDITORNAMESPACE + EditorConstants.USER       -> Json.obj("@id" -> s"$userNexusId"),
-      EditorConstants.EDITORNAMESPACE + EditorConstants.FOLDERTYPE -> folderType.t
+      SchemaFieldsConstants.NAME                                          -> name,
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.USER       -> Json.obj("@id" -> s"$userNexusId"),
+      EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.FOLDERTYPE -> folderType.t
     )
 
   implicit object JsEither {
@@ -711,4 +768,5 @@ object EditorBookmarkService {
     implicit def eitherFormat[A, B](implicit A: Format[A], B: Format[B]): Format[Either[A, B]] =
       Format(eitherReads, eitherWrites)
   }
+
 }

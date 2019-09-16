@@ -150,20 +150,24 @@ export default class InstancesHistory extends React.Component{
   }
 
   handleInstanceClick(instance){
-    if (instance && instance.id) {
-      routerStore.history.push(`/instance/view/${instance.id}`);
+    let id = instance && instance["@id"];
+    if (id) {
+      id = id.split("/").slice(-1); //todo retrieve id from url
+      routerStore.history.push(`/instance/view/${id}`);
     }
   }
 
   handleInstanceCtrlClick(instance){
-    if (instance && instance.id) {
-      instanceStore.openInstance(instance.id);
+    const id = instance && instance["@id"];
+    if (id) {
+      instanceStore.openInstance(id);
     }
   }
 
   handleInstanceActionClick(instance, mode){
-    if (instance && instance.id) {
-      routerStore.history.push(`/instance/${mode}/${instance.id}`);
+    const id = instance && instance["@id"];
+    if (id) {
+      routerStore.history.push(`/instance/${mode}/${id}`);
     }
   }
 
@@ -221,8 +225,9 @@ export default class InstancesHistory extends React.Component{
             historyStore.instances.length?
               <ul>
                 {historyStore.instances.map(instance => {
+                  const id = instance["@id"];
                   return (
-                    <li key={instance.id}>
+                    <li key={id}>
                       <InstanceRow instance={instance} selected={false} onClick={this.handleInstanceClick}  onCtrlClick={this.handleInstanceCtrlClick}  onActionClick={this.handleInstanceActionClick} />
                     </li>
                   );

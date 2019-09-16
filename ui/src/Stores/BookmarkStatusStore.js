@@ -108,25 +108,6 @@ class BookmarkStatusStore{
               status.previousBookmarkLists = [];
               console.debug(`bookmark of "${id}" successfully saved`, data);
             });
-            /* Mockup Data
-            if ((Math.floor(Math.random() * 10) % 2) === 0) {
-              throw "Failed to save bookmark (Error 501).";
-            }
-            const data = {
-              id: id,
-              bookmarkLists: payload
-            };
-            setTimeout(() => {
-              runInAction(() =>{
-                status.hasChanged = false;
-                status.saveError = null;
-                status.hasSaveError = false;
-                status.isSaving = false;
-                status.previousBookmarkLists = [];
-                console.debug(`bookmark of "${id}" successfully saved`, data);
-              });
-            }, 500);
-            */
           } catch (e) {
             runInAction(() => {
               const message = e.message?e.message:e;
@@ -194,7 +175,7 @@ class BookmarkStatusStore{
       this.statuses.get(id).isFetching = true;
     });
     try{
-      const { data } = await API.axios.post(API.endpoints.listInstancesBookmarkLists(), toProcess);
+      const { data } = await API.axios.post(API.endpoints.bookmarks(), toProcess);
       runInAction(() =>{
         const statuses = Array.isArray(data.data)?data.data:[];
         statuses.forEach(responseStatus => {
@@ -215,31 +196,6 @@ class BookmarkStatusStore{
           this.smartProcessQueue();
         });
       });
-      /* Mockup Data
-      if ((Math.floor(Math.random() * 10) % 2) === 0) {
-        throw "Failed to request bookmark status (Error 501).";
-      }
-      const { data } = {
-        data: toProcess.map(id => (
-          {
-            id: id,
-            bookmarkLists: (Math.floor(Math.random() * 10) % 2) === 0?[]:["bookmarkList02"]
-          }
-        ))
-      };
-      setTimeout(() => {
-        runInAction(() =>{
-          const statuses = Array.isArray(data.data)?data.data:[];
-          statuses.forEach(status => {
-            this.statuses.get(status.id).data = status;
-            this.statuses.get(status.id).isFetching = false;
-            this.statuses.get(status.id).isFetched = true;
-            this.isFetching = false;
-            this.smartProcessQueue();
-          });
-        });
-      }, 500);
-      */
     } catch(e){
       runInAction(() =>{
         const message = e.message?e.message:e;

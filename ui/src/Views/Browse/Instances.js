@@ -117,22 +117,22 @@ export default class Instances extends React.Component{
     return (
       <div className={classes.container}>
         <div className={classes.header}>
-          {browseStore.selectedList !== null &&
+          {browseStore.selectedItem !== null &&
             <input ref={ref => this.inputRef = ref}
-              disabled={browseStore.selectedList === null}
+              disabled={browseStore.selectedItem === null}
               className={`form-control ${classes.search}`}
-              placeholder={`Filter instances of ${browseStore.selectedList.name}`}
+              placeholder={`Filter instances of ${browseStore.selectedItem.label}`}
               type="text"
               value={browseStore.instancesFilter}
               onChange={this.handleFilterChange} />}
-          {browseStore.selectedList !== null &&
+          {browseStore.selectedItem !== null &&
             <div className={classes.instanceCount}>
               {browseStore.totalInstances} Result{`${browseStore.totalInstances !== 0?"s":""}`}
             </div>}
-          {browseStore.selectedList !== null && <FontAwesomeIcon icon="search" className={classes.searchIcon}/>}
+          {browseStore.selectedItem !== null && <FontAwesomeIcon icon="search" className={classes.searchIcon}/>}
         </div>
         <Scrollbars autoHide>
-          {browseStore.selectedList ?
+          {browseStore.selectedItem ?
             !browseStore.fetchError.instances ?
               !browseStore.isFetching.instances ?
                 browseStore.instances.length ?

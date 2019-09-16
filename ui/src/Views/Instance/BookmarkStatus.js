@@ -3,10 +3,10 @@ import { observer } from "mobx-react";
 import { toJS } from "mobx";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import browseStore from "../../Stores/BrowseStore";
 import bookmarkStatusStore from "../../Stores/BookmarkStatusStore";
 import BookmarkButton from "../../Components/BookmarkButton";
 import PopOverButton from "../../Components/PopOverButton";
+import bookmarkStore from "../../Stores/BookmarkStore";
 
 let styles = {
   container:{
@@ -55,7 +55,7 @@ export default class BookmarkStatus extends React.Component{
 
   handleBookmarksChange = bookmarkLists => bookmarkStatusStore.updateStatus(this.props.id, bookmarkLists);
 
-  handleNewBookmark = name => browseStore.createBookmarkList(name, this.props.id);
+  handleNewBookmark = name => bookmarkStore.createBookmarkList(name, this.props.id);
 
   handleFetchRetry = () => bookmarkStatusStore.retryFetchStatus();
 
@@ -67,7 +67,7 @@ export default class BookmarkStatus extends React.Component{
     const instanceStatus = bookmarkStatusStore.getInstance(this.props.id);
     const { classes, className } = this.props;
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarkLists.length)?toJS(instanceStatus.data.bookmarkLists):[];
-    const bookmarkLists = toJS(browseStore.bookmarkLists);
+    const bookmarkLists = bookmarkStore.list;
     return(
       instanceStatus?
         <div className={`${classes.container} ${className?className:""}`}>

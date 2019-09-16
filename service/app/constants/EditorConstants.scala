@@ -18,10 +18,12 @@ package constants
 import models.NexusPath
 
 object EditorConstants {
-  val EDITORNAMESPACE = "https://schema.hbp.eu/hbpkg/"
-  val EDITORVOCAB = "https://schema.hbp.eu/editor/"
-  val INFERENCESPACE = "https://schema.hbp.eu/inference/"
   val BASENAMESPACE = "https://schema.hbp.eu/"
+  val UNSAFE_EDITORNAMESPACE = s"${BASENAMESPACE}hbpkg/" // TODO Deprecation warning ! this will be deprecated, use EDITORNAMESPACE instead
+  val BASECLIENTNAMESPACEE = s"${BASENAMESPACE}client/"
+  val EDITORNAMESPACE = s"${BASECLIENTNAMESPACEE}kg-editor/"
+  val EDITORVOCAB = s"${BASENAMESPACE}editor/"
+  val INFERENCESPACE = s"${BASENAMESPACE}inference/"
   val BOOKMARKLIST = "bookmarkList"
   val BOOKMARKINSTANCELINK = "bookmarkInstanceLink"
   val BOOKMARKLISTFOLDER = "bookmarkListFolder"
@@ -49,7 +51,7 @@ object EditorConstants {
        |{
        |    "@vocab": "https://schema.hbp.eu/graphQuery/",
        |    "schema": "http://schema.org/",
-       |    "hbpkg": "$EDITORNAMESPACE",
+       |    "hbpkg": "$UNSAFE_EDITORNAMESPACE",
        |    "base":"$BASENAMESPACE",
        |    "nexus": "https://nexus-dev.humanbrainproject.org/vocabs/nexus/core/terms/v0.1.0/",
        |    "nexus_instance": "https://nexus-dev.humanbrainproject.org/v0/schemas/",

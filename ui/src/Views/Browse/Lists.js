@@ -82,7 +82,7 @@ export default class Lists extends React.Component{
   }
 
   handleFilterChange = event => {
-    browseStore.setListsFilter(event.target.value);
+    browseStore.setFilter(event.target.value);
   }
 
   handleToggleFolder (folder){

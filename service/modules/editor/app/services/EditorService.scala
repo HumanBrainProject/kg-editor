@@ -16,10 +16,10 @@
 
 package services
 
+import cats.implicits._
 import com.google.inject.Inject
 import constants._
 import helpers._
-import cats.implicits._
 import models.errors.{APIEditorError, APIEditorMultiError}
 import models.instance._
 import models.specification.{FormRegistry, QuerySpec, UISpec}
@@ -30,7 +30,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
@@ -254,7 +254,18 @@ class EditorService @Inject()(
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] = {
     instanceApiService
-      .postSuggestions(wSClient, config.kgQueryEndpoint, instancePath, token, field, fieldType, size, start, search, payload)
+      .postSuggestions(
+        wSClient,
+        config.kgQueryEndpoint,
+        instancePath,
+        token,
+        field,
+        fieldType,
+        size,
+        start,
+        search,
+        payload
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -574,13 +585,13 @@ object EditorService {
 
   def getIdForPayload(instance: JsValue): Option[(JsValue, String)] = {
     if ((instance \ EditorService.atId).isDefined) {
-      Some(instance, (instance \ EditorService.atId).get.as[String])
+      Some((instance, (instance \ EditorService.atId).get.as[String]))
     } else if ((instance \ EditorService.relativeURL).isDefined) {
-      Some(instance, (instance \ EditorService.relativeURL).get.as[String])
+      Some((instance, (instance \ EditorService.relativeURL).get.as[String]))
     } else if ((instance \ EditorService.editorId).isDefined) {
-      Some(instance, (instance \ EditorService.editorId).get.as[String])
+      Some((instance, (instance \ EditorService.editorId).get.as[String]))
     } else if ((instance \ EditorService.simpleId).isDefined) {
-      Some(instance, (instance \ EditorService.simpleId).get.as[String])
+      Some((instance, (instance \ EditorService.simpleId).get.as[String]))
     } else {
       None
     }

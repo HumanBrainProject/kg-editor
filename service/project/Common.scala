@@ -7,21 +7,21 @@ import play.sbt.routes.RoutesKeys.routesGenerator
 import play.routes.compiler.InjectedRoutesGenerator
 
 object Common {
-  
-  
+
   val scalacOptionsAll = Seq(
     "-encoding",
     "UTF-8",
     "-unchecked",
     "-deprecation",
     "-Xfuture",
-    "-Yno-adapted-args",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     "-Ywarn-unused",
+    "-Yno-adapted-args",
     "-Ypartial-unification"
   )
+
   val settings: Seq[Setting[_]] = Seq(
     organization := "eu.humanbrainproject",
     version := "1.0.0-SNAPSHOT",

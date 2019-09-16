@@ -228,10 +228,10 @@ object FormOp {
   def fillFormTemplate(fields: JsValue, formTemplate: UISpec, alternatives: JsObject = Json.obj()): JsValue = {
     val alt = stripAlternativeVocab(alternatives)
     Json.obj("fields" -> fields) +
-    ("label", JsString(formTemplate.label)) +
-    ("editable", JsBoolean(formTemplate.isEditable.getOrElse(true))) +
-    ("ui_info", formTemplate.uiInfo.map(Json.toJson(_)).getOrElse(Json.obj())) +
-    ("alternatives", alt)
+    ("label"        -> JsString(formTemplate.label)) +
+    ("editable"     -> JsBoolean(formTemplate.isEditable.getOrElse(true))) +
+    ("ui_info"      -> formTemplate.uiInfo.map(Json.toJson(_)).getOrElse(Json.obj())) +
+    ("alternatives" -> alt)
   }
 
   def stripAlternativeVocab(jsObject: JsObject): JsObject = {

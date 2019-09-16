@@ -62,7 +62,7 @@ class FormService @Inject()(
 
   private final def loadFormConfiguration(): Task[FormRegistries] = {
     logger.info("Form Service INITIALIZATION --- Starting to load specification")
-    OIDCAuthService.getTechAccessToken(true).flatMap { token =>
+    OIDCAuthService.getTechAccessToken().flatMap { token =>
       Task
         .deferFuture(ws.url(s"${config.kgQueryEndpoint}/arango/internalDocuments/editor_specifications").get())
         .flatMap { querySpec =>

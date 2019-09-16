@@ -25,13 +25,12 @@ object AuthHttpClient {
 
   def postWithRetry[T: BodyWritable](request: WSRequest, body: T)(
     implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
   ): Task[WSResponse] = {
     Task.deferFuture(request.post(body)).flatMap { res =>
       res.status match {
         case UNAUTHORIZED =>
           for {
-            token <- oIDCAuthService.refreshAccessToken(credentials.getClientCredentials())
+            token <- oIDCAuthService.getTechAccessToken()
             res   <- Task.deferFuture(refreshToken(request, token).post(body))
           } yield res
         case _ => Task.pure(res)
@@ -47,7 +46,7 @@ object AuthHttpClient {
       res.status match {
         case UNAUTHORIZED =>
           for {
-            token <- oIDCAuthService.refreshAccessToken(credentials.getClientCredentials())
+            token <- oIDCAuthService.getTechAccessToken()
             res   <- Task.deferFuture(refreshToken(request, token).put(body))
           } yield res
         case _ => Task.pure(res)
@@ -63,7 +62,7 @@ object AuthHttpClient {
       res.status match {
         case UNAUTHORIZED =>
           for {
-            token <- oIDCAuthService.refreshAccessToken(credentials.getClientCredentials())
+            token <- oIDCAuthService.getTechAccessToken()
             res   <- Task.deferFuture(refreshToken(request, token).get())
           } yield res
         case _ => Task.pure(res)
@@ -79,7 +78,7 @@ object AuthHttpClient {
       res.status match {
         case UNAUTHORIZED =>
           for {
-            token <- oIDCAuthService.refreshAccessToken(credentials.getClientCredentials())
+            token <- oIDCAuthService.getTechAccessToken()
             res   <- Task.deferFuture(refreshToken(request, token).delete())
           } yield res
         case _ => Task.pure(res)

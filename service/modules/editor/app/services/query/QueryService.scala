@@ -15,7 +15,6 @@
  */
 package services.query
 
-import constants.QueryConstants
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference
 import models.specification.QuerySpec
@@ -24,11 +23,9 @@ import monix.eval.Task
 import play.api.http.ContentTypes._
 import play.api.http.HeaderNames._
 import play.api.http.Status.{NO_CONTENT, OK}
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json.{JsArray, JsObject}
 import play.api.libs.ws.{WSClient, WSResponse}
 import services.{AuthHttpClient, CredentialsService, TokenAuthService}
-
-import scala.concurrent.ExecutionContext
 
 trait QueryService {
 
@@ -87,17 +84,16 @@ trait QueryService {
     wSClient: WSClient,
     apiEndpoint: String,
     instancePath: NexusPath,
-    vocab:Option[String] = None,
-    size:Int,
-    start:Int,
+    vocab: Option[String] = None,
+    size: Int,
+    start: Int,
     databaseScope: Option[String] = None,
     payload: JsObject,
     token: AccessToken
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsObject]] = {
-    val v = vocab.map("vocab" -> _).getOrElse("" -> "")
+    val v = vocab.map("vocab"                       -> _).getOrElse("" -> "")
     val dbScope = databaseScope.map("databaseScope" -> _).getOrElse("" -> "")
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath}/instances")

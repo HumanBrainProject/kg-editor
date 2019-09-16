@@ -55,7 +55,7 @@ class TokenAuthService @Inject()(
     }
   }
 
-  def refreshAccessToken(clientCredentials: ClientCredentials): Task[RefreshAccessToken] = {
+  private def refreshAccessToken(clientCredentials: ClientCredentials): Task[RefreshAccessToken] = {
     Task
       .deferFuture {
         ws.url(config.oidcTokenEndpoint)
@@ -71,7 +71,7 @@ class TokenAuthService @Inject()(
         result.status match {
           case OK =>
             val token = s"Bearer ${(result.json \ "access_token").as[String]}"
-            cache.set(techAccessToken, token, FiniteDuration(5, TimeUnit.MINUTES))
+            cache.set(techAccessToken, token, config.cacheExpiration)
             RefreshAccessToken(token)
           case _ =>
             logger.error(s"Error: while fetching tech account access token $result")

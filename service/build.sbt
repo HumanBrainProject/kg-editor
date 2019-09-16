@@ -26,6 +26,4 @@ sources in (Compile, doc) := Seq.empty
 
 publishArtifact in (Compile, packageDoc) := false
 
-scalafmtOnCompile := true
-
-dockerBaseImage := "openjdk:8"
+dockerBaseImage := "openjdk:11

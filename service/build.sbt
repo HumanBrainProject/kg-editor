@@ -96,4 +96,4 @@ scalafmtOnCompile := true
 
 publishArtifact in (Compile, packageDoc) := false
 
-dockerBaseImage := "openjdk:8"
+dockerBaseImage := "openjdk:11"

@@ -61,7 +61,7 @@ class SpecificationService @Inject()(
     //Get by identifier all Specification field
     log.debug("Specification Service INITIALIZATION --- Fetching remote specification fields")
 
-    OIDCAuthService.getTechAccessToken(forceRefresh = true).flatMap { token =>
+    OIDCAuthService.getTechAccessToken().flatMap { token =>
       createSpecificationQueries("Queries", token).flatMap { _ =>
         createSpecificationQueries("SpecificationQueries", token).flatMap { _ =>
           log.info(s"Specification Service INITIALIZATION --- Done fetching and creating queries")

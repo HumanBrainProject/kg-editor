@@ -17,6 +17,7 @@
 package controllers
 
 import actions.EditorUserAction
+import cats.instances.map
 import constants.EditorConstants
 import javax.inject.{Inject, Singleton}
 import constants._
@@ -151,35 +152,44 @@ class EditorController @Inject()(
       } yield {
         (typeInfoOpt, structureOpt) match {
           case (Right(typeInfo), Right(structure)) =>
+            val infoProps = List[(String, String, Option[JsValue])](
+              ("https://schema.hbp.eu/client/kg-editor/labelField", "labelInfo", None),
+              ("https://schema.hbp.eu/client/kg-editor/promotedFields", "promotedFields", Some(JsArray()))
+            )
             val typeInfoMap =
               (typeInfo \ "data").as[List[Map[String, JsValue]]].foldLeft(Map[String, Map[String, JsValue]]()) {
                 case (map, info) =>
-                  val typeMap = Map[String, JsValue]()
-                    .updated(
-                      "labelInfo",
-                      info.getOrElse("https://schema.hbp.eu/client/kg-editor/labelField", JsString(""))
-                    )
-                    .updated(
-                      "promotedFields",
-                      info.getOrElse("https://schema.hbp.eu/client/kg-editor/promotedFields", JsArray())
-                    )
+                  val typeMap = infoProps.foldLeft(Map[String, JsValue]()) {
+                    case (map, (in: String, out: String, default: Option[JsValue])) =>
+                      info.get(in) match {
+                        case Some(value) => map.updated(out, value)
+                        case None =>
+                          default match {
+                            case Some(d) => map.updated(out, d)
+                            case None    => map
+                          }
+                      }
+                  }
                   info.get("https://schema.hbp.eu/client/kg-editor/describedType") match {
                     case Some(typeName) => map.updated(typeName.as[String], typeMap)
                     case None           => map
                   }
               }
-            val res = (structure \ "data").as[List[Map[String, JsValue]]].map { structureField =>
-              structureField.get("id") match {
-                case Some(typeName) =>
-                  typeInfoMap.get(typeName.as[String]) match {
-                    case Some(r) =>
-                      structureField
-                        .updated("labelInfo", r.getOrElse("labelInfo", JsString("")))
-                        .updated("promotedFields", r.getOrElse("promotedFields", JsArray()))
-                    case None => structureField
-                  }
-                case None => structureField
-              }
+            val res = (structure \ "data").as[List[Map[String, JsValue]]].foldLeft(List[Map[String, JsValue]]()) {
+              case (list, structureField) =>
+                structureField.get("id") match {
+                  case Some(typeName) =>
+                    typeInfoMap.get(typeName.as[String]) match {
+                      case Some(r) =>
+                        val field = r.foldLeft(structureField) {
+                          case (map, (k, v)) =>
+                            map.updated(k, v)
+                        }
+                        list :+ field
+                      case None => list
+                    }
+                  case None => list
+                }
             }
             Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
           case _ => InternalServerError("Something went wrong! Please try again!")

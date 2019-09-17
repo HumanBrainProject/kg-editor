@@ -120,7 +120,7 @@ export default class InstanceManage extends React.Component{
                     <div className={classes.content}>
                       <h4>{instance.data.label}</h4>
                       <div className={classes.id}>
-                        Nexus ID: {this.props.id}
+                        ID: {this.props.id}
                       </div>
                       {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
                         <Form store={instance.readModeFormStore} key={this.props.id}>

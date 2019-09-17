@@ -160,7 +160,7 @@ export default class DynamicDropdownField extends React.Component {
   }
 
   triggerRemoveSuggestionOnChange = () => {
-    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
     selectedInstance && selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
     this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
     this.handleNodesStyles(this.props.field.getValue(false));
@@ -466,9 +466,8 @@ export default class DynamicDropdownField extends React.Component {
   renderReadMode(){
     const { classes, field, readModeRendering } = this.props;
     const { value, disabled, readOnly } = field;
-
     return (
-      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
           <FieldLabel field={field}/>
           {isFunction(readModeRendering)?
@@ -496,7 +495,7 @@ export default class DynamicDropdownField extends React.Component {
     const { classes, formStore, field } = this.props;
     const { options, value: values, mappingValue, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
 
-    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
     const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     const dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
@@ -509,7 +508,7 @@ export default class DynamicDropdownField extends React.Component {
     }
 
     return (
-      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <div ref={ref=>this.wrapperRef = ref}>
           <FormGroup
             onClick={this.handleFocus}

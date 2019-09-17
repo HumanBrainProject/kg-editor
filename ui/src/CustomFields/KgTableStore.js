@@ -104,7 +104,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
           // }
           toProcess.forEach(identifier => {
             const instance = this.instancesMap.get(identifier);
-            const instanceData = find(response.data.data, (item) => item.fields[instance.mappingValue].nexus_id === identifier);
+            const instanceData = find(response.data.data, (item) => item.id === identifier);
             if(instanceData){
               const promotedFields = instanceData.ui_info && instanceData.ui_info.promotedFields;
               set(instance, "promotedFields", promotedFields);

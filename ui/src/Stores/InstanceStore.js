@@ -10,6 +10,7 @@ import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import { matchPath } from "react-router-dom";
+import structureStore from "./StructureStore";
 
 class Instance {
   @observable instanceId = null;
@@ -166,8 +167,7 @@ class Instance {
 
   @computed
   get nodeType() {
-    const [ , , schema, , ] = this.instanceId?this.instanceId.split("/"):[ null, null, null, null, null];
-    return this.isFetched && this.data && this.data.fields && this.data.fields.id && this.data.fields.id.value && this.data.fields.id.value.path || schema;
+    return this.isFetched && this.data && this.data.type && this.data.type.length && this.data.type[0] || "";
   }
 
   @action
@@ -364,7 +364,7 @@ class InstanceStore {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = find(response.data.data, (item) => item.fields.id.nexus_id === instance.instanceId);
+            const data = find(response.data.data, (item) => item.id === instance.instanceId);
             if(data){
               const normalizedData = instance.normalizeData(data?data:{fields: [], alternatives: []});
               instance.data = normalizedData;
@@ -419,8 +419,8 @@ class InstanceStore {
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
     this.setReadMode(readMode);
-    if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
-      browseStore.fetchLists();
+    if (!readMode && viewMode === "edit" && !structureStore.isFetched) {
+      structureStore.fetch();
     }
     historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){

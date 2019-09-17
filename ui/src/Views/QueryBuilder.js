@@ -70,8 +70,8 @@ let styles = {
 @injectStyles(styles)
 @observer
 export default class QueryBuilder extends React.Component {
-  fetchStructure(forceFetch=false) {
-    structureStore.fetchStructure(!!forceFetch);
+  fetch(forceFetch=false) {
+    structureStore.fetch(!!forceFetch);
   }
   handleSelectTab(tab) {
     queryBuilderStore.selectTab(tab);
@@ -80,8 +80,8 @@ export default class QueryBuilder extends React.Component {
   handleCloseField = () => {
     queryBuilderStore.closeFieldOptions();
   }
-  handleRetryFetchStructure = () => {
-    this.fetchStructure(true);
+  handleRetryfetch = () => {
+    this.fetch(true);
   }
 
   render() {
@@ -89,19 +89,19 @@ export default class QueryBuilder extends React.Component {
 
     return (
       <div className={classes.container}>
-        {structureStore.isFetchingStructure ?
+        {structureStore.isFetching ?
           <div className={classes.structureLoader}>
             <FetchingLoader>
               Fetching api structure
             </FetchingLoader>
           </div>
           :
-          structureStore.fetchStuctureError ?
+          structureStore.fetchError ?
             <BGMessage icon={"ban"}>
               There was a network problem fetching the api structure.<br />
               If the problem persists, please contact the support.<br />
-              <small>{structureStore.fetchStuctureError}</small><br /><br />
-              <Button bsStyle={"primary"} onClick={this.handleRetryFetchStructure}>
+              <small>{structureStore.fetchError}</small><br /><br />
+              <Button bsStyle={"primary"} onClick={this.handleRetryfetch}>
                 <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
               </Button>
             </BGMessage>
@@ -110,7 +110,7 @@ export default class QueryBuilder extends React.Component {
               <BGMessage icon={"blender-phone"}>
                 No schemas available.<br />
                 If the problem persists, please contact the support.<br /><br />
-                <Button bsStyle={"primary"} onClick={this.handleRetryFetchStructure}>
+                <Button bsStyle={"primary"} onClick={this.handleRetryfetch}>
                   <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
                 </Button>
               </BGMessage>

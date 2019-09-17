@@ -2,9 +2,9 @@ import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
 
-import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import ThemeSwitcher from "./ThemeSwitcher";
+import structureStore from "../../Stores/StructureStore";
 
 const styles = {
   container:{
@@ -52,8 +52,8 @@ export default class Hub extends React.Component{
   }
 
   handleCreateInstance = () => {
-    if(!browseStore.isFetched.lists && !browseStore.isFetching.list){
-      browseStore.fetchLists();
+    if(!structureStore.isFetched) {
+      structureStore.fetch();
     }
     instanceStore.toggleShowCreateModal();
   }

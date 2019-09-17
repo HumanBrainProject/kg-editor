@@ -175,8 +175,8 @@ export default class InstanceRow extends React.Component {
       primaryField: typeof instance[primaryField] === "object" && instance[primaryField]["https://schema.hbp.eu/value"],
       secondaryField: typeof instance[secondaryField] === "object" && instance[secondaryField] && instance[secondaryField]["https://schema.hbp.eu/value"]
     };
-    const id = instance["@id"];
-    const type = instance["@type"][0];
+    const id = instance.id;
+    const type = instance.nodeType;
     const color = structureStore.colorPalletteByType(type);
     const label = structureStore.findLabelByType(type);
     return (

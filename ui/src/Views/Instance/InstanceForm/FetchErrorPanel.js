@@ -76,7 +76,7 @@ export default class FetchErrorPanel extends React.Component{
         <div className={classes.inlineFetchErrorPanel}>
           <HeaderPanel className={classes.panelHeader} />
           <h5>{error}</h5>
-          <small>Nexus ID: {id}</small>
+          <small>ID: {id}</small>
           <div>
             <Button onClick={this.handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
           </div>

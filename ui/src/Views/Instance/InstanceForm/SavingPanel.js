@@ -83,7 +83,7 @@ export default class SavingPanel extends React.Component{
         <div className={classes.panel} >
           <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
           <span className={classes.label}>Saving instance...</span>
-          <small>Nexus ID: {id}</small>
+          <small>ID: {id}</small>
         </div>
       </div>
     );

@@ -6,12 +6,12 @@ import palette from "google-palette";
 class StructureStore {
   @observable colorPaletteByLabel = new Map();
   @observable types = [];
-  @observable fetchStuctureError = null;
-  @observable isFetchingStructure = false;
+  @observable fetchError = null;
+  @observable isFetching = false;
   colorPalette = null;
 
   constructor() {
-    this.fetchStructure();
+    this.fetch();
   }
 
   filteredList(term) {
@@ -35,7 +35,7 @@ class StructureStore {
   @computed
   get hasTypes() {
     return (
-      !this.fetchStuctureError && this.types.length
+      !this.fetchError && this.types.length
     );
   }
 
@@ -61,11 +61,16 @@ class StructureStore {
     return this.typesLabel.get(type);
   }
 
+  @computed
+  get isFetched() {
+    return !this.fetchError && this.types.length;
+  }
+
   @action
-  async fetchStructure(forceFetch=false) {
-    if (!this.isFetchingStructure && (!this.types.length || !!forceFetch)) {
-      this.isFetchingStructure = true;
-      this.fetchStuctureError = null;
+  async fetch(forceFetch=false) {
+    if (!this.isFetching && (!this.types.length || !!forceFetch)) {
+      this.isFetching = true;
+      this.fetchError = null;
       try {
         const response = await API.axios.get(API.endpoints.structure());
         runInAction(() => {
@@ -76,12 +81,12 @@ class StructureStore {
             this.colorPaletteByLabel[this.findLabelByType(type.id)] = color;
             type.color = color;
           });
-          this.isFetchingStructure = false;
+          this.isFetching = false;
         });
       } catch (e) {
         const message = e.message ? e.message : e;
-        this.fetchStuctureError = `Error while fetching api structure (${message})`;
-        this.isFetchingStructure = false;
+        this.fetchError = `Error while fetching api structure (${message})`;
+        this.isFetching = false;
       }
     }
   }

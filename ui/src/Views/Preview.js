@@ -185,7 +185,7 @@ export default class Preview extends React.Component {
                 )}
               </div>
               <div className={classes.id}>
-                Nexus ID: {instanceId}
+                ID: {instanceId}
               </div>
             </div>
             <Scrollbars autoHide>

@@ -51,7 +51,7 @@ export default class FetchingPanel extends React.Component{
       <div className={classes.panel} inline={inline?"true":"false"}>
         <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
         <span className={classes.label}>Fetching instance...</span>
-        <small>Nexus ID: {id}</small>
+        <small>ID: {id}</small>
       </div>
     );
   }

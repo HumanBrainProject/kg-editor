@@ -20,7 +20,8 @@ import actions.EditorUserAction
 import constants.EditorConstants
 import javax.inject.{Inject, Singleton}
 import constants._
-import models._
+import helpers.DocumentId
+import models.{instance, _}
 import models.instance._
 import models.specification.{FormRegistry, UISpec}
 import monix.eval.Task
@@ -138,6 +139,55 @@ class EditorController @Inject()(
       }
       .toList
 
+  def getStructure(withLinks: Boolean): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val result = for {
+        typeInfoOpt <- editorService.retrieveTypes(
+          s"${EditorConstants.EDITORNAMESPACE}typeInfo",
+          request.userToken,
+          false
+        )
+        structureOpt <- editorService.retrieveStructure(withLinks)
+      } yield {
+        (typeInfoOpt, structureOpt) match {
+          case (Right(typeInfo), Right(structure)) =>
+            val typeInfoMap =
+              (typeInfo \ "data").as[List[Map[String, JsValue]]].foldLeft(Map[String, Map[String, JsValue]]()) {
+                case (map, info) =>
+                  val typeMap = Map[String, JsValue]()
+                    .updated(
+                      "labelInfo",
+                      info.getOrElse("https://schema.hbp.eu/client/kg-editor/labelField", JsString(""))
+                    )
+                    .updated(
+                      "promotedFields",
+                      info.getOrElse("https://schema.hbp.eu/client/kg-editor/promotedFields", JsArray())
+                    )
+                  info.get("https://schema.hbp.eu/client/kg-editor/describedType") match {
+                    case Some(typeName) => map.updated(typeName.as[String], typeMap)
+                    case None           => map
+                  }
+              }
+            val res = (structure \ "data").as[List[Map[String, JsValue]]].map { structureField =>
+              structureField.get("id") match {
+                case Some(typeName) =>
+                  typeInfoMap.get(typeName.as[String]) match {
+                    case Some(r) =>
+                      structureField
+                        .updated("labelInfo", r.getOrElse("labelInfo", JsString("")))
+                        .updated("promotedFields", r.getOrElse("promotedFields", JsArray()))
+                    case None => structureField
+                  }
+                case None => structureField
+              }
+            }
+            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
+          case _ => InternalServerError("Something went wrong! Please try again!")
+        }
+      }
+      result.runToFuture
+    }
+
   //  TODO: Deprecate either this one or getInstancesByIds
   def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
@@ -151,8 +201,40 @@ class EditorController @Inject()(
             editorService
               .retrieveInstances(ids, request.userToken, databaseScope, metadata)
               .map {
-                case Right(value) => Ok(value)
-                case Left(err)    => err.toResult
+                case Right(value) =>
+                  val res = (value \ "data").as[List[Map[String, JsValue]]].map { instance =>
+                    val normalizedValues = List[(String, String, Option[Function1[String, Option[String]]])](
+                      ("@id", "id", Some(DocumentId.getIdFromPath)),
+                      ("@type", "type", None)
+                    ).foldLeft(Map[String, JsValue]()) {
+                      case (map, (in: String, out: String, callback: Option[Function1[String, Option[String]]])) =>
+                        callback match {
+                          case Some(c) =>
+                            val jsFieldValue = for {
+                              instaceFieldJs <- instance.get(in)
+                              instanceField  <- instaceFieldJs.asOpt[String]
+                              r              <- c(instanceField)
+                            } yield r
+                            jsFieldValue match {
+                              case Some(v) => map.updated(out, JsString(v))
+                              case None    => map
+                            }
+                          case None =>
+                            val jsFieldValue = for {
+                              instaceFieldJs <- instance.get(in)
+                              instanceField  <- instaceFieldJs.asOpt[List[String]]
+                            } yield instanceField
+                            jsFieldValue match {
+                              case Some(i) => map.updated(out, Json.toJson(i))
+                              case None    => map
+                            }
+                        }
+                    }
+                    val fieldsMapNormalized = instance.filter(value => value._1 != "@id" && value._1 != "@type")
+                    normalizedValues.updated("fields", Json.toJson(fieldsMapNormalized))
+                  }
+                  Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
+                case Left(err) => err.toResult
               }
           } else {
             for {
@@ -178,9 +260,10 @@ class EditorController @Inject()(
                       } yield promotedFieldsArray
                       promotedFieldsListOpt.getOrElse(List())
                     }
+                    val id = (instance \ "@id").as[String].split("/").lastOption
                     val initMap = Map[String, JsValue]()
-                      .updated("@type", (instance \ "@type").as[JsArray])
-                      .updated("@id", (instance \ "@id").as[JsString])
+                      .updated("type", (instance \ "@type").as[JsArray])
+                      .updated("id", JsString(id.getOrElse((instance \ "@id").as[String])))
                     promotedFieldsList.distinct.foldLeft(initMap) {
                       case (map, promotedField) => map.updated(promotedField, (instance \ promotedField).as[JsObject])
                     }
@@ -289,16 +372,6 @@ class EditorController @Inject()(
     val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
     editorService
       .retrieveInstanceRelease(nexusInstanceReference, request.userToken)
-      .map {
-        case Left(err)    => err.toResult
-        case Right(value) => Ok(value)
-      }
-      .runToFuture
-  }
-
-  def getStructure(withLinks: Boolean): Action[AnyContent] = Action.async { implicit request =>
-    editorService
-      .retrieveStructure(withLinks)
       .map {
         case Left(err)    => err.toResult
         case Right(value) => Ok(value)

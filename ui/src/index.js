@@ -432,8 +432,8 @@ class App extends React.Component {
   }
 
   handleCreateInstance = () => {
-    if (!browseStore.isFetched.lists && !browseStore.isFetching.list) {
-      browseStore.fetchLists();
+    if (!structureStore.isFetched) {
+      structureStore.fetch();
     }
     instanceStore.toggleShowCreateModal();
   }
@@ -488,7 +488,7 @@ class App extends React.Component {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = instance.data && structureStore.colorPalletteByType(instance.data.fields.id.value.path);
+                      color = instance.data && structureStore.colorPalletteByType(instance.nodeType);
                     }
                     if (!label) {
                       label = instanceId;

@@ -9,6 +9,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import browseStore from "../../Stores/BrowseStore";
 
 import List from "./List";
+import structureStore from "../../Stores/StructureStore";
 
 const styles = {
   container:{
@@ -76,8 +77,8 @@ const styles = {
 @observer
 export default class Lists extends React.Component{
   componentDidMount() {
-    if(!browseStore.isFetched.lists && !browseStore.isFetching.lists){
-      browseStore.fetchLists();
+    if(!structureStore.isFetched) {
+      structureStore.fetch();
     }
   }
 

@@ -81,7 +81,7 @@ export default class KgInputTextField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
-    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
     const prototype = this.props.componentClass === "textarea"?window.HTMLTextAreaElement.prototype:window.HTMLInputElement.prototype;
     if (selectedInstance && this.props.field.value === null) {
       Object.getOwnPropertyDescriptor(prototype, "disabled").set
@@ -159,7 +159,7 @@ export default class KgInputTextField extends React.Component {
       path
     } = this.props.field;
 
-    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.fields.id.nexus_id);
+    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
     let isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
     const style = this.getStyle();
@@ -191,7 +191,7 @@ export default class KgInputTextField extends React.Component {
       }));
 
     return (
-      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
           <FieldLabel field={this.props.field}/>
           <Alternatives className={classes.alternatives}
@@ -233,7 +233,7 @@ export default class KgInputTextField extends React.Component {
     const lines = typeof value === "string"?value.split("\n"):[];
 
     return (
-      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
           <FieldLabel field={this.props.field}/>
           {isFunction(this.props.readModeRendering)?

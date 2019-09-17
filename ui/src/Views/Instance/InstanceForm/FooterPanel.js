@@ -83,7 +83,7 @@ export default class FooterPanel extends React.Component{
       <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
         <Row>
           <Col xs={10}>
-            <div className={classes.id}>Nexus ID: {nexusId}</div>
+            <div className={classes.id}>ID: {nexusId}</div>
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>

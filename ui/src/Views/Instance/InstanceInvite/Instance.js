@@ -78,7 +78,7 @@ export default class InstanceInvite extends React.Component{
 
     const color = structureStore.colorPalletteByType(instance.path);
 
-    const nexusId = instance.data.fields.id?instance.data.fields.id.nexus_id:"<new>";
+    const nexusId = instance.data.id?instance.data.id:"<new>";
 
     return (
       <div className={classes.container}>
@@ -111,7 +111,7 @@ export default class InstanceInvite extends React.Component{
               <div>
                 <Row>
                   <Col xs={12}>
-                    <div className={classes.id}>Nexus ID: {nexusId}</div>
+                    <div className={classes.id}>ID: {nexusId}</div>
                   </Col>
                 </Row>
               </div>

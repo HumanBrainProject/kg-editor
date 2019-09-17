@@ -36,12 +36,14 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Types extends React.Component {
+  handleLoadRetry = () => structureStore.fetch();
+
   render() {
     const {classes} = this.props;
     const list = structureStore.filteredList(browseStore.navigationFilter);
     return (
-      !structureStore.fetchStuctureError ?
-        !structureStore.isFetchingStructure ?
+      !structureStore.fetchError ?
+        !structureStore.isFetching ?
           list.map(space =><TypesSpace key={space.label} space={space} />)
           :
           <FetchingLoader>
@@ -49,7 +51,7 @@ export default class Types extends React.Component {
           </FetchingLoader>
         :
         <div className={classes.fetchErrorPanel}>
-          <div>{structureStore.fetchStuctureError}</div>
+          <div>{structureStore.fetchError}</div>
           <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
         </div>
     );

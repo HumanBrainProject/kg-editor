@@ -222,7 +222,7 @@ class QueryBuilderStore {
   @observable currentField = null;
 
   constructor(){
-    structureStore.fetchStructure();
+    structureStore.fetch();
   }
 
   get queryIdRegex() {

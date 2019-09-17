@@ -55,14 +55,12 @@ const styles = {
 @observer
 export default class NewInstance extends React.Component {
   componentDidMount() {
-    if (!browseStore.isFetched.lists && !browseStore.isFetching.lists) {
-      browseStore.fetchLists();
+    if (!structureStore.isFetched) {
+      structureStore.fetch();
     }
   }
 
-  handleFetchInstanceTypes = () => {
-    browseStore.fetchLists();
-  }
+  handleFetchInstanceTypes = () => structureStore.fetch();
 
   async handleClickNewInstanceOfType(path) {
     let newInstanceId = await instanceStore.createNewInstance(path);

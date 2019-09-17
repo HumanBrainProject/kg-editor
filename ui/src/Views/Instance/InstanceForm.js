@@ -150,9 +150,7 @@ export default class InstanceForm extends React.Component {
     }
   }
 
-  handleListLoadRetry = () => {
-    browseStore.fetchLists();
-  }
+  handleListLoadRetry = () => structureStore.fetch();
 
   handleFocus = () => {
     if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
@@ -292,7 +290,7 @@ export default class InstanceForm extends React.Component {
                         }
                         <FooterPanel
                           className={classes.panelFooter}
-                          nexusId={instance.data.fields.id ? instance.data.fields.id.nexus_id : "<new>"}
+                          nexusId={instance.data.id ? instance.data.id : "<new>"}
                           id={id}
                           showOpenActions={isCurrentInstance && !isMainInstance} />
                       </Form>

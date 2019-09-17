@@ -477,7 +477,7 @@ export default class KgTable extends React.Component {
     }
 
     return (
-      <FieldError id={this.props.formStore.structure.fields.id.nexus_id} field={this.props.field}>
+      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
           <div ref={ref=>this.dropDownRef = ref}>
             <FormGroup

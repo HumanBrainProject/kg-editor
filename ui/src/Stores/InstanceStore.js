@@ -79,10 +79,8 @@ class Instance {
 
   @computed
   get promotedFields() {
-    if (this.isFetched && !this.fetchError && this.data && this.data.fields && this.data.ui_info && this.data.ui_info.promotedFields) {
-      return this.data.ui_info.promotedFields.filter(name => this.data.fields[name]);
-    }
-    return [];
+    const info = structureStore.typesMap.get(this.nodeType);
+    return (info && info.promotedFields) || [];
   }
 
   @computed
@@ -93,7 +91,7 @@ class Instance {
   @computed
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
-      return Object.keys(this.data.fields).filter(key => !this.data.ui_info || !this.data.ui_info.promotedFields || !this.data.ui_info.promotedFields.includes(key));
+      return Object.keys(this.data.fields).filter(key => !this.promotedFields.includes(key));
     }
     return [];
   }
@@ -190,6 +188,7 @@ class Instance {
     }
     for(let fieldKey in data.fields) {
       let field = data.fields[fieldKey];
+      field.type = field["https://schema.hbp.eu/type"];
       if(field.type === "InputText"){
         field.type = "KgInputText";
       } else if(field.type === "TextArea"){

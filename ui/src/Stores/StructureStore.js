@@ -27,6 +27,14 @@ class StructureStore {
     return this.typesBySpace;
   }
 
+  findTypeById(id) {
+    return this.typesMap.get(id);
+  }
+
+  findLabelByType(type) {
+    return this.typesLabel.get(type);
+  }
+
   @computed
   get typesBySpace() {
     return Object.entries(groupBy(this.types, "space")).map(([label, types]) => ({label: label, types: types}));
@@ -51,14 +59,6 @@ class StructureStore {
     const map = new Map();
     this.types.forEach(type => map.set(type.id, type.label));
     return map;
-  }
-
-  findTypeById(id) {
-    return this.typesMap.get(id);
-  }
-
-  findLabelByType(type) {
-    return this.typesLabel.get(type);
   }
 
   @computed

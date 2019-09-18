@@ -22,6 +22,7 @@ import constants.EditorConstants
 import javax.inject.{Inject, Singleton}
 import constants._
 import helpers.DocumentId
+import models.errors.APIEditorError
 import models.{instance, _}
 import models.instance._
 import models.specification.{FormRegistry, UISpec}
@@ -198,6 +199,117 @@ class EditorController @Inject()(
       result.runToFuture
     }
 
+  def normalizeIdOfField(field: Map[String, JsValue]): Map[String, JsValue] =
+    field.get("@id") match {
+      case Some(id) =>
+        val normalizedId = DocumentId.getIdFromPath(id.as[String])
+        normalizedId match {
+          case Some(id) => field.updated("id", JsString(id)).filter(value => !value._1.equals("@id"))
+          case None     => field
+        }
+      case None => field
+    }
+
+  def normalizeIdOfArray(fieldArray: List[Map[String, JsValue]]): List[Map[String, JsValue]] =
+    fieldArray.map(field => normalizeIdOfField(field))
+
+  def normalizeFieldValue(value: JsValue): JsValue =
+    value.asOpt[JsArray] match {
+      case Some(valueArray) => Json.toJson(normalizeIdOfArray(valueArray.as[List[Map[String, JsValue]]]))
+      case None =>
+        value.asOpt[JsObject] match {
+          case Some(valueObj) => Json.toJson(normalizeIdOfField(valueObj.as[Map[String, JsValue]]))
+          case None           => value
+        }
+    }
+
+  def normalizeField(field: Map[String, JsValue]): Map[String, JsValue] = {
+    val res = Map[String, JsValue]()
+    val res2 = field.get("https://schema.hbp.eu/value") match {
+      case Some(value) =>
+        field.get("https://schema.hbp.eu/isLink") match {
+          case Some(link) =>
+            link.as[Boolean] match {
+              case true =>
+                res.updated("value", normalizeFieldValue(value))
+              case false => res.updated("value", value)
+            }
+          case None => res.updated("value", value)
+        }
+      case None => res
+    }
+    field.get("https://schema.hbp.eu/label") match {
+      case Some(value) => res2.updated("label", value)
+      case None        => res2
+    }
+  }
+
+  def normalizeInstance(instance: Map[String, JsValue]): Map[String, JsValue] = {
+
+    val normalizedInstance = List[(String, String, Option[Function1[String, Option[String]]])](
+      ("@id", "id", Some(DocumentId.getIdFromPath)),
+      ("@type", "type", None)
+    ).foldLeft(Map[String, JsValue]()) {
+      case (map, (in: String, out: String, callback: Option[Function1[String, Option[String]]])) =>
+        callback match {
+          case Some(c) =>
+            val jsFieldValue = for {
+              instaceFieldJs <- instance.get(in)
+              instanceField  <- instaceFieldJs.asOpt[String]
+              r              <- c(instanceField)
+            } yield r
+            jsFieldValue match {
+              case Some(v) => map.updated(out, JsString(v))
+              case None    => map
+            }
+          case None =>
+            val jsFieldValue = for {
+              instaceFieldJs <- instance.get(in)
+              instanceField  <- instaceFieldJs.asOpt[List[String]]
+            } yield instanceField
+            jsFieldValue match {
+              case Some(i) => map.updated(out, Json.toJson(i))
+              case None    => map
+            }
+        }
+    }
+    val normalizedFields = instance
+      .filter(value => value._1 != "@id" && value._1 != "@type")
+      .map {
+        case (fieldName, field) => (fieldName, normalizeField(field.as[Map[String, JsValue]]))
+      }
+    normalizedInstance.updated("fields", Json.toJson(normalizedFields))
+  }
+
+  def normalizeInstancesData(data: JsValue): List[Map[String, JsValue]] =
+    (data \ "data").as[List[Map[String, JsValue]]].map { instance =>
+      normalizeInstance(instance)
+    }
+
+  def normalizeInstanceSummaryData(instanceData: JsValue, typeInfoData: JsValue): List[Map[String, JsValue]] = {
+    val typeInfos = (typeInfoData \ "data").as[List[JsObject]].foldLeft(Map[String, JsObject]()) {
+      case (map, js) =>
+        map.updated((js \ s"${EditorConstants.EDITORNAMESPACE}describedType").as[String], js)
+    }
+    (instanceData \ "data").as[JsArray].value.toList.map { instance =>
+      val promotedFieldsList = (instance \ "@type").as[List[String]].flatMap { typeName =>
+        val promotedFieldsListOpt = for {
+          typeInfoRes <- typeInfos.get(typeName)
+          promotedFieldsArray <- (typeInfoRes \ s"${EditorConstants.EDITORNAMESPACE}promotedFields")
+            .asOpt[List[String]]
+        } yield promotedFieldsArray
+        promotedFieldsListOpt.getOrElse(List())
+      }
+      val id = (instance \ "@id").as[String].split("/").lastOption
+      val initMap = Map[String, JsValue]()
+        .updated("type", (instance \ "@type").as[JsArray])
+        .updated("id", JsString(id.getOrElse((instance \ "@id").as[String])))
+      promotedFieldsList.distinct.foldLeft(initMap) {
+        case (map, promotedField) => map.updated(promotedField, (instance \ promotedField).as[JsObject])
+      }
+    }
+  }
+
   //  TODO: Deprecate either this one or getInstancesByIds
   def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
@@ -211,74 +323,21 @@ class EditorController @Inject()(
             editorService
               .retrieveInstances(ids, request.userToken, databaseScope, metadata)
               .map {
-                case Right(value) =>
-                  val res = (value \ "data").as[List[Map[String, JsValue]]].map { instance =>
-                    val normalizedValues = List[(String, String, Option[Function1[String, Option[String]]])](
-                      ("@id", "id", Some(DocumentId.getIdFromPath)),
-                      ("@type", "type", None)
-                    ).foldLeft(Map[String, JsValue]()) {
-                      case (map, (in: String, out: String, callback: Option[Function1[String, Option[String]]])) =>
-                        callback match {
-                          case Some(c) =>
-                            val jsFieldValue = for {
-                              instaceFieldJs <- instance.get(in)
-                              instanceField  <- instaceFieldJs.asOpt[String]
-                              r              <- c(instanceField)
-                            } yield r
-                            jsFieldValue match {
-                              case Some(v) => map.updated(out, JsString(v))
-                              case None    => map
-                            }
-                          case None =>
-                            val jsFieldValue = for {
-                              instaceFieldJs <- instance.get(in)
-                              instanceField  <- instaceFieldJs.asOpt[List[String]]
-                            } yield instanceField
-                            jsFieldValue match {
-                              case Some(i) => map.updated(out, Json.toJson(i))
-                              case None    => map
-                            }
-                        }
-                    }
-                    val fieldsMapNormalized = instance.filter(value => value._1 != "@id" && value._1 != "@type")
-                    normalizedValues.updated("fields", Json.toJson(fieldsMapNormalized))
-                  }
-                  Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
-                case Left(err) => err.toResult
+                case Right(data) => Ok(Json.toJson(EditorResponseObject(Json.toJson(normalizeInstancesData(data)))))
+                case Left(err)   => err.toResult
               }
           } else {
             for {
-              typeInfo <- editorService.retrieveTypes(
+              instancesResult <- editorService.retrieveInstances(ids, request.userToken, databaseScope, metadata)
+              typeInfoResult <- editorService.retrieveTypes(
                 s"${EditorConstants.EDITORNAMESPACE}typeInfo",
                 request.userToken,
                 metadata
               )
-              instances <- editorService.retrieveInstances(ids, request.userToken, databaseScope, metadata)
             } yield {
-              (typeInfo, instances) match {
-                case (Right(typeInfoResult), Right(instancesResult)) =>
-                  val typeInfos = (typeInfoResult \ "data").as[List[JsObject]].foldLeft(Map[String, JsObject]()) {
-                    case (map, js) =>
-                      map.updated((js \ s"${EditorConstants.EDITORNAMESPACE}describedType").as[String], js)
-                  }
-                  val res = (instancesResult \ "data").as[JsArray].value.toList.map { instance =>
-                    val promotedFieldsList = (instance \ "@type").as[List[String]].flatMap { typeName =>
-                      val promotedFieldsListOpt = for {
-                        typeInfoRes <- typeInfos.get(typeName)
-                        promotedFieldsArray <- (typeInfoRes \ s"${EditorConstants.EDITORNAMESPACE}promotedFields")
-                          .asOpt[List[String]]
-                      } yield promotedFieldsArray
-                      promotedFieldsListOpt.getOrElse(List())
-                    }
-                    val id = (instance \ "@id").as[String].split("/").lastOption
-                    val initMap = Map[String, JsValue]()
-                      .updated("type", (instance \ "@type").as[JsArray])
-                      .updated("id", JsString(id.getOrElse((instance \ "@id").as[String])))
-                    promotedFieldsList.distinct.foldLeft(initMap) {
-                      case (map, promotedField) => map.updated(promotedField, (instance \ promotedField).as[JsObject])
-                    }
-                  }
-                  Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
+              (instancesResult, typeInfoResult) match {
+                case (Right(instances), Right(typeInfo)) =>
+                  Ok(Json.toJson(EditorResponseObject(Json.toJson(normalizeInstanceSummaryData(instances, typeInfo)))))
                 case _ => InternalServerError("Something went wrong! Please try again!")
               }
             }

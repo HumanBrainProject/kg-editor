@@ -172,11 +172,11 @@ export default class InstanceRow extends React.Component {
     const { classes, instance, selected } = this.props;
     const [,,primaryField, secondaryField] = Object.keys(instance); // TODO:Consider changing destruction style and move to scala
     const result = {
-      primaryField: typeof instance[primaryField] === "object" && instance[primaryField]["https://schema.hbp.eu/value"],
-      secondaryField: typeof instance[secondaryField] === "object" && instance[secondaryField] && instance[secondaryField]["https://schema.hbp.eu/value"]
+      primaryField: typeof instance[primaryField] === "string" && instance[primaryField],
+      secondaryField: typeof instance[secondaryField] === "string" && instance[secondaryField]
     };
     const id = instance.id;
-    const type = instance.nodeType;
+    const type = instance.type[0];
     const color = structureStore.colorPalletteByType(type);
     const label = structureStore.findLabelByType(type);
     return (

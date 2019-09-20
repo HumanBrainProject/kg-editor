@@ -27,7 +27,7 @@ const endpoints = {
   "bookmarks": () => "/editor/api/bookmarks",
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
-  "structure": () => "/editor/api/structure?withLinks=true",
+  "structure": () => "/editor/api/structure?withFields=false",
   "performQuery": function(instancePath, vocab, size, start, databaseScope){
     return `/editor/api/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${

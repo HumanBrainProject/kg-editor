@@ -141,62 +141,73 @@ class EditorController @Inject()(
       }
       .toList
 
-  def getStructure(withLinks: Boolean): Action[AnyContent] =
+  //  def getStructure(withLinks: Boolean): Action[AnyContent] =
+  //    authenticatedUserAction.async { implicit request =>
+  //      val result = for {
+  //        typeInfoOpt <- editorService.retrieveTypes(
+  //          s"${EditorConstants.EDITORNAMESPACE}typeInfo",
+  //          request.userToken,
+  //          false
+  //        )
+  //        structureOpt <- editorService.retrieveStructure(withLinks)
+  //      } yield {
+  //        (typeInfoOpt, structureOpt) match {
+  //          case (Right(typeInfo), Right(structure)) =>
+  //            val infoProps = List[(String, String, Option[JsValue])](
+  //              ("https://schema.hbp.eu/client/kg-editor/labelField", "labelInfo", None),
+  //              ("https://schema.hbp.eu/client/kg-editor/promotedFields", "promotedFields", Some(JsArray()))
+  //            )
+  //            val typeInfoMap =
+  //              (typeInfo \ "data").as[List[Map[String, JsValue]]].foldLeft(Map[String, Map[String, JsValue]]()) {
+  //                case (map, info) =>
+  //                  val typeMap = infoProps.foldLeft(Map[String, JsValue]()) {
+  //                    case (map, (in: String, out: String, default: Option[JsValue])) =>
+  //                      info.get(in) match {
+  //                        case Some(value) => map.updated(out, value)
+  //                        case None =>
+  //                          default match {
+  //                            case Some(d) => map.updated(out, d)
+  //                            case None    => map
+  //                          }
+  //                      }
+  //                  }
+  //                  info.get("https://schema.hbp.eu/client/kg-editor/describedType") match {
+  //                    case Some(typeName) => map.updated(typeName.as[String], typeMap)
+  //                    case None           => map
+  //                  }
+  //              }
+  //            val res = (structure \ "data").as[List[Map[String, JsValue]]].foldLeft(List[Map[String, JsValue]]()) {
+  //              case (list, structureField) =>
+  //                structureField.get("id") match {
+  //                  case Some(typeName) =>
+  //                    typeInfoMap.get(typeName.as[String]) match {
+  //                      case Some(r) =>
+  //                        val field = r.foldLeft(structureField) {
+  //                          case (map, (k, v)) =>
+  //                            map.updated(k, v)
+  //                        }
+  //                        list :+ field
+  //                      case None => list
+  //                    }
+  //                  case None => list
+  //                }
+  //            }
+  //            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
+  //          case _ => InternalServerError("Something went wrong! Please try again!")
+  //        }
+  //      }
+  //      result.runToFuture
+  //    }
+
+  def getStructure(withFields: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      val result = for {
-        typeInfoOpt <- editorService.retrieveTypes(
-          s"${EditorConstants.EDITORNAMESPACE}typeInfo",
-          request.userToken,
-          false
-        )
-        structureOpt <- editorService.retrieveStructure(withLinks)
-      } yield {
-        (typeInfoOpt, structureOpt) match {
-          case (Right(typeInfo), Right(structure)) =>
-            val infoProps = List[(String, String, Option[JsValue])](
-              ("https://schema.hbp.eu/client/kg-editor/labelField", "labelInfo", None),
-              ("https://schema.hbp.eu/client/kg-editor/promotedFields", "promotedFields", Some(JsArray()))
-            )
-            val typeInfoMap =
-              (typeInfo \ "data").as[List[Map[String, JsValue]]].foldLeft(Map[String, Map[String, JsValue]]()) {
-                case (map, info) =>
-                  val typeMap = infoProps.foldLeft(Map[String, JsValue]()) {
-                    case (map, (in: String, out: String, default: Option[JsValue])) =>
-                      info.get(in) match {
-                        case Some(value) => map.updated(out, value)
-                        case None =>
-                          default match {
-                            case Some(d) => map.updated(out, d)
-                            case None    => map
-                          }
-                      }
-                  }
-                  info.get("https://schema.hbp.eu/client/kg-editor/describedType") match {
-                    case Some(typeName) => map.updated(typeName.as[String], typeMap)
-                    case None           => map
-                  }
-              }
-            val res = (structure \ "data").as[List[Map[String, JsValue]]].foldLeft(List[Map[String, JsValue]]()) {
-              case (list, structureField) =>
-                structureField.get("id") match {
-                  case Some(typeName) =>
-                    typeInfoMap.get(typeName.as[String]) match {
-                      case Some(r) =>
-                        val field = r.foldLeft(structureField) {
-                          case (map, (k, v)) =>
-                            map.updated(k, v)
-                        }
-                        list :+ field
-                      case None => list
-                    }
-                  case None => list
-                }
-            }
-            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
-          case _ => InternalServerError("Something went wrong! Please try again!")
+      editorService
+        .retrieveStructure(withFields)
+        .map {
+          case Left(err)    => err.toResult
+          case Right(value) => Ok(value)
         }
-      }
-      result.runToFuture
+        .runToFuture
     }
 
   def normalizeIdOfField(field: Map[String, JsValue]): Map[String, JsValue] =
@@ -223,28 +234,42 @@ class EditorController @Inject()(
         }
     }
 
-  def normalizeField(field: Map[String, JsValue]): Map[String, JsValue] = {
+  def normalizeField(field: Map[String, JsValue], info: Map[String, JsValue]): Map[String, JsValue] = {
     val res = Map[String, JsValue]()
-    val res2 = field.get("https://schema.hbp.eu/value") match {
+    //    if(info.nonEmpty) {
+    val res1 = info.get("https://schema.hbp.eu/client/kg-editor/widgetType") match {
+      case Some(typeInfo) => res.updated("type", typeInfo)
+      case None           => res
+    }
+    //    val res2 = info.get("https://schema.hbp.eu/client/kg-editor/widgetType") match {
+    //      case Some(markdown) =>
+    //        markdown.as[Boolean] match {
+    //          case true  => res1.updated("markdown", JsString(true.toString))
+    //          case false => res1.updated("markdown", JsString(false.toString))
+    //        }
+    //      case None => res1
+    //    }
+    //    }
+    val res3 = field.get("https://schema.hbp.eu/value") match {
       case Some(value) =>
         field.get("https://schema.hbp.eu/isLink") match {
           case Some(link) =>
-            link.as[Boolean] match {
-              case true =>
-                res.updated("value", normalizeFieldValue(value))
-              case false => res.updated("value", value)
+            if (link.as[Boolean]) {
+              res1.updated("value", normalizeFieldValue(value))
+            } else {
+              res1.updated("value", value)
             }
-          case None => res.updated("value", value)
+          case None => res1.updated("value", value)
         }
-      case None => res
+      case None => res1
     }
     field.get("https://schema.hbp.eu/label") match {
-      case Some(value) => res2.updated("label", value)
-      case None        => res2
+      case Some(value) => res3.updated("label", value)
+      case None        => res3
     }
   }
 
-  def normalizeInstance(instance: Map[String, JsValue]): Map[String, JsValue] = {
+  def normalizeInstance(instance: Map[String, JsValue], fieldsInfo: Map[String, JsValue]): Map[String, JsValue] = {
 
     val normalizedInstance = List[(String, String, Option[Function1[String, Option[String]]])](
       ("@id", "id", Some(DocumentId.getIdFromPath)),
@@ -276,26 +301,36 @@ class EditorController @Inject()(
     val normalizedFields = instance
       .filter(value => value._1 != "@id" && value._1 != "@type")
       .map {
-        case (fieldName, field) => (fieldName, normalizeField(field.as[Map[String, JsValue]]))
+        case (fieldName, field) => {
+          fieldsInfo.get(fieldName) match {
+            case Some(fieldInfo) =>
+              (fieldName, normalizeField(field.as[Map[String, JsValue]], fieldInfo.as[Map[String, JsValue]]))
+            case None => (fieldName, normalizeField(field.as[Map[String, JsValue]], Map[String, JsValue]()))
+          }
+        }
       }
     normalizedInstance.updated("fields", Json.toJson(normalizedFields))
   }
 
-  def normalizeInstancesData(data: JsValue): List[Map[String, JsValue]] =
-    (data \ "data").as[List[Map[String, JsValue]]].map { instance =>
-      normalizeInstance(instance)
+  def normalizeInstancesData(data: JsValue, fieldsInfoJs: JsValue): List[Map[String, JsValue]] = {
+    val fieldsInfo = (fieldsInfoJs \ "data").as[List[JsObject]].foldLeft(Map[String, JsObject]()) {
+      case (map, js) =>
+        map.updated((js \ s"${EditorConstants.EDITORNAMESPACE}describedField").as[String], js)
     }
+    (data \ "data").as[List[Map[String, JsValue]]].map { instance =>
+      normalizeInstance(instance, fieldsInfo)
+    }
+  }
 
   def normalizeInstanceSummaryData(instanceData: JsValue, typeInfoData: JsValue): List[Map[String, JsValue]] = {
     val typeInfos = (typeInfoData \ "data").as[List[JsObject]].foldLeft(Map[String, JsObject]()) {
-      case (map, js) =>
-        map.updated((js \ s"${EditorConstants.EDITORNAMESPACE}describedType").as[String], js)
+      case (map, js) => map.updated((js \ "type").as[String], js)
     }
     (instanceData \ "data").as[JsArray].value.toList.map { instance =>
       val promotedFieldsList = (instance \ "@type").as[List[String]].flatMap { typeName =>
         val promotedFieldsListOpt = for {
           typeInfoRes <- typeInfos.get(typeName)
-          promotedFieldsArray <- (typeInfoRes \ s"${EditorConstants.EDITORNAMESPACE}promotedFields")
+          promotedFieldsArray <- (typeInfoRes \ "promotedFields")
             .asOpt[List[String]]
         } yield promotedFieldsArray
         promotedFieldsListOpt.getOrElse(List())
@@ -304,8 +339,11 @@ class EditorController @Inject()(
       val initMap = Map[String, JsValue]()
         .updated("type", (instance \ "@type").as[JsArray])
         .updated("id", JsString(id.getOrElse((instance \ "@id").as[String])))
+        .updated("space", JsString((instance \ "space").as[String]))
       promotedFieldsList.distinct.foldLeft(initMap) {
-        case (map, promotedField) => map.updated(promotedField, (instance \ promotedField).as[JsObject])
+        case (map, promotedField) => {
+          map.updated(promotedField, (instance \ promotedField).as[JsString])
+        }
       }
     }
   }
@@ -320,27 +358,43 @@ class EditorController @Inject()(
       val result = listOfIds match {
         case Some(ids) =>
           if (allFields) {
-            editorService
-              .retrieveInstances(ids, request.userToken, databaseScope, metadata)
-              .map {
-                case Right(data) => Ok(Json.toJson(EditorResponseObject(Json.toJson(normalizeInstancesData(data)))))
-                case Left(err)   => err.toResult
-              }
-          } else {
             for {
               instancesResult <- editorService.retrieveInstances(ids, request.userToken, databaseScope, metadata)
-              typeInfoResult <- editorService.retrieveTypes(
-                s"${EditorConstants.EDITORNAMESPACE}typeInfo",
+              fieldsInfoResult <- editorService.retrieveTypes(
+                s"${EditorConstants.EDITORNAMESPACE}fieldInfo",
                 request.userToken,
                 metadata
               )
             } yield {
-              (instancesResult, typeInfoResult) match {
-                case (Right(instances), Right(typeInfo)) =>
-                  Ok(Json.toJson(EditorResponseObject(Json.toJson(normalizeInstanceSummaryData(instances, typeInfo)))))
+              (instancesResult, fieldsInfoResult) match {
+                case (Right(instances), Right(fieldsInfo)) =>
+                  Ok(Json.toJson(EditorResponseObject(Json.toJson(normalizeInstancesData(instances, fieldsInfo)))))
                 case _ => InternalServerError("Something went wrong! Please try again!")
               }
             }
+          } else {
+            editorService
+              .retrieveInstances(ids, request.userToken, databaseScope, metadata)
+              .flatMap {
+                case Right(instancesResult) =>
+                  val typesToRetrieve = (instancesResult \ "data")
+                    .as[JsArray]
+                    .value
+                    .toList
+                    .flatMap(instance => (instance \ "@type").as[List[String]])
+                  editorService
+                    .retrieveTypesList(typesToRetrieve.distinct, request.userToken, false)
+                    .map {
+                      case Right(typeInfo) =>
+                        Ok(
+                          Json.toJson(
+                            EditorResponseObject(Json.toJson(normalizeInstanceSummaryData(instancesResult, typeInfo)))
+                          )
+                        )
+                      case _ => InternalServerError("Something went wrong! Please try again!")
+                    }
+                case _ => Task.pure(InternalServerError("Something went wrong! Please try again!"))
+              }
           }
         case None => Task.pure(BadRequest("Wrong body content!"))
       }

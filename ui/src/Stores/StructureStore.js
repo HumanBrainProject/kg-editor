@@ -75,12 +75,6 @@ class StructureStore {
         const response = await API.axios.get(API.endpoints.structure());
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
-          this.colorPalette = palette("tol-dv", this.types.length);
-          this.types.forEach((type, index) => {
-            let color = "#" + this.colorPalette[index];
-            this.colorPaletteByLabel[this.findLabelByType(type.id)] = color;
-            type.color = color;
-          });
           this.isFetching = false;
         });
       } catch (e) {
@@ -92,7 +86,8 @@ class StructureStore {
   }
 
   colorPalletteByType(type) {
-    return this.colorPaletteByLabel[this.findLabelByType(type)];
+    return this.types && this.types.forEach(t => t[type] && t[type].color);
+    // return this.colorPaletteByLabel[this.findLabelByType(type)];
   }
 }
 

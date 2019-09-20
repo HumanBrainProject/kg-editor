@@ -100,6 +100,27 @@ trait InstanceApiService {
     }
   }
 
+  def getInstancesByTypeList(
+    wsClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    types: List[String],
+    withFields: Boolean
+  ): Task[Either[WSResponse, JsObject]] = {
+    val payload = Json.toJson(types)
+    val q = wsClient
+      .url(s"${apiBaseEndpoint}/types/structure")
+      .withHttpHeaders(AUTHORIZATION -> token.token)
+      .addQueryStringParameters("withFields" -> withFields.toString)
+    val r = Task.deferFuture(q.post(payload))
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
+
   def getReleaseStatus(
     wSClient: WSClient,
     apiBaseEndpoint: String,
@@ -317,12 +338,12 @@ trait InstanceApiService {
   def getStructure(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    withLinks: Boolean,
+    withFields: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/types/structure/")
-      .addQueryStringParameters("withLinks" -> withLinks.toString)
+      .addQueryStringParameters("withFields" -> withFields.toString)
       .withHttpHeaders("client" -> serviceClient.client)
     val r = Task.deferFuture(q.get())
     r.map { res =>

@@ -105,9 +105,9 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     }
   }
 
-  def retrieveStructure(withLinks: Boolean): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveStructure(withFields: Boolean): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getStructure(wSClient, config.kgCoreEndpoint, withLinks)
+      .getStructure(wSClient, config.kgCoreEndpoint, withFields)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -543,6 +543,18 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
       .getInstancesByType(wSClient, config.kgCoreEndpoint, token, typeOfInstance, metadata)
+      .map {
+        case Right(value) => Right(value)
+        case Left(res)    => Left(APIEditorError(res.status, res.body))
+      }
+
+  def retrieveTypesList(
+    types: List[String],
+    token: AccessToken,
+    withFields: Boolean
+  ): Task[Either[APIEditorError, JsObject]] =
+    instanceApiService
+      .getInstancesByTypeList(wSClient, config.kgCoreEndpoint, token, types, withFields)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))

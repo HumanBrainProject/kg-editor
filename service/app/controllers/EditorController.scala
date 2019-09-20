@@ -335,11 +335,22 @@ class EditorController @Inject()(
         } yield promotedFieldsArray
         promotedFieldsListOpt.getOrElse(List())
       }
+      val space = (instance \ "@type").as[List[String]].map { typeName =>
+        val result = for {
+          typeInfoRes <- typeInfos.get(typeName)
+          spaceRes <- (typeInfoRes \ "space")
+            .asOpt[String]
+        } yield spaceRes
+        result match {
+          case Some(value) => value
+          case _           => ""
+        }
+      }
       val id = (instance \ "@id").as[String].split("/").lastOption
       val initMap = Map[String, JsValue]()
         .updated("type", (instance \ "@type").as[JsArray])
         .updated("id", JsString(id.getOrElse((instance \ "@id").as[String])))
-        .updated("space", JsString((instance \ "space").as[String]))
+        .updated("space", Json.toJson(space))
       promotedFieldsList.distinct.foldLeft(initMap) {
         case (map, promotedField) => {
           map.updated(promotedField, (instance \ promotedField).as[JsString])

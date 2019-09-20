@@ -177,7 +177,8 @@ export default class InstanceRow extends React.Component {
     };
     const id = instance.id;
     const type = instance.type[0];
-    const color = structureStore.colorPalletteByType(type);
+    const space = instance.space[0]; //TODO:apply space on the service part
+    const color = structureStore.colorPalletteByType(type, space);
     const label = structureStore.findLabelByType(type);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}

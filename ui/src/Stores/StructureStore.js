@@ -85,9 +85,9 @@ class StructureStore {
     }
   }
 
-  colorPalletteByType(type) {
-    return this.types && this.types.forEach(t => t[type] && t[type].color);
-    // return this.colorPaletteByLabel[this.findLabelByType(type)];
+  // TODO: applay space to all the places referring to this method
+  colorPalletteByType(type, space) {
+    return this.types && this.types.filter(t => (t.space === space && t.type === type))[0].color;
   }
 }
 

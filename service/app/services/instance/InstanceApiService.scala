@@ -112,6 +112,7 @@ trait InstanceApiService {
       .url(s"${apiBaseEndpoint}/types/structure")
       .withHttpHeaders(AUTHORIZATION -> token.token)
       .addQueryStringParameters("withFields" -> withFields.toString)
+      .addQueryStringParameters("workspace" -> "minds") //TODO: remove hardcoded value
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {

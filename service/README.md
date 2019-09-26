@@ -276,7 +276,7 @@ Response:
    "total": 10
 }
 ```
-#### GET /instances/summary?type=http%3A%2F%2Fschema.org.name%2FPerson&search=...&from=0&size=20
+#### GET /workspaces/:workspace/instances/summary?type=http%3A%2F%2Fschema.org.name%2FPerson&search=...&from=0&size=20
 ```plantuml
     participant service
     participant core #Orange

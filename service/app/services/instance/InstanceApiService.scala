@@ -336,15 +336,17 @@ trait InstanceApiService {
 
   }
 
-  def getStructure(
+  def getWorkspaceTypes(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    workspace: String,
     withFields: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/types/structure/")
+      .url(s"$apiBaseEndpoint/types/structure")
       .addQueryStringParameters("withFields" -> withFields.toString)
+      .addQueryStringParameters("workspace" -> workspace)
       .withHttpHeaders("client" -> serviceClient.client)
     val r = Task.deferFuture(q.get())
     r.map { res =>

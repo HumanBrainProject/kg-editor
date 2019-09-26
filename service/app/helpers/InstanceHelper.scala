@@ -156,26 +156,14 @@ object InstanceHelper {
     }
 
   def generateProperties(field: Map[String, JsValue]): Map[String, JsValue] =
-    List[(String, String, Option[Function1[List[String], Boolean]])](
-      ("canBe", "isLink", Some(transformCanBe)),
-      ("widget", "widget", None),
-      ("markdown", "markdown", None),
-      ("label", "label", None)
-    ).foldLeft(Map[String, JsValue]()) {
-      case (map, (in: String, out: String, callback: Option[Function1[List[String], Boolean]])) =>
-        callback match {
-          case Some(c) =>
-            field.get(in) match {
-              case Some(v) => map.updated(out, Json.toJson(c(v.as[List[String]])))
-              case None    => map
-            }
-          case None =>
-            field.get(in) match {
-              case Some(res) => map.updated(out, res)
-              case None      => map
-            }
-        }
-    }
+    List[String]("canBe", "widget", "markdown", "label", "allowCustomValues", "labelTooltip")
+      .foldLeft(Map[String, JsValue]()) {
+        case (map, name) =>
+          field.get(name) match {
+            case Some(res) => map.updated(name, res)
+            case None      => map
+          }
+      }
 
   def normalizeInstancesData(data: JsValue, fieldsInfoJs: JsValue): List[Map[String, JsValue]] = {
     val fieldsInfo = getFieldsInfoMapByType((fieldsInfoJs \ "data").as[List[JsObject]])
@@ -204,11 +192,11 @@ object InstanceHelper {
         promotedFieldsListOpt.getOrElse(List())
       }
       val id = (instance \ "@id").as[String].split("/").lastOption
-//      val name = (instance \ typ)
+      //      val name = (instance \ typ)
       val initMap = Map[String, JsValue]()
         .updated("type", (instance \ "@type").as[JsArray])
         .updated("id", JsString(id.getOrElse((instance \ "@id").as[String])))
-//        .updated("name", ())
+      //        .updated("name", ())
       promotedFieldsList.distinct.foldLeft(initMap) {
         case (map, promotedField) => {
           map.updated(promotedField, (instance \ promotedField).as[JsString])

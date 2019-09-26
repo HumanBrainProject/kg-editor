@@ -1,0 +1,10 @@
+###
+#  summary: Get the current workspace types
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET   /:workspace/types                                                             controllers.EditorController.getWorkspaceTypes(workspace: String)

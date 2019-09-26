@@ -137,76 +137,25 @@ class EditorController @Inject()(
       }
       .toList
 
-  //  def getStructure(withLinks: Boolean): Action[AnyContent] =
-  //    authenticatedUserAction.async { implicit request =>
-  //      val result = for {
-  //        typeInfoOpt <- editorService.retrieveTypes(
-  //          s"${EditorConstants.EDITORNAMESPACE}typeInfo",
-  //          request.userToken,
-  //          false
-  //        )
-  //        structureOpt <- editorService.retrieveStructure(withLinks)
-  //      } yield {
-  //        (typeInfoOpt, structureOpt) match {
-  //          case (Right(typeInfo), Right(structure)) =>
-  //            val infoProps = List[(String, String, Option[JsValue])](
-  //              ("https://schema.hbp.eu/client/kg-editor/labelField", "labelInfo", None),
-  //              ("https://schema.hbp.eu/client/kg-editor/promotedFields", "promotedFields", Some(JsArray()))
-  //            )
-  //            val typeInfoMap =
-  //              (typeInfo \ "data").as[List[Map[String, JsValue]]].foldLeft(Map[String, Map[String, JsValue]]()) {
-  //                case (map, info) =>
-  //                  val typeMap = infoProps.foldLeft(Map[String, JsValue]()) {
-  //                    case (map, (in: String, out: String, default: Option[JsValue])) =>
-  //                      info.get(in) match {
-  //                        case Some(value) => map.updated(out, value)
-  //                        case None =>
-  //                          default match {
-  //                            case Some(d) => map.updated(out, d)
-  //                            case None    => map
-  //                          }
-  //                      }
-  //                  }
-  //                  info.get("https://schema.hbp.eu/client/kg-editor/describedType") match {
-  //                    case Some(typeName) => map.updated(typeName.as[String], typeMap)
-  //                    case None           => map
-  //                  }
-  //              }
-  //            val res = (structure \ "data").as[List[Map[String, JsValue]]].foldLeft(List[Map[String, JsValue]]()) {
-  //              case (list, structureField) =>
-  //                structureField.get("id") match {
-  //                  case Some(typeName) =>
-  //                    typeInfoMap.get(typeName.as[String]) match {
-  //                      case Some(r) =>
-  //                        val field = r.foldLeft(structureField) {
-  //                          case (map, (k, v)) =>
-  //                            map.updated(k, v)
-  //                        }
-  //                        list :+ field
-  //                      case None => list
-  //                    }
-  //                  case None => list
-  //                }
-  //            }
-  //            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
-  //          case _ => InternalServerError("Something went wrong! Please try again!")
-  //        }
-  //      }
-  //      result.runToFuture
-  //    }
-
-  def getStructure(withFields: Boolean): Action[AnyContent] =
+  def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      editorService
-        .retrieveStructure(withFields)
+      val acceptedEntries = List("type", "color", "label")
+      val result = editorService
+        .retrieveWorkspaceTypes(workspace, withFields = false)
         .map {
-          case Left(err)    => err.toResult
-          case Right(value) => Ok(value)
+          case Left(err) => err.toResult
+          case Right(value) =>
+            val res = (value \ "data").as[List[JsObject]].map { instance =>
+              instance.asOpt[Map[String, JsValue]] match {
+                case Some(i) => i.filter(v => acceptedEntries.contains(v._1))
+                case None    => Map[String, JsValue]()
+              }
+            }
+            Ok(Json.toJson(res))
         }
-        .runToFuture
+      result.runToFuture
     }
 
-  //  TODO: Deprecate either this one or getInstancesByIds
   def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val listOfIds = for {
@@ -282,47 +231,6 @@ class EditorController @Inject()(
         .map {
           case Right(value) => Ok(value)
           case Left(error)  => error.toResult
-        }
-        .runToFuture
-    }
-
-  //  TODO: This method is deprecated! Use getInstances instead
-  def getInstancesByIds(allFields: Boolean, databaseScope: Option[String]): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val listOfIds = for {
-        bodyContent <- request.body.asJson
-        ids         <- bodyContent.asOpt[List[String]]
-      } yield ids.map(NexusInstanceReference.fromUrl)
-      formService
-        .getRegistries()
-        .flatMap { registries =>
-          listOfIds match {
-            case Some(ids) =>
-              editorService
-                .retrieveInstancesByIds(
-                  ids,
-                  request.userToken,
-                  if (allFields) "editorFull" else "editorPreview",
-                  databaseScope
-                )
-                .flatMap {
-                  case Left(err) => Task.pure(err.toResult)
-                  case Right(ls) =>
-                    if (allFields) {
-                      val listOfIds: List[Task[Option[JsObject]]] = getMetaDataByIds(ls, registries.formRegistry)
-                      Task.sequence(listOfIds).map { l =>
-                        val jsonList = l.collect {
-                          case Some(r) => r
-                        }
-                        Ok(Json.toJson(EditorResponseObject(Json.toJson(jsonList))))
-                      }
-                    } else {
-                      val previews = ls.map(i => i.content.as[PreviewInstance].setLabel(registries.formRegistry)).toList
-                      Task.pure(Ok(Json.toJson(EditorResponseObject(Json.toJson(previews)))))
-                    }
-                }
-            case None => Task.pure(BadRequest("Missing body content"))
-          }
         }
         .runToFuture
     }

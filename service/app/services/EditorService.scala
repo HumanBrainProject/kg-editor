@@ -105,9 +105,9 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     }
   }
 
-  def retrieveStructure(withFields: Boolean): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveWorkspaceTypes(workspace: String, withFields: Boolean): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getStructure(wSClient, config.kgCoreEndpoint, withFields)
+      .getWorkspaceTypes(wSClient, config.kgCoreEndpoint, workspace, withFields)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))

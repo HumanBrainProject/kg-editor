@@ -129,7 +129,7 @@ class BookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient
     }
   }
 
-  def getBookmarks(token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+  def getBookmarks(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     queryService
       .getQueryResults(
         wSClient,
@@ -138,6 +138,7 @@ class BookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient
           Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
           Option("bookmark")
         ),
+        workspace,
         token,
         QueryApiParameter()
       )

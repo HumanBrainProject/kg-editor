@@ -36,25 +36,6 @@
 ###
 DELETE    /:org/:domain/:schema/:version/:id                  controllers.EditorController.deleteInstance(org: String, domain:String, schema: String, version:String, id: String)
 
-
-###
-#  summary: get a list of entities
-#  tags:
-#    - editor
-#  parameters:
-#  - in: body
-#    description: A list of IDs
-#    required: true
-#    type: array
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-###
-POST    /                 controllers.EditorController.getInstancesByIds(allFields:Boolean?=false, databaseScope: Option[String])
-
-
 ###
 #  summary: get a list of entities
 #  tags:
@@ -88,71 +69,6 @@ POST    /list                 controllers.EditorController.getInstances(allField
 #    type: string
 ###
 POST    /summary                 controllers.EditorController.getInstances(allFields:Boolean?=false, databaseScope: Option[String], metadata:Boolean?=false)
-
-
-###
-#tags:
-#  - editor
-#summary: Returns the instances - paginated - filterable
-#parameters:
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-#  - name: from
-#    in: path
-#    description: the offset of the pagination
-#    required: false
-#    type: int
-#  - name: size
-#    in: path
-#    description: the size of the page
-#    required: false
-#    type: int
-#  - name: search
-#    in: path
-#    description: the search query only applied for the name of the instance
-#    required: false
-#    type: string
-#    responses:
-#      '200':
-#        description: Ok
-###
-GET    /filter                 controllers.EditorController.filterBookmarkInstances(bookmarkId:String, from:Option[Int], size:Option[Int], search:String?="")
-
-
-###
-#tags:
-#  - editor
-#summary: Returns the instances - paginated - filterable
-#parameters:
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-#  - name: from
-#    in: path
-#    description: the offset of the pagination
-#    required: false
-#    type: int
-#  - name: size
-#    in: path
-#    description: the size of the page
-#    required: false
-#    type: int
-#  - name: search
-#    in: path
-#    description: the search query only applied for the name of the instance
-#    required: false
-#    type: string
-#    responses:
-#      '200':
-#        description: Ok
-###
-GET    /search                 controllers.EditorController.searchInstances(typeId:Option[String], from:Option[Int], size:Option[Int], search:String?="")
-
 
 ###
 #tags:

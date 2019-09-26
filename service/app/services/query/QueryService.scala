@@ -191,6 +191,7 @@ trait QueryService {
     wSClient: WSClient,
     apiEndpoint: String,
     query: QuerySpec,
+    workspace: String,
     token: AccessToken,
     queryApiParameters: QueryApiParameter,
     parameters: Map[String, String] = Map()
@@ -199,7 +200,7 @@ trait QueryService {
       case QuerySpec(_, Some(queryId)) =>
         val q = wSClient
           .url(s"$apiEndpoint/queries/$queryId/instances")
-          .addQueryStringParameters(queryApiParameters.toParams: _*)
+          .addQueryStringParameters(queryApiParameters.toParams: _*) // TODO: add parameters
           .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
         Task.deferFuture(q.get())
       case QuerySpec(payload, None) =>

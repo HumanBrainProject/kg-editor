@@ -205,13 +205,14 @@ class EditorController @Inject()(
 
   def filterBookmarkInstances(
     bookmarkId: String,
+    workspace: String,
     from: Option[Int],
     size: Option[Int],
     search: String
   ): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .getBookmarkInstances(bookmarkId, from, size, search, request.userToken)
+        .getBookmarkInstances(bookmarkId, workspace, from, size, search, request.userToken)
         .map {
           case Right(value) => Ok(value)
           case Left(error)  => error.toResult
@@ -220,6 +221,7 @@ class EditorController @Inject()(
     }
 
   def searchInstances(
+    workspace: String,
     typeId: Option[String],
     from: Option[Int],
     size: Option[Int],
@@ -227,7 +229,7 @@ class EditorController @Inject()(
   ): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .doSearchInstances(typeId, from, size, search, request.userToken)
+        .doSearchInstances(workspace, typeId, from, size, search, request.userToken)
         .map {
           case Right(value) => Ok(value)
           case Left(error)  => error.toResult

@@ -153,6 +153,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   def getBookmarkInstances(
     bookmarkId: String,
+    workspace: String,
     from: Option[Int],
     size: Option[Int],
     search: String,
@@ -166,6 +167,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
           Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
           Option("bookmarkInstances")
         ),
+        workspace,
         token,
         QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
       )
@@ -177,6 +179,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
       }
 
   def doSearchInstances(
+    workspace: String,
     typeId: Option[String],
     from: Option[Int],
     size: Option[Int],
@@ -191,6 +194,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
           Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
           Option("searchInstances")
         ),
+        workspace,
         token,
         QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
       )

@@ -21,9 +21,9 @@ object InstanceHelper {
     fieldArray.map(field => normalizeIdOfField(field))
 
   def normalizeFieldValue(value: JsValue, fieldInfo: Map[String, JsValue]): JsValue =
-    fieldInfo.get("isLink") match {
-      case Some(link) =>
-        if (link.as[Boolean]) {
+    fieldInfo.get("canBe") match {
+      case Some(canBe) =>
+        if (canBe.as[List[String]].nonEmpty) {
           value.asOpt[List[Map[String, JsValue]]] match {
             case Some(valueArray) => Json.toJson(normalizeIdOfArray(valueArray))
             case None =>

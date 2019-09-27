@@ -49,7 +49,7 @@ class OptionsPool{
       set(this.options.get(identifier), "isFetching", true);
     });
     try{
-      let response = await API.axios.post(API.endpoints.listedInstances(), toProcess);
+      let response = await API.axios.post(API.endpoints.instancesLabel(), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           const option = this.options.get(identifier);

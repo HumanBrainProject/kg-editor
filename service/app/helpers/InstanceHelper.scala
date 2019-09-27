@@ -69,14 +69,20 @@ object InstanceHelper {
   }
    */
   def generateProperties(field: Map[String, JsValue]): Map[String, JsValue] =
-    List[String]("canBe", "widget", "markdown", "label", "allowCustomValues", "labelTooltip")
-      .foldLeft(Map[String, JsValue]()) {
-        case (map, name) =>
-          field.get(name) match {
-            case Some(res) => map.updated(name, res)
-            case None      => map
-          }
-      }
+    List[(String, String)](
+      ("canBe", "canBe"),
+      ("widget", "type"),
+      ("markdown", "markdown"),
+      ("label", "label"),
+      ("allowCustomValues", "allowCustomValues"),
+      ("labelTooltip", "labelTooltip")
+    ).foldLeft(Map[String, JsValue]()) {
+      case (map, (in: String, out: String)) =>
+        field.get(in) match {
+          case Some(res) => map.updated(out, res)
+          case None      => map
+        }
+    }
 
   def reconcilePromotedFields(data: JsValue, typeInfoMap: Map[String, Map[String, JsValue]]): List[String] =
     (data \ "@type")

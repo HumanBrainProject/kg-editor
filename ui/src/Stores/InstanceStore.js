@@ -188,7 +188,6 @@ class Instance {
     }
     for(let fieldKey in data.fields) {
       let field = data.fields[fieldKey];
-      field.type = field["https://schema.hbp.eu/type"];
       if(field.type === "InputText"){
         field.type = "KgInputText";
       } else if(field.type === "TextArea"){
@@ -198,7 +197,11 @@ class Instance {
           field.type = "DynamicDropdown";
         }
         field.optionsUrl = field.instancesPath;
-        field.instanceType = data.fields.id.value.path;
+        field.instanceType = data.type[0];
+        field.mappingLabel = "name";
+        field.mappingValue = "id";
+        field.mappingReturn = ["id"];
+        field.closeDropdownAfterInteraction = true;
       }
     }
     return data;
@@ -358,7 +361,7 @@ class InstanceStore {
       }
     });
     try{
-      let response = await API.axios.post(API.endpoints.listedInstances(true, this.databaseScope), toProcess);
+      let response = await API.axios.post(API.endpoints.instancesList(this.databaseScope), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {

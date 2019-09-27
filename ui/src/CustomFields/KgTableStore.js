@@ -96,7 +96,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         instance.fetchError = null;
       });
       try{
-        let response = await API.axios.post(API.endpoints.listedInstances(true), toProcess);
+        let response = await API.axios.post(API.endpoints.instancesLabel(), toProcess);
         runInAction(() =>{
           // if(Math.round(Math.random()*10) %2 === 0) {
           //   console.log("error");

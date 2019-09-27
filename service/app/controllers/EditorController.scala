@@ -156,51 +156,45 @@ class EditorController @Inject()(
       result.runToFuture
     }
 
-  def getInstances(allFields: Boolean, databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+  def getInstancesList(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      val listOfIds = for {
-        bodyContent <- request.body.asJson
-        ids         <- bodyContent.asOpt[List[String]]
-      } yield ids
-      val result = listOfIds match {
-        case Some(ids) =>
-          editorService
-            .retrieveInstances(ids, request.userToken, databaseScope, metadata)
-            .flatMap {
-              case Right(instancesResult) =>
-                val typesToRetrieve = (instancesResult \ "data")
-                  .as[JsArray]
-                  .value
-                  .toList
-                  .flatMap(instance => (instance \ "@type").as[List[String]])
-                editorService
-                  .retrieveTypesList(typesToRetrieve.distinct, request.userToken, withFields = true)
-                  .map {
-                    case Right(typesWithFields) =>
-                      if (allFields) {
-                        Ok(
-                          Json.toJson(
-                            EditorResponseObject(
-                              Json.toJson(InstanceHelper.normalizeInstancesData(instancesResult, typesWithFields))
-                            )
-                          )
-                        )
-                      } else {
-                        Ok(
-                          Json.toJson(
-                            EditorResponseObject(
-                              Json.toJson(InstanceHelper.normalizeInstanceSummaryData(instancesResult, typesWithFields))
-                            )
-                          )
-                        )
-                      }
-                    case _ => InternalServerError("Something went wrong! Please try again!")
-                  }
-              case _ => Task.pure(InternalServerError("Something went wrong! Please try again!"))
-            }
-        case None => Task.pure(BadRequest("Wrong body content!"))
-      }
-      result.runToFuture
+      getInstances(databaseScope, metadata, viewFunction = InstanceHelper.normalizeInstances).runToFuture
+    }
+
+  def getInstancesSummary(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      getInstances(databaseScope, metadata, viewFunction = InstanceHelper.normalizeInstancesSummary).runToFuture
+    }
+
+  def getInstancesLabel(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      getInstances(databaseScope, metadata, viewFunction = InstanceHelper.normalizeInstancesLabel).runToFuture
+    }
+
+  def getInstances(
+    databaseScope: Option[String],
+    metadata: Boolean,
+    viewFunction: (List[JsObject], List[JsObject]) => List[Map[String, JsValue]]
+  )(implicit request: UserRequest[AnyContent]): Task[Result] =
+    InstanceHelper.extractPayloadAsList(request) match {
+      case Some(ids) =>
+        editorService
+          .retrieveInstances(ids, request.userToken, databaseScope, metadata)
+          .flatMap {
+            case Right(instancesResult) =>
+              val instances = InstanceHelper.extractDataAsList(instancesResult)
+              val typesToRetrieve = InstanceHelper.toTypeList(instances)
+              editorService
+                .retrieveTypesList(typesToRetrieve.distinct, request.userToken, withFields = true)
+                .map {
+                  case Right(typesWithFields) =>
+                    val typeInfoList = InstanceHelper.extractDataAsList(typesWithFields)
+                    Ok(Json.toJson(EditorResponseObject(Json.toJson(viewFunction(instances, typeInfoList)))))
+                  case _ => InternalServerError("Something went wrong! Please try again!")
+                }
+            case _ => Task.pure(InternalServerError("Something went wrong! Please try again!"))
+          }
+      case None => Task.pure(BadRequest("Wrong body content!"))
     }
 
   def filterBookmarkInstances(

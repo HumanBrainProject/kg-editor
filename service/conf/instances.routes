@@ -51,10 +51,10 @@ DELETE    /:org/:domain/:schema/:version/:id                  controllers.Editor
 #    required: false
 #    type: string
 ###
-POST    /list                 controllers.EditorController.getInstances(allFields:Boolean?=true, databaseScope: Option[String], metadata:Boolean?=false)
+POST    /list                 controllers.EditorController.getInstancesList(databaseScope: Option[String], metadata:Boolean?=false)
 
 ###
-#  summary: get a list of entities with all fields false
+#  summary: get a summary list of entities
 #  tags:
 #    - editor
 #  parameters:
@@ -68,7 +68,24 @@ POST    /list                 controllers.EditorController.getInstances(allField
 #    required: false
 #    type: string
 ###
-POST    /summary                 controllers.EditorController.getInstances(allFields:Boolean?=false, databaseScope: Option[String], metadata:Boolean?=false)
+POST    /summary                 controllers.EditorController.getInstancesSummary(databaseScope: Option[String], metadata:Boolean?=false)
+
+###
+#  summary: get label for a list of entities
+#  tags:
+#    - editor
+#  parameters:
+#  - in: body
+#    description: A list of IDs
+#    required: true
+#    type: array
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST    /label                 controllers.EditorController.getInstancesLabel(databaseScope: Option[String], metadata:Boolean?=false)
 
 ###
 #tags:

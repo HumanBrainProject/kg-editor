@@ -1,7 +1,6 @@
 import { observable, action, computed, runInAction } from "mobx";
 import { groupBy } from "lodash";
 import API from "../Services/API";
-import palette from "google-palette";
 
 class StructureStore {
   @observable colorPaletteByLabel = new Map();
@@ -72,7 +71,7 @@ class StructureStore {
       this.isFetching = true;
       this.fetchError = null;
       try {
-        const response = await API.axios.get(API.endpoints.structure());
+        const response = await API.axios.get(API.endpoints.workspaceTypes());
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
           this.isFetching = false;
@@ -85,9 +84,9 @@ class StructureStore {
     }
   }
 
-  // TODO: applay space to all the places referring to this method
-  colorPalletteByType(type, space) {
-    return this.types && this.types.filter(t => (t.space === space && t.type === type))[0].color;
+  // TODO: possible deprecation for method
+  colorPalletteByType(type) {
+    return this.types && this.types.filter(t => (t.type === type))[0].color;
   }
 }
 

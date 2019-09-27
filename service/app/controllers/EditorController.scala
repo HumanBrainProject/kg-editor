@@ -151,7 +151,7 @@ class EditorController @Inject()(
                 case None    => Map[String, JsValue]()
               }
             }
-            Ok(Json.toJson(res))
+            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
         }
       result.runToFuture
     }

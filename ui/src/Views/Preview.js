@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import structureStore from "../Stores/StructureStore";
 import instanceStore from "../Stores/InstanceStore";
 
 import FetchingLoader from "../Components/FetchingLoader";
@@ -150,7 +149,7 @@ export default class Preview extends React.Component {
       instance && instance.promotedFieldsWithMarkdown;
     const nonPromotedFields =
       instance && instance.nonPromotedFields;
-    const color = showNodeType?structureStore.colorPalletteByType(instance.path):null;
+    const color = showNodeType?instance.data.color[0]:null;
     return (
       <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
         {(!instance.isFetched || instance.isFetching)? (

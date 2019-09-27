@@ -3,8 +3,6 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import bookmarkStore from "../../Stores/BookmarkStore";
 import TypesItem from "./TypesItem";
 
 const styles = {

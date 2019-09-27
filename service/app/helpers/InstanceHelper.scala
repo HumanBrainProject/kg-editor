@@ -34,6 +34,68 @@ object InstanceHelper {
       .flatten
       .distinct
 
+  def extractDataAsList(data: JsObject): List[JsObject] =
+    (data \ "data").asOpt[List[JsObject]] match {
+      case Some(list) => list
+      case _          => List()
+    }
+
+  def extractPayloadAsList(request: UserRequest[AnyContent]): Option[List[String]] =
+    for {
+      bodyContent <- request.body.asJson
+      res         <- bodyContent.asOpt[List[String]]
+    } yield res
+
+  /*
+  {
+    "http://schema.org/Dataset": {
+      "http://schema.org/name": {
+          type: "InputText",
+          label: "Name"
+      },
+      "http://schema.org/description": {
+          type: "InputText",
+          label: "Description",
+          markdown: true,
+          link: false
+      },
+      "http://schema.org/contributor": {
+          type: "DropDown",
+          label: "Contributors",
+          markdown: true,
+          link: true
+      }
+    }
+  }
+   */
+  def generateProperties(field: Map[String, JsValue]): Map[String, JsValue] =
+    List[String]("canBe", "widget", "markdown", "label", "allowCustomValues", "labelTooltip")
+      .foldLeft(Map[String, JsValue]()) {
+        case (map, name) =>
+          field.get(name) match {
+            case Some(res) => map.updated(name, res)
+            case None      => map
+          }
+      }
+
+  def reconcilePromotedFields(data: JsValue, typeInfoMap: Map[String, Map[String, JsValue]]): List[String] =
+    (data \ "@type")
+      .as[List[String]]
+      .flatMap { typeName =>
+        val promotedFieldsListOpt = for {
+          typeInfo       <- typeInfoMap.get(typeName)
+          promotedFields <- typeInfo.get("promotedFields")
+          list           <- promotedFields.asOpt[List[String]]
+        } yield list
+        promotedFieldsListOpt.getOrElse(List())
+      }
+      .distinct
+
+  def createInstance(list: List[(String, JsValue)]): Map[String, JsValue] =
+    list.foldLeft(Map[String, JsValue]()) {
+      case (map, (name, value)) => map.updated(name, value)
+    }
+
   def getTypeInfoMap(list: List[JsObject]): Map[String, Map[String, JsValue]] =
     list.foldLeft(Map[String, Map[String, JsValue]]()) {
       case (map, typeInfo) =>
@@ -68,38 +130,6 @@ object InstanceHelper {
           }
           case _ => map
         }
-    }
-
-  def normalizeIdOfField(field: Map[String, JsValue]): Map[String, JsValue] =
-    field.get("@id") match {
-      case Some(id) =>
-        val normalizedId = DocumentId.getIdFromPath(id.as[String])
-        normalizedId match {
-          case Some(id) => field.updated("id", JsString(id)).filter(value => !value._1.equals("@id"))
-          case None     => field
-        }
-      case None => field
-    }
-
-  def normalizeIdOfArray(fieldArray: List[Map[String, JsValue]]): List[Map[String, JsValue]] =
-    fieldArray.map(field => normalizeIdOfField(field))
-
-  def normalizeFieldValue(value: JsValue, fieldInfo: Map[String, JsValue]): JsValue =
-    fieldInfo.get("canBe") match {
-      case Some(canBe) =>
-        if (canBe.as[List[String]].nonEmpty) {
-          value.asOpt[List[Map[String, JsValue]]] match {
-            case Some(valueArray) => Json.toJson(normalizeIdOfArray(valueArray))
-            case None =>
-              value.asOpt[Map[String, JsValue]] match {
-                case Some(valueObj) => Json.toJson(normalizeIdOfField(valueObj))
-                case None           => value
-              }
-          }
-        } else {
-          value
-        }
-      case None => value
     }
 
   def getFields(data: JsObject, fieldsInfo: Map[String, Map[String, JsValue]]): Map[String, Map[String, JsValue]] =
@@ -145,80 +175,6 @@ object InstanceHelper {
           case None => reconciledFieldsInfo
         }
       }
-    }
-
-  /*
-  {
-    "http://schema.org/Dataset": {
-      "http://schema.org/name": {
-          type: "InputText",
-          label: "Name"
-      },
-      "http://schema.org/description": {
-          type: "InputText",
-          label: "Description",
-          markdown: true,
-          link: false
-      },
-      "http://schema.org/contributor": {
-          type: "DropDown",
-          label: "Contributors",
-          markdown: true,
-          link: true
-      }
-    }
-  }
-   */
-
-  def generateProperties(field: Map[String, JsValue]): Map[String, JsValue] =
-    List[String]("canBe", "widget", "markdown", "label", "allowCustomValues", "labelTooltip")
-      .foldLeft(Map[String, JsValue]()) {
-        case (map, name) =>
-          field.get(name) match {
-            case Some(res) => map.updated(name, res)
-            case None      => map
-          }
-      }
-
-  def filterFieldsInfo(
-    fieldsInfo: Map[String, Map[String, JsValue]],
-    filter: List[String]
-  ): Map[String, Map[String, JsValue]] =
-    filter.foldLeft(Map[String, Map[String, JsValue]]()) {
-      case (map, name) => {
-        fieldsInfo.get(name) match {
-          case Some(info) => map.updated(name, info)
-          case _          => map
-        }
-      }
-    }
-
-  def filterFields(fields: List[String], filter: List[String]): List[String] = fields.filterNot(filter.toSet)
-
-  def filterFields(fields: List[String], filter: String): List[String] = filterFields(fields, List(filter))
-
-  def filterFields(fields: List[String], filter: Option[String]): List[String] =
-    filter match {
-      case Some(f) => filterFields(fields, List(f))
-      case None    => fields
-    }
-
-  def reconcilePromotedFields(data: JsValue, typeInfoMap: Map[String, Map[String, JsValue]]): List[String] =
-    (data \ "@type")
-      .as[List[String]]
-      .flatMap { typeName =>
-        val promotedFieldsListOpt = for {
-          typeInfo       <- typeInfoMap.get(typeName)
-          promotedFields <- typeInfo.get("promotedFields")
-          list           <- promotedFields.asOpt[List[String]]
-        } yield list
-        promotedFieldsListOpt.getOrElse(List())
-      }
-      .distinct
-
-  def createInstance(list: List[(String, JsValue)]): Map[String, JsValue] =
-    list.foldLeft(Map[String, JsValue]()) {
-      case (map, (name, value)) => map.updated(name, value)
     }
 
   def getReconciledTypeInfo(
@@ -270,6 +226,42 @@ object InstanceHelper {
       case _          => None
     }
 
+  def filterFieldsInfo(
+    fieldsInfo: Map[String, Map[String, JsValue]],
+    filter: List[String]
+  ): Map[String, Map[String, JsValue]] =
+    filter.foldLeft(Map[String, Map[String, JsValue]]()) {
+      case (map, name) => {
+        fieldsInfo.get(name) match {
+          case Some(info) => map.updated(name, info)
+          case _          => map
+        }
+      }
+    }
+
+  def filterFields(fields: List[String], filter: List[String]): List[String] = fields.filterNot(filter.toSet)
+
+  def filterFields(fields: List[String], filter: String): List[String] = filterFields(fields, List(filter))
+
+  def filterFields(fields: List[String], filter: Option[String]): List[String] =
+    filter match {
+      case Some(f) => filterFields(fields, List(f))
+      case None    => fields
+    }
+
+  def normalizeInstances(dataList: List[JsObject], typeInfoList: List[JsObject]): List[Map[String, JsValue]] = {
+    val typeInfoMap = getTypeInfoMap(typeInfoList)
+    val fieldsInfoMapByType = getFieldsInfoMapByType(typeInfoList)
+    dataList.foldLeft(List[Map[String, JsValue]]()) {
+      case (instances, data) =>
+        (data \ "@type").asOpt[List[String]] match {
+          case Some(instanceTypes) =>
+            instances :+ normalizeInstance(data, instanceTypes, typeInfoMap, fieldsInfoMapByType)
+          case _ => instances
+        }
+    }
+  }
+
   def normalizeInstance(
     data: JsObject,
     instanceTypes: List[String],
@@ -290,14 +282,14 @@ object InstanceHelper {
     )
   }
 
-  def normalizeInstances(dataList: List[JsObject], typeInfoList: List[JsObject]): List[Map[String, JsValue]] = {
+  def normalizeInstancesSummary(dataList: List[JsObject], typeInfoList: List[JsObject]): List[Map[String, JsValue]] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     val fieldsInfoMapByType = getFieldsInfoMapByType(typeInfoList)
     dataList.foldLeft(List[Map[String, JsValue]]()) {
       case (instances, data) =>
         (data \ "@type").asOpt[List[String]] match {
           case Some(instanceTypes) =>
-            instances :+ normalizeInstance(data, instanceTypes, typeInfoMap, fieldsInfoMapByType)
+            instances :+ normalizeInstanceSummary(data, instanceTypes, typeInfoMap, fieldsInfoMapByType)
           case _ => instances
         }
     }
@@ -328,15 +320,13 @@ object InstanceHelper {
     )
   }
 
-  def normalizeInstancesSummary(dataList: List[JsObject], typeInfoList: List[JsObject]): List[Map[String, JsValue]] = {
+  def normalizeInstancesLabel(dataList: List[JsObject], typeInfoList: List[JsObject]): List[Map[String, JsValue]] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
-    val fieldsInfoMapByType = getFieldsInfoMapByType(typeInfoList)
     dataList.foldLeft(List[Map[String, JsValue]]()) {
       case (instances, data) =>
         (data \ "@type").asOpt[List[String]] match {
-          case Some(instanceTypes) =>
-            instances :+ normalizeInstanceSummary(data, instanceTypes, typeInfoMap, fieldsInfoMapByType)
-          case _ => instances
+          case Some(instanceTypes) => instances :+ normalizeInstanceLabel(data, instanceTypes, typeInfoMap)
+          case _                   => instances
         }
     }
   }
@@ -359,26 +349,35 @@ object InstanceHelper {
     )
   }
 
-  def normalizeInstancesLabel(dataList: List[JsObject], typeInfoList: List[JsObject]): List[Map[String, JsValue]] = {
-    val typeInfoMap = getTypeInfoMap(typeInfoList)
-    dataList.foldLeft(List[Map[String, JsValue]]()) {
-      case (instances, data) =>
-        (data \ "@type").asOpt[List[String]] match {
-          case Some(instanceTypes) => instances :+ normalizeInstanceLabel(data, instanceTypes, typeInfoMap)
-          case _                   => instances
+  def normalizeIdOfField(field: Map[String, JsValue]): Map[String, JsValue] =
+    field.get("@id") match {
+      case Some(id) =>
+        val normalizedId = DocumentId.getIdFromPath(id.as[String])
+        normalizedId match {
+          case Some(id) => field.updated("id", JsString(id)).filter(value => !value._1.equals("@id"))
+          case None     => field
         }
-    }
-  }
-
-  def extractDataAsList(data: JsObject): List[JsObject] =
-    (data \ "data").asOpt[List[JsObject]] match {
-      case Some(list) => list
-      case _          => List()
+      case None => field
     }
 
-  def extractPayloadAsList(request: UserRequest[AnyContent]): Option[List[String]] =
-    for {
-      bodyContent <- request.body.asJson
-      res         <- bodyContent.asOpt[List[String]]
-    } yield res
+  def normalizeIdOfArray(fieldArray: List[Map[String, JsValue]]): List[Map[String, JsValue]] =
+    fieldArray.map(field => normalizeIdOfField(field))
+
+  def normalizeFieldValue(value: JsValue, fieldInfo: Map[String, JsValue]): JsValue =
+    fieldInfo.get("canBe") match {
+      case Some(canBe) =>
+        if (canBe.as[List[String]].nonEmpty) {
+          value.asOpt[List[Map[String, JsValue]]] match {
+            case Some(valueArray) => Json.toJson(normalizeIdOfArray(valueArray))
+            case None =>
+              value.asOpt[Map[String, JsValue]] match {
+                case Some(valueObj) => Json.toJson(normalizeIdOfField(valueObj))
+                case None           => value
+              }
+          }
+        } else {
+          value
+        }
+      case None => value
+    }
 }

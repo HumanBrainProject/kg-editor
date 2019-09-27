@@ -2,8 +2,6 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import structureStore from "../../Stores/StructureStore";
-
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
@@ -170,16 +168,9 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    const [,,primaryField, secondaryField] = Object.keys(instance); // TODO:Consider changing destruction style and move to scala
-    const result = {
-      primaryField: typeof instance[primaryField] === "string" && instance[primaryField],
-      secondaryField: typeof instance[secondaryField] === "string" && instance[secondaryField]
-    };
     const id = instance.id;
-    const type = instance.type[0];
-    const space = instance.space[0]; //TODO:apply space on the service part
-    const color = structureStore.colorPalletteByType(type, space);
-    const label = structureStore.findLabelByType(type);
+    const color = instance.color[0];
+    const label = instance.typeLabel[0];
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}
@@ -189,9 +180,9 @@ export default class InstanceRow extends React.Component {
           <div className={classes.nodeType} style={color ? { color: color } : {}} title={label}>
             <FontAwesomeIcon fixedWidth icon="circle" />
           </div>
-          <div className={classes.name}>{result.primaryField}</div>
+          <div className={classes.name}>{instance.name}</div>
         </div>
-        {result.secondaryField && <div className={classes.description}>{result.secondaryField}</div>}
+        {/* {result.secondaryField && <div className={classes.description}>{result.secondaryField}</div>} */}
         <div className={classes.actions}>
           <div className={classes.action} onClick={this.handleAction.bind(this, "view", instance)}>
             <FontAwesomeIcon icon="eye" />

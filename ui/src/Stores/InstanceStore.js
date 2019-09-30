@@ -76,7 +76,6 @@ class Instance {
     return "";
   }
 
-
   @computed
   get promotedFields() {
     const info = TypesStore.typesMap.get(this.nodeType);
@@ -180,31 +179,6 @@ class Instance {
     const formStore = new FormStore(toJS(this.data));
     formStore.toggleReadMode(true);
     return formStore;
-  }
-
-  normalizeData(data) {
-    if (!data) {
-      return {fields: [], alternatives: []};
-    }
-    for(let fieldKey in data.fields) {
-      let field = data.fields[fieldKey];
-      if(field.type === "InputText"){
-        field.type = "KgInputText";
-      } else if(field.type === "TextArea"){
-        field.type = "KgTextArea";
-      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
-        if(field.type === "DropdownSelect") {
-          field.type = "DynamicDropdown";
-        }
-        field.optionsUrl = field.instancesPath;
-        field.instanceType = data.type[0];
-        field.mappingLabel = "name";
-        field.mappingValue = "id";
-        field.mappingReturn = ["id"];
-        field.closeDropdownAfterInteraction = true;
-      }
-    }
-    return data;
   }
 
   @action
@@ -325,6 +299,33 @@ class InstanceStore {
     }
   }
 
+  normalizeData(data, transformField) {
+    if (!data) {
+      return {fields: [], alternatives: []};
+    }
+    for(let fieldKey in data.fields) {
+      let field = data.fields[fieldKey];
+      typeof transformField === "function"  && transformField(field);
+      if(field.type === "InputText"){
+        field.type = "KgInputText";
+      } else if(field.type === "TextArea"){
+        field.type = "KgTextArea";
+      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
+        if(field.type === "DropdownSelect") {
+          field.type = "DynamicDropdown";
+        }
+        field.optionsUrl = field.instancesPath;
+        field.instanceType = data.type[0];
+        field.isLink = true;
+        field.mappingLabel = "name";
+        field.mappingValue = "id";
+        field.mappingReturn = ["id"];
+        field.closeDropdownAfterInteraction = true;
+      }
+    }
+    return data;
+  }
+
   @action
   processQueue(){
     if(this.instancesQueue.size <= 0){
@@ -368,7 +369,7 @@ class InstanceStore {
             const instance = this.instances.get(identifier);
             const data = find(response.data.data, (item) => item.id === instance.instanceId);
             if(data){
-              const normalizedData = instance.normalizeData(data?data:{fields: [], alternatives: []});
+              const normalizedData = this.normalizeData(data?data:{fields: [], alternatives: []});
               instance.data = normalizedData;
               instance.form = new FormStore(normalizedData);
               instance.isFetching = false;

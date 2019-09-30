@@ -138,7 +138,6 @@ export default class KgInputTextField extends React.Component {
   }
 
   render() {
-
     const { classes, formStore } = this.props;
 
     if(this.props.formStore.readMode || this.props.field.readMode){

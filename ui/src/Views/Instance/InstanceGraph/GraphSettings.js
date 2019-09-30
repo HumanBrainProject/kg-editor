@@ -10,7 +10,6 @@ import { Scrollbars } from "react-custom-scrollbars";
 import routerStore from "../../../Stores/RouterStore";
 import dataTypesStore from "../../../Stores/DataTypesStore";
 import graphStore from "../../../Stores/GraphStore";
-import TypesStore from "../../../Stores/TypesStore";
 
 const styles = {
   container: {

@@ -1,10 +1,12 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import { FormStore, Form, Field } from "hbp-quickfire";
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
+import InstanceStore from "../../Stores/InstanceStore";
+import { toJS } from "mobx";
 
 const styles = {
   container: {
@@ -168,9 +170,19 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
+    const transformField = field  =>  {
+      if(field.type === "TextArea") {
+        field.value = field.value.substr(0, 197) + "...";
+        delete field.label;
+      }
+    };
     const id = instance.id;
     const color = instance.color[0];
     const label = instance.typeLabel[0];
+    const normalizedData = InstanceStore.normalizeData(instance, transformField);
+    const formStore = new FormStore(toJS(normalizedData));
+    formStore.toggleReadMode(true);
+    const fields = Object.keys(instance.fields);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
         onClick={this.handleClick.bind(this, instance)}
@@ -182,7 +194,9 @@ export default class InstanceRow extends React.Component {
           </div>
           <div className={classes.name}>{instance.name}</div>
         </div>
-        {/* {result.secondaryField && <div className={classes.description}>{result.secondaryField}</div>} */}
+        <Form store={formStore} >
+          {fields.map(field => <Field name={field} key={field} />)}
+        </Form>
         <div className={classes.actions}>
           <div className={classes.action} onClick={this.handleAction.bind(this, "view", instance)}>
             <FontAwesomeIcon icon="eye" />

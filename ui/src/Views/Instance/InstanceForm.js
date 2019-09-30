@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
 import routerStore from "../../Stores/RouterStore";
-import structureStore from "../../Stores/StructureStore";
+import TypesStore from "../../Stores/TypesStore";
 import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -150,7 +150,7 @@ export default class InstanceForm extends React.Component {
     }
   }
 
-  handleListLoadRetry = () => structureStore.fetch();
+  handleListLoadRetry = () => TypesStore.fetch();
 
   handleFocus = () => {
     if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {

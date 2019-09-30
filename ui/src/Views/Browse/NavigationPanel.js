@@ -7,7 +7,7 @@ import Bookmarks from "./Bookmarks";
 import { Scrollbars } from "react-custom-scrollbars";
 import bookmarkStore from "../../Stores/BookmarkStore";
 import Types from "./Types";
-import structureStore from "../../Stores/StructureStore";
+import TypesStore from "../../Stores/TypesStore";
 
 const styles = {
   container: {
@@ -54,7 +54,7 @@ export default class NavigationPanel extends React.Component {
   render() {
     const { classes } = this.props;
     const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
-    const typeList = structureStore.filteredList(browseStore.navigationFilter);
+    const typeList = TypesStore.filteredList(browseStore.navigationFilter);
     return (
       <div className={classes.container}>
         <div className={classes.header}>

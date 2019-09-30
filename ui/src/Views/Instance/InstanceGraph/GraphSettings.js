@@ -10,7 +10,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import routerStore from "../../../Stores/RouterStore";
 import dataTypesStore from "../../../Stores/DataTypesStore";
 import graphStore from "../../../Stores/GraphStore";
-import structureStore from "../../../Stores/StructureStore";
+import TypesStore from "../../../Stores/TypesStore";
 
 const styles = {
   container: {
@@ -133,7 +133,7 @@ export default class GraphSettings extends React.Component {
                 const isDisabled = typeState === "none";
                 const isExpanded = graphStore.expandedTypes.indexOf(nodeType.schema) !== -1;
                 const isGrouped = typeState === "group";
-                const backgroundColor = structureStore.colorPalletteByType(nodeType.schema);
+                const backgroundColor = nodeType.color; //TODO: backend integration for color
                 const borderColor = new Color(backgroundColor).darken(0.25).hex();
                 return (
                   <div className={`${classes.nodeType} ${isDisabled ? "disabled" : ""} ${isExpanded ? "expanded" : ""}`} key={nodeType.schema}>
@@ -142,7 +142,7 @@ export default class GraphSettings extends React.Component {
                     <div className={classes.nodeTypeLabel}
                       onMouseOver={isGrouped ? this.handleNodeHover.bind(this, graphStore.groupNodes.get(nodeType.schema)) : undefined}
                       onMouseOut={this.handleNodeHover.bind(this, null)}
-                    >{structureStore.findLabelByType(nodeType.schema)}</div>
+                    >{nodeType.typeLabel[0]}</div>
                     <div className={classes.nodeTypeActions}>
                       {!isDisabled && (
                         <MultiToggle selectedValue={typeState} onChange={this.handleChange.bind(this, nodeType.schema)}>

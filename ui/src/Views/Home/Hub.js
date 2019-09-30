@@ -4,7 +4,7 @@ import {observer} from "mobx-react";
 
 import instanceStore from "../../Stores/InstanceStore";
 import ThemeSwitcher from "./ThemeSwitcher";
-import structureStore from "../../Stores/StructureStore";
+import TypesStore from "../../Stores/TypesStore";
 
 const styles = {
   container:{
@@ -52,8 +52,8 @@ export default class Hub extends React.Component{
   }
 
   handleCreateInstance = () => {
-    if(!structureStore.isFetched) {
-      structureStore.fetch();
+    if(!TypesStore.isFetched) {
+      TypesStore.fetch();
     }
     instanceStore.toggleShowCreateModal();
   }

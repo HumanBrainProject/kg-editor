@@ -18,7 +18,7 @@ const endpoints = {
   "instancesSummary": (databaseScope=null) => `/editor/api/instances/summary?${databaseScope?("&databaseScope=" + databaseScope):""}`,
   "instancesLabel": (databaseScope=null) => `/editor/api/instances/label?${databaseScope?("&databaseScope=" + databaseScope):""}`,
   "filterBookmarkInstances": (id, from, size, search) => `/editor/api/instances/filter?bookmarkId=${id}&from=${from}&size=${size}&search=${search}`,
-  "searchInstances": (id, from, size, search) => `/editor/api/instances/search?typeId=${id}&from=${from}&size=${size}&search=${search}`,
+  "searchInstances": (id, from, size, search) => `/editor/api/workspaces/minds/instances/summary?type=${encodeURIComponent(id)}&from=${from}&size=${size}&search=${search}`, // TODO: change minds to parameter
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instanceData": (instance, databaseScope=null) => `/editor/api/instances/${instance}${databaseScope?("?databaseScope=" + databaseScope):""}`,
   "release": instance => `/editor/api/instances/${instance}/release`,
@@ -26,10 +26,10 @@ const endpoints = {
   "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/editor/api/instances/releases?releaseTreeScope=CHILDREN_ONLY",
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
-  "bookmarks": () => "/editor/api/bookmarks",
+  "bookmarks": () => "/editor/api/workspaces/minds/bookmarks", //TODO: change minds to parameter
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
-  "workspaceTypes": () => "/editor/api/workspaces/minds/types", // TODO: change minds to dynamically
+  "workspaceTypes": () => "/editor/api/workspaces/minds/types", // TODO: change minds to parameter
   "performQuery": function(instancePath, vocab, size, start, databaseScope){
     return `/editor/api/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
@@ -57,15 +57,11 @@ class API {
   }
 
   get axios() {
-    this.reloadToken();
-    return this._axios;
-  }
-
-  reloadToken() {
     Object.assign(this._axios.defaults, {
       headers: { Authorization: "Bearer " + authStore.accessToken },
       withCredentials: true
     });
+    return this._axios;
   }
 
   get endpoints() {

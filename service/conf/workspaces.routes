@@ -74,5 +74,5 @@ GET /:workspace/bookmarks/:bookmarkId/instances/summary                         
 #      '200':
 #        description: Ok
 ###
-GET    /:workspace/instances/summary                 controllers.EditorController.searchInstances(workspace: String, typeId:Option[String], from:Option[Int], size:Option[Int], search:String?="")
+GET    /:workspace/instances/summary                 controllers.EditorController.searchInstances(workspace: String, `type`:Option[String], from:Option[Int], size:Option[Int], search:String?="")
 

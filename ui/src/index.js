@@ -17,7 +17,7 @@ import "./Services/IconsImport";
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
-import structureStore from "./Stores/StructureStore";
+import TypesStore from "./Stores/TypesStore";
 import instanceStore from "./Stores/InstanceStore";
 import browseStore from "./Stores/BrowseStore";
 
@@ -33,7 +33,6 @@ import Help from "./Views/Help";
 import Browse from "./Views/Browse";
 import Instance from "./Views/Instance";
 import NewInstance from "./Views/NewInstance";
-import QueryBuilder from "./Views/QueryBuilder";
 import FetchingLoader from "./Components/FetchingLoader";
 import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
@@ -368,7 +367,6 @@ class App extends React.Component {
   handleCloseAllInstances() {
     if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
       || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
-      || matchPath(this.state.currentLocation, { path: "/query-builder", exact: "true" })
       || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
       routerStore.history.push("/browse");
     }
@@ -432,8 +430,8 @@ class App extends React.Component {
   }
 
   handleCreateInstance = () => {
-    if (!structureStore.isFetched) {
-      structureStore.fetch();
+    if (!TypesStore.isFetched) {
+      TypesStore.fetch();
     }
     instanceStore.toggleShowCreateModal();
   }
@@ -473,7 +471,6 @@ class App extends React.Component {
                       <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                       <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
                       <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
-                      <Tab icon={"blender-phone"} current={matchPath(currentLocation, { path: "/query-builder", exact: "true" })} path={"/query-builder"} hideLabel label={"Query Builder"} />
                     </React.Fragment>
                     : null
                   }
@@ -542,7 +539,6 @@ class App extends React.Component {
                     <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
                     <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
                     <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
-                    <Route path="/query-builder" exact={true} component={QueryBuilder} />
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />

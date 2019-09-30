@@ -5,7 +5,6 @@ import API from "../Services/API";
 import console from "../Services/Logger";
 
 import dataTypesStore from "../Stores/DataTypesStore";
-import structureStore from "../Stores/StructureStore";
 
 class GraphStore {
   @observable sidePanel = false;
@@ -90,7 +89,7 @@ class GraphStore {
 
   @action filterOriginalData() {
     //Remove nodes that are not whitelisted
-    remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => nodeType.schema === node.schemas));
+    remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => node.type.includes(nodeType.type)));
     remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
     //Transform links source and target reference to actual node objects
     this.originalData.links.forEach(link => {
@@ -98,7 +97,7 @@ class GraphStore {
       link.target = find(this.originalData.nodes, node => node.id === link.target);
     });
     this.originalData.nodes.forEach(node => {
-      node.schemaLabel = structureStore.findLabelByType(node.schemas); //node.dataType.replace("https://schema.hbp.eu/minds/","");
+      node.schemaLabel = node.typeLabel[0];
       node.isMainNode = node.id.includes(this.mainId);
     });
 
@@ -106,25 +105,25 @@ class GraphStore {
     this.typeStates = new Map();
     //Create group nodes
     dataTypesStore.dataTypes.forEach(nodeType => {
-      let nodesOfType = this.findNodesBySchema(nodeType.schema);
+      let nodesOfType = this.findNodesBySchema(nodeType.type);
       if (nodesOfType.length <= 1) {
-        this.typeStates.set(nodeType.schema, nodesOfType.length === 1 ? "show" : "none");
+        this.typeStates.set(nodeType.type, nodesOfType.length === 1 ? "show" : "none");
         return;
       }
-      let label = structureStore.findLabelByType(nodeType.schema);
+      let label = nodeType.typeLabel[0];
       let groupNode = {
-        id: "Group_" + nodeType.schema,
+        id: "Group_" + nodeType.type,
         name: "Group_" + label,
-        schemas: "Group_" + nodeType.schema,
+        schemas: "Group_" + nodeType.type,
         title: "Group of " + label + " (" + nodesOfType.length + ")",
-        original_schema: nodeType.schema,
+        original_schema: nodeType.type,
         schemaLabel: label,
         isGroup: true,
         groupSize: nodesOfType.length
       };
 
-      this.groupNodes.set(nodeType.schema, groupNode);
-      this.typeStates.set(nodeType.schema, "group");
+      this.groupNodes.set(nodeType.type, groupNode);
+      this.typeStates.set(nodeType.type, "group");
       this.originalData.nodes.push(groupNode);
     });
 

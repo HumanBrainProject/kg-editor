@@ -2,10 +2,11 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
-import structureStore from "../../Stores/StructureStore";
-import TypesSpace from "./TypesSpace";
+import TypesStore from "../../Stores/TypesStore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import browseStore from "../../Stores/BrowseStore";
 import FetchingLoader from "../../Components/FetchingLoader";
+import TypesItem from "./TypesItem";
 
 const styles = {
   folderName: {
@@ -36,22 +37,37 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Types extends React.Component {
-  handleLoadRetry = () => structureStore.fetch();
+  constructor(props) {
+    super(props);
+    this.state = {
+      showTypes: true
+    };
+  }
+
+  handleLoadRetry = () => TypesStore.fetch();
+  handleToggleType = () => this.setState((state) => ({ showTypes: !state.showTypes }));
 
   render() {
-    const {classes} = this.props;
-    const list = structureStore.filteredList(browseStore.navigationFilter);
+    const { classes } = this.props;
+    const list = TypesStore.filteredList(browseStore.navigationFilter);
     return (
-      !structureStore.fetchError ?
-        !structureStore.isFetching ?
-          list.map(space =><TypesSpace key={space.label} space={space} />)
+      !TypesStore.fetchError ?
+        !TypesStore.isFetching ?
+          list.length ?
+            (<div className={classes.folder}>
+              <div className={classes.folderName} onClick={this.handleToggleType}>
+                <FontAwesomeIcon fixedWidth icon={this.state.showTypes ? "caret-down" : "caret-right"} /> &nbsp;
+                Types
+              </div>
+              {this.state.showTypes && list.map(type => <TypesItem key={type.label} type={type} />)}
+            </div>) : null
           :
           <FetchingLoader>
             Fetching types
           </FetchingLoader>
         :
         <div className={classes.fetchErrorPanel}>
-          <div>{structureStore.fetchError}</div>
+          <div>{TypesStore.fetchError}</div>
           <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
         </div>
     );

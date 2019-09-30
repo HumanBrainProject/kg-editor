@@ -5,7 +5,7 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
-import structureStore from "../Stores/StructureStore";
+import TypesStore from "../Stores/TypesStore";
 import browseStore from "../Stores/BrowseStore";
 import instanceStore from "../Stores/InstanceStore";
 import routerStore from "../Stores/RouterStore";
@@ -55,12 +55,12 @@ const styles = {
 @observer
 export default class NewInstance extends React.Component {
   componentDidMount() {
-    if (!structureStore.isFetched) {
-      structureStore.fetch();
+    if (!TypesStore.isFetched) {
+      TypesStore.fetch();
     }
   }
 
-  handleFetchInstanceTypes = () => structureStore.fetch();
+  handleFetchInstanceTypes = () => TypesStore.fetch();
 
   async handleClickNewInstanceOfType(path) {
     let newInstanceId = await instanceStore.createNewInstance(path);
@@ -99,10 +99,9 @@ export default class NewInstance extends React.Component {
                   <h4>{folder.folderName}</h4>
                   <div className={classes.list}>
                     {folder.lists.map(list => {
-                      const color = structureStore.colorPalletteByType(list.id);
                       return (
                         <div key={list.id} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                          <div className={classes.icon} style={color ? { color: color } : {}}>
+                          <div className={classes.icon} style={list.color ? { color: list.color } : {}}>
                             <FontAwesomeIcon fixedWidth icon="circle" />
                           </div>{list.name}
                         </div>

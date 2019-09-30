@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import graphStore from "../../../Stores/GraphStore";
 import routerStore from "../../../Stores/RouterStore";
-import structureStore from "../../../Stores/StructureStore";
+import TypesStore from "../../../Stores/TypesStore";
 
 
 const styles = {
@@ -146,7 +146,7 @@ export default class Graph extends React.Component {
         ctx.globalAlpha = 0.1;
       }
     }
-    const color = structureStore.colorPalletteByType(node.original_schema ? node.original_schema : node.schemas);
+    const color = node.color; //TODO: check if color applies here
     ctx.strokeStyle = new Color(color).darken(0.25).hex();
     ctx.fillStyle = color;
 
@@ -214,7 +214,7 @@ export default class Graph extends React.Component {
             height={this.state.graphHeight}
             graphData={data}
             nodeAutoColorBy={d => d.schemas}
-            nodeLabel={node => structureStore.findLabelByType(node.schemas)}
+            nodeLabel={node => node.typeLabel[0]}
             nodeCanvasObject={this._paintNode}
             onNodeClick={this.handleNodeClick}
             onNodeHover={this.handleNodeHover}

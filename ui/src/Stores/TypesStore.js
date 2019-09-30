@@ -1,13 +1,10 @@
 import { observable, action, computed, runInAction } from "mobx";
-import { groupBy } from "lodash";
 import API from "../Services/API";
 
-class StructureStore {
-  @observable colorPaletteByLabel = new Map();
+class TypesStore {
   @observable types = [];
   @observable fetchError = null;
   @observable isFetching = false;
-  colorPalette = null;
 
   constructor() {
     this.fetch();
@@ -15,28 +12,9 @@ class StructureStore {
 
   filteredList(term) {
     if(term.trim()) {
-      return this.typesBySpace.reduce((acc, space) => {
-        const types = space.types.filter(type => type.label.toLowerCase().includes(term.trim().toLowerCase()));
-        if(types.length) {
-          acc.push({label: space.label, types: types});
-        }
-        return acc;
-      },[]);
+      return this.types.filter(type => type.label.toLowerCase().includes(term.trim().toLowerCase()));
     }
-    return this.typesBySpace;
-  }
-
-  findTypeById(id) {
-    return this.typesMap.get(id);
-  }
-
-  findLabelByType(type) {
-    return this.typesLabel.get(type);
-  }
-
-  @computed
-  get typesBySpace() {
-    return Object.entries(groupBy(this.types, "space")).map(([label, types]) => ({label: label, types: types}));
+    return this.types;
   }
 
   @computed
@@ -50,13 +28,6 @@ class StructureStore {
   get typesMap() {
     const map = new Map();
     this.types.forEach(type => map.set(type.id, type));
-    return map;
-  }
-
-  @computed
-  get typesLabel() {
-    const map = new Map();
-    this.types.forEach(type => map.set(type.id, type.label));
     return map;
   }
 
@@ -83,11 +54,6 @@ class StructureStore {
       }
     }
   }
-
-  // TODO: possible deprecation for method
-  colorPalletteByType(type) {
-    return this.types && this.types.filter(t => (t.type === type))[0].color;
-  }
 }
 
-export default new StructureStore();
+export default new TypesStore();

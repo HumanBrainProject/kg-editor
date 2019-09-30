@@ -10,7 +10,7 @@ import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import { matchPath } from "react-router-dom";
-import structureStore from "./StructureStore";
+import TypesStore from "./TypesStore";
 
 class Instance {
   @observable instanceId = null;
@@ -79,7 +79,7 @@ class Instance {
 
   @computed
   get promotedFields() {
-    const info = structureStore.typesMap.get(this.nodeType);
+    const info = TypesStore.typesMap.get(this.nodeType);
     return (info && info.promotedFields) || [];
   }
 
@@ -421,8 +421,8 @@ class InstanceStore {
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
     this.setReadMode(readMode);
-    if (!readMode && viewMode === "edit" && !structureStore.isFetched) {
-      structureStore.fetch();
+    if (!readMode && viewMode === "edit" && !TypesStore.isFetched) {
+      TypesStore.fetch();
     }
     historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){

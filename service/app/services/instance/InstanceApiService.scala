@@ -125,26 +125,23 @@ trait InstanceApiService {
   def getReleaseStatus(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    instanceIds: List[NexusInstanceReference],
+    instanceIds: List[String],
     token: AccessToken,
     releaseTreeScope: String
   )(
     implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
-  ): Task[Either[WSResponse, JsArray]] = {
-    val payload = Json.toJson(instanceIds.map(i => i.toString)).as[JsArray]
+  ): Task[Either[WSResponse, JsObject]] = {
+    val payload = Json.toJson(instanceIds).as[JsArray]
     val q = wSClient
-      .url(s"$apiBaseEndpoint$instanceReleaseEndpoint")
+      .url(s"${apiBaseEndpoint}/instances/releases/status")
       .withHttpHeaders(AUTHORIZATION -> token.token)
       .addQueryStringParameters("releaseTreeScope" -> releaseTreeScope)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
-      case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
-    }
+    val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
         case OK =>
-          Right(res.json.as[JsArray])
+          Right(res.json.as[JsObject])
         case _ => Left(res)
       }
     }

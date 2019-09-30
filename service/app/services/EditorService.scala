@@ -139,15 +139,17 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
   }
 
   def retrieveReleaseStatus(
-    instanceIds: List[NexusInstanceReference],
+    instanceIds: List[String],
     releaseTreeScope: String,
     token: AccessToken
-  ): Task[Either[APIEditorError, JsArray]] = {
+  ): Task[Either[APIEditorError, JsValue]] = {
     val result = instanceApiService
-      .getReleaseStatus(wSClient, config.kgQueryEndpoint, instanceIds, token, releaseTreeScope)
+      .getReleaseStatus(wSClient, config.kgCoreEndpoint, instanceIds, token, releaseTreeScope)
     result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
+      case Right(ref) =>
+        val r = (ref \ "data").as[List[Map[String, JsValue]]].map(field => InstanceHelper.normalizeIdOfField(field))
+        Right(Json.toJson(r))
+      case Left(res) => Left(APIEditorError(res.status, res.body))
     }
   }
 

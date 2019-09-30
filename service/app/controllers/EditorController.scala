@@ -265,14 +265,14 @@ class EditorController @Inject()(
       val listOfIds = for {
         bodyContent <- request.body.asJson
         ids         <- bodyContent.asOpt[List[String]]
-      } yield ids.map(NexusInstanceReference.fromUrl)
+      } yield ids
       listOfIds match {
         case Some(ids) =>
           editorService
             .retrieveReleaseStatus(ids, releaseTreeScope, request.userToken)
             .map {
               case Left(err)    => err.toResult
-              case Right(value) => Ok(value)
+              case Right(value) => Ok(Json.toJson(EditorResponseObject(value)))
             }
             .runToFuture
         case None => Task.pure(BadRequest("Missing body content")).runToFuture

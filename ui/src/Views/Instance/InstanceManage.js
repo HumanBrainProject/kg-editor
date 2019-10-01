@@ -4,7 +4,6 @@ import injectStyles from "react-jss";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
-import { Form, Field } from "hbp-quickfire";
 
 import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
@@ -29,7 +28,7 @@ const styles = {
     position: "relative",
     width: "60%",
     height: "calc(100% - 40px)",
-    margin:"20px 20%"
+    margin: "20px 20%"
   },
   content: {
     backgroundColor: "var(--bg-color-ui-contrast2)",
@@ -50,15 +49,15 @@ const styles = {
       color: "var(--ft-color-louder)"
     }
   },
-  id:{
-    fontSize:"0.75em",
-    color:"var(--ft-color-normal)",
-    marginTop:"20px",
-    marginBottom:"20px"
+  id: {
+    fontSize: "0.75em",
+    color: "var(--ft-color-normal)",
+    marginTop: "20px",
+    marginBottom: "20px"
   },
-  field:{
-    marginBottom:"10px",
-    wordBreak:"break-word"
+  field: {
+    marginBottom: "10px",
+    wordBreak: "break-word"
   },
   error: {
     color: "var(--ft-color-error)"
@@ -67,7 +66,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceManage extends React.Component{
+export default class InstanceManage extends React.Component {
   componentDidMount() {
     if (this.props.id) {
       this.fetchInstance();
@@ -93,45 +92,39 @@ export default class InstanceManage extends React.Component{
 
   handleDuplicateInstance = async () => {
     let newInstanceId = await instanceStore.duplicateInstance(this.props.id);
-    routerStore.history.push("/instance/edit/"+newInstanceId);
+    routerStore.history.push("/instance/edit/" + newInstanceId);
   }
 
   handleDeleteInstance = async () => {
     instanceStore.deleteInstance(this.props.id);
   }
 
-  render(){
+  render() {
     const { classes } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
-    const promotedFields = instance && instance.promotedFields;
-    const status = instance &&  statusStore.getInstance(this.props.id);
+    const status = instance && statusStore.getInstance(this.props.id);
     return (
       instance && instance.data ?
         <div className={classes.container}>
           <Scrollbars autoHide>
             <div className={classes.panel}>
-              {instance.isFetching?
+              {instance.isFetching ?
                 <FetchingLoader>
                   <span>Fetching instance information...</span>
                 </FetchingLoader>
-                :!instance.hasFetchError?
+                : !instance.hasFetchError ?
                   <React.Fragment>
                     <div className={classes.content}>
-                      <h4>{instance.data.label}</h4>
+                      <h4>{instance.data.typeLabel}</h4>
                       <div className={classes.id}>
                         ID: {this.props.id}
                       </div>
-                      {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
-                        <Form store={instance.readModeFormStore} key={this.props.id}>
-                          {promotedFields.map(fieldKey => {
-                            return(
-                              <div key={this.props.id+fieldKey} className={classes.field}>
-                                <Field name={fieldKey}/>
-                              </div>
-                            );
-                          })}
-                        </Form>}
+                      {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} /> :
+                        < div className={classes.field}>
+                          {instance.data.name}
+                        </div>
+                      }
                     </div>
                     <div className={classes.content}>
                       <h4>Duplicate this instance</h4>
@@ -140,23 +133,23 @@ export default class InstanceManage extends React.Component{
                         <li>After dupplication you should update the name &amp; description fields.</li>
                       </ul>
                       <Button bsStyle={"warning"} onClick={this.handleDuplicateInstance}>
-                        <FontAwesomeIcon icon={"copy"}/> &nbsp; Duplicate this instance
+                        <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance
                       </Button>
                     </div>
                     <div className={classes.content}>
                       <h4>Delete this instance</h4>
-                      {status && status.hasFetchError?
+                      {status && status.hasFetchError ?
                         <div className={classes.error}>
-                          <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
-                          <Button bsStyle="primary" onClick={this.fetchStatus}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+                          <FontAwesomeIcon icon={"exclamation-triangle"} />&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
+                          <Button bsStyle="primary" onClick={this.fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
                         </div>
-                        :!status || !status.isFetched?
+                        : !status || !status.isFetched ?
                           <React.Fragment>
-                            <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Fetching instance release status
+                            <FontAwesomeIcon icon={"circle-notch"} spin />&nbsp;&nbsp;Fetching instance release status
                           </React.Fragment>
                           :
                           <React.Fragment>
-                            {status.data.status !== "NOT_RELEASED"?
+                            {status.data.status !== "NOT_RELEASED" ?
                               <ul>
                                 <li>This instance has been released and therefore cannot be deleted.</li>
                                 <li>If you still want to delete it you first have to unrelease it.</li>
@@ -167,7 +160,7 @@ export default class InstanceManage extends React.Component{
                               </p>
                             }
                             <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "NOT_RELEASED"} >
-                              <FontAwesomeIcon icon={"trash-alt"}/>&nbsp;&nbsp; Delete this instance
+                              <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
                             </Button>
                           </React.Fragment>
                       }
@@ -175,17 +168,17 @@ export default class InstanceManage extends React.Component{
                   </React.Fragment>
                   :
                   <BGMessage icon={"ban"}>
-                    There was a network problem fetching the instance.<br/>
-                    If the problem persists, please contact the support.<br/>
-                    <small>{instance.fetchError}</small><br/><br/>
+                    There was a network problem fetching the instance.<br />
+                    If the problem persists, please contact the support.<br />
+                    <small>{instance.fetchError}</small><br /><br />
                     <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
-                      <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                      <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
                     </Button>
                   </BGMessage>
               }
             </div>
           </Scrollbars>
-        </div>:null
+        </div> : null
     );
   }
 }

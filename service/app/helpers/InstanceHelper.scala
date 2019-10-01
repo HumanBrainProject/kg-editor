@@ -275,14 +275,16 @@ object InstanceHelper {
     fieldsInfoMapByType: Map[String, Map[String, Map[String, JsValue]]]
   ): Map[String, JsValue] = {
     val reconciledFieldsInfo = getReconciledFieldsInfo(instanceTypes, fieldsInfoMapByType)
-    val fields = getFields(data, reconciledFieldsInfo)
     val reconciledTypeInfo = getReconciledTypeInfo(instanceTypes, typeInfoMap)
+    val fields = getFields(data, reconciledFieldsInfo)
+    val labelField = getLabelField(reconciledTypeInfo)
     createInstance(
       List[(String, JsValue)](
         ("id", getId(data)),
         ("type", Json.toJson(instanceTypes)),
         ("typeLabel", Json.toJson(reconciledTypeInfo.get("label"))),
         ("color", Json.toJson(reconciledTypeInfo.get("color"))),
+        ("name", Json.toJson(getName(data, labelField))),
         ("fields", Json.toJson(fields))
       )
     )

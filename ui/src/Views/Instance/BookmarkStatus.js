@@ -72,7 +72,7 @@ export default class BookmarkStatus extends React.Component{
       instanceStatus?
         <div className={`${classes.container} ${className?className:""}`}>
           {instanceStatus.isFetching || (!instanceStatus.isFetched && !instanceStatus.hasFetchError)?
-            <div className={classes.loader} title="retrieving favrorite status">
+            <div className={classes.loader} title="retrieving favorite status">
               <FontAwesomeIcon icon="circle-notch" spin/>
             </div>
             :

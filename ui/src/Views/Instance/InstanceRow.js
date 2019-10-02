@@ -177,8 +177,8 @@ export default class InstanceRow extends React.Component {
       }
     };
     const id = instance.id;
-    const color = instance.color[0];
-    const label = instance.typeLabel[0];
+    const color = instance.typeColors[0];
+    const label = instance.typeLabels[0];
     const normalizedData = InstanceStore.normalizeData(instance, transformField);
     const formStore = new FormStore(toJS(normalizedData));
     formStore.toggleReadMode(true);

@@ -485,7 +485,7 @@ class App extends React.Component {
                       const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = instance.data && instance.data.color[0];
+                      color = instance.data && instance.data.typeColors[0];
                     }
                     if (!label) {
                       label = instanceId;

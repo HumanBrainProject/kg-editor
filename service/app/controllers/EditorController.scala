@@ -19,6 +19,7 @@ package controllers
 import actions.EditorUserAction
 import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
+import models.instance.InstanceProtocol._
 import models.{instance, _}
 import models.instance._
 import models.specification.{FormRegistry, UISpec}
@@ -31,6 +32,7 @@ import services._
 import services.specification.{FormOp, FormService}
 
 import scala.concurrent.ExecutionContext
+import scala.util.Try
 
 @Singleton
 class EditorController @Inject()(
@@ -158,23 +160,23 @@ class EditorController @Inject()(
 
   def getInstancesList(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(databaseScope, metadata, viewFunction = InstanceHelper.normalizeInstances).runToFuture
+      getInstances(databaseScope, metadata, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
     }
 
   def getInstancesSummary(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(databaseScope, metadata, viewFunction = InstanceHelper.normalizeInstancesSummary).runToFuture
+      getInstances(databaseScope, metadata, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
     }
 
   def getInstancesLabel(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(databaseScope, metadata, viewFunction = InstanceHelper.normalizeInstancesLabel).runToFuture
+      getInstances(databaseScope, metadata, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
     }
 
   def getInstances(
     databaseScope: Option[String],
     metadata: Boolean,
-    viewFunction: (List[JsObject], List[JsObject]) => List[Map[String, JsValue]]
+    generateInstanceView: (JsObject, List[String], Map[String, StructureOfType]) => Instance
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
@@ -188,8 +190,21 @@ class EditorController @Inject()(
                 .retrieveTypesList(typesToRetrieve.distinct, request.userToken, withFields = true)
                 .map {
                   case Right(typesWithFields) =>
-                    val typeInfoList = InstanceHelper.extractDataAsList(typesWithFields)
-                    Ok(Json.toJson(EditorResponseObject(Json.toJson(viewFunction(instances, typeInfoList)))))
+                    implicit val writer = InstanceProtocol.instanceWrites
+                    (typesWithFields \ "data").asOpt[List[StructureOfType]] match {
+                      case Some(typeInfoList) =>
+                        Ok(
+                          Json.toJson(
+                            EditorResponseObject(
+                              Json.toJson(
+                                InstanceHelper.generateInstanceListView(instances, typeInfoList, generateInstanceView)
+                              )
+                            )
+                          )
+                        )
+                      case _ => InternalServerError("Something went wrong! Please try again!")
+                    }
+
                   case _ => InternalServerError("Something went wrong! Please try again!")
                 }
             case _ => Task.pure(InternalServerError("Something went wrong! Please try again!"))

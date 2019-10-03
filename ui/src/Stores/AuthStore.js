@@ -45,6 +45,7 @@ const mapUserProfile = data => {
         user[name] = data.data[fullyQualifiedName];
       }
     });
+    user.workspaces = ["minds", "uniminds"]; //TODO: remove hardcoded value;
   }
   return user;
 };
@@ -54,17 +55,18 @@ class AuthStore {
   @observable user = null;
   @observable isRetrievingUserProfile = false;
   @observable userProfileError = false;
+  @observable currentWorkspace = null;
   expiredToken = false;
 
-  constructor(){
-    if(Storage === undefined){
+  constructor() {
+    if (Storage === undefined) {
       throw "The browser must support WebStorage API";
     }
   }
 
   @computed
   get accessToken() {
-    return this.hasExpired? null: this.session.accessToken;
+    return this.hasExpired ? null : this.session.accessToken;
   }
 
   @computed
@@ -78,6 +80,16 @@ class AuthStore {
   }
 
   @computed
+  get hasWorkspaces() {
+    return this.user && this.user.workspaces && !!this.user.workspaces.length;
+  }
+
+  @computed
+  get workspaces() {
+    return this.hasWorkspaces ? this.user.workspaces: [];
+  }
+
+  @computed
   get isFullyAuthenticated() {
     return this.isAuthenticated && this.hasUserProfile;
   }
@@ -87,12 +99,18 @@ class AuthStore {
   }
 
   @action
+  setCurrentWorkspace(workspace) {
+    localStorage.setItem("currentWorkspace", workspace);
+    this.currentWorkspace = workspace;
+  }
+
+  @action
   logout() {
     // console.log("logout");
     this.session = null;
     this.expiredToken = true;
     this.user = null;
-    if (typeof Storage !== "undefined" ) {
+    if (typeof Storage !== "undefined") {
       localStorage.removeItem(authLocalStorageKey);
     }
   }
@@ -111,11 +129,12 @@ class AuthStore {
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
           this.user = mapUserProfile(data);
+          this.retrieveUserWorkspace();
           this.isRetrievingUserProfile = false;
         });
       } catch (e) {
         runInAction(() => {
-          this.userProfileError = e.message?e.message:e;
+          this.userProfileError = e.message ? e.message : e;
           this.isRetrievingUserProfile = false;
         });
       }
@@ -130,6 +149,24 @@ class AuthStore {
     };
     localStorage.setItem(stateLocalStorageKey, JSON.stringify(state));
   }
+
+  @action
+  retrieveUserWorkspace = () => {
+    //TODO: Get the options of spaces
+    const savedWorkspace = localStorage.getItem("currentWorkspace");
+    if (this.user.workspaces.includes(savedWorkspace)) {
+      this.currentWorkspace = savedWorkspace;
+    } else {
+      if (this.user.workspaces.length) {
+        if (this.user.workspaces.length > 1) {
+          this.currentWorkspace = null;
+        } else {
+          localStorage.setItem("currentWorkspace", this.user.workspaces[0]);
+        }
+      }
+    }
+  }
+
 
   @action
   tryAuthenticate() {

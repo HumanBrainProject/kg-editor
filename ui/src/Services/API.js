@@ -26,10 +26,10 @@ const endpoints = {
   "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/editor/api/instances/releases?releaseTreeScope=CHILDREN_ONLY",
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
-  "bookmarks": () => "/editor/api/workspaces/minds/bookmarks", //TODO: change minds to parameter
+  "bookmarks": () => `/editor/api/workspaces/${authStore.currentWorkspace}/bookmarks`, //TODO: change minds to parameter
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
-  "workspaceTypes": () => "/editor/api/workspaces/minds/types", // TODO: change minds to parameter
+  "workspaceTypes": () => `/editor/api/workspaces/${authStore.currentWorkspace}/types`, // TODO: change minds to parameter
   "performQuery": function(instancePath, vocab, size, start, databaseScope){
     return `/editor/api/query/${instancePath}/instances${arguments.length > 1?"?":""}${
       ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${

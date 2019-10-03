@@ -40,6 +40,7 @@ import * as Sentry from "@sentry/browser";
 
 import "babel-polyfill";
 import "./CustomFields";
+import WorkspaceSelector from "./Components/WorkspaceSelector";
 
 FormStore.setPathNodeSeparator("|");
 
@@ -466,8 +467,9 @@ class App extends React.Component {
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {authStore.isFullyAuthenticated ?
+                  {authStore.isFullyAuthenticated && authStore.hasWorkspaces && authStore.currentWorkspace?
                     <React.Fragment>
+                      <WorkspaceSelector />
                       <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                       <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
                       <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />

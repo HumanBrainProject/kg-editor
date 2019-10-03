@@ -90,6 +90,17 @@ object InstanceHelper {
       case None    => None
     }
 
+  def getTypes(data: JsObject): Option[List[String]] =
+    (data \ "@type").asOpt[List[String]] match {
+      case Some(types) =>
+        if (types.nonEmpty) {
+          Some(types)
+        } else {
+          None
+        }
+      case None => None
+    }
+
   def getName(data: JsObject, name: Option[String]): Option[String] =
     name match {
       case Some(n) => (data \ n).asOpt[String]
@@ -123,39 +134,26 @@ object InstanceHelper {
   def normalizeIdOfArray(fieldArray: ListOfLinks): ListOfLinks =
     fieldArray.map(field => normalizeIdOfField(field))
 
-  def getInstanceView(
-    data: JsObject,
-    instanceTypes: List[String],
-    typeInfoMap: Map[String, StructureOfType]
-  ): Instance =
-    InstanceView(data, instanceTypes, typeInfoMap)
+  def getInstanceView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
+    InstanceView(data, typeInfoMap)
 
-  def getInstanceSummaryView(
-    data: JsObject,
-    instanceTypes: List[String],
-    typeInfoMap: Map[String, StructureOfType]
-  ): Instance =
-    InstanceSummaryView(data, instanceTypes, typeInfoMap)
+  def getInstanceSummaryView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
+    InstanceSummaryView(data, typeInfoMap)
 
-  def getInstanceLabelView(
-    data: JsObject,
-    instanceTypes: List[String],
-    typeInfoMap: Map[String, StructureOfType]
-  ): Instance =
-    InstanceLabelView(data, instanceTypes, typeInfoMap)
+  def getInstanceLabelView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
+    InstanceLabelView(data, typeInfoMap)
 
   def generateInstanceListView(
     dataList: List[JsObject],
     typeInfoList: List[StructureOfType],
-    generateInstanceView: (JsObject, List[String], Map[String, StructureOfType]) => Instance
+    generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
   ): List[Instance] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     dataList.foldLeft(List[Instance]()) {
       case (instances, data) =>
-        (data \ "@type").asOpt[List[String]] match {
-          case Some(instanceTypes) =>
-            instances :+ generateInstanceView(data, instanceTypes, typeInfoMap)
-          case _ => instances
+        generateInstanceView(data, typeInfoMap) match {
+          case Some(instance) => instances :+ instance
+          case _              => instances
         }
     }
   }

@@ -176,7 +176,7 @@ class EditorController @Inject()(
   def getInstances(
     databaseScope: Option[String],
     metadata: Boolean,
-    generateInstanceView: (JsObject, List[String], Map[String, StructureOfType]) => Instance
+    generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>

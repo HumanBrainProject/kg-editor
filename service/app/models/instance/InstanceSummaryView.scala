@@ -20,7 +20,7 @@ import helpers.InstanceHelper
 import play.api.libs.json.{JsObject, JsPath, JsValue, Json, Reads, Writes}
 
 final case class InstanceSummaryView(
-  id: Option[String],
+  id: String,
   typeNames: List[String],
   typeLabels: Option[List[String]],
   typeColors: Option[List[String]],
@@ -32,22 +32,28 @@ object InstanceSummaryView {
 
   implicit val fieldWriter = Field.fieldWrites
 
-  def apply(
-    data: JsObject,
-    instanceTypes: List[String],
-    typeInfoMap: Map[String, StructureOfType]
-  ): InstanceSummaryView = {
-    val structure = StructureOfInstance(instanceTypes, typeInfoMap)
-    val filteredPromotedFieldsList = InstanceHelper.filterFieldNames(structure.promotedFields, structure.labelField)
-    val filteredFields = InstanceHelper.filterStructureOfFields(structure.fields, filteredPromotedFieldsList)
-    InstanceSummaryView(
-      InstanceHelper.getId(data),
-      structure.typeName,
-      InstanceHelper.toOptionalList(structure.typeLabel),
-      InstanceHelper.toOptionalList(structure.typeColor),
-      InstanceHelper.getName(data, structure.labelField.headOption),
-      InstanceHelper.getFields(data, filteredFields)
-    )
+  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[InstanceSummaryView] = {
+    val res = for {
+      id    <- InstanceHelper.getId(data)
+      types <- InstanceHelper.getTypes(data)
+    } yield (id, types)
+    res match {
+      case Some((instanceId, instanceTypes)) =>
+        val structure = StructureOfInstance(instanceTypes, typeInfoMap)
+        val filteredPromotedFieldsList = InstanceHelper.filterFieldNames(structure.promotedFields, structure.labelField)
+        val filteredFields = InstanceHelper.filterStructureOfFields(structure.fields, filteredPromotedFieldsList)
+        Some(
+          InstanceSummaryView(
+            instanceId,
+            structure.typeName,
+            InstanceHelper.toOptionalList(structure.typeLabel),
+            InstanceHelper.toOptionalList(structure.typeColor),
+            InstanceHelper.getName(data, structure.labelField.headOption),
+            InstanceHelper.getFields(data, filteredFields)
+          )
+        )
+      case _ => None
+    }
   }
 
   implicit val instanceSummaryViewWrites: Writes[InstanceSummaryView] = new Writes[InstanceSummaryView] {

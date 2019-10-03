@@ -20,7 +20,7 @@ import helpers.InstanceHelper
 import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceView(
-  id: Option[String],
+  id: String,
   `type`: List[String],
   typeLabels: Option[List[String]],
   typeColors: Option[List[String]],
@@ -30,16 +30,26 @@ final case class InstanceView(
 
 object InstanceView {
 
-  def apply(data: JsObject, instanceTypes: List[String], typeInfoMap: Map[String, StructureOfType]): InstanceView = {
-    val structure = StructureOfInstance(instanceTypes, typeInfoMap)
-    InstanceView(
-      InstanceHelper.getId(data),
-      structure.typeName,
-      InstanceHelper.toOptionalList(structure.typeLabel),
-      InstanceHelper.toOptionalList(structure.typeColor),
-      InstanceHelper.getName(data, structure.labelField.headOption),
-      InstanceHelper.getFields(data, structure.fields)
-    )
+  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[InstanceView] = {
+    val res = for {
+      id    <- InstanceHelper.getId(data)
+      types <- InstanceHelper.getTypes(data)
+    } yield (id, types)
+    res match {
+      case Some((instanceId, instanceTypes)) =>
+        val structure = StructureOfInstance(instanceTypes, typeInfoMap)
+        Some(
+          InstanceView(
+            instanceId,
+            structure.typeName,
+            InstanceHelper.toOptionalList(structure.typeLabel),
+            InstanceHelper.toOptionalList(structure.typeColor),
+            InstanceHelper.getName(data, structure.labelField.headOption),
+            InstanceHelper.getFields(data, structure.fields)
+          )
+        )
+      case _ => None
+    }
   }
 
   implicit val instanceViewWrites = Json.writes[InstanceView]

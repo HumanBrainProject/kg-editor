@@ -26,7 +26,7 @@ export default class GlobalFieldErrors extends React.Component {
     return (
       <div className={classes.container}>
         <h4>
-        The {(instance.schemaName && instance.shortId)?`${instance.schemaName} ${instance.shortId}`:`instance ${instance.instanceId}`} could not be rendered because it contains unexpected type of values in the below fields:
+          {`The ${instance.primaryTypeLabel?instance.primaryTypeLabel:"instance"} ${instance.id} could not be rendered because it contains unexpected type of values in the below fields:`}
         </h4>
         <ul>
           {instance.fieldErrors.map(field =>

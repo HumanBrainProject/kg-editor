@@ -134,9 +134,9 @@ export default class TypesItem extends React.Component {
         className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`}
         onClick={this.handleSelect} title={type.label}>
         {color ?
-          <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.nodetypeIcon}`} style={{ color: color }} />
+          <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.typeIcon}`} style={{ color: color }} />
           :
-          <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.nodetypeIcon}`} />
+          <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
         }
         <span>{type.label}</span>
         {instanceStore.isCreatingNewInstance ?

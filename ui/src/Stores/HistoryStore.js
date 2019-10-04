@@ -1,6 +1,7 @@
 import { observable, action, runInAction } from "mobx";
 
 import API from "../Services/API";
+import authStore from "./AuthStore";
 
 const maxItems = 100;
 
@@ -25,15 +26,13 @@ class HistoryStore {
   }
 
   @action
-  updateInstanceHistory(id, mode, remove) {
-    let [,,nodeType,,] = (typeof id === "string")?id.split("/"):[null, null, null, null, null];
-    if (!nodeType) {
-      return this.instancesHistory;
+  updateInstanceHistory(id, type, mode, remove) {
+    if (!authStore.currentWorkspace) {
+      return;
     }
-    nodeType = nodeType.toLowerCase();
     let index = -1;
     this.instancesHistory.some((instance, idx) => {
-      if (instance.id === id && instance.mode === mode) {
+      if (instance.id === id && instance.workspace === authStore.currentWorkspace && instance.mode === mode) {
         index = idx;
         return true;
       }
@@ -45,19 +44,21 @@ class HistoryStore {
       this.instancesHistory.pop();
     }
     if (!remove) {
-      this.instancesHistory.unshift({id: id, type: nodeType, mode: mode});
+      this.instancesHistory.unshift({id: id, type: type, workspace: authStore.currentWorkspace, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
   }
 
   @action
-  getFileredInstancesHistory(nodeType, modes, max=10) {
-
-    if (typeof nodeType === "string") {
-      nodeType = nodeType.toLowerCase().trim();
-      if (nodeType === "") {
-        nodeType = null;
+  getFileredInstancesHistory(type, modes, max=10) {
+    if (!authStore.currentWorkspace) {
+      return [];
+    }
+    if (typeof type === "string") {
+      type = type.toLowerCase().trim();
+      if (type === "") {
+        type = null;
       }
     }
     if (!modes) {
@@ -68,7 +69,11 @@ class HistoryStore {
     max = Number(max);
     return this.instancesHistory
       .filter(instance => {
-        if (typeof nodeType === "string" && instance.type !== nodeType) {
+        instance.workspace = authStore.currentWorkspace; // TODO: Remove this line
+        if (instance.workspace !== authStore.currentWorkspace) {
+          return false;
+        }
+        if (typeof type === "string" && instance.type.includes(type)) {
           return false;
         }
         if (!modes.length) {
@@ -97,7 +102,7 @@ class HistoryStore {
         this.instances = [];
         this.isFetching = true;
         this.fetchError = null;
-        list = ["bc64b969-32d2-414c-9778-a52c567d9fb1-74657374"]; // TODO Remove hardcoded ids
+        list = ["bc64b969-32d2-414c-9778-a52c567d9fb1-74657374"]; // TODO: Remove hardcoded ids
         const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
         runInAction(() => {
           this.isFetching = false;

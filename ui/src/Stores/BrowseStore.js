@@ -66,18 +66,18 @@ class BrowseStore{
     if(!this.selectedItem) {
       return;
     }
-    try {
-      if(loadMore){
-        this.pageStart++;
-      } else {
-        this.pageStart = 0;
-        this.isFetching.instances = true;
-        this.selectedInstance = null;
-        this.instances = [];
-      }
-      this.fetchError.instances = null;
-      if(this.selectedItem.list) {
-        if(this.selectedItem.list.length > 0) {
+    if(loadMore){
+      this.pageStart++;
+    } else {
+      this.pageStart = 0;
+      this.isFetching.instances = true;
+      this.selectedInstance = null;
+      this.instances = [];
+    }
+    this.fetchError.instances = null;
+    if(this.selectedItem.list) {
+      if(this.selectedItem.list.length > 0) {
+        try {
           const { data } = await API.axios.get(API.endpoints.filterBookmarkInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
           runInAction(() => {
             this.isFetching.instances = false;
@@ -89,8 +89,16 @@ class BrowseStore{
             this.canLoadMoreInstances = this.instances.length < data.total;
             this.totalInstances = data.total;
           });
+        } catch (e) {
+          runInAction(() => {
+            const message = e.message?e.message:e;
+            this.fetchError.instances = `Error while retrieving instances of bookmark "${this.selectedItem.id}" (${message})`;
+            this.isFetching.instances = false;
+          });
         }
-      } else {
+      }
+    } else {
+      try {
         const { data } = await API.axios.get(API.endpoints.searchInstances(this.selectedItem.type, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
         runInAction(() => {
           this.isFetching.instances = false;
@@ -102,13 +110,13 @@ class BrowseStore{
           this.canLoadMoreInstances = this.instances.length < data.total;
           this.totalInstances = data.total;
         });
+      } catch (e) {
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
+          this.isFetching.instances = false;
+        });
       }
-    } catch (e) {
-      runInAction(() => {
-        const message = e.message?e.message:e;
-        this.fetchError.instances = `Error while retrieving instances "${this.nodeTypeId}" (${message})`;
-        this.isFetching.instances = false;
-      });
     }
   }
 

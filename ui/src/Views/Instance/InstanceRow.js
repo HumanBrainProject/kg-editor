@@ -5,6 +5,7 @@ import { FormStore, Form, Field } from "hbp-quickfire";
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
+import { normalizeInstanceData } from "../../Helpers/InstanceHelper";
 import InstanceStore from "../../Stores/InstanceStore";
 import { toJS } from "mobx";
 
@@ -31,7 +32,7 @@ const styles = {
       "& .status": {
         opacity: 1
       },
-      "& $nodeType": {
+      "& $type": {
         opacity: "1"
       },
       "& .bookmarkStatus": {
@@ -51,7 +52,7 @@ const styles = {
       "& .status": {
         opacity: "1"
       },
-      "& $nodeType": {
+      "& $type": {
         opacity: "1"
       },
       "& .bookmarkStatus": {
@@ -70,7 +71,7 @@ const styles = {
       }
     }
   },
-  nodeType: {
+  type: {
     display: "inline-block",
     opacity: "0.5",
     paddingRight: "8px",
@@ -176,11 +177,8 @@ export default class InstanceRow extends React.Component {
         delete field.label;
       }
     };
-    const id = instance.id;
-    const color = instance.typeColors[0];
-    const label = instance.typeLabels[0];
-    const normalizedData = InstanceStore.normalizeData(instance, transformField);
-    const formStore = new FormStore(toJS(normalizedData));
+    const normalizedInstanceData = normalizeInstanceData(toJS(instance), transformField);
+    const formStore = new FormStore(normalizedInstanceData);
     formStore.toggleReadMode(true);
     const fields = Object.keys(instance.fields);
     return (
@@ -188,11 +186,11 @@ export default class InstanceRow extends React.Component {
         onClick={this.handleClick.bind(this, instance)}
         onDoubleClick={this.handleDoubleClick.bind(this, instance)} >
         <div className={classes.statusAndNameRow}>
-          <Status id={id} darkmode={true} />
-          <div className={classes.nodeType} style={color ? { color: color } : {}} title={label}>
+          <Status id={instance.id} darkmode={true} />
+          <div className={classes.type} style={normalizedInstanceData.primaryType.color ? { color: normalizedInstanceData.primaryType.color } : {}} title={normalizedInstanceData.primaryType.name}>
             <FontAwesomeIcon fixedWidth icon="circle" />
           </div>
-          <div className={classes.name}>{instance.name}</div>
+          <div className={classes.name}>{normalizedInstanceData.name}</div>
         </div>
         <Form store={formStore} >
           {fields.map(field => <Field name={field} key={field} />)}
@@ -214,7 +212,7 @@ export default class InstanceRow extends React.Component {
             <FontAwesomeIcon icon="cog" />
           </div>
         </div>
-        <BookmarkStatus id={id} className="bookmarkStatus" />
+        <BookmarkStatus id={instance.id} className="bookmarkStatus" />
         <div className={classes.separator}></div>
       </div>
     );

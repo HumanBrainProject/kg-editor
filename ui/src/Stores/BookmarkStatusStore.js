@@ -94,7 +94,7 @@ class BookmarkStatusStore{
       if(this.statuses.has(id)){
         const status = this.statuses.get(id);
         if(status.hasChanged && !status.isSaving && !status.isFetching && !status.hasFetchError) {
-          historyStore.updateInstanceHistory(id, "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length);
+          historyStore.updateInstanceHistory(id, [], "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length); // TODO: get instance types
           try {
             status.hasSaveError = false;
             status.isSaving = true;

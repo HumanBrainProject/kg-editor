@@ -29,7 +29,7 @@ class AppStore{
     if (!savedHistorySettings) {
       savedHistorySettings = {
         size: 10,
-        nodeType: "dataset",
+        type: " http://schema.org/Dataset",
         eventTypes: {
           viewed: false,
           edited: true,
@@ -70,8 +70,8 @@ class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  setNodeTypeHistorySetting(nodeType){
-    this.historySettings.nodeType = nodeType;
+  setTypeHistorySetting(type){
+    this.historySettings.type = type;
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 

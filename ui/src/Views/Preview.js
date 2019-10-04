@@ -72,7 +72,7 @@ const styles = {
     marginRight: "5px",
     fontSize: "1em"
   },
-  nodeType: {
+  type: {
     display: "inline-block",
     paddingRight: "8px",
     verticalAlign: "text-bottom",
@@ -137,7 +137,7 @@ export default class Preview extends React.Component {
   );
 
   render() {
-    const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showNodeType=false, showStatus=true, showMetaData=true } = this.props;
+    const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
 
     const instance = instanceId?instanceStore.instances.get(instanceId):null;
     if (!instance) {
@@ -149,7 +149,6 @@ export default class Preview extends React.Component {
       instance && instance.promotedFieldsWithMarkdown;
     const nonPromotedFields =
       instance && instance.nonPromotedFields;
-    const color = showNodeType?instance.data.color[0]:null;
     return (
       <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
         {(!instance.isFetched || instance.isFetching)? (
@@ -166,8 +165,8 @@ export default class Preview extends React.Component {
                 {showBookmarkStatus && (
                   <BookmarkStatus className={classes.bookmarkStatus} id={instanceId} />
                 )}
-                {showNodeType && (
-                  <div className={classes.nodeType} style={color ? { color: color } : {}} title={instance.data?instance.data.label:""}>
+                {showTypes && (
+                  <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
                     <FontAwesomeIcon fixedWidth icon="circle" />
                   </div>
                 )}

@@ -278,8 +278,7 @@ export default class InstanceForm extends React.Component {
                       <Form store={instance.form} key={mainInstanceId}>
                         <HeaderPanel
                           className={classes.panelHeader}
-                          nodeType={instance.nodeType}
-                          color={instance.data && instance.data.typeColors[0]}
+                          types={instance.types}
                           hasChanged={instance.hasChanged} />
 
                         {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
@@ -290,8 +289,8 @@ export default class InstanceForm extends React.Component {
                         }
                         <FooterPanel
                           className={classes.panelFooter}
-                          nexusId={instance.data.id ? instance.data.id : "<new>"}
-                          id={id}
+                          id={id?id:"<new>"}
+                          workspace={instance.workspace}
                           showOpenActions={isCurrentInstance && !isMainInstance} />
                       </Form>
                       <ConfirmCancelEditPanel

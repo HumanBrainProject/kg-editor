@@ -81,7 +81,7 @@ export default class InstanceInvite extends React.Component{
               </FetchingLoader>
               :!instance.hasFetchError?
                 <React.Fragment>
-                  <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showNodeType={true} showStatus={false} showMetaData={false} />
+                  <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
                   <Reviewers id={this.props.id} />
                 </React.Fragment>
                 :

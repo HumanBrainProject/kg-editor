@@ -194,7 +194,7 @@ export default class Edit extends React.Component {
                 showEmptyFields={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showEmptyFields}
                 showAction={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showAction}
                 showBookmarkStatus={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showBookmarkStatus}
-                showNodeType={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showNodeType}
+                showType={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showType}
                 showStatus={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showStatus} />
               <div className={classes.closePreviewBtn} title="close preview" onClick={this.handleHidePreview}>
                 <FontAwesomeIcon icon={"times"} />

@@ -77,13 +77,14 @@ export default class FooterPanel extends React.Component{
   }
 
   render(){
-    const { classes, className, nexusId, id, showOpenActions } = this.props;
+    const { classes, className, id, workspace, showOpenActions } = this.props;
 
     return(
       <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
         <Row>
           <Col xs={10}>
-            <div className={classes.id}>ID: {nexusId}</div>
+            <div className={classes.id}>ID: {id}</div>
+            <div className={classes.id}>Workspace: {workspace}</div>
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>

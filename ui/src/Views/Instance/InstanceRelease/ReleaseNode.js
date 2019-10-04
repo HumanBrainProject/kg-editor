@@ -113,7 +113,7 @@ const styles = {
 export default class ReleaseNode extends React.Component {
   handleOptionPreview = (instanceId, instanceName) => event => {
     event && event.stopPropagation();
-    const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showNodeType:true, showStatus:false };
+    const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
     instanceStore.togglePreviewInstance(instanceId, instanceName, options );
   }
 

@@ -3,6 +3,7 @@ import { uniqueId, find, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 import API from "../Services/API";
 
+import { normalizeInstanceData } from "../Helpers/InstanceHelper";
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
 import browseStore from "./BrowseStore";
@@ -13,9 +14,12 @@ import { matchPath } from "react-router-dom";
 import TypesStore from "./TypesStore";
 
 class Instance {
-  @observable instanceId = null;
-  @observable path = "";
-  @observable data = null;
+  @observable id = null;
+  @observable types = [];
+  @observable name = "";
+  @observable fields = {};
+  @observable alternatives = {};
+  @observable metadata = {};
   @observable form = null;
   @observable cancelChangesPending = null;
   @observable fetchError = null;
@@ -30,10 +34,8 @@ class Instance {
   @observable fieldsToSetAsNull = [];
   @observable fieldErrorsMap = new Map();
 
-  constructor(instanceId, instanceStore) {
-    this.instanceId = instanceId;
-    const [organization, domain, schema, version, ] = instanceId.split("/");
-    this.path = (organization && domain && schema && version)?`${organization}/${domain}/${schema}/${version}`:"";
+  constructor(id, instanceStore) {
+    this.id = id;
     this.instanceStore = instanceStore;
   }
 
@@ -61,36 +63,24 @@ class Instance {
   }
 
   @computed
-  get labelField() {
-    return (this.isFetched && this.data.ui_info)?this.data.ui_info.labelField:null;
-  }
-
-  @computed
-  get name() {
-    if (this.isFetched && this.labelField && this.data.fields) {
-      const field = this.data.fields[this.labelField];
-      if (field && field.value) {
-        return field.value;
-      }
-    }
-    return "";
+  get labelField() { //TODO: or not
+    return (this.isFetched && this.data && this.data.ui_info)?this.data.ui_info.labelField:null;
   }
 
   @computed
   get promotedFields() {
-    const info = TypesStore.typesMap.get(this.nodeType);
-    return (info && info.promotedFields) || [];
+    return []; //TODO:
   }
 
   @computed
   get promotedFieldsWithMarkdown() {
-    return this.promotedFields.filter(name => this.data.fields[name]["markdown"]);
+    return this.promotedFields.filter(name => this.fields[name].markdown);
   }
 
   @computed
   get nonPromotedFields() {
-    if (this.isFetched && !this.fetchError && this.data && this.data.fields) {
-      return Object.keys(this.data.fields).filter(key => !this.promotedFields.includes(key));
+    if (this.isFetched && !this.fetchError && this.fields) {
+      return Object.keys(this.fields).filter(key => !this.promotedFields.includes(key));
     }
     return [];
   }
@@ -98,8 +88,8 @@ class Instance {
   @computed
   get linkedIds() {
     let linkKeys = [];
-    if(this.isFetched){
-      linkKeys = Object.keys(this.data.fields).filter(fieldKey => {
+    if(this.isFetched && !this.fetchError && this.fields){
+      linkKeys = Object.keys(this.fields).filter(fieldKey => {
         return this.form.getField(fieldKey).isLink && this.form.getField(fieldKey).getValue().length > 0;
       });
     }
@@ -114,7 +104,7 @@ class Instance {
       }
     });
 
-    let allIds = [this.instanceId];
+    let allIds = [this.id];
     ids.forEach(i=> {
       if(this.instanceStore.instances.has(i)) {
         const inst = this.instanceStore.instances.get(i);
@@ -125,46 +115,8 @@ class Instance {
   }
 
   @computed
-  get metadata() {
-    if (this.isFetched && !this.fetchError && this.data && this.data.metadata) {
-      let metadata = toJS(this.data.metadata);
-      return Object.keys(metadata).map(key => {
-        if(key == "lastUpdateAt" || key == "createdAt") {
-          let d = new Date(metadata[key]["value"]);
-          metadata[key]["value"] = d.toLocaleString();
-        }
-        return metadata[key];
-      });
-    }
-    return [];
-  }
-
-  @computed
   get isReadMode() {
     return !this.isFetched || (this.form && this.form.readMode);
-  }
-
-  @computed
-  get shortId() {
-    const s = this.instanceId?this.instanceId.split("/"):[];
-    if (s.length === 5) {
-      return s[4];
-    }
-    return "";
-  }
-
-  @computed
-  get schemaName() {
-    const s = this.instanceId?this.instanceId.split("/"):[];
-    if (s.length === 5) {
-      return s[2].charAt(0).toUpperCase() + s[2].slice(1);
-    }
-    return "";
-  }
-
-  @computed
-  get nodeType() {
-    return this.isFetched && this.data && this.data.type && this.data.type.length && this.data.type[0] || "";
   }
 
   @action
@@ -196,7 +148,7 @@ class Instance {
       this.fetchError = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
     }
     else {
-      this.fetchError = `Error while retrieving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+      this.fetchError = `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
     }
     this.hasFetchError = true;
     this.isFetched = false;
@@ -205,7 +157,7 @@ class Instance {
 
   @action
   async save() {
-    historyStore.updateInstanceHistory(this.instanceId, "edited");
+    historyStore.updateInstanceHistory(this.id, this.types, "edited");
 
     this.cancelChangesPending = false;
     this.hasSaveError = false;
@@ -217,7 +169,7 @@ class Instance {
     }
 
     try {
-      const { data } = await API.axios.put(API.endpoints.instanceData(this.instanceId, this.instanceStore.databaseScope), payload);
+      const { data } = await API.axios.put(API.endpoints.instanceData(this.id, this.instanceStore.databaseScope), payload);
       runInAction(() => {
         this.hasChanged = false;
         this.saveError = null;
@@ -232,7 +184,7 @@ class Instance {
       runInAction(() => {
         const message = e.message?e.message:e;
         const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-        this.saveError = `Error while saving instance "${this.instanceId}" (${message}) ${errorMessage}`;
+        this.saveError = `Error while saving instance "${this.id}" (${message}) ${errorMessage}`;
         this.hasSaveError = true;
         this.isSaving = false;
       });
@@ -293,37 +245,10 @@ class InstanceStore {
   }
 
   fetchInstance(instance){
-    if(!this.instancesQueue.has(instance.instanceId)){
-      this.instancesQueue.set(instance.instanceId, instance);
+    if(!this.instancesQueue.has(instance.id)){
+      this.instancesQueue.set(instance.id, instance);
       this.processQueue();
     }
-  }
-
-  normalizeData(data, transformField) {
-    if (!data) {
-      return {fields: [], alternatives: []};
-    }
-    for(let fieldKey in data.fields) {
-      let field = data.fields[fieldKey];
-      typeof transformField === "function"  && transformField(field);
-      if(field.type === "InputText"){
-        field.type = "KgInputText";
-      } else if(field.type === "TextArea"){
-        field.type = "KgTextArea";
-      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
-        if(field.type === "DropdownSelect") {
-          field.type = "DynamicDropdown";
-        }
-        field.optionsUrl = field.instancesPath;
-        field.instanceType = data.type[0];
-        field.isLink = true;
-        field.mappingLabel = "name";
-        field.mappingValue = "id";
-        field.mappingReturn = ["id"];
-        field.closeDropdownAfterInteraction = true;
-      }
-    }
-    return data;
   }
 
   @action
@@ -367,13 +292,20 @@ class InstanceStore {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = find(response.data.data, (item) => item.id === instance.instanceId);
+            const data = find(response.data.data, item => item.id === instance.id);
             if(data){
-              const normalizedData = this.normalizeData(data?data:{fields: [], alternatives: []});
-              instance.data = normalizedData;
+              const normalizedData =  normalizeInstanceData(data);
+              instance.types = normalizedData.types;
+              instance.name = normalizedData.name;
+              instance.fields = normalizedData.fields;
+              instance.alternatives = normalizedData.alternatives;
+              instance.metadata = normalizedData.metadata;
               instance.form = new FormStore(normalizedData);
               instance.isFetching = false;
               instance.isFetched = true;
+              if(this.openedInstances.has(instance.id)){
+                historyStore.updateInstanceHistory(instance.id, instance.types, "viewed");
+              }
               instance.memorizeInstanceInitialValues();
               instance.form.toggleReadMode(instance.instanceStore.globalReadMode);
             } else {
@@ -425,8 +357,11 @@ class InstanceStore {
     if (!readMode && viewMode === "edit" && !TypesStore.isFetched) {
       TypesStore.fetch();
     }
-    historyStore.updateInstanceHistory(instanceId, "viewed");
     if(this.openedInstances.has(instanceId)){
+      const instance = this.instances.get(instanceId);
+      if (instance && instance.isFetched && !instance.fetchError) {
+        historyStore.updateInstanceHistory(instance.id, instance.types, "viewed");
+      }
       this.openedInstances.get(instanceId).viewMode = viewMode;
       this.syncStoredOpenedTabs();
     } else {
@@ -436,7 +371,11 @@ class InstanceStore {
         paneStore: new PaneStore()
       });
       const instance = this.createInstanceOrGet(instanceId);
-      instance.fetch();
+      if(instance.isFetched && !instance.fetchError) {
+        historyStore.updateInstanceHistory(instance.id, instance.types, "viewed");
+      } else {
+        instance.fetch();
+      }
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
     }

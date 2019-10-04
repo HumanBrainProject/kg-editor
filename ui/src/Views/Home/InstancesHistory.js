@@ -10,9 +10,15 @@ import routerStore from "../../Stores/RouterStore";
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
 
-const nodeTypes = [
-  "dataset",
-  "person"
+const types = [
+  {
+    name: "http://schema.org/Dataset",
+    label: "Dataset"
+  },
+  {
+    name: "http://schema.org/Person",
+    label: "Person"
+  }
 ];
 
 const styles = {
@@ -115,7 +121,7 @@ export default class InstancesHistory extends React.Component{
       }
       return result;
     }, []);
-    const history = historyStore.getFileredInstancesHistory(appStore.historySettings.nodeType, eventTypes, appStore.historySettings.size);
+    const history = historyStore.getFileredInstancesHistory(appStore.historySettings.type, eventTypes, appStore.historySettings.size);
     historyStore.fetchInstances(history);
   }
 
@@ -124,8 +130,8 @@ export default class InstancesHistory extends React.Component{
     this.fetchInstances();
   }
 
-  handleHistoryNodeTypeChange = event => {
-    appStore.setNodeTypeHistorySetting(event.target.value);
+  handleHistoryTypeChange = event => {
+    appStore.setTypeHistorySetting(event.target.value);
     this.fetchInstances();
   }
 
@@ -187,9 +193,9 @@ export default class InstancesHistory extends React.Component{
               </select>
             </div>
             <div className="selector">
-              <select value={appStore.historySettings.nodeType?appStore.historySettings.nodeType:""} onChange={this.handleHistoryNodeTypeChange} >
+              <select value={appStore.historySettings.type?appStore.historySettings.type:""} onChange={this.handleHistoryTypeChange} >
                 <option value="">instances</option>
-                {nodeTypes.map(nodeType => <option key={nodeType} value={nodeType}>{nodeType}s</option>)}
+                {types.map(type => <option key={type.name} value={type.name}>{type.label}</option>)}
               </select>
             </div>
           </h3>
@@ -201,13 +207,13 @@ export default class InstancesHistory extends React.Component{
           </ul>
         </div>
         {historyStore.isFetching?
-          <div className={classes.fetching}><FontAwesomeIcon icon="circle-notch" spin/><span>Fetching history {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"}s...</span></div>
+          <div className={classes.fetching}><FontAwesomeIcon icon="circle-notch" spin/><span>Fetching history {appStore.historySettings.type?appStore.historySettings.type:"instance"}s...</span></div>
           :
           historyStore.fetchError?
             <div className={classes.fetchError}>
               <PopOverButton
                 buttonClassName={classes.fetchErrorButton}
-                buttonTitle={`fetching history ${appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"}s failed, click for more information`}
+                buttonTitle={`fetching history ${appStore.historySettings.type?appStore.historySettings.type:"instance"}s failed, click for more information`}
                 iconComponent={FontAwesomeIcon}
                 iconProps={{icon: "exclamation-triangle"}}
                 okComponent={() => (
@@ -219,7 +225,7 @@ export default class InstancesHistory extends React.Component{
               >
                 <h5 className={classes.textError}>{historyStore.fetchError}</h5>
               </PopOverButton>
-              <span>fetching history {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"}s failed.</span>
+              <span>fetching history {appStore.historySettings.type?appStore.historySettings.type:"instance"}s failed.</span>
             </div>
             :
             historyStore.instances.length?
@@ -233,7 +239,7 @@ export default class InstancesHistory extends React.Component{
                 })}
               </ul>
               :
-              <div className={classes.noHistory}>No {appStore.historySettings.nodeType?appStore.historySettings.nodeType:"instance"} matches your filters in your history.</div>
+              <div className={classes.noHistory}>No instances matches your filters in your history.</div>
         }
       </div>
     );

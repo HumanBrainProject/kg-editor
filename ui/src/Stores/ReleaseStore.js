@@ -223,7 +223,7 @@ class ReleaseStore{
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.type}) released successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node["relativeUrl"], "released");
+        historyStore.updateInstanceHistory(node["relativeUrl"], [], "released"); // TODO: pass the types
       });
     } catch(e){
       runInAction(()=>{
@@ -245,7 +245,7 @@ class ReleaseStore{
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node["relativeUrl"], "released", true);
+        historyStore.updateInstanceHistory(node["relativeUrl"], [], "released", true); // TODO: pass the types
       });
     } catch(e){
       runInAction(()=>{

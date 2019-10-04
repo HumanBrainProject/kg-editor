@@ -19,7 +19,7 @@ const styles = {
     color:"#e67e22"
   },
   type: {
-    paddingRight: "10px" 
+    paddingRight: "10px"
   }
 };
 

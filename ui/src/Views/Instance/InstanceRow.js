@@ -6,7 +6,6 @@ import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
 import { normalizeInstanceData } from "../../Helpers/InstanceHelper";
-import InstanceStore from "../../Stores/InstanceStore";
 import { toJS } from "mobx";
 
 const styles = {

@@ -17,7 +17,6 @@ import "./Services/IconsImport";
 import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
-import TypesStore from "./Stores/TypesStore";
 import instanceStore from "./Stores/InstanceStore";
 import browseStore from "./Stores/BrowseStore";
 
@@ -431,9 +430,6 @@ class App extends React.Component {
   }
 
   handleCreateInstance = () => {
-    if (!TypesStore.isFetched) {
-      TypesStore.fetch();
-    }
     instanceStore.toggleShowCreateModal();
   }
 
@@ -534,20 +530,23 @@ class App extends React.Component {
                 <Route component={Login} />
                 :
                 authStore.isFullyAuthenticated ?
-                  <Switch>
-                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
-                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
-                    <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
-                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
-                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
-                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
+                  authStore.hasWorkspaces && authStore.currentWorkspace?
+                    <Switch>
+                      <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
+                      <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
+                      <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
+                      <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
+                      <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
+                      <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
 
-                    <Route path="/browse" exact={true} component={Browse} />
-                    <Route path="/help" component={Help} />
-                    {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                    <Route path="/" exact={true} component={Home} />
-                    <Route component={NotFound} />
-                  </Switch>
+                      <Route path="/browse" exact={true} component={Browse} />
+                      <Route path="/help" component={Help} />
+                      {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
+                      <Route path="/" exact={true} component={Home} />
+                      <Route component={NotFound} />
+                    </Switch>
+                    :
+                    <Route component={Home} />
                   : null
             }
             {authStore.isAuthenticated && !authStore.hasUserProfile && (

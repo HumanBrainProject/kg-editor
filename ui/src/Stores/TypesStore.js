@@ -6,10 +6,6 @@ class TypesStore {
   @observable fetchError = null;
   @observable isFetching = false;
 
-  constructor() {
-    this.fetch();
-  }
-
   filteredList(term) {
     if(term.trim()) {
       return this.types.filter(type => type.label.toLowerCase().includes(term.trim().toLowerCase()));
@@ -49,7 +45,7 @@ class TypesStore {
         });
       } catch (e) {
         const message = e.message ? e.message : e;
-        this.fetchError = `Error while fetching api structure (${message})`;
+        this.fetchError = `Error while fetching types (${message})`;
         this.isFetching = false;
       }
     }

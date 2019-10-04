@@ -157,7 +157,8 @@ class Instance {
 
   @action
   async save() {
-    historyStore.updateInstanceHistory(this.id, this.types, "edited");
+    const types = this.types.map(({name}) => name);
+    historyStore.updateInstanceHistory(this.id, types, "edited");
 
     this.cancelChangesPending = false;
     this.hasSaveError = false;
@@ -304,7 +305,8 @@ class InstanceStore {
               instance.isFetching = false;
               instance.isFetched = true;
               if(this.openedInstances.has(instance.id)){
-                historyStore.updateInstanceHistory(instance.id, instance.types, "viewed");
+                const types = instance.types.map(({name}) => name);
+                historyStore.updateInstanceHistory(instance.id, types, "viewed");
               }
               instance.memorizeInstanceInitialValues();
               instance.form.toggleReadMode(instance.instanceStore.globalReadMode);
@@ -360,7 +362,8 @@ class InstanceStore {
     if(this.openedInstances.has(instanceId)){
       const instance = this.instances.get(instanceId);
       if (instance && instance.isFetched && !instance.fetchError) {
-        historyStore.updateInstanceHistory(instance.id, instance.types, "viewed");
+        const types = instance.types.map(({name}) => name);
+        historyStore.updateInstanceHistory(instance.id, types, "viewed");
       }
       this.openedInstances.get(instanceId).viewMode = viewMode;
       this.syncStoredOpenedTabs();
@@ -372,7 +375,8 @@ class InstanceStore {
       });
       const instance = this.createInstanceOrGet(instanceId);
       if(instance.isFetched && !instance.fetchError) {
-        historyStore.updateInstanceHistory(instance.id, instance.types, "viewed");
+        const types = instance.types.map(({name}) => name);
+        historyStore.updateInstanceHistory(instance.id, types, "viewed");
       } else {
         instance.fetch();
       }

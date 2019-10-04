@@ -114,6 +114,16 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     }
   }
 
+  // TODO Consider moving the method to a new service file
+  def retrieveClientToken(): Task[Either[APIEditorError, JsObject]] = {
+    val result = instanceApiService
+      .getClientToken(wSClient, config.kgCoreEndpoint, config.clientSecret)
+    result.map {
+      case Right(ref) => Right(ref)
+      case Left(res)  => Left(APIEditorError(res.status, res.body))
+    }
+  }
+
   def releaseInstance(
     nexusInstanceReference: NexusInstanceReference,
     token: AccessToken

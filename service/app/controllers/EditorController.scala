@@ -32,7 +32,6 @@ import services._
 import services.specification.{FormOp, FormService}
 
 import scala.concurrent.ExecutionContext
-import scala.util.Try
 
 @Singleton
 class EditorController @Inject()(
@@ -156,6 +155,17 @@ class EditorController @Inject()(
             Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
         }
       result.runToFuture
+    }
+
+  def getClientToken: Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      editorService
+        .retrieveClientToken()
+        .map {
+          case Left(err)    => err.toResult
+          case Right(value) => Ok(value)
+        }
+        .runToFuture
     }
 
   def getInstancesList(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =

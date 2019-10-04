@@ -1,0 +1,13 @@
+###
+  #  summary: Get the current token as an Editor client
+  #  parameters:
+  #  - in: header
+  #    name: Authorization
+  #    description: Authorization token
+  #    required: false
+  #    type: string
+  #  responses:
+  #    200:
+  #      description: "Ok"
+  ###
+  GET   /token                                            controllers.EditorController.getClientToken

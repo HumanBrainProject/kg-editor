@@ -1,8 +1,9 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Dropdown, MenuItem } from "react-bootstrap";
 import injectStyles from "react-jss";
 import authStore from "../Stores/AuthStore";
+import CustomDropdownToggle from "./CustomDropdownToggle";
 
 const styles = {
   container: {
@@ -15,7 +16,15 @@ const styles = {
     borderLeft: "none",
     cursor: "pointer",
     display: "grid",
-    gridTemplateColumns: "auto 1fr auto"
+    gridTemplateColumns: "auto 1fr auto",
+    "& .btn-group": {
+      margin: "-2px"
+    }
+  },
+  dropdownMenu: {
+    background: "var(--ft-color-loud)",
+    margin: "0 0 0 -20px",
+    fontSize: "0.9em"
   }
 };
 
@@ -23,27 +32,26 @@ const styles = {
 @observer
 export default class WorkspaceSelector extends React.Component {
 
-  selectWorkspace = (eventKey) => authStore.setCurrentWorkspace(eventKey);
+  selectWorkspace = eventKey => authStore.setCurrentWorkspace(eventKey);
 
   render() {
     const { classes } = this.props;
 
     return (
-      <div className={`${classes.container}`}>
+      <div className={classes.container} title={`${authStore.currentWorkspace} workspace`}>
         {authStore.workspaces.length > 1 ?
-          <DropdownButton
-            id="dropdown-menu"
-            title={authStore.currentWorkspace}
-            key={authStore.currentWorkspace}
-          >
-            {authStore.workspaces.map(workspace =>
-              <MenuItem key={workspace}
-                eventKey={workspace}
-                active={workspace === authStore.currentWorkspace}
-                onSelect={this.selectWorkspace}>
-                {workspace}</MenuItem>
-            )}
-          </DropdownButton> : authStore.currentWorkspace}
+          <Dropdown id="dropdown-custom-1">
+            <CustomDropdownToggle bsRole="toggle">{authStore.currentWorkspace}</CustomDropdownToggle>
+            <Dropdown.Menu className={classes.dropdownMenu}>
+              {authStore.workspaces.map(workspace =>
+                <MenuItem key={workspace}
+                  eventKey={workspace}
+                  onSelect={this.selectWorkspace}>
+                  {workspace}</MenuItem>
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
+          : authStore.currentWorkspace}
       </div>
     );
   }

@@ -7,8 +7,9 @@ class TypesStore {
   @observable isFetching = false;
 
   filteredList(term) {
-    if(term.trim()) {
-      return this.types.filter(type => type.label.toLowerCase().includes(term.trim().toLowerCase()));
+    term = typeof term === "string" && term.trim().toLowerCase();
+    if(term) {
+      return this.types.filter(type => type && typeof type.label === "string" && type.label.toLowerCase().includes(term));
     }
     return this.types;
   }

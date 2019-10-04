@@ -22,8 +22,9 @@ class BookmarkStore {
   }
 
   filteredList(term) {
-    if(term.trim()) {
-      return this.list.filter(bookmark => bookmark.label.toLowerCase().includes(term.trim().toLowerCase()));
+    term = typeof term === "string" && term.trim().toLowerCase();
+    if(term) {
+      return this.list.filter(bookmark => bookmark && typeof bookmark.label === "string" && bookmark.label.toLowerCase().includes(term));
     }
     return this.list;
   }

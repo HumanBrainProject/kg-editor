@@ -10,6 +10,22 @@ import browseStore from "../../Stores/BrowseStore";
 import BookmarksItem from "./BookmarksItem";
 
 const styles = {
+  folder: {
+    "& .fetchingPanel": {
+      position: "unset !important",
+      top: "unset",
+      left: "unset",
+      transform: "unset",
+      width: "auto",
+      margin: "0 33px",
+      padding: "3px 6px",
+      borderRadius: "3px",
+      background: "rgba(255,255,255, 0.05)",
+      color: "var(--ft-color-quiet)",
+      fontSize: "1em",
+      textAlign: "left"
+    }
+  },
   folderName: {
     color: "var(--ft-color-quiet)",
     textTransform: "uppercase",
@@ -19,13 +35,16 @@ const styles = {
     cursor: "pointer"
   },
   fetchErrorPanel: {
+    margin: "0 34px",
+    padding: "3px",
+    borderRadius: "4px",
+    backgroundColor: "rgba(255,255,255,0.05)",
     textAlign: "center",
     fontSize: "0.9em",
     wordBreak: "break-all",
-    padding: "40px 20px",
     "& .btn": {
-      width: "100%",
-      marginTop: "20px"
+      width: "100px",
+      margin: "10px 6px 6px 6px"
     },
     color: "var(--ft-color-error)"
   },
@@ -56,25 +75,28 @@ export default class Bookmarks extends React.Component {
   render() {
     const { classes } = this.props;
     const list = bookmarkStore.filteredList(browseStore.navigationFilter);
+    if (!bookmarkStore.fetchError && !bookmarkStore.isFetching && !list.length) {
+      return null;
+    }
     return (
-      !bookmarkStore.fetchError ?
-        !bookmarkStore.isFetching ?
-          !!list.length &&
-            <div className={classes.folder}>
-              <div className={classes.folderName} onClick={this.handleToggleBookmarks}>
-                <FontAwesomeIcon fixedWidth icon={this.state.showBookmarks ? "caret-down" : "caret-right"} /> &nbsp; My Bookmarks
-              </div>
-              {this.state.showBookmarks && list.map(bookmark => <BookmarksItem key={bookmark.id} bookmark={bookmark}/>)}
-            </div>
-          :
-          <FetchingLoader>
-            Fetching bookmarks
-          </FetchingLoader>
-        :
-        <div className={classes.fetchErrorPanel}>
-          <div>{bookmarkStore.fetchError}</div>
-          <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
+      <div className={classes.folder}>
+        <div className={classes.folderName} onClick={this.handleToggleBookmarks}>
+          <FontAwesomeIcon fixedWidth icon={this.state.showBookmarks ? "caret-down" : "caret-right"} /> &nbsp; My Bookmarks
         </div>
+        {!bookmarkStore.fetchError ?
+          !bookmarkStore.isFetching ?
+            this.state.showBookmarks && list.map(bookmark =>
+              <BookmarksItem key={bookmark.id} bookmark={bookmark}/>
+            )
+            :
+            <FetchingLoader>fetching...</FetchingLoader>
+          :
+          <div className={classes.fetchErrorPanel}>
+            <div>{bookmarkStore.fetchError}</div>
+            <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
+          </div>
+        }
+      </div>
     );
   }
 }

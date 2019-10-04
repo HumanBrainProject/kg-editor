@@ -9,6 +9,22 @@ import FetchingLoader from "../../Components/FetchingLoader";
 import TypesItem from "./TypesItem";
 
 const styles = {
+  folder: {
+    "& .fetchingPanel": {
+      position: "unset !important",
+      top: "unset",
+      left: "unset",
+      transform: "unset",
+      width: "auto",
+      margin: "0 33px",
+      padding: "3px 6px",
+      borderRadius: "3px",
+      background: "rgba(255,255,255, 0.05)",
+      color: "var(--ft-color-quiet)",
+      fontSize: "1em",
+      textAlign: "left"
+    }
+  },
   folderName: {
     color: "var(--ft-color-quiet)",
     textTransform: "uppercase",
@@ -18,19 +34,18 @@ const styles = {
     cursor: "pointer"
   },
   fetchErrorPanel: {
+    margin: "0 34px",
+    padding: "3px",
+    borderRadius: "4px",
+    backgroundColor: "rgba(255,255,255,0.05)",
     textAlign: "center",
     fontSize: "0.9em",
     wordBreak: "break-all",
-    padding: "40px 20px",
     "& .btn": {
-      width: "100%",
-      marginTop: "20px"
+      width: "100px",
+      margin: "10px 6px 6px 6px"
     },
     color: "var(--ft-color-error)"
-  },
-  noResultPanel: {
-    extend: "fetchErrorPanel",
-    color: "var(--ft-color-loud)"
   }
 };
 
@@ -44,32 +59,38 @@ export default class Types extends React.Component {
     };
   }
 
+  componentDidMount() {
+    TypesStore.fetch();
+  }
+
   handleLoadRetry = () => TypesStore.fetch();
   handleToggleType = () => this.setState((state) => ({ showTypes: !state.showTypes }));
 
   render() {
     const { classes } = this.props;
     const list = TypesStore.filteredList(browseStore.navigationFilter);
+    if (!TypesStore.fetchError && !TypesStore.isFetching && !list.length) {
+      return null;
+    }
     return (
-      !TypesStore.fetchError ?
-        !TypesStore.isFetching ?
-          list.length ?
-            (<div className={classes.folder}>
-              <div className={classes.folderName} onClick={this.handleToggleType}>
-                <FontAwesomeIcon fixedWidth icon={this.state.showTypes ? "caret-down" : "caret-right"} /> &nbsp;
-                Types
-              </div>
-              {this.state.showTypes && list.map(type => <TypesItem key={type.label} type={type} />)}
-            </div>) : null
-          :
-          <FetchingLoader>
-            Fetching types
-          </FetchingLoader>
-        :
-        <div className={classes.fetchErrorPanel}>
-          <div>{TypesStore.fetchError}</div>
-          <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
+      <div className={classes.folder}>
+        <div className={classes.folderName} onClick={this.handleToggleBookmarks}>
+          <FontAwesomeIcon fixedWidth icon={this.state.showBookmarks ? "caret-down" : "caret-right"} /> &nbsp;Types
         </div>
+        {!TypesStore.fetchError ?
+          !TypesStore.isFetching ?
+            this.state.showTypes && list.map(type =>
+              <TypesItem key={type.label} type={type}/>
+            )
+            :
+            <FetchingLoader>fetching...</FetchingLoader>
+          :
+          <div className={classes.fetchErrorPanel}>
+            <div>{TypesStore.fetchError}</div>
+            <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
+          </div>
+        }
+      </div>
     );
   }
 }

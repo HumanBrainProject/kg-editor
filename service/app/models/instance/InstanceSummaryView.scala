@@ -21,6 +21,7 @@ import play.api.libs.json.{JsObject, JsPath, JsValue, Json, Reads, Writes}
 
 final case class InstanceSummaryView(
   id: String,
+  workspace: String,
   typeNames: List[String],
   typeLabels: Option[List[String]],
   typeColors: Option[List[String]],
@@ -45,6 +46,7 @@ object InstanceSummaryView {
         Some(
           InstanceSummaryView(
             instanceId,
+            "minds", //TODO: replace by real workspace
             structure.typeName,
             InstanceHelper.toOptionalList(structure.typeLabel),
             InstanceHelper.toOptionalList(structure.typeColor),

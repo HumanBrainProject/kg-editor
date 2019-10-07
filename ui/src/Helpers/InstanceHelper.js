@@ -1,5 +1,5 @@
 export const normalizeInstanceData = (data, transformField) => {
-  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: [], alternatives: [], metadata: {}};
+  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: [], promotedFields: [], alternatives: [], metadata: {}};
   if (!data) {
     return instance;
   }
@@ -16,12 +16,14 @@ export const normalizeInstanceData = (data, transformField) => {
       instance.primaryType = instance.types[0];
     }
   }
-  data.workspace = "minds"; //TODO: remove
   if (data.workspace) {
     instance.workspace = data.workspace;
   }
   if (data.name) {
     instance.name = data.name;
+  }
+  if (data.promotedFields instanceof Array) {
+    instance.promotedFields = data.promotedFields;
   }
   if (typeof data.fields === "object") {
     for(let fieldKey in data.fields) {

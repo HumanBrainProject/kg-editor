@@ -31,15 +31,12 @@ export default class CompareChanges extends React.Component{
     const beforeValues = formStoreBefore.getValues();
     const afterValues = formStoreAfter.getValues();
 
-    const promotedFields = instance.promotedFields;
-    const nonPromotedFields = instance.nonPromotedFields;
-
     return(
       <div className={classes.container}>
-        {promotedFields.map(key => (
+        {instance.promotedFields.map(key => (
           <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
         ))}
-        {nonPromotedFields.map(key => (
+        {instance.nonPromotedFields.map(key => (
           <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
         ))}
       </div>

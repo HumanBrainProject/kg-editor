@@ -241,9 +241,6 @@ export default class InstanceForm extends React.Component {
       return className;
     };
 
-    const promotedFields = instance.promotedFields;
-    const nonPromotedFields = instance.nonPromotedFields;
-
     return (
       <div className={panelClassName()} data-id={this.props.id}>
         {instance.hasFetchError?
@@ -283,8 +280,8 @@ export default class InstanceForm extends React.Component {
 
                         {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
                           <React.Fragment>
-                            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={promotedFields} disableLinks={!isCurrentInstance} />
-                            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
+                            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.promotedFields} disableLinks={!isCurrentInstance} />
+                            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
                           </React.Fragment>
                         }
                         <FooterPanel

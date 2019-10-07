@@ -21,6 +21,7 @@ import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceLabelView(
   id: String,
+  workspace: String,
   `type`: List[String],
   typeLabels: Option[List[String]],
   typeColors: Option[List[String]],
@@ -40,6 +41,7 @@ object InstanceLabelView {
         Some(
           InstanceLabelView(
             instanceId,
+            "minds", //TODO: replace by real workspace
             structure.typeName,
             InstanceHelper.toOptionalList(structure.typeLabel),
             InstanceHelper.toOptionalList(structure.typeColor),

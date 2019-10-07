@@ -68,11 +68,6 @@ class Instance {
   }
 
   @computed
-  get promotedFields() {
-    return []; //TODO:
-  }
-
-  @computed
   get promotedFieldsWithMarkdown() {
     return this.promotedFields.filter(name => this.fields[name].markdown);
   }
@@ -300,6 +295,7 @@ class InstanceStore {
               instance.types = normalizedData.types;
               instance.name = normalizedData.name;
               instance.fields = normalizedData.fields;
+              instance.promotedFields = normalizedData.promotedFields;
               instance.alternatives = normalizedData.alternatives;
               instance.metadata = normalizedData.metadata;
               instance.form = new FormStore(normalizedData);

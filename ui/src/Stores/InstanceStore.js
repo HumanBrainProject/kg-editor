@@ -296,6 +296,7 @@ class InstanceStore {
             const data = find(response.data.data, item => item.id === instance.id);
             if(data){
               const normalizedData =  normalizeInstanceData(data);
+              instance.workspace = normalizedData.workspace;
               instance.types = normalizedData.types;
               instance.name = normalizedData.name;
               instance.fields = normalizedData.fields;

@@ -12,12 +12,14 @@ const styles = {
       width:"100%"
     }
   },
-  id:{
-    paddingBottom: "10px",
+  info:{
     color:"grey",
     fontWeight:"300",
     fontSize:"0.7em",
-    wordBreak: "break-all"
+    wordBreak: "break-all",
+    "&:last-child": {
+      paddingBottom: "10px"
+    }
   },
   showActions:{
     "&$panel":{
@@ -83,8 +85,8 @@ export default class FooterPanel extends React.Component{
       <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
         <Row>
           <Col xs={10}>
-            <div className={classes.id}>ID: {id}</div>
-            <div className={classes.id}>Workspace: {workspace}</div>
+            <div className={classes.info}>ID: {id}</div>
+            <div className={classes.info}>Workspace: {workspace}</div>
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>

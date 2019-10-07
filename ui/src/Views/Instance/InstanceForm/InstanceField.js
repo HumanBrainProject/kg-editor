@@ -67,7 +67,7 @@ export default class InstanceField extends React.Component{
 
   componentDidMount() {
     const { instance, name } = this.props;
-    const field = instance.data.fields[name];
+    const field = instance.fields[name];
     if(field && field.type === "KgTable") {
       const store = instance.form.structure.fields[name];
       store.isInteractive = true;
@@ -158,7 +158,7 @@ export default class InstanceField extends React.Component{
 
   render(){
     const { classes, name, instance, disableLinks } = this.props;
-    const field = instance.data.fields[name];
+    const field = instance.fields[name];
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;

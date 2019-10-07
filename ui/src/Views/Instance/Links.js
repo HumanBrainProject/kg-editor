@@ -42,7 +42,7 @@ class Links extends React.Component{
     const currentInstancePath = mainInstance.currentInstancePath;
     let linkKeys = [];
     if(instance.isFetched){
-      linkKeys = Object.keys(instance.data.fields).filter(fieldKey => {
+      linkKeys = Object.keys(instance.fields).filter(fieldKey => {
         return instance.form.getField(fieldKey).isLink && instance.form.getField(fieldKey).getValue().length > 0;
       });
     }

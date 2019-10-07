@@ -169,7 +169,7 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
       const instance = instanceStore.instances.get(value.id);
       if (instance && instance.isFetched) {
         const labelFieldName = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
-        const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
+        const labelField = labelFieldName && instance.fields && instance.fields[labelFieldName];
         if (labelField) {
           return labelField.value;
         }

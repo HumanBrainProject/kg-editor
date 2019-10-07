@@ -38,5 +38,6 @@ class ConfigurationService @Inject()(configuration: Configuration) {
   val authEndpoint = configuration.get[String]("auth.endpoint")
   val idmApiEndpoint = s"$authEndpoint/idm/v1/api"
   val editorSubSpace = configuration.getOptional[String]("editor.subspace").getOrElse("editor")
+  val clientSecret = configuration.get[String]("client.secret")
 
 }

@@ -22,9 +22,7 @@ import play.api.libs.json.{JsObject, JsPath, JsValue, Json, Reads, Writes}
 final case class InstanceSummaryView(
   id: String,
   workspace: String,
-  typeNames: List[String],
-  typeLabels: Option[List[String]],
-  typeColors: Option[List[String]],
+  types: List[InstanceType],
   name: Option[String],
   fields: Map[String, Field]
 ) extends Instance
@@ -47,9 +45,7 @@ object InstanceSummaryView {
           InstanceSummaryView(
             instanceId,
             "minds", //TODO: replace by real workspace
-            structure.typeName,
-            InstanceHelper.toOptionalList(structure.typeLabel),
-            InstanceHelper.toOptionalList(structure.typeColor),
+            structure.types.values.toList,
             InstanceHelper.getName(data, structure.labelField.headOption),
             InstanceHelper.getFields(data, filteredFields)
           )
@@ -58,16 +54,5 @@ object InstanceSummaryView {
     }
   }
 
-  implicit val instanceSummaryViewWrites: Writes[InstanceSummaryView] = new Writes[InstanceSummaryView] {
-
-    def writes(v: InstanceSummaryView): JsValue =
-      Json.obj(
-        "id"         -> Json.toJson(v.id),
-        "type"       -> Json.toJson(v.typeNames),
-        "typeLabels" -> Json.toJson(v.typeLabels),
-        "typeColors" -> Json.toJson(v.typeColors),
-        "name"       -> Json.toJson(v.name),
-        "fields"     -> Json.toJson(v.fields)
-      )
-  }
+  implicit val instanceSummaryViewWrites = Json.writes[InstanceSummaryView]
 }

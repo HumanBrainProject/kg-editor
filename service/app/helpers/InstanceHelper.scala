@@ -25,7 +25,6 @@ import models.instance.{
   InstanceSummaryView,
   InstanceView,
   StructureOfField,
-  StructureOfInstance,
   StructureOfType
 }
 import play.api.libs.json.{JsObject, JsString}
@@ -66,7 +65,7 @@ object InstanceHelper {
 
   def getTypeInfoMap(list: List[StructureOfType]): Map[String, StructureOfType] =
     list.foldLeft(Map[String, StructureOfType]()) {
-      case (map, typeInfo) => map.updated(typeInfo.fieldType, typeInfo)
+      case (map, typeInfo) => map.updated(typeInfo.`type`.name, typeInfo)
     }
 
   def getFields(data: JsObject, fieldsInfo: Map[String, StructureOfField]): Map[String, Field] =

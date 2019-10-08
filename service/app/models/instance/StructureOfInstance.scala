@@ -17,15 +17,13 @@
 package models.instance
 
 final case class StructureOfInstance(
-  typeName: List[String],
-  typeLabel: List[String],
-  typeColor: List[String],
+  types: Map[String, InstanceType],
   labelField: List[String],
   promotedFields: List[String],
   fields: Map[String, StructureOfField]
 ) {
 
-  def ++(typeInfo: StructureOfType): StructureOfInstance = {
+  def add(typeInfo: StructureOfType): StructureOfInstance = {
     val pf = typeInfo.promotedFields match {
       case Some(value) => value
       case _           => List()
@@ -34,9 +32,7 @@ final case class StructureOfInstance(
       case (map, (name, value)) => map.updated(name, value)
     }
     StructureOfInstance(
-      typeName :+ typeInfo.fieldType,
-      typeLabel :+ typeInfo.label,
-      typeColor :+ typeInfo.color,
+      types.updated(typeInfo.`type`.name, typeInfo.`type`),
       labelField :+ typeInfo.labelField,
       (promotedFields ::: pf).distinct,
       f
@@ -49,10 +45,10 @@ object StructureOfInstance {
 
   def apply(instanceTypes: List[String], typeInfoMap: Map[String, StructureOfType]): StructureOfInstance =
     instanceTypes
-      .foldLeft(StructureOfInstance(List(), List(), List(), List(), List(), Map())) {
+      .foldLeft(StructureOfInstance(Map(), List(), List(), Map())) {
         case (acc, typeName) =>
           typeInfoMap.get(typeName) match {
-            case Some(typeInfo) => acc ++ typeInfo
+            case Some(typeInfo) => acc add typeInfo
             case _              => acc
           }
       }

@@ -6,12 +6,8 @@ export const normalizeInstanceData = (data, transformField) => {
   if (data.id) {
     instance.id = data.id;
   }
-  if (data.type instanceof Array) {
-    instance.types = data.type.map((type, index) => ({
-      name: type,
-      label: (data.typeLabels instanceof Array && data.typeLabels.length > index)?data.typeLabels[index]:"",
-      color: (data.typeColors instanceof Array && data.typeColors.length > index)?data.typeColors[index]:""
-    }));
+  if (data.types instanceof Array) {
+    instance.types = data.types;
     if (instance.types.length) {
       instance.primaryType = instance.types[0];
     }

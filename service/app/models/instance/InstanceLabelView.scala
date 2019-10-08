@@ -19,14 +19,8 @@ package models.instance
 import helpers.InstanceHelper
 import play.api.libs.json.{JsObject, Json}
 
-final case class InstanceLabelView(
-  id: String,
-  workspace: String,
-  `type`: List[String],
-  typeLabels: Option[List[String]],
-  typeColors: Option[List[String]],
-  name: Option[String]
-) extends Instance
+final case class InstanceLabelView(id: String, workspace: String, types: List[InstanceType], name: Option[String])
+    extends Instance
 
 object InstanceLabelView {
 
@@ -42,9 +36,7 @@ object InstanceLabelView {
           InstanceLabelView(
             instanceId,
             "minds", //TODO: replace by real workspace
-            structure.typeName,
-            InstanceHelper.toOptionalList(structure.typeLabel),
-            InstanceHelper.toOptionalList(structure.typeColor),
+            structure.types.values.toList,
             InstanceHelper.getName(data, structure.labelField.headOption)
           )
         )

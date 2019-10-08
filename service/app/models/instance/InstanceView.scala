@@ -22,9 +22,7 @@ import play.api.libs.json.{JsObject, Json}
 final case class InstanceView(
   id: String,
   workspace: String,
-  `type`: List[String],
-  typeLabels: Option[List[String]],
-  typeColors: Option[List[String]],
+  types: List[InstanceType],
   promotedFields: Option[List[String]],
   name: Option[String],
   fields: Map[String, Field]
@@ -44,9 +42,7 @@ object InstanceView {
           InstanceView(
             instanceId,
             "minds", //TODO: replace by real workspace
-            structure.typeName,
-            InstanceHelper.toOptionalList(structure.typeLabel),
-            InstanceHelper.toOptionalList(structure.typeColor),
+            structure.types.values.toList,
             InstanceHelper.toOptionalList(structure.promotedFields),
             InstanceHelper.getName(data, structure.labelField.headOption),
             InstanceHelper.getFields(data, structure.fields)

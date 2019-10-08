@@ -16,25 +16,22 @@
 
 package models.instance
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
+import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
 import play.api.libs.functional.syntax._
 
-final case class StructureOfType(
-  `type`: InstanceType,
-  labelField: String,
-  promotedFields: Option[List[String]],
-  fields: Map[String, StructureOfField]
-)
+final case class InstanceType(name: String, label: String, color: Option[String])
 
-object StructureOfType {
+object InstanceType {
 
-  import models.instance.StructureOfField._
+  implicit val instanceTypeReads: Reads[InstanceType] = (
+    (JsPath \ "type").read[String] and
+    (JsPath \ "label").read[String] and
+    (JsPath \ "color").readNullable[String]
+  )(InstanceType.apply _)
 
-  implicit val structureOfTypeReads: Reads[StructureOfType] = (
-    JsPath.read[InstanceType] and
-    (JsPath \ "labelField").read[String] and
-    (JsPath \ "promotedFields").readNullable[List[String]] and
-    (JsPath \ "fields").read[List[StructureOfField]].map(t => t.map(f => f.fullyQualifiedName -> f).toMap)
-  )(StructureOfType.apply _)
+  implicit val instanceTypeWrites: Writes[InstanceType] = new Writes[InstanceType] {
+
+    def writes(v: InstanceType): JsValue =
+      Json.obj("name" -> Json.toJson(v.name), "label" -> Json.toJson(v.label), "color" -> Json.toJson(v.color))
+  }
 }

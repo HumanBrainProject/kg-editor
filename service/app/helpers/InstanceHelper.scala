@@ -89,6 +89,12 @@ object InstanceHelper {
       case None    => None
     }
 
+  def getWorkspace(data: JsObject): String =
+    (data \ "workspace").asOpt[String] match {
+      case Some(i) => i
+      case None    => ""
+    }
+
   def getTypes(data: JsObject): Option[List[String]] =
     (data \ "@type").asOpt[List[String]] match {
       case Some(types) =>
@@ -98,6 +104,23 @@ object InstanceHelper {
           None
         }
       case None => None
+    }
+
+  def toCamel(s: String): String = {
+    val split = s.split("-")
+    val tail = split.tail.map { x =>
+      x.head.toUpper + x.tail
+    }
+    split.head + tail.mkString
+  }
+
+  def getPermissions(data: JsObject): Map[String, Boolean] =
+    (data \ "permissions").asOpt[List[String]] match {
+      case Some(permissions) =>
+        permissions.foldLeft(Map[String, Boolean]()) {
+          case (map, name) => map.updated(toCamel(name), true)
+        }
+      case None => Map()
     }
 
   def getName(data: JsObject, name: Option[String]): Option[String] =

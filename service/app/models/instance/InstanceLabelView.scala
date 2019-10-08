@@ -35,7 +35,7 @@ object InstanceLabelView {
         Some(
           InstanceLabelView(
             instanceId,
-            "minds", //TODO: replace by real workspace
+            InstanceHelper.getWorkspace(data),
             structure.types.values.toList,
             InstanceHelper.getName(data, structure.labelField.headOption)
           )

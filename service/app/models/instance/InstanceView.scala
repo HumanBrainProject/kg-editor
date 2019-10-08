@@ -25,7 +25,8 @@ final case class InstanceView(
   types: List[InstanceType],
   promotedFields: Option[List[String]],
   name: Option[String],
-  fields: Map[String, Field]
+  fields: Map[String, Field],
+  permissions: Map[String, Boolean]
 ) extends Instance
 
 object InstanceView {
@@ -41,11 +42,12 @@ object InstanceView {
         Some(
           InstanceView(
             instanceId,
-            "minds", //TODO: replace by real workspace
+            InstanceHelper.getWorkspace(data),
             structure.types.values.toList,
             InstanceHelper.toOptionalList(structure.promotedFields),
             InstanceHelper.getName(data, structure.labelField.headOption),
-            InstanceHelper.getFields(data, structure.fields)
+            InstanceHelper.getFields(data, structure.fields),
+            InstanceHelper.getPermissions(data)
           )
         )
       case _ => None

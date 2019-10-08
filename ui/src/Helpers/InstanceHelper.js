@@ -1,5 +1,5 @@
 export const normalizeInstanceData = (data, transformField) => {
-  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: [], promotedFields: [], alternatives: [], metadata: {}};
+  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: [], promotedFields: [], alternatives: [], metadata: {}, permissions: {}};
   if (!data) {
     return instance;
   }
@@ -56,6 +56,9 @@ export const normalizeInstanceData = (data, transformField) => {
       }
       return metadata[key];
     });
+  }
+  if (typeof data.permissions === "object") {
+    instance.permissions = data.permissions;
   }
   return instance;
 };

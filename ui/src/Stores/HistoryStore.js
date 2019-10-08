@@ -1,9 +1,18 @@
 import { observable, action, runInAction } from "mobx";
+import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
 import authStore from "./AuthStore";
+import { normalizeInstanceData } from "../Helpers/InstanceHelper";
 
 const maxItems = 100;
+
+const transformField = field  =>  {
+  if(field.type === "TextArea") {
+    field.value = field.value.substr(0, 197) + "...";
+    delete field.label;
+  }
+};
 
 class HistoryStore {
   @observable instancesHistory = [];
@@ -106,7 +115,12 @@ class HistoryStore {
         const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
         runInAction(() => {
           this.isFetching = false;
-          this.instances = (data && data.data)?data.data:[];
+          this.instances = (data && data.data instanceof Array)?data.data.map(item => {
+            const instance = normalizeInstanceData(item, transformField);
+            instance.formStore = new FormStore(instance);
+            instance.formStore.toggleReadMode(true);
+            return instance;
+          }):[];
         });
       } catch (e) {
         runInAction(() => {

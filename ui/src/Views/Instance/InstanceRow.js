@@ -1,12 +1,10 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FormStore, Form, Field } from "hbp-quickfire";
+import { Form, Field } from "hbp-quickfire";
 import Status from "./Status";
 import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
-import { normalizeInstanceData } from "../../Helpers/InstanceHelper";
-import { toJS } from "mobx";
 
 const styles = {
   container: {
@@ -170,15 +168,6 @@ export default class InstanceRow extends React.Component {
 
   render() {
     const { classes, instance, selected } = this.props;
-    const transformField = field  =>  {
-      if(field.type === "TextArea") {
-        field.value = field.value.substr(0, 197) + "...";
-        delete field.label;
-      }
-    };
-    const normalizedInstanceData = normalizeInstanceData(toJS(instance), transformField);
-    const formStore = new FormStore(normalizedInstanceData);
-    formStore.toggleReadMode(true);
     const fields = Object.keys(instance.fields);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
@@ -186,12 +175,12 @@ export default class InstanceRow extends React.Component {
         onDoubleClick={this.handleDoubleClick.bind(this, instance)} >
         <div className={classes.statusAndNameRow}>
           <Status id={instance.id} darkmode={true} />
-          <div className={classes.type} style={normalizedInstanceData.primaryType.color ? { color: normalizedInstanceData.primaryType.color } : {}} title={normalizedInstanceData.primaryType.name}>
+          <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
             <FontAwesomeIcon fixedWidth icon="circle" />
           </div>
-          <div className={classes.name}>{normalizedInstanceData.name}</div>
+          <div className={classes.name}>{instance.name}</div>
         </div>
-        <Form store={formStore} >
+        <Form store={instance.formStore} >
           {fields.map(field => <Field name={field} key={field} />)}
         </Form>
         <div className={classes.actions}>

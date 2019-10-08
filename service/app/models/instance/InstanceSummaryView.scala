@@ -24,7 +24,8 @@ final case class InstanceSummaryView(
   workspace: String,
   types: List[InstanceType],
   name: Option[String],
-  fields: Map[String, Field]
+  fields: Map[String, Field],
+  permissions: Map[String, Boolean]
 ) extends Instance
 
 object InstanceSummaryView {
@@ -44,10 +45,11 @@ object InstanceSummaryView {
         Some(
           InstanceSummaryView(
             instanceId,
-            "minds", //TODO: replace by real workspace
+            InstanceHelper.getWorkspace(data),
             structure.types.values.toList,
             InstanceHelper.getName(data, structure.labelField.headOption),
-            InstanceHelper.getFields(data, filteredFields)
+            InstanceHelper.getFields(data, filteredFields),
+            InstanceHelper.getPermissions(data)
           )
         )
       case _ => None

@@ -66,18 +66,16 @@ export default class InstanceInvite extends React.Component{
   render(){
     const { classes, instance } = this.props;
 
-    if (instance.isFetching || instance.hasFetchError) {
+    if (!instance || instance.isFetching || instance.hasFetchError) {
       return null;
     }
 
     const promotedFields = instance.promotedFields;
     const nonPromotedFields = instance.nonPromotedFields;
 
-    const nodeType = instance.data && instance.data.label;
+    const nodeType = instance.primaryType.label;
 
-    const color = instance.data && instance.data.color[0];
-
-    const nexusId = instance.data.id?instance.data.id:"<new>";
+    const color = instance.primaryType.color;
 
     return (
       <div className={classes.container}>
@@ -110,7 +108,7 @@ export default class InstanceInvite extends React.Component{
               <div>
                 <Row>
                   <Col xs={12}>
-                    <div className={classes.id}>ID: {nexusId}</div>
+                    <div className={classes.id}>ID: {instance.id}</div>
                   </Col>
                 </Row>
               </div>

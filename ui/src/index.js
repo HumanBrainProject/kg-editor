@@ -266,7 +266,6 @@ const styles = {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    authStore.tryAuthenticate();
     this.state = {
       currentLocation: routerStore.history.location.pathname
     };
@@ -279,6 +278,7 @@ class App extends React.Component {
 
 
   componentDidMount() {
+    authStore.tryAuthenticate();
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
     const cookies = new Cookies();
@@ -479,11 +479,11 @@ class App extends React.Component {
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
-                    if (instance && !instance.isFetching && !instance.hasFetchError) {
-                      const labelField = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+                    if (instance.isFetched) {
+                      const labelField = instance.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
-                      color = instance.data && instance.data.typeColors[0];
+                      color = instance.primaryType.color;
                     }
                     if (!label) {
                       label = instanceId;

@@ -105,7 +105,7 @@ export default class InstanceManage extends React.Component {
     const instance = instanceStore.instances.get(this.props.id);
     const status = instance && statusStore.getInstance(this.props.id);
     return (
-      instance && instance.data ?
+      instance && instance.isFetched ?
         <div className={classes.container}>
           <Scrollbars autoHide>
             <div className={classes.panel}>
@@ -116,13 +116,13 @@ export default class InstanceManage extends React.Component {
                 : !instance.hasFetchError ?
                   <React.Fragment>
                     <div className={classes.content}>
-                      <h4>{instance.data.typeLabel}</h4>
+                      <h4>{instance.primaryType.label}</h4>
                       <div className={classes.id}>
                         ID: {this.props.id}
                       </div>
                       {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} /> :
                         < div className={classes.field}>
-                          {instance.data.name}
+                          {instance.name}
                         </div>
                       }
                     </div>

@@ -71,8 +71,9 @@ export default class InstanceInvite extends React.Component{
     const { classes } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
+
     return (
-      instance && instance.data ?
+      instance && instance.isFetched ?
         <div className={classes.container}>
           <div className={classes.panel}>
             {instance.isFetching?

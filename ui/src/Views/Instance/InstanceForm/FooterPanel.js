@@ -4,6 +4,7 @@ import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import instanceStore from "../../../Stores/InstanceStore";
 import routerStore from "../../../Stores/RouterStore";
+import authStore from "../../../Stores/AuthStore";
 
 const styles = {
   panel:{
@@ -68,7 +69,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class FooterPanel extends React.Component{
+export default class FooterPanel extends React.Component {
   handleOpenInstance(mode, instanceId, event){
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
@@ -90,18 +91,10 @@ export default class FooterPanel extends React.Component{
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
-                <FontAwesomeIcon icon="folder-open"/>
-              </div>
-              {/*<div className={classes.action} onClick={this.handleOpenInstance.bind(this, "edit", id)}>
-                <FontAwesomeIcon icon="pencil-alt"/>
-              </div>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "graph", id)}>
-                <FontAwesomeIcon icon="project-diagram"/>
-              </div>
-              <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "release", id)}>
-                <FontAwesomeIcon icon="cloud-upload-alt"/>
-              </div>*/}
+              {authStore.currentWorkspace === workspace ?
+                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
+                  <FontAwesomeIcon icon="folder-open"/>
+                </div>:null}
             </div>
           </Col>
         </Row>

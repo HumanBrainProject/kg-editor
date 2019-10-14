@@ -5,8 +5,7 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
-import TypesStore from "../Stores/TypesStore";
-import browseStore from "../Stores/BrowseStore";
+import typesStore from "../Stores/TypesStore";
 import instanceStore from "../Stores/InstanceStore";
 import routerStore from "../Stores/RouterStore";
 
@@ -55,15 +54,15 @@ const styles = {
 @observer
 export default class NewInstance extends React.Component {
   componentDidMount() {
-    if (!TypesStore.isFetched) {
-      TypesStore.fetch();
+    if (!typesStore.isFetched) {
+      typesStore.fetch();
     }
   }
 
-  handleFetchInstanceTypes = () => TypesStore.fetch();
+  handleFetchInstanceTypes = () => typesStore.fetch();
 
-  async handleClickNewInstanceOfType(path) {
-    let newInstanceId = await instanceStore.createNewInstance(path);
+  async handleClickNewInstanceOfType(type) {
+    let newInstanceId = await instanceStore.createNewInstance(type);
     instanceStore.toggleShowCreateModal();
     routerStore.history.push(`/instance/edit/${newInstanceId}`);
   }
@@ -73,14 +72,14 @@ export default class NewInstance extends React.Component {
 
     return (
       <div className={classes.container}>
-        {browseStore.isFetching.lists ?
+        {typesStore.isFetching ?
           <FetchingLoader>Fetching data types...</FetchingLoader>
           :
-          browseStore.fetchError.lists ?
+          typesStore.fetchError ?
             <BGMessage icon={"ban"}>
               There was a network problem fetching data types.<br />
               If the problem persists, please contact the support.<br />
-              <small>{browseStore.fetchError.lists}</small><br /><br />
+              <small>{typesStore.fetchError}</small><br /><br />
               <div>
                 {typeof onCancel === "function" && (
                   <Button onClick={onCancel}>
@@ -94,19 +93,14 @@ export default class NewInstance extends React.Component {
             </BGMessage>
             :
             <Scrollbars autoHide>
-              {browseStore.lists.map(folder => folder.folderType === "NODETYPE" && (
-                <div className={classes.lists} key={folder.folderName}>
-                  <h4>{folder.folderName}</h4>
+              {typesStore.types.map(type => (
+                <div className={classes.lists} key={type.label}>
                   <div className={classes.list}>
-                    {folder.lists.map(list => {
-                      return (
-                        <div key={list.id} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, list.id)}>
-                          <div className={classes.icon} style={list.color ? { color: list.color } : {}}>
-                            <FontAwesomeIcon fixedWidth icon="circle" />
-                          </div>{list.name}
-                        </div>
-                      );
-                    })}
+                    <div key={type.label} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, type.type)}>
+                      <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
+                        <FontAwesomeIcon fixedWidth icon="circle" />
+                      </div>{type.label}
+                    </div>
                   </div>
                 </div>
               ))}

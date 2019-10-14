@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
-import TypesStore from "../../Stores/TypesStore";
+import typesStore from "../../Stores/TypesStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import browseStore from "../../Stores/BrowseStore";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -60,16 +60,16 @@ export default class Types extends React.Component {
   }
 
   componentDidMount() {
-    TypesStore.fetch();
+    typesStore.fetch();
   }
 
-  handleLoadRetry = () => TypesStore.fetch();
+  handleLoadRetry = () => typesStore.fetch();
   handleToggleType = () => this.setState((state) => ({ showTypes: !state.showTypes }));
 
   render() {
     const { classes } = this.props;
-    const list = TypesStore.filteredList(browseStore.navigationFilter);
-    if (!TypesStore.fetchError && !TypesStore.isFetching && !list.length) {
+    const list = typesStore.filteredList(browseStore.navigationFilter);
+    if (!typesStore.fetchError && !typesStore.isFetching && !list.length) {
       return null;
     }
     return (
@@ -77,8 +77,8 @@ export default class Types extends React.Component {
         <div className={classes.folderName} onClick={this.handleToggleBookmarks}>
           <FontAwesomeIcon fixedWidth icon={this.state.showBookmarks ? "caret-down" : "caret-right"} /> &nbsp;Types
         </div>
-        {!TypesStore.fetchError ?
-          !TypesStore.isFetching ?
+        {!typesStore.fetchError ?
+          !typesStore.isFetching ?
             this.state.showTypes && list.map(type =>
               <TypesItem key={type.label} type={type}/>
             )
@@ -86,7 +86,7 @@ export default class Types extends React.Component {
             <FetchingLoader>fetching...</FetchingLoader>
           :
           <div className={classes.fetchErrorPanel}>
-            <div>{TypesStore.fetchError}</div>
+            <div>{typesStore.fetchError}</div>
             <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
           </div>
         }

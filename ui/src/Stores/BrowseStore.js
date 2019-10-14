@@ -19,8 +19,8 @@ const normalizeInstancesData = data => {
     instance.formStore = new FormStore(instance);
     instance.formStore.toggleReadMode(true);
     return instance;
-  }):[]
-}
+  }):[];
+};
 
 class BrowseStore{
 

@@ -11,7 +11,7 @@ import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import { matchPath } from "react-router-dom";
-import TypesStore from "./TypesStore";
+import typesStore from "./TypesStore";
 
 class Instance {
   @observable id = null;
@@ -19,7 +19,11 @@ class Instance {
   @observable name = "";
   @observable fields = {};
   @observable alternatives = {};
+  @observable promotedFields = [];
+  @observable primaryType = {name: "", color: "", label: ""};
+  @observable workspace = "";
   @observable metadata = {};
+  @observable permissions = {};
   @observable form = null;
   @observable cancelChangesPending = null;
   @observable fetchError = null;
@@ -123,7 +127,7 @@ class Instance {
 
   @computed
   get readModeFormStore() {
-    const formStore = new FormStore(toJS(this.data));
+    const formStore = new FormStore(toJS(this.form.structure));
     formStore.toggleReadMode(true);
     return formStore;
   }
@@ -295,6 +299,7 @@ class InstanceStore {
               instance.types = normalizedData.types;
               instance.name = normalizedData.name;
               instance.fields = normalizedData.fields;
+              instance.primaryType = normalizedData.primaryType;
               instance.promotedFields = normalizedData.promotedFields;
               instance.alternatives = normalizedData.alternatives;
               instance.metadata = normalizedData.metadata;
@@ -353,8 +358,8 @@ class InstanceStore {
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
     this.setReadMode(readMode);
-    if (!readMode && viewMode === "edit" && !TypesStore.isFetched) {
-      TypesStore.fetch();
+    if (!readMode && viewMode === "edit" && !typesStore.isFetched) {
+      typesStore.fetch();
     }
     if(this.openedInstances.has(instanceId)){
       const instance = this.instances.get(instanceId);
@@ -454,19 +459,19 @@ class InstanceStore {
   }
 
   @action
-  async createNewInstance(path, name=""){
-    if (browseStore.isFetched.lists) {
-      const list = browseStore.getListById(path);
-      if (list) {
-        const labelField = list && list.uiSpec && list.uiSpec.labelField;
+  async createNewInstance(typeObj, name=""){
+    if (typesStore.isFetched) {
+      const type = typeObj.type;
+      if (type) {
+        const labelField = typeObj.labelField;
         if (!name || (name && labelField)) {
-          this.isCreatingNewInstance = path;
+          this.isCreatingNewInstance = true;
           try{
             const payload = {};
             if (labelField) {
               payload[labelField] = name;
             }
-            const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), payload);
+            const { data } = await API.axios.post(API.endpoints.createInstance(type, this.databaseScope), payload);
             this.isCreatingNewInstance = false;
             return data.data.id;
           } catch(e){
@@ -475,12 +480,12 @@ class InstanceStore {
           }
         } else {
           this.isCreatingNewInstance = false;
-          this.instanceCreationError = `Error: labelField is not defined for ${path} type!`;
+          this.instanceCreationError = `Error: labelField is not defined for ${type} type!`;
         }
       } else {
         // Should never happen: UI should ensure to propose only available types
         this.isCreatingNewInstance = false;
-        this.instanceCreationError = `Error: type ${path} is not available!`;
+        this.instanceCreationError = `Error: type ${type} is not available!`;
       }
     } else {
       // Should never happen: UI should ensure we the list has been fetch before calling createNewInstance

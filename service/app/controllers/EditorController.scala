@@ -140,18 +140,12 @@ class EditorController @Inject()(
 
   def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      val acceptedEntries = List("type", "color", "label")
       val result = editorService
         .retrieveWorkspaceTypes(workspace, withFields = false)
         .map {
           case Left(err) => err.toResult
           case Right(value) =>
-            val res = (value \ "data").as[List[JsObject]].map { instance =>
-              instance.asOpt[Map[String, JsValue]] match {
-                case Some(i) => i.filter(v => acceptedEntries.contains(v._1))
-                case None    => Map[String, JsValue]()
-              }
-            }
+            val res = (value \ "data").as[List[Type]]
             Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
         }
       result.runToFuture

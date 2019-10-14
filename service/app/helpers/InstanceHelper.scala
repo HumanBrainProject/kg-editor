@@ -90,7 +90,7 @@ object InstanceHelper {
     }
 
   def getWorkspace(data: JsObject): String =
-    (data \ "workspace").asOpt[String] match {
+    (data \ "space").asOpt[String] match {
       case Some(i) => i
       case None    => ""
     }

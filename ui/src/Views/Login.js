@@ -2,6 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import API from "../Services/API";
 import authStore from "../Stores/AuthStore";
+import { Button } from "react-bootstrap";
 
 const styles = {
   container: {
@@ -35,10 +36,12 @@ const styles = {
 
 @injectStyles(styles)
 export default class Login extends React.Component {
-  constructor(props) {
-    super(props);
+
+  handleLogin = () => {
     authStore.storeState();
+    window.location.href = API.endpoints.login();
   }
+
   render() {
     const { classes } = this.props;
     return (
@@ -51,7 +54,7 @@ export default class Login extends React.Component {
               Click on the following button to ask a new one and continue with your session.
             </p>
             <div>
-              <a className="btn btn-primary" href={API.endpoints.login()}>Re-Login</a>
+              <Button bsStyle="primary" onClick={this.handleLogin} >Re-Login</Button>
             </div>
           </div>
           :
@@ -59,7 +62,7 @@ export default class Login extends React.Component {
             <h3>Welcome to Knowledge Graph Editor</h3>
             <p>Please login to continue.</p>
             <div>
-              <a className="btn btn-primary" href={API.endpoints.login()}>Login</a>
+              <Button bsStyle="primary" onClick={this.handleLogin} >Login</Button>
             </div>
           </div>
         }

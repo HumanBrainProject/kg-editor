@@ -1,9 +1,13 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { Dropdown, MenuItem } from "react-bootstrap";
+import { matchPath } from "react-router-dom";
 import injectStyles from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
+import routerStore from "../Stores/RouterStore";
+import instanceStore from "../Stores/InstanceStore";
+
 
 const styles = {
   container: {
@@ -31,8 +35,35 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class WorkspaceSelector extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentLocation: routerStore.history.location.pathname
+    };
+    routerStore.history.listen(location => {
+      this.setState({ currentLocation: location.pathname });
+    });
+  }
 
-  selectWorkspace = eventKey => authStore.setCurrentWorkspace(eventKey);
+  selectWorkspace = eventKey => {
+    if(instanceStore.openedInstances.size > 0) {
+      if(authStore.currentWorkspace !== eventKey && window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
+        authStore.setCurrentWorkspace(eventKey);
+        this.handleCloseAllInstances();
+      }
+    } else {
+      authStore.setCurrentWorkspace(eventKey);
+    }
+  }
+
+  handleCloseAllInstances = ()  => {
+    if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
+      || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
+      || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
+      routerStore.history.push("/browse");
+    }
+    instanceStore.removeAllInstances();
+  }
 
   render() {
     const { classes } = this.props;

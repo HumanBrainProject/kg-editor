@@ -422,6 +422,12 @@ class InstanceStore {
   }
 
   @action
+  removeAllInstances() {
+    this.closeAllInstances();
+    this.instances.clear();
+  }
+
+  @action
   closeAllInstances(){
     this.openedInstances.clear();
     this.syncStoredOpenedTabs();

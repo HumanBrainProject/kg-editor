@@ -20,12 +20,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-final case class StructureOfType(
-  `type`: InstanceType,
-  labelField: String,
-  promotedFields: Option[List[String]],
-  fields: Map[String, StructureOfField]
-)
+final case class StructureOfType(`type`: InstanceType, labelField: String, fields: Map[String, StructureOfField])
 
 object StructureOfType {
 
@@ -34,7 +29,6 @@ object StructureOfType {
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
     JsPath.read[InstanceType] and
     (JsPath \ "labelField").read[String] and
-    (JsPath \ "promotedFields").readNullable[List[String]] and
     (JsPath \ "fields").read[List[StructureOfField]].map(t => t.map(f => f.fullyQualifiedName -> f).toMap)
   )(StructureOfType.apply _)
 }

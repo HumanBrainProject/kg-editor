@@ -29,7 +29,8 @@ final case class StructureOfField(
   allowCustomValues: Option[Boolean],
   canBe: Option[List[String]],
   numOfOccurrences: Option[Int],
-  `type`: String
+  `type`: String,
+  searchable: Boolean
 )
 
 object StructureOfField {
@@ -43,7 +44,8 @@ object StructureOfField {
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ "canBe").readNullable[List[String]] and
     (JsPath \ "numOfOccurrences").readNullable[Int] and
-    (JsPath \ "widget").read[String]
+    (JsPath \ "widget").read[String] and
+    (JsPath \ "searchable").read[Boolean]
   )(StructureOfField.apply _)
 
   implicit val structureOfFieldWrites = Json.writes[StructureOfField]

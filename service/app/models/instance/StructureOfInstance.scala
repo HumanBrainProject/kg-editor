@@ -23,11 +23,18 @@ final case class StructureOfInstance(
   fields: Map[String, StructureOfField]
 ) {
 
-  def add(typeInfo: StructureOfType): StructureOfInstance = {
-    val pf = typeInfo.promotedFields match {
-      case Some(value) => value
-      case _           => List()
+  def getPromotedFields(fields: Map[String, StructureOfField]): List[String] =
+    fields.values.foldLeft(List[String]()) {
+      case (acc, field) =>
+        if (field.searchable) {
+          acc :+ field.fullyQualifiedName
+        } else {
+          acc
+        }
     }
+
+  def add(typeInfo: StructureOfType): StructureOfInstance = {
+    val pf = getPromotedFields(typeInfo.fields)
     val f = typeInfo.fields.foldLeft(fields) {
       case (map, (name, value)) => map.updated(name, value)
     }

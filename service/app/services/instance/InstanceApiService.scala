@@ -343,7 +343,7 @@ trait InstanceApiService {
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/LIVE/typesWithProperties")
-//      .addQueryStringParameters("withFields" -> withFields.toString)
+      //      .addQueryStringParameters("withFields" -> withFields.toString)
       .addQueryStringParameters("workspace" -> workspace)
       .withHttpHeaders("client" -> serviceClient.client)
     val r = Task.deferFuture(q.get())
@@ -352,6 +352,18 @@ trait InstanceApiService {
         case OK =>
           Right(res.json.as[JsObject])
         case _ => Left(res)
+      }
+    }
+  }
+
+  def getWorkspaces(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/LIVE/spaces")
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
       }
     }
   }

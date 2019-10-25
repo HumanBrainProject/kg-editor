@@ -7,7 +7,8 @@ const userKeys = {
   email: "http://schema.org/email",
   displayName: "http://schema.org/name",
   givenName: "http://schema.org/givenName",
-  familyName: "http://schema.org/familyName"
+  familyName: "http://schema.org/familyName",
+  workspaces: "https://kg.ebrains.eu/meta/workspaces"
 };
 
 const mapUserProfile = data => {
@@ -18,7 +19,6 @@ const mapUserProfile = data => {
         user[name] = data.data[fullyQualifiedName];
       }
     });
-    user.workspaces = ["simpsons"]; //TODO: remove hardcoded value;
   }
   return user;
 };

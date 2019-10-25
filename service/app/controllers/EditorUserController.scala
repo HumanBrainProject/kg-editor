@@ -50,12 +50,15 @@ class EditorUserController @Inject()(
   val logger = Logger(this.getClass)
 
   object queryService extends QueryService
+
   implicit val s = monix.execution.Scheduler.Implicits.global
 
   private def getOrCreateUserWithUserFolder(
     token: AccessToken
   )(implicit request: UserRequest[AnyContent]): Task[Either[APIEditorError, EditorUser]] =
-    editorUserService.getOrCreateUser(request.user, token) { postCreation }
+    editorUserService.getOrCreateUser(request.user, token) {
+      postCreation
+    }
 
   def postCreation(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] =
     editorUserListService.createBookmarkListFolder(editorUser, "My Bookmarks", token, BOOKMARKFOLDER).flatMap {
@@ -72,13 +75,22 @@ class EditorUserController @Inject()(
     }
 
   def getUserProfile(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    editorUserService
-      .getUserProfile(request.userToken)
-      .map {
-        case Right(value) => Ok(value)
-        case Left(error)  => error.toResult
-      }
-      .runToFuture
+    val res = for {
+      userProfile    <- editorUserService.getUserProfile(request.userToken)
+      userWorkspaces <- editorService.retrieveWorkspaces()
+    } yield (userProfile, userWorkspaces)
+    val result = res.map {
+      case (Right(user), Right(workspace)) =>
+        val workspaces =
+          (workspace \ "data").as[List[Map[String, String]]].map(w => w.getOrElse("http://schema.org/name", ""))
+        val r = (user \ "data")
+          .as[Map[String, JsValue]]
+          .updated("https://kg.ebrains.eu/meta/workspaces", Json.toJson(workspaces))
+        Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
+      case (Right(user), _) => Ok(user)
+      case (Left(err), _)   => err.toResult
+    }
+    result.runToFuture
   }
 
   def getOrCreateCurrentUser(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>

@@ -16,17 +16,30 @@
 
 package models
 
+import constants.SchemaFieldsConstants
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.functional.syntax._
 
-final case class Type(`type`: String, label: String, labelField: String, color: Option[String])
+//final case class Type(`type`: String, label: String, labelField: Option[Boolean], color: Option[String])
+final case class Type(`type`: String, label: String, color: Option[String])
+//
+//object Type {
+//  implicit val typeReads: Reads[Type] = (
+//    (JsPath \ "type").read[String] and
+//    (JsPath \ "label").read[String] and
+//    (JsPath \ "labelField").read[String] and
+//    (JsPath \ "color").readNullable[String]
+//  )(Type.apply _)
+//
+//  implicit val typeWrites = Json.writes[Type]
+//}
 
 object Type {
   implicit val typeReads: Reads[Type] = (
-    (JsPath \ "type").read[String] and
-    (JsPath \ "label").read[String] and
-    (JsPath \ "labelField").read[String] and
-    (JsPath \ "color").readNullable[String]
+    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
+    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
+//    (JsPath \ "https://kg.ebrains.eu/meta/labelField").readNullable[Boolean] and
+    (JsPath \ "https://kg.ebrains.eu/meta/color").readNullable[String]
   )(Type.apply _)
 
   implicit val typeWrites = Json.writes[Type]

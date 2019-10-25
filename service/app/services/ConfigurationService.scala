@@ -32,7 +32,7 @@ class ConfigurationService @Inject()(configuration: Configuration) {
   val editorPrefix: String = configuration.getOptional[String]("nexus.editor.prefix").getOrElse("editor")
 
   val kgCoreEndpoint
-    : String = configuration.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:10130") // TODO: change the port from mock to real data
+    : String = configuration.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:7130") // TODO: change the port from mock to real data
   val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
   val iamEndpoint = configuration.get[String]("nexus.iam")
   val authEndpoint = configuration.get[String]("auth.endpoint")

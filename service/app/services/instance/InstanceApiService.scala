@@ -342,8 +342,8 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/types/structure")
-      .addQueryStringParameters("withFields" -> withFields.toString)
+      .url(s"$apiBaseEndpoint/LIVE/typesWithProperties")
+//      .addQueryStringParameters("withFields" -> withFields.toString)
       .addQueryStringParameters("workspace" -> workspace)
       .withHttpHeaders("client" -> serviceClient.client)
     val r = Task.deferFuture(q.get())

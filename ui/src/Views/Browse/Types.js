@@ -64,6 +64,7 @@ export default class Types extends React.Component {
   }
 
   handleLoadRetry = () => typesStore.fetch();
+
   handleToggleType = () => this.setState((state) => ({ showTypes: !state.showTypes }));
 
   render() {
@@ -74,8 +75,8 @@ export default class Types extends React.Component {
     }
     return (
       <div className={classes.folder}>
-        <div className={classes.folderName} onClick={this.handleToggleBookmarks}>
-          <FontAwesomeIcon fixedWidth icon={this.state.showBookmarks ? "caret-down" : "caret-right"} /> &nbsp;Types
+        <div className={classes.folderName} onClick={this.handleToggleType}>
+          <FontAwesomeIcon fixedWidth icon={this.state.showTypes ? "caret-down" : "caret-right"} /> &nbsp;Types
         </div>
         {!typesStore.fetchError ?
           !typesStore.isFetching ?

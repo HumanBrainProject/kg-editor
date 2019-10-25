@@ -45,7 +45,7 @@ const mapUserProfile = data => {
         user[name] = data.data[fullyQualifiedName];
       }
     });
-    user.workspaces = ["minds", "uniminds"]; //TODO: remove hardcoded value;
+    user.workspaces = ["simpsons"]; //TODO: remove hardcoded value;
   }
   return user;
 };

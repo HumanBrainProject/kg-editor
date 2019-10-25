@@ -93,17 +93,18 @@ export default class NewInstance extends React.Component {
             </BGMessage>
             :
             <Scrollbars autoHide>
-              {typesStore.types.map(type => (
-                <div className={classes.lists} key={type.label}>
-                  <div className={classes.list}>
+              <div className={classes.lists}>
+                <div className={classes.list}>
+                  {typesStore.types.map(type => (
                     <div key={type.label} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, type.type)}>
                       <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
                         <FontAwesomeIcon fixedWidth icon="circle" />
                       </div>{type.label}
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
             </Scrollbars>
         }
         {instanceStore.isCreatingNewInstance ?

@@ -1,6 +1,5 @@
 import React from "react";
 import injectStyles from "react-jss";
-import API from "../Services/API";
 import authStore from "../Stores/AuthStore";
 import { Button } from "react-bootstrap";
 
@@ -36,17 +35,13 @@ const styles = {
 
 @injectStyles(styles)
 export default class Login extends React.Component {
-
-  handleLogin = () => {
-    authStore.storeState();
-    window.location.href = API.endpoints.login();
-  }
+  handleLogin = () => authStore.login();
 
   render() {
     const { classes } = this.props;
     return (
       <div className={classes.container}>
-        {authStore.expiredToken?
+        {authStore.isTokenExpired?
           <div className={classes.panel}>
             <h3>Your session has expired</h3>
             <p>
@@ -54,17 +49,10 @@ export default class Login extends React.Component {
               Click on the following button to ask a new one and continue with your session.
             </p>
             <div>
-              <Button bsStyle="primary" onClick={this.handleLogin} >Re-Login</Button>
+              <Button bsStyle={"primary"} onClick={this.handleLogin}>Re-Login</Button>
             </div>
           </div>
-          :
-          <div className={classes.panel}>
-            <h3>Welcome to Knowledge Graph Editor</h3>
-            <p>Please login to continue.</p>
-            <div>
-              <Button bsStyle="primary" onClick={this.handleLogin} >Login</Button>
-            </div>
-          </div>
+          : null
         }
       </div>
     );

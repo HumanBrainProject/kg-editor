@@ -40,6 +40,7 @@ import * as Sentry from "@sentry/browser";
 import "babel-polyfill";
 import "./CustomFields";
 import WorkspaceSelector from "./Components/WorkspaceSelector";
+import WorkspaceModal from "./Views/WorkspaceModal";
 
 FormStore.setPathNodeSeparator("|");
 
@@ -154,7 +155,7 @@ const styles = {
       "transform": "scale(1.1)"
     }
   },
-  userProfileLoader: {
+  loader: {
     position: "fixed",
     top: 0,
     left: 0,
@@ -171,18 +172,8 @@ const styles = {
       background: "var(--list-bg-hover)"
     }
   },
-  userProfileError: {
+  authError: {
     color: "var(--ft-color-loud)"
-  },
-  userProfileErrorFooterBar: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
-    }
   },
   userProfileTab: {
     width: "50px",
@@ -258,6 +249,18 @@ const styles = {
       maxHeight: "calc(100vh - 210px)",
       overflowY: "auto"
     }
+  },
+  noWorkspacesModal: {
+    "&.modal-dialog": {
+      marginTop: "40vh",
+      "& .modal-body": {
+        padding: "0 30px 15px 30px",
+        fontSize: "1.6rem",
+        "@media screen and (min-width:768px)": {
+          whiteSpace: "nowrap"
+        }
+      }
+    }
   }
 };
 
@@ -278,7 +281,7 @@ class App extends React.Component {
 
 
   componentDidMount() {
-    authStore.tryAuthenticate();
+    authStore.initiliazeAuthenticate();
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
     const cookies = new Cookies();
@@ -454,12 +457,10 @@ class App extends React.Component {
         <div className={classes.layout}>
           <Theme />
           <div className={classes.tabs}>
-
             <div className={`${classes.logo} layout-logo`} onClick={this.handleGoToDashboard}>
-              <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
-              <span>Knowledge Graph Editor</span>
+              {/* <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" /> */}
+              <span>Knowledge Graph Query Builder</span>
             </div>
-
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
@@ -526,50 +527,68 @@ class App extends React.Component {
             {appStore.globalError ?
               <Route component={GlobalError} />
               :
-              !authStore.isAuthenticated ?
-                <Route component={Login} />
-                :
-                authStore.isFullyAuthenticated ?
-                  authStore.hasWorkspaces && authStore.currentWorkspace?
-                    <Switch>
-                      <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
-                      <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
-                      <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
-                      <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
-                      <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
-                      <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
-
-                      <Route path="/browse" exact={true} component={Browse} />
-                      <Route path="/help" component={Help} />
-                      {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                      <Route path="/" exact={true} component={Home} />
-                      <Route component={NotFound} />
-                    </Switch>
-                    :
-                    <Route component={Home} />
-                  : null
-            }
-            {authStore.isAuthenticated && !authStore.hasUserProfile && (
-              authStore.isRetrievingUserProfile ?
-                <div className={classes.userProfileLoader}>
-                  <FetchingLoader>Retrieving user profile...</FetchingLoader>
+              authStore.authError?
+                <div className={classes.authError}>
+                  <BGMessage icon={"ban"}>
+                    {`There was a problem authenticating (${authStore.authError}).
+                    If the problem persists, please contact the support.`}<br /><br />
+                    <Button bsStyle={"primary"} onClick={this.handleRetryAuthenticate}>
+                      <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+                    </Button>
+                  </BGMessage>
                 </div>
                 :
-                authStore.userProfileError ?
-                  <div className={classes.userProfileError}>
-                    <BGMessage icon={"ban"}>
-                      {`There was a network problem retrieving user profile (${authStore.userProfileError}).
-                      If the problem persists, please contact the support.`}<br /><br />
-                      <Button bsStyle={"primary"} onClick={this.handleRetryretrieveUserProfile}>
-                        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-                      </Button>
-                    </BGMessage>
+                authStore.isInitializing?
+                  <div className={classes.loader}>
+                    <FetchingLoader>Initializing authentication...</FetchingLoader>
                   </div>
-                  : null
-            )}
-          </div>
-          <div className={`${classes.status} layout-status`}>
+                  :
+                  !authStore.isAuthenticated ?
+                    <Route component={Login} />
+                    :
+                    authStore.userProfileError ?
+                      <div className={classes.authError}>
+                        <BGMessage icon={"ban"}>
+                          {`There was a network problem retrieving user profile (${authStore.userProfileError}).
+                          If the problem persists, please contact the support.`}<br /><br />
+                          <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
+                            <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+                          </Button>
+                        </BGMessage>
+                      </div>
+                      :
+                      authStore.isRetrievingUserProfile ?
+                        <div className={classes.loader}>
+                          <FetchingLoader>Retrieving user profile...</FetchingLoader>
+                        </div>
+                        :
+                        authStore.hasWorkspaces?
+                          authStore.currentWorkspace?
+                            <Switch>
+                              <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
+                              <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
+                              <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
+                              <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
+                              <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
+                              <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
 
+                              <Route path="/browse" exact={true} component={Browse} />
+                              <Route path="/help" component={Help} />
+                              {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
+                              <Route path="/" exact={true} component={Home} />
+                              <Route component={NotFound} />
+                            </Switch>
+                            :
+                            <Route component={WorkspaceModal} />
+                          :
+                          <Modal dialogClassName={classes.noWorkspacesModal} show={true} centered>
+                            <Modal.Body>
+                              <h1>Welcome <span title={name}>{name}</span></h1>
+                              <p>You are currently not granted permission to acccess any workspaces.</p>
+                              <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
+                            </Modal.Body>
+                          </Modal>
+            }
           </div>
           {authStore.isFullyAuthenticated && (
             <React.Fragment>
@@ -608,6 +627,9 @@ class App extends React.Component {
               }
             </React.Fragment>
           )}
+          <div className={`${classes.status} layout-status`}>
+              Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
+          </div>
         </div>
       </Router>
     );

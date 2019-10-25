@@ -1,32 +1,5 @@
-// import console from "../Services/Logger";
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
-
-const authLocalStorageKey = "hbp.kg-editor.auth";
-const stateLocalStorageKey = "hbp.kg-editor.state";
-
-const getKey = (hash, key) => {
-  if (typeof hash !== "string" || typeof key !== "string") {
-    return null;
-  }
-  const patterns = [
-    `^#${key}=([^&]+)&.+$`,
-    `^.+&${key}=([^&]+)&.+$`,
-    `^#${key}=([^&]+)$`,
-    `^.+&${key}=([^&]+)$`
-  ];
-  let value = null;
-  patterns.some(pattern => {
-    const reg = new RegExp(pattern);
-    const m = hash.match(reg);
-    if (m && m.length === 2) {
-      value = m[1];
-      return true;
-    }
-    return false;
-  });
-  return value;
-};
 
 const userKeys = {
   id: "@id",
@@ -51,12 +24,17 @@ const mapUserProfile = data => {
 };
 
 class AuthStore {
-  @observable session = null;
   @observable user = null;
   @observable isRetrievingUserProfile = false;
   @observable userProfileError = false;
+  @observable authError = null;
+  @observable authSuccess = false;
   @observable currentWorkspace = null;
-  expiredToken = false;
+  @observable isTokenExpired = false;
+  @observable isInitializing = true;
+  @observable initializationError = null;
+  keycloak = null;
+  endpoint = null;
 
   constructor() {
     if (Storage === undefined) {
@@ -66,12 +44,12 @@ class AuthStore {
 
   @computed
   get accessToken() {
-    return this.hasExpired ? null : this.session.accessToken;
+    return this.isAuthenticated ? this.keycloak.token: "";
   }
 
   @computed
   get isAuthenticated() {
-    return !this.hasExpired;
+    return this.authSuccess;
   }
 
   @computed
@@ -94,10 +72,6 @@ class AuthStore {
     return this.isAuthenticated && this.hasUserProfile;
   }
 
-  get hasExpired() {
-    return this.session === null || (new Date() - this.session.expiryTimestamp) > 0;
-  }
-
   @action
   setCurrentWorkspace(workspace) {
     localStorage.setItem("currentWorkspace", workspace);
@@ -106,26 +80,28 @@ class AuthStore {
 
   @action
   logout() {
-    // console.log("logout");
-    this.session = null;
-    this.expiredToken = true;
+    this.authSuccess = false;
+    this.isTokenExpired = true;
     this.user = null;
-    if (typeof Storage !== "undefined") {
-      localStorage.removeItem(authLocalStorageKey);
-    }
+    this.keycloak.logout();
   }
 
   @action
   async retrieveUserProfile() {
-    if (!this.hasExpired && !this.user) {
+    if (this.isAuthenticated && !this.user) {
       this.userProfileError = false;
       this.isRetrievingUserProfile = true;
       try {
-        /* Uncomment to test error handling
-        if ((Math.floor(Math.random() * 10) % 2) === 0) {
-          throw "Error 501";
-        }
-        */
+        // setTimeout(() => {
+        //   runInAction(() => {
+        //     this.user = {
+        //       id: "asdfasdfasdfsd",
+        //       workspaces: ["simpsons"] //TODO: Remove hardcoded values
+        //     };
+        //     this.retrieveUserWorkspace();
+        //     this.isRetrievingUserProfile = false;
+        //   });
+        // }, 1000);
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
           this.user = mapUserProfile(data);
@@ -139,15 +115,6 @@ class AuthStore {
         });
       }
     }
-  }
-
-
-  storeState = () => {
-    const state = {
-      hash: window.location.hash,
-      search: window.location.search
-    };
-    localStorage.setItem(stateLocalStorageKey, JSON.stringify(state));
   }
 
   @action
@@ -167,39 +134,80 @@ class AuthStore {
     }
   }
 
+  @action
+  initializeKeycloak() {
+    const keycloak = window.Keycloak({
+      "realm": "hbp",
+      "url":  this.endpoint,
+      "clientId": "kg-editor"
+    });
+    runInAction(() => this.keycloak = keycloak);
+    keycloak.onAuthSuccess = () => {
+      runInAction(() => {
+        this.authSuccess = true;
+        this.isInitializing = false;
+      });
+      this.retrieveUserProfile();
+    };
+    keycloak.onAuthError = error => {
+      runInAction(() => {
+        this.authError = error.error_description;
+      });
+    };
+    keycloak.onTokenExpired = () => {
+      runInAction(() => {
+        this.authSuccess = false;
+        this.isTokenExpired = true;
+      });
+    };
+    keycloak.init({ onLoad: "login-required", flow: "implicit" });
+  }
 
   @action
-  tryAuthenticate() {
-    const hash = window.location.hash;
-    const accessToken = getKey(hash, "access_token");
-    const state = getKey(hash, "session_state");
-    const expiresIn = getKey(hash, "expires_in");
+  login() {
+    if(!this.isAuthenticated && this.keycloak) {
+      this.keycloak.login();
+    }
+  }
 
-    if (accessToken && state && expiresIn) {
-      this.session = {
-        accessToken: accessToken,
-        expiryTimestamp: new Date().getTime() + 1000 * (Number(expiresIn) - 60)
-      };
+  @action
+  async initiliazeAuthenticate() {
+    this.isInitializing = true;
+    this.authError = null;
+    try {
+      const { data } = await API.axios.get(API.endpoints.auth());
+      runInAction(() => {
+        this.endpoint =  data && data.data? data.data.endpoint :null;
+      });
+      if(this.endpoint) {
+        const keycloakScript = document.createElement("script");
+        keycloakScript.src = this.endpoint + "/js/keycloak.js";
+        keycloakScript.async = true;
 
-      // console.log ("retrieved auth from url: ", this.session);
-      localStorage.setItem(authLocalStorageKey, JSON.stringify(this.session));
-
-      const state = JSON.parse(localStorage.getItem(stateLocalStorageKey));
-      let startHistory = window.location.protocol + "//" + window.location.host + window.location.pathname + state.search + state.hash;
-      const historyState = window.history.state;
-      window.history.replaceState(historyState, "Knowledge Graph Editor", startHistory);
-
-      //TODO: change route to whatever it was before
-      this.retrieveUserProfile();
-    } else {
-      const authStoredState = JSON.parse(localStorage.getItem(authLocalStorageKey));
-      // console.log ("retrieved oid from localStorage: ", authStoredState);
-
-      if (authStoredState && authStoredState.expiryTimestamp && new Date() < authStoredState.expiryTimestamp) {
-        this.session = authStoredState;
-        this.retrieveUserProfile();
+        document.head.appendChild(keycloakScript);
+        keycloakScript.onload = () => {
+          this.initializeKeycloak();
+        };
+        keycloakScript.onerror = () => {
+          document.head.removeChild(keycloakScript);
+          runInAction(() => {
+            this.isInitializing = false;
+            this.authError = `Failed to load resource! (${keycloakScript.src})`;
+          });
+        };
+      } else {
+        runInAction(() => {
+          this.isInitializing = false;
+          this.authError = "service endpoints configuration is not correctly set";
+        });
       }
+    } catch (e) {
+      runInAction(() => {
+        this.isInitializing = false;
+        this.authError = `Failed to load service endpoints configuration (${e && e.message?e.message:e})`;
+      });
     }
   }
 }
+
 export default new AuthStore();

@@ -1,10 +1,8 @@
 import axios from "axios";
 import authStore from "../Stores/AuthStore";
 
-const redirectUri = () => `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
-
 const endpoints = {
-  "login": () => `/editor/api/auth/login?redirect_uri=${escape(redirectUri())}`,
+  "auth": () => "/editor/api/auth/endpoint",
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
@@ -44,9 +42,15 @@ const endpoints = {
 class API {
   constructor() {
     this._axios = axios.create({});
+    this._axios.interceptors.request.use(config => {
+      if(authStore.keycloak) {
+        config.headers.Authorization = "Bearer " + authStore.accessToken;
+      }
+      return Promise.resolve(config);
+    });
     this._axios.interceptors.response.use(null, (error) => {
       if (error.response && error.response.status === 401 && !error.config._isRetry) {
-        return authStore.logout(true).then(()=>{
+        return authStore.logout().then(()=>{
           error.config.headers.Authorization = "Bearer " + authStore.accessToken;
           error.config._isRetry = true;
           return this.axios.request(error.config);
@@ -58,10 +62,6 @@ class API {
   }
 
   get axios() {
-    Object.assign(this._axios.defaults, {
-      headers: { Authorization: "Bearer " + authStore.accessToken },
-      withCredentials: true
-    });
     return this._axios;
   }
 

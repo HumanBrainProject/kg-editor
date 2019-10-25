@@ -26,13 +26,13 @@ object Type {
   implicit val typeReads: Reads[Type] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ "https://kg.ebrains.eu/meta/labelField")
+    (JsPath \ "https://kg.ebrains.eu/meta/labelField") //TODO: Create vocabulary
       .readNullable[Map[String, String]]
       .map {
         case Some(v) => v.getOrElse("@id", "").toString
         case _       => ""
       } and
-    (JsPath \ "https://kg.ebrains.eu/meta/color").readNullable[String]
+    (JsPath \ "https://kg.ebrains.eu/meta/color").readNullable[String] // TODO: Create vocabulary
   )(Type.apply _)
 
   implicit val typeWrites = Json.writes[Type]

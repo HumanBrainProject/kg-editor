@@ -85,7 +85,7 @@ class EditorUserController @Inject()(
           (workspace \ "data").as[List[Map[String, String]]].map(w => w.getOrElse("http://schema.org/name", ""))
         val r = (user \ "data")
           .as[Map[String, JsValue]]
-          .updated("https://kg.ebrains.eu/meta/workspaces", Json.toJson(workspaces))
+          .updated("https://kg.ebrains.eu/meta/workspaces", Json.toJson(workspaces)) //TODO: create vocabulary
         Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
       case (Right(user), _) => Ok(user)
       case (Left(err), _)   => err.toResult

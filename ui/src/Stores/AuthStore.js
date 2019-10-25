@@ -92,16 +92,6 @@ class AuthStore {
       this.userProfileError = false;
       this.isRetrievingUserProfile = true;
       try {
-        // setTimeout(() => {
-        //   runInAction(() => {
-        //     this.user = {
-        //       id: "asdfasdfasdfsd",
-        //       workspaces: ["simpsons"] //TODO: Remove hardcoded values
-        //     };
-        //     this.retrieveUserWorkspace();
-        //     this.isRetrievingUserProfile = false;
-        //   });
-        // }, 1000);
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
           this.user = mapUserProfile(data);
@@ -119,7 +109,6 @@ class AuthStore {
 
   @action
   retrieveUserWorkspace = () => {
-    //TODO: Get the options of spaces
     const savedWorkspace = localStorage.getItem("currentWorkspace");
     if (this.user.workspaces.includes(savedWorkspace)) {
       this.currentWorkspace = savedWorkspace;

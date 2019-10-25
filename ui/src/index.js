@@ -108,7 +108,9 @@ const styles = {
     }
   },
   status: {
-    background: "var(--bg-color-ui-contrast1)"
+    background: "var(--bg-color-ui-contrast1)",
+    color: "var(--ft-color-loud)",
+    paddingLeft: "10px"
   },
   savebar: {
     position: "absolute",
@@ -458,7 +460,7 @@ class App extends React.Component {
           <Theme />
           <div className={classes.tabs}>
             <div className={`${classes.logo} layout-logo`} onClick={this.handleGoToDashboard}>
-              <img src={`${window.rootPath}/assets/HBP.png`} alt="" width="30" height="30" />
+              <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" width="30" height="30" />
               <span>Knowledge Graph Editor</span>
             </div>
             {!appStore.globalError &&

@@ -7,6 +7,7 @@ import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
 import routerStore from "../Stores/RouterStore";
 import instanceStore from "../Stores/InstanceStore";
+import typesStore from "../Stores/TypesStore";
 
 
 const styles = {
@@ -54,6 +55,7 @@ export default class WorkspaceSelector extends React.Component {
     } else {
       authStore.setCurrentWorkspace(eventKey);
     }
+    typesStore.fetch(true);
   }
 
   handleCloseAllInstances = ()  => {

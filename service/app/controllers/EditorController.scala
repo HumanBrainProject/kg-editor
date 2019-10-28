@@ -141,7 +141,7 @@ class EditorController @Inject()(
   def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val result = editorService
-        .retrieveWorkspaceTypes(workspace, withFields = false)
+        .retrieveWorkspaceTypes(workspace)
         .map {
           case Left(err) => err.toResult
           case Right(value) =>

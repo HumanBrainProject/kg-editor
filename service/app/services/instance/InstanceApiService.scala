@@ -338,7 +338,6 @@ trait InstanceApiService {
     wSClient: WSClient,
     apiBaseEndpoint: String,
     workspace: String,
-    withFields: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient

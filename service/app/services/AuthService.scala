@@ -25,21 +25,6 @@ import play.api.libs.json.JsObject
 
 class AuthService @Inject()(wSClient: WSClient, config: ConfigurationService) {
 
-  def getLogin(redirectUri: String): Task[Either[APIEditorError, WSResponse]] = {
-    val q = wSClient
-      .url("http://localhost:10130/users/login") //TODO: Remove hardcoded host
-      .withFollowRedirects(false)
-      .addQueryStringParameters("redirect_uri" -> redirectUri.toString)
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case TEMPORARY_REDIRECT =>
-          Right(res)
-        case _ => Left(APIEditorError(res.status, res.body))
-      }
-    }
-  }
-
   def getEndpoint: Task[Either[APIEditorError, JsObject]] = {
     val q = wSClient
       .url(s"${config.kgCoreEndpoint}/users/authorization")

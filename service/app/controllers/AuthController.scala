@@ -37,22 +37,6 @@ class AuthController @Inject()(
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def getLogin(redirect_uri: String): Action[AnyContent] = Action.async { implicit request =>
-    authService
-      .getLogin(redirect_uri)
-      .map {
-        case Left(err) => err.toResult
-        case Right(value) =>
-          val location = value.header("Location")
-          location match {
-            case Some(value) =>
-              Redirect(value, TEMPORARY_REDIRECT)
-            case None => APIEditorError(INTERNAL_SERVER_ERROR, "No redirect").toResult
-          }
-      }
-      .runToFuture
-  }
-
   def getAuthEndpoint: Action[AnyContent] = Action.async { implicit request =>
     authService.getEndpoint.map {
       case Left(err)    => err.toResult

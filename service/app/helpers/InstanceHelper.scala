@@ -16,6 +16,7 @@
 
 package helpers
 
+import constants.EditorConstants
 import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
 import models.instance.{
@@ -93,7 +94,7 @@ object InstanceHelper {
     }
 
   def getWorkspace(data: JsObject): String =
-    (data \ "space").asOpt[String] match {
+    (data \ EditorConstants.VOCABEBRAINSSPACES).asOpt[String] match {
       case Some(i) => i
       case None    => ""
     }

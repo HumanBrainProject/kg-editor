@@ -59,17 +59,13 @@ trait InstanceApiService {
     apiBaseEndpoint: String,
     token: AccessToken,
     instanceIds: List[String],
-    databaseScope: Option[String] = None,
     metadata: Boolean
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds)
-    val dbScope = databaseScope.map("databaseScope" -> _).getOrElse("" -> "")
     val q = wsClient
-      .url(s"${apiBaseEndpoint}/instances/subset")
-      .withHttpHeaders(AUTHORIZATION -> token.token)
-      .addQueryStringParameters(dbScope)
+      .url(s"${apiBaseEndpoint}/LIVE/instancesByIds")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "X-client-authorization" -> "kgeditor")
       .addQueryStringParameters("metadata" -> metadata.toString)
-      .addQueryStringParameters("stage" -> "LIVE")
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
@@ -105,14 +101,16 @@ trait InstanceApiService {
     apiBaseEndpoint: String,
     token: AccessToken,
     types: List[String],
-    withFields: Boolean
+    serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(types)
     val q = wsClient
-      .url(s"${apiBaseEndpoint}/types/structure")
-      .withHttpHeaders(AUTHORIZATION -> token.token)
-      .addQueryStringParameters("withFields" -> withFields.toString)
-      .addQueryStringParameters("workspace" -> "minds") //TODO: remove hardcoded value
+      .url(s"$apiBaseEndpoint/LIVE/typesWithPropertiesByName")
+      .withHttpHeaders(
+//        "client"                 -> serviceClient.client,
+        AUTHORIZATION            -> token.token,
+        "X-client-authorization" -> "kgeditor"
+      ) //TODO: This should pass the client token
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {

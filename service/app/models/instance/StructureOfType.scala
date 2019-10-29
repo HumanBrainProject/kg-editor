@@ -16,6 +16,7 @@
 
 package models.instance
 
+import constants.EditorConstants
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -26,9 +27,20 @@ object StructureOfType {
 
   import models.instance.StructureOfField._
 
+  val valuesToRemove = List("@id", "@type", "http://schema.org/identifier")
+
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
     JsPath.read[InstanceType] and
-    (JsPath \ "labelField").read[String] and
-    (JsPath \ "fields").read[List[StructureOfField]].map(t => t.map(f => f.fullyQualifiedName -> f).toMap)
+    (JsPath \ EditorConstants.METAEBRAINSLABELFIELD)
+      .readNullable[Map[String, String]]
+      .map {
+        case Some(v) => v.getOrElse("@id", "").toString
+        case _       => ""
+      } and
+    (JsPath \ "https://kg.ebrains.eu/vocab/meta/properties")
+      .read[List[StructureOfField]]
+      .map(
+        t => t.filterNot(i => valuesToRemove.contains(i.fullyQualifiedName)).map(f => f.fullyQualifiedName -> f).toMap
+      )
   )(StructureOfType.apply _)
 }

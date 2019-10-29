@@ -162,36 +162,35 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def getInstancesList(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+  def getInstancesList(metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(databaseScope, metadata, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
+      getInstances(metadata, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
     }
 
-  def getInstancesSummary(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+  def getInstancesSummary(metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(databaseScope, metadata, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
+      getInstances(metadata, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
     }
 
-  def getInstancesLabel(databaseScope: Option[String], metadata: Boolean): Action[AnyContent] =
+  def getInstancesLabel(metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(databaseScope, metadata, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
+      getInstances(metadata, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
     }
 
   def getInstances(
-    databaseScope: Option[String],
     metadata: Boolean,
     generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
         editorService
-          .retrieveInstances(ids, request.userToken, databaseScope, metadata)
+          .retrieveInstances(ids, request.userToken, metadata)
           .flatMap {
             case Right(instancesResult) =>
               val instances = InstanceHelper.extractDataAsList(instancesResult)
               val typesToRetrieve = InstanceHelper.toTypeList(instances)
               editorService
-                .retrieveTypesList(typesToRetrieve.distinct, request.userToken, withFields = true)
+                .retrieveTypesList(typesToRetrieve, request.userToken)
                 .map {
                   case Right(typesWithFields) =>
                     implicit val writer = InstanceProtocol.instanceWrites
@@ -206,12 +205,12 @@ class EditorController @Inject()(
                             )
                           )
                         )
-                      case _ => InternalServerError("Something went wrong! Please try again!")
+                      case _ => InternalServerError("Something went wrong with types list! Please try again!")
                     }
 
-                  case _ => InternalServerError("Something went wrong! Please try again!")
+                  case _ => InternalServerError("Something went wrong with types! Please try again!")
                 }
-            case _ => Task.pure(InternalServerError("Something went wrong! Please try again!"))
+            case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
           }
       case None => Task.pure(BadRequest("Wrong body content!"))
     }

@@ -26,11 +26,16 @@ final case class StructureOfInstance(
   def getPromotedFields(fields: Map[String, StructureOfField]): List[String] =
     fields.values.foldLeft(List[String]()) {
       case (acc, field) =>
-        if (field.searchable) {
-          acc :+ field.fullyQualifiedName
-        } else {
-          acc
+        field.searchable match {
+          case Some(f) =>
+            if (f) {
+              acc :+ field.fullyQualifiedName
+            } else {
+              acc
+            }
+          case _ => acc
         }
+
     }
 
   def add(typeInfo: StructureOfType): StructureOfInstance = {

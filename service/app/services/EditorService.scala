@@ -551,11 +551,10 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
   def retrieveInstances(
     instanceIds: List[String],
     token: AccessToken,
-    databaseScope: Option[String] = None,
     metadata: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstances(wSClient, config.kgCoreEndpoint, token, instanceIds, databaseScope, metadata)
+      .getInstances(wSClient, config.kgCoreEndpoint, token, instanceIds, metadata)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
@@ -573,13 +572,9 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
         case Left(res)    => Left(APIEditorError(res.status, res.body))
       }
 
-  def retrieveTypesList(
-    types: List[String],
-    token: AccessToken,
-    withFields: Boolean
-  ): Task[Either[APIEditorError, JsObject]] =
+  def retrieveTypesList(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstancesByTypeList(wSClient, config.kgCoreEndpoint, token, types, withFields)
+      .getInstancesByTypeList(wSClient, config.kgCoreEndpoint, token, types)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))

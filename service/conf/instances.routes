@@ -51,7 +51,7 @@ DELETE    /:org/:domain/:schema/:version/:id                  controllers.Editor
 #    required: false
 #    type: string
 ###
-POST    /list                 controllers.EditorController.getInstancesList(databaseScope: Option[String], metadata:Boolean?=false)
+POST    /list                 controllers.EditorController.getInstancesList(metadata:Boolean?=false)
 
 ###
 #  summary: get a summary list of entities
@@ -68,7 +68,7 @@ POST    /list                 controllers.EditorController.getInstancesList(data
 #    required: false
 #    type: string
 ###
-POST    /summary                 controllers.EditorController.getInstancesSummary(databaseScope: Option[String], metadata:Boolean?=false)
+POST    /summary                 controllers.EditorController.getInstancesSummary(metadata:Boolean?=false)
 
 ###
 #  summary: get label for a list of entities
@@ -85,7 +85,7 @@ POST    /summary                 controllers.EditorController.getInstancesSummar
 #    required: false
 #    type: string
 ###
-POST    /label                 controllers.EditorController.getInstancesLabel(databaseScope: Option[String], metadata:Boolean?=false)
+POST    /label                 controllers.EditorController.getInstancesLabel(metadata:Boolean?=false)
 
 ###
 #tags:

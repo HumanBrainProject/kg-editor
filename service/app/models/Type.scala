@@ -16,7 +16,7 @@
 
 package models
 
-import constants.SchemaFieldsConstants
+import constants.{EditorConstants, SchemaFieldsConstants}
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.functional.syntax._
 
@@ -26,13 +26,13 @@ object Type {
   implicit val typeReads: Reads[Type] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ "https://kg.ebrains.eu/meta/labelField") //TODO: Create vocabulary
+    (JsPath \ EditorConstants.METAEBRAINSLABELFIELD)
       .readNullable[Map[String, String]]
       .map {
         case Some(v) => v.getOrElse("@id", "").toString
         case _       => ""
       } and
-    (JsPath \ "https://kg.ebrains.eu/meta/color").readNullable[String] // TODO: Create vocabulary
+    (JsPath \ EditorConstants.METAEBRAINSCOLOR).readNullable[String]
   )(Type.apply _)
 
   implicit val typeWrites = Json.writes[Type]

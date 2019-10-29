@@ -16,6 +16,7 @@
 
 package models.instance
 
+import constants.{EditorConstants, SchemaFieldsConstants}
 import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
 import play.api.libs.functional.syntax._
 
@@ -24,9 +25,13 @@ final case class InstanceType(name: String, label: String, color: Option[String]
 object InstanceType {
 
   implicit val instanceTypeReads: Reads[InstanceType] = (
-    (JsPath \ "type").read[String] and
-    (JsPath \ "label").read[String] and
-    (JsPath \ "color").readNullable[String]
+    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
+    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
+    (JsPath \ EditorConstants.METAEBRAINSCOLOR).readNullable[String]
+//
+//    (JsPath \ "type").read[String] and
+//    (JsPath \ "label").read[String] and
+//    (JsPath \ "color").readNullable[String]
   )(InstanceType.apply _)
 
   implicit val instanceTypeWrites: Writes[InstanceType] = new Writes[InstanceType] {

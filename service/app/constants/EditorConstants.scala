@@ -18,8 +18,10 @@ package constants
 import models.NexusPath
 
 object EditorConstants {
-  val BASENAMESPACE = "https://schema.hbp.eu/"
-  val UNSAFE_EDITORNAMESPACE = s"${BASENAMESPACE}hbpkg/" // TODO Deprecation warning ! this will be deprecated, use EDITORNAMESPACE instead
+  val BASENAMESPACE = "https://schema.hbp.eu/" //TODO: Deprecation warning! this will be deprecated, use EBRAINSNAMESPACE instead or update the value to ebrains one
+  val EBRAINSNAMESPACE = "https://kg.ebrains.eu/"
+  val EBRAINSVOCAB = s"${EBRAINSNAMESPACE}vocab"
+  val UNSAFE_EDITORNAMESPACE = s"${BASENAMESPACE}hbpkg/" // TODO: Deprecation warning ! this will be deprecated, use EDITORNAMESPACE instead
   val BASECLIENTNAMESPACEE = s"${BASENAMESPACE}client/"
   val EDITORNAMESPACE = s"${BASECLIENTNAMESPACEE}kg-editor/"
   val EDITORVOCAB = s"${BASENAMESPACE}editor/"
@@ -35,6 +37,14 @@ object EditorConstants {
   // META
   val META = "https://schema.hbp.eu/meta/editor/"
   val METAIDENTIFIER = s"${META}identifier"
+
+  val VOCABMETAEBRAINSOCCURENCES = s"${EBRAINSVOCAB}/meta/occurences"
+
+  val METAEBRAINS = "https://kg.ebrains.eu/meta/"
+  val METAEBRAINSLABELFIELD = s"${METAEBRAINS}labelField"
+  val METAEBRAINSCOLOR = s"${METAEBRAINS}color"
+  val METAEBRAINSWORKSPACES = s"${METAEBRAINS}workspaces"
+  val METAEBRAINSSEARCHABLE = s"${METAEBRAINS}property/searchable"
 
   val RELATIVEURL = "relativeUrl"
 

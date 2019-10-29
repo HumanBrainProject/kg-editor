@@ -17,7 +17,6 @@
 package controllers
 
 import javax.inject.Inject
-import models.errors.APIEditorError
 import play.api.Logger
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.{AuthService, ConfigurationService}

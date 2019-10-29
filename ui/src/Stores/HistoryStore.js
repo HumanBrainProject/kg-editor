@@ -102,33 +102,56 @@ class HistoryStore {
 
   @action
   async fetchInstances(list) {
-    if (!list.length) {
+    // if (!list.length) {
+    //   this.instances = [];
+    //   this.isFetching = false;
+    //   this.fetchError = null;
+    // } else {
+    //   try {
+    //     this.instances = [];
+    //     this.isFetching = true;
+    //     this.fetchError = null;
+    //     list = ["b795759e-ea60-4748-94c2-c23bd7ab4e60-73696d70736f6e73"]; // TODO: Remove hardcoded ids
+    //     const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
+    //     runInAction(() => {
+    //       this.isFetching = false;
+    //       this.instances = (data && data.data instanceof Array)?data.data.map(item => {
+    //         const instance = normalizeInstanceData(item, transformField);
+    //         instance.formStore = new FormStore(instance);
+    //         instance.formStore.toggleReadMode(true);
+    //         return instance;
+    //       }):[];
+    //     });
+    //   } catch (e) {
+    //     runInAction(() => {
+    //       const message = e.message?e.message:e;
+    //       this.fetchError = `Error while retrieving history instances (${message})`;
+    //       this.isFetching = false;
+    //     });
+    //   }
+    // }
+
+    try {
       this.instances = [];
-      this.isFetching = false;
+      this.isFetching = true;
       this.fetchError = null;
-    } else {
-      try {
-        this.instances = [];
-        this.isFetching = true;
-        this.fetchError = null;
-        list = ["bc64b969-32d2-414c-9778-a52c567d9fb1-74657374"]; // TODO: Remove hardcoded ids
-        const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
-        runInAction(() => {
-          this.isFetching = false;
-          this.instances = (data && data.data instanceof Array)?data.data.map(item => {
-            const instance = normalizeInstanceData(item, transformField);
-            instance.formStore = new FormStore(instance);
-            instance.formStore.toggleReadMode(true);
-            return instance;
-          }):[];
-        });
-      } catch (e) {
-        runInAction(() => {
-          const message = e.message?e.message:e;
-          this.fetchError = `Error while retrieving history instances (${message})`;
-          this.isFetching = false;
-        });
-      }
+      list = ["8849c7d3-d7cd-4929-a6fd-84f9b474dd06-73696d70736f6e73"]; // TODO: Remove hardcoded ids
+      const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
+      runInAction(() => {
+        this.isFetching = false;
+        this.instances = (data && data.data instanceof Array)?data.data.map(item => {
+          const instance = normalizeInstanceData(item, transformField);
+          instance.formStore = new FormStore(instance);
+          instance.formStore.toggleReadMode(true);
+          return instance;
+        }):[];
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError = `Error while retrieving history instances (${message})`;
+        this.isFetching = false;
+      });
     }
   }
 

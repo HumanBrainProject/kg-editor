@@ -18,6 +18,7 @@ package controllers
 
 import actions.EditorUserAction
 import com.google.inject.Inject
+import constants.{EditorConstants, SchemaFieldsConstants}
 import helpers.AuthenticationHelper
 import models.editorUserList.BOOKMARKFOLDER
 import models.errors.APIEditorError
@@ -82,10 +83,10 @@ class EditorUserController @Inject()(
     val result = res.map {
       case (Right(user), Right(workspace)) =>
         val workspaces =
-          (workspace \ "data").as[List[Map[String, String]]].map(w => w.getOrElse("http://schema.org/name", ""))
+          (workspace \ "data").as[List[Map[String, String]]].map(w => w.getOrElse(SchemaFieldsConstants.NAME, ""))
         val r = (user \ "data")
           .as[Map[String, JsValue]]
-          .updated("https://kg.ebrains.eu/meta/workspaces", Json.toJson(workspaces)) //TODO: create vocabulary
+          .updated(EditorConstants.METAEBRAINSWORKSPACES, Json.toJson(workspaces))
         Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
       case (Right(user), _) => Ok(user)
       case (Left(err), _)   => err.toResult

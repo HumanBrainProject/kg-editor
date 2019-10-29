@@ -69,8 +69,11 @@ object InstanceHelper {
     }
 
   def getFields(data: JsObject, fieldsInfo: Map[String, StructureOfField]): Map[String, Field] =
+//    List("http://schema.org/identifier", "@id", "@type")
     fieldsInfo.foldLeft(Map[String, Field]()) {
-      case (map, (fieldName, fieldInfo)) => map.updated(fieldName, Field(data, fieldInfo))
+      case (map, (fieldName, fieldInfo)) =>
+//        if(fieldName !==)
+        map.updated(fieldName, Field(data, fieldInfo))
     }
 
   def filterFieldNames(fields: List[String], filter: List[String]): List[String] = fields.filterNot(filter.toSet)

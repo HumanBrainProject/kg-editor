@@ -16,6 +16,7 @@
 
 package models.instance
 
+import constants.{EditorConstants, SchemaFieldsConstants}
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -29,23 +30,35 @@ final case class StructureOfField(
   allowCustomValues: Option[Boolean],
   canBe: Option[List[String]],
   numOfOccurrences: Option[Int],
-  `type`: String,
-  searchable: Boolean
+  `type`: Option[String],
+  searchable: Option[Boolean]
 )
 
 object StructureOfField {
 
   implicit val structureOfFieldReads: Reads[StructureOfField] = (
-    (JsPath \ "fullyQualifiedName").read[String] and
-    (JsPath \ "name").read[String] and
-    (JsPath \ "label").read[String] and
+    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
+    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
+    (JsPath \ SchemaFieldsConstants.NAME).read[String].map(i => i.capitalize) and
     (JsPath \ "labelTooltip").readNullable[String] and
     (JsPath \ "markdown").readNullable[Boolean] and
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ "canBe").readNullable[List[String]] and
-    (JsPath \ "numOfOccurrences").readNullable[Int] and
-    (JsPath \ "widget").read[String] and
-    (JsPath \ "searchable").read[Boolean]
+    (JsPath \ EditorConstants.VOCABMETAEBRAINSOCCURENCES).readNullable[Int] and
+    (JsPath \ "https://kg.ebrains.eu/meta/property/widget")
+      .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
+    (JsPath \ EditorConstants.METAEBRAINSSEARCHABLE).readNullable[Boolean]
+
+//      (JsPath \ "fullyQualifiedName").read[String] and
+//      (JsPath \ "name").read[String] and
+//      (JsPath \ "label").read[String] and
+//      (JsPath \ "labelTooltip").readNullable[String] and
+//      (JsPath \ "markdown").readNullable[Boolean] and
+//      (JsPath \ "allowCustomValues").readNullable[Boolean] and
+//      (JsPath \ "canBe").readNullable[List[String]] and
+//      (JsPath \ "numOfOccurrences").readNullable[Int] and
+//      (JsPath \ "widget").read[String] and
+//      (JsPath \ "searchable").read[Boolean]
   )(StructureOfField.apply _)
 
   implicit val structureOfFieldWrites = Json.writes[StructureOfField]

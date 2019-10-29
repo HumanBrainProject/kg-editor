@@ -45,20 +45,9 @@ object StructureOfField {
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ "canBe").readNullable[List[String]] and
     (JsPath \ EditorConstants.VOCABMETAEBRAINSOCCURENCES).readNullable[Int] and
-    (JsPath \ "https://kg.ebrains.eu/meta/property/widget")
+    (JsPath \ EditorConstants.METAEBRAINSWIDGET)
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
     (JsPath \ EditorConstants.METAEBRAINSSEARCHABLE).readNullable[Boolean]
-
-//      (JsPath \ "fullyQualifiedName").read[String] and
-//      (JsPath \ "name").read[String] and
-//      (JsPath \ "label").read[String] and
-//      (JsPath \ "labelTooltip").readNullable[String] and
-//      (JsPath \ "markdown").readNullable[Boolean] and
-//      (JsPath \ "allowCustomValues").readNullable[Boolean] and
-//      (JsPath \ "canBe").readNullable[List[String]] and
-//      (JsPath \ "numOfOccurrences").readNullable[Int] and
-//      (JsPath \ "widget").read[String] and
-//      (JsPath \ "searchable").read[Boolean]
   )(StructureOfField.apply _)
 
   implicit val structureOfFieldWrites = Json.writes[StructureOfField]

@@ -37,7 +37,7 @@ object StructureOfType {
         case Some(v) => v.getOrElse("@id", "").toString
         case _       => ""
       } and
-    (JsPath \ "https://kg.ebrains.eu/vocab/meta/properties")
+    (JsPath \ EditorConstants.METAEBRAINSPROPERTIES)
       .read[List[StructureOfField]]
       .map(
         t => t.filterNot(i => valuesToRemove.contains(i.fullyQualifiedName)).map(f => f.fullyQualifiedName -> f).toMap

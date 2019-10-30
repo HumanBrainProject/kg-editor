@@ -107,7 +107,7 @@ trait InstanceApiService {
     val q = wsClient
       .url(s"$apiBaseEndpoint/LIVE/typesWithPropertiesByName")
       .withHttpHeaders(
-//        "client"                 -> serviceClient.client,
+        //        "client"                 -> serviceClient.client,
         AUTHORIZATION            -> token.token,
         "X-client-authorization" -> "kgeditor"
       ) //TODO: This should pass the client token
@@ -132,7 +132,7 @@ trait InstanceApiService {
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds).as[JsArray]
     val q = wSClient
-      .url(s"${apiBaseEndpoint}/instances/releases/status")
+      .url(s"${apiBaseEndpoint}/releases/status")
       .withHttpHeaders(AUTHORIZATION -> token.token)
       .addQueryStringParameters("releaseTreeScope" -> releaseTreeScope)
     val r = Task.deferFuture(q.post(payload))
@@ -341,7 +341,7 @@ trait InstanceApiService {
     val q = wSClient
       .url(s"$apiBaseEndpoint/LIVE/typesWithProperties")
       .addQueryStringParameters("workspace" -> workspace)
-      .withHttpHeaders("client" -> serviceClient.client)
+      .withHttpHeaders("X-client-authorization" -> "kgeditor")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {

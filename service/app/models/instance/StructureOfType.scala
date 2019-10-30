@@ -16,21 +16,40 @@
 
 package models.instance
 
-import constants.EditorConstants
+import constants.{EditorConstants, SchemaFieldsConstants}
+import helpers.InstanceHelper
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-final case class StructureOfType(`type`: InstanceType, labelField: String, fields: Map[String, StructureOfField])
+final case class StructureOfType(
+  name: String,
+  label: String,
+  color: Option[String],
+  labelField: String,
+  fields: Map[String, StructureOfField],
+  promotedFields: List[String]
+)
 
 object StructureOfType {
+
+  def apply(
+    name: String,
+    label: String,
+    color: Option[String],
+    labelField: String,
+    fields: Map[String, StructureOfField]
+  ): StructureOfType =
+    StructureOfType(name, label, color, labelField, fields, InstanceHelper.getPromotedFields(fields))
 
   import models.instance.StructureOfField._
 
   val valuesToRemove = List("@id", "@type", "http://schema.org/identifier")
 
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
-    JsPath.read[InstanceType] and
+    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
+    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
+    (JsPath \ EditorConstants.METAEBRAINSCOLOR).readNullable[String] and
     (JsPath \ EditorConstants.METAEBRAINSLABELFIELD)
       .readNullable[Map[String, String]]
       .map {
@@ -42,5 +61,7 @@ object StructureOfType {
       .map(
         t => t.filterNot(i => valuesToRemove.contains(i.fullyQualifiedName)).map(f => f.fullyQualifiedName -> f).toMap
       )
-  )(StructureOfType.apply _)
+  )(StructureOfType.apply(_, _, _, _, _))
+
+  implicit val structureOfTypeWrites = Json.writes[StructureOfType]
 }

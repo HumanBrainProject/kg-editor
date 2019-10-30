@@ -28,10 +28,6 @@ object InstanceType {
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.METAEBRAINSCOLOR).readNullable[String]
-//
-//    (JsPath \ "type").read[String] and
-//    (JsPath \ "label").read[String] and
-//    (JsPath \ "color").readNullable[String]
   )(InstanceType.apply _)
 
   implicit val instanceTypeWrites: Writes[InstanceType] = new Writes[InstanceType] {

@@ -145,7 +145,7 @@ class EditorController @Inject()(
         .map {
           case Left(err) => err.toResult
           case Right(value) =>
-            val res = (value \ "data").as[List[Type]]
+            val res = (value \ "data").as[List[StructureOfType]]
             Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
         }
       result.runToFuture

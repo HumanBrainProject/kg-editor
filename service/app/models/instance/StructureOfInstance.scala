@@ -16,6 +16,8 @@
 
 package models.instance
 
+import helpers.InstanceHelper
+
 final case class StructureOfInstance(
   types: Map[String, InstanceType],
   labelField: List[String],
@@ -23,28 +25,13 @@ final case class StructureOfInstance(
   fields: Map[String, StructureOfField]
 ) {
 
-  def getPromotedFields(fields: Map[String, StructureOfField]): List[String] =
-    fields.values.foldLeft(List[String]()) {
-      case (acc, field) =>
-        field.searchable match {
-          case Some(f) =>
-            if (f) {
-              acc :+ field.fullyQualifiedName
-            } else {
-              acc
-            }
-          case _ => acc
-        }
-
-    }
-
   def add(typeInfo: StructureOfType): StructureOfInstance = {
-    val pf = getPromotedFields(typeInfo.fields)
+    val pf = InstanceHelper.getPromotedFields(typeInfo.fields)
     val f = typeInfo.fields.foldLeft(fields) {
       case (map, (name, value)) => map.updated(name, value)
     }
     StructureOfInstance(
-      types.updated(typeInfo.`type`.name, typeInfo.`type`),
+      types.updated(typeInfo.name, InstanceType(typeInfo.name, typeInfo.label, typeInfo.color)),
       labelField :+ typeInfo.labelField,
       (promotedFields ::: pf).distinct,
       f

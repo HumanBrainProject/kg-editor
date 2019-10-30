@@ -66,15 +66,12 @@ object InstanceHelper {
 
   def getTypeInfoMap(list: List[StructureOfType]): Map[String, StructureOfType] =
     list.foldLeft(Map[String, StructureOfType]()) {
-      case (map, typeInfo) => map.updated(typeInfo.`type`.name, typeInfo)
+      case (map, typeInfo) => map.updated(typeInfo.name, typeInfo)
     }
 
   def getFields(data: JsObject, fieldsInfo: Map[String, StructureOfField]): Map[String, Field] =
-//    List("http://schema.org/identifier", "@id", "@type")
     fieldsInfo.foldLeft(Map[String, Field]()) {
-      case (map, (fieldName, fieldInfo)) =>
-//        if(fieldName !==)
-        map.updated(fieldName, Field(data, fieldInfo))
+      case (map, (fieldName, fieldInfo)) => map.updated(fieldName, Field(data, fieldInfo))
     }
 
   def filterFieldNames(fields: List[String], filter: List[String]): List[String] = fields.filterNot(filter.toSet)
@@ -108,6 +105,21 @@ object InstanceHelper {
           None
         }
       case None => None
+    }
+
+  def getPromotedFields(fields: Map[String, StructureOfField]): List[String] =
+    fields.values.foldLeft(List[String]()) {
+      case (acc, field) =>
+        field.searchable match {
+          case Some(f) =>
+            if (f) {
+              acc :+ field.fullyQualifiedName
+            } else {
+              acc
+            }
+          case _ => acc
+        }
+
     }
 
   def toCamel(s: String): String = {

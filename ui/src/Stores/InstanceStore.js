@@ -11,7 +11,6 @@ import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import { matchPath } from "react-router-dom";
-import typesStore from "./TypesStore";
 
 class Instance {
   @observable id = null;
@@ -358,9 +357,6 @@ class InstanceStore {
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
     this.setReadMode(readMode);
-    if (!readMode && viewMode === "edit" && !typesStore.isFetched) {
-      typesStore.fetch();
-    }
     if(this.openedInstances.has(instanceId)){
       const instance = this.instances.get(instanceId);
       if (instance && instance.isFetched && !instance.fetchError) {
@@ -375,12 +371,14 @@ class InstanceStore {
         viewMode: viewMode,
         paneStore: new PaneStore()
       });
-      const instance = this.createInstanceOrGet(instanceId);
-      if(instance.isFetched && !instance.fetchError) {
-        const types = instance.types.map(({name}) => name);
-        historyStore.updateInstanceHistory(instance.id, types, "viewed");
-      } else {
-        instance.fetch();
+      if(viewMode !== "create") {
+        const instance = this.createInstanceOrGet(instanceId);
+        if(instance.isFetched && !instance.fetchError) {
+          const types = instance.types.map(({name}) => name);
+          historyStore.updateInstanceHistory(instance.id, types, "viewed");
+        } else {
+          instance.fetch();
+        }
       }
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
@@ -440,7 +438,7 @@ class InstanceStore {
   @action
   restoreOpenedTabs(storedOpenedTabs){
     storedOpenedTabs.forEach(([id, viewMode]) => {
-      this.openInstance(id, viewMode, viewMode !== "edit");
+      this.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
     });
   }
 
@@ -465,39 +463,36 @@ class InstanceStore {
   }
 
   @action
-  async createNewInstance(typeObj, name=""){
-    if (typesStore.isFetched) {
-      const type = typeObj.type;
-      if (type) {
-        const labelField = typeObj.labelField;
-        if (!name || (name && labelField)) {
-          this.isCreatingNewInstance = true;
-          try{
-            const payload = {};
-            if (labelField) {
-              payload[labelField] = name;
-            }
-            const { data } = await API.axios.post(API.endpoints.createInstance(type, this.databaseScope), payload);
-            this.isCreatingNewInstance = false;
-            return data.data.id;
-          } catch(e){
-            this.isCreatingNewInstance = false;
-            this.instanceCreationError = e.message;
-          }
-        } else {
-          this.isCreatingNewInstance = false;
-          this.instanceCreationError = `Error: labelField is not defined for ${type} type!`;
-        }
-      } else {
-        // Should never happen: UI should ensure to propose only available types
-        this.isCreatingNewInstance = false;
-        this.instanceCreationError = `Error: type ${type} is not available!`;
-      }
-    } else {
-      // Should never happen: UI should ensure we the list has been fetch before calling createNewInstance
-      this.isCreatingNewInstance = false;
-      this.instanceCreationError = "Error: instances types are not available!";
-    }
+  createNewInstance(type, id, name=""){
+    const instanceType = {name: type.name, label: type.label, color: type.color};
+    const fields = toJS(type.fields);
+    Object.values(fields).forEach(field => field.value = "");
+    const data = {
+      workspace: authStore.currentWorkspace,
+      types: [instanceType],
+      name: name,
+      fields: fields,
+      primaryType: instanceType,
+      promotedFields: toJS(type.promotedFields),
+      alternatives: {},
+      metadata: {},
+      permissions: {}
+    };
+    const normalizedData = normalizeInstanceData(data);
+    const instance  = new Instance(id, this);
+    instance.workspace = normalizedData.workspace;
+    instance.types = normalizedData.types;
+    instance.name = normalizedData.name;
+    instance.fields = normalizedData.fields;
+    instance.primaryType = normalizedData.primaryType;
+    instance.promotedFields = normalizedData.promotedFields;
+    instance.alternatives = normalizedData.alternatives;
+    instance.metadata = normalizedData.metadata;
+    instance.form = new FormStore(normalizedData);
+    instance.isFetching = false;
+    instance.isFetched = true;
+    this.instances.set(id, instance);
+    this.setReadMode(false);
   }
 
   @action

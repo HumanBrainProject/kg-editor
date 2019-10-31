@@ -108,14 +108,6 @@ export default class InstanceField extends React.Component{
     const { classes } = this.props;
     if (field) {
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
-        /*
-        if (this.props.id !== this.props.mainInstanceId && this.props.id !== instanceStore.getCurrentInstanceId(this.props.mainInstanceId) && this.props.level !== 0) {
-          if (field.value && field.value.length && field.value.length >= 200) {
-            return field.value.substr(0,197) + "...";
-          }
-          return field.value;
-        }
-        */
         return (
           field.markdown === true ? <RenderMarkdownField value={field.value}/>:
             <p>{field.value}</p>

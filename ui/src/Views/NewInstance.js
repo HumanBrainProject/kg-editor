@@ -14,7 +14,13 @@ import BGMessage from "../Components/BGMessage";
 
 const styles = {
   container: {
-    height: "100%",
+    position:"absolute",
+    width:"50%",
+    height:"calc(100% - 40px)",
+    top:"20px",
+    left:"25%",
+    boxShadow: "0 2px 10px var(--pane-box-shadow)",
+    background: "white",
     "& > div": {
       height: "100%"
     },
@@ -61,11 +67,10 @@ export default class NewInstance extends React.Component {
 
   handleFetchInstanceTypes = () => typesStore.fetch();
 
-  async handleClickNewInstanceOfType(type) {
-    let newInstanceId = await instanceStore.createNewInstance(type);
-    instanceStore.toggleShowCreateModal();
-    routerStore.history.push(`/instance/edit/${newInstanceId}`);
+  handleClickNewInstanceOfType(type) {
+    instanceStore.createNewInstance(type, this.props.id);
   }
+
 
   render() {
     const { classes, onCancel } = this.props;
@@ -96,7 +101,7 @@ export default class NewInstance extends React.Component {
               <div className={classes.lists}>
                 <div className={classes.list}>
                   {typesStore.types.map(type => (
-                    <div key={type.label} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, type.type)}>
+                    <div key={type.label} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, type)}>
                       <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
                         <FontAwesomeIcon fixedWidth icon="circle" />
                       </div>{type.label}
@@ -104,7 +109,6 @@ export default class NewInstance extends React.Component {
                   ))}
                 </div>
               </div>
-
             </Scrollbars>
         }
         {instanceStore.isCreatingNewInstance ?

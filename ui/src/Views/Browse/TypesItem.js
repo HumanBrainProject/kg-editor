@@ -1,6 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
+import _ from "lodash-uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import browseStore from "../../Stores/BrowseStore";
@@ -118,10 +119,9 @@ export default class TypesItem extends React.Component {
     browseStore.selectItem(this.props.type);
   }
 
-  handleCreateInstance = event => {
-    event && event.stopPropagation();
-    let newInstanceId = instanceStore.createNewInstance(this.props.type.id);
-    routerStore.history.push(`/instance/edit/${newInstanceId}`);
+  handleCreateInstance = () => {
+    const uuid = _.uuid();
+    routerStore.history.push(`/instance/create/${uuid}`);
   }
 
   render() {

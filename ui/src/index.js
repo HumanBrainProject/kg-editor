@@ -6,6 +6,7 @@ import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
+import _  from "lodash-uuid";
 import injectStyles from "react-jss";
 
 import "react-virtualized/styles.css";
@@ -31,7 +32,6 @@ import Help from "./Views/Help";
 // import Statistics from "./Views/Statistics";
 import Browse from "./Views/Browse";
 import Instance from "./Views/Instance";
-import NewInstance from "./Views/NewInstance";
 import FetchingLoader from "./Components/FetchingLoader";
 import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
@@ -435,7 +435,8 @@ class App extends React.Component {
   }
 
   handleCreateInstance = () => {
-    instanceStore.toggleShowCreateModal();
+    const uuid = _.uuid();
+    routerStore.history.push(`/instance/create/${uuid}`);
   }
 
   handleHideCreateModal = () => {
@@ -482,7 +483,7 @@ class App extends React.Component {
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
-                    if (instance.isFetched) {
+                    if (instance && instance.isFetched) {
                       const labelField = instance.labelField;
                       const field = labelField && instance.form.getField(labelField);
                       label = field ? field.getValue() : instanceId;
@@ -494,8 +495,8 @@ class App extends React.Component {
                     return (
                       <Tab
                         key={instanceId}
-                        icon={instance.isFetching ? "circle-notch" : "circle"}
-                        iconSpin={instance.isFetching}
+                        icon={instance && instance.isFetching ? "circle-notch" : "circle"}
+                        iconSpin={instance && instance.isFetching}
                         iconColor={color}
                         current={matchPath(currentLocation, { path: `/instance/${mode}/${instanceId}`, exact: "true" })}
                         path={`/instance/${mode}/${instanceId}`}
@@ -567,6 +568,7 @@ class App extends React.Component {
                         authStore.hasWorkspaces?
                           authStore.currentWorkspace?
                             <Switch>
+                              <Route path="/instance/create/:id*" render={(props) => (<Instance {...props} mode="create" />)} />
                               <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
                               <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
                               <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
@@ -594,16 +596,6 @@ class App extends React.Component {
           </div>
           {authStore.isFullyAuthenticated && (
             <React.Fragment>
-              {instanceStore.showCreateModal &&
-                <Modal dialogClassName={classes.newInstanceModal} show={true} onHide={this.handleHideCreateModal}>
-                  <Modal.Header closeButton>
-                    New Instance
-                  </Modal.Header>
-                  <Modal.Body>
-                    <NewInstance onCancel={this.handleHideCreateModal} />
-                  </Modal.Body>
-                </Modal>
-              }
               {instanceStore.deleteInstanceError ?
                 <div className={classes.deleteInstanceErrorModal}>
                   <Modal.Dialog>

@@ -1,4 +1,4 @@
-export const normalizeInstanceData = (data, transformField) => {
+export const normalizeInstanceData = (data, transformField=null) => {
   const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: {}, promotedFields: [], alternatives: [], metadata: {}, permissions: {}};
   if (!data) {
     return instance;

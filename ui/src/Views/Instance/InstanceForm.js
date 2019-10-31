@@ -250,58 +250,44 @@ export default class InstanceForm extends React.Component {
             <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
             :
             instance.isFetched?
-              (!instance.isReadMode && browseStore.fetchError.lists)?
-                <BGMessage icon={"ban"}>
-                  {`There was a network problem fetching the instances types (${browseStore.fetchError.lists}).
-                  If the problem persists, please contact the support.`}<br /><br />
-                  <Button bsStyle={"primary"} onClick={this.handleListLoadRetry}>
-                    <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-                  </Button>
-                </BGMessage>
-                :
-                (!instance.isReadMode && browseStore.isFetching.lists)?
-                  <FetchingLoader>
-                    Fetching instances types...
-                  </FetchingLoader>
-                  :
-                  <React.Fragment>
-                    <div
-                      onFocus={this.handleFocus}
-                      onClick={this.handleFocus}
-                      onDoubleClick={instance.isReadMode && !isMainInstance ? this.handleOpenInstance : undefined}
-                      onChange={this.handleChange}
-                      onLoad={this.handleLoad}
-                    >
-                      <Form store={instance.form} key={mainInstanceId}>
-                        <HeaderPanel
-                          className={classes.panelHeader}
-                          types={instance.types}
-                          hasChanged={instance.hasChanged} />
+              <React.Fragment>
+                <div
+                  onFocus={this.handleFocus}
+                  onClick={this.handleFocus}
+                  onDoubleClick={instance.isReadMode && !isMainInstance ? this.handleOpenInstance : undefined}
+                  onChange={this.handleChange}
+                  onLoad={this.handleLoad}
+                >
+                  <Form store={instance.form} key={mainInstanceId}>
+                    <HeaderPanel
+                      className={classes.panelHeader}
+                      types={instance.types}
+                      hasChanged={instance.hasChanged} />
 
-                        {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
-                          <React.Fragment>
-                            <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.promotedFields} disableLinks={!isCurrentInstance} />
-                            <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
-                          </React.Fragment>
-                        }
-                        <FooterPanel
-                          className={classes.panelFooter}
-                          id={id?id:"<new>"}
-                          workspace={instance.workspace}
-                          showOpenActions={isCurrentInstance && !isMainInstance} />
-                      </Form>
-                      <ConfirmCancelEditPanel
-                        show={instance.cancelChangesPending}
-                        text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
-                        onConfirm={this.handleConfirmCancelEdit}
-                        onCancel={this.handleContinueEditing}
-                        inline={!isMainInstance} />
-                      <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
-                      <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance} />
-                      <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
-                    </div>
-                    <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
-                  </React.Fragment>
+                    {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
+                      <React.Fragment>
+                        <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.promotedFields} disableLinks={!isCurrentInstance} />
+                        <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
+                      </React.Fragment>
+                    }
+                    <FooterPanel
+                      className={classes.panelFooter}
+                      id={id?id:"<new>"}
+                      workspace={instance.workspace}
+                      showOpenActions={isCurrentInstance && !isMainInstance} />
+                  </Form>
+                  <ConfirmCancelEditPanel
+                    show={instance.cancelChangesPending}
+                    text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
+                    onConfirm={this.handleConfirmCancelEdit}
+                    onCancel={this.handleContinueEditing}
+                    inline={!isMainInstance} />
+                  <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
+                  <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance} />
+                  <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
+                </div>
+                <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
+              </React.Fragment>
               :
               null
         }

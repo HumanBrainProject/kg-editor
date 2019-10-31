@@ -16,6 +16,7 @@
     "hbp-quickfire": "^1.0.24",
     "jsonld": "~1.5.4",
     "lodash": "^4.17.15",
+    "lodash-uuid": "0.0.3",
     "mobx": "^4.11.0",
     "mobx-react": "^5.4.4",
     "nivo": "^0.31.0",

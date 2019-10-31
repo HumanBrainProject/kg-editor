@@ -466,9 +466,9 @@ class InstanceStore {
   createNewInstance(type, id, name=""){
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
-    Object.values(fields).forEach(field => field.value = "");
     const data = {
       workspace: authStore.currentWorkspace,
+      id: id,
       types: [instanceType],
       name: name,
       fields: fields,

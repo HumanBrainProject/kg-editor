@@ -23,7 +23,6 @@ import monix.eval.Task
 import monix.execution.Scheduler
 import play.api.mvc.Results._
 import play.api.mvc._
-import services.IDMAPIService
 
 import scala.concurrent.{ExecutionContext, Future}
 

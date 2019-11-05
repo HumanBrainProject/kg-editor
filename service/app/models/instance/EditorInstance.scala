@@ -15,9 +15,6 @@
  */
 package models.instance
 
-import constants.{JsonLDConstants, SchemaFieldsConstants}
-import models.user.User
-import org.joda.time.DateTime
 import play.api.libs.json._
 
 final case class EditorInstance(nexusInstance: NexusInstance) {

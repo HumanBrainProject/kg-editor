@@ -45,7 +45,7 @@ class FormService @Inject()(
   val timeout = FiniteDuration(30, "sec")
   val retryTime = 5000 //ms
   val logger: slf4j.Logger = LoggerFactory.getLogger(this.getClass)
-  specificationService.init().runSyncUnsafe(timeout)
+  //specificationService.init().runSyncUnsafe(timeout)
 
   /**
     * @return the specification and stored queries

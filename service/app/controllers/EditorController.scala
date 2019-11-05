@@ -16,13 +16,11 @@
 
 package controllers
 
-import actions.EditorUserAction
 import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
 import models.instance.InstanceProtocol._
-import models.{instance, _}
+import models._
 import models.instance._
-import models.specification.{FormRegistry, UISpec}
 import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.Json.JsValueWrapper
@@ -40,9 +38,7 @@ class EditorController @Inject()(
   editorService: EditorService,
   TokenAuthService: TokenAuthService,
   config: ConfigurationService,
-  iAMAuthService: IAMAuthService,
   formService: FormService,
-  metadataService: MetadataService,
   reverseLinkService: ReverseLinkService
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
@@ -125,29 +121,6 @@ class EditorController @Inject()(
         }
         .runToFuture
     }
-
-  private def getMetaDataByIds(
-    ls: Seq[NexusInstance],
-    formRegistry: FormRegistry[UISpec]
-  ): List[Task[Option[JsObject]]] =
-    ls.groupBy(_.id().get)
-      .map {
-        case (_, v) =>
-          val formService: Task[Option[JsObject]] =
-            FormOp.getFormStructure(v.head.nexusPath, v.head.content, formRegistry) match {
-              case JsNull =>
-                Task.pure(None)
-              case instanceForm =>
-                metadataService.getMetadata(v.head).map {
-                  case Right(metadata) =>
-                    Some(instanceForm.as[JsObject] ++ Json.obj("metadata" -> Json.toJson(metadata)))
-                  case Left(_) =>
-                    Some(instanceForm.as[JsObject])
-                }
-            }
-          formService
-      }
-      .toList
 
   def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
@@ -511,7 +484,7 @@ class EditorController @Inject()(
     * @return A result with the instance updated or an error message
     */
   def updateInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
-    (authenticatedUserAction andThen EditorUserAction.editorUserWriteAction(org, config.editorPrefix, iAMAuthService))
+    (authenticatedUserAction)
       .async { implicit request =>
         val instanceRef = NexusInstanceReference(org, domain, schema, version, id)
         editorService
@@ -562,7 +535,7 @@ class EditorController @Inject()(
     * @return 201 Created
     */
   def createInstance(org: String, domain: String, schema: String, version: String): Action[AnyContent] =
-    (authenticatedUserAction andThen EditorUserAction.editorUserWriteAction(org, config.editorPrefix, iAMAuthService))
+    (authenticatedUserAction)
       .async { implicit request =>
         val instancePath = NexusPath(org, domain, schema, version)
         editorService

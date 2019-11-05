@@ -22,7 +22,6 @@ import models.instance.{NexusInstanceReference, PreviewInstance}
 import models.specification.{FormRegistry, UISpec}
 import models.user.EditorUser
 import monix.eval.Task
-import play.api.libs.ws.WSResponse
 
 trait BookmarkServiceInterface {
 

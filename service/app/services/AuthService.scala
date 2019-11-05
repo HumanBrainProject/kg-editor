@@ -19,7 +19,7 @@ package services
 import com.google.inject.Inject
 import models.errors.APIEditorError
 import monix.eval.Task
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import play.api.http.Status._
 import play.api.libs.json.JsObject
 

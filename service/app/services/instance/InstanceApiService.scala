@@ -25,7 +25,6 @@ import play.api.http.HeaderNames._
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.mvc.Results
 import services.query.QueryApiParameter
 import services.{AuthHttpClient, CredentialsService, TokenAuthService}
 

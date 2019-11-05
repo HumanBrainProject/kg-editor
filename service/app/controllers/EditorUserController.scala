@@ -19,7 +19,6 @@ package controllers
 import actions.EditorUserAction
 import com.google.inject.Inject
 import constants.{EditorConstants, SchemaFieldsConstants}
-import helpers.AuthenticationHelper
 import models.editorUserList.BOOKMARKFOLDER
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference

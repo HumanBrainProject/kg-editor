@@ -16,52 +16,18 @@
 
 package actions
 
-import helpers.EditorSpaceHelper
-import models.user.{EditorUserRequest, EditorUserWriteRequest, IDMUser}
-import models.{user, IAMPermission, UserRequest}
-import monix.eval.Task
+import models.user.{EditorUserRequest, IDMUser}
+import models.{user, UserRequest}
 import play.api.Logger
 import play.api.mvc.Results._
 import play.api.mvc._
-import services.{EditorUserService, IAMAuthService}
+import services.EditorUserService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object EditorUserAction {
   val logger = Logger(this.getClass)
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
-
-  def editorUserWriteAction(org: String, editorSuffix: String, iAMAuthService: IAMAuthService)(
-    implicit ec: ExecutionContext
-  ): ActionRefiner[UserRequest, EditorUserWriteRequest] =
-    new ActionRefiner[UserRequest, EditorUserWriteRequest] {
-
-      def executionContext: ExecutionContext = ec
-
-      def refine[A](input: UserRequest[A]): Future[Either[Result, EditorUserWriteRequest[A]]] = {
-        val editorOrg = if (org.endsWith(editorSuffix)) org else org + "-" + editorSuffix
-        val iamOrg = if (org.endsWith(editorSuffix)) org else org + editorSuffix
-        val result = if (EditorSpaceHelper.isEditorGroup(input.user, editorOrg)) {
-          iAMAuthService.getAcls(iamOrg, Seq(("self", "true"), ("parents", "true")), input.userToken).map {
-            case Right(acls) =>
-              if (IAMAuthService.hasAccess(acls, IAMPermission.Write)) {
-                Right(EditorUserWriteRequest(input.user, org, input, input.userToken))
-              } else {
-                Left(Forbidden("You do not have sufficient access rights to proceed"))
-              }
-            case Left(response) =>
-              logger.error(s"Fetching permission failed - ${response.body}")
-              Left(InternalServerError("An error occurred while fetching permission"))
-          }
-        } else {
-          logger.debug(s"Not allowed: ${input.user} for index: $org")
-          Task.pure {
-            Left(Forbidden("You are not allowed to perform this request"))
-          }
-        }
-        result.runToFuture
-      }
-    }
 
   def editorUserAction(
     editorUserService: EditorUserService

@@ -15,7 +15,6 @@
  */
 package services.query
 
-import constants.QueryConstants
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference
 import models.specification.QuerySpec
@@ -24,7 +23,7 @@ import monix.eval.Task
 import play.api.http.ContentTypes._
 import play.api.http.HeaderNames._
 import play.api.http.Status.{NO_CONTENT, OK}
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json.{JsArray, JsObject}
 import play.api.libs.ws.{WSClient, WSResponse}
 import services.{AuthHttpClient, CredentialsService, TokenAuthService}
 

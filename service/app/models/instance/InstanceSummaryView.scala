@@ -17,7 +17,7 @@
 package models.instance
 
 import helpers.InstanceHelper
-import play.api.libs.json.{JsObject, JsPath, JsValue, Json, Reads, Writes}
+import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceSummaryView(
   id: String,

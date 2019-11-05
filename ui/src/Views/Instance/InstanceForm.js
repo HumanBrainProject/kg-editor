@@ -4,14 +4,10 @@ import { observer } from "mobx-react";
 import { Form } from "hbp-quickfire";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
 
 import routerStore from "../../Stores/RouterStore";
 import TypesStore from "../../Stores/TypesStore";
-import browseStore from "../../Stores/BrowseStore";
 import instanceStore from "../../Stores/InstanceStore";
-import FetchingLoader from "../../Components/FetchingLoader";
-import BGMessage from "../../Components/BGMessage";
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";

@@ -2,9 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import {observer} from "mobx-react";
 
-import instanceStore from "../../Stores/InstanceStore";
 import ThemeSwitcher from "./ThemeSwitcher";
-import TypesStore from "../../Stores/TypesStore";
 
 const styles = {
   container:{
@@ -44,20 +42,6 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class Hub extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      showCreateModal:false
-    };
-  }
-
-  handleCreateInstance = () => {
-    if(!TypesStore.isFetched) {
-      TypesStore.fetch();
-    }
-    instanceStore.toggleShowCreateModal();
-  }
-
   render(){
     const { classes } = this.props;
     return(

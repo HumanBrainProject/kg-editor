@@ -1,4 +1,22 @@
 ###
+#  summary: Check if a specific entity id is available
+#  tags:
+#    - editor
+#  parameters:
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to delete
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /:id/available                  controllers.EditorController.isInstanceIdAvailable(id: String)
+
+###
 #  summary: Delete a specific entity
 #  tags:
 #    - editor

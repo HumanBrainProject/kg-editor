@@ -33,6 +33,16 @@ let styles = {
     }
   },
   closable:{},
+  disabled:{
+    "&, &:hover": {
+      backgroundColor:"var(--bg-color-ui-contrast2)",
+      color:"var(--ft-color-normal)",
+      cursor: "not-allowed",
+      "& $icon": {
+        opacity:0.2
+      }
+    }
+  },
   current:{
     backgroundColor:"var(--bg-color-ui-contrast3)",
     color:"var(--ft-color-loud)",
@@ -87,9 +97,9 @@ export default class Tab extends React.Component {
   }
 
   render(){
-    const {classes, current, icon, onClose, iconColor, iconSpin, hideLabel} = this.props;
+    const {classes, disabled, current, icon, onClose, iconColor, iconSpin, hideLabel} = this.props;
     return (
-      <div className={`${classes.container} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={this.handleClick}>
+      <div className={`${classes.container} ${disabled? classes.disabled: ""} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={this.handleClick}>
         <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={this.props.label}>
           {icon && <FontAwesomeIcon fixedWidth icon={icon} spin={iconSpin}/>}
         </div>

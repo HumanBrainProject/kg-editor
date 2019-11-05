@@ -100,7 +100,7 @@ class WorkspaceModal extends React.Component{
           "";
     return (
       <div className={classes.container}>
-        <Modal dialogClassName={classes.workspaceSelectionModal} show={true} centered>
+        <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
           <Modal.Body>
             <div className={classes.workspacesSelection}>
               <h1>Welcome <span title={name}>{name}</span></h1>

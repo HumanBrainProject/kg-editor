@@ -108,6 +108,10 @@ const styles = {
   textError: {
     margin: 0,
     wordBreak: "keep-all"
+  },
+  createInstance: {
+    display: "none",
+    cursor: "pointer"
   }
 };
 

@@ -51,6 +51,17 @@ class EditorController @Inject()(
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
+  def isInstanceIdAvailable(id: String): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      editorService
+        .isInstanceIdAvailable(id, request.userToken)
+        .map {
+          case Left(err) => err.toResult
+          case Right(()) => Ok("Instance Id is available")
+        }
+        .runToFuture
+    }
+
   def deleteInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)

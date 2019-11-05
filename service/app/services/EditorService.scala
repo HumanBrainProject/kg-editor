@@ -49,6 +49,10 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   object queryService extends QueryService
 
+  def isInstanceIdAvailable(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
+    instanceApiService
+      .isInstanceIdAvailable(wSClient, config.kgCoreEndpoint, id, token)
+
   def retrievePreviewInstances(
     nexusPath: NexusPath,
     formRegistry: FormRegistry[UISpec],

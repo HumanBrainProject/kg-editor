@@ -15,6 +15,7 @@ import { matchPath } from "react-router-dom";
 class Instance {
   @observable id = null;
   @observable types = [];
+  @observable isNew = false;
   @observable name = "";
   @observable fields = {};
   @observable alternatives = {};
@@ -139,6 +140,28 @@ class Instance {
   }
 
   @action
+  initializeData(data, readMode=false, isNew=false) {
+    const normalizedData =  normalizeInstanceData(data);
+    this.workspace = normalizedData.workspace;
+    this.types = normalizedData.types;
+    this.name = normalizedData.name;
+    this.isNew = isNew;
+    this.fields = normalizedData.fields;
+    this.primaryType = normalizedData.primaryType;
+    this.promotedFields = normalizedData.promotedFields;
+    this.alternatives = normalizedData.alternatives;
+    this.metadata = normalizedData.metadata;
+    this.permissions = normalizedData.permissions;
+    this.form = new FormStore(normalizedData);
+    this.fetchError = null;
+    this.hasFetchError = false;
+    this.isFetching = false;
+    this.isFetched = true;
+    this.memorizeInstanceInitialValues();
+    this.form.toggleReadMode(readMode);
+  }
+
+  @action
   errorInstance(e) {
     const message = e.message?e.message:e;
     const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
@@ -218,6 +241,13 @@ class InstanceStore {
   @observable comparedWithReleasedVersionInstance = null;
   @observable previewInstance = null;
   @observable globalReadMode = true;
+  @observable instanceIdAvailability = {
+    instanceId: null,
+    isAvailable: false,
+    isChecking: false,
+    error: null
+  };
+  @observable instanceCreationError = null;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable showSaveBar = false;
@@ -229,7 +259,6 @@ class InstanceStore {
   queueThreshold = 1000;
   queueTimeout = 250;
 
-  @observable showCreateModal = false;
 
   generatedKeys = new WeakMap();
 
@@ -293,24 +322,11 @@ class InstanceStore {
             const instance = this.instances.get(identifier);
             const data = find(response.data.data, item => item.id === instance.id);
             if(data){
-              const normalizedData =  normalizeInstanceData(data);
-              instance.workspace = normalizedData.workspace;
-              instance.types = normalizedData.types;
-              instance.name = normalizedData.name;
-              instance.fields = normalizedData.fields;
-              instance.primaryType = normalizedData.primaryType;
-              instance.promotedFields = normalizedData.promotedFields;
-              instance.alternatives = normalizedData.alternatives;
-              instance.metadata = normalizedData.metadata;
-              instance.form = new FormStore(normalizedData);
-              instance.isFetching = false;
-              instance.isFetched = true;
+              instance.initializeData(data, this.globalReadMode, false);
               if(this.openedInstances.has(instance.id)){
                 const types = instance.types.map(({name}) => name);
                 historyStore.updateInstanceHistory(instance.id, types, "viewed");
               }
-              instance.memorizeInstanceInitialValues();
-              instance.form.toggleReadMode(instance.instanceStore.globalReadMode);
             } else {
               const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
               instance.errorInstance(message);
@@ -342,6 +358,10 @@ class InstanceStore {
 
   @action flush(){
     this.instances = new Map();
+    this.instanceIdAvailability.instanceId = null,
+    this.instanceIdAvailability.isAvailable = false,
+    this.instanceIdAvailability.isChecking = false;
+    this.instanceIdAvailability.error = null;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
     this.showSaveBar = false;
@@ -371,7 +391,9 @@ class InstanceStore {
         viewMode: viewMode,
         paneStore: new PaneStore()
       });
-      if(viewMode !== "create") {
+      if(viewMode === "create") {
+        this.checkInstanceIdAvailability(instanceId);
+      } else {
         const instance = this.createInstanceOrGet(instanceId);
         if(instance.isFetched && !instance.fetchError) {
           const types = instance.types.map(({name}) => name);
@@ -463,6 +485,48 @@ class InstanceStore {
   }
 
   @action
+  resetInstanceIdAvailability() {
+    this.instanceIdAvailability.instanceId = null;
+    this.instanceIdAvailability.isChecking = false;
+    this.instanceIdAvailability.error = null;
+    this.instanceIdAvailability.isAvailable = false;
+  }
+
+  @action
+  async checkInstanceIdAvailability(instanceId){
+    if (!this.instanceIdAvailability.instanceId || instanceId === this.instanceIdAvailability.instanceId) {
+      this.instanceIdAvailability.instanceId = instanceId,
+      this.instanceIdAvailability.isChecking = true;
+      this.instanceIdAvailability.error = null;
+      this.instanceIdAvailability.isAvailable = false;
+      // TODO: replace timeout with real code
+      setTimeout(() => {
+        runInAction(() => {
+          this.instanceIdAvailability.isAvailable = true;
+          this.instanceIdAvailability.isChecking = false;
+        });
+      }, 500);
+      /*
+      try{
+        await API.axios.get(API.endpoints.checkInstanceIdAvailability(instanceId));
+        runInAction(() => {
+          this.instanceIdAvailability.isAvailable = true;
+          this.instanceIdAvailability.isChecking = false;
+        });
+      } catch(e){
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          this.instanceIdAvailability.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
+          this.instanceIdAvailability.isChecking = false;
+          this.instanceIdAvailability.isAvailable = false;
+        });
+      }
+      */
+    }
+  }
+
+  @action
   createNewInstance(type, id, name=""){
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
@@ -471,28 +535,16 @@ class InstanceStore {
       id: id,
       types: [instanceType],
       name: name,
-      fields: fields,
+      fields: toJS(fields),
       primaryType: instanceType,
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},
       permissions: {}
     };
-    const normalizedData = normalizeInstanceData(data);
     const instance  = new Instance(id, this);
-    instance.workspace = normalizedData.workspace;
-    instance.types = normalizedData.types;
-    instance.name = normalizedData.name;
-    instance.fields = normalizedData.fields;
-    instance.primaryType = normalizedData.primaryType;
-    instance.promotedFields = normalizedData.promotedFields;
-    instance.alternatives = normalizedData.alternatives;
-    instance.metadata = normalizedData.metadata;
-    instance.form = new FormStore(normalizedData);
-    instance.isFetching = false;
-    instance.isFetched = true;
+    instance.initializeData(data, this.globalReadMode, true);
     this.instances.set(id, instance);
-    this.setReadMode(false);
   }
 
   @action
@@ -523,11 +575,15 @@ class InstanceStore {
     this.isCreatingNewInstance = path;
     try{
       const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), values);
-      this.isCreatingNewInstance = false;
+      runInAction(() => {
+        this.isCreatingNewInstance = false;
+      });
       return data.data.id;
     } catch(e){
-      this.isCreatingNewInstance = false;
-      this.instanceCreationError = e.message;
+      runInAction(() => {
+        this.isCreatingNewInstance = false;
+        this.instanceCreationError = e.message;
+      });
     }
   }
 
@@ -625,7 +681,7 @@ class InstanceStore {
     });
   }
 
-  doesInstanceHaveLinkedInstancesInUnsavedState = (instance) => {
+  doesInstanceHaveLinkedInstancesInUnsavedState = instance => {
     return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
   }
 
@@ -672,11 +728,6 @@ class InstanceStore {
   @action
   toggleSavebarDisplay(state){
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
-  }
-
-  @action
-  toggleShowCreateModal(state){
-    this.showCreateModal = state !== undefined? !!state: !this.showCreateModal;
   }
 
   @action

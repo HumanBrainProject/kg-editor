@@ -81,7 +81,7 @@ export default class Types extends React.Component {
         {!typesStore.fetchError ?
           !typesStore.isFetching ?
             this.state.showTypes && list.map(type =>
-              <TypesItem key={type.label} type={type}/>
+              <TypesItem key={type.name} type={type}/>
             )
             :
             <FetchingLoader>fetching...</FetchingLoader>

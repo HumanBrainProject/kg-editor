@@ -20,6 +20,7 @@ const endpoints = {
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instanceData": (type, databaseScope=null) => `/editor/api/instances?type=${encodeURIComponent(type)}${databaseScope?("&databaseScope=" + databaseScope):""}`,
   "createInstance": (type, databaseScope=null) => `/editor/api/instances?type=${encodeURIComponent(type)}${databaseScope?("&databaseScope=" + databaseScope):""}`,
+  "checkInstanceIdAvailability": instance => `/editor/api/instances/${instance}/available`,
   "release": instance => `/editor/api/instances/${instance}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",

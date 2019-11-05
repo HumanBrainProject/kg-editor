@@ -1,22 +1,19 @@
 import React from "react";
 import {observer} from "mobx-react";
 import injectStyles from "react-jss";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import instanceStore from "../Stores/InstanceStore";
 
-import InstanceForm from "./Instance/InstanceForm";
+import InstanceCreate from "./Instance/InstanceCreate";
+import InstanceView from "./Instance/InstanceView";
 import InstanceInvite from "./Instance/InstanceInvite";
 import InstanceGraph from "./Instance/InstanceGraph";
 import InstanceRelease from "./Instance/InstanceRelease";
 import InstanceManage from "./Instance/InstanceManage";
-import Pane from "./Instance/Pane";
-import Links from "./Instance/Links";
-import PaneContainer from "./Instance/PaneContainer";
 import SaveBar from "./Instance/SaveBar";
 import Preview from "./Preview";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Tabs from "./Instance/Tabs";
-import NewInstance from "./NewInstance";
 
 const styles = {
   container: {
@@ -101,28 +98,16 @@ export default class Edit extends React.Component {
       return null;
     }
 
-    const instance = this.props.match.params.id?instanceStore.instances.get(this.props.match.params.id):null;
-    if (!instance && openedInstance.viewMode !== "create") {
-      return null;
-    }
-
     return (
       <React.Fragment>
         <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
           <Tabs mode={openedInstance.viewMode} id={this.props.match.params.id} />
           <div className={classes.body}>
-            {openedInstance.viewMode === "create" && !instance? <NewInstance id={this.props.match.params.id}/>:
-              openedInstance.viewMode === "create" || openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
-                <PaneContainer key={this.props.match.params.id} paneStore={openedInstance.paneStore}>
-                  <React.Fragment>
-                    <Pane paneId={this.props.match.params.id} key={this.props.match.params.id}>
-                      <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
-                    </Pane>
-                    {!instance.hasFetchError?
-                      <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
-                      :null}
-                  </React.Fragment>
-                </PaneContainer>
+            {openedInstance.viewMode === "create"?
+              <InstanceCreate instanceId={this.props.match.params.id} paneStore={openedInstance.paneStore} />
+              :
+              openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
+                <InstanceView instanceId={this.props.match.params.id} paneStore={openedInstance.paneStore} />
                 : openedInstance.viewMode === "invite" ?
                   <InstanceInvite id={this.props.match.params.id}/>
                   : openedInstance.viewMode === "graph" ?

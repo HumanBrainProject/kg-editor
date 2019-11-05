@@ -253,7 +253,7 @@ export default class Home extends React.Component{
               <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
             </React.Fragment>
             :
-            <Modal dialogClassName={classes.workspaceSelectionModal} show={true} centered>
+            <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
               <Modal.Body>
                 <div className={classes.workspacesSelection}>
                   <h1>Welcome <span title={name}>{name}</span></h1>
@@ -271,7 +271,7 @@ export default class Home extends React.Component{
               </Modal.Body>
             </Modal>
           :
-          <Modal dialogClassName={classes.noWorkspacesModal} show={true} centered>
+          <Modal dialogClassName={classes.noWorkspacesModal} show={true} >
             <Modal.Body>
               <h1>Welcome <span title={name}>{name}</span></h1>
               <p>You are currently not granted permission to acccess any workspaces.</p>

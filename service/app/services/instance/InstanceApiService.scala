@@ -331,6 +331,26 @@ trait InstanceApiService {
 
   }
 
+  def isInstanceIdAvailable(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    id: String,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[APIEditorError, Unit]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/LIVE/instances/${id}/available")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "X-client-authorization" -> "kgeditor")
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK =>
+          Right(())
+        case _ => Left(APIEditorError(res.status, res.body))
+      }
+    }
+  }
+
   //TODO: Consider moving this to another service
   def getWorkspaceTypes(
     wSClient: WSClient,

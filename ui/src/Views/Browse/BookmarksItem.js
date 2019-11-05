@@ -23,18 +23,6 @@ const styles = {
       "& $actions": {
         opacity: 0.75
       },
-      "& $createInstance": {
-        position: "absolute",
-        top: "0",
-        right: "0",
-        height: "100%",
-        padding: "5px 10px",
-        display: "block",
-        color: "var(--ft-color-normal)",
-        "&:hover": {
-          color: "var(--ft-color-loud)",
-        }
-      },
       "& $savingBookmark": {
         position: "absolute",
         top: "0",

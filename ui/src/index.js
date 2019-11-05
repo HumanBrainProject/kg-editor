@@ -353,15 +353,18 @@ class App extends React.Component {
         if (instanceStore.openedInstances.size > 1) {
           let openedInstances = Array.from(instanceStore.openedInstances.keys());
           let currentInstanceIndex = openedInstances.indexOf(instanceId);
-          let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
+          let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
-          let openedInstance = instanceStore.openedInstances.get(newInstanceId);
-          routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+          let openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+          routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
         } else {
           routerStore.history.push("/browse");
           browseStore.clearSelectedInstance();
         }
       }
+    }
+    if (instanceId === instanceStore.instanceIdAvailability.instanceId) {
+      instanceStore.resetInstanceIdAvailability();
     }
     instanceStore.closeInstance(instanceId);
     const instance = instanceStore.instances.get(instanceId);
@@ -370,6 +373,7 @@ class App extends React.Component {
   }
 
   handleCloseAllInstances() {
+    instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
       || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
       || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
@@ -383,19 +387,19 @@ class App extends React.Component {
       if (instanceStore.openedInstances.size > 1) {
         let openedInstances = Array.from(instanceStore.openedInstances.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
+        let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
-        let openedInstance = instanceStore.openedInstances.get(newInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+        let openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
       if (instanceStore.openedInstances.size > 1) {
         const openedInstances = Array.from(instanceStore.openedInstances.keys());
-        const newInstanceId = openedInstances[openedInstances.length - 1];
-        const openedInstance = instanceStore.openedInstances.get(newInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+        const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
+        const openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -407,19 +411,19 @@ class App extends React.Component {
       if (instanceStore.openedInstances.size > 1) {
         let openedInstances = Array.from(instanceStore.openedInstances.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
+        let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
-        let openedInstance = instanceStore.openedInstances.get(newInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+        let openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
       if (instanceStore.openedInstances.size > 1) {
         const openedInstances = Array.from(instanceStore.openedInstances.keys());
-        const newInstanceId = openedInstances[0];
-        const openedInstance = instanceStore.openedInstances.get(newInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newInstanceId}`);
+        const newCurrentInstanceId = openedInstances[0];
+        const openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -435,12 +439,10 @@ class App extends React.Component {
   }
 
   handleCreateInstance = () => {
-    const uuid = _.uuid();
-    routerStore.history.push(`/instance/create/${uuid}`);
-  }
-
-  handleHideCreateModal = () => {
-    instanceStore.toggleShowCreateModal();
+    if (!instanceStore.instanceIdAvailability.instanceId) {
+      const uuid = _.uuid();
+      routerStore.history.push(`/instance/create/${uuid}`);
+    }
   }
 
   handleLogout = () => {
@@ -472,7 +474,7 @@ class App extends React.Component {
                       <WorkspaceSelector />
                       <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                       <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
-                      <Tab icon={"file"} current={instanceStore.showCreateModal} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
+                      <Tab icon={"file"} disabled={!!instanceStore.instanceIdAvailability.instanceId} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
                     </React.Fragment>
                     : null
                   }
@@ -585,7 +587,7 @@ class App extends React.Component {
                             :
                             <Route component={WorkspaceModal} />
                           :
-                          <Modal dialogClassName={classes.noWorkspacesModal} show={true} centered>
+                          <Modal dialogClassName={classes.noWorkspacesModal} show={true}>
                             <Modal.Body>
                               <h1>Welcome <span title={name}>{name}</span></h1>
                               <p>You are currently not granted permission to acccess any workspaces.</p>

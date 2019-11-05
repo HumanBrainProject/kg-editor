@@ -5,12 +5,10 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
-import typesStore from "../Stores/TypesStore";
-import instanceStore from "../Stores/InstanceStore";
-import routerStore from "../Stores/RouterStore";
+import typesStore from "../../Stores/TypesStore";
 
-import FetchingLoader from "../Components/FetchingLoader";
-import BGMessage from "../Components/BGMessage";
+import FetchingLoader from "../../Components/FetchingLoader";
+import BGMessage from "../../Components/BGMessage";
 
 const styles = {
   container: {
@@ -21,9 +19,6 @@ const styles = {
     left:"25%",
     boxShadow: "0 2px 10px var(--pane-box-shadow)",
     background: "white",
-    "& > div": {
-      height: "100%"
-    },
     "& button": {
       margin: "0 10px"
     }
@@ -58,7 +53,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class NewInstance extends React.Component {
+export default class TypeSelection extends React.Component {
   componentDidMount() {
     if (!typesStore.isFetched) {
       typesStore.fetch();
@@ -67,13 +62,8 @@ export default class NewInstance extends React.Component {
 
   handleFetchInstanceTypes = () => typesStore.fetch();
 
-  handleClickNewInstanceOfType(type) {
-    instanceStore.createNewInstance(type, this.props.id);
-  }
-
-
   render() {
-    const { classes, onCancel } = this.props;
+    const { classes, onSelect } = this.props;
 
     return (
       <div className={classes.container}>
@@ -86,11 +76,6 @@ export default class NewInstance extends React.Component {
               If the problem persists, please contact the support.<br />
               <small>{typesStore.fetchError}</small><br /><br />
               <div>
-                {typeof onCancel === "function" && (
-                  <Button onClick={onCancel}>
-                    <FontAwesomeIcon icon={"times"} />&nbsp;&nbsp; Close
-                  </Button>
-                )}
                 <Button bsStyle={"primary"} onClick={this.handleFetchInstanceTypes}>
                   <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
                 </Button>
@@ -101,7 +86,7 @@ export default class NewInstance extends React.Component {
               <div className={classes.lists}>
                 <div className={classes.list}>
                   {typesStore.types.map(type => (
-                    <div key={type.label} className={classes.type} onClick={this.handleClickNewInstanceOfType.bind(this, type)}>
+                    <div key={type.name} className={classes.type} onClick={onSelect.bind(this, type)}>
                       <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
                         <FontAwesomeIcon fixedWidth icon="circle" />
                       </div>{type.label}
@@ -111,11 +96,6 @@ export default class NewInstance extends React.Component {
               </div>
             </Scrollbars>
         }
-        {instanceStore.isCreatingNewInstance ?
-          <div>
-            {<div className={classes.overlay}></div>}
-            {<FetchingLoader>Creating new instance...</FetchingLoader>}
-          </div>:null}
       </div>
     );
   }

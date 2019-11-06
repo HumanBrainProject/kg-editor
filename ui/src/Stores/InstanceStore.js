@@ -189,7 +189,7 @@ class Instance {
     if (this.fieldsToSetAsNull.length > 0) {
       this.fieldsToSetAsNull.forEach(key=> payload[key] = null);
     }
-    payload["@types"] = this.types.map(t => t.name);
+    payload["@type"] = this.types.map(t => t.name);
 
     try {
       if (this.isNew) {

@@ -524,29 +524,57 @@ class EditorController @Inject()(
           .runToFuture
       }
 
-  def createInstanceWithoutId(workspace: String): Action[AnyContent] = createInstance(workspace, None)
-  def createInstanceWithId(workspace: String, id: String): Action[AnyContent] = createInstance(workspace, Some(id))
+  def createInstanceWithoutId(workspace: String): Action[AnyContent] = authenticatedUserAction.async {
+    implicit request =>
+      createInstance(workspace, None).runToFuture
+  }
+
+  def createInstanceWithId(workspace: String, id: String): Action[AnyContent] = authenticatedUserAction.async {
+    implicit request =>
+      createInstance(workspace, Some(id)).runToFuture
+  }
 
   /**
     * Creation of a new instance in the editor
     *
-    * @param id     The id of the instance
+    * @param id The id of the instance
     * @return 200 Created
     */
-  def createInstance(workspace: String, id: Option[String]): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val bodyContent = request.body.asJson
-      bodyContent match {
-        case Some(body) =>
-          editorService
-            .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken)
-            .map {
-              case Right(value) => Ok(value)
-              case Left(err)    => err.toResult
-            }
-            .runToFuture
-        case None => Task.pure(BadRequest("Missing body content")).runToFuture
-      }
+  def createInstance(workspace: String, id: Option[String])(implicit request: UserRequest[AnyContent]): Task[Result] = {
+    val bodyContent = request.body.asJson
+    bodyContent match {
+      case Some(body) =>
+        editorService
+          .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken)
+          .flatMap {
+            case Right(value) =>
+              val instance = (value \ "data").as[JsObject]
+              val typesToRetrieve = InstanceHelper.getTypes(instance)
+              typesToRetrieve match {
+                case Some(t) =>
+                  editorService
+                    .retrieveTypesList(t, request.userToken)
+                    .map {
+                      case Right(typesWithFields) =>
+                        implicit val writer = InstanceProtocol.instanceWrites
+                        (typesWithFields \ "data").asOpt[List[StructureOfType]] match {
+                          case Some(typeInfoList) =>
+                            val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
+                            val instanceRes = InstanceHelper.getInstanceView(instance, typeInfoMap)
+                            instanceRes match {
+                              case Some(r) =>
+                                Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
+                              case _ => InternalServerError("Something went wrong with types list! Please try again!")
+                            }
+                          case _ => InternalServerError("Something went wrong with types list! Please try again!")
+                        }
+                      case _ => InternalServerError("Something went wrong with types! Please try again!")
+                    }
+                case _ => Task.pure(InternalServerError("Something went wrong with types list! Please try again!"))
+              }
+            case _ => Task.pure(InternalServerError("Something went wrong with the insertion! Please try again!"))
+          }
+      case None => Task.pure(BadRequest("Missing body content"))
     }
-
+  }
 }

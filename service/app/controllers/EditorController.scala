@@ -58,11 +58,10 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def deleteInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
+  def deleteInstance(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
       editorService
-        .deleteInstance(nexusInstanceReference, request.userToken)
+        .deleteInstance(id, request.userToken)
         .map {
           case Right(()) => Ok("Instance has been deleted")
           case Left(err) => err.toResult
@@ -125,7 +124,7 @@ class EditorController @Inject()(
   def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val result = editorService
-        .retrieveWorkspaceTypes(workspace)
+        .retrieveWorkspaceTypes(workspace, request.userToken)
         .map {
           case Left(err) => err.toResult
           case Right(value) =>
@@ -233,11 +232,10 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def getInstanceGraph(org: String, domain: String, datatype: String, version: String, id: String): Action[AnyContent] =
+  def getInstanceGraph(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      val nexusInstanceReference = NexusInstanceReference(org, domain, datatype, version, id)
       editorService
-        .retrieveInstanceGraph(nexusInstanceReference, request.userToken)
+        .retrieveInstanceGraph(id, request.userToken)
         .map {
           case Left(err)    => err.toResult
           case Right(value) => Ok(value)
@@ -574,26 +572,4 @@ class EditorController @Inject()(
           }
           .runToFuture
       }
-
-  /**
-    * Returns an empty form for a specific instance type
-    *
-    * @param org     The organization of the instance
-    * @param domain  The domain of the instance
-    * @param schema  The schema of the instance
-    * @param version The version of the schema
-    * @return 200
-    */
-  def getEmptyForm(org: String, domain: String, schema: String, version: String): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val nexusPath = NexusPath(org, domain, schema, version)
-      formService
-        .getRegistries()
-        .map { registries =>
-          val form = FormOp.getFormStructure(nexusPath, JsNull, registries.formRegistry)
-          Ok(form)
-        }
-        .runToFuture
-    }
-
 }

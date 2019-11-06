@@ -21,5 +21,5 @@ sealed trait ServiceClient {
 }
 
 object EditorClient extends ServiceClient {
-  override def client: String = "editor"
+  override def client: String = "kgeditor"
 }

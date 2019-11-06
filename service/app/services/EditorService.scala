@@ -85,12 +85,9 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
         }
       }
 
-  def retrieveInstanceGraph(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveInstanceGraph(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getGraph(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+      .getGraph(wSClient, config.kgCoreEndpoint, id, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -109,18 +106,18 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     }
   }
 
-  def retrieveWorkspaceTypes(workspace: String): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveWorkspaceTypes(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getWorkspaceTypes(wSClient, config.kgCoreEndpoint, workspace)
+      .getWorkspaceTypes(wSClient, config.kgCoreEndpoint, workspace, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
   }
 
-  def retrieveWorkspaces(): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getWorkspaces(wSClient, config.kgCoreEndpoint)
+      .getWorkspaces(wSClient, config.kgCoreEndpoint, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -628,11 +625,8 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
         }
       }
 
-  def deleteInstance(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] =
-    instanceApiService.deleteEditorInstance(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+  def deleteInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
+    instanceApiService.deleteEditorInstance(wSClient, config.kgCoreEndpoint, id, token)
 
 }
 

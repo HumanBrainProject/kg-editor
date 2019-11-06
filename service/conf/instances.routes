@@ -21,26 +21,6 @@ GET    /:id/available                  controllers.EditorController.isInstanceId
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
-#    in: path
-#    description: organization the instance to delete
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance to delete
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance to delete
-#    required: true
-#    type: string
 #  - name: id
 #    in: path
 #    description: the UUID of the instance to delete
@@ -52,7 +32,7 @@ GET    /:id/available                  controllers.EditorController.isInstanceId
 #    required: false
 #    type: string
 ###
-DELETE    /:org/:domain/:schema/:version/:id                  controllers.EditorController.deleteInstance(org: String, domain:String, schema: String, version:String, id: String)
+DELETE    /:id                  controllers.EditorController.deleteInstance(id: String)
 
 ###
 #  summary: get a list of entities
@@ -106,114 +86,10 @@ POST    /summary                 controllers.EditorController.getInstancesSummar
 POST    /label                 controllers.EditorController.getInstancesLabel(metadata:Boolean?=false)
 
 ###
-#tags:
-#  - editor
-#summary: Returns the instances  by schema - paginated - filterable
-#parameters:
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-#  - name: org
-#    in: path
-#    description: organization the instance to retrieve
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance to retrieve
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance to retrieve
-#    required: true
-#    type: string
-#  - name: from
-#    in: path
-#    description: the offset of the pagination
-#    required: false
-#    type: int
-#  - name: size
-#    in: path
-#    description: the size of the page
-#    required: false
-#    type: int
-#  - name: search
-#    in: path
-#    description: the search query only applied for the name of the instance
-#    required: false
-#    type: string
-#    responses:
-#      '200':
-#        description: Ok
-###
-GET /:org/:domain/:schema/:version        controllers.EditorUserController.getInstancesOfBookmarkListBySchema(org: String, domain:String, schema: String, version:String, from:Option[Int], size:Option[Int], search:String?="")
-
-###
-#  summary: return a an empty form for a specific entity type
-#  tags:
-#    - editor
-#  parameters:
-#  - name: org
-#    in: path
-#    description: organization the instance
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance
-#    required: true
-#    type: string
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-###
-POST    /:org/:domain/:schema/:version                  controllers.EditorController.getEmptyForm(org: String, domain:String, schema: String, version:String)
-
-###
 #  summary: return the graph payload for a specific entity type
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
-#    in: path
-#    description: organization the instance
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance
-#    required: true
-#    type: string
 #  - name: id
 #    in: path
 #    description: the UUID of the instance to fetch
@@ -225,7 +101,7 @@ POST    /:org/:domain/:schema/:version                  controllers.EditorContro
 #    required: false
 #    type: string
 ###
-GET    /:org/:domain/:schema/:version/:id/graph                  controllers.EditorController.getInstanceGraph(org: String, domain:String, schema: String, version:String, id: String)
+GET    /:id/graph                  controllers.EditorController.getInstanceGraph(id: String)
 
 ###
 #  summary: return the release payload for a specific entity type

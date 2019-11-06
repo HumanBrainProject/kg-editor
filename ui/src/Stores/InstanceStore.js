@@ -242,6 +242,7 @@ class InstanceStore {
   @observable previewInstance = null;
   @observable globalReadMode = true;
   @observable instanceIdAvailability = {
+    resolvedId: null,
     instanceId: null,
     isAvailable: false,
     isChecking: false,
@@ -358,10 +359,7 @@ class InstanceStore {
 
   @action flush(){
     this.instances = new Map();
-    this.instanceIdAvailability.instanceId = null,
-    this.instanceIdAvailability.isAvailable = false,
-    this.instanceIdAvailability.isChecking = false;
-    this.instanceIdAvailability.error = null;
+    this.resetInstanceIdAvailability();
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
     this.showSaveBar = false;
@@ -486,6 +484,7 @@ class InstanceStore {
 
   @action
   resetInstanceIdAvailability() {
+    this.instanceIdAvailability.resolvedId = null;
     this.instanceIdAvailability.instanceId = null;
     this.instanceIdAvailability.isChecking = false;
     this.instanceIdAvailability.error = null;
@@ -500,8 +499,9 @@ class InstanceStore {
       this.instanceIdAvailability.error = null;
       this.instanceIdAvailability.isAvailable = false;
       try{
-        await API.axios.get(API.endpoints.checkInstanceIdAvailability(instanceId));
+        const { data } = await API.axios.get(API.endpoints.resolvedId(instanceId));
         runInAction(() => {
+          this.instanceIdAvailability.resolvedId = data && data.data ? data.data.uuid:null;
           this.instanceIdAvailability.isAvailable = true;
           this.instanceIdAvailability.isChecking = false;
         });

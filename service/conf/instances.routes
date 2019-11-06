@@ -14,7 +14,7 @@
 #    required: false
 #    type: string
 ###
-GET    /:id/available                  controllers.EditorController.isInstanceIdAvailable(id: String)
+GET    /:id/resolvedId                  controllers.EditorController.getResolvedId(id: String)
 
 ###
 #  summary: Delete a specific entity

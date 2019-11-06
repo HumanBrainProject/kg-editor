@@ -329,7 +329,7 @@ trait InstanceApiService {
 
   }
 
-  def isInstanceIdAvailable(
+  def getResolvedId(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     id: String,

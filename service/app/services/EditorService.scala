@@ -49,9 +49,9 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   object queryService extends QueryService
 
-  def isInstanceIdAvailable(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+  def getResolvedId(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .isInstanceIdAvailable(wSClient, config.kgCoreEndpoint, id, token)
+      .getResolvedId(wSClient, config.kgCoreEndpoint, id, token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))

@@ -47,13 +47,13 @@ class EditorController @Inject()(
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def isInstanceIdAvailable(id: String): Action[AnyContent] =
+  def getResolvedId(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .isInstanceIdAvailable(id, request.userToken)
+        .getResolvedId(id, request.userToken)
         .map {
           case Left(err)    => err.toResult
-          case Right(value) => Ok(value)
+          case Right(value) => Ok(Json.toJson(EditorResponseObject(value)))
         }
         .runToFuture
     }

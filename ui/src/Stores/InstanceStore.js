@@ -499,14 +499,6 @@ class InstanceStore {
       this.instanceIdAvailability.isChecking = true;
       this.instanceIdAvailability.error = null;
       this.instanceIdAvailability.isAvailable = false;
-      // TODO: replace timeout with real code
-      setTimeout(() => {
-        runInAction(() => {
-          this.instanceIdAvailability.isAvailable = true;
-          this.instanceIdAvailability.isChecking = false;
-        });
-      }, 500);
-      /*
       try{
         await API.axios.get(API.endpoints.checkInstanceIdAvailability(instanceId));
         runInAction(() => {
@@ -522,7 +514,6 @@ class InstanceStore {
           this.instanceIdAvailability.isAvailable = false;
         });
       }
-      */
     }
   }
 

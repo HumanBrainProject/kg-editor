@@ -49,9 +49,13 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   object queryService extends QueryService
 
-  def isInstanceIdAvailable(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
+  def isInstanceIdAvailable(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
       .isInstanceIdAvailable(wSClient, config.kgCoreEndpoint, id, token)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
+      }
 
   def retrievePreviewInstances(
     nexusPath: NexusPath,

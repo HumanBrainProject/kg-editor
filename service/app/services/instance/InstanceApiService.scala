@@ -335,16 +335,16 @@ trait InstanceApiService {
     id: String,
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
-  ): Task[Either[APIEditorError, Unit]] = {
+  ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/LIVE/instances/${id}/available")
+      .url(s"$apiBaseEndpoint/LIVE/instances/${id}/resolvedId")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
         case OK =>
-          Right(())
-        case _ => Left(APIEditorError(res.status, res.body))
+          Right(res.json.as[JsObject])
+        case _ => Left(res)
       }
     }
   }

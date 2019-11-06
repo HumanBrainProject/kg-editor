@@ -52,8 +52,8 @@ class EditorController @Inject()(
       editorService
         .isInstanceIdAvailable(id, request.userToken)
         .map {
-          case Left(err) => err.toResult
-          case Right(()) => Ok("Instance Id is available")
+          case Left(err)    => err.toResult
+          case Right(value) => Ok(value)
         }
         .runToFuture
     }

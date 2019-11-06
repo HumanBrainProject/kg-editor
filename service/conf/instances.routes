@@ -17,28 +17,15 @@
 GET    /:id/resolvedId                  controllers.EditorController.getResolvedId(id: String)
 
 ###
-#  summary: Delete a specific entity
-#  tags:
-#    - editor
-#  parameters:
-#  - name: id
-#    in: path
-#    description: the UUID of the instance to delete
-#    required: true
-#    type: string
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-###
-DELETE    /:id                  controllers.EditorController.deleteInstance(id: String)
-
-###
 #  summary: get a list of entities
 #  tags:
 #    - editor
 #  parameters:
+#  - name: stage
+#    in: path
+#    description: the stage
+#    required: false
+#    type: string
 #  - in: body
 #    description: A list of IDs
 #    required: true
@@ -49,13 +36,18 @@ DELETE    /:id                  controllers.EditorController.deleteInstance(id: 
 #    required: false
 #    type: string
 ###
-POST    /list                 controllers.EditorController.getInstancesList(metadata:Boolean?=false)
+POST    /list                 controllers.EditorController.getInstancesList(stage:String?="LIVE", metadata:Boolean?=false)
 
 ###
 #  summary: get a summary list of entities
 #  tags:
 #    - editor
 #  parameters:
+#  - name: stage
+#    in: path
+#    description: the stage
+#    required: false
+#    type: string
 #  - in: body
 #    description: A list of IDs
 #    required: true
@@ -66,13 +58,18 @@ POST    /list                 controllers.EditorController.getInstancesList(meta
 #    required: false
 #    type: string
 ###
-POST    /summary                 controllers.EditorController.getInstancesSummary(metadata:Boolean?=false)
+POST    /summary                 controllers.EditorController.getInstancesSummary(stage:String?="LIVE", metadata:Boolean?=false)
 
 ###
 #  summary: get label for a list of entities
 #  tags:
 #    - editor
 #  parameters:
+#  - name: stage
+#    in: path
+#    description: the stage
+#    required: false
+#    type: string
 #  - in: body
 #    description: A list of IDs
 #    required: true
@@ -83,7 +80,7 @@ POST    /summary                 controllers.EditorController.getInstancesSummar
 #    required: false
 #    type: string
 ###
-POST    /label                 controllers.EditorController.getInstancesLabel(metadata:Boolean?=false)
+POST    /label                 controllers.EditorController.getInstancesLabel(stage:String?="LIVE", metadata:Boolean?=false)
 
 ###
 #  summary: return the graph payload for a specific entity type
@@ -236,6 +233,47 @@ DELETE    /:org/:domain/:schema/:version/:id/release                  controller
 POST /releases                  controllers.EditorController.postReleaseInstance(releaseTreeScope:String?="")
 
 ###
+#  summary: create a new instance
+#  tags:
+#    - editor
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+#  - in: query
+#    name: workspace
+#    description: Workspace
+#    required: true
+#    type: string
+###
+POST   /                 controllers.EditorController.createInstanceWithoutId(workspace: String)
+
+###
+#  summary: create a new instance
+#  tags:
+#    - editor
+#  parameters:
+#  - name: id
+#    in: path
+#    description: id of the instance to create
+#    required: true
+#    type: string
+#  - in: query
+#    name: workspace
+#    description: Workspace
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST   /:id                  controllers.EditorController.createInstanceWithId(workspace: String, id:String)
+
+###
 #  summary: update an instance
 #  tags:
 #    - editor
@@ -273,29 +311,15 @@ POST /releases                  controllers.EditorController.postReleaseInstance
 ###
 PUT   /:org/:domain/:schema/:version/:id                   controllers.EditorController.updateInstance(org: String, domain:String, schema: String, version:String, id: String)
 
+
 ###
-#  summary: create a new instance
+#  summary: Delete a specific entity
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
+#  - name: id
 #    in: path
-#    description: organization the instance to create
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance to create
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance to create
+#    description: the UUID of the instance to delete
 #    required: true
 #    type: string
 #  - in: header
@@ -304,7 +328,7 @@ PUT   /:org/:domain/:schema/:version/:id                   controllers.EditorCon
 #    required: false
 #    type: string
 ###
-POST   /:org/:domain/:schema/:version                  controllers.EditorController.createInstance(org: String, domain:String, schema: String, version:String)
+DELETE    /:id                  controllers.EditorController.deleteInstance(id: String)
 
 ###
 #  summary: Get the number of revisions available for a specific instance

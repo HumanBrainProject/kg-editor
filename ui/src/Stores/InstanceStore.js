@@ -189,18 +189,33 @@ class Instance {
     if (this.fieldsToSetAsNull.length > 0) {
       this.fieldsToSetAsNull.forEach(key=> payload[key] = null);
     }
+    payload["@types"] = this.types.map(t => t.name);
 
     try {
-      const { data } = await API.axios.put(API.endpoints.instanceData(this.id, this.instanceStore.databaseScope), payload);
-      runInAction(() => {
-        this.hasChanged = false;
-        this.saveError = null;
-        this.hasSaveError = false;
-        this.isSaving = false;
-        this.fieldsToSetAsNull = [];
-        this.data = data.data;
-      });
+      if (this.isNew) {
+        const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
+        runInAction(() => {
+          this.isNew = false;
+          this.hasChanged = false;
+          this.saveError = null;
+          this.hasSaveError = false;
+          this.isSaving = false;
+          this.fieldsToSetAsNull = [];
+          this.data = data.data;
+        });
+      } else {
+        const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
+        runInAction(() => {
+          this.hasChanged = false;
+          this.saveError = null;
+          this.hasSaveError = false;
+          this.isSaving = false;
+          this.fieldsToSetAsNull = [];
+          this.data = data.data;
+        });
+      }
 
+      // TODO: Check if reload is still neeeded or if we only need to  update the instance object using the result of the save
       this.fetch(true);
     } catch (e) {
       runInAction(() => {
@@ -234,7 +249,7 @@ class Instance {
 }
 
 class InstanceStore {
-  @observable databaseScope = null;
+  @observable stage = null;
   @observable instances = new Map();
   @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
@@ -263,8 +278,8 @@ class InstanceStore {
 
   generatedKeys = new WeakMap();
 
-  constructor(databaseScope=null) {
-    this.databaseScope = databaseScope?databaseScope:null;
+  constructor(stage=null) {
+    this.stage = stage?stage:null;
     if(localStorage.getItem("openedTabs")){
       let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
       if (authStore.isFullyAuthenticated) {
@@ -316,7 +331,7 @@ class InstanceStore {
       }
     });
     try{
-      let response = await API.axios.post(API.endpoints.instancesList(this.databaseScope), toProcess);
+      let response = await API.axios.post(API.endpoints.instancesList(this.stage), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
@@ -502,16 +517,21 @@ class InstanceStore {
         const { data } = await API.axios.get(API.endpoints.resolvedId(instanceId));
         runInAction(() => {
           this.instanceIdAvailability.resolvedId = data && data.data ? data.data.uuid:null;
-          this.instanceIdAvailability.isAvailable = true;
+          this.instanceIdAvailability.isAvailable = false;
           this.instanceIdAvailability.isChecking = false;
         });
       } catch(e){
         runInAction(() => {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          this.instanceIdAvailability.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
-          this.instanceIdAvailability.isChecking = false;
-          this.instanceIdAvailability.isAvailable = false;
+          if (e.response && e.response.status === 404) {
+            this.instanceIdAvailability.isAvailable = true;
+            this.instanceIdAvailability.isChecking = false;
+          } else {
+            const message = e.message?e.message:e;
+            const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+            this.instanceIdAvailability.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
+            this.instanceIdAvailability.isChecking = false;
+            this.instanceIdAvailability.isAvailable = false;
+          }
         });
       }
     }
@@ -556,16 +576,15 @@ class InstanceStore {
   @action
   async duplicateInstance(fromInstanceId){
     let instanceToCopy = this.instances.get(fromInstanceId);
-    let path = instanceToCopy.path;
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
     const labelField = instanceToCopy.data && instanceToCopy.data.ui_info && instanceToCopy.data.ui_info.labelField;
     if(labelField) {
       values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
     }
-    this.isCreatingNewInstance = path;
+    this.isCreatingNewInstance = true;
     try{
-      const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), values);
+      const { data } = await API.axios.post(API.endpoints.instance(), values);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });
@@ -585,7 +604,7 @@ class InstanceStore {
       this.isDeletingInstance = true;
       this.deleteInstanceError = null;
       try{
-        await API.axios.delete(API.endpoints.instanceData(instanceId, this.databaseScope));
+        await API.axios.delete(API.endpoints.instance(instanceId));
         runInAction(() => {
           this.instanceToDelete = null;
           this.isDeletingInstance = false;
@@ -732,8 +751,8 @@ class InstanceStore {
 
 }
 
-export const createInstanceStore = (databaseScope=null) => {
-  return new InstanceStore(databaseScope);
+export const createInstanceStore = (stage=null) => {
+  return new InstanceStore(stage);
 };
 
 export default new InstanceStore();

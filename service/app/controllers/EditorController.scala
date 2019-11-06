@@ -145,29 +145,30 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def getInstancesList(metadata: Boolean): Action[AnyContent] =
+  def getInstancesList(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(metadata, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
+      getInstances(stage, metadata, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
     }
 
-  def getInstancesSummary(metadata: Boolean): Action[AnyContent] =
+  def getInstancesSummary(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(metadata, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
+      getInstances(stage, metadata, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
     }
 
-  def getInstancesLabel(metadata: Boolean): Action[AnyContent] =
+  def getInstancesLabel(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(metadata, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
+      getInstances(stage, metadata, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
     }
 
   def getInstances(
+    stage: String,
     metadata: Boolean,
     generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
         editorService
-          .retrieveInstances(ids, request.userToken, metadata)
+          .retrieveInstances(ids, request.userToken, stage, metadata)
           .flatMap {
             case Right(instancesResult) =>
               val instances = InstanceHelper.extractDataAsList(instancesResult)
@@ -523,53 +524,29 @@ class EditorController @Inject()(
           .runToFuture
       }
 
+  def createInstanceWithoutId(workspace: String): Action[AnyContent] = createInstance(workspace, None)
+  def createInstanceWithId(workspace: String, id: String): Action[AnyContent] = createInstance(workspace, Some(id))
+
   /**
     * Creation of a new instance in the editor
     *
-    * @param org     The organization of the instance
-    * @param domain  The domain of the instance
-    * @param schema  The schema of the instance
-    * @param version The version of the schema
-    * @return 201 Created
+    * @param id     The id of the instance
+    * @return 200 Created
     */
-  def createInstance(org: String, domain: String, schema: String, version: String): Action[AnyContent] =
-    (authenticatedUserAction)
-      .async { implicit request =>
-        val instancePath = NexusPath(org, domain, schema, version)
-        editorService
-          .insertInstance(NexusInstance(None, instancePath, Json.obj()), Some(request.user), request.userToken)
-          .flatMap[Result] {
-            case Left(error) => Task.pure(error.toResult)
-            case Right(ref) =>
-              request.body.asJson match {
-                case Some(content) =>
-                  formService.getRegistries().flatMap { registries =>
-                    val nonEmptyInstance = FormOp.buildNewInstanceFromForm(
-                      ref,
-                      config.nexusEndpoint,
-                      content.as[JsObject],
-                      registries.formRegistry
-                    )
-                    editorService
-                      .updateInstance(nonEmptyInstance, ref, request.userToken, request.user.id)
-                      .flatMap[Result] {
-                        case Right(()) =>
-                          val specFlush = formService.shouldReloadSpecification(instancePath).flatMap { shouldReload =>
-                            if (shouldReload) {
-                              formService.flushSpec()
-                            } else {
-                              Task.pure(())
-                            }
-                          }
-                          specFlush.map { _ =>
-                            Created(Json.toJson(EditorResponseObject(Json.toJson(ref))))
-                          }
-                        case Left(error) => Task.pure(error.toResult)
-                      }
-                  }
-                case None => Task.pure(Created(Json.toJson(EditorResponseObject(Json.toJson(ref)))))
-              }
-          }
-          .runToFuture
+  def createInstance(workspace: String, id: Option[String]): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      val bodyContent = request.body.asJson
+      bodyContent match {
+        case Some(body) =>
+          editorService
+            .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken)
+            .map {
+              case Right(value) => Ok(value)
+              case Left(err)    => err.toResult
+            }
+            .runToFuture
+        case None => Task.pure(BadRequest("Missing body content")).runToFuture
       }
+    }
+
 }

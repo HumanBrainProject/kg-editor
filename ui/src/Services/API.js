@@ -12,15 +12,15 @@ const endpoints = {
   "structureStatistics": () => "/statistics/structure.json",
   "perWeekDatasetsStatistics": () => `${window.rootPath}/data/mockups/perWeekDatasetsStatistics.json`,
   "globalDatasetsStatistics": () => `${window.rootPath}/data/mockups/globalDatasetsStatistics.json`,
-  "instancesList": () => "/editor/api/instances/list",
-  "instancesSummary": () => "/editor/api/instances/summary",
-  "instancesLabel": () => "/editor/api/instances/label",
+  "instancesList": (stage=null) => `/editor/api/instances/list${stage?`?stage=${stage}`:"" }`,
+  "instancesSummary": (stage=null) => `/editor/api/instances/summary${stage?`?stage=${stage}`:"" }`,
+  "instancesLabel": (stage=null) => `/editor/api/instances/label${stage?`?stage=${stage}`:"" }`,
   "filterBookmarkInstances": (id, from, size, search) => `/editor/api/instances/filter?bookmarkId=${id}&from=${from}&size=${size}&search=${search}`,
   "searchInstances": (id, from, size, search) => `/editor/api/workspaces/${authStore.currentWorkspace}/instances/summary?type=${encodeURIComponent(id)}&from=${from}&size=${size}&search=${search}`,
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
-  "instanceData": (type, databaseScope=null) => `/editor/api/instances?type=${encodeURIComponent(type)}${databaseScope?("&databaseScope=" + databaseScope):""}`,
-  "createInstance": (type, databaseScope=null) => `/editor/api/instances?type=${encodeURIComponent(type)}${databaseScope?("&databaseScope=" + databaseScope):""}`,
-  "checkInstanceIdAvailability": instance => `/editor/api/instances/${instance}/available`,
+  "instance": id => `/editor/api/instances/${id}`,
+  "createInstance": (id=null) => `/editor/api/instances/${id?("/" + id):""}?workspace=${authStore.currentWorkspace}`,
+  "resolvedId": instance => `/editor/api/instances/${instance}/resolvedId`,
   "release": instance => `/editor/api/instances/${instance}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
@@ -29,15 +29,7 @@ const endpoints = {
   "bookmarks": () => `/editor/api/workspaces/${authStore.currentWorkspace}/bookmarks`,
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
-  "workspaceTypes": () => `/editor/api/workspaces/${authStore.currentWorkspace}/types`,
-  "performQuery": function(instancePath, vocab, size, start, databaseScope){
-    return `/editor/api/query/${instancePath}/instances${arguments.length > 1?"?":""}${
-      ""}${vocab!==undefined && vocab!==null?`vocab=${encodeURIComponent(vocab)}&`:""}${
-      ""}${size!==undefined && size!==null?`size=${encodeURIComponent(size)}&`:""}${
-      ""}${start!==undefined && start!==null?`start=${encodeURIComponent(start)}&`:""}${
-      ""}${databaseScope?`databaseScope=${databaseScope}`:"" }`;},
-  "query": (instancePath, queryId) => `/editor/api/query/${instancePath}/${encodeURIComponent(queryId)}`,
-  "listQueries": () => "/editor/api/query"
+  "workspaceTypes": () => `/editor/api/workspaces/${authStore.currentWorkspace}/types`
 };
 
 class API {

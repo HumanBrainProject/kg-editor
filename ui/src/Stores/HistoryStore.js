@@ -135,7 +135,7 @@ class HistoryStore {
       this.instances = [];
       this.isFetching = true;
       this.fetchError = null;
-      list = ["cfbd4063-3f58-4944-b979-c4270c307baf-73696d70736f6e73"]; // TODO: Remove hardcoded ids
+      list = ["6fe6ab26-1059-4d14-bfa6-b49acf37060e"]; // TODO: Remove hardcoded ids
       const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
       runInAction(() => {
         this.isFetching = false;

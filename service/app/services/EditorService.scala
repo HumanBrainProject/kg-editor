@@ -338,6 +338,20 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
 
+  def insertInstanceNew(
+    id: Option[String],
+    workspace: String,
+    body: JsObject,
+    token: AccessToken
+  ): Task[Either[APIEditorError, JsObject]] =
+    instanceApiService
+      .postNew(wSClient, config.kgCoreEndpoint, id, workspace, body, token)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
+      }
+
+  //TODO: Deprecate this one and use insertInstanceNew
   def insertInstance(
     newInstance: NexusInstance,
     user: Option[User],
@@ -556,10 +570,11 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
   def retrieveInstances(
     instanceIds: List[String],
     token: AccessToken,
+    stage: String,
     metadata: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstances(wSClient, config.kgCoreEndpoint, token, instanceIds, metadata)
+      .getInstances(wSClient, config.kgCoreEndpoint, token, instanceIds, stage, metadata)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))

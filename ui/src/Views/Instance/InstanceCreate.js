@@ -88,8 +88,9 @@ export default class InstanceCreate extends React.Component {
         );
       }
       if (!instanceStore.instanceIdAvailability.isAvailable) {
+        const resolvedId = instanceStore.instanceIdAvailability.resolvedId?instanceStore.instanceIdAvailability.resolvedId:instanceId;
         this.resetInstanceIdAvailability();
-        routerStore.history.replace(`/instance/edit/${instanceId}`);
+        routerStore.history.replace(`/instance/edit/${resolvedId}`);
       }
 
       return (

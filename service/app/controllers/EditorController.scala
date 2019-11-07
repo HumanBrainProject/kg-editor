@@ -537,11 +537,12 @@ class EditorController @Inject()(
   /**
     * Creation of a new instance in the editor
     *
-    * @param id The id of the instance
+    * @param workspace The workspace that the instance belongs
+    * @param id        The id of the instance
     * @return 200 Created
     */
   def createInstance(workspace: String, id: Option[String])(implicit request: UserRequest[AnyContent]): Task[Result] = {
-    val bodyContent = request.body.asJson
+    val bodyContent: Option[JsValue] = request.body.asJson
     bodyContent match {
       case Some(body) =>
         editorService
@@ -564,15 +565,20 @@ class EditorController @Inject()(
                             instanceRes match {
                               case Some(r) =>
                                 Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
-                              case _ => InternalServerError("Something went wrong with types list! Please try again!")
+                              case _ =>
+                                InternalServerError("Something went wrong retrieving the instance! Please try again!")
                             }
                           case _ => InternalServerError("Something went wrong with types list! Please try again!")
                         }
                       case _ => InternalServerError("Something went wrong with types! Please try again!")
                     }
-                case _ => Task.pure(InternalServerError("Something went wrong with types list! Please try again!"))
+                case _ =>
+                  Task.pure(InternalServerError("Something went wrong while extracting the types! Please try again!"))
               }
-            case _ => Task.pure(InternalServerError("Something went wrong with the insertion! Please try again!"))
+            case _ =>
+              Task.pure(
+                InternalServerError("Something went wrong with the insertion of the instance! Please try again!")
+              )
           }
       case None => Task.pure(BadRequest("Missing body content"))
     }

@@ -114,6 +114,12 @@ export default class InstancesHistory extends React.Component{
     this.fetchInstances();
   }
 
+  componentDidUpdate(prevProps) {
+    if(prevProps.workspace !== this.props.workspace) {
+      this.fetchInstances();
+    }
+  }
+
   fetchInstances = () => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((result, [eventType, eventValue]) => {
       if (eventValue) {

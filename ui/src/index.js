@@ -280,8 +280,6 @@ class App extends React.Component {
     this.kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
   }
 
-
-
   componentDidMount() {
     authStore.initiliazeAuthenticate();
     document.addEventListener("keydown", this.handleGlobalShortcuts);

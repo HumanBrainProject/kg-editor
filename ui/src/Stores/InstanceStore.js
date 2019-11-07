@@ -195,13 +195,33 @@ class Instance {
       if (this.isNew) {
         const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
         runInAction(() => {
+          const newId = data.data.id;
           this.isNew = false;
           this.hasChanged = false;
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
           this.fieldsToSetAsNull = [];
-          this.data = data.data;
+          const instance = this.instanceStore.openedInstances.get(this.id);
+          if (newId !== this.id) {
+            this.instanceStore.openedInstances.set(newId, {
+              currentInstancePath: instance.currentInstancePath,
+              viewMode: "edit",
+              paneStore: instance.paneStore
+            });
+            this.instanceStore.openedInstances.delete(this.id);
+            this.instanceStore.instances.set(newId, instance);
+            this.instanceStore.instance.delete(this.id);
+            this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${newId}`);
+            this.id = newId;
+          } else {
+            instance.viewMode = "edit";
+            this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${this.id}`);
+          }
+          this.initializeData(data.data, this.globalReadMode, false);
+          const types = this.types.map(({name}) => name);
+          historyStore.updateInstanceHistory(this.id, types, "edited");
+          this.instanceStore.syncStoredOpenedTabs();
         });
       } else {
         const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
@@ -216,7 +236,7 @@ class Instance {
       }
 
       // TODO: Check if reload is still neeeded or if we only need to  update the instance object using the result of the save
-      this.fetch(true);
+      // this.fetch(true);
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;
@@ -256,6 +276,7 @@ class InstanceStore {
   @observable comparedWithReleasedVersionInstance = null;
   @observable previewInstance = null;
   @observable globalReadMode = true;
+  @observable pathsToResolve = new Map();
   @observable instanceIdAvailability = {
     resolvedId: null,
     instanceId: null,
@@ -280,12 +301,12 @@ class InstanceStore {
 
   constructor(stage=null) {
     this.stage = stage?stage:null;
-    if(localStorage.getItem("openedTabs")){
-      let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
-      if (authStore.isFullyAuthenticated) {
-        this.restoreOpenedTabs(storedOpenedTabs);
-      }
-    }
+    // if(localStorage.getItem("openedTabs")){
+    //   let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
+    //   if (authStore.isFullyAuthenticated) {
+    //     this.restoreOpenedTabs(storedOpenedTabs);
+    //   }
+    // }
   }
 
   fetchInstance(instance){
@@ -381,6 +402,7 @@ class InstanceStore {
     this.instanceToDelete = null;
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
+    this.pathsToResolve = new Map();
   }
 
   /**

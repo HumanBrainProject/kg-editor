@@ -39,6 +39,24 @@ const styles = {
 @observer
 export default class InstanceCreate extends React.Component {
 
+  componentDidMount() {
+    this.handleResultId();
+  }
+
+  componentDidUpdate() {
+    this.handleResultId();
+  }
+
+  handleResultId = () => {
+    if (!instanceStore.instanceIdAvailability.isChecking && !instanceStore.instanceIdAvailability.error && this.props.instanceId === instanceStore.instanceIdAvailability.instanceId) {
+      if (!instanceStore.instanceIdAvailability.isAvailable) {
+        const resolvedId = instanceStore.instanceIdAvailability.resolvedId?instanceStore.instanceIdAvailability.resolvedId:this.props.instanceId;
+        this.resetInstanceIdAvailability();
+        routerStore.history.replace(`/instance/edit/${resolvedId}`);
+      }
+    }
+  }
+
   resetInstanceIdAvailability = () => {
     if (this.props.instanceId === instanceStore.instanceIdAvailability.instanceId) {
       instanceStore.resetInstanceIdAvailability();
@@ -86,11 +104,6 @@ export default class InstanceCreate extends React.Component {
             </BGMessage>
           </div>
         );
-      }
-      if (!instanceStore.instanceIdAvailability.isAvailable) {
-        const resolvedId = instanceStore.instanceIdAvailability.resolvedId?instanceStore.instanceIdAvailability.resolvedId:instanceId;
-        this.resetInstanceIdAvailability();
-        routerStore.history.replace(`/instance/edit/${resolvedId}`);
       }
 
       return (

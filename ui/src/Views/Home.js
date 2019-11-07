@@ -239,7 +239,7 @@ export default class Home extends React.Component{
                   </div>
                   <div className={classes.main}>
                     <DatasetsStatistics />
-                    <InstancesHistory />
+                    <InstancesHistory workspace={authStore.currentWorkspace}/>
                   </div>
                   <div className={classes.features}>
                     <div className="widget-list">

@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import CompareChanges from "./CompareChanges";
 import instanceStore from "../../Stores/InstanceStore";
+import routerStore from "../../Stores/RouterStore";
 
 const animationId = uniqueId("animationId");
 
@@ -108,6 +109,14 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class SavePanel extends React.Component{
+  componentDidMount() {
+    window.addEventListener("beforeunload", this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.onUnload);
+  }
+
   handleSaveAll = () => {
     Array.from(instanceStore.instances.entries())
       .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
@@ -116,6 +125,7 @@ export default class SavePanel extends React.Component{
         instance && instance.save();
       });
   }
+
   handleSave(instanceId){
     const instance = instanceStore.instances.get(instanceId);
     if (instance) {
@@ -123,14 +133,17 @@ export default class SavePanel extends React.Component{
       instanceStore.setComparedInstance(null);
     }
   }
+
   handleReset(instanceId){
     instanceStore.confirmCancelInstanceChanges(instanceId);
     instanceStore.setComparedInstance(null);
   }
+
   handleDismissSaveError(instanceId){
     const instance = instanceStore.instances.get(instanceId);
     instance && instance.cancelSave();
   }
+
   handleShowCompare(instanceId){
     instanceStore.setComparedInstance(instanceId);
   }
@@ -142,14 +155,6 @@ export default class SavePanel extends React.Component{
     instanceStore.toggleSavebarDisplay(true);
     event.returnValue = "You have unsaved modifications. Are you sure you want to leave this page?";
     return event.returnValue;
-  }
-
-  componentDidMount() {
-    window.addEventListener("beforeunload", this.onUnload);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("beforeunload", this.onUnload);
   }
 
   render(){

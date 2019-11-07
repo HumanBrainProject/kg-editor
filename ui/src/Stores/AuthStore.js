@@ -2,7 +2,7 @@ import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
 
 const userKeys = {
-  id: "@id",
+  id: "https://schema.hbp.eu/users/nativeId",
   username: "http://schema.org/alternateName",
   email: "http://schema.org/email",
   displayName: "http://schema.org/name",
@@ -20,6 +20,7 @@ const mapUserProfile = data => {
       }
     });
   }
+  console.log(user);
   return user;
 };
 

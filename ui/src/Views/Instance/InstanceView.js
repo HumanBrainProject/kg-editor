@@ -14,12 +14,12 @@ export default class InstanceView extends React.Component {
     const { instanceId, paneStore } = this.props;
 
     const instance = instanceId?instanceStore.instances.get(instanceId):null;
-
     if (!instance) {
       return null;
     }
 
     return (
+      
       <PaneContainer key={instanceId} paneStore={paneStore}>
         <React.Fragment>
           <Pane paneId={instanceId} key={instanceId}>

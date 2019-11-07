@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import CompareChanges from "./CompareChanges";
 import instanceStore from "../../Stores/InstanceStore";
-import routerStore from "../../Stores/RouterStore";
 
 const animationId = uniqueId("animationId");
 

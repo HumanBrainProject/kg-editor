@@ -301,12 +301,6 @@ class InstanceStore {
 
   constructor(stage=null) {
     this.stage = stage?stage:null;
-    // if(localStorage.getItem("openedTabs")){
-    //   let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
-    //   if (authStore.isFullyAuthenticated) {
-    //     this.restoreOpenedTabs(storedOpenedTabs);
-    //   }
-    // }
   }
 
   fetchInstance(instance){
@@ -419,7 +413,6 @@ class InstanceStore {
         historyStore.updateInstanceHistory(instance.id, types, "viewed");
       }
       this.openedInstances.get(instanceId).viewMode = viewMode;
-      this.syncStoredOpenedTabs();
     } else {
       this.openedInstances.set(instanceId, {
         currentInstancePath: [],
@@ -438,8 +431,8 @@ class InstanceStore {
         }
       }
       this.setCurrentInstanceId(instanceId, instanceId, 0);
-      this.syncStoredOpenedTabs();
     }
+    this.syncStoredOpenedTabs();
   }
 
   @action
@@ -492,11 +485,23 @@ class InstanceStore {
     localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
   }
 
+  getSavedOpenedTabs() {
+    return localStorage.getItem("openedTabs");
+  }
+
   @action
-  restoreOpenedTabs(storedOpenedTabs){
-    storedOpenedTabs.forEach(([id, viewMode]) => {
-      this.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
-    });
+  restoreOpenedTabs(openedTabs){
+    if(authStore.currentWorkspace) {
+      if (!openedTabs) {
+        openedTabs = this.getSavedOpenedTabs();
+      }
+      if(openedTabs) {
+        const storedOpenedTabs = JSON.parse(openedTabs);
+        storedOpenedTabs.forEach(([id, viewMode]) => {
+          this.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
+        });
+      }
+    }
   }
 
   @action

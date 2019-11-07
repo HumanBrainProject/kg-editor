@@ -20,7 +20,6 @@ const mapUserProfile = data => {
       }
     });
   }
-  console.log(user);
   return user;
 };
 
@@ -96,7 +95,6 @@ class AuthStore {
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
           this.user = mapUserProfile(data);
-          this.retrieveUserWorkspace();
           this.isRetrievingUserProfile = false;
         });
       } catch (e) {
@@ -106,6 +104,7 @@ class AuthStore {
         });
       }
     }
+    return this.hasUserProfile;
   }
 
   @action
@@ -125,7 +124,7 @@ class AuthStore {
   }
 
   @action
-  initializeKeycloak() {
+  initializeKeycloak(resolve, reject) {
     const keycloak = window.Keycloak({
       "realm": "hbp",
       "url":  this.endpoint,
@@ -137,12 +136,13 @@ class AuthStore {
         this.authSuccess = true;
         this.isInitializing = false;
       });
-      this.retrieveUserProfile();
+      resolve(true);
     };
     keycloak.onAuthError = error => {
       runInAction(() => {
         this.authError = error.error_description;
       });
+      reject(error.error_description);
     };
     keycloak.onTokenExpired = () => {
       runInAction(() => {
@@ -161,7 +161,7 @@ class AuthStore {
   }
 
   @action
-  async initiliazeAuthenticate() {
+  async authenticate() {
     this.isInitializing = true;
     this.authError = null;
     try {
@@ -170,21 +170,29 @@ class AuthStore {
         this.endpoint =  data && data.data? data.data.endpoint :null;
       });
       if(this.endpoint) {
-        const keycloakScript = document.createElement("script");
-        keycloakScript.src = this.endpoint + "/js/keycloak.js";
-        keycloakScript.async = true;
+        try {
+          await new Promise(async (resolve, reject) => {
+            const keycloakScript = document.createElement("script");
+            keycloakScript.src = this.endpoint + "/js/keycloak.js";
+            keycloakScript.async = true;
 
-        document.head.appendChild(keycloakScript);
-        keycloakScript.onload = () => {
-          this.initializeKeycloak();
-        };
-        keycloakScript.onerror = () => {
-          document.head.removeChild(keycloakScript);
-          runInAction(() => {
-            this.isInitializing = false;
-            this.authError = `Failed to load resource! (${keycloakScript.src})`;
+            document.head.appendChild(keycloakScript);
+            keycloakScript.onload = () => {
+              this.initializeKeycloak(resolve, reject);
+            };
+            keycloakScript.onerror = () => {
+              document.head.removeChild(keycloakScript);
+              runInAction(() => {
+                this.isInitializing = false;
+                this.authError = `Failed to load resource! (${keycloakScript.src})`;
+              });
+              reject(this.authError);
+            };
           });
-        };
+        } catch (e) {
+          // error are already set in the store so no need to do anything here
+          // window.console.log(e);
+        }
       } else {
         runInAction(() => {
           this.isInitializing = false;
@@ -197,6 +205,7 @@ class AuthStore {
         this.authError = `Failed to load service endpoints configuration (${e && e.message?e.message:e})`;
       });
     }
+    return this.authSuccess;
   }
 }
 

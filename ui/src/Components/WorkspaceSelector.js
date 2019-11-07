@@ -51,6 +51,7 @@ export default class WorkspaceSelector extends React.Component {
       if(authStore.currentWorkspace !== eventKey && window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
         authStore.setCurrentWorkspace(eventKey);
         this.handleCloseAllInstances();
+        instanceStore.restoreOpenedTabs();
       }
     } else {
       authStore.setCurrentWorkspace(eventKey);

@@ -3,6 +3,8 @@ import { observable, action } from "mobx";
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
+import authStore from "./AuthStore";
+import instanceStore from "./InstanceStore";
 
 class AppStore{
   @observable globalError = null;
@@ -39,6 +41,18 @@ class AppStore{
       };
     }
     this.historySettings = savedHistorySettings;
+  }
+
+  async initialize() {
+    const openedTabs = instanceStore.getSavedOpenedTabs();
+    await authStore.authenticate();
+    if(authStore.isAuthenticated) {
+      await authStore.retrieveUserProfile();
+    }
+    if(authStore.isFullyAuthenticated) {
+      authStore.retrieveUserWorkspace();
+      instanceStore.restoreOpenedTabs(openedTabs);
+    }
   }
 
   @action

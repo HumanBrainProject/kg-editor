@@ -281,7 +281,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    authStore.initiliazeAuthenticate();
+    appStore.initialize();
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
     const cookies = new Cookies();

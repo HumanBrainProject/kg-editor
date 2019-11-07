@@ -19,7 +19,7 @@ export default class InstanceView extends React.Component {
     }
 
     return (
-      
+
       <PaneContainer key={instanceId} paneStore={paneStore}>
         <React.Fragment>
           <Pane paneId={instanceId} key={instanceId}>

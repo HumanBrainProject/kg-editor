@@ -5,12 +5,12 @@ import API from "../Services/API";
 
 import { normalizeInstanceData } from "../Helpers/InstanceHelper";
 import historyStore from "./HistoryStore";
-import PaneStore from "./PaneStore";
 import browseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import { matchPath } from "react-router-dom";
+import instanceTabStore from "./InstanceTabStore";
 
 class Instance {
   @observable id = null;
@@ -202,14 +202,14 @@ class Instance {
           this.hasSaveError = false;
           this.isSaving = false;
           this.fieldsToSetAsNull = [];
-          const instance = this.instanceStore.openedInstances.get(this.id);
+          const instance = instanceTabStore.openedInstances.get(this.id);
           if (newId !== this.id) {
-            this.instanceStore.openedInstances.set(newId, {
+            instanceTabStore.openedInstances.set(newId, {
               currentInstancePath: instance.currentInstancePath,
               viewMode: "edit",
               paneStore: instance.paneStore
             });
-            this.instanceStore.openedInstances.delete(this.id);
+            instanceTabStore.openedInstances.delete(this.id);
             this.instanceStore.instances.set(newId, instance);
             this.instanceStore.instance.delete(this.id);
             this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${newId}`);
@@ -221,7 +221,7 @@ class Instance {
           this.initializeData(data.data, this.globalReadMode, false);
           const types = this.types.map(({name}) => name);
           historyStore.updateInstanceHistory(this.id, types, "edited");
-          this.instanceStore.syncStoredOpenedTabs();
+          instanceTabStore.syncStoredInstanceTabs();
         });
       } else {
         const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
@@ -271,19 +271,10 @@ class Instance {
 class InstanceStore {
   @observable stage = null;
   @observable instances = new Map();
-  @observable openedInstances = new Map();
   @observable comparedInstanceId = null;
   @observable comparedWithReleasedVersionInstance = null;
-  @observable previewInstance = null;
   @observable globalReadMode = true;
   @observable pathsToResolve = new Map();
-  @observable instanceIdAvailability = {
-    resolvedId: null,
-    instanceId: null,
-    isAvailable: false,
-    isChecking: false,
-    error: null
-  };
   @observable instanceCreationError = null;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
@@ -354,7 +345,7 @@ class InstanceStore {
             const data = find(response.data.data, item => item.id === instance.id);
             if(data){
               instance.initializeData(data, this.globalReadMode, false);
-              if(this.openedInstances.has(instance.id)){
+              if(instanceTabStore.openedInstances.has(instance.id)){
                 const types = instance.types.map(({name}) => name);
                 historyStore.updateInstanceHistory(instance.id, types, "viewed");
               }
@@ -389,7 +380,7 @@ class InstanceStore {
 
   @action flush(){
     this.instances = new Map();
-    this.resetInstanceIdAvailability();
+    //this.resetInstanceIdAvailability();
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
     this.showSaveBar = false;
@@ -397,116 +388,6 @@ class InstanceStore {
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
     this.pathsToResolve = new Map();
-  }
-
-  /**
-   * Opened instances are shown in their own tab in the UI
-   * We keep track in that store of which instances are opened
-   */
-  @action openInstance(instanceId, viewMode = "view", readMode = true){
-    this.togglePreviewInstance();
-    this.setReadMode(readMode);
-    if(this.openedInstances.has(instanceId)){
-      const instance = this.instances.get(instanceId);
-      if (instance && instance.isFetched && !instance.fetchError) {
-        const types = instance.types.map(({name}) => name);
-        historyStore.updateInstanceHistory(instance.id, types, "viewed");
-      }
-      this.openedInstances.get(instanceId).viewMode = viewMode;
-    } else {
-      this.openedInstances.set(instanceId, {
-        currentInstancePath: [],
-        viewMode: viewMode,
-        paneStore: new PaneStore()
-      });
-      if(viewMode === "create") {
-        this.checkInstanceIdAvailability(instanceId);
-      } else {
-        const instance = this.createInstanceOrGet(instanceId);
-        if(instance.isFetched && !instance.fetchError) {
-          const types = instance.types.map(({name}) => name);
-          historyStore.updateInstanceHistory(instance.id, types, "viewed");
-        } else {
-          instance.fetch();
-        }
-      }
-      this.setCurrentInstanceId(instanceId, instanceId, 0);
-    }
-    this.syncStoredOpenedTabs();
-  }
-
-  @action
-  setInstanceViewMode(instanceId, mode){
-    this.openedInstances.get(instanceId).viewMode = mode;
-  }
-
-  @action
-  closeInstance(instanceId){
-    this.openedInstances.delete(instanceId);
-    this.syncStoredOpenedTabs();
-  }
-
-  @action
-  removeUnusedInstances(instanceId, instancesToBeDeleted) {
-    const instancesToBeKept = this.getOpenedInstancesExceptCurrent(instanceId);
-    instancesToBeDeleted.forEach(i => {
-      const instance = this.instances.get(i);
-      if(!instance.isFetching && !instancesToBeKept.includes(i)) {
-        this.instances.delete(i);
-      }
-    });
-  }
-
-  getOpenedInstancesExceptCurrent(instanceId) {
-    let result = [];
-    Array.from(this.openedInstances.keys()).forEach(id => {
-      if (id !== instanceId) {
-        const instance = this.instances.get(id);
-        const instancesToBeKept = instance.linkedIds;
-        result = [...result, ...instancesToBeKept];
-      }
-    });
-    return Array.from(new Set(result));
-  }
-
-  @action
-  removeAllInstances() {
-    this.closeAllInstances();
-    this.instances.clear();
-  }
-
-  @action
-  closeAllInstances(){
-    this.openedInstances.clear();
-    this.syncStoredOpenedTabs();
-  }
-
-  syncStoredOpenedTabs(){
-    localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
-  }
-
-  getSavedOpenedTabs() {
-    return localStorage.getItem("openedTabs");
-  }
-
-  @action
-  restoreOpenedTabs(openedTabs){
-    if(authStore.currentWorkspace) {
-      if (!openedTabs) {
-        openedTabs = this.getSavedOpenedTabs();
-      }
-      if(openedTabs) {
-        const storedOpenedTabs = JSON.parse(openedTabs);
-        storedOpenedTabs.forEach(([id, viewMode]) => {
-          this.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
-        });
-      }
-    }
-  }
-
-  @action
-  flushOpenedTabs(){
-    localStorage.removeItem("openedTabs");
   }
 
   @action
@@ -522,46 +403,6 @@ class InstanceStore {
   @computed
   get hasUnsavedChanges(){
     return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
-  }
-
-  @action
-  resetInstanceIdAvailability() {
-    this.instanceIdAvailability.resolvedId = null;
-    this.instanceIdAvailability.instanceId = null;
-    this.instanceIdAvailability.isChecking = false;
-    this.instanceIdAvailability.error = null;
-    this.instanceIdAvailability.isAvailable = false;
-  }
-
-  @action
-  async checkInstanceIdAvailability(instanceId){
-    if (!this.instanceIdAvailability.instanceId || instanceId === this.instanceIdAvailability.instanceId) {
-      this.instanceIdAvailability.instanceId = instanceId,
-      this.instanceIdAvailability.isChecking = true;
-      this.instanceIdAvailability.error = null;
-      this.instanceIdAvailability.isAvailable = false;
-      try{
-        const { data } = await API.axios.get(API.endpoints.resolvedId(instanceId));
-        runInAction(() => {
-          this.instanceIdAvailability.resolvedId = data && data.data ? data.data.uuid:null;
-          this.instanceIdAvailability.isAvailable = false;
-          this.instanceIdAvailability.isChecking = false;
-        });
-      } catch(e){
-        runInAction(() => {
-          if (e.response && e.response.status === 404) {
-            this.instanceIdAvailability.isAvailable = true;
-            this.instanceIdAvailability.isChecking = false;
-          } else {
-            const message = e.message?e.message:e;
-            const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-            this.instanceIdAvailability.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
-            this.instanceIdAvailability.isChecking = false;
-            this.instanceIdAvailability.isAvailable = false;
-          }
-        });
-      }
-    }
   }
 
   @action
@@ -669,6 +510,11 @@ class InstanceStore {
   }
 
   @action
+  removeInstances(instanceIds) {
+    instanceIds.forEach(id => this.instances.delete(id));
+  }
+
+  @action
   async retryDeleteInstance() {
     return await this.deleteInstance(this.instanceToDelete);
   }
@@ -718,18 +564,14 @@ class InstanceStore {
     });
   }
 
-  doesInstanceHaveLinkedInstancesInUnsavedState = instance => {
-    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
-  }
-
   @action
   setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
-    let currentInstancePath = this.openedInstances.get(mainInstanceId).currentInstancePath;
+    let currentInstancePath = instanceTabStore.openedInstances.get(mainInstanceId).currentInstancePath;
     currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
   }
 
   getCurrentInstanceId(instanceId){
-    let currentInstancePath = this.openedInstances.get(instanceId).currentInstancePath;
+    let currentInstancePath = instanceTabStore.openedInstances.get(instanceId).currentInstancePath;
     return currentInstancePath[currentInstancePath.length-1];
   }
 
@@ -760,20 +602,6 @@ class InstanceStore {
   @action
   abortCancelInstanceChange(instanceId){
     this.instances.get(instanceId).cancelChangesPending = false;
-  }
-
-  @action
-  toggleSavebarDisplay(state){
-    this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
-  }
-
-  @action
-  togglePreviewInstance(instanceId, instanceName, options) {
-    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
-      this.previewInstance = null;
-    } else {
-      this.previewInstance = {id: instanceId, name: instanceName, options: options};
-    }
   }
 
 }

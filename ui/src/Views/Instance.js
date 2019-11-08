@@ -15,6 +15,8 @@ import SaveBar from "./Instance/SaveBar";
 import Preview from "./Preview";
 import Tabs from "./Instance/Tabs";
 import routerStore from "../Stores/RouterStore";
+import instanceTabStore from "../Stores/InstanceTabStore";
+import appStore from "../Stores/AppStore";
 
 const styles = {
   container: {
@@ -78,7 +80,7 @@ const styles = {
 @observer
 export default class Edit extends React.Component {
   componentDidMount() {
-    instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
+    appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
   }
 
   componentDidUpdate(prevProps) {
@@ -88,7 +90,7 @@ export default class Edit extends React.Component {
       instanceStore.pathsToResolve.delete(path);
       routerStore.history.replace(newPath);
     } else if (this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
-      instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
+      appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
     }
   }
 
@@ -98,7 +100,7 @@ export default class Edit extends React.Component {
 
   render() {
     const {classes} = this.props;
-    const openedInstance = this.props.match.params.id?instanceStore.openedInstances.get(this.props.match.params.id):null;
+    const openedInstance = this.props.match.params.id?instanceTabStore.openedInstances.get(this.props.match.params.id):null;
 
     if (!openedInstance) {
       return null;

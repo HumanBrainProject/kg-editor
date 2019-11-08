@@ -14,6 +14,7 @@ import instanceStore from "../../Stores/InstanceStore";
 import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
 import InstanceRow from "../Instance/InstanceRow";
+import appStore from "../../Stores/AppStore";
 
 const styles = {
   container:{
@@ -93,7 +94,7 @@ export default class Instances extends React.Component{
 
   handleInstanceCtrlClick(instance){
     if (instance && instance.id) {
-      instanceStore.openInstance(instance.id);
+      appStore.openInstance(instance.id);
     }
   }
 

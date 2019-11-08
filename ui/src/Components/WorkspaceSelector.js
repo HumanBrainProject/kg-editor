@@ -7,7 +7,7 @@ import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
 import routerStore from "../Stores/RouterStore";
 import instanceStore from "../Stores/InstanceStore";
-import typesStore from "../Stores/TypesStore";
+import appStore from "../Stores/AppStore";
 
 
 const styles = {
@@ -47,16 +47,7 @@ export default class WorkspaceSelector extends React.Component {
   }
 
   selectWorkspace = eventKey => {
-    if(instanceStore.openedInstances.size > 0) {
-      if(authStore.currentWorkspace !== eventKey && window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
-        authStore.setCurrentWorkspace(eventKey);
-        this.handleCloseAllInstances();
-        instanceStore.restoreOpenedTabs();
-      }
-    } else {
-      authStore.setCurrentWorkspace(eventKey);
-    }
-    typesStore.fetch(true);
+    appStore.setCurrentWorkspace(eventKey);
   }
 
   handleCloseAllInstances = ()  => {
@@ -65,7 +56,7 @@ export default class WorkspaceSelector extends React.Component {
       || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
       routerStore.history.push("/browse");
     }
-    instanceStore.removeAllInstances();
+    instanceStore.clearOpenedInstances();
   }
 
   render() {

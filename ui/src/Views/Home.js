@@ -2,7 +2,6 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
-import { Modal } from "react-bootstrap";
 
 import Hub from "./Home/Hub";
 import InstancesHistory from "./Home/InstancesHistory";
@@ -204,8 +203,6 @@ const styles = {
 @observer
 export default class Home extends React.Component{
 
-  handleClick = workspace => authStore.setCurrentWorkspace(workspace);
-
   render(){
     const { classes } =  this.props;
     const firstNameReg = /^([^ ]+) .*$/;
@@ -226,59 +223,28 @@ export default class Home extends React.Component{
           "";
     return (
       <div className={classes.container}>
-        {authStore.hasWorkspaces?
-          authStore.currentWorkspace?
-            <React.Fragment>
-              <Scrollbars autoHide>
-                <div className={classes.panel}>
-                  <div className={classes.welcome}>
-                    <h1>Welcome <span title={name}>{name}</span></h1>
-                  </div>
-                  <div className={classes.nav}>
-                    <Hub/>
-                  </div>
-                  <div className={classes.main}>
-                    <DatasetsStatistics />
-                    <InstancesHistory workspace={authStore.currentWorkspace}/>
-                  </div>
-                  <div className={classes.features}>
-                    <div className="widget-list">
-                      <KeyboardShortcuts />
-                      <Features />
-                    </div>
-                  </div>
-                </div>
-                <TipsOfTheDay />
-              </Scrollbars>
-              <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
-            </React.Fragment>
-            :
-            <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
-              <Modal.Body>
-                <div className={classes.workspacesSelection}>
-                  <h1>Welcome <span title={name}>{name}</span></h1>
-                  <p>Please select a workspace:</p>
-                  <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(authStore.workspaces.length / 3) * 80))}px`}}>
-                    <Scrollbars>
-                      <div className={classes.workspaces}>
-                        {authStore.workspaces.map(workspace =>
-                          <div className={classes.workspace} key={workspace} onClick={() => this.handleClick(workspace)}>{workspace}</div>
-                        )}
-                      </div>
-                    </Scrollbars>
-                  </div>
-                </div>
-              </Modal.Body>
-            </Modal>
-          :
-          <Modal dialogClassName={classes.noWorkspacesModal} show={true} >
-            <Modal.Body>
+        <Scrollbars autoHide>
+          <div className={classes.panel}>
+            <div className={classes.welcome}>
               <h1>Welcome <span title={name}>{name}</span></h1>
-              <p>You are currently not granted permission to acccess any workspaces.</p>
-              <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
-            </Modal.Body>
-          </Modal>
-        }
+            </div>
+            <div className={classes.nav}>
+              <Hub/>
+            </div>
+            <div className={classes.main}>
+              <DatasetsStatistics />
+              <InstancesHistory workspace={authStore.currentWorkspace}/>
+            </div>
+            <div className={classes.features}>
+              <div className="widget-list">
+                <KeyboardShortcuts />
+                <Features />
+              </div>
+            </div>
+          </div>
+          <TipsOfTheDay />
+        </Scrollbars>
+        <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
       </div>
     );
   }

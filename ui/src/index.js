@@ -19,6 +19,7 @@ import appStore from "./Stores/AppStore";
 import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
 import instanceStore from "./Stores/InstanceStore";
+import instanceTabStore from "./Stores/InstanceTabStore";
 import browseStore from "./Stores/BrowseStore";
 
 import Tab from "./Components/Tab";
@@ -348,12 +349,12 @@ class App extends React.Component {
   handleCloseInstance(instanceId) {
     if (matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" })) {
       if (matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-        if (instanceStore.openedInstances.size > 1) {
-          let openedInstances = Array.from(instanceStore.openedInstances.keys());
+        if (instanceTabStore.openedInstances.size > 1) {
+          let openedInstances = Array.from(instanceTabStore.openedInstances.keys());
           let currentInstanceIndex = openedInstances.indexOf(instanceId);
           let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
-          let openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+          let openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
           routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
         } else {
           routerStore.history.push("/browse");
@@ -361,17 +362,14 @@ class App extends React.Component {
         }
       }
     }
-    if (instanceId === instanceStore.instanceIdAvailability.instanceId) {
-      instanceStore.resetInstanceIdAvailability();
-    }
-    instanceStore.closeInstance(instanceId);
+    appStore.instanceIdAvailability.delete(instanceId);
+    instanceTabStore.closeInstance(instanceId);
     const instance = instanceStore.instances.get(instanceId);
-    const instancesToBeDeleted = instance.linkedIds;
-    instanceStore.removeUnusedInstances(instanceId, instancesToBeDeleted);
+    appStore.removeUnusedInstances(instanceId, instance.linkedIds);
   }
 
   handleCloseAllInstances() {
-    instanceStore.resetInstanceIdAvailability();
+    appStore.resetInstanceIdAvailability();
     if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
       || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
       || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
@@ -382,21 +380,21 @@ class App extends React.Component {
 
   handleFocusPreviousInstance(instanceId) {
     if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceStore.openedInstances.size > 1) {
-        let openedInstances = Array.from(instanceStore.openedInstances.keys());
+      if (instanceTabStore.openedInstances.size > 1) {
+        let openedInstances = Array.from(instanceTabStore.openedInstances.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
-        let openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        let openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
-      if (instanceStore.openedInstances.size > 1) {
-        const openedInstances = Array.from(instanceStore.openedInstances.keys());
+      if (instanceTabStore.openedInstances.size > 1) {
+        const openedInstances = Array.from(instanceTabStore.openedInstances.keys());
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
-        const openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        const openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
@@ -406,21 +404,21 @@ class App extends React.Component {
 
   handleFocusNextInstance(instanceId) {
     if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceStore.openedInstances.size > 1) {
-        let openedInstances = Array.from(instanceStore.openedInstances.keys());
+      if (instanceTabStore.openedInstances.size > 1) {
+        let openedInstances = Array.from(instanceTabStore.openedInstances.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
-        let openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        let openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
-      if (instanceStore.openedInstances.size > 1) {
-        const openedInstances = Array.from(instanceStore.openedInstances.keys());
+      if (instanceTabStore.openedInstances.size > 1) {
+        const openedInstances = Array.from(instanceTabStore.openedInstances.keys());
         const newCurrentInstanceId = openedInstances[0];
-        const openedInstance = instanceStore.openedInstances.get(newCurrentInstanceId);
+        const openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
@@ -437,20 +435,19 @@ class App extends React.Component {
   }
 
   handleCreateInstance = () => {
-    if (!instanceStore.instanceIdAvailability.instanceId) {
-      const uuid = _.uuid();
-      routerStore.history.push(`/instance/create/${uuid}`);
-    }
+    const uuid = _.uuid();
+    routerStore.history.push(`/instance/create/${uuid}`);
   }
 
   handleLogout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      instanceStore.flushOpenedTabs();
+      instanceStore.flushStoredInstanceTabs();
       authStore.logout();
       document.querySelector("#root").style.display = "none";
       window.location.href = window.rootPath + "/";
     }
   }
+
   render() {
     const { classes } = this.props;
     const { currentLocation } = this.state;
@@ -472,15 +469,15 @@ class App extends React.Component {
                       <WorkspaceSelector />
                       <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                       <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
-                      <Tab icon={"file"} disabled={!!instanceStore.instanceIdAvailability.instanceId} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
+                      <Tab icon={"file"} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
                     </React.Fragment>
                     : null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
-                  {authStore.isFullyAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
+                  {authStore.isFullyAuthenticated && Array.from(instanceTabStore.openedInstances.keys()).map(instanceId => {
                     const instance = instanceStore.instances.get(instanceId);
-                    const mode = instanceStore.openedInstances.get(instanceId).viewMode;
+                    const mode = instanceTabStore.openedInstances.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
                     if (instance && instance.isFetched) {

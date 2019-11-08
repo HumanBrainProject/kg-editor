@@ -2,9 +2,9 @@ import React from "react";
 import injectStyles from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import instanceStore from "../../../Stores/InstanceStore";
 import routerStore from "../../../Stores/RouterStore";
 import authStore from "../../../Stores/AuthStore";
+import appStore from "../../../Stores/AppStore";
 
 const styles = {
   panel:{
@@ -23,10 +23,10 @@ const styles = {
     }
   },
   showActions:{
-    "&$panel":{
+    "& $panel":{
       height:"36px"
     },
-    "& $id":{
+    "& $info":{
       paddingTop: "10px"
     },
     "& $actions":{
@@ -46,7 +46,6 @@ const styles = {
     },
     cursor:"pointer"
   },
-
   action:{
     fontSize:"0.9em",
     lineHeight:"27px",
@@ -73,7 +72,7 @@ export default class FooterPanel extends React.Component {
   handleOpenInstance(mode, instanceId, event){
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
-      instanceStore.openInstance(instanceId, mode);
+      appStore.openInstance(instanceId, mode);
     } else {
       routerStore.history.push(`/instance/${mode}/${instanceId}`);
     }

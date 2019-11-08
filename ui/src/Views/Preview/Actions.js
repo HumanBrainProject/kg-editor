@@ -33,7 +33,7 @@ const styles = {
 export default class Actions extends React.Component {
   handleOpenInstance(mode, event) {
     if (event.metaKey || event.ctrlKey) {
-      instanceStore.openInstance(this.props.instanceId, mode);
+      appStore.openInstance(this.props.instanceId, mode);
     } else {
       routerStore.history.push(
         `/instance/${mode}/${this.props.instanceId}`

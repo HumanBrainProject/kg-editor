@@ -174,7 +174,7 @@ export default class UserProfileTab extends React.Component{
 
   handleLogout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      instanceStore.flushOpenedTabs();
+      instanceStore.flushStoredInstanceTabs();
       authStore.logout();
       document.querySelector("#root").style.display = "none";
       window.location.href = window.rootPath + "/";

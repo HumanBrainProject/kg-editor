@@ -14,6 +14,7 @@ export default class InstanceView extends React.Component {
     const { instanceId, paneStore } = this.props;
 
     const instance = instanceId?instanceStore.instances.get(instanceId):null;
+    console.log("instance", instanceId);
     if (!instance) {
       return null;
     }

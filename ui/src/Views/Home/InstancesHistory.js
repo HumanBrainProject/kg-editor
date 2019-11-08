@@ -172,7 +172,7 @@ export default class InstancesHistory extends React.Component{
   handleInstanceCtrlClick(instance){
     const id = instance && instance.id;
     if (id) {
-      instanceStore.openInstance(id);
+      appStore.openInstance(id);
     }
   }
 

@@ -5,12 +5,12 @@ import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
 
 import instanceStore from "../../Stores/InstanceStore";
-import routerStore from "../../Stores/RouterStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import InstanceView from "./InstanceView";
 import TypeSelection from "./TypeSelection";
+import appStore from "../../Stores/AppStore";
 
 const styles = {
   loader: {
@@ -39,41 +39,18 @@ const styles = {
 @observer
 export default class InstanceCreate extends React.Component {
 
-  componentDidMount() {
-    this.handleResultId();
-  }
-
-  componentDidUpdate() {
-    this.handleResultId();
-  }
-
-  handleResultId = () => {
-    if (!instanceStore.instanceIdAvailability.isChecking && !instanceStore.instanceIdAvailability.error && this.props.instanceId === instanceStore.instanceIdAvailability.instanceId) {
-      if (!instanceStore.instanceIdAvailability.isAvailable) {
-        const resolvedId = instanceStore.instanceIdAvailability.resolvedId?instanceStore.instanceIdAvailability.resolvedId:this.props.instanceId;
-        this.resetInstanceIdAvailability();
-        routerStore.history.replace(`/instance/edit/${resolvedId}`);
-      }
-    }
-  }
-
-  resetInstanceIdAvailability = () => {
-    if (this.props.instanceId === instanceStore.instanceIdAvailability.instanceId) {
-      instanceStore.resetInstanceIdAvailability();
-    }
-  }
-
-  handleCheckInstanceIdAvailability = () => instanceStore.checkInstanceIdAvailability(this.props.instanceId);
+  handleCheckInstanceIdAvailability = () => appStore.checkInstanceIdAvailability(this.props.instanceId);
 
   handleCreateNewInstanceOfType = type => {
     instanceStore.createNewInstance(type, this.props.instanceId);
-    this.resetInstanceIdAvailability();
+    appStore.resetInstanceIdAvailability();
   }
 
   render() {
     const { classes, instanceId, paneStore } = this.props;
 
     const instance = instanceId?instanceStore.instances.get(instanceId):null;
+    const status = appStore.instanceIdAvailability.get(instanceId);
 
     if (instance) {
       return (
@@ -81,21 +58,21 @@ export default class InstanceCreate extends React.Component {
       );
     }
 
-    if (instanceId === instanceStore.instanceIdAvailability.instanceId) {
-      if (instanceStore.instanceIdAvailability.isChecking) {
+    if (status) {
+      if (status.isChecking) {
         return (
           <div className={classes.loader}>
             <FetchingLoader>Processing...</FetchingLoader>
           </div>
         );
       }
-      if (instanceStore.instanceIdAvailability.error) {
+      if (status.error) {
         return (
           <div className={classes.error}>
             <BGMessage icon={"ban"}>
                 There was a network problem.<br />
                 If the problem persists, please contact the support.<br />
-              <small>{instanceStore.instanceIdAvailability.error}</small><br /><br />
+              <small>{status.error}</small><br /><br />
               <div>
                 <Button bsStyle={"primary"} onClick={this.handleCheckInstanceIdAvailability}>
                   <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry

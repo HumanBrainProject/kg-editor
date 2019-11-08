@@ -156,7 +156,7 @@ export default class InstanceForm extends React.Component {
 
   handleOpenInstance = (e) => {
     if ((e.metaKey || e.ctrlKey)) {
-      instanceStore.openInstance(this.props.id);
+      appStore.openInstance(this.props.id);
     } else {
       routerStore.history.push(`/instance/view/${this.props.id}`);
     }

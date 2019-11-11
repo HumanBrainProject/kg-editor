@@ -2,7 +2,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import releaseStore from "../../../Stores/ReleaseStore";
-import instanceStore from "../../../Stores/InstanceStore";
+import appStore from "../../../Stores/AppStore";
 import ReleaseStatus from "../../../Components/ReleaseStatus";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReleaseNodeToggle from "./ReleaseNodeToggle";
@@ -114,12 +114,12 @@ export default class ReleaseNode extends React.Component {
   handleOptionPreview = (instanceId, instanceName) => event => {
     event && event.stopPropagation();
     const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(instanceId, instanceName, options );
+    appStore.togglePreviewInstance(instanceId, instanceName, options );
   }
 
   handleShowCompare(node, e) {
     e && e.stopPropagation();
-    instanceStore.setComparedWithReleasedVersionInstance(node);
+    appStore.setComparedWithReleasedVersionInstance(node);
   }
 
   render() {

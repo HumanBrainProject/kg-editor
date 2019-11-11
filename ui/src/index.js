@@ -6,7 +6,6 @@ import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
-import _  from "lodash-uuid";
 import injectStyles from "react-jss";
 
 import "react-virtualized/styles.css";
@@ -20,7 +19,6 @@ import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
 import instanceStore from "./Stores/InstanceStore";
 import instanceTabStore from "./Stores/InstanceTabStore";
-import browseStore from "./Stores/BrowseStore";
 
 import Tab from "./Components/Tab";
 import SaveBar from "./Views/Instance/SaveBar";
@@ -249,20 +247,9 @@ const styles = {
 @injectStyles(styles)
 @observer
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentLocation: routerStore.history.location.pathname
-    };
-    routerStore.history.listen(location => {
-      this.setState({ currentLocation: location.pathname });
-    });
-    this.kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
-  }
-
   componentDidMount() {
     appStore.initialize();
-    document.addEventListener("keydown", this.handleGlobalShortcuts);
+    document.addEventListener("keydown", appStore.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
     const cookies = new Cookies();
     const sentryUrl = cookies.get("sentry_url");
@@ -277,148 +264,36 @@ class App extends React.Component {
     appStore.setGlobalError(error, info);
   }
 
-  handleGlobalShortcuts = (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84) {
-      appStore.toggleTheme();
-    } else if (e.altKey && e.keyCode === 66) { // alt+b, browse
-      routerStore.history.push("/browse");
-    } else if (e.altKey && e.keyCode === 78) { // alt+n, new
-      this.handleCreateInstance();
-    } else if (e.altKey && e.keyCode === 68) { // alt+d, dashboard
-      routerStore.history.push("/");
-    } else if (e.keyCode === 112) { // F1, help
-      routerStore.history.push("/help");
-    } else if (e.altKey && e.keyCode === 87) { // alt+w, close
-      if (e.shiftKey) { // alt+shift+w, close all
-        appStore.closeAllInstances();
-      } else {
-        let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
-        if (matchInstanceTab) {
-          this.handleCloseInstance(matchInstanceTab.params.id);
-        }
-      }
-    } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
-      let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
-      this.handleFocusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
-    } else if (e.altKey && e.keyCode === 39) { // right arrow, next
-      let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
-      this.handleFocusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
-    } else {
-      this.kCode.step = this.kCode.ref[this.kCode.step] === e.keyCode ? this.kCode.step + 1 : 0;
-      if (this.kCode.step === this.kCode.ref.length) {
-        this.kCode.step = 0;
-        appStore.setTheme("cupcake");
-      }
-    }
-  }
-
   handleToggleSaveBar = () => {
-    instanceStore.toggleSavebarDisplay();
+    appStore.toggleSavebarDisplay();
   }
 
   handleRetryDeleteInstance = async () => {
-    instanceStore.retryDeleteInstance();
+    appStore.retryDeleteInstance();
   }
 
   handleCancelDeleteInstance = () => {
-    instanceStore.cancelDeleteInstance();
+    appStore.cancelDeleteInstance();
   }
 
   handleCloseInstance(instanceId) {
-    if (matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" })) {
-      if (matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-        if (instanceTabStore.instancesTabs.size > 1) {
-          let openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
-          let currentInstanceIndex = openedInstances.indexOf(instanceId);
-          let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
-
-          let openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
-          routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
-        } else {
-          routerStore.history.push("/browse");
-          browseStore.clearSelectedInstance();
-        }
-      }
-    }
-    appStore.instanceIdAvailability.delete(instanceId);
-    instanceTabStore.closeInstanceTab(instanceId);
-    const instance = instanceStore.instances.get(instanceId);
-    appStore.removeUnusedInstances(instanceId, instance.linkedIds);
-  }
-
-  handleFocusPreviousInstance(instanceId) {
-    if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceTabStore.instancesTabs.size > 1) {
-        let openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
-        let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
-
-        let openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
-      } else {
-        routerStore.history.push("/browse");
-      }
-    } else {
-      if (instanceTabStore.instancesTabs.size > 1) {
-        const openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
-        const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
-        const openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
-      } else {
-        routerStore.history.push("/browse");
-      }
-    }
-  }
-
-  handleFocusNextInstance(instanceId) {
-    if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceTabStore.instancesTabs.size > 1) {
-        let openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
-        let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
-
-        let openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
-      } else {
-        routerStore.history.push("/browse");
-      }
-    } else {
-      if (instanceTabStore.instancesTabs.size > 1) {
-        const openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
-        const newCurrentInstanceId = openedInstances[0];
-        const openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
-      } else {
-        routerStore.history.push("/browse");
-      }
-    }
+    appStore.closeInstance(instanceId);
   }
 
   handleGoToDashboard = () => {
-    routerStore.history.push("/");
-  }
-
-  handleRetryretrieveUserProfile = () => {
-    authStore.retrieveUserProfile();
+    appStore.goToDashboard();
   }
 
   handleCreateInstance = () => {
-    const uuid = _.uuid();
-    routerStore.history.push(`/instance/create/${uuid}`);
+    appStore.createInstance();
   }
 
   handleLogout = () => {
-    if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      instanceStore.flushStoredInstanceTabs();
-      authStore.logout();
-      document.querySelector("#root").style.display = "none";
-      window.location.href = window.rootPath + "/";
-    }
+    appStore.logout();
   }
 
   render() {
     const { classes } = this.props;
-    const { currentLocation } = this.state;
     const Theme = appStore.availableThemes[appStore.currentTheme];
     return (
       <Router history={routerStore.history}>
@@ -435,17 +310,17 @@ class App extends React.Component {
                   {authStore.isFullyAuthenticated && authStore.hasWorkspaces && appStore.currentWorkspace?
                     <React.Fragment>
                       <WorkspaceSelector />
-                      <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
-                      <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
+                      <Tab icon={"home"} current={matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
+                      <Tab icon={"search"} current={matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
                       <Tab icon={"file"} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
                     </React.Fragment>
                     : null
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
-                  {authStore.isFullyAuthenticated && Array.from(instanceTabStore.instancesTabs.keys()).map(instanceId => {
+                  {authStore.isFullyAuthenticated && Array.from(instanceTabStore.instanceTabs.keys()).map(instanceId => {
                     const instance = instanceStore.instances.get(instanceId);
-                    const mode = instanceTabStore.instancesTabs.get(instanceId).viewMode;
+                    const mode = instanceTabStore.instanceTabs.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
                     if (instance && instance.isFetched) {
@@ -463,7 +338,7 @@ class App extends React.Component {
                         icon={instance && instance.isFetching ? "circle-notch" : "circle"}
                         iconSpin={instance && instance.isFetching}
                         iconColor={color}
-                        current={matchPath(currentLocation, { path: `/instance/${mode}/${instanceId}`, exact: "true" })}
+                        current={matchPath(routerStore.history.location.pathname, { path: `/instance/${mode}/${instanceId}`, exact: "true" })}
                         path={`/instance/${mode}/${instanceId}`}
                         onClose={this.handleCloseInstance.bind(this, instanceId)}
                         label={label} />
@@ -473,7 +348,7 @@ class App extends React.Component {
                 <div className={classes.fixedTabsRight}>
                   {authStore.isFullyAuthenticated &&
                     <React.Fragment>
-                      <Tab icon={"question-circle"} current={matchPath(currentLocation, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
+                      <Tab icon={"question-circle"} current={matchPath(routerStore.history.location.pathname, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
                       <UserProfileTab className={classes.userProfileTab} size={32} />
                     </React.Fragment>
                   }
@@ -482,7 +357,7 @@ class App extends React.Component {
             }
           </div>
           <div className={classes.body}>
-            {instanceStore.hasUnsavedChanges && !matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) &&
+            {instanceStore.hasUnsavedChanges && !matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" }) &&
               <div className={`${classes.savebar} ${instanceStore.showSaveBar ? "show" : ""}`}>
                 <div className={classes.savebarToggle} onClick={this.handleToggleSaveBar}>
                   <FontAwesomeIcon className={classes.savebarToggleIcon} icon={"exclamation-triangle"} />&nbsp;
@@ -529,11 +404,11 @@ class App extends React.Component {
           </div>
           {authStore.isFullyAuthenticated && (
             <React.Fragment>
-              {instanceStore.deleteInstanceError ?
+              {appStore.deleteInstanceError ?
                 <div className={classes.deleteInstanceErrorModal}>
                   <Modal.Dialog>
                     <Modal.Body>
-                      <div className={classes.deleteInstanceError}>{instanceStore.deleteInstanceError}</div>
+                      <div className={classes.deleteInstanceError}>{appStore.deleteInstanceError}</div>
                       <div className={classes.deleteInstanceErrorFooterBar}>
                         <Button onClick={this.handleCancelDeleteInstance}>Cancel</Button>
                         <Button bsStyle="primary" onClick={this.handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
@@ -542,11 +417,11 @@ class App extends React.Component {
                   </Modal.Dialog>
                 </div>
                 :
-                instanceStore.isDeletingInstance && !!instanceStore.instanceToDelete ?
+                appStore.isDeletingInstance && !!appStore.instanceToDelete ?
                   <div className={classes.deletingInstanceModal}>
                     <Modal.Dialog>
                       <Modal.Body>
-                        <FetchingLoader>{`Deleting instance "${instanceStore.instanceToDelete}" ...`}</FetchingLoader>
+                        <FetchingLoader>{`Deleting instance "${appStore.instanceToDelete}" ...`}</FetchingLoader>
                       </Modal.Body>
                     </Modal.Dialog>
                   </div>

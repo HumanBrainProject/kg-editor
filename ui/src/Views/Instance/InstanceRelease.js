@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { Button } from "react-bootstrap";
 
+import appStore from "../../Stores/AppStore";
 import releaseStore from "../../Stores/ReleaseStore";
 import instanceStore from "../../Stores/InstanceStore";
 
@@ -145,8 +146,8 @@ export default class InstanceRelease extends React.Component {
                 <ReleaseAction />
               </div>
               <SavingModal />
-              {instanceStore.comparedWithReleasedVersionInstance &&
-                  instanceStore.comparedWithReleasedVersionInstance
+              {appStore.comparedWithReleasedVersionInstance &&
+                  appStore.comparedWithReleasedVersionInstance
                     .relativeUrl && (
                 <CompareInstancesModal />
               )}

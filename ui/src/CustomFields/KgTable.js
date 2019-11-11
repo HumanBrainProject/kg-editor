@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
 import FetchingLoader from "../Components/FetchingLoader";
+import appStore from "../Stores/AppStore";
 import instanceStore from "../Stores/InstanceStore";
 import FieldError from "./FieldError";
 
@@ -261,7 +262,7 @@ export default class KgTable extends React.Component {
 
   closeDropdown(){
     this.dropDownRef = null;
-    instanceStore.togglePreviewInstance();
+    appStore.togglePreviewInstance();
     this.forceUpdate();
   }
 
@@ -292,7 +293,7 @@ export default class KgTable extends React.Component {
     if(field.disabled || field.readOnly){
       return;
     }
-    instanceStore.togglePreviewInstance();
+    appStore.togglePreviewInstance();
     if(!e || (e && (!e.keyCode || e.keyCode === 13))){
       //If this function call doesn't send an event (->React Bootstrap OnSelect callback)
       //Or if it comes from a keyboard event associated with the "Enter" key
@@ -332,7 +333,7 @@ export default class KgTable extends React.Component {
     if(!this.dropDownRef || !this.dropDownRef.contains(e.target)){
       this.unlistenClickOutHandler();
       this.props.field.setUserInput("");
-      instanceStore.togglePreviewInstance();
+      appStore.togglePreviewInstance();
     }
   };
 
@@ -382,7 +383,7 @@ export default class KgTable extends React.Component {
 
   handleOptionPreview = (instanceId, instanceName, event) => {
     event && event.stopPropagation();
-    instanceStore.togglePreviewInstance(instanceId, instanceName);
+    appStore.togglePreviewInstance(instanceId, instanceName);
   }
 
   setContainerWidth = () => {

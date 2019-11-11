@@ -40,7 +40,7 @@ object EditorConstants {
   val METAIDENTIFIER = s"${META}identifier"
 
   val VOCABMETAEBRAINSOCCURENCES = s"${EBRAINSVOCAB}meta/occurences"
-  val VOCABEBRAINSSPACES = s"${EBRAINSVOCAB}meta/spaces"
+  val VOCABEBRAINSSPACES = s"${EBRAINSVOCAB}meta/space"
 
   val METAEBRAINS = "https://kg.ebrains.eu/meta/"
   val METAEBRAINSPROPERTIES = s"${EBRAINSVOCAB}meta/properties"

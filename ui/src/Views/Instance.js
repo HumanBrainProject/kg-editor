@@ -14,7 +14,6 @@ import InstanceManage from "./Instance/InstanceManage";
 import SaveBar from "./Instance/SaveBar";
 import Preview from "./Preview";
 import Tabs from "./Instance/Tabs";
-import routerStore from "../Stores/RouterStore";
 import instanceTabStore from "../Stores/InstanceTabStore";
 import appStore from "../Stores/AppStore";
 
@@ -85,22 +84,16 @@ export default class Edit extends React.Component {
 
   componentDidUpdate(prevProps) {
     const path = `/instance/${this.props.mode}/${this.props.match.params.id}`;
-    if (instanceStore.pathsToResolve.has(path)) {
-      const newPath = instanceStore.pathsToResolve.get(path);
-      instanceStore.pathsToResolve.delete(path);
-      routerStore.history.replace(newPath);
-    } else if (this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
+    if (!appStore.replaceInstanceResolvedIdPath(path) && this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
       appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
     }
   }
 
-  handleHidePreview = () => {
-    instanceStore.togglePreviewInstance();
-  }
+  handleHidePreview = () => appStore.togglePreviewInstance();
 
   render() {
     const {classes} = this.props;
-    const openedInstance = this.props.match.params.id?instanceTabStore.instancesTabs.get(this.props.match.params.id):null;
+    const openedInstance = this.props.match.params.id?instanceTabStore.instanceTabs.get(this.props.match.params.id):null;
 
     if (!openedInstance) {
       return null;

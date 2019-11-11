@@ -1,4 +1,5 @@
 import React from "react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -47,16 +48,24 @@ const styles = {
     }
   },
   error: {
-    color: "var(--ft-color-loud)"
-  },
+    color: "var(--ft-color-loud)",
+    "& button + button": {
+      marginLeft: "60px"
+    }
+  }
 };
 
 @injectStyles(styles)
+@observer
 export default class Login extends React.Component {
   handleLogin = () => authStore.login();
 
   handleRetryToInitialize() {
     appStore.initialize();
+  }
+
+  handleCancelInitialInstance() {
+    appStore.cancelInitialInstance();
   }
 
   render() {
@@ -75,12 +84,33 @@ export default class Login extends React.Component {
               </BGMessage>
             </div>
             :
-            appStore.initializingMessage?
-              <div className={classes.loader}>
-                <FetchingLoader>{appStore.initializingMessage}</FetchingLoader>
+            appStore.initialInstanceError?
+              <div className={classes.error}>
+                <BGMessage icon={"ban"}>
+                  {appStore.initialInstanceError}<br /><br />
+                  <div>
+                    <Button onClick={this.handleRetryToInitialize}>
+                      <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+                    </Button>
+                    <Button bsStyle={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
+                  </div>
+                </BGMessage>
               </div>
               :
-              null
+              appStore.initialInstanceWorkspaceError?
+                <div className={classes.error}>
+                  <BGMessage icon={"ban"}>
+                    {appStore.initialInstanceWorkspaceError}<br /><br />
+                    <Button bsStyle={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
+                  </BGMessage>
+                </div>
+                :
+                appStore.initializingMessage?
+                  <div className={classes.loader}>
+                    <FetchingLoader>{appStore.initializingMessage}</FetchingLoader>
+                  </div>
+                  :
+                  null
           :
           authStore.isTokenExpired?
             <div className={classes.panel}>

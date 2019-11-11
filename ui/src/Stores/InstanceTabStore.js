@@ -12,7 +12,7 @@ const getStoredInstanceTabs = () => {
   }
   try {
     const tabs = JSON.parse(value);
-    if (tabs && typeof tabs === "object") {
+    if (tabs && typeof tabs === "object" && !(tabs instanceof Array)) {
       return tabs;
     }
     return {};
@@ -22,11 +22,11 @@ const getStoredInstanceTabs = () => {
 };
 
 class InstanceTabStore{
-  @observable instancesTabs = new Map();
+  @observable instanceTabs = new Map();
 
   syncStoredInstanceTabs(){
     const tabs = getStoredInstanceTabs();
-    tabs[appStore.currentWorkspace] = [...this.instancesTabs].map(([id, infos])=>[id, infos.viewMode]);
+    tabs[appStore.currentWorkspace] = [...this.instanceTabs].map(([id, infos])=>[id, infos.viewMode]);
     localStorage.setItem(STORED_INSTANCE_TABS_KEY, JSON.stringify(tabs));
   }
 
@@ -48,27 +48,27 @@ class InstanceTabStore{
 
   @action
   closeInstanceTab(instanceId){
-    this.instancesTabs.delete(instanceId);
+    this.instanceTabs.delete(instanceId);
     this.syncStoredInstanceTabs();
   }
 
   @action
   closeAllInstanceTabs(){
-    this.instancesTabs.clear();
+    this.instanceTabs.clear();
     this.syncStoredInstanceTabs();
   }
 
   @action
   clearInstanceTabs() {
-    this.instancesTabs.clear();
+    this.instanceTabs.clear();
   }
 
   @action
   openInstanceTab(instanceId, viewMode) {
-    if (this.instancesTabs.has(instanceId)) {
-      this.instancesTabs.get(instanceId).viewMode = viewMode;
+    if (this.instanceTabs.has(instanceId)) {
+      this.instanceTabs.get(instanceId).viewMode = viewMode;
     } else {
-      this.instancesTabs.set(instanceId, {
+      this.instanceTabs.set(instanceId, {
         currentInstancePath: [],
         viewMode: viewMode,
         paneStore: new PaneStore()
@@ -78,7 +78,7 @@ class InstanceTabStore{
 
   getOpenedInstanceTabsExceptCurrent(instanceId) {
     let result = [];
-    Array.from(this.instancesTabs.keys()).forEach(id => {
+    Array.from(this.instanceTabs.keys()).forEach(id => {
       if (id !== instanceId) {
         const instance = instanceStore.instances.get(id);
         const instancesToBeKept = instance.linkedIds;
@@ -88,6 +88,16 @@ class InstanceTabStore{
     return Array.from(new Set(result));
   }
 
+  @action
+  setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
+    let currentInstancePath = this.instanceTabs.get(mainInstanceId).currentInstancePath;
+    currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
+  }
+
+  getCurrentInstanceId(instanceId){
+    let currentInstancePath = this.instanceTabs.get(instanceId).currentInstancePath;
+    return currentInstancePath[currentInstancePath.length-1];
+  }
 
 }
 

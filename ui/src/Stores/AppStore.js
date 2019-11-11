@@ -1,4 +1,5 @@
 import {observable, action, runInAction} from "mobx";
+import { matchPath } from "react-router-dom";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -13,10 +14,15 @@ import typesStore from "./TypesStore";
 
 class AppStore{
   @observable globalError = null;
+  @observable initializingMessage = "Initializing...";
+  @observable initializationError = null;
+  @observable isInitialized = false;
   @observable currentTheme;
   @observable historySettings;
   @observable instanceIdAvailability = new Map();
   @observable currentWorkspace = null;
+  @observable previewInstance = null;
+  @observable showSaveBar = false;
 
   availableThemes = {
     "default": DefaultTheme,
@@ -50,34 +56,118 @@ class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
+  @action
   async initialize() {
-    const openedTabs = instanceTabStore.getStoredInstanceTabs();
-    if(!authStore.isAuthenticated) {
-      await authStore.authenticate();
-    }
-    if(authStore.isAuthenticated && !authStore.hasUserProfile) {
-      await authStore.retrieveUserProfile();
-    }
-    if(authStore.isFullyAuthenticated) {
-      authStore.retrieveUserWorkspace();
-      instanceTabStore.restoreOpenedTabs(openedTabs);
+    if (!this.isInitialized) {
+      this.initializingMessage = "Initializing...";
+      this.initializationError = null;
+      if(!authStore.isAuthenticated) {
+        this.initializingMessage = "Authenticating...";
+        await authStore.authenticate();
+        if (authStore.authError) {
+          runInAction(() => {
+            this.initializationError = authStore.authError;
+            this.initializingMessage = null;
+          });
+        }
+      }
+      if(authStore.isAuthenticated && !authStore.hasUserProfile) {
+        this.initializingMessage = "Retrieving user profile...";
+        await authStore.retrieveUserProfile();
+        if (authStore.userProfileError) {
+          runInAction(() => {
+            this.initializationError = authStore.userProfileError;
+            this.initializingMessage = null;
+          });
+        }
+      }
+      if(authStore.isFullyAuthenticated) {
+        await this.initializeWorkspace();
+        runInAction(() => {
+          this.initializingMessage = null;
+          this.isInitialized = true;
+        });
+      }
     }
   }
 
-  @action
-  retrieveUserWorkspace(){
-    const savedWorkspace = localStorage.getItem("currentWorkspace");
-    if (this.user.workspaces.includes(savedWorkspace)) {
-      this.currentWorkspace = savedWorkspace;
-    } else {
-      if (this.user.workspaces.length) {
-        if (this.user.workspaces.length > 1) {
-          this.currentWorkspace = null;
-        } else {
-          localStorage.setItem("currentWorkspace", this.user.workspaces[0]);
-        }
+  async initializeWorkspace() {
+    let workspace = null;
+    const path = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+    if (path && path.params.mode !== "create") {
+      workspace = await this.getInitialInstanceWorkspace(path.params.id);
+    }
+    this.initializingMessage = "Setting workspace...";
+    if (!workspace) {
+      workspace = localStorage.getItem("currentWorkspace");
+    }
+    if (!workspace || !authStore.workspaces.includes(workspace)) {
+      if (authStore.hasWorkspaces) {
+        workspace = authStore.workspaces[0];
+      } else {
+        workspace = null;
       }
     }
+    this.setCurrentWorkspace(workspace);
+    this.restoreWorkspaceInstanceTabs();
+    if (path) {
+      if (workspace && workspace != this.currentWorkspace) {
+        routerStore.history.push("/browse");
+      }
+    }
+  }
+
+  async getInitialInstanceWorkspace(instanceId){
+    this.initializingMessage = `Retrieving instance "${instanceId}"...`;
+    try{
+      let response = await API.axios.post(API.endpoints.instancesList("LIVE"), [instanceId]);
+      const data = find(response.data.data, item => item.id === instanceId);
+      if(data){
+        if(data.workspace){
+          return data.workspace;
+        }
+        runInAction(() => {
+          this.initializationError = `Instance "${instanceId}" does not have a workspace.`;
+          this.initializingMessage = null;
+        });
+        return null;
+      } else {
+        runInAction(() => {
+          this.initializationError = `Instance "${instanceId}" can not be found - it either could have been removed or it is not accessible by your user account.`;
+          this.initializingMessage = null;
+        });
+      }
+    } catch(e){
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+        if(e.response && e.response.status === 404){
+          this.initializationError = `Instance "${instanceId}" can not be found - it either could have been removed or it is not accessible by your user account.`;
+        }
+        else {
+          this.initializationError = `Error while retrieving instance "${instanceId}" (${message}) ${errorMessage}`;
+        }
+        this.initializingMessage = null;
+      });
+    }
+    return null;
+  }
+
+  restoreWorkspaceInstanceTabs() {
+    const instanceTabs = instanceTabStore.getWorkspaceStoredInstanceTabs();
+    instanceTabs.forEach(([id, viewMode]) => {
+      this.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
+    });
+  }
+
+  closeAllInstances() {
+    this.resetInstanceIdAvailability();
+    if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
+      || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
+      || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
+      routerStore.history.push("/browse");
+    }
+    instanceTabStore.closeAllInstanceTabs();
   }
 
   @action
@@ -136,16 +226,37 @@ class AppStore{
 
   @action
   setCurrentWorkspace = workspace => {
-    if(authStore.currentWorkspace !== workspace) {
-      if(instanceTabStore.openedInstances.size > 0 && window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
-        this.handleCloseAllInstances();
+    if (!workspace || !authStore.workspaces.includes(workspace)) {
+      if (authStore.hasWorkspaces) {
+        workspace = authStore.workspaces[0];
+      } else {
+        workspace = null;
+      }
+    }
+    if(this.currentWorkspace !== workspace) {
+      if(instanceTabStore.instancesTabs.size > 0 && window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
+        this.closeAllInstances();
       } else {
         return;
       }
       this.currentWorkspace = workspace;
       localStorage.setItem("currentWorkspace", workspace);
-      instanceStore.restoreOpenedTabs();
+      this.restoreWorkspaceInstanceTabs();
       typesStore.fetch(true);
+    }
+  }
+
+  @action
+  toggleSavebarDisplay(state){
+    this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
+  }
+
+  @action
+  togglePreviewInstance(instanceId, instanceName, options) {
+    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
+      this.previewInstance = null;
+    } else {
+      this.previewInstance = {id: instanceId, name: instanceName, options: options};
     }
   }
 
@@ -190,7 +301,7 @@ class AppStore{
 
   @action
   removeUnusedInstances(instanceId, linkedInstanceIds) {
-    const instanceIdsToBeKept = instanceTabStore.getOpenedInstancesExceptCurrent(instanceId);
+    const instanceIdsToBeKept = instanceTabStore.getOpenedInstanceTabsExceptCurrent(instanceId);
     const instanceIdsToBeRemoved = linkedInstanceIds.filter(id => !instanceIdsToBeKept.includes(id));
     instanceStore.removeInstances(instanceIdsToBeRemoved);
   }
@@ -198,7 +309,7 @@ class AppStore{
   @action openInstance(instanceId, viewMode = "view", readMode = true){
     instanceTabStore.togglePreviewInstance();
     instanceStore.setReadMode(readMode);
-    instanceTabStore.openInstance(instanceId, viewMode);
+    instanceTabStore.openInstanceTab(instanceId, viewMode);
     if(viewMode === "create") {
       this.checkInstanceIdAvailability(instanceId);
     } else {

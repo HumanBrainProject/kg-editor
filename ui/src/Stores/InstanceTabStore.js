@@ -1,83 +1,74 @@
 import {observable, action} from "mobx";
 import PaneStore from "./PaneStore";
-import authStore from "./AuthStore";
 import instanceStore from "./InstanceStore";
 import appStore from "./AppStore";
 
 const STORED_INSTANCE_TABS_KEY = "openedTabs";
 
+const getStoredInstanceTabs = () => {
+  const value = localStorage.getItem(STORED_INSTANCE_TABS_KEY);
+  if(!value) {
+    return {};
+  }
+  try {
+    const tabs = JSON.parse(value);
+    if (tabs && typeof tabs === "object") {
+      return tabs;
+    }
+    return {};
+  } catch (e) {
+    return {};
+  }
+};
+
 class InstanceTabStore{
-  @observable openedInstances = new Map();
-  @observable previewInstance = null;
+  @observable instancesTabs = new Map();
 
   syncStoredInstanceTabs(){
-    const instanceTabs = this.getStoredInstanceTabs();
-    let obj = instanceTabs?JSON.parse(instanceTabs):{};
-    obj[authStore.currentWorkspace] = [...this.openedInstances].map(([id, infos])=>[id, infos.viewMode]);
-    localStorage.setItem(STORED_INSTANCE_TABS_KEY, JSON.stringify(obj));
+    const tabs = getStoredInstanceTabs();
+    tabs[appStore.currentWorkspace] = [...this.instancesTabs].map(([id, infos])=>[id, infos.viewMode]);
+    localStorage.setItem(STORED_INSTANCE_TABS_KEY, JSON.stringify(tabs));
   }
 
   flushStoredInstanceTabs(){
     localStorage.removeItem(STORED_INSTANCE_TABS_KEY);
   }
 
-  getStoredInstanceTabs() {
-    return localStorage.getItem(STORED_INSTANCE_TABS_KEY);
-  }
-
-  @action
-  restoreOpenedTabs(instanceTabs){
-    if(authStore.currentWorkspace) {
-      if (!instanceTabs) {
-        instanceTabs = this.getStoredInstanceTabs();
-      }
-      if(instanceTabs) {
-        const storedOpenedTabs = JSON.parse(instanceTabs);
-        const tabs = storedOpenedTabs[authStore.currentWorkspace];
-        tabs instanceof Array && tabs.forEach(([id, viewMode]) => {
-          appStore.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
-        });
-      }
+  getWorkspaceStoredInstanceTabs(){
+    if(!appStore.currentWorkspace) {
+      return [];
     }
-  }
-
-  @action
-  toggleSavebarDisplay(state){
-    this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
-  }
-
-  @action
-  togglePreviewInstance(instanceId, instanceName, options) {
-    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
-      this.previewInstance = null;
-    } else {
-      this.previewInstance = {id: instanceId, name: instanceName, options: options};
+    const tabs = getStoredInstanceTabs();
+    const workspaceTabs = tabs[appStore.currentWorkspace];
+    if (workspaceTabs instanceof Array) {
+      return workspaceTabs;
     }
+    return [];
   }
 
   @action
-  closeInstance(instanceId){
-    this.openedInstances.delete(instanceId);
+  closeInstanceTab(instanceId){
+    this.instancesTabs.delete(instanceId);
     this.syncStoredInstanceTabs();
   }
 
   @action
-  closeAllInstances(){
-    this.openedInstances.clear();
+  closeAllInstanceTabs(){
+    this.instancesTabs.clear();
     this.syncStoredInstanceTabs();
   }
 
   @action
-  clearOpenedInstances() {
-    this.openedInstances.clear();
+  clearInstanceTabs() {
+    this.instancesTabs.clear();
   }
 
   @action
-  openInstance(instanceId, viewMode) {
-    if (this.openedInstances.has(instanceId)) {
-      this.openedInstances.get(instanceId).viewMode = viewMode;
+  openInstanceTab(instanceId, viewMode) {
+    if (this.instancesTabs.has(instanceId)) {
+      this.instancesTabs.get(instanceId).viewMode = viewMode;
     } else {
-      this.openedInstances.set(instanceId, {
+      this.instancesTabs.set(instanceId, {
         currentInstancePath: [],
         viewMode: viewMode,
         paneStore: new PaneStore()
@@ -85,9 +76,9 @@ class InstanceTabStore{
     }
   }
 
-  getOpenedInstancesExceptCurrent(instanceId) {
+  getOpenedInstanceTabsExceptCurrent(instanceId) {
     let result = [];
-    Array.from(this.openedInstances.keys()).forEach(id => {
+    Array.from(this.instancesTabs.keys()).forEach(id => {
       if (id !== instanceId) {
         const instance = instanceStore.instances.get(id);
         const instancesToBeKept = instance.linkedIds;

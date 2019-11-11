@@ -1,5 +1,6 @@
 import axios from "axios";
 import authStore from "../Stores/AuthStore";
+import appStore from "../Stores/AppStore";
 
 const endpoints = {
   "auth": () => "/editor/api/auth/endpoint",
@@ -16,20 +17,20 @@ const endpoints = {
   "instancesSummary": (stage=null) => `/editor/api/instances/summary${stage?`?stage=${stage}`:"" }`,
   "instancesLabel": (stage=null) => `/editor/api/instances/label${stage?`?stage=${stage}`:"" }`,
   "filterBookmarkInstances": (id, from, size, search) => `/editor/api/instances/filter?bookmarkId=${id}&from=${from}&size=${size}&search=${search}`,
-  "searchInstances": (id, from, size, search) => `/editor/api/workspaces/${authStore.currentWorkspace}/instances/summary?type=${encodeURIComponent(id)}&from=${from}&size=${size}&search=${search}`,
+  "searchInstances": (id, from, size, search) => `/editor/api/workspaces/${appStore.currentWorkspace}/instances/summary?type=${encodeURIComponent(id)}&from=${from}&size=${size}&search=${search}`,
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instance": id => `/editor/api/instances/${id}`,
-  "createInstance": (id=null) => `/editor/api/instances/${id?("/" + id):""}?workspace=${authStore.currentWorkspace}`,
+  "createInstance": (id=null) => `/editor/api/instances/${id?("/" + id):""}?workspace=${appStore.currentWorkspace}`,
   "resolvedId": instance => `/editor/api/instances/${instance}/resolvedId`,
   "release": instance => `/editor/api/instances/${instance}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/instances/releases?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/editor/api/instances/releases?releaseTreeScope=CHILDREN_ONLY",
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
-  "bookmarks": () => `/editor/api/workspaces/${authStore.currentWorkspace}/bookmarks`,
+  "bookmarks": () => `/editor/api/workspaces/${appStore.currentWorkspace}/bookmarks`,
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": instance => `/editor/api/instances/${instance}/graph`,
-  "workspaceTypes": () => `/editor/api/workspaces/${authStore.currentWorkspace}/types`
+  "workspaceTypes": () => `/editor/api/workspaces/${appStore.currentWorkspace}/types`
 };
 
 class API {

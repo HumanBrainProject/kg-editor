@@ -3,7 +3,6 @@ import injectStyles from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import routerStore from "../../../Stores/RouterStore";
-import authStore from "../../../Stores/AuthStore";
 import appStore from "../../../Stores/AppStore";
 
 const styles = {
@@ -90,7 +89,7 @@ export default class FooterPanel extends React.Component {
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              {authStore.currentWorkspace === workspace ?
+              {appStore.currentWorkspace === workspace ?
                 <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
                   <FontAwesomeIcon icon="folder-open"/>
                 </div>:null}

@@ -34,7 +34,6 @@ import Help from "./Views/Help";
 import Browse from "./Views/Browse";
 import Instance from "./Views/Instance";
 import FetchingLoader from "./Components/FetchingLoader";
-import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
 import * as Sentry from "@sentry/browser";
 
@@ -158,26 +157,6 @@ const styles = {
       "transform": "scale(1.1)"
     }
   },
-  loader: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    zIndex: 10000,
-    background: "var(--bg-color-blend-contrast1)",
-    "& .fetchingPanel": {
-      width: "auto",
-      padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast1)",
-      borderRadius: "4px",
-      color: "var(--ft-color-loud)",
-      background: "var(--list-bg-hover)"
-    }
-  },
-  authError: {
-    color: "var(--ft-color-loud)"
-  },
   userProfileTab: {
     width: "50px",
     height: "50px",
@@ -294,7 +273,6 @@ class App extends React.Component {
     }
   }
 
-
   componentDidCatch(error, info) {
     appStore.setGlobalError(error, info);
   }
@@ -312,7 +290,7 @@ class App extends React.Component {
       routerStore.history.push("/help");
     } else if (e.altKey && e.keyCode === 87) { // alt+w, close
       if (e.shiftKey) { // alt+shift+w, close all
-        this.handleCloseAllInstances();
+        appStore.closeAllInstances();
       } else {
         let matchInstanceTab = matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" });
         if (matchInstanceTab) {
@@ -349,12 +327,12 @@ class App extends React.Component {
   handleCloseInstance(instanceId) {
     if (matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" })) {
       if (matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-        if (instanceTabStore.openedInstances.size > 1) {
-          let openedInstances = Array.from(instanceTabStore.openedInstances.keys());
+        if (instanceTabStore.instancesTabs.size > 1) {
+          let openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
           let currentInstanceIndex = openedInstances.indexOf(instanceId);
           let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
-          let openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
+          let openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
           routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
         } else {
           routerStore.history.push("/browse");
@@ -363,38 +341,28 @@ class App extends React.Component {
       }
     }
     appStore.instanceIdAvailability.delete(instanceId);
-    instanceTabStore.closeInstance(instanceId);
+    instanceTabStore.closeInstanceTab(instanceId);
     const instance = instanceStore.instances.get(instanceId);
     appStore.removeUnusedInstances(instanceId, instance.linkedIds);
   }
 
-  handleCloseAllInstances() {
-    appStore.resetInstanceIdAvailability();
-    if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
-      || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
-      || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
-      routerStore.history.push("/browse");
-    }
-    instanceStore.closeAllInstances();
-  }
-
   handleFocusPreviousInstance(instanceId) {
     if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceTabStore.openedInstances.size > 1) {
-        let openedInstances = Array.from(instanceTabStore.openedInstances.keys());
+      if (instanceTabStore.instancesTabs.size > 1) {
+        let openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
-        let openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
+        let openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
-      if (instanceTabStore.openedInstances.size > 1) {
-        const openedInstances = Array.from(instanceTabStore.openedInstances.keys());
+      if (instanceTabStore.instancesTabs.size > 1) {
+        const openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
-        const openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
+        const openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
@@ -404,21 +372,21 @@ class App extends React.Component {
 
   handleFocusNextInstance(instanceId) {
     if (instanceId && matchPath(this.state.currentLocation, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(this.state.currentLocation, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceTabStore.openedInstances.size > 1) {
-        let openedInstances = Array.from(instanceTabStore.openedInstances.keys());
+      if (instanceTabStore.instancesTabs.size > 1) {
+        let openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
-        let openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
+        let openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
-      if (instanceTabStore.openedInstances.size > 1) {
-        const openedInstances = Array.from(instanceTabStore.openedInstances.keys());
+      if (instanceTabStore.instancesTabs.size > 1) {
+        const openedInstances = Array.from(instanceTabStore.instancesTabs.keys());
         const newCurrentInstanceId = openedInstances[0];
-        const openedInstance = instanceTabStore.openedInstances.get(newCurrentInstanceId);
+        const openedInstance = instanceTabStore.instancesTabs.get(newCurrentInstanceId);
         routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
@@ -464,7 +432,7 @@ class App extends React.Component {
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {authStore.isFullyAuthenticated && authStore.hasWorkspaces && authStore.currentWorkspace?
+                  {authStore.isFullyAuthenticated && authStore.hasWorkspaces && appStore.currentWorkspace?
                     <React.Fragment>
                       <WorkspaceSelector />
                       <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
@@ -475,9 +443,9 @@ class App extends React.Component {
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
-                  {authStore.isFullyAuthenticated && Array.from(instanceTabStore.openedInstances.keys()).map(instanceId => {
+                  {authStore.isFullyAuthenticated && Array.from(instanceTabStore.instancesTabs.keys()).map(instanceId => {
                     const instance = instanceStore.instances.get(instanceId);
-                    const mode = instanceTabStore.openedInstances.get(instanceId).viewMode;
+                    const mode = instanceTabStore.instancesTabs.get(instanceId).viewMode;
                     let label;
                     let color = undefined;
                     if (instance && instance.isFetched) {
@@ -527,68 +495,36 @@ class App extends React.Component {
             {appStore.globalError ?
               <Route component={GlobalError} />
               :
-              authStore.authError?
-                <div className={classes.authError}>
-                  <BGMessage icon={"ban"}>
-                    {`There was a problem authenticating (${authStore.authError}).
-                    If the problem persists, please contact the support.`}<br /><br />
-                    <Button bsStyle={"primary"} onClick={this.handleRetryAuthenticate}>
-                      <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-                    </Button>
-                  </BGMessage>
-                </div>
+              !appStore.isInitialized || !authStore.isAuthenticated ?
+                <Route component={Login} />
                 :
-                authStore.isInitializing?
-                  <div className={classes.loader}>
-                    <FetchingLoader>Initializing authentication...</FetchingLoader>
-                  </div>
-                  :
-                  !authStore.isAuthenticated ?
-                    <Route component={Login} />
-                    :
-                    authStore.userProfileError ?
-                      <div className={classes.authError}>
-                        <BGMessage icon={"ban"}>
-                          {`There was a network problem retrieving user profile (${authStore.userProfileError}).
-                          If the problem persists, please contact the support.`}<br /><br />
-                          <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
-                            <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-                          </Button>
-                        </BGMessage>
-                      </div>
-                      :
-                      authStore.isRetrievingUserProfile ?
-                        <div className={classes.loader}>
-                          <FetchingLoader>Retrieving user profile...</FetchingLoader>
-                        </div>
-                        :
-                        authStore.hasWorkspaces?
-                          authStore.currentWorkspace?
-                            <Switch>
-                              <Route path="/instance/create/:id*" render={(props) => (<Instance {...props} mode="create" />)} />
-                              <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
-                              <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
-                              <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
-                              <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
-                              <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
-                              <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
+                authStore.hasWorkspaces?
+                  appStore.currentWorkspace?
+                    <Switch>
+                      <Route path="/instance/create/:id*" render={(props) => (<Instance {...props} mode="create" />)} />
+                      <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
+                      <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
+                      <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
+                      <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
+                      <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
+                      <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
 
-                              <Route path="/browse" exact={true} component={Browse} />
-                              <Route path="/help" component={Help} />
-                              {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                              <Route path="/" exact={true} component={Home} />
-                              <Route component={NotFound} />
-                            </Switch>
-                            :
-                            <Route component={WorkspaceModal} />
-                          :
-                          <Modal dialogClassName={classes.noWorkspacesModal} show={true}>
-                            <Modal.Body>
-                              <h1>Welcome <span title={name}>{name}</span></h1>
-                              <p>You are currently not granted permission to acccess any workspaces.</p>
-                              <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
-                            </Modal.Body>
-                          </Modal>
+                      <Route path="/browse" exact={true} component={Browse} />
+                      <Route path="/help" component={Help} />
+                      {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
+                      <Route path="/" exact={true} component={Home} />
+                      <Route component={NotFound} />
+                    </Switch>
+                    :
+                    <Route component={WorkspaceModal} />
+                  :
+                  <Modal dialogClassName={classes.noWorkspacesModal} show={true}>
+                    <Modal.Body>
+                      <h1>Welcome <span title={name}>{name}</span></h1>
+                      <p>You are currently not granted permission to acccess any workspaces.</p>
+                      <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
+                    </Modal.Body>
+                  </Modal>
             }
           </div>
           {authStore.isFullyAuthenticated && (

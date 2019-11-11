@@ -39,7 +39,7 @@ class Links extends React.Component{
     if (!instance) {
       return null;
     }
-    const mainInstance = instanceTabStore.openedInstances.get(mainInstanceId);
+    const mainInstance = instanceTabStore.instancesTabs.get(mainInstanceId);
     const currentInstancePath = mainInstance.currentInstancePath;
     let linkKeys = [];
     if(instance.isFetched){

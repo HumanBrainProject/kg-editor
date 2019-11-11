@@ -9,6 +9,7 @@ import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
 import Features from "./Home/Features";
 import DatasetsStatistics from "./Home/DatasetsStatistics";
+import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
@@ -233,7 +234,7 @@ export default class Home extends React.Component{
             </div>
             <div className={classes.main}>
               <DatasetsStatistics />
-              <InstancesHistory workspace={authStore.currentWorkspace}/>
+              <InstancesHistory workspace={appStore.currentWorkspace}/>
             </div>
             <div className={classes.features}>
               <div className="widget-list">

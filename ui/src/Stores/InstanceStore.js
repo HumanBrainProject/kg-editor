@@ -4,6 +4,7 @@ import { FormStore } from "hbp-quickfire";
 import API from "../Services/API";
 
 import { normalizeInstanceData } from "../Helpers/InstanceHelper";
+import appStore from "./AppStore";
 import historyStore from "./HistoryStore";
 import browseStore from "./BrowseStore";
 import authStore from "./AuthStore";
@@ -202,14 +203,14 @@ class Instance {
           this.hasSaveError = false;
           this.isSaving = false;
           this.fieldsToSetAsNull = [];
-          const instance = instanceTabStore.openedInstances.get(this.id);
+          const instance = instanceTabStore.instancesTabs.get(this.id);
           if (newId !== this.id) {
-            instanceTabStore.openedInstances.set(newId, {
+            instanceTabStore.instancesTabs.set(newId, {
               currentInstancePath: instance.currentInstancePath,
               viewMode: "edit",
               paneStore: instance.paneStore
             });
-            instanceTabStore.openedInstances.delete(this.id);
+            instanceTabStore.instancesTabs.delete(this.id);
             this.instanceStore.instances.set(newId, instance);
             this.instanceStore.instance.delete(this.id);
             this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${newId}`);
@@ -278,7 +279,6 @@ class InstanceStore {
   @observable instanceCreationError = null;
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
-  @observable showSaveBar = false;
   @observable instanceToDelete = null;
   @observable isDeletingInstance = false;
   @observable deleteInstanceError = null;
@@ -345,7 +345,7 @@ class InstanceStore {
             const data = find(response.data.data, item => item.id === instance.id);
             if(data){
               instance.initializeData(data, this.globalReadMode, false);
-              if(instanceTabStore.openedInstances.has(instance.id)){
+              if(instanceTabStore.instancesTabs.has(instance.id)){
                 const types = instance.types.map(({name}) => name);
                 historyStore.updateInstanceHistory(instance.id, types, "viewed");
               }
@@ -383,7 +383,7 @@ class InstanceStore {
     //this.resetInstanceIdAvailability();
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
-    this.showSaveBar = false;
+    //this.showSaveBar = false;
     this.instanceToDelete = null;
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
@@ -410,7 +410,7 @@ class InstanceStore {
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
     const data = {
-      workspace: authStore.currentWorkspace,
+      workspace: appStore.currentWorkspace,
       id: id,
       types: [instanceType],
       name: name,
@@ -492,7 +492,7 @@ class InstanceStore {
             }
           }
           browseStore.refreshFilter();
-          this.closeInstance(instanceId);
+          instanceTabStore.closeInstanceTab(instanceId);
           this.flush();
           if (nextLocation) {
             routerStore.history.push(nextLocation);
@@ -566,12 +566,12 @@ class InstanceStore {
 
   @action
   setCurrentInstanceId(mainInstanceId, currentInstanceId, level){
-    let currentInstancePath = instanceTabStore.openedInstances.get(mainInstanceId).currentInstancePath;
+    let currentInstancePath = instanceTabStore.instancesTabs.get(mainInstanceId).currentInstancePath;
     currentInstancePath.splice(level, currentInstancePath.length-level, currentInstanceId);
   }
 
   getCurrentInstanceId(instanceId){
-    let currentInstancePath = instanceTabStore.openedInstances.get(instanceId).currentInstancePath;
+    let currentInstancePath = instanceTabStore.instancesTabs.get(instanceId).currentInstancePath;
     return currentInstancePath[currentInstancePath.length-1];
   }
 

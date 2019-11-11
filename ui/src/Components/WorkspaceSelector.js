@@ -1,12 +1,10 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { Dropdown, MenuItem } from "react-bootstrap";
-import { matchPath } from "react-router-dom";
 import injectStyles from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
 import routerStore from "../Stores/RouterStore";
-import instanceStore from "../Stores/InstanceStore";
 import appStore from "../Stores/AppStore";
 
 
@@ -50,23 +48,14 @@ export default class WorkspaceSelector extends React.Component {
     appStore.setCurrentWorkspace(eventKey);
   }
 
-  handleCloseAllInstances = ()  => {
-    if (!(matchPath(this.state.currentLocation, { path: "/", exact: "true" })
-      || matchPath(this.state.currentLocation, { path: "/browse", exact: "true" })
-      || matchPath(this.state.currentLocation, { path: "/help/*", exact: "true" }))) {
-      routerStore.history.push("/browse");
-    }
-    instanceStore.clearOpenedInstances();
-  }
-
   render() {
     const { classes } = this.props;
 
     return (
-      <div className={classes.container} title={`${authStore.currentWorkspace} workspace`}>
+      <div className={classes.container} title={`${appStore.currentWorkspace} workspace`}>
         {authStore.workspaces.length > 1 ?
           <Dropdown id="dropdown-custom-1">
-            <CustomDropdownToggle bsRole="toggle">{authStore.currentWorkspace}</CustomDropdownToggle>
+            <CustomDropdownToggle bsRole="toggle">{appStore.currentWorkspace}</CustomDropdownToggle>
             <Dropdown.Menu className={classes.dropdownMenu}>
               {authStore.workspaces.map(workspace =>
                 <MenuItem key={workspace}
@@ -76,7 +65,7 @@ export default class WorkspaceSelector extends React.Component {
               )}
             </Dropdown.Menu>
           </Dropdown>
-          : authStore.currentWorkspace}
+          : appStore.currentWorkspace}
       </div>
     );
   }

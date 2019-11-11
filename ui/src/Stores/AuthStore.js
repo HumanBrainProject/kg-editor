@@ -58,7 +58,7 @@ class AuthStore {
 
   @computed
   get hasWorkspaces() {
-    return this.user && this.user.workspaces && !!this.user.workspaces.length;
+    return this.user && this.user.workspaces instanceof Array && !!this.user.workspaces.length;
   }
 
   @computed

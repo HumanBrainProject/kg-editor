@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import historyStore from "../../Stores/HistoryStore";
 import appStore from "../../Stores/AppStore";
-import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";

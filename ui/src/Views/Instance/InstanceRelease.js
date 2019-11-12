@@ -6,7 +6,6 @@ import { Button } from "react-bootstrap";
 
 import appStore from "../../Stores/AppStore";
 import releaseStore from "../../Stores/ReleaseStore";
-import instanceStore from "../../Stores/InstanceStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";

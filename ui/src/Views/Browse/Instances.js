@@ -10,7 +10,6 @@ import { Scrollbars } from "react-custom-scrollbars";
 import browseStore from "../../Stores/BrowseStore";
 import routerStore from "../../Stores/RouterStore";
 import FetchingLoader from "../../Components/FetchingLoader";
-import instanceStore from "../../Stores/InstanceStore";
 import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
 import InstanceRow from "../Instance/InstanceRow";

@@ -1,13 +1,11 @@
 import {observable, action, runInAction, computed, toJS} from "mobx";
 import { uniqueId, find, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
+
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 import { normalizeInstanceData } from "../Helpers/InstanceHelper";
-import appStore from "./AppStore";
-import historyStore from "./HistoryStore";
-import statusStore from "./StatusStore";
-import instanceTabStore from "./InstanceTabStore";
 
 class Instance {
   @observable id = null;
@@ -118,7 +116,7 @@ class Instance {
   @action
   setReadMode(readMode){
     if (this.isFetched) {
-      this.form.toggleReadMode(!!readMode);
+      this.form.toggleReadMode(!!readMode || this.workspace !== appStore.currentWorkspace);
     }
   }
 
@@ -149,13 +147,24 @@ class Instance {
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
-    this.form = new FormStore(normalizedData);
+    if (this.form) {
+      this.form.structure.workspace = normalizedData.workspace;
+      this.form.structure.types = normalizedData.types;
+      this.form.structure.name = normalizedData.name;
+      this.form.structure.primaryType = normalizedData.primaryType;
+      this.form.structure.promotedFields = normalizedData.promotedFields;
+      this.form.structure.alternatives = normalizedData.alternatives;
+      this.form.structure.metadata = normalizedData.metadata;
+      this.form.structure.permissions = normalizedData.permissions;
+    } else {
+      this.form = new FormStore(normalizedData);
+    }
     this.fetchError = null;
     this.hasFetchError = false;
     this.isFetching = false;
     this.isFetched = true;
     this.memorizeInstanceInitialValues();
-    this.form.toggleReadMode(readMode);
+    this.setReadMode(readMode);
   }
 
   @action
@@ -175,8 +184,6 @@ class Instance {
 
   @action
   async save() {
-    const types = this.types.map(({name}) => name);
-    historyStore.updateInstanceHistory(this.id, types, "edited");
 
     this.cancelChangesPending = false;
     this.hasSaveError = false;
@@ -199,26 +206,12 @@ class Instance {
           this.hasSaveError = false;
           this.isSaving = false;
           this.fieldsToSetAsNull = [];
-          const instance = instanceTabStore.instanceTabs.get(this.id);
           if (newId !== this.id) {
-            instanceTabStore.instanceTabs.set(newId, {
-              currentInstancePath: instance.currentInstancePath,
-              viewMode: "edit",
-              paneStore: instance.paneStore
-            });
-            instanceTabStore.instanceTabs.delete(this.id);
-            this.instanceStore.instances.set(newId, instance);
+            this.instanceStore.instances.set(newId, this);
             this.instanceStore.instance.delete(this.id);
-            this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${newId}`);
             this.id = newId;
-          } else {
-            instance.viewMode = "edit";
-            this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${this.id}`);
           }
-          this.initializeData(data.data, this.globalReadMode, false);
-          const types = this.types.map(({name}) => name);
-          historyStore.updateInstanceHistory(this.id, types, "edited");
-          instanceTabStore.syncStoredInstanceTabs();
+          this.initializeData(data.data, false, false);
         });
       } else {
         const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
@@ -231,9 +224,6 @@ class Instance {
           this.data = data.data;
         });
       }
-
-      // TODO: Check if reload is still neeeded or if we only need to  update the instance object using the result of the save
-      // this.fetch(true);
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;
@@ -242,8 +232,6 @@ class Instance {
         this.hasSaveError = true;
         this.isSaving = false;
       });
-    } finally {
-      statusStore.flush();
     }
   }
 
@@ -268,7 +256,6 @@ class Instance {
 class InstanceStore {
   @observable stage = null;
   @observable instances = new Map();
-  @observable globalReadMode = true;
 
   instancesQueue = new Map();
   queueThreshold = 1000;
@@ -320,7 +307,7 @@ class InstanceStore {
         instance.hasFetchError = false;
         instance.saveError = null;
         instance.hasSaveError = false;
-        instance.fieldErrorsMap = new Map();
+        instance.fieldErrorsMap.clear();
       }
     });
     try{
@@ -331,11 +318,8 @@ class InstanceStore {
             const instance = this.instances.get(identifier);
             const data = find(response.data.data, item => item.id === instance.id);
             if(data){
-              instance.initializeData(data, this.globalReadMode, false);
-              if(instanceTabStore.instanceTabs.has(instance.id)){
-                const types = instance.types.map(({name}) => name);
-                historyStore.updateInstanceHistory(instance.id, types, "viewed");
-              }
+              instance.initializeData(data, appStore.getReadMode(), false);
+              appStore.syncInstancesHistory(instance, "viewed");
             } else {
               const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
               instance.errorInstance(message);
@@ -366,7 +350,7 @@ class InstanceStore {
   }
 
   @action flush(){
-    this.instances = new Map();
+    this.instances.clear();
   }
 
   @action
@@ -385,11 +369,11 @@ class InstanceStore {
   }
 
   @action
-  createNewInstance(type, id, name=""){
+  createNewInstance(workspace, type, id, name=""){
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
     const data = {
-      workspace: appStore.currentWorkspace,
+      workspace: workspace,
       id: id,
       types: [instanceType],
       name: name,
@@ -401,14 +385,14 @@ class InstanceStore {
       permissions: {}
     };
     const instance  = new Instance(id, this);
-    instance.initializeData(data, this.globalReadMode, true);
+    instance.initializeData(data, false, true);
     this.instances.set(id, instance);
   }
 
   @action
-  async createNewInstanceAsOption(field, name){
+  async createNewInstanceAsOption(workspace, field, name){
     try{
-      const newInstanceId = await this.createNewInstance(field.instancesPath, name);
+      const newInstanceId = await this.createNewInstance(workspace. field.instancesPath, name);
       field.options.push({
         [field.mappingValue]: newInstanceId,
         [field.mappingLabel]: name
@@ -439,24 +423,8 @@ class InstanceStore {
     return this.generatedKeys.get(from);
   }
 
-  checkLinkedInstances(instance, check) {
-    const fields = instance.form.getField();
-    return Object.values(fields).some(field => {
-      return field.isLink && field.value.some(option => {
-        if (option.id) {
-          const linkedInstance = this.instances.get(option.id);
-          if (linkedInstance && typeof check === "function") {
-            return check(option.id, linkedInstance);
-          }
-        }
-        return false;
-      });
-    });
-  }
-
   @action
   setReadMode(readMode){
-    this.globalReadMode = readMode;
     this.instances.forEach(instance => instance.setReadMode(readMode));
   }
 

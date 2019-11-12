@@ -3,6 +3,7 @@ import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Field } from "hbp-quickfire";
 
+import appStore from "../../../Stores/AppStore";
 import instanceStore from "../../../Stores/InstanceStore";
 import instanceTabStore from "../../../Stores/InstanceTabStore";
 
@@ -144,7 +145,7 @@ export default class InstanceField extends React.Component{
   }
 
   addCustomValueHandler = async (value, field) => {
-    let newInstanceId = await instanceStore.createNewInstanceAsOption(field, value);
+    let newInstanceId = await instanceStore.createNewInstanceAsOption(appStore.currentWorkspace, field, value);
     if(newInstanceId){
       instanceStore.instanceHasChanged(this.props.id);
       this.handleFieldFocus(field, {id: newInstanceId});

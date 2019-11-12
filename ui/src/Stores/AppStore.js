@@ -14,6 +14,7 @@ import historyStore from "./HistoryStore";
 import instanceTabStore from "./InstanceTabStore";
 import typesStore from "./TypesStore";
 import browseStore from "./BrowseStore";
+import statusStore from "./StatusStore";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
@@ -110,8 +111,10 @@ class AppStore{
     }
   }
 
-  @action flush(){
+  @action
+  flush(){
     instanceStore.flush();
+    statusStore.flush();
     this.resetInstanceIdAvailability();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
@@ -119,7 +122,7 @@ class AppStore{
     this.instanceToDelete = null;
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
-    this.pathsToResolve = new Map();
+    this.pathsToResolve.clear();
   }
 
   @action
@@ -382,6 +385,10 @@ class AppStore{
     instanceTabStore.syncStoredInstanceTabs();
   }
 
+  getReadMode() {
+    const path = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+    return !(path && (path.params.mode === "edit" || path.params.mode === "create"));
+  }
 
   closeInstance(instanceId) {
     if (matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" })) {
@@ -407,77 +414,41 @@ class AppStore{
 
   @action
   async saveInstance(instance) {
-
+    const isNew = instance.isNew;
+    const id = instance.id;
     await instance.save();
-    const types = this.types.map(({name}) => name);
-    historyStore.updateInstanceHistory(this.id, types, "edited");
-
-    this.cancelChangesPending = false;
-    this.hasSaveError = false;
-    this.isSaving = true;
-
-    const payload = this.form.getValues();
-    if (this.fieldsToSetAsNull.length > 0) {
-      this.fieldsToSetAsNull.forEach(key=> payload[key] = null);
-    }
-    payload["@type"] = this.types.map(t => t.name);
-
-    try {
-      if (this.isNew) {
-        const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
+    const newId = instance.id;
+    if (!instance.hasSaveError) {
+      if (isNew) {
         runInAction(() => {
-          const newId = data.data.id;
-          this.isNew = false;
-          this.hasChanged = false;
-          this.saveError = null;
-          this.hasSaveError = false;
-          this.isSaving = false;
-          this.fieldsToSetAsNull = [];
-          const instance = instanceTabStore.instanceTabs.get(this.id);
-          if (newId !== this.id) {
+          const instanceTab = instanceTabStore.instanceTabs.get(id);
+          if (newId !== id) {
             instanceTabStore.instanceTabs.set(newId, {
-              currentInstancePath: instance.currentInstancePath,
+              currentInstancePath: instanceTab.currentInstancePath,
               viewMode: "edit",
-              paneStore: instance.paneStore
+              paneStore: instanceTab.paneStore
             });
-            instanceTabStore.instanceTabs.delete(this.id);
-            this.instanceStore.instances.set(newId, instance);
-            this.instanceStore.instance.delete(this.id);
-            this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${newId}`);
-            this.id = newId;
+            instanceTabStore.instanceTabs.delete(id);
+            this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${newId}`);
           } else {
-            instance.viewMode = "edit";
-            this.instanceStore.pathsToResolve.set(`/instance/create/${this.id}`, `/instance/edit/${this.id}`);
+            instanceTab.viewMode = "edit";
+            this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${id}`);
           }
-          this.initializeData(data.data, this.globalReadMode, false);
-          const types = this.types.map(({name}) => name);
-          historyStore.updateInstanceHistory(this.id, types, "edited");
-          instanceTabStore.syncStoredInstanceTabs();
         });
-      } else {
-        const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
-        runInAction(() => {
-          this.hasChanged = false;
-          this.saveError = null;
-          this.hasSaveError = false;
-          this.isSaving = false;
-          this.fieldsToSetAsNull = [];
-          this.data = data.data;
-        });
+        instanceTabStore.syncStoredInstanceTabs();
       }
-
       // TODO: Check if reload is still neeeded or if we only need to  update the instance object using the result of the save
-      // this.fetch(true);
-    } catch (e) {
-      runInAction(() => {
-        const message = e.message?e.message:e;
-        const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-        this.saveError = `Error while saving instance "${this.id}" (${message}) ${errorMessage}`;
-        this.hasSaveError = true;
-        this.isSaving = false;
-      });
-    } finally {
-      statusStore.flush();
+      // instance.fetch(true);
+    }
+    const types = instance.types.map(({name}) => name);
+    historyStore.updateInstanceHistory(instance.id, types, "edited");
+    statusStore.flush();
+  }
+
+  syncInstancesHistory(instance, mode) {
+    if(instance && instanceTabStore.instanceTabs.has(instance.id)){
+      const types = instance.types.map(({name}) => name);
+      historyStore.updateInstanceHistory(instance.id, types, mode);
     }
   }
 

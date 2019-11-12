@@ -11,7 +11,6 @@ import {Button} from "react-bootstrap";
 
 import FetchingLoader from "../Components/FetchingLoader";
 import appStore from "../Stores/AppStore";
-import instanceStore from "../Stores/InstanceStore";
 import FieldError from "./FieldError";
 
 const styles = {

@@ -1,7 +1,6 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import _ from "lodash-uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import appStore from "../../Stores/AppStore";

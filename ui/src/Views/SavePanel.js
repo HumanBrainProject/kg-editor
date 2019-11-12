@@ -61,7 +61,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 export default class SavePanel extends React.Component {
-  constructor(props) {	
+  constructor(props) {
     super(props);
     this.state = {
       currentLocationPathname: routerStore.history.location.pathname

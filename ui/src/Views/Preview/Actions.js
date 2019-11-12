@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import instanceStore from "../../Stores/InstanceStore";
+import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
 const styles = {

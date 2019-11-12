@@ -42,7 +42,7 @@ export default class InstanceCreate extends React.Component {
   handleCheckInstanceIdAvailability = () => appStore.checkInstanceIdAvailability(this.props.instanceId);
 
   handleCreateNewInstanceOfType = type => {
-    instanceStore.createNewInstance(type, this.props.instanceId);
+    instanceStore.createNewInstance(appStore.currentWorkspace, type, this.props.instanceId);
     appStore.resetInstanceIdAvailability();
   }
 

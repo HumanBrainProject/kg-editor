@@ -2,7 +2,11 @@ import React from "react";
 import injectStyles from "react-jss";
 import { observer, inject } from "mobx-react";
 import { Field } from "hbp-quickfire";
+
+import appStore from "../../../Stores/AppStore";
 import instanceStore from "../../../Stores/InstanceStore";
+import instanceTabStore from "../../../Stores/InstanceTabStore";
+
 import RenderMarkdownField from "../../../Components/Markdown";
 
 const styles = {
@@ -78,7 +82,7 @@ export default class InstanceField extends React.Component{
     if (field && field.isLink && value && value.id) {
       this.handleToggleOffFieldHighlight(field, value);
       setTimeout(() => {
-        instanceStore.setCurrentInstanceId(this.props.mainInstanceId, value.id, this.props.level + 1);
+        instanceTabStore.setCurrentInstanceId(this.props.mainInstanceId, value.id, this.props.level + 1);
         const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
         if (target && target.childNodes && target.childNodes[0] && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
           target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
@@ -141,7 +145,7 @@ export default class InstanceField extends React.Component{
   }
 
   addCustomValueHandler = async (value, field) => {
-    let newInstanceId = await instanceStore.createNewInstanceAsOption(field, value);
+    let newInstanceId = await instanceStore.createNewInstanceAsOption(appStore.currentWorkspace, field, value);
     if(newInstanceId){
       instanceStore.instanceHasChanged(this.props.id);
       this.handleFieldFocus(field, {id: newInstanceId});

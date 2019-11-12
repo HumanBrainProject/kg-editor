@@ -2,7 +2,7 @@ import React from "react";
 import {observer} from "mobx-react";
 import injectStyles from "react-jss";
 
-import instanceStore from "../../Stores/InstanceStore";
+import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -45,7 +45,7 @@ const styles = {
 @observer
 export default class Tabs extends React.Component {
   handleSelectMode(mode) {
-    instanceStore.togglePreviewInstance();
+    appStore.togglePreviewInstance();
     routerStore.history.push(`/instance/${mode}/${this.props.id}`);
   }
 

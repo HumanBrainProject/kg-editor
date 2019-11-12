@@ -6,8 +6,8 @@ import {uniqueId} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
+import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
-import instanceStore from "../Stores/InstanceStore";
 
 import Avatar from "../Components/Avatar";
 
@@ -173,12 +173,7 @@ export default class UserProfileTab extends React.Component{
   }
 
   handleLogout = () => {
-    if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      instanceStore.flushOpenedTabs();
-      authStore.logout();
-      document.querySelector("#root").style.display = "none";
-      window.location.href = window.rootPath + "/";
-    }
+    appStore.logout();
   }
 
   componentWillUnmount() {

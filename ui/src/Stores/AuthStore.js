@@ -29,7 +29,6 @@ class AuthStore {
   @observable userProfileError = false;
   @observable authError = null;
   @observable authSuccess = false;
-  @observable currentWorkspace = null;
   @observable isTokenExpired = false;
   @observable isInitializing = true;
   @observable initializationError = null;
@@ -59,7 +58,7 @@ class AuthStore {
 
   @computed
   get hasWorkspaces() {
-    return this.user && this.user.workspaces && !!this.user.workspaces.length;
+    return this.user && this.user.workspaces instanceof Array && !!this.user.workspaces.length;
   }
 
   @computed
@@ -70,12 +69,6 @@ class AuthStore {
   @computed
   get isFullyAuthenticated() {
     return this.isAuthenticated && this.hasUserProfile;
-  }
-
-  @action
-  setCurrentWorkspace(workspace) {
-    localStorage.setItem("currentWorkspace", workspace);
-    this.currentWorkspace = workspace;
   }
 
   @action
@@ -105,22 +98,6 @@ class AuthStore {
       }
     }
     return this.hasUserProfile;
-  }
-
-  @action
-  retrieveUserWorkspace = () => {
-    const savedWorkspace = localStorage.getItem("currentWorkspace");
-    if (this.user.workspaces.includes(savedWorkspace)) {
-      this.currentWorkspace = savedWorkspace;
-    } else {
-      if (this.user.workspaces.length) {
-        if (this.user.workspaces.length > 1) {
-          this.currentWorkspace = null;
-        } else {
-          localStorage.setItem("currentWorkspace", this.user.workspaces[0]);
-        }
-      }
-    }
   }
 
   @action

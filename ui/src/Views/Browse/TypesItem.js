@@ -1,12 +1,10 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import _ from "lodash-uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import appStore from "../../Stores/AppStore";
 import browseStore from "../../Stores/BrowseStore";
-import instanceStore from "../../Stores/InstanceStore";
-import routerStore from "../../Stores/RouterStore";
 
 
 const styles = {
@@ -124,8 +122,7 @@ export default class TypesItem extends React.Component {
   }
 
   handleCreateInstance = () => {
-    const uuid = _.uuid();
-    routerStore.history.push(`/instance/create/${uuid}`);
+    appStore.createInstance();
   }
 
   render() {
@@ -143,7 +140,7 @@ export default class TypesItem extends React.Component {
           <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
         }
         <span>{type.label}</span>
-        {instanceStore.isCreatingNewInstance ?
+        {appStore.isCreatingNewInstance ?
           <div className={classes.createInstance}>
             <FontAwesomeIcon icon={"circle-notch"} spin />
           </div>

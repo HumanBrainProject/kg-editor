@@ -6,6 +6,7 @@ import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormStore } from "hbp-quickfire";
 
+import appStore from "../../Stores/AppStore";
 import instanceStore, { createInstanceStore } from "../../Stores/InstanceStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
@@ -54,7 +55,7 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
   }
 
   handleCloseComparison = () => {
-    instanceStore.setComparedWithReleasedVersionInstance(null);
+    appStore.setComparedWithReleasedVersionInstance(null);
   }
 
   handleRetryFetchInstance = () => {

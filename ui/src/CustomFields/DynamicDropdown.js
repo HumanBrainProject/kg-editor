@@ -8,6 +8,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import Alternatives from "./Alternatives";
+import appStore from "../Stores/AppStore";
 import instanceStore from "../Stores/InstanceStore";
 
 import injectStyles from "react-jss";
@@ -235,7 +236,7 @@ export default class DynamicDropdownField extends React.Component {
 
   closeDropdown(){
     this.wrapperRef = null;
-    instanceStore.togglePreviewInstance();
+    appStore.togglePreviewInstance();
     this.forceUpdate();
   }
 
@@ -266,7 +267,7 @@ export default class DynamicDropdownField extends React.Component {
     if(field.disabled || field.readOnly){
       return;
     }
-    instanceStore.togglePreviewInstance();
+    appStore.togglePreviewInstance();
     if(!e || (e && (!e.keyCode || e.keyCode === 13))){
       //If this function call doesn't send an event (->React Bootstrap OnSelect callback)
       //Or if it comes from a keyboard event associated with the "Enter" key
@@ -388,7 +389,7 @@ export default class DynamicDropdownField extends React.Component {
     if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
       this.unlistenClickOutHandler();
       this.props.field.setUserInput("");
-      instanceStore.togglePreviewInstance();
+      appStore.togglePreviewInstance();
     }
   };
 
@@ -456,7 +457,7 @@ export default class DynamicDropdownField extends React.Component {
   handleOptionPreview = (instanceId, instanceName, event) => {
     event && event.stopPropagation();
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(instanceId, instanceName, options);
+    appStore.togglePreviewInstance(instanceId, instanceName, options);
   }
 
   valueLabelRendering = (field, value) => {

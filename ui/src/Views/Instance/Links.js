@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 import instanceStore from "../../Stores/InstanceStore";
+import instanceTabStore from "../../Stores/InstanceTabStore";
 
 const styles = {
   pane: {
@@ -38,7 +39,7 @@ class Links extends React.Component{
     if (!instance) {
       return null;
     }
-    const mainInstance = instanceStore.openedInstances.get(mainInstanceId);
+    const mainInstance = instanceTabStore.instanceTabs.get(mainInstanceId);
     const currentInstancePath = mainInstance.currentInstancePath;
     let linkKeys = [];
     if(instance.isFetched){

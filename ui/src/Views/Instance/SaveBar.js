@@ -7,6 +7,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import CompareChanges from "./CompareChanges";
+import appStore from "../../Stores/AppStore";
 import instanceStore from "../../Stores/InstanceStore";
 
 const animationId = uniqueId("animationId");
@@ -121,21 +122,21 @@ export default class SavePanel extends React.Component{
       .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
       .forEach(([id, ]) => {
         const instance = instanceStore.instances.get(id);
-        instance && instance.save();
+        instance && appStore.saveInstance(instance);
       });
   }
 
   handleSave(instanceId){
     const instance = instanceStore.instances.get(instanceId);
     if (instance) {
-      instance.save();
-      instanceStore.setComparedInstance(null);
+      appStore.saveInstance(instance);
+      appStore.setComparedInstance(null);
     }
   }
 
   handleReset(instanceId){
     instanceStore.confirmCancelInstanceChanges(instanceId);
-    instanceStore.setComparedInstance(null);
+    appStore.setComparedInstance(null);
   }
 
   handleDismissSaveError(instanceId){
@@ -144,7 +145,7 @@ export default class SavePanel extends React.Component{
   }
 
   handleShowCompare(instanceId){
-    instanceStore.setComparedInstance(instanceId);
+    appStore.setComparedInstance(instanceId);
   }
 
   onUnload = (event) => { // the method that will be used for both add and remove event
@@ -160,7 +161,7 @@ export default class SavePanel extends React.Component{
     const { classes } = this.props;
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
 
-    const comparedInstance = instanceStore.comparedInstanceId?instanceStore.instances.get(instanceStore.comparedInstanceId):null;
+    const comparedInstance = appStore.comparedInstanceId?instanceStore.instances.get(appStore.comparedInstanceId):null;
     const comparedInstanceLabelField = comparedInstance && comparedInstance.labelField;
     const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.form?comparedInstance.form.getField(comparedInstanceLabelField).getValue():"";
     return(
@@ -175,12 +176,12 @@ export default class SavePanel extends React.Component{
                 </Modal.Header>
                 <Modal.Body>
                   <Scrollbars autoHide>
-                    <CompareChanges instanceId={instanceStore.comparedInstanceId}/>
+                    <CompareChanges instanceId={appStore.comparedInstanceId}/>
                   </Scrollbars>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button bsSize="small" onClick={this.handleReset.bind(this, instanceStore.comparedInstanceId)}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
-                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instanceStore.comparedInstanceId)}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
+                  <Button bsSize="small" onClick={this.handleReset.bind(this, appStore.comparedInstanceId)}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
+                  <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, appStore.comparedInstanceId)}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
                 </Modal.Footer>
               </Modal>
             }

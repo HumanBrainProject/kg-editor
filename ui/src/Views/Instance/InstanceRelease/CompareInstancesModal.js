@@ -5,7 +5,7 @@ import { Button, Modal } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import instanceStore from "../../../Stores/InstanceStore";
+import appStore from "../../../Stores/AppStore";
 
 import CompareWithReleasedVersionChanges from "../CompareWithReleasedVersionChanges";
 
@@ -32,7 +32,7 @@ const styles = {
 export default class CompareInstancesModal extends React.Component {
   handleShowCompare = node => e => {
     e && e.stopPropagation();
-    instanceStore.setComparedWithReleasedVersionInstance(node);
+    appStore.setComparedWithReleasedVersionInstance(node);
   }
 
   render() {
@@ -47,12 +47,12 @@ export default class CompareInstancesModal extends React.Component {
             Compare with the released version of{" "}
           <strong>
             {
-              instanceStore.comparedWithReleasedVersionInstance
+              appStore.comparedWithReleasedVersionInstance
                 .type
             }
                         &nbsp;
             {
-              instanceStore.comparedWithReleasedVersionInstance
+              appStore.comparedWithReleasedVersionInstance
                 .label
             }
           </strong>
@@ -61,11 +61,11 @@ export default class CompareInstancesModal extends React.Component {
           <Scrollbars autoHide>
             <CompareWithReleasedVersionChanges
               instanceId={
-                instanceStore.comparedWithReleasedVersionInstance
+                appStore.comparedWithReleasedVersionInstance
                   .relativeUrl
               }
               status={
-                instanceStore.comparedWithReleasedVersionInstance
+                appStore.comparedWithReleasedVersionInstance
                   .status
               }
             />

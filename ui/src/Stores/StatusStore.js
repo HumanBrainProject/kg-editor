@@ -16,7 +16,7 @@ class StatusStore {
   }
 
   @action flush() {
-    this.statuses = new Map();
+    this.statuses.clear();
   }
 
   @action

@@ -5,9 +5,12 @@ import { Form } from "hbp-quickfire";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
-import TypesStore from "../../Stores/TypesStore";
+import typesStore from "../../Stores/TypesStore";
 import instanceStore from "../../Stores/InstanceStore";
+import instanceTabStore from "../../Stores/InstanceTabStore";
+
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -146,17 +149,17 @@ export default class InstanceForm extends React.Component {
     }
   }
 
-  handleListLoadRetry = () => TypesStore.fetch();
+  handleListLoadRetry = () => typesStore.fetch();
 
   handleFocus = () => {
-    if (instanceStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
-      instanceStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
+    if (instanceTabStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
+      instanceTabStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
     }
   }
 
   handleOpenInstance = (e) => {
     if ((e.metaKey || e.ctrlKey)) {
-      instanceStore.openInstance(this.props.id);
+      appStore.openInstance(this.props.id);
     } else {
       routerStore.history.push(`/instance/view/${this.props.id}`);
     }
@@ -197,7 +200,7 @@ export default class InstanceForm extends React.Component {
 
   handleSave = (e) => {
     e && e.stopPropagation();
-    this.instance && this.instance.save();
+    this.instance && appStore.saveInstance(this.instance);
   }
 
   handleCancelSave = (e) => {
@@ -215,7 +218,7 @@ export default class InstanceForm extends React.Component {
     }
 
     const isMainInstance = id === mainInstanceId;
-    const isCurrentInstance = id === instanceStore.getCurrentInstanceId(mainInstanceId);
+    const isCurrentInstance = id === instanceTabStore.getCurrentInstanceId(mainInstanceId);
 
     const panelClassName = () => {
       let className = classes.panel;
@@ -279,7 +282,7 @@ export default class InstanceForm extends React.Component {
                     onCancel={this.handleContinueEditing}
                     inline={!isMainInstance} />
                   <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
-                  <CreatingChildInstancePanel show={instanceStore.isCreatingNewInstance} />
+                  <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
                   <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
                 </div>
                 <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />

@@ -2,7 +2,7 @@ import { observable, action, runInAction } from "mobx";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
-import authStore from "./AuthStore";
+import appStore from "./AppStore";
 import { normalizeInstanceData } from "../Helpers/InstanceHelper";
 
 const maxItems = 100;
@@ -36,12 +36,12 @@ class HistoryStore {
 
   @action
   updateInstanceHistory(id, type, mode, remove) {
-    if (!authStore.currentWorkspace) {
+    if (!appStore.currentWorkspace) {
       return;
     }
     let index = -1;
     this.instancesHistory.some((instance, idx) => {
-      if (instance.id === id && instance.workspace === authStore.currentWorkspace && instance.mode === mode) {
+      if (instance.id === id && instance.workspace === appStore.currentWorkspace && instance.mode === mode) {
         index = idx;
         return true;
       }
@@ -53,7 +53,7 @@ class HistoryStore {
       this.instancesHistory.pop();
     }
     if (!remove) {
-      this.instancesHistory.unshift({id: id, type: type, workspace: authStore.currentWorkspace, mode: mode});
+      this.instancesHistory.unshift({id: id, type: type, workspace: appStore.currentWorkspace, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
@@ -61,7 +61,7 @@ class HistoryStore {
 
   @action
   getFileredInstancesHistory(type, modes, max=10) {
-    if (!authStore.currentWorkspace) {
+    if (!appStore.currentWorkspace) {
       return [];
     }
     if (typeof type === "string") {
@@ -78,7 +78,7 @@ class HistoryStore {
     max = Number(max);
     return this.instancesHistory
       .filter(instance => {
-        if (instance.workspace !== authStore.currentWorkspace) {
+        if (instance.workspace !== appStore.currentWorkspace) {
           return false;
         }
         if (typeof type === "string" && instance.type.includes(type)) {

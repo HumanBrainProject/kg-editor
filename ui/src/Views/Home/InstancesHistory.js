@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import historyStore from "../../Stores/HistoryStore";
 import appStore from "../../Stores/AppStore";
-import instanceStore from "../../Stores/InstanceStore";
 import routerStore from "../../Stores/RouterStore";
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
@@ -172,7 +171,7 @@ export default class InstancesHistory extends React.Component{
   handleInstanceCtrlClick(instance){
     const id = instance && instance.id;
     if (id) {
-      instanceStore.openInstance(id);
+      appStore.openInstance(id);
     }
   }
 

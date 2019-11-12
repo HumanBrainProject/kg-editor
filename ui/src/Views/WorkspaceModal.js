@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 import { Modal } from "react-bootstrap";
 
+import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
@@ -78,7 +79,7 @@ const styles = {
 @observer
 class WorkspaceModal extends React.Component{
 
-  handleClick = workspace => authStore.setCurrentWorkspace(workspace);
+  handleClick = workspace => appStore.setCurrentWorkspace(workspace);
 
   render(){
     const { classes } =  this.props;

@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import instanceStore from "../../Stores/InstanceStore";
+import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
 const styles = {
@@ -33,7 +33,7 @@ const styles = {
 export default class Actions extends React.Component {
   handleOpenInstance(mode, event) {
     if (event.metaKey || event.ctrlKey) {
-      instanceStore.openInstance(this.props.instanceId, mode);
+      appStore.openInstance(this.props.instanceId, mode);
     } else {
       routerStore.history.push(
         `/instance/${mode}/${this.props.instanceId}`

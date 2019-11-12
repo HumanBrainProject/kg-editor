@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed, toJS} from "mobx";
-import { uniqueId, find, debounce } from "lodash";
+import { uniqueId, find, debounce, isEqual } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -189,14 +189,10 @@ class Instance {
     this.hasSaveError = false;
     this.isSaving = true;
 
-    const payload = this.form.getValues();
-    if (this.fieldsToSetAsNull.length > 0) {
-      this.fieldsToSetAsNull.forEach(key=> payload[key] = null);
-    }
-    payload["@type"] = this.types.map(t => t.name);
-
     try {
       if (this.isNew) {
+        const payload = this.form.getValues();
+        payload["@type"] = this.types.map(t => t.name);
         const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
         runInAction(() => {
           const newId = data.data.id;
@@ -214,6 +210,18 @@ class Instance {
           this.initializeData(data.data, false, false);
         });
       } else {
+        const values = this.form.getValues();
+        if (this.fieldsToSetAsNull.length > 0) {
+          this.fieldsToSetAsNull.forEach(key=> values[key] = null);
+        }
+        const payload = Object.entries(values).reduce((result, [key, value]) => {
+          const previous = this.initialValues[key];
+          if (!isEqual(value, previous)) {
+            result[key] = value;
+          }
+          return result;
+        }, {});
+        payload["@type"] = this.types.map(t => t.name);
         const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
         runInAction(() => {
           this.hasChanged = false;

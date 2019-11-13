@@ -45,9 +45,6 @@
 # KG Editor User Routes
 -> /editor/api/user user.Routes
 
-# KG Editor Client Routes
--> /editor/api/client editor.Routes
-
 # Admin services
 -> /admin admin.Routes
 

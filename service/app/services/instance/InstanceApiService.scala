@@ -331,17 +331,23 @@ trait InstanceApiService {
 
   }
 
-  def getResolvedId(
+  def getInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
+    metadata: Boolean,
+    permissions: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/${id}/resolvedId")
+      .url(s"$apiBaseEndpoint/instances/${id}")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
-      .addQueryStringParameters("stage" -> "LIVE")
+      .addQueryStringParameters(
+        "stage"       -> "LIVE",
+        "metadata"    -> metadata.toString,
+        "permissions" -> permissions.toString
+      )
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
@@ -397,7 +403,7 @@ trait InstanceApiService {
   def getClientToken(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    clientSecret: String,
+    clientSecret: String, // config.clientSecret
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient

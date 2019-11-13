@@ -49,9 +49,14 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   object queryService extends QueryService
 
-  def getResolvedId(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+  def getInstance(
+    id: String,
+    token: AccessToken,
+    metadata: Boolean,
+    permissions: Boolean
+  ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getResolvedId(wSClient, config.kgCoreEndpoint, id, token)
+      .getInstance(wSClient, config.kgCoreEndpoint, id, token, metadata, permissions)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -122,16 +127,6 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
   def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
       .getWorkspaces(wSClient, config.kgCoreEndpoint, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  // TODO Consider moving the method to a new service file
-  def retrieveClientToken(): Task[Either[APIEditorError, JsObject]] = {
-    val result = instanceApiService
-      .getClientToken(wSClient, config.kgCoreEndpoint, config.clientSecret)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))

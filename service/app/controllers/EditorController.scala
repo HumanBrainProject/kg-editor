@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
 import models.instance.InstanceProtocol._
 import models._
+import models.errors.APIEditorError
 import models.instance._
 import monix.eval.Task
 import play.api.Logger
@@ -51,9 +52,12 @@ class EditorController @Inject()(
     authenticatedUserAction.async { implicit request =>
       editorService
         .getInstance(id, request.userToken, metadata, permissions)
-        .map {
-          case Left(err)    => err.toResult
-          case Right(value) => Ok(Json.toJson(EditorResponseObject(value)))
+        .flatMap {
+          case Right(value) =>
+            val instance = (value \ "data").as[JsObject]
+            normalizeInstance(instance, request.userToken)
+          case _ =>
+            Task.pure(InternalServerError("Something went wrong while fetching the instance! Please try again!"))
         }
         .runToFuture
     }
@@ -541,37 +545,41 @@ class EditorController @Inject()(
           .flatMap {
             case Right(value) =>
               val instance = (value \ "data").as[JsObject]
-              val typesToRetrieve = InstanceHelper.getTypes(instance)
-              typesToRetrieve match {
-                case Some(t) =>
-                  editorService
-                    .retrieveTypesList(t, request.userToken)
-                    .map {
-                      case Right(typesWithFields) =>
-                        implicit val writer = InstanceProtocol.instanceWrites
-                        (typesWithFields \ "data").asOpt[List[StructureOfType]] match {
-                          case Some(typeInfoList) =>
-                            val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
-                            val instanceRes = InstanceHelper.getInstanceView(instance, typeInfoMap)
-                            instanceRes match {
-                              case Some(r) =>
-                                Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
-                              case _ =>
-                                InternalServerError("Something went wrong retrieving the instance! Please try again!")
-                            }
-                          case _ => InternalServerError("Something went wrong with types list! Please try again!")
-                        }
-                      case _ => InternalServerError("Something went wrong with types! Please try again!")
-                    }
-                case _ =>
-                  Task.pure(InternalServerError("Something went wrong while extracting the types! Please try again!"))
-              }
+              normalizeInstance(instance, request.userToken)
             case _ =>
               Task.pure(
                 InternalServerError("Something went wrong with the insertion of the instance! Please try again!")
               )
           }
       case None => Task.pure(BadRequest("Missing body content"))
+    }
+  }
+
+  private def normalizeInstance(instance: JsObject, token: AccessToken): Task[Result] = {
+    val typesToRetrieve = InstanceHelper.getTypes(instance)
+    typesToRetrieve match {
+      case Some(t) =>
+        editorService
+          .retrieveTypesList(t, token)
+          .map {
+            case Right(typesWithFields) =>
+              implicit val writer = InstanceProtocol.instanceWrites
+              (typesWithFields \ "data").asOpt[List[StructureOfType]] match {
+                case Some(typeInfoList) =>
+                  val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
+                  val instanceRes = InstanceHelper.getInstanceView(instance, typeInfoMap)
+                  instanceRes match {
+                    case Some(r) =>
+                      Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
+                    case _ =>
+                      InternalServerError("Something went wrong retrieving the instance! Please try again!")
+                  }
+                case _ => InternalServerError("Something went wrong with types list! Please try again!")
+              }
+            case _ => InternalServerError("Something went wrong with types! Please try again!")
+          }
+      case _ =>
+        Task.pure(InternalServerError("Something went wrong while extracting the types! Please try again!"))
     }
   }
 }

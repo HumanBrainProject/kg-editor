@@ -25,7 +25,7 @@ final case class InstanceSummaryView(
   types: List[InstanceType],
   name: Option[String],
   fields: Map[String, Field],
-  permissions: Map[String, Boolean]
+  permissions: List[String]
 ) extends Instance
 
 object InstanceSummaryView {

@@ -26,9 +26,9 @@ final case class InstanceView(
   promotedFields: Option[List[String]],
   name: Option[String],
   fields: Map[String, Field],
-  permissions: Map[String, Boolean],
+  permissions: List[String],
   alternatives: Map[String, JsValue],
-  user: Map[String, JsValue]
+  user: Option[String]
 ) extends Instance
 
 object InstanceView {

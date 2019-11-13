@@ -122,21 +122,10 @@ object InstanceHelper {
 
     }
 
-  def toCamel(s: String): String = {
-    val split = s.split("_")
-    val tail = split.tail.map { x =>
-      x.head.toUpper + x.tail
-    }
-    split.head + tail.mkString
-  }
-
-  def getPermissions(data: JsObject): Map[String, Boolean] =
-    (data \ "permissions").asOpt[List[String]] match {
-      case Some(permissions) =>
-        permissions.foldLeft(Map[String, Boolean]()) {
-          case (map, name) => map.updated(toCamel(name), true)
-        }
-      case None => Map()
+  def getPermissions(data: JsObject): List[String] =
+    (data \ s"${EditorConstants.VOCABEBRAINSPERMISSIONS}").asOpt[List[String]] match {
+      case Some(permissions) => permissions
+      case None              => List()
     }
 
   def getAlternatives(data: JsObject): Map[String, JsValue] =
@@ -145,10 +134,14 @@ object InstanceHelper {
       case None               => Map()
     }
 
-  def getUser(data: JsObject): Map[String, JsValue] =
+  def getUser(data: JsObject): Option[String] =
     (data \ s"${EditorConstants.VOCABEBRAINSUSER}").asOpt[Map[String, JsValue]] match {
-      case Some(user) => user
-      case None       => Map()
+      case Some(user) =>
+        user.get("@id") match {
+          case Some(i) => DocumentId.getIdFromPath(i.as[String])
+          case None    => None
+        }
+      case None => None
     }
 
   def getName(data: JsObject, name: Option[String]): Option[String] =

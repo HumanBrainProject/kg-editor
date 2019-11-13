@@ -278,26 +278,6 @@ POST   /:id                  controllers.EditorController.createInstanceWithId(w
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
-#    in: path
-#    description: organization the instance to update
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance to update
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance to update
-#    required: true
-#    type: string
 #  - name: id
 #    in: path
 #    description: the UUID of the instance to update
@@ -309,7 +289,7 @@ POST   /:id                  controllers.EditorController.createInstanceWithId(w
 #    required: false
 #    type: string
 ###
-PUT   /:org/:domain/:schema/:version/:id                   controllers.EditorController.updateInstance(org: String, domain:String, schema: String, version:String, id: String)
+PATCH   /:id                   controllers.EditorController.updateInstance(id: String)
 
 
 ###

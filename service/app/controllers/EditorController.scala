@@ -20,7 +20,6 @@ import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
 import models.instance.InstanceProtocol._
 import models._
-import models.errors.APIEditorError
 import models.instance._
 import monix.eval.Task
 import play.api.Logger
@@ -470,53 +469,28 @@ class EditorController @Inject()(
   /**
     * Entry point when updating an instance
     *
-    * @param org     The organization of the instance
-    * @param domain  The domain of the instance
-    * @param schema  The schema of the instance
-    * @param version The version of the schema
-    * @param id      The id of the instance
+    * @param id The id of the instance
     * @return A result with the instance updated or an error message
     */
-  def updateInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
-    (authenticatedUserAction)
+  def updateInstance(id: String): Action[AnyContent] =
+    authenticatedUserAction
       .async { implicit request =>
-        val instanceRef = NexusInstanceReference(org, domain, schema, version, id)
-        editorService
-          .updateInstanceFromForm(instanceRef, request.body.asJson, request.user, request.userToken, reverseLinkService)
-          .flatMap {
-            case Right(()) =>
-              formService.getRegistries().flatMap { registries =>
-                editorService
-                  .retrieveInstance(instanceRef, request.userToken, registries.queryRegistry)
-                  .flatMap {
-                    case Right(instance) =>
-                      FormOp
-                        .getFormStructure(instanceRef.nexusPath, instance.content, registries.formRegistry) match {
-                        case JsNull =>
-                          Task.pure(NotImplemented("Form not implemented"))
-                        case instanceForm =>
-                          val specFlush = formService.shouldReloadSpecification(instanceRef.nexusPath).flatMap {
-                            shouldReload =>
-                              if (shouldReload) {
-                                formService.flushSpec()
-                              } else {
-                                Task.pure(())
-                              }
-                          }
-                          specFlush.map { _ =>
-                            Ok(Json.toJson(EditorResponseObject(instanceForm.as[JsObject])))
-                          }
-                      }
-                    case Left(error) =>
-                      logger.error(error.toString)
-                      Task.pure(error.toResult)
-                  }
+        val bodyContent: Option[JsValue] = request.body.asJson
+        (bodyContent match {
+          case Some(body) =>
+            editorService
+              .updateInstanceNew(id, body.as[JsObject], request.userToken)
+              .flatMap {
+                case Right(value) =>
+                  val instance = (value \ "data").as[JsObject]
+                  normalizeInstance(instance, request.userToken)
+                case _ =>
+                  Task.pure(
+                    InternalServerError("Something went wrong with the update of the instance! Please try again!")
+                  )
               }
-            case Left(error) =>
-              logger.error(error.content.mkString("\n"))
-              Task.pure(error.toResult)
-          }
-          .runToFuture
+          case None => Task.pure(BadRequest("Missing body content"))
+        }).runToFuture
       }
 
   def createInstanceWithoutId(workspace: String): Action[AnyContent] = authenticatedUserAction.async {

@@ -400,29 +400,13 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
       }
   }
 
-  def updateInstanceFromForm(
-    instanceRef: NexusInstanceReference,
-    form: Option[JsValue],
-    user: IDMUser,
-    token: AccessToken,
-    reverseLinkService: ReverseLinkService
-  ): Task[Either[APIEditorMultiError, Unit]] =
-    form match {
-      case Some(json) =>
-        formService.getRegistries().flatMap { registries =>
-          registries.formRegistry.registry.get(instanceRef.nexusPath) match {
-            case Some(spec)
-                if spec.getFieldsAsMap.values.exists(p => p.isReverse.getOrElse(false)) |
-                spec.getFieldsAsMap.values.exists(p => p.isLinkingInstance.getOrElse(false)) =>
-              reverseLinkService
-                .generateDiffAndUpdateInstanceWithReverseLink(instanceRef, json, token, user, registries)
-            case _ =>
-              generateDiffAndUpdateInstance(instanceRef, json, token, user, registries)
-          }
-        }
-      case None =>
-        Task.pure(Left(APIEditorMultiError(BAD_REQUEST, List(APIEditorError(BAD_REQUEST, "No content provided")))))
-    }
+  def updateInstanceNew(id: String, body: JsObject, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+    instanceApiService
+      .updateInstance(wSClient, config.kgCoreEndpoint, id, body, token)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
+      }
 
   /**
     * Return a instance by its nexus ID

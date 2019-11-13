@@ -582,6 +582,27 @@ trait InstanceApiService {
     }
   }
 
+  def updateInstance(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    id: String,
+    body: JsObject,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]] = {
+
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/instances/${id}")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+    val r = Task.deferFuture(q.patch(body))
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
+
   def postNew(
     wSClient: WSClient,
     apiBaseEndpoint: String,

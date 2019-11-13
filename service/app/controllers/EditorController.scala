@@ -136,28 +136,30 @@ class EditorController @Inject()(
 
   def getInstancesList(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(stage, metadata, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
+      getInstances(stage, metadata, true, true, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
     }
 
   def getInstancesSummary(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(stage, metadata, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
+      getInstances(stage, metadata, false, true, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
     }
 
   def getInstancesLabel(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(stage, metadata, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
+      getInstances(stage, metadata, false, false, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
     }
 
   def getInstances(
     stage: String,
     metadata: Boolean,
+    alternatives: Boolean,
+    permissions: Boolean,
     generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
         editorService
-          .retrieveInstances(ids, request.userToken, stage, metadata)
+          .retrieveInstances(ids, request.userToken, stage, metadata, alternatives, permissions)
           .flatMap {
             case Right(instancesResult) =>
               val instances = InstanceHelper.extractDataAsList(instancesResult)

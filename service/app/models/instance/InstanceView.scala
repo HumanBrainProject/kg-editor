@@ -17,7 +17,7 @@
 package models.instance
 
 import helpers.InstanceHelper
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 final case class InstanceView(
   id: String,
@@ -26,7 +26,9 @@ final case class InstanceView(
   promotedFields: Option[List[String]],
   name: Option[String],
   fields: Map[String, Field],
-  permissions: Map[String, Boolean]
+  permissions: Map[String, Boolean],
+  alternatives: Map[String, JsValue],
+  user: Map[String, JsValue]
 ) extends Instance
 
 object InstanceView {
@@ -47,7 +49,9 @@ object InstanceView {
             InstanceHelper.toOptionalList(structure.promotedFields),
             InstanceHelper.getName(data, structure.labelField.headOption),
             InstanceHelper.getFields(data, structure.fields),
-            InstanceHelper.getPermissions(data)
+            InstanceHelper.getPermissions(data),
+            InstanceHelper.getAlternatives(data),
+            InstanceHelper.getUser(data)
           )
         )
       case _ => None

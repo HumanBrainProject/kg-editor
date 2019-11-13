@@ -44,7 +44,14 @@ object StructureOfType {
 
   import models.instance.StructureOfField._
 
-  val valuesToRemove = List("@id", "@type", "http://schema.org/identifier")
+  val valuesToRemove = List(
+    "@id",
+    "@type",
+    s"${SchemaFieldsConstants.IDENTIFIER}",
+    s"${EditorConstants.VOCABEBRAINSALTERNATIVES}",
+    s"${EditorConstants.VOCABEBRAINSUSER}",
+    s"${EditorConstants.VOCABEBRAINSSPACES}"
+  )
 
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and

@@ -28,7 +28,7 @@ import models.instance.{
   StructureOfField,
   StructureOfType
 }
-import play.api.libs.json.{JsObject, JsString}
+import play.api.libs.json.{JsObject, JsString, JsValue}
 import play.api.mvc.AnyContent
 
 object InstanceHelper {
@@ -123,7 +123,7 @@ object InstanceHelper {
     }
 
   def toCamel(s: String): String = {
-    val split = s.split("-")
+    val split = s.split("_")
     val tail = split.tail.map { x =>
       x.head.toUpper + x.tail
     }
@@ -137,6 +137,18 @@ object InstanceHelper {
           case (map, name) => map.updated(toCamel(name), true)
         }
       case None => Map()
+    }
+
+  def getAlternatives(data: JsObject): Map[String, JsValue] =
+    (data \ s"${EditorConstants.VOCABEBRAINSALTERNATIVES}").asOpt[Map[String, JsValue]] match {
+      case Some(alternatives) => alternatives
+      case None               => Map()
+    }
+
+  def getUser(data: JsObject): Map[String, JsValue] =
+    (data \ s"${EditorConstants.VOCABEBRAINSUSER}").asOpt[Map[String, JsValue]] match {
+      case Some(user) => user
+      case None       => Map()
     }
 
   def getName(data: JsObject, name: Option[String]): Option[String] =

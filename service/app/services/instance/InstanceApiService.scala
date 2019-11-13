@@ -60,13 +60,20 @@ trait InstanceApiService {
     instanceIds: List[String],
     stage: String,
     metadata: Boolean,
+    alternatives: Boolean,
+    permissions: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds)
     val q = wsClient
       .url(s"${apiBaseEndpoint}/instancesByIds")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
-      .addQueryStringParameters("stage" -> stage, "metadata" -> metadata.toString)
+      .addQueryStringParameters(
+        "stage"        -> stage,
+        "metadata"     -> metadata.toString,
+        "alternatives" -> alternatives.toString,
+        "permissions"  -> metadata.toString
+      )
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {

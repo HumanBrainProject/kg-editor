@@ -33,29 +33,24 @@ import play.api.mvc.AnyContent
 
 object InstanceHelper {
 
-  def toTypeList(list: List[JsObject]): List[String] =
-    list
-      .foldLeft(List[List[String]]()) {
-        case (res, data) =>
-          (data \ "@type").asOpt[List[String]] match {
-            case Some(values) => res :+ values
-            case _            => res
-          }
-      }
-      .flatten
-      .distinct
+  def toTypeList(data: JsObject): List[String] =
+    (data \ "data").asOpt[JsObject] match {
+      case Some(instancesData) =>
+        instancesData.as[Map[String, JsObject]].foldLeft(List[String]()) {
+          case (acc, (id, instanceData)) =>
+            (instanceData \ "@type").asOpt[List[String]] match {
+              case Some(values) => (acc ::: values).distinct
+              case _            => acc
+            }
+        }
+      case _ => List()
+    }
 
   def toOptionalList[T](list: List[T]): Option[List[T]] =
     if (list.nonEmpty) {
       Some(list)
     } else {
       None
-    }
-
-  def extractDataAsList(data: JsObject): List[JsObject] =
-    (data \ "data").asOpt[List[JsObject]] match {
-      case Some(list) => list
-      case _          => List()
     }
 
   def extractPayloadAsList(request: UserRequest[AnyContent]): Option[List[String]] =
@@ -194,18 +189,19 @@ object InstanceHelper {
   def getInstanceLabelView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
     InstanceLabelView(data, typeInfoMap)
 
-  def generateInstanceListView(
-    dataList: List[JsObject],
+  def generateInstancesView(
+    data: JsObject,
     typeInfoList: List[StructureOfType],
     generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
-  ): List[Instance] = {
+  ): Map[String, Option[Instance]] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
-    dataList.foldLeft(List[Instance]()) {
-      case (instances, data) =>
-        generateInstanceView(data, typeInfoMap) match {
-          case Some(instance) => instances :+ instance
-          case _              => instances
+    (data \ "data").asOpt[JsObject] match {
+      case Some(instancesData) =>
+        instancesData.as[Map[String, JsObject]].foldLeft(Map[String, Option[Instance]]()) {
+          case (map, (id, instanceData)) =>
+            map.updated(id, generateInstanceView(instanceData, typeInfoMap))
         }
+      case _ => Map()
     }
   }
 }

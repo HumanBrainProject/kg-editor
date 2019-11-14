@@ -110,15 +110,22 @@ class HistoryStore {
         this.instances = [];
         this.isFetching = true;
         this.fetchError = null;
-        const { data } = await API.axios.post(API.endpoints.instancesSummary(), list);
+        const response = await API.axios.post(API.endpoints.instancesSummary(), list);
         runInAction(() => {
+          list.forEach(identifier => {
+            const data =  response && response.data && response.data.data && response.data.data[identifier];
+            if(data){
+              const instance = normalizeInstanceData(data, transformField);
+              instance.formStore = new FormStore(instance);
+              instance.formStore.toggleReadMode(true);
+              this.instances.push(instance);
+            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
+              // TODO: check if we need to handle error
+            } else {
+              // TODO: check if we need to handle error
+            }
+          });
           this.isFetching = false;
-          this.instances = (data && data.data instanceof Array)?data.data.map(item => {
-            const instance = normalizeInstanceData(item, transformField);
-            instance.formStore = new FormStore(instance);
-            instance.formStore.toggleReadMode(true);
-            return instance;
-          }):[];
         });
       } catch (e) {
         runInAction(() => {

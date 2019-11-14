@@ -1,6 +1,5 @@
 import {observable, action, runInAction} from "mobx";
 import { matchPath } from "react-router-dom";
-import { find } from "lodash";
 import _  from "lodash-uuid";
 
 import DefaultTheme from "../Themes/Default";

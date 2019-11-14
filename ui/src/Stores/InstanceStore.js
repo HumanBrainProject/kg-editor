@@ -1,5 +1,5 @@
 import {observable, action, runInAction, computed, toJS} from "mobx";
-import { uniqueId, find, debounce, isEqual } from "lodash";
+import { uniqueId, debounce, isEqual } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -319,10 +319,16 @@ class InstanceStore {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = find(response.data.data, item => item.id === instance.id);
+            const data = response && response.data && response.data.data && response.data.data[identifier];
             if(data){
               instance.initializeData(data, appStore.getReadMode(), false);
               appStore.syncInstancesHistory(instance, "viewed");
+            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
+              const error = response.data.error[identifier];
+              const message = JSON.stringify(error); // TODO: check and handle properly error object
+              instance.errorInstance(message);
+              instance.isFetching = false;
+              instance.isFetched = false;
             } else {
               const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
               instance.errorInstance(message);

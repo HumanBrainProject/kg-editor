@@ -165,8 +165,7 @@ class EditorController @Inject()(
           .retrieveInstances(ids, request.userToken, stage, metadata, returnAlternatives, returnPermissions)
           .flatMap {
             case Right(instancesResult) =>
-              val instances = InstanceHelper.extractDataAsList(instancesResult)
-              val typesToRetrieve = InstanceHelper.toTypeList(instances)
+              val typesToRetrieve = InstanceHelper.toTypeList(instancesResult)
               editorService
                 .retrieveTypesList(typesToRetrieve, request.userToken)
                 .map {
@@ -178,7 +177,8 @@ class EditorController @Inject()(
                           Json.toJson(
                             EditorResponseObject(
                               Json.toJson(
-                                InstanceHelper.generateInstanceListView(instances, typeInfoList, generateInstanceView)
+                                InstanceHelper
+                                  .generateInstancesView(instancesResult, typeInfoList, generateInstanceView)
                               )
                             )
                           )

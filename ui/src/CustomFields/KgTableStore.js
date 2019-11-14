@@ -1,5 +1,5 @@
 import { observable, action, runInAction, set, computed } from "mobx";
-import { find, union, debounce, remove } from "lodash";
+import { union, debounce, remove } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -100,9 +100,10 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         runInAction(() =>{
           toProcess.forEach(identifier => {
             const instance = this.instancesMap.get(identifier);
-            const instanceData = find(response.data.data, (item) => item.id === identifier);
+
+            const instanceData =  response && response.data && response.data.data && response.data.data[identifier];
             if(instanceData){
-              const promotedFields = instanceData.ui_info && instanceData.ui_info.promotedFields;
+              const promotedFields = instanceData.promotedFields;
               set(instance, "promotedFields", promotedFields);
               Object.keys(instanceData.fields).forEach(key => {
                 if(key === instance.mappingValue){return;}
@@ -111,6 +112,10 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
                 }
               });
               set(instance, "isFetched", true);
+            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
+              const error = response.data.error[identifier];
+              const message = JSON.stringify(error); // TODO: check and handle properly error object
+              set(instance, "fetchError", message);
             } else {
               set(instance, "fetchError", `Error fetching instance ${identifier}`);
             }

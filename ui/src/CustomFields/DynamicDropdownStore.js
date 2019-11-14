@@ -1,5 +1,5 @@
 import { observable, action, runInAction, get, set } from "mobx";
-import { find, union, debounce } from "lodash";
+import { union, debounce } from "lodash";
 import console from "../Services/Logger";
 import { FormStore } from "hbp-quickfire";
 
@@ -49,25 +49,28 @@ class OptionsPool{
       set(this.options.get(identifier), "isFetching", true);
     });
     try{
-      let response = await API.axios.post(API.endpoints.instancesLabel(), toProcess);
+      const response = await API.axios.post(API.endpoints.instancesLabel(), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           const option = this.options.get(identifier);
           const optionQueueItem = this.optionsQueue.get(identifier);
           const mappingValue = optionQueueItem.mappingValue;
           const mappingLabel = optionQueueItem.mappingLabel;
-          const optionData = find(response.data.data, (item) => item[mappingValue] === identifier);
-          if(optionData){
+          const optionData =  response && response.data && response.data.data && response.data.data[identifier];
+          if(optionData){ // TODO: check data and adapt code in consequence
             Object.keys(optionData).forEach(key => {
               if(key === mappingValue){return;}
               set(option, key, optionData[key]);
             });
+          } else if (response && response.data && response.data.error && response.data.error[identifier]) {
+            const error = response.data.error[identifier];
+            const message = JSON.stringify(error); // TODO: check and handle properly error object
+            set(option, mappingLabel, message);
+            set(option, "fetchError", true);
           } else {
             set(option, mappingLabel, "Not found");
             set(option, "fetchError", true);
           }
-          set(option, "isFetching", false);
-          this.optionsQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
         this.processQueue();

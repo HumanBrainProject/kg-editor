@@ -47,10 +47,10 @@ class EditorController @Inject()(
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def getInstance(id: String, metadata: Boolean, permissions: Boolean): Action[AnyContent] =
+  def getInstance(id: String, metadata: Boolean, returnPermissions: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .getInstance(id, request.userToken, metadata, permissions)
+        .getInstance(id, request.userToken, metadata, returnPermissions)
         .flatMap {
           case Right(value) =>
             val instance = (value \ "data").as[JsObject]
@@ -155,14 +155,14 @@ class EditorController @Inject()(
   def getInstances(
     stage: String,
     metadata: Boolean,
-    alternatives: Boolean,
-    permissions: Boolean,
+    returnAlternatives: Boolean,
+    returnPermissions: Boolean,
     generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
         editorService
-          .retrieveInstances(ids, request.userToken, stage, metadata, alternatives, permissions)
+          .retrieveInstances(ids, request.userToken, stage, metadata, returnAlternatives, returnPermissions)
           .flatMap {
             case Right(instancesResult) =>
               val instances = InstanceHelper.extractDataAsList(instancesResult)

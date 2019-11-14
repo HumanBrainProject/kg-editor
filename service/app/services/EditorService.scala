@@ -53,10 +53,10 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     id: String,
     token: AccessToken,
     metadata: Boolean,
-    permissions: Boolean
+    returnPermissions: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstance(wSClient, config.kgCoreEndpoint, id, token, metadata, permissions)
+      .getInstance(wSClient, config.kgCoreEndpoint, id, token, metadata, returnPermissions)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -551,11 +551,20 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken,
     stage: String,
     metadata: Boolean,
-    alternatives: Boolean,
-    permissions: Boolean
+    returnAlternatives: Boolean,
+    returnPermissions: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstances(wSClient, config.kgCoreEndpoint, token, instanceIds, stage, metadata, alternatives, permissions)
+      .getInstances(
+        wSClient,
+        config.kgCoreEndpoint,
+        token,
+        instanceIds,
+        stage,
+        metadata,
+        returnAlternatives,
+        returnPermissions
+      )
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))

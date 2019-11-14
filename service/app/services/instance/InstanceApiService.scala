@@ -60,8 +60,8 @@ trait InstanceApiService {
     instanceIds: List[String],
     stage: String,
     metadata: Boolean,
-    alternatives: Boolean,
-    permissions: Boolean,
+    returnAlternatives: Boolean,
+    returnPermissions: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds)
@@ -69,10 +69,10 @@ trait InstanceApiService {
       .url(s"${apiBaseEndpoint}/instancesByIds")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
       .addQueryStringParameters(
-        "stage"        -> stage,
-        "metadata"     -> metadata.toString,
-        "alternatives" -> alternatives.toString,
-        "permissions"  -> metadata.toString
+        "stage"              -> stage,
+        "metadata"           -> metadata.toString,
+        "returnAlternatives" -> returnAlternatives.toString,
+        "returnPermissions"  -> returnPermissions.toString
       )
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
@@ -344,16 +344,16 @@ trait InstanceApiService {
     id: String,
     token: AccessToken,
     metadata: Boolean,
-    permissions: Boolean,
+    returnPermissions: Boolean,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/instances/${id}")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
       .addQueryStringParameters(
-        "stage"       -> "LIVE",
-        "metadata"    -> metadata.toString,
-        "permissions" -> permissions.toString
+        "stage"             -> "LIVE",
+        "metadata"          -> metadata.toString,
+        "returnPermissions" -> returnPermissions.toString
       )
     val r = Task.deferFuture(q.get())
     r.map { res =>

@@ -14,7 +14,7 @@
 #    required: false
 #    type: string
 ###
-GET    /:id                  controllers.EditorController.getInstance(id: String, metadata:Boolean?=false, permissions:Boolean?=false)
+GET    /:id                  controllers.EditorController.getInstance(id: String, metadata:Boolean?=false, returnPermissions:Boolean?=false)
 
 ###
 #  summary: get a list of entities

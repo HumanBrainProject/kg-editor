@@ -11,9 +11,9 @@ class Instance {
   @observable id = null;
   @observable types = [];
   @observable isNew = false;
-  @observable name = "";
   @observable fields = {};
   @observable alternatives = {};
+  @observable labelField = null;
   @observable promotedFields = [];
   @observable primaryType = {name: "", color: "", label: ""};
   @observable workspace = "";
@@ -59,11 +59,6 @@ class Instance {
   @action setFieldAsNull(id) {
     !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
     this.hasChanged = true;
-  }
-
-  @computed
-  get labelField() { //TODO: or not
-    return (this.isFetched && this.data && this.data.ui_info)?this.data.ui_info.labelField:null;
   }
 
   @computed
@@ -139,9 +134,9 @@ class Instance {
     const normalizedData =  normalizeInstanceData(data);
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;
-    this.name = normalizedData.name;
     this.isNew = isNew;
     this.fields = normalizedData.fields;
+    this.labelField = normalizedData.labelField;
     this.primaryType = normalizedData.primaryType;
     this.promotedFields = normalizedData.promotedFields;
     this.alternatives = normalizedData.alternatives;
@@ -384,14 +379,17 @@ class InstanceStore {
       workspace: workspace,
       id: id,
       types: [instanceType],
-      name: name,
       fields: toJS(fields),
       primaryType: instanceType,
+      labelField: (Array.isArray(type.labelField) && type.labelField.length)?type.labelField[0]:null,
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},
       permissions: {}
     };
+    if (name && data.labelField && data.fields && data.fields[data.labelField]) {
+      data.fields[data.labelField].value = name;
+    }
     const instance  = new Instance(id, this);
     instance.initializeData(data, false, true);
     this.instances.set(id, instance);

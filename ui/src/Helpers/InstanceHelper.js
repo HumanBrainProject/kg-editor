@@ -1,5 +1,5 @@
 export const normalizeInstanceData = (data, transformField=null) => {
-  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: {}, promotedFields: [], alternatives: [], metadata: {}, permissions: {}};
+  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: {}, labelField: null, promotedFields: [], alternatives: [], metadata: {}, permissions: {}};
   if (!data) {
     return instance;
   }
@@ -17,6 +17,9 @@ export const normalizeInstanceData = (data, transformField=null) => {
   }
   if (data.name) {
     instance.name = data.name;
+  }
+  if (data.labelField) {
+    instance.labelField = data.labelField;
   }
   if (data.promotedFields instanceof Array) {
     instance.promotedFields = data.promotedFields;

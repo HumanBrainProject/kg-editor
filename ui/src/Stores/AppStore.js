@@ -150,8 +150,8 @@ class AppStore{
   async getInitialInstanceWorkspace(instanceId){
     this.initializingMessage = `Retrieving instance "${instanceId}"...`;
     try{
-      const response = await API.axios.post(API.endpoints.instancesList("LIVE"), [instanceId]);
-      const data = find(response.data.data, item => item.id === instanceId);
+      const response = await API.axios.get(API.endpoints.getInstance(instanceId));
+      const data = response.data && response.data.data;
       if(data){
         if(data.workspace){
           return data.workspace;
@@ -330,15 +330,19 @@ class AppStore{
       error: null
     });
     try{
-      const { data } = await API.axios.get(API.endpoints.resolvedId(instanceId));
+      const { data } = await API.axios.get(API.endpoints.getInstance(instanceId));
       runInAction(() => {
-        const resolvedId = (data && data.data && data.data.uuid)?data.data.uuid:instanceId;
+        const resolvedId = (data && data.data && data.data.id)?data.data.id:instanceId;
         this.instanceIdAvailability.delete(instanceId);
         routerStore.history.replace(`/instance/edit/${resolvedId}`);
       });
     } catch(e){
       runInAction(() => {
         const status =  this.instanceIdAvailability.get(instanceId);
+        //TODO: remove the 2 following lines and uncomment when backend is fixed
+        status.isAvailable = true;
+        status.isChecking = false;
+        /*
         if (e.response && e.response.status === 404) {
           status.isAvailable = true;
           status.isChecking = false;
@@ -346,12 +350,12 @@ class AppStore{
           const message = e.message?e.message:e;
           const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
           status.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
-          status.isChecking = false;
           status.isAvailable = false;
+          status.isChecking = false;
         }
+        */
       });
     }
-
   }
 
   @action
@@ -501,7 +505,7 @@ class AppStore{
     let instanceToCopy = instanceStore.instances.get(fromInstanceId);
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
-    const labelField = instanceToCopy.data && instanceToCopy.data.ui_info && instanceToCopy.data.ui_info.labelField;
+    const labelField = instanceToCopy.labelField;
     if(labelField) {
       values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
     }

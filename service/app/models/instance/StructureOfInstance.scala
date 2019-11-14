@@ -32,7 +32,7 @@ final case class StructureOfInstance(
     }
     StructureOfInstance(
       types.updated(typeInfo.name, InstanceType(typeInfo.name, typeInfo.label, typeInfo.color)),
-      labelField :+ typeInfo.labelField,
+      (labelField ::: typeInfo.labelField).distinct,
       (promotedFields ::: pf).distinct,
       f
     )

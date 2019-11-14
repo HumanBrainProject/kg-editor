@@ -23,7 +23,7 @@ final case class InstanceSummaryView(
   id: String,
   workspace: String,
   types: List[InstanceType],
-  name: Option[String],
+  name: String,
   fields: Map[String, Field],
   permissions: List[String]
 ) extends Instance
@@ -47,7 +47,7 @@ object InstanceSummaryView {
             instanceId,
             InstanceHelper.getWorkspace(data),
             structure.types.values.toList,
-            InstanceHelper.getName(data, structure.labelField.headOption),
+            InstanceHelper.getName(data, structure.labelField),
             InstanceHelper.getFields(data, filteredFields),
             InstanceHelper.getPermissions(data)
           )

@@ -19,7 +19,7 @@ package models.instance
 import helpers.InstanceHelper
 import play.api.libs.json.{JsObject, Json}
 
-final case class InstanceLabelView(id: String, workspace: String, types: List[InstanceType], name: Option[String])
+final case class InstanceLabelView(id: String, workspace: String, types: List[InstanceType], name: String)
     extends Instance
 
 object InstanceLabelView {
@@ -37,7 +37,7 @@ object InstanceLabelView {
             instanceId,
             InstanceHelper.getWorkspace(data),
             structure.types.values.toList,
-            InstanceHelper.getName(data, structure.labelField.headOption)
+            InstanceHelper.getName(data, structure.labelField)
           )
         )
       case _ => None

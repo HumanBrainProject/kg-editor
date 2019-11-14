@@ -26,7 +26,7 @@ final case class StructureOfType(
   name: String,
   label: String,
   color: Option[String],
-  labelField: String,
+  labelField: List[String],
   fields: Map[String, StructureOfField],
   promotedFields: List[String]
 )
@@ -37,7 +37,7 @@ object StructureOfType {
     name: String,
     label: String,
     color: Option[String],
-    labelField: String,
+    labelField: List[String],
     fields: Map[String, StructureOfField]
   ): StructureOfType =
     StructureOfType(name, label, color, labelField, fields, InstanceHelper.getPromotedFields(fields))
@@ -57,11 +57,11 @@ object StructureOfType {
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.METAEBRAINSCOLOR).readNullable[String] and
-    (JsPath \ EditorConstants.METAEBRAINSLABELFIELD)
-      .readNullable[Map[String, String]]
+    (JsPath \ EditorConstants.METAEBRAINSLABELFIELDS)
+      .readNullable[List[String]]
       .map {
-        case Some(v) => v.getOrElse("@id", "").toString
-        case _       => ""
+        case Some(v) => v
+        case _       => List()
       } and
     (JsPath \ EditorConstants.METAEBRAINSPROPERTIES)
       .read[List[StructureOfField]]

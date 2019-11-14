@@ -144,10 +144,18 @@ object InstanceHelper {
       case None => None
     }
 
-  def getName(data: JsObject, name: Option[String]): Option[String] =
-    name match {
-      case Some(n) => (data \ n).asOpt[String]
-      case _       => None
+  def getName(data: JsObject, names: List[String]): String =
+    names.foldLeft("") {
+      case (acc, name) => {
+        if (acc.isEmpty) {
+          (data \ name).asOpt[String] match {
+            case Some(value) => value
+            case _           => acc
+          }
+        } else {
+          acc
+        }
+      }
     }
 
   def filterStructureOfFields(

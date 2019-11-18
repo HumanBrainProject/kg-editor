@@ -45,7 +45,7 @@ object StructureOfField {
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ "canBe").readNullable[List[String]] and
     (JsPath \ EditorConstants.VOCABMETAEBRAINSOCCURENCES).readNullable[Int] and
-    (JsPath \ EditorConstants.METAEBRAINSWIDGET)
+    (JsPath \ EditorConstants.VOCABEBRAINSWIDGET)
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
     (JsPath \ EditorConstants.METAEBRAINSSEARCHABLE).readNullable[Boolean]
   )(StructureOfField.apply _)

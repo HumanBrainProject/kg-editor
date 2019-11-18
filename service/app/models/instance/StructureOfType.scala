@@ -50,13 +50,14 @@ object StructureOfType {
     s"${SchemaFieldsConstants.IDENTIFIER}",
     s"${EditorConstants.VOCABEBRAINSALTERNATIVES}",
     s"${EditorConstants.VOCABEBRAINSUSER}",
-    s"${EditorConstants.VOCABEBRAINSSPACES}"
+    s"${EditorConstants.VOCABEBRAINSSPACES}",
+    s"${EditorConstants.VOCABEBRAINSFIELDUPDATES}"
   )
 
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ EditorConstants.METAEBRAINSCOLOR).readNullable[String] and
+    (JsPath \ EditorConstants.VOCABEBRAINSCOLOR).readNullable[String] and
     (JsPath \ EditorConstants.METAEBRAINSLABELFIELDS)
       .readNullable[List[String]]
       .map {

@@ -171,7 +171,7 @@ class EditorController @Inject()(
                 .map {
                   case Right(typesWithFields) =>
                     implicit val writer = InstanceProtocol.instanceWrites
-                    (typesWithFields \ "data").asOpt[List[StructureOfType]] match {
+                    extractTypeList(typesWithFields) match {
                       case Some(typeInfoList) =>
                         Ok(
                           Json.toJson(
@@ -185,7 +185,6 @@ class EditorController @Inject()(
                         )
                       case _ => InternalServerError("Something went wrong with types list! Please try again!")
                     }
-
                   case _ => InternalServerError("Something went wrong with types! Please try again!")
                 }
             case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
@@ -538,7 +537,7 @@ class EditorController @Inject()(
           .map {
             case Right(typesWithFields) =>
               implicit val writer = InstanceProtocol.instanceWrites
-              (typesWithFields \ "data").asOpt[List[StructureOfType]] match {
+              extractTypeList(typesWithFields) match {
                 case Some(typeInfoList) =>
                   val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
                   val instanceRes = InstanceHelper.getInstanceView(instance, typeInfoMap)
@@ -556,4 +555,19 @@ class EditorController @Inject()(
         Task.pure(InternalServerError("Something went wrong while extracting the types! Please try again!"))
     }
   }
+
+  private def extractTypeList(typesWithFields: JsObject): Option[List[StructureOfType]] =
+    (typesWithFields \ "data")
+      .asOpt[Map[String, JsObject]] match {
+      case Some(value) =>
+        val l = value.foldLeft(List[StructureOfType]()) {
+          case (acc, (id, value)) =>
+            (value \ "data").asOpt[StructureOfType] match {
+              case Some(v) => acc :+ v
+              case _       => acc
+            }
+        }
+        Some(l)
+      case _ => None
+    }
 }

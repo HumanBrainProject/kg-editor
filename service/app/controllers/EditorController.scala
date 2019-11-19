@@ -191,6 +191,45 @@ class EditorController @Inject()(
       case None => Task.pure(BadRequest("Wrong body content!"))
     }
 
+  def searchInstancesSummary(
+    typeId: String,
+    from: Option[Int],
+    size: Option[Int],
+    searchByLabel: String
+  ): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      editorService
+        .doSearchInstances(typeId, from, size, searchByLabel, request.userToken)
+        .flatMap {
+          case Right(instancesResult) =>
+            (instancesResult \ "data").asOpt[List[JsObject]] match {
+              case Some(coreInstancesList) =>
+                val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstancesList(coreInstancesList)
+                editorService
+                  .retrieveTypesList(typesToRetrieve, request.userToken)
+                  .map {
+                    case Right(typesWithFields) =>
+                      implicit val writer = InstanceProtocol.instanceWrites
+                      val typeInfoList = extractTypeList(typesWithFields)
+                      Ok(
+                        Json.toJson(
+                          EditorResponseObject(
+                            Json.toJson(
+                              InstanceHelper
+                                .generateInstancesSummaryView(coreInstancesList, typeInfoList)
+                            )
+                          )
+                        )
+                      )
+                    case _ => InternalServerError("Something went wrong with types! Please try again!")
+                  }
+              case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
+            }
+          case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
+        }
+        .runToFuture
+    }
+
   def filterBookmarkInstances(
     bookmarkId: String,
     workspace: String,
@@ -201,23 +240,6 @@ class EditorController @Inject()(
     authenticatedUserAction.async { implicit request =>
       editorService
         .getBookmarkInstances(bookmarkId, workspace, from, size, search, request.userToken)
-        .map {
-          case Right(value) => Ok(value)
-          case Left(error)  => error.toResult
-        }
-        .runToFuture
-    }
-
-  def searchInstances(
-    workspace: String,
-    typeId: Option[String],
-    from: Option[Int],
-    size: Option[Int],
-    search: String
-  ): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      editorService
-        .doSearchInstances(workspace, typeId, from, size, search, request.userToken)
         .map {
           case Right(value) => Ok(value)
           case Left(error)  => error.toResult

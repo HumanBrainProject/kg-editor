@@ -73,5 +73,8 @@ object InstanceSummaryView {
       case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }
 
+  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): InstanceSummaryView =
+    generateInstanceView("", data, typeInfoMap)
+
   implicit val instanceSummaryViewWrites = Json.writes[InstanceSummaryView]
 }

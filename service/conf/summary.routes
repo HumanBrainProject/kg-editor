@@ -1,0 +1,21 @@
+###
+  #  summary: get a summary list of entities - paginated - filterable
+  #  tags:
+  #    - editor
+  #  parameters:
+  #  - name: stage
+  #    in: path
+  #    description: the stage
+  #    required: false
+  #    type: string
+  #  - in: body
+  #    description: A list of IDs
+  #    required: true
+  #    type: array
+  #  - in: header
+  #    name: Authorization
+  #    description: Authorization token
+  #    required: false
+  #    type: string
+  ###
+  GET    /                 controllers.EditorController.searchInstancesSummary(`type`:String, from:Option[Int], size:Option[Int], searchByLabel:String?="")

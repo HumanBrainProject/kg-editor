@@ -44,35 +44,3 @@ GET /:workspace/bookmarks                                                 contro
 #      type: string
 ###
 GET /:workspace/bookmarks/:bookmarkId/instances/summary                                                 controllers.EditorController.filterBookmarkInstances(workspace: String, bookmarkId: String, from:Option[Int], size:Option[Int], search:String?="")
-
-###
-#tags:
-#  - editor
-#summary: Returns the instances - paginated - filterable
-#parameters:
-#  - in: header
-#    name: Authorization
-#    description: Authorization token
-#    required: false
-#    type: string
-#  - name: from
-#    in: path
-#    description: the offset of the pagination
-#    required: false
-#    type: int
-#  - name: size
-#    in: path
-#    description: the size of the page
-#    required: false
-#    type: int
-#  - name: search
-#    in: path
-#    description: the search query only applied for the name of the instance
-#    required: false
-#    type: string
-#    responses:
-#      '200':
-#        description: Ok
-###
-GET    /:workspace/instances/summary                 controllers.EditorController.searchInstances(workspace: String, `type`:Option[String], from:Option[Int], size:Option[Int], search:String?="")
-

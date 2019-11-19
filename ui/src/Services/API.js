@@ -17,7 +17,7 @@ const endpoints = {
   "instancesSummary": (stage=null) => `/editor/api/instances/summary${stage?`?stage=${stage}`:"" }`,
   "instancesLabel": (stage=null) => `/editor/api/instances/label${stage?`?stage=${stage}`:"" }`,
   "filterBookmarkInstances": (id, from, size, search) => `/editor/api/instances/filter?bookmarkId=${id}&from=${from}&size=${size}&search=${search}`,
-  "searchInstances": (id, from, size, search) => `/editor/api/workspaces/${appStore.currentWorkspace}/instances/summary?type=${encodeURIComponent(id)}&from=${from}&size=${size}&search=${search}`,
+  "searchInstances": (type, from, size, searchByLabel) => `/editor/api/summary?type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${searchByLabel}`,
   "suggestions": (entity, field, type, start, size, search) => `/editor/api/suggestions/${entity}/fields?field=${encodeURIComponent(field)}&fieldType=${encodeURIComponent(type)}&start=${start}&size=${size}&search=${search}`,
   "instance": id => `/editor/api/instances/${id}`,
   "createInstance": (id=null) => `/editor/api/instances/${id?("/" + id):""}?workspace=${appStore.currentWorkspace}`,

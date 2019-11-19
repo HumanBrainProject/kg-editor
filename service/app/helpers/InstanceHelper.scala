@@ -47,6 +47,15 @@ object InstanceHelper {
         }
     }
 
+  def extractTypesFromCoreInstancesList(list: List[JsObject]): List[String] =
+    list.foldLeft(List[String]()) {
+      case (acc, data) =>
+        (data \ "@type").asOpt[List[String]] match {
+          case Some(values) => (acc ::: values).distinct
+          case _            => acc
+        }
+    }
+
   def toCoreData(data: JsObject): Map[String, CoreData] =
     (data \ "data")
       .asOpt[Map[String, JsObject]] match {
@@ -209,6 +218,16 @@ object InstanceHelper {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     coreInstances.foldLeft(Map[String, Instance]()) {
       case (map, (id, coreInstance)) => map.updated(id, generateInstanceView(id, coreInstance, typeInfoMap))
+    }
+  }
+
+  def generateInstancesSummaryView(
+    coreInstancesList: List[JsObject],
+    typeInfoList: List[StructureOfType]
+  ): List[Instance] = {
+    val typeInfoMap = getTypeInfoMap(typeInfoList)
+    coreInstancesList.foldLeft(List[Instance]()) {
+      case (acc, data) => acc :+ InstanceSummaryView(data, typeInfoMap)
     }
   }
 }

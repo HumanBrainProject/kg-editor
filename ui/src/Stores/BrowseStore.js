@@ -50,7 +50,8 @@ class BrowseStore{
   pageStart = 0;
   pageSize = 20;
 
-  @action selectItem(item){
+  @action
+  selectItem(item){
     this.instancesFilter = "";
     this.selectedItem = item;
     this.fetchInstances();
@@ -119,7 +120,7 @@ class BrowseStore{
       }
     } else {
       try {
-        const { data } = await API.axios.get(API.endpoints.searchInstances(this.selectedItem.type, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
+        const { data } = await API.axios.get(API.endpoints.searchInstances(this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
         runInAction(() => {
           this.isFetching.instances = false;
           const instances = normalizeInstancesData(data);

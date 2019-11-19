@@ -200,30 +200,17 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
       }
 
   def doSearchInstances(
-    workspace: String,
-    typeId: Option[String],
+    typeId: String,
     from: Option[Int],
     size: Option[Int],
-    search: String,
+    searchByLabel: String,
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] =
-    queryService
-      .getQueryResults(
-        wSClient,
-        config.kgCoreEndpoint,
-        QuerySpec(
-          Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
-          Option("searchInstances")
-        ),
-        workspace,
-        token,
-        QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
-      )
-      .map { res =>
-        res.status match {
-          case OK => Right(res.json.as[JsObject])
-          case _  => Left(APIEditorError(res.status, res.body))
-        }
+    instanceApiService
+      .searchInstances(wSClient, config.kgCoreEndpoint, from, size, typeId, searchByLabel, token)
+      .map {
+        case Right(res) => Right(res)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
 
   def getInstanceScope(

@@ -83,6 +83,34 @@ trait InstanceApiService {
     }
   }
 
+  def searchInstances(
+    wsClient: WSClient,
+    apiBaseEndpoint: String,
+    from: Option[Int],
+    size: Option[Int],
+    typeId: String,
+    searchByLabel: String,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]] = {
+    val q = wsClient
+      .url(s"${apiBaseEndpoint}/instances")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .addQueryStringParameters(
+        "stage"             -> "LIVE",
+        "returnPermissions" -> "true",
+        "type"              -> typeId,
+        "searchByLabel"     -> searchByLabel
+      )
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
+
   def getInstancesByType(
     wsClient: WSClient,
     apiBaseEndpoint: String,

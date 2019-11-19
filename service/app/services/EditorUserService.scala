@@ -78,7 +78,7 @@ class EditorUserService @Inject()(
 
   def getUserProfile(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val q = wSClient
-      .url("http://localhost:10130/users/me") //TODO: remove hardcoded host
+      .url(s"${config.kgCoreEndpoint}/users/me")
       .withHttpHeaders(AUTHORIZATION -> token.token)
     val r = Task.deferFuture(q.get())
     r.map { res =>

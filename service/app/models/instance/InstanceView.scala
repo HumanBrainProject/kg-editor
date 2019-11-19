@@ -16,47 +16,60 @@
 
 package models.instance
 
+import constants.EditorConstants
 import helpers.InstanceHelper
+import models.errors.CoreDataError
 import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.http.Status._
 
 final case class InstanceView(
   id: String,
-  workspace: String,
+  workspace: Option[String],
   types: List[InstanceType],
   promotedFields: Option[List[String]],
   labelField: Option[String],
   fields: Map[String, Field],
   permissions: List[String],
   alternatives: Map[String, JsValue],
-  user: Option[String]
+  user: Option[String],
+  error: Option[CoreDataError]
 ) extends Instance
 
 object InstanceView {
 
-  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[InstanceView] = {
+  def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType]): InstanceView = {
     val res = for {
-      id    <- InstanceHelper.getId(data)
-      types <- InstanceHelper.getTypes(data)
-    } yield (id, types)
+      resolvedId <- InstanceHelper.getId(data)
+      types      <- InstanceHelper.getTypes(data)
+    } yield (resolvedId, types)
     res match {
       case Some((instanceId, instanceTypes)) =>
         val structure = StructureOfInstance(instanceTypes, typeInfoMap)
-        Some(
-          InstanceView(
-            instanceId,
-            InstanceHelper.getWorkspace(data),
-            structure.types.values.toList,
-            InstanceHelper.toOptionalList(structure.promotedFields),
-            structure.labelField.headOption,
-            InstanceHelper.getFields(data, structure.fields),
-            InstanceHelper.getPermissions(data),
-            InstanceHelper.getAlternatives(data),
-            InstanceHelper.getUser(data)
-          )
+        InstanceView(
+          instanceId,
+          (data \ EditorConstants.VOCABEBRAINSSPACES).asOpt[String],
+          structure.types.values.toList,
+          InstanceHelper.toOptionalList(structure.promotedFields),
+          structure.labelField.headOption,
+          InstanceHelper.getFields(data, structure.fields),
+          InstanceHelper.getPermissions(data),
+          InstanceHelper.getAlternatives(data),
+          InstanceHelper.getUser(data),
+          None
         )
-      case _ => None
+      case _ => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }
   }
+
+  def generateInstanceError(id: String, error: CoreDataError): InstanceView =
+    InstanceView(id, None, List(), None, None, Map(), List(), Map(), None, Some(error))
+
+  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceView =
+    coreInstance match {
+      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap)
+      case CoreData(_, Some(error))   => generateInstanceError(id, error)
+      case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
+    }
 
   implicit val instanceViewWrites = Json.writes[InstanceView]
 }

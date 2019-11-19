@@ -20,6 +20,7 @@ import constants.EditorConstants
 import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
 import models.instance.{
+  CoreData,
   Field,
   Instance,
   InstanceLabelView,
@@ -33,17 +34,28 @@ import play.api.mvc.AnyContent
 
 object InstanceHelper {
 
-  def toTypeList(data: JsObject): List[String] =
-    (data \ "data").asOpt[JsObject] match {
-      case Some(instancesData) =>
-        instancesData.as[Map[String, JsObject]].foldLeft(List[String]()) {
-          case (acc, (id, instanceData)) =>
-            (instanceData \ "@type").asOpt[List[String]] match {
+  def extractTypesFromCoreInstances(coreInstances: Map[String, CoreData]): List[String] =
+    coreInstances.foldLeft(List[String]()) {
+      case (acc, (_, coreInstance)) =>
+        coreInstance.data match {
+          case Some(d) =>
+            (d \ "@type").asOpt[List[String]] match {
               case Some(values) => (acc ::: values).distinct
               case _            => acc
             }
+          case _ => acc
         }
-      case _ => List()
+    }
+
+  def toCoreData(data: JsObject): Map[String, CoreData] =
+    (data \ "data")
+      .asOpt[Map[String, JsObject]] match {
+      case Some(value) =>
+        value.foldLeft(Map[String, CoreData]()) {
+          case (map, (id, value)) =>
+            map.updated(id, value.as[CoreData])
+        }
+      case _ => Map()
     }
 
   def toOptionalList[T](list: List[T]): Option[List[T]] =
@@ -85,10 +97,10 @@ object InstanceHelper {
       case None    => None
     }
 
-  def getWorkspace(data: JsObject): String =
-    (data \ EditorConstants.VOCABEBRAINSSPACES).asOpt[String] match {
-      case Some(i) => i
-      case None    => ""
+  def getTypes(coreInstance: CoreData): Option[List[String]] =
+    coreInstance match {
+      case CoreData(Some(data), None) => getTypes(data)
+      case _                          => None
     }
 
   def getTypes(data: JsObject): Option[List[String]] =
@@ -180,28 +192,23 @@ object InstanceHelper {
   def normalizeIdOfArray(fieldArray: ListOfLinks): ListOfLinks =
     fieldArray.map(field => normalizeIdOfField(field))
 
-  def getInstanceView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
-    InstanceView(data, typeInfoMap)
+  def getInstanceView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType]): Instance =
+    InstanceView(id, data, typeInfoMap)
 
-  def getInstanceSummaryView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
-    InstanceSummaryView(data, typeInfoMap)
+  def getInstanceSummaryView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType]): Instance =
+    InstanceSummaryView(id, data, typeInfoMap)
 
-  def getInstanceLabelView(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[Instance] =
-    InstanceLabelView(data, typeInfoMap)
+  def getInstanceLabelView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType]): Instance =
+    InstanceLabelView(id, data, typeInfoMap)
 
   def generateInstancesView(
-    data: JsObject,
+    coreInstances: Map[String, CoreData],
     typeInfoList: List[StructureOfType],
-    generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
-  ): Map[String, Option[Instance]] = {
+    generateInstanceView: (String, CoreData, Map[String, StructureOfType]) => Instance
+  ): Map[String, Instance] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
-    (data \ "data").asOpt[JsObject] match {
-      case Some(instancesData) =>
-        instancesData.as[Map[String, JsObject]].foldLeft(Map[String, Option[Instance]]()) {
-          case (map, (id, instanceData)) =>
-            map.updated(id, generateInstanceView(instanceData, typeInfoMap))
-        }
-      case _ => Map()
+    coreInstances.foldLeft(Map[String, Instance]()) {
+      case (map, (id, coreInstance)) => map.updated(id, generateInstanceView(id, coreInstance, typeInfoMap))
     }
   }
 }

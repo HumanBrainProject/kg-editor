@@ -16,33 +16,50 @@
 
 package models.instance
 
+import constants.EditorConstants
 import helpers.InstanceHelper
+import models.errors.CoreDataError
+import play.api.http.Status.NOT_IMPLEMENTED
 import play.api.libs.json.{JsObject, Json}
 
-final case class InstanceLabelView(id: String, workspace: String, types: List[InstanceType], name: String)
-    extends Instance
+final case class InstanceLabelView(
+  id: String,
+  workspace: Option[String],
+  types: List[InstanceType],
+  name: String,
+  error: Option[CoreDataError]
+) extends Instance
 
 object InstanceLabelView {
 
-  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[InstanceLabelView] = {
+  def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType]): InstanceLabelView = {
     val res = for {
-      id    <- InstanceHelper.getId(data)
-      types <- InstanceHelper.getTypes(data)
-    } yield (id, types)
+      resolvedId <- InstanceHelper.getId(data)
+      types      <- InstanceHelper.getTypes(data)
+    } yield (resolvedId, types)
     res match {
       case Some((instanceId, instanceTypes)) =>
         val structure = StructureOfInstance(instanceTypes, typeInfoMap)
-        Some(
-          InstanceLabelView(
-            instanceId,
-            InstanceHelper.getWorkspace(data),
-            structure.types.values.toList,
-            InstanceHelper.getName(data, structure.labelField)
-          )
+        InstanceLabelView(
+          instanceId,
+          (data \ EditorConstants.VOCABEBRAINSSPACES).asOpt[String],
+          structure.types.values.toList,
+          InstanceHelper.getName(data, structure.labelField),
+          None
         )
-      case _ => None
+      case _ => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }
   }
+
+  def generateInstanceError(id: String, error: CoreDataError): InstanceLabelView =
+    InstanceLabelView(id, None, List(), "", Some(error))
+
+  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceLabelView =
+    coreInstance match {
+      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap)
+      case CoreData(_, Some(error))   => generateInstanceError(id, error)
+      case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
+    }
 
   implicit val instanceLabelViewWrites = Json.writes[InstanceLabelView]
 }

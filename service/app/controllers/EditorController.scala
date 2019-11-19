@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
 import models.instance.InstanceProtocol._
 import models._
+import models.instance.InstanceView.{generateInstanceError, generateInstanceView}
 import models.instance._
 import monix.eval.Task
 import play.api.Logger
@@ -53,8 +54,8 @@ class EditorController @Inject()(
         .getInstance(id, request.userToken, metadata, returnPermissions)
         .flatMap {
           case Right(value) =>
-            val instance = (value \ "data").as[JsObject]
-            normalizeInstance(instance, request.userToken)
+            val coreInstance = value.as[CoreData]
+            normalizeInstance(id, coreInstance, request.userToken)
           case _ =>
             Task.pure(InternalServerError("Something went wrong while fetching the instance! Please try again!"))
         }
@@ -157,7 +158,7 @@ class EditorController @Inject()(
     metadata: Boolean,
     returnAlternatives: Boolean,
     returnPermissions: Boolean,
-    generateInstanceView: (JsObject, Map[String, StructureOfType]) => Option[Instance]
+    generateInstanceView: (String, CoreData, Map[String, StructureOfType]) => Instance
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
@@ -165,26 +166,24 @@ class EditorController @Inject()(
           .retrieveInstances(ids, request.userToken, stage, metadata, returnAlternatives, returnPermissions)
           .flatMap {
             case Right(instancesResult) =>
-              val typesToRetrieve = InstanceHelper.toTypeList(instancesResult)
+              val coreInstances = InstanceHelper.toCoreData(instancesResult)
+              val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstances(coreInstances)
               editorService
                 .retrieveTypesList(typesToRetrieve, request.userToken)
                 .map {
                   case Right(typesWithFields) =>
                     implicit val writer = InstanceProtocol.instanceWrites
-                    extractTypeList(typesWithFields) match {
-                      case Some(typeInfoList) =>
-                        Ok(
+                    val typeInfoList = extractTypeList(typesWithFields)
+                    Ok(
+                      Json.toJson(
+                        EditorResponseObject(
                           Json.toJson(
-                            EditorResponseObject(
-                              Json.toJson(
-                                InstanceHelper
-                                  .generateInstancesView(instancesResult, typeInfoList, generateInstanceView)
-                              )
-                            )
+                            InstanceHelper
+                              .generateInstancesView(coreInstances, typeInfoList, generateInstanceView)
                           )
                         )
-                      case _ => InternalServerError("Something went wrong with types list! Please try again!")
-                    }
+                      )
+                    )
                   case _ => InternalServerError("Something went wrong with types! Please try again!")
                 }
             case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
@@ -481,8 +480,8 @@ class EditorController @Inject()(
               .updateInstanceNew(id, body.as[JsObject], request.userToken)
               .flatMap {
                 case Right(value) =>
-                  val instance = (value \ "data").as[JsObject]
-                  normalizeInstance(instance, request.userToken)
+                  val coreInstance = value.as[CoreData]
+                  normalizeInstance(id, coreInstance, request.userToken)
                 case _ =>
                   Task.pure(
                     InternalServerError("Something went wrong with the update of the instance! Please try again!")
@@ -517,8 +516,11 @@ class EditorController @Inject()(
           .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken)
           .flatMap {
             case Right(value) =>
-              val instance = (value \ "data").as[JsObject]
-              normalizeInstance(instance, request.userToken)
+              val instance = value.as[CoreData]
+              id match {
+                case Some(i) => normalizeInstance(i, instance, request.userToken)
+                case None    => normalizeInstance("", instance, request.userToken)
+              }
             case _ =>
               Task.pure(
                 InternalServerError("Something went wrong with the insertion of the instance! Please try again!")
@@ -528,8 +530,8 @@ class EditorController @Inject()(
     }
   }
 
-  private def normalizeInstance(instance: JsObject, token: AccessToken): Task[Result] = {
-    val typesToRetrieve = InstanceHelper.getTypes(instance)
+  private def normalizeInstance(id: String, coreInstance: CoreData, token: AccessToken): Task[Result] = {
+    val typesToRetrieve = InstanceHelper.getTypes(coreInstance)
     typesToRetrieve match {
       case Some(t) =>
         editorService
@@ -537,18 +539,10 @@ class EditorController @Inject()(
           .map {
             case Right(typesWithFields) =>
               implicit val writer = InstanceProtocol.instanceWrites
-              extractTypeList(typesWithFields) match {
-                case Some(typeInfoList) =>
-                  val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
-                  val instanceRes = InstanceHelper.getInstanceView(instance, typeInfoMap)
-                  instanceRes match {
-                    case Some(r) =>
-                      Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
-                    case _ =>
-                      InternalServerError("Something went wrong retrieving the instance! Please try again!")
-                  }
-                case _ => InternalServerError("Something went wrong with types list! Please try again!")
-              }
+              val typeInfoList = extractTypeList(typesWithFields)
+              val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
+              val instanceView = InstanceHelper.getInstanceView(id, coreInstance, typeInfoMap)
+              Ok(Json.toJson(EditorResponseObject(Json.toJson(instanceView))))
             case _ => InternalServerError("Something went wrong with types! Please try again!")
           }
       case _ =>
@@ -556,18 +550,18 @@ class EditorController @Inject()(
     }
   }
 
-  private def extractTypeList(typesWithFields: JsObject): Option[List[StructureOfType]] =
-    (typesWithFields \ "data")
-      .asOpt[Map[String, JsObject]] match {
-      case Some(value) =>
-        val l = value.foldLeft(List[StructureOfType]()) {
-          case (acc, (id, value)) =>
-            (value \ "data").asOpt[StructureOfType] match {
-              case Some(v) => acc :+ v
-              case _       => acc
-            }
-        }
-        Some(l)
-      case _ => None
-    }
+  private def extractTypeList(typesWithFields: JsObject): List[StructureOfType] =
+    InstanceHelper
+      .toCoreData(typesWithFields)
+      .foldLeft(List[StructureOfType]()) {
+        case (acc, (id, data)) =>
+          data.data match {
+            case Some(d) =>
+              d.asOpt[StructureOfType] match {
+                case Some(t) => acc :+ t
+                case _       => acc
+              }
+            case _ => acc
+          }
+      }
 }

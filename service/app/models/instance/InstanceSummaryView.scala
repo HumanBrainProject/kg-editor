@@ -16,45 +16,62 @@
 
 package models.instance
 
+import constants.EditorConstants
 import helpers.InstanceHelper
+import models.errors.CoreDataError
+import play.api.http.Status.NOT_IMPLEMENTED
 import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceSummaryView(
   id: String,
-  workspace: String,
+  workspace: Option[String],
   types: List[InstanceType],
   name: String,
   fields: Map[String, Field],
-  permissions: List[String]
+  permissions: List[String],
+  error: Option[CoreDataError]
 ) extends Instance
 
 object InstanceSummaryView {
 
   implicit val fieldWriter = Field.fieldWrites
 
-  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): Option[InstanceSummaryView] = {
+  def generateInstanceView(
+    id: String,
+    data: JsObject,
+    typeInfoMap: Map[String, StructureOfType]
+  ): InstanceSummaryView = {
     val res = for {
-      id    <- InstanceHelper.getId(data)
-      types <- InstanceHelper.getTypes(data)
-    } yield (id, types)
+      resolvedId <- InstanceHelper.getId(data)
+      types      <- InstanceHelper.getTypes(data)
+    } yield (resolvedId, types)
     res match {
       case Some((instanceId, instanceTypes)) =>
         val structure = StructureOfInstance(instanceTypes, typeInfoMap)
         val filteredPromotedFieldsList = InstanceHelper.filterFieldNames(structure.promotedFields, structure.labelField)
         val filteredFields = InstanceHelper.filterStructureOfFields(structure.fields, filteredPromotedFieldsList)
-        Some(
-          InstanceSummaryView(
-            instanceId,
-            InstanceHelper.getWorkspace(data),
-            structure.types.values.toList,
-            InstanceHelper.getName(data, structure.labelField),
-            InstanceHelper.getFields(data, filteredFields),
-            InstanceHelper.getPermissions(data)
-          )
+        InstanceSummaryView(
+          instanceId,
+          (data \ EditorConstants.VOCABEBRAINSSPACES).asOpt[String],
+          structure.types.values.toList,
+          InstanceHelper.getName(data, structure.labelField),
+          InstanceHelper.getFields(data, filteredFields),
+          InstanceHelper.getPermissions(data),
+          None
         )
-      case _ => None
+      case _ => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }
   }
+
+  def generateInstanceError(id: String, error: CoreDataError): InstanceSummaryView =
+    InstanceSummaryView(id, None, List(), "", Map(), List(), Some(error))
+
+  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceSummaryView =
+    coreInstance match {
+      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap)
+      case CoreData(_, Some(error))   => generateInstanceError(id, error)
+      case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
+    }
 
   implicit val instanceSummaryViewWrites = Json.writes[InstanceSummaryView]
 }

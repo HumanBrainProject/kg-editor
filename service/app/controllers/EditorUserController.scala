@@ -19,11 +19,11 @@ package controllers
 import actions.EditorUserAction
 import com.google.inject.Inject
 import constants.{EditorConstants, SchemaFieldsConstants}
+import models._
 import models.editorUserList.BOOKMARKFOLDER
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference
 import models.user.EditorUser
-import models._
 import monix.eval.Task
 import org.joda.time.DateTime
 import play.api.Logger
@@ -34,7 +34,7 @@ import services.bookmark.BookmarkService
 import services.query.QueryService
 import services.specification.FormService
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class EditorUserController @Inject()(
   cc: ControllerComponents,
@@ -53,13 +53,6 @@ class EditorUserController @Inject()(
   object queryService extends QueryService
 
   implicit val s = monix.execution.Scheduler.Implicits.global
-
-  private def getOrCreateUserWithUserFolder(
-    token: AccessToken
-  )(implicit request: UserRequest[AnyContent]): Task[Either[APIEditorError, EditorUser]] =
-    editorUserService.getOrCreateUser(request.user, token) {
-      postCreation
-    }
 
   def postCreation(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] =
     editorUserListService.createBookmarkListFolder(editorUser, "My Bookmarks", token, BOOKMARKFOLDER).flatMap {
@@ -92,18 +85,6 @@ class EditorUserController @Inject()(
       case (Left(err), _)   => err.toResult
     }
     result.runToFuture
-  }
-
-  def getOrCreateCurrentUser(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    (for {
-      token <- oIDCAuthService.getTechAccessToken()
-      u     <- getOrCreateUserWithUserFolder(token)
-    } yield {
-      u match {
-        case Right(editorUser) => Ok(Json.toJson(EditorResponseObject(Json.toJson(editorUser))))
-        case Left(error)       => error.toResult
-      }
-    }).runToFuture
   }
 
   def getBookmarkListFolders: Action[AnyContent] =

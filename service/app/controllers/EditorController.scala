@@ -36,6 +36,7 @@ class EditorController @Inject()(
   cc: ControllerComponents,
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
+  workspaceServiceLive: WorkspaceServiceLive,
   TokenAuthService: TokenAuthService,
   config: ConfigurationServiceLive,
   formService: FormService,
@@ -154,8 +155,8 @@ class EditorController @Inject()(
             case Right(instancesResult) =>
               val coreInstances = InstanceHelper.toCoreData(instancesResult)
               val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstances(coreInstances)
-              editorService
-                .retrieveTypesList(typesToRetrieve, request.userToken)
+              workspaceServiceLive
+                .retrieveTypesListByName(typesToRetrieve, request.userToken)
                 .map {
                   case Right(typesWithFields) =>
                     implicit val writer = InstanceProtocol.instanceWrites
@@ -191,8 +192,8 @@ class EditorController @Inject()(
             (instancesResult \ "data").asOpt[List[JsObject]] match {
               case Some(coreInstancesList) =>
                 val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstancesList(coreInstancesList)
-                editorService
-                  .retrieveTypesList(typesToRetrieve, request.userToken)
+                workspaceServiceLive
+                  .retrieveTypesListByName(typesToRetrieve, request.userToken)
                   .map {
                     case Right(typesWithFields) =>
                       implicit val writer = InstanceProtocol.instanceWrites
@@ -542,8 +543,8 @@ class EditorController @Inject()(
     val typesToRetrieve = InstanceHelper.getTypes(coreInstance)
     typesToRetrieve match {
       case Some(t) =>
-        editorService
-          .retrieveTypesList(t, token)
+        workspaceServiceLive
+          .retrieveTypesListByName(t, token)
           .map {
             case Right(typesWithFields) =>
               implicit val writer = InstanceProtocol.instanceWrites

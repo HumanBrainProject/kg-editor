@@ -26,6 +26,8 @@ import play.api.libs.ws.WSClient
 
 trait WorkspaceService {
 
+  def retrieveTypesListByName(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]]
+
   def retrieveWorkspaceTypes(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]]
 
   def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]]
@@ -39,6 +41,14 @@ class WorkspaceServiceLive @Inject()(
 ) extends WorkspaceService {
 
   val logger = Logger(this.getClass)
+
+  def retrieveTypesListByName(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+    workspaceAPIServiceLive
+      .getTypesByName(wSClient, configuration.kgCoreEndpoint, token, types)
+      .map {
+        case Right(value) => Right(value)
+        case Left(res)    => Left(APIEditorError(res.status, res.body))
+      }
 
   def retrieveWorkspaceTypes(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = workspaceAPIServiceLive

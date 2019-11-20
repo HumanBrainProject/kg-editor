@@ -21,10 +21,18 @@ import models.AccessToken
 import monix.eval.Task
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.OK
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 trait WorkspaceAPIService {
+
+  def getTypesByName(
+    wsClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    types: List[String],
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]]
 
   def getWorkspaceTypes(
     wSClient: WSClient,
@@ -43,6 +51,27 @@ trait WorkspaceAPIService {
 }
 
 class WorkspaceAPIServiceLive extends WorkspaceAPIService {
+
+  def getTypesByName(
+    wsClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    types: List[String],
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]] = {
+    val payload = Json.toJson(types)
+    val q = wsClient
+      .url(s"$apiBaseEndpoint/typesByName")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .addQueryStringParameters("stage" -> "LIVE", "withProperties" -> "true")
+    val r = Task.deferFuture(q.post(payload))
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
 
   def getWorkspaceTypes(
     wSClient: WSClient,

@@ -16,7 +16,6 @@
 
 package services
 
-import cats.implicits._
 import com.google.inject.Inject
 import constants._
 import helpers._
@@ -557,58 +556,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
-      }
-
-  def retrieveTypesList(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]] =
-    instanceApiService
-      .getInstancesByTypeList(wSClient, configuration.kgCoreEndpoint, token, types)
-      .map {
-        case Right(value) => Right(value)
-        case Left(res)    => Left(APIEditorError(res.status, res.body))
-      }
-
-  def retrieveInstancesByIds(
-    instanceIds: List[NexusInstanceReference],
-    token: AccessToken,
-    queryId: String,
-    databaseScope: Option[String] = None
-  ): Task[Either[APIEditorError, Seq[NexusInstance]]] =
-    instanceApiService
-      .getByIdList(
-        wSClient,
-        configuration.kgQueryEndpoint,
-        instanceIds,
-        token,
-        queryId,
-        QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), databaseScope = databaseScope)
-      )
-      .map { res =>
-        res.status match {
-          case OK =>
-            res.json
-              .as[JsArray]
-              .value
-              .toList
-              .map(EditorService.getIdForPayload)
-              .sequence match {
-              case Some(listOfIds) =>
-                Right(listOfIds.map {
-                  case (instance, id) =>
-                    val ref = NexusInstanceReference.fromUrl(id)
-                    NexusInstance(Some(ref.id), ref.nexusPath, instance.as[JsObject])
-                })
-              case None =>
-                Left(
-                  APIEditorError(
-                    INTERNAL_SERVER_ERROR,
-                    s"Was not able to find an id definition of the instance. To make proper use of this endpoint, " +
-                    s"you need either to define ${EditorService.atId}, ${EditorService.relativeURL}, " +
-                    s"${EditorService.editorId} or ${EditorService.simpleId} in your query!"
-                  )
-                )
-            }
-          case _ => Left(APIEditorError(res.status, res.body))
-        }
       }
 
   def deleteInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =

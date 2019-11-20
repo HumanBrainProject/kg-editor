@@ -33,26 +33,6 @@ trait InstanceApiService {
   val instanceReleaseEndpoint = "/api/releases"
   val internalInstanceEndpoint = "/internal/api/instances"
 
-  def getByIdList(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    instanceIds: List[NexusInstanceReference],
-    token: AccessToken,
-    queryId: String,
-    queryApiParameters: QueryApiParameter
-  )(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService): Task[WSResponse] = {
-
-    val payload = Json.toJson(instanceIds.map(i => i.toString)).as[JsArray]
-    val q = wSClient
-      .url(s"$apiBaseEndpoint$instanceEndpoint/${queryId}")
-      .withHttpHeaders(AUTHORIZATION -> token.token)
-      .addQueryStringParameters(queryApiParameters.toParams: _*)
-    token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
-      case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
-    }
-  }
-
   def getInstances(
     wsClient: WSClient,
     apiBaseEndpoint: String,
@@ -124,27 +104,6 @@ trait InstanceApiService {
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
       .addQueryStringParameters("type" -> typeOfInstance, "metadata" -> metadata.toString, "stage" -> "LIVE")
     val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
-      }
-    }
-  }
-
-  def getInstancesByTypeList(
-    wsClient: WSClient,
-    apiBaseEndpoint: String,
-    token: AccessToken,
-    types: List[String],
-    serviceClient: ServiceClient = EditorClient
-  ): Task[Either[WSResponse, JsObject]] = {
-    val payload = Json.toJson(types)
-    val q = wsClient
-      .url(s"$apiBaseEndpoint/typesByName")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
-      .addQueryStringParameters("stage" -> "LIVE", "withProperties" -> "true")
-    val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])

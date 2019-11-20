@@ -23,7 +23,6 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{Action, _}
 import services._
-import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
@@ -31,11 +30,7 @@ import scala.concurrent.ExecutionContext
 class WorkspaceController @Inject()(
   cc: ControllerComponents,
   authenticatedUserAction: AuthenticatedUserAction,
-  workspaceServiceLive: WorkspaceServiceLive,
-  TokenAuthService: TokenAuthService,
-  config: ConfigurationServiceLive,
-  formService: FormService,
-  reverseLinkService: ReverseLinkService
+  workspaceServiceLive: WorkspaceServiceLive
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
 

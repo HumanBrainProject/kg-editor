@@ -100,57 +100,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     }
   }
 
-  def retrieveInstanceRelease(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] = {
-    val result = instanceApiService
-      .getRelease(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def releaseInstance(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
-    val result = instanceApiService
-      .putReleaseInstance(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
-      case Right(()) => Right(())
-      case Left(res) => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def unreleaseInstance(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
-    val result = instanceApiService
-      .deleteRelease(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
-      case Right(()) => Right(())
-      case Left(res) => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def retrieveReleaseStatus(
-    instanceIds: List[String],
-    releaseTreeScope: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsValue]] = {
-    val result = instanceApiService
-      .getReleaseStatus(wSClient, configuration.kgCoreEndpoint, instanceIds, token, releaseTreeScope)
-    result.map {
-      case Right(ref) =>
-        val r = (ref \ "data").as[List[Map[String, JsValue]]].map(field => InstanceHelper.normalizeIdOfField(field))
-        Right(Json.toJson(r))
-      case Left(res) => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
   def getBookmarkInstances(
     bookmarkId: String,
     workspace: String,

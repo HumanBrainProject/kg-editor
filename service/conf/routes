@@ -24,6 +24,9 @@
 # KG Editor Instances Routes
 -> /editor/api/instances instances.Routes
 
+# KG Editor Releases Routes
+-> /editor/api/releases releases.Routes
+
 # KG Editor Instances Summary Routes
 -> /editor/api/summary summary.Routes
 

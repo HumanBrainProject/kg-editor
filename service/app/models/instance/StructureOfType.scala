@@ -58,7 +58,7 @@ object StructureOfType {
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.VOCABEBRAINSCOLOR).readNullable[String] and
-    (JsPath \ EditorConstants.METAEBRAINSLABELFIELDS)
+    (JsPath \ EditorConstants.METAEBRAINSLABELPROPERTIES)
       .readNullable[List[String]]
       .map {
         case Some(v) => v

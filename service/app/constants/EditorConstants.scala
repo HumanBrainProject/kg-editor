@@ -50,7 +50,7 @@ object EditorConstants {
 
   val METAEBRAINS = "https://kg.ebrains.eu/meta/"
   val METAEBRAINSPROPERTIES = s"${EBRAINSVOCAB}meta/properties"
-  val METAEBRAINSLABELFIELDS = s"${EBRAINSVOCAB}meta/labelFields"
+  val METAEBRAINSLABELPROPERTIES = s"${EBRAINSVOCAB}meta/labelProperties"
   val METAEBRAINSWORKSPACES = s"${METAEBRAINS}workspaces"
   val METAEBRAINSSEARCHABLE = s"${METAEBRAINS}property/searchable"
 

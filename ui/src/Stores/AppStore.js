@@ -297,6 +297,7 @@ class AppStore{
       localStorage.setItem("currentWorkspace", workspace);
       this.restoreWorkspaceInstanceTabs();
       typesStore.fetch(true);
+      browseStore.clearInstances();
     }
   }
 

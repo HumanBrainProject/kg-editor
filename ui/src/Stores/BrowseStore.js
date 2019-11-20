@@ -58,20 +58,28 @@ class BrowseStore{
   }
 
   @action
+  clearInstances() {
+    this.instances.length = 0;
+    this.clearSelectedInstance();
+  }
+
+  @action
   setNavigationFilterTerm(filter) {
     this.navigationFilter = filter;
   }
 
-
-  @action selectInstance(selectedInstance){
+  @action
+  selectInstance(selectedInstance){
     this.selectedInstance = selectedInstance;
   }
 
-  @action clearSelectedInstance() {
+  @action
+  clearSelectedInstance() {
     this.selectedInstance = null;
   }
 
-  @action setInstancesFilter(filter){
+  @action
+  setInstancesFilter(filter){
     this.instancesFilter = filter;
     this.isFetching.instances = true;
     this.applyInstancesFilter();

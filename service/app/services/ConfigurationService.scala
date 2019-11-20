@@ -15,29 +15,46 @@
  */
 package services
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import play.api.Configuration
 
 import scala.concurrent.duration.FiniteDuration
 
-@Singleton
-class ConfigurationService @Inject()(configuration: Configuration) {
-  val refreshTokenFile: String = configuration.get[String]("auth.refreshTokenFile")
-  val oidcEndpoint = s"${configuration.get[String]("auth.endpoint")}/oidc"
+trait ConfigurationService {
+  val refreshTokenFile: String
+  val oidcEndpoint: String
+  val oidcTokenEndpoint: String
+  val cacheExpiration: FiniteDuration
+
+  val nexusEndpoint: String
+  val editorPrefix: String
+
+  val kgCoreEndpoint: String
+  val kgQueryEndpoint: String
+  val iamEndpoint: String
+  val authEndpoint: String
+  val idmApiEndpoint: String
+  val editorSubSpace: String
+  val clientSecret: String
+}
+
+class ConfigurationServiceLive @Inject()(config: Configuration) extends ConfigurationService {
+
+  val refreshTokenFile: String = config.get[String]("auth.refreshTokenFile")
+  val oidcEndpoint = s"${config.get[String]("auth.endpoint")}/oidc"
   val oidcTokenEndpoint = s"$oidcEndpoint/token"
-  val cacheExpiration: FiniteDuration = configuration.get[FiniteDuration]("cache.expiration")
+  val cacheExpiration: FiniteDuration = config.get[FiniteDuration]("cache.expiration")
 
   val nexusEndpoint: String =
-    configuration.getOptional[String]("nexus.endpoint").getOrElse("https://nexus-dev.humanbrainproject.org")
-  val editorPrefix: String = configuration.getOptional[String]("nexus.editor.prefix").getOrElse("editor")
+    config.getOptional[String]("nexus.endpoint").getOrElse("https://nexus-dev.humanbrainproject.org")
+  val editorPrefix: String = config.getOptional[String]("nexus.editor.prefix").getOrElse("editor")
 
   val kgCoreEndpoint
-    : String = configuration.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:7130") // TODO: change the port from mock to real data
-  val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
-  val iamEndpoint = configuration.get[String]("nexus.iam")
-  val authEndpoint = configuration.get[String]("auth.endpoint")
+    : String = config.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:7130") // TODO: change the port from mock to real data
+  val kgQueryEndpoint: String = config.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
+  val iamEndpoint = config.get[String]("nexus.iam")
+  val authEndpoint = config.get[String]("auth.endpoint")
   val idmApiEndpoint = s"$authEndpoint/idm/v1/api"
-  val editorSubSpace = configuration.getOptional[String]("editor.subspace").getOrElse("editor")
-  val clientSecret = configuration.get[String]("client.secret")
-
+  val editorSubSpace = config.getOptional[String]("editor.subspace").getOrElse("editor")
+  val clientSecret = config.get[String]("client.secret")
 }

@@ -22,14 +22,14 @@ import models.specification.{DropdownSelect, EditorFieldSpecification, GenericTy
 import models.{AuthenticatedUserAction, NexusPath}
 import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services.ConfigurationService
+import services.{ConfigurationService, ConfigurationServiceLive}
 import services.specification.FormService
 
 class SpecificationController @Inject()(
   cc: ControllerComponents,
   formService: FormService,
   authenticatedUserAction: AuthenticatedUserAction,
-  configurationService: ConfigurationService
+  configurationService: ConfigurationServiceLive
 ) extends AbstractController(cc) {
 
   implicit val scheduler = monix.execution.Scheduler.Implicits.global

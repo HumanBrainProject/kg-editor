@@ -59,7 +59,7 @@ object UserRequestMap {
 }
 
 class EditorUserService @Inject()(
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   wSClient: WSClient,
   @NamedCache("editor-userinfo-cache") cache: AsyncCacheApi
 )(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService, actorSystem: ActorSystem) {

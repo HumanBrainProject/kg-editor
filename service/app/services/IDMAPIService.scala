@@ -28,7 +28,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 
 class IDMAPIService @Inject()(
   WSClient: WSClient,
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi
 )(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService) {
   private val log = LoggerFactory.getLogger(this.getClass)

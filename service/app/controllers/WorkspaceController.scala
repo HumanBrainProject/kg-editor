@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2019, EPFL/Human Brain Project PCO
+ *   Copyright (c) 2018, EPFL/Human Brain Project PCO
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,34 +16,44 @@
 
 package controllers
 
-import com.google.inject.Inject
-import models.AuthenticatedUserAction
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services.bookmark.BookmarkService
-import services.{ConfigurationService, ConfigurationServiceLive, TokenAuthService}
+import javax.inject.{Inject, Singleton}
+import models._
+import models.instance._
+import play.api.Logger
+import play.api.libs.json._
+import play.api.mvc.{Action, _}
+import services._
+import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
-class BookmarkController @Inject()(
+@Singleton
+class WorkspaceController @Inject()(
   cc: ControllerComponents,
-  config: ConfigurationServiceLive,
   authenticatedUserAction: AuthenticatedUserAction,
-  bookmarkService: BookmarkService,
-  oIDCAuthService: TokenAuthService
+  workspaceServiceLive: WorkspaceServiceLive,
+  TokenAuthService: TokenAuthService,
+  config: ConfigurationServiceLive,
+  formService: FormService,
+  reverseLinkService: ReverseLinkService
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
 
+  val logger = Logger(this.getClass)
+
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def getBookmarks(workspace: String): Action[AnyContent] =
+  def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      bookmarkService
-        .getBookmarks(workspace, request.userToken)
+      val result = workspaceServiceLive
+        .retrieveWorkspaceTypes(workspace, request.userToken)
         .map {
-          case Left(err)    => err.toResult
-          case Right(value) => Ok(value)
+          case Left(err) => err.toResult
+          case Right(value) =>
+            val res = (value \ "data").as[List[StructureOfType]]
+            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
         }
-        .runToFuture
+      result.runToFuture
     }
 
 }

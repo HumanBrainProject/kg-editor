@@ -38,9 +38,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EditorUserController @Inject()(
   cc: ControllerComponents,
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
+  workspaceServiceLive: WorkspaceServiceLive,
   editorUserService: EditorUserService,
   editorUserListService: BookmarkService,
   oIDCAuthService: TokenAuthService,
@@ -77,7 +78,7 @@ class EditorUserController @Inject()(
   def getUserProfile(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     val res = for {
       userProfile    <- editorUserService.getUserProfile(request.userToken)
-      userWorkspaces <- editorService.retrieveWorkspaces(request.userToken)
+      userWorkspaces <- workspaceServiceLive.retrieveWorkspaces(request.userToken)
     } yield (userProfile, userWorkspaces)
     val result = res.map {
       case (Right(user), Right(workspace)) =>

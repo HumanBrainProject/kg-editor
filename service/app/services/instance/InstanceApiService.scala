@@ -393,67 +393,6 @@ trait InstanceApiService {
     }
   }
 
-  //TODO: Consider moving this to another service
-  def getWorkspaceTypes(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    workspace: String,
-    token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
-  ): Task[Either[WSResponse, JsObject]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint/types")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
-      .addQueryStringParameters("workspace" -> workspace, "stage" -> "LIVE", "withProperties" -> "true")
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK =>
-          Right(res.json.as[JsObject])
-        case _ => Left(res)
-      }
-    }
-  }
-
-  def getWorkspaces(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
-  ): Task[Either[WSResponse, JsObject]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint/spaces")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
-      .addQueryStringParameters("stage" -> "LIVE")
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
-      }
-    }
-  }
-
-  //TODO: Consider moving this to another service
-  def getClientToken(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    clientSecret: String, // config.clientSecret
-    serviceClient: ServiceClient = EditorClient
-  ): Task[Either[WSResponse, JsObject]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint/clients/${serviceClient.client}/token")
-      .withHttpHeaders("client_secret" -> clientSecret)
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK =>
-          Right(res.json.as[JsObject])
-        case _ => Left(res)
-      }
-    }
-  }
-
   def get(
     wSClient: WSClient,
     apiBaseEndpoint: String,

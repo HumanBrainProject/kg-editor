@@ -28,7 +28,7 @@ trait Credentials {
 case class ClientCredentials(refreshToken: String, clientId: String, clientSecret: String, openidHost: String)
 
 @Singleton
-class CredentialsService @Inject()(configuration: ConfigurationService) extends Credentials {
+class CredentialsService @Inject()(configuration: ConfigurationServiceLive) extends Credentials {
   var clientCredentials: Option[ClientCredentials] = None
   val fileName = s"${configuration.refreshTokenFile}/oidc"
   override def getClientCredentials(): ClientCredentials =

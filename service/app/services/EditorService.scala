@@ -16,29 +16,27 @@
 
 package services
 
+import cats.implicits._
 import com.google.inject.Inject
 import constants._
 import helpers._
-import cats.implicits._
-import constants.QueryConstants.{SEARCH, SIZE, START}
 import models.errors.{APIEditorError, APIEditorMultiError}
 import models.instance._
 import models.specification.{FormRegistry, QuerySpec, UISpec}
-import models.user.{IDMUser, User}
-import models.{AccessToken, BasicAccessToken, NexusPath, RefreshAccessToken}
+import models.user.User
+import models.{AccessToken, NexusPath}
 import monix.eval.Task
 import org.joda.time.DateTime
 import play.api.Logger
-import play.api.http.HeaderNames.{AUTHORIZATION, CONTENT_TYPE}
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import services.bookmark.BookmarkService
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
 
-class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, formService: FormService)(
+class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationServiceLive, formService: FormService)(
   implicit TokenAuthService: TokenAuthService,
   clientCredentials: CredentialsService
 ) {
@@ -56,7 +54,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     returnPermissions: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstance(wSClient, config.kgCoreEndpoint, id, token, metadata, returnPermissions)
+      .getInstance(wSClient, configuration.kgCoreEndpoint, id, token, metadata, returnPermissions)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -73,7 +71,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     queryService
       .getInstances(
         wSClient,
-        config.kgQueryEndpoint,
+        configuration.kgQueryEndpoint,
         nexusPath,
         QuerySpec(Json.obj(), Some("editorPreview")),
         token,
@@ -96,7 +94,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   def retrieveInstanceGraph(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getGraph(wSClient, config.kgCoreEndpoint, id, token)
+      .getGraph(wSClient, configuration.kgCoreEndpoint, id, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -108,25 +106,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
-      .getRelease(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def retrieveWorkspaceTypes(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
-    val result = instanceApiService
-      .getWorkspaceTypes(wSClient, config.kgCoreEndpoint, workspace, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
-    val result = instanceApiService
-      .getWorkspaces(wSClient, config.kgCoreEndpoint, token)
+      .getRelease(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -138,7 +118,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, Unit]] = {
     val result = instanceApiService
-      .putReleaseInstance(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+      .putReleaseInstance(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
@@ -150,7 +130,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, Unit]] = {
     val result = instanceApiService
-      .deleteRelease(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+      .deleteRelease(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
@@ -163,7 +143,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, JsValue]] = {
     val result = instanceApiService
-      .getReleaseStatus(wSClient, config.kgCoreEndpoint, instanceIds, token, releaseTreeScope)
+      .getReleaseStatus(wSClient, configuration.kgCoreEndpoint, instanceIds, token, releaseTreeScope)
     result.map {
       case Right(ref) =>
         val r = (ref \ "data").as[List[Map[String, JsValue]]].map(field => InstanceHelper.normalizeIdOfField(field))
@@ -183,7 +163,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     queryService
       .getQueryResults(
         wSClient,
-        config.kgCoreEndpoint,
+        configuration.kgCoreEndpoint,
         QuerySpec(
           Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
           Option("bookmarkInstances")
@@ -207,7 +187,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .searchInstances(wSClient, config.kgCoreEndpoint, from, size, typeId, searchByLabel, token)
+      .searchInstances(wSClient, configuration.kgCoreEndpoint, from, size, typeId, searchByLabel, token)
       .map {
         case Right(res) => Right(res)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -218,7 +198,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, JsArray]] = {
     val result = instanceApiService
-      .getScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+      .getScope(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -231,7 +211,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, Unit]] = {
     val result = instanceApiService
-      .addUserToScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, user, token)
+      .addUserToScope(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, user, token)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
@@ -244,7 +224,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, Unit]] = {
     val result = instanceApiService
-      .removeUserOfScope(wSClient, config.kgQueryEndpoint, nexusInstanceReference, user, token)
+      .removeUserOfScope(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, user, token)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
@@ -253,7 +233,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   def retrieveQuery(token: AccessToken): Task[Either[APIEditorError, JsArray]] = {
     val result = queryService
-      .getQuery(wSClient, config.kgQueryEndpoint, token)
+      .getQuery(wSClient, configuration.kgQueryEndpoint, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -261,7 +241,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
   }
 
   def deleteQuery(instancePath: NexusPath, queryId: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
-    queryService.delete(wSClient, config.kgQueryEndpoint, instancePath, queryId, token)
+    queryService.delete(wSClient, configuration.kgQueryEndpoint, instancePath, queryId, token)
 
   def saveQuery(
     instancePath: NexusPath,
@@ -270,7 +250,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, Unit]] =
     queryService
-      .putQuery(wSClient, config.kgQueryEndpoint, instancePath, queryId, payload, token)
+      .putQuery(wSClient, configuration.kgQueryEndpoint, instancePath, queryId, payload, token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -286,7 +266,17 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] =
     queryService
-      .postQuery(wSClient, config.kgQueryEndpoint, instancePath, vocab, size, start, databaseScope, payload, token)
+      .postQuery(
+        wSClient,
+        configuration.kgQueryEndpoint,
+        instancePath,
+        vocab,
+        size,
+        start,
+        databaseScope,
+        payload,
+        token
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -305,7 +295,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     instanceApiService
       .postSuggestions(
         wSClient,
-        config.kgQueryEndpoint,
+        configuration.kgQueryEndpoint,
         instancePath,
         token,
         field,
@@ -327,7 +317,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .postNew(wSClient, config.kgCoreEndpoint, id, workspace, body, token)
+      .postNew(wSClient, configuration.kgCoreEndpoint, id, workspace, body, token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -340,9 +330,9 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorError, NexusInstanceReference]] = {
     val modifiedContent =
-      FormOp.removeClientKeysCorrectLinks(newInstance.content.as[JsValue], config.nexusEndpoint)
+      FormOp.removeClientKeysCorrectLinks(newInstance.content.as[JsValue], configuration.nexusEndpoint)
     instanceApiService
-      .post(wSClient, config.kgQueryEndpoint, newInstance.copy(content = modifiedContent), user.map(_.id), token)
+      .post(wSClient, configuration.kgQueryEndpoint, newInstance.copy(content = modifiedContent), user.map(_.id), token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -375,7 +365,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     instanceApiService
       .put(
         wSClient,
-        config.kgQueryEndpoint,
+        configuration.kgQueryEndpoint,
         nexusInstanceReference,
         diffInstance.copy(nexusInstance = diffInstance.nexusInstance.copy(content = content)),
         token,
@@ -389,7 +379,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   def updateInstanceNew(id: String, body: JsObject, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .updateInstance(wSClient, config.kgCoreEndpoint, id, body, token)
+      .updateInstance(wSClient, configuration.kgCoreEndpoint, id, body, token)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -415,7 +405,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
         queryService
           .getInstancesWithId(
             wSClient,
-            config.kgQueryEndpoint,
+            configuration.kgQueryEndpoint,
             nexusInstanceReference,
             querySpec,
             token,
@@ -436,7 +426,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
           }
       case None =>
         instanceApiService
-          .get(wSClient, config.kgQueryEndpoint, nexusInstanceReference, token)
+          .get(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
           .map {
             case Left(res)       => Left(APIEditorError(res.status, res.body))
             case Right(instance) => Right(instance)
@@ -450,7 +440,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorMultiError, Unit]] =
     instanceApiService
-      .getLinkingInstance(wSClient, config.kgQueryEndpoint, from, to, linkingInstancePath, token)
+      .getLinkingInstance(wSClient, configuration.kgQueryEndpoint, from, to, linkingInstancePath, token)
       .flatMap {
         case Right(ls) =>
           Task
@@ -458,7 +448,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
               ls.map(
                 l =>
                   instanceApiService
-                    .delete(wSClient, config.kgQueryEndpoint, l, token)
+                    .delete(wSClient, configuration.kgQueryEndpoint, l, token)
                     .map[Either[APIEditorError, Unit]] {
                       case Left(res) => Left(APIEditorError(res.status, res.body))
                       case Right(_)  => Right(())
@@ -488,7 +478,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
         Task.pure(Left(APIEditorMultiError(error.status, List(error))))
       case Right(currentInstanceDisplayed) =>
         val updateToBeStored =
-          EditorService.computeUpdateTobeStored(currentInstanceDisplayed, updateFromUser, config.nexusEndpoint)
+          EditorService.computeUpdateTobeStored(currentInstanceDisplayed, updateFromUser, configuration.nexusEndpoint)
         //Normal update of the instance without reverse links
         processInstanceUpdate(instanceRef, updateToBeStored, user, token)
     }
@@ -509,7 +499,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     token: AccessToken
   ): Task[Either[APIEditorMultiError, Unit]] =
     instanceApiService
-      .get(wSClient, config.kgQueryEndpoint, instanceRef, token, EditorClient, Some(user.id))
+      .get(wSClient, configuration.kgQueryEndpoint, instanceRef, token, EditorClient, Some(user.id))
       .flatMap {
         case Left(res) =>
           res.status match {
@@ -544,7 +534,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     instanceApiService
       .getInstances(
         wSClient,
-        config.kgCoreEndpoint,
+        configuration.kgCoreEndpoint,
         token,
         instanceIds,
         stage,
@@ -563,7 +553,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     metadata: Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstancesByType(wSClient, config.kgCoreEndpoint, token, typeOfInstance, metadata)
+      .getInstancesByType(wSClient, configuration.kgCoreEndpoint, token, typeOfInstance, metadata)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
@@ -571,7 +561,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
 
   def retrieveTypesList(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .getInstancesByTypeList(wSClient, config.kgCoreEndpoint, token, types)
+      .getInstancesByTypeList(wSClient, configuration.kgCoreEndpoint, token, types)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
@@ -586,7 +576,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
     instanceApiService
       .getByIdList(
         wSClient,
-        config.kgQueryEndpoint,
+        configuration.kgQueryEndpoint,
         instanceIds,
         token,
         queryId,
@@ -622,7 +612,7 @@ class EditorService @Inject()(wSClient: WSClient, config: ConfigurationService, 
       }
 
   def deleteInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
-    instanceApiService.deleteEditorInstance(wSClient, config.kgCoreEndpoint, id, token)
+    instanceApiService.deleteEditorInstance(wSClient, configuration.kgCoreEndpoint, id, token)
 
 }
 

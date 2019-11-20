@@ -29,7 +29,7 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.duration.FiniteDuration
 
 class TokenAuthService @Inject()(
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   credentialsService: CredentialsService,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi,
   ws: WSClient

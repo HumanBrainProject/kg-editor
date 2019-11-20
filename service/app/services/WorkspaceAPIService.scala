@@ -16,56 +16,70 @@
 
 package services
 
-import com.google.inject.Inject
 import constants.{EditorClient, ServiceClient}
-import models.errors.APIEditorError
+import models.AccessToken
 import monix.eval.Task
-import play.api.http.Status._
+import play.api.http.HeaderNames.AUTHORIZATION
+import play.api.http.Status.OK
 import play.api.libs.json.JsObject
 import play.api.libs.ws.{WSClient, WSResponse}
 
-trait AuthService {
+trait WorkspaceAPIService {
 
-  def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]]
-
-  def getClientToken(
+  def getWorkspaceTypes(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    clientSecret: String, // config.clientSecret
+    workspace: String,
+    token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]]
 
-}
-
-class AuthServiceLive @Inject()(config: ConfigurationServiceLive) extends AuthService {
-
-  def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]] = {
-    val q = wSClient
-      .url(s"${config.kgCoreEndpoint}/users/authorization")
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK => Right(res.json.as[JsObject])
-        case _  => Left(APIEditorError(res.status, res.body))
-      }
-    }
-  }
-
-  def getClientToken(
+  def getWorkspaces(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    clientSecret: String, // config.clientSecret
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]]
+}
+
+class WorkspaceAPIServiceLive extends WorkspaceAPIService {
+
+  def getWorkspaceTypes(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    workspace: String,
+    token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/clients/${serviceClient.client}/token")
-      .withHttpHeaders("client_secret" -> clientSecret)
+      .url(s"$apiBaseEndpoint/types")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .addQueryStringParameters("workspace" -> workspace, "stage" -> "LIVE", "withProperties" -> "true")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
         case OK =>
           Right(res.json.as[JsObject])
         case _ => Left(res)
+      }
+    }
+  }
+
+  def getWorkspaces(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    token: AccessToken,
+    serviceClient: ServiceClient = EditorClient
+  ): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/spaces")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .addQueryStringParameters("stage" -> "LIVE")
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
       }
     }
   }

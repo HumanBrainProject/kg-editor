@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReverseLinkService @Inject()(
   editorService: EditorService,
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   formService: FormService
 ) {
 

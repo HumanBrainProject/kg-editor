@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory
 import play.api.http.Status.OK
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import services.{ConfigurationService, TokenAuthService}
+import services.{ConfigurationService, ConfigurationServiceLive, TokenAuthService}
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -34,7 +34,7 @@ final case class FormRegistries(formRegistry: FormRegistry[UISpec], queryRegistr
 
 @Singleton
 class FormService @Inject()(
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   ws: WSClient,
   OIDCAuthService: TokenAuthService,
   specificationService: SpecificationService

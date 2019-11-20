@@ -17,18 +17,20 @@
 package controllers
 
 import javax.inject.Inject
-import play.api.Logger
+import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services.{AuthService, ConfigurationService}
+import play.api.{Configuration, Logger}
+import services.AuthServiceLive
 import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
 class AuthController @Inject()(
   cc: ControllerComponents,
-  authService: AuthService,
-  config: ConfigurationService,
-  formService: FormService
+  config: Configuration,
+  formService: FormService,
+  wsClient: WSClient,
+  authServiceLive: AuthServiceLive
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
 
@@ -37,10 +39,13 @@ class AuthController @Inject()(
   implicit val s = monix.execution.Scheduler.Implicits.global
 
   def getAuthEndpoint: Action[AnyContent] = Action.async { implicit request =>
-    authService.getEndpoint.map {
-      case Left(err)    => err.toResult
-      case Right(value) => Ok(value)
-    }.runToFuture
+    authServiceLive
+      .getEndpoint(wsClient)
+      .map {
+        case Left(err)    => err.toResult
+        case Right(value) => Ok(value)
+      }
+      .runToFuture
   }
 
 }

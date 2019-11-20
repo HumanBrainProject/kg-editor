@@ -7,7 +7,7 @@
 #    required: false
 #    type: string
 ###
-GET   /:workspace/types                                                             controllers.EditorController.getWorkspaceTypes(workspace: String)
+GET   /:workspace/types                                                             controllers.WorkspaceController.getWorkspaceTypes(workspace: String)
 
 ###
 #  tags:

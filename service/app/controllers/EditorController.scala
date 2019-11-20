@@ -20,7 +20,6 @@ import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
 import models.instance.InstanceProtocol._
 import models._
-import models.instance.InstanceView.{generateInstanceError, generateInstanceView}
 import models.instance._
 import monix.eval.Task
 import play.api.Logger
@@ -38,7 +37,7 @@ class EditorController @Inject()(
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
   TokenAuthService: TokenAuthService,
-  config: ConfigurationService,
+  config: ConfigurationServiceLive,
   formService: FormService,
   reverseLinkService: ReverseLinkService
 )(implicit ec: ExecutionContext)
@@ -123,19 +122,6 @@ class EditorController @Inject()(
             Ok(s"user ${user} has been removed from instance ${org}/${domain}/${schema}/${version}/${id}' scope")
         }
         .runToFuture
-    }
-
-  def getWorkspaceTypes(workspace: String): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val result = editorService
-        .retrieveWorkspaceTypes(workspace, request.userToken)
-        .map {
-          case Left(err) => err.toResult
-          case Right(value) =>
-            val res = (value \ "data").as[List[StructureOfType]]
-            Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
-        }
-      result.runToFuture
     }
 
   def getInstancesList(stage: String, metadata: Boolean): Action[AnyContent] =

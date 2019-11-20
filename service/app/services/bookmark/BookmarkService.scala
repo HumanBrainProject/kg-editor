@@ -37,7 +37,7 @@ import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.FormOp
 
-class BookmarkService @Inject()(config: ConfigurationService, wSClient: WSClient)(
+class BookmarkService @Inject()(config: ConfigurationServiceLive, wSClient: WSClient)(
   implicit OIDCAuthService: TokenAuthService,
   clientCredentials: CredentialsService
 ) extends BookmarkServiceInterface {

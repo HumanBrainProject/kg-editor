@@ -46,7 +46,7 @@ object EditorConstants {
   val VOCABEBRAINSPERMISSIONS = s"${EBRAINSVOCAB}meta/permissions"
   val VOCABEBRAINSCOLOR = s"${EBRAINSVOCAB}meta/color"
   val VOCABEBRAINSWIDGET = s"${EBRAINSVOCAB}meta/property/widget"
-  val VOCABEBRAINSFIELDUPDATES = s"${EBRAINSVOCAB}meta/fieldUpdates"
+  val VOCABEBRAINSPROPERTYUPDATES = s"${EBRAINSVOCAB}meta/propertyUpdates"
 
   val METAEBRAINS = "https://kg.ebrains.eu/meta/"
   val METAEBRAINSPROPERTIES = s"${EBRAINSVOCAB}meta/properties"

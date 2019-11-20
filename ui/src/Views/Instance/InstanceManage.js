@@ -6,12 +6,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
 import instanceStore from "../../Stores/InstanceStore";
-import routerStore from "../../Stores/RouterStore";
 import statusStore from "../../Stores/StatusStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
+import appStore from "../../Stores/AppStore";
 
 const rootPath = window.rootPath || "";
 
@@ -90,9 +90,8 @@ export default class InstanceManage extends React.Component {
     statusStore.fetchStatus(this.props.id);
   }
 
-  handleDuplicateInstance = async () => {
-    let newInstanceId = await instanceStore.duplicateInstance(this.props.id);
-    routerStore.history.push("/instance/edit/" + newInstanceId);
+  handleDuplicateInstance = () => {
+    appStore.duplicateInstance(this.props.id);
   }
 
   handleDeleteInstance = async () => {

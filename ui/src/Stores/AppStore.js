@@ -510,12 +510,16 @@ class AppStore{
       values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
     }
     this.isCreatingNewInstance = true;
+    values["@type"] = instanceToCopy.types.map(t => t.name);
     try{
-      const { data } = await API.axios.post(API.endpoints.instance(), values);
+      const { data } = await API.axios.post(API.endpoints.createInstance(), values);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });
-      return data.data.id;
+      const newId = data.data.id;
+      const newInstance = instanceStore.createInstanceOrGet(newId);
+      newInstance.initializeData(data.data, false, false);
+      routerStore.history.push("/instance/edit/" + newId);
     } catch(e){
       runInAction(() => {
         this.isCreatingNewInstance = false;

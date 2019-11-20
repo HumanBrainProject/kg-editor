@@ -51,7 +51,7 @@ object StructureOfType {
     s"${EditorConstants.VOCABEBRAINSALTERNATIVES}",
     s"${EditorConstants.VOCABEBRAINSUSER}",
     s"${EditorConstants.VOCABEBRAINSSPACES}",
-    s"${EditorConstants.VOCABEBRAINSFIELDUPDATES}"
+    s"${EditorConstants.VOCABEBRAINSPROPERTYUPDATES}"
   )
 
   implicit val structureOfTypeReads: Reads[StructureOfType] = (

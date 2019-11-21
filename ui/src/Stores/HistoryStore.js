@@ -115,13 +115,18 @@ class HistoryStore {
           list.forEach(identifier => {
             const data =  response && response.data && response.data.data && response.data.data[identifier];
             if(data){
-              const instance = normalizeInstanceData(data, transformField);
-              instance.formStore = new FormStore(instance);
-              instance.formStore.toggleReadMode(true);
-              this.instances.push(instance);
-            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-              // TODO: check if we need to handle error
+              if (data.error && data.error.code && [401, 403, 404, 410].includes(data.error.code)) {
+                // ignore those errors because instance id in localstorage may have been deleted or permissions may have changed
+              } else if (data.error) {
+                // TODO: check if we need to handle error
+              } else {
+                const instance = normalizeInstanceData(data, transformField);
+                instance.formStore = new FormStore(instance);
+                instance.formStore.toggleReadMode(true);
+                this.instances.push(instance);
+              }
             } else {
+              // should never happen
               // TODO: check if we need to handle error
             }
           });

@@ -29,7 +29,7 @@ export const normalizeInstanceData = (data, transformField=null) => {
       const field = data.fields[fieldKey];
       // TODO: temporary, please remove
       if (!field.type) {
-        if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse"].includes(fieldKey)) {
+        if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse", "http://schema.org/affiliation"].includes(fieldKey)) {
           field.type = "DropdownSelect";
         } else {
           field.type = "InputText";

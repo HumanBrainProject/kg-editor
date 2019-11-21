@@ -83,6 +83,50 @@ POST    /summary                 controllers.EditorController.getInstancesSummar
 POST    /label                 controllers.EditorController.getInstancesLabel(stage:String?="LIVE", metadata:Boolean?=false)
 
 ###
+#  summary: Return suggestions
+#  tags:
+#    - editor
+#  - name: id
+#    in: path
+#    description: instance id
+#    required: true
+#    type: string
+#  - name: field
+#    in: path
+#    description: field to look suggestions for
+#    required: true
+#    type: string
+#  - name: type
+#    in: path
+#    description: filter suggestions for a specific type
+#    required: false
+#    type: string
+#  - name: start
+#    in: path
+#    description: param to start
+#    required: false
+#    type: int
+#  - name: size
+#    in: path
+#    description: total size returned
+#    required: false
+#    type: int
+#  - name: search
+#    in: path
+#    description: search query
+#    required: false
+#    type: string
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+POST /:id/suggestions                  controllers.EditorController.getSuggestions(id: String, field: String, type: Option[String], start: Int=0, size: Int=50, search: String?="")
+
+
+###
 #  summary: return the graph payload for a specific entity type
 #  tags:
 #    - editor

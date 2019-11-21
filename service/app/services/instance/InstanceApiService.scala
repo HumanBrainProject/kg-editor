@@ -230,10 +230,10 @@ trait InstanceApiService {
   def postSuggestions(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    instancePath: NexusPath,
     token: AccessToken,
+    id: String,
     field: String,
-    fieldType: String,
+    `type`: Option[String],
     start: Int,
     size: Int,
     search: String,
@@ -244,28 +244,28 @@ trait InstanceApiService {
     implicit OIDCAuthService: TokenAuthService,
     clientCredentials: CredentialsService
   ): Task[Either[WSResponse, JsObject]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint/api/suggestion/${instancePath}/fields")
+    val wsc = wSClient
+      .url(s"$apiBaseEndpoint/instances/${id}/suggestedLinksForProperty")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
       .addQueryStringParameters(
-        "field"  -> field,
-        "type"   -> fieldType,
-        "start"  -> start.toString,
-        "size"   -> size.toString,
-        "search" -> search
+        "id"       -> id,
+        "property" -> field,
+        "from"     -> start.toString,
+        "size"     -> size.toString,
+        "search"   -> search,
+        "stage"    -> "LIVE"
       )
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
-      case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
+    val q = `type` match {
+      case Some(t) => wsc.addQueryStringParameters("type" -> t)
+      case _       => wsc
     }
+    val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
-        case OK =>
-          Right(res.json.as[JsObject])
-        case _ => Left(res)
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
       }
     }
-
   }
 
   def getInstance(

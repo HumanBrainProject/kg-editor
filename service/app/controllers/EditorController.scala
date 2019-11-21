@@ -285,31 +285,18 @@ class EditorController @Inject()(
     }
 
   def getSuggestions(
-    org: String,
-    domain: String,
-    schema: String,
-    version: String,
+    id: String,
     field: String,
-    fieldType: String,
+    `type`: Option[String],
     size: Int,
     start: Int,
     search: String
   ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     val bodyContent = request.body.asJson
-    val instancePath = NexusPath(org, domain, schema, version)
     bodyContent match {
       case Some(content) =>
         editorService
-          .retrieveSuggestions(
-            instancePath,
-            field,
-            fieldType,
-            size,
-            start,
-            search,
-            content.as[JsObject],
-            request.userToken
-          )
+          .retrieveSuggestions(id, field, `type`, size, start, search, content.as[JsObject], request.userToken)
           .map {
             case Right(value) => Ok(value)
             case Left(err)    => err.toResult

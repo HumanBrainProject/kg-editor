@@ -27,6 +27,14 @@ export const normalizeInstanceData = (data, transformField=null) => {
   if (typeof data.fields === "object") {
     for(let fieldKey in data.fields) {
       const field = data.fields[fieldKey];
+      // TODO: temporary, please remove
+      if (!field.type) {
+        if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse"].includes(fieldKey)) {
+          field.type = "DropdownSelect";
+        } else {
+          field.type = "InputText";
+        }
+      }
       typeof transformField === "function"  && transformField(field);
       if(field.type === "InputText"){
         field.type = "KgInputText";
@@ -36,8 +44,7 @@ export const normalizeInstanceData = (data, transformField=null) => {
         if(field.type === "DropdownSelect") {
           field.type = "DynamicDropdown";
         }
-        field.optionsUrl = field.instancesPath;
-        field.instanceType = instance.types.length?instance.types[0].name:null;
+        field.instanceId = instance.id;
         field.isLink = true;
         field.mappingLabel = "name";
         field.mappingValue = "id";

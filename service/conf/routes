@@ -42,9 +42,6 @@
 # KG Editor Workspaces Routes
 -> /editor/api/workspaces workspaces.Routes
 
-# KG Editor Suggestions Routes
--> /editor/api/suggestions suggestions.Routes
-
 # KG Editor Specifications Routes
 -> /editor/api/specifications specifications.Routes
 

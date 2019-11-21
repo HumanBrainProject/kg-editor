@@ -231,9 +231,9 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       }
 
   def retrieveSuggestions(
-    instancePath: NexusPath,
+    id: String,
     field: String,
-    fieldType: String,
+    `type`: Option[String],
     size: Int,
     start: Int,
     search: String,
@@ -241,18 +241,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     token: AccessToken
   ): Task[Either[APIEditorError, JsObject]] =
     instanceApiService
-      .postSuggestions(
-        wSClient,
-        configuration.kgQueryEndpoint,
-        instancePath,
-        token,
-        field,
-        fieldType,
-        size,
-        start,
-        search,
-        payload
-      )
+      .postSuggestions(wSClient, configuration.kgCoreEndpoint, token, id, field, `type`, size, start, search, payload)
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))

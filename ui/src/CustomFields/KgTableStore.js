@@ -7,6 +7,8 @@ import API from "../Services/API";
 export default class KgTableStore extends FormStore.typesMapping.Default{
     @observable value = [];
     @observable options = [];
+    @observable instanceId = null;
+    @observable fullyQualifiedName = null;
     @observable instances = []
     @observable allowCustomValues =  false;
     @observable mappingValue = "value";
@@ -15,7 +17,11 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
     @observable max = Infinity;
     @observable listPosition = "bottom";
     @observable closeDropdownAfterInteraction = false;
+
     @observable userInput = "";
+
+    @observable optionsSelectedType = null;
+    @observable optionsTypes = [];
     @observable optionsPageStart = 0;
     @observable optionsPageSize = 50;
     @observable optionsCurrentTotal = Infinity;
@@ -33,7 +39,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
     __emptyValue = () => [];
 
     static get properties(){
-      return union(super.properties,["value", "options",  "allowCustomValues", "mappingValue", "mappingLabel", "mappingReturn", "max", "listPosition", "closeDropdownAfterInteraction", "userInput"]);
+      return union(super.properties,["value", "instanceId", "fullyQualifiedName",  "allowCustomValues", "mappingValue", "mappingLabel", "mappingReturn", "max", "listPosition", "closeDropdownAfterInteraction", "userInput"]);
     }
 
     constructor(fieldData, store, path){
@@ -230,17 +236,28 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       this.fetchingOptions = true;
       this.optionsPageStart = append?this.options.length:0;
       const payload = this.store.getValues();
-      const field = this.path.replace(FormStore.getPathNodeSeparator(),"");
-      const { data } = await API.axios.post(API.endpoints.suggestions(this.instanceType, field, this.instancesPath, this.optionsPageStart, this.optionsPageSize, this.userInput), payload);
-      runInAction(()=>{
-        if(append){
-          this.options = this.options.concat(data.results);
-        } else {
-          this.options = data.results;
-        }
-        this.optionsCurrentTotal = data.total;
+      payload["@type"] = this.store.structure.types.map(t => t.name);
+      try {
+        const { data: { data: { suggestions: { data: options, totalResults: total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.userInput), payload);
+        runInAction(()=>{
+          const opts = Array.isArray(options)?options:[];
+          // TODO: remove this and fix it in scala
+          opts.forEach(option => {
+            option.name = option.label;
+          });
+          if(append){
+            this.options = this.options.concat(opts);
+          } else {
+            this.options = opts;
+          }
+          this.optionsTypes = types;
+          this.optionsCurrentTotal = total;
+          this.fetchingOptions = false;
+        });
+      } catch (e) {
+        // TODO: handle error
         this.fetchingOptions = false;
-      });
+      }
     }
 
     _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);

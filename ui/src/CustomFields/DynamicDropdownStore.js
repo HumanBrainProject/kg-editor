@@ -91,21 +91,26 @@ class OptionsPool{
   }
 
   @action
-  async fetchOptions(url, field, type, search, start, size, mappingValue, requestBody){
-    const optionsSet = [];
-    const { data } = await API.axios.post(API.endpoints.suggestions(url, field, type, start, size, search), requestBody);
-    data && data.results.forEach(option => {
-      if(!this.options.has(option[mappingValue])){
-        this.options.set(option[mappingValue], option);
-      } else {
-        Object.keys(option).forEach(key => {
-          if(key === mappingValue){return;}
-          set(this.options.get(option[mappingValue]), key, option[key]);
-        });
-      }
-      optionsSet.push(this.options.get(option[mappingValue]));
-    });
-    return {options:optionsSet, total:data.total};
+  async fetchOptions(instanceId, field, type, search, start, size, mappingValue, requestBody){
+    try {
+      const { data: { data: { suggestions: { data: options, totalResults: total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
+      const optionsSet = [];
+      Array.isArray(options) && options.forEach(option => {
+        option.name = option.label; // TODO: remove this and fix it in scala
+        if(!this.options.has(option[mappingValue])){
+          this.options.set(option[mappingValue], option);
+        } else {
+          Object.keys(option).forEach(key => {
+            if(key === mappingValue){return;}
+            set(this.options.get(option[mappingValue]), key, option[key]);
+          });
+        }
+        optionsSet.push(this.options.get(option[mappingValue]));
+      });
+      return {options: optionsSet, total: total, types: types};
+    } catch (e) {
+      return {options: [], total: 0, types: [], error: e};
+    }
   }
 }
 
@@ -115,7 +120,8 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
   @observable value = [];
   @observable defaultValue = [];
   @observable options = [];
-  @observable optionsUrl = null;
+  @observable instanceId = null;
+  @observable fullyQualifiedName = null;
   @observable allowCustomValues =  false;
   @observable mappingValue = "value";
   @observable mappingLabel = "label";
@@ -126,6 +132,8 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
   @observable closeDropdownAfterInteraction = false;
 
   @observable userInput = "";
+  @observable optionsSelectedType = null;
+  @observable optionsTypes = [];
   @observable optionsPageStart = 0;
   @observable optionsPageSize = 50;
   lastFetchParams = null;
@@ -137,7 +145,7 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
   __emptyValue = () => [];
 
   static get properties(){
-    return union(super.properties,["value", "defaultValue", "options", "optionsUrl", "cacheOptionsUrl", "allowCustomValues",
+    return union(super.properties,["value", "defaultValue", "instanceId", "fullyQualifiedName", "allowCustomValues",
       "mappingValue", "mappingLabel", "mappingReturn", "returnSingle", "max", "listPosition", "closeDropdownAfterInteraction", "userInput"]);
   }
 
@@ -192,13 +200,15 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     this.fetchingOptions = true;
     this.optionsPageStart = append?this.options.length:0;
     const payload = this.store.getValues();
-    let {options, total}= await optionsPool.fetchOptions(this.instanceType, this.path.replace(FormStore.getPathNodeSeparator(),""), this.instancesPath, this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
+    payload["@type"] = this.store.structure.types.map(t => t.name);
+    const {options, total, types} = await optionsPool.fetchOptions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
     runInAction(()=>{
-      if(append){
+      if (append) {
         this.options = this.options.concat(options);
       } else {
         this.options = options;
       }
+      this.optionsTypes = types;
       this.optionsCurrentTotal = total;
       this.fetchingOptions = false;
     });

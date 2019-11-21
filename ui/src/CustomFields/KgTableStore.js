@@ -47,7 +47,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       this.injectValue(this.value);
     }
 
-    addInstance(value, mappingValue){
+    addInstance(value, mappingValue, mappingLabel) {
       const id = value[mappingValue];
       if(this.instancesMap.has(id)){
         const instance = this.instancesMap.get(id);
@@ -56,7 +56,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         }
         return instance;
       } else {
-        this.instancesMap.set(id, {id: id, mappingValue: mappingValue, fetchError:null, isFetching:false, isFetched:false, promotedFields:[], show:false});
+        this.instancesMap.set(id, {id: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:false, fields:{}, show:false});
         const instance = this.instancesMap.get(id);
         this.instances.push(instance);
         this.fetchInstance(instance);
@@ -102,21 +102,24 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         instance.fetchError = null;
       });
       try{
-        let response = await API.axios.post(API.endpoints.instancesLabel(), toProcess);
+        let response = await API.axios.post(API.endpoints.instancesSummary(), toProcess);
         runInAction(() =>{
           toProcess.forEach(identifier => {
             const instance = this.instancesMap.get(identifier);
-
             const instanceData =  response && response.data && response.data.data && response.data.data[identifier];
             if(instanceData){
-              const promotedFields = instanceData.promotedFields;
-              set(instance, "promotedFields", promotedFields);
-              Object.keys(instanceData.fields).forEach(key => {
-                if(key === instance.mappingValue){return;}
-                if(promotedFields.includes(key)){
-                  set(instance, key, instanceData.fields[key]);
-                }
-              });
+              if (typeof instanceData.fields !== "object") {
+                instanceData.fields = {};
+              }
+              // TODO: remove this mock data
+              instanceData.fields["http://schema.org/givenName"] = {
+                fullyQualifiedName: "http://schema.org/givenName",
+                label: "Given name in Person for editor",
+                name: "Given name in Person for editor",
+                type: "InputText",
+                value: "Carl",
+              };
+              set(instance, "fields", instanceData.fields);
               set(instance, "isFetched", true);
             } else if (response && response.data && response.data.error && response.data.error[identifier]) {
               const error = response.data.error[identifier];
@@ -158,7 +161,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         if(!value || this.value.length >= this.max){
           return;
         }
-        const instance = this.addInstance(value, this.mappingValue);
+        const instance = this.addInstance(value, this.mappingValue, this.mappingLabel);
         this.addValue(instance);
       });
     }
@@ -166,7 +169,9 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
     @computed
     get columns() {
       if(this.isInitialized && !this.hasInitializationError) {
-        let columns = this.instances[0].promotedFields.map(name => ({name: name, label: this.instances[0][name].label}));
+        const label = this.instances[0].mappingLabel;
+        const fields = this.instances[0].fields;
+        let columns = Object.entries(fields).map(([name, field]) => ({name: name, label: field[label]}));
         columns.push({name: "delete", label: ""});
         return columns;
       }
@@ -208,7 +213,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
 
     @computed
     get isInitialized() {
-      return this.hasInitializationError || this.instances.length && this.instances[0].promotedFields.length>0;
+      return this.hasInitializationError || this.instances.length && typeof this.instances[0].fields == "object" && Object.keys(this.instances[0].fields).length>0;
     }
 
     @computed
@@ -223,7 +228,7 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         if(!instance.isFetching && instance.isFetched) {
           this.columns.forEach(col => {
             if(col.name !== "delete") {
-              row[col.name] = instance[col.name].value;
+              row[col.name] = instance.fields[col.name].value;
             }
           });
         }

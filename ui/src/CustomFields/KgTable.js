@@ -351,13 +351,14 @@ export default class KgTable extends React.Component {
 
   beforeAddValue(value){
     const mappingValue = this.props.field.mappingValue;
+    const mappingLabel = this.props.field.mappingLabel;
     if(isFunction(this.props.onBeforeAddValue)){
       this.props.onBeforeAddValue(() => {
-        const instance = this.props.field.addInstance(value, mappingValue);
+        const instance = this.props.field.addInstance(value, mappingValue, mappingLabel);
         this.props.field.addValue(instance);
       }, this.props.field, value);
     } else {
-      const instance = this.props.field.addInstance(value, mappingValue);
+      const instance = this.props.field.addInstance(value, mappingValue, mappingLabel);
       this.props.field.addValue(instance);
     }
     if(this.props.field.closeDropdownAfterInteraction){

@@ -19,31 +19,47 @@ package controllers
 import com.google.inject.Inject
 import models.AuthenticatedUserAction
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services.bookmark.BookmarkService
-import services.{ConfigurationService, ConfigurationServiceLive, TokenAuthService}
+import services.ConfigurationServiceLive
+//import services.bookmark.BookmarkServiceLive
 
 import scala.concurrent.ExecutionContext
 
 class BookmarkController @Inject()(
   cc: ControllerComponents,
   config: ConfigurationServiceLive,
-  authenticatedUserAction: AuthenticatedUserAction,
-  bookmarkService: BookmarkService,
-  oIDCAuthService: TokenAuthService
+  authenticatedUserAction: AuthenticatedUserAction
+//  bookmarkServiceLive: BookmarkServiceLive,
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def getBookmarks(workspace: String): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      bookmarkService
-        .getBookmarks(workspace, request.userToken)
-        .map {
-          case Left(err)    => err.toResult
-          case Right(value) => Ok(value)
-        }
-        .runToFuture
-    }
+//  def getBookmarks(workspace: String): Action[AnyContent] =
+//    authenticatedUserAction.async { implicit request =>
+//      bookmarkServiceLive
+//        .getBookmarks(workspace, request.userToken)
+//        .map {
+//          case Left(err)    => err.toResult
+//          case Right(value) => Ok(value)
+//        }
+//        .runToFuture
+//    }
+
+//  def filterBookmarkInstances(
+//                               bookmarkId: String,
+//                               workspace: String,
+//                               from: Option[Int],
+//                               size: Option[Int],
+//                               search: String
+//                             ): Action[AnyContent] =
+//    authenticatedUserAction.async { implicit request =>
+//      editorService
+//        .getBookmarkInstances(bookmarkId, workspace, from, size, search, request.userToken)
+//        .map {
+//          case Right(value) => Ok(value)
+//          case Left(error)  => error.toResult
+//        }
+//        .runToFuture
+//    }
 
 }

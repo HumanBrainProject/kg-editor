@@ -30,7 +30,6 @@ import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.libs.ws.WSClient
-import services.bookmark.BookmarkService
 import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
@@ -68,32 +67,14 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     }
   }
 
-  def getBookmarkInstances(
-    bookmarkId: String,
-    workspace: String,
-    from: Option[Int],
-    size: Option[Int],
-    search: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] =
-    queryService
-      .getQueryResults(
-        wSClient,
-        configuration.kgCoreEndpoint,
-        QuerySpec(
-          Json.parse(BookmarkService.kgQueryGetBookmarksByUser()).as[JsObject], //TODO change the query to a real one,
-          Option("bookmarkInstances")
-        ),
-        workspace,
-        token,
-        QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
-      )
-      .map { res =>
-        res.status match {
-          case OK => Right(res.json.as[JsObject])
-          case _  => Left(APIEditorError(res.status, res.body))
-        }
-      }
+//  def getBookmarkInstances(
+//    bookmarkId: String,
+//    workspace: String,
+//    from: Option[Int],
+//    size: Option[Int],
+//    search: String,
+//    token: AccessToken
+//  ): Task[Either[APIEditorError, JsObject]]
 
   def doSearchInstances(
     typeId: String,

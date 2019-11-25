@@ -25,7 +25,7 @@ GET   /:workspace/types                                                         
 #      required: false
 #      type: string
 ###
-GET /:workspace/bookmarks                                                 controllers.BookmarkController.getBookmarks(workspace: String)
+#GET /:workspace/bookmarks                                                 controllers.BookmarkController.getBookmarks(workspace: String)
 
 ###
 #  tags:
@@ -43,4 +43,4 @@ GET /:workspace/bookmarks                                                 contro
 #      required: false
 #      type: string
 ###
-GET /:workspace/bookmarks/:bookmarkId/instances/summary                                                 controllers.EditorController.filterBookmarkInstances(workspace: String, bookmarkId: String, from:Option[Int], size:Option[Int], search:String?="")
+#GET /:workspace/bookmarks/:bookmarkId/instances/summary                                                 controllers.BookmarkController.filterBookmarkInstances(workspace: String, bookmarkId: String, from:Option[Int], size:Option[Int], search:String?="")

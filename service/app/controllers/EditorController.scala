@@ -165,23 +165,6 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def filterBookmarkInstances(
-    bookmarkId: String,
-    workspace: String,
-    from: Option[Int],
-    size: Option[Int],
-    search: String
-  ): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      editorService
-        .getBookmarkInstances(bookmarkId, workspace, from, size, search, request.userToken)
-        .map {
-          case Right(value) => Ok(value)
-          case Left(error)  => error.toResult
-        }
-        .runToFuture
-    }
-
   def getInstanceGraph(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService

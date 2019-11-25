@@ -6,9 +6,6 @@
 # KG Editor Auth Routes
 -> /editor/api/auth auth.Routes
 
-# KG Editor Bookmarks Routes
--> /editor/api/bookmarks bookmarks.Routes
-
 # KG Editor Directives Routes
 -> /editor/api/directives directives.Routes
 

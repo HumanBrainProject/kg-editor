@@ -151,7 +151,6 @@ trait InstanceApiService {
       .url(s"$apiBaseEndpoint/instances/${id}/suggestedLinksForProperty")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
       .addQueryStringParameters(
-        "id"       -> id,
         "property" -> field,
         "from"     -> start.toString,
         "size"     -> size.toString,

@@ -56,10 +56,6 @@ object EditorConstants {
 
   val RELATIVEURL = "relativeUrl"
 
-  val bookmarkListFolderPath = NexusPath("hbpkg", "core", "bookmarklistfolder", "v0.0.1")
-  val bookmarkListPath = NexusPath("hbpkg", "core", "bookmarklist", "v0.0.1")
-  val bookmarkPath = NexusPath("hbpkg", "core", "bookmark", "v0.0.1")
-
   val editorUserPath = NexusPath("hbpkg", "core", "user", "v0.0.1")
 
   val editorVocab = "https://schema.hbp.eu/editor/"

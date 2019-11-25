@@ -175,45 +175,6 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def getQuery(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    editorService
-      .retrieveQuery(request.userToken)
-      .map {
-        case Left(err)    => err.toResult
-        case Right(value) => Ok(value)
-      }
-      .runToFuture
-  }
-
-  def deleteQuery(org: String, domain: String, schema: String, version: String, queryId: String): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val instancePath = NexusPath(org, domain, schema, version)
-      editorService
-        .deleteQuery(instancePath, queryId, request.userToken)
-        .map {
-          case Right(()) => Ok("Deleted specification from database")
-          case Left(err) => err.toResult
-        }
-        .runToFuture
-    }
-
-  def saveQuery(org: String, domain: String, schema: String, version: String, queryId: String): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val bodyContent = request.body.asJson
-      val instancePath = NexusPath(org, domain, schema, version)
-      bodyContent match {
-        case Some(content) =>
-          editorService
-            .saveQuery(instancePath, queryId, content.as[JsObject], request.userToken)
-            .map {
-              case Right(()) => Ok("Saved specification to database")
-              case Left(err) => err.toResult
-            }
-            .runToFuture
-        case None => Task.pure(BadRequest("Missing body content")).runToFuture
-      }
-    }
-
   def getSuggestions(
     id: String,
     field: String,
@@ -235,32 +196,6 @@ class EditorController @Inject()(
       case None => Task.pure(BadRequest("Missing body content")).runToFuture
     }
   }
-
-  def performQuery(
-    org: String,
-    domain: String,
-    schema: String,
-    version: String,
-    vocab: Option[String],
-    size: Int,
-    start: Int,
-    databaseScope: Option[String]
-  ): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val bodyContent = request.body.asJson
-      val instancePath = NexusPath(org, domain, schema, version)
-      bodyContent match {
-        case Some(content) =>
-          editorService
-            .doQuery(instancePath, vocab, size, start, databaseScope, content.as[JsObject], request.userToken)
-            .map {
-              case Right(value) => Ok(value)
-              case Left(err)    => err.toResult
-            }
-            .runToFuture
-        case None => Task.pure(BadRequest("Missing body content")).runToFuture
-      }
-    }
 
   class MapWrites[T]()(implicit writes: Writes[T]) extends Writes[Map[NexusPath, T]] {
 

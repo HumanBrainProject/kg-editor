@@ -18,9 +18,6 @@
 # KG Editor Instances Summary Routes
 -> /editor/api/summary summary.Routes
 
-# KG Editor Query Routes
--> /editor/api/query query.Routes
-
 # KG Editor Review Routes
 -> /editor/api/review review.Routes
 

@@ -87,57 +87,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
 
-  def retrieveQuery(token: AccessToken): Task[Either[APIEditorError, JsArray]] = {
-    val result = queryService
-      .getQuery(wSClient, configuration.kgQueryEndpoint, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def deleteQuery(instancePath: NexusPath, queryId: String, token: AccessToken): Task[Either[APIEditorError, Unit]] =
-    queryService.delete(wSClient, configuration.kgQueryEndpoint, instancePath, queryId, token)
-
-  def saveQuery(
-    instancePath: NexusPath,
-    queryId: String,
-    payload: JsObject,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] =
-    queryService
-      .putQuery(wSClient, configuration.kgQueryEndpoint, instancePath, queryId, payload, token)
-      .map {
-        case Right(ref) => Right(ref)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
-      }
-
-  def doQuery(
-    instancePath: NexusPath,
-    vocab: Option[String],
-    size: Int,
-    start: Int,
-    databaseScope: Option[String],
-    payload: JsObject,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsObject]] =
-    queryService
-      .postQuery(
-        wSClient,
-        configuration.kgQueryEndpoint,
-        instancePath,
-        vocab,
-        size,
-        start,
-        databaseScope,
-        payload,
-        token
-      )
-      .map {
-        case Right(ref) => Right(ref)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
-      }
-
   def retrieveSuggestions(
     id: String,
     field: String,

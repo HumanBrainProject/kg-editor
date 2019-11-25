@@ -3,26 +3,6 @@
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
-#    in: path
-#    description: organization of the instance to get scope
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance to get scope
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name of the instance to get scope
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance to get scope
-#    required: true
-#    type: string
 #  - name: id
 #    in: path
 #    description: the UUID of the instance to get scope
@@ -34,7 +14,7 @@
 #    required: false
 #    type: string
 ###
-GET    /:org/:domain/:schema/:version/:id                  controllers.EditorController.getInstanceScope(org: String, domain:String, schema: String, version:String, id: String)
+GET    /:id                  controllers.ScopeController.getInstanceScope(id: String)
 
 
 ###
@@ -42,26 +22,6 @@ GET    /:org/:domain/:schema/:version/:id                  controllers.EditorCon
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
-#    in: path
-#    description: organization of the instance
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name of the instance
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance
-#    required: true
-#    type: string
 #  - name: id
 #    in: path
 #    description: the UUID of the instance
@@ -78,7 +38,7 @@ GET    /:org/:domain/:schema/:version/:id                  controllers.EditorCon
 #    required: false
 #    type: string
 ###
-PUT    /:org/:domain/:schema/:version/:id/:user                 controllers.EditorController.addUserToInstanceScope(org: String, domain:String, schema: String, version:String, id: String, user: String)
+PUT    /:id/:user                 controllers.ScopeController.addUserToInstanceScope(id: String, user: String)
 
 
 ###
@@ -86,26 +46,6 @@ PUT    /:org/:domain/:schema/:version/:id/:user                 controllers.Edit
 #  tags:
 #    - editor
 #  parameters:
-#  - name: org
-#    in: path
-#    description: organization of the instance
-#    required: true
-#    type: string
-#  - name: domain
-#    in: path
-#    description: domain of the instance
-#    required: true
-#    type: string
-#  - name: schema
-#    in: path
-#    description: schema name of the instance
-#    required: true
-#    type: string
-#  - name: version
-#    in: path
-#    description: version of the instance
-#    required: true
-#    type: string
 #  - name: id
 #    in: path
 #    description: the UUID of the instance
@@ -122,4 +62,4 @@ PUT    /:org/:domain/:schema/:version/:id/:user                 controllers.Edit
 #    required: false
 #    type: string
 ###
-DELETE    /:org/:domain/:schema/:version/:id/:user                 controllers.EditorController.removeUserOfInstanceScope(org: String, domain:String, schema: String, version:String, id: String, user: String)
+DELETE    /:id/:user                 controllers.ScopeController.removeUserOfInstanceScope(id: String, user: String)

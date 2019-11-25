@@ -141,44 +141,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
 
-  def getInstanceScope(
-    nexusInstanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, JsArray]] = {
-    val result = instanceApiService
-      .getScope(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, token)
-    result.map {
-      case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def addUserToInstanceScope(
-    nexusInstanceReference: NexusInstanceReference,
-    user: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
-    val result = instanceApiService
-      .addUserToScope(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, user, token)
-    result.map {
-      case Right(()) => Right(())
-      case Left(res) => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
-  def removeUserOfInstanceScope(
-    nexusInstanceReference: NexusInstanceReference,
-    user: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, Unit]] = {
-    val result = instanceApiService
-      .removeUserOfScope(wSClient, configuration.kgQueryEndpoint, nexusInstanceReference, user, token)
-    result.map {
-      case Right(()) => Right(())
-      case Left(res) => Left(APIEditorError(res.status, res.body))
-    }
-  }
-
   def retrieveQuery(token: AccessToken): Task[Either[APIEditorError, JsArray]] = {
     val result = queryService
       .getQuery(wSClient, configuration.kgQueryEndpoint, token)

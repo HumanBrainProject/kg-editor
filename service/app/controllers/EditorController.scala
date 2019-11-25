@@ -73,58 +73,6 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def getInstanceScope(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
-      editorService
-        .getInstanceScope(nexusInstanceReference, request.userToken)
-        .map {
-          case Left(err)    => err.toResult
-          case Right(value) => Ok(value)
-        }
-        .runToFuture
-    }
-
-  def addUserToInstanceScope(
-    org: String,
-    domain: String,
-    schema: String,
-    version: String,
-    id: String,
-    user: String
-  ): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
-      editorService
-        .addUserToInstanceScope(nexusInstanceReference, user, request.userToken)
-        .map {
-          case Left(err) => err.toResult
-          case Right(()) =>
-            Ok(s"user ${user} has been added to instance ${org}/${domain}/${schema}/${version}/${id}' scope")
-        }
-        .runToFuture
-    }
-
-  def removeUserOfInstanceScope(
-    org: String,
-    domain: String,
-    schema: String,
-    version: String,
-    id: String,
-    user: String
-  ): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val nexusInstanceReference = NexusInstanceReference(org, domain, schema, version, id)
-      editorService
-        .removeUserOfInstanceScope(nexusInstanceReference, user, request.userToken)
-        .map {
-          case Left(err) => err.toResult
-          case Right(()) =>
-            Ok(s"user ${user} has been removed from instance ${org}/${domain}/${schema}/${version}/${id}' scope")
-        }
-        .runToFuture
-    }
-
   def getInstancesList(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       getInstances(stage, metadata, true, true, generateInstanceView = InstanceHelper.getInstanceView).runToFuture

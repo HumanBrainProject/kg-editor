@@ -6,15 +6,6 @@
 # KG Editor Auth Routes
 -> /editor/api/auth auth.Routes
 
-# KG Editor BookmarkList Routes
--> /editor/api/bookmarkList bookmarkList.Routes
-
-# KG Editor BookmarkListFolders Routes
--> /editor/api/bookmarkListFolders bookmarkListFolders.Routes
-
-# KG Editor BookmarkListInstances Routes
--> /editor/api/bookmarkListInstances bookmarkListInstances.Routes
-
 # KG Editor Bookmarks Routes
 -> /editor/api/bookmarks bookmarks.Routes
 

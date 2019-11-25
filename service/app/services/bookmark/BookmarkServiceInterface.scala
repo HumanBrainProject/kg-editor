@@ -26,34 +26,6 @@ import monix.eval.Task
 trait BookmarkServiceInterface {
 
   /**
-    * Return the user bookmark list containing  user defined and static lists
-    * @param editorUser the current user
-    * @param formRegistry the registry with the types associated with the user organization
-    * @return The bookmarklists organised by folders
-    */
-  def getUserBookmarkLists(
-    editorUser: EditorUser,
-    formRegistry: FormRegistry[UISpec],
-    token: AccessToken
-  ): Task[Either[APIEditorError, List[BookmarkListFolder]]]
-
-  /**
-    *  Get the instances contained in a bookmark list paginated and searchable
-    * @param bookmarkListId the id of the bookmark
-    * @param start
-    * @param size
-    * @param search
-    * @return a list of instance
-    */
-  def getInstancesOfBookmarkList(
-    bookmarkListId: NexusInstanceReference,
-    start: Int,
-    size: Int,
-    search: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, (List[PreviewInstance], Long)]]
-
-  /**
     * Create a folder for bookmarklist
     * @param editorUser  the current user
     * @param name the name of the folder
@@ -67,30 +39,6 @@ trait BookmarkServiceInterface {
     token: AccessToken,
     folderType: FolderType = BOOKMARKFOLDER
   ): Task[Either[APIEditorError, BookmarkListFolder]]
-
-  /**
-    *
-    * @param bookmarkListName
-    * @param folderId
-    * @param token
-    * @return
-    */
-  def createBookmarkList(
-    bookmarkListName: String,
-    folderId: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, BookmarkList]]
-
-  def updateBookmarkList(
-    bookmarkList: BookmarkList,
-    bookmarkListRef: NexusInstanceReference,
-    userFolderId: String,
-    newDate: Option[String],
-    userId: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, BookmarkList]]
-
-  def deleteBookmarkList(bookmarkRef: NexusInstanceReference, token: AccessToken): Task[Either[APIEditorError, Unit]]
 
   def addInstanceToBookmarkLists(
     instanceReference: NexusInstanceReference,

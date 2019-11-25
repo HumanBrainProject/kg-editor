@@ -59,38 +59,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
 
-  def retrievePreviewInstances(
-    nexusPath: NexusPath,
-    formRegistry: FormRegistry[UISpec],
-    from: Option[Int],
-    size: Option[Int],
-    search: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, (List[PreviewInstance], Long)]] =
-    queryService
-      .getInstances(
-        wSClient,
-        configuration.kgQueryEndpoint,
-        nexusPath,
-        QuerySpec(Json.obj(), Some("editorPreview")),
-        token,
-        QueryApiParameter(vocab = Some(EditorConstants.EDITORVOCAB), size = size, from = from, search = search)
-      )
-      .map { res =>
-        res.status match {
-          case OK =>
-            Right(
-              (
-                (res.json \ "results")
-                  .as[List[PreviewInstance]]
-                  .map(_.setLabel(formRegistry)),
-                (res.json \ "total").as[Long]
-              )
-            )
-          case _ => Left(APIEditorError(res.status, res.body))
-        }
-      }
-
   def retrieveInstanceGraph(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceApiService
       .getGraph(wSClient, configuration.kgCoreEndpoint, id, token)

@@ -47,33 +47,6 @@ class BookmarkService @Inject()(config: ConfigurationServiceLive, wSClient: WSCl
 
   object queryService extends QueryService
 
-  def getUserBookmarkLists(
-    editorUser: EditorUser,
-    formRegistry: FormRegistry[UISpec],
-    token: AccessToken
-  ): Task[Either[APIEditorError, List[BookmarkListFolder]]] =
-    queryService
-      .getInstancesWithId(
-        wSClient,
-        config.kgQueryEndpoint,
-        editorUser.nexusId,
-        QuerySpec(Json.parse(BookmarkService.kgQueryGetUserFoldersQuery(EditorConstants.editorUserPath)).as[JsObject]),
-        token,
-        QueryApiParameter()
-      )
-      .map { res =>
-        res.status match {
-          case OK =>
-            val folders = (res.json \ "userFolders").as[List[BookmarkListFolder]]
-            // Concatenate with form service lists
-            val r = getEditableEntities(editorUser.user, formRegistry)
-            Right(folders ::: r)
-          case _ =>
-            logger.error(s"Could not fetch the user with ID ${editorUser.user.id} ${res.body}")
-            Left(APIEditorError(res.status, res.body))
-        }
-      }
-
   /**
     * Get folder containing static list of bookmarklist
     *
@@ -100,33 +73,6 @@ class BookmarkService @Inject()(config: ConfigurationServiceLive, wSClient: WSCl
           }
       }
     allEditableEntities.values.toList.sortBy(_.folderName).map(s => s.copy(userLists = s.userLists.sortBy(_.name)))
-  }
-
-  def getInstancesOfBookmarkList(
-    bookmarkListId: NexusInstanceReference,
-    start: Int,
-    size: Int,
-    search: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, (List[PreviewInstance], Long)]] = {
-    val q = wSClient
-      .url(s"${config.kgQueryEndpoint}/arango/bookmarks/${bookmarkListId.toString}")
-      .withQueryStringParameters(START -> start.toString, SIZE -> size.toString, SEARCH -> search)
-      .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-    }
-
-    r.map { res =>
-      res.status match {
-        case OK =>
-          val instances = (res.json \ "data").as[List[PreviewInstance]]
-          val total = (res.json \ "count").as[Long]
-          Right((instances, total))
-        case _ => Left(APIEditorError(res.status, res.body))
-      }
-    }
   }
 
   def getBookmarks(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
@@ -176,137 +122,6 @@ class BookmarkService @Inject()(config: ConfigurationServiceLive, wSClient: WSCl
           Left(APIEditorError(res.status, res.body))
       }
   }
-
-  def createBookmarkList(
-    bookmarkListName: String,
-    folderId: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, BookmarkList]] = {
-    val payload =
-      BookmarkService.bookmarkListToNexusStruct(bookmarkListName, s"${config.nexusEndpoint}/v0/data/$folderId")
-    instanceApiService
-      .post(
-        wSClient,
-        config.kgQueryEndpoint,
-        NexusInstance(None, EditorConstants.bookmarkListPath, payload),
-        None,
-        token
-      )
-      .map {
-        case Right(ref) =>
-          Right(BookmarkList(ref.toString, bookmarkListName, None, None, None))
-        case Left(res) =>
-          logger.error("Error while creating a bookmark list " + res.body)
-          Left(APIEditorError(res.status, res.body))
-      }
-  }
-
-  def getBookmarkListById(
-    instanceReference: NexusInstanceReference,
-    token: AccessToken
-  ): Task[Either[APIEditorError, (BookmarkList, String)]] =
-    queryService
-      .getInstancesWithId(
-        wSClient,
-        config.kgQueryEndpoint,
-        instanceReference,
-        QuerySpec(
-          Json.parse(BookmarkService.kgQueryGetBookmarkListByIdQuery(instanceReference.nexusPath)).as[JsObject]
-        ),
-        token,
-        QueryApiParameter()
-      )
-      .map { res =>
-        res.status match {
-          case OK =>
-            val id = NexusInstanceReference.fromUrl((res.json \ "id").as[String])
-            val name = (res.json \ "name").as[String]
-            val bookmarkList = BookmarkList(id.toString(), name, None, None, None)
-            val userFolderId = (res.json \ "userFolderId" \ "@id").as[String]
-            Right((bookmarkList, userFolderId))
-          case _ =>
-            logger.error(s"Could not fetch the bookmark list  with ID ${instanceReference.id} ${res.body}")
-            Left(APIEditorError(res.status, res.body))
-        }
-      }
-
-  def updateBookmarkList(
-    bookmarkList: BookmarkList,
-    bookmarkListRef: NexusInstanceReference,
-    userFolderId: String,
-    newDate: Option[String],
-    userId: String,
-    token: AccessToken
-  ): Task[Either[APIEditorError, BookmarkList]] =
-    instanceApiService
-      .put(
-        wSClient,
-        config.kgQueryEndpoint,
-        bookmarkListRef,
-        EditorInstance(
-          NexusInstance(
-            Some(bookmarkListRef.id),
-            bookmarkListRef.nexusPath,
-            BookmarkService.bookmarkListToNexusStruct(bookmarkList.name, userFolderId, newDate)
-          )
-        ),
-        token,
-        userId
-      )
-      .map {
-        case Right(()) => Right(bookmarkList)
-        case Left(err) => Left(APIEditorError(err.status, err.body))
-      }
-
-  def deleteBookmarkList(bookmarkRef: NexusInstanceReference, token: AccessToken): Task[Either[APIEditorError, Unit]] =
-    queryService
-      .getInstancesWithId(
-        wSClient,
-        config.kgQueryEndpoint,
-        bookmarkRef,
-        QuerySpec(Json.parse(BookmarkService.kgQueryGetBookmarksForDeletion(bookmarkRef.nexusPath)).as[JsObject]),
-        token,
-        QueryApiParameter()
-      )
-      .flatMap { res =>
-        res.status match {
-          case OK =>
-            val bookmarksToDelete = (res.json \ "bookmarks").as[List[JsObject]].map { js =>
-              NexusInstanceReference.fromUrl((js \ "originalId").as[String])
-            }
-            // Delete all bookmarks
-            val listOfFuture = for {
-              ref <- bookmarksToDelete
-            } yield {
-              instanceApiService.delete(wSClient, config.kgQueryEndpoint, ref, token)
-            }
-            Task.gather(listOfFuture).flatMap[Either[APIEditorError, Unit]] { listOfResponse =>
-              if (listOfResponse.forall(_.isRight)) {
-                logger.debug("All the bookmarks are deleted. We can safely delete the bookmark list")
-                // Delete the bookmark list
-                instanceApiService
-                  .delete(wSClient, config.kgQueryEndpoint, bookmarkRef, token)
-                  .map {
-                    case Right(()) => Right(())
-                    case Left(r)   => Left(APIEditorError(r.status, r.body))
-                  }
-              } else {
-                logger.error("Could not delete all the bookmarks")
-                val compiledMessage = listOfResponse
-                  .filterNot(_.isRight)
-                  .map {
-                    case Left(response) => s"${response.status} - ${response.statusText} - ${response.body}"
-                    case _              => ""
-                  }
-                  .mkString("\n")
-                Task.pure(Left(APIEditorError(INTERNAL_SERVER_ERROR, compiledMessage)))
-              }
-            }
-          case _ =>
-            logger.error(s"Could not fetch the bookmarks to be deleted ${res.body}")
-            Task.pure(Left(APIEditorError(INTERNAL_SERVER_ERROR, "Could not fetch data to delete ")))
-        }
-      }
 
   def addInstanceToBookmarkLists(
     instanceReference: NexusInstanceReference,

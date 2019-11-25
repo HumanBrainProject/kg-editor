@@ -32,10 +32,8 @@ class EditorUserController @Inject()(
   cc: ControllerComponents,
   config: ConfigurationServiceLive,
   authenticatedUserAction: AuthenticatedUserAction,
-  editorService: EditorService,
   workspaceServiceLive: WorkspaceServiceLive,
   editorUserService: EditorUserService,
-  oIDCAuthService: TokenAuthService,
   formService: FormService
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {

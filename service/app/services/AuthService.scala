@@ -54,7 +54,7 @@ class AuthServiceLive @Inject()(config: ConfigurationServiceLive) extends AuthSe
   def getClientToken(
     wSClient: WSClient,
     apiBaseEndpoint: String,
-    clientSecret: String, // config.clientSecret
+    clientSecret: String,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient

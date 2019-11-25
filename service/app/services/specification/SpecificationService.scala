@@ -24,7 +24,7 @@ import constants.{EditorConstants, JsonLDConstants, QueryConstants}
 import javax.inject.Singleton
 import models.errors.APIEditorError
 import models.instance.{NexusInstance, NexusInstanceReference}
-import models.{NexusPath, RefreshAccessToken}
+import models.{AccessToken, NexusPath}
 import monix.eval.Task
 import org.slf4j.LoggerFactory
 import play.api.Environment
@@ -73,7 +73,7 @@ class SpecificationService @Inject()(
     }
   }
 
-  private def getOrCreateSpecificationAndSpecificationFields(token: RefreshAccessToken): Task[Done] =
+  private def getOrCreateSpecificationAndSpecificationFields(token: AccessToken): Task[Done] =
     runQuery(s"${specFieldIdQueryPath.toString}/$specFieldIdQueryId/instances", token)
       .flatMap { specFieldResult =>
         specFieldResult.status match {
@@ -119,10 +119,7 @@ class SpecificationService @Inject()(
         }
       }
 
-  private def getSpecifications(
-    fieldsIdMap: Map[String, NexusInstanceReference],
-    token: RefreshAccessToken
-  ): Task[Done] = {
+  private def getSpecifications(fieldsIdMap: Map[String, NexusInstanceReference], token: AccessToken): Task[Done] = {
     log.debug("Specification Service INITIALIZATION --- Fetching remote specifications")
     val futListOfSpecToUpload =
       runQuery(s"${specIdQueryPath.toString}/$specQueryId/instances", token)
@@ -225,15 +222,12 @@ class SpecificationService @Inject()(
 
   private def uploadSpec(
     value: SpecificationFile,
-    token: RefreshAccessToken
+    token: AccessToken
   ): Task[Either[APIEditorError, (String, NexusInstanceReference)]] = {
 
     val path = NexusInstanceReference.fromUrl(value.id).nexusPath
     instanceApiService
-      .post(WSClient, config.kgQueryEndpoint, NexusInstance(None, path, value.data), None, token)(
-        OIDCAuthService,
-        clientCredentials
-      )
+      .post(WSClient, config.kgQueryEndpoint, NexusInstance(None, path, value.data), None, token)
       .map {
         case Left(res) =>
           log.error(
@@ -252,7 +246,7 @@ class SpecificationService @Inject()(
     */
   private def getSpecificationQueries(
     folder: String,
-    token: RefreshAccessToken
+    token: AccessToken
   ): Task[(List[SpecificationFile], List[SpecificationFile])] =
     fetchFile(folder).foldLeft(Task.pure((List[SpecificationFile](), List[SpecificationFile]()))) {
       case (previousFuture, file) =>
@@ -271,15 +265,12 @@ class SpecificationService @Inject()(
         }
     }
 
-  def fetchSpecificationQueries(token: RefreshAccessToken): Task[List[NexusInstanceReference]] =
+  def fetchSpecificationQueries(token: AccessToken): Task[List[NexusInstanceReference]] =
     getSpecificationQueries("SpecificationQueries", token).map { l =>
       l._1.map(f => NexusInstanceReference.fromUrl(f.id))
     }
 
-  private def createSpecificationQueries(
-    folder: String,
-    token: RefreshAccessToken
-  ): Task[List[NexusInstanceReference]] = {
+  private def createSpecificationQueries(folder: String, token: AccessToken): Task[List[NexusInstanceReference]] = {
     log.info("Specification service INITIALIZATION --- Fetching local queries")
     val futQueriesToCreate = getSpecificationQueries(folder, token)
     futQueriesToCreate.flatMap { l =>
@@ -307,7 +298,7 @@ class SpecificationService @Inject()(
     }
   }
 
-  def fetchSpecifications(token: RefreshAccessToken): Task[WSResponse] =
+  def fetchSpecifications(token: AccessToken): Task[WSResponse] =
     Task.deferFuture(
       WSClient
         .url(s"${config.kgQueryEndpoint}/query/meta/minds/specification/v0.0.1/specificationQuery/instances")
@@ -316,7 +307,7 @@ class SpecificationService @Inject()(
         .get()
     )
 
-  private def runQuery(queryPath: String, token: RefreshAccessToken): Task[WSResponse] =
+  private def runQuery(queryPath: String, token: AccessToken): Task[WSResponse] =
     Task.deferFuture(
       WSClient
         .url(s"${config.kgQueryEndpoint}/query/$queryPath")

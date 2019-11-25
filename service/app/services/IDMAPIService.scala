@@ -17,7 +17,7 @@ package services
 
 import com.google.inject.Inject
 import models.user.{Group, IDMUser}
-import models.{AccessToken, BasicAccessToken, Pagination, RefreshAccessToken}
+import models.{AccessToken, BasicAccessToken, Pagination}
 import monix.eval.Task
 import org.slf4j.LoggerFactory
 import play.api.cache.{AsyncCacheApi, NamedCache}
@@ -41,10 +41,7 @@ class IDMAPIService @Inject()(
       val url = s"${config.idmApiEndpoint}/user/$userId"
       val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token)
 
-      val queryResult = token match {
-        case BasicAccessToken(_)   => Task.deferFuture(q.get())
-        case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-      }
+      val queryResult = Task.deferFuture(q.get())
       for {
         userRes    <- queryResult
         userGroups <- getUserGroups(userId, token)
@@ -138,10 +135,7 @@ class IDMAPIService @Inject()(
     val url = s"${config.idmApiEndpoint}/user/${user.id}/member-groups"
     val queryGroups: List[(String, String)] = groups.map("name" -> _)
     val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token).addQueryStringParameters(queryGroups: _*)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-    }
+    val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
         case OK => Right((res.json \ "_embedded" \ "groups").as[List[JsValue]].nonEmpty)
@@ -160,10 +154,7 @@ class IDMAPIService @Inject()(
     val url = s"${config.idmApiEndpoint}/user/$userId/member-groups"
     val q =
       WSClient.url(url).withHttpHeaders(AUTHORIZATION -> token.token).addQueryStringParameters("pageSize" -> "1000")
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-    }
+    val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
         case OK =>

@@ -18,30 +18,30 @@ package services.query
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference
 import models.specification.QuerySpec
-import models.{AccessToken, BasicAccessToken, NexusPath, RefreshAccessToken}
+import models.{AccessToken, BasicAccessToken, NexusPath}
 import monix.eval.Task
 import play.api.http.ContentTypes._
 import play.api.http.HeaderNames._
 import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsArray, JsObject}
 import play.api.libs.ws.{WSClient, WSResponse}
-import services.{AuthHttpClient, CredentialsService, TokenAuthService}
+import services.CredentialsService
 
 import scala.concurrent.ExecutionContext
 
 trait QueryService {
 
-  def delete(wSClient: WSClient, apiEndpoint: String, instancePath: NexusPath, queryId: String, token: AccessToken)(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+  def delete(
+    wSClient: WSClient,
+    apiEndpoint: String,
+    instancePath: NexusPath,
+    queryId: String,
+    token: AccessToken
   ): Task[Either[APIEditorError, Unit]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath.toString}/${queryId}")
       .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.delete())
-      case RefreshAccessToken(_) => AuthHttpClient.deleteWithRetry(q)
-    }
+    val r = Task.deferFuture(q.delete())
     r.map { res =>
       res.status match {
         case OK | NO_CONTENT => Right(())
@@ -57,14 +57,11 @@ trait QueryService {
     queryId: String,
     payload: JsObject,
     token: AccessToken
-  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[Either[WSResponse, Unit]] = {
+  ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath.toString}/${queryId}")
       .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.put(payload))
-      case RefreshAccessToken(_) => AuthHttpClient.putWithRetry(q, payload)
-    }
+    val r = Task.deferFuture(q.put(payload))
     r.map { res =>
       res.status match {
         case OK | NO_CONTENT => Right(())
@@ -83,17 +80,14 @@ trait QueryService {
     databaseScope: Option[String] = None,
     payload: JsObject,
     token: AccessToken
-  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[Either[WSResponse, JsObject]] = {
+  ): Task[Either[WSResponse, JsObject]] = {
     val v = vocab.map("vocab"                       -> _).getOrElse("" -> "")
     val dbScope = databaseScope.map("databaseScope" -> _).getOrElse("" -> "")
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath}/instances")
       .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
       .addQueryStringParameters(v, "size" -> size.toString, "start" -> start.toString, dbScope)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
-      case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
-    }
+    val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
         case OK =>
@@ -103,17 +97,11 @@ trait QueryService {
     }
   }
 
-  def getQuery(wSClient: WSClient, apiEndpoint: String, token: AccessToken)(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
-  ): Task[Either[WSResponse, JsArray]] = {
+  def getQuery(wSClient: WSClient, apiEndpoint: String, token: AccessToken): Task[Either[WSResponse, JsArray]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query")
       .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-    }
+    val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
         case OK =>
@@ -130,7 +118,7 @@ trait QueryService {
     query: QuerySpec,
     token: AccessToken,
     queryApiParameters: QueryApiParameter
-  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
+  ): Task[WSResponse] =
     query match {
       case QuerySpec(_, Some(queryId)) =>
         val q = wSClient
@@ -139,10 +127,7 @@ trait QueryService {
           )
           .addQueryStringParameters(queryApiParameters.toParams: _*)
           .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-        token match {
-          case BasicAccessToken(_)   => Task.deferFuture(q.get())
-          case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-        }
+        Task.deferFuture(q.get())
       case QuerySpec(payload, None) =>
         val q = wSClient
           .url(
@@ -150,10 +135,7 @@ trait QueryService {
           )
           .addQueryStringParameters(queryApiParameters.toParams: _*)
           .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-        token match {
-          case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
-          case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
-        }
+        Task.deferFuture(q.post(payload))
     }
 
   def getInstances(
@@ -164,26 +146,20 @@ trait QueryService {
     token: AccessToken,
     queryApiParameters: QueryApiParameter,
     parameters: Map[String, String] = Map()
-  )(implicit OIDCAuthService: TokenAuthService, credentials: CredentialsService): Task[WSResponse] =
+  ): Task[WSResponse] =
     query match {
       case QuerySpec(_, Some(queryId)) =>
         val q = wSClient
           .url(s"$apiEndpoint/query/${nexusPath.toString()}/$queryId/instances")
           .addQueryStringParameters(parameters ++: queryApiParameters.toParams: _*)
           .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-        token match {
-          case BasicAccessToken(_)   => Task.deferFuture(q.get())
-          case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-        }
+        Task.deferFuture(q.get())
       case QuerySpec(payload, None) =>
         val q = wSClient
           .url(s"$apiEndpoint/query/${nexusPath.toString()}/instances")
           .addQueryStringParameters(parameters ++: queryApiParameters.toParams: _*)
           .withHttpHeaders(CONTENT_TYPE -> JSON, AUTHORIZATION -> token.token)
-        token match {
-          case BasicAccessToken(_)   => Task.deferFuture(q.post(payload))
-          case RefreshAccessToken(_) => AuthHttpClient.postWithRetry(q, payload)
-        }
+        Task.deferFuture(q.post(payload))
     }
 
   def getQueryResults(
@@ -194,7 +170,7 @@ trait QueryService {
     token: AccessToken,
     queryApiParameters: QueryApiParameter,
     parameters: Map[String, String] = Map()
-  )(implicit OIDCAuthService: TokenAuthService): Task[WSResponse] =
+  ): Task[WSResponse] =
     query match {
       case QuerySpec(_, Some(queryId)) =>
         val q = wSClient

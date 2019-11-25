@@ -37,7 +37,6 @@ class EditorController @Inject()(
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
   workspaceServiceLive: WorkspaceServiceLive,
-  TokenAuthService: TokenAuthService,
   config: ConfigurationServiceLive,
   formService: FormService,
   reverseLinkService: ReverseLinkService

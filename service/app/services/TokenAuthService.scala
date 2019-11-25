@@ -16,21 +16,19 @@
 
 package services
 
-import java.util.concurrent.TimeUnit
-
 import com.google.inject.Inject
-import models.RefreshAccessToken
+import models.{AccessToken, BasicAccessToken}
 import monix.eval.Task
 import play.api.Logger
 import play.api.cache.{AsyncCacheApi, NamedCache}
-import play.api.http.Status._
+import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.duration.FiniteDuration
-
 class TokenAuthService @Inject()(
+  wSClient: WSClient,
   config: ConfigurationServiceLive,
   credentialsService: CredentialsService,
+  authServiceLive: AuthServiceLive,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi,
   ws: WSClient
 ) {
@@ -40,40 +38,13 @@ class TokenAuthService @Inject()(
 
   object cacheService extends CacheService
 
-  def getTechAccessToken(forceRefresh: Boolean = false): Task[RefreshAccessToken] =
-    if (forceRefresh) {
-      val clientCred = credentialsService.getClientCredentials()
-      refreshAccessToken(clientCred)
-    } else {
-      cacheService.get[String](cache, techAccessToken).flatMap {
-        case Some(token) => Task.pure(RefreshAccessToken(token))
-        case _ =>
-          val clientCred = credentialsService.getClientCredentials()
-          refreshAccessToken(clientCred)
-      }
-    }
-
-  def refreshAccessToken(clientCredentials: ClientCredentials): Task[RefreshAccessToken] =
-    Task
-      .deferFuture {
-        ws.url(config.oidcTokenEndpoint)
-          .withQueryStringParameters(
-            "client_id"     -> clientCredentials.clientId,
-            "client_secret" -> clientCredentials.clientSecret,
-            "refresh_token" -> clientCredentials.refreshToken,
-            "grant_type"    -> "refresh_token"
-          )
-          .get()
-      }
-      .map { result =>
-        result.status match {
-          case OK =>
-            val token = s"Bearer ${(result.json \ "access_token").as[String]}"
-            cache.set(techAccessToken, token, FiniteDuration(5, TimeUnit.MINUTES))
-            RefreshAccessToken(token)
-          case _ =>
-            logger.error(s"Error: while fetching tech account access token $result")
-            throw new Exception("Could not fetch access token for tech account")
-        }
+  def getTechAccessToken(forceRefresh: Boolean = false): Task[AccessToken] =
+    authServiceLive
+      .getClientToken(wSClient, config.kgCoreEndpoint, config.clientSecret)
+      .map {
+        case Right(value) =>
+          val d = (value \ "data").as[JsObject]
+          BasicAccessToken((d \ "uuid").as[String]) //TODO: this is an assumption, move it to AuthService and create a reader
+        case _ => throw new Exception("Could not fetch access token for tech account")
       }
 }

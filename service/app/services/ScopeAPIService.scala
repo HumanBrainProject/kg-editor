@@ -1,8 +1,7 @@
 package services
 
 import constants.{EditorClient, ServiceClient}
-import models.{AccessToken, BasicAccessToken, RefreshAccessToken}
-import models.instance.NexusInstanceReference
+import models.AccessToken
 import monix.eval.Task
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.{CREATED, NO_CONTENT, OK}

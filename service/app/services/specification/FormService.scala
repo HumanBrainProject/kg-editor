@@ -102,7 +102,7 @@ object FormService {
   def getRegistry(
     js: List[JsObject],
     specificationService: SpecificationService,
-    token: RefreshAccessToken
+    token: AccessToken
   ): Task[FormRegistries] = {
     val formRegistries = extractRegistries(js)
     for {

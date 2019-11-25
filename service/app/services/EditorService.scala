@@ -34,10 +34,7 @@ import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 import services.specification.{FormOp, FormRegistries, FormService}
 
-class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationServiceLive, formService: FormService)(
-  implicit TokenAuthService: TokenAuthService,
-  clientCredentials: CredentialsService
-) {
+class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationServiceLive, formService: FormService) {
 
   val logger = Logger(this.getClass)
 

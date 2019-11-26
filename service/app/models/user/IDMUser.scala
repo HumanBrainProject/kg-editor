@@ -28,7 +28,7 @@ final case class IDMUser(
   picture: Option[String],
   isCurator: Boolean = false,
   groups: List[Group] = List()
-) extends User
+) extends UNSAFE_User
     with Serializable {}
 
 object IDMUser {

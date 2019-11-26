@@ -22,7 +22,7 @@ import models.commands.{AddLinkingInstanceCommand, Command, DeleteLinkingInstanc
 import models.errors.{APIEditorError, APIEditorMultiError}
 import models.instance.{EditorInstance, NexusInstance, NexusInstanceReference, NexusLink}
 import models.specification.{EditorFieldSpecification, FormRegistry, QuerySpec, UISpec}
-import models.user.User
+import models.user.UNSAFE_User
 import monix.eval.Task
 import play.api.Logger
 import play.api.http.Status.INTERNAL_SERVER_ERROR
@@ -43,7 +43,7 @@ class ReverseLinkService @Inject()(
     instanceRef: NexusInstanceReference,
     updateFromUser: JsValue,
     token: AccessToken,
-    user: User,
+    user: UNSAFE_User,
     registries: FormRegistries
   ): Task[Either[APIEditorMultiError, Unit]] =
     editorService.retrieveInstance(instanceRef, token, registries.queryRegistry).flatMap {
@@ -114,7 +114,7 @@ class ReverseLinkService @Inject()(
     fieldsSpec: Map[String, EditorFieldSpecification],
     currentInstanceDisplayed: NexusInstance,
     instanceRef: NexusInstanceReference,
-    user: User,
+    user: UNSAFE_User,
     queryRegistry: FormRegistry[QuerySpec],
     baseUrl: String,
     token: AccessToken
@@ -153,7 +153,7 @@ class ReverseLinkService @Inject()(
     fieldsSpec: Map[String, EditorFieldSpecification],
     currentInstanceDisplayed: NexusInstance,
     instanceRef: NexusInstanceReference,
-    user: Option[User],
+    user: Option[UNSAFE_User],
     token: AccessToken
   ): List[Command] =
     filterLinks(updateToBeStored, fieldsSpec, e => e.isLinkingInstance.getOrElse(false)).flatMap {

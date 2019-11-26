@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2019, EPFL/Human Brain Project PCO
+ *   Copyright (c) 2018, EPFL/Human Brain Project PCO
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -13,22 +13,11 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 package models.user
 
-import constants.SchemaFieldsConstants
-import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
-
-final case class User(id: List[String], name: String, username: String)
-
-object User {
-  implicit val userReads: Reads[User] = (
-    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[List[String]] and
-    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ SchemaFieldsConstants.ALTERNATENAME).read[String]
-  )(User.apply _)
-
-  implicit val userWrites = Json.writes[User]
+trait UNSAFE_User {
+  val id: String
+  val email: Option[String]
+  val groups: List[Group]
+  val displayName: String
 }

@@ -20,7 +20,7 @@ import models.commands.{AddReverseLinkCommand, Command, DeleteReverseLinkCommand
 import models.errors.APIEditorError
 import models.instance.{EditorInstance, NexusInstance, NexusInstanceReference, NexusLink}
 import models.specification.{EditorFieldSpecification, FormRegistry, QuerySpec}
-import models.user.User
+import models.user.UNSAFE_User
 import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
@@ -89,7 +89,7 @@ object ReverseLinkOP {
     editorService: EditorService,
     token: AccessToken,
     baseUrl: String,
-    user: User,
+    user: UNSAFE_User,
     queryRegistry: FormRegistry[QuerySpec]
   ): List[Task[Either[APIEditorError, Command]]] = {
     val (added, removed) = getAddedAndRemovedLinks(currentInstanceDisplayed, linkName, fullIds)

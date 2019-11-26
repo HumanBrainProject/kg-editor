@@ -20,6 +20,7 @@ import constants.EditorConstants
 import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
 import models.instance.{
+  Alternative,
   CoreData,
   Field,
   Instance,
@@ -144,8 +145,8 @@ object InstanceHelper {
       case None              => List()
     }
 
-  def getAlternatives(data: JsObject): Map[String, JsValue] =
-    (data \ s"${EditorConstants.VOCABEBRAINSALTERNATIVES}").asOpt[Map[String, JsValue]] match {
+  def getAlternatives(data: JsObject): Map[String, List[Alternative]] =
+    (data \ s"${EditorConstants.VOCABEBRAINSALTERNATIVES}").asOpt[Map[String, List[Alternative]]] match {
       case Some(alternatives) => alternatives
       case None               => Map()
     }

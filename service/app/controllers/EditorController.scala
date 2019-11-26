@@ -74,17 +74,35 @@ class EditorController @Inject()(
 
   def getInstancesList(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(stage, metadata, true, true, generateInstanceView = InstanceHelper.getInstanceView).runToFuture
+      getInstances(
+        stage,
+        metadata,
+        returnAlternatives = true,
+        returnPermissions = true,
+        generateInstanceView = InstanceHelper.getInstanceView
+      ).runToFuture
     }
 
   def getInstancesSummary(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(stage, metadata, false, true, generateInstanceView = InstanceHelper.getInstanceSummaryView).runToFuture
+      getInstances(
+        stage,
+        metadata,
+        returnAlternatives = false,
+        returnPermissions = true,
+        generateInstanceView = InstanceHelper.getInstanceSummaryView
+      ).runToFuture
     }
 
   def getInstancesLabel(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
-      getInstances(stage, metadata, false, false, generateInstanceView = InstanceHelper.getInstanceLabelView).runToFuture
+      getInstances(
+        stage,
+        metadata,
+        returnAlternatives = false,
+        returnPermissions = false,
+        generateInstanceView = InstanceHelper.getInstanceLabelView
+      ).runToFuture
     }
 
   def getInstances(

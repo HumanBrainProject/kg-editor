@@ -22,7 +22,7 @@ import helpers._
 import models.errors.{APIEditorError, APIEditorMultiError}
 import models.instance._
 import models.specification.{FormRegistry, QuerySpec, UISpec}
-import models.user.User
+import models.user.UNSAFE_User
 import models.{AccessToken, NexusPath}
 import monix.eval.Task
 import org.joda.time.DateTime
@@ -120,7 +120,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   //TODO: Deprecate this one and use insertInstanceNew
   def insertInstance(
     newInstance: NexusInstance,
-    user: Option[User],
+    user: Option[UNSAFE_User],
     token: AccessToken
   ): Task[Either[APIEditorError, NexusInstanceReference]] = {
     val modifiedContent =
@@ -264,7 +264,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     instanceRef: NexusInstanceReference,
     updateFromUser: JsValue,
     token: AccessToken,
-    user: User,
+    user: UNSAFE_User,
     registries: FormRegistries
   ): Task[Either[APIEditorMultiError, Unit]] =
     retrieveInstance(instanceRef, token, registries.queryRegistry).flatMap {
@@ -289,7 +289,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   def processInstanceUpdate(
     instanceRef: NexusInstanceReference,
     updateToBeStored: EditorInstance,
-    user: User,
+    user: UNSAFE_User,
     token: AccessToken
   ): Task[Either[APIEditorMultiError, Unit]] =
     instanceApiService

@@ -18,7 +18,7 @@ import helpers.ReverseLinkOP
 import models.AccessToken
 import models.errors.APIEditorError
 import models.instance.{EditorInstance, NexusInstance, NexusInstanceReference, NexusLink}
-import models.user.User
+import models.user.UNSAFE_User
 import monix.eval.Task
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.libs.json.Json
@@ -32,7 +32,7 @@ final case class DeleteReverseLinkCommand(
   editorService: EditorService,
   baseUrl: String,
   token: AccessToken,
-  user: User
+  user: UNSAFE_User
 ) extends Command {
   override def execute(): Task[Either[APIEditorError, Unit]] = {
     val diffToSave = reverseInstance.content.value.get(targetField) match {

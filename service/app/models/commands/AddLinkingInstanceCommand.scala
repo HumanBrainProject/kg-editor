@@ -17,7 +17,7 @@
 package models.commands
 import models.errors.APIEditorError
 import models.instance.{LinkingInstance, NexusInstance, NexusInstanceReference, NexusLink}
-import models.user.User
+import models.user.UNSAFE_User
 import models.{AccessToken, NexusPath}
 import monix.eval.Task
 import play.api.Logger
@@ -30,7 +30,7 @@ final case class AddLinkingInstanceCommand(
   linkingInstancePath: NexusPath,
   editorService: EditorService,
   baseUrl: String,
-  user: Option[User],
+  user: Option[UNSAFE_User],
   token: AccessToken
 ) extends Command {
   val log = Logger(this.getClass)

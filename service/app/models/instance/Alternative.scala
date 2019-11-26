@@ -14,21 +14,23 @@
  *   limitations under the License.
  */
 
-package models.user
+package models.instance
 
-import constants.SchemaFieldsConstants
+import constants.EditorConstants
+import models.user.User
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-final case class User(id: List[String], name: String, username: String)
+final case class Alternative(value: String, selected: Boolean, user: List[User])
 
-object User {
-  implicit val userReads: Reads[User] = (
-    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[List[String]] and
-    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ SchemaFieldsConstants.ALTERNATENAME).read[String]
-  )(User.apply _)
+object Alternative {
 
-  implicit val userWrites = Json.writes[User]
+  implicit val alternativeReads: Reads[Alternative] = (
+    (JsPath \ EditorConstants.VOCABEBRAINSVALUE).read[String] and
+    (JsPath \ EditorConstants.VOCABEBRAINSSELECTED).read[Boolean] and
+    (JsPath \ EditorConstants.VOCABEBRAINSUSER).read[List[User]]
+  )(Alternative.apply _)
+
+  implicit val alternativeWrites = Json.writes[Alternative]
 }

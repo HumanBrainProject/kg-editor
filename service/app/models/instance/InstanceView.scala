@@ -30,7 +30,7 @@ final case class InstanceView(
   labelField: Option[String],
   fields: Map[String, Field],
   permissions: List[String],
-  alternatives: Map[String, JsValue],
+  alternatives: Map[String, List[Alternative]],
   user: Option[String],
   error: Option[CoreDataError]
 ) extends Instance

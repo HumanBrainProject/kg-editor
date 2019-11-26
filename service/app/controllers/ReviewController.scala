@@ -20,8 +20,7 @@ import models.errors.APIEditorError
 import models.{AuthenticatedUserAction, EditorResponseObject}
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services._
-import services.instance.InstanceApiService
+import services.{InstanceAPIService, _}
 import services.specification.FormService
 
 class ReviewController @Inject()(
@@ -34,7 +33,7 @@ class ReviewController @Inject()(
   reverseLinkService: ReverseLinkService
 ) extends AbstractController(cc) {
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
-  object instanceApiService extends InstanceApiService
+  object instanceAPIService extends InstanceAPIService
 
   def getUsers(size: Int, search: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     IDMAPIService

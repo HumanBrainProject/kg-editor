@@ -26,27 +26,27 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Cobbled this together from:
- * https://www.playframework.com/documentation/2.6.x/ScalaActionsComposition#Authentication
- */
+  * Cobbled this together from:
+  * https://www.playframework.com/documentation/2.6.x/ScalaActionsComposition#Authentication
+  */
 class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default)(
   implicit val executionContext: ExecutionContext
 ) extends ActionBuilder[UserRequest, AnyContent] {
   implicit val scheduler: Scheduler = monix.execution.Scheduler.Implicits.global
 
   /**
-   * This action helps us identify a user. If the user is not logged in a 401 is returned
-   *
-   * @param request The current request
-   * @param block   The play action the user wants to perform
-   * @tparam A The type of the request (AnyContent)
-   * @return The play action with the user info or Unauthorized
-   */
+    * This action helps us identify a user. If the user is not logged in a 401 is returned
+    *
+    * @param request The current request
+    * @param block   The play action the user wants to perform
+    * @tparam A The type of the request (AnyContent)
+    * @return The play action with the user info or Unauthorized
+    */
   override def invokeBlock[A](request: Request[A], block: (UserRequest[A]) => Future[Result]): Future[Result] = {
     val token = AuthenticationHelper.getTokenFromRequest[A](request)
     val result = token match {
       case Some(t) => Task.deferFuture(block(new UserRequest(request, t)))
-      case None => Task.pure(Unauthorized("You must be logged in to execute this request"))
+      case None    => Task.pure(Unauthorized("You must be logged in to execute this request"))
     }
     result.runToFuture
   }

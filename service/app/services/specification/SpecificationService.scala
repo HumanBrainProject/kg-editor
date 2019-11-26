@@ -32,8 +32,13 @@ import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
-import services.instance.InstanceApiService
-import services.{ConfigurationService, ConfigurationServiceLive, CredentialsService, TokenAuthService}
+import services.{
+  ConfigurationService,
+  ConfigurationServiceLive,
+  CredentialsService,
+  InstanceAPIService,
+  TokenAuthService
+}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -54,7 +59,7 @@ class SpecificationService @Inject()(
   private val specFieldTypeIdQueryPath = NexusPath("meta", "minds", "specificationfieldtype", "v0.0.1")
   private val specFieldTypeIdQueryId = "specificationFieldTypeIdentifier"
   private val log = LoggerFactory.getLogger(this.getClass)
-  object instanceApiService extends InstanceApiService
+  object instanceAPIService extends InstanceAPIService
 
   def init(): Task[Done] = {
     log.debug("Specification Service INITIALIZATION ---------------------------------")
@@ -226,7 +231,7 @@ class SpecificationService @Inject()(
   ): Task[Either[APIEditorError, (String, NexusInstanceReference)]] = {
 
     val path = NexusInstanceReference.fromUrl(value.id).nexusPath
-    instanceApiService
+    instanceAPIService
       .post(WSClient, config.kgQueryEndpoint, NexusInstance(None, path, value.data), None, token)
       .map {
         case Left(res) =>

@@ -16,50 +16,55 @@
 
 package services
 
-import com.google.inject.Inject
 import constants.{EditorClient, ServiceClient}
-import models.errors.APIEditorError
 import monix.eval.Task
+import play.api.http.Status._
 import play.api.libs.json.JsObject
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 
-trait AuthService {
+trait AuthAPIService {
 
-  def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]]
+  def getEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]]
 
   def getClientToken(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     clientSecret: String,
     serviceClient: ServiceClient = EditorClient
-  ): Task[Either[APIEditorError, JsObject]]
+  ): Task[Either[WSResponse, JsObject]]
 
 }
 
-class AuthServiceLive @Inject()(
-  wSClient: WSClient,
-  config: ConfigurationServiceLive,
-  authAPIServiceLive: AuthAPIServiceLive
-) extends AuthService {
+class AuthAPIServiceLive extends AuthAPIService {
 
-  def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]] =
-    authAPIServiceLive
-      .getEndpoint(wSClient, config.kgCoreEndpoint)
-      .map {
-        case Right(value) => Right(value)
-        case Left(res)    => Left(APIEditorError(res.status, res.body))
+  def getEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/users/authorization")
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
       }
+    }
+  }
 
   def getClientToken(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     clientSecret: String,
     serviceClient: ServiceClient = EditorClient
-  ): Task[Either[APIEditorError, JsObject]] =
-    authAPIServiceLive
-      .getClientToken(wSClient, config.kgCoreEndpoint, config.clientSecret)
-      .map {
-        case Right(value) => Right(value)
-        case Left(res)    => Left(APIEditorError(res.status, res.body))
+  ): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/clients/${serviceClient.client}/token")
+      .withHttpHeaders("client_secret" -> clientSecret)
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
       }
+    }
+  }
+
 }

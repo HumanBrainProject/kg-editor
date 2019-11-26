@@ -37,7 +37,6 @@ import play.api.http.HeaderNames._
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
-import services.instance.InstanceApiService
 import services.query.{QueryApiParameter, QueryService}
 
 import scala.concurrent.duration._
@@ -65,7 +64,7 @@ class EditorUserService @Inject()(
 )(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService, actorSystem: ActorSystem) {
   val logger = Logger(this.getClass)
 
-  object instanceApiService extends InstanceApiService
+  object instanceAPIService extends InstanceAPIService
   object cacheService extends CacheService
   object queryService extends QueryService
 
@@ -162,7 +161,7 @@ class EditorUserService @Inject()(
     }
 
   def createUser(user: IDMUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] =
-    instanceApiService
+    instanceAPIService
       .post(
         wSClient,
         config.kgQueryEndpoint,
@@ -178,7 +177,7 @@ class EditorUserService @Inject()(
       }
 
   def deleteUser(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, Unit]] =
-    instanceApiService
+    instanceAPIService
       .delete(wSClient, config.kgQueryEndpoint, editorUser.nexusId, token)
       .map {
         case Right(_) => ().asRight

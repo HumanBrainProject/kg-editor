@@ -185,7 +185,7 @@ export default class KgInputTextField extends React.Component {
       .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
       .map(alternative => ({
         value: alternative.value,
-        userIds: alternative.userIds,
+        users: alternative.users,
         selected: !!alternative.selected
       }));
 

@@ -339,10 +339,6 @@ class AppStore{
     } catch(e){
       runInAction(() => {
         const status =  this.instanceIdAvailability.get(instanceId);
-        //TODO: remove the 2 following lines and uncomment when backend is fixed
-        status.isAvailable = true;
-        status.isChecking = false;
-        /*
         if (e.response && e.response.status === 404) {
           status.isAvailable = true;
           status.isChecking = false;
@@ -353,7 +349,6 @@ class AppStore{
           status.isAvailable = false;
           status.isChecking = false;
         }
-        */
       });
     }
   }

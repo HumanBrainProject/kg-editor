@@ -22,7 +22,7 @@ import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-final case class Alternative(value: String, selected: Boolean, user: List[User])
+final case class Alternative(value: String, selected: Boolean, users: List[User])
 
 object Alternative {
 

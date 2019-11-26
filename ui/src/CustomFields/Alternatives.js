@@ -1,7 +1,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 
-import Avatar from "../Views/Avatar";
+import Avatar from "../Components/Avatar";
 import Alternative from "./Alternative";
 
 const styles = {
@@ -188,17 +188,17 @@ export default class Alternatives extends React.Component {
           onKeyDown={this.handleInputKeyStrokes}
           onClick={this.handleToggle}>
           {list.map(alternative => {
-            const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
+            const users = (!alternative || !alternative.users)?[]:alternative.users;
             return (
-              userIds.map(userId => (
-                <Avatar key={userId} userId={userId} />
+              users.map(user => (
+                <Avatar userId={user.id} name={user.name} key={user.id} />
               ))
             );
           })}
         </button>
         <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} style={style} ref={ref=>{this.alternativesRef = ref;}}>
           {list.map(alternative => {
-            const key = ((!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds).toString();
+            const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => acc += user.id, "");
             return (
               <Alternative key={key} alternative={alternative} field={field} onClick={this.handleClick} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
             );

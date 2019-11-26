@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 import { MenuItem } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import User from "../Views/User";
+import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
 
 const Value = ({value, field}) => {
@@ -84,16 +84,16 @@ export default class Alternative extends React.Component {
   render() {
     const { classes, alternative, field, className } = this.props;
 
-    const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
-    const isOwnAlternative = userIds.includes(authStore.user.id);
+    const users = (!alternative || !alternative.users)?[]:alternative.users;
+    const isOwnAlternative = users.includes(authStore.user.id);
 
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
         <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect(alternative)}>
           <strong>
             <Values value={alternative.value} field={field} /></strong> <em><div className="parenthesis">(</div>{
-            userIds.map(userId => (
-              <User key={userId} userId={userId} />
+            users.map(user => (
+              <User userId={user.id} name={user.name} key={user.id} />
             ))
           }<div className="parenthesis">)</div></em>
           {alternative.selected?

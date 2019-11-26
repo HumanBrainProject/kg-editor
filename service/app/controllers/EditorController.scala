@@ -55,8 +55,7 @@ class EditorController @Inject()(
           case Right(value) =>
             val coreInstance = value.as[CoreData]
             normalizeInstance(id, coreInstance, request.userToken)
-          case _ =>
-            Task.pure(InternalServerError("Something went wrong while fetching the instance! Please try again!"))
+          case Left(err) => Task.pure(err.toResult)
         }
         .runToFuture
     }

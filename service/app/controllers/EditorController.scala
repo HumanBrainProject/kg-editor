@@ -27,7 +27,7 @@ import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.api.mvc.{Action, _}
 import services._
-import services.specification.{FormOp, FormService}
+import services.specification.{FormService}
 
 import scala.concurrent.ExecutionContext
 

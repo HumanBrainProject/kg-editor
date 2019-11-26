@@ -144,8 +144,7 @@ trait InstanceApiService {
     size: Int,
     search: String,
     payload: JsObject,
-    serviceClient: ServiceClient = EditorClient,
-    clientExtensionId: Option[String] = None
+    serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val wsc = wSClient
       .url(s"$apiBaseEndpoint/instances/${id}/suggestedLinksForProperty")

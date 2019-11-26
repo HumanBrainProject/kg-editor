@@ -129,39 +129,6 @@ object ReverseLinkOP {
       }
     }
   }
-//
-//  /**
-//    *  Create the content to update the reverse link instance
-//    * @param command Command to decide if we should add or remove the current instance from the reverse instance
-//    * @param reverseInstance the reverse instance
-//    * @param targetField the field from the reverse instance pointing to the current instance or not
-//    * @param currentInstanceRef the current instance
-//    * @return
-//    */
-//  def createContentToUpdate(
-//    command: Command,
-//    reverseInstance: NexusInstance,
-//    targetField: String,
-//    currentInstanceRef: NexusInstanceReference
-//  ): Either[String, Option[List[NexusLink]]] = {
-//    command match {
-//      case ADD =>
-//        reverseInstance.content.value.get(targetField) match {
-//          case Some(fieldValue) =>
-//            addLink(fieldValue, currentInstanceRef, targetField)
-//          case None =>
-//            //The field does not exists on the reverse instance we add it
-//            Right(Some(List(NexusLink(currentInstanceRef))))
-//        }
-//      case DELETE =>
-//        reverseInstance.content.value.get(targetField) match {
-//          case Some(fieldValue) => removeLink(fieldValue, currentInstanceRef, targetField)
-//          case None             =>
-//            //The field does not exists we do nothing
-//            Right(None)
-//        }
-//    }
-//  }
 
   def addLink(
     fieldValue: JsValue,

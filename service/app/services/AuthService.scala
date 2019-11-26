@@ -29,11 +29,11 @@ trait AuthService {
   def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]]
 
   def getClientToken(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    clientSecret: String, // config.clientSecret
-    serviceClient: ServiceClient = EditorClient
-  ): Task[Either[WSResponse, JsObject]]
+                      wSClient: WSClient,
+                      apiBaseEndpoint: String,
+                      clientSecret: String,
+                      serviceClient: ServiceClient = EditorClient
+                    ): Task[Either[WSResponse, JsObject]]
 
 }
 
@@ -46,25 +46,24 @@ class AuthServiceLive @Inject()(config: ConfigurationServiceLive) extends AuthSe
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])
-        case _  => Left(APIEditorError(res.status, res.body))
+        case _ => Left(APIEditorError(res.status, res.body))
       }
     }
   }
 
   def getClientToken(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    clientSecret: String,
-    serviceClient: ServiceClient = EditorClient
-  ): Task[Either[WSResponse, JsObject]] = {
+                      wSClient: WSClient,
+                      apiBaseEndpoint: String,
+                      clientSecret: String,
+                      serviceClient: ServiceClient = EditorClient
+                    ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/clients/${serviceClient.client}/token")
       .withHttpHeaders("client_secret" -> clientSecret)
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
-        case OK =>
-          Right(res.json.as[JsObject])
+        case OK => Right(res.json.as[JsObject])
         case _ => Left(res)
       }
     }

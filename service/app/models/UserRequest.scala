@@ -15,14 +15,11 @@
  */
 package models
 
-import models.user.IDMUser
 import play.api.mvc.{Request, WrappedRequest}
 
 /**
   * A helper case class for logged in users
-  * @param user
   * @param request
   * @tparam A
   */
-class UserRequest[A](val user: IDMUser, val request: Request[A], val userToken: BasicAccessToken)
-    extends WrappedRequest[A](request)
+class UserRequest[A](val request: Request[A], val userToken: BasicAccessToken) extends WrappedRequest[A](request)

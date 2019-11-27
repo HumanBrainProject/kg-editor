@@ -14,7 +14,7 @@
     "color": "^3.1.2",
     "diff": "^3.5.0",
     "google-palette": "^1.1.0",
-    "hbp-quickfire": "^1.0.24",
+    "hbp-quickfire": "^1.0.27",
     "jsonld": "~1.5.4",
     "lodash": "^4.17.15",
     "lodash-uuid": "0.0.3",

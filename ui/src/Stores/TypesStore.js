@@ -15,20 +15,6 @@ class TypesStore {
   }
 
   @computed
-  get hasTypes() {
-    return (
-      !this.fetchError && this.types.length
-    );
-  }
-
-  @computed
-  get typesMap() {
-    const map = new Map();
-    this.types.forEach(type => map.set(type.id, type));
-    return map;
-  }
-
-  @computed
   get isFetched() {
     return !this.fetchError && this.types.length;
   }

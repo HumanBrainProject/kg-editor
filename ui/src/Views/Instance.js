@@ -123,17 +123,17 @@ export default class Edit extends React.Component {
             <SaveBar/>
           </div>
         </div>
-        <div className={`${classes.previewPanel} ${instanceStore.previewInstance?"show":""}`}>
-          {instanceStore.previewInstance && (
+        <div className={`${classes.previewPanel} ${appStore.previewInstance?"show":""}`}>
+          {appStore.previewInstance && (
             <React.Fragment>
               <h3>Preview</h3>
-              <Preview instanceId={instanceStore.previewInstance.id}
-                instanceName={instanceStore.previewInstance.name}
-                showEmptyFields={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showEmptyFields}
-                showAction={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showAction}
-                showBookmarkStatus={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showBookmarkStatus}
-                showType={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showType}
-                showStatus={instanceStore.previewInstance.options && instanceStore.previewInstance.options.showStatus} />
+              <Preview instanceId={appStore.previewInstance.id}
+                instanceName={appStore.previewInstance.name}
+                showEmptyFields={appStore.previewInstance.options && appStore.previewInstance.options.showEmptyFields}
+                showAction={appStore.previewInstance.options && appStore.previewInstance.options.showAction}
+                showBookmarkStatus={appStore.previewInstance.options && appStore.previewInstance.options.showBookmarkStatus}
+                showType={appStore.previewInstance.options && appStore.previewInstance.options.showType}
+                showStatus={appStore.previewInstance.options && appStore.previewInstance.options.showStatus} />
               <div className={classes.closePreviewBtn} title="close preview" onClick={this.handleHidePreview}>
                 <FontAwesomeIcon icon={"times"} />
               </div>

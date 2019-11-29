@@ -165,8 +165,8 @@ const styles = {
   }
 };
 
-@injectStyles(styles)
 @inject("formStore")
+@injectStyles(styles)
 @observer
 export default class KgTable extends React.Component {
   constructor(props){

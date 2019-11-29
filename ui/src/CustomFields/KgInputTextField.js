@@ -31,8 +31,8 @@ const styles = {
   }
 };
 
-@injectStyles(styles)
 @inject("formStore")
+@injectStyles(styles)
 @observer
 /**
  * A simple text input

@@ -2,7 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   entry: ["babel-polyfill","./src/index.js"],
@@ -31,14 +31,15 @@ module.exports = {
   },
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
+      new TerserPlugin({
         test: /\.js($|\?)/i,
         cache: false,
         parallel: true,
-        uglifyOptions: {
+        terserOptions: {
           compress: true,
           ecma: 6,
           mangle: true,
+          ie8: false,
           output: {
             comments: false,
             beautify: false

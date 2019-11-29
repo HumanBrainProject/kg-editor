@@ -132,51 +132,50 @@ class Instance {
   @action
   initializeData(data, readMode=false, isNew=false) {
     // TODO: Remove this when alternatives are ready in the core part
-    const testAlternatives = {
-      "http://schema.org/address":[{
-        "value": "fefefe",
-        "selected": true,
-        "users": [{
-          "name": "Toto",
-          "username": "toto",
-          "id": "a9e746d5-1200-3621-8ec1-19685b443eac"
-        }]
-      }],
-      "http://schema.org/familyName": [{
-        "value": "Simpson",
-        "selected": true,
-        "users": [
-          {
-            "name": "Ioannis",
-            "username": "ioannis",
-            "id": "a9e746d5-1200-3621-8ec1-19685b443eag"
-          }
-        ]
-      },
-      {
-        "value": "blabla",
-        "selected": false,
-        "users": [
-          {
-            "name": "Gilles",
-            "username": "gilles",
-            "id": "a9e746d5-1200-3621-8ec1-19685b443ead"
-          }
-        ]
-      }],
-      "http://schema.org/givenName": [{
-        "value": "Bart",
-        "selected": true,
-        "users": [
-          {
-            "name": "Fake User",
-            "username": "fakeUser",
-            "id": "a9e746d5-1200-3621-8ec1-19685b443eac"
-          }
-        ]
-      }]
-    };
-    data.alternatives = testAlternatives;
+    // const testAlternatives = {
+    //   "http://schema.org/address":[{
+    //     "value": "fefefe",
+    //     "selected": true,
+    //     "users": [{
+    //       "name": "Toto",
+    //       "username": "toto",
+    //       "id": "a9e746d5-1200-3621-8ec1-19685b443eac"
+    //     }]
+    //   }],
+    //   "http://schema.org/familyName": [{
+    //     "value": "Simpson",
+    //     "selected": true,
+    //     "users": [
+    //       {
+    //         "name": "Ioannis",
+    //         "username": "ioannis",
+    //         "id": "a9e746d5-1200-3621-8ec1-19685b443eag"
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "value": "blabla",
+    //     "selected": false,
+    //     "users": [
+    //       {
+    //         "name": "Gilles",
+    //         "username": "gilles",
+    //         "id": "a9e746d5-1200-3621-8ec1-19685b443ead"
+    //       }
+    //     ]
+    //   }],
+    //   "http://schema.org/givenName": [{
+    //     "value": "Bart",
+    //     "selected": true,
+    //     "users": [
+    //       {
+    //         "name": "Fake User",
+    //         "username": "fakeUser",
+    //         "id": "a9e746d5-1200-3621-8ec1-19685b443eac"
+    //       }
+    //     ]
+    //   }]
+    // };
     const normalizedData =  normalizeInstanceData(data);
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;

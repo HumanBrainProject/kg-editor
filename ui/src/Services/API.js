@@ -44,11 +44,8 @@ class API {
     });
     this._axios.interceptors.response.use(null, (error) => {
       if (error.response && error.response.status === 401 && !error.config._isRetry) {
-        return authStore.logout().then(()=>{
-          error.config.headers.Authorization = "Bearer " + authStore.accessToken;
-          error.config._isRetry = true;
-          return this.axios.request(error.config);
-        });
+        authStore.logout();
+        return this.axios.request(error.config);
       } else {
         return Promise.reject(error);
       }

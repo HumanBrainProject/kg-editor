@@ -18,7 +18,7 @@ package services
 
 import java.util.concurrent.ConcurrentHashMap
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Cancellable}
 import akka.http.scaladsl.model.DateTime
 import cats.syntax.either._
 import cats.syntax.option._
@@ -61,16 +61,16 @@ class EditorUserService @Inject()(
   config: ConfigurationServiceLive,
   wSClient: WSClient,
   @NamedCache("editor-userinfo-cache") cache: AsyncCacheApi
-)(implicit oIDCAuthService: TokenAuthService, credentials: CredentialsService, actorSystem: ActorSystem) {
+)(implicit credentials: CredentialsService, actorSystem: ActorSystem) {
   val logger = Logger(this.getClass)
 
-  object instanceAPIService extends InstanceAPIService
   object cacheService extends CacheService
+
   object queryService extends QueryService
 
   lazy val scheduler = scheduled
 
-  def scheduled(implicit actorSystem: ActorSystem) =
+  def scheduled(implicit actorSystem: ActorSystem): Cancellable =
     actorSystem.scheduler.schedule(initialDelay = 10.seconds, interval = 20.minute) {
       UserRequestMap.cleanMap
     }
@@ -130,66 +130,5 @@ class EditorUserService @Inject()(
     cache.set(editorUser.user.id, editorUser, config.cacheExpiration)
     editorUser
   }
-
-  def getOrCreateUser(user: IDMUser, token: AccessToken)(
-    afterCreation: (EditorUser, AccessToken) => Task[Either[APIEditorError, EditorUser]]
-  ): Task[Either[APIEditorError, EditorUser]] =
-    getUser(user, token).flatMap {
-      case Right(Some(editorUser)) => Task.pure(editorUser.asRight)
-      case Right(None) =>
-        logger.debug("Calling second time get user returns None")
-        UserRequestMap
-          .get(user.id.toString) match {
-          case Some(req) =>
-            logger.debug(s"Fetching request from cache for user ${user.id.toString}")
-            req
-          case None =>
-            logger.debug(s"Adding request to cache for user ${user.id.toString}")
-            val task = Task.from {
-              createUser(user, token).flatMap {
-                case Right(editorUser) =>
-                  logger.debug("Creating the user")
-                  afterCreation(editorUser, token)
-                case Left(e) => Task.pure(e.asLeft)
-              }
-            }.memoize
-            UserRequestMap.put(user.id.toString, task)
-            scheduler
-            task
-        }
-      case Left(e) => Task.pure(e.asLeft)
-    }
-
-  def createUser(user: IDMUser, token: AccessToken): Task[Either[APIEditorError, EditorUser]] =
-    instanceAPIService
-      .post(
-        wSClient,
-        config.kgQueryEndpoint,
-        NexusInstance(None, EditorConstants.editorUserPath, EditorUserService.userToNexusStruct(user.id)),
-        None,
-        token
-      )
-      .map {
-        case Right(ref) => EditorUser(ref, user).asRight
-        case Left(res) =>
-          logger.error(s"Could not create the user with ID ${user.id} - ${res.body}")
-          APIEditorError(res.status, res.body).asLeft
-      }
-
-  def deleteUser(editorUser: EditorUser, token: AccessToken): Task[Either[APIEditorError, Unit]] =
-    instanceAPIService
-      .delete(wSClient, config.kgQueryEndpoint, editorUser.nexusId, token)
-      .map {
-        case Right(_) => ().asRight
-        case Left(res) =>
-          logger.error(s"Could not delete the user with ID ${editorUser.nexusId.toString} - ${res.body}")
-          APIEditorError(res.status, res.body).asLeft
-      }
-}
-
-object EditorUserService {
-
-  def userToNexusStruct(userId: String): JsObject =
-    Json.obj(EditorConstants.UNSAFE_EDITORNAMESPACE + EditorConstants.USERID -> userId)
 
 }

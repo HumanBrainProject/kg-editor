@@ -86,7 +86,6 @@ class EditorUserServiceSpec
       when(cache.get[EditorUser](id)).thenReturn(Future(None))
       val service =
         new EditorUserService(configService, ws, cache)(
-          oidcService,
           clientCred,
           actorSystem
         )
@@ -126,7 +125,6 @@ class EditorUserServiceSpec
       when(cache.get[EditorUser](id)).thenReturn(Future(None))
       val service =
         new EditorUserService(configService, ws, cache)(
-          oidcService,
           clientCred,
           actorSystem
         )

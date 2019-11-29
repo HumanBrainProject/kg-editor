@@ -16,6 +16,7 @@
 
 package controllers
 
+import constants.{EditorConstants, SchemaFieldsConstants}
 import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
 import models.instance.InstanceProtocol._
@@ -27,7 +28,7 @@ import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.api.mvc.{Action, _}
 import services._
-import services.specification.{FormService}
+import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
@@ -206,8 +207,46 @@ class EditorController @Inject()(
         editorService
           .retrieveSuggestions(id, field, `type`, size, start, search, content.as[JsObject], request.userToken)
           .map {
-            case Right(value) => Ok(value)
-            case Left(err)    => err.toResult
+            case Right(value) =>
+              (value \ "data").asOpt[Map[String, JsObject]] match {
+                case Some(data) =>
+                  val types: Map[String, SuggestionType] = data.get("types") match {
+                    case Some(t) => t.as[Map[String, SuggestionType]]
+                    case None    => Map()
+                  }
+                  data.get("suggestions") match {
+                    case Some(s) =>
+                      val suggestions = (s \ "data").as[List[JsObject]].map { instance =>
+                        val instanceType = (instance \ "type").as[String]
+                        val t = types.get(instanceType)
+                        instance ++ Json.obj("type" -> Json.toJson(t))
+                      }
+                      Ok(
+                        Json.toJson(
+                          EditorResponseObject(
+                            Json.toJson(
+                              Json.obj("suggestions" -> Json.toJson(suggestions), "types" -> Json.toJson(types))
+                            )
+                          )
+                        )
+                      )
+                    case None =>
+                      Ok(
+                        Json.toJson(
+                          EditorResponseObject(
+                            Json.toJson(Json.obj("suggestions" -> JsArray(), "types" -> Json.toJson(types)))
+                          )
+                        )
+                      )
+                  }
+                case None =>
+                  Ok(
+                    Json.toJson(
+                      EditorResponseObject(Json.toJson(Json.obj("suggestions" -> JsArray(), "types" -> JsArray())))
+                    )
+                  )
+              }
+            case Left(err) => err.toResult
           }
           .runToFuture
       case None => Task.pure(BadRequest("Missing body content")).runToFuture

@@ -19,11 +19,12 @@ const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
 class AppStore{
   @observable globalError = null;
-  @observable initializingMessage = "Initializing the application...";
+  @observable initializingMessage = null;
   @observable initializationError = null;
   @observable initialInstanceError = null;
   @observable initialInstanceWorkspaceError = null;
   @observable isInitialized = false;
+  @observable canLogin = true;
   @observable currentTheme;
   @observable historySettings;
   @observable instanceIdAvailability = new Map();
@@ -46,6 +47,7 @@ class AppStore{
   }
 
   constructor(){
+    this.canLogin = !matchPath(routerStore.history.location.pathname, { path: "/logout", exact: "true" });
     let savedTheme = localStorage.getItem("currentTheme");
     this.currentTheme = savedTheme === "bright"? "bright": "default";
     let savedHistorySettings = null;
@@ -73,7 +75,7 @@ class AppStore{
 
   @action
   async initialize() {
-    if (!this.isInitialized) {
+    if (this.canLogin && !this.isInitialized) {
       this.initializingMessage = "Initializing the application...";
       this.initializationError = null;
       this.initialInstanceError = null;
@@ -606,11 +608,21 @@ class AppStore{
     routerStore.history.push("/");
   }
 
+  @action
+  login = () => {
+    if (this.canLogin) {
+      authStore.login();
+    } else {
+      routerStore.history.replace("/");
+      this.canLogin = true;
+      this.initialize(true);
+    }
+  }
+
   logout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      instanceStore.flushStoredInstanceTabs();
+      instanceTabStore.flushStoredInstanceTabs();
       authStore.logout();
-      window.location.href = window.rootPath + "/";
     }
   }
 

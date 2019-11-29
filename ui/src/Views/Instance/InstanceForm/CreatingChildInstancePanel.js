@@ -15,7 +15,7 @@ let styles = {
 };
 
 @injectStyles(styles)
-export default class CreatingChildInstancePanel extends React.Component{
+class CreatingChildInstancePanel extends React.Component{
   render(){
     const {classes} = this.props;
     return(
@@ -27,3 +27,5 @@ export default class CreatingChildInstancePanel extends React.Component{
     );
   }
 }
+
+export default CreatingChildInstancePanel;

@@ -4,7 +4,7 @@ import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
 
-export default class KgTableStore extends FormStore.typesMapping.Default{
+class KgTableStore extends FormStore.typesMapping.Default{
     @observable value = [];
     @observable options = [];
     @observable instanceId = null;
@@ -285,3 +285,5 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
     }
 }
+
+export default KgTableStore;

@@ -41,7 +41,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class KeyboardShortcuts extends React.Component {
+class KeyboardShortcuts extends React.Component {
   render(){
     const { classes } = this.props;
     return (
@@ -62,3 +62,5 @@ export default class KeyboardShortcuts extends React.Component {
     );
   }
 }
+
+export default KeyboardShortcuts;

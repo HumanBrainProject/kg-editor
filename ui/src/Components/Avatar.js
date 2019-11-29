@@ -16,7 +16,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class Avatar extends React.Component {
+class Avatar extends React.Component {
 
   render() {
     const {classes, userId, name, picture, size=20} = this.props;
@@ -36,3 +36,5 @@ export default class Avatar extends React.Component {
     );
   }
 }
+
+export default Avatar;

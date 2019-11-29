@@ -45,7 +45,7 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-export default class Status extends React.Component {
+class Status extends React.Component {
   componentDidMount() {
     statusStore.fetchStatus(this.props.id);
   }
@@ -82,3 +82,5 @@ export default class Status extends React.Component {
     );
   }
 }
+
+export default Status;

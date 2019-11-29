@@ -20,7 +20,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class FetchingLoader extends React.Component{
+class FetchingLoader extends React.Component{
   render(){
     const { classes } = this.props;
 
@@ -34,3 +34,5 @@ export default class FetchingLoader extends React.Component{
     );
   }
 }
+
+export default FetchingLoader;

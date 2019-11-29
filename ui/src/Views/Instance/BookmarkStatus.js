@@ -40,7 +40,7 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-export default class BookmarkStatus extends React.Component{
+class BookmarkStatus extends React.Component{
   componentDidMount() {
     bookmarkStatusStore.fetchStatus(this.props.id);
   }
@@ -120,3 +120,5 @@ export default class BookmarkStatus extends React.Component{
     );
   }
 }
+
+export default BookmarkStatus;

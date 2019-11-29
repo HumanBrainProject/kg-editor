@@ -57,7 +57,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Login extends React.Component {
+class Login extends React.Component {
 
   handleLogin = () => appStore.login();
 
@@ -137,3 +137,5 @@ export default class Login extends React.Component {
     );
   }
 }
+
+export default Login;

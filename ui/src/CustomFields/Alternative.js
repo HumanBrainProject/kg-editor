@@ -68,7 +68,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class Alternative extends React.Component {
+class Alternative extends React.Component {
 
   handleSelect = alternative => event => {
     const { onSelect } = this.props;
@@ -108,3 +108,5 @@ export default class Alternative extends React.Component {
     );
   }
 }
+
+export default Alternative;

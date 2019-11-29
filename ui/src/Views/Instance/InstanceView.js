@@ -9,7 +9,7 @@ import Links from "./Links";
 import PaneContainer from "./PaneContainer";
 
 @observer
-export default class InstanceView extends React.Component {
+class InstanceView extends React.Component {
   render() {
     const { instanceId, paneStore } = this.props;
 
@@ -33,3 +33,5 @@ export default class InstanceView extends React.Component {
     );
   }
 }
+
+export default InstanceView;

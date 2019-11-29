@@ -16,7 +16,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseList extends React.Component {
+class ReleaseList extends React.Component {
   constructor(props){
     super(props);
     this.state = {
@@ -74,3 +74,5 @@ export default class ReleaseList extends React.Component {
     );
   }
 }
+
+export default ReleaseList;

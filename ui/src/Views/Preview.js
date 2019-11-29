@@ -109,7 +109,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Preview extends React.Component {
+class Preview extends React.Component {
 
   componentDidMount() {
     if (this.props.instanceId) {
@@ -259,3 +259,5 @@ export default class Preview extends React.Component {
     );
   }
 }
+
+export default Preview;

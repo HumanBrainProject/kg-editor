@@ -78,7 +78,7 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-export default class Tab extends React.Component {
+class Tab extends React.Component {
   handleClick = (e) => {
     e.preventDefault();
     if(this.props.path){
@@ -117,3 +117,5 @@ export default class Tab extends React.Component {
     );
   }
 }
+
+export default Tab;

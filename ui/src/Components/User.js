@@ -18,7 +18,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class User extends React.Component {
+class User extends React.Component {
 
   render() {
     const {classes, userId, name, picture, isCurator, title} = this.props;
@@ -36,3 +36,5 @@ export default class User extends React.Component {
     );
   }
 }
+
+export default User;

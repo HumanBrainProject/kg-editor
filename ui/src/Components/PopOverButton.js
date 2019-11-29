@@ -86,7 +86,7 @@ class PopOverContent extends React.Component {
 
 @injectStyles(styles)
 @observer
-export default class PopOverButton extends React.Component{
+class PopOverButton extends React.Component{
   constructor(props){
     super(props);
     this.state = { showPopOver: false, popOverPosition: "bottom" };
@@ -173,3 +173,5 @@ export default class PopOverButton extends React.Component{
     );
   }
 }
+
+export default PopOverButton;

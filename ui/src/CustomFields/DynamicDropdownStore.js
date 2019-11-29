@@ -116,7 +116,7 @@ class OptionsPool{
 
 const optionsPool = new OptionsPool();
 
-export default class DynamicDropdownField extends FormStore.typesMapping.Default{
+class DynamicDropdownField extends FormStore.typesMapping.Default{
   @observable value = [];
   @observable defaultValue = [];
   @observable options = [];
@@ -234,3 +234,5 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 }
+
+export default DynamicDropdownField;

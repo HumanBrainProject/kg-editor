@@ -21,7 +21,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseNodeToggle extends React.Component {
+class ReleaseNodeToggle extends React.Component {
   handleChange = status => {
     appStore.togglePreviewInstance();
     const { node } = this.props;
@@ -75,3 +75,5 @@ export default class ReleaseNodeToggle extends React.Component {
     );
   }
 }
+
+export default ReleaseNodeToggle;

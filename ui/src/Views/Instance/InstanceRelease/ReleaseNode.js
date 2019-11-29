@@ -110,7 +110,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseNode extends React.Component {
+class ReleaseNode extends React.Component {
   handleOptionPreview = (instanceId, instanceName) => event => {
     event && event.stopPropagation();
     const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
@@ -192,3 +192,5 @@ export default class ReleaseNode extends React.Component {
     );
   }
 }
+
+export default ReleaseNode;

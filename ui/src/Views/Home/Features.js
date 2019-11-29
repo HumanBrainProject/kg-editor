@@ -232,7 +232,7 @@ const getVideoSize = (width, height) => {
 
 @injectStyles(styles)
 @observer
-export default class Features extends React.Component {
+class Features extends React.Component {
   constructor(props){
     super(props);
     this.state = { zoom: {type: null, src: null, width: 0, height: 0}};
@@ -343,3 +343,5 @@ export default class Features extends React.Component {
     );
   }
 }
+
+export default Features;

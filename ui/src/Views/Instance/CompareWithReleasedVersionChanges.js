@@ -23,7 +23,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class CompareWithReleasedVersionChanges extends React.Component{
+class CompareWithReleasedVersionChanges extends React.Component{
   constructor(props){
     super(props);
     this.releasedInstanceStore = createInstanceStore("RELEASED");
@@ -145,3 +145,5 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
     );
   }
 }
+
+export default CompareWithReleasedVersionChanges;

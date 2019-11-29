@@ -24,7 +24,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class HeaderPanel extends React.Component{
+class HeaderPanel extends React.Component{
   render(){
     const { classes, className, types, hasChanged } = this.props;
     return(
@@ -49,3 +49,5 @@ export default class HeaderPanel extends React.Component{
     );
   }
 }
+
+export default HeaderPanel;

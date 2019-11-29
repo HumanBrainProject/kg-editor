@@ -141,13 +141,11 @@ const styles = {
 @inject("formStore")
 @injectStyles(styles)
 @observer
-export default class DynamicDropdownField extends React.Component {
+class DynamicDropdownField extends React.Component {
   constructor(props) {
     super(props);
     this.state = { alternatives: [] };
   }
-
-
 
   //The only way to trigger an onChange event in React is to do the following
   //Basically changing the field value, bypassing the react setter and dispatching an "input"
@@ -618,3 +616,5 @@ export default class DynamicDropdownField extends React.Component {
     );
   }
 }
+
+export default DynamicDropdownField;

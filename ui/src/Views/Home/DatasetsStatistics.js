@@ -136,7 +136,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class DatasetsStatistics extends React.Component {
+class DatasetsStatistics extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
@@ -378,3 +378,5 @@ export default class DatasetsStatistics extends React.Component {
     );
   }
 }
+
+export default DatasetsStatistics;

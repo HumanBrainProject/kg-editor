@@ -165,7 +165,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class BookmarksItem extends React.Component {
+class BookmarksItem extends React.Component {
   constructor(props) {
     super(props);
     this.editBookmarkNameRef = React.createRef();
@@ -329,3 +329,5 @@ export default class BookmarksItem extends React.Component {
 
   }
 }
+
+export default BookmarksItem;

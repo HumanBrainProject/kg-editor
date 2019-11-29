@@ -53,7 +53,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class FetchErrorPanel extends React.Component{
+class FetchErrorPanel extends React.Component{
   handleRetry = (e) => {
     e.stopPropagation();
     this.props.onRetry(e);
@@ -84,3 +84,5 @@ export default class FetchErrorPanel extends React.Component{
     );
   }
 }
+
+export default FetchErrorPanel;

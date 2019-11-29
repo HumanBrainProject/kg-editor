@@ -129,7 +129,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceForm extends React.Component {
+class InstanceForm extends React.Component {
   componentDidMount() {
     if (this.props.id) {
       this.fetchInstance();
@@ -294,3 +294,5 @@ export default class InstanceForm extends React.Component {
     );
   }
 }
+
+export default InstanceForm;

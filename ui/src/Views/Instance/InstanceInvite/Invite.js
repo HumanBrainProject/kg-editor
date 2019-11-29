@@ -62,7 +62,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceInvite extends React.Component{
+class InstanceInvite extends React.Component{
   render(){
     const { classes, instance } = this.props;
 
@@ -119,3 +119,5 @@ export default class InstanceInvite extends React.Component{
     );
   }
 }
+
+export default InstanceInvite;

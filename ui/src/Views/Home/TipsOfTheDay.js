@@ -61,7 +61,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class TipsOfTheDay extends React.Component {
+class TipsOfTheDay extends React.Component {
   constructor(props){
     super(props);
     this.tips = [
@@ -98,3 +98,5 @@ export default class TipsOfTheDay extends React.Component {
     );
   }
 }
+
+export default TipsOfTheDay;

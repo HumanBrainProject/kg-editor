@@ -72,7 +72,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class SavingPanel extends React.Component{
+class SavingPanel extends React.Component{
   render(){
     const { classes, id, show, inline } = this.props;
     if (!show) {
@@ -89,3 +89,5 @@ export default class SavingPanel extends React.Component{
     );
   }
 }
+
+export default SavingPanel;

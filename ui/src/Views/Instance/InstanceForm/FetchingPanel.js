@@ -41,7 +41,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class FetchingPanel extends React.Component{
+class FetchingPanel extends React.Component{
   render(){
     const { classes, id, show, inline } = this.props;
     if (!show) {
@@ -56,3 +56,5 @@ export default class FetchingPanel extends React.Component{
     );
   }
 }
+
+export default FetchingPanel;

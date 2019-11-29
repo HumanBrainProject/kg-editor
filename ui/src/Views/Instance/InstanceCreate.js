@@ -37,7 +37,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceCreate extends React.Component {
+class InstanceCreate extends React.Component {
 
   handleCheckInstanceIdAvailability = () => appStore.checkInstanceIdAvailability(this.props.instanceId);
 
@@ -91,3 +91,5 @@ export default class InstanceCreate extends React.Component {
     return null;
   }
 }
+
+export default InstanceCreate;

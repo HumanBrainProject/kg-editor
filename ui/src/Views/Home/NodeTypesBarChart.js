@@ -41,7 +41,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class NodeTypesBarChart extends React.Component {
+class NodeTypesBarChart extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
@@ -157,3 +157,5 @@ export default class NodeTypesBarChart extends React.Component {
     );
   }
 }
+
+export default NodeTypesBarChart;

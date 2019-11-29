@@ -5,7 +5,7 @@ import UserComponent from "../Components/User";
 import UsersStore from "../Stores/UsersStore";
 
 @observer
-export default class User extends React.Component {
+class User extends React.Component {
   componentDidMount() {
     if (this.props.userId) {
       UsersStore.fetchUser(this.props.userId);
@@ -30,3 +30,5 @@ export default class User extends React.Component {
     );
   }
 }
+
+export default User;

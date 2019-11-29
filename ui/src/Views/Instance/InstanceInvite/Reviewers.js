@@ -52,7 +52,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Reviewers extends React.Component{
+class Reviewers extends React.Component{
   componentDidMount() {
     this.fetchInstanceReviews();
   }
@@ -120,3 +120,5 @@ export default class Reviewers extends React.Component{
     );
   }
 }
+
+export default Reviewers;

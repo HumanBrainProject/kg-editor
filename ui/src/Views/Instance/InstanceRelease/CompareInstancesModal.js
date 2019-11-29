@@ -29,7 +29,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class CompareInstancesModal extends React.Component {
+class CompareInstancesModal extends React.Component {
   handleShowCompare = node => e => {
     e && e.stopPropagation();
     appStore.setComparedWithReleasedVersionInstance(node);
@@ -84,3 +84,5 @@ export default class CompareInstancesModal extends React.Component {
     );
   }
 }
+
+export default CompareInstancesModal;

@@ -58,7 +58,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class ReleaseStatus extends React.Component {
+class ReleaseStatus extends React.Component {
   constructor(props) {
     super(props);
     this.tooltipId = uniqueId("release-tooltip");
@@ -109,3 +109,5 @@ export default class ReleaseStatus extends React.Component {
     );
   }
 }
+
+export default ReleaseStatus;

@@ -49,7 +49,7 @@ const styles = {
 @injectStyles(styles)
 @inject("paneStore")
 @observer
-export default class Pane extends React.Component {
+class Pane extends React.Component {
   constructor(props) {
     super(props);
     this.props.paneStore.registerPane(this.props.paneId);
@@ -95,3 +95,5 @@ export default class Pane extends React.Component {
     );
   }
 }
+
+export default Pane;

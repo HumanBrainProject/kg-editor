@@ -9,7 +9,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class SummaryPanel extends React.Component{
+class SummaryPanel extends React.Component{
   render(){
     const { classes, className, level, id, instance, fields, mainInstanceId, disableLinks } = this.props;
     return(
@@ -19,3 +19,5 @@ export default class SummaryPanel extends React.Component{
     );
   }
 }
+
+export default SummaryPanel;

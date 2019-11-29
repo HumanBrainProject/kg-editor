@@ -8,7 +8,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class HelpView extends React.Component{
+class HelpView extends React.Component{
   render(){
     const {classes} = this.props;
     return (
@@ -24,3 +24,5 @@ export default class HelpView extends React.Component{
     );
   }
 }
+
+export default HelpView;

@@ -16,7 +16,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class PaneContainer extends React.Component {
+class PaneContainer extends React.Component {
   constructor(props) {
     super(props);
     if(!this.props.paneStore){
@@ -38,3 +38,5 @@ export default class PaneContainer extends React.Component {
     );
   }
 }
+
+export default PaneContainer;

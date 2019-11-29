@@ -43,7 +43,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Tabs extends React.Component {
+class Tabs extends React.Component {
   handleSelectMode(mode) {
     appStore.togglePreviewInstance();
     routerStore.history.push(`/instance/${mode}/${this.props.id}`);
@@ -100,3 +100,5 @@ export default class Tabs extends React.Component {
     }
   }
 }
+
+export default Tabs;

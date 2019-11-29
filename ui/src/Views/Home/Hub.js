@@ -41,7 +41,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Hub extends React.Component{
+class Hub extends React.Component{
   render(){
     const { classes } = this.props;
     return(
@@ -62,3 +62,5 @@ export default class Hub extends React.Component{
     );
   }
 }
+
+export default Hub;

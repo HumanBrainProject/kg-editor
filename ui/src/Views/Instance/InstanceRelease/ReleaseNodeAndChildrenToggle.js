@@ -43,7 +43,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseNodeAndChildrenToggle extends React.Component {
+class ReleaseNodeAndChildrenToggle extends React.Component {
   handleClick = status => {
     const node = releaseStore.instancesTree;
     releaseStore.markAllNodeForChange(node, status);
@@ -63,3 +63,5 @@ export default class ReleaseNodeAndChildrenToggle extends React.Component {
     );
   }
 }
+
+export default ReleaseNodeAndChildrenToggle;

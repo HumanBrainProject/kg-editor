@@ -5,7 +5,7 @@ import AvatarComponent from "../Components/Avatar";
 import UsersStore from "../Stores/UsersStore";
 
 @observer
-export default class Avatar extends React.Component {
+class Avatar extends React.Component {
   componentDidMount() {
     if (this.props.userId) {
       UsersStore.fetchUser(this.props.userId);
@@ -22,3 +22,5 @@ export default class Avatar extends React.Component {
     );
   }
 }
+
+export default Avatar;

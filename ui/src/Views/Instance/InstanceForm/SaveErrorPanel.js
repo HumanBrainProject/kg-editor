@@ -43,7 +43,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class SaveErrorPanel extends React.Component{
+class SaveErrorPanel extends React.Component{
   render(){
     const { classes, show, error, onCancel, onRetry, inline } = this.props;
     const handleCancel = (e) => {
@@ -69,3 +69,5 @@ export default class SaveErrorPanel extends React.Component{
     );
   }
 }
+
+export default SaveErrorPanel;

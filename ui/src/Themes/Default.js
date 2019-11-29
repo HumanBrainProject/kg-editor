@@ -62,8 +62,10 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class Theme extends React.Component{
+class Theme extends React.Component{
   render(){
     return null;
   }
 }
+
+export default Theme;

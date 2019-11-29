@@ -77,7 +77,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Edit extends React.Component {
+class Edit extends React.Component {
   componentDidMount() {
     appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
   }
@@ -144,3 +144,5 @@ export default class Edit extends React.Component {
     );
   }
 }
+
+export default Edit;

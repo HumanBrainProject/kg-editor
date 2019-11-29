@@ -74,7 +74,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseStats extends React.Component {
+class ReleaseStats extends React.Component {
   render() {
     const { classes } = this.props;
 
@@ -213,3 +213,5 @@ export default class ReleaseStats extends React.Component {
     );
   }
 }
+
+export default ReleaseStats;

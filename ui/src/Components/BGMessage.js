@@ -25,7 +25,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class BGMessage extends React.Component{
+class BGMessage extends React.Component{
   render(){
     const { classes } = this.props;
     return(
@@ -40,3 +40,5 @@ export default class BGMessage extends React.Component{
     );
   }
 }
+
+export default BGMessage;

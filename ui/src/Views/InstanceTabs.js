@@ -19,7 +19,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceTabs extends React.Component {
+class InstanceTabs extends React.Component {
   handleCloseInstance(instanceId) {
     appStore.closeInstance(instanceId);
   }
@@ -59,3 +59,4 @@ export default class InstanceTabs extends React.Component {
   }
 }
 
+export default InstanceTabs;

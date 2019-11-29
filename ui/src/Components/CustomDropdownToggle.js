@@ -17,7 +17,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class CustomDropdownToggle extends React.Component {
+class CustomDropdownToggle extends React.Component {
   handleClick = e => {
     e.preventDefault();
     this.props.onClick(e);
@@ -32,3 +32,5 @@ export default class CustomDropdownToggle extends React.Component {
     );
   }
 }
+
+export default CustomDropdownToggle;

@@ -129,7 +129,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceRow extends React.Component {
+class InstanceRow extends React.Component {
   handleClick(instance, event) {
     event.stopPropagation();
     if (!event.currentTarget.contains(event.target)) {
@@ -206,3 +206,5 @@ export default class InstanceRow extends React.Component {
     );
   }
 }
+
+export default InstanceRow;

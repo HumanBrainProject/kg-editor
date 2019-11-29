@@ -14,7 +14,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class CompareChanges extends React.Component{
+class CompareChanges extends React.Component{
   render(){
     const { classes } = this.props;
     const instance = instanceStore.instances.get(this.props.instanceId);
@@ -43,3 +43,5 @@ export default class CompareChanges extends React.Component{
     );
   }
 }
+
+export default CompareChanges;

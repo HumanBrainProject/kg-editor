@@ -23,7 +23,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseMessages extends React.Component {
+class ReleaseMessages extends React.Component {
   render() {
     const {classes} = this.props;
     return (
@@ -45,3 +45,4 @@ export default class ReleaseMessages extends React.Component {
   }
 }
 
+export default ReleaseMessages;

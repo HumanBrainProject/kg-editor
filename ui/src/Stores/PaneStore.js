@@ -1,7 +1,7 @@
 import { observable, action, computed } from "mobx";
 import { uniqueId, remove } from "lodash";
 
-export default class PaneStore {
+class PaneStore {
   @observable selectedPane;
   @observable panes = [];
 
@@ -23,3 +23,5 @@ export default class PaneStore {
     remove(this.panes, paneId => paneId === id);
   }
 }
+
+export default PaneStore;

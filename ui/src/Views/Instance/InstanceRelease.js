@@ -67,7 +67,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceRelease extends React.Component {
+class InstanceRelease extends React.Component {
   componentDidMount() {
     releaseStore.setTopInstanceId(this.props.id);
     releaseStore.fetchReleaseData();
@@ -157,3 +157,5 @@ export default class InstanceRelease extends React.Component {
     ) : null;
   }
 }
+
+export default InstanceRelease;

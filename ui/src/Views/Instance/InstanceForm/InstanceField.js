@@ -67,7 +67,7 @@ const styles = {
 @injectStyles(styles)
 @inject("paneStore")
 @observer
-export default class InstanceField extends React.Component{
+class InstanceField extends React.Component{
 
   componentDidMount() {
     const { instance, name } = this.props;
@@ -180,3 +180,6 @@ export default class InstanceField extends React.Component{
     return null;
   }
 }
+
+
+export default InstanceField;

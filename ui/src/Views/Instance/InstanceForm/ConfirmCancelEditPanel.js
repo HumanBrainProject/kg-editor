@@ -46,7 +46,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class ConfirmCancelEditPanel extends React.Component{
+class ConfirmCancelEditPanel extends React.Component{
   render(){
     const { classes, show, text, onConfirm, onCancel, inline} = this.props;
     const handleConfirm = (e) => {
@@ -73,3 +73,5 @@ export default class ConfirmCancelEditPanel extends React.Component{
     );
   }
 }
+
+export default ConfirmCancelEditPanel;

@@ -202,7 +202,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Home extends React.Component{
+class Home extends React.Component{
 
   render(){
     const { classes } =  this.props;
@@ -250,3 +250,6 @@ export default class Home extends React.Component{
     );
   }
 }
+
+
+export default Home;

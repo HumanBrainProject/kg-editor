@@ -153,7 +153,7 @@ class AuthStore {
       });
       if(this.endpoint) {
         try {
-          await new Promise(async (resolve, reject) => {
+          await new Promise((resolve, reject) => {
             const keycloakScript = document.createElement("script");
             keycloakScript.src = this.endpoint + "/js/keycloak.js";
             keycloakScript.async = true;

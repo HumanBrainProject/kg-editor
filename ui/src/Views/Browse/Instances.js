@@ -82,7 +82,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Instances extends React.Component{
+class Instances extends React.Component{
   handleFilterChange = event => {
     browseStore.setInstancesFilter(event.target.value);
   }
@@ -187,3 +187,5 @@ export default class Instances extends React.Component{
     );
   }
 }
+
+export default Instances;

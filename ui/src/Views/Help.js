@@ -80,7 +80,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class Instances extends React.Component{
+class Instances extends React.Component{
   render(){
     const {classes, match} = this.props;
     const {path} = match;
@@ -150,3 +150,5 @@ export default class Instances extends React.Component{
     );
   }
 }
+
+export default Instances;

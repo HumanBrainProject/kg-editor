@@ -20,7 +20,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ThemeSwitcher extends React.Component{
+class ThemeSwitcher extends React.Component{
   handleChange = (theme) => {
     appStore.setTheme(theme);
   }
@@ -42,3 +42,5 @@ export default class ThemeSwitcher extends React.Component{
     );
   }
 }
+
+export default ThemeSwitcher;

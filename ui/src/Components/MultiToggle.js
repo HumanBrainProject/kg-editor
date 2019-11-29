@@ -13,7 +13,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class MultiToggle extends React.Component{
+class MultiToggle extends React.Component{
 
   constructor(props){
     super(props);
@@ -82,3 +82,5 @@ class Toggle extends React.Component{
 }
 
 MultiToggle.Toggle = Toggle;
+
+export default MultiToggle;

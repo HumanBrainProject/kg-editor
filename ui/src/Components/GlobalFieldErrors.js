@@ -20,7 +20,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class GlobalFieldErrors extends React.Component {
+class GlobalFieldErrors extends React.Component {
   render() {
     const { classes, instance } = this.props;
     return (
@@ -48,3 +48,5 @@ export default class GlobalFieldErrors extends React.Component {
     this.setState({ showFrame: true });
   }
 }
+
+export default GlobalFieldErrors;

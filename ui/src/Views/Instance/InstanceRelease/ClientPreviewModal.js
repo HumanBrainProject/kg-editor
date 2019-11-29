@@ -31,7 +31,7 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-export default class ClientPreviewModal extends React.Component {
+class ClientPreviewModal extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.url = "https://kg.humanbrainproject.eu/webapp?group=curated&search=false#" + props.store.topInstanceId;
@@ -59,3 +59,5 @@ export default class ClientPreviewModal extends React.Component {
     );
   }
 }
+
+export default ClientPreviewModal;

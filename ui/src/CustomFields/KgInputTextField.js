@@ -40,7 +40,7 @@ const styles = {
  * @memberof FormFields
  * @namespace KgInputTextField
  */
-export default class KgInputTextField extends React.Component {
+class KgInputTextField extends React.Component {
   static defaultProps = {
     componentClass: undefined
   };
@@ -253,3 +253,5 @@ export default class KgInputTextField extends React.Component {
     );
   }
 }
+
+export default KgInputTextField;

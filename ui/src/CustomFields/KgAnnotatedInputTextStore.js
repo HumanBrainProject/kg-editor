@@ -2,7 +2,7 @@ import { observable, action } from "mobx";
 import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{
+class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{
   @observable value = null;
   @observable defaultValue = [];
   @observable max = Infinity;
@@ -40,3 +40,5 @@ export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.De
     return this.value.map(i=> ({"@id": i}));
   }
 }
+
+export default KgAnnotatedInputTextStore;

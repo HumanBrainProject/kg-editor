@@ -46,7 +46,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Graph extends React.Component {
+class Graph extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -229,3 +229,5 @@ export default class Graph extends React.Component {
     );
   }
 }
+
+export default Graph;

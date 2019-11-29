@@ -108,7 +108,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstancesHistory extends React.Component{
+class InstancesHistory extends React.Component{
   componentDidMount() {
     this.fetchInstances();
   }
@@ -250,3 +250,5 @@ export default class InstancesHistory extends React.Component{
     );
   }
 }
+
+export default InstancesHistory;

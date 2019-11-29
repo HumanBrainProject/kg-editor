@@ -33,7 +33,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class WorkspaceSelector extends React.Component {
+class WorkspaceSelector extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -70,3 +70,5 @@ export default class WorkspaceSelector extends React.Component {
     );
   }
 }
+
+export default WorkspaceSelector;

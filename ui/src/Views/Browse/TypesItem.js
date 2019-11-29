@@ -115,7 +115,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class TypesItem extends React.Component {
+class TypesItem extends React.Component {
   handleSelect = event => {
     event && event.stopPropagation();
     browseStore.selectItem(this.props.type);
@@ -153,7 +153,7 @@ export default class TypesItem extends React.Component {
         }
       </div>
     );
-
-
   }
 }
+
+export default TypesItem;

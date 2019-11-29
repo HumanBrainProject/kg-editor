@@ -65,7 +65,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Reviewer extends React.Component{
+class Reviewer extends React.Component{
 
   handleInvite = userId => {
     const { onInvite } = this.props;
@@ -92,3 +92,5 @@ export default class Reviewer extends React.Component{
     );
   }
 }
+
+export default Reviewer;

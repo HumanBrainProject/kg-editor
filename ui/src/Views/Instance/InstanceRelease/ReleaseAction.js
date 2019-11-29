@@ -87,7 +87,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class ReleaseAction extends React.Component {
+class ReleaseAction extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -171,3 +171,5 @@ export default class ReleaseAction extends React.Component {
     );
   }
 }
+
+export default ReleaseAction;

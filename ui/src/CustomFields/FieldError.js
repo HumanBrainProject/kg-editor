@@ -2,7 +2,7 @@ import React from "react";
 import instanceStore from "../Stores/InstanceStore";
 
 
-export default class FieldError extends React.Component {
+class FieldError extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
@@ -24,3 +24,5 @@ export default class FieldError extends React.Component {
     return this.props.children;
   }
 }
+
+export default FieldError;

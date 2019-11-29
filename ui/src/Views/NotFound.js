@@ -33,7 +33,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class NotFound extends React.Component{
+class NotFound extends React.Component{
   render(){
     const {classes} =  this.props;
     return (
@@ -46,3 +46,5 @@ export default class NotFound extends React.Component{
     );
   }
 }
+
+export default NotFound;

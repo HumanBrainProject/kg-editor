@@ -24,7 +24,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class CompareFieldChanges extends React.Component{
+class CompareFieldChanges extends React.Component{
   render(){
     const {classes, field, beforeValue, afterValue} = this.props;
 
@@ -39,3 +39,5 @@ export default class CompareFieldChanges extends React.Component{
     );
   }
 }
+
+export default CompareFieldChanges;

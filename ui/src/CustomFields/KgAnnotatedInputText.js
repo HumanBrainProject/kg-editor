@@ -7,7 +7,7 @@ const InputTextMultiple =  Components.InputTextMultiple;
 
 @inject("formStore")
 @observer
-export default class KgAnnotatedInputText extends React.Component {
+class KgAnnotatedInputText extends React.Component {
 
   render() {
     return (
@@ -17,3 +17,5 @@ export default class KgAnnotatedInputText extends React.Component {
     );
   }
 }
+
+export default KgAnnotatedInputText;

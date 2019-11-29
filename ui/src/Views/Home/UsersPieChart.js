@@ -41,7 +41,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class UsersPieChart extends React.Component {
+class UsersPieChart extends React.Component {
   constructor(props){
     super(props);
     this.state = {key: uniqueId("key")};
@@ -148,3 +148,5 @@ export default class UsersPieChart extends React.Component {
     );
   }
 }
+
+export default UsersPieChart;

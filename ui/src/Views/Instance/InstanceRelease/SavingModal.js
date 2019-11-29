@@ -41,7 +41,7 @@ let styles = {
 
 @injectStyles(styles)
 @observer
-export default class SavingModal extends React.Component{
+class SavingModal extends React.Component{
   handleDismissSavingReport = () => {
     releaseStore.dismissSaveError();
   }
@@ -100,3 +100,5 @@ export default class SavingModal extends React.Component{
     );
   }
 }
+
+export default SavingModal;

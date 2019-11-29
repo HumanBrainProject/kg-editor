@@ -15,7 +15,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class GlobalError extends React.Component {
+class GlobalError extends React.Component {
   handleDismiss = () => {
     appStore.dismissGlobalError();
   }
@@ -45,3 +45,5 @@ export default class GlobalError extends React.Component {
     this.setState({ showFrame: true });
   }
 }
+
+export default GlobalError;

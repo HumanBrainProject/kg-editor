@@ -46,7 +46,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class NavigationPanel extends React.Component {
+class NavigationPanel extends React.Component {
   handleFilterChange = event => {
     browseStore.setNavigationFilterTerm(event.target.value);
   }
@@ -78,3 +78,5 @@ export default class NavigationPanel extends React.Component {
     );
   }
 }
+
+export default NavigationPanel;

@@ -66,7 +66,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class InstanceManage extends React.Component {
+class InstanceManage extends React.Component {
   componentDidMount() {
     if (this.props.id) {
       this.fetchInstance();
@@ -181,3 +181,5 @@ export default class InstanceManage extends React.Component {
     );
   }
 }
+
+export default InstanceManage;

@@ -37,7 +37,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class GraphInstance extends React.Component {
+class GraphInstance extends React.Component {
   componentDidMount() {
     graphStore.fetchGraph(this.props.id);
   }
@@ -71,3 +71,5 @@ export default class GraphInstance extends React.Component {
     );
   }
 }
+
+export default GraphInstance;

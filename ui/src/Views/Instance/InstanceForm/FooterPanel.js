@@ -67,7 +67,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class FooterPanel extends React.Component {
+class FooterPanel extends React.Component {
   handleOpenInstance(mode, instanceId, event){
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
@@ -100,3 +100,5 @@ export default class FooterPanel extends React.Component {
     );
   }
 }
+
+export default FooterPanel;

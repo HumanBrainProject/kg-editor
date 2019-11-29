@@ -55,7 +55,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Tabs extends React.Component {
+class Tabs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -110,4 +110,6 @@ export default class Tabs extends React.Component {
     );
   }
 }
+
+export default Tabs;
 

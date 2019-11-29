@@ -168,7 +168,7 @@ const styles = {
 @inject("formStore")
 @injectStyles(styles)
 @observer
-export default class KgTable extends React.Component {
+class KgTable extends React.Component {
   constructor(props){
     super(props);
     this.state = {
@@ -597,3 +597,5 @@ export default class KgTable extends React.Component {
     );
   }
 }
+
+export default KgTable;

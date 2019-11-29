@@ -99,7 +99,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class GraphSettings extends React.Component {
+class GraphSettings extends React.Component {
   handleChange(nodeType, state) {
     graphStore.setTypeState(nodeType, state);
   }
@@ -177,3 +177,5 @@ export default class GraphSettings extends React.Component {
     );
   }
 }
+
+export default GraphSettings;

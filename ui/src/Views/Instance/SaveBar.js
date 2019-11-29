@@ -108,7 +108,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class SavePanel extends React.Component{
+class SavePanel extends React.Component{
   componentDidMount() {
     window.addEventListener("beforeunload", this.onUnload);
   }
@@ -228,3 +228,5 @@ export default class SavePanel extends React.Component{
     );
   }
 }
+
+export default SavePanel;

@@ -30,7 +30,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class Actions extends React.Component {
+class Actions extends React.Component {
   handleOpenInstance(mode, event) {
     if (event.metaKey || event.ctrlKey) {
       appStore.openInstance(this.props.instanceId, mode);
@@ -91,3 +91,5 @@ export default class Actions extends React.Component {
     );
   }
 }
+
+export default Actions;

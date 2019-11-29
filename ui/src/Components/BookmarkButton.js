@@ -32,7 +32,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class BookmarkButton extends React.Component {
+class BookmarkButton extends React.Component {
   constructor (props) {
     super(props);
     this.state = { listPosition: "bottom" };
@@ -68,3 +68,5 @@ export default class BookmarkButton extends React.Component {
     );
   }
 }
+
+export default BookmarkButton;

@@ -45,7 +45,7 @@ const getContainerWidth = (node, className) => {
 };
 
 @injectStyles(styles)
-export default class Alternatives extends React.Component {
+class Alternatives extends React.Component {
   constructor (props) {
     super(props);
     this.state = { open: false, maxWidth:  null};
@@ -208,3 +208,5 @@ export default class Alternatives extends React.Component {
     );
   }
 }
+
+export default Alternatives;

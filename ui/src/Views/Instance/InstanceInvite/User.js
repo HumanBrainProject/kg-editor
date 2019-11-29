@@ -53,7 +53,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class User extends React.Component{
+class User extends React.Component{
 
   handleSelect = (user, event) => {
     const { onSelect } = this.props;
@@ -86,3 +86,6 @@ export default class User extends React.Component{
     );
   }
 }
+
+
+export default User;

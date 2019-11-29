@@ -28,7 +28,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class CompareFieldValueChanges extends React.Component{
+class CompareFieldValueChanges extends React.Component{
   render(){
     const {classes, beforeValue, afterValue, mappingLabel} = this.props;
 
@@ -93,3 +93,5 @@ export default class CompareFieldValueChanges extends React.Component{
     );
   }
 }
+
+export default CompareFieldValueChanges;

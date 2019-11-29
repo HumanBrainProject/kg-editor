@@ -60,7 +60,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class SavePanel extends React.Component {
+class SavePanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -96,4 +96,6 @@ export default class SavePanel extends React.Component {
     return null;
   }
 }
+
+export default SavePanel;
 

@@ -53,7 +53,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class TypeSelection extends React.Component {
+class TypeSelection extends React.Component {
   componentDidMount() {
     if (!typesStore.isFetched) {
       typesStore.fetch();
@@ -100,3 +100,5 @@ export default class TypeSelection extends React.Component {
     );
   }
 }
+
+export default TypeSelection;

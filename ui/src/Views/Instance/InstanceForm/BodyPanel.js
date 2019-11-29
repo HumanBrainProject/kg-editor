@@ -18,7 +18,7 @@ const styles = {
 };
 
 @injectStyles(styles)
-export default class BodyPanel extends React.Component{
+class BodyPanel extends React.Component{
   render(){
     const { classes, className,  show, level, id, instance, fields, mainInstanceId, disableLinks } = this.props;
     return(
@@ -32,3 +32,5 @@ export default class BodyPanel extends React.Component{
     );
   }
 }
+
+export default BodyPanel;

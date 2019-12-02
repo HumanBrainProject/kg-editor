@@ -1,6 +1,4 @@
 import {observable, action, runInAction} from "mobx";
-
-import console from "../Services/Logger";
 import API from "../Services/API";
 
 class ReviewsStore {
@@ -39,10 +37,7 @@ class ReviewsStore {
     }
 
     try {
-      console.debug("fetch reviews of instance " + instanceId + ".");
-
       const {data} = await API.axios.get(API.endpoints.instanceReviews(instanceId));
-
       runInAction(async () => {
         const reviews = data.length ? data : [];
         const [org, , , ,] = instanceId.split("/");
@@ -51,36 +46,6 @@ class ReviewsStore {
         instanceReviews.isFetching = false;
         instanceReviews.isFetched = true;
       });
-      //
-      // Mockup Data
-      //
-      /*
-      const data = {
-        data: [
-          {
-            userId: "305861"
-          },
-          {
-            userId: "305670"
-          },
-          {
-            userId: "305629"
-          },
-          {
-            userId: "305630"
-          },
-          {
-            userId: "305808"
-          },
-          {
-            userId: "303447"
-          },
-          {
-            userId: "305920"
-          }
-        ]
-      };
-      */
     } catch (e) {
       runInAction(() => {
         const message = e.message ? e.message : e;
@@ -110,11 +75,9 @@ class ReviewsStore {
         }
         delete instanceReview.error;
         try {
-          console.debug(`invite user "${userId}" to review instance "${instanceId}".`);
           const {data} = await API.axios.put(API.endpoints.instanceReviewsByUser(instanceId, userId));
 
           runInAction(async () => {
-            console.debug(`user "${userId}" invitation to review instance "${instanceId}".`, data);
             instanceReview.status = data && data.status ? data.status : "PENDING";
           });
         } catch (e) {
@@ -137,7 +100,6 @@ class ReviewsStore {
         instanceReviews.reviews.remove(instanceReview);
         delete instanceReview.error;
         try {
-          console.debug(`canceling invite to user "${userId}" to review instance "${instanceId}".`);
           await API.axios.delete(API.endpoints.instanceReviewsByUser(instanceId, userId));
           runInAction(async () => {
             instanceReviews.reviews.remove(instanceReview);

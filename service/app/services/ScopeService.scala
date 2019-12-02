@@ -41,7 +41,7 @@ class ScopeServiceLive @Inject()(
 
   def getInstanceScope(id: String, token: AccessToken): Task[Either[APIEditorError, JsArray]] = {
     val result = scopeAPIServiceLive
-      .getScope(wSClient, configuration.kgQueryEndpoint, id, token)
+      .getScope(wSClient, configuration.kgCoreEndpoint, id, token)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -50,7 +50,7 @@ class ScopeServiceLive @Inject()(
 
   def addUserToInstanceScope(id: String, user: String, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
     val result = scopeAPIServiceLive
-      .addUserToScope(wSClient, configuration.kgQueryEndpoint, id, user, token)
+      .addUserToScope(wSClient, configuration.kgCoreEndpoint, id, user, token)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
@@ -59,7 +59,7 @@ class ScopeServiceLive @Inject()(
 
   def removeUserOfInstanceScope(id: String, user: String, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
     val result = scopeAPIServiceLive
-      .removeUserOfScope(wSClient, configuration.kgQueryEndpoint, id, user, token)
+      .removeUserOfScope(wSClient, configuration.kgCoreEndpoint, id, user, token)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))

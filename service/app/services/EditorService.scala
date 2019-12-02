@@ -63,14 +63,14 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     }
   }
 
-//  def getBookmarkInstances(
-//    bookmarkId: String,
-//    workspace: String,
-//    from: Option[Int],
-//    size: Option[Int],
-//    search: String,
-//    token: AccessToken
-//  ): Task[Either[APIEditorError, JsObject]]
+  //  def getBookmarkInstances(
+  //    bookmarkId: String,
+  //    workspace: String,
+  //    from: Option[Int],
+  //    size: Option[Int],
+  //    search: String,
+  //    token: AccessToken
+  //  ): Task[Either[APIEditorError, JsObject]]
 
   def doSearchInstances(
     typeId: String,
@@ -381,18 +381,5 @@ object EditorService {
     )
     InstanceOp.removeEmptyFieldsNotInOriginal(cleanedOriginalInstance, diff)
   }
-
-  def getIdForPayload(instance: JsValue): Option[(JsValue, String)] =
-    if ((instance \ EditorService.atId).isDefined) {
-      Some((instance, (instance \ EditorService.atId).get.as[String]))
-    } else if ((instance \ EditorService.relativeURL).isDefined) {
-      Some((instance, (instance \ EditorService.relativeURL).get.as[String]))
-    } else if ((instance \ EditorService.editorId).isDefined) {
-      Some((instance, (instance \ EditorService.editorId).get.as[String]))
-    } else if ((instance \ EditorService.simpleId).isDefined) {
-      Some((instance, (instance \ EditorService.simpleId).get.as[String]))
-    } else {
-      None
-    }
 
 }

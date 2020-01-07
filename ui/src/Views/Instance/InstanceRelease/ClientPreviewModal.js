@@ -34,7 +34,7 @@ let styles = {
 export default class ClientPreviewModal extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.url = "https://kg.ebrains.eu/search?group=curated&search=false#" + props.store.topInstanceId;
+    this.url = `https://kg.ebrains.eu/search/live/${props.store.topInstanceId}`;
   }
 
   render() {

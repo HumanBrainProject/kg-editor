@@ -32,13 +32,7 @@ import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
-import services.{
-  ConfigurationService,
-  ConfigurationServiceLive,
-  CredentialsService,
-  InstanceAPIService,
-  TokenAuthService
-}
+import services.{ConfigurationService, ConfigurationServiceLive, CredentialsService, InstanceAPIService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,7 +42,7 @@ final case class SpecificationFile(id: String, data: JsObject)
 class SpecificationService @Inject()(
   WSClient: WSClient,
   config: ConfigurationServiceLive,
-  OIDCAuthService: TokenAuthService,
+//  OIDCAuthService: TokenAuthService,
   clientCredentials: CredentialsService,
   env: Environment
 ) {
@@ -61,22 +55,22 @@ class SpecificationService @Inject()(
   private val log = LoggerFactory.getLogger(this.getClass)
   object instanceAPIService extends InstanceAPIService
 
-  def init(): Task[Done] = {
-    log.debug("Specification Service INITIALIZATION ---------------------------------")
-    //Get by identifier all Specification field
-    log.debug("Specification Service INITIALIZATION --- Fetching remote specification fields")
-
-    OIDCAuthService.getTechAccessToken(forceRefresh = true).flatMap { token =>
-      createSpecificationQueries("Queries", token).flatMap { _ =>
-        createSpecificationQueries("SpecificationQueries", token).flatMap { _ =>
-          log.info(s"Specification Service INITIALIZATION --- Done fetching and creating queries")
-          getOrCreateSpecificationAndSpecificationFields(token).map { s =>
-            Done
-          }
-        }
-      }
-    }
-  }
+//  def init(): Task[Done] = {
+//    log.debug("Specification Service INITIALIZATION ---------------------------------")
+//    //Get by identifier all Specification field
+//    log.debug("Specification Service INITIALIZATION --- Fetching remote specification fields")
+//
+//    OIDCAuthService.getTechAccessToken(forceRefresh = true).flatMap { token =>
+//      createSpecificationQueries("Queries", token).flatMap { _ =>
+//        createSpecificationQueries("SpecificationQueries", token).flatMap { _ =>
+//          log.info(s"Specification Service INITIALIZATION --- Done fetching and creating queries")
+//          getOrCreateSpecificationAndSpecificationFields(token).map { s =>
+//            Done
+//          }
+//        }
+//      }
+//    }
+//  }
 
   private def getOrCreateSpecificationAndSpecificationFields(token: AccessToken): Task[Done] =
     runQuery(s"${specFieldIdQueryPath.toString}/$specFieldIdQueryId/instances", token)

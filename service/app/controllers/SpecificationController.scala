@@ -23,38 +23,36 @@ import models.{AuthenticatedUserAction, NexusPath}
 import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.{ConfigurationService, ConfigurationServiceLive}
-import services.specification.FormService
 
 class SpecificationController @Inject()(
   cc: ControllerComponents,
-  formService: FormService,
   authenticatedUserAction: AuthenticatedUserAction,
   configurationService: ConfigurationServiceLive
 ) extends AbstractController(cc) {
 
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
 
-  def getTemplate(org: String, domain: String, schema: String, version: String): Action[AnyContent] =
-    authenticatedUserAction.async {
-      formService
-        .getRegistries()
-        .map { registries =>
-          val nexusPath = NexusPath(org, domain, schema, version)
-          registries.formRegistry.registry.get(nexusPath).fold(NotFound("Could not find the requested specification")) {
-            registry =>
-              val template = registry.getFieldsAsMap.map {
-                case (k, v) =>
-                  k -> SpecificationController.getExampleValue(v, configurationService.nexusEndpoint)
-              }
-              Ok(
-                Json.toJson(
-                  template.updated(JsonLDConstants.TYPE, JsString(s"https://schema.hbp.eu/$org/${schema.capitalize}"))
-                )
-              )
-          }
-        }
-        .runToFuture
-    }
+//  def getTemplate(org: String, domain: String, schema: String, version: String): Action[AnyContent] =
+//    authenticatedUserAction.async {
+//      formService
+//        .getRegistries()
+//        .map { registries =>
+//          val nexusPath = NexusPath(org, domain, schema, version)
+//          registries.formRegistry.registry.get(nexusPath).fold(NotFound("Could not find the requested specification")) {
+//            registry =>
+//              val template = registry.getFieldsAsMap.map {
+//                case (k, v) =>
+//                  k -> SpecificationController.getExampleValue(v, configurationService.nexusEndpoint)
+//              }
+//              Ok(
+//                Json.toJson(
+//                  template.updated(JsonLDConstants.TYPE, JsString(s"https://schema.hbp.eu/$org/${schema.capitalize}"))
+//                )
+//              )
+//          }
+//        }
+//        .runToFuture
+//    }
 
 }
 

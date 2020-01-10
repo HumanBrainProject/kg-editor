@@ -31,9 +31,9 @@ import play.api.http.Status._
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.libs.ws.WSClient
 import services.query.{QueryApiParameter, QueryService}
-import services.specification.{FormOp, FormRegistries, FormService}
+import services.specification.{FormOp}
 
-class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationServiceLive, formService: FormService) {
+class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationServiceLive) {
 
   val logger = Logger(this.getClass)
 
@@ -259,22 +259,21 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         case Left(res) => Task.pure(Left(APIEditorMultiError.fromResponse(res.status, res.body)))
       }
 
-  def generateDiffAndUpdateInstance(
-    instanceRef: NexusInstanceReference,
-    updateFromUser: JsValue,
-    token: AccessToken,
-    user: UNSAFE_User,
-    registries: FormRegistries
-  ): Task[Either[APIEditorMultiError, Unit]] =
-    retrieveInstance(instanceRef, token, registries.queryRegistry).flatMap {
-      case Left(error) =>
-        Task.pure(Left(APIEditorMultiError(error.status, List(error))))
-      case Right(currentInstanceDisplayed) =>
-        val updateToBeStored =
-          EditorService.computeUpdateTobeStored(currentInstanceDisplayed, updateFromUser, configuration.nexusEndpoint)
-        //Normal update of the instance without reverse links
-        processInstanceUpdate(instanceRef, updateToBeStored, user, token)
-    }
+//  def generateDiffAndUpdateInstance(
+//    instanceRef: NexusInstanceReference,
+//    updateFromUser: JsValue,
+//    token: AccessToken,
+//    user: UNSAFE_User,
+//  ): Task[Either[APIEditorMultiError, Unit]] =
+//    retrieveInstance(instanceRef, token, registries.queryRegistry).flatMap {
+//      case Left(error) =>
+//        Task.pure(Left(APIEditorMultiError(error.status, List(error))))
+//      case Right(currentInstanceDisplayed) =>
+//        val updateToBeStored =
+//          EditorService.computeUpdateTobeStored(currentInstanceDisplayed, updateFromUser, configuration.nexusEndpoint)
+//        //Normal update of the instance without reverse links
+//        processInstanceUpdate(instanceRef, updateToBeStored, user, token)
+//    }
 
   /**
     * Update the reverse instance

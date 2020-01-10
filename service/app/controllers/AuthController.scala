@@ -21,14 +21,12 @@ import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import play.api.{Configuration, Logger}
 import services.AuthServiceLive
-import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
 class AuthController @Inject()(
   cc: ControllerComponents,
   config: Configuration,
-  formService: FormService,
   wsClient: WSClient,
   authServiceLive: AuthServiceLive
 )(implicit ec: ExecutionContext)

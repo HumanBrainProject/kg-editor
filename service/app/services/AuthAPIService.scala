@@ -26,6 +26,8 @@ trait AuthAPIService {
 
   def getEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]]
 
+  def getClientTokenEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]]
+
   def getClientToken(
     wSClient: WSClient,
     apiBaseEndpoint: String,
@@ -49,16 +51,32 @@ class AuthAPIServiceLive extends AuthAPIService {
     }
   }
 
+  def getClientTokenEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/users/authorization/tokenEndpoint")
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK => Right(res.json.as[JsObject])
+        case _  => Left(res)
+      }
+    }
+  }
+
   def getClientToken(
     wSClient: WSClient,
-    apiBaseEndpoint: String,
+    endpoint: String,
     clientSecret: String,
     serviceClient: ServiceClient = EditorClient
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/clients/${serviceClient.client}/token")
-      .withHttpHeaders("client_secret" -> clientSecret)
-    val r = Task.deferFuture(q.get())
+      .url(endpoint)
+      .withHttpHeaders("cache-control" -> "no-cache", "content-type" -> "application/x-www-form-urlencoded")
+    val r = Task.deferFuture(
+      q.post(
+        Map("grant_type" -> "client_credentials", "client_id" -> serviceClient.client, "client_secret" -> clientSecret)
+      )
+    )
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])

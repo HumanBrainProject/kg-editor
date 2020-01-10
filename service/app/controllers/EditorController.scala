@@ -16,10 +16,8 @@
 
 package controllers
 
-import constants.{EditorConstants, SchemaFieldsConstants}
 import javax.inject.{Inject, Singleton}
 import helpers.InstanceHelper
-import models.instance.InstanceProtocol._
 import models._
 import models.instance._
 import monix.eval.Task
@@ -28,7 +26,6 @@ import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.api.mvc.{Action, _}
 import services._
-import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
@@ -39,7 +36,6 @@ class EditorController @Inject()(
   editorService: EditorService,
   workspaceServiceLive: WorkspaceServiceLive,
   config: ConfigurationServiceLive,
-  formService: FormService,
   reverseLinkService: ReverseLinkService
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
@@ -263,52 +259,52 @@ class EditorController @Inject()(
       }.toSeq: _*)
   }
 
-  def getUiDirectivesMessages(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    formService
-      .getRegistries()
-      .map { registries =>
-        val instancesWithMessages = registries.formRegistry.registry
-          .foldLeft(Map[NexusPath, JsObject]()) {
-            case (acc, (k, v)) =>
-              val m = for {
-                directive <- v.uiDirective
-                messages  <- (directive \ "messages").asOpt[JsObject]
-              } yield messages
-              m match {
-                case Some(message) => acc.updated(k, message)
-                case None          => acc
-              }
-          }
+//  def getUiDirectivesMessages(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+//    formService
+//      .getRegistries()
+//      .map { registries =>
+//        val instancesWithMessages = registries.formRegistry.registry
+//          .foldLeft(Map[NexusPath, JsObject]()) {
+//            case (acc, (k, v)) =>
+//              val m = for {
+//                directive <- v.uiDirective
+//                messages  <- (directive \ "messages").asOpt[JsObject]
+//              } yield messages
+//              m match {
+//                case Some(message) => acc.updated(k, message)
+//                case None          => acc
+//              }
+//          }
+//
+//        Ok(Json.toJson(EditorResponseObject(Json.toJson(instancesWithMessages)(new MapWrites[JsObject]()))))
+//      }
+//      .runToFuture
+//  }
 
-        Ok(Json.toJson(EditorResponseObject(Json.toJson(instancesWithMessages)(new MapWrites[JsObject]()))))
-      }
-      .runToFuture
-  }
-
-  def getInstanceNumberOfAvailableRevisions(
-    org: String,
-    domain: String,
-    datatype: String,
-    version: String,
-    id: String
-  ): Action[AnyContent] =
-    authenticatedUserAction.async { implicit request =>
-      val nexusInstanceRef = NexusInstanceReference(org, domain, datatype, version, id)
-      formService
-        .getRegistries()
-        .flatMap { registries =>
-          editorService
-            .retrieveInstance(nexusInstanceRef, request.userToken, registries.queryRegistry)
-            .flatMap[Result] {
-              case Left(error) =>
-                Task.pure(error.toResult)
-              case Right(originalInstance) =>
-                val nbRevision = (originalInstance.content \ "nxv:rev").as[JsNumber]
-                Task.pure(Ok(Json.obj("available_revisions" -> nbRevision, "path" -> id)))
-            }
-        }
-        .runToFuture
-    }
+//  def getInstanceNumberOfAvailableRevisions(
+//    org: String,
+//    domain: String,
+//    datatype: String,
+//    version: String,
+//    id: String
+//  ): Action[AnyContent] =
+//    authenticatedUserAction.async { implicit request =>
+//      val nexusInstanceRef = NexusInstanceReference(org, domain, datatype, version, id)
+//      formService
+//        .getRegistries()
+//        .flatMap { registries =>
+//          editorService
+//            .retrieveInstance(nexusInstanceRef, request.userToken, registries.queryRegistry)
+//            .flatMap[Result] {
+//              case Left(error) =>
+//                Task.pure(error.toResult)
+//              case Right(originalInstance) =>
+//                val nbRevision = (originalInstance.content \ "nxv:rev").as[JsNumber]
+//                Task.pure(Ok(Json.obj("available_revisions" -> nbRevision, "path" -> id)))
+//            }
+//        }
+//        .runToFuture
+//    }
 
   /**
     * Entry point when updating an instance

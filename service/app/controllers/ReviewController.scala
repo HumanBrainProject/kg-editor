@@ -21,13 +21,11 @@ import models.{AuthenticatedUserAction, EditorResponseObject}
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.{InstanceAPIService, _}
-import services.specification.FormService
 
 class ReviewController @Inject()(
   cc: ControllerComponents,
   IDMAPIService: IDMAPIService,
   authenticatedUserAction: AuthenticatedUserAction,
-  formService: FormService,
   editorUserService: EditorUserService,
   editorService: EditorService,
   reverseLinkService: ReverseLinkService

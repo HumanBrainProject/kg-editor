@@ -13,6 +13,14 @@
     If there are more than 10000 elements it will overflow to the
     disk cache, which in this configuration will go to wherever java.io.tmp is
     defined on your system. On a standard Linux system this will be /tmp" -->
+    <cache name="servicetoken-cache"
+           maxEntriesLocalHeap="10000"
+           eternal="false"
+           diskSpoolBufferSizeMB="20"
+           memoryStoreEvictionPolicy="FIFO"
+           transactionalMode="off">
+        <persistence strategy="localTempSwap" />
+    </cache>
     <cache name="userinfo-cache"
            maxEntriesLocalHeap="10000"
            eternal="false"

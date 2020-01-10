@@ -3,4 +3,4 @@
 #  tags:
 #    - editor
 ###
-GET    /messages                controllers.EditorController.getUiDirectivesMessages()
+#GET    /messages                controllers.EditorController.getUiDirectivesMessages()

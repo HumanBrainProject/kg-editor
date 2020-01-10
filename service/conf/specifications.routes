@@ -37,4 +37,4 @@
 #     schema:
 #       type: object
 ###
-GET /:org/:domain/:schema/:version/template        controllers.SpecificationController.getTemplate(org: String, domain:String, schema: String, version:String)
+# GET /:org/:domain/:schema/:version/template        controllers.SpecificationController.getTemplate(org: String, domain:String, schema: String, version:String)

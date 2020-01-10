@@ -24,7 +24,6 @@ import play.api.libs.json._
 import play.api.mvc.{AnyContent, _}
 import services._
 import services.query.QueryService
-import services.specification.FormService
 
 import scala.concurrent.ExecutionContext
 
@@ -33,8 +32,7 @@ class EditorUserController @Inject()(
   config: ConfigurationServiceLive,
   authenticatedUserAction: AuthenticatedUserAction,
   workspaceServiceLive: WorkspaceServiceLive,
-  editorUserService: EditorUserService,
-  formService: FormService
+  editorUserService: EditorUserService
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
   val logger = Logger(this.getClass)

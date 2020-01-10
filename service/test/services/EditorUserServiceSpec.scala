@@ -78,7 +78,6 @@ class EditorUserServiceSpec
             Ok(Json.obj("results" -> Json.toJson(List(endpointResponse))))
           }
       }
-      val oidcService = mock[TokenAuthService]
       val clientCred = mock[CredentialsService]
       val configService = mock[ConfigurationServiceLive]
       val cache = mock[AsyncCacheApi]
@@ -117,7 +116,6 @@ class EditorUserServiceSpec
             NotFound("User not found")
           }
       }
-      val oidcService = mock[TokenAuthService]
       val configService = mock[ConfigurationServiceLive]
       val clientCred = mock[CredentialsService]
       val cache = mock[AsyncCacheApi]

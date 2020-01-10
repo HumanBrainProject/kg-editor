@@ -30,7 +30,7 @@ class IDMAPIService @Inject()(
   WSClient: WSClient,
   config: ConfigurationServiceLive,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi
-)(implicit OIDCAuthService: TokenAuthService, clientCredentials: CredentialsService) {
+)(implicit clientCredentials: CredentialsService) {
   private val log = LoggerFactory.getLogger(this.getClass)
   object cacheService extends CacheService
 

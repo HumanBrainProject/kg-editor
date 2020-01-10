@@ -39,7 +39,7 @@ trait WorkspaceAPIService {
     apiBaseEndpoint: String,
     workspace: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]]
 
   def getWorkspaces(
@@ -78,11 +78,11 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
     apiBaseEndpoint: String,
     workspace: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/types")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("workspace" -> workspace, "stage" -> "LIVE", "withProperties" -> "true")
     val r = Task.deferFuture(q.get())
     r.map { res =>

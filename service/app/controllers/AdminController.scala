@@ -16,21 +16,20 @@
 package controllers
 
 import com.google.inject.Inject
-import models.{Cache, EditorUserCache, MetadataCache, UserInfoCache}
+import models.{Cache, ServiceTokenCache}
 import monix.eval.Task
 import play.api.Logger
 import play.api.cache.AsyncCacheApi
 import play.api.mvc._
 import play.cache.NamedCache
 import services.CacheService
-import services.specification.FormService
 
 class AdminController @Inject()(
   cc: ControllerComponents,
-  @NamedCache("editor-userinfo-cache") editorCache: AsyncCacheApi,
-  @NamedCache("userinfo-cache") userCache: AsyncCacheApi,
-  @NamedCache("editor-metadata-cache") metadataCache: AsyncCacheApi,
-  formService: FormService
+  @NamedCache("servicetoken-cache") serviceTokenCache: AsyncCacheApi
+//  @NamedCache("editor-userinfo-cache") editorCache: AsyncCacheApi,
+//  @NamedCache("userinfo-cache") userCache: AsyncCacheApi,
+//  @NamedCache("editor-metadata-cache") metadataCache: AsyncCacheApi,
 ) extends AbstractController(cc) {
   val log = Logger(this.getClass)
   object cacheService extends CacheService
@@ -40,20 +39,21 @@ class AdminController @Inject()(
     Cache
       .fromString(name)
       .fold(Task.pure(NotFound("Cache not found"))) {
-        case EditorUserCache => cacheService.clearCache(editorCache).map(_ => Ok("Cache cleared"))
-        case UserInfoCache   => cacheService.clearCache(userCache).map(_ => Ok("Cache cleared"))
-        case MetadataCache   => cacheService.clearCache(metadataCache).map(_ => Ok("Cache cleared"))
+        case ServiceTokenCache => cacheService.clearCache(serviceTokenCache).map(_ => Ok("Cache cleared"))
+//        case EditorUserCache => cacheService.clearCache(editorCache).map(_ => Ok("Cache cleared"))
+//        case UserInfoCache   => cacheService.clearCache(userCache).map(_ => Ok("Cache cleared"))
+//        case MetadataCache   => cacheService.clearCache(metadataCache).map(_ => Ok("Cache cleared"))
       }
       .runToFuture
   }
-
-  def deleteAndReloadSpecs: Action[AnyContent] = Action.async { implicit request =>
-    formService
-      .flushSpec()
-      .map { _ =>
-        Ok("Specification reloaded")
-      }
-      .runToFuture
-  }
+//
+//  def deleteAndReloadSpecs: Action[AnyContent] = Action.async { implicit request =>
+//    formService
+//      .flushSpec()
+//      .map { _ =>
+//        Ok("Specification reloaded")
+//      }
+//      .runToFuture
+//  }
 
 }

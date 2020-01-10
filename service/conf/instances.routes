@@ -258,4 +258,4 @@ DELETE    /:id                  controllers.EditorController.deleteInstance(id: 
 #    required: false
 #    type: string
 ###
-GET    /:org/:domain/:schema/:version/:id/revisions                         controllers.EditorController.getInstanceNumberOfAvailableRevisions(org: String, domain:String, schema: String, version:String, id: String)
+# GET    /:org/:domain/:schema/:version/:id/revisions                         controllers.EditorController.getInstanceNumberOfAvailableRevisions(org: String, domain:String, schema: String, version:String, id: String)

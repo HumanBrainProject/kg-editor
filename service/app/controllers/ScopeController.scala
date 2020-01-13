@@ -39,7 +39,7 @@ class ScopeController @Inject()(
   def getInstanceScope(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       scopeServiceLive
-        .getInstanceScope(id, request.userToken)
+        .getInstanceScope(id, request.userToken, request.clientToken)
         .map {
           case Left(err)    => err.toResult
           case Right(value) => Ok(value)
@@ -50,7 +50,7 @@ class ScopeController @Inject()(
   def addUserToInstanceScope(id: String, user: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       scopeServiceLive
-        .addUserToInstanceScope(id, user, request.userToken)
+        .addUserToInstanceScope(id, user, request.userToken, request.clientToken)
         .map {
           case Left(err) => err.toResult
           case Right(()) =>
@@ -62,7 +62,7 @@ class ScopeController @Inject()(
   def removeUserOfInstanceScope(id: String, user: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       scopeServiceLive
-        .removeUserOfInstanceScope(id, user, request.userToken)
+        .removeUserOfInstanceScope(id, user, request.userToken, request.clientToken)
         .map {
           case Left(err) => err.toResult
           case Right(()) =>

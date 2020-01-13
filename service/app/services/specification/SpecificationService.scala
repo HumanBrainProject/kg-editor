@@ -32,7 +32,7 @@ import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
-import services.{ConfigurationService, ConfigurationServiceLive, CredentialsService, InstanceAPIService}
+import services.{ConfigurationService, ConfigurationServiceLive, InstanceAPIService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +43,6 @@ class SpecificationService @Inject()(
   WSClient: WSClient,
   config: ConfigurationServiceLive,
 //  OIDCAuthService: TokenAuthService,
-  clientCredentials: CredentialsService,
   env: Environment
 ) {
   private val specFieldIdQueryPath = NexusPath("meta", "minds", "specificationfield", "v0.0.1")
@@ -72,7 +71,7 @@ class SpecificationService @Inject()(
 //    }
 //  }
 
-  private def getOrCreateSpecificationAndSpecificationFields(token: AccessToken): Task[Done] =
+  private def getOrCreateSpecificationAndSpecificationFields(token: AccessToken, clientToken: String): Task[Done] =
     runQuery(s"${specFieldIdQueryPath.toString}/$specFieldIdQueryId/instances", token)
       .flatMap { specFieldResult =>
         specFieldResult.status match {
@@ -91,7 +90,7 @@ class SpecificationService @Inject()(
             )
             // Create if not exists
             val futToCreate = toCreate.map { el =>
-              this.uploadSpec(el, token)
+              this.uploadSpec(el, token, clientToken)
             }
             //Update the map of ids
             val fieldId = for {
@@ -102,7 +101,7 @@ class SpecificationService @Inject()(
               }
             } yield fieldIdMap
             fieldId.flatMap { fMap =>
-              getSpecifications(fMap, token).map { _ =>
+              getSpecifications(fMap, token, clientToken).map { _ =>
                 log.info(s"Specification Service INITIALIZATION --- Done fetching and creating specification")
                 Done
               }
@@ -118,7 +117,11 @@ class SpecificationService @Inject()(
         }
       }
 
-  private def getSpecifications(fieldsIdMap: Map[String, NexusInstanceReference], token: AccessToken): Task[Done] = {
+  private def getSpecifications(
+    fieldsIdMap: Map[String, NexusInstanceReference],
+    token: AccessToken,
+    clientToken: String
+  ): Task[Done] = {
     log.debug("Specification Service INITIALIZATION --- Fetching remote specifications")
     val futListOfSpecToUpload =
       runQuery(s"${specIdQueryPath.toString}/$specQueryId/instances", token)
@@ -165,7 +168,7 @@ class SpecificationService @Inject()(
     futListOfSpecToUpload.flatMap { listOfSpecToUpload =>
       (listOfSpecToUpload
         .map { file =>
-          uploadSpec(file, token)
+          uploadSpec(file, token, clientToken)
         })
         .sequence
         .map { specCreated =>
@@ -221,12 +224,13 @@ class SpecificationService @Inject()(
 
   private def uploadSpec(
     value: SpecificationFile,
-    token: AccessToken
+    token: AccessToken,
+    clientToken: String
   ): Task[Either[APIEditorError, (String, NexusInstanceReference)]] = {
 
     val path = NexusInstanceReference.fromUrl(value.id).nexusPath
     instanceAPIService
-      .post(WSClient, config.kgQueryEndpoint, NexusInstance(None, path, value.data), None, token)
+      .post(WSClient, config.kgQueryEndpoint, NexusInstance(None, path, value.data), None, token, clientToken)
       .map {
         case Left(res) =>
           log.error(

@@ -32,7 +32,8 @@ final case class AddReverseLinkCommand(
   editorService: EditorService,
   baseUrl: String,
   token: AccessToken,
-  user: UNSAFE_User
+  user: UNSAFE_User,
+  clientToken: String
 ) extends Command {
   override def execute(): Task[Either[APIEditorError, Unit]] = {
     val diffToSave = reverseInstance.content.value.get(targetField) match {
@@ -50,7 +51,7 @@ final case class AddReverseLinkCommand(
             Json.obj(targetField -> Json.toJson(l.map(_.toJson(baseUrl))))
           )
         )
-        editorService.updateInstance(reverseLinkInstance, reverseInstanceLink.ref, token, user.id)
+        editorService.updateInstance(reverseLinkInstance, reverseInstanceLink.ref, token, user.id, clientToken)
       case Left(s) => Task.pure(Left(APIEditorError(INTERNAL_SERVER_ERROR, s)))
     }
 

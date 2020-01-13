@@ -47,11 +47,11 @@ class EditorController @Inject()(
   def getInstance(id: String, metadata: Boolean, returnPermissions: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .getInstance(id, request.userToken, metadata, returnPermissions)
+        .getInstance(id, request.userToken, metadata, returnPermissions, request.clientToken)
         .flatMap {
           case Right(value) =>
             val coreInstance = value.as[CoreData]
-            normalizeInstance(id, coreInstance, request.userToken)
+            normalizeInstance(id, coreInstance, request.userToken, request.clientToken)
           case Left(err) => Task.pure(err.toResult)
         }
         .runToFuture
@@ -60,7 +60,7 @@ class EditorController @Inject()(
   def deleteInstance(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .deleteInstance(id, request.userToken)
+        .deleteInstance(id, request.userToken, request.clientToken)
         .map {
           case Right(()) => Ok("Instance has been deleted")
           case Left(err) => err.toResult
@@ -111,13 +111,21 @@ class EditorController @Inject()(
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
         editorService
-          .retrieveInstances(ids, request.userToken, stage, metadata, returnAlternatives, returnPermissions)
+          .retrieveInstances(
+            ids,
+            request.userToken,
+            stage,
+            metadata,
+            returnAlternatives,
+            returnPermissions,
+            request.clientToken
+          )
           .flatMap {
             case Right(instancesResult) =>
               val coreInstances = InstanceHelper.toCoreData(instancesResult)
               val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstances(coreInstances)
               workspaceServiceLive
-                .retrieveTypesListByName(typesToRetrieve, request.userToken)
+                .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken)
                 .map {
                   case Right(typesWithFields) =>
                     implicit val writer = InstanceProtocol.instanceWrites
@@ -147,14 +155,14 @@ class EditorController @Inject()(
   ): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .doSearchInstances(typeId, from, size, searchByLabel, request.userToken)
+        .doSearchInstances(typeId, from, size, searchByLabel, request.userToken, request.clientToken)
         .flatMap {
           case Right(instancesResult) =>
             (instancesResult \ "data").asOpt[List[JsObject]] match {
               case Some(coreInstancesList) =>
                 val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstancesList(coreInstancesList)
                 workspaceServiceLive
-                  .retrieveTypesListByName(typesToRetrieve, request.userToken)
+                  .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken)
                   .map {
                     case Right(typesWithFields) =>
                       implicit val writer = InstanceProtocol.instanceWrites
@@ -181,7 +189,7 @@ class EditorController @Inject()(
   def getInstanceGraph(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .retrieveInstanceGraph(id, request.userToken)
+        .retrieveInstanceGraph(id, request.userToken, request.clientToken)
         .map {
           case Left(err)    => err.toResult
           case Right(value) => Ok(value)
@@ -201,7 +209,17 @@ class EditorController @Inject()(
     bodyContent match {
       case Some(content) =>
         editorService
-          .retrieveSuggestions(id, field, `type`, size, start, search, content.as[JsObject], request.userToken)
+          .retrieveSuggestions(
+            id,
+            field,
+            `type`,
+            size,
+            start,
+            search,
+            content.as[JsObject],
+            request.userToken,
+            request.clientToken
+          )
           .map {
             case Right(value) =>
               (value \ "data").asOpt[Map[String, JsObject]] match {
@@ -319,11 +337,11 @@ class EditorController @Inject()(
         (bodyContent match {
           case Some(body) =>
             editorService
-              .updateInstanceNew(id, body.as[JsObject], request.userToken)
+              .updateInstanceNew(id, body.as[JsObject], request.userToken, request.clientToken)
               .flatMap {
                 case Right(value) =>
                   val coreInstance = value.as[CoreData]
-                  normalizeInstance(id, coreInstance, request.userToken)
+                  normalizeInstance(id, coreInstance, request.userToken, request.clientToken)
                 case _ =>
                   Task.pure(
                     InternalServerError("Something went wrong with the update of the instance! Please try again!")
@@ -355,13 +373,13 @@ class EditorController @Inject()(
     bodyContent match {
       case Some(body) =>
         editorService
-          .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken)
+          .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken, request.clientToken)
           .flatMap {
             case Right(value) =>
               val instance = value.as[CoreData]
               id match {
-                case Some(i) => normalizeInstance(i, instance, request.userToken)
-                case None    => normalizeInstance("", instance, request.userToken)
+                case Some(i) => normalizeInstance(i, instance, request.userToken, request.clientToken)
+                case None    => normalizeInstance("", instance, request.userToken, request.clientToken)
               }
             case _ =>
               Task.pure(
@@ -372,12 +390,17 @@ class EditorController @Inject()(
     }
   }
 
-  private def normalizeInstance(id: String, coreInstance: CoreData, token: AccessToken): Task[Result] = {
+  private def normalizeInstance(
+    id: String,
+    coreInstance: CoreData,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Result] = {
     val typesToRetrieve = InstanceHelper.getTypes(coreInstance)
     typesToRetrieve match {
       case Some(t) =>
         workspaceServiceLive
-          .retrieveTypesListByName(t, token)
+          .retrieveTypesListByName(t, token, clientToken)
           .map {
             case Right(typesWithFields) =>
               implicit val writer = InstanceProtocol.instanceWrites

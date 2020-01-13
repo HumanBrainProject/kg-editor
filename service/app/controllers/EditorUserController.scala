@@ -44,7 +44,7 @@ class EditorUserController @Inject()(
   def getUserProfile(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     val res = for {
       userProfile    <- editorUserService.getUserProfile(request.userToken)
-      userWorkspaces <- workspaceServiceLive.retrieveWorkspaces(request.userToken)
+      userWorkspaces <- workspaceServiceLive.retrieveWorkspaces(request.userToken, request.clientToken)
     } yield (userProfile, userWorkspaces)
     val result = res.map {
       case (Right(user), Right(workspace)) =>

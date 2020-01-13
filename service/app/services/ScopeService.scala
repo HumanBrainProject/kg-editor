@@ -25,11 +25,21 @@ import play.api.libs.ws.WSClient
 
 trait ScopeService {
 
-  def getInstanceScope(id: String, token: AccessToken): Task[Either[APIEditorError, JsArray]]
+  def getInstanceScope(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, JsArray]]
 
-  def addUserToInstanceScope(id: String, user: String, token: AccessToken): Task[Either[APIEditorError, Unit]]
+  def addUserToInstanceScope(
+    id: String,
+    user: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, Unit]]
 
-  def removeUserOfInstanceScope(id: String, user: String, token: AccessToken): Task[Either[APIEditorError, Unit]]
+  def removeUserOfInstanceScope(
+    id: String,
+    user: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, Unit]]
 
 }
 
@@ -39,27 +49,37 @@ class ScopeServiceLive @Inject()(
   scopeAPIServiceLive: ScopeAPIServiceLive
 ) extends ScopeService {
 
-  def getInstanceScope(id: String, token: AccessToken): Task[Either[APIEditorError, JsArray]] = {
+  def getInstanceScope(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, JsArray]] = {
     val result = scopeAPIServiceLive
-      .getScope(wSClient, configuration.kgCoreEndpoint, id, token)
+      .getScope(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
   }
 
-  def addUserToInstanceScope(id: String, user: String, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
+  def addUserToInstanceScope(
+    id: String,
+    user: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, Unit]] = {
     val result = scopeAPIServiceLive
-      .addUserToScope(wSClient, configuration.kgCoreEndpoint, id, user, token)
+      .addUserToScope(wSClient, configuration.kgCoreEndpoint, id, user, token, clientToken)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
     }
   }
 
-  def removeUserOfInstanceScope(id: String, user: String, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
+  def removeUserOfInstanceScope(
+    id: String,
+    user: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, Unit]] = {
     val result = scopeAPIServiceLive
-      .removeUserOfScope(wSClient, configuration.kgCoreEndpoint, id, user, token)
+      .removeUserOfScope(wSClient, configuration.kgCoreEndpoint, id, user, token, clientToken)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))

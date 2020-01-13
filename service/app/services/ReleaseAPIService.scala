@@ -32,7 +32,7 @@ trait ReleaseAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]]
 
   def putReleaseInstance(
@@ -40,7 +40,7 @@ trait ReleaseAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]]
 
   def deleteRelease(
@@ -48,7 +48,7 @@ trait ReleaseAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]]
 
   def getReleaseStatus(
@@ -57,7 +57,7 @@ trait ReleaseAPIService {
     instanceIds: List[String],
     token: AccessToken,
     releaseTreeScope: String,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]]
 }
 
@@ -68,11 +68,11 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${id}/graph")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
@@ -88,11 +88,11 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${id}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.put(""))
     r.map { res =>
       res.status match {
@@ -107,11 +107,11 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${id}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.delete())
     r.map { res =>
       res.status match {
@@ -127,12 +127,12 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
     instanceIds: List[String],
     token: AccessToken,
     releaseTreeScope: String,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds).as[JsArray]
     val q = wSClient
       .url(s"${apiBaseEndpoint}/releases/status")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("releaseTreeScope" -> releaseTreeScope)
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>

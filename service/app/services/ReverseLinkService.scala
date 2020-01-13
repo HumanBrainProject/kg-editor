@@ -111,7 +111,8 @@ class ReverseLinkService @Inject()(editorService: EditorService, config: Configu
     user: UNSAFE_User,
     queryRegistry: FormRegistry[QuerySpec],
     baseUrl: String,
-    token: AccessToken
+    token: AccessToken,
+    clientToken: String
   ): List[Task[Either[APIEditorError, Command]]] =
     filterLinks(updateToBeStored, fieldsSpec, e => e.isReverse.getOrElse(false)).flatMap {
       case (reverseField, ids) =>
@@ -127,7 +128,8 @@ class ReverseLinkService @Inject()(editorService: EditorService, config: Configu
                 token,
                 baseUrl,
                 user,
-                queryRegistry
+                queryRegistry,
+                clientToken
               )
           case None => List()
         }
@@ -148,7 +150,8 @@ class ReverseLinkService @Inject()(editorService: EditorService, config: Configu
     currentInstanceDisplayed: NexusInstance,
     instanceRef: NexusInstanceReference,
     user: Option[UNSAFE_User],
-    token: AccessToken
+    token: AccessToken,
+    clientToken: String
   ): List[Command] =
     filterLinks(updateToBeStored, fieldsSpec, e => e.isLinkingInstance.getOrElse(false)).flatMap {
       case (reverseField, ids) =>
@@ -170,10 +173,12 @@ class ReverseLinkService @Inject()(editorService: EditorService, config: Configu
                 editorService,
                 config.nexusEndpoint,
                 user,
-                token
+                token,
+                clientToken
               )
           ) ::: removed.map(
-            id => DeleteLinkingInstanceCommand(instanceRef, id.ref, linkingInstancePath, editorService, token)
+            id =>
+              DeleteLinkingInstanceCommand(instanceRef, id.ref, linkingInstancePath, editorService, token, clientToken)
           )
         }
         opt.getOrElse(List())

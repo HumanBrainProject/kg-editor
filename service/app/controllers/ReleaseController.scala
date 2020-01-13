@@ -47,7 +47,7 @@ class ReleaseController @Inject()(
       listOfIds match {
         case Some(ids) =>
           releaseServiceLive
-            .retrieveReleaseStatus(ids, releaseTreeScope, request.userToken)
+            .retrieveReleaseStatus(ids, releaseTreeScope, request.userToken, request.clientToken)
             .map {
               case Left(err)    => err.toResult
               case Right(value) => Ok(Json.toJson(EditorResponseObject(value)))
@@ -60,7 +60,7 @@ class ReleaseController @Inject()(
 
   def getInstanceRelease(id: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     releaseServiceLive
-      .retrieveInstanceRelease(id, request.userToken)
+      .retrieveInstanceRelease(id, request.userToken, request.clientToken)
       .map {
         case Left(err)    => err.toResult
         case Right(value) => Ok(value)
@@ -70,7 +70,7 @@ class ReleaseController @Inject()(
 
   def putInstanceRelease(id: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     releaseServiceLive
-      .releaseInstance(id, request.userToken)
+      .releaseInstance(id, request.userToken, request.clientToken)
       .map {
         case Left(err) => err.toResult
         case Right(()) => Ok("Instance has been released")
@@ -80,7 +80,7 @@ class ReleaseController @Inject()(
 
   def deleteInstanceRelease(id: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     releaseServiceLive
-      .unreleaseInstance(id, request.userToken)
+      .unreleaseInstance(id, request.userToken, request.clientToken)
       .map {
         case Left(err) => err.toResult
         case Right(()) => Ok("Instance has been unreleased")

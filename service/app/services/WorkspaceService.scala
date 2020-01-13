@@ -25,7 +25,11 @@ import play.api.libs.ws.WSClient
 
 trait WorkspaceService {
 
-  def retrieveTypesListByName(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]]
+  def retrieveTypesListByName(
+    types: List[String],
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, JsObject]]
 
   def retrieveWorkspaceTypes(
     workspace: String,
@@ -33,20 +37,23 @@ trait WorkspaceService {
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]]
 
-  def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]]
+  def retrieveWorkspaces(token: AccessToken, clientToken: String): Task[Either[APIEditorError, JsObject]]
 
 }
 
 class WorkspaceServiceLive @Inject()(
   wSClient: WSClient,
   configuration: ConfigurationServiceLive,
-  workspaceAPIServiceLive: WorkspaceAPIServiceLive,
-  authServiceLive: AuthServiceLive
+  workspaceAPIServiceLive: WorkspaceAPIServiceLive
 ) extends WorkspaceService {
 
-  def retrieveTypesListByName(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]] =
+  def retrieveTypesListByName(
+    types: List[String],
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, JsObject]] =
     workspaceAPIServiceLive
-      .getTypesByName(wSClient, configuration.kgCoreEndpoint, token, types)
+      .getTypesByName(wSClient, configuration.kgCoreEndpoint, token, types, clientToken)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
@@ -64,9 +71,9 @@ class WorkspaceServiceLive @Inject()(
         case Left(res)  => Left(APIEditorError(res.status, res.body))
       }
 
-  def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveWorkspaces(token: AccessToken, clientToken: String): Task[Either[APIEditorError, JsObject]] = {
     val result = workspaceAPIServiceLive
-      .getWorkspaces(wSClient, configuration.kgCoreEndpoint, token)
+      .getWorkspaces(wSClient, configuration.kgCoreEndpoint, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))

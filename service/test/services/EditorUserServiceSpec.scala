@@ -78,14 +78,12 @@ class EditorUserServiceSpec
             Ok(Json.obj("results" -> Json.toJson(List(endpointResponse))))
           }
       }
-      val clientCred = mock[CredentialsService]
       val configService = mock[ConfigurationServiceLive]
       val cache = mock[AsyncCacheApi]
       val actorSystem = mock[ActorSystem]
       when(cache.get[EditorUser](id)).thenReturn(Future(None))
       val service =
         new EditorUserService(configService, ws, cache)(
-          clientCred,
           actorSystem
         )
 
@@ -117,13 +115,11 @@ class EditorUserServiceSpec
           }
       }
       val configService = mock[ConfigurationServiceLive]
-      val clientCred = mock[CredentialsService]
       val cache = mock[AsyncCacheApi]
       val actorSystem = mock[ActorSystem]
       when(cache.get[EditorUser](id)).thenReturn(Future(None))
       val service =
         new EditorUserService(configService, ws, cache)(
-          clientCred,
           actorSystem
         )
       val res = service.getUser(nexusUser, BasicAccessToken("token")).runSyncUnsafe(FiniteDuration(10, "s"))

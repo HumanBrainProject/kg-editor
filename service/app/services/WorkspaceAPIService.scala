@@ -31,7 +31,7 @@ trait WorkspaceAPIService {
     apiBaseEndpoint: String,
     token: AccessToken,
     types: List[String],
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]]
 
   def getWorkspaceTypes(
@@ -46,7 +46,7 @@ trait WorkspaceAPIService {
     wSClient: WSClient,
     apiBaseEndpoint: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]]
 }
 
@@ -57,12 +57,12 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
     apiBaseEndpoint: String,
     token: AccessToken,
     types: List[String],
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(types)
     val q = wsClient
       .url(s"$apiBaseEndpoint/typesByName")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("stage" -> "LIVE", "withProperties" -> "true")
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
@@ -98,11 +98,11 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
     wSClient: WSClient,
     apiBaseEndpoint: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/spaces")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("stage" -> "LIVE")
     val r = Task.deferFuture(q.get())
     r.map { res =>

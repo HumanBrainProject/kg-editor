@@ -31,7 +31,8 @@ final case class AddLinkingInstanceCommand(
   editorService: EditorService,
   baseUrl: String,
   user: Option[UNSAFE_User],
-  token: AccessToken
+  token: AccessToken,
+  clientToken: String
 ) extends Command {
   val log = Logger(this.getClass)
   override def execute(): Task[Either[APIEditorError, Unit]] = {
@@ -41,7 +42,7 @@ final case class AddLinkingInstanceCommand(
       linkingInstanceType
     )
     editorService
-      .insertInstance(NexusInstance(None, linkingInstancePath, linkingInstance.toNexusFormat), user, token)
+      .insertInstance(NexusInstance(None, linkingInstancePath, linkingInstance.toNexusFormat), user, token, clientToken)
       .map {
         case Right(i) =>
           log.debug(s"Added linking instance with id ${linkingInstancePath

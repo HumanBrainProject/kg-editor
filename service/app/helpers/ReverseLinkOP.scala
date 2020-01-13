@@ -90,11 +90,12 @@ object ReverseLinkOP {
     token: AccessToken,
     baseUrl: String,
     user: UNSAFE_User,
-    queryRegistry: FormRegistry[QuerySpec]
+    queryRegistry: FormRegistry[QuerySpec],
+    clientToken: String
   ): List[Task[Either[APIEditorError, Command]]] = {
     val (added, removed) = getAddedAndRemovedLinks(currentInstanceDisplayed, linkName, fullIds)
     removed.map { link =>
-      editorService.retrieveInstance(link.ref, token, queryRegistry).map {
+      editorService.retrieveInstance(link.ref, token, queryRegistry, None, clientToken).map {
         case Right(reverseInstance) =>
           Right(
             DeleteReverseLinkCommand(
@@ -105,13 +106,14 @@ object ReverseLinkOP {
               editorService,
               baseUrl,
               token,
-              user
+              user,
+              clientToken
             )
           )
         case Left(error) => Left(error)
       }
     } ::: added.map { link =>
-      editorService.retrieveInstance(link.ref, token, queryRegistry).map {
+      editorService.retrieveInstance(link.ref, token, queryRegistry, None, clientToken).map {
         case Right(reverseInstance) =>
           Right(
             AddReverseLinkCommand(
@@ -122,7 +124,8 @@ object ReverseLinkOP {
               editorService,
               baseUrl,
               token,
-              user
+              user,
+              clientToken
             )
           )
         case Left(error) => Left(error)

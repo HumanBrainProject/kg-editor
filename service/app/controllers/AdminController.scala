@@ -16,7 +16,7 @@
 package controllers
 
 import com.google.inject.Inject
-import models.{Cache, ServiceTokenCache}
+import models.{Cache, EditorUserCache, ServiceTokenCache, UserInfoCache}
 import monix.eval.Task
 import play.api.Logger
 import play.api.cache.AsyncCacheApi
@@ -26,10 +26,9 @@ import services.CacheService
 
 class AdminController @Inject()(
   cc: ControllerComponents,
-  @NamedCache("servicetoken-cache") serviceTokenCache: AsyncCacheApi
-//  @NamedCache("editor-userinfo-cache") editorCache: AsyncCacheApi,
-//  @NamedCache("userinfo-cache") userCache: AsyncCacheApi,
-//  @NamedCache("editor-metadata-cache") metadataCache: AsyncCacheApi,
+  @NamedCache("servicetoken-cache") serviceTokenCache: AsyncCacheApi,
+  @NamedCache("editor-userinfo-cache") editorCache: AsyncCacheApi,
+  @NamedCache("userinfo-cache") userCache: AsyncCacheApi
 ) extends AbstractController(cc) {
   val log = Logger(this.getClass)
   object cacheService extends CacheService
@@ -40,20 +39,10 @@ class AdminController @Inject()(
       .fromString(name)
       .fold(Task.pure(NotFound("Cache not found"))) {
         case ServiceTokenCache => cacheService.clearCache(serviceTokenCache).map(_ => Ok("Cache cleared"))
-//        case EditorUserCache => cacheService.clearCache(editorCache).map(_ => Ok("Cache cleared"))
-//        case UserInfoCache   => cacheService.clearCache(userCache).map(_ => Ok("Cache cleared"))
-//        case MetadataCache   => cacheService.clearCache(metadataCache).map(_ => Ok("Cache cleared"))
+        case EditorUserCache   => cacheService.clearCache(editorCache).map(_ => Ok("Cache cleared"))
+        case UserInfoCache     => cacheService.clearCache(userCache).map(_ => Ok("Cache cleared"))
       }
       .runToFuture
   }
-//
-//  def deleteAndReloadSpecs: Action[AnyContent] = Action.async { implicit request =>
-//    formService
-//      .flushSpec()
-//      .map { _ =>
-//        Ok("Specification reloaded")
-//      }
-//      .runToFuture
-//  }
 
 }

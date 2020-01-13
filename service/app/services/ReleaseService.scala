@@ -20,7 +20,6 @@ import com.google.inject.Inject
 import helpers.InstanceHelper
 import models.AccessToken
 import models.errors.APIEditorError
-import models.instance.NexusInstanceReference
 import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -31,14 +30,19 @@ trait ReleaseService {
   def retrieveReleaseStatus(
     instanceIds: List[String],
     releaseTreeScope: String,
-    token: AccessToken
+    token: AccessToken,
+    clientToken: String
   ): Task[Either[APIEditorError, JsValue]]
 
-  def retrieveInstanceRelease(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]]
+  def retrieveInstanceRelease(
+    id: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, JsObject]]
 
-  def releaseInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]]
+  def releaseInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]]
 
-  def unreleaseInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]]
+  def unreleaseInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]]
 
 }
 
@@ -53,10 +57,11 @@ class ReleaseServiceLive @Inject()(
   def retrieveReleaseStatus(
     instanceIds: List[String],
     releaseTreeScope: String,
-    token: AccessToken
+    token: AccessToken,
+    clientToken: String
   ): Task[Either[APIEditorError, JsValue]] = {
     val result = releaseAPIServiceLive
-      .getReleaseStatus(wSClient, configuration.kgCoreEndpoint, instanceIds, token, releaseTreeScope)
+      .getReleaseStatus(wSClient, configuration.kgCoreEndpoint, instanceIds, token, releaseTreeScope, clientToken)
     result.map {
       case Right(ref) =>
         val r = (ref \ "data").as[List[Map[String, JsValue]]].map(field => InstanceHelper.normalizeIdOfField(field))
@@ -65,27 +70,31 @@ class ReleaseServiceLive @Inject()(
     }
   }
 
-  def retrieveInstanceRelease(id: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveInstanceRelease(
+    id: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, JsObject]] = {
     val result = releaseAPIServiceLive
-      .getRelease(wSClient, configuration.kgQueryEndpoint, id, token)
+      .getRelease(wSClient, configuration.kgQueryEndpoint, id, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
     }
   }
 
-  def releaseInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
+  def releaseInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]] = {
     val result = releaseAPIServiceLive
-      .putReleaseInstance(wSClient, configuration.kgQueryEndpoint, id, token)
+      .putReleaseInstance(wSClient, configuration.kgQueryEndpoint, id, token, clientToken)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
     }
   }
 
-  def unreleaseInstance(id: String, token: AccessToken): Task[Either[APIEditorError, Unit]] = {
+  def unreleaseInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]] = {
     val result = releaseAPIServiceLive
-      .deleteRelease(wSClient, configuration.kgQueryEndpoint, id, token)
+      .deleteRelease(wSClient, configuration.kgQueryEndpoint, id, token, clientToken)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))

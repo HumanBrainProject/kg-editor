@@ -53,13 +53,8 @@ class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default, authSer
             case Some(t) => Task.deferFuture(block(new UserRequest(request, t, clientToken)))
             case _       => Task.pure(Unauthorized("You must be logged in to execute this request"))
           }
-        case Left(err) => Task.pure(Unauthorized("You must be logged in to execute this request"))
+        case Left(_) => Task.pure(Unauthorized("You must be logged in to execute this request"))
       }
-
-    //    val result = token match {
-    //      case Some(t) => Task.deferFuture(block(new UserRequest(request, t)))
-    //      case _              => Task.pure(Unauthorized("You must be logged in to execute this request"))
-    //    }
     result.runToFuture
   }
 

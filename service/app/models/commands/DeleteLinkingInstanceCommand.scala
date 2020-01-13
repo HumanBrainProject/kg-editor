@@ -26,12 +26,13 @@ final case class DeleteLinkingInstanceCommand(
   to: NexusInstanceReference,
   linkingInstancePath: NexusPath,
   editorService: EditorService,
-  token: AccessToken
+  token: AccessToken,
+  clientToken: String
 ) extends Command {
   private val log = Logger(this.getClass)
   override def execute(): Task[Either[APIEditorError, Unit]] =
     editorService
-      .deleteLinkingInstance(from, to, linkingInstancePath, token)
+      .deleteLinkingInstance(from, to, linkingInstancePath, token, clientToken)
       .map {
         case Left(errors) =>
           log.error(s"Could not delete all linking instances ${errors.content.mkString("\n")}")

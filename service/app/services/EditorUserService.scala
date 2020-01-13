@@ -61,19 +61,19 @@ class EditorUserService @Inject()(
   config: ConfigurationServiceLive,
   wSClient: WSClient,
   @NamedCache("editor-userinfo-cache") cache: AsyncCacheApi
-)(implicit credentials: CredentialsService, actorSystem: ActorSystem) {
+)(actorSystem: ActorSystem) {
   val logger = Logger(this.getClass)
 
   object cacheService extends CacheService
 
   object queryService extends QueryService
 
-  lazy val scheduler = scheduled
-
-  def scheduled(implicit actorSystem: ActorSystem): Cancellable =
-    actorSystem.scheduler.schedule(initialDelay = 10.seconds, interval = 20.minute) {
-      UserRequestMap.cleanMap
-    }
+//  lazy val scheduler = scheduled
+//
+//  def scheduled(implicit actorSystem: ActorSystem): Cancellable =
+//    actorSystem.scheduler.schedule(initialDelay = 10.seconds, interval = 20.minute) {
+//      UserRequestMap.cleanMap
+//    }
 
   def getUserProfile(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val q = wSClient

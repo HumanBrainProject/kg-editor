@@ -15,7 +15,7 @@ trait ScopeAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsArray]]
 
   def addUserToScope(
@@ -24,7 +24,7 @@ trait ScopeAPIService {
     id: String,
     user: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]]
 
   def removeUserOfScope(
@@ -33,7 +33,7 @@ trait ScopeAPIService {
     id: String,
     user: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]]
 }
 
@@ -44,11 +44,11 @@ class ScopeAPIServiceLive extends ScopeAPIService {
     apiBaseEndpoint: String,
     id: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, JsArray]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/api/scopes/${id}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
@@ -65,11 +65,11 @@ class ScopeAPIServiceLive extends ScopeAPIService {
     id: String,
     user: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/api/scopes/${id}/${user}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.put(""))
     r.map { res =>
       res.status match {
@@ -85,11 +85,11 @@ class ScopeAPIServiceLive extends ScopeAPIService {
     id: String,
     user: String,
     token: AccessToken,
-    serviceClient: ServiceClient = EditorClient
+    clientToken: String
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/api/scopes/${id}/${user}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> serviceClient.client)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.delete())
     r.map { res =>
       res.status match {

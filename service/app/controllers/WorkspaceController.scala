@@ -41,7 +41,7 @@ class WorkspaceController @Inject()(
   def getWorkspaceTypes(workspace: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       val result = workspaceServiceLive
-        .retrieveWorkspaceTypes(workspace, request.userToken)
+        .retrieveWorkspaceTypes(workspace, request.userToken, request.clientToken)
         .map {
           case Left(err) => err.toResult
           case Right(value) =>

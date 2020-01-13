@@ -22,6 +22,7 @@ import monix.eval.Task
 import monix.execution.Scheduler
 import play.api.mvc.Results._
 import play.api.mvc._
+import services.AuthServiceLive
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * Cobbled this together from:
   * https://www.playframework.com/documentation/2.6.x/ScalaActionsComposition#Authentication
   */
-class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default)(
+class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default, authServiceLive: AuthServiceLive)(
   implicit val executionContext: ExecutionContext
 ) extends ActionBuilder[UserRequest, AnyContent] {
   implicit val scheduler: Scheduler = monix.execution.Scheduler.Implicits.global
@@ -44,10 +45,21 @@ class AuthenticatedUserAction @Inject()(val parser: BodyParsers.Default)(
     */
   override def invokeBlock[A](request: Request[A], block: (UserRequest[A]) => Future[Result]): Future[Result] = {
     val token = AuthenticationHelper.getTokenFromRequest[A](request)
-    val result = token match {
-      case Some(t) => Task.deferFuture(block(new UserRequest(request, t)))
-      case None    => Task.pure(Unauthorized("You must be logged in to execute this request"))
-    }
+    val result = authServiceLive
+      .getClientToken()
+      .flatMap {
+        case Right(clientToken) =>
+          token match {
+            case Some(t) => Task.deferFuture(block(new UserRequest(request, t, clientToken)))
+            case _       => Task.pure(Unauthorized("You must be logged in to execute this request"))
+          }
+        case Left(err) => Task.pure(Unauthorized("You must be logged in to execute this request"))
+      }
+
+    //    val result = token match {
+    //      case Some(t) => Task.deferFuture(block(new UserRequest(request, t)))
+    //      case _              => Task.pure(Unauthorized("You must be logged in to execute this request"))
+    //    }
     result.runToFuture
   }
 

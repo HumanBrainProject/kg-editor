@@ -20,47 +20,40 @@ import akka.Done
 import com.google.inject.Inject
 import models.errors.APIEditorError
 import monix.eval.Task
-import org.slf4j.LoggerFactory
 import play.api.cache.AsyncCacheApi
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
 import play.cache.NamedCache
 import monix.execution.Scheduler.Implicits.global
-
+import com.google.inject.{Inject, Singleton}
 import scala.concurrent.duration.FiniteDuration
 
 trait AuthService {
 
   def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]]
 
-  def getClientToken(): Task[Either[APIEditorError, JsObject]]
+  def retrieveClientToken(): Task[Either[APIEditorError, String]]
+
+  def getClientToken(forceRefresh: Boolean): Task[Either[APIEditorError, String]]
 
 }
 
+@Singleton
 class AuthServiceLive @Inject()(
   wSClient: WSClient,
   config: ConfigurationServiceLive,
   authAPIServiceLive: AuthAPIServiceLive,
   @NamedCache("servicetoken-cache") serviceTokenCache: AsyncCacheApi
-) extends AuthService {
-  private val log = LoggerFactory.getLogger(this.getClass)
+) extends AuthService
+    with CacheService {
 
   val timeout = FiniteDuration(30, "sec")
   init().runSyncUnsafe(timeout)
 
   def init(): Task[Done] = {
     log.info("Client Token Initialization")
-    getClientToken().map {
-      case Right(res) =>
-        log.info("Setting token in cache")
-        val token = (res \ "access_token").as[String]
-        val expiration = (res \ "expires_in").as[Long]
-        serviceTokenCache.set("clientToken", token, FiniteDuration(expiration, "minute"))
-        Done
-      case Left(err) =>
-        log.error(err.content)
-        Done
-    }
+    getClientToken()
+    Task.pure(Done)
   }
 
   def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]] =
@@ -71,7 +64,7 @@ class AuthServiceLive @Inject()(
         case Left(res)    => Left(APIEditorError(res.status, res.body))
       }
 
-  def getClientToken(): Task[Either[APIEditorError, JsObject]] = {
+  def retrieveClientToken(): Task[Either[APIEditorError, String]] = {
     val clientTokenEndpoint = authAPIServiceLive.getClientTokenEndpoint(wSClient, config.kgCoreEndpoint)
     clientTokenEndpoint.flatMap {
       case Right(endpoint) =>
@@ -79,10 +72,31 @@ class AuthServiceLive @Inject()(
         authAPIServiceLive
           .getClientToken(wSClient, res.getOrElse("endpoint", ""), config.clientSecret)
           .map {
-            case Right(value) => Right(value)
-            case Left(res)    => Left(APIEditorError(res.status, res.body))
+            case Right(value) =>
+              log.info("Setting token in cache")
+              val token = (value \ "access_token").as[String]
+              val expiration = (value \ "expires_in").as[Long]
+              serviceTokenCache.set("clientToken", token, FiniteDuration(expiration, "sec"))
+              Right(token)
+            case Left(res) =>
+              log.error(res.body)
+              Left(APIEditorError(res.status, res.body))
           }
-      case Left(res) => Task.pure(Left(APIEditorError(res.status, res.body)))
+      case Left(res) =>
+        log.error(res.body)
+        Task.pure(Left(APIEditorError(res.status, res.body)))
     }
   }
+
+  def getClientToken(forceRefresh: Boolean = false): Task[Either[APIEditorError, String]] =
+    if (forceRefresh) {
+      clearCache(serviceTokenCache)
+      retrieveClientToken()
+    } else {
+      get[String](serviceTokenCache, "clientToken").flatMap {
+        case None      => retrieveClientToken()
+        case Some(res) => Task.pure(Right(res))
+      }
+    }
+
 }

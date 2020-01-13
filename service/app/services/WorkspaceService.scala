@@ -17,20 +17,21 @@
 package services
 
 import com.google.inject.Inject
-import models.AccessToken
+import models.{AccessToken}
 import models.errors.APIEditorError
 import monix.eval.Task
-import play.api.Logger
-import play.api.cache.AsyncCacheApi
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
-import play.cache.NamedCache
 
 trait WorkspaceService {
 
   def retrieveTypesListByName(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]]
 
-  def retrieveWorkspaceTypes(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]]
+  def retrieveWorkspaceTypes(
+    workspace: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, JsObject]]
 
   def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]]
 
@@ -40,11 +41,8 @@ class WorkspaceServiceLive @Inject()(
   wSClient: WSClient,
   configuration: ConfigurationServiceLive,
   workspaceAPIServiceLive: WorkspaceAPIServiceLive,
-  @NamedCache("servicetoken-cache") serviceTokenCache: AsyncCacheApi
-) extends WorkspaceService
-    with CacheService {
-
-  val logger = Logger(this.getClass)
+  authServiceLive: AuthServiceLive
+) extends WorkspaceService {
 
   def retrieveTypesListByName(types: List[String], token: AccessToken): Task[Either[APIEditorError, JsObject]] =
     workspaceAPIServiceLive
@@ -54,17 +52,17 @@ class WorkspaceServiceLive @Inject()(
         case Left(res)    => Left(APIEditorError(res.status, res.body))
       }
 
-  def retrieveWorkspaceTypes(workspace: String, token: AccessToken): Task[Either[APIEditorError, JsObject]] =
-    get[String](serviceTokenCache, "clientToken").flatMap {
-      case None => Task.pure(Left(APIEditorError(500, "")))
-      case Some(res) =>
-        val result = workspaceAPIServiceLive
-          .getWorkspaceTypes(wSClient, configuration.kgCoreEndpoint, workspace, token, res)
-        result.map {
-          case Right(ref) => Right(ref)
-          case Left(res)  => Left(APIEditorError(res.status, res.body))
-        }
-    }
+  def retrieveWorkspaceTypes(
+    workspace: String,
+    token: AccessToken,
+    clientToken: String
+  ): Task[Either[APIEditorError, JsObject]] =
+    workspaceAPIServiceLive
+      .getWorkspaceTypes(wSClient, configuration.kgCoreEndpoint, workspace, token, clientToken)
+      .map {
+        case Right(ref) => Right(ref)
+        case Left(res)  => Left(APIEditorError(res.status, res.body))
+      }
 
   def retrieveWorkspaces(token: AccessToken): Task[Either[APIEditorError, JsObject]] = {
     val result = workspaceAPIServiceLive

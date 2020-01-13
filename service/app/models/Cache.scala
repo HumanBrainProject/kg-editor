@@ -21,7 +21,6 @@ sealed trait Cache {
     case ServiceTokenCache => Cache.SERVICETOKEN_CACHE
     case UserInfoCache     => Cache.USER_CACHE
     case EditorUserCache   => Cache.EDITOR_CACHE
-//    case MetadataCache   => Cache.METADATA_CACHE
   }
 }
 
@@ -29,18 +28,15 @@ object Cache {
   val SERVICETOKEN_CACHE = "servicetoken-cache"
   val USER_CACHE = "userinfo-cache"
   val EDITOR_CACHE = "editor-userinfo-cache"
-//  val METADATA_CACHE = "editor-metadata-cache"
 
   def fromString(s: String): Option[Cache] = s match {
     case SERVICETOKEN_CACHE => Some(ServiceTokenCache)
     case USER_CACHE         => Some(UserInfoCache)
     case EDITOR_CACHE       => Some(EditorUserCache)
-//    case METADATA_CACHE => Some(MetadataCache)
-    case _ => None
+    case _                  => None
   }
 }
 
 object ServiceTokenCache extends Cache
 object UserInfoCache extends Cache
 object EditorUserCache extends Cache
-//object MetadataCache extends Cache

@@ -68,4 +68,4 @@
   #    required: false
   #    type: string
   ###
-  POST /releases                  controllers.ReleaseController.postReleaseInstance(releaseTreeScope:String?="")
+  POST /status                  controllers.ReleaseController.postReleaseInstance(releaseTreeScope:String?="")

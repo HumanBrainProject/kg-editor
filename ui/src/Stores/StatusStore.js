@@ -89,9 +89,9 @@ class StatusStore {
     try {
       let { data } = await API.axios.post(API.endpoints.releaseStatusTopInstance(), toProcess);
       runInAction(() => {
-        data.data.forEach(responseStatus => {
-          const status = this.statuses.get(responseStatus.id);
-          status.data = responseStatus;
+        Object.entries(data.data).forEach(([id, responseStatus]) => {
+          const status = this.statuses.get(id);
+          status.data = responseStatus.data;
           status.isFetching = false;
           status.isFetched = true;
           this.isFetching = false;
@@ -130,6 +130,14 @@ class StatusStore {
     try {
       let { data } = await API.axios.post(API.endpoints.releaseStatusChildren(), toProcessChildren);
       runInAction(() => {
+        // Object.entries(data.data).forEach(([id, responseStatus]) => {
+        //   const status = this.statuses.get(id);
+        //   status.data.childrenStatus = responseStatus.data;
+        //   status.isFetchingChildren = false;
+        //   status.isFetchedChildren = true;
+        //   this.isFetchingChildren = false;
+        //   this.smartProcessQueueChildren();
+        // });
         data.data.forEach(responseStatus => {
           const status = this.statuses.get(responseStatus.id);
           status.data.childrenStatus = responseStatus.childrenStatus;

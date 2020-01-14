@@ -43,7 +43,7 @@ class ReleaseNodeToggle extends React.Component {
       <div
         className={`${classes.container} ${
           node.status === "RELEASED" ? "no-release" : ""
-        } ${node.status === "NOT_RELEASED" ? "no-unrelease" : ""}`}
+        } ${node.status === "UNRELEASED" ? "no-unrelease" : ""}`}
         onClick={this.handleStopClick}
       >
         <MultiToggle
@@ -63,10 +63,10 @@ class ReleaseNodeToggle extends React.Component {
             icon="dot-circle"
             noscale
           />
-          {node.status !== "NOT_RELEASED" && (
+          {node.status !== "UNRELEASED" && (
             <MultiToggle.Toggle
               color={"#e74c3c"}
-              value={"NOT_RELEASED"}
+              value={"UNRELEASED"}
               icon="unlink"
             />
           )}

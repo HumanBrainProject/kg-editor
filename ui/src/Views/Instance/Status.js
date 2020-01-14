@@ -65,7 +65,7 @@ class Status extends React.Component {
               <FontAwesomeIcon icon={"circle-notch"} spin />
             </div>
             :
-            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.status} isChildren={false} />
+            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data} isChildren={false} />
         }
         {instanceStatus.hasFetchErrorChildren ?
           <div className={classes.loader}>

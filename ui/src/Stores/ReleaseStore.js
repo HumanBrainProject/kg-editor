@@ -54,11 +54,11 @@ class ReleaseStore{
     const getStatsFromNode = node => {
       count.total++;
       if(node.status === "RELEASED"){count.released++;}
-      if(node.status === "NOT_RELEASED"){count.not_released++;}
+      if(node.status === "UNRELEASED"){count.not_released++;}
       if(node.status === "HAS_CHANGED"){count.has_changed++;}
 
       if(node.pending_status === "RELEASED"){count.pending_released++;}
-      if(node.pending_status === "NOT_RELEASED"){count.pending_not_released++;}
+      if(node.pending_status === "UNRELEASED"){count.pending_not_released++;}
       if(node.pending_status === "HAS_CHANGED"){count.pending_has_changed++;}
 
       if(node.status === node.pending_status){
@@ -98,7 +98,7 @@ class ReleaseStore{
   getNodesToProceed(){
     const nodesByStatus = {
       "RELEASED": [],
-      "NOT_RELEASED": []
+      "UNRELEASED": []
     };
 
     const rseek = node => {
@@ -112,7 +112,7 @@ class ReleaseStore{
 
     rseek(this.instancesTree);
     nodesByStatus.RELEASED = uniq(nodesByStatus.RELEASED);
-    nodesByStatus.NOT_RELEASED = uniq(nodesByStatus.NOT_RELEASED);
+    nodesByStatus.UNRELEASED = uniq(nodesByStatus.UNRELEASED);
     return nodesByStatus;
   }
 
@@ -194,7 +194,7 @@ class ReleaseStore{
   async commitStatusChanges(){
     let nodesToProceed = this.getNodesToProceed();
     this.savingProgress = 0;
-    this.savingTotal = nodesToProceed["NOT_RELEASED"].length + nodesToProceed["RELEASED"].length;
+    this.savingTotal = nodesToProceed["UNRELEASED"].length + nodesToProceed["RELEASED"].length;
     this.savingErrors = [];
     this.isStopped = false;
     if(!this.savingTotal){
@@ -208,8 +208,8 @@ class ReleaseStore{
       await this.releaseNode(node);
     }
 
-    for(let i=0; i<nodesToProceed["NOT_RELEASED"].length && !this.isStopped; i++) {
-      const node = nodesToProceed["NOT_RELEASED"][i];
+    for(let i=0; i<nodesToProceed["UNRELEASED"].length && !this.isStopped; i++) {
+      const node = nodesToProceed["UNRELEASED"][i];
       await this.unreleaseNode(node);
     }
 
@@ -293,12 +293,12 @@ class ReleaseStore{
     node[prefix+"childrenStatus"] = null;
     if(node.children && node.children.length > 0){
       let childrenStatuses = node.children.map(child => this.populateStatuses(child, prefix));
-      if(childrenStatuses.some(status => status === "NOT_RELEASED")){
-        node[prefix+"childrenStatus"] = "NOT_RELEASED";
-        node[prefix+"globalStatus"] = "NOT_RELEASED";
+      if(childrenStatuses.some(status => status === "UNRELEASED")){
+        node[prefix+"childrenStatus"] = "UNRELEASED";
+        node[prefix+"globalStatus"] = "UNRELEASED";
       } else if(childrenStatuses.some(status => status === "HAS_CHANGED")){
         node[prefix+"childrenStatus"] = "HAS_CHANGED";
-        node[prefix+"globalStatus"] = node[prefix+"status"] === "NOT_RELEASED"? "NOT_RELEASED": "HAS_CHANGED";
+        node[prefix+"globalStatus"] = node[prefix+"status"] === "UNRELEASED"? "UNRELEASED": "HAS_CHANGED";
       } else {
         node[prefix+"childrenStatus"] = "RELEASED";
         node[prefix+"globalStatus"] = node[prefix+"status"];
@@ -359,9 +359,9 @@ class ReleaseStore{
   handleWarning(node, newStatus) {
     if(this.warningMessages.has(node.typePath)) {
       const messages = this.warningMessages.get(node.typePath);
-      if(newStatus === "RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "NOT_RELEASED")))  {
+      if(newStatus === "RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "UNRELEASED")))  {
         messages.releaseFlags.set(node.relativeUrl, true);
-      } else if(newStatus === "NOT_RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "RELEASED"))) {
+      } else if(newStatus === "UNRELEASED" && ((node.status === "HAS_CHANGED" || node.status === "RELEASED"))) {
         messages.releaseFlags.set(node.relativeUrl, false);
       } else {
         messages.releaseFlags.delete(node.relativeUrl);

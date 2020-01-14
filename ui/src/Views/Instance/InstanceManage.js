@@ -148,7 +148,7 @@ class InstanceManage extends React.Component {
                           </React.Fragment>
                           :
                           <React.Fragment>
-                            {status.data.status !== "NOT_RELEASED" ?
+                            {status.data.status !== "UNRELEASED" ?
                               <ul>
                                 <li>This instance has been released and therefore cannot be deleted.</li>
                                 <li>If you still want to delete it you first have to unrelease it.</li>
@@ -158,7 +158,7 @@ class InstanceManage extends React.Component {
                                 <strong>Be careful. Removed instances cannot be restored!</strong>
                               </p>
                             }
-                            <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "NOT_RELEASED"} >
+                            <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "UNRELEASED"} >
                               <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
                             </Button>
                           </React.Fragment>

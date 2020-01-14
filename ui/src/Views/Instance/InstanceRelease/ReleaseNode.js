@@ -134,7 +134,7 @@ class ReleaseNode extends React.Component {
     }
 
     const statusClass =
-      node["pending_" + "status"] === "NOT_RELEASED"
+      node["pending_" + "status"] === "UNRELEASED"
         ? "not-released"
         : node["pending_" + "status"] === "HAS_CHANGED"
           ? "has-changed"

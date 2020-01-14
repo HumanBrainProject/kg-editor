@@ -131,7 +131,7 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds).as[JsArray]
     val q = wSClient
-      .url(s"${apiBaseEndpoint}/releases/status")
+      .url(s"${apiBaseEndpoint}/releases/statusByIds")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("releaseTreeScope" -> releaseTreeScope)
     val r = Task.deferFuture(q.post(payload))

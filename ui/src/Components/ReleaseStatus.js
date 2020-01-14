@@ -66,8 +66,7 @@ class ReleaseStatus extends React.Component {
 
   render() {
     const { classes, instanceStatus, isChildren, highContrastChildren } = this.props;
-
-    const instanceStatusClass = (instanceStatus === "NOT_RELEASED") ? "not-released"
+    const instanceStatusClass = (instanceStatus === "UNRELEASED") ? "not-released"
       : (instanceStatus === "HAS_CHANGED") ? "has-changed"
         : "released";
 
@@ -79,12 +78,12 @@ class ReleaseStatus extends React.Component {
         <Tooltip id={this.tooltipId}>
           {isChildren ?
             <div>
-              {instanceStatus === "NOT_RELEASED" ? <span>At least one of this instance children is <strong>not released</strong></span> :
+              {instanceStatus === "UNRELEASED" ? <span>At least one of this instance children is <strong>not released</strong></span> :
                 instanceStatus === "HAS_CHANGED" ? <span>At least one of this instance is <strong>different</strong> than its released version</span> :
                   <span>All of this instance children are <strong>released</strong></span>}
             </div>
             : <div>
-              {instanceStatus === "NOT_RELEASED" ? <span>This instance is <strong>not released</strong>.</span> :
+              {instanceStatus === "UNRELEASED" ? <span>This instance is <strong>not released</strong>.</span> :
                 instanceStatus === "HAS_CHANGED" ? <span>This instance is <strong>different</strong> than its released version</span> :
                   <span>This instance is <strong>released</strong></span>}
             </div>}
@@ -93,7 +92,7 @@ class ReleaseStatus extends React.Component {
         {!isChildren || (isChildren && instanceStatus) ?
           <div className={`${classes.status} ${instanceStatusClass} ${hightContrast} ${this.props.darkmode && !highContrastChildren ? "darkmode" : ""} `}>
             <div className={`${classes.instanceStatus}  `}>
-              {instanceStatus === "NOT_RELEASED" ?
+              {instanceStatus === "UNRELEASED" ?
                 <FontAwesomeIcon icon="unlink" />
                 : instanceStatus === "HAS_CHANGED" ?
                   <FontAwesomeIcon icon="pencil-alt" />

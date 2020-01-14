@@ -31,7 +31,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
 
   componentDidMount() {
     if (this.props.instanceId) {
-      if (this.props.status !== "NOT_RELEASED") {
+      if (this.props.status !== "UNRELEASED") {
         const instance = this.releasedInstanceStore.createInstanceOrGet(this.props.instanceId);
         instance.fetch(true);
       }
@@ -41,7 +41,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
 
   componentDidUpdate(prevProps) {
     if(this.props.instanceId && prevProps.instanceId !== this.props.instanceId) {
-      if (this.props.status !== "NOT_RELEASED") {
+      if (this.props.status !== "UNRELEASED") {
         const instance = this.releasedInstanceStore.createInstanceOrGet(this.props.instanceId);
         instance.fetch(true);
       }
@@ -63,7 +63,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
   }
 
   handleRetryFetchReleasedInstance = () => {
-    if (this.props.status !== "NOT_RELEASED") {
+    if (this.props.status !== "UNRELEASED") {
       this.releasedInstanceStore.getInstance(this.props.instanceId, true);
     }
   }
@@ -75,7 +75,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
       window.console.log("Error: instanceId is null. Could not compare instance with released version!");
       return null;
     }
-    const instanceBefore = status !== "NOT_RELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
+    const instanceBefore = status !== "UNRELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
     const instanceAfter = instanceStore.instances.get(instanceId);
 
     if (!instanceAfter) {

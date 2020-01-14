@@ -64,7 +64,7 @@ class ReleaseServiceLive @Inject()(
       .getReleaseStatus(wSClient, configuration.kgCoreEndpoint, instanceIds, token, releaseTreeScope, clientToken)
     result.map {
       case Right(ref) =>
-        val r = (ref \ "data").as[List[Map[String, JsValue]]].map(field => InstanceHelper.normalizeIdOfField(field))
+        val r = (ref \ "data").as[Map[String, JsValue]]
         Right(Json.toJson(r))
       case Left(res) => Left(APIEditorError(res.status, res.body))
     }

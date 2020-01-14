@@ -61,19 +61,19 @@ class HelpView extends React.Component{
         <p>Hover those examples with your mouse to reveal a tooltip explaining the status</p>
         <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="RELEASED"/></p>
         <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="HAS_CHANGED"/></p>
-        <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="NOT_RELEASED"/></p>
+        <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="UNRELEASED"/></p>
 
         <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="RELEASED"/></p>
         <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="HAS_CHANGED"/></p>
-        <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="NOT_RELEASED"/></p>
+        <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="UNRELEASED"/></p>
 
-        <p><ReleaseStatus darkmode={true} instanceStatus="NOT_RELEASED" childrenStatus="RELEASED"/></p>
-        <p><ReleaseStatus darkmode={true} instanceStatus="NOT_RELEASED" childrenStatus="HAS_CHANGED"/></p>
-        <p><ReleaseStatus darkmode={true} instanceStatus="NOT_RELEASED" childrenStatus="NOT_RELEASED"/></p>
+        <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus="RELEASED"/></p>
+        <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus="HAS_CHANGED"/></p>
+        <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus="UNRELEASED"/></p>
 
         <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus={null}/></p>
         <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus={null}/></p>
-        <p><ReleaseStatus darkmode={true} instanceStatus="NOT_RELEASED" childrenStatus={null}/></p>
+        <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus={null}/></p>
       </div>
     );
   }

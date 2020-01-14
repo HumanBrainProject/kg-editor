@@ -22,7 +22,7 @@ const endpoints = {
   "instance": id => `/editor/api/instances/${id}`,
   "createInstance": (id=null) => `/editor/api/instances${id?("/" + id):""}?workspace=${appStore.currentWorkspace}`,
   "getInstance": id => `/editor/api/instances/${id}?returnPermissions=true&metadata=true`,
-  "release": id => `/editor/api/instances/${id}/release`,
+  "release": id => `/editor/api/releases/${id}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/editor/api/releases/status?releaseTreeScope=CHILDREN_ONLY",

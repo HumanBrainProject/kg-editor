@@ -42,7 +42,7 @@ object InstanceLabelView {
         val structure = StructureOfInstance(instanceTypes, typeInfoMap)
         InstanceLabelView(
           instanceId,
-          (data \ EditorConstants.VOCABEBRAINSSPACES).asOpt[String],
+          (data \ EditorConstants.VOCABEBRAINSSPACE).asOpt[String],
           structure.types.values.toList,
           InstanceHelper.getName(data, structure.labelField),
           None

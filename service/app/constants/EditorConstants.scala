@@ -41,6 +41,7 @@ object EditorConstants {
 
   val VOCABMETAEBRAINSOCCURENCES = s"${EBRAINSVOCAB}meta/occurences"
   val VOCABEBRAINSSPACES = s"${EBRAINSVOCAB}meta/spaces"
+  val VOCABEBRAINSSPACE = s"${EBRAINSVOCAB}meta/space"
   val VOCABEBRAINSALTERNATIVES = s"${EBRAINSVOCAB}meta/alternative"
   val VOCABEBRAINSVALUE = s"${EBRAINSVOCAB}meta/value"
   val VOCABEBRAINSSELECTED = s"${EBRAINSVOCAB}meta/selected"

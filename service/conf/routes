@@ -27,9 +27,6 @@
 # KG Editor Workspaces Routes
 -> /editor/api/workspaces workspaces.Routes
 
-# KG Editor Specifications Routes
--> /editor/api/specifications specifications.Routes
-
 # KG Editor User Routes
 -> /editor/api/user user.Routes
 

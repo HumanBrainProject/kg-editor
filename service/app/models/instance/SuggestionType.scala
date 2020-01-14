@@ -17,10 +17,10 @@
 package models.instance
 
 import constants.{EditorConstants, SchemaFieldsConstants}
-import play.api.libs.json.{JsObject, JsPath, JsValue, Json, Reads, Writes}
+import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
 import play.api.libs.functional.syntax._
 
-final case class SuggestionType(name: String, label: String, color: Option[String], space: String)
+final case class SuggestionType(name: String, label: String, color: Option[String], space: List[String])
 
 object SuggestionType {
 
@@ -28,9 +28,7 @@ object SuggestionType {
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.VOCABEBRAINSCOLOR).readNullable[String] and
-    (JsPath \ EditorConstants.VOCABEBRAINSSPACES)
-      .read[JsObject]
-      .map(s => (s \ SchemaFieldsConstants.NAME).as[String]) //TODO: this will not work as now spaces are returned as List
+    (JsPath \ EditorConstants.VOCABEBRAINSSPACES).read[List[String]]
   )(SuggestionType.apply _)
 
   implicit val instanceTypeWrites: Writes[SuggestionType] = new Writes[SuggestionType] {

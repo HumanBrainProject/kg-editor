@@ -39,6 +39,7 @@ object EditorConstants {
   val META = "https://schema.hbp.eu/meta/editor/"
   val METAIDENTIFIER = s"${META}identifier"
 
+  val VOCABEBRAINSEMBEDDEDPROPERTIES = s"${EBRAINSVOCAB}meta/embeddedProperties"
   val VOCABMETAEBRAINSOCCURENCES = s"${EBRAINSVOCAB}meta/occurences"
   val VOCABEBRAINSSPACES = s"${EBRAINSVOCAB}meta/spaces"
   val VOCABEBRAINSSPACE = s"${EBRAINSVOCAB}meta/space"

@@ -32,6 +32,21 @@ class Links extends React.Component{
     instance.fetch(forceFetch);
   }
 
+  getLinkedFields = (fields, values) => {
+    const linkedFields = [];
+    Object.entries(fields).forEach(([id, fieldObj]) => {
+      const vals = values.filter(v => v[id]).flatMap(v => v[id]);
+      if (fieldObj.type === "Nested") {
+        linkedFields.push(...this.getLinkedFields(fieldObj.fields, vals));
+      } else if(fieldObj.isLink) {
+        if (vals.length > 0) {
+          linkedFields.push([fieldObj, vals]);
+        }
+      }
+    });
+    return linkedFields;
+  }
+
   render(){
     const {classes, mainInstanceId } = this.props;
 
@@ -41,43 +56,46 @@ class Links extends React.Component{
     }
     const mainInstance = instanceTabStore.instanceTabs.get(mainInstanceId);
     const currentInstancePath = mainInstance.currentInstancePath;
-    let linkKeys = [];
+    let linkFields = [];
     if(instance.isFetched){
-      linkKeys = Object.keys(instance.fields).filter(fieldKey => {
-        return instance.form.getField(fieldKey).isLink && instance.form.getField(fieldKey).getValue().length > 0;
-      });
+      linkFields = Object.keys(instance.fields).reduce((acc, fieldKey) => {
+        const fieldObj = instance.form.getField(fieldKey);
+        const values = fieldObj.getValue();
+        if(fieldObj.type === "Nested") {
+          acc.push(...this.getLinkedFields(fieldObj.fields, values));
+        } else if(fieldObj.isLink && values.length > 0) {
+          acc.push([fieldObj, values]);
+        }
+        return acc;
+      }, []);
     }
+
     return(
       <React.Fragment>
-        {linkKeys.length > 0?
+        {linkFields.length > 0?
           <Pane paneId={"ChildrenOf"+this.props.id} key={"ChildrenOf"+this.props.id} className={classes.pane}>
-            {linkKeys.map(fieldKey => {
-              let fieldObj = instance.form.getField(fieldKey);
-              if(fieldObj.isLink && fieldObj.value.length > 0){
-                return (
-                  <div key={fieldObj.label} data-provenence={fieldObj.label}>
-                    <h4>{fieldObj.label}{fieldObj.type === "KgTable"?
-                      <em style={{fontWeight:"lighter"}}>
+            {linkFields.map(([fieldObj, values]) => (
+              <div key={fieldObj.label} data-provenence={fieldObj.label}>
+                <h4>{fieldObj.label}{fieldObj.type === "KgTable"?
+                  <em style={{fontWeight:"lighter"}}>
                         (showing {fieldObj.visibleInstancesCount} out of {fieldObj.instances.length})</em>:null}
-                    </h4>
-                    {fieldObj.value.map((value, index) => {
-                      const id = value[fieldObj.mappingValue];
-                      if(fieldObj.type === "KgTable") {
-                        if(index < fieldObj.defaultVisibleInstances || fieldObj.instancesMap.get(id).show){
-                          return (
-                            <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
-                          );
-                        }
-                      } else {
-                        return (
-                          <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
-                        );
-                      }
-                    })}
-                  </div>
-                );
-              }
-            })}
+                </h4>
+                {values.map((value, index) => {
+                  const id = value[fieldObj.mappingValue];
+                  if(fieldObj.type === "KgTable") {
+                    if(index < fieldObj.defaultVisibleInstances || fieldObj.instancesMap.get(id).show){
+                      return (
+                        <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
+                      );
+                    }
+                  } else {
+                    return (
+                      <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
+                    );
+                  }
+                })}
+              </div>
+            ))}
           </Pane>
           :
           null

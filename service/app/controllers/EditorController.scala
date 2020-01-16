@@ -75,6 +75,7 @@ class EditorController @Inject()(
         metadata,
         returnAlternatives = true,
         returnPermissions = true,
+        returnEmbedded = true,
         generateInstanceView = InstanceHelper.getInstanceView
       ).runToFuture
     }
@@ -86,6 +87,7 @@ class EditorController @Inject()(
         metadata,
         returnAlternatives = false,
         returnPermissions = true,
+        returnEmbedded = false,
         generateInstanceView = InstanceHelper.getInstanceSummaryView
       ).runToFuture
     }
@@ -97,6 +99,7 @@ class EditorController @Inject()(
         metadata,
         returnAlternatives = false,
         returnPermissions = false,
+        returnEmbedded = false,
         generateInstanceView = InstanceHelper.getInstanceLabelView
       ).runToFuture
     }
@@ -106,6 +109,7 @@ class EditorController @Inject()(
     metadata: Boolean,
     returnAlternatives: Boolean,
     returnPermissions: Boolean,
+    returnEmbedded: Boolean,
     generateInstanceView: (String, CoreData, Map[String, StructureOfType]) => Instance
   )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
@@ -118,6 +122,7 @@ class EditorController @Inject()(
             metadata,
             returnAlternatives,
             returnPermissions,
+            returnEmbedded,
             request.clientToken
           )
           .flatMap {

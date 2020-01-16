@@ -31,7 +31,8 @@ final case class StructureOfField(
   canBe: Option[List[String]],
   numOfOccurrences: Option[Int],
   `type`: Option[String],
-  searchable: Option[Boolean]
+  searchable: Option[Boolean],
+  fields: Option[List[StructureOfField]]
 )
 
 object StructureOfField {
@@ -47,7 +48,9 @@ object StructureOfField {
     (JsPath \ EditorConstants.VOCABMETAEBRAINSOCCURENCES).readNullable[Int] and
     (JsPath \ EditorConstants.VOCABEBRAINSWIDGET)
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
-    (JsPath \ EditorConstants.METAEBRAINSSEARCHABLE).readNullable[Boolean]
+    (JsPath \ EditorConstants.METAEBRAINSSEARCHABLE).readNullable[Boolean] and
+    (JsPath \ EditorConstants.VOCABEBRAINSEMBEDDEDPROPERTIES)
+      .lazyReadNullable(Reads.list[StructureOfField](structureOfFieldReads))
   )(StructureOfField.apply _)
 
   implicit val structureOfFieldWrites = Json.writes[StructureOfField]

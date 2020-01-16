@@ -55,6 +55,17 @@ const styles = {
       }
     }
   },
+  nestedField: {
+    "& > div > input + div": {
+      border: "1px solid #ccc",
+      padding: "10px"
+    }
+  },
+  nestedFieldItem: {
+    border: "1px solid #ccc",
+    marginBottom: "10px",
+    padding: "10px"
+  },
   notFound:{
     fontStyle: "italic",
     backgroundColor: "lightgrey",
@@ -152,10 +163,22 @@ class InstanceField extends React.Component{
     }
   }
 
-  render(){
-    const { classes, name, instance, disableLinks } = this.props;
-    const field = instance.fields[name];
+  renderField = (name, field) => {
+    const { classes, disableLinks } = this.props;
     if (field) {
+      if (field.type === "Nested") {
+        return (
+          <Field name={name} className={classes.nestedField}>
+            <div className={classes.nestedFieldItem} >
+              {Object.entries(field.fields).map(([name, f]) =>
+                <React.Fragment key={name}>
+                  {this.renderField(name, f)}
+                </React.Fragment>
+              )}
+            </div>
+          </Field>
+        );
+      }
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
@@ -165,7 +188,7 @@ class InstanceField extends React.Component{
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
           onValueMouseLeave={this.handleToggleOffFieldHighlight}  />;
       }
-      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) {
+      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) { 
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}
@@ -178,6 +201,12 @@ class InstanceField extends React.Component{
       return <Field name={name} className={classes.field} />;
     }
     return null;
+  }
+
+  render(){
+    const { name, instance } = this.props;
+    const field = instance.fields[name];
+    return this.renderField(name, field);
   }
 }
 

@@ -50,7 +50,7 @@ class OptionsPool{
     });
     try{
       const response = await API.axios.post(API.endpoints.instancesLabel(), toProcess);
-      runInAction(() =>{
+      runInAction(() => {
         toProcess.forEach(identifier => {
           const option = this.options.get(identifier);
           const optionQueueItem = this.optionsQueue.get(identifier);
@@ -71,6 +71,8 @@ class OptionsPool{
             set(option, mappingLabel, "Not found");
             set(option, "fetchError", true);
           }
+          set(this.options.get(identifier), "isFetching", false);
+          this.optionsQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
         this.processQueue();

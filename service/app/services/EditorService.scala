@@ -335,6 +335,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     metadata: Boolean,
     returnAlternatives: Boolean,
     returnPermissions: Boolean,
+    returnEmbedded: Boolean,
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
@@ -347,6 +348,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         metadata,
         returnAlternatives,
         returnPermissions,
+        returnEmbedded,
         clientToken
       )
       .map {

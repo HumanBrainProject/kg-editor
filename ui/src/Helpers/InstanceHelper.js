@@ -1,4 +1,48 @@
 export const normalizeInstanceData = (data, transformField=null) => {
+
+  const normalizeFields = fields => {
+    for(let fieldKey in fields) {
+      const field = fields[fieldKey];
+      // TODO: temporary, please remove. This is just a test for proof of concept.
+      if (!field.type) {
+        if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse", "http://schema.org/affiliation"].includes(fieldKey)) {
+          field.type = "DropdownSelect";
+        } else {
+          field.type = "InputText";
+        }
+      }
+      // END of temporary
+      typeof transformField === "function"  && transformField(field);
+      if(field.type === "Nested"){
+        field.topAddButton = false;
+        if(!field.min) {
+          field.min = 0;
+        }
+        if(!field.max) {
+          field.max = Number.POSITIVE_INFINITY;
+        }
+        if (typeof field.fields === "object") {
+          normalizeFields(field.fields);
+        }
+      } else if(field.type === "InputText"){
+        field.type = "KgInputText";
+      } else if(field.type === "TextArea"){
+        field.type = "KgTextArea";
+      }
+      else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
+        if(field.type === "DropdownSelect") {
+          field.type = "DynamicDropdown";
+        }
+        field.instanceId = instance.id;
+        field.isLink = true;
+        field.mappingLabel = "name";
+        field.mappingValue = "id";
+        field.mappingReturn = ["id"];
+        field.closeDropdownAfterInteraction = true;
+      }
+    }
+  };
+
   const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: {}, labelField: null, promotedFields: [], alternatives: {}, metadata: {}, permissions: {}, error: null};
   if (!data) {
     return instance;
@@ -25,33 +69,7 @@ export const normalizeInstanceData = (data, transformField=null) => {
     instance.promotedFields = data.promotedFields;
   }
   if (typeof data.fields === "object") {
-    for(let fieldKey in data.fields) {
-      const field = data.fields[fieldKey];
-      // TODO: temporary, please remove
-      if (!field.type) {
-        if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse", "http://schema.org/affiliation"].includes(fieldKey)) {
-          field.type = "DropdownSelect";
-        } else {
-          field.type = "InputText";
-        }
-      }
-      typeof transformField === "function"  && transformField(field);
-      if(field.type === "InputText"){
-        field.type = "KgInputText";
-      } else if(field.type === "TextArea"){
-        field.type = "KgTextArea";
-      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
-        if(field.type === "DropdownSelect") {
-          field.type = "DynamicDropdown";
-        }
-        field.instanceId = instance.id;
-        field.isLink = true;
-        field.mappingLabel = "name";
-        field.mappingValue = "id";
-        field.mappingReturn = ["id"];
-        field.closeDropdownAfterInteraction = true;
-      }
-    }
+    normalizeFields(data.fields);
     instance.fields = data.fields;
   }
   if (typeof data.alternatives === "object") {

@@ -39,6 +39,7 @@ trait InstanceAPIService {
     metadata: Boolean,
     returnAlternatives: Boolean,
     returnPermissions: Boolean,
+    returnEmbedded: Boolean,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds)
@@ -49,7 +50,8 @@ trait InstanceAPIService {
         "stage"              -> stage,
         "metadata"           -> metadata.toString,
         "returnAlternatives" -> returnAlternatives.toString,
-        "returnPermissions"  -> returnPermissions.toString
+        "returnPermissions"  -> returnPermissions.toString,
+        "returnEmbedded"     -> returnEmbedded.toString
       )
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>

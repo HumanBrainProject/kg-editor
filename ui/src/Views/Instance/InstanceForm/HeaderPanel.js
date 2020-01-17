@@ -32,7 +32,7 @@ class HeaderPanel extends React.Component{
         <Row>
           <Col xs={12}>
             <h6>
-              {types.map(({name, label, color}) => (
+              {types && types.map(({name, label, color}) => (
                 <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
               ))}
             </h6>

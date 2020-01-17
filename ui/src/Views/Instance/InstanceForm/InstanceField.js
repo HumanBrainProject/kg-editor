@@ -59,6 +59,9 @@ const styles = {
     "& > div > input + div": {
       border: "1px solid #ccc",
       padding: "10px"
+    },
+    "& .quickfire-nested-remove": {
+      marginBottom: "5px"
     }
   },
   nestedFieldItem: {
@@ -169,6 +172,12 @@ class InstanceField extends React.Component{
       if (field.type === "Nested") {
         return (
           <Field name={name} className={classes.nestedField}>
+            <div className="btn-group">
+              <Field.Remove />
+              <Field.MoveUp />
+              <Field.MoveDown />
+              <Field.Duplicate />
+            </div>
             <div className={classes.nestedFieldItem} >
               {Object.entries(field.fields).map(([name, f]) =>
                 <React.Fragment key={name}>
@@ -188,7 +197,7 @@ class InstanceField extends React.Component{
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
           onValueMouseLeave={this.handleToggleOffFieldHighlight}  />;
       }
-      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) { 
+      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}

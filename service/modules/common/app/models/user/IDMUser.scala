@@ -16,8 +16,8 @@
 package models.user
 
 import models.user.IDMUser.ID
-import play.api.libs.json.{JsPath, Reads, Writes}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 final case class IDMUser(
   id: ID,
   userName: String,

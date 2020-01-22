@@ -1,4 +1,3 @@
-
 name := """kg-service"""
 organization := "eu.humanbrainproject"
 

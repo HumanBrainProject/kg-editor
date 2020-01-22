@@ -16,5 +16,3 @@ GET     /metrics                    com.github.stijndehaes.playprometheusfilters
 #Swagger
 ### NoDocs ###
 GET   /docs/swagger-ui/*file        controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
-### NoDocs ###
-GET   /assets/swagger.json          controllers.swagger.ApiSpecs.specs

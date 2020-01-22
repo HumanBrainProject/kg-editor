@@ -17,13 +17,13 @@ package controllers
 
 import com.google.inject.Inject
 import constants.JsonLDConstants
-import models.instance.{NexusInstance, NexusInstanceReference, NexusLink}
-import models.specification.{DropdownSelect, EditorFieldSpecification, GenericType, InputText, TextArea}
+import models.instance.NexusInstanceReference
+import models.specification._
 import models.{AuthenticatedUserAction, NexusPath}
-import play.api.libs.json.{JsNull, JsObject, JsString, JsValue, Json}
+import play.api.libs.json.{JsString, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.ConfigurationService
-import services.specification.{FormOp, FormService}
+import services.specification.FormService
 
 class SpecificationController @Inject()(
   cc: ControllerComponents,

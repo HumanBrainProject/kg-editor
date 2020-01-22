@@ -15,7 +15,8 @@
  */
 package models.instance
 
-import constants.{JsonLDConstants, SchemaFieldsConstants, UiConstants}
+import constants.{EditorConstants, JsonLDConstants, SchemaFieldsConstants, UiConstants}
+import models.NexusPath
 import models.specification.{FormRegistry, UISpec}
 
 final case class PreviewInstance(

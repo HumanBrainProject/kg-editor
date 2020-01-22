@@ -17,16 +17,19 @@ package services
 
 import com.google.inject.Inject
 import helpers.ReverseLinkOP
+import models.{AccessToken, NexusPath}
 import models.commands.{AddLinkingInstanceCommand, Command, DeleteLinkingInstanceCommand}
 import models.errors.{APIEditorError, APIEditorMultiError}
 import models.instance.{EditorInstance, NexusInstance, NexusInstanceReference, NexusLink}
-import models.specification.{EditorFieldSpecification, FormRegistry, QuerySpec}
+import models.specification.{EditorFieldSpecification, FormRegistry, QuerySpec, UISpec}
 import models.user.User
-import models.{AccessToken, NexusPath}
 import monix.eval.Task
 import play.api.Logger
-import play.api.libs.json.{JsArray, JsObject, JsValue}
+import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import services.specification.{FormRegistries, FormService}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReverseLinkService @Inject()(
   editorService: EditorService,

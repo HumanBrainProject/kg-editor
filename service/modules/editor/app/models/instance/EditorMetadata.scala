@@ -17,7 +17,7 @@ package models.instance
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.libs.json._
+import play.api.libs.json.{Format, JsNull, JsObject, JsResult, JsString, JsSuccess, JsValue, Json, Reads, Writes}
 
 final case class EditorMetadata(
   createdBy: String,

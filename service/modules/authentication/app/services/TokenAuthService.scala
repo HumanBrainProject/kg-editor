@@ -16,13 +16,18 @@
 
 package services
 
+import java.util.concurrent.TimeUnit
+
 import com.google.inject.Inject
 import models.RefreshAccessToken
+
 import monix.eval.Task
 import play.api.Logger
 import play.api.cache.{AsyncCacheApi, NamedCache}
 import play.api.http.Status._
 import play.api.libs.ws.WSClient
+
+import scala.concurrent.duration.FiniteDuration
 
 class TokenAuthService @Inject()(
   config: ConfigurationService,

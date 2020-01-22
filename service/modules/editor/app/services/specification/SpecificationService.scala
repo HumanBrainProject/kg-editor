@@ -35,6 +35,8 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import services.instance.InstanceApiService
 import services.{ConfigurationService, CredentialsService, TokenAuthService}
 
+import scala.concurrent.{ExecutionContext, Future}
+
 final case class SpecificationFile(id: String, data: JsObject)
 
 @Singleton

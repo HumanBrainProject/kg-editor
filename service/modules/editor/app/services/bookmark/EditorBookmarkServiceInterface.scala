@@ -15,13 +15,14 @@
  */
 package services.bookmark
 
+import models.errors.APIEditorError
 import models._
 import models.editorUserList.{BOOKMARKFOLDER, BookmarkList, BookmarkListFolder, FolderType}
-import models.errors.APIEditorError
 import models.instance.{NexusInstanceReference, PreviewInstance}
 import models.specification.{FormRegistry, UISpec}
 import models.user.EditorUser
 import monix.eval.Task
+import play.api.libs.ws.WSResponse
 
 trait EditorBookmarkServiceInterface {
 

@@ -26,8 +26,8 @@ final case class BookmarkListFolder(
 
 object BookmarkListFolder {
 
-  import play.api.libs.functional.syntax._
   import play.api.libs.json._
+  import play.api.libs.functional.syntax._
   implicit val bookmarkListFolderReads: Reads[BookmarkListFolder] = (
     (JsPath \ "id").read[String].map(s => Some(NexusInstanceReference.fromUrl(s))) and
     (JsPath \ "folderName").read[String] and

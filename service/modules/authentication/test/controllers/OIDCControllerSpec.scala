@@ -3,8 +3,11 @@ package controllers
 import mockws.MockWSHelpers
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
+import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test._
+
+import scala.concurrent.ExecutionContext
 
 /**
   * Add your spec here.

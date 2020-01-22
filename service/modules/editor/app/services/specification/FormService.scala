@@ -17,6 +17,7 @@
 package services.specification
 
 import com.google.inject.{Inject, Singleton}
+import helpers.OIDCHelper
 import models._
 import models.specification._
 import monix.eval.Task

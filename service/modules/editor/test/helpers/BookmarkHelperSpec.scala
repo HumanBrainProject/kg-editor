@@ -1,12 +1,12 @@
 package helpers
 
 import models.instance.NexusInstanceReference
-import org.scalatest.Matchers._
-import org.scalatest._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatest._
+import Matchers._
 
-class BookmarkHelperSpec extends PlaySpec with GuiceOneAppPerSuite {
+class BookmarkHelperSpec extends PlaySpec with GuiceOneAppPerSuite{
 
   "bookmarkToAddAndDelete" should {
     "return the list of element to add correctly" in {

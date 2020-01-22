@@ -18,11 +18,11 @@ package controllers
 
 import actions.EditorUserAction
 import com.google.inject.Inject
-import models._
 import models.editorUserList.BOOKMARKFOLDER
 import models.errors.APIEditorError
 import models.instance.NexusInstanceReference
 import models.user.EditorUser
+import models._
 import monix.eval.Task
 import org.joda.time.DateTime
 import play.api.Logger
@@ -33,7 +33,7 @@ import services.bookmark.EditorBookmarkService
 import services.query.QueryService
 import services.specification.FormService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class EditorUserController @Inject()(
   cc: ControllerComponents,

@@ -25,9 +25,9 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 import play.api.cache.{AsyncCacheApi, NamedCache}
+import scala.concurrent.duration._
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.duration._
 import scala.util.Try
 
 class MetadataService @Inject()(

@@ -1,3 +1,9 @@
+import sbt._
+import Keys._
+import sbt._
+import Keys._
+import play.sbt.PlayImport._
+import play.sbt.routes.RoutesKeys.routesGenerator
 import play.routes.compiler.InjectedRoutesGenerator
 
 object Common {

@@ -45,7 +45,7 @@ object Common {
 
   val playSettings = settings ++ Seq(
     resolvers ++= Seq(
-      "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/",
+      "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/",
       Resolver.jcenterRepo
     ),
     routesGenerator := InjectedRoutesGenerator,

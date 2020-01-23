@@ -5,5 +5,5 @@ COPY target/universal/stage/ /app/
 RUN ls -al /app
 WORKDIR /app
 USER root
-ENTRYPOINT ["bin/kg-editor"]
+ENTRYPOINT ["bin/kg-service"]
 CMD []

@@ -25,4 +25,4 @@ sources in (Compile, doc) := Seq.empty
 
 publishArtifact in (Compile, packageDoc) := false
 
-dockerBaseImage := "openjdk:11"
+dockerBaseImage := "adoptopenjdk/openjdk11:jre-11.0.5_10-alpine"

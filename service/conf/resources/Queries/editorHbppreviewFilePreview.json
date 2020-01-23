@@ -25,7 +25,7 @@
     }
   },
   "http://schema.org/identifier": "hbppreview/core/filepreview/v1.0.0/editorPreview",
-  "https://schema.hbp.eu/meta/editor/identifier": "hbppreview/core/filepreview/v1.0.0/editorPreview",,
+  "https://schema.hbp.eu/meta/editor/identifier": "hbppreview/core/filepreview/v1.0.0/editorPreview",
   "description": "The preview query for File preview",
   "label": "Editor: File preview",
   "fields": [

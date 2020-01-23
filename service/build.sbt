@@ -15,7 +15,7 @@ lazy val editor = (project in file("modules/editor"))
   .dependsOn(common, auth)
 
 lazy val kg_service = (project in file("."))
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, DockerPlugin)
   .aggregate(common, auth, editor)
   .dependsOn(common, auth, editor)
 

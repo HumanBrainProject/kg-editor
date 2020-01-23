@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre-11.0.5_10-apline
+FROM adoptopenjdk:11-jre-hotspot
 MAINTAINER David Kunzmann "david.kunzmann@epfl.ch"
 
 COPY ./target/universal/stage/ /app/

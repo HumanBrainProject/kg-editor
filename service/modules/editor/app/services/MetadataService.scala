@@ -33,7 +33,6 @@ import scala.util.Try
 class MetadataService @Inject()(
   IDMAPIService: IDMAPIService,
   authService: TokenAuthService,
-  WSClient: WSClient,
   @NamedCache("editor-metadata-cache") cache: AsyncCacheApi
 ) {
 

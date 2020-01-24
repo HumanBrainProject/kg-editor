@@ -39,8 +39,7 @@ object AuthHttpClient {
   }
 
   def putWithRetry[T: BodyWritable](request: WSRequest, body: T)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit oIDCAuthService: TokenAuthService
   ): Task[WSResponse] = {
     Task.deferFuture(request.put(body)).flatMap { res =>
       res.status match {
@@ -55,8 +54,7 @@ object AuthHttpClient {
   }
 
   def getWithRetry(request: WSRequest)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit oIDCAuthService: TokenAuthService
   ): Task[WSResponse] = {
     Task.deferFuture(request.get()).flatMap { res =>
       res.status match {
@@ -71,8 +69,7 @@ object AuthHttpClient {
   }
 
   def deleteWithRetry(request: WSRequest)(
-    implicit oIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit oIDCAuthService: TokenAuthService
   ): Task[WSResponse] = {
     Task.deferFuture(request.delete()).flatMap { res =>
       res.status match {

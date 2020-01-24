@@ -31,8 +31,7 @@ class IDMAPIService @Inject()(
   config: ConfigurationService,
   @NamedCache("userinfo-cache") cache: AsyncCacheApi
 )(
-  implicit OIDCAuthService: TokenAuthService,
-  clientCredentials: CredentialsService
+  implicit OIDCAuthService: TokenAuthService
 ) {
   private val log = LoggerFactory.getLogger(this.getClass)
   object cacheService extends CacheService

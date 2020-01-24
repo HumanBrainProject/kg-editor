@@ -41,8 +41,7 @@ trait InstanceApiService {
     queryId: String,
     queryApiParameters: QueryApiParameter
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[WSResponse] = {
 
     val payload = Json.toJson(instanceIds.map(i => i.toString)).as[JsArray]
@@ -63,8 +62,7 @@ trait InstanceApiService {
     token: AccessToken,
     releaseTreeScope: String
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsArray]] = {
     val payload = Json.toJson(instanceIds.map(i => i.toString)).as[JsArray]
     val q = wSClient
@@ -92,8 +90,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsArray]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
@@ -122,8 +119,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, Unit]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
@@ -151,8 +147,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, Unit]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
@@ -179,8 +174,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsObject]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
@@ -208,8 +202,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsObject]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
@@ -243,8 +236,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/api/suggestion/${instancePath}/fields")
@@ -298,8 +290,7 @@ trait InstanceApiService {
     serviceClient: ServiceClient = EditorClient,
     clientExtensionId: Option[String] = None
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, NexusInstance]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
@@ -328,8 +319,7 @@ trait InstanceApiService {
     userId: String,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$internalInstanceEndpoint/${nexusInstance.toString}")
@@ -382,8 +372,7 @@ trait InstanceApiService {
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${nexusInstance.toString}")
@@ -407,8 +396,7 @@ trait InstanceApiService {
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$instanceEndpoint/${nexusInstance.toString}")
@@ -432,8 +420,7 @@ trait InstanceApiService {
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[APIEditorError, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$internalInstanceEndpoint/${nexusInstance.toString}")
@@ -458,8 +445,7 @@ trait InstanceApiService {
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, NexusInstanceReference]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint$internalInstanceEndpoint/${nexusInstance.nexusPath.toString()}")
@@ -487,8 +473,7 @@ trait InstanceApiService {
     token: AccessToken,
     serviceClient: ServiceClient = EditorClient
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    clientCredentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, List[NexusInstanceReference]]] = {
     val q = wSClient
       .url(

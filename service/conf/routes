@@ -9,10 +9,6 @@
 # KG Editor routes
 -> /editor/api editor.Routes
 
-# Monitoring
-### NoDocs ###
-GET     /metrics                    com.github.stijndehaes.playprometheusfilters.controllers.PrometheusController.getMetrics
-
 #Swagger
 ### NoDocs ###
 GET   /docs/swagger-ui/*file        controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)

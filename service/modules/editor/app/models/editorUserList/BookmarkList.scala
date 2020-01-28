@@ -28,8 +28,8 @@ final case class BookmarkList(
 
 object BookmarkList {
 
-  import play.api.libs.json._
   import play.api.libs.functional.syntax._
+  import play.api.libs.json._
 
   implicit val userListReads: Reads[BookmarkList] = (
     (JsPath \ "id").read[String].map(id => s"${EditorConstants.bookmarkListPath.toString()}/${id.split("/").last}") and

@@ -35,8 +35,6 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import services.instance.InstanceApiService
 import services.{ConfigurationService, CredentialsService, TokenAuthService}
 
-import scala.concurrent.{ExecutionContext, Future}
-
 final case class SpecificationFile(id: String, data: JsObject)
 
 @Singleton
@@ -44,7 +42,6 @@ class SpecificationService @Inject()(
   WSClient: WSClient,
   config: ConfigurationService,
   OIDCAuthService: TokenAuthService,
-  clientCredentials: CredentialsService,
   env: Environment
 ) {
   private val specFieldIdQueryPath = NexusPath("meta", "minds", "specificationfield", "v0.0.1")
@@ -65,7 +62,7 @@ class SpecificationService @Inject()(
       createSpecificationQueries("Queries", token).flatMap { _ =>
         createSpecificationQueries("SpecificationQueries", token).flatMap { _ =>
           log.info(s"Specification Service INITIALIZATION --- Done fetching and creating queries")
-          getOrCreateSpecificationAndSpecificationFields(token).map { s =>
+          getOrCreateSpecificationAndSpecificationFields(token).map { _ =>
             Done
           }
         }
@@ -227,8 +224,7 @@ class SpecificationService @Inject()(
     val path = NexusInstanceReference.fromUrl(value.id).nexusPath
     instanceApiService
       .post(WSClient, config.kgQueryEndpoint, NexusInstance(None, path, value.data), None, token)(
-        OIDCAuthService,
-        clientCredentials
+        OIDCAuthService
       )
       .map {
         case Left(res) =>

@@ -36,8 +36,7 @@ trait QueryService {
     queryId: String,
     token: AccessToken
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[APIEditorError, Unit]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath.toString}/${queryId}")
@@ -62,8 +61,7 @@ trait QueryService {
     payload: JsObject,
     token: AccessToken
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query/${instancePath.toString}/${queryId}")
@@ -117,8 +115,7 @@ trait QueryService {
     apiEndpoint: String,
     token: AccessToken
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[Either[WSResponse, JsArray]] = {
     val q = wSClient
       .url(s"$apiEndpoint/query")
@@ -144,8 +141,7 @@ trait QueryService {
     token: AccessToken,
     queryApiParameters: QueryApiParameter
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[WSResponse] = {
     query match {
       case QuerySpec(_, Some(queryId)) =>
@@ -182,8 +178,7 @@ trait QueryService {
     queryApiParameters: QueryApiParameter,
     parameters: Map[String, String] = Map()
   )(
-    implicit OIDCAuthService: TokenAuthService,
-    credentials: CredentialsService
+    implicit OIDCAuthService: TokenAuthService
   ): Task[WSResponse] = {
     query match {
       case QuerySpec(_, Some(queryId)) =>

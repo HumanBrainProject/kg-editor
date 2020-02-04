@@ -96,8 +96,22 @@ const dataTypes = [
   },
   {
     "schema": "demo/core/file/v1.0.0"
+  },
+  {
+    "schema": "simpsons/core/person/v1.0.0"
+  },
+  {
+    "schema": "simpsons/core/episode/v1.0.0"
+  },
+  {
+    "schema": "simpsons/core/food/v1.0.0"
+  },
+  {
+    "schema": "simpsons/core/address/v1.0.0"
+  },
+  {
+    "schema": "simpsons/core/saying/v1.0.0"
   }
-
 ];
 
 class DataTypesStore {

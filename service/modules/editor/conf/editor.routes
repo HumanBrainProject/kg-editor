@@ -518,7 +518,7 @@ GET /query                  controllers.EditorController.getQuery()
 #  '200':
 #    description: Ok
 ###
-POST /query/:org/:domain/:schema/:version/instances                     controllers.EditorController.performQuery(org: String, domain:String, schema: String, version:String, vocab:Option[String], size:Int=20, start:Int=0, databaseScope: Option[String])
+POST /query/:org/:domain/:schema/:version/instances                     controllers.EditorController.performQuery(org: String, domain:String, schema: String, version:String, vocab:Option[String], size:Int?=20, start:Int?=0, databaseScope: Option[String])
 
 ###
 #  summary: Delete saved query
@@ -642,7 +642,7 @@ PUT /query/:org/:domain/:schema/:version/:queryId                  controllers.E
 #    required: false
 #    type: string
 ###
-POST /suggestions/:org/:domain/:schema/:version/fields                  controllers.EditorController.getSuggestions(org: String, domain: String, schema: String, version: String, field: String, fieldType: String, start: Int=0, size: Int=50, search: String?="")
+POST /suggestions/:org/:domain/:schema/:version/fields                  controllers.EditorController.getSuggestions(org: String, domain: String, schema: String, version: String, field: String, fieldType: String, start: Int?=0, size: Int?=50, search: String?="")
 
 
 
@@ -900,7 +900,7 @@ GET /bookmarkListInstances/:org/:domain/:schema/:version        controllers.Edit
 #  '200':
 #    description: Ok
 ###
-GET /bookmarkListInstances/:org/:domain/:schema/:version/:id                            controllers.EditorUserController.getInstancesbyBookmarkList(org: String, domain:String, schema: String, version:String, id: String, from:Int=0, size:Int=20, search:String?="")
+GET /bookmarkListInstances/:org/:domain/:schema/:version/:id                            controllers.EditorUserController.getInstancesbyBookmarkList(org: String, domain:String, schema: String, version:String, id: String, from:Int?=0, size:Int?=20, search:String?="")
 
 ###
 #tags:

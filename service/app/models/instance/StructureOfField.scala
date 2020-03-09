@@ -23,8 +23,8 @@ import play.api.libs.functional.syntax._
 
 final case class StructureOfField(
   fullyQualifiedName: String,
-  name: String,
-  label: String,
+  name: Option[String],
+  label: Option[String],
   labelTooltip: Option[String],
   markdown: Option[Boolean],
   allowCustomValues: Option[Boolean],
@@ -39,8 +39,11 @@ object StructureOfField {
 
   implicit val structureOfFieldReads: Reads[StructureOfField] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
-    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ SchemaFieldsConstants.NAME).read[String].map(i => i.capitalize) and
+    (JsPath \ SchemaFieldsConstants.NAME).readNullable[String] and
+    (JsPath \ SchemaFieldsConstants.NAME).readNullable[String].map {
+      case Some(v) => Some(v.capitalize)
+      case _       => None
+    } and
     (JsPath \ "labelTooltip").readNullable[String] and
     (JsPath \ "markdown").readNullable[Boolean] and
     (JsPath \ "allowCustomValues").readNullable[Boolean] and

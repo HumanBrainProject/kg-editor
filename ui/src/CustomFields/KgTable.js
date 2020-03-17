@@ -173,7 +173,7 @@ export default class KgTable extends React.Component {
     super(props);
     this.state = {
       containerWidth: 0,
-      scrollToIndex: undefined
+      scrollToIndex: -1
     };
   }
 

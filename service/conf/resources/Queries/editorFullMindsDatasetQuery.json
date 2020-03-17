@@ -89,6 +89,11 @@
       "relative_path": "minds:container_url"
     },
     {
+      "fieldname": "minds:dataDescriptorURL",
+      "label": "Data descriptor Url",
+      "relative_path": "minds:dataDescriptorURL"
+    },
+    {
       "relative_path": "minds:containerUrlAsZIP"
     },
     {

@@ -154,6 +154,7 @@ export default class InstanceField extends React.Component{
       instanceStore.instanceHasChanged(this.props.id);
       this.handleFieldFocus(field, {id: newInstanceId});
     }
+    return newInstanceId;
   }
 
   render(){
@@ -167,7 +168,8 @@ export default class InstanceField extends React.Component{
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
-          onValueMouseLeave={this.handleToggleOffFieldHighlight}  />;
+          onValueMouseLeave={this.handleToggleOffFieldHighlight}
+          onAddCustomValue={field.allowCustomValues?this.addCustomValueHandler:undefined} />;
       }
       if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) {
         return <Field name={name} className={classes.field}

@@ -39,6 +39,8 @@ object Common {
     "de.leanovate.play-mockws" %% "play-mockws" % "2.6.2" % Test,
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
     "org.mockito" % "mockito-core" % "2.19.0" % Test,
+    "org.webjars" % "swagger-ui" % "3.18.1",
+    "com.iheart" %% "play-swagger" % "0.7.4",
     "org.typelevel" %% "cats-core" % "1.4.0",
     "io.monix" %% "monix" % "3.0.0-RC2"
   )

@@ -61,7 +61,7 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
     }
     "correctly build a diff when a field is added" in {
       val content = Json.obj(
-        "name"        -> "test",
+        "name" -> "test",
         "description" -> "description"
       )
 
@@ -98,7 +98,7 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         Some(reconId),
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description"
         )
       )
@@ -130,7 +130,7 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         Some(reconId),
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description",
           "activities" -> Json.toJson(
             List(
@@ -152,7 +152,7 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         None,
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description",
           "activities" -> Json.toJson(
             List(
@@ -195,7 +195,7 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         Some(reconId),
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description",
           "activities" -> Json.toJson(
             List(
@@ -224,12 +224,14 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         None,
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description",
-          "activities"  -> JsArray(),
+          "activities" -> JsArray(),
           "contributors" -> Json.toJson(
-            "james",
-            "jane"
+            List(
+              "james",
+              "jane"
+            )
           )
         )
       )
@@ -241,8 +243,10 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
           Json.obj(
             "activities" -> JsArray(),
             "contributors" -> Json.toJson(
-              "james",
-              "jane"
+              List(
+                "james",
+                "jane"
+              )
             )
           )
         )
@@ -258,9 +262,9 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         Some(reconId),
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description",
-          "activities"  -> JsArray(),
+          "activities" -> JsArray(),
           "contributors" -> Json.toJson(
             List(
               "james",
@@ -274,12 +278,14 @@ class InstanceOpSpec extends PlaySpec with GuiceOneAppPerSuite {
         None,
         path,
         Json.obj(
-          "name"        -> "test",
+          "name" -> "test",
           "description" -> "description",
-          "activities"  -> JsArray(),
+          "activities" -> JsArray(),
           "contributors" -> Json.toJson(
-            "james",
-            "jane"
+            List(
+              "james",
+              "jane"
+            )
           )
         )
       )

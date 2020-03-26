@@ -610,7 +610,7 @@ class InstanceStore {
           }
           browseStore.refreshFilter();
           this.closeInstance(instanceId);
-          this.flush();
+          this.instances.delete(instanceId);
           if (nextLocation) {
             routerStore.history.push(nextLocation);
           }

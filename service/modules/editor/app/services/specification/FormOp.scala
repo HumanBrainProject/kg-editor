@@ -32,7 +32,7 @@ object FormOp {
       } else {
         val correctedObj = jsValue
           .as[JsObject] - "description" - "name" - "status" - "childrenStatus" - UiConstants.DATATYPE -
-        s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}" - UiConstants.LABEL - UiConstants.SCHEMA
+          s"${EditorConstants.BASENAMESPACE}${EditorConstants.RELATIVEURL}" - UiConstants.LABEL - UiConstants.SCHEMA
         val res = correctedObj.value.map {
           case (k, v) => k -> removeKey(v)
         }
@@ -72,10 +72,10 @@ object FormOp {
   }
 
   def buildInstanceFromForm(
-    original: NexusInstance,
-    modificationFromUser: JsValue,
-    nexusEndpoint: String
-  ): NexusInstance = {
+                             original: NexusInstance,
+                             modificationFromUser: JsValue,
+                             nexusEndpoint: String
+                           ): NexusInstance = {
     val formContent = Json.parse(modificationFromUser.toString()).as[JsObject] - "id"
     val formWithID = removeClientKeysCorrectLinks(formContent, nexusEndpoint)
     val res = original.content.deepMerge(formWithID)
@@ -106,11 +106,11 @@ object FormOp {
     * @return A
     */
   def buildNewInstanceFromForm(
-    instanceRef: NexusInstanceReference,
-    nexusEndpoint: String,
-    newInstance: JsObject,
-    registry: FormRegistry[UISpec]
-  ): EditorInstance = {
+                                instanceRef: NexusInstanceReference,
+                                nexusEndpoint: String,
+                                newInstance: JsObject,
+                                registry: FormRegistry[UISpec]
+                              ): EditorInstance = {
 
     def addNexusEndpointToLinks(item: JsValue): JsObject = {
       val id = (item.as[JsObject] \ "id").as[String]
@@ -126,14 +126,14 @@ object FormOp {
       .filterNot(
         s =>
           fields(s._1).isReverse.exists(identity) ||
-          fields(s._1).isLinkingInstance.exists(identity) ||
-          s._1 == InternalSchemaFieldsConstants.ALTERNATIVES
+            fields(s._1).isLinkingInstance.exists(identity) ||
+            s._1 == InternalSchemaFieldsConstants.ALTERNATIVES
       )
       .map {
         case (key, v) =>
           val formObjectType = fields(key).fieldType
           formObjectType match {
-            case DropdownSelect =>
+            case DropdownSelect | KgTable =>
               val arr: IndexedSeq[JsValue] = v.as[JsArray].value.map { item =>
                 addNexusEndpointToLinks(item)
               }
@@ -216,7 +216,7 @@ object FormOp {
           }
           val valueWithoutNull = newValue.value match {
             case Some(JsNull) => newValue.copy(value = None)
-            case _            => newValue
+            case _ => newValue
           }
           filledTemplate ++ valueWithoutNull.transformToNormalizedJsonStructure()
         } else {
@@ -228,10 +228,10 @@ object FormOp {
   def fillFormTemplate(fields: JsValue, formTemplate: UISpec, alternatives: JsObject = Json.obj()): JsValue = {
     val alt = stripAlternativeVocab(alternatives)
     Json.obj("fields" -> fields) +
-    ("label"        -> JsString(formTemplate.label)) +
-    ("editable"     -> JsBoolean(formTemplate.isEditable.getOrElse(true))) +
-    ("ui_info"      -> formTemplate.uiInfo.map(Json.toJson(_)).getOrElse(Json.obj())) +
-    ("alternatives" -> alt)
+      ("label" -> JsString(formTemplate.label)) +
+      ("editable" -> JsBoolean(formTemplate.isEditable.getOrElse(true))) +
+      ("ui_info" -> formTemplate.uiInfo.map(Json.toJson(_)).getOrElse(Json.obj())) +
+      ("alternatives" -> alt)
   }
 
   def stripAlternativeVocab(jsObject: JsObject): JsObject = {
@@ -263,7 +263,7 @@ object FormOp {
                 })
               } else {
                 js
-            }
+              }
           )
     }
     Json.toJson(m).as[JsObject]

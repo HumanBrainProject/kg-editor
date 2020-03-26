@@ -28,14 +28,16 @@ object FieldType {
 
   def apply(s: String): FieldType = s match {
     case "DropdownSelect" => DropdownSelect
-    case "InputText"      => InputText
-    case "TextArea"       => TextArea
-    case fieldType        => GenericType(fieldType)
+    case "KgTable" => KgTable
+    case "InputText" => InputText
+    case "TextArea" => TextArea
+    case fieldType => GenericType(fieldType)
   }
 
   implicit object FieldType extends Writes[FieldType] {
     def writes(f: FieldType): JsValue = Json.toJson(f.t)
   }
+
 }
 
 final case class GenericType(fieldType: String) extends FieldType {
@@ -48,10 +50,16 @@ case object DropdownSelect extends FieldType {
   val zero = List()
 }
 
+case object KgTable extends FieldType {
+  override val t: String = "KgTable"
+  val zero = List()
+}
+
 case object InputText extends FieldType {
   override val t: String = "InputText"
   val zero = ""
 }
+
 case object InputTextMultiple extends FieldType {
   override val t: String = "InputTextMultiple"
   val zero = ""

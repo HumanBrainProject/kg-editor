@@ -610,7 +610,9 @@ class InstanceStore {
           }
           browseStore.refreshFilter();
           this.closeInstance(instanceId);
-          this.instances.delete(instanceId);
+          const instance = this.instances.get(instanceId);
+          const instancesToBeDeleted = instance.linkedIds;
+          this.removeUnusedInstances(instanceId, instancesToBeDeleted);
           if (nextLocation) {
             routerStore.history.push(nextLocation);
           }

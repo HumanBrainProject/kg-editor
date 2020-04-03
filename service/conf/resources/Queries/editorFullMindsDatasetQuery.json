@@ -90,7 +90,7 @@
     },
     {
       "fieldname": "minds:dataDescriptorURL",
-      "label": "Data descriptor Url",
+      "label": "Datadescriptor Url",
       "relative_path": "minds:dataDescriptorURL"
     },
     {

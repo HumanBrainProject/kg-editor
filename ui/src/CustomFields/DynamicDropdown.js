@@ -228,9 +228,7 @@ export default class DynamicDropdownField extends React.Component {
       return;
     }
     this.props.field.fetchOptions(true);
-    this.inputRef.focus();
     this.listenClickOutHandler();
-    //this.forceUpdate();
   };
 
   closeDropdown(){

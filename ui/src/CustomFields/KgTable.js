@@ -255,7 +255,6 @@ export default class KgTable extends React.Component {
       return;
     }
     this.props.field.fetchOptions(true);
-    this.inputRef.focus();
     this.listenClickOutHandler();
   };
 
@@ -313,7 +312,7 @@ export default class KgTable extends React.Component {
           this.triggerOnChange();
           this.setState({scrollToIndex:this.props.field.list.length});
         }
-        // field.setUserInput("");
+        field.setUserInput("");
         this.handleFocus();
       }
     } else if(e && (e.keyCode === 38 || e.keyCode === 40)){

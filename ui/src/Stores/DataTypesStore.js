@@ -111,7 +111,62 @@ const dataTypes = [
   },
   {
     "schema": "simpsons/core/saying/v1.0.0"
+  },  
+  {
+    "schema": "softwarecatalog/options/applicationcategory/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/applicationsubcategory/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/device/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/fileformat/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/keyword/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/language/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/license/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/operatingsystem/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/options/programminglanguage/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/software/software/v0.1.2"
+  },
+  {
+    "schema": "softwarecatalog/software/software/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwarefeature/v0.1.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwarefeature/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwarefeaturecategory/v0.1.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwarefeaturecategory/v1.0.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwarefeaturesubcategory/v0.1.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwareproject/v0.1.0"
+  },
+  {
+    "schema": "softwarecatalog/software/softwareproject/v1.0.0"
   }
+
 ];
 
 class DataTypesStore {

@@ -111,7 +111,7 @@ const dataTypes = [
   },
   {
     "schema": "simpsons/core/saying/v1.0.0"
-  },  
+  },
   {
     "schema": "softwarecatalog/options/applicationcategory/v1.0.0"
   },
@@ -165,8 +165,10 @@ const dataTypes = [
   },
   {
     "schema": "softwarecatalog/software/softwareproject/v1.0.0"
+  },
+  {
+    "schema": "neuralactivity/core/person/v0.1.0"
   }
-
 ];
 
 class DataTypesStore {

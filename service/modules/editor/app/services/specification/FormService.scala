@@ -41,11 +41,7 @@ class FormService @Inject()(
 ) {
 
   private var stateSpec: Option[FormRegistries] = None
-
-  val timeout = FiniteDuration(30, "sec")
-  val retryTime = 5000 //ms
   val logger: slf4j.Logger = LoggerFactory.getLogger(this.getClass)
-  specificationService.init().runSyncUnsafe(timeout)
 
   /**
     * @return the specification and stored queries
@@ -55,10 +51,7 @@ class FormService @Inject()(
     case None       => loadFormConfiguration()
   }
 
-  def flushSpec(): Task[FormRegistries] =
-    specificationService.init().flatMap { _ =>
-      loadFormConfiguration()
-    }
+  def flushSpec(): Task[FormRegistries] = loadFormConfiguration()
 
   private final def loadFormConfiguration(): Task[FormRegistries] = {
     logger.info("Form Service INITIALIZATION --- Starting to load specification")
@@ -96,8 +89,6 @@ class FormService @Inject()(
 object FormService {
   val log: slf4j.Logger = LoggerFactory.getLogger(this.getClass)
 
-  private val timeout = FiniteDuration(30, "sec")
-
   def getRegistry(
     js: List[JsObject],
     specificationService: SpecificationService,
@@ -106,15 +97,9 @@ object FormService {
     val formRegistries = extractRegistries(js)
     for {
       token          <- oidcAuthService.getTechAccessToken()
-      systemQueries  <- specificationService.fetchSpecificationQueries(token)
       uiSpecResponse <- specificationService.fetchSpecifications(token)
     } yield {
-      val completeQueries = FormRegistry(
-        systemQueries.foldLeft(formRegistries.queryRegistry.registry) {
-          case (acc, el) => acc.updated(el.nexusPath, QuerySpec(Json.obj(), Some(el.id)))
-        }
-      )
-
+      val completeQueries = FormRegistry(formRegistries.queryRegistry.registry)
       val uiSpecFromDB = uiSpecResponse.status match {
         case OK => (uiSpecResponse.json \ "results").as[List[JsObject]]
         case _ =>

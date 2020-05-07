@@ -23,17 +23,19 @@ import KgAnnotatedInputTextField from "./KgAnnotatedInputText";
 import DynamicDropdownStore from "./DynamicDropdownStore";
 import KgTableStore from "./KgTableStore";
 import KgAnnotatedInputTextStore from "./KgAnnotatedInputTextStore";
+import KgInputTextStore from "./KgInputTextStore";
+import KgTextAreaStore from "./KgTextAreaStore";
 
-FormStore.registerCustomField("KgInputText", KgInputTextField, FormStore.typesMapping.InputText);
+FormStore.registerCustomField("KgInputText", KgInputTextField, KgInputTextStore);
 FormStore.registerCustomField("KgAnnotatedInputTextField",  KgAnnotatedInputTextField, KgAnnotatedInputTextStore);
-FormStore.registerCustomField("KgTextArea", KgTextAreaField, FormStore.typesMapping.TextArea);
+FormStore.registerCustomField("KgTextArea", KgTextAreaField, KgTextAreaStore);
 FormStore.registerCustomField("DynamicDropdown", DynamicDropdown, DynamicDropdownStore);
 FormStore.registerCustomField("KgTable", KgTable, KgTableStore);
 
 export default {
   KgInputTextField:{
     component:KgInputTextField,
-    store:FormStore.typesMapping.InputText
+    store:KgInputTextStore
   },
   KgAnnotatedInputTextField: {
     component:KgAnnotatedInputTextField,
@@ -41,7 +43,7 @@ export default {
   },
   KgTextAreaField:{
     component:KgTextAreaField,
-    store:FormStore.typesMapping.TextArea
+    store:KgTextAreaStore
   },
   DynamicDropdown:{
     component:DynamicDropdown,

@@ -87,7 +87,6 @@ export default class CompareWithReleasedVersionChanges extends React.Component{
     const { classes, instanceId, status } = this.props;
 
     if (!instanceId) {
-      window.console.log("Error: instanceId is null. Could not compare instance with released version!");
       return null;
     }
     const instanceBefore = status !== "NOT_RELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;

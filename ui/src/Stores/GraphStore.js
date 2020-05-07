@@ -116,7 +116,7 @@ class GraphStore {
         this.isFetching = false;
       });
     } catch (e) {
-      console.log(e);
+      //console.log(e);
     }
   }
 

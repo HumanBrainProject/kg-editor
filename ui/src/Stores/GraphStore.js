@@ -18,7 +18,6 @@ import { observable, action, runInAction } from "mobx";
 import { find, remove, clone, pullAll, uniqueId, uniq, flatten } from "lodash";
 
 import API from "../Services/API";
-import console from "../Services/Logger";
 
 import dataTypesStore from "../Stores/DataTypesStore";
 import structureStore from "../Stores/StructureStore";

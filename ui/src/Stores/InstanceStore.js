@@ -416,7 +416,8 @@ class InstanceStore {
    * Opened instances are shown in their own tab in the UI
    * We keep track in that store of which instances are opened
    */
-  @action openInstance(instanceId, viewMode = "view", readMode = true){
+  @action
+  openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
     this.setReadMode(readMode);
     if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {

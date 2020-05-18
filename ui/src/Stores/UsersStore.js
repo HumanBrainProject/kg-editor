@@ -20,19 +20,15 @@ import { debounce } from "lodash";
 import API from "../Services/API";
 
 class UsersStore {
-
   @observable users = new Map();
-
   @observable isFetchingSearch = false;
   @observable isSearchFetched = false;
   @observable searchFetchError = null;
-
   @observable searchResult = [];
   @observable searchFilter = {
     queryString: "",
     excludedUsers: []
   };
-
   @observable totalSearchCount = 0;
 
   searchPageStart = 0;
@@ -42,6 +38,19 @@ class UsersStore {
   get hasSearchFilter() {
     return this.searchFilter.queryString !== "";
   }
+
+  @computed
+  get canLoadMoreResults() {
+    if (!this.hasSearchFilter || this.isFetchingSearch || this.searchFetchError || !this.searchResult.length) {
+      return false;
+    }
+
+    return this.searchResult.length < this.totalSearchCount;
+  }
+
+  applySearchFilter = debounce(() => {
+    this.searchUsers();
+  }, 750);
 
   @action
   getUser(userId) {
@@ -121,7 +130,8 @@ class UsersStore {
     return user;
   }
 
-  @action setSearchFilter(queryString, excludedUsers = []) {
+  @action
+  setSearchFilter(queryString, excludedUsers = []) {
     if (!queryString) {
       queryString = "";
     }
@@ -133,19 +143,6 @@ class UsersStore {
       this.isFetchingSearch = true;
       this.applySearchFilter();
     }
-  }
-
-  applySearchFilter = debounce(() => {
-    this.searchUsers();
-  }, 750);
-
-  @computed
-  get canLoadMoreResults() {
-    if (!this.hasSearchFilter || this.isFetchingSearch || this.searchFetchError || !this.searchResult.length) {
-      return false;
-    }
-
-    return this.searchResult.length < this.totalSearchCount;
   }
 
   @action

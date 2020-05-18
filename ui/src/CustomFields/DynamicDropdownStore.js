@@ -24,10 +24,11 @@ import instanceStore from "../Stores/InstanceStore";
 
 class OptionsPool{
   @observable options = new Map();
+  @observable isFetchingQueue = false;
+
   optionsQueue = new Map();
   queueThreshold = 5000;
   queueTimeout = 250;
-  @observable isFetchingQueue = false;
 
   getOption(value, mappingValue, mappingLabel){
     if(this.options.has(value[mappingValue])){
@@ -40,6 +41,8 @@ class OptionsPool{
     return this.options.get(value[mappingValue]);
   }
 
+  _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+
   @action
   processQueue(){
     if(this.optionsQueue.size <= 0){
@@ -51,8 +54,6 @@ class OptionsPool{
       this.fetchQueue();
     }
   }
-
-  _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
 
   @action
   async fetchQueue(){
@@ -137,15 +138,14 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
   @observable max = Infinity;
   @observable listPosition = "bottom";
   @observable closeDropdownAfterInteraction = false;
-
   @observable userInput = "";
   @observable optionsPageStart = 0;
   @observable optionsPageSize = 50;
+  @observable optionsCurrentTotal = Infinity;
+  @observable fetchingOptions = false;
+
   lastFetchParams = null;
   lastFetchOptions = [];
-  @observable optionsCurrentTotal = Infinity;
-
-  @observable fetchingOptions = false;
 
   __emptyValue = () => [];
 
@@ -157,6 +157,29 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
   constructor(fieldData, store, path){
     super(fieldData, store, path);
     this.injectValue(this.value);
+  }
+
+  valueLabelRendering = (field, value, valueLabelRendering) => {
+    if (instanceStore.instances.has(value.id)) {
+      const instance = instanceStore.instances.get(value.id);
+      if (instance && instance.isFetched) {
+        const labelFieldName = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+        const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
+        if (labelField) {
+          return labelField.value;
+        }
+      }
+    }
+    return typeof valueLabelRendering === "function"?
+      valueLabelRendering(field, value)
+      :
+      get(value, field.mappingLabel);
+  }
+
+  _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
+
+  hasMoreOptions(){
+    return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 
   @action
@@ -180,23 +203,6 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     return optionsPool.getOption(value, this.mappingValue, this.mappingLabel);
   }
 
-  valueLabelRendering = (field, value, valueLabelRendering) => {
-    if (instanceStore.instances.has(value.id)) {
-      const instance = instanceStore.instances.get(value.id);
-      if (instance && instance.isFetched) {
-        const labelFieldName = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
-        const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
-        if (labelField) {
-          return labelField.value;
-        }
-      }
-    }
-    return typeof valueLabelRendering === "function"?
-      valueLabelRendering(field, value)
-      :
-      get(value, field.mappingLabel);
-  }
-
   @action
   async fetchOptions(append){
     if(this.fetchingOptions){
@@ -217,8 +223,6 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     });
   }
 
-  _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
-
   @action
   setUserInput(userInput){
     this.userInput = userInput;
@@ -231,9 +235,5 @@ export default class DynamicDropdownField extends FormStore.typesMapping.Default
     if(this.hasMoreOptions()){
       this.fetchOptions(true);
     }
-  }
-
-  hasMoreOptions(){
-    return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 }

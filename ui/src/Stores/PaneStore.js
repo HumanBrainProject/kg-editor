@@ -21,10 +21,13 @@ export default class PaneStore {
   @observable selectedPane;
   @observable panes = [];
 
-  @computed get selectedIndex(){
+  @computed
+  get selectedIndex(){
     return this.panes.indexOf(this.selectedPane);
   }
-  @action registerPane(id){
+
+  @action
+  registerPane(id){
     let paneId = id || uniqueId("pane");
     this.panes.push(paneId);
     if(this.selectedPane === undefined){
@@ -32,10 +35,14 @@ export default class PaneStore {
     }
     return paneId;
   }
-  @action selectPane(id){
+
+  @action
+  selectPane(id){
     this.selectedPane = id;
   }
-  @action unregisterPane(id){
+
+  @action
+  unregisterPane(id){
     remove(this.panes, paneId => paneId === id);
   }
 }

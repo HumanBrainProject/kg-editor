@@ -76,6 +76,10 @@ class StructureStore {
     return this.schemasLabel.get(schema);
   }
 
+  colorPalletteBySchema(schema) {
+    return this.colorPaletteByLabel[this.findLabelBySchema(schema)];
+  }
+
   @action
   async fetchStructure(forceFetch=false) {
     if (!this.isFetchingStructure && (!this.structure || !!forceFetch)) {
@@ -99,10 +103,6 @@ class StructureStore {
         this.isFetchingStructure = false;
       }
     }
-  }
-
-  colorPalletteBySchema(schema) {
-    return this.colorPaletteByLabel[this.findLabelBySchema(schema)];
   }
 }
 

@@ -17,34 +17,14 @@
 import { observable, action, runInAction, computed } from "mobx";
 import API from "../Services/API";
 
-class StructureStatisticsStore{
-
+class StructureStatisticsStore {
   @observable statistics = [];
   @observable isFetched = false;
   @observable isFetching = false;
   @observable fetchError = null;
 
-  @action
-  async fetchStatistics() {
-    try {
-      this.isFetching = true;
-      this.fetchError = null;
-      const { data } = await API.axios.get(API.endpoints.statistics());
-      runInAction(() => {
-        this.isFetched = true;
-        this.isFetching = false;
-        this.statistics = data;
-      });
-    } catch (e) {
-      runInAction(() => {
-        const message = e.message? e.message: e;
-        this.fetchError = `Error while retrieving list of features (${message})`;
-        this.isFetching = false;
-      });
-    }
-  }
-
-  @computed get nodeTypeStatistics() {
+  @computed
+  get nodeTypeStatistics() {
     let stats = [];
     if (this.statistics && this.statistics.nodes && this.statistics.nodes.length) {
       stats = Object.values(
@@ -79,7 +59,8 @@ class StructureStatisticsStore{
     return stats;
   }
 
-  @computed get usersStatistics() {
+  @computed
+  get usersStatistics() {
     let stats = [];
     const users = ["Oliver Schmid", "Gilles Dénervaud", "David Kunzmann", "Benoît Beaumatin", "Rémi Diana", "Milica Markovic", "Katrin Amunts"];
     if (users.length) {
@@ -93,6 +74,26 @@ class StructureStatisticsStore{
         .filter((user, index) => index < 5);
     }
     return stats;
+  }
+
+  @action
+  async fetchStatistics() {
+    try {
+      this.isFetching = true;
+      this.fetchError = null;
+      const { data } = await API.axios.get(API.endpoints.statistics());
+      runInAction(() => {
+        this.isFetched = true;
+        this.isFetching = false;
+        this.statistics = data;
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message? e.message: e;
+        this.fetchError = `Error while retrieving list of features (${message})`;
+        this.isFetching = false;
+      });
+    }
   }
 
 }

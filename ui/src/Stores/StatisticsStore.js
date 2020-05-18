@@ -17,8 +17,7 @@
 import { observable, action, runInAction } from "mobx";
 import API from "../Services/API";
 
-class StatisticsStore{
-
+class StatisticsStore {
   @observable statistics = {};
   @observable globalDatasetsStatistics = {
     data: {},

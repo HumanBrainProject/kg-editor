@@ -65,6 +65,34 @@ class GraphStore {
     return uniq(flatten(this.findLinksByNode(node).map(link => [link.target, link.source])));
   }
 
+  getCurrentNode() {
+    return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
+  }
+
+  get graphData() {
+    if (this.typeStates === null || this.originalData === null) {
+      return null;
+    }
+
+    let graphData = {
+      nodes: [...this.originalData.nodes],
+      links: [...this.originalData.links]
+    };
+
+    this.typeStates.forEach((state, type) => {
+      if (state === "group" || state === "hide") {
+        pullAll(graphData.nodes, this.findNodesBySchema(type));
+        pullAll(graphData.links, this.findLinksBySchema(type));
+      }
+      if (state === "show" || state === "hide") {
+        pullAll(graphData.nodes, this.findNodesBySchema("Group_" + type));
+        pullAll(graphData.links, this.findLinksBySchema("Group_" + type));
+      }
+    });
+
+    return graphData;
+  }
+
   @action hlNode(node) {
     if (node !== null && this.typeStates.get(node.schemas) === "group") {
       node = this.groupNodes.get(node.schemas);
@@ -92,7 +120,8 @@ class GraphStore {
     }
   }
 
-  @action reset() {
+  @action
+  reset() {
     this.isFetched = false;
     this.isFetching = false;
     this.expandedTypes = [];
@@ -104,7 +133,8 @@ class GraphStore {
     this.mainId = null;
   }
 
-  @action filterOriginalData() {
+  @action
+  filterOriginalData() {
     //Remove nodes that are not whitelisted
     remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => nodeType.schema === node.schemas));
     remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
@@ -170,37 +200,15 @@ class GraphStore {
     });
   }
 
-  get graphData() {
-    if (this.typeStates === null || this.originalData === null) {
-      return null;
-    }
-
-    let graphData = {
-      nodes: [...this.originalData.nodes],
-      links: [...this.originalData.links]
-    };
-
-    this.typeStates.forEach((state, type) => {
-      if (state === "group" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesBySchema(type));
-        pullAll(graphData.links, this.findLinksBySchema(type));
-      }
-      if (state === "show" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesBySchema("Group_" + type));
-        pullAll(graphData.links, this.findLinksBySchema("Group_" + type));
-      }
-    });
-
-    return graphData;
-  }
-
-  @action explodeNode(clickedNode) {
+  @action
+  explodeNode(clickedNode) {
     if (clickedNode.isGroup) {
       this.typeStates.set(clickedNode.original_schema, "show");
     }
   }
 
-  @action toggleSettingsPanel(state) {
+  @action
+  toggleSettingsPanel(state) {
     if (state === undefined) {
       this.sidePanel = this.sidePanel === "settings" ? "" : "settings";
     } else {
@@ -212,28 +220,28 @@ class GraphStore {
     }
   }
 
-  @action setTypeState(nodeType, state) {
+  @action
+  setTypeState(nodeType, state) {
     this.typeStates.set(nodeType, state);
   }
 
-  @action expandType(typeToExpand) {
+  @action
+  expandType(typeToExpand) {
     this.expandedTypes.push(typeToExpand);
   }
 
-  @action collapseType(typeToCollapse) {
+  @action
+  collapseType(typeToCollapse) {
     remove(this.expandedTypes, type => typeToCollapse === type);
   }
 
-  @action toggleType(typeToToggle) {
+  @action
+  toggleType(typeToToggle) {
     if (find(this.expandedTypes, type => typeToToggle === type)) {
       this.collapseType(typeToToggle);
     } else {
       this.expandType(typeToToggle);
     }
-  }
-
-  getCurrentNode() {
-    return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
   }
 }
 

@@ -56,8 +56,6 @@ const styles = {
       backgroundColor: "var(--bg-color-ui-contrast2)"
     }
   },
-
-
   instanceStatus: {
     color: "white",
     "& .svg-inline--fa": {

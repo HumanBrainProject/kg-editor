@@ -75,15 +75,15 @@ class API {
     return this._axios;
   }
 
+  get endpoints() {
+    return endpoints;
+  }
+
   reloadToken() {
     Object.assign(this._axios.defaults, {
       headers: { Authorization: "Bearer " + authStore.accessToken },
       withCredentials: true
     });
-  }
-
-  get endpoints() {
-    return endpoints;
   }
 }
 

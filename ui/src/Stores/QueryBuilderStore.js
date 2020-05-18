@@ -92,33 +92,12 @@ class Field {
     defaultOptions.forEach(option => this.optionsMap.set(option.name, option.value));
   }
 
-  @action
-  setAlias(value) {
-    this.alias = value;
-    this.aliasError = (value.trim() === "" && this.isRootMerge);
-  }
-
   @computed
   get options() {
     return Array.from(this.optionsMap).map(([name, value]) => ({
       name: name,
       value: toJS(value)
     }));
-  }
-
-  getOption(name) {
-    return this.optionsMap.has(name) ? this.optionsMap.get(name) : undefined;
-  }
-
-  @action setOption(name, value, preventRecursivity) {
-    this.optionsMap.set(name, value);
-    if (name === "sort" && value && !preventRecursivity) {
-      this.parent.fields.forEach(field => {
-        if (field !== this) {
-          field.setOption("sort", undefined, true);
-        }
-      });
-    }
   }
 
   @computed
@@ -202,6 +181,28 @@ class Field {
     }
     return currentField.schema.simpleAttributeName || currentField.schema.simplePropertyName || currentField.schema.label || "";
   }
+
+  getOption(name) {
+    return this.optionsMap.has(name) ? this.optionsMap.get(name) : undefined;
+  }
+
+  @action
+  setAlias(value) {
+    this.alias = value;
+    this.aliasError = (value.trim() === "" && this.isRootMerge);
+  }
+
+  @action
+  setOption(name, value, preventRecursivity) {
+    this.optionsMap.set(name, value);
+    if (name === "sort" && value && !preventRecursivity) {
+      this.parent.fields.forEach(field => {
+        if (field !== this) {
+          field.setOption("sort", undefined, true);
+        }
+      });
+    }
+  }
 }
 
 class QueryBuilderStore {
@@ -225,15 +226,12 @@ class QueryBuilderStore {
   @observable showOthersQueries = true;
   @observable saveAsMode = false;
   @observable compareChanges = false;
-
   @observable specifications = [];
-
   @observable runStripVocab = true;
   @observable resultSize = 20;
   @observable resultStart = 0;
   @observable.shallow result = null;
   @observable tableViewRoot = ["results"];
-
   @observable currentTab = "query";
   @observable currentField = null;
 
@@ -325,79 +323,6 @@ class QueryBuilderStore {
   @computed
   get currentFieldParentLookupsLinks() {
     return this.getLookupsLinks(this.currentFieldParentLookups);
-  }
-
-  @action
-  selectRootSchema(schema) {
-    if (!this.isSaving) {
-      this.queryId = "";
-      this.label = "";
-      this.description = "";
-      this.context = toJS(defaultContext);
-      this.sourceQuery = null;
-      this.savedQueryHasInconsistencies = false;
-      this.rootField = new Field({
-        id: schema.id,
-        label: schema.label,
-        canBe: [schema.id]
-      });
-      this.isSaving = false;
-      this.saveError = null;
-      this.isRunning = false;
-      this.runError = null;
-      this.saveAsMode = false;
-      this.showHeader = true;
-      this.showQueries = false;
-      this.showMyQueries = true;
-      this.showOthersQueries = true;
-      this.result = null;
-      this.selectField(this.rootField);
-      this.fetchQueries();
-    }
-  }
-
-  @action
-  resetRootSchema() {
-    if (!this.isSaving) {
-      this.queryId = "";
-      this.label = "";
-      this.description = "";
-      this.context = toJS(defaultContext);
-      this.sourceQuery = null;
-      this.savedQueryHasInconsistencies = false;
-      this.rootField = new Field(this.rootField.schema);
-      this.isSaving = false;
-      this.saveError = null;
-      this.isRunning = false;
-      this.runError = null;
-      this.saveAsMode = false;
-      this.showHeader = true;
-      this.showQueries = false;
-      this.showMyQueries = true;
-      this.showOthersQueries = true;
-      this.result = null;
-      this.selectField(this.rootField);
-    }
-  }
-
-  @action
-  setAsNewQuery() {
-    if (!this.isSaving) {
-      this.queryId = "";
-      this.label = "";
-      this.description = "";
-      this.sourceQuery = null;
-      this.savedQueryHasInconsistencies = false;
-      this.isSaving = false;
-      this.saveError = null;
-      this.isRunning = false;
-      this.runError = null;
-      this.showHeader = true;
-      this.saveAsMode = false;
-      this.showQueries = false;
-      this.showMyQueries = true;
-      this.showOthersQueries = true;
-    }
   }
 
   @computed
@@ -500,149 +425,6 @@ class QueryBuilderStore {
       return this.specifications.filter(spec => spec.user !== authStore.user.id).sort((a, b) => a.label - b.label);
     }
     return this.specifications.sort((a, b) => a.label - b.label);
-  }
-
-  @action
-  addField(schema, parent, gotoField = true) {
-    if (parent === undefined) {
-      parent = this.showModalFieldChoice || this.rootField;
-      this.showModalFieldChoice = null;
-    }
-    if (!parent.isFlattened || parent.fields.length < 1) {
-      const newField = new Field(schema, parent);
-      if (parent.isMerge && !parent.isRootMerge) {
-        newField.isMerge = true;
-        newField.isFlattened = !!newField.lookups.length;
-      }
-      if (!parent.fields || parent.fields.length === undefined) {
-        parent.fields = [];
-      }
-      parent.fields.push(newField);
-      const rootMerge = newField.rootMerge;
-      if (rootMerge) {
-        this.checkMergeFields(rootMerge);
-      }
-      if (gotoField) {
-        this.selectField(newField);
-      }
-    }
-  }
-
-  @action
-  addMergeField(parent, gotoField = true) {
-    if (parent === undefined) {
-      parent = this.showModalFieldChoice || this.rootField;
-      this.showModalFieldChoice = null;
-    }
-    if (!parent.isRootMerge && parent !== this.rootFields) {
-      if (!this.context.merge) {
-        this.context.merge = toJS(defaultContext.merge);
-      }
-      const newField = new Field({}, parent);
-      newField.isMerge = true;
-      newField.isInvalid = true;
-      newField.alias = uniqueId("field");
-      if (!parent.fields || parent.fields.length === undefined) {
-        parent.fields = [];
-      }
-      parent.fields.push(newField);
-      if (gotoField) {
-        this.selectField(newField);
-      }
-    }
-  }
-
-  checkMergeFields(parent) {
-    if (parent.isRootMerge) {
-      parent.fields.forEach(field => {
-        let isUnknown = true;
-        parent.lookups.some(schemaId => {
-          const schema = structureStore.findSchemaById(schemaId);
-          if (schema && schema.properties && schema.properties.length) {
-            if (schema.properties.find(property => property.attribute === field.schema.attribute && ((!field.schema.canBe && !property.canBe) || (isEqual(toJS(field.schema.canBe), toJS(property.canBe)))))) {
-              isUnknown = false;
-              return true;
-            }
-          }
-          return false;
-        });
-        field.isUnknown = isUnknown;
-      });
-    }
-  }
-
-  @action
-  addMergeChildField(schema, parent, gotoField = true) {
-    if (parent === undefined) {
-      parent = this.showModalFieldChoice || this.rootField;
-      this.showModalFieldChoice = null;
-    }
-    if (parent.isRootMerge) {
-      const newField = new Field(schema, parent);
-      newField.isMerge = true;
-      newField.isFlattened = !!newField.lookups.length;
-      if (!parent.merge || parent.merge.length === undefined) {
-        parent.merge = [];
-      }
-      parent.merge.push(newField);
-      parent.isInvalid = (parent.merge.length < 2);
-      this.checkMergeFields(parent);
-      if (gotoField) {
-        this.selectField(newField);
-      }
-    }
-  }
-
-  @action
-  removeField(field) {
-    if (field === this.rootField) {
-      this.rootField = null;
-      this.queryId = "";
-      this.label = "";
-      this.description = "";
-      this.sourceQuery = null;
-      this.context = null;
-      this.specifications = [];
-      this.saveError = null;
-      this.runError = null;
-      this.saveAsMode = false;
-      this.sourceQuery = null;
-      this.savedQueryHasInconsistencies = false;
-      this.closeFieldOptions();
-    } else {
-      if (field === this.currentField) {
-        this.closeFieldOptions();
-      }
-      if (field.isMerge && field.parentIsRootMerge) {
-        remove(field.parent.merge, parentField => field === parentField);
-        field.parent.isInvalid = (field.parent.merge.length < 2);
-        this.checkMergeFields(field.parent);
-      } else {
-        remove(field.parent.fields, parentField => field === parentField);
-        const rootMerge = field.rootMerge;
-        if (rootMerge) {
-          this.checkMergeFields(rootMerge);
-        }
-      }
-    }
-  }
-
-  @action toggleRunStripVocab(state) {
-    this.runStripVocab = state !== undefined ? !!state : !this.runStripVocab;
-  }
-
-  @action selectTab(tab) {
-    this.currentTab = tab;
-  }
-
-  @action selectField(field) {
-    this.currentField = field;
-    this.currentTab = "fieldOptions";
-  }
-
-  @action closeFieldOptions() {
-    this.currentField = null;
-    this.currentTab = "query";
   }
 
   @computed
@@ -1025,6 +807,226 @@ class QueryBuilderStore {
     this._processJsonSpecificationFields(rootField, fields);
     properties && Object.entries(properties).forEach(([name, value]) => rootField.setOption(name, value));
     return rootField;
+  }
+
+  checkMergeFields(parent) {
+    if (parent.isRootMerge) {
+      parent.fields.forEach(field => {
+        let isUnknown = true;
+        parent.lookups.some(schemaId => {
+          const schema = structureStore.findSchemaById(schemaId);
+          if (schema && schema.properties && schema.properties.length) {
+            if (schema.properties.find(property => property.attribute === field.schema.attribute && ((!field.schema.canBe && !property.canBe) || (isEqual(toJS(field.schema.canBe), toJS(property.canBe)))))) {
+              isUnknown = false;
+              return true;
+            }
+          }
+          return false;
+        });
+        field.isUnknown = isUnknown;
+      });
+    }
+  }
+
+  @action
+  selectRootSchema(schema) {
+    if (!this.isSaving) {
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.context = toJS(defaultContext);
+      this.sourceQuery = null;
+      this.savedQueryHasInconsistencies = false;
+      this.rootField = new Field({
+        id: schema.id,
+        label: schema.label,
+        canBe: [schema.id]
+      });
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
+      this.saveAsMode = false;
+      this.showHeader = true;
+      this.showQueries = false;
+      this.showMyQueries = true;
+      this.showOthersQueries = true;
+      this.result = null;
+      this.selectField(this.rootField);
+      this.fetchQueries();
+    }
+  }
+
+  @action
+  resetRootSchema() {
+    if (!this.isSaving) {
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.context = toJS(defaultContext);
+      this.sourceQuery = null;
+      this.savedQueryHasInconsistencies = false;
+      this.rootField = new Field(this.rootField.schema);
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
+      this.saveAsMode = false;
+      this.showHeader = true;
+      this.showQueries = false;
+      this.showMyQueries = true;
+      this.showOthersQueries = true;
+      this.result = null;
+      this.selectField(this.rootField);
+    }
+  }
+
+  @action
+  setAsNewQuery() {
+    if (!this.isSaving) {
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.sourceQuery = null;
+      this.savedQueryHasInconsistencies = false;
+      this.isSaving = false;
+      this.saveError = null;
+      this.isRunning = false;
+      this.runError = null;
+      this.showHeader = true;
+      this.saveAsMode = false;
+      this.showQueries = false;
+      this.showMyQueries = true;
+      this.showOthersQueries = true;
+    }
+  }
+
+  @action
+  addField(schema, parent, gotoField = true) {
+    if (parent === undefined) {
+      parent = this.showModalFieldChoice || this.rootField;
+      this.showModalFieldChoice = null;
+    }
+    if (!parent.isFlattened || parent.fields.length < 1) {
+      const newField = new Field(schema, parent);
+      if (parent.isMerge && !parent.isRootMerge) {
+        newField.isMerge = true;
+        newField.isFlattened = !!newField.lookups.length;
+      }
+      if (!parent.fields || parent.fields.length === undefined) {
+        parent.fields = [];
+      }
+      parent.fields.push(newField);
+      const rootMerge = newField.rootMerge;
+      if (rootMerge) {
+        this.checkMergeFields(rootMerge);
+      }
+      if (gotoField) {
+        this.selectField(newField);
+      }
+    }
+  }
+
+  @action
+  addMergeField(parent, gotoField = true) {
+    if (parent === undefined) {
+      parent = this.showModalFieldChoice || this.rootField;
+      this.showModalFieldChoice = null;
+    }
+    if (!parent.isRootMerge && parent !== this.rootFields) {
+      if (!this.context.merge) {
+        this.context.merge = toJS(defaultContext.merge);
+      }
+      const newField = new Field({}, parent);
+      newField.isMerge = true;
+      newField.isInvalid = true;
+      newField.alias = uniqueId("field");
+      if (!parent.fields || parent.fields.length === undefined) {
+        parent.fields = [];
+      }
+      parent.fields.push(newField);
+      if (gotoField) {
+        this.selectField(newField);
+      }
+    }
+  }
+
+  @action
+  addMergeChildField(schema, parent, gotoField = true) {
+    if (parent === undefined) {
+      parent = this.showModalFieldChoice || this.rootField;
+      this.showModalFieldChoice = null;
+    }
+    if (parent.isRootMerge) {
+      const newField = new Field(schema, parent);
+      newField.isMerge = true;
+      newField.isFlattened = !!newField.lookups.length;
+      if (!parent.merge || parent.merge.length === undefined) {
+        parent.merge = [];
+      }
+      parent.merge.push(newField);
+      parent.isInvalid = (parent.merge.length < 2);
+      this.checkMergeFields(parent);
+      if (gotoField) {
+        this.selectField(newField);
+      }
+    }
+  }
+
+  @action
+  removeField(field) {
+    if (field === this.rootField) {
+      this.rootField = null;
+      this.queryId = "";
+      this.label = "";
+      this.description = "";
+      this.sourceQuery = null;
+      this.context = null;
+      this.specifications = [];
+      this.saveError = null;
+      this.runError = null;
+      this.saveAsMode = false;
+      this.sourceQuery = null;
+      this.savedQueryHasInconsistencies = false;
+      this.closeFieldOptions();
+    } else {
+      if (field === this.currentField) {
+        this.closeFieldOptions();
+      }
+      if (field.isMerge && field.parentIsRootMerge) {
+        remove(field.parent.merge, parentField => field === parentField);
+        field.parent.isInvalid = (field.parent.merge.length < 2);
+        this.checkMergeFields(field.parent);
+      } else {
+        remove(field.parent.fields, parentField => field === parentField);
+        const rootMerge = field.rootMerge;
+        if (rootMerge) {
+          this.checkMergeFields(rootMerge);
+        }
+      }
+    }
+  }
+
+  @action
+  toggleRunStripVocab(state) {
+    this.runStripVocab = state !== undefined ? !!state : !this.runStripVocab;
+  }
+
+  @action
+  selectTab(tab) {
+    this.currentTab = tab;
+  }
+
+  @action
+  selectField(field) {
+    this.currentField = field;
+    this.currentTab = "fieldOptions";
+  }
+
+  @action
+  closeFieldOptions() {
+    this.currentField = null;
+    this.currentTab = "query";
   }
 
   @action

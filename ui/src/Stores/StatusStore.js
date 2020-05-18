@@ -31,6 +31,9 @@ class StatusStore {
     return this.statuses.get(id);
   }
 
+  _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
+  _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
+
   @action flush() {
     this.statuses = new Map();
   }
@@ -85,9 +88,6 @@ class StatusStore {
       this.processQueueChildren();
     }
   }
-
-  _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
-  _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
 
   @action
   async processQueue() {

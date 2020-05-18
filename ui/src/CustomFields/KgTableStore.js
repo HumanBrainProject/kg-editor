@@ -57,6 +57,57 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       this.injectValue(this.value);
     }
 
+    @computed
+    get columns() {
+      if(this.isInitialized && !this.hasInitializationError) {
+        let columns = this.instances[0].promotedFields.map(name => ({name: name, label: this.instances[0][name].label}));
+        columns.push({name: "delete", label: ""});
+        return columns;
+      }
+      return [
+        {name: "id", label: "Name"},
+        {name: "delete", label: ""}
+      ];
+    }
+
+    @computed
+    get visibleInstancesCount() {
+      const defaultInstances = this.defaultVisibleInstances > this.instances.length ? this.instances.length:this.defaultVisibleInstances;
+      let count = defaultInstances + this.visibleInstances;
+      for(let i=0; i<defaultInstances && i<this.instances.length; i++ ) {
+        const instance = this.instances[i];
+        if(instance && instance.show) {
+          count--;
+        }
+      }
+      return count;
+    }
+
+    @computed
+    get isInitialized() {
+      return this.hasInitializationError || this.instances.length && this.instances[0].promotedFields.length>0;
+    }
+
+    @computed
+    get hasInitializationError() {
+      return this.instances.length && this.instances[0].fetchError;
+    }
+
+    @computed
+    get list() {
+      return this.instances.map(instance => {
+        const row = {id:instance.id, instance: instance};
+        if(!instance.isFetching && instance.isFetched) {
+          this.columns.forEach(col => {
+            if(col.name !== "delete") {
+              row[col.name] = instance[col.name].value;
+            }
+          });
+        }
+        return row;
+      });
+    }
+
     addInstance(value, mappingValue){
       const id = value[mappingValue];
       if(this.instancesMap.has(id)){
@@ -74,10 +125,26 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       }
     }
 
+    isInstanceVisilbe = (index, instanceId) => {
+      if(index < this.defaultVisibleInstances) {
+        return true;
+      }
+      const instance = this.instancesMap.get(instanceId);
+      return instance && instance.show;
+    }
+
+    hasMoreOptions(){
+      return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
+    }
+
     fetchInstance(instance){
       this.instancesQueue.add(instance.id);
       this.processQueue();
     }
+
+    _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+
+    _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
 
     @action
     removeInstance(id) {
@@ -96,8 +163,6 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         this.fetchQueue();
       }
     }
-
-    _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
 
     @action
     async fetchQueue(){
@@ -172,19 +237,6 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       });
     }
 
-    @computed
-    get columns() {
-      if(this.isInitialized && !this.hasInitializationError) {
-        let columns = this.instances[0].promotedFields.map(name => ({name: name, label: this.instances[0][name].label}));
-        columns.push({name: "delete", label: ""});
-        return columns;
-      }
-      return [
-        {name: "id", label: "Name"},
-        {name: "delete", label: ""}
-      ];
-    }
-
     @action
     showInstance(instanceId) {
       const instance = this.instancesMap.get(instanceId);
@@ -192,52 +244,6 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
         instance.show = true;
         this.visibleInstances++;
       }
-    }
-
-    @computed
-    get visibleInstancesCount() {
-      const defaultInstances = this.defaultVisibleInstances > this.instances.length ? this.instances.length:this.defaultVisibleInstances;
-      let count = defaultInstances + this.visibleInstances;
-      for(let i=0; i<defaultInstances && i<this.instances.length; i++ ) {
-        const instance = this.instances[i];
-        if(instance && instance.show) {
-          count--;
-        }
-      }
-      return count;
-    }
-
-    isInstanceVisilbe = (index, instanceId) => {
-      if(index < this.defaultVisibleInstances) {
-        return true;
-      }
-      const instance = this.instancesMap.get(instanceId);
-      return instance && instance.show;
-    }
-
-    @computed
-    get isInitialized() {
-      return this.hasInitializationError || this.instances.length && this.instances[0].promotedFields.length>0;
-    }
-
-    @computed
-    get hasInitializationError() {
-      return this.instances.length && this.instances[0].fetchError;
-    }
-
-    @computed
-    get list() {
-      return this.instances.map(instance => {
-        const row = {id:instance.id, instance: instance};
-        if(!instance.isFetching && instance.isFetched) {
-          this.columns.forEach(col => {
-            if(col.name !== "delete") {
-              row[col.name] = instance[col.name].value;
-            }
-          });
-        }
-        return row;
-      });
     }
 
     @action
@@ -258,8 +264,6 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       });
     }
 
-    _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
-
     @action
     setUserInput(userInput){
       this.userInput = userInput;
@@ -272,9 +276,5 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
       if(this.hasMoreOptions()){
         this.fetchOptions(true);
       }
-    }
-
-    hasMoreOptions(){
-      return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
     }
 }

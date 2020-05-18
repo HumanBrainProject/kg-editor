@@ -22,7 +22,6 @@ const maxItems = 100;
 
 class HistoryStore {
   @observable instancesHistory = [];
-
   @observable instances = [];
   @observable isFetching = false;
   @observable fetchError = null;

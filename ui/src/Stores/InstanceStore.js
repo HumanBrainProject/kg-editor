@@ -52,6 +52,32 @@ class Instance {
     this.instanceStore = instanceStore;
   }
 
+  memorizeInstanceInitialValues() {
+    this.initialValues = this.form.getValues();
+  }
+
+  normalizeData(data) {
+    if (!data) {
+      return {fields: [], alternatives: []};
+    }
+    for(let fieldKey in data.fields) {
+      let field = data.fields[fieldKey];
+      if(field.type === "InputText"){
+        field.type = "KgInputText";
+      } else if(field.type === "TextArea"){
+        field.type = "KgTextArea";
+      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
+        if(field.type === "DropdownSelect") {
+          field.type = "DynamicDropdown";
+        }
+        field.optionsUrl = field.instancesPath;
+        field.instanceType = data.fields.id.value.path;
+      }
+    }
+    return data;
+  }
+
+
   @computed
   get hasFieldErrors() {
     return this.fieldErrors.length;
@@ -60,19 +86,6 @@ class Instance {
   @computed
   get fieldErrors() {
     return Array.from(this.fieldErrorsMap.values());
-  }
-
-  @action setFieldError(field) {
-    this.fieldErrorsMap.set(field.path.substr(1), field);
-  }
-
-  memorizeInstanceInitialValues() {
-    this.initialValues = this.form.getValues();
-  }
-
-  @action setFieldAsNull(id) {
-    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
-    this.hasChanged = true;
   }
 
   @computed
@@ -90,7 +103,6 @@ class Instance {
     }
     return "";
   }
-
 
   @computed
   get promotedFields() {
@@ -186,13 +198,6 @@ class Instance {
     return this.isFetched && this.data && this.data.fields && this.data.fields.id && this.data.fields.id.value && this.data.fields.id.value.path || schema;
   }
 
-  @action
-  setReadMode(readMode){
-    if (this.isFetched) {
-      this.form.toggleReadMode(!!readMode);
-    }
-  }
-
   @computed
   get readModeFormStore() {
     const formStore = new FormStore(toJS(this.data));
@@ -200,25 +205,22 @@ class Instance {
     return formStore;
   }
 
-  normalizeData(data) {
-    if (!data) {
-      return {fields: [], alternatives: []};
+  @action
+  setFieldError(field) {
+    this.fieldErrorsMap.set(field.path.substr(1), field);
+  }
+
+  @action
+  setFieldAsNull(id) {
+    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
+    this.hasChanged = true;
+  }
+
+  @action
+  setReadMode(readMode){
+    if (this.isFetched) {
+      this.form.toggleReadMode(!!readMode);
     }
-    for(let fieldKey in data.fields) {
-      let field = data.fields[fieldKey];
-      if(field.type === "InputText"){
-        field.type = "KgInputText";
-      } else if(field.type === "TextArea"){
-        field.type = "KgTextArea";
-      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
-        if(field.type === "DropdownSelect") {
-          field.type = "DynamicDropdown";
-        }
-        field.optionsUrl = field.instancesPath;
-        field.instanceType = data.fields.id.value.path;
-      }
-    }
-    return data;
   }
 
   @action
@@ -313,13 +315,11 @@ class InstanceStore {
   @observable instanceToDelete = null;
   @observable isDeletingInstance = false;
   @observable deleteInstanceError = null;
+  @observable showCreateModal = false;
 
   instancesQueue = new Map();
   queueThreshold = 1000;
   queueTimeout = 250;
-
-  @observable showCreateModal = false;
-
   generatedKeys = new WeakMap();
 
   constructor(databaseScope=null) {
@@ -337,6 +337,53 @@ class InstanceStore {
       this.instancesQueue.set(instance.instanceId, instance);
       this.processQueue();
     }
+  }
+
+  getOpenedInstancesExceptCurrent(instanceId) {
+    let result = [];
+    Array.from(this.openedInstances.keys()).forEach(id => {
+      if (id !== instanceId) {
+        const instance = this.instances.get(id);
+        const instancesToBeKept = instance.linkedIds;
+        result = [...result, ...instancesToBeKept];
+      }
+    });
+    return Array.from(new Set(result));
+  }
+
+  syncStoredOpenedTabs(){
+    localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
+  }
+
+  getGeneratedKey(from, namespace){
+    if(!this.generatedKeys.has(from)){
+      this.generatedKeys.set(from, uniqueId(namespace));
+    }
+    return this.generatedKeys.get(from);
+  }
+
+  checkLinkedInstances(instance, check) {
+    const fields = instance.form.getField();
+    return Object.values(fields).some(field => {
+      return field.isLink && field.value.some(option => {
+        if (option.id) {
+          const linkedInstance = this.instances.get(option.id);
+          if (linkedInstance && typeof check === "function") {
+            return check(option.id, linkedInstance);
+          }
+        }
+        return false;
+      });
+    });
+  }
+
+  doesInstanceHaveLinkedInstancesInUnsavedState = instance => {
+    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
+  }
+
+  @computed
+  get hasUnsavedChanges(){
+    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
   }
 
   @action
@@ -418,7 +465,8 @@ class InstanceStore {
     }
   }
 
-  @action flush(){
+  @action
+  flush(){
     this.instances = new Map();
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
@@ -432,7 +480,8 @@ class InstanceStore {
    * Opened instances are shown in their own tab in the UI
    * We keep track in that store of which instances are opened
    */
-  @action openInstance(instanceId, viewMode = "view", readMode = true){
+  @action
+  openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
     this.setReadMode(readMode);
     if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
@@ -477,26 +526,10 @@ class InstanceStore {
     });
   }
 
-  getOpenedInstancesExceptCurrent(instanceId) {
-    let result = [];
-    Array.from(this.openedInstances.keys()).forEach(id => {
-      if (id !== instanceId) {
-        const instance = this.instances.get(id);
-        const instancesToBeKept = instance.linkedIds;
-        result = [...result, ...instancesToBeKept];
-      }
-    });
-    return Array.from(new Set(result));
-  }
-
   @action
   closeAllInstances(){
     this.openedInstances.clear();
     this.syncStoredOpenedTabs();
-  }
-
-  syncStoredOpenedTabs(){
-    localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
   }
 
   @action
@@ -519,11 +552,6 @@ class InstanceStore {
       return instance;
     }
     return this.instances.get(instanceId);
-  }
-
-  @computed
-  get hasUnsavedChanges(){
-    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
   }
 
   @action
@@ -670,32 +698,6 @@ class InstanceStore {
   @action
   setComparedWithReleasedVersionInstance(instanceId){
     this.comparedWithReleasedVersionInstance = instanceId;
-  }
-
-  getGeneratedKey(from, namespace){
-    if(!this.generatedKeys.has(from)){
-      this.generatedKeys.set(from, uniqueId(namespace));
-    }
-    return this.generatedKeys.get(from);
-  }
-
-  checkLinkedInstances(instance, check) {
-    const fields = instance.form.getField();
-    return Object.values(fields).some(field => {
-      return field.isLink && field.value.some(option => {
-        if (option.id) {
-          const linkedInstance = this.instances.get(option.id);
-          if (linkedInstance && typeof check === "function") {
-            return check(option.id, linkedInstance);
-          }
-        }
-        return false;
-      });
-    });
-  }
-
-  doesInstanceHaveLinkedInstancesInUnsavedState = (instance) => {
-    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
   }
 
   @action

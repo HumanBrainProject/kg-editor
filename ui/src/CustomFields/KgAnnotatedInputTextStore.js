@@ -36,6 +36,10 @@ export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.De
     this.injectValue(this.value);
   }
 
+  getValue(){
+    return this.value.map(i=> ({"@id": i}));
+  }
+
   @action
   injectValue(value){
     if(value !== undefined){
@@ -50,9 +54,5 @@ export default class KgAnnotatedInputTextStore extends FormStore.typesMapping.De
       }
       this.value.push(value["@id"]);
     });
-  }
-
-  getValue(){
-    return this.value.map(i=> ({"@id": i}));
   }
 }

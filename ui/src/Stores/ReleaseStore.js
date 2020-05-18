@@ -23,7 +23,6 @@ import {uniq} from "lodash";
 class ReleaseStore{
   @observable topInstanceId = null;
   @observable instancesTree = null;
-
   @observable isFetching = false;
   @observable isFetched = false;
   @observable isSaving = false;
@@ -33,19 +32,31 @@ class ReleaseStore{
   @observable savingLastEndedNode = null;
   @observable savingLastEndedRequest = "";
   @observable hasWarning = false;
-
   @observable fetchError = null;
   @observable saveError = null;
-
   @observable warningMessages = new Map();
   @observable fetchWarningMessagesError = null;
   @observable isWarningMessagesFetched = false;
   @observable isFetchingWarningMessages = false;
   @observable isStopped = false;
 
-  @action
-  stopRelease() {
-    this.isStopped = true;
+  @computed
+  get visibleWarningMessages() {
+    let results = [];
+    this.warningMessages.forEach(message =>{
+      let release = 0;
+      let unrelease = 0;
+      message.releaseFlags.forEach(flag => {
+        flag ? release++ : unrelease++;
+      });
+      if(release && message.messages.release) {
+        results.push(message.messages.release);
+      }
+      if(unrelease && message.messages.unrelease) {
+        results.push(message.messages.unrelease);
+      }
+    });
+    return results;
   }
 
   @computed
@@ -130,6 +141,11 @@ class ReleaseStore{
     nodesByStatus.RELEASED = uniq(nodesByStatus.RELEASED);
     nodesByStatus.NOT_RELEASED = uniq(nodesByStatus.NOT_RELEASED);
     return nodesByStatus;
+  }
+
+  @action
+  stopRelease() {
+    this.isStopped = true;
   }
 
   @action
@@ -345,25 +361,6 @@ class ReleaseStore{
     if(node.children && node.children.length > 0){
       node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
     }
-  }
-
-  @computed
-  get visibleWarningMessages() {
-    let results = [];
-    this.warningMessages.forEach(message =>{
-      let release = 0;
-      let unrelease = 0;
-      message.releaseFlags.forEach(flag => {
-        flag ? release++ : unrelease++;
-      });
-      if(release && message.messages.release) {
-        results.push(message.messages.release);
-      }
-      if(unrelease && message.messages.unrelease) {
-        results.push(message.messages.unrelease);
-      }
-    });
-    return results;
   }
 
   @action

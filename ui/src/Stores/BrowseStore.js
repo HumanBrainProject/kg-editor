@@ -15,7 +15,6 @@
 */
 
 import { observable, action, runInAction, computed } from "mobx";
-//import { debounce, uniqueId } from "lodash";
 import { debounce } from "lodash";
 
 
@@ -25,8 +24,7 @@ import bookmarkStatusStore from "./BookmarkStatusStore";
 const LIST_TYPE_BOOKMARK = "BOOKMARK";
 const LIST_TYPE_DATATYPE = "NODETYPE";
 
-class BrowseStore{
-
+class BrowseStore {
   @observable lists = [];
   @observable listsFilter = "";
   @observable isFetching = {
@@ -70,23 +68,22 @@ class BrowseStore{
     return this.allLists.find(list => list.id === id);
   }
 
-  @action setListsFilter(filter){
-    this.listsFilter = filter;
-  }
-
-  @computed get filteredLists(){
+  @computed
+  get filteredLists(){
     const term = this.listsFilter.trim().toLowerCase();
     return this.allLists.filter(list => list.name.toLowerCase().includes(term));
   }
 
-  @computed get allLists(){
+  @computed
+  get allLists(){
     return this.lists.reduce((list, folder) => {
       list.push(...folder.lists);
       return list;
     }, []);
   }
 
-  @computed get nodetypeLists(){
+  @computed
+  get nodetypeLists(){
     return this.lists.reduce((list, folder) => {
       if (folder.folderType !== LIST_TYPE_DATATYPE) { return list; }
       list.push(...folder.lists);
@@ -94,12 +91,18 @@ class BrowseStore{
     }, []);
   }
 
-  @computed get bookmarkLists(){
+  @computed
+  get bookmarkLists(){
     return this.lists.reduce((list, folder) => {
       if (folder.folderType !== LIST_TYPE_BOOKMARK) { return list; }
       list.push(...folder.lists);
       return list;
     }, []);
+  }
+
+  @action
+  setListsFilter(filter){
+    this.listsFilter = filter;
   }
 
   @action
@@ -139,25 +142,30 @@ class BrowseStore{
     }
   }
 
-  @action toggleFolder(folder, state){
+  @action
+  toggleFolder(folder, state){
     folder.expand = state !== undefined? !!state: !folder.expand;
   }
 
-  @action selectList(list){
+  @action
+  selectList(list){
     this.instancesFilter = "";
     this.selectedList = list;
     this.fetchInstances();
   }
 
-  @action selectInstance(selectedInstance){
+  @action
+  selectInstance(selectedInstance){
     this.selectedInstance = selectedInstance;
   }
 
-  @action clearSelectedInstance() {
+  @action
+  clearSelectedInstance() {
     this.selectedInstance = null;
   }
 
-  @action setInstancesFilter(filter){
+  @action
+  setInstancesFilter(filter){
     this.instancesFilter = filter;
     this.isFetching.instances = true;
     this.applyInstancesFilter();

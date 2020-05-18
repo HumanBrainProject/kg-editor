@@ -24,6 +24,16 @@ class FeaturesStore{
   @observable isFetching = false;
   @observable fetchError = null;
 
+  @computed
+  get latestReleases() {
+    return this.releases.slice(0, 3);
+  }
+
+  @computed
+  get olderReleases() {
+    return this.releases.slice(3);
+  }
+
   @action
   async fetchFeatures() {
     try {
@@ -43,15 +53,6 @@ class FeaturesStore{
       });
     }
   }
-
-  @computed get latestReleases() {
-    return this.releases.slice(0, 3);
-  }
-
-  @computed get olderReleases() {
-    return this.releases.slice(3);
-  }
-
 }
 
 export default new FeaturesStore();

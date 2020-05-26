@@ -18,7 +18,6 @@ import { observable, action, runInAction } from "mobx";
 import { toJS } from "mobx";
 import { isArray, debounce } from "lodash";
 
-import console from "../Services/Logger";
 import API from "../Services/API";
 import historyStore from "./HistoryStore";
 
@@ -115,14 +114,13 @@ class BookmarkStatusStore{
             status.hasSaveError = false;
             status.isSaving = true;
             const payload = (status.data && status.data.bookmarkLists)?toJS(status.data.bookmarkLists):[];
-            const { data } = await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
+            await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
             runInAction(() => {
               status.hasChanged = false;
               status.saveError = null;
               status.hasSaveError = false;
               status.isSaving = false;
               status.previousBookmarkLists = [];
-              console.debug(`bookmark of "${id}" successfully saved`, data);
             });
             /* Mockup Data
             if ((Math.floor(Math.random() * 10) % 2) === 0) {

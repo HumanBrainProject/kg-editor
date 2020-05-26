@@ -16,7 +16,6 @@
 
 import { observable, action, runInAction, get, set } from "mobx";
 import { find, union, debounce } from "lodash";
-import console from "../Services/Logger";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -90,7 +89,6 @@ class OptionsPool{
         this.processQueue();
       });
     } catch(e){
-      console.error(e);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           const option = this.options.get(identifier);

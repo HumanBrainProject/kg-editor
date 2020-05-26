@@ -215,7 +215,6 @@ export default class Search extends React.Component{
       && event.keyCode !== 40   // Down
       && event.keyCode !== 38   // Up
       && event.keyCode !== 27) { //escape
-      window.console.log("searching user...", event.target.value);
       usersStore.setSearchFilter(event.target.value, excludedUsers);
     }
   }

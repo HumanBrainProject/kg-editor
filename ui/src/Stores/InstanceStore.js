@@ -483,7 +483,6 @@ class InstanceStore {
   @action
   openInstance(instanceId, viewMode = "view", readMode = true){
     this.togglePreviewInstance();
-    this.setReadMode(readMode);
     if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
       browseStore.fetchLists();
     }

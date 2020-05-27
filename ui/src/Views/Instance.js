@@ -123,7 +123,9 @@ export default class Edit extends React.Component {
   componentDidMount() {
     const instanceId = this._constructInstanceId(this.props.match.params);
     if(instanceId) {
-      instanceStore.openInstance(instanceId, this.props.mode, this.props.mode !== "edit");
+      const isReadMode = this.props.mode !== "edit";
+      instanceStore.openInstance(instanceId, this.props.mode, isReadMode);
+      instanceStore.setReadMode(isReadMode);
     }
   }
 
@@ -131,7 +133,9 @@ export default class Edit extends React.Component {
     const prevInstanceId = this._constructInstanceId(prevProps.match.params);
     const instanceId = this._constructInstanceId(this.props.match.params);
     if (prevInstanceId && instanceId && (instanceId !== prevInstanceId) || (this.props.mode !== prevProps.mode)) {
-      instanceStore.openInstance(instanceId, this.props.mode, this.props.mode !== "edit");
+      const isReadMode = this.props.mode !== "edit";
+      instanceStore.openInstance(instanceId, this.props.mode, isReadMode);
+      instanceStore.setReadMode(isReadMode);
     }
   }
 

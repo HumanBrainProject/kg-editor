@@ -481,9 +481,9 @@ class InstanceStore {
    * We keep track in that store of which instances are opened
    */
   @action
-  openInstance(instanceId, viewMode = "view", readMode = true){
+  openInstance(instanceId, viewMode = "view"){
     this.togglePreviewInstance();
-    if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
+    if (viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
       browseStore.fetchLists();
     }
     historyStore.updateInstanceHistory(instanceId, "viewed");
@@ -501,11 +501,6 @@ class InstanceStore {
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
     }
-  }
-
-  @action
-  setInstanceViewMode(instanceId, mode){
-    this.openedInstances.get(instanceId).viewMode = mode;
   }
 
   @action
@@ -534,7 +529,7 @@ class InstanceStore {
   @action
   restoreOpenedTabs(storedOpenedTabs){
     storedOpenedTabs.forEach(([id, viewMode]) => {
-      this.openInstance(id, viewMode, viewMode !== "edit");
+      this.openInstance(id, viewMode);
     });
   }
 

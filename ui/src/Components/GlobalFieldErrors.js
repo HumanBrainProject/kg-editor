@@ -58,8 +58,4 @@ export default class GlobalFieldErrors extends React.Component {
       </div >
     );
   }
-
-  showFrame() {
-    this.setState({ showFrame: true });
-  }
 }

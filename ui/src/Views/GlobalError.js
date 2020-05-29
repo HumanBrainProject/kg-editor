@@ -56,8 +56,4 @@ export default class GlobalError extends React.Component {
       </div >
     );
   }
-
-  showFrame() {
-    this.setState({ showFrame: true });
-  }
 }

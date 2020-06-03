@@ -16,6 +16,7 @@
 
 import { observable, action, runInAction, computed } from "mobx";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class StructureStatisticsStore {
   @observable statistics = [];
@@ -93,6 +94,7 @@ class StructureStatisticsStore {
         this.fetchError = `Error while retrieving list of features (${message})`;
         this.isFetching = false;
       });
+      appStore.captureSentryException(e);
     }
   }
 

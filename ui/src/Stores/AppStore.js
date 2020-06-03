@@ -15,6 +15,7 @@
 */
 
 import { observable, action } from "mobx";
+import * as Sentry from "@sentry/browser";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -65,6 +66,18 @@ class AppStore{
   @action
   dismissGlobalError(){
     this.globalError = null;
+  }
+
+  captureSentryException = e => {
+    const { response } = e;
+    const { status } = response;
+    switch(status) {
+    case 500:
+    {
+      Sentry.captureException(e);
+      break;
+    }
+    }
   }
 
   setTheme(theme){

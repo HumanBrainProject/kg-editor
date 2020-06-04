@@ -17,9 +17,9 @@
 import { observable, action, runInAction, computed } from "mobx";
 import { debounce } from "lodash";
 
-
 import API from "../Services/API";
 import bookmarkStatusStore from "./BookmarkStatusStore";
+import appStore from "./AppStore";
 
 const LIST_TYPE_BOOKMARK = "BOOKMARK";
 const LIST_TYPE_DATATYPE = "NODETYPE";
@@ -139,6 +139,7 @@ class BrowseStore {
         this.fetchError.lists = `Error while retrieving lists (${message})`;
         this.isFetching.lists = false;
       });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -203,6 +204,7 @@ class BrowseStore {
         this.fetchError.instances = `Error while retrieving instances "${this.nodeTypeId}" (${message})`;
         this.isFetching.instances = false;
       });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -254,6 +256,7 @@ class BrowseStore {
           this.isCreatingBookmarkList = false;
           this.bookmarkListCreationError = e.message?e.message:e;
         });
+        appStore.captureSentryException(e);
       }
     } else {
       this.isCreatingBookmarkList = false;
@@ -301,6 +304,7 @@ class BrowseStore {
         list.isUpdating = false;
         return false;
       });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -343,6 +347,7 @@ class BrowseStore {
         list.isDeleting = false;
         return false;
       });
+      appStore.captureSentryException(e);
     }
   }
 

@@ -16,8 +16,9 @@
 
 import { observable, action, computed, runInAction } from "mobx";
 import { sortBy, groupBy } from "lodash";
-import API from "../Services/API";
 import palette from "google-palette";
+import API from "../Services/API";
+import appStore from "./AppStore";
 
 class StructureStore {
   @observable colorPaletteByLabel = new Map();
@@ -98,9 +99,12 @@ class StructureStore {
           this.isFetchingStructure = false;
         });
       } catch (e) {
-        const message = e.message ? e.message : e;
-        this.fetchStuctureError = `Error while fetching api structure (${message})`;
-        this.isFetchingStructure = false;
+        runInAction(() => {
+          const message = e.message ? e.message : e;
+          this.fetchStuctureError = `Error while fetching api structure (${message})`;
+          this.isFetchingStructure = false;
+        });
+        appStore.captureSentryException(e);
       }
     }
   }

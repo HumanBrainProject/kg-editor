@@ -21,6 +21,7 @@ import API from "../Services/API";
 
 import dataTypesStore from "../Stores/DataTypesStore";
 import structureStore from "../Stores/StructureStore";
+import appStore from "./AppStore";
 
 class GraphStore {
   @observable sidePanel = false;
@@ -92,7 +93,8 @@ class GraphStore {
     return graphData;
   }
 
-  @action hlNode(node) {
+  @action
+  hlNode(node) {
     if (node !== null && this.typeStates.get(node.schemas) === "group") {
       node = this.groupNodes.get(node.schemas);
     }
@@ -101,7 +103,8 @@ class GraphStore {
     this.connectedLinks = node !== null ? this.findLinksByNode(node) : [];
   }
 
-  @action async fetchGraph(id) {
+  @action
+  async fetchGraph(id) {
     this.isFetched = false;
     this.isFetching = true;
     try {
@@ -115,7 +118,7 @@ class GraphStore {
         this.isFetching = false;
       });
     } catch (e) {
-      //console.log(e);
+      appStore.captureSentryException(e);
     }
   }
 

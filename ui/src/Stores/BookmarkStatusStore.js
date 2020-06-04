@@ -20,6 +20,7 @@ import { isArray, debounce } from "lodash";
 
 import API from "../Services/API";
 import historyStore from "./HistoryStore";
+import appStore from "./AppStore";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
@@ -148,6 +149,7 @@ class BookmarkStatusStore{
               status.hasSaveError = true;
               status.isSaving = false;
             });
+            appStore.captureSentryException(e);
           }
         }
       }
@@ -266,6 +268,7 @@ class BookmarkStatusStore{
         this.isFetching = false;
         this.smartProcessQueue();
       });
+      appStore.captureSentryException(e);
     }
   }
 }

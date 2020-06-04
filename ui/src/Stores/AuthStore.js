@@ -17,6 +17,8 @@
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
 
+import appStore from "./AppStore";
+
 const oidConnectServerUri = "https://services.humanbrainproject.eu/oidc/authorize";
 const oidClientId = "nexus-kg-search";
 const oidLocalStorageKey = "hbp.kg-editor.oid";
@@ -174,6 +176,7 @@ class AuthStore {
           this.userProfileError = e.message?e.message:e;
           this.isRetrievingUserProfile = false;
         });
+        appStore.captureSentryException(e);
       }
     }
   }

@@ -214,6 +214,7 @@ export default class KgTable extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
+    this.hiddenInputRef.value = "";
     Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
     var event = new Event("input", { bubbles: true });

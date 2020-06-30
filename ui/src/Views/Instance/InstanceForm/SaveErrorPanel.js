@@ -60,23 +60,21 @@ const styles = {
 
 @injectStyles(styles)
 export default class SaveErrorPanel extends React.Component{
+  handleCancel = e => this.props.onCancel(e);
+
+  handleRetry = e => this.props.onRetry(e);
+
   render(){
-    const { classes, show, error, onCancel, onRetry, inline } = this.props;
-    const handleCancel = (e) => {
-      e.stopPropagation();
-      onCancel(e);
-    };const handleRetry = (e) => {
-      e.stopPropagation();
-      onRetry(e);
-    };
+    const { classes, show, error, inline } = this.props;
+
     return(
-      (show)?
+      show?
         <div className={classes.container} inline={inline?"true":"false"}>
           <div className={classes.panel}>
             <h4>{error}</h4>
             <div>
-              <Button bsStyle="default" onClick={handleCancel}>Cancel</Button>
-              <Button bsStyle="primary" onClick={handleRetry}>Retry</Button>
+              <Button bsStyle="default" onClick={this.handleCancel}>Cancel</Button>
+              <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
             </div>
           </div>
         </div>

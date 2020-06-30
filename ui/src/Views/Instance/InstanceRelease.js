@@ -30,7 +30,9 @@ import CompareInstancesModal from "./InstanceRelease/CompareInstancesModal";
 
 import ReleaseList from "./InstanceRelease/ReleaseList";
 import ReleaseAction from "./InstanceRelease/ReleaseAction";
+
 import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
+import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
 
 const rootPath = window.rootPath || "";
 
@@ -78,6 +80,12 @@ const styles = {
     backgroundColor: "var(--bg-color-ui-contrast3)",
     padding: "10px",
     border: "1px solid var(--border-color-ui-contrast1)"
+  },
+  listFooter: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    paddingTop: "5px"
   }
 };
 
@@ -155,6 +163,9 @@ export default class InstanceRelease extends React.Component {
                 </div>
                 <div className={classes.list}>
                   <ReleaseList />
+                </div>
+                <div className={classes.listFooter}>
+                  <HideReleasedInstancesToggle />
                 </div>
               </div>
               <div className={classes.action}>

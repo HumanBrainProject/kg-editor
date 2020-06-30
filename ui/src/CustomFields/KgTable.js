@@ -178,6 +178,10 @@ const styles = {
   emptyMessageLabel: {
     paddingLeft: "6px",
     display:"inline-block"
+  },
+  deleteBtn: {
+    float: "right",
+    marginRight: "9px"
   }
 };
 
@@ -441,6 +445,11 @@ export default class KgTable extends React.Component {
     this.props.field.removeInstance(id);
   }
 
+  handleDeleteAll = () => {
+    this.props.field.removeAllInstancesAndValues();
+    this.triggerOnChange();
+  }
+
   handleRetry = instance => e => {
     e.stopPropagation();
     this.props.field.fetchInstance(instance);
@@ -503,6 +512,13 @@ export default class KgTable extends React.Component {
               className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.kgDropdown}`}
               validationState={validationState}>
               <FieldLabel field={field}/>
+              {!this.props.formStore.readMode && !this.props.field.readMode &&
+              <div className={classes.deleteBtn}>
+                <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={field.list.length === 0}>
+                  <FontAwesomeIcon icon="times"/>
+                </Button>
+              </div>
+              }
               <div className={classes.kgTable}>
                 <Table
                   width={this.state.containerWidth}

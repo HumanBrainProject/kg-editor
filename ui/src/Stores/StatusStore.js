@@ -17,6 +17,7 @@
 import { observable, action, runInAction } from "mobx";
 import { isArray, debounce } from "lodash";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class StatusStore {
   @observable statuses = new Map();
@@ -126,6 +127,7 @@ class StatusStore {
         this.isFetching = false;
         this.smartProcessQueue();
       });
+      appStore.captureSentryException(e);
     }
 
   }
@@ -167,6 +169,7 @@ class StatusStore {
         this.isFetchingChildren = false;
         this.smartProcessQueueChildren();
       });
+      appStore.captureSentryException(e);
     }
   }
 }

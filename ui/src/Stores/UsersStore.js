@@ -18,6 +18,7 @@ import { observable, action, runInAction, computed } from "mobx";
 import { debounce } from "lodash";
 
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class UsersStore {
   @observable users = new Map();
@@ -125,6 +126,7 @@ class UsersStore {
           user.isFetched = true;
           user.isFetching = false;
         });
+        appStore.captureSentryException(e);
       }
     }
     return user;
@@ -205,6 +207,7 @@ class UsersStore {
             this.isFetchingSearch = false;
           }
         });
+        appStore.captureSentryException(e);
       }
     }
   }

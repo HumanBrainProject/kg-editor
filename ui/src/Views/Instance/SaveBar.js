@@ -132,6 +132,7 @@ export default class SavePanel extends React.Component{
         instance && instance.save();
       });
   }
+
   handleSave(instanceId){
     const instance = instanceStore.instances.get(instanceId);
     if (instance) {
@@ -139,14 +140,17 @@ export default class SavePanel extends React.Component{
       instanceStore.setComparedInstance(null);
     }
   }
+
   handleReset(instanceId){
     instanceStore.confirmCancelInstanceChanges(instanceId);
     instanceStore.setComparedInstance(null);
   }
+
   handleDismissSaveError(instanceId){
     const instance = instanceStore.instances.get(instanceId);
     instance && instance.cancelSave();
   }
+
   handleShowCompare(instanceId){
     instanceStore.setComparedInstance(instanceId);
   }
@@ -171,7 +175,6 @@ export default class SavePanel extends React.Component{
   render(){
     const { classes } = this.props;
     const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
-
     const comparedInstance = instanceStore.comparedInstanceId?instanceStore.instances.get(instanceStore.comparedInstanceId):null;
     const comparedInstanceLabelField = comparedInstance && comparedInstance.data && comparedInstance.data.ui_info && comparedInstance.data.ui_info.labelField;
     const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.form?comparedInstance.form.getField(comparedInstanceLabelField).getValue():"";

@@ -15,10 +15,12 @@
 */
 
 import { observable, action, runInAction, computed } from "mobx";
+import {uniq} from "lodash";
+
 import API from "../Services/API";
 import statusStore from "./StatusStore";
 import historyStore from "./HistoryStore";
-import {uniq} from "lodash";
+import appStore from "./AppStore";
 
 const setNodeTypes = node => {
   node.typePath = (typeof node.relativeUrl === "string")?
@@ -229,8 +231,11 @@ class ReleaseStore{
         this.isFetching = false;
       });
     } catch(e){
-      const message = e.message?e.message:e;
-      this.fetchError = message;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError = message;
+      });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -265,10 +270,13 @@ class ReleaseStore{
         this.isFetchingWarningMessages = false;
       });
     } catch(e) {
-      const message = e.message?e.message:e;
-      this.fetchWarningMessagesError = message;
-      this.isWarningMessagesFetched = false;
-      this.isFetchingWarningMessages = false;
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchWarningMessagesError = message;
+        this.isWarningMessagesFetched = false;
+        this.isFetchingWarningMessages = false;
+      });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -313,6 +321,7 @@ class ReleaseStore{
         this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
+      appStore.captureSentryException(e);
     } finally {
       runInAction(()=>{
         this.savingProgress++;
@@ -335,6 +344,7 @@ class ReleaseStore{
         this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
+      appStore.captureSentryException(e);
     } finally {
       runInAction(()=>{
         this.savingProgress++;

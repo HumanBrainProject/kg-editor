@@ -153,6 +153,13 @@ export default class KgTableStore extends FormStore.typesMapping.Default{
     }
 
     @action
+    removeAllInstancesAndValues() {
+      this.value = [];
+      this.instancesMap.clear();
+      this.instances = [];
+    }
+
+    @action
     processQueue(){
       if(this.instancesQueue.size <= 0){
         this._debouncedFetchQueue.cancel();

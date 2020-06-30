@@ -16,8 +16,8 @@
 
 import {observable, action, runInAction} from "mobx";
 
-import console from "../Services/Logger";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class ReviewsStore {
   @observable instancesReviews = new Map();
@@ -55,11 +55,9 @@ class ReviewsStore {
     }
 
     try {
-      console.debug("fetch reviews of instance " + instanceId + ".");
-
       const {data} = await API.axios.get(API.endpoints.instanceReviews(instanceId));
 
-      runInAction(async () => {
+      runInAction(() => {
         const reviews = data.length ? data : [];
         const [org, , , ,] = instanceId.split("/");
         reviews.forEach(review => review.org = org);
@@ -106,6 +104,7 @@ class ReviewsStore {
         instanceReviews.isFetched = false;
         instanceReviews.isFetching = false;
       });
+      appStore.captureSentryException(e);
     }
     return instanceReviews;
   }
@@ -126,11 +125,9 @@ class ReviewsStore {
         }
         delete instanceReview.error;
         try {
-          console.debug(`invite user "${userId}" to review instance "${instanceId}".`);
           const {data} = await API.axios.put(API.endpoints.instanceReviewsByUser(instanceId, userId));
 
           runInAction(async () => {
-            console.debug(`user "${userId}" invitation to review instance "${instanceId}".`, data);
             instanceReview.status = data && data.status ? data.status : "PENDING";
           });
         } catch (e) {
@@ -139,6 +136,7 @@ class ReviewsStore {
             instanceReview.status = "ADD_ERROR";
             instanceReview.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
           });
+          appStore.captureSentryException(e);
         }
       }
     }
@@ -153,7 +151,6 @@ class ReviewsStore {
         instanceReviews.reviews.remove(instanceReview);
         delete instanceReview.error;
         try {
-          console.debug(`canceling invite to user "${userId}" to review instance "${instanceId}".`);
           await API.axios.delete(API.endpoints.instanceReviewsByUser(instanceId, userId));
           runInAction(async () => {
             instanceReviews.reviews.remove(instanceReview);
@@ -164,6 +161,7 @@ class ReviewsStore {
             instanceReview.status = "REMOVE_ERROR";
             instanceReview.error = `Error while trying to cancel invite to user "${userId}" to review instance "${instanceId}" (${message})`;
           });
+          appStore.captureSentryException(e);
         }
       }
     }

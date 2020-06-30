@@ -178,6 +178,10 @@ const styles = {
   emptyMessageLabel: {
     paddingLeft: "6px",
     display:"inline-block"
+  },
+  deleteBtn: {
+    float: "right",
+    marginRight: "9px"
   }
 };
 
@@ -214,6 +218,7 @@ export default class KgTable extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
+    this.hiddenInputRef.value = "";
     Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
     var event = new Event("input", { bubbles: true });
@@ -440,6 +445,11 @@ export default class KgTable extends React.Component {
     this.props.field.removeInstance(id);
   }
 
+  handleDeleteAll = () => {
+    this.props.field.removeAllInstancesAndValues();
+    this.triggerOnChange();
+  }
+
   handleRetry = instance => e => {
     e.stopPropagation();
     this.props.field.fetchInstance(instance);
@@ -502,6 +512,13 @@ export default class KgTable extends React.Component {
               className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.kgDropdown}`}
               validationState={validationState}>
               <FieldLabel field={field}/>
+              {!this.props.formStore.readMode && !this.props.field.readMode &&
+              <div className={classes.deleteBtn}>
+                <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={field.list.length === 0}>
+                  <FontAwesomeIcon icon="times"/>
+                </Button>
+              </div>
+              }
               <div className={classes.kgTable}>
                 <Table
                   width={this.state.containerWidth}

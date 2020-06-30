@@ -189,14 +189,15 @@ export default class InstanceForm extends React.Component {
   }
 
   handleLoad = () => {
-    this.instance && this.instance.memorizeInstanceInitialValues();
+    const instance = instanceStore.instances.get(this.props.id);
+    instance && instance.memorizeInstanceInitialValues();
   }
 
-  handleCancelEdit = (e) => {
+  handleCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = this.instanceStore.instances.get(this.props.id);
+    const instance = instanceStore.instances.get(this.props.id);
     if (instance) {
-      if (this.instance.hasChanged) {
+      if (instance.hasChanged) {
         instanceStore.cancelInstanceChanges(this.props.id);
       } else {
         this.handleConfirmCancelEdit();
@@ -204,25 +205,26 @@ export default class InstanceForm extends React.Component {
     }
   }
 
-  handleConfirmCancelEdit = (e) => {
+  handleConfirmCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = this.instanceStore.instances.get(this.props.id);
+    const instance = instanceStore.instances.get(this.props.id);
     if (instance && instance.hasChanged) {
       instanceStore.confirmCancelInstanceChanges(this.props.id);
     }
   }
 
-  handleContinueEditing = (e) => {
+  handleContinueEditing = e => {
     e && e.stopPropagation();
     instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
-  handleSave = (e) => {
+  handleSave = e => {
     e && e.stopPropagation();
-    this.instance && this.instance.save();
+    const instance = instanceStore.instances.get(this.props.id);
+    instance && instance.save();
   }
 
-  handleCancelSave = (e) => {
+  handleCancelSave = e => {
     e && e.stopPropagation();
     const instance = instanceStore.instances.get(this.props.id);
     instance && instance.cancelSave();

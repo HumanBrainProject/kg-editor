@@ -15,13 +15,13 @@
 */
 
 import { observable, action, computed, runInAction, toJS } from "mobx";
-import { uniqueId, isEqual } from "lodash";
-import API from "../Services/API";
-import { remove } from "lodash";
+import { uniqueId, isEqual, remove } from "lodash";
 import jsonld from "jsonld";
 
+import API from "../Services/API";
 import authStore from "./AuthStore";
 import structureStore from "./StructureStore";
+import appStore from "./AppStore";
 
 const defaultContext = {
   "@vocab": "https://schema.hbp.eu/graphQuery/",
@@ -1070,10 +1070,13 @@ class QueryBuilderStore {
           this.isRunning = false;
         });
       } catch (e) {
-        const message = e.message ? e.message : e;
-        this.result = null;
-        this.runError = `Error while executing query (${message})`;
-        this.isRunning = false;
+        runInAction(() => {
+          const message = e.message ? e.message : e;
+          this.result = null;
+          this.runError = `Error while executing query (${message})`;
+          this.isRunning = false;
+        });
+        appStore.captureSentryException(e);
       }
     }
   }
@@ -1156,9 +1159,12 @@ class QueryBuilderStore {
           this.isSaving = false;
         });
       } catch (e) {
-        const message = e.message ? e.message : e;
-        this.saveError = `Error while saving query "${queryId}" (${message})`;
-        this.isSaving = false;
+        runInAction(() => {
+          const message = e.message ? e.message : e;
+          this.saveError = `Error while saving query "${queryId}" (${message})`;
+          this.isSaving = false;
+        });
+        appStore.captureSentryException(e);
       }
     }
   }
@@ -1187,9 +1193,12 @@ class QueryBuilderStore {
           }
         });
       } catch (e) {
-        const message = e.message ? e.message : e;
-        query.deleteError = `Error while deleting query "${query.id}" (${message})`;
-        query.isDeleting = false;
+        runInAction(() => {
+          const message = e.message ? e.message : e;
+          query.deleteError = `Error while deleting query "${query.id}" (${message})`;
+          query.isDeleting = false;
+        });
+        appStore.captureSentryException(e);
       }
     }
   }
@@ -1264,10 +1273,13 @@ class QueryBuilderStore {
             this.isFetchingQueries = false;
           });
         } catch (e) {
-          this.specifications = [];
-          const message = e.message ? e.message : e;
-          this.fetchQueriesError = `Error while fetching saved queries for "${this.rootField.id}" (${message})`;
-          this.isFetchingQueries = false;
+          runInAction(() => {
+            this.specifications = [];
+            const message = e.message ? e.message : e;
+            this.fetchQueriesError = `Error while fetching saved queries for "${this.rootField.id}" (${message})`;
+            this.isFetchingQueries = false;
+          });
+          appStore.captureSentryException(e);
         }
       }
     }

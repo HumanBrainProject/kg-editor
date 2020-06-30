@@ -121,33 +121,49 @@ const styles = {
 @observer
 export default class Edit extends React.Component {
   componentDidMount() {
-    instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
+    const instanceId = this._constructInstanceId(this.props.match.params);
+    if(instanceId) {
+      const isReadMode = this.props.mode !== "edit";
+      instanceStore.openInstance(instanceId, this.props.mode);
+      instanceStore.setReadMode(isReadMode);
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
-      instanceStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit");
+    const prevInstanceId = this._constructInstanceId(prevProps.match.params);
+    const instanceId = this._constructInstanceId(this.props.match.params);
+    if (prevInstanceId && instanceId && (instanceId !== prevInstanceId) || (this.props.mode !== prevProps.mode)) {
+      const isReadMode = this.props.mode !== "edit";
+      instanceStore.openInstance(instanceId, this.props.mode);
+      instanceStore.setReadMode(isReadMode);
     }
   }
 
   handleSelectMode(mode) {
     instanceStore.togglePreviewInstance();
-    routerStore.history.push(`/instance/${mode}/${this.props.match.params.id}`);
+    const instanceId = this._constructInstanceId(this.props.match.params);
+    routerStore.history.push(`/instance/${mode}/${instanceId}`);
   }
 
   handleHidePreview = () => {
     instanceStore.togglePreviewInstance();
   }
 
+  _constructInstanceId = params => (params.org && params.domain && params.schema && params.version && params.id) ?
+    `${params.org}/${params.domain}/${params.schema}/${params.version}/${params.id}`:
+    null;
+
+
   render() {
     const {classes} = this.props;
-    const openedInstance = this.props.match.params.id?instanceStore.openedInstances.get(this.props.match.params.id):null;
+    const instanceId = this._constructInstanceId(this.props.match.params);
+    const openedInstance = instanceId?instanceStore.openedInstances.get(instanceId):null;
 
     if (!openedInstance) {
       return null;
     }
 
-    const instance = this.props.match.params.id?instanceStore.instances.get(this.props.match.params.id):null;
+    const instance = instanceId?instanceStore.instances.get(instanceId):null;
     if (!instance) {
       return null;
     }
@@ -177,24 +193,24 @@ export default class Edit extends React.Component {
           </div>
           <div className={classes.body}>
             {openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
-              <PaneContainer key={this.props.match.params.id} paneStore={openedInstance.paneStore}>
+              <PaneContainer key={instanceId} paneStore={openedInstance.paneStore}>
                 <React.Fragment>
-                  <Pane paneId={this.props.match.params.id} key={this.props.match.params.id}>
-                    <InstanceForm level={0} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
+                  <Pane paneId={instanceId} key={instanceId}>
+                    <InstanceForm level={0} id={instanceId} mainInstanceId={instanceId} />
                   </Pane>
                   {!instance.hasFetchError?
-                    <Links level={1} id={this.props.match.params.id} mainInstanceId={this.props.match.params.id} />
+                    <Links level={1} id={instanceId} mainInstanceId={instanceId} />
                     :null}
                 </React.Fragment>
               </PaneContainer>
               : openedInstance.viewMode === "invite" ?
-                <InstanceInvite id={this.props.match.params.id}/>
+                <InstanceInvite id={instanceId}/>
                 : openedInstance.viewMode === "graph" ?
-                  <InstanceGraph id={this.props.match.params.id}/>
+                  <InstanceGraph id={instanceId}/>
                   : openedInstance.viewMode === "release" ?
-                    <InstanceRelease id={this.props.match.params.id}/>
+                    <InstanceRelease id={instanceId}/>
                     : openedInstance.viewMode === "manage" ?
-                      <InstanceManage id={this.props.match.params.id}/>
+                      <InstanceManage id={instanceId}/>
                       : null}
           </div>
           <div className={classes.sidebar}>

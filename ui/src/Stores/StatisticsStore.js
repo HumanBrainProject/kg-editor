@@ -16,6 +16,7 @@
 
 import { observable, action, runInAction } from "mobx";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class StatisticsStore {
   @observable statistics = {};
@@ -49,6 +50,7 @@ class StatisticsStore {
         this.globalDatasetsStatistics.fetchError = `Error while retrieving datasets statistics (${message})`;
         this.globalDatasetsStatistics.isFetching = false;
       });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -69,6 +71,7 @@ class StatisticsStore {
         this.perWeekDatasetsStatistics.fetchError = `Error while retrieving per week datasets statistics (${message})`;
         this.perWeekDatasetsStatistics.isFetching = false;
       });
+      appStore.captureSentryException(e);
     }
   }
 }

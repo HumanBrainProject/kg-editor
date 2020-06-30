@@ -17,6 +17,7 @@
 import { observable, action, runInAction } from "mobx";
 
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 const maxItems = 100;
 
@@ -123,6 +124,7 @@ class HistoryStore {
           this.fetchError = `Error while retrieving history instances (${message})`;
           this.isFetching = false;
         });
+        appStore.captureSentryException(e);
       }
     }
   }

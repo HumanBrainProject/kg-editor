@@ -17,15 +17,16 @@
 import {observable, action, runInAction, computed, toJS} from "mobx";
 import { uniqueId, find, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
-import API from "../Services/API";
+import { matchPath } from "react-router-dom";
 
+import API from "../Services/API";
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
 import browseStore from "./BrowseStore";
 import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
-import { matchPath } from "react-router-dom";
+import appStore from "./AppStore";
 
 class Instance {
   @observable instanceId = null;
@@ -278,6 +279,7 @@ class Instance {
         this.hasSaveError = true;
         this.isSaving = false;
       });
+      appStore.captureSentryException(e);
     } finally {
       statusStore.flush();
     }
@@ -462,6 +464,7 @@ class InstanceStore {
         this.isFetchingQueue = false;
         this.processQueue();
       });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -481,10 +484,9 @@ class InstanceStore {
    * We keep track in that store of which instances are opened
    */
   @action
-  openInstance(instanceId, viewMode = "view", readMode = true){
+  openInstance(instanceId, viewMode = "view"){
     this.togglePreviewInstance();
-    this.setReadMode(readMode);
-    if (!readMode && viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
+    if (viewMode === "edit" && !browseStore.isFetched.lists && !browseStore.isFetching.lists) {
       browseStore.fetchLists();
     }
     historyStore.updateInstanceHistory(instanceId, "viewed");
@@ -502,11 +504,6 @@ class InstanceStore {
       this.setCurrentInstanceId(instanceId, instanceId, 0);
       this.syncStoredOpenedTabs();
     }
-  }
-
-  @action
-  setInstanceViewMode(instanceId, mode){
-    this.openedInstances.get(instanceId).viewMode = mode;
   }
 
   @action
@@ -535,7 +532,7 @@ class InstanceStore {
   @action
   restoreOpenedTabs(storedOpenedTabs){
     storedOpenedTabs.forEach(([id, viewMode]) => {
-      this.openInstance(id, viewMode, viewMode !== "edit");
+      this.openInstance(id, viewMode);
     });
   }
 
@@ -601,6 +598,7 @@ class InstanceStore {
       field.addValue(field.options[field.options.length-1]);
       return newInstanceId;
     } catch(e){
+      appStore.captureSentryException(e);
       return false;
     }
   }
@@ -618,11 +616,16 @@ class InstanceStore {
     this.isCreatingNewInstance = path;
     try{
       const { data } = await API.axios.post(API.endpoints.instanceData(path, this.databaseScope), values);
-      this.isCreatingNewInstance = false;
+      runInAction(() => {
+        this.isCreatingNewInstance = false;
+      });
       return data.data.id;
     } catch(e){
-      this.isCreatingNewInstance = false;
-      this.instanceCreationError = e.message;
+      runInAction(() => {
+        this.isCreatingNewInstance = false;
+        this.instanceCreationError = e.message;
+      });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -668,6 +671,7 @@ class InstanceStore {
           this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message}) ${errorMessage}`;
           this.isDeletingInstance = false;
         });
+        appStore.captureSentryException(e);
       }
     }
   }

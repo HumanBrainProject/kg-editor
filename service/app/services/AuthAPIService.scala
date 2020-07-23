@@ -24,9 +24,13 @@ import play.api.libs.ws.{WSClient, WSResponse}
 
 trait AuthAPIService {
 
-  def getEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]]
+  def getEndpoint(wSClient: WSClient, apiBaseEndpoint: String, apiVersion: String): Task[Either[WSResponse, JsObject]]
 
-  def getClientTokenEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]]
+  def getClientTokenEndpoint(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    apiVersion: String
+  ): Task[Either[WSResponse, JsObject]]
 
   def getClientToken(
     wSClient: WSClient,
@@ -39,9 +43,13 @@ trait AuthAPIService {
 
 class AuthAPIServiceLive extends AuthAPIService {
 
-  def getEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]] = {
+  def getEndpoint(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    apiVersion: String
+  ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/users/authorization")
+      .url(s"$apiBaseEndpoint/$apiVersion/users/authorization")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
@@ -51,9 +59,13 @@ class AuthAPIServiceLive extends AuthAPIService {
     }
   }
 
-  def getClientTokenEndpoint(wSClient: WSClient, apiBaseEndpoint: String): Task[Either[WSResponse, JsObject]] = {
+  def getClientTokenEndpoint(
+    wSClient: WSClient,
+    apiBaseEndpoint: String,
+    apiVersion: String
+  ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/users/authorization/tokenEndpoint")
+      .url(s"$apiBaseEndpoint/$apiVersion/users/authorization/tokenEndpoint")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {

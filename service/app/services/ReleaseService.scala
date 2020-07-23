@@ -61,7 +61,15 @@ class ReleaseServiceLive @Inject()(
     clientToken: String
   ): Task[Either[APIEditorError, JsValue]] = {
     val result = releaseAPIServiceLive
-      .getReleaseStatus(wSClient, configuration.kgCoreEndpoint, instanceIds, token, releaseTreeScope, clientToken)
+      .getReleaseStatus(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        instanceIds,
+        token,
+        releaseTreeScope,
+        clientToken
+      )
     result.map {
       case Right(ref) =>
         val r = (ref \ "data").as[Map[String, JsValue]]

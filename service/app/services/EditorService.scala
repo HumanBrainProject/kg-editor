@@ -49,7 +49,16 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
-      .getInstance(wSClient, configuration.kgCoreEndpoint, id, token, metadata, returnPermissions, clientToken)
+      .getInstance(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        id,
+        token,
+        metadata,
+        returnPermissions,
+        clientToken
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -77,7 +86,17 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
-      .searchInstances(wSClient, configuration.kgCoreEndpoint, from, size, typeId, searchByLabel, token, clientToken)
+      .searchInstances(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        from,
+        size,
+        typeId,
+        searchByLabel,
+        token,
+        clientToken
+      )
       .map {
         case Right(res) => Right(res)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -98,6 +117,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       .postSuggestions(
         wSClient,
         configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
         token,
         id,
         field,
@@ -121,7 +141,16 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
-      .postNew(wSClient, configuration.kgCoreEndpoint, id, workspace, body, token, clientToken)
+      .postNew(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        id,
+        workspace,
+        body,
+        token,
+        clientToken
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -198,7 +227,15 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
-      .updateInstance(wSClient, configuration.kgCoreEndpoint, id, body, token, clientToken)
+      .updateInstance(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        id,
+        body,
+        token,
+        clientToken
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -342,6 +379,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       .getInstances(
         wSClient,
         configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
         token,
         instanceIds,
         stage,
@@ -363,14 +401,29 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
-      .getInstancesByType(wSClient, configuration.kgCoreEndpoint, token, typeOfInstance, metadata, clientToken)
+      .getInstancesByType(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        token,
+        typeOfInstance,
+        metadata,
+        clientToken
+      )
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
       }
 
   def deleteInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]] =
-    instanceAPIService.deleteEditorInstance(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
+    instanceAPIService.deleteEditorInstance(
+      wSClient,
+      configuration.kgCoreEndpoint,
+      configuration.kgCoreApiVersion,
+      id,
+      token,
+      clientToken
+    )
 
 }
 

@@ -33,6 +33,7 @@ trait InstanceAPIService {
   def getInstances(
     wsClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     instanceIds: List[String],
     stage: String,
@@ -44,7 +45,7 @@ trait InstanceAPIService {
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds)
     val q = wsClient
-      .url(s"${apiBaseEndpoint}/instancesByIds")
+      .url(s"${apiBaseEndpoint}/$apiVersion/instancesByIds")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
         "stage"              -> stage,
@@ -65,6 +66,7 @@ trait InstanceAPIService {
   def searchInstances(
     wsClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     from: Option[Int],
     size: Option[Int],
     typeId: String,
@@ -73,10 +75,10 @@ trait InstanceAPIService {
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wsClient
-      .url(s"${apiBaseEndpoint}/instances")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage"             -> "LIVE",
+        "stage"             -> "IN_PROGRESS",
         "returnPermissions" -> "true",
         "type"              -> typeId,
         "searchByLabel"     -> searchByLabel
@@ -93,15 +95,16 @@ trait InstanceAPIService {
   def getInstancesByType(
     wsClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     typeOfInstance: String,
     metadata: Boolean,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wsClient
-      .url(s"${apiBaseEndpoint}/instances")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("type" -> typeOfInstance, "metadata" -> metadata.toString, "stage" -> "LIVE")
+      .addQueryStringParameters("type" -> typeOfInstance, "metadata" -> metadata.toString, "stage" -> "IN_PROGRESS")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
@@ -121,9 +124,9 @@ trait InstanceAPIService {
   ): Task[Either[WSResponse, JsObject]] = {
     val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/${id}/graph")
+      .url(s"$apiBaseEndpoint/instances/${id}/graph") // TODO: Not implemented in kg-core
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("stage" -> "LIVE")
+      .addQueryStringParameters("stage" -> "IN_PROGRESS")
       .addQueryStringParameters(params)
     val r = Task.deferFuture(q.get())
     r.map { res =>
@@ -138,6 +141,7 @@ trait InstanceAPIService {
   def postSuggestions(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     id: String,
     field: String,
@@ -149,14 +153,14 @@ trait InstanceAPIService {
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val wsc = wSClient
-      .url(s"$apiBaseEndpoint/instances/${id}/suggestedLinksForProperty")
+      .url(s"$apiBaseEndpoint/$apiVersion/extra/instances/${id}/suggestedLinksForProperty")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
         "property" -> field,
         "from"     -> start.toString,
         "size"     -> size.toString,
         "search"   -> search,
-        "stage"    -> "LIVE"
+        "stage"    -> "IN_PROGRESS"
       )
     val q = `type` match {
       case Some(t) => wsc.addQueryStringParameters("type" -> t)
@@ -174,6 +178,7 @@ trait InstanceAPIService {
   def getInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     metadata: Boolean,
@@ -181,10 +186,10 @@ trait InstanceAPIService {
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/${id}")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/${id}")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage"             -> "LIVE",
+        "stage"             -> "IN_PROGRESS",
         "metadata"          -> metadata.toString,
         "returnPermissions" -> returnPermissions.toString
       )
@@ -266,12 +271,13 @@ trait InstanceAPIService {
   def deleteEditorInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[APIEditorError, Unit]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/${id}")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/${id}")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.delete())
     r.map { res =>
@@ -285,13 +291,14 @@ trait InstanceAPIService {
   def updateInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     body: JsObject,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/${id}")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/${id}")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.patch(body))
     r.map { res =>
@@ -305,6 +312,7 @@ trait InstanceAPIService {
   def postNew(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: Option[String],
     workspace: String,
     body: JsObject,
@@ -313,7 +321,7 @@ trait InstanceAPIService {
   ): Task[Either[WSResponse, JsObject]] = {
     val idRes = id.getOrElse("")
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/${idRes}")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/${idRes}")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("space" -> workspace)
     val r = Task.deferFuture(q.post(body))

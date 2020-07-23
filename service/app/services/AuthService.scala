@@ -57,14 +57,15 @@ class AuthServiceLive @Inject()(
 
   def getEndpoint(wSClient: WSClient): Task[Either[APIEditorError, JsObject]] =
     authAPIServiceLive
-      .getEndpoint(wSClient, config.kgCoreEndpoint)
+      .getEndpoint(wSClient, config.kgCoreEndpoint, config.kgCoreApiVersion)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
       }
 
   def retrieveClientToken(): Task[Either[APIEditorError, String]] = {
-    val clientTokenEndpoint = authAPIServiceLive.getClientTokenEndpoint(wSClient, config.kgCoreEndpoint)
+    val clientTokenEndpoint =
+      authAPIServiceLive.getClientTokenEndpoint(wSClient, config.kgCoreEndpoint, config.kgCoreApiVersion)
     clientTokenEndpoint.flatMap {
       case Right(endpoint) =>
         val res = (endpoint \ "data").as[Map[String, String]]

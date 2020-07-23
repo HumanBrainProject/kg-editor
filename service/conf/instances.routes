@@ -36,7 +36,7 @@ GET    /:id                  controllers.EditorController.getInstance(id: String
 #    required: false
 #    type: string
 ###
-POST    /list                 controllers.EditorController.getInstancesList(stage:String?="LIVE", metadata:Boolean?=false)
+POST    /list                 controllers.EditorController.getInstancesList(stage:String?="IN_PROGRESS", metadata:Boolean?=false)
 
 ###
 #  summary: get a summary list of entities
@@ -58,7 +58,7 @@ POST    /list                 controllers.EditorController.getInstancesList(stag
 #    required: false
 #    type: string
 ###
-POST    /summary                 controllers.EditorController.getInstancesSummary(stage:String?="LIVE", metadata:Boolean?=false)
+POST    /summary                 controllers.EditorController.getInstancesSummary(stage:String?="IN_PROGRESS", metadata:Boolean?=false)
 
 ###
 #  summary: get label for a list of entities
@@ -80,7 +80,7 @@ POST    /summary                 controllers.EditorController.getInstancesSummar
 #    required: false
 #    type: string
 ###
-POST    /label                 controllers.EditorController.getInstancesLabel(stage:String?="LIVE", metadata:Boolean?=false)
+POST    /label                 controllers.EditorController.getInstancesLabel(stage:String?="IN_PROGRESS", metadata:Boolean?=false)
 
 ###
 #  summary: Return suggestions

@@ -30,6 +30,7 @@ trait ConfigurationService {
   val editorPrefix: String
 
   val kgCoreEndpoint: String
+  val kgCoreApiVersion: String
   val kgQueryEndpoint: String
   val iamEndpoint: String
   val authEndpoint: String
@@ -50,7 +51,8 @@ class ConfigurationServiceLive @Inject()(config: Configuration) extends Configur
   val editorPrefix: String = config.getOptional[String]("nexus.editor.prefix").getOrElse("editor")
 
   val kgCoreEndpoint
-    : String = config.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:7130") // TODO: change the port from mock to real data
+    : String = config.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:8000") // TODO: change the port from mock to real data
+  val kgCoreApiVersion: String = config.get[String]("kgcore.apiVersion")
   val kgQueryEndpoint: String = config.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
   val iamEndpoint = config.get[String]("nexus.iam")
   val authEndpoint = config.get[String]("auth.endpoint")

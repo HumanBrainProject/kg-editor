@@ -53,7 +53,7 @@ class WorkspaceServiceLive @Inject()(
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     workspaceAPIServiceLive
-      .getTypesByName(wSClient, configuration.kgCoreEndpoint, token, types, clientToken)
+      .getTypesByName(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, token, types, clientToken)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))
@@ -65,7 +65,14 @@ class WorkspaceServiceLive @Inject()(
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     workspaceAPIServiceLive
-      .getWorkspaceTypes(wSClient, configuration.kgCoreEndpoint, workspace, token, clientToken)
+      .getWorkspaceTypes(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        workspace,
+        token,
+        clientToken
+      )
       .map {
         case Right(ref) => Right(ref)
         case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -73,7 +80,7 @@ class WorkspaceServiceLive @Inject()(
 
   def retrieveWorkspaces(token: AccessToken, clientToken: String): Task[Either[APIEditorError, JsObject]] = {
     val result = workspaceAPIServiceLive
-      .getWorkspaces(wSClient, configuration.kgCoreEndpoint, token, clientToken)
+      .getWorkspaces(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))

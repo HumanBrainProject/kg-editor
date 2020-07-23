@@ -54,6 +54,7 @@ trait ReleaseAPIService {
   def getReleaseStatus(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     instanceIds: List[String],
     token: AccessToken,
     releaseTreeScope: String,
@@ -124,6 +125,7 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   def getReleaseStatus(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     instanceIds: List[String],
     token: AccessToken,
     releaseTreeScope: String,
@@ -131,7 +133,7 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds).as[JsArray]
     val q = wSClient
-      .url(s"${apiBaseEndpoint}/releases/statusByIds")
+      .url(s"$apiBaseEndpoint/$apiVersion/releases/statusByIds")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("releaseTreeScope" -> releaseTreeScope)
     val r = Task.deferFuture(q.post(payload))

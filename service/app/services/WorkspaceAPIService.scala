@@ -29,6 +29,7 @@ trait WorkspaceAPIService {
   def getTypesByName(
     wsClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     types: List[String],
     clientToken: String
@@ -37,6 +38,7 @@ trait WorkspaceAPIService {
   def getWorkspaceTypes(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     workspace: String,
     token: AccessToken,
     clientToken: String
@@ -45,6 +47,7 @@ trait WorkspaceAPIService {
   def getWorkspaces(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]]
@@ -55,15 +58,16 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
   def getTypesByName(
     wsClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     types: List[String],
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(types)
     val q = wsClient
-      .url(s"$apiBaseEndpoint/typesByName")
+      .url(s"$apiBaseEndpoint/$apiVersion/typesByName")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("stage" -> "LIVE", "withProperties" -> "true")
+      .addQueryStringParameters("stage" -> "IN_PROGRESS", "withProperties" -> "true")
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
@@ -76,14 +80,15 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
   def getWorkspaceTypes(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     workspace: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/types")
+      .url(s"$apiBaseEndpoint/$apiVersion/types")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("workspace" -> workspace, "stage" -> "LIVE", "withProperties" -> "true")
+      .addQueryStringParameters("workspace" -> workspace, "stage" -> "IN_PROGRESS", "withProperties" -> "true")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
@@ -97,13 +102,14 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
   def getWorkspaces(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint/spaces")
+      .url(s"$apiBaseEndpoint/$apiVersion/spaces")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("stage" -> "LIVE")
+      .addQueryStringParameters("stage" -> "IN_PROGRESS")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {

@@ -412,10 +412,6 @@ class InstanceStore {
                     name: "country",
                     label: "Country",
                     type: "DropdownSelect",
-                    closeDropdownAfterInteraction: true,
-                    mappingValue: "id",
-                    mappingLabel: "name",
-                    mappingReturn: ["id"],
                     isLink: true,
                     allowCustomValues: true
                   },
@@ -438,10 +434,6 @@ class InstanceStore {
                         name: "region",
                         label: "Region",
                         type: "DropdownSelect",
-                        closeDropdownAfterInteraction: true,
-                        mappingValue: "id",
-                        mappingLabel: "name",
-                        mappingReturn: ["id"],
                         isLink: true,
                         allowCustomValues: true
                       }
@@ -454,10 +446,6 @@ class InstanceStore {
               //   name: "origin",
               //   label: "Origin",
               //   type: "DropdownSelect",
-              //   closeDropdownAfterInteraction: true,
-              //   mappingValue: "id",
-              //   mappingLabel: "name",
-              //   mappingReturn: ["id"],
               //   isLink: true,
               //   allowCustomValues: true,
               //   value: [{id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},

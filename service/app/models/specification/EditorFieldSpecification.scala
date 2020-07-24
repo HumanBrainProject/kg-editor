@@ -21,12 +21,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 final case class EditorFieldSpecification(
   key: String,
   label: String,
-  instancesPath: Option[String],
   fieldType: FieldType,
-  closeDropdownAfterInteraction: Option[Boolean],
-  mappingValue: Option[JsValue],
-  mappingLabel: Option[String],
-  mappingReturn: Option[JsValue],
   isLink: Option[Boolean],
   allowCustomValues: Option[Boolean],
   isReverse: Option[Boolean] = None,
@@ -60,12 +55,7 @@ object EditorFieldSpecification {
   implicit val EditorFieldSpecificationWrites: Writes[EditorFieldSpecification] = (
     (JsPath \ "key").write[String] and
     (JsPath \ "label").write[String] and
-    (JsPath \ "instancesPath").writeNullable[String] and
     (JsPath \ "type").write[FieldType] and
-    (JsPath \ "closeDropdownAfterInteraction").writeNullable[Boolean] and
-    (JsPath \ "mappingValue").writeNullable[JsValue] and
-    (JsPath \ "mappingLabel").writeNullable[String] and
-    (JsPath \ "mappingReturn").writeNullable[JsValue] and
     (JsPath \ "isLink").writeNullable[Boolean] and
     (JsPath \ "allowCustomValues").writeNullable[Boolean] and
     (JsPath \ "isReverse").writeNullable[Boolean] and
@@ -80,12 +70,7 @@ object EditorFieldSpecification {
   implicit val EditorFieldSpecificationReads: Reads[EditorFieldSpecification] = (
     (JsPath \ "key").read[String] and
     (JsPath \ "label").read[String] and
-    (JsPath \ "instancesPath").readNullable[String] and
     (JsPath \ "type").read[String].map(FieldType(_)) and
-    (JsPath \ "closeDropdownAfterInteraction").readNullable[Boolean] and
-    (JsPath \ "mappingValue").readNullable[JsValue] and
-    (JsPath \ "mappingLabel").readNullable[String] and
-    (JsPath \ "mappingReturn").readNullable[JsValue] and
     (JsPath \ "isLink").readNullable[Boolean] and
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ "isReverse").readNullable[Boolean] and

@@ -111,11 +111,7 @@
 //          |    },
 //          |    "http://hbp.eu/minds#methods": {
 //          |      "label": "Methods",
-//          |      "instancesPath": "minds/experiment/method/v0.0.4",
 //          |      "type": "DropdownSelect",
-//          |      "mappingValue": "id",
-//          |      "mappingLabel": "label",
-//          |      "mappingReturn": "id",
 //          |      "isLink": true,
 //          |      "allowCustomValues": true,
 //          |      "value": [
@@ -166,12 +162,7 @@
 //            |            "fields": [
 //            |            {
 //            |                "key": "https://schema.hbp.eu/minds/embargo_status",
-//            |                "instancesPath": "minds/core/embargostatus/v1.0.0",
 //            |                "isLink": true,
-//            |                "mappingValue": "id",
-//            |                "closeDropdownAfterInteraction": true,
-//            |                "mappingLabel": "name",
-//            |                "mappingReturn": "id",
 //            |                "label": "Embargo Status",
 //            |                "type": "DropdownSelect",
 //            |                "allowCustomValues": true

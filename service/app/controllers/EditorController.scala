@@ -34,9 +34,7 @@ class EditorController @Inject()(
   cc: ControllerComponents,
   authenticatedUserAction: AuthenticatedUserAction,
   editorService: EditorService,
-  workspaceServiceLive: WorkspaceServiceLive,
-  config: ConfigurationServiceLive,
-  reverseLinkService: ReverseLinkService
+  workspaceServiceLive: WorkspaceServiceLive
 )(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
 
@@ -272,16 +270,6 @@ class EditorController @Inject()(
     }
   }
 
-  class MapWrites[T]()(implicit writes: Writes[T]) extends Writes[Map[NexusPath, T]] {
-
-    def writes(map: Map[NexusPath, T]): JsValue =
-      Json.obj(map.map {
-        case (s, o) =>
-          val ret: (String, JsValueWrapper) = s.toString -> Json.toJson(o)
-          ret
-      }.toSeq: _*)
-  }
-
   /**
     * Entry point when updating an instance
     *
@@ -295,7 +283,7 @@ class EditorController @Inject()(
         (bodyContent match {
           case Some(body) =>
             editorService
-              .updateInstanceNew(id, body.as[JsObject], request.userToken, request.clientToken)
+              .updateInstance(id, body.as[JsObject], request.userToken, request.clientToken)
               .flatMap {
                 case Right(value) =>
                   val coreInstance = value.as[CoreData]
@@ -331,7 +319,7 @@ class EditorController @Inject()(
     bodyContent match {
       case Some(body) =>
         editorService
-          .insertInstanceNew(id, workspace, body.as[JsObject], request.userToken, request.clientToken)
+          .insertInstance(id, workspace, body.as[JsObject], request.userToken, request.clientToken)
           .flatMap {
             case Right(value) =>
               val instance = value.as[CoreData]

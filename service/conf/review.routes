@@ -30,7 +30,7 @@
 #     schema:
 #       type: object
 ###
-GET /users          controllers.ReviewController.getUsers(size:Int?=20, search:String?="")
+# GET /users          controllers.ReviewController.getUsers(size:Int?=20, search:String?="")
 
 ###
 # tags:
@@ -56,4 +56,4 @@ GET /users          controllers.ReviewController.getUsers(size:Int?=20, search:S
 #     schema:
 #       type: object
 ###
-GET /user/:id          controllers.ReviewController.getUserById(id:String)
+# GET /user/:id          controllers.ReviewController.getUserById(id:String)

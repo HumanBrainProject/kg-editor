@@ -15,7 +15,6 @@
  */
 package models
 
-import constants.UiConstants
 import play.api.libs.json._
 
 trait EditorResponse {
@@ -28,7 +27,7 @@ object EditorResponseObject {
   import play.api.libs.functional.syntax._
 
   implicit val responseWrites: Writes[EditorResponseObject] =
-    (JsPath \ UiConstants.DATA).write[JsValue].contramap(_.data)
+    (JsPath \ "data").write[JsValue].contramap(_.data)
 
   def empty: EditorResponseObject = EditorResponseObject(Json.obj())
 }
@@ -40,7 +39,7 @@ object EditorResponseWithCount {
   import play.api.libs.functional.syntax._
 
   implicit val responseWithCountWrites: Writes[EditorResponseWithCount] = (
-    (JsPath \ UiConstants.DATA).write[JsValue] and
+    (JsPath \ "data").write[JsValue] and
     (JsPath \ "label").write[String] and
     (JsPath \ "total").write[Long]
   )(unlift(EditorResponseWithCount.unapply))

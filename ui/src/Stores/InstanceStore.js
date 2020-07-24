@@ -367,80 +367,80 @@ class InstanceStore {
             const data = response && response.data && response.data.data && response.data.data[identifier];
             if(data){
               // TODO: Remove the mockup, this is just a test for embedded
-              data.fields["http://schema.org/address"] = {
-                type: "Nested",
-                fullyQualifiedName: "http://schema.org/address",
-                name: "address",
-                label: "Address",
-                min:0,
-                max: Number.POSITIVE_INFINITY,
-                value: [
-                  {
-                    "http://schema.org/addressLocality": "Springfield",
-                    "http://schema.org/streetAddress": "742 Evergreen Terrace",
-                    "http://schema.org/country" : [
-                      {id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
-                      {id: "88743735-88ad-45e9-acff-e67b5c407820"},
-                      {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
-                    ],
-                    "http://schema.org/zipCode": [
-                      { "http://schema.org/test": "Testing...",
-                        "http://schema.org/region":  [
-                          {id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
-                          {id: "88743735-88ad-45e9-acff-e67b5c407820"},
-                          {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
-                        ]
-                      }
-                    ]
-                  }
-                ],
-                fields: {
-                  "http://schema.org/addressLocality": {
-                    fullyQualifiedName: "http://schema.org/addressLocality",
-                    name: "addressLocality",
-                    label: "Address Locality",
-                    type: "InputText"
-                  },
-                  "http://schema.org/streetAddress": {
-                    fullyQualifiedName: "http://schema.org/streetAddress",
-                    name: "streetAddress",
-                    label: "Street Address",
-                    type: "InputText"
-                  },
-                  "http://schema.org/country" : {
-                    fullyQualifiedName: "http://schema.org/country",
-                    name: "country",
-                    label: "Country",
-                    type: "DropdownSelect",
-                    isLink: true,
-                    allowCustomValues: true
-                  },
-                  "http://schema.org/zipCode": {
-                    type: "Nested",
-                    fullyQualifiedName: "http://schema.org/zipCode",
-                    name: "zipCode",
-                    label: "Zip Code",
-                    min:0,
-                    max: Number.POSITIVE_INFINITY,
-                    fields: {
-                      "http://schema.org/test": {
-                        fullyQualifiedName: "http://schema.org/test",
-                        name: "test",
-                        label: "Test",
-                        type: "InputText"
-                      },
-                      "http://schema.org/region" :{
-                        fullyQualifiedName: "http://schema.org/region",
-                        name: "region",
-                        label: "Region",
-                        type: "DropdownSelect",
-                        isLink: true,
-                        allowCustomValues: true
-                      }
-                    }
-                  }
-                }
-              };
+              // data.fields["http://schema.org/address"] = {
+              //   type: "Nested",
+              //   fullyQualifiedName: "http://schema.org/address",
+              //   name: "address",
+              //   label: "Address",
+              //   min:0,
+              //   max: Number.POSITIVE_INFINITY,
+              //   value: [
+              //     {
+              //       "http://schema.org/addressLocality": "Springfield",
+              //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
+              //       "http://schema.org/country" : [
+              //         {id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
+              //         {id: "88743735-88ad-45e9-acff-e67b5c407820"},
+              //         {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
+              //       ],
+              //       "http://schema.org/zipCode": [
+              //         { "http://schema.org/test": "Testing...",
+              //           "http://schema.org/region":  [
+              //             {id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
+              //             {id: "88743735-88ad-45e9-acff-e67b5c407820"},
+              //             {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
+              //           ]
+              //         }
+              //       ]
+              //     }
+              //   ],
+              //   fields: {
+              //     "http://schema.org/addressLocality": {
+              //       fullyQualifiedName: "http://schema.org/addressLocality",
+              //       name: "addressLocality",
+              //       label: "Address Locality",
+              //       type: "InputText"
+              //     },
+              //     "http://schema.org/streetAddress": {
+              //       fullyQualifiedName: "http://schema.org/streetAddress",
+              //       name: "streetAddress",
+              //       label: "Street Address",
+              //       type: "InputText"
+              //     },
+              //     "http://schema.org/country" : {
+              //       fullyQualifiedName: "http://schema.org/country",
+              //       name: "country",
+              //       label: "Country",
+              //       type: "DropdownSelect",
+              //       isLink: true,
+              //       allowCustomValues: true
+              //     },
+              //     "http://schema.org/zipCode": {
+              //       type: "Nested",
+              //       fullyQualifiedName: "http://schema.org/zipCode",
+              //       name: "zipCode",
+              //       label: "Zip Code",
+              //       min:0,
+              //       max: Number.POSITIVE_INFINITY,
+              //       fields: {
+              //         "http://schema.org/test": {
+              //           fullyQualifiedName: "http://schema.org/test",
+              //           name: "test",
+              //           label: "Test",
+              //           type: "InputText"
+              //         },
+              //         "http://schema.org/region" :{
+              //           fullyQualifiedName: "http://schema.org/region",
+              //           name: "region",
+              //           label: "Region",
+              //           type: "DropdownSelect",
+              //           isLink: true,
+              //           allowCustomValues: true
+              //         }
+              //       }
+              //     }
+              //   }
+              // };
               // data.fields["http://schema.org/origin"] = {
               //   fullyQualifiedName: "http://schema.org/origin",
               //   name: "origin",

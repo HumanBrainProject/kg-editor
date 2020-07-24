@@ -16,10 +16,8 @@
 
 package services
 
-import constants.{EditorClient, EditorConstants, ServiceClient}
+import models.AccessToken
 import models.errors.APIEditorError
-import models.instance.{EditorInstance, NexusInstance, NexusInstanceReference}
-import models.{AccessToken, NexusPath}
 import monix.eval.Task
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.{CREATED, NO_CONTENT, OK}
@@ -203,72 +201,7 @@ trait InstanceAPIService {
     }
   }
 
-  def get(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    nexusInstance: NexusInstanceReference,
-    token: AccessToken,
-    clientToken: String,
-    clientExtensionId: Option[String] = None
-  ): Task[Either[WSResponse, NexusInstance]] = {
-    val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
-    val q = wSClient
-      .url(s"$apiBaseEndpoint$internalInstanceEndpoint/${nexusInstance.toString}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters(params)
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK =>
-          Right(NexusInstance(Some(nexusInstance.id), nexusInstance.nexusPath, res.json.as[JsObject]))
-        case _ => Left(res)
-      }
-    }
-  }
-
-  def put(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    nexusInstance: NexusInstanceReference,
-    editorInstance: EditorInstance,
-    token: AccessToken,
-    userId: String,
-    clientToken: String
-  ): Task[Either[WSResponse, Unit]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint$internalInstanceEndpoint/${nexusInstance.toString}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("clientIdExtension" -> userId)
-
-    val r = Task.deferFuture(q.put(editorInstance.nexusInstance.content))
-    r.map { res =>
-      res.status match {
-        case OK | CREATED => Right(())
-        case _            => Left(res)
-      }
-    }
-  }
-
-  def delete(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    nexusInstance: NexusInstanceReference,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, Unit]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint$instanceEndpoint/${nexusInstance.toString}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-    val r = Task.deferFuture(q.delete())
-    r.map { res =>
-      res.status match {
-        case OK | NO_CONTENT => Right(())
-        case _               => Left(res)
-      }
-    }
-  }
-
-  def deleteEditorInstance(
+  def deleteInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     apiVersion: String,
@@ -288,7 +221,7 @@ trait InstanceAPIService {
     }
   }
 
-  def updateInstance(
+  def patchInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     apiVersion: String,
@@ -309,7 +242,7 @@ trait InstanceAPIService {
     }
   }
 
-  def postNew(
+  def postInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
     apiVersion: String,
@@ -333,49 +266,4 @@ trait InstanceAPIService {
     }
   }
 
-  // TODO: deprecate this one and use postNew
-  def post(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    nexusInstance: NexusInstance,
-    user: Option[String],
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, NexusInstanceReference]] = {
-    val q = wSClient
-      .url(s"$apiBaseEndpoint$internalInstanceEndpoint/${nexusInstance.nexusPath.toString()}")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("clientIdExtension" -> user.getOrElse(""))
-    val r = Task.deferFuture(q.post(nexusInstance.content))
-    r.map { res =>
-      res.status match {
-        case OK | CREATED =>
-          Right(NexusInstanceReference.fromUrl((res.json \ EditorConstants.RELATIVEURL).as[String]))
-        case _ => Left(res)
-      }
-    }
-  }
-
-  def getLinkingInstance(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    from: NexusInstanceReference,
-    to: NexusInstanceReference,
-    linkingInstancePath: NexusPath,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, List[NexusInstanceReference]]] = {
-    val q = wSClient
-      .url(
-        s"$apiBaseEndpoint$internalInstanceEndpoint/${to.toString}/links/${from.toString}/${linkingInstancePath.toString()}"
-      )
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK => Right(res.json.as[List[NexusInstanceReference]])
-        case _  => Left(res)
-      }
-    }
-  }
 }

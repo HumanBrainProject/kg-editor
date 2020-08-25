@@ -3,6 +3,7 @@ import API from "../Services/API";
 
 const rootPath = window.rootPath || "";
 
+// TODO: Move this logic to kg-editor-service
 const userKeys = {
   id: "https://schema.hbp.eu/users/nativeId",
   username: "http://schema.org/alternateName",
@@ -10,7 +11,7 @@ const userKeys = {
   displayName: "http://schema.org/name",
   givenName: "http://schema.org/givenName",
   familyName: "http://schema.org/familyName",
-  workspaces: "https://kg.ebrains.eu/meta/workspaces"
+  workspaces: "https://core.kg.ebrains.eu/vocab/meta/workspaces"
 };
 
 const mapUserProfile = data => {

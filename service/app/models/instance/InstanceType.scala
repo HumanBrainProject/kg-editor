@@ -27,7 +27,7 @@ object InstanceType {
   implicit val instanceTypeReads: Reads[InstanceType] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ EditorConstants.VOCABEBRAINSCOLOR).readNullable[String]
+    (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String]
   )(InstanceType.apply _)
 
   implicit val instanceTypeWrites: Writes[InstanceType] = new Writes[InstanceType] {

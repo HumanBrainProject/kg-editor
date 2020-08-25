@@ -8,7 +8,7 @@ import API from "../Services/API";
 
 const transformField = field  =>  {
   if(field.type === "TextArea") {
-    field.value = field.value.substr(0, 197) + "...";
+    field.value = field.value?field.value.substr(0, 197) + "...": null;
     delete field.label;
   }
 };

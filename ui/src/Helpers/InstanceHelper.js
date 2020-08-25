@@ -1,5 +1,4 @@
 export const normalizeInstanceData = (data, transformField=null) => {
-
   const normalizeFields = fields => {
     for(let fieldKey in fields) {
       const field = fields[fieldKey];

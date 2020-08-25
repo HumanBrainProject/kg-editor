@@ -27,8 +27,8 @@ object SuggestionType {
   implicit val instanceTypeReads: Reads[SuggestionType] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ EditorConstants.VOCABEBRAINSCOLOR).readNullable[String] and
-    (JsPath \ EditorConstants.VOCABEBRAINSSPACES).read[List[String]]
+    (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
+    (JsPath \ EditorConstants.VOCAB_SPACES).read[List[String]]
   )(SuggestionType.apply _)
 
   implicit val instanceTypeWrites: Writes[SuggestionType] = new Writes[SuggestionType] {

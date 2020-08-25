@@ -16,30 +16,25 @@
 package constants
 
 object EditorConstants {
-  //TODO: Rerwrite the vocabulary to follow ebrains
-  val BASENAMESPACE = "https://schema.hbp.eu/" //TODO: Deprecation warning! this will be deprecated, use EBRAINSNAMESPACE instead or update the value to ebrains one
-  val EBRAINSNAMESPACE = "https://kg.ebrains.eu/"
-  val EBRAINSVOCAB = s"${EBRAINSNAMESPACE}vocab/"
+  val CORE_NAMESPACE = "https://core.kg.ebrains.eu/"
+  val EDITOR_NAMESPACE = "https://editor.kg.ebrains.eu/"
+  val CORE_META = s"${CORE_NAMESPACE}vocab/meta/"
+  val EDITOR_META = s"${EDITOR_NAMESPACE}vocab/meta/"
 
-  // META
-  val META = "https://schema.hbp.eu/meta/editor/"
-  val METAIDENTIFIER = s"${META}identifier"
-  val VOCABEBRAINSEMBEDDEDPROPERTIES = s"${EBRAINSVOCAB}meta/embeddedProperties"
-  val VOCABMETAEBRAINSOCCURENCES = s"${EBRAINSVOCAB}meta/occurences"
-  val VOCABEBRAINSSPACES = s"${EBRAINSVOCAB}meta/spaces"
-  val VOCABEBRAINSSPACE = s"${EBRAINSVOCAB}meta/space"
-  val VOCABEBRAINSALTERNATIVES = s"${EBRAINSVOCAB}meta/alternative"
-  val VOCABEBRAINSVALUE = s"${EBRAINSVOCAB}meta/value"
-  val VOCABEBRAINSSELECTED = s"${EBRAINSVOCAB}meta/selected"
-  val VOCABEBRAINSUSER = s"${EBRAINSVOCAB}meta/user"
-  val VOCABEBRAINSPERMISSIONS = s"${EBRAINSVOCAB}meta/permissions"
-  val VOCABEBRAINSCOLOR = s"${EBRAINSVOCAB}meta/color"
-  val VOCABEBRAINSWIDGET = s"${EBRAINSVOCAB}meta/property/widget"
-  val VOCABEBRAINSPROPERTYUPDATES = s"${EBRAINSVOCAB}meta/propertyUpdates"
-
-  val METAEBRAINS = "https://kg.ebrains.eu/meta/"
-  val METAEBRAINSPROPERTIES = s"${EBRAINSVOCAB}meta/properties"
-  val METAEBRAINSLABELPROPERTIES = s"${EBRAINSVOCAB}meta/labelProperties"
-  val METAEBRAINSWORKSPACES = s"${METAEBRAINS}workspaces"
-  val METAEBRAINSSEARCHABLE = s"${METAEBRAINS}property/searchable"
+  val VOCABEBRAINSEMBEDDEDPROPERTIES = s"${CORE_META}embeddedProperties"
+  val VOCAB_OCCURRENCES = s"${CORE_META}occurrences"
+  val VOCAB_SPACES = s"${CORE_META}spaces"
+  val VOCABEBRAINSSPACE = s"${CORE_META}space"
+  val VOCABEBRAINSALTERNATIVES = s"${CORE_META}alternative"
+  val VOCABEBRAINSVALUE = s"${CORE_META}value"
+  val VOCABEBRAINSSELECTED = s"${CORE_META}selected"
+  val VOCABEBRAINSUSER = s"${CORE_META}user"
+  val VOCABEBRAINSPERMISSIONS = s"${CORE_META}permissions"
+  val VOCAB_COLOR = s"${CORE_META}color"
+  val VOCAB_WIDGET = s"${EDITOR_META}property/widget"
+  val VOCAB_PROPERTY_UPDATES = s"${CORE_META}propertyUpdates"
+  val VOCAB_PROPERTIES = s"${CORE_META}properties"
+  val VOCAB_LABEL_PROPERTIES = s"${CORE_META}labelProperties"
+  val VOCAB_WORKSPACES = s"${CORE_META}workspaces"
+  val VOCAB_SEARCHABLE = s"${CORE_META}property/searchable"
 }

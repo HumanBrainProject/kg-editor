@@ -48,7 +48,7 @@ class EditorUserController @Inject()(
           (workspace \ "data").as[List[Map[String, String]]].map(w => w.getOrElse(SchemaFieldsConstants.NAME, ""))
         val r = (user \ "data")
           .as[Map[String, JsValue]]
-          .updated(EditorConstants.METAEBRAINSWORKSPACES, Json.toJson(workspaces))
+          .updated(EditorConstants.VOCAB_WORKSPACES, Json.toJson(workspaces))
         Ok(Json.toJson(EditorResponseObject(Json.toJson(r))))
       case (Right(user), _) => Ok(user)
       case (Left(err), _)   => err.toResult

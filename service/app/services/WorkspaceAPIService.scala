@@ -88,7 +88,7 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/types")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("workspace" -> workspace, "stage" -> "IN_PROGRESS", "withProperties" -> "true")
+      .addQueryStringParameters("space" -> workspace, "stage" -> "IN_PROGRESS", "withProperties" -> "true")
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {

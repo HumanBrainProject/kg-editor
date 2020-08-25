@@ -113,7 +113,6 @@ class Instances extends React.Component{
 
   render() {
     const { classes } = this.props;
-
     return (
       <div className={classes.container}>
         <div className={classes.header}>

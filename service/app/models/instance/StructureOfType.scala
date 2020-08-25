@@ -50,21 +50,21 @@ object StructureOfType {
     s"${SchemaFieldsConstants.IDENTIFIER}",
     s"${EditorConstants.VOCABEBRAINSALTERNATIVES}",
     s"${EditorConstants.VOCABEBRAINSUSER}",
-    s"${EditorConstants.VOCABEBRAINSSPACES}",
-    s"${EditorConstants.VOCABEBRAINSPROPERTYUPDATES}"
+    s"${EditorConstants.VOCAB_SPACES}",
+    s"${EditorConstants.VOCAB_PROPERTY_UPDATES}"
   )
 
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ EditorConstants.VOCABEBRAINSCOLOR).readNullable[String] and
-    (JsPath \ EditorConstants.METAEBRAINSLABELPROPERTIES)
+    (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
+    (JsPath \ EditorConstants.VOCAB_LABEL_PROPERTIES)
       .readNullable[List[String]]
       .map {
         case Some(v) => v
         case _       => List()
       } and
-    (JsPath \ EditorConstants.METAEBRAINSPROPERTIES)
+    (JsPath \ EditorConstants.VOCAB_PROPERTIES)
       .read[List[StructureOfField]]
       .map(
         t => t.filterNot(i => valuesToRemove.contains(i.fullyQualifiedName)).map(f => f.fullyQualifiedName -> f).toMap

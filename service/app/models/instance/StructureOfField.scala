@@ -48,10 +48,10 @@ object StructureOfField {
     (JsPath \ "markdown").readNullable[Boolean] and
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ "canBe").readNullable[List[String]] and
-    (JsPath \ EditorConstants.VOCABMETAEBRAINSOCCURENCES).readNullable[Int] and
-    (JsPath \ EditorConstants.VOCABEBRAINSWIDGET)
+    (JsPath \ EditorConstants.VOCAB_OCCURRENCES).readNullable[Int] and
+    (JsPath \ EditorConstants.VOCAB_WIDGET)
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
-    (JsPath \ EditorConstants.METAEBRAINSSEARCHABLE).readNullable[Boolean] and
+    (JsPath \ EditorConstants.VOCAB_SEARCHABLE).readNullable[Boolean] and
     (JsPath \ EditorConstants.VOCABEBRAINSEMBEDDEDPROPERTIES)
       .lazyReadNullable(Reads.list[StructureOfField](structureOfFieldReads))
   )(StructureOfField.apply _)

@@ -27,21 +27,17 @@ object Field {
   type ListOfLinks = List[Link]
 
   def normalizeFieldValue(value: JsValue, fieldInfo: StructureOfField): JsValue =
-    fieldInfo.canBe match {
-      case Some(canBe) =>
-        if (canBe.nonEmpty) {
-          value.asOpt[ListOfLinks] match {
-            case Some(valueArray) => Json.toJson(InstanceHelper.normalizeIdOfArray(valueArray))
-            case None =>
-              value.asOpt[Link] match {
-                case Some(valueObj) => Json.toJson(InstanceHelper.normalizeIdOfField(valueObj))
-                case None           => value
-              }
+    if (fieldInfo.isLink) {
+      value.asOpt[ListOfLinks] match {
+        case Some(valueArray) => Json.toJson(InstanceHelper.normalizeIdOfArray(valueArray))
+        case None =>
+          value.asOpt[Link] match {
+            case Some(valueObj) => Json.toJson(InstanceHelper.normalizeIdOfField(valueObj))
+            case None           => value
           }
-        } else {
-          value
-        }
-      case None => value
+      }
+    } else {
+      value
     }
 
   def getValue(data: JsValue, fieldInfo: StructureOfField): JsValue = {

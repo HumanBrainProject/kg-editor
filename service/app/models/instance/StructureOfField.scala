@@ -28,7 +28,7 @@ final case class StructureOfField(
   labelTooltip: Option[String],
   markdown: Option[Boolean],
   allowCustomValues: Option[Boolean],
-  canBe: Option[List[String]],
+  isLink: Boolean,
   numOfOccurrences: Option[Int],
   `type`: Option[String],
   searchable: Option[Boolean],
@@ -47,7 +47,10 @@ object StructureOfField {
     (JsPath \ "labelTooltip").readNullable[String] and
     (JsPath \ "markdown").readNullable[Boolean] and
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
-    (JsPath \ "canBe").readNullable[List[String]] and
+    (JsPath \ EditorConstants.VOCAB_TARGET_TYPES).readNullable[List[JsObject]].map {
+      case Some(v) => v.nonEmpty
+      case _       => false
+    } and
     (JsPath \ EditorConstants.VOCAB_OCCURRENCES).readNullable[Int] and
     (JsPath \ EditorConstants.VOCAB_WIDGET)
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided

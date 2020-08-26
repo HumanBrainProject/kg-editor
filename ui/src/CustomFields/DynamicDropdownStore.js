@@ -17,9 +17,11 @@ class OptionsPool{
     if(this.options.has(value[mappingValue])){
       return this.options.get(value[mappingValue]);
     } else {
-      this.optionsQueue.set(value[mappingValue], {mappingValue: mappingValue, mappingLabel: mappingLabel});
       this.options.set(value[mappingValue],{[mappingValue]:value[mappingValue], isFetching:false});
-      this.processQueue();
+      if(value[mappingValue]) {
+        this.optionsQueue.set(value[mappingValue], {mappingValue: mappingValue, mappingLabel: mappingLabel});
+        this.processQueue();
+      }
     }
     return this.options.get(value[mappingValue]);
   }
@@ -58,15 +60,16 @@ class OptionsPool{
           const mappingLabel = optionQueueItem.mappingLabel;
           const optionData =  response && response.data && response.data.data && response.data.data[identifier];
           if(optionData){ // TODO: check data and adapt code in consequence
-            Object.keys(optionData).forEach(key => {
-              if(key === mappingValue){return;}
-              set(option, key, optionData[key]);
-            });
-          } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-            const error = response.data.error[identifier];
-            const message = JSON.stringify(error); // TODO: check and handle properly error object
-            set(option, mappingLabel, message);
-            set(option, "fetchError", true);
+            if(optionData.error) {
+              const message = JSON.stringify(optionData.error.message); // TODO: check and handle properly error object
+              set(option, mappingLabel, message);
+              set(option, "fetchError", true);
+            } else {
+              Object.keys(optionData).forEach(key => {
+                if(key === mappingValue){return;}
+                set(option, key, optionData[key]);
+              });
+            }
           } else {
             set(option, mappingLabel, "Not found");
             set(option, "fetchError", true);

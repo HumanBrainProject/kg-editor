@@ -207,7 +207,7 @@ class InstancesHistory extends React.Component{
           <ul className="config">
             <li><input type="checkbox" checked={appStore.historySettings.eventTypes.viewed} onChange={this.handleHistoryViewedFlagChange} />Viewed</li>
             <li><input type="checkbox" checked={appStore.historySettings.eventTypes.edited} onChange={this.handleHistoryEditedFlagChange} />Edited</li>
-            <li><input type="checkbox" checked={appStore.historySettings.eventTypes.bookmarked} onChange={this.handleHistoryBookmarkedFlagChange} />Bookmarked</li>
+            {/* <li><input type="checkbox" checked={appStore.historySettings.eventTypes.bookmarked} onChange={this.handleHistoryBookmarkedFlagChange} />Bookmarked</li> */}
             <li><input type="checkbox" checked={appStore.historySettings.eventTypes.released} onChange={this.handleHistoryReleasedFlagChange} />Released</li>
           </ul>
         </div>

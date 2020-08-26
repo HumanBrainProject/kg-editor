@@ -40,7 +40,7 @@ object StructureOfType {
     labelField: List[String],
     fields: Map[String, StructureOfField]
   ): StructureOfType =
-    StructureOfType(name, label, color, labelField, fields, InstanceHelper.getPromotedFields(fields))
+    StructureOfType(name, label, color, labelField, fields, InstanceHelper.getPromotedFields(fields, labelField))
 
   import models.instance.StructureOfField._
 
@@ -67,7 +67,20 @@ object StructureOfType {
     (JsPath \ EditorConstants.VOCAB_PROPERTIES)
       .read[List[StructureOfField]]
       .map(
-        t => t.filterNot(i => valuesToRemove.contains(i.fullyQualifiedName)).map(f => f.fullyQualifiedName -> f).toMap
+        t =>
+          t.filterNot { i =>
+              val l = i.label match {
+                case Some(_) => true
+                case _       => false
+              }
+              if (l) {
+                valuesToRemove.contains(i.fullyQualifiedName)
+              } else {
+                true
+              }
+            }
+            .map(f => f.fullyQualifiedName -> f)
+            .toMap
       )
   )(StructureOfType.apply(_, _, _, _, _))
 

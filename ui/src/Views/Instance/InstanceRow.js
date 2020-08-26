@@ -3,7 +3,7 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Field } from "hbp-quickfire";
 import Status from "./Status";
-import BookmarkStatus from "./BookmarkStatus";
+// import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
 
 const styles = {
@@ -11,7 +11,8 @@ const styles = {
     position: "relative",
     minHeight: "47px",
     cursor: "pointer",
-    padding: "10px 10px 10px 75px",
+    // padding: "10px 10px 10px 75px",
+    padding: "10px",
     //background:"var(--bg-color-ui-contrast3)",
     background: "var(--bg-color-ui-contrast2)",
     borderLeft: "4px solid transparent",
@@ -200,8 +201,8 @@ class InstanceRow extends React.Component {
             <FontAwesomeIcon icon="cog" />
           </div>
         </div>
-        <BookmarkStatus id={instance.id} className="bookmarkStatus" />
-        <div className={classes.separator}></div>
+        {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
+        {/* <div className={classes.separator}></div> */}
       </div>
     );
   }

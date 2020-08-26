@@ -3,9 +3,9 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import browseStore from "../../Stores/BrowseStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Bookmarks from "./Bookmarks";
+// import Bookmarks from "./Bookmarks";
 import { Scrollbars } from "react-custom-scrollbars";
-import bookmarkStore from "../../Stores/BookmarkStore";
+// import bookmarkStore from "../../Stores/BookmarkStore";
 import Types from "./Types";
 import TypesStore from "../../Stores/TypesStore";
 
@@ -53,7 +53,7 @@ class NavigationPanel extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
+    // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
     const typeList = TypesStore.filteredList(browseStore.navigationFilter);
     return (
       <div className={classes.container}>
@@ -69,9 +69,10 @@ class NavigationPanel extends React.Component {
         </div>
         <Scrollbars autoHide>
           {browseStore.navigationFilter.trim() &&
-              bookmarkList.length === 0 && typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
+              // bookmarkList.length === 0 && typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
+              typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
           }
-          <Bookmarks />
+          {/* <Bookmarks /> */}
           <Types />
         </Scrollbars>
       </div>

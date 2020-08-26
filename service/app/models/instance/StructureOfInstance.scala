@@ -26,7 +26,7 @@ final case class StructureOfInstance(
 ) {
 
   def add(typeInfo: StructureOfType): StructureOfInstance = {
-    val pf = InstanceHelper.getPromotedFields(typeInfo.fields)
+    val pf = InstanceHelper.getPromotedFields(typeInfo.fields, labelField)
     val f = typeInfo.fields.foldLeft(fields) {
       case (map, (name, value)) => map.updated(name, value)
     }

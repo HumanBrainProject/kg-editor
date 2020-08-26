@@ -124,20 +124,28 @@ object InstanceHelper {
       case None => None
     }
 
-  def getPromotedFields(fields: Map[String, StructureOfField]): List[String] =
-    fields.values.foldLeft(List[String]()) {
-      case (acc, field) =>
-        field.searchable match {
-          case Some(f) =>
-            if (f) {
-              acc :+ field.fullyQualifiedName
-            } else {
-              acc
-            }
-          case _ => acc
+  def getPromotedFields(fields: Map[String, StructureOfField], labelField: List[String]): List[String] =
+    fields.values
+      .foldLeft(List[(String, Boolean)]()) {
+        case (acc, field) =>
+          field.searchable match {
+            case Some(f) =>
+              if (f) {
+                acc :+ ((field.fullyQualifiedName, labelField.contains(field.fullyQualifiedName)))
+              } else {
+                acc
+              }
+            case _ => acc
+          }
+      }
+      .sortWith((t1, t2) => {
+        if ((t1._2 && t2._2) || (!t1._2 && !t2._2)) {
+          t1._1.compareTo(t2._1) > 0
+        } else {
+          t1._2
         }
-
-    }
+      })
+      .map(i => i._1)
 
   def getPermissions(data: JsObject): List[String] =
     (data \ s"${EditorConstants.VOCABEBRAINSPERMISSIONS}").asOpt[List[String]] match {

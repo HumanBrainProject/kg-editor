@@ -60,6 +60,16 @@ const styles = {
 
 @injectStyles(styles)
 class SaveErrorPanel extends React.Component{
+  handleCancel = e => {	
+    e.stopPropagation();	
+    this.props.onCancel(e);	
+  }
+  
+  handleRetry = e => {	
+    e.stopPropagation();	
+    this.props.onRetry(e);	
+  }
+
   render(){
     const { classes, show, error, inline } = this.props;
 

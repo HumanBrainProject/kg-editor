@@ -198,7 +198,7 @@ class KgInputTextField extends React.Component {
         users: alternative.users,
         selected: !!alternative.selected
       }));
-    console.log(alternatives);
+
     return (
       <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>

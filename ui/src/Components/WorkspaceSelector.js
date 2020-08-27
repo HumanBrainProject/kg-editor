@@ -7,7 +7,6 @@ import CustomDropdownToggle from "./CustomDropdownToggle";
 import routerStore from "../Stores/RouterStore";
 import appStore from "../Stores/AppStore";
 
-
 const styles = {
   container: {
     height: "50px",

@@ -14,7 +14,7 @@
     "bootstrap": "^3.4.1",
     "color": "^3.1.2",
     "diff": "^4.0.1",
-    "hbp-quickfire": "^1.0.27",
+    "hbp-quickfire": "^1.0.29",
     "jsonld": "^1.8.1",
     "lodash": "^4.17.15",
     "lodash-uuid": "0.0.3",

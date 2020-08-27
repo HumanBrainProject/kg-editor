@@ -52,7 +52,7 @@ object InstanceSummaryView {
         val filteredFields = InstanceHelper.filterStructureOfFields(structure.fields, filteredPromotedFieldsList)
         InstanceSummaryView(
           instanceId,
-          (data \ EditorConstants.VOCABEBRAINSSPACE).asOpt[String],
+          (data \ EditorConstants.VOCAB_SPACE).asOpt[String],
           structure.types.values.toList,
           InstanceHelper.getName(data, structure.labelField),
           InstanceHelper.getFields(data, filteredFields),

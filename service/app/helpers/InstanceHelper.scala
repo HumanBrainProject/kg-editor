@@ -148,19 +148,31 @@ object InstanceHelper {
       .map(i => i._1)
 
   def getPermissions(data: JsObject): List[String] =
-    (data \ s"${EditorConstants.VOCABEBRAINSPERMISSIONS}").asOpt[List[String]] match {
+    (data \ s"${EditorConstants.VOCAB_PERMISSIONS}").asOpt[List[String]] match {
       case Some(permissions) => permissions
       case None              => List()
     }
 
   def getAlternatives(data: JsObject): Map[String, List[Alternative]] =
-    (data \ s"${EditorConstants.VOCABEBRAINSALTERNATIVES}").asOpt[Map[String, List[Alternative]]] match {
-      case Some(alternatives) => alternatives
-      case None               => Map()
+    (data \ s"${EditorConstants.VOCAB_ALTERNATIVES}").asOpt[Map[String, JsValue]] match {
+      case Some(alternatives) =>
+        alternatives.foldLeft(Map[String, List[Alternative]]()) {
+          case (acc, data) =>
+            data._2.asOpt[List[Alternative]] match {
+              case Some(alt) =>
+                if (!data._1.contains("https://schema.hbp.eu/relativeUrl")) {
+                  acc.updated(data._1, alt)
+                } else {
+                  acc
+                }
+              case _ => acc
+            }
+        }
+      case None => Map()
     }
 
   def getUser(data: JsObject): Option[String] =
-    (data \ s"${EditorConstants.VOCABEBRAINSUSER}").asOpt[Map[String, JsValue]] match {
+    (data \ s"${EditorConstants.VOCAB_USER}").asOpt[Map[String, JsValue]] match {
       case Some(user) =>
         user.get("@id") match {
           case Some(i) => DocumentId.getIdFromPath(i.as[String])

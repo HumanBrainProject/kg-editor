@@ -27,9 +27,9 @@ final case class Alternative(value: String, selected: Boolean, users: List[User]
 object Alternative {
 
   implicit val alternativeReads: Reads[Alternative] = (
-    (JsPath \ EditorConstants.VOCABEBRAINSVALUE).read[String] and
-    (JsPath \ EditorConstants.VOCABEBRAINSSELECTED).read[Boolean] and
-    (JsPath \ EditorConstants.VOCABEBRAINSUSER).read[List[User]]
+    (JsPath \ EditorConstants.VOCAB_VALUE).read[String] and
+    (JsPath \ EditorConstants.VOCAB_SELECTED).read[Boolean] and
+    (JsPath \ EditorConstants.VOCAB_USER).read[List[User]]
   )(Alternative.apply _)
 
   implicit val alternativeWrites = Json.writes[Alternative]

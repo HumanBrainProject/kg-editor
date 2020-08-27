@@ -21,13 +21,15 @@ import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-final case class User(id: List[String], name: String, username: String)
+final case class User(id: String, name: Option[String], username: Option[String])
 
 object User {
   implicit val userReads: Reads[User] = (
-    (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[List[String]] and
-    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ SchemaFieldsConstants.ALTERNATENAME).read[String]
+    (JsPath \ SchemaFieldsConstants.IDENTIFIER)
+      .read[List[String]]
+      .map(i => i.head) and //We get the first element of the Id list
+    (JsPath \ SchemaFieldsConstants.NAME).readNullable[String] and
+    (JsPath \ SchemaFieldsConstants.ALTERNATENAME).readNullable[String]
   )(User.apply _)
 
   implicit val userWrites = Json.writes[User]

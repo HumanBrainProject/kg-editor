@@ -48,8 +48,8 @@ object StructureOfType {
     "@id",
     "@type",
     s"${SchemaFieldsConstants.IDENTIFIER}",
-    s"${EditorConstants.VOCABEBRAINSALTERNATIVES}",
-    s"${EditorConstants.VOCABEBRAINSUSER}",
+    s"${EditorConstants.VOCAB_ALTERNATIVES}",
+    s"${EditorConstants.VOCAB_USER}",
     s"${EditorConstants.VOCAB_SPACES}",
     s"${EditorConstants.VOCAB_PROPERTY_UPDATES}"
   )

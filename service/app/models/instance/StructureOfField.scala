@@ -55,7 +55,7 @@ object StructureOfField {
     (JsPath \ EditorConstants.VOCAB_WIDGET)
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
     (JsPath \ EditorConstants.VOCAB_SEARCHABLE).readNullable[Boolean] and
-    (JsPath \ EditorConstants.VOCABEBRAINSEMBEDDEDPROPERTIES)
+    (JsPath \ EditorConstants.VOCAB_EMBEDDED_PROPERTIES)
       .lazyReadNullable(Reads.list[StructureOfField](structureOfFieldReads))
   )(StructureOfField.apply _)
 

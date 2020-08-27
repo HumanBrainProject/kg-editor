@@ -47,7 +47,7 @@ object InstanceView {
         val structure = StructureOfInstance(instanceTypes, typeInfoMap)
         InstanceView(
           instanceId,
-          (data \ EditorConstants.VOCABEBRAINSSPACE).asOpt[String],
+          (data \ EditorConstants.VOCAB_SPACE).asOpt[String],
           structure.types.values.toList,
           InstanceHelper.toOptionalList(structure.promotedFields),
           structure.labelField.headOption,

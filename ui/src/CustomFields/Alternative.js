@@ -7,7 +7,6 @@ import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
 
 const Value = ({value, field}) => {
-
   if (value === undefined || value === null) {
     return null;
   }

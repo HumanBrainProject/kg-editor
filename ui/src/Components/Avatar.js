@@ -20,7 +20,6 @@ class Avatar extends React.Component {
 
   render() {
     const {classes, userId, name, picture, size=20} = this.props;
-
     if (!userId) {
       return null;
     }

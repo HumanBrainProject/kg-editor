@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import createBrowserHistory from "history/createBrowserHistory";
+import { createBrowserHistory } from "history";
 
 class RouterStore{
   history = createBrowserHistory({basename:window.rootPath});

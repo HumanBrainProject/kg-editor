@@ -58,28 +58,6 @@ class Instance {
     this.initialValues = this.form.getValues();
   }
 
-  normalizeData(data) {
-    if (!data) {
-      return {fields: [], alternatives: []};
-    }
-    for(let fieldKey in data.fields) {
-      let field = data.fields[fieldKey];
-      if(field.type === "InputText"){
-        field.type = "KgInputText";
-      } else if(field.type === "TextArea"){
-        field.type = "KgTextArea";
-      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
-        if(field.type === "DropdownSelect") {
-          field.type = "DynamicDropdown";
-        }
-        field.optionsUrl = field.instancesPath;
-        field.instanceType = data.fields.id.value.path;
-      }
-    }
-    return data;
-  }
-
-
   @computed
   get hasFieldErrors() {
     return this.fieldErrors.length;
@@ -317,48 +295,6 @@ class InstanceStore {
     }
   }
 
-  getOpenedInstancesExceptCurrent(instanceId) {
-    let result = [];
-    Array.from(this.openedInstances.keys()).forEach(id => {
-      if (id !== instanceId) {
-        const instance = this.instances.get(id);
-        const instancesToBeKept = instance.linkedIds;
-        result = [...result, ...instancesToBeKept];
-      }
-    });
-    return Array.from(new Set(result));
-  }
-
-  syncStoredOpenedTabs(){
-    localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
-  }
-
-  getGeneratedKey(from, namespace){
-    if(!this.generatedKeys.has(from)){
-      this.generatedKeys.set(from, uniqueId(namespace));
-    }
-    return this.generatedKeys.get(from);
-  }
-
-  checkLinkedInstances(instance, check) {
-    const fields = instance.form.getField();
-    return Object.values(fields).some(field => {
-      return field.isLink && field.value.some(option => {
-        if (option.id) {
-          const linkedInstance = this.instances.get(option.id);
-          if (linkedInstance && typeof check === "function") {
-            return check(option.id, linkedInstance);
-          }
-        }
-        return false;
-      });
-    });
-  }
-
-  doesInstanceHaveLinkedInstancesInUnsavedState = instance => {
-    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
-  }
-
   @computed
   get hasUnsavedChanges(){
     return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
@@ -533,7 +469,8 @@ class InstanceStore {
     }
   }
 
-  @action flush(){
+  @action 
+  flush(){
     this.instances.clear();
   }
 

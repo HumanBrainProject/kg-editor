@@ -15,6 +15,7 @@
 */
 
 import {observable, action, runInAction} from "mobx";
+import * as Sentry from "@sentry/browser";
 import { matchPath } from "react-router-dom";
 import _  from "lodash-uuid";
 

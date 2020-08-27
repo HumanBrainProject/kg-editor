@@ -1,5 +1,22 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import {observable, action, runInAction} from "mobx";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class ReviewsStore {
   @observable instancesReviews = new Map();
@@ -38,7 +55,8 @@ class ReviewsStore {
 
     try {
       const {data} = await API.axios.get(API.endpoints.instanceReviews(instanceId));
-      runInAction(async () => {
+
+      runInAction(() => {
         const reviews = data.length ? data : [];
         const [org, , , ,] = instanceId.split("/");
         reviews.forEach(review => review.org = org);
@@ -55,6 +73,7 @@ class ReviewsStore {
         instanceReviews.isFetched = false;
         instanceReviews.isFetching = false;
       });
+      appStore.captureSentryException(e);
     }
     return instanceReviews;
   }
@@ -86,6 +105,7 @@ class ReviewsStore {
             instanceReview.status = "ADD_ERROR";
             instanceReview.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
           });
+          appStore.captureSentryException(e);
         }
       }
     }
@@ -110,6 +130,7 @@ class ReviewsStore {
             instanceReview.status = "REMOVE_ERROR";
             instanceReview.error = `Error while trying to cancel invite to user "${userId}" to review instance "${instanceId}" (${message})`;
           });
+          appStore.captureSentryException(e);
         }
       }
     }

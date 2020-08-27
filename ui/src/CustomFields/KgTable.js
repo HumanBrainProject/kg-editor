@@ -1,3 +1,19 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import React from "react";
 import injectStyles from "react-jss";
 import { Column, Table } from "react-virtualized";
@@ -162,6 +178,10 @@ const styles = {
   emptyMessageLabel: {
     paddingLeft: "6px",
     display:"inline-block"
+  },
+  deleteBtn: {
+    float: "right",
+    marginRight: "9px"
   }
 };
 
@@ -173,7 +193,7 @@ class KgTable extends React.Component {
     super(props);
     this.state = {
       containerWidth: 0,
-      scrollToIndex: undefined
+      scrollToIndex: -1
     };
   }
 
@@ -198,6 +218,7 @@ class KgTable extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
+    this.hiddenInputRef.value = "";
     Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
     var event = new Event("input", { bubbles: true });
@@ -255,7 +276,6 @@ class KgTable extends React.Component {
       return;
     }
     this.props.field.fetchOptions(true);
-    this.inputRef.focus();
     this.listenClickOutHandler();
   };
 
@@ -287,7 +307,7 @@ class KgTable extends React.Component {
     }
   }
 
-  handleSelect(option, e){
+  async handleSelect(option, e){
     let field = this.props.field;
     if(field.disabled || field.readOnly){
       return;
@@ -303,14 +323,17 @@ class KgTable extends React.Component {
         //If we have not reached the maximum values
         if(isString(option)){
           if(field.allowCustomValues && isFunction(this.props.onAddCustomValue)){
-            this.props.onAddCustomValue(option, field, this.props.formStore);
+            const id = await this.props.onAddCustomValue(option, field, this.props.formStore);
+            const obj = {};
+            obj[field.mappingValue] = id;
+            field.addInstance(obj, field.mappingValue);
           }
         } else {
           this.beforeAddValue(option);
           this.triggerOnChange();
           this.setState({scrollToIndex:this.props.field.list.length});
         }
-        // field.setUserInput("");
+        field.setUserInput("");
         this.handleFocus();
       }
     } else if(e && (e.keyCode === 38 || e.keyCode === 40)){
@@ -423,6 +446,11 @@ class KgTable extends React.Component {
     this.props.field.removeInstance(id);
   }
 
+  handleDeleteAll = () => {
+    this.props.field.removeAllInstancesAndValues();
+    this.triggerOnChange();
+  }
+
   handleRetry = instance => e => {
     e.stopPropagation();
     this.props.field.fetchInstance(instance);
@@ -450,7 +478,6 @@ class KgTable extends React.Component {
             <FontAwesomeIcon icon="circle-notch" spin/>
             &nbsp; fetching {props.rowData.id}...
           </span>:props.rowData.id
-
   )
 
   cellRenderer = index => {
@@ -486,6 +513,13 @@ class KgTable extends React.Component {
               className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.kgDropdown}`}
               validationState={validationState}>
               <FieldLabel field={field}/>
+              {!this.props.formStore.readMode && !this.props.field.readMode &&
+              <div className={classes.deleteBtn}>
+                <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={field.list.length === 0}>
+                  <FontAwesomeIcon icon="times"/>
+                </Button>
+              </div>
+              }
               <div className={classes.kgTable}>
                 <Table
                   width={this.state.containerWidth}

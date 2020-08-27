@@ -1,3 +1,19 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 /* eslint-disable indent */
 import React from "react";
 import { observer } from "mobx-react";
@@ -14,7 +30,9 @@ import CompareInstancesModal from "./InstanceRelease/CompareInstancesModal";
 
 import ReleaseList from "./InstanceRelease/ReleaseList";
 import ReleaseAction from "./InstanceRelease/ReleaseAction";
+
 import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
+import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
 
 const rootPath = window.rootPath || "";
 
@@ -62,6 +80,12 @@ const styles = {
     backgroundColor: "var(--bg-color-ui-contrast3)",
     padding: "10px",
     border: "1px solid var(--border-color-ui-contrast1)"
+  },
+  listFooter: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    paddingTop: "5px"
   }
 };
 
@@ -139,6 +163,9 @@ class InstanceRelease extends React.Component {
                 </div>
                 <div className={classes.list}>
                   <ReleaseList />
+                </div>
+                <div className={classes.listFooter}>
+                  <HideReleasedInstancesToggle />
                 </div>
               </div>
               <div className={classes.action}>

@@ -1,10 +1,26 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import { observable, action, runInAction } from "mobx";
 import { find, remove, clone, pullAll, uniqueId, uniq, flatten } from "lodash";
 
 import API from "../Services/API";
-import console from "../Services/Logger";
 
 import dataTypesStore from "../Stores/DataTypesStore";
+import appStore from "./AppStore";
 
 class GraphStore {
   @observable sidePanel = false;
@@ -48,7 +64,36 @@ class GraphStore {
     return uniq(flatten(this.findLinksByNode(node).map(link => [link.target, link.source])));
   }
 
-  @action hlNode(node) {
+  getCurrentNode() {
+    return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
+  }
+
+  get graphData() {
+    if (this.typeStates === null || this.originalData === null) {
+      return null;
+    }
+
+    let graphData = {
+      nodes: [...this.originalData.nodes],
+      links: [...this.originalData.links]
+    };
+
+    this.typeStates.forEach((state, type) => {
+      if (state === "group" || state === "hide") {
+        pullAll(graphData.nodes, this.findNodesBySchema(type));
+        pullAll(graphData.links, this.findLinksBySchema(type));
+      }
+      if (state === "show" || state === "hide") {
+        pullAll(graphData.nodes, this.findNodesBySchema("Group_" + type));
+        pullAll(graphData.links, this.findLinksBySchema("Group_" + type));
+      }
+    });
+
+    return graphData;
+  }
+
+  @action
+  hlNode(node) {
     if (node !== null && this.typeStates.get(node.schemas) === "group") {
       node = this.groupNodes.get(node.schemas);
     }
@@ -57,7 +102,8 @@ class GraphStore {
     this.connectedLinks = node !== null ? this.findLinksByNode(node) : [];
   }
 
-  @action async fetchGraph(id) {
+  @action
+  async fetchGraph(id) {
     this.isFetched = false;
     this.isFetching = true;
     try {
@@ -71,11 +117,12 @@ class GraphStore {
         this.isFetching = false;
       });
     } catch (e) {
-      //console.log(e);
+      appStore.captureSentryException(e);
     }
   }
 
-  @action reset() {
+  @action
+  reset() {
     this.isFetched = false;
     this.isFetching = false;
     this.expandedTypes = [];
@@ -87,7 +134,8 @@ class GraphStore {
     this.mainId = null;
   }
 
-  @action filterOriginalData() {
+  @action
+  filterOriginalData() {
     //Remove nodes that are not whitelisted
     remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => node.type.includes(nodeType.type)));
     remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
@@ -153,37 +201,15 @@ class GraphStore {
     });
   }
 
-  get graphData() {
-    if (this.typeStates === null || this.originalData === null) {
-      return null;
-    }
-
-    let graphData = {
-      nodes: [...this.originalData.nodes],
-      links: [...this.originalData.links]
-    };
-
-    this.typeStates.forEach((state, type) => {
-      if (state === "group" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesBySchema(type));
-        pullAll(graphData.links, this.findLinksBySchema(type));
-      }
-      if (state === "show" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesBySchema("Group_" + type));
-        pullAll(graphData.links, this.findLinksBySchema("Group_" + type));
-      }
-    });
-
-    return graphData;
-  }
-
-  @action explodeNode(clickedNode) {
+  @action
+  explodeNode(clickedNode) {
     if (clickedNode.isGroup) {
       this.typeStates.set(clickedNode.original_schema, "show");
     }
   }
 
-  @action toggleSettingsPanel(state) {
+  @action
+  toggleSettingsPanel(state) {
     if (state === undefined) {
       this.sidePanel = this.sidePanel === "settings" ? "" : "settings";
     } else {
@@ -195,28 +221,28 @@ class GraphStore {
     }
   }
 
-  @action setTypeState(nodeType, state) {
+  @action
+  setTypeState(nodeType, state) {
     this.typeStates.set(nodeType, state);
   }
 
-  @action expandType(typeToExpand) {
+  @action
+  expandType(typeToExpand) {
     this.expandedTypes.push(typeToExpand);
   }
 
-  @action collapseType(typeToCollapse) {
+  @action
+  collapseType(typeToCollapse) {
     remove(this.expandedTypes, type => typeToCollapse === type);
   }
 
-  @action toggleType(typeToToggle) {
+  @action
+  toggleType(typeToToggle) {
     if (find(this.expandedTypes, type => typeToToggle === type)) {
       this.collapseType(typeToToggle);
     } else {
       this.expandType(typeToToggle);
     }
-  }
-
-  getCurrentNode() {
-    return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
   }
 }
 

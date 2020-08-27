@@ -1,3 +1,19 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import { observable, action, runInAction, set, computed } from "mobx";
 import { union, debounce, remove } from "lodash";
 import { FormStore } from "hbp-quickfire";
@@ -64,15 +80,38 @@ class KgTableStore extends FormStore.typesMapping.Default{
       }
     }
 
+    isInstanceVisilbe = (index, instanceId) => {
+      if(index < this.defaultVisibleInstances) {
+        return true;
+      }
+      const instance = this.instancesMap.get(instanceId);
+      return instance && instance.show;
+    }
+
+    hasMoreOptions(){
+      return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
+    }
+
     fetchInstance(instance){
       this.instancesQueue.add(instance.id);
       this.processQueue();
     }
 
+    _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+
+    _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
+
     @action
     removeInstance(id) {
       this.instancesMap.delete(id);
       remove(this.instances, instance=> instance.id === id);
+    }
+
+    @action
+    removeAllInstancesAndValues() {
+      this.value = [];
+      this.instancesMap.clear();
+      this.instances = [];
     }
 
     @action
@@ -86,8 +125,6 @@ class KgTableStore extends FormStore.typesMapping.Default{
         this.fetchQueue();
       }
     }
-
-    _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
 
     @action
     async fetchQueue(){
@@ -265,8 +302,6 @@ class KgTableStore extends FormStore.typesMapping.Default{
       }
     }
 
-    _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
-
     @action
     setUserInput(userInput){
       this.userInput = userInput;
@@ -279,10 +314,6 @@ class KgTableStore extends FormStore.typesMapping.Default{
       if(this.hasMoreOptions()){
         this.fetchOptions(true);
       }
-    }
-
-    hasMoreOptions(){
-      return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
     }
 }
 

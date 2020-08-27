@@ -1,6 +1,21 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import { observable, action, runInAction, get, set } from "mobx";
 import { union, debounce } from "lodash";
-import console from "../Services/Logger";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -8,10 +23,11 @@ import instanceStore from "../Stores/InstanceStore";
 
 class OptionsPool{
   @observable options = new Map();
+  @observable isFetchingQueue = false;
+
   optionsQueue = new Map();
   queueThreshold = 5000;
   queueTimeout = 250;
-  @observable isFetchingQueue = false;
 
   getOption(value, mappingValue, mappingLabel){
     if(this.options.has(value[mappingValue])){
@@ -26,6 +42,8 @@ class OptionsPool{
     return this.options.get(value[mappingValue]);
   }
 
+  _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+
   @action
   processQueue(){
     if(this.optionsQueue.size <= 0){
@@ -37,8 +55,6 @@ class OptionsPool{
       this.fetchQueue();
     }
   }
-
-  _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
 
   @action
   async fetchQueue(){
@@ -81,7 +97,6 @@ class OptionsPool{
         this.processQueue();
       });
     } catch(e){
-      console.error(e);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           const option = this.options.get(identifier);
@@ -135,17 +150,16 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   @observable max = Infinity;
   @observable listPosition = "bottom";
   @observable closeDropdownAfterInteraction = false;
-
   @observable userInput = "";
   @observable optionsSelectedType = null;
   @observable optionsTypes = [];
   @observable optionsPageStart = 0;
   @observable optionsPageSize = 50;
+  @observable optionsCurrentTotal = Infinity;
+  @observable fetchingOptions = false;
+
   lastFetchParams = null;
   lastFetchOptions = [];
-  @observable optionsCurrentTotal = Infinity;
-
-  @observable fetchingOptions = false;
 
   __emptyValue = () => [];
 
@@ -157,6 +171,29 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   constructor(fieldData, store, path){
     super(fieldData, store, path);
     this.injectValue(this.value);
+  }
+
+  valueLabelRendering = (field, value, valueLabelRendering) => {
+    if (instanceStore.instances.has(value.id)) {
+      const instance = instanceStore.instances.get(value.id);
+      if (instance && instance.isFetched) {
+        const labelFieldName = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
+        const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
+        if (labelField) {
+          return labelField.value;
+        }
+      }
+    }
+    return typeof valueLabelRendering === "function"?
+      valueLabelRendering(field, value)
+      :
+      get(value, field.mappingLabel);
+  }
+
+  _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
+
+  hasMoreOptions(){
+    return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 
   @action
@@ -219,8 +256,6 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     });
   }
 
-  _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
-
   @action
   setUserInput(userInput){
     this.userInput = userInput;
@@ -233,10 +268,6 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     if(this.hasMoreOptions()){
       this.fetchOptions(true);
     }
-  }
-
-  hasMoreOptions(){
-    return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 }
 

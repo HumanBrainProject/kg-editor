@@ -1,10 +1,26 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import { observable, action, runInAction } from "mobx";
 import { toJS } from "mobx";
 import { isArray, debounce } from "lodash";
 
-import console from "../Services/Logger";
 import API from "../Services/API";
 import historyStore from "./HistoryStore";
+import appStore from "./AppStore";
 
 class BookmarkStatusStore{
   @observable statuses = new Map();
@@ -99,14 +115,13 @@ class BookmarkStatusStore{
             status.hasSaveError = false;
             status.isSaving = true;
             const payload = (status.data && status.data.bookmarkLists)?toJS(status.data.bookmarkLists):[];
-            const { data } = await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
+            await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
             runInAction(() => {
               status.hasChanged = false;
               status.saveError = null;
               status.hasSaveError = false;
               status.isSaving = false;
               status.previousBookmarkLists = [];
-              console.debug(`bookmark of "${id}" successfully saved`, data);
             });
           } catch (e) {
             runInAction(() => {
@@ -115,6 +130,7 @@ class BookmarkStatusStore{
               status.hasSaveError = true;
               status.isSaving = false;
             });
+            appStore.captureSentryException(e);
           }
         }
       }
@@ -208,6 +224,7 @@ class BookmarkStatusStore{
         this.isFetching = false;
         this.smartProcessQueue();
       });
+      appStore.captureSentryException(e);
     }
   }
 }

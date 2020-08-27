@@ -1,3 +1,19 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import {observable, action, runInAction, computed, toJS} from "mobx";
 import { uniqueId, debounce, isEqual } from "lodash";
 import { FormStore } from "hbp-quickfire";
@@ -38,6 +54,32 @@ class Instance {
     this.instanceStore = instanceStore;
   }
 
+  memorizeInstanceInitialValues() {
+    this.initialValues = this.form.getValues();
+  }
+
+  normalizeData(data) {
+    if (!data) {
+      return {fields: [], alternatives: []};
+    }
+    for(let fieldKey in data.fields) {
+      let field = data.fields[fieldKey];
+      if(field.type === "InputText"){
+        field.type = "KgInputText";
+      } else if(field.type === "TextArea"){
+        field.type = "KgTextArea";
+      } else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
+        if(field.type === "DropdownSelect") {
+          field.type = "DynamicDropdown";
+        }
+        field.optionsUrl = field.instancesPath;
+        field.instanceType = data.fields.id.value.path;
+      }
+    }
+    return data;
+  }
+
+
   @computed
   get hasFieldErrors() {
     return this.fieldErrors.length;
@@ -46,19 +88,6 @@ class Instance {
   @computed
   get fieldErrors() {
     return Array.from(this.fieldErrorsMap.values());
-  }
-
-  @action setFieldError(field) {
-    this.fieldErrorsMap.set(field.path.substr(1), field);
-  }
-
-  memorizeInstanceInitialValues() {
-    this.initialValues = this.form.getValues();
-  }
-
-  @action setFieldAsNull(id) {
-    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
-    this.hasChanged = true;
   }
 
   @computed
@@ -122,6 +151,16 @@ class Instance {
     return formStore;
   }
 
+  @action // TODO: check this one if it is used
+  setFieldError(field) {
+    this.fieldErrorsMap.set(field.path.substr(1), field);
+  }
+
+  @action // TODO: check this one if it is used
+  setFieldAsNull(id) {
+    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
+    this.hasChanged = true;
+  }
   @action
   fetch(forceFetch=false) {
     if(!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
@@ -235,6 +274,9 @@ class Instance {
         this.hasSaveError = true;
         this.isSaving = false;
       });
+      appStore.captureSentryException(e);
+    } finally {
+      statusStore.flush();
     }
   }
 
@@ -264,7 +306,6 @@ class InstanceStore {
   queueThreshold = 1000;
   queueTimeout = 250;
 
-
   generatedKeys = new WeakMap();
 
   constructor(stage=null) {
@@ -276,6 +317,53 @@ class InstanceStore {
       this.instancesQueue.set(instance.id, instance);
       this.processQueue();
     }
+  }
+
+  getOpenedInstancesExceptCurrent(instanceId) {
+    let result = [];
+    Array.from(this.openedInstances.keys()).forEach(id => {
+      if (id !== instanceId) {
+        const instance = this.instances.get(id);
+        const instancesToBeKept = instance.linkedIds;
+        result = [...result, ...instancesToBeKept];
+      }
+    });
+    return Array.from(new Set(result));
+  }
+
+  syncStoredOpenedTabs(){
+    localStorage.setItem("openedTabs", JSON.stringify([...this.openedInstances].map(([id, infos])=>[id, infos.viewMode])));
+  }
+
+  getGeneratedKey(from, namespace){
+    if(!this.generatedKeys.has(from)){
+      this.generatedKeys.set(from, uniqueId(namespace));
+    }
+    return this.generatedKeys.get(from);
+  }
+
+  checkLinkedInstances(instance, check) {
+    const fields = instance.form.getField();
+    return Object.values(fields).some(field => {
+      return field.isLink && field.value.some(option => {
+        if (option.id) {
+          const linkedInstance = this.instances.get(option.id);
+          if (linkedInstance && typeof check === "function") {
+            return check(option.id, linkedInstance);
+          }
+        }
+        return false;
+      });
+    });
+  }
+
+  doesInstanceHaveLinkedInstancesInUnsavedState = instance => {
+    return this.checkLinkedInstances(instance, (id, linkedInstance) => linkedInstance && linkedInstance.isFetched && linkedInstance.hasChanged);
+  }
+
+  @computed
+  get hasUnsavedChanges(){
+    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
   }
 
   @action
@@ -443,6 +531,7 @@ class InstanceStore {
         this.isFetchingQueue = false;
         this.processQueue();
       });
+      appStore.captureSentryException(e);
     }
   }
 
@@ -458,11 +547,6 @@ class InstanceStore {
       return instance;
     }
     return this.instances.get(instanceId);
-  }
-
-  @computed
-  get hasUnsavedChanges(){
-    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
   }
 
   @action
@@ -500,6 +584,7 @@ class InstanceStore {
       field.addValue(field.options[field.options.length-1]);
       return newInstanceId;
     } catch(e){
+      appStore.captureSentryException(e);
       return false;
     }
   }

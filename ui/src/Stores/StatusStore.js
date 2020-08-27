@@ -1,6 +1,23 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import { observable, action, runInAction } from "mobx";
 import { isArray, debounce } from "lodash";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 class StatusStore {
   @observable statuses = new Map();
@@ -14,6 +31,9 @@ class StatusStore {
   getInstance(id) {
     return this.statuses.get(id);
   }
+
+  _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
+  _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
 
   @action flush() {
     this.statuses.clear();
@@ -70,9 +90,6 @@ class StatusStore {
     }
   }
 
-  _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
-  _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
-
   @action
   async processQueue() {
     if (this.isFetching) {
@@ -110,6 +127,7 @@ class StatusStore {
         this.isFetching = false;
         this.smartProcessQueue();
       });
+      appStore.captureSentryException(e);
     }
 
   }
@@ -159,6 +177,7 @@ class StatusStore {
         this.isFetchingChildren = false;
         this.smartProcessQueueChildren();
       });
+      appStore.captureSentryException(e);
     }
   }
 }

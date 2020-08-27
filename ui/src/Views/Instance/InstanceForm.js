@@ -1,3 +1,19 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
@@ -170,14 +186,15 @@ class InstanceForm extends React.Component {
   }
 
   handleLoad = () => {
-    this.instance && this.instance.memorizeInstanceInitialValues();
+    const instance = instanceStore.instances.get(this.props.id);
+    instance && instance.memorizeInstanceInitialValues();
   }
 
-  handleCancelEdit = (e) => {
+  handleCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = this.instanceStore.instances.get(this.props.id);
+    const instance = instanceStore.instances.get(this.props.id);
     if (instance) {
-      if (this.instance.hasChanged) {
+      if (instance.hasChanged) {
         instanceStore.cancelInstanceChanges(this.props.id);
       } else {
         this.handleConfirmCancelEdit();
@@ -185,25 +202,25 @@ class InstanceForm extends React.Component {
     }
   }
 
-  handleConfirmCancelEdit = (e) => {
+  handleConfirmCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = this.instanceStore.instances.get(this.props.id);
+    const instance = instanceStore.instances.get(this.props.id);
     if (instance && instance.hasChanged) {
       instanceStore.confirmCancelInstanceChanges(this.props.id);
     }
   }
 
-  handleContinueEditing = (e) => {
+  handleContinueEditing = e => {
     e && e.stopPropagation();
     instanceStore.abortCancelInstanceChange(this.props.id);
   }
 
-  handleSave = (e) => {
+  handleSave = e => {
     e && e.stopPropagation();
     this.instance && appStore.saveInstance(this.instance);
   }
 
-  handleCancelSave = (e) => {
+  handleCancelSave = e => {
     e && e.stopPropagation();
     const instance = instanceStore.instances.get(this.props.id);
     instance && instance.cancelSave();

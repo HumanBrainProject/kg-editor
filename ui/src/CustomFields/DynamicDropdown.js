@@ -1,3 +1,19 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { get, toJS } from "mobx";
@@ -152,6 +168,7 @@ class DynamicDropdownField extends React.Component {
   // event on a proper html input node
   //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
   triggerOnChange = () => {
+    this.hiddenInputRef.value = "";
     Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
     var event = new Event("input", { bubbles: true });
@@ -227,9 +244,7 @@ class DynamicDropdownField extends React.Component {
       return;
     }
     this.props.field.fetchOptions(true);
-    this.inputRef.focus();
     this.listenClickOutHandler();
-    //this.forceUpdate();
   };
 
   closeDropdown(){

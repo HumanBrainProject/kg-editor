@@ -1,19 +1,3 @@
-/*
-*   Copyright (c) 2020, EPFL/Human Brain Project PCO
-*
-*   Licensed under the Apache License, Version 2.0 (the "License");
-*   you may not use this file except in compliance with the License.
-*   You may obtain a copy of the License at
-*
-*       http://www.apache.org/licenses/LICENSE-2.0
-*
-*   Unless required by applicable law or agreed to in writing, software
-*   distributed under the License is distributed on an "AS IS" BASIS,
-*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*   See the License for the specific language governing permissions and
-*   limitations under the License.
-*/
-
 import React from "react";
 import {observer} from "mobx-react";
 import injectStyles from "react-jss";
@@ -30,6 +14,7 @@ import InstanceManage from "./Instance/InstanceManage";
 import SaveBar from "./Instance/SaveBar";
 import Preview from "./Preview";
 import Tabs from "./Instance/Tabs";
+import instanceTabStore from "../Stores/InstanceTabStore";
 import appStore from "../Stores/AppStore";
 
 const styles = {
@@ -94,50 +79,23 @@ const styles = {
 @observer
 class Edit extends React.Component {
   componentDidMount() {
-    const instanceId = this._constructInstanceId(this.props.match.params);
-    if(instanceId) {
-      const isReadMode = this.props.mode !== "edit";
-      instanceStore.openInstance(instanceId, this.props.mode);
-      instanceStore.setReadMode(isReadMode);
-    }
+    appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
   }
 
   componentDidUpdate(prevProps) {
-    const prevInstanceId = this._constructInstanceId(prevProps.match.params);
-    const instanceId = this._constructInstanceId(this.props.match.params);
-    if (prevInstanceId && instanceId && (instanceId !== prevInstanceId) || (this.props.mode !== prevProps.mode)) {
-      const isReadMode = this.props.mode !== "edit";
-      instanceStore.openInstance(instanceId, this.props.mode);
-      instanceStore.setReadMode(isReadMode);
+    const path = `/instance/${this.props.mode}/${this.props.match.params.id}`;
+    if (!appStore.replaceInstanceResolvedIdPath(path) && this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
+      appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
     }
   }
 
-  handleSelectMode(mode) {
-    instanceStore.togglePreviewInstance();
-    const instanceId = this._constructInstanceId(this.props.match.params);
-    routerStore.history.push(`/instance/${mode}/${instanceId}`);
-  }
-
-  handleHidePreview = () => {
-    instanceStore.togglePreviewInstance();
-  }
-
-  _constructInstanceId = params => (params.org && params.domain && params.schema && params.version && params.id) ?
-    `${params.org}/${params.domain}/${params.schema}/${params.version}/${params.id}`:
-    null;
-
+  handleHidePreview = () => appStore.togglePreviewInstance();
 
   render() {
     const {classes} = this.props;
-    const instanceId = this._constructInstanceId(this.props.match.params);
-    const openedInstance = instanceId?instanceStore.openedInstances.get(instanceId):null;
+    const openedInstance = this.props.match.params.id?instanceTabStore.instanceTabs.get(this.props.match.params.id):null;
 
     if (!openedInstance) {
-      return null;
-    }
-
-    const instance = instanceId?instanceStore.instances.get(instanceId):null;
-    if (!instance) {
       return null;
     }
 

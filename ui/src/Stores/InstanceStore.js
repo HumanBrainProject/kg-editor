@@ -151,12 +151,12 @@ class Instance {
     return formStore;
   }
 
-  @action // TODO: check this one if it is used
+  @action
   setFieldError(field) {
     this.fieldErrorsMap.set(field.path.substr(1), field);
   }
 
-  @action // TODO: check this one if it is used
+  @action
   setFieldAsNull(id) {
     !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
     this.hasChanged = true;
@@ -275,8 +275,6 @@ class Instance {
         this.isSaving = false;
       });
       appStore.captureSentryException(e);
-    } finally {
-      statusStore.flush();
     }
   }
 

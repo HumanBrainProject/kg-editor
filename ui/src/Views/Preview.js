@@ -27,7 +27,7 @@ import instanceStore from "../Stores/InstanceStore";
 import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
-import BookmarkStatus from "./Instance/BookmarkStatus";
+// import BookmarkStatus from "./Instance/BookmarkStatus";
 import RenderMarkdownField from "../Components/Markdown";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
@@ -153,7 +153,8 @@ class Preview extends React.Component {
   );
 
   render() {
-    const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
+    // const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
+    const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
 
     const instance = instanceId?instanceStore.instances.get(instanceId):null;
     if (!instance) {
@@ -178,9 +179,9 @@ class Preview extends React.Component {
                 <Actions instanceId={instanceId} />
               )}
               <div className={classes.titlePanel}>
-                {showBookmarkStatus && (
+                {/* {showBookmarkStatus && (
                   <BookmarkStatus className={classes.bookmarkStatus} id={instanceId} />
-                )}
+                )} */}
                 {showTypes && (
                   <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
                     <FontAwesomeIcon fixedWidth icon="circle" />

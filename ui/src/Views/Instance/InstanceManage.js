@@ -5,13 +5,13 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
+import appStore from "../../Stores/AppStore";
 import instanceStore from "../../Stores/InstanceStore";
 import statusStore from "../../Stores/StatusStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
-import appStore from "../../Stores/AppStore";
 
 const rootPath = window.rootPath || "";
 
@@ -95,7 +95,7 @@ class InstanceManage extends React.Component {
   }
 
   handleDeleteInstance = async () => {
-    instanceStore.deleteInstance(this.props.id);
+    appStore.deleteInstance(this.props.id);
   }
 
   render() {
@@ -103,6 +103,7 @@ class InstanceManage extends React.Component {
 
     const instance = instanceStore.instances.get(this.props.id);
     const status = instance && statusStore.getInstance(this.props.id);
+
     return (
       instance && instance.isFetched ?
         <div className={classes.container}>
@@ -148,7 +149,7 @@ class InstanceManage extends React.Component {
                           </React.Fragment>
                           :
                           <React.Fragment>
-                            {status.data.status !== "UNRELEASED" ?
+                            {status.data !== "UNRELEASED" ?
                               <ul>
                                 <li>This instance has been released and therefore cannot be deleted.</li>
                                 <li>If you still want to delete it you first have to unrelease it.</li>
@@ -158,7 +159,7 @@ class InstanceManage extends React.Component {
                                 <strong>Be careful. Removed instances cannot be restored!</strong>
                               </p>
                             }
-                            <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data.status !== "UNRELEASED"} >
+                            <Button bsStyle={"danger"} onClick={this.handleDeleteInstance} disabled={status.data !== "UNRELEASED"} >
                               <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
                             </Button>
                           </React.Fragment>

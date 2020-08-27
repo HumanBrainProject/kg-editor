@@ -438,8 +438,6 @@ class AppStore{
         });
         instanceTabStore.syncStoredInstanceTabs();
       }
-      // TODO: Check if reload is still neeeded or if we only need to  update the instance object using the result of the save
-      // instance.fetch(true);
     }
     const types = instance.types.map(({name}) => name);
     historyStore.updateInstanceHistory(instance.id, types, "edited");
@@ -467,12 +465,11 @@ class AppStore{
           let nextLocation = null;
           if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
             if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
-              if(this.openedInstances.size > 1){
-                let openedInstances = Array.from(this.openedInstances.keys());
+              const openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
+              if(openedInstances.size > 1){
                 let currentInstanceIndex = openedInstances.indexOf(instanceId);
                 let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
-
-                let openedInstance = this.openedInstances.get(newInstanceId);
+                let openedInstance = openedInstances.get(newInstanceId);
                 nextLocation = `/instance/${openedInstance.viewMode}/${newInstanceId}`;
               } else {
                 nextLocation = "/browse";

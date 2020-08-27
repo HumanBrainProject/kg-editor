@@ -32,7 +32,7 @@ object EditorResponseObject {
   def empty: EditorResponseObject = EditorResponseObject(Json.obj())
 }
 
-case class EditorResponseWithCount(override val data: JsValue, label: String, total: Long) extends EditorResponse
+case class EditorResponseWithCount(override val data: JsValue, total: Long) extends EditorResponse
 
 object EditorResponseWithCount {
 
@@ -40,9 +40,8 @@ object EditorResponseWithCount {
 
   implicit val responseWithCountWrites: Writes[EditorResponseWithCount] = (
     (JsPath \ "data").write[JsValue] and
-    (JsPath \ "label").write[String] and
     (JsPath \ "total").write[Long]
   )(unlift(EditorResponseWithCount.unapply))
 
-  def empty: EditorResponseWithCount = EditorResponseWithCount(JsArray(), "", 0)
+  def empty: EditorResponseWithCount = EditorResponseWithCount(JsArray(), 0)
 }

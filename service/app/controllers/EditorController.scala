@@ -172,11 +172,12 @@ class EditorController @Inject()(
                       val typeInfoList = extractTypeList(typesWithFields)
                       Ok(
                         Json.toJson(
-                          EditorResponseObject(
+                          EditorResponseWithCount(
                             Json.toJson(
                               InstanceHelper
                                 .generateInstancesSummaryView(coreInstancesList, typeInfoList)
-                            )
+                            ),
+                            (instancesResult \ "total").as[Long]
                           )
                         )
                       )

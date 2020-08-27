@@ -23,7 +23,7 @@
     "nivo": "^0.31.0",
     "react": "^16.13.1",
     "react-bootstrap": "^0.33.1",
-    "react-copy-to-clipboard": "5.0.1",
+    "react-copy-to-clipboard": "5.0.2",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^16.13.1",
     "react-force-graph-2d": "^1.17.4",

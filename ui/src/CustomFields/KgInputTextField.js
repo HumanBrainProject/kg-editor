@@ -41,6 +41,37 @@ const styles = {
   }
 };
 
+const renderLines = value => {
+  const lines = typeof value === "string"?value.split("\n"):[];
+  return (
+    <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
+      {lines.map((line, index) => {
+        return(
+          <p key={line+(""+index)}>{line}</p>
+        );
+      })}
+    </div>
+  );
+};
+
+const FieldValue = ({field, readModeRendering, splitLines}) => {
+
+  if (isFunction(readModeRendering)) {
+    return readModeRendering(field);
+  }
+  
+  const { value } = field;
+  const val = !value || typeof value === "string"? value:value.toString();
+  
+  if (splitLines) {
+     return renderLines(val);
+  }
+  
+  return (
+    <span className="quickfire-readmode-value">&nbsp;{val}</span>
+  );
+};
+
 @inject("formStore")
 @injectStyles(styles)
 @observer
@@ -231,34 +262,15 @@ class KgInputTextField extends React.Component {
     );
   }
 
+
   renderReadMode(){
-    let {
-      value,
-      disabled,
-      readOnly
-    } = this.props.field;
-
-    const { classes } = this.props;
-
-    const lines = typeof value === "string"?value.split("\n"):[];
-
+    const { classes, field, formStore, readModeRendering, componentClass } = this.props;
+    const { value, disabled, readOnly} = field;
     return (
-      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
+      <FieldError id={formStore.structure.id} field={field}>
         <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
-          <FieldLabel field={this.props.field}/>
-          {isFunction(this.props.readModeRendering)?
-            this.props.readModeRendering(this.props.field)
-            : this.props.componentClass === "textarea"?
-              <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
-                {lines.map((line, index) => {
-                  return(
-                    <p key={line+(""+index)}>{line}</p>
-                  );
-                })}
-              </div>
-              :
-              <span className="quickfire-readmode-value">&nbsp;{value}</span>
-          }
+          <FieldLabel field={field}/>
+          <FieldValue field={field} readModeRendering={readModeRendering} splitLines={componentClass=== "textarea"} />
         </div>
       </FieldError>
     );

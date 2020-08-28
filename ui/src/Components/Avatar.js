@@ -35,7 +35,9 @@ const styles = {
 class Avatar extends React.Component {
 
   render() {
-    const {classes, userId, name, picture, size=20} = this.props;
+    const {classes, userId, name, picture} = this.props;
+    const size = 20;
+
     if (!userId) {
       return null;
     }

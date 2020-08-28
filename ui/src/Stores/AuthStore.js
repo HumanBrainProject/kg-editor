@@ -16,6 +16,7 @@
 
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
+import appStore from "./AppStore";
 
 const rootPath = window.rootPath || "";
 

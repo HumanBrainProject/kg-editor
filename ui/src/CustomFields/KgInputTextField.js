@@ -59,14 +59,14 @@ const FieldValue = ({field, readModeRendering, splitLines}) => {
   if (isFunction(readModeRendering)) {
     return readModeRendering(field);
   }
-  
+
   const { value } = field;
   const val = !value || typeof value === "string"? value:value.toString();
-  
+
   if (splitLines) {
-     return renderLines(val);
+    return renderLines(val);
   }
-  
+
   return (
     <span className="quickfire-readmode-value">&nbsp;{val}</span>
   );

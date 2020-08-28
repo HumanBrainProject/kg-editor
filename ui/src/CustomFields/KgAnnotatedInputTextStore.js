@@ -56,9 +56,6 @@ class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{
     });
   }
 
-  getValue(){
-    return this.value.map(i=> ({"@id": i}));
-  }
 }
 
 export default KgAnnotatedInputTextStore;

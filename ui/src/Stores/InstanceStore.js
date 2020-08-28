@@ -469,7 +469,7 @@ class InstanceStore {
     }
   }
 
-  @action 
+  @action
   flush(){
     this.instances.clear();
   }

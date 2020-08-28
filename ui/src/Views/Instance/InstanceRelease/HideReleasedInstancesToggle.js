@@ -39,7 +39,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-export default class HideReleasedInstancesToggle extends React.Component {
+class HideReleasedInstancesToggle extends React.Component {
 
   handleClick = showAll => {
     releaseStore.toggleHideReleasedInstances(!!showAll);
@@ -60,3 +60,5 @@ export default class HideReleasedInstancesToggle extends React.Component {
     );
   }
 }
+
+export default HideReleasedInstancesToggle;

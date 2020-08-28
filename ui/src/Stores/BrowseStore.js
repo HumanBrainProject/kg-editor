@@ -18,6 +18,7 @@ import { observable, action, runInAction } from "mobx";
 import { debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
+import appStore from "./AppStore";
 import { normalizeInstanceData } from "../Helpers/InstanceHelper";
 
 import API from "../Services/API";

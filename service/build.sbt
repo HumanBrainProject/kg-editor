@@ -79,7 +79,7 @@ val settings: Seq[Setting[_]] = Seq(
   scalaVersion := "2.12.9",
   libraryDependencies ++= baseDependencies,
   resolvers ++= Seq(
-      "Typesafe Simple Repository" at "http://repo.typesafe.com/typesafe/simple/maven-releases/",
+      "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/",
       Resolver.jcenterRepo
     ),
   routesGenerator := InjectedRoutesGenerator,
@@ -92,8 +92,6 @@ lazy val kg_service = (project in file("."))
 
 sources in (Compile, doc) := Seq.empty
 
-scalafmtOnCompile := true
-
 publishArtifact in (Compile, packageDoc) := false
 
-dockerBaseImage := "openjdk:11"
+dockerBaseImage := "adoptopenjdk:11-jre-hotspot"

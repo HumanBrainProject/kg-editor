@@ -45,7 +45,7 @@ class WorkspaceController @Inject()(
         .map {
           case Left(err) => err.toResult
           case Right(value) =>
-            val res = (value \ "data").as[List[StructureOfType]]
+            val res = (value \ "data").as[List[StructureOfType]].sortBy(_.label)
             Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
         }
       result.runToFuture

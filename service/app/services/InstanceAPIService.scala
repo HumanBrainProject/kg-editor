@@ -72,7 +72,7 @@ trait InstanceAPIService {
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
-    val q = wsClient
+    val wsc = wsClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
@@ -81,6 +81,14 @@ trait InstanceAPIService {
         "type"              -> typeId,
         "searchByLabel"     -> searchByLabel
       )
+    val q0 = from match {
+      case Some(f) => wsc.addQueryStringParameters("from" -> f.toString)
+      case _       => wsc
+    }
+    val q = size match {
+      case Some(s) => q0.addQueryStringParameters("size" -> s.toString)
+      case _       => q0
+    }
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {

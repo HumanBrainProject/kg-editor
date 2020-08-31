@@ -22,13 +22,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
-const styles = {
+const stylesActions = {
   actions: {
     display: "grid",
     gridTemplateColumns: "repeat(5, 1fr)",
     gridGap: "10px",
     marginBottom: "20px"
-  },
+  }
+};
+
+const stylesAction = {
   action: {
     height: "34px",
     cursor: "pointer",
@@ -44,65 +47,47 @@ const styles = {
   }
 };
 
-@injectStyles(styles)
-@observer
-class Actions extends React.Component {
-  handleOpenInstance(mode, event) {
+@injectStyles(stylesAction)
+class Action extends React.PureComponent {
+  handleOpenInstance = event => {
     if (event.metaKey || event.ctrlKey) {
-      appStore.openInstance(this.props.instanceId, mode);
+      appStore.openInstance(this.props.instance.id, this.props.mode);
     } else {
       routerStore.history.push(
-        `/instance/${mode}/${this.props.instanceId}`
+        `/instance/${this.props.mode}/${this.props.instance.id}`
       );
     }
   }
-  render() {
-    const { classes } = this.props;
 
+  render() {
+    const {classes, show, label, icon} = this.props;
+
+    if(!show) {
+      return null;
+    }
+
+    return(
+      <div className={classes.action} onClick={this.handleOpenInstance}>
+        <FontAwesomeIcon icon={icon} />&nbsp;&nbsp;{label}
+      </div>
+    );
+  }
+}
+
+@injectStyles(stylesActions)
+@observer
+class Actions extends React.Component {
+  render() {
+    const { classes, instance } = this.props;
+    const { permissions } =  instance;
     return (
       <div className={classes.actions}>
-        <div
-          className={classes.action}
-          onClick={this.handleOpenInstance.bind(this, "view")}
-        >
-          <FontAwesomeIcon icon="eye" />
-                  &nbsp;&nbsp;Open
-        </div>
-        <div
-          className={classes.action}
-          onClick={this.handleOpenInstance.bind(this, "edit")}
-        >
-          <FontAwesomeIcon icon="pencil-alt" />
-                  &nbsp;&nbsp;Edit
-        </div>
-        <div
-          className={classes.action}
-          onClick={this.handleOpenInstance.bind(this, "invite")}
-        >
-          <FontAwesomeIcon icon="user-edit" />
-                  &nbsp;&nbsp;Invite
-        </div>
-        <div
-          className={classes.action}
-          onClick={this.handleOpenInstance.bind(this, "graph")}
-        >
-          <FontAwesomeIcon icon="project-diagram" />
-                  &nbsp;&nbsp;Explore
-        </div>
-        <div
-          className={classes.action}
-          onClick={this.handleOpenInstance.bind(this, "release")}
-        >
-          <FontAwesomeIcon icon="cloud-upload-alt" />
-                  &nbsp;&nbsp;Release
-        </div>
-        <div
-          className={classes.action}
-          onClick={this.handleOpenInstance.bind(this, "manage")}
-        >
-          <FontAwesomeIcon icon="cog" />
-                  &nbsp;&nbsp;Manage
-        </div>
+        <Action show={permissions.canRead} icon="eye" label="Open" mode="view"/>
+        <Action show={permissions.canCreate} icon="pencil-alt" label="Edit" mode="edit"/>
+        <Action show={permissions.canInviteForSuggestion} icon="user-edit" label="Invite" mode="invite"/>
+        <Action show={permissions.canRead} icon="project-diagram" label="Explore" mode="graph"/>
+        <Action show={permissions.canRelease} icon="cloud-upload-alt" label="Release" mode="release"/>
+        <Action show={permissions.canDelete || permissions.canCreate} icon="cog" label="Manage" mode="manage"/>
       </div>
     );
   }

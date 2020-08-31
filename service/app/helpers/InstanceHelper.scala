@@ -19,17 +19,7 @@ package helpers
 import constants.EditorConstants
 import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
-import models.instance.{
-  Alternative,
-  CoreData,
-  Field,
-  Instance,
-  InstanceLabelView,
-  InstanceSummaryView,
-  InstanceView,
-  StructureOfField,
-  StructureOfType
-}
+import models.instance.{Alternative, CoreData, Field, Instance, InstanceLabelView, InstanceSummaryView, InstanceView, Permissions, StructureOfField, StructureOfType}
 import play.api.libs.json.{JsObject, JsString, JsValue}
 import play.api.mvc.AnyContent
 
@@ -147,11 +137,7 @@ object InstanceHelper {
       })
       .map(i => i._1)
 
-  def getPermissions(data: JsObject): List[String] =
-    (data \ s"${EditorConstants.VOCAB_PERMISSIONS}").asOpt[List[String]] match {
-      case Some(permissions) => permissions
-      case None              => List()
-    }
+  def getPermissions(data: JsObject): Permissions = Permissions((data \ s"${EditorConstants.VOCAB_PERMISSIONS}").asOpt[List[String]])
 
   def getAlternatives(data: JsObject): Map[String, List[Alternative]] =
     (data \ s"${EditorConstants.VOCAB_ALTERNATIVES}").asOpt[Map[String, JsValue]] match {

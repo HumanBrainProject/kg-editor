@@ -19,13 +19,13 @@ export const normalizeInstanceData = (data, transformField=null) => {
     for(let fieldKey in fields) {
       const field = fields[fieldKey];
       // TODO: temporary, please remove. This is just a test for proof of concept.
-      if (!field.type) {
-        if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse", "http://schema.org/affiliation"].includes(fieldKey)) {
-          field.type = "DropdownSelect";
-        } else {
-          field.type = "InputText";
-        }
-      }
+      // if (!field.type) {
+      //   if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse", "http://schema.org/affiliation"].includes(fieldKey)) {
+      //     field.type = "DropdownSelect";
+      //   } else {
+      //     field.type = "InputText";
+      //   }
+      // }
       // END of temporary
       typeof transformField === "function"  && transformField(field);
       if(field.type === "Nested"){

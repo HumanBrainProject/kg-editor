@@ -19,8 +19,8 @@ package models.instance
 import constants.EditorConstants
 import helpers.InstanceHelper
 import models.errors.CoreDataError
-import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.http.Status._
+import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceView(
   id: String,
@@ -29,7 +29,7 @@ final case class InstanceView(
   promotedFields: Option[List[String]],
   labelField: Option[String],
   fields: Map[String, Field],
-  permissions: List[String],
+  permissions: Permissions,
   alternatives: Map[String, List[Alternative]],
   user: Option[String],
   error: Option[CoreDataError]
@@ -62,7 +62,7 @@ object InstanceView {
   }
 
   def generateInstanceError(id: String, error: CoreDataError): InstanceView =
-    InstanceView(id, None, List(), None, None, Map(), List(), Map(), None, Some(error))
+    InstanceView(id, None, List(), None, None, Map(), Permissions(None), Map(), None, Some(error))
 
   def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceView =
     coreInstance match {

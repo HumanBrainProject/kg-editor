@@ -23,13 +23,13 @@ import play.api.http.Status.NOT_IMPLEMENTED
 import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceSummaryView(
-  id: String,
-  workspace: Option[String],
-  types: List[InstanceType],
-  name: String,
-  fields: Map[String, Field],
-  permissions: List[String],
-  error: Option[CoreDataError]
+                                      id: String,
+                                      workspace: Option[String],
+                                      types: List[InstanceType],
+                                      name: String,
+                                      fields: Map[String, Field],
+                                      permissions: Permissions,
+                                      error: Option[CoreDataError]
 ) extends Instance
 
 object InstanceSummaryView {
@@ -64,7 +64,7 @@ object InstanceSummaryView {
   }
 
   def generateInstanceError(id: String, error: CoreDataError): InstanceSummaryView =
-    InstanceSummaryView(id, None, List(), "", Map(), List(), Some(error))
+    InstanceSummaryView(id, None, List(), "", Map(), Permissions(None), Some(error))
 
   def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceSummaryView =
     coreInstance match {

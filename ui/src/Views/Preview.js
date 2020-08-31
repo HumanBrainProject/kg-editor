@@ -176,7 +176,7 @@ class Preview extends React.Component {
           <div className={classes.content}>
             <div className="header">
               {showAction && (
-                <Actions instanceId={instanceId} />
+                <Actions instance={instance} />
               )}
               <div className={classes.titlePanel}>
                 {/* {showBookmarkStatus && (

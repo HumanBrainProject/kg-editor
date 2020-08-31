@@ -145,19 +145,20 @@ class KgTableStore extends FormStore.typesMapping.Default{
             const instance = this.instancesMap.get(identifier);
             const instanceData =  response && response.data && response.data.data && response.data.data[identifier];
             if(instanceData){
-              if (typeof instanceData.fields !== "object") {
-                instanceData.fields = {};
+              if(instanceData.error) {
+                const message = JSON.stringify(instanceData.error.message); // TODO: check and handle properly error object
+                set(instance, "fetchError", message);
+              } else {
+                if (typeof instanceData.fields !== "object") {
+                  instanceData.fields = {};
+                }
+                instanceData.fields["http://schema.org/name"] = {
+                  name: "Name",
+                  value: instanceData.name
+                };
+                set(instance, "fields", instanceData.fields);
+                set(instance, "isFetched", true);
               }
-              instanceData.fields["http://schema.org/name"] = {
-                name: "Name",
-                value: instanceData.name
-              };
-              set(instance, "fields", instanceData.fields);
-              set(instance, "isFetched", true);
-            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-              const error = response.data.error[identifier];
-              const message = JSON.stringify(error); // TODO: check and handle properly error object
-              set(instance, "fetchError", message);
             } else {
               set(instance, "fetchError", `Error fetching instance ${identifier}`);
             }

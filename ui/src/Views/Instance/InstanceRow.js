@@ -107,28 +107,11 @@ const styles = {
     position: "absolute",
     top: "10px",
     right: "10px",
-    width: "125px",
-    display: "grid",
-    gridTemplateColumns: "repeat(5, 1fr)",
+    display: "flex",
+    alignItems: "flex-end",
     opacity: 0,
     "&:hover": {
       opacity: "1 !important"
-    }
-  },
-  action: {
-    fontSize: "0.9em",
-    lineHeight: "27px",
-    textAlign: "center",
-    backgroundColor: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
-    "&:hover": {
-      color: "var(--ft-color-loud)"
-    },
-    "&:first-child": {
-      borderRadius: "4px 0 0 4px"
-    },
-    "&:last-child": {
-      borderRadius: "0 4px 4px 0"
     }
   },
   separator: {
@@ -143,6 +126,57 @@ const styles = {
     alignItems: "center"
   }
 };
+
+const styleAction = {
+  action: {
+    fontSize: "0.9em",
+    lineHeight: "27px",
+    textAlign: "center",
+    backgroundColor: "var(--bg-color-ui-contrast2)",
+    color: "var(--ft-color-normal)",
+    width: "25px",
+    "&:hover": {
+      color: "var(--ft-color-loud)"
+    },
+    "&:first-child": {
+      borderRadius: "4px 0 0 4px"
+    },
+    "&:last-child": {
+      borderRadius: "0 4px 4px 0"
+    }
+  }
+};
+
+
+@injectStyles(styleAction)
+class Action extends React.PureComponent {
+  handleAction = event => {
+    event.stopPropagation();
+    if (!event.currentTarget.contains(event.target)) {
+      return;
+    }
+    if (event.metaKey || event.ctrlKey) {
+      typeof this.props.onCtrlClick === "function" && this.props.onCtrlClick(this.props.instance, this.props.mode);
+    } else {
+      typeof this.props.onActionClick === "function" && this.props.onActionClick(this.props.instance, this.props.mode);
+    }
+  }
+
+  render() {
+    const {classes, show, icon} = this.props;
+
+    if(!show) {
+      return null;
+    }
+
+    return(
+      <div className={classes.action} onClick={this.handleAction}>
+        <FontAwesomeIcon icon={icon} />
+      </div>
+    );
+  }
+}
+
 
 @injectStyles(styles)
 @observer
@@ -171,20 +205,10 @@ class InstanceRow extends React.Component {
     }
   }
 
-  handleAction(mode, instance, event) {
-    event.stopPropagation();
-    if (!event.currentTarget.contains(event.target)) {
-      return;
-    }
-    if (event.metaKey || event.ctrlKey) {
-      typeof this.props.onCtrlClick === "function" && this.props.onCtrlClick(instance, mode);
-    } else {
-      typeof this.props.onActionClick === "function" && this.props.onActionClick(instance, mode);
-    }
-  }
 
   render() {
-    const { classes, instance, selected } = this.props;
+    const { classes, instance, selected, onCtrlClick, onActionClick } = this.props;
+    const { permissions } = instance;
     const fields = Object.keys(instance.fields);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`}
@@ -201,21 +225,12 @@ class InstanceRow extends React.Component {
           {fields.map(field => <Field name={field} key={field} />)}
         </Form>
         <div className={classes.actions}>
-          <div className={classes.action} onClick={this.handleAction.bind(this, "view", instance)}>
-            <FontAwesomeIcon icon="eye" />
-          </div>
-          <div className={classes.action} onClick={this.handleAction.bind(this, "edit", instance)}>
-            <FontAwesomeIcon icon="pencil-alt" />
-          </div>
-          <div className={classes.action} onClick={this.handleAction.bind(this, "graph", instance)}>
-            <FontAwesomeIcon icon="project-diagram" />
-          </div>
-          <div className={classes.action} onClick={this.handleAction.bind(this, "release", instance)}>
-            <FontAwesomeIcon icon="cloud-upload-alt" />
-          </div>
-          <div className={classes.action} onClick={this.handleAction.bind(this, "manage", instance)}>
-            <FontAwesomeIcon icon="cog" />
-          </div>
+          <Action show={permissions.canRead} icon="eye" mode="view" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
+          <Action show={permissions.canCreate} icon="pencil-alt" mode="edit" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
+          <Action show={permissions.canInviteForSuggestion} icon="user-edit"  mode="invite" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
+          <Action show={permissions.canRead} icon="project-diagram" mode="graph" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
+          <Action show={permissions.canRelease} icon="cloud-upload-alt" mode="release" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
+          <Action show={permissions.canDelete || permissions.canCreate} icon="cog" mode="manage" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
         </div>
         {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
         {/* <div className={classes.separator}></div> */}

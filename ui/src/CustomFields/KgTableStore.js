@@ -148,13 +148,9 @@ class KgTableStore extends FormStore.typesMapping.Default{
               if (typeof instanceData.fields !== "object") {
                 instanceData.fields = {};
               }
-              // TODO: remove this mock data
-              instanceData.fields["http://schema.org/givenName"] = {
-                fullyQualifiedName: "http://schema.org/givenName",
-                label: "Given name in Person for editor",
-                name: "Given name in Person for editor",
-                type: "InputText",
-                value: "Carl",
+              instanceData.fields["http://schema.org/name"] = {
+                name: "Name",
+                value: instanceData.name
               };
               set(instance, "fields", instanceData.fields);
               set(instance, "isFetched", true);

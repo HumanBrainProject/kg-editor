@@ -32,7 +32,7 @@ object Field {
         case Some(valueArray) => Json.toJson(InstanceHelper.normalizeIdOfArray(valueArray))
         case None =>
           value.asOpt[Link] match {
-            case Some(valueObj) => Json.toJson(InstanceHelper.normalizeIdOfField(valueObj))
+            case Some(valueObj) => Json.toJson(List(InstanceHelper.normalizeIdOfField(valueObj)))
             case None           => value
           }
       }

@@ -114,20 +114,6 @@ const styles = {
       opacity: "1 !important"
     }
   },
-  separator: {
-    position: "absolute",
-    top: "10px",
-    left: "55px",
-    height: "calc(100% - 20px)",
-    borderRight: "1px solid var(--border-color-ui-contrast1)"
-  },
-  statusAndNameRow: {
-    display: "flex",
-    alignItems: "center"
-  }
-};
-
-const styleAction = {
   action: {
     fontSize: "0.9em",
     lineHeight: "27px",
@@ -144,76 +130,95 @@ const styleAction = {
     "&:last-child": {
       borderRadius: "0 4px 4px 0"
     }
+  },
+  separator: {
+    position: "absolute",
+    top: "10px",
+    left: "55px",
+    height: "calc(100% - 20px)",
+    borderRight: "1px solid var(--border-color-ui-contrast1)"
+  },
+  statusAndNameRow: {
+    display: "flex",
+    alignItems: "center"
   }
 };
 
-
-@injectStyles(styleAction)
 class Action extends React.PureComponent {
-  handleAction = event => {
+  handleClick = event => {
+    const { mode, onClick, onCtrlClick } = this.props;
     event.stopPropagation();
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
     if (event.metaKey || event.ctrlKey) {
-      typeof this.props.onCtrlClick === "function" && this.props.onCtrlClick(this.props.instance, this.props.mode);
+      typeof onCtrlClick === "function" && onCtrlClick(mode);
     } else {
-      typeof this.props.onActionClick === "function" && this.props.onActionClick(this.props.instance, this.props.mode);
+      typeof onClick === "function" && onClick(mode);
     }
   }
 
   render() {
-    const {classes, show, icon} = this.props;
+    const {className, show, icon} = this.props;
 
     if(!show) {
       return null;
     }
 
     return(
-      <div className={classes.action} onClick={this.handleAction}>
+      <div className={className} onClick={this.handleClick}>
         <FontAwesomeIcon icon={icon} />
       </div>
     );
   }
 }
 
-
 @injectStyles(styles)
 @observer
 class InstanceRow extends React.Component {
-  handleClick(instance, event) {
+
+  handleClick = event => {
+    const { instance, onClick, onCtrlClick } = this.props;
     event.stopPropagation();
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
     if (event.metaKey || event.ctrlKey) {
-      typeof this.props.onCtrlClick === "function" && this.props.onCtrlClick(instance);
+      typeof onCtrlClick === "function" && onCtrlClick(instance);
     } else {
-      typeof this.props.onClick === "function" && this.props.onClick(instance);
+      typeof onClick === "function" && onClick(instance);
     }
   }
 
-  handleDoubleClick(instance, event) {
+  handleDoubleClick = event => {
+    const { instance, onCtrlClick, onActionClick } = this.props;
     event.stopPropagation();
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
     if (event.metaKey || event.ctrlKey) {
-      typeof this.props.onCtrlClick === "function" && this.props.onCtrlClick(instance);
+      typeof onCtrlClick === "function" && onCtrlClick(instance);
     } else {
-      typeof this.props.onActionClick === "function" && this.props.onActionClick(instance, "view");
+      typeof onActionClick === "function" && onActionClick(instance, "view");
     }
   }
 
+  handleActionCtrlClick = () => {
+    const { instance, onCtrlClick } = this.props;
+    typeof onCtrlClick === "function" && onCtrlClick(instance);
+  }
+
+  handleActionClick = mode => {
+    const { instance, onActionClick } = this.props;
+    typeof onActionClick === "function" && onActionClick(instance, mode);
+  }
 
   render() {
-    const { classes, instance, selected, onCtrlClick, onActionClick } = this.props;
+    const { classes, instance, selected } = this.props;
     const { permissions } = instance;
     const fields = Object.keys(instance.fields);
     return (
-      <div className={`${classes.container} ${selected ? "selected" : ""}`}
-        onClick={this.handleClick.bind(this, instance)}
-        onDoubleClick={this.handleDoubleClick.bind(this, instance)} >
+      <div className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleClick} onDoubleClick={this.handleDoubleClick} >
         <div className={classes.statusAndNameRow}>
           <Status id={instance.id} darkmode={true} />
           <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
@@ -225,12 +230,12 @@ class InstanceRow extends React.Component {
           {fields.map(field => <Field name={field} key={field} />)}
         </Form>
         <div className={classes.actions}>
-          <Action show={permissions.canRead} icon="eye" mode="view" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
-          <Action show={permissions.canCreate} icon="pencil-alt" mode="edit" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
-          <Action show={permissions.canInviteForSuggestion} icon="user-edit"  mode="invite" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
-          <Action show={permissions.canRead} icon="project-diagram" mode="graph" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
-          <Action show={permissions.canRelease} icon="cloud-upload-alt" mode="release" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
-          <Action show={permissions.canDelete || permissions.canCreate} icon="cog" mode="manage" instance={instance} onCtrlClick={onCtrlClick} onActionClick={onActionClick}/>
+          <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
+          <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
+          <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
+          <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
+          <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
+          <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
         </div>
         {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
         {/* <div className={classes.separator}></div> */}

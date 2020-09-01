@@ -20,6 +20,7 @@ import injectStyles from "react-jss";
 
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
+import instanceStore from "../../Stores/InstanceStore";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -57,63 +58,69 @@ const styles = {
   }
 };
 
-@injectStyles(styles)
-@observer
-class Tabs extends React.Component {
-  handleSelectMode(mode) {
-    appStore.togglePreviewInstance();
-    routerStore.history.push(`/instance/${mode}/${this.props.id}`);
+class Tab extends React.PureComponent {
+
+  handleClick = () => {
+    const { mode, onClick } = this.props;
+    typeof onClick === "function" && onClick(mode);
   }
 
   render() {
-    const {classes, mode} = this.props;
-    if(mode === "create") {
-      return(
-        <div className={classes.tabs}>
-          <div className={`${classes.tab} disabled`} >
-            <FontAwesomeIcon icon="eye"/>
-          </div>
-          <div className={`${classes.tab} active`} >
-            <FontAwesomeIcon icon="pencil-alt"/>
-          </div>
-          <div className={`${classes.tab} disabled`} >
-            <FontAwesomeIcon icon="user-edit"/>
-          </div>
-          <div className={`${classes.tab} disabled`} >
-            <FontAwesomeIcon icon="project-diagram"/>
-          </div>
-          <div className={`${classes.tab} disabled`} >
-            <FontAwesomeIcon icon="cloud-upload-alt"/>
-          </div>
-          <div className={`${classes.tab} disabled`} >
-            <FontAwesomeIcon icon="cog"/>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className={classes.tabs}>
-          <div className={`${classes.tab} ${mode === "view"?"active":""}`} onClick={this.handleSelectMode.bind(this, "view")}>
-            <FontAwesomeIcon icon="eye"/>
-          </div>
-          <div className={`${classes.tab} ${mode === "edit"?"active":""}`} onClick={this.handleSelectMode.bind(this, "edit")}>
-            <FontAwesomeIcon icon="pencil-alt"/>
-          </div>
-          <div className={`${classes.tab} ${mode === "invite" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "invite")}>
-            <FontAwesomeIcon icon="user-edit"/>
-          </div>
-          <div className={`${classes.tab} ${mode === "graph" ? "active" : ""}`} onClick={this.handleSelectMode.bind(this, "graph")}>
-            <FontAwesomeIcon icon="project-diagram"/>
-          </div>
-          <div className={`${classes.tab} ${mode === "release"?"active":""}`} onClick={this.handleSelectMode.bind(this, "release")}>
-            <FontAwesomeIcon icon="cloud-upload-alt"/>
-          </div>
-          <div className={`${classes.tab} ${mode === "manage"?"active":""}`} onClick={this.handleSelectMode.bind(this, "manage")}>
-            <FontAwesomeIcon icon="cog"/>
-          </div>
-        </div>
-      );
+    const {className, show, disbled, active, icon} = this.props;
+
+    if(!show) {
+      return null;
     }
+
+    const props = disbled || active?
+      {
+        className: `${className} ${disbled?"disbled":""} ${active?"active":""}`
+      }
+      :
+      {
+        className: className,
+        onClick: this.handleClick
+      };
+
+    return(
+      <div {...props} >
+        <FontAwesomeIcon icon={icon}/>
+      </div>
+    );
+  }
+}
+
+@injectStyles(styles)
+@observer
+class Tabs extends React.Component {
+
+  handleClick = mode => {
+    const { instanceId } = this.props;
+    appStore.togglePreviewInstance();
+    routerStore.history.push(`/instance/${mode}/${instanceId}`);
+  }
+
+  render() {
+    const {classes, instanceId, mode} = this.props;
+
+    const instance = instanceStore.instances.get(instanceId);
+
+    if (!instance || instance.isFetching || instance.hasFetchError) {
+      return null;
+    }
+
+    const permissions = instance.permissions;
+
+    return (
+      <div className={classes.tabs}>
+        <Tab className={classes.tab} show={permissions.canRead}                            icon="eye"              mode="view"    disabled={mode === "create"} active={mode === "view"}                      onClick={this.handleClick} />
+        <Tab className={classes.tab} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    disabled={false}             active={mode === "edit" || mode === "create"} onClick={this.handleClick} />
+        <Tab className={classes.tab} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  disabled={mode === "create"} active={mode === "invite"}                    onClick={this.handleClick} />
+        <Tab className={classes.tab} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   disabled={mode === "create"} active={mode === "graph"}                     onClick={this.handleClick} />
+        <Tab className={classes.tab} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" disabled={mode === "create"} active={mode === "release"}                   onClick={this.handleClick} />
+        <Tab className={classes.tab} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  disabled={mode === "create"} active={mode === "manage"}                    onClick={this.handleClick} />
+      </div>
+    );
   }
 }
 

@@ -22,16 +22,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
-const stylesActions = {
+const styles = {
   actions: {
     display: "grid",
     gridTemplateColumns: "repeat(5, 1fr)",
     gridGap: "10px",
     marginBottom: "20px"
-  }
-};
-
-const stylesAction = {
+  },
   action: {
     height: "34px",
     cursor: "pointer",
@@ -47,47 +44,58 @@ const stylesAction = {
   }
 };
 
-@injectStyles(stylesAction)
 class Action extends React.PureComponent {
-  handleOpenInstance = event => {
+  handleClick = event => {
+    const { mode, onClick, onCtrlClick } = this.props;
     if (event.metaKey || event.ctrlKey) {
-      appStore.openInstance(this.props.instance.id, this.props.mode);
+      typeof onCtrlClick === "function" && onCtrlClick(mode);
     } else {
-      routerStore.history.push(
-        `/instance/${this.props.mode}/${this.props.instance.id}`
-      );
+      typeof onClick === "function" && onClick(mode);
     }
   }
 
   render() {
-    const {classes, show, label, icon} = this.props;
+    const {className, show, label, icon} = this.props;
 
     if(!show) {
       return null;
     }
 
     return(
-      <div className={classes.action} onClick={this.handleOpenInstance}>
+      <div className={className} onClick={this.handleClick}>
         <FontAwesomeIcon icon={icon} />&nbsp;&nbsp;{label}
       </div>
     );
   }
 }
 
-@injectStyles(stylesActions)
+@injectStyles(styles)
 @observer
 class Actions extends React.Component {
+
+  handleCtrlClick = mode => {
+    const { instance } = this.props;
+    const { id } = instance;
+    appStore.openInstance(id, mode);
+  }
+
+  handleClick = mode => {
+    const { instance } = this.props;
+    const { id } = instance;
+    routerStore.history.push(`/instance/${mode}/${id}`);
+  }
+
   render() {
     const { classes, instance } = this.props;
-    const { permissions } =  instance;
+    const { permissions } = instance;
     return (
       <div className={classes.actions}>
-        <Action show={permissions.canRead} icon="eye" label="Open" mode="view"/>
-        <Action show={permissions.canCreate} icon="pencil-alt" label="Edit" mode="edit"/>
-        <Action show={permissions.canInviteForSuggestion} icon="user-edit" label="Invite" mode="invite"/>
-        <Action show={permissions.canRead} icon="project-diagram" label="Explore" mode="graph"/>
-        <Action show={permissions.canRelease} icon="cloud-upload-alt" label="Release" mode="release"/>
-        <Action show={permissions.canDelete || permissions.canCreate} icon="cog" label="Manage" mode="manage"/>
+        <Action className={classes.action} show={permissions.canRead}                            icon="eye"              label="Open"    mode="view"    onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
+        <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       label="Edit"    mode="edit"    onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
+        <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        label="Invite"  mode="invite"  onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  label="Explore" mode="graph"   onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
+        <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" label="Release" mode="release" onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
+        <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              label="Manage"  mode="manage"  onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
       </div>
     );
   }

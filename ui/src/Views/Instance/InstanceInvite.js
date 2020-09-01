@@ -83,36 +83,51 @@ class InstanceInvite extends React.Component{
     instance.fetch(forceFetch);
   }
 
+  forceFetchInstance = () => this.fetchInstance(true)
+
   render(){
     const { classes } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
 
+    if (!instance) {
+      return null;
+    }
+
+    const permissions = instance.permissions;
+
     return (
-      instance && instance.isFetched ?
-        <div className={classes.container}>
-          <div className={classes.panel}>
-            {instance.isFetching?
-              <FetchingLoader>
-                <span>Fetching instance information...</span>
-              </FetchingLoader>
-              :!instance.hasFetchError?
-                <React.Fragment>
+      <div className={classes.container}>
+        <div className={classes.panel}>
+          {instance.isFetching?
+            <FetchingLoader>
+              <span>Fetching instance information...</span>
+            </FetchingLoader>
+            :!instance.hasFetchError?
+              permissions.canInviteForSuggestion?
+                <>
                   <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
                   <Reviewers id={this.props.id} />
-                </React.Fragment>
+                </>
                 :
                 <BGMessage icon={"ban"} className={classes.error}>
-                  There was a network problem fetching the instance.<br/>
-                  If the problem persists, please contact the support.<br/>
-                  <small>{instance.fetchError}</small><br/><br/>
-                  <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
+                  You are note entitled to invite people for suggestions.<br/>
+                  <Button bsStyle={"primary"} onClick={this.forceFetchInstance}>
                     <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
                   </Button>
                 </BGMessage>
-            }
-          </div>
-        </div>:null
+              :
+              <BGMessage icon={"ban"} className={classes.error}>
+                There was a network problem fetching the instance.<br/>
+                If the problem persists, please contact the support.<br/>
+                <small>{instance.fetchError}</small><br/><br/>
+                <Button bsStyle={"primary"} onClick={this.forceFetchInstance}>
+                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
+                </Button>
+              </BGMessage>
+          }
+        </div>
+      </div>
     );
   }
 }

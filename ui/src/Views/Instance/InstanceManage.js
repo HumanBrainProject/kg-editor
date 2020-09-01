@@ -118,30 +118,36 @@ class InstanceManage extends React.Component {
     const { classes } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
-    const status = instance && statusStore.getInstance(this.props.id);
+
+    if (!instance) {
+      return null;
+    }
+
+    const status = statusStore.getInstance(this.props.id);
+    const permissions = instance.permissions;
 
     return (
-      instance && instance.isFetched ?
-        <div className={classes.container}>
-          <Scrollbars autoHide>
-            <div className={classes.panel}>
-              {instance.isFetching ?
-                <FetchingLoader>
-                  <span>Fetching instance information...</span>
-                </FetchingLoader>
-                : !instance.hasFetchError ?
-                  <React.Fragment>
-                    <div className={classes.content}>
-                      <h4>{instance.primaryType.label}</h4>
-                      <div className={classes.id}>
-                        ID: {this.props.id}
-                      </div>
-                      {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} /> :
-                        < div className={classes.field}>
-                          {instance.name}
-                        </div>
-                      }
+      <div className={classes.container}>
+        <Scrollbars autoHide>
+          <div className={classes.panel}>
+            {instance.isFetching ?
+              <FetchingLoader>
+                <span>Fetching instance information...</span>
+              </FetchingLoader>
+              : !instance.hasFetchError ?
+                <React.Fragment>
+                  <div className={classes.content}>
+                    <h4>{instance.primaryType.label}</h4>
+                    <div className={classes.id}>
+                      ID: {this.props.id}
                     </div>
+                    {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} /> :
+                      < div className={classes.field}>
+                        {instance.name}
+                      </div>
+                    }
+                  </div>
+                  {permissions.canCreate && (
                     <div className={classes.content}>
                       <h4>Duplicate this instance</h4>
                       <ul>
@@ -152,6 +158,8 @@ class InstanceManage extends React.Component {
                         <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance
                       </Button>
                     </div>
+                  )}
+                  {permissions.canDelete && (
                     <div className={classes.content}>
                       <h4>Delete this instance</h4>
                       {status && status.hasFetchError ?
@@ -181,20 +189,21 @@ class InstanceManage extends React.Component {
                           </React.Fragment>
                       }
                     </div>
-                  </React.Fragment>
-                  :
-                  <BGMessage icon={"ban"}>
-                    There was a network problem fetching the instance.<br />
-                    If the problem persists, please contact the support.<br />
-                    <small>{instance.fetchError}</small><br /><br />
-                    <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
-                      <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-                    </Button>
-                  </BGMessage>
-              }
-            </div>
-          </Scrollbars>
-        </div> : null
+                  )}
+                </React.Fragment>
+                :
+                <BGMessage icon={"ban"}>
+                  There was a network problem fetching the instance.<br />
+                  If the problem persists, please contact the support.<br />
+                  <small>{instance.fetchError}</small><br /><br />
+                  <Button bsStyle={"primary"} onClick={this.fetchInstance.bind(this, true)}>
+                    <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+                  </Button>
+                </BGMessage>
+            }
+          </div>
+        </Scrollbars>
+      </div>
     );
   }
 }

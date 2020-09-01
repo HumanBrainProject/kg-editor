@@ -265,7 +265,9 @@ trait InstanceAPIService {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$idRes")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("space" -> workspace)
+      .addQueryStringParameters(
+        "space" -> workspace,
+        "returnPermissions" -> "true")
     val r = Task.deferFuture(q.post(body))
     r.map { res =>
       res.status match {

@@ -124,9 +124,12 @@ class Instance {
 
   @computed
   get readModeFormStore() {
-    const formStore = new FormStore(toJS(this.form.structure));
-    formStore.toggleReadMode(true);
-    return formStore;
+    if (this._readModeFormStore) {
+      return this._readModeFormStore;
+    }
+    this._readModeFormStore = new FormStore(toJS(this.form.structure));
+    this._readModeFormStore.toggleReadMode(true);
+    return this._readModeFormStore;
   }
 
   @action
@@ -149,6 +152,7 @@ class Instance {
   @action
   initializeData(data, readMode=false, isNew=false) {
     const normalizedData =  normalizeInstanceData(data);
+    this._readModeFormStore = null;
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;
     this.isNew = isNew;

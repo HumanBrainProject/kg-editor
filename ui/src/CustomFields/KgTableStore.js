@@ -63,6 +63,77 @@ class KgTableStore extends FormStore.typesMapping.Default{
       this.injectValue(this.value);
     }
 
+
+    @computed
+    get columns() {
+      if(this.isInitialized && !this.hasInitializationError) {
+        const label = this.instances[0].mappingLabel;
+        const fields = this.instances[0].fields;
+        let columns = Object.entries(fields).map(([name, field]) => ({name: name, label: field[label]}));
+        columns.push({name: "delete", label: ""});
+        return columns;
+      }
+      return [
+        {name: "id", label: "Name"},
+        {name: "delete", label: ""}
+      ];
+    }
+
+    @action
+    showInstance(instanceId) {
+      const instance = this.instancesMap.get(instanceId);
+      if(!instance.show) {
+        instance.show = true;
+        this.visibleInstances++;
+      }
+    }
+
+    @computed
+    get visibleInstancesCount() {
+      const defaultInstances = this.defaultVisibleInstances > this.instances.length ? this.instances.length:this.defaultVisibleInstances;
+      let count = defaultInstances + this.visibleInstances;
+      for(let i=0; i<defaultInstances && i<this.instances.length; i++ ) {
+        const instance = this.instances[i];
+        if(instance && instance.show) {
+          count--;
+        }
+      }
+      return count;
+    }
+
+    isInstanceVisilbe = (index, instanceId) => {
+      if(index < this.defaultVisibleInstances) {
+        return true;
+      }
+      const instance = this.instancesMap.get(instanceId);
+      return instance && instance.show;
+    }
+
+    @computed
+    get isInitialized() {
+      return this.hasInitializationError || this.instances.length && typeof this.instances[0].fields == "object" && Object.keys(this.instances[0].fields).length>0;
+    }
+
+    @computed
+    get hasInitializationError() {
+      return this.instances.length && this.instances[0].fetchError;
+    }
+
+    @computed
+    get list() {
+      return this.instances.map(instance => {
+        const row = {id:instance.id, instance: instance};
+        if(!instance.isFetching && instance.isFetched) {
+          this.columns.forEach(col => {
+            if(col.name !== "delete") {
+              row[col.name] = instance.fields[col.name].value;
+            }
+          });
+        }
+        return row;
+      });
+    }
+
     addInstance(value, mappingValue, mappingLabel) {
       const id = value[mappingValue];
       if(this.instancesMap.has(id)){
@@ -197,76 +268,6 @@ class KgTableStore extends FormStore.typesMapping.Default{
         }
         const instance = this.addInstance(value, this.mappingValue, this.mappingLabel);
         this.addValue(instance);
-      });
-    }
-
-    @computed
-    get columns() {
-      if(this.isInitialized && !this.hasInitializationError) {
-        const label = this.instances[0].mappingLabel;
-        const fields = this.instances[0].fields;
-        let columns = Object.entries(fields).map(([name, field]) => ({name: name, label: field[label]}));
-        columns.push({name: "delete", label: ""});
-        return columns;
-      }
-      return [
-        {name: "id", label: "Name"},
-        {name: "delete", label: ""}
-      ];
-    }
-
-    @action
-    showInstance(instanceId) {
-      const instance = this.instancesMap.get(instanceId);
-      if(!instance.show) {
-        instance.show = true;
-        this.visibleInstances++;
-      }
-    }
-
-    @computed
-    get visibleInstancesCount() {
-      const defaultInstances = this.defaultVisibleInstances > this.instances.length ? this.instances.length:this.defaultVisibleInstances;
-      let count = defaultInstances + this.visibleInstances;
-      for(let i=0; i<defaultInstances && i<this.instances.length; i++ ) {
-        const instance = this.instances[i];
-        if(instance && instance.show) {
-          count--;
-        }
-      }
-      return count;
-    }
-
-    isInstanceVisilbe = (index, instanceId) => {
-      if(index < this.defaultVisibleInstances) {
-        return true;
-      }
-      const instance = this.instancesMap.get(instanceId);
-      return instance && instance.show;
-    }
-
-    @computed
-    get isInitialized() {
-      return this.hasInitializationError || this.instances.length && typeof this.instances[0].fields == "object" && Object.keys(this.instances[0].fields).length>0;
-    }
-
-    @computed
-    get hasInitializationError() {
-      return this.instances.length && this.instances[0].fetchError;
-    }
-
-    @computed
-    get list() {
-      return this.instances.map(instance => {
-        const row = {id:instance.id, instance: instance};
-        if(!instance.isFetching && instance.isFetched) {
-          this.columns.forEach(col => {
-            if(col.name !== "delete") {
-              row[col.name] = instance.fields[col.name].value;
-            }
-          });
-        }
-        return row;
       });
     }
 

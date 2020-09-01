@@ -18,8 +18,11 @@ import React from "react";
 import {observer} from "mobx-react";
 import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
 
 import instanceStore from "../Stores/InstanceStore";
+import instanceTabStore from "../Stores/InstanceTabStore";
+import appStore from "../Stores/AppStore";
 
 import InstanceCreate from "./Instance/InstanceCreate";
 import InstanceView from "./Instance/InstanceView";
@@ -30,8 +33,8 @@ import InstanceManage from "./Instance/InstanceManage";
 import SaveBar from "./Instance/SaveBar";
 import Preview from "./Preview";
 import Tabs from "./Instance/Tabs";
-import instanceTabStore from "../Stores/InstanceTabStore";
-import appStore from "../Stores/AppStore";
+import FetchingLoader from "../Components/FetchingLoader";
+import BGMessage from "../Components/BGMessage";
 
 const styles = {
   container: {
@@ -91,6 +94,59 @@ const styles = {
   }
 };
 
+@observer
+class Instance extends React.Component {
+  render() {
+    const { instance, mode, paneStore, onRetry} = this.props;
+    if (instance.isFetching) {
+      return (
+        <FetchingLoader>
+          <span>Fetching instance information...</span>
+        </FetchingLoader>
+      );
+    }
+
+    if (instance.hasFetchError) {
+      return (
+        <BGMessage icon={"ban"}>
+          There was a network problem fetching the instance.<br />
+          If the problem persists, please contact the support.<br />
+          <small>{instance.fetchError}</small><br /><br />
+          <Button bsStyle={"primary"} onClick={onRetry}>
+            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+          </Button>
+        </BGMessage>
+      );
+    }
+
+    switch (mode) {
+    case "edit":
+    case "view":
+      return (
+        <InstanceView instance={instance} paneStore={paneStore} />
+      );
+    case "invite":
+      return (
+        <InstanceInvite instance={instance} />
+      );
+    case "graph":
+      return (
+        <InstanceGraph instance={instance} />
+      );
+    case "release":
+      return (
+        <InstanceRelease instance={instance} />
+      );
+    case "manage":
+      return (
+        <InstanceManage instance={instance} />
+      );
+    default:
+      return null;
+    }
+  }
+}
+
 @injectStyles(styles)
 @observer
 class Edit extends React.Component {
@@ -107,49 +163,50 @@ class Edit extends React.Component {
 
   handleHidePreview = () => appStore.togglePreviewInstance();
 
+  handleRetry = () => {
+    const instance = instanceStore.createInstanceOrGet(this.props.match.params.id);
+    instance.fetch(true);
+  }
+
   render() {
     const {classes} = this.props;
-    const openedInstance = this.props.match.params.id?instanceTabStore.instanceTabs.get(this.props.match.params.id):null;
+    const id = this.props.match.params.id;
+    const openedInstance = id?instanceTabStore.instanceTabs.get(id):null;
+    const instance = id?instanceStore.instances.get(id):null;
 
-    if (!openedInstance) {
+    if (!openedInstance || (!instance && openedInstance.viewMode !== "create")) {
       return null;
     }
+
+    const previewInstance = appStore.previewInstance;
+    const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
 
     return (
       <React.Fragment>
         <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
-          <Tabs mode={openedInstance.viewMode} id={this.props.match.params.id} />
+          <Tabs mode={openedInstance.viewMode} instance={instance} />
           <div className={classes.body}>
             {openedInstance.viewMode === "create"?
-              <InstanceCreate instanceId={this.props.match.params.id} paneStore={openedInstance.paneStore} />
+              <InstanceCreate instanceId={id} paneStore={openedInstance.paneStore} />
               :
-              openedInstance.viewMode === "edit" || openedInstance.viewMode === "view"?
-                <InstanceView instanceId={this.props.match.params.id} paneStore={openedInstance.paneStore} />
-                : openedInstance.viewMode === "invite" ?
-                  <InstanceInvite id={this.props.match.params.id}/>
-                  : openedInstance.viewMode === "graph" ?
-                    <InstanceGraph id={this.props.match.params.id}/>
-                    : openedInstance.viewMode === "release" ?
-                      <InstanceRelease id={this.props.match.params.id}/>
-                      : openedInstance.viewMode === "manage" ?
-                        <InstanceManage id={this.props.match.params.id}/>
-                        : null}
+              <Instance instance={instance} mode={openedInstance.viewMode} paneStore={openedInstance.paneStore} onRetry={this.handleRetry} />
+            }
           </div>
           <div className={classes.sidebar}>
             <SaveBar/>
           </div>
         </div>
-        <div className={`${classes.previewPanel} ${appStore.previewInstance?"show":""}`}>
-          {appStore.previewInstance && (
+        <div className={`${classes.previewPanel} ${previewInstance?"show":""}`}>
+          {previewInstance && (
             <React.Fragment>
               <h3>Preview</h3>
-              <Preview instanceId={appStore.previewInstance.id}
-                instanceName={appStore.previewInstance.name}
-                showEmptyFields={appStore.previewInstance.options && appStore.previewInstance.options.showEmptyFields}
-                showAction={appStore.previewInstance.options && appStore.previewInstance.options.showAction}
-                showBookmarkStatus={appStore.previewInstance.options && appStore.previewInstance.options.showBookmarkStatus}
-                showType={appStore.previewInstance.options && appStore.previewInstance.options.showType}
-                showStatus={appStore.previewInstance.options && appStore.previewInstance.options.showStatus} />
+              <Preview instanceId={previewInstance.id}
+                instanceName={previewInstance.name}
+                showEmptyFields={previewOptions.showEmptyFields}
+                showAction={previewOptions.showAction}
+                showBookmarkStatus={previewOptions.showBookmarkStatus}
+                showType={previewOptions.showType}
+                showStatus={previewOptions.showStatus} />
               <div className={classes.closePreviewBtn} title="close preview" onClick={this.handleHidePreview}>
                 <FontAwesomeIcon icon={"times"} />
               </div>

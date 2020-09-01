@@ -20,7 +20,6 @@ import injectStyles from "react-jss";
 
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
-import instanceStore from "../../Stores/InstanceStore";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -95,21 +94,14 @@ class Tab extends React.PureComponent {
 class Tabs extends React.Component {
 
   handleClick = mode => {
-    const { instanceId } = this.props;
+    const { instance } = this.props;
     appStore.togglePreviewInstance();
-    routerStore.history.push(`/instance/${mode}/${instanceId}`);
+    routerStore.history.push(`/instance/${mode}/${instance.id}`);
   }
 
   render() {
-    const {classes, instanceId, mode} = this.props;
-
-    const instance = instanceStore.instances.get(instanceId);
-
-    if (!instance || instance.isFetching || instance.hasFetchError) {
-      return null;
-    }
-
-    const permissions = instance.permissions;
+    const {classes, instance, mode} = this.props;
+    const permissions = instance?instance.permissions:{};
 
     return (
       <div className={classes.tabs}>

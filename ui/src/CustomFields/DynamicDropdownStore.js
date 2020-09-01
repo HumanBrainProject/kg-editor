@@ -173,23 +173,6 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     this.injectValue(this.value);
   }
 
-  valueLabelRendering = (field, value, valueLabelRendering) => {
-    if (instanceStore.instances.has(value.id)) {
-      const instance = instanceStore.instances.get(value.id);
-      if (instance && instance.isFetched) {
-        const labelFieldName = instance.data && instance.data.ui_info && instance.data.ui_info.labelField;
-        const labelField = labelFieldName && instance.data.fields && instance.data.fields[labelFieldName];
-        if (labelField) {
-          return labelField.value;
-        }
-      }
-    }
-    return typeof valueLabelRendering === "function"?
-      valueLabelRendering(field, value)
-      :
-      get(value, field.mappingLabel);
-  }
-
   _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
 
   hasMoreOptions(){

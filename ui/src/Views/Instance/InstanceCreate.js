@@ -65,12 +65,12 @@ class InstanceCreate extends React.Component {
   render() {
     const { classes, instanceId, paneStore } = this.props;
 
-    const instance = instanceId?instanceStore.instances.get(instanceId):null;
     const status = appStore.instanceIdAvailability.get(instanceId);
+    const instance = instanceStore.instances.get(instanceId);
 
     if (instance) {
       return (
-        <InstanceView instanceId={instanceId} paneStore={paneStore} />
+        <InstanceView instance={instance} paneStore={paneStore} />
       );
     }
 

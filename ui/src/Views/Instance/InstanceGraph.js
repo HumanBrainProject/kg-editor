@@ -55,12 +55,12 @@ const styles = {
 @observer
 class GraphInstance extends React.Component {
   componentDidMount() {
-    graphStore.fetchGraph(this.props.id);
+    graphStore.fetchGraph(this.props.instance.id);
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
-      graphStore.fetchGraph(this.props.id);
+    if (prevProps.instance !== this.props.instance) {
+      graphStore.fetchGraph(this.props.instance.id);
     }
   }
 

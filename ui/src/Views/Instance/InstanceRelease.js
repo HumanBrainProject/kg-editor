@@ -93,14 +93,14 @@ const styles = {
 @observer
 class InstanceRelease extends React.Component {
   componentDidMount() {
-    releaseStore.setTopInstanceId(this.props.id);
+    releaseStore.setTopInstanceId(this.props.instance.id);
     releaseStore.fetchReleaseData();
     releaseStore.fetchWarningMessages();
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.id !== prevProps.id) {
-      releaseStore.setTopInstanceId(this.props.id);
+    if (this.props.instance !== prevProps.instance) {
+      releaseStore.setTopInstanceId(this.props.instance.id);
       releaseStore.clearWarningMessages();
       releaseStore.fetchReleaseData();
     }

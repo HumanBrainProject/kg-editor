@@ -17,14 +17,11 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
 
 import instanceStore from "../../Stores/InstanceStore";
 
 import Preview from "../Preview";
 import Reviewers from "./InstanceInvite/Reviewers";
-import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 
 const rootPath = window.rootPath || "";
@@ -65,66 +62,34 @@ const styles = {
 @observer
 class InstanceInvite extends React.Component{
   componentDidMount() {
-    if (this.props.id) {
-      this.fetchInstance();
+    if (this.props.instance) {
       instanceStore.setReadMode(true);
     }
+    instanceStore.setReadMode(true);
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.id && this.props.id !== prevProps.id) {
-      this.fetchInstance(true);
+    if (this.props.instance && this.props.instance !== prevProps.instance) {
       instanceStore.setReadMode(true);
     }
   }
 
-  fetchInstance = (forceFetch = false) => {
-    const instance = instanceStore.createInstanceOrGet(this.props.id);
-    instance.fetch(forceFetch);
-  }
-
-  forceFetchInstance = () => this.fetchInstance(true)
-
   render(){
-    const { classes } = this.props;
-
-    const instance = instanceStore.instances.get(this.props.id);
-
-    if (!instance) {
-      return null;
-    }
-
+    const { classes, instance } = this.props;
     const permissions = instance.permissions;
 
     return (
       <div className={classes.container}>
         <div className={classes.panel}>
-          {instance.isFetching?
-            <FetchingLoader>
-              <span>Fetching instance information...</span>
-            </FetchingLoader>
-            :!instance.hasFetchError?
-              permissions.canInviteForSuggestion?
-                <React.Fragment>
-                  <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
-                  <Reviewers id={this.props.id} />
-                </React.Fragment>
-                :
-                <BGMessage icon={"ban"} className={classes.error}>
-                  You are note entitled to invite people for suggestions.<br/>
-                  <Button bsStyle={"primary"} onClick={this.forceFetchInstance}>
-                    <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
-                  </Button>
-                </BGMessage>
-              :
-              <BGMessage icon={"ban"} className={classes.error}>
-                There was a network problem fetching the instance.<br/>
-                If the problem persists, please contact the support.<br/>
-                <small>{instance.fetchError}</small><br/><br/>
-                <Button bsStyle={"primary"} onClick={this.forceFetchInstance}>
-                  <FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry
-                </Button>
-              </BGMessage>
+          {permissions.canInviteForSuggestion?
+            <React.Fragment>
+              <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
+              <Reviewers id={this.props.id} />
+            </React.Fragment>
+            :
+            <BGMessage icon={"ban"} className={classes.error}>
+              You are note entitled to invite people for suggestions.
+            </BGMessage>
           }
         </div>
       </div>

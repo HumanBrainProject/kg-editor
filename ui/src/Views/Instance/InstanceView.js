@@ -17,8 +17,6 @@
 import React from "react";
 import {observer} from "mobx-react";
 
-import instanceStore from "../../Stores/InstanceStore";
-
 import InstanceForm from "./InstanceForm";
 import Pane from "./Pane";
 import Links from "./Links";
@@ -26,19 +24,16 @@ import PaneContainer from "./PaneContainer";
 
 @observer
 class InstanceView extends React.Component {
-  render() {
-    const { instanceId, paneStore } = this.props;
 
-    const instance = instanceId?instanceStore.instances.get(instanceId):null;
-    if (!instance) {
-      return null;
-    }
+  render() {
+    const { instance, paneStore } = this.props;
+    const { id:instanceId } = instance;
 
     return (
 
       <PaneContainer key={instanceId} paneStore={paneStore}>
         <React.Fragment>
-          <Pane paneId={instanceId} key={instanceId}>
+          <Pane paneId={instanceId} key={instance.id}>
             <InstanceForm level={0} id={instanceId} mainInstanceId={instanceId} />
           </Pane>
           {!instance.hasFetchError?

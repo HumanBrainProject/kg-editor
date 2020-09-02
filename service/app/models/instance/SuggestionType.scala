@@ -17,7 +17,7 @@
 package models.instance
 
 import constants.{EditorConstants, SchemaFieldsConstants}
-import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
+import play.api.libs.json.{JsObject, JsPath, JsValue, Json, Reads, Writes}
 import play.api.libs.functional.syntax._
 
 final case class SuggestionType(name: String, label: String, color: Option[String], space: List[String])
@@ -28,7 +28,12 @@ object SuggestionType {
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
-    (JsPath \ EditorConstants.VOCAB_SPACES).read[List[String]]
+    (JsPath \ EditorConstants.VOCAB_SPACES).read[List[JsObject]].map(
+      list => list.map(
+        v => (v \ EditorConstants.VOCAB_SPACE).as[String]
+      )
+
+    )
   )(SuggestionType.apply _)
 
   implicit val instanceTypeWrites: Writes[SuggestionType] = new Writes[SuggestionType] {

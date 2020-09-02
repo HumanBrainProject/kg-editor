@@ -281,10 +281,6 @@ class KgTableStore extends FormStore.typesMapping.Default{
         const { data: { data: { suggestions: { data: options, totalResults: total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.userInput), payload);
         runInAction(()=>{
           const opts = Array.isArray(options)?options:[];
-          // TODO: remove this and fix it in scala
-          opts.forEach(option => {
-            option.name = option.label;
-          });
           if(append){
             this.options = this.options.concat(opts);
           } else {

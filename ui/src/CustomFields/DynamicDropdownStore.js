@@ -116,7 +116,6 @@ class OptionsPool{
       const { data: { data: { suggestions: { data: options, totalResults: total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
       const optionsSet = [];
       Array.isArray(options) && options.forEach(option => {
-        option.name = option.label; // TODO: remove this and fix it in scala
         if(!this.options.has(option[mappingValue])){
           this.options.set(option[mappingValue], option);
         } else {

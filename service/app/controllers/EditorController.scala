@@ -22,7 +22,7 @@ import models._
 import models.instance._
 import monix.eval.Task
 import play.api.Logger
-import play.api.libs.json._
+import play.api.libs.json.{JsObject, _}
 import play.api.mvc.{Action, _}
 import services._
 
@@ -200,6 +200,16 @@ class EditorController @Inject()(
         .runToFuture
     }
 
+  def getSuggestion(obj: JsObject, types: Map[String, SuggestionType]): JsObject = {
+    val t = types.get((obj \ "type").as[String])
+    Json.obj(
+      "id" ->(obj \ "id").as[String],
+      "name" ->(obj \ "label").as[String],
+      "type" -> Json.toJson(t),
+      "space" ->(obj \ "space").as[String]
+    )
+  }
+
   def getSuggestions(
     id: String,
     field: String,
@@ -233,16 +243,18 @@ class EditorController @Inject()(
                   }
                   data.get("suggestions") match {
                     case Some(s) =>
-                      val suggestions = (s \ "data").as[List[JsObject]].map { instance =>
-                        val instanceType = (instance \ "type").as[String]
-                        val t = types.get(instanceType)
-                        instance ++ Json.obj("type" -> Json.toJson(t))
-                      }
+                      val suggestions = (s \ "data").as[List[JsObject]].map(obj => getSuggestion(obj, types))
                       Ok(
                         Json.toJson(
                           EditorResponseObject(
                             Json.toJson(
-                              Json.obj("suggestions" -> Json.toJson(suggestions), "types" -> Json.toJson(types))
+                              Json.obj(
+                                "suggestions" -> Json.obj(
+                                "data" -> Json.toJson(suggestions),
+                                  "total" -> (s \ "totalResults").as[Long],
+                                  "size" -> (s \ "size").as[Long],
+                                  "from" -> (s \ "from").as[Long]),
+                                "types" -> Json.toJson(types))
                             )
                           )
                         )

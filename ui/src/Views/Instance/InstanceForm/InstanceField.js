@@ -175,7 +175,7 @@ class InstanceField extends React.Component{
   }
 
   addCustomValueHandler = async (value, field) => {
-    let newInstanceId = await instanceStore.createNewInstanceAsOption(appStore.currentWorkspace, field, value);
+    let newInstanceId = await instanceStore.createNewInstanceAsOption(appStore.currentWorkspace.id, field, value);
     if(newInstanceId){
       instanceStore.instanceHasChanged(this.props.id);
       this.handleFieldFocus(field, {id: newInstanceId});

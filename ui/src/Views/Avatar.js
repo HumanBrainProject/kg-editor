@@ -34,7 +34,7 @@ class Avatar extends React.Component {
     const user = UsersStore.users.get(userId);
 
     return (
-      userId ? <AvatarComponent userId={userId} name={user && user.displayName} picture={user && user.picture} />:null
+      userId ? <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />:null
     );
   }
 }

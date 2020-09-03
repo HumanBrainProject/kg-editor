@@ -80,7 +80,7 @@ class UsersStore {
       this.users.set(userId, {
         id: userId,
         username: null,
-        displayName: null,
+        name: null,
         givenName: null,
         familyName: null,
         emails: [],
@@ -102,7 +102,7 @@ class UsersStore {
         runInAction(() => {
           const userData = data && data.data;
           user.username = userData && userData.username;
-          user.displayName = userData && userData.displayName;
+          user.name = userData && userData.name;
           user.givenName = userData && userData.givenName;
           user.familyName = userData && userData.familyName;
           user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
@@ -114,7 +114,7 @@ class UsersStore {
       } catch (e) {
         runInAction(() => {
           user.username = null;
-          user.displayName = null;
+          user.name = null;
           user.givenName = null;
           user.familyName = null;
           user.emails = [];

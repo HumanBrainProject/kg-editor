@@ -31,11 +31,14 @@ object EditorConstants {
   val VOCAB_USER = s"${CORE_META}user"
   val VOCAB_PERMISSIONS = s"${CORE_META}permissions"
   val VOCAB_COLOR = s"${CORE_META}color"
-  val VOCAB_WIDGET = s"${EDITOR_META}property/widget"
   val VOCAB_PROPERTY_UPDATES = s"${CORE_META}propertyUpdates"
   val VOCAB_PROPERTIES = s"${CORE_META}properties"
   val VOCAB_LABEL_PROPERTIES = s"${CORE_META}labelProperties"
   val VOCAB_WORKSPACES = s"${CORE_META}workspaces"
   val VOCAB_SEARCHABLE = s"${CORE_META}property/searchable"
   val VOCAB_TARGET_TYPES = s"${CORE_META}targetTypes"
+  val VOCAB_AUTO_RELEASE = s"${CORE_META}space/autorelease"
+  val VOCAB_CLIENT_SPACE = s"${CORE_META}space/clientSpace"
+
+  val VOCAB_WIDGET = s"${EDITOR_META}property/widget"
 }

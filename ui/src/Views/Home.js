@@ -228,11 +228,11 @@ class Home extends React.Component{
       && authStore.user.givenName?
       authStore.user.givenName
       :
-      authStore.user.displayName?
-        (firstNameReg.test(authStore.user.displayName)?
-          authStore.user.displayName.match(firstNameReg)[1]
+      authStore.user.name?
+        (firstNameReg.test(authStore.user.name)?
+          authStore.user.name.match(firstNameReg)[1]
           :
-          authStore.user.displayName)
+          authStore.user.name)
         :
         authStore.user.username?
           authStore.user.username
@@ -250,7 +250,7 @@ class Home extends React.Component{
             </div>
             <div className={classes.main}>
               {/* <DatasetsStatistics /> */}
-              <InstancesHistory workspace={appStore.currentWorkspace}/>
+              <InstancesHistory workspace={appStore.currentWorkspace && appStore.currentWorkspace.id}/>
             </div>
             <div className={classes.features}>
               <div className="widget-list">

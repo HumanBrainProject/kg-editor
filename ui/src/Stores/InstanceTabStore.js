@@ -41,9 +41,11 @@ class InstanceTabStore{
   @observable instanceTabs = new Map();
 
   syncStoredInstanceTabs(){
-    const tabs = getStoredInstanceTabs();
-    tabs[appStore.currentWorkspace] = [...this.instanceTabs].map(([id, infos])=>[id, infos.viewMode]);
-    localStorage.setItem(STORED_INSTANCE_TABS_KEY, JSON.stringify(tabs));
+    if (appStore.currentWorkspace) {
+      const tabs = getStoredInstanceTabs();
+      tabs[appStore.currentWorkspace.id] = [...this.instanceTabs].map(([id, infos])=>[id, infos.viewMode]);
+      localStorage.setItem(STORED_INSTANCE_TABS_KEY, JSON.stringify(tabs));
+    }
   }
 
   flushStoredInstanceTabs(){
@@ -55,7 +57,7 @@ class InstanceTabStore{
       return [];
     }
     const tabs = getStoredInstanceTabs();
-    const workspaceTabs = tabs[appStore.currentWorkspace];
+    const workspaceTabs = tabs[appStore.currentWorkspace.id];
     if (workspaceTabs instanceof Array) {
       return workspaceTabs;
     }

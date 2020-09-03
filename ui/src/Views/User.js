@@ -42,7 +42,7 @@ class User extends React.Component {
     }, null):null;
 
     return (
-      userId ? <UserComponent userId={userId} name={user && user.displayName} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />: null
+      userId ? <UserComponent userId={userId} name={user && user.name} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />: null
     );
   }
 }

@@ -105,11 +105,11 @@ class WorkspaceModal extends React.Component{
       && authStore.user.givenName?
       authStore.user.givenName
       :
-      authStore.user.displayName?
-        (firstNameReg.test(authStore.user.displayName)?
-          authStore.user.displayName.match(firstNameReg)[1]
+      authStore.user.name?
+        (firstNameReg.test(authStore.user.name)?
+          authStore.user.name.match(firstNameReg)[1]
           :
-          authStore.user.displayName)
+          authStore.user.name)
         :
         authStore.user.username?
           authStore.user.username
@@ -126,7 +126,7 @@ class WorkspaceModal extends React.Component{
                 <Scrollbars>
                   <div className={classes.workspaces}>
                     {authStore.workspaces.map(workspace =>
-                      <div className={classes.workspace} key={workspace} onClick={() => this.handleClick(workspace)}>{workspace}</div>
+                      <div className={classes.workspace} key={workspace.id} onClick={() => this.handleClick(workspace)}>{workspace.name||workspace.id}</div>
                     )}
                   </div>
                 </Scrollbars>

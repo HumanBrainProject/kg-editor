@@ -20,29 +20,6 @@ import appStore from "./AppStore";
 
 const rootPath = window.rootPath || "";
 
-// TODO: Move this logic to kg-editor-service
-const userKeys = {
-  id: "https://schema.hbp.eu/users/nativeId",
-  username: "http://schema.org/alternateName",
-  email: "http://schema.org/email",
-  displayName: "http://schema.org/name",
-  givenName: "http://schema.org/givenName",
-  familyName: "http://schema.org/familyName",
-  workspaces: "https://core.kg.ebrains.eu/vocab/meta/workspaces"
-};
-
-const mapUserProfile = data => {
-  const user = {};
-  if (data && data.data) {
-    Object.entries(userKeys).forEach(([name, fullyQualifiedName]) => {
-      if (data.data[fullyQualifiedName]) {
-        user[name] = data.data[fullyQualifiedName];
-      }
-    });
-  }
-  return user;
-};
-
 class AuthStore {
   @observable user = null;
   @observable isRetrievingUserProfile = false;
@@ -109,7 +86,7 @@ class AuthStore {
       try {
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
-          this.user = mapUserProfile(data);
+          this.user = (data && data.data)?data.data:{};
           this.isRetrievingUserProfile = false;
         });
       } catch (e) {

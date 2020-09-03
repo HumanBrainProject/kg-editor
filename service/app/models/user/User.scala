@@ -17,19 +17,36 @@
 package models.user
 
 import constants.SchemaFieldsConstants
+import constants.EditorConstants
+import models.workspace.Workspace
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-final case class User(id: String, name: Option[String], username: Option[String])
+final case class User(
+                       id: String,
+                       username: Option[String],
+                       name: Option[String],
+                       givenName: Option[String],
+                       familyName: Option[String],
+                       email: Option[String],
+                       picture: Option[String],
+                       isCurator: Option[Boolean],
+                       workspaces: Option[List[Workspace]])
 
 object User {
   implicit val userReads: Reads[User] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER)
       .read[List[String]]
       .map(i => i.head) and //We get the first element of the Id list
-    (JsPath \ SchemaFieldsConstants.NAME).readNullable[String] and
-    (JsPath \ SchemaFieldsConstants.ALTERNATENAME).readNullable[String]
+    (JsPath \ SchemaFieldsConstants.ALTERNATENAME).readNullable[String] and
+      (JsPath \ SchemaFieldsConstants.NAME).readNullable[String] and
+      (JsPath \ SchemaFieldsConstants.GIVEN_NAME).readNullable[String] and
+      (JsPath \ SchemaFieldsConstants.FAMILY_NAME).readNullable[String] and
+      (JsPath \ SchemaFieldsConstants.EMAIL).readNullable[String] and
+      (JsPath \ SchemaFieldsConstants.PICTURE).readNullable[String] and
+      (JsPath \ SchemaFieldsConstants.CURATOR).readNullable[Boolean] and
+      (JsPath \ EditorConstants.VOCAB_WORKSPACES).readNullable[List[Workspace]]
   )(User.apply _)
 
   implicit val userWrites = Json.writes[User]

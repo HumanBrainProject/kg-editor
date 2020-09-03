@@ -17,14 +17,17 @@ package constants
 
 object SchemaFieldsConstants {
 
-  val IDENTIFIER = "http://schema.org/identifier"
-  val NAME = "http://schema.org/name"
-  val ALTERNATENAME = "http://schema.org/alternateName"
-  val DESCRIPTION = "http://schema.org/description"
-  val RELATIVEURL = "https://schema.hbp.eu/relativeUrl"
-  val lastUpater = "https://schema.hbp.eu/provenance/lastModificationUserId"
-  val lastUpdate = "https://schema.hbp.eu/provenance/modifiedAt"
-  val createdBy = "https://schema.hbp.eu/provenance/createdBy"
-  val createdAt = "https://schema.hbp.eu/provenance/createdAt"
-  val SUGGESTION_OF = "https://schema.hbp.eu/suggestion/suggestionOf"
+  val SCHEMA_ORG = "http://schema.org/"
+  val SCHEMA_HBP = "https://schema.hbp.eu/"
+
+  val NATIVE_ID = s"${SCHEMA_HBP}users/nativeId"
+
+  val IDENTIFIER = s"${SCHEMA_ORG}identifier"
+  val ALTERNATENAME = s"${SCHEMA_ORG}alternateName"
+  val NAME = s"${SCHEMA_ORG}name"
+  val GIVEN_NAME = s"${SCHEMA_ORG}givenName"
+  val FAMILY_NAME = s"${SCHEMA_ORG}familyName"
+  val EMAIL = s"${SCHEMA_ORG}email"
+  val PICTURE = s"${SCHEMA_ORG}picture"
+  val CURATOR = s"${SCHEMA_HBP}curator"
 }

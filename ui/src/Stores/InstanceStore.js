@@ -118,7 +118,7 @@ class Instance {
   @action
   setReadMode(readMode){
     if (this.isFetched) {
-      this.form.toggleReadMode(!!readMode || this.workspace !== appStore.currentWorkspace);
+      this.form.toggleReadMode(!!readMode || (appStore.currentWorkspace && this.workspace !== appStore.currentWorkspace.id));
     }
   }
 

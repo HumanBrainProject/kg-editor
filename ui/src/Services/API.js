@@ -36,17 +36,17 @@ const endpoints = {
   "searchInstances": (type, from, size, searchByLabel) => `/editor/api/summary?type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${searchByLabel}`,
   "suggestions": (id, field, type=null, start, size, search) => `/editor/api/instances/${id}/suggestions?field=${encodeURIComponent(field)}${type?"&type=" + encodeURIComponent(type):""}&start=${start}&size=${size}&search=${search}`,
   "instance": id => `/editor/api/instances/${id}`,
-  "createInstance": (id=null) => `/editor/api/instances${id?("/" + id):""}?workspace=${appStore.currentWorkspace}`,
+  "createInstance": (id=null) => `/editor/api/instances${id?("/" + id):""}?workspace=${appStore.currentWorkspace.id}`,
   "getInstance": id => `/editor/api/instances/${id}?returnPermissions=true&metadata=true`,
   "release": id => `/editor/api/releases/${id}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY",
   "releaseStatusChildren": () => "/editor/api/releases/status?releaseTreeScope=CHILDREN_ONLY",
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
-  "bookmarks": () => `/editor/api/workspaces/${appStore.currentWorkspace}/bookmarks`,
+  "bookmarks": () => `/editor/api/workspaces/${appStore.currentWorkspace.id}/bookmarks`,
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
   "graph": id => `/editor/api/instances/${id}/graph`,
-  "workspaceTypes": () => `/editor/api/workspaces/${appStore.currentWorkspace}/types`
+  "workspaceTypes": () => `/editor/api/workspaces/${appStore.currentWorkspace.id}/types`
 };
 
 class API {

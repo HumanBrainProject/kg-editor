@@ -56,7 +56,7 @@ class HistoryStore {
     }
     let index = -1;
     this.instancesHistory.some((instance, idx) => {
-      if (instance.id === id && instance.workspace === appStore.currentWorkspace && instance.mode === mode) {
+      if (instance.id === id && appStore.currentWorkspace && instance.workspace === appStore.currentWorkspace.id && instance.mode === mode) {
         index = idx;
         return true;
       }
@@ -67,8 +67,8 @@ class HistoryStore {
     } else if (this.instancesHistory.length >= maxItems) {
       this.instancesHistory.pop();
     }
-    if (!remove) {
-      this.instancesHistory.unshift({id: id, type: type, workspace: appStore.currentWorkspace, mode: mode});
+    if (!remove && appStore.currentWorkspace) {
+      this.instancesHistory.unshift({id: id, type: type, workspace: appStore.currentWorkspace.id, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
@@ -93,7 +93,7 @@ class HistoryStore {
     max = Number(max);
     return this.instancesHistory
       .filter(instance => {
-        if (instance.workspace !== appStore.currentWorkspace) {
+        if (appStore.currentWorkspace && instance.workspace !== appStore.currentWorkspace.id) {
           return false;
         }
         if (typeof type === "string" && instance.type.includes(type)) {

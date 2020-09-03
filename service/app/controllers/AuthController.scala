@@ -26,7 +26,6 @@ import scala.concurrent.ExecutionContext
 
 class AuthController @Inject()(
   cc: ControllerComponents,
-  config: Configuration,
   wsClient: WSClient,
   authServiceLive: AuthServiceLive
 )(implicit ec: ExecutionContext)

@@ -105,7 +105,7 @@ class FooterPanel extends React.Component {
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              {appStore.currentWorkspace === workspace ?
+              {appStore.currentWorkspace.id === workspace ?
                 <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
                   <FontAwesomeIcon icon="folder-open"/>
                 </div>:null}

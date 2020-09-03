@@ -93,7 +93,7 @@ class User extends React.Component{
         <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, user)}>
           <UserComponent
             userId={user && user.id}
-            name={user && user.displayName}
+            name={user && user.name}
             picture={user && user.picture}
             isCurator={!!user && !!user.isCurator}
             title={email} />

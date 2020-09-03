@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import {observable, action, runInAction} from "mobx";
+import {observable, computed, action, runInAction} from "mobx";
 import * as Sentry from "@sentry/browser";
 import { matchPath } from "react-router-dom";
 import _  from "lodash-uuid";
@@ -90,6 +90,14 @@ class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
+  @computed
+  get currentWorkspaceName() {
+    if (this.currentWorkspace) {
+      return this.currentWorkspace.name || this.currentWorkspace.id;
+    }
+    return "";
+  }
+
   @action
   async initialize() {
     if (this.canLogin && !this.isInitialized) {
@@ -152,7 +160,7 @@ class AppStore{
       workspace = await this.getInitialInstanceWorkspace(path.params.id);
       if (workspace) {
         this.setCurrentWorkspace(workspace);
-        if (this.currentWorkspace !== workspace) {
+        if (!this.currentWorkspace || this.currentWorkspace.id !== workspace) {
           this.initialInstanceWorkspaceError = `Could not load instance "${path.params.id}" because you're not granted access to workspace "${workspace}".`;
         }
       }
@@ -308,13 +316,10 @@ class AppStore{
   }
 
   @action
-  setCurrentWorkspace = workspace => {
-    if (!workspace || !authStore.workspaces.includes(workspace)) {
-      if (authStore.hasWorkspaces && authStore.workspaces.length === 1) {
-        workspace = authStore.workspaces[0];
-      } else {
-        workspace = null;
-      }
+  setCurrentWorkspace = space => {
+    let workspace = space?authStore.workspaces.find( w => w.id === space):null;
+    if (!workspace && authStore.hasWorkspaces && authStore.workspaces.length === 1) {
+      workspace = authStore.workspaces[0];
     }
     if(this.currentWorkspace !== workspace) {
       if(instanceTabStore.instanceTabs.size > 0) {
@@ -325,7 +330,7 @@ class AppStore{
         }
       }
       this.currentWorkspace = workspace;
-      localStorage.setItem("currentWorkspace", workspace);
+      localStorage.setItem("currentWorkspace", workspace.id);
       this.restoreWorkspaceInstanceTabs();
       typesStore.fetch(true);
       browseStore.clearInstances();

@@ -51,20 +51,20 @@ class WorkspaceSelector extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.container} title={`${appStore.currentWorkspace} workspace`}>
+      <div className={classes.container} title={`${appStore.currentWorkspaceName} workspace`}>
         {authStore.workspaces.length > 1 ?
           <Dropdown id="dropdown-custom-1">
-            <CustomDropdownToggle bsRole="toggle">{appStore.currentWorkspace}</CustomDropdownToggle>
+            <CustomDropdownToggle bsRole="toggle">{appStore.currentWorkspaceName}</CustomDropdownToggle>
             <Dropdown.Menu className={classes.dropdownMenu}>
               {authStore.workspaces.map(workspace =>
-                <MenuItem key={workspace}
-                  eventKey={workspace}
+                <MenuItem key={workspace.id}
+                  eventKey={workspace.id}
                   onSelect={this.selectWorkspace}>
-                  {workspace}</MenuItem>
+                  {workspace.name||workspace.id}</MenuItem>
               )}
             </Dropdown.Menu>
           </Dropdown>
-          : appStore.currentWorkspace}
+          : appStore.currentWorkspaceName}
       </div>
     );
   }

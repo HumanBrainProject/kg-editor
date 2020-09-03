@@ -98,6 +98,11 @@ class AppStore{
     return "";
   }
 
+  @computed
+  get currentWorkspacePermissions() {
+    return this.currentWorkspace?this.currentWorkspace.permissions:{};
+  }
+
   @action
   async initialize() {
     if (this.canLogin && !this.isInitialized) {
@@ -330,10 +335,14 @@ class AppStore{
         }
       }
       this.currentWorkspace = workspace;
-      localStorage.setItem("currentWorkspace", workspace.id);
-      this.restoreWorkspaceInstanceTabs();
-      typesStore.fetch(true);
-      browseStore.clearInstances();
+      if (this.currentWorkspace) {
+        localStorage.setItem("currentWorkspace", workspace.id);
+        this.restoreWorkspaceInstanceTabs();
+        typesStore.fetch(true);
+        browseStore.clearInstances();
+      } else {
+        localStorage.removeItem("currentWorkspace");
+      }
     }
   }
 

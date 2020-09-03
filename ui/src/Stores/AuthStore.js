@@ -86,6 +86,7 @@ class AuthStore {
       try {
         const { data } = await API.axios.get(API.endpoints.user());
         runInAction(() => {
+          //data.data.workspaces = []; // uncomment to simulate a user without any workspace
           this.user = (data && data.data)?data.data:{};
           this.isRetrievingUserProfile = false;
         });

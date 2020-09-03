@@ -156,17 +156,18 @@ class TypesItem extends React.Component {
           <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
         }
         <span>{type.label}</span>
-        {appStore.isCreatingNewInstance ?
-          <div className={classes.createInstance}>
-            <FontAwesomeIcon icon={"circle-notch"} spin />
-          </div>
-          :
-          <div className={classes.actions}>
-            <div className={classes.action} onClick={this.handleCreateInstance} title={`create a new ${type.label}`}>
-              <FontAwesomeIcon icon={"plus"} />
+        {appStore.currentWorkspacePermissions.canCreate && (
+          appStore.isCreatingNewInstance ?
+            <div className={classes.createInstance}>
+              <FontAwesomeIcon icon={"circle-notch"} spin />
             </div>
-          </div>
-        }
+            :
+            <div className={classes.actions}>
+              <div className={classes.action} onClick={this.handleCreateInstance} title={`create a new ${type.label}`}>
+                <FontAwesomeIcon icon={"plus"} />
+              </div>
+            </div>
+        )}
       </div>
     );
   }

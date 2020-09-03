@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package models.instance
+package models.permissions
 
 import play.api.libs.json.Json
 

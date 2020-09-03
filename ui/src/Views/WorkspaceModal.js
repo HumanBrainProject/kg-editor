@@ -126,7 +126,7 @@ class WorkspaceModal extends React.Component{
                 <Scrollbars>
                   <div className={classes.workspaces}>
                     {authStore.workspaces.map(workspace =>
-                      <div className={classes.workspace} key={workspace.id} onClick={() => this.handleClick(workspace)}>{workspace.name||workspace.id}</div>
+                      <div className={classes.workspace} key={workspace.id} onClick={() => this.handleClick(workspace.id)}>{workspace.name||workspace.id}</div>
                     )}
                   </div>
                 </Scrollbars>

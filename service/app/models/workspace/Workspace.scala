@@ -16,8 +16,8 @@
 
 package models.workspace
 
-import constants.SchemaFieldsConstants
-import constants.EditorConstants
+import constants.{EditorConstants, SchemaFieldsConstants}
+import models.permissions.Permissions
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -26,15 +26,26 @@ final case class Workspace(
                        id: String,
                        name: Option[String],
                        autorelease: Option[Boolean],
-                       clientSpace: Option[Boolean])
+                       clientSpace: Option[Boolean],
+                       permissions: Permissions)
 
 object Workspace {
+
+  def apply(
+             id: String,
+             name: Option[String],
+             autorelease: Option[Boolean],
+             clientSpace: Option[Boolean],
+             permissions: Option[List[String]]
+           ): Workspace = Workspace(id, name, autorelease, clientSpace, Permissions(permissions));
+
   implicit val workspaceReads: Reads[Workspace] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
       (JsPath \ SchemaFieldsConstants.NAME).readNullable[String] and
       (JsPath \ EditorConstants.VOCAB_AUTO_RELEASE).readNullable[Boolean] and
-      (JsPath \ EditorConstants.VOCAB_CLIENT_SPACE).readNullable[Boolean]
-    )(Workspace.apply _)
+      (JsPath \ EditorConstants.VOCAB_CLIENT_SPACE).readNullable[Boolean] and
+      (JsPath \ EditorConstants.VOCAB_PERMISSIONS).readNullable[List[String]]
+    )(Workspace.apply(_, _, _, _, _))
 
   implicit val workspaceWrites = Json.writes[Workspace]
 }

@@ -19,6 +19,7 @@ package models.instance
 import constants.EditorConstants
 import helpers.InstanceHelper
 import models.errors.CoreDataError
+import models.permissions.Permissions
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
 

@@ -106,7 +106,9 @@ class Tabs extends React.Component {
                   <WorkspaceSelector />
                   <Tab icon={"home"} current={matchPath(this.state.currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                   <Tab icon={"search"} current={matchPath(this.state.currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
-                  <Tab icon={"file"} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
+                  {appStore.currentWorkspacePermissions.canCreate && (
+                    <Tab icon={"file"} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
+                  )}
                 </React.Fragment>
                 : null
               }

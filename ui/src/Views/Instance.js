@@ -49,6 +49,23 @@ const styles = {
       }
     }
   },
+  loader: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    background: "var(--bg-color-blend-contrast1)",
+    "& .fetchingPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
+  },
   body: {
     position: "relative",
     overflow: "hidden"
@@ -97,12 +114,14 @@ const styles = {
 @observer
 class Instance extends React.Component {
   render() {
-    const { instance, mode, paneStore, onRetry} = this.props;
+    const { className, instance, mode, paneStore, onRetry} = this.props;
     if (instance.isFetching) {
       return (
-        <FetchingLoader>
-          <span>Fetching instance information...</span>
-        </FetchingLoader>
+        <div className={className}>
+          <FetchingLoader>
+            <span>Fetching instance information...</span>
+          </FetchingLoader>
+        </div>
       );
     }
 
@@ -189,7 +208,7 @@ class Edit extends React.Component {
             {openedInstance.viewMode === "create"?
               <InstanceCreate instanceId={id} paneStore={openedInstance.paneStore} />
               :
-              <Instance instance={instance} mode={openedInstance.viewMode} paneStore={openedInstance.paneStore} onRetry={this.handleRetry} />
+              <Instance className={classes.loader} instance={instance} mode={openedInstance.viewMode} paneStore={openedInstance.paneStore} onRetry={this.handleRetry} />
             }
           </div>
           <div className={classes.sidebar}>

@@ -25,17 +25,6 @@ import routerStore from "../../Stores/RouterStore";
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
 
-const types = [
-  {
-    name: "http://schema.org/Dataset",
-    label: "Dataset"
-  },
-  {
-    name: "http://schema.org/Person",
-    label: "Person"
-  }
-];
-
 const styles = {
   container: {
     color:"var(--ft-color-normal)",
@@ -142,17 +131,12 @@ class InstancesHistory extends React.Component{
       }
       return result;
     }, []);
-    const history = historyStore.getFileredInstancesHistory(appStore.historySettings.type, eventTypes, appStore.historySettings.size);
+    const history = historyStore.getFileredInstancesHistory(eventTypes, appStore.historySettings.size);
     historyStore.fetchInstances(history);
   }
 
   handleHistorySizeChange = event => {
     appStore.setSizeHistorySetting(event.target.value);
-    this.fetchInstances();
-  }
-
-  handleHistoryTypeChange = event => {
-    appStore.setTypeHistorySetting(event.target.value);
     this.fetchInstances();
   }
 
@@ -213,12 +197,7 @@ class InstancesHistory extends React.Component{
                 <option value={50}>50</option>
               </select>
             </div>
-            <div className="selector">
-              <select value={appStore.historySettings.type?appStore.historySettings.type:""} onChange={this.handleHistoryTypeChange} >
-                <option value="">instances</option>
-                {types.map(type => <option key={type.name} value={type.name}>{type.label}</option>)}
-              </select>
-            </div>
+            instances in {appStore.currentWorkspaceName}
           </h3>
           <ul className="config">
             <li><input type="checkbox" checked={appStore.historySettings.eventTypes.viewed} onChange={this.handleHistoryViewedFlagChange} />Viewed</li>
@@ -228,13 +207,13 @@ class InstancesHistory extends React.Component{
           </ul>
         </div>
         {historyStore.isFetching?
-          <div className={classes.fetching}><FontAwesomeIcon icon="circle-notch" spin/><span>Fetching history {appStore.historySettings.type?appStore.historySettings.type:"instance"}s...</span></div>
+          <div className={classes.fetching}><FontAwesomeIcon icon="circle-notch" spin/><span>Fetching history instances...</span></div>
           :
           historyStore.fetchError?
             <div className={classes.fetchError}>
               <PopOverButton
                 buttonClassName={classes.fetchErrorButton}
-                buttonTitle={`fetching history ${appStore.historySettings.type?appStore.historySettings.type:"instance"}s failed, click for more information`}
+                buttonTitle="fetching history instances failed, click for more information"
                 iconComponent={FontAwesomeIcon}
                 iconProps={{icon: "exclamation-triangle"}}
                 okComponent={() => (
@@ -246,7 +225,7 @@ class InstancesHistory extends React.Component{
               >
                 <h5 className={classes.textError}>{historyStore.fetchError}</h5>
               </PopOverButton>
-              <span>fetching history {appStore.historySettings.type?appStore.historySettings.type:"instance"}s failed.</span>
+              <span>fetching history instances failed.</span>
             </div>
             :
             historyStore.instances.length?

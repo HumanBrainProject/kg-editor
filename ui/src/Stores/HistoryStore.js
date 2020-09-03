@@ -75,15 +75,9 @@ class HistoryStore {
   }
 
   @action
-  getFileredInstancesHistory(type, modes, max=10) {
+  getFileredInstancesHistory(modes, max=10) {
     if (!appStore.currentWorkspace) {
       return [];
-    }
-    if (typeof type === "string") {
-      type = type.toLowerCase().trim();
-      if (type === "") {
-        type = null;
-      }
     }
     if (!modes) {
       modes = [];
@@ -94,9 +88,6 @@ class HistoryStore {
     return this.instancesHistory
       .filter(instance => {
         if (appStore.currentWorkspace && instance.workspace !== appStore.currentWorkspace.id) {
-          return false;
-        }
-        if (typeof type === "string" && instance.type.includes(type)) {
           return false;
         }
         if (!modes.length) {

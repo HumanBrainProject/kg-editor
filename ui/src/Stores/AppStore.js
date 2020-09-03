@@ -78,7 +78,6 @@ class AppStore{
     if (!savedHistorySettings) {
       savedHistorySettings = {
         size: 10,
-        type: " http://schema.org/Dataset",
         eventTypes: {
           viewed: false,
           edited: true,
@@ -292,11 +291,6 @@ class AppStore{
   setSizeHistorySetting(size){
     size = Number(size);
     this.historySettings.size = (!isNaN(size) && size > 0)?size:10;
-    localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
-  }
-
-  setTypeHistorySetting(type){
-    this.historySettings.type = type;
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 

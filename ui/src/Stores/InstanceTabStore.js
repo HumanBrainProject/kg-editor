@@ -95,14 +95,16 @@ class InstanceTabStore{
   }
 
   getOpenedInstanceTabsExceptCurrent(instanceId) {
-    let result = [];
-    Array.from(this.instanceTabs.keys()).forEach(id => {
+    const result = Array.from(this.instanceTabs.keys()).reduce((acc, id) => {
       if (id !== instanceId) {
         const instance = instanceStore.instances.get(id);
-        const instancesToBeKept = instance.linkedIds;
-        result = [...result, ...instancesToBeKept];
+        if (instance) {
+          const linkedIds = instance.linkedIds;
+          acc.push(...linkedIds);
+        }
       }
-    });
+      return acc;
+    }, []);
     return Array.from(new Set(result));
   }
 

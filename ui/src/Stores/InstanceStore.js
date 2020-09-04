@@ -95,14 +95,16 @@ class Instance {
               const id = obj[field.mappingValue];
               if (!acc.has(id)) {
                 acc.add(id);
-                if(this.instanceStore.instances.has(id)) {
-                  this.instanceStore.instances.get(id).linkedIds.forEach(child => acc.add(child));
+                const instance = this.instanceStore.instances.get(id);
+                if(instance) {
+                  const linkedIds = instance.linkedIds;
+                  linkedIds.forEach(child => acc.add(child));
                 }
               }
             });
           }
           return acc;
-        }, new Set(this.id));
+        }, new Set().add(this.id));
       return Array.from(ids);
     }
     return [this.id];

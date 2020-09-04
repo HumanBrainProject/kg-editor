@@ -48,21 +48,6 @@ class Links extends React.Component{
     instance.fetch(forceFetch);
   }
 
-  getLinkedFields = (fields, values) => {
-    const linkedFields = [];
-    Object.entries(fields).forEach(([id, fieldObj]) => {
-      const vals = values.filter(v => v[id]).flatMap(v => v[id]);
-      if (fieldObj.type === "Nested") {
-        linkedFields.push(...this.getLinkedFields(fieldObj.fields, vals));
-      } else if(fieldObj.isLink) {
-        if (vals.length > 0) {
-          linkedFields.push([fieldObj, vals]);
-        }
-      }
-    });
-    return linkedFields;
-  }
-
   render(){
     const {classes, mainInstanceId } = this.props;
 
@@ -72,44 +57,22 @@ class Links extends React.Component{
     }
     const mainInstance = instanceTabStore.instanceTabs.get(mainInstanceId);
     const currentInstancePath = mainInstance.currentInstancePath;
-    let linkFields = [];
-    if(instance.isFetched){
-      linkFields = Object.keys(instance.fields).reduce((acc, fieldKey) => {
-        const fieldObj = instance.form.getField(fieldKey);
-        const values = fieldObj.getValue();
-        if(fieldObj.type === "Nested") {
-          acc.push(...this.getLinkedFields(fieldObj.fields, values));
-        } else if(fieldObj.isLink && values.length > 0) {
-          acc.push([fieldObj, values]);
-        }
-        return acc;
-      }, []);
-    }
 
-    return(
+    const groups = instance.childrenIdsGroupedByField;
+
+    return (
       <React.Fragment>
-        {linkFields.length > 0?
+        {groups.length > 0?
           <Pane paneId={"ChildrenOf"+this.props.id} key={"ChildrenOf"+this.props.id} className={classes.pane}>
-            {linkFields.map(([fieldObj, values]) => (
-              <div key={fieldObj.label} data-provenence={fieldObj.label}>
-                <h4>{fieldObj.label}{fieldObj.type === "KgTable"?
+            {groups.map(group => (
+              <div key={group.label} data-provenence={group.label}>
+                <h4>{group.label}{group.pagination?
                   <em style={{fontWeight:"lighter"}}>
-                        (showing {fieldObj.visibleInstancesCount} out of {fieldObj.instances.length})</em>:null}
+                        (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
                 </h4>
-                {values.map((value, index) => {
-                  const id = value[fieldObj.mappingValue];
-                  if(fieldObj.type === "KgTable") {
-                    if(index < fieldObj.defaultVisibleInstances || fieldObj.instancesMap.get(id).show){
-                      return (
-                        <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
-                      );
-                    }
-                  } else {
-                    return (
-                      <InstanceForm level={this.props.level} id={id} key={id} provenence={fieldObj.label} mainInstanceId={mainInstanceId} />
-                    );
-                  }
-                })}
+                {group.ids.map(id => (
+                  <InstanceForm key={id} level={this.props.level} id={id} provenence={group.label} mainInstanceId={mainInstanceId} />
+                ))}
               </div>
             ))}
           </Pane>

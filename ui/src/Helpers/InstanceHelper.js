@@ -14,7 +14,99 @@
 *   limitations under the License.
 */
 
+import {toJS} from "mobx";
+
 export const normalizeInstanceData = (data, transformField=null) => {
+
+  // TODO: Remove the mockup, this is just a test for embedded
+  // data.fields["http://schema.org/address"] = {
+  //   type: "Nested",
+  //   fullyQualifiedName: "http://schema.org/address",
+  //   name: "address",
+  //   label: "Address",
+  //   min:0,
+  //   max: Number.POSITIVE_INFINITY,
+  //   value: [
+  //     {
+  //       "http://schema.org/addressLocality": "Springfield",
+  //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
+  //       "http://schema.org/country" : [
+  //         {id: "e583e6a5-d621-4724-90aa-8706326ede44"},
+  //         {id: "933048fa-f314-4a70-8839-0ce346ac0c36"},
+  //         {id: "ced19d52-78e7-4e3f-a68b-6e42ba77d83b"}
+  //       ],
+  //       "http://schema.org/zipCode": [
+  //         { "http://schema.org/test": "Testing...",
+  //           "http://schema.org/region":  [
+  //             {id: "f9590f64-b8f9-4d70-a966-7af3b60ea2ae"},
+  //             {id: "3b10cce0-c452-4217-94b4-631fff56d854"},
+  //             {id: "8f3a518b-8224-447c-bf41-0da18797d969"}
+  //           ]
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   fields: {
+  //     "http://schema.org/addressLocality": {
+  //       fullyQualifiedName: "http://schema.org/addressLocality",
+  //       name: "addressLocality",
+  //       label: "Address Locality",
+  //       type: "InputText"
+  //     },
+  //     "http://schema.org/streetAddress": {
+  //       fullyQualifiedName: "http://schema.org/streetAddress",
+  //       name: "streetAddress",
+  //       label: "Street Address",
+  //       type: "InputText"
+  //     },
+  //     "http://schema.org/country" : {
+  //       fullyQualifiedName: "http://schema.org/country",
+  //       name: "country",
+  //       label: "Country",
+  //       type: "DropdownSelect",
+  //       isLink: true,
+  //       allowCustomValues: true
+  //     },
+  //     "http://schema.org/zipCode": {
+  //       type: "Nested",
+  //       fullyQualifiedName: "http://schema.org/zipCode",
+  //       name: "zipCode",
+  //       label: "Zip Code",
+  //       min:0,
+  //       max: Number.POSITIVE_INFINITY,
+  //       fields: {
+  //         "http://schema.org/test": {
+  //           fullyQualifiedName: "http://schema.org/test",
+  //           name: "test",
+  //           label: "Test",
+  //           type: "InputText"
+  //         },
+  //         "http://schema.org/region" :{
+  //           fullyQualifiedName: "http://schema.org/region",
+  //           name: "region",
+  //           label: "Region",
+  //           type: "DropdownSelect",
+  //           isLink: true,
+  //           allowCustomValues: true
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
+  // data.fields["http://schema.org/origin"] = {
+  //   fullyQualifiedName: "http://schema.org/origin",
+  //   name: "origin",
+  //   label: "Origin",
+  //   type: "DropdownSelect",
+  //   isLink: true,
+  //   allowCustomValues: true,
+  //   value: [{id: "5fc91798-7bde-43c3-98b4-931b30c8c410"},
+  //     {id: "5fc91798-7bde-43c3-98b4-931b30c8c410"},
+  //     {id: "cfc1656c-67d1-4d2c-a17e-efd7ce0df88c"}
+  //   ]
+  // };
+  // END of TODO
+
   const normalizeFields = fields => {
     for(let fieldKey in fields) {
       const field = fields[fieldKey];
@@ -52,7 +144,9 @@ export const normalizeInstanceData = (data, transformField=null) => {
         field.isLink = true;
         field.mappingLabel = "name";
         field.mappingValue = "id";
-        field.mappingReturn = ["id"];
+        field.mappingReturn = "id";
+        field.mappingIsIdentifier = true;
+        field.mappingIdentifierReturnValuePrefix = "https://kg.ebrains.eu/api/instances/";
         field.closeDropdownAfterInteraction = true;
       }
     }
@@ -107,4 +201,84 @@ export const normalizeInstanceData = (data, transformField=null) => {
     instance.error = data.error;
   }
   return instance;
+};
+
+export const getChildrenIdsGroupedByField = fields => {
+  function getPagination(field) {
+    if (field.type === "KgTable") {
+      const total = field.instances.length;
+      if (total) {
+        return {
+          count: field.visibleInstancesCount?field.visibleInstancesCount:0,
+          total: total
+        };
+      }
+    }
+    return null;
+  }
+
+  function showId(field, id) {
+    if (id) {
+      if (field.type === "KgTable") {
+        if (field.defaultVisibleInstances) {
+          return true;
+        }
+        const instance = field.instancesMap.get(id);
+        return !!instance && !!instance.show;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function getIds(field, values, mappingValue) {
+    return  Array.isArray(values)?values.map(obj => obj[mappingValue]).filter(id => showId(field, id)):[];
+  }
+
+  function getGroup(field, values) {
+    const ids = getIds(field, values, field.mappingValue);
+    if (ids.length) {
+      const group = {
+        //name: field.name,
+        label: field.label,
+        ids: ids
+      };
+      const pagination = getPagination(field);
+      if (pagination) {
+        group.pagination = pagination;
+      }
+      return group;
+    }
+    return null;
+  }
+
+  function getGroups(field, values) {
+    const groups = [];
+    if (field.type === "Nested") {
+      groups.push(...getNestedFields(field.fields, values));
+    } else if(field.isLink) {
+      const group = getGroup(field, values);
+      if (group) {
+        groups.push(group);
+      }
+    }
+    return groups;
+  }
+
+  function getNestedFields(fields, vals) {
+    const nestedFields = [];
+    Object.entries(fields).forEach(([id, field]) => {
+      const values = vals.filter(v => v[id]).flatMap(v => v[id]);
+      const groups = getGroups(field, values);
+      nestedFields.push(...groups);
+    });
+    return nestedFields;
+  }
+
+  return fields.reduce((acc, field) => {
+    const values = toJS(field.value);
+    const groups = getGroups(field, values);
+    acc.push(...groups);
+    return acc;
+  }, []);
 };

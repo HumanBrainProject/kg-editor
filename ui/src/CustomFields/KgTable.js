@@ -424,12 +424,12 @@ class KgTable extends React.Component {
 
   onRowMouseOver = ({index, rowData}) => {
     const { field, onValueMouseEnter } = this.props;
-    field.isInstanceVisilbe(index, rowData.id) && typeof onValueMouseEnter === "function" && onValueMouseEnter(field, rowData);
+    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseEnter === "function" && onValueMouseEnter(field, rowData);
   }
 
   onRowMouseOut = ({index, rowData}) => {
     const { field, onValueMouseLeave } = this.props;
-    field.isInstanceVisilbe(index, rowData.id) && typeof onValueMouseLeave === "function" && onValueMouseLeave(field, rowData);
+    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseLeave === "function" && onValueMouseLeave(field, rowData);
   }
 
   _rowClassName = ({index}) => {

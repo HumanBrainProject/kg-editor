@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction, set, computed } from "mobx";
-import { union, debounce, remove } from "lodash";
+import { union, debounce, remove, isObject } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -101,7 +101,7 @@ class KgTableStore extends FormStore.typesMapping.Default{
       return count;
     }
 
-    isInstanceVisilbe = (index, instanceId) => {
+    isInstanceVisible = (index, instanceId) => {
       if(index < this.defaultVisibleInstances) {
         return true;
       }
@@ -151,7 +151,7 @@ class KgTableStore extends FormStore.typesMapping.Default{
       }
     }
 
-    isInstanceVisilbe = (index, instanceId) => {
+    isInstanceVisible = (index, instanceId) => {
       if(index < this.defaultVisibleInstances) {
         return true;
       }
@@ -269,6 +269,23 @@ class KgTableStore extends FormStore.typesMapping.Default{
         const instance = this.addInstance(value, this.mappingValue, this.mappingLabel);
         this.addValue(instance);
       });
+    }
+
+    mapIdentifierReturnValue(value) {
+      return {
+        "@id": this.mappingIdentifierReturnValuePrefix?`${this.mappingIdentifierReturnValuePrefix}${value[this.mappingReturn]}`:value[this.mappingReturn]
+      };
+    }
+
+    mapReturnValue(value){
+      if(this.mappingReturn && this.mappingIsIdentifier){
+        if(Array.isArray(value)) {
+          return value.map( obj => this.mapIdentifierReturnValue(obj));
+        } else if(isObject(value)){
+          return this.mapIdentifierReturnValue(value);
+        }
+      }
+      return super.mapReturnValue(value);
     }
 
     @action

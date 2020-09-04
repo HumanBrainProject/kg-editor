@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction } from "mobx";
-import { isArray, debounce } from "lodash";
+import { debounce } from "lodash";
 import API from "../Services/API";
 import appStore from "./AppStore";
 
@@ -41,7 +41,7 @@ class StatusStore {
 
   @action
   fetchStatus(instanceIds) {
-    if (!isArray(instanceIds)) {
+    if (!Array.isArray(instanceIds)) {
       instanceIds = [instanceIds];
     }
     instanceIds.forEach(id => {

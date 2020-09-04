@@ -21,7 +21,7 @@ import { FormStore } from "hbp-quickfire";
 import API from "../Services/API";
 import appStore from "./AppStore";
 
-import { normalizeInstanceData } from "../Helpers/InstanceHelper";
+import { normalizeInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper";
 
 class Instance {
   @observable id = null;
@@ -83,31 +83,38 @@ class Instance {
 
   @computed
   get linkedIds() {
-    let linkKeys = [];
     if(this.isFetched && !this.fetchError && this.fields){
-      linkKeys = Object.keys(this.fields).filter(fieldKey => {
-        return this.form.getField(fieldKey).isLink && this.form.getField(fieldKey).getValue().length > 0;
-      });
+      const ids = Object.keys(this.fields)
+        .map(fieldKey => this.form.getField(fieldKey))
+        .reduce((acc, field) => {
+          if (field.type === "Nested") {
+            //TODO
+          } else if (field.isLink) {
+            const values = toJS(field.value);
+            Array.isArray(values) && values.map(obj => {
+              const id = obj[field.mappingValue];
+              if (!acc.has(id)) {
+                acc.add(id);
+                if(this.instanceStore.instances.has(id)) {
+                  this.instanceStore.instances.get(id).linkedIds.forEach(child => acc.add(child));
+                }
+              }
+            });
+          }
+          return acc;
+        }, new Set(this.id));
+      return Array.from(ids);
     }
+    return [this.id];
+  }
 
-    let ids = [];
-    linkKeys.map(fieldKey => {
-      let fieldObj = this.form.getField(fieldKey);
-      if(fieldObj.isLink && fieldObj.value.length > 0){
-        fieldObj.value.map(value => {
-          ids.push(value[fieldObj.mappingValue]);
-        });
-      }
-    });
-
-    let allIds = [this.id];
-    ids.forEach(i=> {
-      if(this.instanceStore.instances.has(i)) {
-        const inst = this.instanceStore.instances.get(i);
-        allIds = [...allIds, ...inst.linkedIds];
-      }
-    });
-    return Array.from(new Set(allIds));
+  @computed
+  get childrenIdsGroupedByField() {
+    if(this.isFetched && !this.fetchError && this.fields){
+      const fields = Object.keys(this.fields).map(fieldKey => this.form.getField(fieldKey));
+      return getChildrenIdsGroupedByField(fields);
+    }
+    return [];
   }
 
   @computed
@@ -347,94 +354,6 @@ class InstanceStore {
             const instance = this.instances.get(identifier);
             const data = response && response.data && response.data.data && response.data.data[identifier];
             if(data){
-              // TODO: Remove the mockup, this is just a test for embedded
-              // data.fields["http://schema.org/address"] = {
-              //   type: "Nested",
-              //   fullyQualifiedName: "http://schema.org/address",
-              //   name: "address",
-              //   label: "Address",
-              //   min:0,
-              //   max: Number.POSITIVE_INFINITY,
-              //   value: [
-              //     {
-              //       "http://schema.org/addressLocality": "Springfield",
-              //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
-              //       "http://schema.org/country" : [
-              //         {id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
-              //         {id: "88743735-88ad-45e9-acff-e67b5c407820"},
-              //         {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
-              //       ],
-              //       "http://schema.org/zipCode": [
-              //         { "http://schema.org/test": "Testing...",
-              //           "http://schema.org/region":  [
-              //             {id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
-              //             {id: "88743735-88ad-45e9-acff-e67b5c407820"},
-              //             {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
-              //           ]
-              //         }
-              //       ]
-              //     }
-              //   ],
-              //   fields: {
-              //     "http://schema.org/addressLocality": {
-              //       fullyQualifiedName: "http://schema.org/addressLocality",
-              //       name: "addressLocality",
-              //       label: "Address Locality",
-              //       type: "InputText"
-              //     },
-              //     "http://schema.org/streetAddress": {
-              //       fullyQualifiedName: "http://schema.org/streetAddress",
-              //       name: "streetAddress",
-              //       label: "Street Address",
-              //       type: "InputText"
-              //     },
-              //     "http://schema.org/country" : {
-              //       fullyQualifiedName: "http://schema.org/country",
-              //       name: "country",
-              //       label: "Country",
-              //       type: "DropdownSelect",
-              //       isLink: true,
-              //       allowCustomValues: true
-              //     },
-              //     "http://schema.org/zipCode": {
-              //       type: "Nested",
-              //       fullyQualifiedName: "http://schema.org/zipCode",
-              //       name: "zipCode",
-              //       label: "Zip Code",
-              //       min:0,
-              //       max: Number.POSITIVE_INFINITY,
-              //       fields: {
-              //         "http://schema.org/test": {
-              //           fullyQualifiedName: "http://schema.org/test",
-              //           name: "test",
-              //           label: "Test",
-              //           type: "InputText"
-              //         },
-              //         "http://schema.org/region" :{
-              //           fullyQualifiedName: "http://schema.org/region",
-              //           name: "region",
-              //           label: "Region",
-              //           type: "DropdownSelect",
-              //           isLink: true,
-              //           allowCustomValues: true
-              //         }
-              //       }
-              //     }
-              //   }
-              // };
-              // data.fields["http://schema.org/origin"] = {
-              //   fullyQualifiedName: "http://schema.org/origin",
-              //   name: "origin",
-              //   label: "Origin",
-              //   type: "DropdownSelect",
-              //   isLink: true,
-              //   allowCustomValues: true,
-              //   value: [{id: "5763cbd4-7f92-4adb-98ea-1b6a26b61932"},
-              //     {id: "88743735-88ad-45e9-acff-e67b5c407820"},
-              //     {id: "7dec739f-ac25-4bcc-a255-39753013304d"}
-              //   ]
-              // };
-              // END of TODO
               instance.initializeData(data, appStore.getReadMode(), false);
               appStore.syncInstancesHistory(instance, "viewed");
             } else if (response && response.data && response.data.error && response.data.error[identifier]) {

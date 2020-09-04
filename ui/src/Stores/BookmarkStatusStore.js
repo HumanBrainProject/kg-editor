@@ -16,7 +16,7 @@
 
 import { observable, action, runInAction } from "mobx";
 import { toJS } from "mobx";
-import { isArray, debounce } from "lodash";
+import { debounce } from "lodash";
 
 import API from "../Services/API";
 import historyStore from "./HistoryStore";
@@ -36,7 +36,7 @@ class BookmarkStatusStore{
 
   @action
   fetchStatus(instanceIds){
-    if(!isArray(instanceIds)){
+    if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
     instanceIds.forEach(id => {
@@ -60,7 +60,7 @@ class BookmarkStatusStore{
 
   @action
   updateStatus(instanceIds, bookmarkLists, appendMode){
-    if(!isArray(instanceIds)){
+    if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
     instanceIds.forEach(id => {
@@ -70,7 +70,7 @@ class BookmarkStatusStore{
           if (!status.data) {
             status.data = {id: id, bookmarkLists: []};
           }
-          if(!isArray(bookmarkLists)){
+          if(!Array.isArray(bookmarkLists)){
             bookmarkLists = bookmarkLists?[bookmarkLists]:[];
           }
           if (appendMode) {
@@ -103,7 +103,7 @@ class BookmarkStatusStore{
 
   @action
   saveStatus(instanceIds){
-    if(!isArray(instanceIds)){
+    if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
     instanceIds.forEach(async id => {
@@ -139,7 +139,7 @@ class BookmarkStatusStore{
 
   @action
   revertSaveStatus(instanceIds) {
-    if(!isArray(instanceIds)){
+    if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
     instanceIds.forEach(id => {

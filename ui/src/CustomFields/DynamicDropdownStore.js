@@ -113,7 +113,7 @@ class OptionsPool{
   @action
   async fetchOptions(instanceId, field, type, search, start, size, mappingValue, requestBody){
     try {
-      const { data: { data: { suggestions: { data: options, totalResults: total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
+      const { data: { data: { suggestions: { data: options, total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
       const optionsSet = [];
       Array.isArray(options) && options.forEach(option => {
         if(!this.options.has(option[mappingValue])){

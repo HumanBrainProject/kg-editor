@@ -295,7 +295,7 @@ class KgTableStore extends FormStore.typesMapping.Default{
       const payload = this.store.getValues();
       payload["@type"] = this.store.structure.types.map(t => t.name);
       try {
-        const { data: { data: { suggestions: { data: options, totalResults: total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.userInput), payload);
+        const { data: { data: { suggestions: { data: options, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.userInput), payload);
         runInAction(()=>{
           const opts = Array.isArray(options)?options:[];
           if(append){

@@ -266,13 +266,12 @@ export const getChildrenIdsGroupedByField = fields => {
   }
 
   function getNestedFields(fields, vals) {
-    const nestedFields = [];
-    Object.entries(fields).forEach(([id, field]) => {
-      const values = vals.flatMap(v => v[id].value);
+    return Object.entries(fields).reduce((acc, [fieldKey, field]) => {
+      const values = vals.flatMap(v => v[fieldKey].value);
       const groups = getGroups(field, values);
-      nestedFields.push(...groups);
-    });
-    return nestedFields;
+      acc.push(...groups);
+      return acc;
+    }, []);
   }
 
   return fields.reduce((acc, field) => {

@@ -146,7 +146,6 @@ export const normalizeInstanceData = (data, transformField=null) => {
         field.mappingValue = "id";
         field.mappingReturn = "id";
         field.mappingIsIdentifier = true;
-        field.mappingIdentifierReturnValuePrefix = "https://kg.ebrains.eu/api/instances/";
         field.closeDropdownAfterInteraction = true;
       }
     }

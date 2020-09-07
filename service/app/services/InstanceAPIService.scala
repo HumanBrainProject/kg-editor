@@ -21,7 +21,7 @@ import models.errors.APIEditorError
 import monix.eval.Task
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.{CREATED, NO_CONTENT, OK}
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 trait InstanceAPIService {
@@ -155,7 +155,7 @@ trait InstanceAPIService {
     start: Int,
     size: Int,
     search: String,
-    payload: JsObject,
+    payload: JsValue,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val wsc = wSClient
@@ -230,13 +230,13 @@ trait InstanceAPIService {
   }
 
   def patchInstance(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    id: String,
-    body: JsObject,
-    token: AccessToken,
-    clientToken: String
+                     wSClient: WSClient,
+                     apiBaseEndpoint: String,
+                     apiVersion: String,
+                     id: String,
+                     body: JsValue,
+                     token: AccessToken,
+                     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id")
@@ -257,7 +257,7 @@ trait InstanceAPIService {
     apiVersion: String,
     id: Option[String],
     workspace: String,
-    body: JsObject,
+    body: JsValue,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {

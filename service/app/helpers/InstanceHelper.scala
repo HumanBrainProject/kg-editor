@@ -77,9 +77,9 @@ object InstanceHelper {
       case (map, typeInfo) => map.updated(typeInfo.name, typeInfo)
     }
 
-  def getFields(data: JsObject, fieldsInfo: Map[String, StructureOfField]): Map[String, Field] =
+  def getFields(data: JsObject, fieldsInfo: Map[String, StructureOfField], apiInstancesPrefix: String): Map[String, Field] =
     fieldsInfo.foldLeft(Map[String, Field]()) {
-      case (map, (fieldName, fieldInfo)) => map.updated(fieldName, Field(data, fieldInfo))
+      case (map, (fieldName, fieldInfo)) => map.updated(fieldName, Field(data, fieldInfo, apiInstancesPrefix))
     }
 
   def filterFieldNames(fields: List[String], filter: List[String]): List[String] = fields.filterNot(filter.toSet)
@@ -92,9 +92,9 @@ object InstanceHelper {
       case None    => fields
     }
 
-  def getId(data: JsObject): Option[String] =
+  def getId(data: JsObject, apiInstancesPrefix: String): Option[String] =
     (data \ "@id").asOpt[String] match {
-      case Some(i) => DocumentId.getIdFromPath(i)
+      case Some(i) => Some(DocumentId.getIdFromPath(i, apiInstancesPrefix))
       case None    => None
     }
 
@@ -158,11 +158,11 @@ object InstanceHelper {
       case None => Map()
     }
 
-  def getUser(data: JsObject): Option[String] =
+  def getUser(data: JsObject, apiInstancesPrefix: String): Option[String] =
     (data \ s"${EditorConstants.VOCAB_USER}").asOpt[Map[String, JsValue]] match {
       case Some(user) =>
         user.get("@id") match {
-          case Some(i) => DocumentId.getIdFromPath(i.as[String])
+          case Some(i) => Some(DocumentId.getIdFromPath(i.as[String], apiInstancesPrefix))
           case None    => None
         }
       case None => None
@@ -195,47 +195,46 @@ object InstanceHelper {
       }
     }
 
-  def normalizeIdOfField(field: Link): Link =
+  def normalizeIdOfField(field: Link, apiInstancesPrefix: String): Link =
     field.get("@id") match {
       case Some(id) =>
-        val normalizedId = DocumentId.getIdFromPath(id.as[String])
-        normalizedId match {
-          case Some(id) => field.updated("id", JsString(id)).filter(value => !value._1.equals("@id"))
-          case None     => field
-        }
+        val normalizedId = DocumentId.getIdFromPath(id.as[String], apiInstancesPrefix)
+        field.updated("id", JsString(normalizedId)).filter(value => !value._1.equals("@id"))
       case None => field
     }
 
-  def normalizeIdOfArray(fieldArray: ListOfLinks): ListOfLinks =
-    fieldArray.map(field => normalizeIdOfField(field))
+  def normalizeIdOfArray(fieldArray: ListOfLinks, apiInstancesPrefix: String): ListOfLinks =
+    fieldArray.map(field => normalizeIdOfField(field, apiInstancesPrefix))
 
-  def getInstanceView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType]): Instance =
-    InstanceView(id, data, typeInfoMap)
+  def getInstanceView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): Instance =
+    InstanceView(id, data, typeInfoMap, apiInstancesPrefix)
 
-  def getInstanceSummaryView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType]): Instance =
-    InstanceSummaryView(id, data, typeInfoMap)
+  def getInstanceSummaryView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): Instance =
+    InstanceSummaryView(id, data, typeInfoMap, apiInstancesPrefix)
 
-  def getInstanceLabelView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType]): Instance =
-    InstanceLabelView(id, data, typeInfoMap)
+  def getInstanceLabelView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): Instance =
+    InstanceLabelView(id, data, typeInfoMap, apiInstancesPrefix)
 
   def generateInstancesView(
     coreInstances: Map[String, CoreData],
     typeInfoList: List[StructureOfType],
-    generateInstanceView: (String, CoreData, Map[String, StructureOfType]) => Instance
+    generateInstanceView: (String, CoreData, Map[String, StructureOfType], String) => Instance,
+    apiInstancesPrefix: String
   ): Map[String, Instance] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     coreInstances.foldLeft(Map[String, Instance]()) {
-      case (map, (id, coreInstance)) => map.updated(id, generateInstanceView(id, coreInstance, typeInfoMap))
+      case (map, (id, coreInstance)) => map.updated(id, generateInstanceView(id, coreInstance, typeInfoMap, apiInstancesPrefix))
     }
   }
 
   def generateInstancesSummaryView(
     coreInstancesList: List[JsObject],
-    typeInfoList: List[StructureOfType]
+    typeInfoList: List[StructureOfType],
+    apiInstancesPrefix: String
   ): List[Instance] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     coreInstancesList.foldLeft(List[Instance]()) {
-      case (acc, data) => acc :+ InstanceSummaryView(data, typeInfoMap)
+      case (acc, data) => acc :+ InstanceSummaryView(data, typeInfoMap, apiInstancesPrefix)
     }
   }
 }

@@ -32,6 +32,7 @@ trait ConfigurationService {
   val kgCoreEndpoint: String
   val kgCoreApiVersion: String
   val kgQueryEndpoint: String
+  val kgApiInstancesPrefix: String
   val iamEndpoint: String
   val authEndpoint: String
   val idmApiEndpoint: String
@@ -54,6 +55,7 @@ class ConfigurationServiceLive @Inject()(config: Configuration) extends Configur
     : String = config.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:8000") // TODO: change the port from mock to real data
   val kgCoreApiVersion: String = config.get[String]("kgcore.apiVersion")
   val kgQueryEndpoint: String = config.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
+  val kgApiInstancesPrefix: String = config.getOptional[String]("kgcore.apiInstancesPrefix").getOrElse("https://kg.ebrains.eu/api/instances/")
   val iamEndpoint = config.get[String]("nexus.iam")
   val authEndpoint = config.get[String]("auth.endpoint")
   val idmApiEndpoint = s"$authEndpoint/idm/v1/api"

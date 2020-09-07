@@ -18,7 +18,12 @@ package helpers
 
 object DocumentId {
 
-  def getIdFromPath(fullPath: String): Option[String] =
-    fullPath.split("/").lastOption
+  def getIdFromPath(fullPath: String, apiInstancesPrefix: String): String = {
+    if(fullPath.startsWith(apiInstancesPrefix)){
+      fullPath.replaceAllLiterally(apiInstancesPrefix, "")
+    } else {
+      fullPath
+    }
+  }
 
 }

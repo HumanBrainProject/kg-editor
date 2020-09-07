@@ -32,9 +32,9 @@ final case class InstanceLabelView(
 
 object InstanceLabelView {
 
-  def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType]): InstanceLabelView = {
+  def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceLabelView = {
     val res = for {
-      resolvedId <- InstanceHelper.getId(data)
+      resolvedId <- InstanceHelper.getId(data, apiInstancesPrefix)
       types      <- InstanceHelper.getTypes(data)
     } yield (resolvedId, types)
     res match {
@@ -54,9 +54,9 @@ object InstanceLabelView {
   def generateInstanceError(id: String, error: CoreDataError): InstanceLabelView =
     InstanceLabelView(id, None, List(), "", Some(error))
 
-  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceLabelView =
+  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix:String): InstanceLabelView =
     coreInstance match {
-      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap)
+      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap, apiInstancesPrefix)
       case CoreData(_, Some(error))   => generateInstanceError(id, error)
       case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }

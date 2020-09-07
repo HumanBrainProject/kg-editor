@@ -21,7 +21,7 @@ import models.AccessToken
 import models.errors.APIEditorError
 import monix.eval.Task
 import play.api.Logger
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.ws.WSClient
 
 class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationServiceLive) {
@@ -98,7 +98,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
     size: Int,
     start: Int,
     search: String,
-    payload: JsObject,
+    payload: JsValue,
     token: AccessToken,
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
@@ -125,7 +125,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   def insertInstance(
     id: Option[String],
     workspace: String,
-    body: JsObject,
+    body: JsValue,
     token: AccessToken,
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
@@ -146,10 +146,10 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       }
 
   def updateInstance(
-    id: String,
-    body: JsObject,
-    token: AccessToken,
-    clientToken: String
+                      id: String,
+                      body: JsValue,
+                      token: AccessToken,
+                      clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .patchInstance(

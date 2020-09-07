@@ -40,10 +40,11 @@ object InstanceSummaryView {
   def generateInstanceView(
     id: String,
     data: JsObject,
-    typeInfoMap: Map[String, StructureOfType]
+    typeInfoMap: Map[String, StructureOfType],
+    apiInstancesPrefix: String
   ): InstanceSummaryView = {
     val res = for {
-      resolvedId <- InstanceHelper.getId(data)
+      resolvedId <- InstanceHelper.getId(data, apiInstancesPrefix)
       types      <- InstanceHelper.getTypes(data)
     } yield (resolvedId, types)
     res match {
@@ -56,7 +57,7 @@ object InstanceSummaryView {
           (data \ EditorConstants.VOCAB_SPACE).asOpt[String],
           structure.types.values.toList,
           InstanceHelper.getName(data, structure.labelField),
-          InstanceHelper.getFields(data, filteredFields),
+          InstanceHelper.getFields(data, filteredFields, apiInstancesPrefix),
           InstanceHelper.getPermissions(data),
           None
         )
@@ -67,15 +68,15 @@ object InstanceSummaryView {
   def generateInstanceError(id: String, error: CoreDataError): InstanceSummaryView =
     InstanceSummaryView(id, None, List(), "", Map(), Permissions(None), Some(error))
 
-  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceSummaryView =
+  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceSummaryView =
     coreInstance match {
-      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap)
+      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap, apiInstancesPrefix)
       case CoreData(_, Some(error))   => generateInstanceError(id, error)
       case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }
 
-  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType]): InstanceSummaryView =
-    generateInstanceView("", data, typeInfoMap)
+  def apply(data: JsObject, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceSummaryView =
+    generateInstanceView("", data, typeInfoMap, apiInstancesPrefix)
 
   implicit val instanceSummaryViewWrites = Json.writes[InstanceSummaryView]
 }

@@ -196,7 +196,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
 
   mapIdentifierReturnValue(value) {
     return {
-      "@id": this.mappingIdentifierReturnValuePrefix?`${this.mappingIdentifierReturnValuePrefix}${value[this.mappingReturn]}`:value[this.mappingReturn]
+      "@id": value[this.mappingReturn]
     };
   }
 

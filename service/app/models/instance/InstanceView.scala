@@ -38,9 +38,9 @@ final case class InstanceView(
 
 object InstanceView {
 
-  def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType]): InstanceView = {
+  def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceView = {
     val res = for {
-      resolvedId <- InstanceHelper.getId(data)
+      resolvedId <- InstanceHelper.getId(data, apiInstancesPrefix)
       types      <- InstanceHelper.getTypes(data)
     } yield (resolvedId, types)
     res match {
@@ -52,10 +52,10 @@ object InstanceView {
           structure.types.values.toList,
           InstanceHelper.toOptionalList(structure.promotedFields),
           structure.labelField.headOption,
-          InstanceHelper.getFields(data, structure.fields),
+          InstanceHelper.getFields(data, structure.fields, apiInstancesPrefix),
           InstanceHelper.getPermissions(data),
           InstanceHelper.getAlternatives(data),
-          InstanceHelper.getUser(data),
+          InstanceHelper.getUser(data, apiInstancesPrefix),
           None
         )
       case _ => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
@@ -65,9 +65,9 @@ object InstanceView {
   def generateInstanceError(id: String, error: CoreDataError): InstanceView =
     InstanceView(id, None, List(), None, None, Map(), Permissions(None), Map(), None, Some(error))
 
-  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType]): InstanceView =
+  def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceView =
     coreInstance match {
-      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap)
+      case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap, apiInstancesPrefix)
       case CoreData(_, Some(error))   => generateInstanceError(id, error)
       case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }

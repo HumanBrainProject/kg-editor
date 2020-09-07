@@ -20,19 +20,19 @@ import helpers.InstanceHelper
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 
-final case class Field(data: JsValue, fieldsInfo: StructureOfField)
+final case class Field(data: JsValue, fieldsInfo: StructureOfField, apiInstancesPrefix: String)
 
 object Field {
   type Link = Map[String, JsValue]
   type ListOfLinks = List[Link]
 
-  def normalizeFieldValue(value: JsValue, fieldInfo: StructureOfField): JsValue =
+  def normalizeFieldValue(value: JsValue, fieldInfo: StructureOfField, apiInstancesPrefix: String): JsValue =
     if (fieldInfo.isLink) {
       value.asOpt[ListOfLinks] match {
-        case Some(valueArray) => Json.toJson(InstanceHelper.normalizeIdOfArray(valueArray))
+        case Some(valueArray) => Json.toJson(InstanceHelper.normalizeIdOfArray(valueArray, apiInstancesPrefix))
         case None =>
           value.asOpt[Link] match {
-            case Some(valueObj) => Json.toJson(List(InstanceHelper.normalizeIdOfField(valueObj)))
+            case Some(valueObj) => Json.toJson(List(InstanceHelper.normalizeIdOfField(valueObj, apiInstancesPrefix)))
             case None           => value
           }
       }
@@ -40,11 +40,11 @@ object Field {
       value
     }
 
-  def getValue(data: JsValue, fieldInfo: StructureOfField): JsValue = {
+  def getValue(data: JsValue, fieldInfo: StructureOfField, apiInstancesPrefix: String): JsValue = {
     val name = fieldInfo.fullyQualifiedName
     (data \ name).asOpt[JsValue] match {
       case Some(value) => {
-        normalizeFieldValue(value, fieldInfo)
+        normalizeFieldValue(value, fieldInfo, apiInstancesPrefix)
       }
       case None => JsNull
     }
@@ -53,7 +53,7 @@ object Field {
   implicit val fieldWrites: Writes[Field] = new Writes[Field] {
 
     def writes(f: Field): JsValue =
-      Json.toJson(f.fieldsInfo).as[JsObject] ++ Json.obj("value" -> Json.toJson(getValue(f.data, f.fieldsInfo)))
+      Json.toJson(f.fieldsInfo).as[JsObject] ++ Json.obj("value" -> Json.toJson(getValue(f.data, f.fieldsInfo, f.apiInstancesPrefix)))
 
   }
 

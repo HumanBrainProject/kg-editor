@@ -30,12 +30,13 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class EditorController @Inject()(
-  cc: ControllerComponents,
-  authenticatedUserAction: AuthenticatedUserAction,
-  editorService: EditorService,
-  workspaceServiceLive: WorkspaceServiceLive
-)(implicit ec: ExecutionContext)
-    extends AbstractController(cc) {
+                                  cc: ControllerComponents,
+                                  authenticatedUserAction: AuthenticatedUserAction,
+                                  editorService: EditorService,
+                                  workspaceServiceLive: WorkspaceServiceLive,
+                                  configurationServiceLive: ConfigurationServiceLive
+                                )(implicit ec: ExecutionContext)
+  extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 
@@ -102,13 +103,13 @@ class EditorController @Inject()(
     }
 
   def getInstances(
-    stage: String,
-    metadata: Boolean,
-    returnAlternatives: Boolean,
-    returnPermissions: Boolean,
-    returnEmbedded: Boolean,
-    generateInstanceView: (String, CoreData, Map[String, StructureOfType]) => Instance
-  )(implicit request: UserRequest[AnyContent]): Task[Result] =
+                    stage: String,
+                    metadata: Boolean,
+                    returnAlternatives: Boolean,
+                    returnPermissions: Boolean,
+                    returnEmbedded: Boolean,
+                    generateInstanceView: (String, CoreData, Map[String, StructureOfType], String) => Instance
+                  )(implicit request: UserRequest[AnyContent]): Task[Result] =
     InstanceHelper.extractPayloadAsList(request) match {
       case Some(ids) =>
         editorService
@@ -137,24 +138,24 @@ class EditorController @Inject()(
                         EditorResponseObject(
                           Json.toJson(
                             InstanceHelper
-                              .generateInstancesView(coreInstances, typeInfoList, generateInstanceView)
+                              .generateInstancesView(coreInstances, typeInfoList, generateInstanceView, configurationServiceLive.kgApiInstancesPrefix)
                           )
                         )
                       )
                     )
                   case _ => InternalServerError("Something went wrong with types! Please try again!")
                 }
-            case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
+            case _ =>Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
           }
       case None => Task.pure(BadRequest("Wrong body content!"))
     }
 
   def searchInstancesSummary(
-    typeId: String,
-    from: Option[Int],
-    size: Option[Int],
-    searchByLabel: String
-  ): Action[AnyContent] =
+                              typeId: String,
+                              from: Option[Int],
+                              size: Option[Int],
+                              searchByLabel: String
+                            ): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
         .doSearchInstances(typeId, from, size, searchByLabel, request.userToken, request.clientToken)
@@ -174,7 +175,7 @@ class EditorController @Inject()(
                           EditorResponseWithCount(
                             Json.toJson(
                               InstanceHelper
-                                .generateInstancesSummaryView(coreInstancesList, typeInfoList)
+                                .generateInstancesSummaryView(coreInstancesList, typeInfoList, configurationServiceLive.kgApiInstancesPrefix)
                             ),
                             (instancesResult \ "total").as[Long]
                           )
@@ -194,7 +195,7 @@ class EditorController @Inject()(
       editorService
         .retrieveInstanceGraph(id, request.userToken, request.clientToken)
         .map {
-          case Left(err)    => err.toResult
+          case Left(err) => err.toResult
           case Right(value) => Ok(value)
         }
         .runToFuture
@@ -203,24 +204,25 @@ class EditorController @Inject()(
   def getSuggestion(obj: JsObject, types: Map[String, SuggestionType]): JsObject = {
     val t = types.get((obj \ "type").as[String])
     Json.obj(
-      "id" ->(obj \ "id").as[String],
-      "name" ->(obj \ "label").as[String],
+      "id" -> (obj \ "id").as[String],
+      "name" -> (obj \ "label").as[String],
       "type" -> Json.toJson(t),
-      "space" ->(obj \ "space").as[String]
+      "space" -> (obj \ "space").as[String]
     )
   }
 
   def getSuggestions(
-    id: String,
-    field: String,
-    `type`: Option[String],
-    size: Int,
-    start: Int,
-    search: String
-  ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+                      id: String,
+                      field: String,
+                      `type`: Option[String],
+                      size: Int,
+                      start: Int,
+                      search: String
+                    ): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     val bodyContent = request.body.asJson
     bodyContent match {
       case Some(content) =>
+        val payload = normalizePayloadWithId(content)
         editorService
           .retrieveSuggestions(
             id,
@@ -229,7 +231,7 @@ class EditorController @Inject()(
             size,
             start,
             search,
-            content.as[JsObject],
+            payload,
             request.userToken,
             request.clientToken
           )
@@ -239,7 +241,7 @@ class EditorController @Inject()(
                 case Some(data) =>
                   val types: Map[String, SuggestionType] = data.get("types") match {
                     case Some(t) => t.as[Map[String, SuggestionType]]
-                    case None    => Map()
+                    case None => Map()
                   }
                   data.get("suggestions") match {
                     case Some(s) =>
@@ -250,7 +252,7 @@ class EditorController @Inject()(
                             Json.toJson(
                               Json.obj(
                                 "suggestions" -> Json.obj(
-                                "data" -> Json.toJson(suggestions),
+                                  "data" -> Json.toJson(suggestions),
                                   "total" -> (s \ "totalResults").as[Long],
                                   "size" -> (s \ "size").as[Long],
                                   "from" -> (s \ "from").as[Long]),
@@ -282,6 +284,36 @@ class EditorController @Inject()(
     }
   }
 
+  def addPrefix(s: String): String = {
+    if (s.startsWith("http")) {
+      s
+    } else {
+      s"${configurationServiceLive.kgApiInstancesPrefix}${s}"
+    }
+  }
+
+  def checkId(value: JsObject): JsObject =
+    (value \ "@id").asOpt[String] match {
+      case Some(s) => Json.obj("@id" -> addPrefix(s))
+      case _ => value
+    }
+
+  def normalizePayloadWithId(body: JsValue): JsValue = {
+    val result: Map[String, JsValue] = body.as[Map[String, JsValue]].map {
+      f =>
+        f._2.asOpt[List[JsObject]] match {
+          case Some(l) =>
+            val list = l.map(el => checkId(el))
+            (f._1, Json.toJson(list))
+          case _ => f._2.asOpt[JsObject] match {
+            case Some(v) => (f._1, checkId(v))
+            case _ => (f._1, f._2)
+          }
+        }
+    }
+    Json.toJson(result)
+  }
+
   /**
     * Entry point when updating an instance
     *
@@ -294,8 +326,9 @@ class EditorController @Inject()(
         val bodyContent: Option[JsValue] = request.body.asJson
         (bodyContent match {
           case Some(body) =>
+            val payload = normalizePayloadWithId(body)
             editorService
-              .updateInstance(id, body.as[JsObject], request.userToken, request.clientToken)
+              .updateInstance(id, payload, request.userToken, request.clientToken)
               .flatMap {
                 case Right(value) =>
                   val coreInstance = value.as[CoreData]
@@ -330,14 +363,15 @@ class EditorController @Inject()(
     val bodyContent: Option[JsValue] = request.body.asJson
     bodyContent match {
       case Some(body) =>
+        val payload = normalizePayloadWithId(body)
         editorService
-          .insertInstance(id, workspace, body.as[JsObject], request.userToken, request.clientToken)
+          .insertInstance(id, workspace, payload, request.userToken, request.clientToken)
           .flatMap {
             case Right(value) =>
               val instance = value.as[CoreData]
               id match {
                 case Some(i) => normalizeInstance(i, instance, request.userToken, request.clientToken)
-                case None    => normalizeInstance("", instance, request.userToken, request.clientToken)
+                case None => normalizeInstance("", instance, request.userToken, request.clientToken)
               }
             case _ =>
               Task.pure(
@@ -349,11 +383,11 @@ class EditorController @Inject()(
   }
 
   private def normalizeInstance(
-    id: String,
-    coreInstance: CoreData,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Result] = {
+                                 id: String,
+                                 coreInstance: CoreData,
+                                 token: AccessToken,
+                                 clientToken: String
+                               ): Task[Result] = {
     val typesToRetrieve = InstanceHelper.getTypes(coreInstance)
     typesToRetrieve match {
       case Some(t) =>
@@ -364,7 +398,7 @@ class EditorController @Inject()(
               implicit val writer = InstanceProtocol.instanceWrites
               val typeInfoList = extractTypeList(typesWithFields)
               val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
-              val instanceView = InstanceHelper.getInstanceView(id, coreInstance, typeInfoMap)
+              val instanceView = InstanceHelper.getInstanceView(id, coreInstance, typeInfoMap, configurationServiceLive.kgApiInstancesPrefix)
               Ok(Json.toJson(EditorResponseObject(Json.toJson(instanceView))))
             case _ => InternalServerError("Something went wrong with types! Please try again!")
           }
@@ -382,7 +416,7 @@ class EditorController @Inject()(
             case Some(d) =>
               d.asOpt[StructureOfType] match {
                 case Some(t) => acc :+ t
-                case _       => acc
+                case _ => acc
               }
             case _ => acc
           }

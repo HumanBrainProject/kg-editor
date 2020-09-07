@@ -94,6 +94,17 @@ class InstanceTabStore{
     }
   }
 
+  @action
+  replaceInstanceId(id, newId) {
+    const instanceTab = this.instanceTabs.get(id);
+    this.instanceTabs.set(newId, {
+      currentInstancePath: instanceTab.currentInstancePath,
+      viewMode: "edit",
+      paneStore: instanceTab.paneStore
+    });
+    this.instanceTabs.delete(id);
+  }
+
   getOpenedInstanceTabsExceptCurrent(instanceId) {
     const result = Array.from(this.instanceTabs.keys()).reduce((acc, id) => {
       if (id !== instanceId) {

@@ -27,17 +27,17 @@ class InstanceView extends React.Component {
 
   render() {
     const { instance, paneStore } = this.props;
-    const { id:instanceId } = instance;
+    const { id } = instance;
 
     return (
 
-      <PaneContainer key={instanceId} paneStore={paneStore}>
+      <PaneContainer key={id} paneStore={paneStore}>
         <React.Fragment>
-          <Pane paneId={instanceId} key={instance.id}>
-            <InstanceForm level={0} id={instanceId} mainInstanceId={instanceId} />
+          <Pane paneId={id} key={id}>
+            <InstanceForm level={0} id={id} mainInstanceId={id} />
           </Pane>
           {!instance.hasFetchError?
-            <Links level={1} id={instanceId} mainInstanceId={instanceId} />
+            <Links level={1} id={id} mainInstanceId={id} />
             :null}
         </React.Fragment>
       </PaneContainer>

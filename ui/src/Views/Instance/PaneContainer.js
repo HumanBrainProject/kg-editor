@@ -16,7 +16,6 @@
 
 import React from "react";
 import injectStyles from "react-jss";
-import PaneStore from "../../Stores/PaneStore";
 import { observer, Provider } from "mobx-react";
 
 const styles = {
@@ -33,20 +32,11 @@ const styles = {
 @injectStyles(styles)
 @observer
 class PaneContainer extends React.Component {
-  constructor(props) {
-    super(props);
-    if(!this.props.paneStore){
-      this.paneStore = new PaneStore();
-    } else {
-      this.paneStore = this.props.paneStore;
-    }
-  }
-
   render() {
-    const { classes } = this.props;
-    let selectedIndex = this.paneStore.selectedIndex;
+    const { classes, paneStore } = this.props;
+    let selectedIndex = paneStore.selectedIndex;
     return (
-      <Provider paneStore={this.paneStore}>
+      <Provider paneStore={paneStore}>
         <div className={classes.container} style={{ "--selected-index": selectedIndex }}>
           {this.props.children}
         </div>

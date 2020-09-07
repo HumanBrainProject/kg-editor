@@ -66,8 +66,7 @@ const styles = {
 @inject("paneStore")
 @observer
 class Pane extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
     this.props.paneStore.registerPane(this.props.paneId);
   }
 

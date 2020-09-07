@@ -461,12 +461,7 @@ class AppStore{
         runInAction(() => {
           const instanceTab = instanceTabStore.instanceTabs.get(id);
           if (newId !== id) {
-            instanceTabStore.instanceTabs.set(newId, {
-              currentInstancePath: instanceTab.currentInstancePath,
-              viewMode: "edit",
-              paneStore: instanceTab.paneStore
-            });
-            instanceTabStore.instanceTabs.delete(id);
+            instanceTabStore.replaceInstanceId(id, newId);
             this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${newId}`);
           } else {
             instanceTab.viewMode = "edit";

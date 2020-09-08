@@ -109,11 +109,12 @@ class InstanceField extends React.Component{
   }
 
   handleFieldFocus = (field, value) => {
-    if (field && field.isLink && value && value.id) {
+    const id = value && value["@id"];
+    if (field && field.isLink && id) {
       this.handleToggleOffFieldHighlight(field, value);
       setTimeout(() => {
-        instanceTabStore.setCurrentInstanceId(this.props.mainInstanceId, value.id, this.props.level + 1);
-        const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
+        instanceTabStore.setCurrentInstanceId(this.props.mainInstanceId, id, this.props.level + 1);
+        const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${id}"]`);
         if (target && target.childNodes && target.childNodes[0] && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
           target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
         }
@@ -123,9 +124,10 @@ class InstanceField extends React.Component{
   }
 
   handleToggleOnFieldHighlight = (field, value) => {
-    if (field && field.isLink && value && value.id) {
-      instanceStore.setInstanceHighlight(value.id, field.label);
-      const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${value.id}"]`);
+    const id = value && value["@id"];
+    if (field && field.isLink && id) {
+      instanceStore.setInstanceHighlight(id, field.label);
+      const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${id}"]`);
       if (target && target.childNodes && target.childNodes[0] && target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0]) {
         target.childNodes[0].firstChild.firstChild.getElementsByClassName("fa-w-16")[0].scrollIntoView({behavior:"smooth", block:"center"});
       }
@@ -133,8 +135,9 @@ class InstanceField extends React.Component{
   }
 
   handleToggleOffFieldHighlight = (field, value) => {
-    if (field && field.isLink && value && value.id) {
-      instanceStore.setInstanceHighlight(value.id, null);
+    const id = value && value["@id"];
+    if (field && field.isLink && id) {
+      instanceStore.setInstanceHighlight(id, null);
     }
   }
 

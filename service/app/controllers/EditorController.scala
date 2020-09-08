@@ -26,8 +26,6 @@ import play.api.libs.json.{JsObject, _}
 import play.api.mvc.{Action, _}
 import services._
 
-import scala.concurrent.ExecutionContext
-
 @Singleton
 class EditorController @Inject()(
                                   cc: ControllerComponents,
@@ -35,17 +33,16 @@ class EditorController @Inject()(
                                   editorService: EditorService,
                                   workspaceServiceLive: WorkspaceServiceLive,
                                   configurationServiceLive: ConfigurationServiceLive
-                                )(implicit ec: ExecutionContext)
-  extends AbstractController(cc) {
+                                ) extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def getInstance(id: String, metadata: Boolean, returnPermissions: Boolean): Action[AnyContent] =
+  def getInstance(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .getInstance(id, request.userToken, metadata, returnPermissions, request.clientToken)
+        .getInstance(id, request.userToken, request.clientToken)
         .flatMap {
           case Right(value) =>
             val coreInstance = value.as[CoreData]
@@ -411,7 +408,7 @@ class EditorController @Inject()(
     InstanceHelper
       .toCoreData(typesWithFields)
       .foldLeft(List[StructureOfType]()) {
-        case (acc, (id, data)) =>
+        case (acc, (_, data)) =>
           data.data match {
             case Some(d) =>
               d.asOpt[StructureOfType] match {

@@ -16,8 +16,8 @@
 package services.bookmark
 
 import models.AccessToken
-import monix.eval.Task
 import models.errors.APIEditorError
+import monix.eval.Task
 import play.api.libs.json.JsObject
 
 trait BookmarkService {

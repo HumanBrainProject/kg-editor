@@ -17,8 +17,8 @@
 package models.instance
 
 import constants.{EditorConstants, SchemaFieldsConstants}
-import play.api.libs.json.{JsPath, JsValue, Json, Reads, Writes}
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 final case class InstanceType(name: String, label: String, color: Option[String])
 

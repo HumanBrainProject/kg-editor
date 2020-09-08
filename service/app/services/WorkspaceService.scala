@@ -17,7 +17,7 @@
 package services
 
 import com.google.inject.Inject
-import models.{AccessToken}
+import models.AccessToken
 import models.errors.APIEditorError
 import monix.eval.Task
 import play.api.libs.json.JsObject

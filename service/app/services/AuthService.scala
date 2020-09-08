@@ -17,14 +17,15 @@
 package services
 
 import akka.Done
+import com.google.inject.{Inject, Singleton}
 import models.errors.APIEditorError
 import monix.eval.Task
+import monix.execution.Scheduler.Implicits.global
 import play.api.cache.AsyncCacheApi
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
 import play.cache.NamedCache
-import monix.execution.Scheduler.Implicits.global
-import com.google.inject.{Inject, Singleton}
+
 import scala.concurrent.duration.FiniteDuration
 
 trait AuthService {

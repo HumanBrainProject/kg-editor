@@ -24,7 +24,6 @@ trait EditorResponse {
 case class EditorResponseObject(override val data: JsValue) extends EditorResponse
 
 object EditorResponseObject {
-  import play.api.libs.functional.syntax._
 
   implicit val responseWrites: Writes[EditorResponseObject] =
     (JsPath \ "data").write[JsValue].contramap(_.data)

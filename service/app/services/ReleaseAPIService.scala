@@ -16,7 +16,6 @@
 
 package services
 
-import constants.{EditorClient, ServiceClient}
 import models.AccessToken
 import monix.eval.Task
 import play.api.http.HeaderNames.AUTHORIZATION

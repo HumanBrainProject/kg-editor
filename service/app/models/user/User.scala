@@ -16,12 +16,11 @@
 
 package models.user
 
-import constants.SchemaFieldsConstants
-import constants.EditorConstants
+import constants.{EditorConstants, SchemaFieldsConstants}
 import models.workspace.Workspace
-import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json.{JsPath, Json, Reads}
 
 final case class User(
                        id: String,

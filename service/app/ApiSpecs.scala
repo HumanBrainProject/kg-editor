@@ -19,10 +19,9 @@ package controllers.swagger
 import com.google.inject.Inject
 import com.iheart.playSwagger.SwaggerSpecGenerator
 import play.api.Logger
-import play.api.cache.Cached
 import play.api.mvc._
 
-class ApiSpecs @Inject()(cc: ControllerComponents, cached: Cached) extends AbstractController(cc) {
+class ApiSpecs @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
   implicit val cl = getClass.getClassLoader
   val logger = Logger(this.getClass)
   val domainPackage = "models"

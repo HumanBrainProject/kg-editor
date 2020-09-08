@@ -37,7 +37,7 @@ const endpoints = {
   "suggestions": (id, field, type=null, start, size, search) => `/editor/api/instances/${id}/suggestions?field=${encodeURIComponent(field)}${type?"&type=" + encodeURIComponent(type):""}&start=${start}&size=${size}&search=${search}`,
   "instance": id => `/editor/api/instances/${id}`,
   "createInstance": (id=null) => `/editor/api/instances${id?("/" + id):""}?workspace=${appStore.currentWorkspace.id}`,
-  "getInstance": id => `/editor/api/instances/${id}?returnPermissions=true&metadata=true`,
+  "getInstance": id => `/editor/api/instances/${id}`,
   "release": id => `/editor/api/releases/${id}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY",

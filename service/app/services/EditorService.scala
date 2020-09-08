@@ -33,8 +33,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   def getInstance(
     id: String,
     token: AccessToken,
-    metadata: Boolean,
-    returnPermissions: Boolean,
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
@@ -44,8 +42,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         configuration.kgCoreApiVersion,
         id,
         token,
-        metadata,
-        returnPermissions,
         clientToken
       )
       .map {

@@ -24,15 +24,12 @@ import play.api.libs.json._
 import play.api.mvc.{Action, _}
 import services._
 
-import scala.concurrent.ExecutionContext
-
 @Singleton
 class WorkspaceController @Inject()(
-  cc: ControllerComponents,
-  authenticatedUserAction: AuthenticatedUserAction,
-  workspaceServiceLive: WorkspaceServiceLive
-)(implicit ec: ExecutionContext)
-    extends AbstractController(cc) {
+                                     cc: ControllerComponents,
+                                     authenticatedUserAction: AuthenticatedUserAction,
+                                     workspaceServiceLive: WorkspaceServiceLive
+                                   ) extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 

@@ -18,9 +18,9 @@ package models.instance
 
 import constants.EditorConstants
 import models.user.User
-import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json.{JsPath, Json, Reads}
 
 final case class Alternative(value: String, selected: Boolean, users: List[User])
 

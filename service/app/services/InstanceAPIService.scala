@@ -187,8 +187,6 @@ trait InstanceAPIService {
     apiVersion: String,
     id: String,
     token: AccessToken,
-    metadata: Boolean,
-    returnPermissions: Boolean,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
@@ -196,8 +194,8 @@ trait InstanceAPIService {
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
         "stage"             -> "IN_PROGRESS",
-        "metadata"          -> metadata.toString,
-        "returnPermissions" -> returnPermissions.toString
+        "metadata"          -> "true",
+        "returnPermissions" -> "true"
       )
     val r = Task.deferFuture(q.get())
     r.map { res =>

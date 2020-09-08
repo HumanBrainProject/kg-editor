@@ -18,9 +18,9 @@ package models.workspace
 
 import constants.{EditorConstants, SchemaFieldsConstants}
 import models.permissions.Permissions
-import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json.{JsPath, Json, Reads}
 
 final case class Workspace(
                        id: String,

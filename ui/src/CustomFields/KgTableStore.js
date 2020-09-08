@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction, set, computed } from "mobx";
-import { union, debounce, remove, isObject } from "lodash";
+import { union, debounce, remove } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";

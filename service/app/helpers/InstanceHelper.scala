@@ -19,7 +19,7 @@ package helpers
 import constants.EditorConstants
 import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
-import models.instance.{Alternative, CoreData, Field, Instance, InstanceLabelView, InstanceSummaryView, InstanceView, StructureOfField, StructureOfType}
+import models.instance._
 import models.permissions.Permissions
 import play.api.libs.json.{JsObject, JsString, JsValue}
 import play.api.mvc.AnyContent

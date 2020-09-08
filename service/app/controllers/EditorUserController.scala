@@ -25,15 +25,12 @@ import play.api.libs.json.{JsArray, _}
 import play.api.mvc.{AnyContent, _}
 import services._
 
-import scala.concurrent.ExecutionContext
-
 class EditorUserController @Inject()(
   cc: ControllerComponents,
   authenticatedUserAction: AuthenticatedUserAction,
   workspaceServiceLive: WorkspaceServiceLive,
   editorUserService: EditorUserService
-)(implicit ec: ExecutionContext)
-    extends AbstractController(cc) {
+) extends AbstractController(cc) {
   val logger = Logger(this.getClass)
 
   implicit val s = monix.execution.Scheduler.Implicits.global

@@ -17,7 +17,6 @@
 package services
 
 import com.google.inject.Inject
-import helpers.InstanceHelper
 import models.AccessToken
 import models.errors.APIEditorError
 import monix.eval.Task

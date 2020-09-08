@@ -17,25 +17,22 @@
 package controllers
 
 import javax.inject.Inject
+import play.api.Logger
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import play.api.{Configuration, Logger}
 import services.AuthServiceLive
-
-import scala.concurrent.ExecutionContext
 
 class AuthController @Inject()(
   cc: ControllerComponents,
   wsClient: WSClient,
   authServiceLive: AuthServiceLive
-)(implicit ec: ExecutionContext)
-    extends AbstractController(cc) {
+) extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def getAuthEndpoint: Action[AnyContent] = Action.async { implicit request =>
+  def getAuthEndpoint: Action[AnyContent] = Action.async {
     authServiceLive
       .getEndpoint(wsClient)
       .map {

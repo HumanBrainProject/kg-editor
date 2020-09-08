@@ -93,32 +93,11 @@ export const normalizeInstanceData = (data, transformField=null) => {
   //     }
   //   }
   // };
-  // data.fields["http://schema.org/origin"] = {
-  //   fullyQualifiedName: "http://schema.org/origin",
-  //   name: "origin",
-  //   label: "Origin",
-  //   type: "DropdownSelect",
-  //   isLink: true,
-  //   allowCustomValues: true,
-  //   value: [{id: "5fc91798-7bde-43c3-98b4-931b30c8c410"},
-  //     {id: "5fc91798-7bde-43c3-98b4-931b30c8c410"},
-  //     {id: "cfc1656c-67d1-4d2c-a17e-efd7ce0df88c"}
-  //   ]
-  // };
   // END of TODO
 
   const normalizeFields = fields => {
     for(let fieldKey in fields) {
       const field = fields[fieldKey];
-      // TODO: temporary, please remove. This is just a test for proof of concept.
-      // if (!field.type) {
-      //   if (["http://schema.org/children", "http://schema.org/colleague", "http://schema.org/spouse", "http://schema.org/affiliation"].includes(fieldKey)) {
-      //     field.type = "DropdownSelect";
-      //   } else {
-      //     field.type = "InputText";
-      //   }
-      // }
-      // END of temporary
       typeof transformField === "function"  && transformField(field);
       if(field.type === "Nested"){
         field.topAddButton = false;

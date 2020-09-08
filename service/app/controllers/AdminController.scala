@@ -33,7 +33,7 @@ class AdminController @Inject()(
   object cacheService extends CacheService
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
 
-  def clearCache(name: String): Action[AnyContent] = Action.async { implicit request =>
+  def clearCache(name: String): Action[AnyContent] = Action.async {
     Cache
       .fromString(name)
       .fold(Task.pure(NotFound("Cache not found"))) {

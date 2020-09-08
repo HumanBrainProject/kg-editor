@@ -22,15 +22,12 @@ import play.api.Logger
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.ScopeServiceLive
 
-import scala.concurrent.ExecutionContext
-
 @Singleton
 class ScopeController @Inject()(
   cc: ControllerComponents,
   authenticatedUserAction: AuthenticatedUserAction,
   scopeServiceLive: ScopeServiceLive
-)(implicit ec: ExecutionContext)
-    extends AbstractController(cc) {
+) extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 

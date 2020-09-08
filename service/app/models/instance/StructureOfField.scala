@@ -17,9 +17,9 @@
 package models.instance
 
 import constants.{EditorConstants, SchemaFieldsConstants}
-import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json._
 
 final case class StructureOfField(
   fullyQualifiedName: String,

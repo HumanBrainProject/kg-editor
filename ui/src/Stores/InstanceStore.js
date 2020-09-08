@@ -419,7 +419,7 @@ class InstanceStore {
       types: [instanceType],
       fields: toJS(fields),
       primaryType: instanceType,
-      labelField: (Array.isArray(type.labelField) && type.labelField.length)?type.labelField[0]:null,
+      labelField: type.labelField,
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},

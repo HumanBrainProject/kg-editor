@@ -20,7 +20,7 @@ import helpers.InstanceHelper
 
 final case class StructureOfInstance(
   types: Map[String, InstanceType],
-  labelField: List[String],
+  labelField: Option[String],
   promotedFields: List[String],
   fields: Map[String, StructureOfField]
 ) {
@@ -30,9 +30,13 @@ final case class StructureOfInstance(
     val f = typeInfo.fields.foldLeft(fields) {
       case (map, (name, value)) => map.updated(name, value)
     }
+    val labelF = labelField match {
+      case Some(l) => Some(l)
+      case _ => typeInfo.labelField
+    }
     StructureOfInstance(
       types.updated(typeInfo.name, InstanceType(typeInfo.name, typeInfo.label, typeInfo.color)),
-      (labelField ::: typeInfo.labelField).distinct,
+      labelF,
       (promotedFields ::: pf).distinct,
       f
     )
@@ -44,7 +48,7 @@ object StructureOfInstance {
 
   def apply(instanceTypes: List[String], typeInfoMap: Map[String, StructureOfType]): StructureOfInstance =
     instanceTypes
-      .foldLeft(StructureOfInstance(Map(), List(), List(), Map())) {
+      .foldLeft(StructureOfInstance(Map(), None, List(), Map())) {
         case (acc, typeName) =>
           typeInfoMap.get(typeName) match {
             case Some(typeInfo) => acc add typeInfo

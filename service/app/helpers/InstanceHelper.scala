@@ -33,7 +33,7 @@ object InstanceHelper {
           case Some(d) =>
             (d \ "@type").asOpt[List[String]] match {
               case Some(values) => (acc ::: values).distinct
-              case _            => acc
+              case _ => acc
             }
           case _ => acc
         }
@@ -44,7 +44,7 @@ object InstanceHelper {
       case (acc, data) =>
         (data \ "@type").asOpt[List[String]] match {
           case Some(values) => (acc ::: values).distinct
-          case _            => acc
+          case _ => acc
         }
     }
 
@@ -69,7 +69,7 @@ object InstanceHelper {
   def extractPayloadAsList(request: UserRequest[AnyContent]): Option[List[String]] =
     for {
       bodyContent <- request.body.asJson
-      res         <- bodyContent.asOpt[List[String]]
+      res <- bodyContent.asOpt[List[String]]
     } yield res
 
   def getTypeInfoMap(list: List[StructureOfType]): Map[String, StructureOfType] =
@@ -89,19 +89,19 @@ object InstanceHelper {
   def filterFieldNames(fields: List[String], filter: Option[String]): List[String] =
     filter match {
       case Some(f) => filterFieldNames(fields, List(f))
-      case None    => fields
+      case None => fields
     }
 
   def getId(data: JsObject, apiInstancesPrefix: String): Option[String] =
     (data \ "@id").asOpt[String] match {
       case Some(i) => Some(DocumentId.getIdFromPath(i, apiInstancesPrefix))
-      case None    => None
+      case None => None
     }
 
   def getTypes(coreInstance: CoreData): Option[List[String]] =
     coreInstance match {
       case CoreData(Some(data), None) => getTypes(data)
-      case _                          => None
+      case _ => None
     }
 
   def getTypes(data: JsObject): Option[List[String]] =
@@ -115,14 +115,17 @@ object InstanceHelper {
       case None => None
     }
 
-  def getPromotedFields(fields: Map[String, StructureOfField], labelField: List[String]): List[String] =
+  def getPromotedFields(fields: Map[String, StructureOfField], labelField: Option[String]): List[String] = {
     fields.values
       .foldLeft(List[(String, Boolean)]()) {
         case (acc, field) =>
           field.searchable match {
             case Some(f) =>
               if (f) {
-                acc :+ ((field.fullyQualifiedName, labelField.contains(field.fullyQualifiedName)))
+                labelField match {
+                  case Some(l) => acc :+ ((field.fullyQualifiedName, l.equals(field.fullyQualifiedName)))
+                  case _ => acc :+ ((field.fullyQualifiedName, false))
+                }
               } else {
                 acc
               }
@@ -137,6 +140,7 @@ object InstanceHelper {
         }
       })
       .map(i => i._1)
+  }
 
   def getPermissions(data: JsObject): Permissions = Permissions((data \ EditorConstants.VOCAB_PERMISSIONS).asOpt[List[String]])
 
@@ -163,34 +167,30 @@ object InstanceHelper {
       case Some(user) =>
         user.get("@id") match {
           case Some(i) => Some(DocumentId.getIdFromPath(i.as[String], apiInstancesPrefix))
-          case None    => None
+          case None => None
         }
       case None => None
     }
 
-  def getName(data: JsObject, names: List[String]): String =
-    names.foldLeft("") {
-      case (acc, name) => {
-        if (acc.isEmpty) {
-          (data \ name).asOpt[String] match {
-            case Some(value) => value
-            case _           => acc
-          }
-        } else {
-          acc
+  def getName(data: JsObject, name: Option[String]): String =
+    name match {
+      case Some(n) =>
+        (data \ n).asOpt[String] match {
+          case Some(value) => value
+          case _ => ""
         }
+      case _ => ""
       }
-    }
 
   def filterStructureOfFields(
-    fieldsInfo: Map[String, StructureOfField],
-    filter: List[String]
-  ): Map[String, StructureOfField] =
+                               fieldsInfo: Map[String, StructureOfField],
+                               filter: List[String]
+                             ): Map[String, StructureOfField] =
     filter.foldLeft(Map[String, StructureOfField]()) {
       case (map, name) => {
         fieldsInfo.get(name) match {
           case Some(info) => map.updated(name, info)
-          case _          => map
+          case _ => map
         }
       }
     }
@@ -216,11 +216,11 @@ object InstanceHelper {
     InstanceLabelView(id, data, typeInfoMap, apiInstancesPrefix)
 
   def generateInstancesView(
-    coreInstances: Map[String, CoreData],
-    typeInfoList: List[StructureOfType],
-    generateInstanceView: (String, CoreData, Map[String, StructureOfType], String) => Instance,
-    apiInstancesPrefix: String
-  ): Map[String, Instance] = {
+                             coreInstances: Map[String, CoreData],
+                             typeInfoList: List[StructureOfType],
+                             generateInstanceView: (String, CoreData, Map[String, StructureOfType], String) => Instance,
+                             apiInstancesPrefix: String
+                           ): Map[String, Instance] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     coreInstances.foldLeft(Map[String, Instance]()) {
       case (map, (id, coreInstance)) => map.updated(id, generateInstanceView(id, coreInstance, typeInfoMap, apiInstancesPrefix))
@@ -228,10 +228,10 @@ object InstanceHelper {
   }
 
   def generateInstancesSummaryView(
-    coreInstancesList: List[JsObject],
-    typeInfoList: List[StructureOfType],
-    apiInstancesPrefix: String
-  ): List[Instance] = {
+                                    coreInstancesList: List[JsObject],
+                                    typeInfoList: List[StructureOfType],
+                                    apiInstancesPrefix: String
+                                  ): List[Instance] = {
     val typeInfoMap = getTypeInfoMap(typeInfoList)
     coreInstancesList.foldLeft(List[Instance]()) {
       case (acc, data) => acc :+ InstanceSummaryView(data, typeInfoMap, apiInstancesPrefix)

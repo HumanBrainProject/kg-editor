@@ -26,7 +26,7 @@ final case class StructureOfType(
   name: String,
   label: String,
   color: Option[String],
-  labelField: List[String],
+  labelField: Option[String],
   fields: Map[String, StructureOfField],
   promotedFields: List[String]
 )
@@ -37,7 +37,7 @@ object StructureOfType {
     name: String,
     label: String,
     color: Option[String],
-    labelField: List[String],
+    labelField: Option[String],
     fields: Map[String, StructureOfField]
   ): StructureOfType =
     StructureOfType(name, label, color, labelField, fields, InstanceHelper.getPromotedFields(fields, labelField))
@@ -58,12 +58,7 @@ object StructureOfType {
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
-    (JsPath \ EditorConstants.VOCAB_LABEL_PROPERTIES)
-      .readNullable[List[String]]
-      .map {
-        case Some(v) => v
-        case _       => List()
-      } and
+    (JsPath \ EditorConstants.VOCAB_LABEL_PROPERTY).readNullable[String] and
     (JsPath \ EditorConstants.VOCAB_PROPERTIES)
       .read[List[StructureOfField]]
       .map(

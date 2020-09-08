@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction, get, set } from "mobx";
-import { union, debounce, isObject } from "lodash";
+import { union, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
@@ -192,23 +192,6 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
       }
       this.addValue(optionsPool.getOption(value, this.mappingValue, this.mappingLabel));
     });
-  }
-
-  mapIdentifierReturnValue(value) {
-    return {
-      "@id": value[this.mappingReturn]
-    };
-  }
-
-  mapReturnValue(value){
-    if(this.mappingReturn && this.mappingIsIdentifier){
-      if(Array.isArray(value)) {
-        return value.map( obj => this.mapIdentifierReturnValue(obj));
-      } else if(isObject(value)){
-        return this.mapIdentifierReturnValue(value);
-      }
-    }
-    return super.mapReturnValue(value);
   }
 
   @action

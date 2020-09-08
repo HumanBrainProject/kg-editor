@@ -271,23 +271,6 @@ class KgTableStore extends FormStore.typesMapping.Default{
       });
     }
 
-    mapIdentifierReturnValue(value) {
-      return {
-        "@id": this.mappingIdentifierReturnValuePrefix?`${this.mappingIdentifierReturnValuePrefix}${value[this.mappingReturn]}`:value[this.mappingReturn]
-      };
-    }
-
-    mapReturnValue(value){
-      if(this.mappingReturn && this.mappingIsIdentifier){
-        if(Array.isArray(value)) {
-          return value.map( obj => this.mapIdentifierReturnValue(obj));
-        } else if(isObject(value)){
-          return this.mapIdentifierReturnValue(value);
-        }
-      }
-      return super.mapReturnValue(value);
-    }
-
     @action
     async fetchOptions(append){
       this.fetchingOptions = true;

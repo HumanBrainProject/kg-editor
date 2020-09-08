@@ -199,7 +199,7 @@ object InstanceHelper {
     field.get("@id") match {
       case Some(id) =>
         val normalizedId = DocumentId.getIdFromPath(id.as[String], apiInstancesPrefix)
-        field.updated("id", JsString(normalizedId)).filter(value => !value._1.equals("@id"))
+        field.updated("@id", JsString(normalizedId))
       case None => field
     }
 

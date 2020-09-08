@@ -29,10 +29,7 @@ object SuggestionType {
     (JsPath \ SchemaFieldsConstants.NAME).read[String] and
     (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
     (JsPath \ EditorConstants.VOCAB_SPACES).read[List[JsObject]].map(
-      list => list.map(
-        v => (v \ EditorConstants.VOCAB_SPACE).as[String]
-      )
-
+      list => list.map(v => (v \ EditorConstants.VOCAB_SPACE).as[String])
     )
   )(SuggestionType.apply _)
 

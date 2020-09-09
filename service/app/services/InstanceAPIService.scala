@@ -120,6 +120,30 @@ trait InstanceAPIService {
     }
   }
 
+  def getInstanceScope(
+                        wSClient: WSClient,
+                        apiBaseEndpoint: String,
+                        apiVersion: String,
+                        id: String,
+                        token: AccessToken,
+                        clientToken: String
+                      ): Task[Either[WSResponse, JsObject]] = {
+    val q = wSClient
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/$id/scope")
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
+      .addQueryStringParameters(
+        "stage"             -> "IN_PROGRESS"
+      )
+    val r = Task.deferFuture(q.get())
+    r.map { res =>
+      res.status match {
+        case OK =>
+          Right(res.json.as[JsObject])
+        case _ => Left(res)
+      }
+    }
+  }
+
   def getGraph(
     wSClient: WSClient,
     apiBaseEndpoint: String,

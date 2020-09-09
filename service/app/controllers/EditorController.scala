@@ -32,6 +32,7 @@ class EditorController @Inject()(
                                   authenticatedUserAction: AuthenticatedUserAction,
                                   editorService: EditorService,
                                   workspaceServiceLive: WorkspaceServiceLive,
+                                  releaseServiceLive: ReleaseServiceLive,
                                   configurationServiceLive: ConfigurationServiceLive
                                 ) extends AbstractController(cc) {
 
@@ -62,6 +63,110 @@ class EditorController @Inject()(
         }
         .runToFuture
     }
+
+  def getInstanceScope(id: String): Action[AnyContent] =
+    authenticatedUserAction.async { implicit request =>
+      editorService
+        .getInstanceScope(id, request.userToken, request.clientToken)
+        .flatMap {
+          case Right(value) =>
+            val data = (value \ "data").as[JsObject]
+            val typesToRetrieve = extractTypesFromScope(data)
+            val idsForStatusToRetrieve = extractIdsFromScope(data)
+            val result = for {
+              types <- workspaceServiceLive
+                .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken, true) //TODO: change this to false and adapt
+              statuses <- releaseServiceLive
+                .retrieveReleaseStatus(idsForStatusToRetrieve, "TOP_INSTANCE_ONLY", request.userToken, request.clientToken)
+            } yield (types, statuses)
+            result.map {
+              case (Right(t), Right(s)) =>
+                val typeList = extractTypeList(t)
+                val typeInfoMap = InstanceHelper.getTypeInfoMap(typeList)
+                Ok(
+                  Json.toJson(
+                    EditorResponseObject(
+                      Json.toJson(
+                        updateScopeWithTypeInfoAndStatus(data, typeInfoMap, s)
+                      )
+                    )
+                  )
+                )
+              case (_, Right(s)) =>
+                Ok(
+                  Json.toJson(
+                    EditorResponseObject(
+                      Json.toJson(
+                        updateScopeWithTypeInfoAndStatus(data, Map(), s)
+                      )
+                    )
+                  )
+                )
+              case (_, _) => InternalServerError("Release management is currently unavailable! Please try again later!")
+            }
+          case Left(err) => Task.pure(err.toResult)
+        }
+        .runToFuture
+    }
+
+  private def updateScopeWithTypeInfoAndStatus(data: JsObject, typeInfoMap: Map[String, StructureOfType], statuses: JsValue): JsObject = {
+    val types = (data \ "types").asOpt[List[String]] match {
+      case Some(values) =>
+        values.foldLeft(List[StructureOfType]()) {
+          case (acc, v) => typeInfoMap.get(v) match {
+            case Some(res) => acc :+ res
+            case _ => acc
+          }
+        }
+      case _ => List()
+    }
+
+    val status = (statuses \ (data \ "id").as[String] \ "data").as[JsString]
+
+    val children = (data \ "children").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(List[JsValue]()) {
+        case (acc, data) => acc :+ updateScopeWithTypeInfoAndStatus(data, typeInfoMap, statuses)
+      }
+      case _ => List()
+    }
+
+    if (children.nonEmpty) {
+      Json.obj("id" -> (data \ "id").as[JsString],
+        "status" -> status,
+        "label" -> (data \ "label").as[JsString],
+        "types" -> Json.toJson(types),
+        "children" -> Json.toJson(children))
+    } else {
+      Json.obj("id" -> (data \ "id").as[JsString],
+        "status" -> status,
+        "label" -> (data \ "label").as[JsString],
+        "types" -> Json.toJson(types))
+    }
+
+  }
+
+  private def extractTypesFromScope(data: JsObject): List[String] = {
+    val types = (data \ "types").asOpt[List[String]] match {
+      case Some(values) => values
+      case _ => List[String]()
+    }
+    (data \ "children").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(types) {
+        case (acc, data) => (acc ::: extractTypesFromScope(data)).distinct
+      }
+      case _ => types
+    }
+  }
+
+  private def extractIdsFromScope(data: JsObject): List[String] = {
+    val id = (data \ "id").as[String]
+    (data \ "children").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(List[String](id)) {
+        case (acc, data) => (acc ::: extractIdsFromScope(data)).distinct
+      }
+      case _ => List[String](id)
+    }
+  }
 
   def getInstancesList(stage: String, metadata: Boolean): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
@@ -125,7 +230,7 @@ class EditorController @Inject()(
               val coreInstances = InstanceHelper.toCoreData(instancesResult)
               val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstances(coreInstances)
               workspaceServiceLive
-                .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken)
+                .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken, true)
                 .map {
                   case Right(typesWithFields) =>
                     implicit val writer = InstanceProtocol.instanceWrites
@@ -142,7 +247,7 @@ class EditorController @Inject()(
                     )
                   case _ => InternalServerError("Something went wrong with types! Please try again!")
                 }
-            case _ =>Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
+            case _ => Task.pure(InternalServerError("Something went wrong with instances! Please try again!"))
           }
       case None => Task.pure(BadRequest("Wrong body content!"))
     }
@@ -162,7 +267,7 @@ class EditorController @Inject()(
               case Some(coreInstancesList) =>
                 val typesToRetrieve = InstanceHelper.extractTypesFromCoreInstancesList(coreInstancesList)
                 workspaceServiceLive
-                  .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken)
+                  .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken, true)
                   .map {
                     case Right(typesWithFields) =>
                       implicit val writer = InstanceProtocol.instanceWrites
@@ -389,7 +494,7 @@ class EditorController @Inject()(
     typesToRetrieve match {
       case Some(t) =>
         workspaceServiceLive
-          .retrieveTypesListByName(t, token, clientToken)
+          .retrieveTypesListByName(t, token, clientToken, true)
           .map {
             case Right(typesWithFields) =>
               implicit val writer = InstanceProtocol.instanceWrites

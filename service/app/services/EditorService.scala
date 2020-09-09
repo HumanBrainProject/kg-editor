@@ -31,10 +31,10 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   object instanceAPIService extends InstanceAPIService
 
   def getInstance(
-    id: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                   id: String,
+                   token: AccessToken,
+                   clientToken: String
+                 ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .getInstance(
         wSClient,
@@ -46,30 +46,50 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(ref) => Right(ref)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
+  def getInstanceScope(
+                        id: String,
+                        token: AccessToken,
+                        clientToken: String
+                      ): Task[Either[APIEditorError, JsObject]] = {
+    instanceAPIService
+      .getInstanceScope(
+        wSClient,
+        configuration.kgCoreEndpoint,
+        configuration.kgCoreApiVersion,
+        id,
+        token,
+        clientToken
+      )
+      .map {
+        case Right(res) => Right(res)
+        case Left(res) => Left(APIEditorError(res.status, res.body))
+      }
+  }
+
   def retrieveInstanceGraph(
-    id: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] = {
+                             id: String,
+                             token: AccessToken,
+                             clientToken: String
+                           ): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceAPIService
       .getGraph(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
-      case Left(res)  => Left(APIEditorError(res.status, res.body))
+      case Left(res) => Left(APIEditorError(res.status, res.body))
     }
   }
 
   def doSearchInstances(
-    typeId: String,
-    from: Option[Int],
-    size: Option[Int],
-    searchByLabel: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                         typeId: String,
+                         from: Option[Int],
+                         size: Option[Int],
+                         searchByLabel: String,
+                         token: AccessToken,
+                         clientToken: String
+                       ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .searchInstances(
         wSClient,
@@ -84,20 +104,20 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(res) => Right(res)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
   def retrieveSuggestions(
-    id: String,
-    field: String,
-    `type`: Option[String],
-    size: Int,
-    start: Int,
-    search: String,
-    payload: JsValue,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                           id: String,
+                           field: String,
+                           `type`: Option[String],
+                           size: Int,
+                           start: Int,
+                           search: String,
+                           payload: JsValue,
+                           token: AccessToken,
+                           clientToken: String
+                         ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .postSuggestions(
         wSClient,
@@ -115,16 +135,16 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(ref) => Right(ref)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
   def insertInstance(
-    id: Option[String],
-    workspace: String,
-    body: JsValue,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                      id: Option[String],
+                      workspace: String,
+                      body: JsValue,
+                      token: AccessToken,
+                      clientToken: String
+                    ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .postInstance(
         wSClient,
@@ -138,7 +158,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(ref) => Right(ref)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
   def updateInstance(
@@ -146,7 +166,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
                       body: JsValue,
                       token: AccessToken,
                       clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                    ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .patchInstance(
         wSClient,
@@ -159,19 +179,19 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(ref) => Right(ref)
-        case Left(res)  => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
   def retrieveInstances(
-    instanceIds: List[String],
-    token: AccessToken,
-    stage: String,
-    metadata: Boolean,
-    returnAlternatives: Boolean,
-    returnPermissions: Boolean,
-    returnEmbedded: Boolean,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                         instanceIds: List[String],
+                         token: AccessToken,
+                         stage: String,
+                         metadata: Boolean,
+                         returnAlternatives: Boolean,
+                         returnPermissions: Boolean,
+                         returnEmbedded: Boolean,
+                         clientToken: String
+                       ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .getInstances(
         wSClient,
@@ -188,15 +208,15 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(value) => Right(value)
-        case Left(res)    => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
   def retrieveTypes(
-    typeOfInstance: String,
-    token: AccessToken,
-    metadata: Boolean,
-    clientToken: String
-  ): Task[Either[APIEditorError, JsObject]] =
+                     typeOfInstance: String,
+                     token: AccessToken,
+                     metadata: Boolean,
+                     clientToken: String
+                   ): Task[Either[APIEditorError, JsObject]] =
     instanceAPIService
       .getInstancesByType(
         wSClient,
@@ -209,7 +229,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       )
       .map {
         case Right(value) => Right(value)
-        case Left(res)    => Left(APIEditorError(res.status, res.body))
+        case Left(res) => Left(APIEditorError(res.status, res.body))
       }
 
   def deleteInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]] =

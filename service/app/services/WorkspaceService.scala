@@ -28,7 +28,8 @@ trait WorkspaceService {
   def retrieveTypesListByName(
     types: List[String],
     token: AccessToken,
-    clientToken: String
+    clientToken: String,
+    withProperties:  Boolean
   ): Task[Either[APIEditorError, JsObject]]
 
   def retrieveWorkspaceTypes(
@@ -50,10 +51,11 @@ class WorkspaceServiceLive @Inject()(
   def retrieveTypesListByName(
     types: List[String],
     token: AccessToken,
-    clientToken: String
+    clientToken: String,
+    withProperties:  Boolean
   ): Task[Either[APIEditorError, JsObject]] =
     workspaceAPIServiceLive
-      .getTypesByName(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, token, types, clientToken)
+      .getTypesByName(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, token, types, clientToken, withProperties)
       .map {
         case Right(value) => Right(value)
         case Left(res)    => Left(APIEditorError(res.status, res.body))

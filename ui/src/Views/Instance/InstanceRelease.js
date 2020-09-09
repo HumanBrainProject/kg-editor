@@ -34,6 +34,7 @@ import ReleaseAction from "./InstanceRelease/ReleaseAction";
 import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
 import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
 
+
 const rootPath = window.rootPath || "";
 
 const styles = {
@@ -95,7 +96,7 @@ class InstanceRelease extends React.Component {
   componentDidMount() {
     releaseStore.setTopInstanceId(this.props.instance.id);
     releaseStore.fetchReleaseData();
-    releaseStore.fetchWarningMessages();
+    //releaseStore.fetchWarningMessages(); TODO:check if this is still valid
   }
 
   componentDidUpdate(prevProps) {

@@ -36,6 +36,7 @@ const endpoints = {
   "searchInstances": (type, from, size, searchByLabel) => `/editor/api/summary?type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${searchByLabel}`,
   "suggestions": (id, field, type=null, start, size, search) => `/editor/api/instances/${id}/suggestions?field=${encodeURIComponent(field)}${type?"&type=" + encodeURIComponent(type):""}&start=${start}&size=${size}&search=${search}`,
   "instance": id => `/editor/api/instances/${id}`,
+  "instanceScope": id => `/editor/api/instances/${id}/scope`,
   "createInstance": (id=null) => `/editor/api/instances${id?("/" + id):""}?workspace=${appStore.currentWorkspace.id}`,
   "getInstance": id => `/editor/api/instances/${id}`,
   "release": id => `/editor/api/releases/${id}/release`,

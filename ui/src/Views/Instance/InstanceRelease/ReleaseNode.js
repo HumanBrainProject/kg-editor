@@ -155,7 +155,7 @@ class ReleaseNode extends React.Component {
         : node["pending_" + "status"] === "HAS_CHANGED"
           ? "has-changed"
           : "released";
-
+    const nodeTypes = node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
     return (
       <div className={`${classes.container} ${statusClass}`} style={{marginLeft: 32*level}}>
         <div
@@ -167,7 +167,7 @@ class ReleaseNode extends React.Component {
               isChildren={false}
             />
           </div>
-          <span className={"node-type"}>({node.type})</span>
+          <span className={"node-type"}>({nodeTypes})</span>
           <span className={classes.label}>{node.label}</span>
           <ReleaseNodeToggle
             key={`${node.pending_status}-${node.pending_childrenStatus}-${

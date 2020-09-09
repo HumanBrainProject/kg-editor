@@ -31,7 +31,8 @@ trait WorkspaceAPIService {
     apiVersion: String,
     token: AccessToken,
     types: List[String],
-    clientToken: String
+    clientToken: String,
+    withProperties: Boolean
   ): Task[Either[WSResponse, JsObject]]
 
   def getWorkspaceTypes(
@@ -60,13 +61,14 @@ class WorkspaceAPIServiceLive extends WorkspaceAPIService {
     apiVersion: String,
     token: AccessToken,
     types: List[String],
-    clientToken: String
+    clientToken: String,
+    withProperties: Boolean
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(types)
     val q = wsClient
       .url(s"$apiBaseEndpoint/$apiVersion/typesByName")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("stage" -> "IN_PROGRESS", "withProperties" -> "true")
+      .addQueryStringParameters("stage" -> "IN_PROGRESS", "withProperties" -> withProperties.toString)
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {

@@ -218,15 +218,15 @@ class ReleaseStore{
     this.isFetching = true;
     this.fetchError = null;
     try{
-      const { data } = await API.axios.get(API.endpoints.release(this.topInstanceId));
+      const { data } = await API.axios.get(API.endpoints.instanceScope(this.topInstanceId));
       runInAction(()=>{
         this.hideReleasedInstances = false;
-        populateStatuses(data);
+        populateStatuses(data.data);
         // Default release state
-        this.recursiveMarkNodeForChange(data, null); // "RELEASED"
-        populateStatuses(data, "pending_");
-        setNodeTypes(data);
-        this.instancesTree = data;
+        this.recursiveMarkNodeForChange(data.data, null); // "RELEASED"
+        populateStatuses(data.data, "pending_");
+        setNodeTypes(data.data);
+        this.instancesTree = data.data;
         this.isFetched = true;
         this.isFetching = false;
       });

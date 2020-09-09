@@ -259,3 +259,22 @@ DELETE    /:id                  controllers.EditorController.deleteInstance(id: 
 #    type: string
 ###
 # GET    /:org/:domain/:schema/:version/:id/revisions                         controllers.EditorController.getInstanceNumberOfAvailableRevisions(org: String, domain:String, schema: String, version:String, id: String)
+
+
+###
+#  summary: return the scope for a specific entity type
+#  tags:
+#    - editor
+#  parameters:
+#  - name: id
+#    in: path
+#    description: the UUID of the instance to fetch
+#    required: true
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+GET    /:id/scope                  controllers.EditorController.getInstanceScope(id: String)

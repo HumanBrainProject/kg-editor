@@ -200,9 +200,11 @@ class EditorController @Inject()(
 
   def getSuggestion(obj: JsObject, types: Map[String, SuggestionType]): JsObject = {
     val t = types.get((obj \ "type").as[String])
+    val id = (obj \ "id").as[String]
+    val label = (obj \ "label").asOpt[String].getOrElse(id)
     Json.obj(
-      "id" -> (obj \ "id").as[String],
-      "name" -> (obj \ "label").asOpt[String].getOrElse((obj \ "id").as[String]),
+      "id" -> id,
+      "name" -> Json.toJson(label),
       "type" -> Json.toJson(t),
       "space" -> (obj \ "space").as[String]
     )

@@ -202,7 +202,7 @@ class EditorController @Inject()(
     val t = types.get((obj \ "type").as[String])
     Json.obj(
       "id" -> (obj \ "id").as[String],
-      "name" -> (obj \ "label").as[String],
+      "name" -> (obj \ "label").asOpt[String].getOrElse((obj \ "id").as[String]),
       "type" -> Json.toJson(t),
       "space" -> (obj \ "space").as[String]
     )

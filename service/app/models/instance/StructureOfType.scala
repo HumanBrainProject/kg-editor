@@ -23,24 +23,27 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 final case class StructureOfType(
-  name: String,
-  label: String,
-  color: Option[String],
-  labelField: Option[String],
-  fields: Map[String, StructureOfField],
-  promotedFields: List[String]
-)
+                                  name: String,
+                                  label: String,
+                                  color: Option[String],
+                                  labelField: Option[String],
+                                  fields: Option[Map[String, StructureOfField]],
+                                  promotedFields: Option[List[String]]
+                                )
 
 object StructureOfType {
 
   def apply(
-    name: String,
-    label: String,
-    color: Option[String],
-    labelField: Option[String],
-    fields: Map[String, StructureOfField]
-  ): StructureOfType =
+             name: String,
+             label: String,
+             color: Option[String],
+             labelField: Option[String],
+             fields: Option[Map[String, StructureOfField]]
+           ): StructureOfType = {
     StructureOfType(name, label, color, labelField, fields, InstanceHelper.getPromotedFields(fields, labelField))
+
+
+  }
 
   import models.instance.StructureOfField._
 
@@ -56,17 +59,17 @@ object StructureOfType {
 
   implicit val structureOfTypeReads: Reads[StructureOfType] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
-    (JsPath \ SchemaFieldsConstants.NAME).read[String] and
-    (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
-    (JsPath \ EditorConstants.VOCAB_LABEL_PROPERTY).readNullable[String] and
-    (JsPath \ EditorConstants.VOCAB_PROPERTIES)
-      .read[List[StructureOfField]]
-      .map(
-        t =>
-          t.filterNot { i =>
+      (JsPath \ SchemaFieldsConstants.NAME).read[String] and
+      (JsPath \ EditorConstants.VOCAB_COLOR).readNullable[String] and
+      (JsPath \ EditorConstants.VOCAB_LABEL_PROPERTY).readNullable[String] and
+      (JsPath \ EditorConstants.VOCAB_PROPERTIES)
+        .readNullable[List[StructureOfField]]
+        .map {
+          case Some(t) =>
+            Some(t.filterNot { i =>
               val l = i.label match {
                 case Some(_) => true
-                case _       => false
+                case _ => false
               }
               if (l) {
                 valuesToRemove.contains(i.fullyQualifiedName)
@@ -74,10 +77,11 @@ object StructureOfType {
                 true
               }
             }
-            .map(f => f.fullyQualifiedName -> f)
-            .toMap
-      )
-  )(StructureOfType.apply(_, _, _, _, _))
+              .map(f => f.fullyQualifiedName -> f)
+              .toMap)
+          case _ => None
+        }
+    ) (StructureOfType.apply(_, _, _, _, _))
 
   implicit val structureOfTypeWrites = Json.writes[StructureOfType]
 }

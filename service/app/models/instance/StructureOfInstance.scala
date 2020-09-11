@@ -19,27 +19,41 @@ package models.instance
 import helpers.InstanceHelper
 
 final case class StructureOfInstance(
-  types: Map[String, InstanceType],
-  labelField: Option[String],
-  promotedFields: List[String],
-  fields: Map[String, StructureOfField]
-) {
+                                      types: Map[String, InstanceType],
+                                      labelField: Option[String],
+                                      promotedFields: List[String],
+                                      fields: Map[String, StructureOfField]
+                                    ) {
 
   def add(typeInfo: StructureOfType): StructureOfInstance = {
-    val pf = InstanceHelper.getPromotedFields(typeInfo.fields, labelField)
-    val f = typeInfo.fields.foldLeft(fields) {
-      case (map, (name, value)) => map.updated(name, value)
+    typeInfo.fields match {
+      case Some(t) =>
+        val pf = InstanceHelper.getPromotedFields(typeInfo.fields, labelField) match {
+          case Some(p) => p
+          case _ => List()
+        }
+        val f = t.foldLeft(fields) {
+          case (map, (name, value)) => map.updated(name, value)
+        }
+        val labelF = labelField match {
+          case Some(l) => Some(l)
+          case _ => typeInfo.labelField
+        }
+        StructureOfInstance(
+          types.updated(typeInfo.name, InstanceType(typeInfo.name, typeInfo.label, typeInfo.color)),
+          labelF,
+          (promotedFields ::: pf).distinct,
+          f
+        )
+      case _ => this
+//        StructureOfInstance(
+//        types,
+//        labelField,
+//        promotedFields,
+//        fields
+//      )
     }
-    val labelF = labelField match {
-      case Some(l) => Some(l)
-      case _ => typeInfo.labelField
-    }
-    StructureOfInstance(
-      types.updated(typeInfo.name, InstanceType(typeInfo.name, typeInfo.label, typeInfo.color)),
-      labelF,
-      (promotedFields ::: pf).distinct,
-      f
-    )
+
   }
 
 }
@@ -52,7 +66,7 @@ object StructureOfInstance {
         case (acc, typeName) =>
           typeInfoMap.get(typeName) match {
             case Some(typeInfo) => acc add typeInfo
-            case _              => acc
+            case _ => acc
           }
       }
 

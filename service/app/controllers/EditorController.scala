@@ -75,7 +75,7 @@ class EditorController @Inject()(
             val idsForStatusToRetrieve = extractIdsFromScope(data)
             val result = for {
               types <- workspaceServiceLive
-                .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken, true) //TODO: change this to false and adapt
+                .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken, false)
               statuses <- releaseServiceLive
                 .retrieveReleaseStatus(idsForStatusToRetrieve, "TOP_INSTANCE_ONLY", request.userToken, request.clientToken)
             } yield (types, statuses)
@@ -130,17 +130,15 @@ class EditorController @Inject()(
       case _ => List()
     }
 
+    val result = Json.obj("id" -> (data \ "id").as[JsString],
+      "status" -> status,
+      "label" -> (data \ "label").as[JsString],
+      "types" -> Json.toJson(types))
+
     if (children.nonEmpty) {
-      Json.obj("id" -> (data \ "id").as[JsString],
-        "status" -> status,
-        "label" -> (data \ "label").as[JsString],
-        "types" -> Json.toJson(types),
-        "children" -> Json.toJson(children))
+      result ++ Json.obj("children" -> Json.toJson(children))
     } else {
-      Json.obj("id" -> (data \ "id").as[JsString],
-        "status" -> status,
-        "label" -> (data \ "label").as[JsString],
-        "types" -> Json.toJson(types))
+      result
     }
 
   }

@@ -115,31 +115,34 @@ object InstanceHelper {
       case None => None
     }
 
-  def getPromotedFields(fields: Map[String, StructureOfField], labelField: Option[String]): List[String] = {
-    fields.values
-      .foldLeft(List[(String, Boolean)]()) {
-        case (acc, field) =>
-          field.searchable match {
-            case Some(f) =>
-              if (f) {
-                labelField match {
-                  case Some(l) => acc :+ ((field.fullyQualifiedName, l.equals(field.fullyQualifiedName)))
-                  case _ => acc :+ ((field.fullyQualifiedName, false))
+  def getPromotedFields(fields: Option[Map[String, StructureOfField]], labelField: Option[String]): Option[List[String]] = {
+    fields match {
+      case Some(f) => Some(f.values
+        .foldLeft(List[(String, Boolean)]()) {
+          case (acc, field) =>
+            field.searchable match {
+              case Some(f) =>
+                if (f) {
+                  labelField match {
+                    case Some(l) => acc :+ ((field.fullyQualifiedName, l.equals(field.fullyQualifiedName)))
+                    case _ => acc :+ ((field.fullyQualifiedName, false))
+                  }
+                } else {
+                  acc
                 }
-              } else {
-                acc
-              }
-            case _ => acc
-          }
-      }
-      .sortWith((t1, t2) => {
-        if ((t1._2 && t2._2) || (!t1._2 && !t2._2)) {
-          t1._1.compareTo(t2._1) > 0
-        } else {
-          t1._2
+              case _ => acc
+            }
         }
-      })
-      .map(i => i._1)
+        .sortWith((t1, t2) => {
+          if ((t1._2 && t2._2) || (!t1._2 && !t2._2)) {
+            t1._1.compareTo(t2._1) > 0
+          } else {
+            t1._2
+          }
+        })
+        .map(i => i._1))
+      case _ => None
+    }
   }
 
   def getPermissions(data: JsObject): Permissions = Permissions((data \ EditorConstants.VOCAB_PERMISSIONS).asOpt[List[String]])

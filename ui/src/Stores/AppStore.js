@@ -629,8 +629,8 @@ class AppStore{
   }
 
   @action
-  setComparedWithReleasedVersionInstance(instanceId){
-    this.comparedWithReleasedVersionInstance = instanceId;
+  setComparedWithReleasedVersionInstance(instance){
+    this.comparedWithReleasedVersionInstance = instance;
   }
 
   goToDashboard = () => {

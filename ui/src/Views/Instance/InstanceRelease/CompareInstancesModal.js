@@ -60,30 +60,17 @@ class CompareInstancesModal extends React.Component {
         onHide={this.handleShowCompare(null)}
       >
         <Modal.Header closeButton>
-            Compare with the released version of{" "}
+            Compare with the released version of &nbsp;
           <strong>
-            {
-              appStore.comparedWithReleasedVersionInstance
-                .type
-            }
-                        &nbsp;
-            {
-              appStore.comparedWithReleasedVersionInstance
-                .label
-            }
+            {appStore.comparedWithReleasedVersionInstance.type}&nbsp;
+            {appStore.comparedWithReleasedVersionInstance.label}
           </strong>
         </Modal.Header>
         <Modal.Body>
           <Scrollbars autoHide>
             <CompareWithReleasedVersionChanges
-              instanceId={
-                appStore.comparedWithReleasedVersionInstance
-                  .relativeUrl
-              }
-              status={
-                appStore.comparedWithReleasedVersionInstance
-                  .status
-              }
+              instanceId={appStore.comparedWithReleasedVersionInstance.id}
+              status={appStore.comparedWithReleasedVersionInstance.status}
             />
           </Scrollbars>
         </Modal.Body>

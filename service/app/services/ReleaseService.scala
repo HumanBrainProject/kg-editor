@@ -83,7 +83,7 @@ class ReleaseServiceLive @Inject()(
     clientToken: String
   ): Task[Either[APIEditorError, JsObject]] = {
     val result = releaseAPIServiceLive
-      .getRelease(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
+      .getRelease(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, id, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res)  => Left(APIEditorError(res.status, res.body))
@@ -92,7 +92,7 @@ class ReleaseServiceLive @Inject()(
 
   def releaseInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]] = {
     val result = releaseAPIServiceLive
-      .putReleaseInstance(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
+      .putReleaseInstance(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, id, token, clientToken)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))
@@ -101,7 +101,7 @@ class ReleaseServiceLive @Inject()(
 
   def unreleaseInstance(id: String, token: AccessToken, clientToken: String): Task[Either[APIEditorError, Unit]] = {
     val result = releaseAPIServiceLive
-      .deleteRelease(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
+      .deleteRelease(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, id, token, clientToken)
     result.map {
       case Right(()) => Right(())
       case Left(res) => Left(APIEditorError(res.status, res.body))

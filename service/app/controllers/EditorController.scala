@@ -132,7 +132,7 @@ class EditorController @Inject()(
 
     val result = Json.obj("id" -> (data \ "id").as[JsString],
       "status" -> status,
-      "label" -> (data \ "label").as[JsString],
+      "label" -> (data \ "label").asOpt[JsString],
       "types" -> Json.toJson(types))
 
     if (children.nonEmpty) {

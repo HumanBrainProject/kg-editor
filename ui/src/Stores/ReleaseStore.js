@@ -23,24 +23,9 @@ import historyStore from "./HistoryStore";
 import appStore from "./AppStore";
 
 const setNodeTypes = node => {
-  node.typePath = (typeof node.relativeUrl === "string")?
-    node.relativeUrl.substr(
-      0,
-      node.relativeUrl.lastIndexOf("/")
-    ):"N/A";
   if (Array.isArray(node.children) && node.children.length) {
     node.children.forEach(child => setNodeTypes(child));
-    node.children = node.children.sort((a, b) => {
-      const at = (typeof a.type === "string")?a.type.toUpperCase():null;
-      const bt = (typeof b.type === "string")?b.type.toUpperCase():null;
-      if (at < bt) {
-        return -1;
-      }
-      if (at > bt) {
-        return 1;
-      }
-      return 0;
-    });
+    node.children = node.children.sort((a, b) =>  a.types.toString().toUpperCase().localeCompare(b.types.toString().toUpperCase()));
   }
 };
 
@@ -308,17 +293,18 @@ class ReleaseStore{
 
   @action
   async releaseNode(node) {
+    const types = node.types && node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
     try {
-      await API.axios.put(API.endpoints.release(node["relativeUrl"], {}));
+      await API.axios.put(API.endpoints.release(node.id, {}));
       runInAction(()=>{
-        this.savingLastEndedRequest = `(${node.type}) released successfully`;
+        this.savingLastEndedRequest = `(${types}) ${node.label} released successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node["relativeUrl"], [], "released"); // TODO: pass the types
+        historyStore.updateInstanceHistory(node.id, node.types, "released", false);
       });
     } catch(e){
       runInAction(()=>{
         this.savingErrors.push({node: node, message: e.message});
-        this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to release this instance`;
+        this.savingLastEndedRequest = `(${types}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
       appStore.captureSentryException(e);
@@ -331,17 +317,18 @@ class ReleaseStore{
 
   @action
   async unreleaseNode(node) {
+    const types = node.types && node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
     try {
-      await API.axios.delete(API.endpoints.release(node["relativeUrl"], {}));
+      await API.axios.delete(API.endpoints.release(node.id, {}));
       runInAction(()=>{
-        this.savingLastEndedRequest = `(${node.type}) unreleased successfully`;
+        this.savingLastEndedRequest = `(${types}) ${node.label} unreleased successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node["relativeUrl"], [], "released", true); // TODO: pass the types
+        historyStore.updateInstanceHistory(node.id, node.types, "released", true);
       });
     } catch(e){
       runInAction(()=>{
         this.savingErrors.push({node: node, message: e.message});
-        this.savingLastEndedRequest = `(${node.type}) : an error occured while trying to unrelease this instance`;
+        this.savingLastEndedRequest = `(${types}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
       appStore.captureSentryException(e);
@@ -406,6 +393,7 @@ class ReleaseStore{
     this.warningMessages.forEach(message => message.releaseFlags.clear());
   }
 
+  //TODO: Check if this logic is still valid
   @action
   handleWarning(node, newStatus) {
     if(this.warningMessages.has(node.typePath)) {

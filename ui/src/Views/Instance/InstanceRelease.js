@@ -175,7 +175,7 @@ class InstanceRelease extends React.Component {
               <SavingModal />
               {appStore.comparedWithReleasedVersionInstance &&
                   appStore.comparedWithReleasedVersionInstance
-                    .relativeUrl && (
+                    .id && (
                 <CompareInstancesModal />
               )}
             </div>

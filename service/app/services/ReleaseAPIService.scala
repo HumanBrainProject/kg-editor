@@ -24,11 +24,10 @@ import play.api.libs.json.{JsArray, JsObject, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 trait ReleaseAPIService {
-  val instanceReleaseEndpoint = "/api/releases"
-
   def getRelease(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
@@ -37,6 +36,7 @@ trait ReleaseAPIService {
   def putReleaseInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
@@ -45,6 +45,7 @@ trait ReleaseAPIService {
   def deleteRelease(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
@@ -66,12 +67,13 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   def getRelease(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${id}/graph")
+      .url(s"$apiBaseEndpoint/$apiVersion/${id}/graph")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.get())
     r.map { res =>
@@ -86,12 +88,13 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   def putReleaseInstance(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${id}")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/${id}/release")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.put(""))
     r.map { res =>
@@ -105,12 +108,13 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   def deleteRelease(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
     clientToken: String
   ): Task[Either[WSResponse, Unit]] = {
     val q = wSClient
-      .url(s"$apiBaseEndpoint$instanceReleaseEndpoint/${id}")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/${id}/release")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
     val r = Task.deferFuture(q.delete())
     r.map { res =>
@@ -132,7 +136,7 @@ class ReleaseAPIServiceLive extends ReleaseAPIService {
   ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds).as[JsArray]
     val q = wSClient
-      .url(s"$apiBaseEndpoint/$apiVersion/releases/statusByIds")
+      .url(s"$apiBaseEndpoint/$apiVersion/instancesByIds/release/status")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("releaseTreeScope" -> releaseTreeScope)
     val r = Task.deferFuture(q.post(payload))

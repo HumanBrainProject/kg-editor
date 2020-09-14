@@ -123,8 +123,9 @@ export const normalizeInstanceData = (data, transformField=null) => {
         field.isLink = true;
         field.mappingLabel = "name";
         field.mappingValue = "@id";
-        field.mappingReturn = "@id";
+        field.mappingReturn = ["@id"];
         field.closeDropdownAfterInteraction = true;
+        // field.allowCustomValues = true;
       }
     }
   };

@@ -19,6 +19,7 @@ import API from "../Services/API";
 
 class TypesStore {
   @observable types = [];
+  @observable typesMap = new Map();
   @observable fetchError = null;
   @observable isFetching = false;
 
@@ -44,6 +45,7 @@ class TypesStore {
         const response = await API.axios.get(API.endpoints.workspaceTypes());
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
+          this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
           this.isFetching = false;
         });
       } catch (e) {

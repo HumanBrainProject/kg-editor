@@ -24,6 +24,7 @@ import instanceStore from "../../../Stores/InstanceStore";
 import instanceTabStore from "../../../Stores/InstanceTabStore";
 
 import RenderMarkdownField from "../../../Components/Markdown";
+import typesStore from "../../../Stores/TypesStore";
 
 const styles = {
   field: {
@@ -177,8 +178,10 @@ class InstanceField extends React.Component{
     return field.value;
   }
 
-  addCustomValueHandler = async (value, field) => {
-    let newInstanceId = await instanceStore.createNewInstanceAsOption(appStore.currentWorkspace.id, field, value);
+  addCustomValueHandler = (value, field) => {
+    const name = "https://schema.hbp.eu/minds/Person"; //TODO: remove the hardcoded value
+    const type = typesStore.typesMap.get(name);
+    let newInstanceId =  instanceStore.createNewInstanceAsOption(appStore.currentWorkspace.id, type, field, value);
     if(newInstanceId){
       instanceStore.instanceHasChanged(this.props.id);
       this.handleFieldFocus(field, {id: newInstanceId});

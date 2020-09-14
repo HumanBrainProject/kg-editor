@@ -144,11 +144,7 @@ class KgInputTextField extends React.Component {
   }
 
   beforeSetValue(value){
-    if(isFunction(this.props.onBeforeSetValue)){
-      this.props.onBeforeSetValue(() => {this.props.field.setValue(value);}, this.props.field, value);
-    } else {
-      this.props.field.setValue(value);
-    }
+    this.props.field.setValue(value);
   }
 
   handleAlternativeSelect = value => {

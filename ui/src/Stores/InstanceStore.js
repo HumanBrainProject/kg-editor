@@ -17,6 +17,7 @@
 import {observable, action, runInAction, computed, toJS} from "mobx";
 import { uniqueId, debounce, isEqual } from "lodash";
 import { FormStore } from "hbp-quickfire";
+import _  from "lodash-uuid";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
@@ -430,13 +431,16 @@ class InstanceStore {
     }
     const instance  = new Instance(id, this);
     instance.initializeData(data, false, true);
+    instance.hasChanged = true;
     this.instances.set(id, instance);
+    return instance.id;
   }
 
   @action
-  async createNewInstanceAsOption(workspace, field, name){
+  createNewInstanceAsOption(workspace, type, field, name){
+    const uuid = _.uuid();
     try{
-      const newInstanceId = await this.createNewInstance(workspace. field.instancesPath, name);
+      const newInstanceId =  this.createNewInstance(workspace, type, uuid, name);
       field.options.push({
         [field.mappingValue]: newInstanceId,
         [field.mappingLabel]: name

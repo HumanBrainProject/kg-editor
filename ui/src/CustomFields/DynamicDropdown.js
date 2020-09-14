@@ -294,7 +294,8 @@ class DynamicDropdownField extends React.Component {
             this.props.onAddCustomValue(option, field, this.props.formStore);
           }
         } else {
-          this.beforeAddValue(option);
+          const data = {"@id": option.id};
+          this.beforeAddValue(data);
           this.triggerOnChange();
         }
         field.setUserInput("");
@@ -433,22 +434,14 @@ class DynamicDropdownField extends React.Component {
   }
 
   beforeAddValue(value){
-    if(isFunction(this.props.onBeforeAddValue)){
-      this.props.onBeforeAddValue(() => {this.props.field.addValue(value);}, this.props.field, value);
-    } else {
-      this.props.field.addValue(value);
-    }
+    this.props.field.addValue(value);
     if(this.props.field.closeDropdownAfterInteraction){
       this.wrapperRef = null;
     }
   }
 
   beforeRemoveValue(value){
-    if(isFunction(this.props.onBeforeRemoveValue)){
-      this.props.onBeforeRemoveValue(() => {this.props.field.removeValue(value);}, this.props.field, value);
-    } else {
-      this.props.field.removeValue(value);
-    }
+    this.props.field.removeValue(value);
     if(this.props.field.closeDropdownAfterInteraction){
       this.wrapperRef = null;
     }
@@ -515,12 +508,6 @@ class DynamicDropdownField extends React.Component {
     const dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
     const dropdownClass = (dropdownOpen? "open": "") + (listPosition === "top"?" " + classes.topList: "");
 
-    let filteredOptions = [];
-    if(dropdownOpen){
-      filteredOptions = difference(options, values);
-      filteredOptions = uniq(filteredOptions);
-    }
-
     return (
       <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
         <div ref={ref=>this.wrapperRef = ref}>
@@ -577,7 +564,7 @@ class DynamicDropdownField extends React.Component {
 
               <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
 
-              {dropdownOpen && (filteredOptions.length || this.props.field.userInput)?
+              {dropdownOpen && (options.length || this.props.field.userInput)?
                 <div className={`quickfire-dropdown ${classes.options} ${dropdownClass}`} ref={ref=>{this.optionsRef = ref;}}>
                   <InfiniteScroll
                     element={"ul"}
@@ -586,7 +573,7 @@ class DynamicDropdownField extends React.Component {
                     hasMore={this.props.field.hasMoreOptions()}
                     loadMore={this.handleLoadMoreOptions}
                     useWindow={false}>
-                    {!allowCustomValues && this.props.field.userInput && filteredOptions.length === 0?
+                    {!allowCustomValues && this.props.field.userInput && options.length === 0?
                       <MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
                         <em>No options available for: </em> <strong>{this.props.field.userInput}</strong>
                       </MenuItem>
@@ -599,7 +586,7 @@ class DynamicDropdownField extends React.Component {
                         </div>
                       </MenuItem>
                       :null}
-                    {filteredOptions.map(option => {
+                    {options.map(option => {
                       return(
                         <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
                           <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, option)}>

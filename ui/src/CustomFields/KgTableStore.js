@@ -126,7 +126,7 @@ class KgTableStore extends FormStore.typesMapping.Default{
         if(!instance.isFetching && instance.isFetched) {
           this.columns.forEach(col => {
             if(col.name !== "delete") {
-              row[col.name] = instance.fields[col.name].value;
+              row[col.name] = instance.fields[col.name] && instance.fields[col.name].value;
             }
           });
         }
@@ -134,19 +134,18 @@ class KgTableStore extends FormStore.typesMapping.Default{
       });
     }
 
-    addInstance(value, mappingValue, mappingLabel) {
-      const id = value[mappingValue];
+    addInstance(id, mappingValue, mappingLabel) {
       if(this.instancesMap.has(id)){
         const instance = this.instancesMap.get(id);
-        if(!this.instances.some(instance => instance.id === id)) {
+        if(!this.instances.some(instance => instance[mappingValue] === id)) {
           this.instances.push(instance);
         }
         return instance;
       } else {
-        this.instancesMap.set(id, {id: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:false, fields:{}, show:false});
+        this.instancesMap.set(id, {[mappingValue]: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:false, fields:{}, show:false});
         const instance = this.instancesMap.get(id);
         this.instances.push(instance);
-        this.fetchInstance(instance);
+        this.fetchInstance(id);
         return instance;
       }
     }
@@ -163,8 +162,8 @@ class KgTableStore extends FormStore.typesMapping.Default{
       return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
     }
 
-    fetchInstance(instance){
-      this.instancesQueue.add(instance.id);
+    fetchInstance(id){
+      this.instancesQueue.add(id);
       this.processQueue();
     }
 
@@ -175,7 +174,7 @@ class KgTableStore extends FormStore.typesMapping.Default{
     @action
     removeInstance(id) {
       this.instancesMap.delete(id);
-      remove(this.instances, instance=> instance.id === id);
+      remove(this.instances, instance=> instance[instance.mappingValue] === id);
     }
 
     @action
@@ -266,7 +265,8 @@ class KgTableStore extends FormStore.typesMapping.Default{
         if(!value || this.value.length >= this.max){
           return;
         }
-        const instance = this.addInstance(value, this.mappingValue, this.mappingLabel);
+        const id = value[this.mappingValue];
+        const instance = this.addInstance(id, this.mappingValue, this.mappingLabel);
         this.addValue(instance);
       });
     }

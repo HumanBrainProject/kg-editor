@@ -29,17 +29,15 @@ class OptionsPool{
   queueThreshold = 5000;
   queueTimeout = 250;
 
-  getOption(value, mappingValue, mappingLabel){
-    if(this.options.has(value[mappingValue])){
-      return this.options.get(value[mappingValue]);
+  getOption(id, mappingValue, mappingLabel){
+    if(this.options.has(id)){
+      return this.options.get(id);
     } else {
-      this.options.set(value[mappingValue],{[mappingValue]:value[mappingValue], isFetching:false});
-      if(value[mappingValue]) {
-        this.optionsQueue.set(value[mappingValue], {mappingValue: mappingValue, mappingLabel: mappingLabel});
-        this.processQueue();
-      }
+      this.options.set(id, {[mappingValue]:id, isFetching:false});
+      this.optionsQueue.set(id, {mappingValue: mappingValue, mappingLabel: mappingLabel});
+      this.processQueue();
     }
-    return this.options.get(value[mappingValue]);
+    return this.options.get(id);
   }
 
   _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
@@ -111,21 +109,19 @@ class OptionsPool{
   }
 
   @action
-  async fetchOptions(instanceId, field, type, search, start, size, mappingValue, requestBody){
+  async fetchOptions(instanceId, field, type, search, start, size, requestBody){
     try {
-      const { data: { data: { suggestions: { data: options, total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
-      const optionsSet = [];
-      Array.isArray(options) && options.forEach(option => {
-        if(!this.options.has(option[mappingValue])){
-          this.options.set(option[mappingValue], option);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
+      const optionsSet = Array.isArray(values) ? values.map(value => {
+        let option = this.options.get(value.id);
+        if(!option){
+          this.options.set(value.id, value);
+          option = this.options.get(value.id);
         } else {
-          Object.keys(option).forEach(key => {
-            if(key === mappingValue){return;}
-            set(this.options.get(option[mappingValue]), key, option[key]);
-          });
+          Object.entries(value).forEach(([key, val]) => key !== "id" && set(option, key, val));
         }
-        optionsSet.push(this.options.get(option[mappingValue]));
-      });
+        return option;
+      }): [];
       return {options: optionsSet, total: total, types: types};
     } catch (e) {
       return {options: [], total: 0, types: [], error: e};
@@ -190,13 +186,16 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
       if(!value || this.value.length >= this.max){
         return;
       }
-      this.addValue(optionsPool.getOption(value, this.mappingValue, this.mappingLabel));
+      const id = value[this.mappingValue];
+      const option = optionsPool.getOption(id, this.mappingValue, this.mappingLabel);
+      this.addValue(option);
     });
   }
 
   @action
   getOption(value) {
-    return optionsPool.getOption(value, this.mappingValue, this.mappingLabel);
+    const id = value[this.mappingValue];
+    return optionsPool.getOption(id, this.mappingValue, this.mappingLabel);
   }
 
   valueLabelRendering = (field, value, valueLabelRendering) => {
@@ -225,7 +224,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     this.optionsPageStart = append?this.options.length:0;
     const payload = this.store.getValues();
     payload["@type"] = this.store.structure.types.map(t => t.name);
-    const {options, total, types} = await optionsPool.fetchOptions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.userInput, this.optionsPageStart, this.optionsPageSize, this.mappingValue, payload);
+    const {options, total, types} = await optionsPool.fetchOptions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.userInput, this.optionsPageStart, this.optionsPageSize, payload);
     runInAction(()=>{
       if (append) {
         this.options = this.options.concat(options);

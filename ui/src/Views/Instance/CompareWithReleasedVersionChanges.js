@@ -16,11 +16,9 @@
 
 import React from "react";
 import injectStyles from "react-jss";
-import { toJS } from "mobx";
 import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FormStore } from "hbp-quickfire";
 
 import appStore from "../../Stores/AppStore";
 import instanceStore, { createInstanceStore } from "../../Stores/InstanceStore";
@@ -107,13 +105,11 @@ class CompareWithReleasedVersionChanges extends React.Component{
       && instanceAfter.isFetched && !instanceAfter.fetchError && instanceAfter.form && instanceAfter.form.structure && instanceAfter.form.structure.fields) {
 
       if (instanceBefore) {
-        const formStoreBefore = new FormStore(toJS(instanceBefore.form.structure));
-        formStoreBefore.toggleReadMode(true);
+        const formStoreBefore = instanceBefore.readModeFormStore;
         beforeValues = formStoreBefore.getValues();
       }
 
-      const formStoreAfter = new FormStore(toJS(instanceAfter.form.structure));
-      formStoreAfter.toggleReadMode(true);
+      const formStoreAfter = instanceAfter.readModeFormStore;
       afterValues = formStoreAfter.getValues();
 
       promotedFields = instanceAfter.promotedFields;

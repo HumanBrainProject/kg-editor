@@ -44,7 +44,7 @@ class CompareFieldChanges extends React.Component{
   render(){
     const {classes, field, beforeValue, afterValue} = this.props;
 
-    if (!field || !field.label || field.id === "id") {
+    if (!field || !field.label) {
       return null;
     }
     return (

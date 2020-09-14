@@ -324,9 +324,7 @@ class KgTable extends React.Component {
         if(isString(option)){
           if(field.allowCustomValues && isFunction(this.props.onAddCustomValue)){
             const id = await this.props.onAddCustomValue(option, field, this.props.formStore);
-            const obj = {};
-            obj[field.mappingValue] = id;
-            field.addInstance(obj, field.mappingValue);
+            field.addInstance(id, field.mappingValue);
           }
         } else {
           this.beforeAddValue(option);
@@ -375,26 +373,15 @@ class KgTable extends React.Component {
   beforeAddValue(value){
     const mappingValue = this.props.field.mappingValue;
     const mappingLabel = this.props.field.mappingLabel;
-    if(isFunction(this.props.onBeforeAddValue)){
-      this.props.onBeforeAddValue(() => {
-        const instance = this.props.field.addInstance(value, mappingValue, mappingLabel);
-        this.props.field.addValue(instance);
-      }, this.props.field, value);
-    } else {
-      const instance = this.props.field.addInstance(value, mappingValue, mappingLabel);
-      this.props.field.addValue(instance);
-    }
+    const instance = this.props.field.addInstance(value.id, mappingValue, mappingLabel);
+    this.props.field.addValue(instance);
     if(this.props.field.closeDropdownAfterInteraction){
       this.dropDownRef = null;
     }
   }
 
   beforeRemoveValue(value){
-    if(isFunction(this.props.onBeforeRemoveValue)){
-      this.props.onBeforeRemoveValue(() => {this.props.field.removeValue(value);}, this.props.field, value);
-    } else {
-      this.props.field.removeValue(value);
-    }
+    this.props.field.removeValue(value);
     if(this.props.field.closeDropdownAfterInteraction){
       this.dropDownRef = null;
     }

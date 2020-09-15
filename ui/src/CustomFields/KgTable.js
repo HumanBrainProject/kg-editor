@@ -307,7 +307,7 @@ class KgTable extends React.Component {
     }
   }
 
-  async handleSelect(option, e){
+  handleSelect(option, e){
     let field = this.props.field;
     if(field.disabled || field.readOnly){
       return;
@@ -323,7 +323,7 @@ class KgTable extends React.Component {
         //If we have not reached the maximum values
         if(isString(option)){
           if(field.allowCustomValues && isFunction(this.props.onAddCustomValue)){
-            const id = await this.props.onAddCustomValue(option, field, this.props.formStore);
+            const id = this.props.onAddCustomValue(option, field);
             field.addInstance(id, field.mappingValue);
           }
         } else {

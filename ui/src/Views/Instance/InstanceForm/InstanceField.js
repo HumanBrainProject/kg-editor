@@ -178,8 +178,7 @@ class InstanceField extends React.Component{
     return field.value;
   }
 
-  addCustomValueHandler = (value, field) => {
-    const name = "https://schema.hbp.eu/minds/Person"; //TODO: remove the hardcoded value
+  addCustomValueHandler = (value, name, field) => {
     const type = typesStore.typesMap.get(name);
     let newInstanceId =  instanceStore.createNewInstanceAsOption(appStore.currentWorkspace.id, type, field, value);
     if(newInstanceId){

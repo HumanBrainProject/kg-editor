@@ -125,7 +125,7 @@ export const normalizeInstanceData = (data, transformField=null) => {
         field.mappingValue = "@id";
         field.mappingReturn = ["@id"];
         field.closeDropdownAfterInteraction = true;
-        // field.allowCustomValues = true;
+        field.allowCustomValues = true;
       }
     }
   };

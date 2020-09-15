@@ -17,19 +17,18 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { get, toJS } from "mobx";
-import { FormGroup, Glyphicon, MenuItem, Alert } from "react-bootstrap";
-import { isFunction, isString } from "lodash";
-import InfiniteScroll from "react-infinite-scroller";
+import { FormGroup, Glyphicon, Alert } from "react-bootstrap";
+import { isFunction } from "lodash";
 
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
-import Alternatives from "./Alternatives";
-import appStore from "../Stores/AppStore";
-import instanceStore from "../Stores/InstanceStore";
+import Alternatives from "../Alternatives";
+import appStore from "../../Stores/AppStore";
+import instanceStore from "../../Stores/InstanceStore";
 
 import injectStyles from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import FieldError from "./FieldError";
+import FieldError from "../FieldError";
+import Dropdown from "./Dropdown";
 
 const styles = {
   values:{
@@ -139,18 +138,6 @@ const styles = {
   },
   alternatives: {
     marginLeft: "3px"
-  },
-  preview: {
-    display: "none",
-    position: "absolute",
-    top: "50%",
-    right: "-10px",
-    borderRadius: "2px",
-    background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-louder)",
-    padding: "3px 6px",
-    cursor: "pointer",
-    transform: "translateY(-50%)"
   }
 };
 
@@ -160,7 +147,11 @@ const styles = {
 class DynamicDropdownField extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { alternatives: [] };
+    this.state = {
+      alternatives: [],
+      currentType: null,
+      currentOption: null
+    };
   }
 
   //The only way to trigger an onChange event in React is to do the following
@@ -195,28 +186,40 @@ class DynamicDropdownField extends React.Component {
     if(field.disabled || field.readOnly){
       return;
     }
-    if(field.allowCustomValues && e.keyCode === 13 && field.value.length < field.max){
-      //User pressed "Enter" while focus on input and we haven't reached the maximum values
-      if(isFunction(this.props.onAddCustomValue)){
-        this.props.onAddCustomValue(e.target.value.trim(), field, this.props.formStore);
-      }
-      field.setUserInput("");
-    } else if(!e.target.value && field.value.length > 0 && e.keyCode === 8){
+    if(!e.target.value && field.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
       this.beforeRemoveValue(field.value[field.value.length-1]);
       this.triggerOnChange();
     } else if(e.keyCode === 40){
       e.preventDefault();
-      let allOptions = this.optionsRef.querySelectorAll(".option");
-      if(allOptions.length > 0){
-        allOptions[0].focus();
+      const { options, optionsTypes } = this.props.field;
+      if(optionsTypes.length){
+        const type = optionsTypes[0];
+        this.setState({currentType: type.name, currentOption: null});
+      } else if(options.length){
+        const value = options[0];
+        this.setState({currentType: null, currentOption: value.id});
+      } else if(optionsTypes.length) {
+        const type = optionsTypes[optionsTypes.length-1];
+        this.setState({currentType: type.name, currentOption: null});
+      } else {
+        this.setState({currentType: null, currentOption: null});
       }
     } else if(e.keyCode === 38){
       e.preventDefault();
-      let allOptions = this.optionsRef.querySelectorAll(".option");
-      if(allOptions.length > 0){
-        allOptions[allOptions.length-1].focus();
+      const { options, optionsTypes } = this.props.field;
+      if(options.length){
+        const value = options[options.length - 1];
+        this.setState({currentType: null, currentOption: value.id});
+      } else if(optionsTypes.length){
+        const type = optionsTypes[options.length-1];
+        this.setState({currentType: type.name, currentOption: null});
+      } else if(options.length){
+        const value = options[0];
+        this.setState({currentType: null, currentOption: value.id});
+      } else {
+        this.setState({currentType: null, currentOption: null});
       }
     } else if(e.keyCode === 27) {
       //escape key -> we want to close the dropdown menu
@@ -233,6 +236,7 @@ class DynamicDropdownField extends React.Component {
   }
 
   handleFocus = e => {
+    this.setState({currentType: null, currentOption: null});
     if(this.props.field.disabled || this.props.field.readOnly){
       return;
     }
@@ -247,8 +251,9 @@ class DynamicDropdownField extends React.Component {
     this.listenClickOutHandler();
   };
 
-  closeDropdown(){
+  closeDropdown = () => {
     this.wrapperRef = null;
+    this.setState({currentType: null, currentOption: null});
     appStore.togglePreviewInstance();
     this.forceUpdate();
   }
@@ -275,47 +280,6 @@ class DynamicDropdownField extends React.Component {
     }
   }
 
-  handleSelect(option, e){
-    let field = this.props.field;
-    if(field.disabled || field.readOnly){
-      return;
-    }
-    appStore.togglePreviewInstance();
-    if(!e || (e && (!e.keyCode || e.keyCode === 13))){
-      //If this function call doesn't send an event (->React Bootstrap OnSelect callback)
-      //Or if it comes from a keyboard event associated with the "Enter" key
-      if(e){
-        e.preventDefault();
-      }
-      if(field.value.length < field.max){
-        //If we have not reached the maximum values
-        if(isString(option)){
-          if(field.allowCustomValues && isFunction(this.props.onAddCustomValue)){
-            this.props.onAddCustomValue(option, field, this.props.formStore);
-          }
-        } else {
-          const data = {"@id": option.id};
-          this.beforeAddValue(data);
-          this.triggerOnChange();
-        }
-        field.setUserInput("");
-        this.handleFocus();
-      }
-    } else if(e && (e.keyCode === 38 || e.keyCode === 40)){
-      //If it comes from a key board event associated with the "Up" or "Down" key
-      e.preventDefault();
-      let allOptions = this.optionsRef.querySelectorAll(".option");
-      let currentIndex = Array.prototype.indexOf.call(allOptions, e.target);
-      let nextIndex;
-      if(e.keyCode === 40){
-        nextIndex = currentIndex + 1 < allOptions.length? currentIndex + 1: 0;
-      } else {
-        nextIndex = currentIndex - 1 >= 0? currentIndex - 1: allOptions.length-1;
-      }
-      allOptions[nextIndex].focus();
-    }
-  }
-
   handleAlternativeSelect = values => {
     let field = this.props.field;
     field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
@@ -327,6 +291,92 @@ class DynamicDropdownField extends React.Component {
     let field = this.props.field;
     field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
     this.triggerRemoveSuggestionOnChange();
+  }
+
+  handleOnAddNewValue = name => {
+    const {field, onAddCustomValue} = this.props;
+    const labelValue =  field.userInput.trim();
+    if(labelValue) {
+      onAddCustomValue(labelValue, name, field);
+      field.setUserInput("");
+    }
+    this.handleFocus();
+  }
+
+  handleOnAddValue = id => {
+    const {field} = this.props;
+    this.beforeAddValue({"@id": id});
+    this.triggerOnChange();
+    field.setUserInput("");
+    this.handleFocus();
+  }
+
+  handleOnSelectNextType = name => {
+    const { optionsTypes, options } = this.props.field;
+    const index = optionsTypes.findIndex(o => o.name === name);
+    if(index < optionsTypes.length - 1){
+      const type = optionsTypes[index + 1] ;
+      this.setState({currentType: type.name, currentOption: null});
+    } else if(options.length){
+      const value = options[0];
+      this.setState({currentType: null, currentOption: value.id});
+    } else if(optionsTypes.length) {
+      const type = optionsTypes[0];
+      this.setState({currentType: type.name, currentOption: null});
+    } else {
+      this.setState({currentType: null, currentOption: null});
+    }
+  }
+
+  handleOnSelectPreviousType = name => {
+    const { optionsTypes, options } = this.props.field;
+    const index = optionsTypes.findIndex(o => o.name === name);
+    if(index > 0){
+      const type = optionsTypes[index - 1] ;
+      this.setState({currentType: type.name, currentOption: null});
+    } else if(options.length){
+      const value = options[options.length-1];
+      this.setState({currentType: null, currentOption: value.id});
+    } else if(optionsTypes.length) {
+      const type = optionsTypes[0];
+      this.setState({currentType: type.name, currentOption:null});
+    } else {
+      this.setState({currentType: null, currentOption: null});
+    }
+  }
+
+  handleOnSelectNextValue = id => {
+    const { optionsTypes, options } = this.props.field;
+    const index = options.findIndex(o => o.id === id);
+    if(index < options.length - 1){
+      const value = options[index + 1] ;
+      this.setState({currentType:null, currentOption: value.id});
+    } else if(optionsTypes.length) {
+      const type = optionsTypes[0];
+      this.setState({currentType: type.name, currentOption: null});
+    } else if(options.length) {
+      const value = options[0];
+      this.setState({currentType: null, currentOption: value.id});
+    } else {
+      this.setState({currentType: null, currentOption: null});
+    }
+  }
+
+  handleOnSelectPreviousValue = id => {
+    const { optionsTypes, options } = this.props.field;
+    const index = options.findIndex(o => o.id === id);
+    if(index > 0){
+      const value = options[index- 1] ;
+      this.setState({currentType: null, currentOption: value.id});
+    } else if(optionsTypes.length){
+      const type = optionsTypes[optionsTypes.length-1];
+      this.setState({currentType: type.name, currentOption: null});
+    } else if(options.length){
+      const value = options[0];
+      this.setState({currentType: null, currentOption: value.id});
+    } else {
+      this.setState({currentType: null, currentOption: null});
+    }
   }
 
   getAlternativeOptions = value => {
@@ -460,8 +510,7 @@ class DynamicDropdownField extends React.Component {
     this.props.field.loadMoreOptions();
   }
 
-  handleOptionPreview = (instanceId, instanceName, event) => {
-    event && event.stopPropagation();
+  handleOptionPreview = (instanceId, instanceName) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
     appStore.togglePreviewInstance(instanceId, instanceName, options);
   }
@@ -500,13 +549,14 @@ class DynamicDropdownField extends React.Component {
     }
 
     const { classes, formStore, field } = this.props;
-    const { options, value: values, mappingValue, mappingLabel, listPosition, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path } = field;
+    const { options, value: values, mappingLabel, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path, optionsTypes, optionsOuterSpaceTypes, userInput} = field;
 
     const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
     const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
 
-    const dropdownOpen = (!disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement));
-    const dropdownClass = (dropdownOpen? "open": "") + (listPosition === "top"?" " + classes.topList: "");
+    const dropdownOpen = !disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || userInput);
+    const types = (allowCustomValues && optionsTypes.length && userInput)?optionsTypes:[];
+    const outerSpaceTypes = (allowCustomValues && optionsOuterSpaceTypes.length && userInput)?optionsOuterSpaceTypes:[];
 
     return (
       <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
@@ -559,54 +609,30 @@ class DynamicDropdownField extends React.Component {
                 onKeyDown={this.handleInputKeyStrokes}
                 onChange={this.handleChangeUserInput}
                 onFocus={this.handleFocus}
-                value={this.props.field.userInput}
+                value={userInput}
                 disabled={readOnly || disabled || values.length >= max}/>
 
               <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
 
-              {dropdownOpen && (options.length || this.props.field.userInput)?
-                <div className={`quickfire-dropdown ${classes.options} ${dropdownClass}`} ref={ref=>{this.optionsRef = ref;}}>
-                  <InfiniteScroll
-                    element={"ul"}
-                    className={"dropdown-menu"}
-                    threshold={100}
-                    hasMore={this.props.field.hasMoreOptions()}
-                    loadMore={this.handleLoadMoreOptions}
-                    useWindow={false}>
-                    {!allowCustomValues && this.props.field.userInput && options.length === 0?
-                      <MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
-                        <em>No options available for: </em> <strong>{this.props.field.userInput}</strong>
-                      </MenuItem>
-                      :null}
-
-                    {allowCustomValues && this.props.field.userInput?
-                      <MenuItem className={"quickfire-dropdown-item"} key={this.props.field.userInput} onSelect={this.handleSelect.bind(this, this.props.field.userInput)}>
-                        <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, this.props.field.userInput)}>
-                          <em>Add a value: </em> <strong>{this.props.field.userInput}</strong>
-                        </div>
-                      </MenuItem>
-                      :null}
-                    {options.map(option => {
-                      return(
-                        <MenuItem className={"quickfire-dropdown-item"} key={formStore.getGeneratedKey(option, "quickfire-dropdown-list-item")} onSelect={this.handleSelect.bind(this, option)}>
-                          <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, option)}>
-                            {option[mappingLabel]}
-                            <div className={classes.preview} title="preview" onClick={this.handleOptionPreview.bind(this, option[mappingValue], option[mappingLabel])}>
-                              <FontAwesomeIcon icon="eye" />
-                            </div>
-                          </div>
-                        </MenuItem>
-                      );
-                    })}
-                    {this.props.field.fetchingOptions?
-                      <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
-                        <div tabIndex={-1} className="option">
-                          <FontAwesomeIcon spin icon="circle-notch"/>
-                        </div>
-                      </MenuItem>
-                      :null}
-                  </InfiniteScroll>
-                </div>
+              {dropdownOpen?
+                <Dropdown currentType={this.state.currentType}
+                  currentOption={this.state.currentOption}
+                  search={userInput}
+                  values={options}
+                  types={types}
+                  outerSpaceTypes={outerSpaceTypes}
+                  loading={this.props.field.fetchingOptions}
+                  hasMore={this.props.field.hasMoreOptions}
+                  onLoadMore={this.handleLoadMoreOptions}
+                  onAddNewValue={this.handleOnAddNewValue}
+                  onAddValue={this.handleOnAddValue}
+                  onSelectNextType={this.handleOnSelectNextType}
+                  onSelectPreviousType={this.handleOnSelectPreviousType}
+                  onSelectNextValue={this.handleOnSelectNextValue}
+                  onSelectPreviousValue={this.handleOnSelectPreviousValue}
+                  onClose={this.closeDropdown}
+                  onPreview={this.handleOptionPreview}
+                />
                 :null}
             </div>
             {validationErrors && <Alert bsStyle="danger">

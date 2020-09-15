@@ -14,12 +14,13 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, get, set } from "mobx";
+import { observable, action, runInAction, get, set, computed } from "mobx";
 import { union, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-import API from "../Services/API";
-import instanceStore from "../Stores/InstanceStore";
+import API from "../../Services/API";
+import instanceStore from "../../Stores/InstanceStore";
+import appStore from "../../Stores/AppStore";
 
 class OptionsPool{
   @observable options = new Map();
@@ -148,6 +149,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   @observable userInput = "";
   @observable optionsSelectedType = null;
   @observable optionsTypes = [];
+  @observable optionsOuterSpaceTypes = [];
   @observable optionsPageStart = 0;
   @observable optionsPageSize = 50;
   @observable optionsCurrentTotal = Infinity;
@@ -170,7 +172,8 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
 
   _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
 
-  hasMoreOptions(){
+  @computed
+  get hasMoreOptions(){
     return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 
@@ -231,7 +234,15 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
       } else {
         this.options = options;
       }
-      this.optionsTypes = types;
+      this.optionsTypes = [];
+      this.optionsOuterSpaceTypes = [];
+      Object.values(types).forEach(type => {
+        if(type.space.includes(appStore.currentWorkspace.id)) {
+          this.optionsTypes.push(type);
+        } else {
+          this.optionsOuterSpaceTypes.push(type);
+        }
+      });
       this.optionsCurrentTotal = total;
       this.fetchingOptions = false;
     });
@@ -246,7 +257,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
 
   @action
   loadMoreOptions(){
-    if(this.hasMoreOptions()){
+    if(this.hasMoreOptions){
       this.fetchOptions(true);
     }
   }

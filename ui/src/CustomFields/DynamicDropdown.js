@@ -18,7 +18,7 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import { get, toJS } from "mobx";
 import { FormGroup, Glyphicon, MenuItem, Alert } from "react-bootstrap";
-import { difference, isFunction, isString, uniq } from "lodash";
+import { isFunction, isString } from "lodash";
 import InfiniteScroll from "react-infinite-scroller";
 
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";

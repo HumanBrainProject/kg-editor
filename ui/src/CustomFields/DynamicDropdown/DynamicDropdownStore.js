@@ -110,7 +110,7 @@ class OptionsPool{
   }
 
   @action
-  async fetchOptions(instanceId, field, type, search, start, size, requestBody){
+  async search(instanceId, field, type, search, start, size, requestBody){
     try {
       const { data: { data: { suggestions: { data: values, total }, types }} } = await API.axios.post(API.endpoints.suggestions(instanceId, field, type, start, size, search), requestBody);
       const optionsSet = Array.isArray(values) ? values.map(value => {
@@ -144,12 +144,9 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   @observable mappingReturn = null;
   @observable returnSingle = false;
   @observable max = Infinity;
-  @observable listPosition = "bottom";
-  @observable closeDropdownAfterInteraction = false;
-  @observable userInput = "";
-  @observable optionsSelectedType = null;
   @observable optionsTypes = [];
-  @observable optionsOuterSpaceTypes = [];
+  @observable optionsExternalTypes = [];
+  @observable optionsSearchTerm = "";
   @observable optionsPageStart = 0;
   @observable optionsPageSize = 50;
   @observable optionsCurrentTotal = Infinity;
@@ -162,7 +159,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
 
   static get properties(){
     return union(super.properties,["value", "defaultValue", "instanceId", "fullyQualifiedName", "allowCustomValues",
-      "mappingValue", "mappingLabel", "mappingReturn", "returnSingle", "max", "listPosition", "closeDropdownAfterInteraction", "userInput"]);
+      "mappingValue", "mappingLabel", "mappingReturn", "returnSingle", "max"]);
   }
 
   constructor(fieldData, store, path){
@@ -170,7 +167,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     this.injectValue(this.value);
   }
 
-  _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
+  _debouncedSearchOptions = debounce(append=>{this.performSearchOptions(append);}, 250);
 
   @computed
   get hasMoreOptions(){
@@ -219,7 +216,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   }
 
   @action
-  async fetchOptions(append){
+  async performSearchOptions(append){
     if(this.fetchingOptions){
       return;
     }
@@ -227,7 +224,7 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     this.optionsPageStart = append?this.options.length:0;
     const payload = this.store.getValues();
     payload["@type"] = this.store.structure.types.map(t => t.name);
-    const {options, total, types} = await optionsPool.fetchOptions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.userInput, this.optionsPageStart, this.optionsPageSize, payload);
+    const {options, total, types} = await optionsPool.search(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsSearchTerm, this.optionsPageStart, this.optionsPageSize, payload);
     runInAction(()=>{
       if (append) {
         this.options = this.options.concat(options);
@@ -235,12 +232,12 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
         this.options = options;
       }
       this.optionsTypes = [];
-      this.optionsOuterSpaceTypes = [];
+      this.optionsExternalTypes = [];
       Object.values(types).forEach(type => {
         if(type.space.includes(appStore.currentWorkspace.id)) {
           this.optionsTypes.push(type);
         } else {
-          this.optionsOuterSpaceTypes.push(type);
+          this.optionsExternalTypes.push(type);
         }
       });
       this.optionsCurrentTotal = total;
@@ -249,16 +246,25 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   }
 
   @action
-  setUserInput(userInput){
-    this.userInput = userInput;
+  searchOptions(search, force=true){
+    this.optionsSearchTerm = search;
     this.options = [];
-    this._debouncedFetchOptions(false);
+    this.optionsTypes = [];
+    this.optionsExternalTypes = [];
+    if (force || search) {
+      this._debouncedSearchOptions(false);
+    }
+  }
+
+  @action
+  resetOptionsSearch() {
+    this.searchOptions("", false);
   }
 
   @action
   loadMoreOptions(){
     if(this.hasMoreOptions){
-      this.fetchOptions(true);
+      this.performSearchOptions(true);
     }
   }
 }

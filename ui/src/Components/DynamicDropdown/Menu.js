@@ -5,19 +5,19 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Options from "./Options";
 import NewValues from "./NewValues";
-import OuterSpaceTypes from "./OuterSpaceTypes";
+import ExternalTypes from "./ExternalTypes";
 
 const styles = {
   container:{
-    width:"100%",
-    maxHeight:"33vh",
-    overflowY:"auto",
     display:"block",
     position: "absolute",
     top: "100%",
     left: "0",
+    width:"100%",
+    maxHeight:"33vh",
     zIndex: "1000",
     float: "left",
+    overflowY:"auto",
     minWidth: "160px",
     padding: "5px 0",
     margin: "2px 0 0",
@@ -41,29 +41,26 @@ const styles = {
     },
     "& .quickfire-dropdown-item .option": {
       position: "relative"
-    },
-    "& .quickfire-dropdown-item:hover $preview": {
-      display: "block"
     }
   }
 };
 
 @injectStyles(styles)
-class Dropdown extends React.Component {
+class Menu extends React.Component {
 
   render() {
     const { types,
-      outerSpaceTypes,
+      externalTypes,
       currentType,
       currentOption,
       classes,
       hasMore,
-      search,
+      searchTerm,
       values,
       loading,
       onAddNewValue,
       onAddValue,
-      onClose,
+      onCancel,
       onLoadMore,
       onPreview,
       onSelectNextType,
@@ -83,12 +80,12 @@ class Dropdown extends React.Component {
           useWindow={false}>
           {!values.length && !types.length &&
             (<MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
-              <em>No results found for: </em> <strong>{search}</strong>
+              <em>No results found for: </em> <strong>{searchTerm}</strong>
             </MenuItem>)
           }
-          <OuterSpaceTypes types={outerSpaceTypes} />
-          <NewValues types={types} currentType={currentType} search={search} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onClose}/>
-          <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onClose} onPreview={onPreview} />
+          <ExternalTypes types={externalTypes} />
+          <NewValues value={searchTerm} types={types} currentType={currentType} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onCancel}/>
+          <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
           {loading?
             <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
               <div tabIndex={-1} className="option">
@@ -103,4 +100,4 @@ class Dropdown extends React.Component {
   }
 }
 
-export default Dropdown;
+export default Menu;

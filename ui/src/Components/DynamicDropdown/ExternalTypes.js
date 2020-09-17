@@ -12,16 +12,16 @@ const styles = {
 };
 
 
-const OuterSpaceTypes = ({types}) => (
+const ExternalTypes = ({types}) => (
   <React.Fragment>
-    {types.map(type => <OuterSpaceType key={type.name} type={type} />)}
+    {types.map(type => <ExternalType key={type.name} type={type} />)}
   </React.Fragment>
 );
 
 @injectStyles(styles)
-class  OuterSpaceType extends React.Component {
+class ExternalType extends React.Component {
   render() {
-    const  {type, classes} = this.props;
+    const  {classes, type} = this.props;
     return(
       <div className={classes.container}>
         <em>New instance of type <span style={type.color ? { color: type.color } : {}}>
@@ -35,4 +35,4 @@ class  OuterSpaceType extends React.Component {
 
 }
 
-export default OuterSpaceTypes;
+export default ExternalTypes;

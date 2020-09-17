@@ -28,7 +28,7 @@ import instanceStore from "../../Stores/InstanceStore";
 
 import injectStyles from "react-jss";
 import FieldError from "../FieldError";
-import Dropdown from "./Dropdown";
+import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 
 const styles = {
   values:{
@@ -72,56 +72,6 @@ const styles = {
       backgroundColor: "lightgrey"
     }
   },
-  options:{
-    width:"100%",
-    maxHeight:"33vh",
-    overflowY:"auto",
-    "&.open":{
-      display:"block"
-    },
-    position: "absolute",
-    top: "100%",
-    left: "0",
-    zIndex: "1000",
-    display: "none",
-    float: "left",
-    minWidth: "160px",
-    padding: "5px 0",
-    margin: "2px 0 0",
-    fontSize: "14px",
-    textAlign: "left",
-    backgroundColor: "#fff",
-    backgroundClip: "padding-box",
-    border: "1px solid rgba(0,0,0,.15)",
-    borderRadius: "4px",
-    boxShadow: "0 6px 12px rgba(0,0,0,.175)",
-    "& .dropdown-menu":{
-      position:"static",
-      display:"block",
-      float:"none",
-      width:"100%",
-      background:"none",
-      border:"none",
-      boxShadow:"none",
-      padding:0,
-      margin:0
-    },
-    "& .quickfire-dropdown-item .option": {
-      position: "relative"
-    },
-    "& .quickfire-dropdown-item:hover $preview": {
-      display: "block"
-    }
-  },
-  userInput:{
-    background:"transparent",
-    border:"none",
-    color:"currentColor",
-    outline:"none",
-    width:"200px",
-    maxWidth:"33%",
-    marginBottom:"3px"
-  },
   topList:{
     bottom: "100%",
     top: "auto",
@@ -138,6 +88,9 @@ const styles = {
   },
   alternatives: {
     marginLeft: "3px"
+  },
+  dropdown: {
+
   }
 };
 
@@ -148,9 +101,7 @@ class DynamicDropdownField extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      alternatives: [],
-      currentType: null,
-      currentOption: null
+      alternatives: []
     };
   }
 
@@ -181,81 +132,9 @@ class DynamicDropdownField extends React.Component {
       .call(this.hiddenInputRef, JSON.stringify(value));
   }
 
-  handleInputKeyStrokes = e => {
-    let field = this.props.field;
-    if(field.disabled || field.readOnly){
-      return;
-    }
-    if(!e.target.value && field.value.length > 0 && e.keyCode === 8){
-      // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
-      e.preventDefault();
-      this.beforeRemoveValue(field.value[field.value.length-1]);
-      this.triggerOnChange();
-    } else if(e.keyCode === 40){
-      e.preventDefault();
-      const { options, optionsTypes } = this.props.field;
-      if(optionsTypes.length){
-        const type = optionsTypes[0];
-        this.setState({currentType: type.name, currentOption: null});
-      } else if(options.length){
-        const value = options[0];
-        this.setState({currentType: null, currentOption: value.id});
-      } else if(optionsTypes.length) {
-        const type = optionsTypes[optionsTypes.length-1];
-        this.setState({currentType: type.name, currentOption: null});
-      } else {
-        this.setState({currentType: null, currentOption: null});
-      }
-    } else if(e.keyCode === 38){
-      e.preventDefault();
-      const { options, optionsTypes } = this.props.field;
-      if(options.length){
-        const value = options[options.length - 1];
-        this.setState({currentType: null, currentOption: value.id});
-      } else if(optionsTypes.length){
-        const type = optionsTypes[options.length-1];
-        this.setState({currentType: type.name, currentOption: null});
-      } else if(options.length){
-        const value = options[0];
-        this.setState({currentType: null, currentOption: value.id});
-      } else {
-        this.setState({currentType: null, currentOption: null});
-      }
-    } else if(e.keyCode === 27) {
-      //escape key -> we want to close the dropdown menu
-      this.closeDropdown();
-    }
-  };
-
-  handleChangeUserInput = e => {
-    if(this.props.field.disabled || this.props.field.readOnly){
-      return;
-    }
-    e.stopPropagation();
-    this.props.field.setUserInput(e.target.value);
-  }
-
-  handleFocus = e => {
-    this.setState({currentType: null, currentOption: null});
-    if(this.props.field.disabled || this.props.field.readOnly){
-      return;
-    }
-    if (e && e.target && this.wrapperRef
-      && this.alternativesRef && this.alternativesRef.props && this.alternativesRef.props.className
-      && this.wrapperRef.querySelector("." + this.alternativesRef.props.className)
-      && this.wrapperRef.querySelector("." + this.alternativesRef.props.className).contains(e.target)) {
-      this.closeDropdown();
-      return;
-    }
-    this.props.field.fetchOptions(true);
-    this.listenClickOutHandler();
-  };
-
-  closeDropdown = () => {
-    this.wrapperRef = null;
-    this.setState({currentType: null, currentOption: null});
+  handleDropdownReset = () => {
     appStore.togglePreviewInstance();
-    this.forceUpdate();
+    this.props.field.resetOptionsSearch();
   }
 
   handleRemove(value, e){
@@ -276,7 +155,6 @@ class DynamicDropdownField extends React.Component {
       e.preventDefault();
       this.beforeRemoveValue(value);
       this.triggerOnChange();
-      this.handleFocus();
     }
   }
 
@@ -285,6 +163,7 @@ class DynamicDropdownField extends React.Component {
     field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
     values.forEach(value => this.beforeAddValue(value));
     this.triggerOnChange();
+    field.resetOptionsSearch();
   }
 
   handleRemoveSuggestion = () => {
@@ -293,90 +172,18 @@ class DynamicDropdownField extends React.Component {
     this.triggerRemoveSuggestionOnChange();
   }
 
-  handleOnAddNewValue = name => {
+  handleOnAddNewValue = (value, type) => {
     const {field, onAddCustomValue} = this.props;
-    const labelValue =  field.userInput.trim();
-    if(labelValue) {
-      onAddCustomValue(labelValue, name, field);
-      field.setUserInput("");
-    }
-    this.handleFocus();
+    onAddCustomValue(value, type, field);
+    this.triggerOnChange();
+    field.resetOptionsSearch();
   }
 
   handleOnAddValue = id => {
     const {field} = this.props;
     this.beforeAddValue({"@id": id});
     this.triggerOnChange();
-    field.setUserInput("");
-    this.handleFocus();
-  }
-
-  handleOnSelectNextType = name => {
-    const { optionsTypes, options } = this.props.field;
-    const index = optionsTypes.findIndex(o => o.name === name);
-    if(index < optionsTypes.length - 1){
-      const type = optionsTypes[index + 1] ;
-      this.setState({currentType: type.name, currentOption: null});
-    } else if(options.length){
-      const value = options[0];
-      this.setState({currentType: null, currentOption: value.id});
-    } else if(optionsTypes.length) {
-      const type = optionsTypes[0];
-      this.setState({currentType: type.name, currentOption: null});
-    } else {
-      this.setState({currentType: null, currentOption: null});
-    }
-  }
-
-  handleOnSelectPreviousType = name => {
-    const { optionsTypes, options } = this.props.field;
-    const index = optionsTypes.findIndex(o => o.name === name);
-    if(index > 0){
-      const type = optionsTypes[index - 1] ;
-      this.setState({currentType: type.name, currentOption: null});
-    } else if(options.length){
-      const value = options[options.length-1];
-      this.setState({currentType: null, currentOption: value.id});
-    } else if(optionsTypes.length) {
-      const type = optionsTypes[0];
-      this.setState({currentType: type.name, currentOption:null});
-    } else {
-      this.setState({currentType: null, currentOption: null});
-    }
-  }
-
-  handleOnSelectNextValue = id => {
-    const { optionsTypes, options } = this.props.field;
-    const index = options.findIndex(o => o.id === id);
-    if(index < options.length - 1){
-      const value = options[index + 1] ;
-      this.setState({currentType:null, currentOption: value.id});
-    } else if(optionsTypes.length) {
-      const type = optionsTypes[0];
-      this.setState({currentType: type.name, currentOption: null});
-    } else if(options.length) {
-      const value = options[0];
-      this.setState({currentType: null, currentOption: value.id});
-    } else {
-      this.setState({currentType: null, currentOption: null});
-    }
-  }
-
-  handleOnSelectPreviousValue = id => {
-    const { optionsTypes, options } = this.props.field;
-    const index = options.findIndex(o => o.id === id);
-    if(index > 0){
-      const value = options[index- 1] ;
-      this.setState({currentType: null, currentOption: value.id});
-    } else if(optionsTypes.length){
-      const type = optionsTypes[optionsTypes.length-1];
-      this.setState({currentType: type.name, currentOption: null});
-    } else if(options.length){
-      const value = options[0];
-      this.setState({currentType: null, currentOption: value.id});
-    } else {
-      this.setState({currentType: null, currentOption: null});
-    }
+    field.resetOptionsSearch();
   }
 
   getAlternativeOptions = value => {
@@ -434,43 +241,34 @@ class DynamicDropdownField extends React.Component {
     this.setState({alternatives: alternatives});
   }
 
+  handleDeleteLastValue = () => {
+    const field = this.props.field;
+    if(field.disabled || field.readOnly || !field.value.length){
+      return;
+    }
+    this.beforeRemoveValue(field.value[field.value.length-1]);
+    this.triggerOnChange();
+  }
+
   handleDrop(droppedVal, e){
     let field = this.props.field;
     if(field.disabled || field.readOnly){
       return;
     }
     e.preventDefault();
+    this.dropValue(droppedVal);
+  }
+
+  dropValue(droppedVal){
+    const field = this.props.field;
+    if(field.disabled || field.readOnly){
+      return;
+    }
     field.removeValue(this.draggedValue);
     field.addValue(this.draggedValue, field.value.indexOf(droppedVal));
-    if(this.props.field.closeDropdownAfterInteraction){
-      this.wrapperRef = null;
-    }
     this.triggerOnChange();
-    this.handleFocus();
-  }
-
-  clickOutHandler = e => {
-    if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
-      this.unlistenClickOutHandler();
-      this.props.field.setUserInput("");
-      appStore.togglePreviewInstance();
-    }
-  };
-
-  listenClickOutHandler(){
-    window.addEventListener("mouseup", this.clickOutHandler, false);
-    window.addEventListener("touchend", this.clickOutHandler, false);
-    window.addEventListener("keyup", this.clickOutHandler, false);
-  }
-
-  unlistenClickOutHandler(){
-    window.removeEventListener("mouseup", this.clickOutHandler, false);
-    window.removeEventListener("touchend", this.clickOutHandler, false);
-    window.removeEventListener("keyup", this.clickOutHandler, false);
-  }
-
-  componentWillUnmount(){
-    this.unlistenClickOutHandler();
+    appStore.togglePreviewInstance();
+    field.resetOptionsSearch();
   }
 
   componentDidMount(){
@@ -484,17 +282,14 @@ class DynamicDropdownField extends React.Component {
   }
 
   beforeAddValue(value){
-    this.props.field.addValue(value);
-    if(this.props.field.closeDropdownAfterInteraction){
-      this.wrapperRef = null;
-    }
+    const field = this.props.field;
+    field.addValue(value);
   }
 
   beforeRemoveValue(value){
     this.props.field.removeValue(value);
-    if(this.props.field.closeDropdownAfterInteraction){
-      this.wrapperRef = null;
-    }
+    appStore.togglePreviewInstance();
+    this.props.field.resetOptionsSearch();
   }
 
   handleTagInteraction(interaction, value, event){
@@ -502,17 +297,22 @@ class DynamicDropdownField extends React.Component {
       this.props[`onValue${interaction}`](this.props.field, value, event);
     } else if(interaction === "Focus"){
       event.stopPropagation();
-      this.closeDropdown();
+      appStore.togglePreviewInstance();
+      this.props.field.resetOptionsSearch();
     }
-  }
-
-  handleLoadMoreOptions = () => {
-    this.props.field.loadMoreOptions();
   }
 
   handleOptionPreview = (instanceId, instanceName) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
     appStore.togglePreviewInstance(instanceId, instanceName, options);
+  }
+
+  handleSearchOptions = term => {
+    this.props.field.searchOptions(term);
+  }
+
+  handleLoadMoreOptions = () => {
+    this.props.field.loadMoreOptions();
   }
 
   valueLabelRendering = (field, value) => {
@@ -544,25 +344,37 @@ class DynamicDropdownField extends React.Component {
   }
 
   render() {
-    if(this.props.formStore.readMode || this.props.field.readMode){
+    const { classes, formStore, field } = this.props;
+    const {
+      instanceId,
+      value: values,
+      fullyQualifiedName,
+      mappingLabel,
+      disabled,
+      readOnly,
+      max,
+      allowCustomValues,
+      validationErrors,
+      validationState,
+      optionsSearchTerm,
+      options,
+      optionsTypes,
+      optionsExternalTypes,
+      hasMoreOptions,
+      fetchingOptions
+    } = field;
+
+    if(formStore.readMode || field.readMode){
       return this.renderReadMode();
     }
 
-    const { classes, formStore, field } = this.props;
-    const { options, value: values, mappingLabel, disabled, readOnly, max, allowCustomValues, validationErrors, validationState, path, optionsTypes, optionsOuterSpaceTypes, userInput} = field;
-
-    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
-    const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
-
-    const dropdownOpen = !disabled && !readOnly && values.length < max && this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || userInput);
-    const types = (allowCustomValues && optionsTypes.length && userInput)?optionsTypes:[];
-    const outerSpaceTypes = (allowCustomValues && optionsOuterSpaceTypes.length && userInput)?optionsOuterSpaceTypes:[];
+    const selectedInstance = instanceStore.instances.get(instanceId);
+    const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
 
     return (
-      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
-        <div ref={ref=>this.wrapperRef = ref}>
+      <FieldError id={instanceId} field={this.props.field}>
+        <div>
           <FormGroup
-            onClick={this.handleFocus}
             className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
             validationState={validationState}>
             <FieldLabel field={this.props.field}/>
@@ -601,39 +413,25 @@ class DynamicDropdownField extends React.Component {
                   <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
                 </div>
               ))}
-
-              <input className={`quickfire-user-input ${classes.userInput}`}
-                onDrop={this.handleDrop.bind(this, null)}
-                onDragOver={e=>e.preventDefault()}
-                ref={ref=>this.inputRef=ref} type="text"
-                onKeyDown={this.handleInputKeyStrokes}
-                onChange={this.handleChangeUserInput}
-                onFocus={this.handleFocus}
-                value={userInput}
-                disabled={readOnly || disabled || values.length >= max}/>
-
-              <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
-
-              {dropdownOpen?
-                <Dropdown currentType={this.state.currentType}
-                  currentOption={this.state.currentOption}
-                  search={userInput}
-                  values={options}
-                  types={types}
-                  outerSpaceTypes={outerSpaceTypes}
-                  loading={this.props.field.fetchingOptions}
-                  hasMore={this.props.field.hasMoreOptions}
-                  onLoadMore={this.handleLoadMoreOptions}
-                  onAddNewValue={this.handleOnAddNewValue}
-                  onAddValue={this.handleOnAddValue}
-                  onSelectNextType={this.handleOnSelectNextType}
-                  onSelectPreviousType={this.handleOnSelectPreviousType}
-                  onSelectNextValue={this.handleOnSelectNextValue}
-                  onSelectPreviousValue={this.handleOnSelectPreviousValue}
-                  onClose={this.closeDropdown}
-                  onPreview={this.handleOptionPreview}
-                />
-                :null}
+              <Dropdown
+                className={classes.dropdown}
+                searchTerm={optionsSearchTerm}
+                options={options}
+                types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+                externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+                loading={fetchingOptions}
+                hasMore={hasMoreOptions}
+                disabled={readOnly || disabled || values.length >= max}
+                onSearch={this.handleSearchOptions}
+                onLoadMore={this.handleLoadMoreOptions}
+                onReset={this.handleDropdownReset}
+                onAddValue={this.handleOnAddValue}
+                onAddNewValue={this.handleOnAddNewValue}
+                onDeleteLastValue={this.handleDeleteLastValue}
+                onDrop={this.dropValue}
+                onPreview={this.handleOptionPreview}
+              />
+              <input style={{ display: "none" }} type="text" ref={ref => this.hiddenInputRef = ref} />
             </div>
             {validationErrors && <Alert bsStyle="danger">
               {validationErrors.map(error => <p key={error}>{error}</p>)}

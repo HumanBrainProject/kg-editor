@@ -4,6 +4,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import injectStyles from "react-jss";
 
 const styles = {
+  container: {
+    "& .option": {
+      position: "relative"
+    },
+    "& :hover $preview": {
+      display: "block"
+    }
+  },
   preview: {
     display: "none",
     position: "absolute",
@@ -20,7 +28,6 @@ const styles = {
     paddingRight: "8px"
   }
 };
-
 
 const Options = ({values, current, onSelectNext, onSelectPrevious, onSelect, onCancel, onPreview}) => (
   <React.Fragment>
@@ -96,8 +103,8 @@ class Option  extends React.Component {
     render() {
       const {value, classes} = this.props;
       return(
-        <MenuItem className={"quickfire-dropdown-item"} onSelect={this.handleOnSelect}>
-          <div title={value.type.name} tabIndex={-1} className="option"  onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>
+        <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleOnSelect}>
+          <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>
             <span className={classes.icon} style={value.type.color ? { color: value.type.color } : {}}>
               <FontAwesomeIcon fixedWidth icon="circle" />
             </span>

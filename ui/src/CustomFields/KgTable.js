@@ -282,7 +282,6 @@ class KgTable extends React.Component {
   closeDropdown(){
     this.dropDownRef = null;
     appStore.togglePreviewInstance();
-    this.forceUpdate();
   }
 
   handleRemove(value, e){

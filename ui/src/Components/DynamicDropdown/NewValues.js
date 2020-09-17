@@ -1,13 +1,24 @@
 import React from "react";
 import {  MenuItem } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import injectStyles from "react-jss";
 
-const NewValues = ({types, currentType, search, onSelectNext, onSelectPrevious, onSelect, onCancel}) => (
+const styles = {
+  container: {
+    "& .option": {
+      position: "relative"
+    }
+  }
+};
+
+
+const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, onSelect, onCancel}) => (
   <React.Fragment>
-    {types.map(type => <NewValue type={type} key={type.name} search={search} onSelectNext={onSelectNext} onSelectPrevious={onSelectPrevious} onSelect={onSelect} onCancel={onCancel} hasFocus={currentType === type.name} />)}
+    {types.map(type => <NewValue type={type} key={type.name} value={value} onSelectNext={onSelectNext} onSelectPrevious={onSelectPrevious} onSelect={onSelect} onCancel={onCancel} hasFocus={currentType === type.name} />)}
   </React.Fragment>
 );
 
+@injectStyles(styles)
 class  NewValue extends React.Component {
   componentDidMount() {
     this.setFocus();
@@ -58,14 +69,14 @@ class  NewValue extends React.Component {
     }
 
     render() {
-      const  {type, search} = this.props;
+      const  {classes, type, value} = this.props;
       return(
-        <MenuItem className={"quickfire-dropdown-item"} key={type.name} onSelect={this.handleOnSelect}>
+        <MenuItem className={`quickfire-dropdown-item ${classes.container}`} key={type.name} onSelect={this.handleOnSelect}>
           <div tabIndex={-1} className="option" onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>
             <em>Add a new <span style={type.color ? { color: type.color } : {}}>
               <FontAwesomeIcon fixedWidth icon="circle" />
             </span>
-            {type.label} </em> : <strong>{search}</strong>
+            {type.label} </em> : <strong>{value}</strong>
           </div>
         </MenuItem>
       );

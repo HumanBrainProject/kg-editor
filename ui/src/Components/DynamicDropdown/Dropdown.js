@@ -28,13 +28,10 @@ class Dropdown extends React.Component {
   }
 
   handleInputKeyStrokes = e => {
-    const { options, types, disabled, onDeleteLastValue} = this.props;
-    if(disabled){
-      return;
-    }
+    const { options, types, onDeleteLastValue} = this.props;
     if(e.keyCode === 8 && !e.target.value){
       e.preventDefault();
-      onDeleteLastValue();
+      onDeleteLastValue && onDeleteLastValue();
     } else if(e.keyCode === 40){
       e.preventDefault();
       if(types.length){
@@ -168,11 +165,9 @@ class Dropdown extends React.Component {
   }
 
   handleFocus = () => {
-    const { searchTerm, disabled, onSearch } = this.props;
-    if (!disabled) {
-      onSearch(searchTerm);
-      this.listenClickOutHandler();
-    }
+    const { searchTerm, onSearch } = this.props;
+    onSearch(searchTerm);
+    this.listenClickOutHandler();
   };
 
   clickOutHandler = e => {
@@ -199,22 +194,23 @@ class Dropdown extends React.Component {
   }
 
   render() {
-    const { classes, className, searchTerm, options, types, externalTypes, disabled, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
+    const { classes, className, searchTerm, options, types, externalTypes, inputPlaceholder, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
 
-    const showMenu = !disabled && this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || searchTerm);
+    const showMenu = this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || searchTerm);
 
     return (
       <div className={`${classes.container} kg-dropdown ${className?className:""}`} ref={ref=>this.wrapperRef = ref}>
         <input className={`quickfire-user-input ${classes.userInput}`}
-          onDrop={e => e.preventDefault() && onDrop}
+          onDrop={e => e.preventDefault() && onDrop && onDrop()}
           onDragOver={e => e.preventDefault()}
-          ref={ref => this.inputRef = ref} type="text"
+          ref={ref => this.inputRef = ref}
+          type="text"
           onKeyDown={this.handleInputKeyStrokes}
           onChange={this.handleChangeUserInput}
           onFocus={this.handleFocus}
           value={searchTerm}
-          disabled={disabled} />
-        {showMenu ?
+          placeholder={inputPlaceholder} />
+        {showMenu && (
           <Menu currentType={this.state.currentType}
             currentOption={this.state.currentOption}
             searchTerm={searchTerm}
@@ -233,7 +229,7 @@ class Dropdown extends React.Component {
             onCancel={this.handleReset}
             onPreview={onPreview}
           />
-          : null}
+        )}
       </div>
     );
   }

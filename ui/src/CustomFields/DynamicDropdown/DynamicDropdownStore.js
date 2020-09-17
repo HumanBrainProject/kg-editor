@@ -134,7 +134,6 @@ const optionsPool = new OptionsPool();
 
 class DynamicDropdownField extends FormStore.typesMapping.Default{
   @observable value = [];
-  @observable defaultValue = [];
   @observable options = [];
   @observable instanceId = null;
   @observable fullyQualifiedName = null;
@@ -152,9 +151,6 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   @observable optionsCurrentTotal = Infinity;
   @observable fetchingOptions = false;
 
-  lastFetchParams = null;
-  lastFetchOptions = [];
-
   __emptyValue = () => [];
 
   static get properties(){
@@ -166,8 +162,6 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
     super(fieldData, store, path);
     this.injectValue(this.value);
   }
-
-  _debouncedSearchOptions = debounce(append=>{this.performSearchOptions(append);}, 250);
 
   @computed
   get hasMoreOptions(){
@@ -244,6 +238,8 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
       this.fetchingOptions = false;
     });
   }
+
+  _debouncedSearchOptions = debounce(append=>{this.performSearchOptions(append);}, 250);
 
   @action
   searchOptions(search, force=true){

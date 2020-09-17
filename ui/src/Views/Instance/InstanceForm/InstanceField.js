@@ -103,7 +103,7 @@ class InstanceField extends React.Component{
   componentDidMount() {
     const { instance, name } = this.props;
     const field = instance.fields[name];
-    if(field && field.type === "DynamicTable") {
+    if(field && field.type === "KgDynamicTable") {
       const store = instance.form.structure.fields[name];
       store.isInteractive = true;
     }
@@ -213,14 +213,14 @@ class InstanceField extends React.Component{
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
-      if(field.type === "DynamicTable") {
+      if(field.type === "KgDynamicTable" && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueMouseEnter={this.handleToggleOnFieldHighlight}
           onValueMouseLeave={this.handleToggleOffFieldHighlight}
           onAddCustomValue={field.allowCustomValues?this.addCustomValueHandler:undefined} />;
       }
-      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown") && field.isLink) {
+      if (field.type === "KgDynamicDropdown" && field.isLink) {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueFocus={this.handleToggleOnFieldHighlight}

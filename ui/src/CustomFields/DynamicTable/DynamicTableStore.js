@@ -19,9 +19,11 @@ import { union, debounce, remove } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../../Services/API";
+import appStore from "../../Stores/AppStore";
 
 class DynamicTableStore extends FormStore.typesMapping.Default{
     @observable value = [];
+    @observable defaultValue = [];
     @observable options = [];
     @observable instanceId = null;
     @observable fullyQualifiedName = null;
@@ -31,17 +33,15 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
     @observable mappingLabel = "label";
     @observable mappingReturn = null;
     @observable max = Infinity;
-    @observable listPosition = "bottom";
-    @observable closeDropdownAfterInteraction = false;
 
-    @observable userInput = "";
-
-    @observable optionsSelectedType = null;
     @observable optionsTypes = [];
+    @observable optionsExternalTypes = [];
+    @observable optionsSearchTerm = "";
     @observable optionsPageStart = 0;
     @observable optionsPageSize = 50;
     @observable optionsCurrentTotal = Infinity;
     @observable fetchingOptions = false;
+
     @observable visibleInstances = 0;
     @observable instancesMap = new Map();
     @observable isFetchingQueue = false;
@@ -55,14 +55,14 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
     __emptyValue = () => [];
 
     static get properties(){
-      return union(super.properties,["value", "instanceId", "fullyQualifiedName",  "allowCustomValues", "mappingValue", "mappingLabel", "mappingReturn", "max", "listPosition", "closeDropdownAfterInteraction", "userInput"]);
+      return union(super.properties,["value", "defaultValue", "instanceId", "fullyQualifiedName",  "allowCustomValues",
+        "mappingValue", "mappingLabel", "mappingReturn", "returnSingle", "max"]);
     }
 
     constructor(fieldData, store, path){
       super(fieldData, store, path);
       this.injectValue(this.value);
     }
-
 
     @computed
     get columns() {
@@ -158,7 +158,8 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
       return instance && instance.show;
     }
 
-    hasMoreOptions(){
+    @computed
+    get hasMoreOptions(){
       return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
     }
 
@@ -168,8 +169,6 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
     }
 
     _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
-
-    _debouncedFetchOptions = debounce((append)=>{this.fetchOptions(append);}, 250);
 
     @action
     removeInstance(id) {
@@ -272,13 +271,13 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
     }
 
     @action
-    async fetchOptions(append){
+    async performSearchOptions(append){
       this.fetchingOptions = true;
       this.optionsPageStart = append?this.options.length:0;
       const payload = this.store.getValues();
       payload["@type"] = this.store.structure.types.map(t => t.name);
       try {
-        const { data: { data: { suggestions: { data: options, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.userInput), payload);
+        const { data: { data: { suggestions: { data: options, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instanceId, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm), payload);
         runInAction(()=>{
           const opts = Array.isArray(options)?options:[];
           if(append){
@@ -286,7 +285,15 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
           } else {
             this.options = opts;
           }
-          this.optionsTypes = types;
+          this.optionsTypes = [];
+          this.optionsExternalTypes = [];
+          Object.values(types).forEach(type => {
+            if(type.space.includes(appStore.currentWorkspace.id)) {
+              this.optionsTypes.push(type);
+            } else {
+              this.optionsExternalTypes.push(type);
+            }
+          });
           this.optionsCurrentTotal = total;
           this.fetchingOptions = false;
         });
@@ -296,17 +303,28 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
       }
     }
 
+    _debouncedSearchOptions = debounce((append)=>{this.performSearchOptions(append);}, 250);
+
     @action
-    setUserInput(userInput){
-      this.userInput = userInput;
+    searchOptions(search, force=true){
+      this.optionsSearchTerm = search;
       this.options = [];
-      this._debouncedFetchOptions(false);
+      this.optionsTypes = [];
+      this.optionsExternalTypes = [];
+      if (force || search) {
+        this._debouncedSearchOptions(false);
+      }
+    }
+
+    @action
+    resetOptionsSearch() {
+      this.searchOptions("", false);
     }
 
     @action
     loadMoreOptions(){
-      if(this.hasMoreOptions()){
-        this.fetchOptions(true);
+      if(this.hasMoreOptions){
+        this.performSearchOptions(true);
       }
     }
 }

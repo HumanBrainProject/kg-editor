@@ -72,12 +72,6 @@ const styles = {
       backgroundColor: "lightgrey"
     }
   },
-  topList:{
-    bottom: "100%",
-    top: "auto",
-    margin: "0 0 2px",
-    boxShadow: "none"
-  },
   readMode:{
     "& .quickfire-label:after":{
       content: "':\\00a0'"
@@ -137,6 +131,20 @@ class DynamicDropdownField extends React.Component {
     this.props.field.resetOptionsSearch();
   }
 
+  handleOnAddNewValue = (value, type) => {
+    const {field, onAddCustomValue} = this.props;
+    onAddCustomValue(value, type, field);
+    field.resetOptionsSearch();
+    this.triggerOnChange();
+  }
+
+  handleOnAddValue = id => {
+    const {field} = this.props;
+    field.addValue({"@id": id});
+    field.resetOptionsSearch();
+    this.triggerOnChange();
+  }
+
   handleRemove(value, e){
     if(this.props.field.disabled || this.props.field.readOnly){
       return;
@@ -159,9 +167,9 @@ class DynamicDropdownField extends React.Component {
   }
 
   handleAlternativeSelect = values => {
-    let field = this.props.field;
+    const field = this.props.field;
     field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
-    values.forEach(value => this.beforeAddValue(value));
+    values.forEach(value => field.addValue(value));
     this.triggerOnChange();
     field.resetOptionsSearch();
   }
@@ -170,20 +178,6 @@ class DynamicDropdownField extends React.Component {
     let field = this.props.field;
     field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
     this.triggerRemoveSuggestionOnChange();
-  }
-
-  handleOnAddNewValue = (value, type) => {
-    const {field, onAddCustomValue} = this.props;
-    onAddCustomValue(value, type, field);
-    this.triggerOnChange();
-    field.resetOptionsSearch();
-  }
-
-  handleOnAddValue = id => {
-    const {field} = this.props;
-    this.beforeAddValue({"@id": id});
-    this.triggerOnChange();
-    field.resetOptionsSearch();
   }
 
   getAlternativeOptions = value => {
@@ -281,11 +275,6 @@ class DynamicDropdownField extends React.Component {
     }
   }
 
-  beforeAddValue(value){
-    const field = this.props.field;
-    field.addValue(value);
-  }
-
   beforeRemoveValue(value){
     this.props.field.removeValue(value);
     appStore.togglePreviewInstance();
@@ -293,8 +282,9 @@ class DynamicDropdownField extends React.Component {
   }
 
   handleTagInteraction(interaction, value, event){
-    if(isFunction(this.props[`onValue${interaction}`])){
-      this.props[`onValue${interaction}`](this.props.field, value, event);
+    const onInteraction = this.props[`onValue${interaction}`];
+    if(isFunction(onInteraction)){
+      onInteraction(this.props.field, value, event);
     } else if(interaction === "Focus"){
       event.stopPropagation();
       appStore.togglePreviewInstance();
@@ -352,6 +342,7 @@ class DynamicDropdownField extends React.Component {
       mappingLabel,
       disabled,
       readOnly,
+      readMode,
       max,
       allowCustomValues,
       validationErrors,
@@ -370,6 +361,7 @@ class DynamicDropdownField extends React.Component {
 
     const selectedInstance = instanceStore.instances.get(instanceId);
     const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
+    const canAddValues = !formStore.readMode && !readMode && !readOnly && !disabled && values.length < max;
 
     return (
       <FieldError id={instanceId} field={this.props.field}>
@@ -413,25 +405,28 @@ class DynamicDropdownField extends React.Component {
                   <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
                 </div>
               ))}
-              <Dropdown
-                className={classes.dropdown}
-                searchTerm={optionsSearchTerm}
-                options={options}
-                types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-                externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
-                loading={fetchingOptions}
-                hasMore={hasMoreOptions}
-                disabled={readOnly || disabled || values.length >= max}
-                onSearch={this.handleSearchOptions}
-                onLoadMore={this.handleLoadMoreOptions}
-                onReset={this.handleDropdownReset}
-                onAddValue={this.handleOnAddValue}
-                onAddNewValue={this.handleOnAddNewValue}
-                onDeleteLastValue={this.handleDeleteLastValue}
-                onDrop={this.dropValue}
-                onPreview={this.handleOptionPreview}
-              />
-              <input style={{ display: "none" }} type="text" ref={ref => this.hiddenInputRef = ref} />
+              {canAddValues && (
+                <React.Fragment>
+                  <Dropdown
+                    className={classes.dropdown}
+                    searchTerm={optionsSearchTerm}
+                    options={options}
+                    types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+                    externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+                    loading={fetchingOptions}
+                    hasMore={hasMoreOptions}
+                    onSearch={this.handleSearchOptions}
+                    onLoadMore={this.handleLoadMoreOptions}
+                    onReset={this.handleDropdownReset}
+                    onAddValue={this.handleOnAddValue}
+                    onAddNewValue={this.handleOnAddNewValue}
+                    onDeleteLastValue={this.handleDeleteLastValue}
+                    onDrop={this.dropValue}
+                    onPreview={this.handleOptionPreview}
+                  />
+                  <input style={{ display: "none" }} type="text" ref={ref => this.hiddenInputRef = ref} />
+                </React.Fragment>
+              )}
             </div>
             {validationErrors && <Alert bsStyle="danger">
               {validationErrors.map(error => <p key={error}>{error}</p>)}

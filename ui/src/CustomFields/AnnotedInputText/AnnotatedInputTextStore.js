@@ -18,7 +18,7 @@ import { observable, action } from "mobx";
 import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{
+class AnnotatedInputTextStore extends FormStore.typesMapping.Default{
   @observable value = null;
   @observable defaultValue = [];
   @observable max = Infinity;
@@ -58,4 +58,4 @@ class KgAnnotatedInputTextStore extends FormStore.typesMapping.Default{
 
 }
 
-export default KgAnnotatedInputTextStore;
+export default AnnotatedInputTextStore;

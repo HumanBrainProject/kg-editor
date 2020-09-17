@@ -15,22 +15,22 @@
 */
 
 import React from "react";
-import KgInputTextField from "./KgInputTextField";
+import InputText from "../InputText/InputText";
 
 /**
  * Textarea input field.
  * Field options are the same as for the InputTextField
- * @class KgTextAreaField
+ * @class TextArea
  * @memberof FormFields
- * @namespace KgTextAreaField
+ * @namespace TextArea
  */
 
-class KgTextAreaField extends React.Component {
+class TextArea extends React.Component {
   render() {
     return (
-      <KgInputTextField {...this.props} componentClass="textarea" />
+      <InputText {...this.props} componentClass="textarea" />
     );
   }
 }
 
-export default KgTextAreaField;
+export default TextArea;

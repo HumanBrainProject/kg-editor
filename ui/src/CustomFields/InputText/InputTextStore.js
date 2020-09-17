@@ -18,7 +18,7 @@ import { observable, action } from "mobx";
 import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-export default class KgInputTextStore extends FormStore.typesMapping.Default{
+export default class InputTextStore extends FormStore.typesMapping.Default{
   @observable value = "";
   @observable defaultValue = "";
   @observable inputType = "text";

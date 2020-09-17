@@ -18,9 +18,9 @@ import { observable, action, runInAction, set, computed } from "mobx";
 import { union, debounce, remove } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-import API from "../Services/API";
+import API from "../../Services/API";
 
-class KgTableStore extends FormStore.typesMapping.Default{
+class DynamicTableStore extends FormStore.typesMapping.Default{
     @observable value = [];
     @observable options = [];
     @observable instanceId = null;
@@ -311,4 +311,4 @@ class KgTableStore extends FormStore.typesMapping.Default{
     }
 }
 
-export default KgTableStore;
+export default DynamicTableStore;

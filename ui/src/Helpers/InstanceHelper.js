@@ -14,9 +14,9 @@
 *   limitations under the License.
 */
 
-import {toJS} from "mobx";
+import { toJS } from "mobx";
 
-export const normalizeInstanceData = (data, transformField=null) => {
+export const normalizeInstanceData = (data, transformField = null) => {
 
   // TODO: Remove the mockup, this is just a test for embedded
   // data.fields["http://schema.org/address"] = {
@@ -95,42 +95,55 @@ export const normalizeInstanceData = (data, transformField=null) => {
   // };
   // END of TODO
 
-  const normalizeFields = fields => {
-    for(let fieldKey in fields) {
-      const field = fields[fieldKey];
-      typeof transformField === "function"  && transformField(field);
-      if(field.type === "Nested"){
-        field.topAddButton = false;
-        if(!field.min) {
-          field.min = 0;
-        }
-        if(!field.max) {
-          field.max = Number.POSITIVE_INFINITY;
-        }
-        if (typeof field.fields === "object") {
-          normalizeFields(field.fields);
-        }
-      } else if(field.type === "InputText"){
-        field.type = "KgInputText";
-      } else if(field.type === "TextArea"){
-        field.type = "KgTextArea";
+  const normalizeField = (field, instanceId) => {
+    switch (field.type) {
+    case "Nested":
+      field.topAddButton = false;
+      if (!field.min) {
+        field.min = 0;
       }
-      else if(field.type === "DropdownSelect" || field.type === "DynamicDropdown"  || field.type === "KgTable"){
-        if(field.type === "DropdownSelect") {
-          field.type = "DynamicDropdown";
-        }
-        field.instanceId = instance.id;
-        field.isLink = true;
-        field.mappingLabel = "name";
-        field.mappingValue = "@id";
-        field.mappingReturn = ["@id"];
-        field.closeDropdownAfterInteraction = true;
-        field.allowCustomValues = true;
+      if (!field.max) {
+        field.max = Number.POSITIVE_INFINITY;
       }
+      if (typeof field.fields === "object") {
+        normalizeFields(field.fields, instanceId);
+      }
+      break;
+    case "InputText":
+      field.type = "KgInputText";
+      break;
+    case "TextArea":
+      field.type = "KgTextArea";
+      break;
+    case "DynamicDropdown":
+      field.type = "KgDynamicDropdown";
+      field.instanceId = instanceId;
+      field.isLink = true;
+      field.mappingLabel = "name";
+      field.mappingValue = "@id";
+      field.mappingReturn = ["@id"];
+      field.allowCustomValues = true;
+      break;
+    case "DynamicTable":
+      field.type = "KgDynamicTable";
+      field.instanceId = instanceId;
+      field.isLink = true;
+      field.mappingLabel = "name";
+      field.mappingValue = "@id";
+      field.mappingReturn = ["@id"];
+      field.allowCustomValues = true;
+      break;
     }
   };
 
-  const instance = {id: null, types: [], primaryType: {name: "", color: "", label: ""}, workspace: "", name: "", fields: {}, labelField: null, promotedFields: [], alternatives: {}, metadata: {}, permissions: {}, error: null};
+  const normalizeFields = (fields, instanceId) => {
+    Object.values(fields).forEach(field => {
+      typeof transformField === "function" && transformField(field);
+      normalizeField(field, instanceId);
+    });
+  };
+
+  const instance = { id: null, types: [], primaryType: { name: "", color: "", label: "" }, workspace: "", name: "", fields: {}, labelField: null, promotedFields: [], alternatives: {}, metadata: {}, permissions: {}, error: null };
   if (!data) {
     return instance;
   }
@@ -156,7 +169,7 @@ export const normalizeInstanceData = (data, transformField=null) => {
     instance.promotedFields = data.promotedFields;
   }
   if (typeof data.fields === "object") {
-    normalizeFields(data.fields);
+    normalizeFields(data.fields, instance.id);
     instance.fields = data.fields;
   }
   if (typeof data.alternatives === "object") {
@@ -165,7 +178,7 @@ export const normalizeInstanceData = (data, transformField=null) => {
   if (typeof data.metadata === "object") {
     const metadata = data.metadata;
     instance.metadata = Object.keys(metadata).map(key => {
-      if(key == "lastUpdateAt" || key == "createdAt") {
+      if (key == "lastUpdateAt" || key == "createdAt") {
         const d = new Date(metadata[key].value);
         metadata[key].value = d.toLocaleString();
       }
@@ -183,11 +196,11 @@ export const normalizeInstanceData = (data, transformField=null) => {
 
 export const getChildrenIdsGroupedByField = fields => {
   function getPagination(field) {
-    if (field.type === "KgTable") {
+    if (field.type === "DynamicTable") {
       const total = field.instances.length;
       if (total) {
         return {
-          count: field.visibleInstancesCount?field.visibleInstancesCount:0,
+          count: field.visibleInstancesCount ? field.visibleInstancesCount : 0,
           total: total
         };
       }
@@ -197,7 +210,7 @@ export const getChildrenIdsGroupedByField = fields => {
 
   function showId(field, id) {
     if (id) {
-      if (field.type === "KgTable") {
+      if (field.type === "DynamicTable") {
         if (field.defaultVisibleInstances) {
           return true;
         }
@@ -210,7 +223,7 @@ export const getChildrenIdsGroupedByField = fields => {
   }
 
   function getIds(field, values, mappingValue) {
-    return  Array.isArray(values)?values.map(obj => obj[mappingValue]).filter(id => showId(field, id)):[];
+    return Array.isArray(values) ? values.map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
   }
 
   function getGroup(field, values) {
@@ -234,7 +247,7 @@ export const getChildrenIdsGroupedByField = fields => {
     const groups = [];
     if (field.type === "Nested") {
       groups.push(...getNestedFields(field.fields, values));
-    } else if(field.isLink) {
+    } else if (field.isLink) {
       const group = getGroup(field, values);
       if (group) {
         groups.push(group);

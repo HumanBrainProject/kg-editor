@@ -19,15 +19,16 @@ import injectStyles from "react-jss";
 import { Column, Table } from "react-virtualized";
 import { FormGroup, MenuItem, Alert } from "react-bootstrap";
 import { inject, observer } from "mobx-react";
-import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 import { difference, isFunction, isString, uniq } from "lodash";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
+import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
-import FetchingLoader from "../Components/FetchingLoader";
-import appStore from "../Stores/AppStore";
-import FieldError from "./FieldError";
+import FieldError from "../FieldError";
+
+import appStore from "../../Stores/AppStore";
+import FetchingLoader from "../../Components/FetchingLoader";
 
 const styles = {
   container: {
@@ -188,7 +189,7 @@ const styles = {
 @inject("formStore")
 @injectStyles(styles)
 @observer
-class KgTable extends React.Component {
+class DynamicTable extends React.Component {
   constructor(props){
     super(props);
     this.state = {
@@ -618,4 +619,4 @@ class KgTable extends React.Component {
   }
 }
 
-export default KgTable;
+export default DynamicTable;

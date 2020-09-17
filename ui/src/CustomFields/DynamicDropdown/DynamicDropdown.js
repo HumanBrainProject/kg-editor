@@ -19,15 +19,15 @@ import { inject, observer } from "mobx-react";
 import { get, toJS } from "mobx";
 import { FormGroup, Glyphicon, Alert } from "react-bootstrap";
 import { isFunction } from "lodash";
-
+import injectStyles from "react-jss";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
+import FieldError from "../FieldError";
 import Alternatives from "../Alternatives";
+
 import appStore from "../../Stores/AppStore";
 import instanceStore from "../../Stores/InstanceStore";
 
-import injectStyles from "react-jss";
-import FieldError from "../FieldError";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 
 const styles = {

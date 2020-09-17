@@ -103,7 +103,7 @@ class InstanceField extends React.Component{
   componentDidMount() {
     const { instance, name } = this.props;
     const field = instance.fields[name];
-    if(field && field.type === "KgTable") {
+    if(field && field.type === "DynamicTable") {
       const store = instance.form.structure.fields[name];
       store.isInteractive = true;
     }
@@ -213,7 +213,7 @@ class InstanceField extends React.Component{
       if (typeof field.type === "string" && field.type.includes("TextArea")) {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
-      if(field.type === "KgTable") {
+      if(field.type === "DynamicTable") {
         return <Field name={name} className={classes.field}
           onValueClick={this.handleFieldFocus}
           onValueMouseEnter={this.handleToggleOnFieldHighlight}

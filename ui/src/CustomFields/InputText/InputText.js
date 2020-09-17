@@ -25,10 +25,10 @@ import { isFunction } from "lodash";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 import clipboard from "hbp-quickfire/lib/Stores/ClipboardStore";
 
-import Alternatives from "./Alternatives";
+import Alternatives from "../Alternatives";
+import FieldError from "../FieldError";
 
-import instanceStore from "../Stores/InstanceStore";
-import FieldError from "./FieldError";
+import instanceStore from "../../Stores/InstanceStore";
 
 const styles = {
   readMode: {
@@ -77,11 +77,11 @@ const FieldValue = ({field, readModeRendering, splitLines}) => {
 @observer
 /**
  * A simple text input
- * @class KgInputTextField
+ * @class InputText
  * @memberof FormFields
- * @namespace KgInputTextField
+ * @namespace InputText
  */
-class KgInputTextField extends React.Component {
+class InputText extends React.Component {
   static defaultProps = {
     componentClass: undefined
   };
@@ -273,4 +273,4 @@ class KgInputTextField extends React.Component {
   }
 }
 
-export default KgInputTextField;
+export default InputText;

@@ -17,7 +17,7 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { Components } from "hbp-quickfire";
-import FieldError from "./FieldError";
+import FieldError from "../FieldError";
 
 const InputTextMultiple =  Components.InputTextMultiple;
 

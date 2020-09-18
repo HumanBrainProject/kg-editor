@@ -39,14 +39,9 @@ const styles = {
       marginRight:"3px",
       marginBottom:"3px"
     },
-    "& :disabled":{
-      pointerEvents:"none"
-    },
-    "& [readonly] .quickfire-remove":{
-      pointerEvents:"none"
-    },
-    "&[readonly] .quickfire-user-input, &[disabled] .quickfire-user-input":{
-      display:"none"
+    "&:disabled $remove, &[disabled] $remove, &.disabled $remove, & :disabled $remove, & [disabled] $remove, & .disabled $remove, &[readonly] $remove, &:disabled $remove, & [readonly] $remove, & :disabled $remove":{
+      pointerEvents:"none",
+      display: "none !important"
     }
   },
   valueDisplay:{
@@ -82,16 +77,13 @@ const styles = {
   },
   alternatives: {
     marginLeft: "3px"
-  },
-  dropdown: {
-
   }
 };
 
 @inject("formStore")
 @injectStyles(styles)
 @observer
-class DynamicDropdownField extends React.Component {
+class DynamicDropdown extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -140,7 +132,7 @@ class DynamicDropdownField extends React.Component {
 
   handleOnAddValue = id => {
     const {field} = this.props;
-    field.addValue({"@id": id});
+    field.addValue({[field.mappingValue]: id});
     field.resetOptionsSearch();
     this.triggerOnChange();
   }
@@ -311,9 +303,9 @@ class DynamicDropdownField extends React.Component {
 
   renderReadMode(){
     const { classes, field, readModeRendering } = this.props;
-    const { value, disabled, readOnly } = field;
+    const { instanceId, value, disabled, readOnly } = field;
     return (
-      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
+      <FieldError id={instanceId} field={field}>
         <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
           <FieldLabel field={field}/>
           {isFunction(readModeRendering)?
@@ -355,16 +347,17 @@ class DynamicDropdownField extends React.Component {
       fetchingOptions
     } = field;
 
-    if(formStore.readMode || field.readMode){
+    if(formStore.readMode || readMode){
       return this.renderReadMode();
     }
 
     const selectedInstance = instanceStore.instances.get(instanceId);
     const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
-    const canAddValues = !formStore.readMode && !readMode && !readOnly && !disabled && values.length < max;
+    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
+    const canAddValues = !isDisabled && values.length < max;
 
     return (
-      <FieldError id={instanceId} field={this.props.field}>
+      <FieldError id={instanceId} field={field}>
         <div>
           <FormGroup
             className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
@@ -379,7 +372,7 @@ class DynamicDropdownField extends React.Component {
               field={field}
               parentContainerClassName="form-group"
               ref={ref=>this.alternativesRef = ref}/>
-            <div disabled={disabled} readOnly={readOnly} className={`form-control ${classes.values}`}>
+            <div className={`form-control ${classes.values}`} disabled={disabled} readOnly={readOnly} >
               {values.map(value => (
                 <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
                   tabIndex={"0"}
@@ -402,13 +395,12 @@ class DynamicDropdownField extends React.Component {
                   onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
                   title={get(value, mappingLabel)}>
                   <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
-                  <Glyphicon className={`${classes.remove} quickfire-remove`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
+                  <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
                 </div>
               ))}
               {canAddValues && (
                 <React.Fragment>
                   <Dropdown
-                    className={classes.dropdown}
                     searchTerm={optionsSearchTerm}
                     options={options}
                     types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
@@ -438,4 +430,4 @@ class DynamicDropdownField extends React.Component {
   }
 }
 
-export default DynamicDropdownField;
+export default DynamicDropdown;

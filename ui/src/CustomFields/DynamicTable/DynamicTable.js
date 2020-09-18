@@ -34,10 +34,17 @@ const styles = {
   container: {
     position: "relative"
   },
-  kgTable: {
+  field: {
+    marginBottom: "0"
+  },
+  table: {
     border: "1px solid #ccc",
     paddingTop: "10px",
     marginBottom: "15px",
+    "&.disabled": {
+      background: "rgb(238, 238, 238)",
+      color: "rgb(85,85,85)"
+    },
     "& .ReactVirtualized__Table__headerTruncatedText": {
       textTransform:"initial",
       fontWeight:"600"
@@ -56,108 +63,24 @@ const styles = {
     borderBottom: "1px solid #e0e0e0"
   },
   activeRow: {
-    cursor: "pointer"
-  },
-  remove:{
-    fontSize:"0.8em",
-    opacity:0.5,
-    marginLeft:"3px",
-    "&:hover":{
-      opacity:1
-    }
-  },
-  notFound:{
-    fontStyle: "italic",
-    backgroundColor: "lightgrey",
-    "&:hover":{
-      backgroundColor: "lightgrey"
-    }
-  },
-  options:{
-    width:"100%",
-    maxHeight:"33vh",
-    overflowY:"auto",
-    "&.open":{
-      display:"block"
-    },
-    position: "absolute",
-    top: "100%",
-    left: "0",
-    zIndex: "1000",
-    display: "none",
-    float: "left",
-    minWidth: "160px",
-    padding: "5px 0",
-    margin: "2px 0 0",
-    fontSize: "14px",
-    textAlign: "left",
-    backgroundColor: "#fff",
-    backgroundClip: "padding-box",
-    border: "1px solid rgba(0,0,0,.15)",
-    borderRadius: "4px",
-    boxShadow: "0 6px 12px rgba(0,0,0,.175)",
-    "& .dropdown-menu":{
-      position:"static",
-      display:"block",
-      float:"none",
-      width:"100%",
-      background:"none",
-      border:"none",
-      boxShadow:"none",
-      padding:0,
-      margin:0
-    },
-    "& .quickfire-dropdown-item .option": {
-      position: "relative"
-    },
-    "& .quickfire-dropdown-item:hover $preview": {
-      display: "block"
-    }
-  },
-  preview: {
-    display: "none",
-    position: "absolute",
-    top: "50%",
-    right: "-10px",
-    borderRadius: "2px",
-    background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-louder)",
-    padding: "3px 6px",
     cursor: "pointer",
-    transform: "translateY(-50%)"
+    "&:hover":{
+      color: "#143048",
+      backgroundColor: "#a5c7e9"
+    }
   },
-  kgDropdown: {
-    marginBottom: "0"
-  },
-  userInput:{
-    background:"transparent",
-    border:"none",
-    color:"currentColor",
-    outline:"none",
-    width:"100%",
-    marginBottom:"3px"
-  },
-  values:{
+  dropdownContainer:{
     height:"auto",
     borderRadius: "0",
     borderLeft: "0",
     borderRight: "0",
     borderBottom: "0",
-    paddingTop: "2px",
-    paddingBottom: "3px",
+    paddingTop: "4px",
+    paddingBottom: "1px",
     position:"relative",
-    "& .btn":{
-      marginRight:"3px",
-      marginBottom:"3px"
-    },
-    "& :disabled":{
-      pointerEvents:"none"
-    },
-    "& [readonly] .quickfire-remove":{
-      pointerEvents:"none"
-    },
-    "&[readonly] .quickfire-user-input, &[disabled] .quickfire-user-input":{
-      display:"none"
+    "& input.quickfire-user-input":{
+      width: "100%",
+      maxWidth: "unset"
     }
   },
   emptyMessage: {
@@ -235,8 +158,8 @@ class DynamicTable extends React.Component {
   handleOnAddValue = id => {
     const {field} = this.props;
     const {mappingValue, mappingLabel} = field;
-    const instance = field.addInstance(id, mappingValue, mappingLabel);
-    field.addValue(instance);
+    field.addInstance(id, mappingValue, mappingLabel);
+    field.addValue({[field.mappingValue]: id});
     field.resetOptionsSearch();
     this.triggerOnChange();
   }
@@ -280,17 +203,17 @@ class DynamicTable extends React.Component {
     const { field, onValueClick } = this.props;
     field.showInstance(rowData.id);
     typeof onValueClick === "function" &&
-    setTimeout(() => onValueClick(field, rowData), 1000);
+    setTimeout(() => onValueClick(field, {[field.mappingValue]: rowData.id}), 1000);
   }
 
   onRowMouseOver = ({index, rowData}) => {
     const { field, onValueMouseEnter } = this.props;
-    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseEnter === "function" && onValueMouseEnter(field, rowData);
+    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseEnter === "function" && onValueMouseEnter(field, {[field.mappingValue]: rowData.id});
   }
 
   onRowMouseOut = ({index, rowData}) => {
     const { field, onValueMouseLeave } = this.props;
-    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseLeave === "function" && onValueMouseLeave(field, rowData);
+    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseLeave === "function" && onValueMouseLeave(field, {[field.mappingValue]: rowData.id});
   }
 
   _rowClassName = ({index}) => {
@@ -317,35 +240,62 @@ class DynamicTable extends React.Component {
     this.props.field.fetchInstance(instance);
   }
 
-  lastCellRenderer = props => (
-    this.props.field.isInitialized && props.rowData.instance.isFetched?
-      <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDelete(props.rowData.id)} >
-        <FontAwesomeIcon icon="times"/>
-      </Button>:
-      props.rowData.instance.fetchError?
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(props.rowData.instance)} >
+  lastCellRenderer = ({rowData}) => {
+    const { formStore, field } = this.props;
+    const { isInitialized, readMode, readOnly, disabled } = field;
+    const { id, instance } = rowData;
+    const { isFetched, fetchError } = instance;
+    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
+    if (isInitialized && isFetched) {
+      if (isDisabled) {
+        return null;
+      }
+      return (
+        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDelete(id)} >
+          <FontAwesomeIcon icon="times"/>
+        </Button>
+      );
+    }
+    if (fetchError) {
+      return (
+        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(instance)} >
           <FontAwesomeIcon icon="redo-alt"/>
-        </Button>:null
-  )
+        </Button>
+      );
+    }
+    return null;
+  }
 
-
-  firstCellRenderer = props => (
-    props.rowData.instance.fetchError ?
-      props.rowData.instance.fetchError:
-      props.rowData.instance.isFetched?
-        props.cellData:
-        this.props.field.isInitialized ?
-          <span>
-            <FontAwesomeIcon icon="circle-notch" spin/>
-            &nbsp; fetching {props.rowData.id}...
-          </span>:props.rowData.id
-  )
+  firstCellRenderer = ({rowData, cellData}) => {
+    const { field } = this.props;
+    const { isInitialized } = field;
+    const { id, instance } = rowData;
+    const { isFetched, fetchError } = instance;
+    if (fetchError) {
+      return fetchError;
+    }
+    if (isFetched) {
+      return cellData;
+    }
+    if (isInitialized) {
+      return (
+        <span>
+          <FontAwesomeIcon icon="circle-notch" spin/>
+          &nbsp; fetching {id}...
+        </span>
+      );
+    }
+    return id;
+  }
 
   cellRenderer = index => {
+    const { formStore, field } = this.props;
+    const { columns, readMode, readOnly, disabled } = field;
+    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
     if(index === 0) {
       return this.firstCellRenderer;
     }
-    if(index === this.props.field.columns.length-1 && !(this.props.formStore.readMode || this.props.field.readMode) ) {
+    if(index === columns.length-1 && !isDisabled) {
       return this.lastCellRenderer;
     }
     return undefined;
@@ -354,6 +304,8 @@ class DynamicTable extends React.Component {
   render() {
     const { classes, formStore, field } = this.props;
     const {
+      instanceId,
+      list,
       value: values,
       label,
       disabled,
@@ -372,33 +324,34 @@ class DynamicTable extends React.Component {
     } = field;
 
     const fieldLabel = label.toLowerCase();
-    const canAddValues = !formStore.readMode && !readMode && !readOnly && !disabled && values.length < max;
+    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
+    const canAddValues =  !isDisabled && values.length < max;
 
     return (
-      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
-        <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
-          <div ref={ref=>this.dropDownRef = ref}>
+      <FieldError id={instanceId} field={field}>
+        <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
+          <div>
             <FormGroup
               onClick={this.handleFocus}
-              className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.kgDropdown}`}
+              className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.field}`}
               validationState={validationState}>
               <FieldLabel field={field}/>
-              {!this.props.formStore.readMode && !this.props.field.readMode &&
-              <div className={classes.deleteBtn}>
-                <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={field.list.length === 0}>
-                  <FontAwesomeIcon icon="times"/>
-                </Button>
-              </div>
-              }
-              <div className={classes.kgTable}>
+              {!isDisabled && (
+                <div className={classes.deleteBtn}>
+                  <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={list.length === 0}>
+                    <FontAwesomeIcon icon="times"/>
+                  </Button>
+                </div>
+              )}
+              <div className={`${classes.table} ${((readOnly || disabled) && !(formStore.readMode || readMode))?"disabled":""}`}>
                 <Table
                   width={this.state.containerWidth}
                   height={300}
                   headerHeight={20}
                   rowHeight={30}
                   rowClassName={this._rowClassName}
-                  rowCount={field.list.length}
-                  rowGetter={({ index }) => field.list[index]}
+                  rowCount={list.length}
+                  rowGetter={({ index }) => list[index]}
                   onRowClick={this.onRowClick}
                   onRowMouseOver={this.onRowMouseOver}
                   onRowMouseOut={this.onRowMouseOut}
@@ -421,9 +374,8 @@ class DynamicTable extends React.Component {
                   )}
                 </Table>
                 {canAddValues && (
-                  <div className={`form-control ${classes.values}`}>
+                  <div className={`form-control ${classes.dropdownContainer}`}>
                     <Dropdown
-                      className={classes.dropdown}
                       searchTerm={optionsSearchTerm}
                       options={options}
                       types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
@@ -442,21 +394,25 @@ class DynamicTable extends React.Component {
                   </div>
                 )}
               </div>
-              {validationErrors && <Alert bsStyle="danger">
-                {validationErrors.map(error => <p key={error}>{error}</p>)}
-              </Alert>}
-              {!field.list.length &&
-            <div className={classes.emptyMessage}>
-              <span className={classes.emptyMessageLabel}>
-                No {fieldLabel} available
-              </span>
-            </div>}
+              {validationErrors && (
+                <Alert bsStyle="danger">
+                  {validationErrors.map(error => <p key={error}>{error}</p>)}
+                </Alert>
+              )}
+              {!list.length && (
+                <div className={classes.emptyMessage}>
+                  <span className={classes.emptyMessageLabel}>
+                    No {fieldLabel} available
+                  </span>
+                </div>
+              )}
             </FormGroup>
           </div>
-          {!field.isInitialized && field.list.length > 0 &&
-          <FetchingLoader>
-            <span>Fetching content...</span>
-          </FetchingLoader>}
+          {!field.isInitialized && list.length > 0 && (
+            <FetchingLoader>
+              <span>Fetching content...</span>
+            </FetchingLoader>
+          )}
         </div>
       </FieldError>
     );

@@ -196,7 +196,7 @@ export const normalizeInstanceData = (data, transformField = null) => {
 
 export const getChildrenIdsGroupedByField = fields => {
   function getPagination(field) {
-    if (field.type === "DynamicTable") {
+    if (field.type === "KgDynamicTable") {
       const total = field.instances.length;
       if (total) {
         return {
@@ -210,7 +210,7 @@ export const getChildrenIdsGroupedByField = fields => {
 
   function showId(field, id) {
     if (id) {
-      if (field.type === "DynamicTable") {
+      if (field.type === "KgDynamicTable") {
         if (field.defaultVisibleInstances) {
           return true;
         }

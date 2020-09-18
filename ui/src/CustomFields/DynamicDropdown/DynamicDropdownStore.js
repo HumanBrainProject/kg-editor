@@ -80,9 +80,9 @@ class OptionsPool{
               set(option, mappingLabel, message);
               set(option, "fetchError", true);
             } else {
-              Object.keys(optionData).forEach(key => {
+              Object.entries(optionData).forEach(([key, value]) => {
                 if(key === mappingValue){return;}
-                set(option, key, optionData[key]);
+                set(option, key, value);
               });
             }
           } else {
@@ -132,7 +132,7 @@ class OptionsPool{
 
 const optionsPool = new OptionsPool();
 
-class DynamicDropdownField extends FormStore.typesMapping.Default{
+class DynamicDropdownStore extends FormStore.typesMapping.Default{
   @observable value = [];
   @observable options = [];
   @observable instanceId = null;
@@ -193,8 +193,9 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   }
 
   valueLabelRendering = (field, value, valueLabelRendering) => {
-    if (instanceStore.instances.has(value["@id"])) {
-      const instance = instanceStore.instances.get(value["@id"]);
+    const id = value[this.mappingValue];
+    if (instanceStore.instances.has(id)) {
+      const instance = instanceStore.instances.get(id);
       if (instance && instance.isFetched) {
         const labelFieldName = instance.labelField;
         const labelField = labelFieldName && instance.fields && instance.fields[labelFieldName];
@@ -203,10 +204,11 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
         }
       }
     }
-    return typeof valueLabelRendering === "function"?
+    const label = typeof valueLabelRendering === "function"?
       valueLabelRendering(field, value)
       :
       get(value, field.mappingLabel);
+    return label?label:id;
   }
 
   @action
@@ -265,4 +267,4 @@ class DynamicDropdownField extends FormStore.typesMapping.Default{
   }
 }
 
-export default DynamicDropdownField;
+export default DynamicDropdownStore;

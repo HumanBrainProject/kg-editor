@@ -142,7 +142,7 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
         }
         return instance;
       } else {
-        this.instancesMap.set(id, {[mappingValue]: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:false, fields:{}, show:false});
+        this.instancesMap.set(id, {id: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:false, fields:{}, show:false});
         const instance = this.instancesMap.get(id);
         this.instances.push(instance);
         this.fetchInstance(id);

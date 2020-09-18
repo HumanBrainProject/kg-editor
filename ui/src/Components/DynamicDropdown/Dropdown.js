@@ -194,12 +194,12 @@ class Dropdown extends React.Component {
   }
 
   render() {
-    const { classes, className, searchTerm, options, types, externalTypes, inputPlaceholder, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
+    const { classes, searchTerm, options, types, externalTypes, inputPlaceholder, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
 
     const showMenu = this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || searchTerm);
 
     return (
-      <div className={`${classes.container} kg-dropdown ${className?className:""}`} ref={ref=>this.wrapperRef = ref}>
+      <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
         <input className={`quickfire-user-input ${classes.userInput}`}
           onDrop={e => e.preventDefault() && onDrop && onDrop()}
           onDragOver={e => e.preventDefault()}

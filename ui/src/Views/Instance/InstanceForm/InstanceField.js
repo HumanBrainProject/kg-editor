@@ -110,7 +110,7 @@ class InstanceField extends React.Component{
   }
 
   handleFieldFocus = (field, value) => {
-    const id = value && value["@id"];
+    const id = value && value[field.mappingValue];
     if (field && field.isLink && id) {
       this.handleToggleOffFieldHighlight(field, value);
       setTimeout(() => {
@@ -125,7 +125,7 @@ class InstanceField extends React.Component{
   }
 
   handleToggleOnFieldHighlight = (field, value) => {
-    const id = value && value["@id"];
+    const id = value && value[field.mappingValue];
     if (field && field.isLink && id) {
       instanceStore.setInstanceHighlight(id, field.label);
       const target = document.querySelector(`[data-provenence="${field.label}"] [data-id="${id}"]`);
@@ -136,7 +136,7 @@ class InstanceField extends React.Component{
   }
 
   handleToggleOffFieldHighlight = (field, value) => {
-    const id = value && value["@id"];
+    const id = value && value[field.mappingValue];
     if (field && field.isLink && id) {
       instanceStore.setInstanceHighlight(id, null);
     }
@@ -145,13 +145,13 @@ class InstanceField extends React.Component{
   renderReadModeField = field => {
     const { classes } = this.props;
     if (field) {
-      if (typeof field.type === "string" && field.type.includes("TextArea")) {
+      if(field.type === "KgTextArea") {
         return (
           field.markdown === true ? <RenderMarkdownField value={field.value}/>:
             <p>{field.value}</p>
         );
       }
-      if (typeof field.type === "string" && (field.type.includes("DropdownSelect") || field.type === "DynamicDropdown")) {
+      if(field.type === "KgDynamicDropdown") {
         const valueLabelRendering = (field, value) => {
           if (typeof field.valueLabelRendering === "function") {
             return field.valueLabelRendering(field, value);
@@ -210,7 +210,7 @@ class InstanceField extends React.Component{
           </Field>
         );
       }
-      if (typeof field.type === "string" && field.type.includes("TextArea")) {
+      if(field.type === "KgTextArea") {
         return <Field name={name} readModeRendering={this.renderReadModeField} className={classes.field} />;
       }
       if(field.type === "KgDynamicTable" && field.isLink) {

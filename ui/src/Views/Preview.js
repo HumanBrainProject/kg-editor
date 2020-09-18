@@ -105,7 +105,7 @@ const styles = {
     display: "inline-block",
     marginBottom: "10px"
   },
-  id: {
+  info: {
     fontSize: "0.75em",
     color: "var(--ft-color-normal)",
     marginTop: "20px",
@@ -199,8 +199,9 @@ class Preview extends React.Component {
                   </div>
                 )}
               </div>
-              <div className={classes.id}>
-                ID: {instanceId}
+              <div className={classes.info}>
+                <div>ID: {instanceId}</div>
+                <div>Workspace: {instance.workspace}</div>
               </div>
             </div>
             <Scrollbars autoHide>

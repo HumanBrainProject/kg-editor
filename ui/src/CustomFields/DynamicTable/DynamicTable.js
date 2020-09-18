@@ -128,7 +128,6 @@ class DynamicTable extends React.Component {
 
   componentWillUnmount(){
     window.removeEventListener("resize", this.setContainerWidth);
-    this.unlistenClickOutHandler();
   }
 
   //The only way to trigger an onChange event in React is to do the following

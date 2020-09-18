@@ -69,13 +69,13 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
       }
   }
 
-  def retrieveInstanceGraph(
+  def retrieveInstanceNeighbors(
                              id: String,
                              token: AccessToken,
                              clientToken: String
                            ): Task[Either[APIEditorError, JsObject]] = {
     val result = instanceAPIService
-      .getGraph(wSClient, configuration.kgCoreEndpoint, id, token, clientToken)
+      .getNeighbors(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, id, token, clientToken)
     result.map {
       case Right(ref) => Right(ref)
       case Left(res) => Left(APIEditorError(res.status, res.body))

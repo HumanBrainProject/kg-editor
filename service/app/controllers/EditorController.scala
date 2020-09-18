@@ -156,6 +156,25 @@ class EditorController @Inject()(
     }
   }
 
+  private def extractTypesFromNeighbors(data: JsObject): List[String] = {
+    val types = (data \ "types").asOpt[List[String]] match {
+      case Some(values) => values
+      case _ => List[String]()
+    }
+    val inboundTypes = (data \ "inbound").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(types) {
+        case (acc, data) => (acc ::: extractTypesFromNeighbors(data)).distinct
+      }
+      case _ => types
+    }
+    (data \ "outbound").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(inboundTypes) {
+        case (acc, data) => (acc ::: extractTypesFromNeighbors(data)).distinct
+      }
+      case _ => inboundTypes
+    }
+  }
+
   private def extractIdsFromScope(data: JsObject): List[String] = {
     val id = (data \ "id").as[String]
     (data \ "children").asOpt[List[JsObject]] match {
@@ -290,13 +309,68 @@ class EditorController @Inject()(
         .runToFuture
     }
 
-  def getInstanceGraph(id: String): Action[AnyContent] =
+  private def generateNeighbors(data: JsObject, typeInfoMap: Map[String, StructureOfType]): JsObject = {
+    val types = (data \ "types").asOpt[List[String]] match {
+      case Some(values) =>
+        values.foldLeft(List[StructureOfType]()) {
+          case (acc, v) => typeInfoMap.get(v) match {
+            case Some(res) => acc :+ res
+            case _ => acc
+          }
+        }
+      case _ => List()
+    }
+
+    val inbound = (data \ "inbound").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(List[JsValue]()) {
+        case (acc, data) => acc :+ generateNeighbors(data, typeInfoMap)
+      }
+      case _ => List()
+    }
+
+    val outbound = (data \ "outbound").asOpt[List[JsObject]] match {
+      case Some(children) => children.foldLeft(List[JsValue]()) {
+        case (acc, data) => acc :+ generateNeighbors(data, typeInfoMap)
+      }
+      case _ => List()
+    }
+
+    Json.obj("id" -> (data \ "id").as[JsString],
+      "name" -> (data \ "name").asOpt[JsString],
+      "types" -> Json.toJson(types),
+      "space" -> (data \ "space").asOpt[JsString],
+      "inbound" -> Json.toJson(inbound),
+      "outbound" -> Json.toJson(outbound)
+    )
+  }
+
+  def getInstanceNeighbors(id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .retrieveInstanceGraph(id, request.userToken, request.clientToken)
-        .map {
-          case Left(err) => err.toResult
-          case Right(value) => Ok(value)
+        .retrieveInstanceNeighbors(id, request.userToken, request.clientToken)
+        .flatMap {
+          case Right(neighborsResult) =>
+            (neighborsResult \ "data").asOpt[JsObject] match {
+              case Some(neighbors) =>
+                val typesToRetrieve = extractTypesFromNeighbors(neighbors)
+                workspaceServiceLive
+                  .retrieveTypesListByName(typesToRetrieve, request.userToken, request.clientToken, false)
+                  .map {
+                    case Right(types) =>
+                      val typeList = extractTypeList(types)
+                      val typeInfoMap = InstanceHelper.getTypeInfoMap(typeList)
+                      Ok(
+                        Json.toJson(
+                          EditorResponseObject(
+                            generateNeighbors(neighbors, typeInfoMap)
+                          )
+                        )
+                      )
+                    case _ => InternalServerError("Something went wrong with types! Please try again!")
+                  }
+              case _ => Task.pure(InternalServerError("Something went wrong with neighbors! Please try again!"))
+            }
+          case _ => Task.pure(InternalServerError("Something went wrong with neighbors! Please try again!"))
         }
         .runToFuture
     }

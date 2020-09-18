@@ -107,7 +107,7 @@ class GraphStore {
     this.isFetched = false;
     this.isFetching = true;
     try {
-      const { data } = await API.axios.get(API.endpoints.graph(id));
+      const { data } = await API.axios.get(API.endpoints.neighbors(id));
       runInAction(() => {
         this.mainId = id;
         this.originalData = data;

@@ -127,7 +127,7 @@ POST /:id/suggestions                  controllers.EditorController.getSuggestio
 
 
 ###
-#  summary: return the graph payload for a specific entity type
+#  summary: return the Neighbors payload for a specific entity type
 #  tags:
 #    - editor
 #  parameters:
@@ -142,7 +142,7 @@ POST /:id/suggestions                  controllers.EditorController.getSuggestio
 #    required: false
 #    type: string
 ###
-GET    /:id/graph                  controllers.EditorController.getInstanceGraph(id: String)
+GET    /:id/neighbors                  controllers.EditorController.getInstanceNeighbors(id: String)
 
 ###
 #  summary: create a new instance

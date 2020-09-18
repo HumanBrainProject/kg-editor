@@ -46,7 +46,7 @@ const endpoints = {
   "bookmarkList": id => `/editor/api/bookmarkList${id?("/" + id):""}`,
   "bookmarks": () => `/editor/api/workspaces/${appStore.currentWorkspace.id}/bookmarks`,
   "setInstanceBookmarkLists": instance => `/editor/api/instance/${instance}/bookmarks`,
-  "graph": id => `/editor/api/instances/${id}/graph`,
+  "neighbors": id => `/editor/api/instances/${id}/neighbors`,
   "workspaceTypes": () => `/editor/api/workspaces/${appStore.currentWorkspace.id}/types`
 };
 

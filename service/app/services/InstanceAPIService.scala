@@ -144,20 +144,18 @@ trait InstanceAPIService {
     }
   }
 
-  def getGraph(
+  def getNeighbors(
     wSClient: WSClient,
     apiBaseEndpoint: String,
+    apiVersion: String,
     id: String,
     token: AccessToken,
-    clientToken: String,
-    clientExtensionId: Option[String] = None
+    clientToken: String
   ): Task[Either[WSResponse, JsObject]] = {
-    val params = clientExtensionId.map("clientIdExtension" -> _).getOrElse("" -> "")
     val q = wSClient
-      .url(s"$apiBaseEndpoint/instances/$id/graph") // TODO: Not implemented in kg-core
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/$id/neighbors")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters("stage" -> "IN_PROGRESS")
-      .addQueryStringParameters(params)
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {

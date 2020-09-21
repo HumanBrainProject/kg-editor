@@ -135,10 +135,7 @@ const styles = {
     borderRadius: "4px",
     overflow: "hidden",
     zIndex: "2",
-    position: "relative",
-    "& > div, & > div > div": {
-      height: "100%"
-    }
+    position: "relative"
   },
   slider: {
     width: "5%",
@@ -183,16 +180,17 @@ class Graph extends React.Component {
     this.resizeWrapper();
   }
 
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.resizeDebounceFn);
-    this.graphRef && this.graphRef.stopAnimation();
-  }
-
   componentDidUpdate() {
     if (!this.initialZoom && this.graphRef) {
+      this.resizeWrapper();
       this.graphRef.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
       this.initialZoom = true;
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.resizeDebounceFn);
+    this.graphRef && this.graphRef.stopAnimation();
   }
 
   resizeWrapper = () => {
@@ -204,7 +202,6 @@ class Graph extends React.Component {
 
   render() {
     const { classes } = this.props;
-
     return (
       <div className={classes.graph} ref={ref => this.graphWrapper = ref}>
         <ForceGraph2D

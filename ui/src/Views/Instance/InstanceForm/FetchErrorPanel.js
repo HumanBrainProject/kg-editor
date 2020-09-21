@@ -33,7 +33,7 @@ const styles = {
     minWidth: "220px",
     "& h4": {
       paddingBottom: "10px",
-      color: "red"
+      color: "var(--ft-color-error)"
     },
     "& button + button, & a + button, & a + a": {
       marginLeft: "20px"
@@ -43,7 +43,7 @@ const styles = {
     padding: "10px",
     "& h5": {
       marginTop: "0",
-      color: "red"
+      color: "var(--ft-color-error)"
     },
     "& small": {
       display: "block",

@@ -49,9 +49,11 @@ class TypesStore {
           this.isFetching = false;
         });
       } catch (e) {
-        const message = e.message ? e.message : e;
-        this.fetchError = `Error while fetching types (${message})`;
-        this.isFetching = false;
+        runInAction(() => {
+          const message = e.message ? e.message : e;
+          this.fetchError = `Error while fetching types (${message})`;
+          this.isFetching = false;
+        });
       }
     }
   }

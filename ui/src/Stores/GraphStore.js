@@ -14,109 +14,192 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction } from "mobx";
-import { find, remove, clone, pullAll, uniqueId, uniq, flatten } from "lodash";
+import { observable, action, computed, runInAction, set} from "mobx";
 
 import API from "../Services/API";
-
-import dataTypesStore from "../Stores/DataTypesStore";
 import appStore from "./AppStore";
 
+const typeDefaultColor = "white";
+const typeDefaultName = "-";
+const typeDefaultLabel = "Unknown";
+
+const getGroupId = types => types.map(t => t.name).join("|");
+
+const getGroupName = types => types.map(t => t.label).join(", ");
+
+const getColor = types => types[0].color?types[0].color:typeDefaultColor;
+
+const createGroup = (id, types) => ({
+  id: id,
+  name: getGroupName(types),
+  color: getColor(types),
+  isGroup: true,
+  types: types,
+  nodes: [],
+  show: true,
+  grouped: false,
+  highlighted: false
+});
+
+const createNode = (id, name, color, groupId) => ({
+  id: id,
+  name: name?name:id,
+  color: color,
+  groupId: groupId,
+  highlighted: false
+});
+
+const createLink = (id, source, target) => ({
+  id: id,
+  source: source,
+  target: target,
+  highlighted: false
+});
+
+const extractGroupsAndLinks = data => {
+  const groups = {};
+  const nodes = {};
+  const links = {};
+
+  const getOrCreateNode = (id, name, group) => {
+    let node = nodes[id];
+    if (!node) {
+      node = createNode(id, name, group.color, group.id);
+      nodes[id] = node;
+      group.nodes.push(node);
+      if (group.nodes.length > 1) { // by default we group nodes when more than one
+        group.grouped = true;
+      }
+    }
+    return node;
+  };
+
+  const getOrCreateGroup = types => {
+    const groupId = getGroupId(types);
+    let group = groups[groupId];
+    if (!group) {
+      group = createGroup(groupId, types);
+      groups[groupId] = group;
+    }
+    return group;
+  };
+
+  const addDirectionalLink = (source, target) => {
+    const id = `${source.id}->${target.id}`;
+    if (!links[id]) {
+      links[id] = createLink(id, source, target);
+    }
+  };
+
+  const addLink = (source, target, isReverse) => {
+    if (isReverse) {
+      addDirectionalLink(target, source);
+    } else {
+      addDirectionalLink(source, target);
+    }
+  };
+
+  const extractData = (data, parentNode, parentGroup, isReverse) => {
+    const types = (data.types && data.types.length)?data.types:[{name: typeDefaultName, label: typeDefaultLabel}];
+    const group = getOrCreateGroup(types);
+    const node = getOrCreateNode(data.id, data.name, group);
+
+    if (!parentNode) {
+      node.isMainNode = true;
+    }
+
+    if (parentNode) {
+      addLink(node, parentNode, isReverse);
+      addLink(group, parentNode, isReverse);
+    }
+    if (parentGroup) {
+      addLink(node, parentGroup, isReverse);
+      addLink(group, parentGroup, isReverse);
+    }
+
+    Array.isArray(data.inbound) && data.inbound.forEach(child => extractData(child, node, group, true));
+    Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, false));
+  };
+
+  extractData(data, null, null, false);
+
+  Object.values(groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
+
+  return {
+    groups: groups,
+    links: Object.values(links)
+  };
+};
+
+const isNodeVisible = (groups, node) => {
+  if(node.isGroup) {
+    if (node.grouped) {
+      return node.show;
+    }
+  } else {
+    const group = groups[node.groupId];
+    if (!group.grouped) {
+      return group.show;
+    }
+  }
+  return false;
+};
+
+const getGraphNodes = groups => Object.values(groups).reduce((acc, group) => {
+  if (group.show) {
+    if (group.grouped) {
+      acc.push(group);
+    } else {
+      acc.push(...group.nodes);
+    }
+  }
+  return acc;
+}, []);
+
+const getGraphLinks = (groups, links) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target));
+
 class GraphStore {
-  @observable sidePanel = false;
-  @observable typeStates = null;
-  @observable expandedTypes = [];
   @observable isFetching = false;
   @observable isFetched = false;
+  @observable fetchError = null;
   @observable mainId = null;
+  @observable groups = {};
+  @observable links = [];
+  @observable highlightedNode = null;
 
-  originalData = null;
-  groupNodes = null;
-  highlightedNode = null;
-  connectedNodes = null;
-  connectedLinks = null;
-
-  findNodesBySchema(schema) {
-    return this.originalData.nodes.filter(node => node.schemas === schema);
-  }
-
-  findLinksBySourceSchema(schema) {
-    return this.originalData.links.filter(link => link.source.schemas === schema);
-  }
-
-  findLinksByTargetSchema(schema) {
-    return this.originalData.links.filter(link => link.target.schemas === schema);
-  }
-
-  findLinksBySchema(schema) {
-    return this.originalData.links.filter(link => link.source.schemas === schema || link.target.schemas === schema);
-  }
-
-  findLinksBySourceAndTarget(sourceNode, targetNode) {
-    return this.originalData.links.filter(link => link.source === sourceNode && link.target === targetNode);
-  }
-
-  findLinksByNode(node) {
-    return this.originalData.links.filter(link => link.source === node || link.target === node);
-  }
-
-  findConnectedNodes(node) {
-    return uniq(flatten(this.findLinksByNode(node).map(link => [link.target, link.source])));
-  }
-
-  getCurrentNode() {
-    return find(this.originalData.nodes, node => node.id === this.instanceStore.mainInstanceId);
-  }
-
+  @computed
   get graphData() {
-    if (this.typeStates === null || this.originalData === null) {
-      return null;
-    }
-
-    let graphData = {
-      nodes: [...this.originalData.nodes],
-      links: [...this.originalData.links]
+    return {
+      nodes: getGraphNodes(this.groups),
+      links: getGraphLinks(this.groups, this.links)
     };
+  }
 
-    this.typeStates.forEach((state, type) => {
-      if (state === "group" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesBySchema(type));
-        pullAll(graphData.links, this.findLinksBySchema(type));
-      }
-      if (state === "show" || state === "hide") {
-        pullAll(graphData.nodes, this.findNodesBySchema("Group_" + type));
-        pullAll(graphData.links, this.findLinksBySchema("Group_" + type));
-      }
-    });
-
-    return graphData;
+  @computed
+  get groupsList() {
+    return Object.values(this.groups).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   @action
-  hlNode(node) {
-    if (node !== null && this.typeStates.get(node.schemas) === "group") {
-      node = this.groupNodes.get(node.schemas);
-    }
-    this.highlightedNode = node;
-    this.connectedNodes = node !== null ? this.findConnectedNodes(node) : [];
-    this.connectedLinks = node !== null ? this.findLinksByNode(node) : [];
-  }
-
-  @action
-  async fetchGraph(id) {
+  async fetch(id) {
+    this.fetchError = null;
     this.isFetched = false;
     this.isFetching = true;
     try {
       const { data } = await API.axios.get(API.endpoints.neighbors(id));
       runInAction(() => {
         this.mainId = id;
-        this.originalData = data;
-        this.filterOriginalData();
-        this.expandedTypes = [];
+        const {groups, links} = extractGroupsAndLinks(data.data);
+        this.groups = groups;
+        this.links = links;
         this.isFetched = true;
         this.isFetching = false;
       });
     } catch (e) {
+      runInAction(() => {
+        this.fetchError = e.message ? e.message : e;
+        this.isFetching = false;
+      });
       appStore.captureSentryException(e);
     }
   }
@@ -125,124 +208,39 @@ class GraphStore {
   reset() {
     this.isFetched = false;
     this.isFetching = false;
-    this.expandedTypes = [];
-    this.originalData = null;
-    this.groupNodes = null;
-    this.highlightedNode = null;
-    this.connectedNodes = null;
-    this.connectedLinks = null;
+    this.groups = {};
+    this.links = [];
     this.mainId = null;
   }
 
   @action
-  filterOriginalData() {
-    //Remove nodes that are not whitelisted
-    remove(this.originalData.nodes, node => !dataTypesStore.dataTypes.some(nodeType => node.type.includes(nodeType.type)));
-    remove(this.originalData.links, link => !find(this.originalData.nodes, node => node.id === link.source) || !find(this.originalData.nodes, node => node.id === link.target));
-    //Transform links source and target reference to actual node objects
-    this.originalData.links.forEach(link => {
-      link.source = find(this.originalData.nodes, node => node.id === link.source);
-      link.target = find(this.originalData.nodes, node => node.id === link.target);
+  setHighlightNodeConnections(node, highlighted=false) {
+    this.highlightedNode = highlighted?node:null;
+    set(node, "highlighted", highlighted);
+    this.links.forEach(link => {
+      set(link.source, "highlighted", false);
+      set(link.target, "highlighted", false);
+      set(link, "highlighted", false);
     });
-    this.originalData.nodes.forEach(node => {
-      node.schemaLabel = node.typeLabel[0];
-      node.isMainNode = node.id.includes(this.mainId);
-    });
-
-    this.groupNodes = new Map();
-    this.typeStates = new Map();
-    //Create group nodes
-    dataTypesStore.dataTypes.forEach(nodeType => {
-      let nodesOfType = this.findNodesBySchema(nodeType.type);
-      if (nodesOfType.length <= 1) {
-        this.typeStates.set(nodeType.type, nodesOfType.length === 1 ? "show" : "none");
-        return;
-      }
-      let label = nodeType.typeLabel[0];
-      let groupNode = {
-        id: "Group_" + nodeType.type,
-        name: "Group_" + label,
-        schemas: "Group_" + nodeType.type,
-        title: "Group of " + label + " (" + nodesOfType.length + ")",
-        original_schema: nodeType.type,
-        schemaLabel: label,
-        isGroup: true,
-        groupSize: nodesOfType.length
-      };
-
-      this.groupNodes.set(nodeType.type, groupNode);
-      this.typeStates.set(nodeType.type, "group");
-      this.originalData.nodes.push(groupNode);
-    });
-
-    this.originalData.links.forEach(link => {
-      let sourceGroupNode = this.groupNodes.get(link.source.schemas);
-      let targetGroupNode = this.groupNodes.get(link.target.schemas);
-
-      if (sourceGroupNode && this.findLinksBySourceAndTarget(sourceGroupNode, link.target).length === 0) {
-        let newLink = clone(link);
-        newLink.source = sourceGroupNode;
-        newLink.id = uniqueId("groupnode-link");
-        this.originalData.links.push(newLink);
-      }
-      if (targetGroupNode && this.findLinksBySourceAndTarget(link.source, targetGroupNode).length === 0) {
-        let newLink = clone(link);
-        newLink.target = targetGroupNode;
-        newLink.id = uniqueId("groupnode-link");
-        this.originalData.links.push(newLink);
-      }
-      if (sourceGroupNode && targetGroupNode && this.findLinksBySourceAndTarget(sourceGroupNode, targetGroupNode).length === 0) {
-        let newLink = clone(link);
-        newLink.source = sourceGroupNode;
-        newLink.target = targetGroupNode;
-        newLink.id = uniqueId("groupnode-link");
-        this.originalData.links.push(newLink);
-      }
-    });
-  }
-
-  @action
-  explodeNode(clickedNode) {
-    if (clickedNode.isGroup) {
-      this.typeStates.set(clickedNode.original_schema, "show");
+    if (highlighted) {
+      this.links.forEach(link => {
+        if (link.source.id === node.id || link.target.id === node.id) {
+          set(link.source, "highlighted", true);
+          set(link.target, "highlighted", true);
+          set(link, "highlighted", true);
+        }
+      });
     }
   }
 
   @action
-  toggleSettingsPanel(state) {
-    if (state === undefined) {
-      this.sidePanel = this.sidePanel === "settings" ? "" : "settings";
-    } else {
-      if (state) {
-        this.sidePanel = "settings";
-      } else {
-        this.sidePanel = "";
-      }
-    }
+  setGroupVisibility(group, show=true) {
+    set(group, "show", show);
   }
 
   @action
-  setTypeState(nodeType, state) {
-    this.typeStates.set(nodeType, state);
-  }
-
-  @action
-  expandType(typeToExpand) {
-    this.expandedTypes.push(typeToExpand);
-  }
-
-  @action
-  collapseType(typeToCollapse) {
-    remove(this.expandedTypes, type => typeToCollapse === type);
-  }
-
-  @action
-  toggleType(typeToToggle) {
-    if (find(this.expandedTypes, type => typeToToggle === type)) {
-      this.collapseType(typeToToggle);
-    } else {
-      this.expandType(typeToToggle);
-    }
+  setGrouping(group, grouped=true) {
+    set(group, "grouped", grouped);
   }
 }
 

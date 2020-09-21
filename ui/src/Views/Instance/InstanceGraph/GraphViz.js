@@ -39,7 +39,7 @@ const handleCapture = e => {
   e.target.download = "test.png";
 };
 
-const handleNodeHover = node => node && graphStore.setHighlightNodeConnections(node, true);
+const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
 
 const getNodeLabel = node => node.isGroup?`Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`:`(${graphStore.groups[node.groupId].name}) ${node.name}`;
 
@@ -83,7 +83,7 @@ const getNodeCanvasObject = (node, ctx, scale) => {
   }
 
   if (graphStore.highlightedNode) {
-    if (node.highlighted) {
+    if (!node.highlighted) {
       ctx.globalAlpha = 0.1;
     }
   }

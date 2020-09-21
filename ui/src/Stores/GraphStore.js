@@ -111,6 +111,10 @@ class GraphStore {
     this.fetchError = null;
     this.isFetched = false;
     this.isFetching = true;
+    this.highlightedNode = null;
+    this.nodes = {};
+    this.groups = {};
+    this.links = [];
     try {
       const { data } = await API.axios.get(API.endpoints.neighbors(id));
       runInAction(() => {
@@ -140,14 +144,16 @@ class GraphStore {
   @action
   setHighlightNodeConnections(node, highlighted=false) {
     this.highlightedNode = highlighted?node:null;
-    set(node, "highlighted", highlighted);
+    if(node) {
+      set(node, "highlighted", highlighted);
+    }
     this.links.forEach(link => {
       set(link.source, "highlighted", false);
       set(link.target, "highlighted", false);
       set(link, "highlighted", false);
     });
-    if (highlighted) {
-      this.links.forEach(link => {
+    if (node && highlighted) {
+      this.graphData.links.forEach(link => {
         if (link.source.id === node.id || link.target.id === node.id) {
           set(link.source, "highlighted", true);
           set(link.target, "highlighted", true);
@@ -226,12 +232,10 @@ class GraphStore {
         addLink(group, parentGroup, isReverse);
       }
 
-      Array.isArray(data.inbound) && data.inbound.forEach(child => extractData(child, node, group, true));
-      Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, false));
+      Array.isArray(data.inbound) && data.inbound.forEach(child => extractData(child, node, group, false));
+      Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, true));
     };
 
-    this.nodes = {};
-    this.groups = {};
     extractData(data, null, null, false);
 
     Object.values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));

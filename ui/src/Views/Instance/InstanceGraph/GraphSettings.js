@@ -121,12 +121,12 @@ class Node extends React.Component {
 
   handelMouseOver = () => {
     const { node } = this.props;
-    graphStore.setHighlightNodeConnections(node), true;
+    graphStore.setHighlightNodeConnections(node, true);
   }
 
   handelMouseOut = () => {
     const { node } = this.props;
-    graphStore.setHighlightNodeConnections(node), false;
+    graphStore.setHighlightNodeConnections(node, false);
   }
 
   handelClick = () => {
@@ -138,17 +138,17 @@ class Node extends React.Component {
   }
 
   render() {
-    const { classes, node } = this.props;
+    const { classes, node, isGrouped } = this.props;
     return (
-      <div className={classes.node} onMouseOver={this.onMouseOver} onMouseOut={this.handelMouseOut} onClick={this.onClick}>{node.name}</div>
+      <div className={classes.node} onMouseOver={!isGrouped && this.handelMouseOver} onMouseOut={!isGrouped && this.handelMouseOut} onClick={this.onClick}>{node.name}</div>
     );
   }
 }
 
-const Nodes = ({className, nodes}) => (
+const Nodes = ({className, nodes, isGrouped}) => (
   <div className={className}>
     {nodes.map(node => (
-      <Node key={node.id} node={node} />
+      <Node key={node.id} node={node} isGrouped={isGrouped} />
     ))}
   </div>
 );
@@ -176,6 +176,7 @@ const Type = ({type, defaultColor, grouped}) => (
     {type.label}
   </span>
 );
+
 @observer
 class GroupLabel extends React.Component {
 
@@ -192,7 +193,7 @@ class GroupLabel extends React.Component {
   render() {
     const { className, group } = this.props;
     return (
-      <span className={className} onMouseOver={this.onMouseOver} onMouseOut={this.handelMouseOut}>
+      <span className={className} onMouseOver={group.grouped && this.handelMouseOver} onMouseOut={group.grouped && this.handelMouseOut}>
         {group.types.map(type => (
           <Type key={type.name} type={type} grouped={group.grouped} />
         ))}
@@ -271,7 +272,7 @@ class Group extends React.Component {
         <GroupLabel className={classes.groupLabel} group={group} />
         <Actions className={classes.groupActions} group={group} />
         {this.state.expanded && (
-          <Nodes className={classes.nodes} nodes={group.nodes} />
+          <Nodes className={classes.nodes} nodes={group.nodes} isGrouped={group.grouped} />
         )}
       </div>
     );

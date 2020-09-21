@@ -24,6 +24,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
+import { action } from "mobx";
 
 const styles = {
   container: {
@@ -139,8 +140,16 @@ class Node extends React.Component {
 
   render() {
     const { classes, node, isGrouped } = this.props;
+    let actions = {onClick: this.handleClick};
+    if(!isGrouped) {
+      actions = {
+        onMouseOver: this.handelMouseOver,
+        onMouseOut: this.handelMouseOut,
+        onClick: this.handleClick
+      };
+    }
     return (
-      <div className={classes.node} onMouseOver={!isGrouped && this.handelMouseOver} onMouseOut={!isGrouped && this.handelMouseOut} onClick={this.onClick}>{node.name}</div>
+      <div className={classes.node} {...actions}>{node.name}</div>
     );
   }
 }
@@ -192,8 +201,16 @@ class GroupLabel extends React.Component {
 
   render() {
     const { className, group } = this.props;
+    let actions = {};
+    if(group.grouped) {
+      actions = {
+        onMouseOver: this.handelMouseOver,
+        onMouseOut: this.handelMouseOut
+      };
+    }
+
     return (
-      <span className={className} onMouseOver={group.grouped && this.handelMouseOver} onMouseOut={group.grouped && this.handelMouseOut}>
+      <span className={className}  {...actions}>
         {group.types.map(type => (
           <Type key={type.name} type={type} grouped={group.grouped} />
         ))}

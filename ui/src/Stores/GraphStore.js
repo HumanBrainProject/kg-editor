@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, runInAction, set} from "mobx";
+import { observable, action, computed, runInAction, set } from "mobx";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
@@ -56,81 +56,6 @@ const createLink = (id, source, target) => ({
   highlighted: false
 });
 
-const extractGroupsAndLinks = data => {
-  const groups = {};
-  const nodes = {};
-  const links = {};
-
-  const getOrCreateNode = (id, name, group) => {
-    let node = nodes[id];
-    if (!node) {
-      node = createNode(id, name, group.color, group.id);
-      nodes[id] = node;
-      group.nodes.push(node);
-      if (group.nodes.length > 1) { // by default we group nodes when more than one
-        group.grouped = true;
-      }
-    }
-    return node;
-  };
-
-  const getOrCreateGroup = types => {
-    const groupId = getGroupId(types);
-    let group = groups[groupId];
-    if (!group) {
-      group = createGroup(groupId, types);
-      groups[groupId] = group;
-    }
-    return group;
-  };
-
-  const addDirectionalLink = (source, target) => {
-    const id = `${source.id}->${target.id}`;
-    if (!links[id]) {
-      links[id] = createLink(id, source, target);
-    }
-  };
-
-  const addLink = (source, target, isReverse) => {
-    if (isReverse) {
-      addDirectionalLink(target, source);
-    } else {
-      addDirectionalLink(source, target);
-    }
-  };
-
-  const extractData = (data, parentNode, parentGroup, isReverse) => {
-    const types = (data.types && data.types.length)?data.types:[{name: typeDefaultName, label: typeDefaultLabel}];
-    const group = getOrCreateGroup(types);
-    const node = getOrCreateNode(data.id, data.name, group);
-
-    if (!parentNode) {
-      node.isMainNode = true;
-    }
-
-    if (parentNode) {
-      addLink(node, parentNode, isReverse);
-      addLink(group, parentNode, isReverse);
-    }
-    if (parentGroup) {
-      addLink(node, parentGroup, isReverse);
-      addLink(group, parentGroup, isReverse);
-    }
-
-    Array.isArray(data.inbound) && data.inbound.forEach(child => extractData(child, node, group, true));
-    Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, false));
-  };
-
-  extractData(data, null, null, false);
-
-  Object.values(groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
-
-  return {
-    groups: groups,
-    links: Object.values(links)
-  };
-};
-
 const isNodeVisible = (groups, node) => {
   if(node.isGroup) {
     if (node.grouped) {
@@ -164,6 +89,7 @@ class GraphStore {
   @observable fetchError = null;
   @observable mainId = null;
   @observable groups = {};
+  @observable nodes = {};
   @observable links = [];
   @observable highlightedNode = null;
 
@@ -189,9 +115,7 @@ class GraphStore {
       const { data } = await API.axios.get(API.endpoints.neighbors(id));
       runInAction(() => {
         this.mainId = id;
-        const {groups, links} = extractGroupsAndLinks(data.data);
-        this.groups = groups;
-        this.links = links;
+        this.extractGroupsAndLinks(data.data);
         this.isFetched = true;
         this.isFetching = false;
       });
@@ -242,6 +166,79 @@ class GraphStore {
   setGrouping(group, grouped=true) {
     set(group, "grouped", grouped);
   }
+
+  extractGroupsAndLinks = data => {
+    const links = {};
+
+    const getOrCreateNode = (id, name, group) => {
+      let node = this.nodes[id];
+      if (!node) {
+        set(this.nodes, id, createNode(id, name, group.color, group.id));
+        node = this.nodes[id];
+        group.nodes.push(node);
+        if (group.nodes.length > 1) { // by default we group nodes when more than one
+          group.grouped = true;
+        }
+      }
+      return node;
+    };
+
+    const getOrCreateGroup = types => {
+      const groupId = getGroupId(types);
+      let group = this.groups[groupId];
+      if (!group) {
+        set(this.groups, groupId, createGroup(groupId, types));
+        group = this.groups[groupId];
+      }
+      return group;
+    };
+
+    const addDirectionalLink = (source, target) => {
+      const id = `${source.id}->${target.id}`;
+      if (!links[id]) {
+        links[id] = createLink(id, source, target);
+      }
+    };
+
+    const addLink = (source, target, isReverse) => {
+      if (isReverse) {
+        addDirectionalLink(target, source);
+      } else {
+        addDirectionalLink(source, target);
+      }
+    };
+
+    const extractData = (data, parentNode, parentGroup, isReverse) => {
+      const types = (data.types && data.types.length)?data.types:[{name: typeDefaultName, label: typeDefaultLabel}];
+      const group = getOrCreateGroup(types);
+      const node = getOrCreateNode(data.id, data.name, group);
+
+      if (!parentNode) {
+        node.isMainNode = true;
+      }
+
+      if (parentNode) {
+        addLink(node, parentNode, isReverse);
+        addLink(group, parentNode, isReverse);
+      }
+      if (parentGroup) {
+        addLink(node, parentGroup, isReverse);
+        addLink(group, parentGroup, isReverse);
+      }
+
+      Array.isArray(data.inbound) && data.inbound.forEach(child => extractData(child, node, group, true));
+      Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, false));
+    };
+
+    this.nodes = {};
+    this.groups = {};
+    extractData(data, null, null, false);
+
+    Object.values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
+
+    this.links =  Object.values(links);
+  };
+
 }
 
 export default new GraphStore();

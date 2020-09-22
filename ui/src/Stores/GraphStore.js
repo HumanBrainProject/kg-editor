@@ -41,9 +41,10 @@ const createGroup = (id, types) => ({
   highlighted: false
 });
 
-const createNode = (id, name, color, groupId) => ({
+const createNode = (id, name, workspace, color, groupId) => ({
   id: id,
   name: name?name:id,
+  workspace: workspace,
   color: color,
   groupId: groupId,
   highlighted: false
@@ -176,10 +177,10 @@ class GraphStore {
   extractGroupsAndLinks = data => {
     const links = {};
 
-    const getOrCreateNode = (id, name, group) => {
+    const getOrCreateNode = (id, name, workspace, group) => {
       let node = this.nodes[id];
       if (!node) {
-        set(this.nodes, id, createNode(id, name, group.color, group.id));
+        set(this.nodes, id, createNode(id, name, workspace, group.color, group.id));
         node = this.nodes[id];
         group.nodes.push(node);
         if (group.nodes.length > 1) { // by default we group nodes when more than one
@@ -217,7 +218,7 @@ class GraphStore {
     const extractData = (data, parentNode, parentGroup, isReverse) => {
       const types = (data.types && data.types.length)?data.types:[{name: typeDefaultName, label: typeDefaultLabel}];
       const group = getOrCreateGroup(types);
-      const node = getOrCreateNode(data.id, data.name, group);
+      const node = getOrCreateNode(data.id, data.name, data.workspace, group);
 
       if (!parentNode) {
         node.isMainNode = true;

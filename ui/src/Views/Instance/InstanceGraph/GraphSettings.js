@@ -24,6 +24,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
+import appStore from "../../../Stores/AppStore";
 
 const styles = {
   container: {
@@ -148,7 +149,7 @@ class Node extends React.Component {
       };
     }
     return (
-      <div className={classes.node} {...actions}>{node.name}</div>
+      <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
     );
   }
 }

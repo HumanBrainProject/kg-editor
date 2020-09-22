@@ -338,7 +338,7 @@ class EditorController @Inject()(
     Json.obj("id" -> (data \ "id").as[JsString],
       "name" -> (data \ "name").asOpt[JsString],
       "types" -> Json.toJson(types),
-      "space" -> (data \ "space").asOpt[JsString],
+      "workspace" -> (data \ "space").asOpt[JsString],
       "inbound" -> Json.toJson(inbound),
       "outbound" -> Json.toJson(outbound)
     )

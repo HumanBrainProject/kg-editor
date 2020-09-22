@@ -90,11 +90,6 @@ const styles = {
 @injectStyles(styles)
 @observer
 class GraphInstance extends React.Component {
-
-  fetch = () => {
-    graphStore.fetch(this.props.instance.id);
-  }
-
   componentDidMount() {
     this.fetch();
   }
@@ -103,6 +98,10 @@ class GraphInstance extends React.Component {
     if (prevProps.instance !== this.props.instance) {
       this.fetch();
     }
+  }
+
+  fetch = () => {
+    graphStore.fetch(this.props.instance.id);
   }
 
   render() {

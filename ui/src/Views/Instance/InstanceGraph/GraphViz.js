@@ -24,13 +24,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import graphStore from "../../../Stores/GraphStore";
 import routerStore from "../../../Stores/RouterStore";
+import appStore from "../../../Stores/AppStore";
 
 const handleNodeClick = node => {
   if (node.isGroup) {
     graphStore.setGrouping(node, false);
   } else if (node.id !== graphStore.mainId) {
-    graphStore.reset();
-    routerStore.history.push("/instance/graph/" + node.id);
+    if(node.workspace === appStore.currentWorkspace.id){
+      graphStore.reset();
+      routerStore.history.push("/instance/graph/" + node.id);
+    }
   }
 };
 
@@ -41,7 +44,14 @@ const handleCapture = e => {
 
 const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
 
-const getNodeLabel = node => node.isGroup?`Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`:`(${graphStore.groups[node.groupId].name}) ${node.name}`;
+const getNodeName = node => {
+  if(node.isGroup) {
+    return `Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`;
+  }
+  return `(${graphStore.groups[node.groupId].name}) ${node.name}`;
+};
+
+const getNodeLabel = node => `${getNodeName(node)} ${node.workspace !== appStore.currentWorkspace.id?`(Workspace: ${node.workspace})`:""}`;
 
 const getNodeAutoColorBy = node => node.color;
 
@@ -104,7 +114,7 @@ const getNodeCanvasObject = (node, ctx, scale) => {
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
 
-    const label = getNodeLabel(node);
+    const label = getNodeName(node);
 
     wrapText(ctx, label, node.x, node.y, 10, 1.3, node);
   }

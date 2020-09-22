@@ -2,6 +2,7 @@ node_modules
 .tmp
 .DS_Store
 service/.DS_Store
+service/.gradle
 .vscode
 .idea/
 .cache

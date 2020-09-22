@@ -67,11 +67,14 @@ class Status extends React.Component {
   }
 
   render() {
-    let instanceStatus = statusStore.getInstance(this.props.id);
+    const instanceStatus = statusStore.getInstance(this.props.id);
     const { classes } = this.props;
+    if(!instanceStatus) {
+      return null;
+    }
 
     return (
-      instanceStatus ?<div className={`${classes.container} status`}>
+      <div className={`${classes.container} status`}>
         {instanceStatus.hasFetchError ?
           <div className={classes.loader}>
             <FontAwesomeIcon icon={"question-circle"} />
@@ -87,14 +90,14 @@ class Status extends React.Component {
           <div className={classes.loader}>
             <FontAwesomeIcon icon={"question-circle"} />
           </div>
-          : !instanceStatus.isFetchedChildren ?
+          : (!instanceStatus.isFetchedChildren?
             <div className={classes.loader}>
               <FontAwesomeIcon icon={"circle-notch"} spin />
             </div>
             :
-            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data.childrenStatus ? instanceStatus.data.childrenStatus : null} highContrastChildren={true} isChildren={true} />
+            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.childrenData ? instanceStatus.childrenData : null} highContrastChildren={true} isChildren={true} />)
         }
-      </div>:null
+      </div>
     );
   }
 }

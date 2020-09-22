@@ -35,7 +35,8 @@ class StatusStore {
   _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
   _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
 
-  @action flush() {
+  @action
+  flush() {
     this.statuses.clear();
   }
 
@@ -55,7 +56,8 @@ class StatusStore {
           isFetchedChildren: false,
           hasFetchErrorChildren: false,
           fetchErrorChildren: null,
-          data: null
+          data: null,
+          childrenData: null
         });
         this.fetchQueue.push(id);
         this.fetchQueueChildren.push(id);
@@ -148,17 +150,9 @@ class StatusStore {
     try {
       let { data } = await API.axios.post(API.endpoints.releaseStatusChildren(), toProcessChildren);
       runInAction(() => {
-        // Object.entries(data.data).forEach(([id, responseStatus]) => {
-        //   const status = this.statuses.get(id);
-        //   status.data.childrenStatus = responseStatus.data;
-        //   status.isFetchingChildren = false;
-        //   status.isFetchedChildren = true;
-        //   this.isFetchingChildren = false;
-        //   this.smartProcessQueueChildren();
-        // });
-        data.data.forEach(responseStatus => {
-          const status = this.statuses.get(responseStatus.id);
-          status.data.childrenStatus = responseStatus.childrenStatus;
+        Object.entries(data.data).forEach(([id, responseStatus]) => {
+          const status = this.statuses.get(id);
+          status.childrenData = responseStatus.data;
           status.isFetchingChildren = false;
           status.isFetchedChildren = true;
           this.isFetchingChildren = false;

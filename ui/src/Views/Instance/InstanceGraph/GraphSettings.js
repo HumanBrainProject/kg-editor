@@ -24,7 +24,6 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
-import { action } from "mobx";
 
 const styles = {
   container: {

@@ -270,7 +270,7 @@ class InstanceForm extends React.Component {
                 <div
                   onFocus={this.handleFocus}
                   onClick={this.handleFocus}
-                  onDoubleClick={instance.isReadMode && !isMainInstance ? this.handleOpenInstance : undefined}
+                  onDoubleClick={instance.isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
                   onChange={this.handleChange}
                   onLoad={this.handleLoad}
                 >

@@ -21,7 +21,7 @@ import injectStyles from "react-jss";
 import instanceStore from "../../Stores/InstanceStore";
 
 import Preview from "../Preview";
-import Reviewers from "./InstanceInvite/Reviewers";
+// import Reviewers from "./InstanceInvite/Reviewers";
 import BGMessage from "../../Components/BGMessage";
 
 const rootPath = window.rootPath || "";
@@ -62,9 +62,6 @@ const styles = {
 @observer
 class InstanceInvite extends React.Component{
   componentDidMount() {
-    if (this.props.instance) {
-      instanceStore.setReadMode(true);
-    }
     instanceStore.setReadMode(true);
   }
 
@@ -76,15 +73,14 @@ class InstanceInvite extends React.Component{
 
   render(){
     const { classes, instance } = this.props;
-    const permissions = instance.permissions;
-
+    const { permissions } = instance;
     return (
       <div className={classes.container}>
         <div className={classes.panel}>
           {permissions.canInviteForSuggestion?
             <React.Fragment>
-              <Preview className={classes.preview} instanceId={this.props.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
-              <Reviewers id={this.props.id} />
+              <Preview className={classes.preview} instanceId={instance.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
+              {/* <Reviewers id={this.props.id} /> */}
             </React.Fragment>
             :
             <BGMessage icon={"ban"} className={classes.error}>

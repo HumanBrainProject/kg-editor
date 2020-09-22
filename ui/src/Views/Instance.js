@@ -115,16 +115,6 @@ const styles = {
 class Instance extends React.Component {
   render() {
     const { className, instance, mode, paneStore, onRetry} = this.props;
-    if (instance.isFetching) {
-      return (
-        <div className={className}>
-          <FetchingLoader>
-            <span>Fetching instance information...</span>
-          </FetchingLoader>
-        </div>
-      );
-    }
-
     if (instance.hasFetchError) {
       return (
         <BGMessage icon={"ban"}>
@@ -135,6 +125,16 @@ class Instance extends React.Component {
             <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
           </Button>
         </BGMessage>
+      );
+    }
+
+    if (instance.isFetching || !instance.isFetched) {
+      return (
+        <div className={className}>
+          <FetchingLoader>
+            <span>Fetching instance information...</span>
+          </FetchingLoader>
+        </div>
       );
     }
 

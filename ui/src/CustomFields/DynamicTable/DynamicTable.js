@@ -149,7 +149,9 @@ class DynamicTable extends React.Component {
 
   handleOnAddNewValue = (value, type) => {
     const {field, onAddCustomValue} = this.props;
-    onAddCustomValue(value, type, field);
+    const {mappingValue, mappingLabel} = field;
+    const id = onAddCustomValue(value, type, field);
+    field.addInstance(id, mappingValue, mappingLabel, value, true);
     field.resetOptionsSearch();
     this.triggerOnChange();
   }
@@ -161,22 +163,6 @@ class DynamicTable extends React.Component {
     field.addValue({[field.mappingValue]: id});
     field.resetOptionsSearch();
     this.triggerOnChange();
-  }
-
-  handleRemove(value, e){
-    if(this.props.field.disabled || this.props.field.readOnly){
-      return;
-    }
-    e.stopPropagation();
-    this.beforeRemoveValue(value);
-    this.triggerOnChange();
-  }
-
-
-  beforeRemoveValue(value){
-    this.props.field.removeValue(value);
-    appStore.togglePreviewInstance();
-    this.props.field.resetOptionsSearch();
   }
 
   handleOptionPreview = (instanceId, instanceName) => {
@@ -224,9 +210,10 @@ class DynamicTable extends React.Component {
   }
 
   handleDelete = id => e => {
-    const instance = this.props.field.instancesMap.get(id);
-    this.handleRemove(instance, e);
+    e.stopPropagation();
     this.props.field.removeInstance(id);
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
   }
 
   handleDeleteAll = () => {

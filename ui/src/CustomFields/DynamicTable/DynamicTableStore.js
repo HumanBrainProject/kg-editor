@@ -14,8 +14,8 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, set, computed } from "mobx";
-import { union, debounce, remove } from "lodash";
+import { observable, action, runInAction, set, computed, remove } from "mobx";
+import { union, debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import API from "../../Services/API";
@@ -137,21 +137,26 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
       });
     }
 
-    addInstance(id, mappingValue, mappingLabel) {
+    addInstance(id, mappingValue, mappingLabel, name="", isNew=false) {
       if (!id) {
         this.instances.push({id: null, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:"Unknown instance", isFetching:false, isFetched:true, fields:{}, show:false});
+      } else if(isNew) {
+        this.instances.push({id: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:true, fields:{
+          "http://schema.org/name":{
+            name: "Name",
+            value: name
+          }
+        }, show:false});
       } else if(this.instancesMap.has(id)){
         const instance = this.instancesMap.get(id);
         if(!this.instances.some(instance => instance[mappingValue] === id)) {
           this.instances.push(instance);
         }
-        return instance;
       } else {
         this.instancesMap.set(id, {id: id, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:null, isFetching:false, isFetched:false, fields:{}, show:false});
         const instance = this.instancesMap.get(id);
         this.instances.push(instance);
         this.fetchInstance(id);
-        return instance;
       }
     }
 
@@ -177,8 +182,15 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
 
     @action
     removeInstance(id) {
+      if(this.disabled || this.readOnly){
+        return;
+      }
+      const value = this.value.find(val => val[this.mappingValue] === id);
+      this.removeValue(value);
+      this.resetOptionsSearch();
       this.instancesMap.delete(id);
-      remove(this.instances, instance=> instance[instance.mappingValue] === id);
+      const index = this.instances.findIndex(instance => instance.id === id);
+      remove(this.instances, index);
     }
 
     @action

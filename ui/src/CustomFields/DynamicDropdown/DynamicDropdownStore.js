@@ -34,7 +34,7 @@ class OptionsPool{
     if(this.options.has(id)){
       return this.options.get(id);
     } else {
-      this.options.set(id, {[mappingValue]:id, isFetching:false});
+      this.options.set(id, {id:id, isFetching:false});
       this.optionsQueue.set(id, {mappingValue: mappingValue, mappingLabel: mappingLabel});
       this.processQueue();
     }

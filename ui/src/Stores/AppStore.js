@@ -447,7 +447,7 @@ class AppStore{
     this.instanceIdAvailability.delete(instanceId);
     instanceTabStore.closeInstanceTab(instanceId);
     const instance = instanceStore.instances.get(instanceId);
-    this.removeUnusedInstances(instanceId, instance.linkedIds);
+    instance && this.removeUnusedInstances(instanceId, instance.linkedIds);
   }
 
   @action

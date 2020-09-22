@@ -270,8 +270,8 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
           return;
         }
         const id = value[this.mappingValue];
-        const instance = this.addInstance(id, this.mappingValue, this.mappingLabel);
-        this.addValue(instance);
+        this.addInstance(id, this.mappingValue, this.mappingLabel);
+        this.addValue(value);
       });
     }
 

@@ -165,8 +165,8 @@ class Dropdown extends React.Component {
   }
 
   handleFocus = () => {
-    const { searchTerm, onSearch } = this.props;
-    onSearch(searchTerm);
+    const { onSearch } = this.props;
+    onSearch("");
     this.listenClickOutHandler();
   };
 

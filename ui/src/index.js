@@ -35,7 +35,6 @@ import authStore from "./Stores/AuthStore";
 import routerStore from "./Stores/RouterStore";
 
 import Tabs from "./Views/Tabs";
-import SavePanel from "./Views/SavePanel";
 
 import NotFound from "./Views/NotFound";
 import Home from "./Views/Home";
@@ -196,7 +195,6 @@ class App extends React.Component {
           <Theme />
           <Tabs />
           <div className={classes.body}>
-            <SavePanel />
             {appStore.globalError ?
               <Route component={GlobalError} />
               :

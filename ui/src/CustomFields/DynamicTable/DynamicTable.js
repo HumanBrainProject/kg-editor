@@ -234,9 +234,9 @@ class DynamicTable extends React.Component {
     this.triggerOnChange();
   }
 
-  handleRetry = instance => e => {
+  handleRetry = id => e => {
     e.stopPropagation();
-    this.props.field.fetchInstance(instance);
+    this.props.field.fetchInstance(id);
   }
 
   lastCellRenderer = ({rowData}) => {
@@ -255,9 +255,9 @@ class DynamicTable extends React.Component {
         </Button>
       );
     }
-    if (fetchError) {
+    if (id && fetchError) {
       return (
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(instance)} >
+        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(id)} >
           <FontAwesomeIcon icon="redo-alt"/>
         </Button>
       );
@@ -271,7 +271,17 @@ class DynamicTable extends React.Component {
     const { id, instance } = rowData;
     const { isFetched, fetchError } = instance;
     if (fetchError) {
-      return fetchError;
+      if(id) {
+        return fetchError;
+      } else {
+        return (
+          <span style={{color: "var(--ft-color-error)"}}>
+            <FontAwesomeIcon icon="exclamation-triangle"/>
+            &nbsp; {fetchError}
+          </span>
+        );
+      }
+
     }
     if (isFetched) {
       return cellData;

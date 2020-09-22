@@ -66,9 +66,10 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
 
     @computed
     get columns() {
-      if(this.isInitialized && !this.hasInitializationError) {
-        const label = this.instances[0].mappingLabel;
-        const fields = this.instances[0].fields;
+      if(this.isInitialized) {
+        const instance = this.instanceForColumns;
+        const label = instance.mappingLabel;
+        const fields = instance.fields;
         let columns = Object.entries(fields).map(([name, field]) => ({name: name, label: field[label]}));
         columns.push({name: "delete", label: ""});
         return columns;
@@ -81,10 +82,12 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
 
     @action
     showInstance(instanceId) {
-      const instance = this.instancesMap.get(instanceId);
-      if(!instance.show) {
-        instance.show = true;
-        this.visibleInstances++;
+      if(instanceId){
+        const instance = this.instancesMap.get(instanceId);
+        if(!instance.show) {
+          instance.show = true;
+          this.visibleInstances++;
+        }
       }
     }
 
@@ -110,13 +113,13 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
     }
 
     @computed
-    get isInitialized() {
-      return this.hasInitializationError || this.instances.length && typeof this.instances[0].fields == "object" && Object.keys(this.instances[0].fields).length>0;
+    get instanceForColumns() {
+      return this.instances.find(instance => instance.isFetched && !instance.fetchError && typeof instance.fields  == "object" && Object.keys(instance.fields).length>0);
     }
 
     @computed
-    get hasInitializationError() {
-      return this.instances.length && this.instances[0].fetchError;
+    get isInitialized() {
+      return this.instances.length && this.instanceForColumns;
     }
 
     @computed
@@ -135,7 +138,9 @@ class DynamicTableStore extends FormStore.typesMapping.Default{
     }
 
     addInstance(id, mappingValue, mappingLabel) {
-      if(this.instancesMap.has(id)){
+      if (!id) {
+        this.instances.push({id: null, mappingValue: mappingValue, mappingLabel: mappingLabel, fetchError:"Unknown instance", isFetching:false, isFetched:true, fields:{}, show:false});
+      } else if(this.instancesMap.has(id)){
         const instance = this.instancesMap.get(id);
         if(!this.instances.some(instance => instance[mappingValue] === id)) {
           this.instances.push(instance);

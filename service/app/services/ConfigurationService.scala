@@ -27,7 +27,7 @@ trait ConfigurationService {
 
 class ConfigurationServiceLive @Inject()(config: Configuration) extends ConfigurationService {
   val kgCoreEndpoint
-    : String = config.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:8000")
+    : String = config.getOptional[String]("kgcore.endpoint").getOrElse("http://localhost:7130")
   val kgCoreApiVersion: String = config.get[String]("kgcore.apiVersion")
   val kgApiInstancesPrefix: String = config.getOptional[String]("kgcore.apiInstancesPrefix").getOrElse("https://kg.ebrains.eu/api/instances/")
   val clientSecret: String = config.get[String]("client.secret")

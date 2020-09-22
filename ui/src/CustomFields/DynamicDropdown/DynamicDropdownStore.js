@@ -181,8 +181,8 @@ class DynamicDropdownStore extends FormStore.typesMapping.Default{
         return;
       }
       const id = value[this.mappingValue];
-      const option = optionsPool.getOption(id, this.mappingValue, this.mappingLabel);
-      this.addValue(option);
+      optionsPool.getOption(id, this.mappingValue, this.mappingLabel);
+      this.addValue(value);
     });
   }
 

@@ -76,6 +76,7 @@ class BrowseStore {
   @action
   clearInstances() {
     this.instances.length = 0;
+    this.totalInstances = 0;
     this.clearSelectedInstance();
   }
 
@@ -144,7 +145,7 @@ class BrowseStore {
       }
     } else {
       try {
-        const { data } = await API.axios.get(API.endpoints.searchInstances(this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
+        const { data } = await API.axios.get(API.endpoints.searchInstances(appStore.currentWorkspace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
         runInAction(() => {
           this.isFetching.instances = false;
           const instances = normalizeInstancesData(data);

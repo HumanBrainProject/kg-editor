@@ -26,96 +26,75 @@ import play.api.libs.ws.{WSClient, WSResponse}
 
 trait InstanceAPIService {
   val instanceEndpoint = "/api/instances"
-  val internalInstanceEndpoint = "/internal/api/instances"
 
   def getInstances(
-    wsClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    token: AccessToken,
-    instanceIds: List[String],
-    stage: String,
-    metadata: Boolean,
-    returnAlternatives: Boolean,
-    returnPermissions: Boolean,
-    returnEmbedded: Boolean,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                    wsClient: WSClient,
+                    apiBaseEndpoint: String,
+                    apiVersion: String,
+                    token: AccessToken,
+                    instanceIds: List[String],
+                    stage: String,
+                    metadata: Boolean,
+                    returnAlternatives: Boolean,
+                    returnPermissions: Boolean,
+                    returnEmbedded: Boolean,
+                    clientToken: String
+                  ): Task[Either[WSResponse, JsObject]] = {
     val payload = Json.toJson(instanceIds)
     val q = wsClient
       .url(s"${apiBaseEndpoint}/$apiVersion/instancesByIds")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage"              -> stage,
-        "metadata"           -> metadata.toString,
+        "stage" -> stage,
+        "metadata" -> metadata.toString,
         "returnAlternatives" -> returnAlternatives.toString,
-        "returnPermissions"  -> returnPermissions.toString,
-        "returnEmbedded"     -> returnEmbedded.toString
+        "returnPermissions" -> returnPermissions.toString,
+        "returnEmbedded" -> returnEmbedded.toString
       )
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
+        case _ => Left(res)
       }
     }
   }
 
   def searchInstances(
-    wsClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    from: Option[Int],
-    size: Option[Int],
-    typeId: String,
-    searchByLabel: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                       wsClient: WSClient,
+                       apiBaseEndpoint: String,
+                       apiVersion: String,
+                       space: String,
+                       typeId: String,
+                       from: Option[Int],
+                       size: Option[Int],
+                       searchByLabel: String,
+                       token: AccessToken,
+                       clientToken: String
+                     ): Task[Either[WSResponse, JsObject]] = {
     val wsc = wsClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage"             -> "IN_PROGRESS",
+        "stage" -> "IN_PROGRESS",
         "returnPermissions" -> "true",
-        "type"              -> typeId,
-        "searchByLabel"     -> searchByLabel
+        "type" -> typeId,
+        "space" -> space,
+        "searchByLabel" -> searchByLabel
       )
     val q0 = from match {
       case Some(f) => wsc.addQueryStringParameters("from" -> f.toString)
-      case _       => wsc
+      case _ => wsc
     }
     val q = size match {
       case Some(s) => q0.addQueryStringParameters("size" -> s.toString)
-      case _       => q0
+      case _ => q0
     }
     val r = Task.deferFuture(q.get())
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
-      }
-    }
-  }
-
-  def getInstancesByType(
-    wsClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    token: AccessToken,
-    typeOfInstance: String,
-    metadata: Boolean,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
-    val q = wsClient
-      .url(s"$apiBaseEndpoint/$apiVersion/instances")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-      .addQueryStringParameters("type" -> typeOfInstance, "metadata" -> metadata.toString, "stage" -> "IN_PROGRESS")
-    val r = Task.deferFuture(q.get())
-    r.map { res =>
-      res.status match {
-        case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
+        case _ => Left(res)
       }
     }
   }
@@ -132,7 +111,7 @@ trait InstanceAPIService {
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id/scope")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage"             -> "IN_PROGRESS"
+        "stage" -> "IN_PROGRESS"
       )
     val r = Task.deferFuture(q.get())
     r.map { res =>
@@ -145,13 +124,13 @@ trait InstanceAPIService {
   }
 
   def getNeighbors(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    id: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                    wSClient: WSClient,
+                    apiBaseEndpoint: String,
+                    apiVersion: String,
+                    id: String,
+                    token: AccessToken,
+                    clientToken: String
+                  ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id/neighbors")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
@@ -167,56 +146,56 @@ trait InstanceAPIService {
   }
 
   def postSuggestions(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    token: AccessToken,
-    id: String,
-    field: String,
-    `type`: Option[String],
-    start: Int,
-    size: Int,
-    search: String,
-    payload: JsValue,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                       wSClient: WSClient,
+                       apiBaseEndpoint: String,
+                       apiVersion: String,
+                       token: AccessToken,
+                       id: String,
+                       field: String,
+                       `type`: Option[String],
+                       start: Int,
+                       size: Int,
+                       search: String,
+                       payload: JsValue,
+                       clientToken: String
+                     ): Task[Either[WSResponse, JsObject]] = {
     val wsc = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/extra/instances/$id/suggestedLinksForProperty")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
         "property" -> field,
-        "from"     -> start.toString,
-        "size"     -> size.toString,
-        "search"   -> search,
-        "stage"    -> "IN_PROGRESS"
+        "from" -> start.toString,
+        "size" -> size.toString,
+        "search" -> search,
+        "stage" -> "IN_PROGRESS"
       )
     val q = `type` match {
       case Some(t) => wsc.addQueryStringParameters("type" -> t)
-      case _       => wsc
+      case _ => wsc
     }
     val r = Task.deferFuture(q.post(payload))
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
+        case _ => Left(res)
       }
     }
   }
 
   def getInstance(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    id: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                   wSClient: WSClient,
+                   apiBaseEndpoint: String,
+                   apiVersion: String,
+                   id: String,
+                   token: AccessToken,
+                   clientToken: String
+                 ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage"             -> "IN_PROGRESS",
-        "metadata"          -> "true",
+        "stage" -> "IN_PROGRESS",
+        "metadata" -> "true",
         "returnPermissions" -> "true"
       )
     val r = Task.deferFuture(q.get())
@@ -230,13 +209,13 @@ trait InstanceAPIService {
   }
 
   def deleteInstance(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    id: String,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[APIEditorError, Unit]] = {
+                      wSClient: WSClient,
+                      apiBaseEndpoint: String,
+                      apiVersion: String,
+                      id: String,
+                      token: AccessToken,
+                      clientToken: String
+                    ): Task[Either[APIEditorError, Unit]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
@@ -244,7 +223,7 @@ trait InstanceAPIService {
     r.map { res =>
       res.status match {
         case OK | NO_CONTENT => Right(())
-        case _               => Left(APIEditorError(res.status, res.body))
+        case _ => Left(APIEditorError(res.status, res.body))
       }
     }
   }
@@ -257,7 +236,7 @@ trait InstanceAPIService {
                      body: JsValue,
                      token: AccessToken,
                      clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                   ): Task[Either[WSResponse, JsObject]] = {
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
@@ -266,21 +245,21 @@ trait InstanceAPIService {
     r.map { res =>
       res.status match {
         case OK => Right(res.json.as[JsObject])
-        case _  => Left(res)
+        case _ => Left(res)
       }
     }
   }
 
   def postInstance(
-    wSClient: WSClient,
-    apiBaseEndpoint: String,
-    apiVersion: String,
-    id: Option[String],
-    workspace: String,
-    body: JsValue,
-    token: AccessToken,
-    clientToken: String
-  ): Task[Either[WSResponse, JsObject]] = {
+                    wSClient: WSClient,
+                    apiBaseEndpoint: String,
+                    apiVersion: String,
+                    id: Option[String],
+                    workspace: String,
+                    body: JsValue,
+                    token: AccessToken,
+                    clientToken: String
+                  ): Task[Either[WSResponse, JsObject]] = {
     val idRes = id.getOrElse("")
     val q = wSClient
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$idRes")
@@ -292,7 +271,7 @@ trait InstanceAPIService {
     r.map { res =>
       res.status match {
         case OK | CREATED => Right(res.json.as[JsObject])
-        case _            => Left(res)
+        case _ => Left(res)
       }
     }
   }

@@ -90,7 +90,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-class Search extends React.Component{
+class Browse extends React.Component{
   handleDismissBookmarkCreationError = () => {
     bookmarkStore.dismissBookmarkCreationError();
   }
@@ -133,4 +133,4 @@ class Search extends React.Component{
   }
 }
 
-export default Search;
+export default Browse;

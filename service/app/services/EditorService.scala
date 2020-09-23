@@ -83,6 +83,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   }
 
   def doSearchInstances(
+                         space: String,
                          typeId: String,
                          from: Option[Int],
                          size: Option[Int],
@@ -95,9 +96,10 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         wSClient,
         configuration.kgCoreEndpoint,
         configuration.kgCoreApiVersion,
+        space,
+        typeId,
         from,
         size,
-        typeId,
         searchByLabel,
         token,
         clientToken
@@ -204,27 +206,6 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         returnAlternatives,
         returnPermissions,
         returnEmbedded,
-        clientToken
-      )
-      .map {
-        case Right(value) => Right(value)
-        case Left(res) => Left(APIEditorError(res.status, res.body))
-      }
-
-  def retrieveTypes(
-                     typeOfInstance: String,
-                     token: AccessToken,
-                     metadata: Boolean,
-                     clientToken: String
-                   ): Task[Either[APIEditorError, JsObject]] =
-    instanceAPIService
-      .getInstancesByType(
-        wSClient,
-        configuration.kgCoreEndpoint,
-        configuration.kgCoreApiVersion,
-        token,
-        typeOfInstance,
-        metadata,
         clientToken
       )
       .map {

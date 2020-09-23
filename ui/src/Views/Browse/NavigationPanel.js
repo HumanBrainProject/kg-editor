@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars";
 // import bookmarkStore from "../../Stores/BookmarkStore";
 import Types from "./Types";
-import TypesStore from "../../Stores/TypesStore";
+import typesStore from "../../Stores/TypesStore";
 
 const styles = {
   container: {
@@ -70,7 +70,7 @@ class NavigationPanel extends React.Component {
   render() {
     const { classes } = this.props;
     // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
-    const typeList = TypesStore.filteredList(browseStore.navigationFilter);
+    const typeList = typesStore.filteredList(browseStore.navigationFilter);
     return (
       <div className={classes.container}>
         <div className={classes.header}>

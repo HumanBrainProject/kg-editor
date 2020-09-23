@@ -24,8 +24,11 @@ import appStore from "./AppStore";
 
 const setNodeTypes = node => {
   if (Array.isArray(node.children) && node.children.length) {
-    node.children.forEach(child => setNodeTypes(child));
-    node.children = node.children.sort((a, b) =>  a.types.toString().toUpperCase().localeCompare(b.types.toString().toUpperCase()));
+    node.children.forEach(child => {
+      child.typesName = child.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
+      setNodeTypes(child);
+    });
+    node.children = node.children.sort((a, b) =>  a.typesName.toUpperCase().localeCompare(b.typesName.toUpperCase()));
   }
 };
 
@@ -293,18 +296,17 @@ class ReleaseStore{
 
   @action
   async releaseNode(node) {
-    const types = node.types && node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
     try {
       await API.axios.put(API.endpoints.release(node.id, {}));
       runInAction(()=>{
-        this.savingLastEndedRequest = `(${types}) ${node.label} released successfully`;
+        this.savingLastEndedRequest = `(${node.typesName}) ${node.label} released successfully`;
         this.savingLastEndedNode = node;
         historyStore.updateInstanceHistory(node.id, node.types, "released", false);
       });
     } catch(e){
       runInAction(()=>{
         this.savingErrors.push({node: node, message: e.message});
-        this.savingLastEndedRequest = `(${types}) : an error occured while trying to release this instance`;
+        this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
       appStore.captureSentryException(e);
@@ -317,18 +319,17 @@ class ReleaseStore{
 
   @action
   async unreleaseNode(node) {
-    const types = node.types && node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
     try {
       await API.axios.delete(API.endpoints.release(node.id, {}));
       runInAction(()=>{
-        this.savingLastEndedRequest = `(${types}) ${node.label} unreleased successfully`;
+        this.savingLastEndedRequest = `(${node.typesName}) ${node.label} unreleased successfully`;
         this.savingLastEndedNode = node;
         historyStore.updateInstanceHistory(node.id, node.types, "released", true);
       });
     } catch(e){
       runInAction(()=>{
         this.savingErrors.push({node: node, message: e.message});
-        this.savingLastEndedRequest = `(${types}) : an error occured while trying to unrelease this instance`;
+        this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
       appStore.captureSentryException(e);

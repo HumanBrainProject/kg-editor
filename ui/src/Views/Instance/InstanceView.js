@@ -41,6 +41,11 @@ class InstanceView extends React.Component {
   render() {
     const { classes, instance } = this.props;
     const { id } = instance;
+
+    if (!viewStore.selectedView) {
+      return null;
+    }
+
     return (
       <ViewContext.Provider value={viewStore.selectedView} >
         <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>

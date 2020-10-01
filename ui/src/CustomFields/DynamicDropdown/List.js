@@ -34,28 +34,28 @@ const List = ({
   onMouseOver,
   onMouseOut
 }) => (
-    <span className={readOnly ? "quickfire-readmode-list" : "quickfire-list"}>
-      {list.map((id, index) => (
-        <ListItem
-          key={`${index}-${id}`}
-          index={index}
-          instanceId={id}
-          readOnly={readOnly}
-          disabled={disabled}
-          enablePointerEvents={enablePointerEvents}
-          onClick={onClick}
-          onDelete={onDelete}
-          onDragEnd={onDragEnd}
-          onDragStart={onDragStart}
-          onDrop={onDrop}
-          onKeyDown={onKeyDown}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          onMouseOver={onMouseOver}
-          onMouseOut={onMouseOut}
-        />
-      ))}
-    </span>
-  );
+  <span className={readOnly ? "quickfire-readmode-list" : "quickfire-list"}>
+    {list.map((id, index) => (
+      <ListItem
+        key={`${index}-${id}`}
+        index={index}
+        instanceId={id}
+        readOnly={readOnly}
+        disabled={disabled}
+        enablePointerEvents={enablePointerEvents}
+        onClick={onClick}
+        onDelete={onDelete}
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+        onKeyDown={onKeyDown}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+      />
+    ))}
+  </span>
+);
 
 export default List;

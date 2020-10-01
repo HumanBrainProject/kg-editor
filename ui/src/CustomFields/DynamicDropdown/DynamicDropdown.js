@@ -26,7 +26,6 @@ import FieldError from "../FieldError";
 import Alternatives from "../Alternatives";
 import List from "./List";
 
-import appStore from "../../Stores/AppStore";
 import instanceStore from "../../Stores/InstanceStore";
 import typesStore from "../../Stores/TypesStore";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
@@ -150,11 +149,12 @@ class DynamicDropdownWithContext extends React.Component {
   }
 
   getAlternatives = () => {
-    const { formStore, field: { path, fullyQualifiedName} } = this.props;
+    //const { formStore, field: { path, fullyQualifiedName} } = this.props;
+    const { formStore, field: { path } } = this.props;
 
 
 
-    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char, later if we go for hierarchical field 
+    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char, later if we go for hierarchical field
     const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
       .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
       .map(alternative => ({
@@ -168,13 +168,13 @@ class DynamicDropdownWithContext extends React.Component {
   dropValue(droppedValue) {
     this.props.field.moveValueAfter(this.draggedValue, droppedValue);
     this.draggedValue = null;
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
   handleDropdownReset = () => {
     this.props.field.resetOptionsSearch();
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
@@ -188,7 +188,7 @@ class DynamicDropdownWithContext extends React.Component {
       field.addValue(value);
       onAddCustomValue(value, type, field);
     }
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
@@ -200,19 +200,20 @@ class DynamicDropdownWithContext extends React.Component {
 
   handleAlternativeSelect = values => {
     this.props.field.setValues(values);
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
   handleRemoveSuggestion = () => {
-    let field = this.props.field.removeAllValues();
-    appStore.togglePreviewInstance();
+    //let field = this.props.field.removeAllValues();
+    this.props.field.removeAllValues();
+    instanceStore.togglePreviewInstance();
     this.triggerRemoveSuggestionOnChange();
   }
 
   handleDeleteLastValue = () => {
     this.props.field.removeLastValue();
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
@@ -235,7 +236,7 @@ class DynamicDropdownWithContext extends React.Component {
     const { value: values } = field;
     const value = values[index];
     field.removeValue(value);
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   };
 
@@ -255,7 +256,7 @@ class DynamicDropdownWithContext extends React.Component {
     if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       this.props.field.removeValue(value);
-      appStore.togglePreviewInstance();
+      instanceStore.togglePreviewInstance();
       this.triggerOnChange();
     }
   }
@@ -267,7 +268,7 @@ class DynamicDropdownWithContext extends React.Component {
       const value = values[index];
       const id = value[field.mappingValue];
       view.setInstanceHighlight(id, field.label);
-      appStore.togglePreviewInstance();
+      instanceStore.togglePreviewInstance();
     }
     field.resetOptionsSearch();
   };
@@ -300,7 +301,7 @@ class DynamicDropdownWithContext extends React.Component {
 
   handleOptionPreview = (instanceId, instanceName) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    appStore.togglePreviewInstance(instanceId, instanceName, options);
+    instanceStore.togglePreviewInstance(instanceId, instanceName, options);
   }
 
   handleSearchOptions = term => {
@@ -440,19 +441,19 @@ class DynamicDropdownWithContext extends React.Component {
 }
 
 class DynamicDropdown extends React.Component { // because Quickfire request class
- render() {
-   return (
-    <ViewContext.Consumer>
-      {view => (
-        <PaneContext.Consumer>
-          {pane => (
-            <DynamicDropdownWithContext view={view} pane={pane} {...this.props} />
-          )}
-        </PaneContext.Consumer> 
-      )}
-    </ViewContext.Consumer> 
-   );
- }
+  render() {
+    return (
+      <ViewContext.Consumer>
+        {view => (
+          <PaneContext.Consumer>
+            {pane => (
+              <DynamicDropdownWithContext view={view} pane={pane} {...this.props} />
+            )}
+          </PaneContext.Consumer>
+        )}
+      </ViewContext.Consumer>
+    );
+  }
 }
 
 export default DynamicDropdown;

@@ -198,7 +198,7 @@ class ViewStore{
   }
 }
 
-export const PaneContext = React.createContext(Pane);
-export const ViewContext = React.createContext(View);
+export const PaneContext = React.createContext(null);
+export const ViewContext = React.createContext(null);
 
 export default new ViewStore();

@@ -20,14 +20,16 @@ import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
-import { normalizeInstanceData, normalizeLabelInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper"
+import routerStore from "./RouterStore";
+
+import { normalizeInstanceData, normalizeLabelInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper";
 
 class ReadModeFormStore {
   constructor(store) {
     this.store = store;
     this.readMode = true;
   }
-  
+
   getGeneratedKey =  (item, namespace) => this.store.getGeneratedKey(item, namespace);
 
   getValues = (fields, applyMapping) => this.store.getValues(fields, applyMapping);
@@ -125,7 +127,7 @@ class Instance {
   get name() {
     const field = this.isFetched && this.labelField && this.form && this.form.getField(this.labelField);
     if (field) {
-      return field.value;
+      return (this.isNew && !field.value)?`<New ${this.primaryType.label}>`:field.value;
     }
     return this._name?this._name:this.id;
   }
@@ -234,7 +236,7 @@ class Instance {
   fetchLabel(forceFetch=false) {
     if (!this.isFetching || this.isLabelFetching) {
       if (forceFetch
-        || !this.isFetched || this.fetchError 
+        || !this.isFetched || this.fetchError
         || !this.isLabelFetched || this.fetchLabelError
       ) {
         this.instanceStore.fetchInstanceLabel(this);
@@ -389,6 +391,8 @@ class Instance {
 class InstanceStore {
   @observable stage = null;
   @observable instances = new Map();
+  @observable previewInstance = null;
+  @observable instanceIdAvailability = new Map();
 
   instancesQueue = new Set();
   instanceLabelsQueue = new Set();
@@ -412,6 +416,60 @@ class InstanceStore {
     if(!this.instanceLabelsQueue.has(instance.id)){
       this.instanceLabelsQueue.add(instance.id);
       this.processLabelsQueue();
+    }
+  }
+
+  @action
+  togglePreviewInstance(instanceId, instanceName, options) {
+    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
+      this.previewInstance = null;
+    } else {
+      this.previewInstance = {id: instanceId, name: instanceName, options: options};
+    }
+  }
+
+  @action
+  resetInstanceIdAvailability() {
+    this.instanceIdAvailability.clear();
+  }
+
+  @action
+  async checkInstanceIdAvailability(instanceId, isCreateMode) {
+    this.instanceIdAvailability.set(instanceId, {
+      isAvailable: false,
+      isChecking: true,
+      error: null
+    });
+    try{
+      const { data } = await API.axios.get(API.endpoints.instance(instanceId));
+      runInAction(() => {
+        const resolvedId = data && data.data && data.data.id;
+        if (!resolvedId) {
+          throw `${API.endpoints.instance(instanceId)} response is invalid" (${data})`;
+        }
+
+        this.instanceIdAvailability.delete(instanceId);
+        const instance = this.createInstanceOrGet(resolvedId);
+        instance.initializeData(data && data.data);
+
+        if (isCreateMode) {
+          routerStore.history.replace(`/instance/edit/${resolvedId}`);
+        }
+      });
+    } catch(e){
+      runInAction(() => {
+        const status =  this.instanceIdAvailability.get(instanceId);
+        if (e.response && e.response.status === 404) {
+          status.isAvailable = true;
+          status.isChecking = false;
+        } else {
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
+          status.isAvailable = false;
+          status.isChecking = false;
+        }
+      });
     }
   }
 
@@ -584,6 +642,7 @@ class InstanceStore {
   @action
   flush(){
     this.instances.clear();
+    this.resetInstanceIdAvailability();
   }
 
   @action
@@ -604,7 +663,7 @@ class InstanceStore {
       _name: name,
       types: [instanceType],
       primaryType: instanceType,
-      workspace: appStore.currentWorkspace,
+      workspace: appStore.currentWorkspace.id,
       fields: toJS(fields),
       labelField: type.labelField,
       promotedFields: toJS(type.promotedFields),

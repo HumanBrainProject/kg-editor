@@ -84,16 +84,18 @@ const styles = {
 
 @injectStyles(styles)
 class FooterPanel extends React.Component {
-  handleOpenInstance(mode, instanceId, event){
+
+  handleOpenInstance = event => {
+    const { id } = this.props;
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
-      appStore.openInstance(instanceId, mode);
+      appStore.openInstance(id, "view");
     } else {
-      routerStore.history.push(`/instance/${mode}/${instanceId}`);
+      routerStore.history.push(`/instance/view/${id}`);
     }
   }
 
-  render(){
+  render() {
     const { classes, className, id, workspace, showOpenActions } = this.props;
 
     return(
@@ -105,10 +107,11 @@ class FooterPanel extends React.Component {
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              {appStore.currentWorkspace.id === workspace ?
-                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
+              {appStore.currentWorkspace.id === workspace && (
+                <div className={classes.action} onClick={this.handleOpenInstance}>
                   <FontAwesomeIcon icon="folder-open"/>
-                </div>:null}
+                </div>
+              )}
             </div>
           </Col>
         </Row>

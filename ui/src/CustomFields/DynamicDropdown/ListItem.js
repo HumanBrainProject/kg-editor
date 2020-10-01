@@ -174,8 +174,8 @@ class ListItem extends React.Component {
         <span className={classes.valueDisplay}>{label}</span>
         <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={this.handleDelete} />
       </div>
-    )
+    );
   }
-} 
+}
 
 export default ListItem;

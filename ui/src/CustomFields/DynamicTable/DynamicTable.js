@@ -17,6 +17,7 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import injectStyles from "react-jss";
+import _  from "lodash-uuid";
 import { FormGroup, Alert } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
@@ -26,7 +27,9 @@ import FieldError from "../FieldError";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 
-import appStore from "../../Stores/AppStore";
+import instanceStore from "../../Stores/InstanceStore";
+import typesStore from "../../Stores/TypesStore";
+
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 const styles = {
@@ -86,7 +89,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 class DynamicTableWithContext extends React.Component {
-  
+
   //The only way to trigger an onChange event in React is to do the following
   //Basically changing the field value, bypassing the react setter and dispatching an "input"
   // event on a proper html input node
@@ -101,7 +104,7 @@ class DynamicTableWithContext extends React.Component {
 
   handleDropdownReset = () => {
     this.props.field.resetOptionsSearch();
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
@@ -115,7 +118,7 @@ class DynamicTableWithContext extends React.Component {
       field.addValue(value);
       onAddCustomValue(value, type, field);
     }
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
@@ -129,19 +132,19 @@ class DynamicTableWithContext extends React.Component {
   handleDelete = id => e => {
     e.stopPropagation();
     this.props.field.removeValue({[this.props.field.mappingValue]: id});
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
   handleDeleteAll = () => {
     this.props.field.removeAllValues();
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
   handleOptionPreview = (id, name) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    appStore.togglePreviewInstance(id, name, options);
+    instanceStore.togglePreviewInstance(id, name, options);
   }
 
   handleSearchOptions = term => {
@@ -157,7 +160,7 @@ class DynamicTableWithContext extends React.Component {
     const { value: values } = field;
     const value = values[index];
     field.removeValue(value);
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
@@ -219,7 +222,7 @@ class DynamicTableWithContext extends React.Component {
     const fieldLabel = label.toLowerCase();
     const isReadOnly = formStore.readMode || readMode || readOnly || disabled;
     const canAddValues =  !isReadOnly && links.length < max;
-    
+
     return (
       <FieldError id={instanceId} field={field}>
         <div className={classes.container}>
@@ -289,17 +292,17 @@ class DynamicTableWithContext extends React.Component {
 class DynamicTable extends React.Component { // because Quickfire request class
   render() {
     return (
-     <ViewContext.Consumer>
-       {view => (
-         <PaneContext.Consumer>
-           {pane => (
-             <DynamicTableWithContext view={view} pane={pane} {...this.props} />
-           )}
-         </PaneContext.Consumer> 
-       )}
-     </ViewContext.Consumer> 
+      <ViewContext.Consumer>
+        {view => (
+          <PaneContext.Consumer>
+            {pane => (
+              <DynamicTableWithContext view={view} pane={pane} {...this.props} />
+            )}
+          </PaneContext.Consumer>
+        )}
+      </ViewContext.Consumer>
     );
   }
- }
- 
+}
+
 export default DynamicTable;

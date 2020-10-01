@@ -17,10 +17,13 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import releaseStore from "../../../Stores/ReleaseStore";
 import appStore from "../../../Stores/AppStore";
+import instanceStore from "../../../Stores/InstanceStore";
+
 import ReleaseStatus from "../../../Components/ReleaseStatus";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReleaseNodeToggle from "./ReleaseNodeToggle";
 
 const styles = {
@@ -130,7 +133,7 @@ class ReleaseNode extends React.Component {
   handleOptionPreview = (instanceId, instanceName) => event => {
     event && event.stopPropagation();
     const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
-    appStore.togglePreviewInstance(instanceId, instanceName, options );
+    instanceStore.togglePreviewInstance(instanceId, instanceName, options );
   }
 
   handleShowCompare(node, e) {

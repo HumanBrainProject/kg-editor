@@ -28,7 +28,6 @@ import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
 // import BookmarkStatus from "./Instance/BookmarkStatus";
-import RenderMarkdownField from "../Components/Markdown";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 
@@ -204,9 +203,9 @@ class Preview extends React.Component {
                   key={instanceId}
                 >
                   {fields.map(fieldKey => (
-                      <div key={instanceId + fieldKey} className={classes.field}>
-                        <Field name={fieldKey} />
-                      </div>
+                    <div key={instanceId + fieldKey} className={classes.field}>
+                      <Field name={fieldKey} />
+                    </div>
                   ))}
                   {showMetaData && instance.metadata && instance.metadata.length > 0 && (
                     <div>

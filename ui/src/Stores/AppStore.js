@@ -56,9 +56,7 @@ class AppStore{
   @observable canLogin = true;
   @observable currentTheme;
   @observable historySettings;
-  @observable instanceIdAvailability = new Map();
   @observable currentWorkspace = null;
-  @observable previewInstance = null;
   @observable showSaveBar = false;
   @observable instanceToDelete = null;
   @observable isDeletingInstance = false;
@@ -157,7 +155,6 @@ class AppStore{
   flush(){
     instanceStore.flush();
     statusStore.flush();
-    this.resetInstanceIdAvailability();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
@@ -192,9 +189,13 @@ class AppStore{
   async getInitialInstanceWorkspace(instanceId){
     this.initializingMessage = `Retrieving instance "${instanceId}"...`;
     try{
-      const response = await API.axios.get(API.endpoints.getInstance(instanceId));
+      const response = await API.axios.get(API.endpoints.instance(instanceId));
       const data = response.data && response.data.data;
       if(data){
+
+        const instance = instanceStore.createInstanceOrGet(instanceId);
+        instance.initializeData(data);
+
         if(data.workspace){
           return data.workspace;
         }
@@ -239,7 +240,7 @@ class AppStore{
   }
 
   closeAllInstances() {
-    this.resetInstanceIdAvailability();
+    instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
@@ -249,7 +250,7 @@ class AppStore{
   }
 
   clearViews() {
-    this.resetInstanceIdAvailability();
+    instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
@@ -350,70 +351,19 @@ class AppStore{
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
 
-  @action
-  togglePreviewInstance(instanceId, instanceName, options) {
-    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
-      this.previewInstance = null;
-    } else {
-      this.previewInstance = {id: instanceId, name: instanceName, options: options};
-    }
-  }
 
-
-  @action
-  resetInstanceIdAvailability() {
-    this.instanceIdAvailability.clear();
-  }
-
-  @action
-  async checkInstanceIdAvailability(instanceId){
-    this.instanceIdAvailability.set(instanceId, {
-      resolvedId: null,
-      isAvailable: false,
-      isChecking: true,
-      error: null
-    });
-    try{
-      const { data } = await API.axios.get(API.endpoints.getInstance(instanceId));
-      runInAction(() => {
-        const resolvedId = (data && data.data && data.data.id)?data.data.id:instanceId;
-        this.instanceIdAvailability.delete(instanceId);
-        routerStore.history.replace(`/instance/edit/${resolvedId}`);
-      });
-    } catch(e){
-      runInAction(() => {
-        const status =  this.instanceIdAvailability.get(instanceId);
-        if (e.response && e.response.status === 404) {
-          status.isAvailable = true;
-          status.isChecking = false;
-        } else {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          status.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
-          status.isAvailable = false;
-          status.isChecking = false;
-        }
-      });
-    }
-  }
   createInstance = () => {
     const uuid = _.uuid();
     routerStore.history.push(`/instance/create/${uuid}`);
   }
 
-  @action openInstance(instanceId, instanceName, viewMode = "view", readMode = true){
-    this.togglePreviewInstance();
-    instanceStore.setReadMode(readMode);
+  @action openInstance(instanceId, instanceName, viewMode = "view"){
     viewStore.registerViewByInstanceId(instanceId, instanceName, viewMode);
-    if(viewMode === "create") {
-      this.checkInstanceIdAvailability(instanceId);
-    } else {
+    if(viewMode !== "create") {
       const instance = instanceStore.createInstanceOrGet(instanceId);
-      if(instance.isFetched && !instance.fetchError) {
+      if(instance.isFetched || instance.isLabelFetched) {
         const types = instance.types.map(({name}) => name);
-        historyStore.updateInstanceHistory(instance.id, instance.name, types, "viewed");
-      } else {
-        instance.fetch();
+        historyStore.updateInstanceHistory(instanceId, types, "viewed");
       }
     }
     viewStore.syncStoredViews();
@@ -441,7 +391,7 @@ class AppStore{
         }
       }
     }
-    this.instanceIdAvailability.delete(instanceId);
+    instanceStore.instanceIdAvailability.delete(instanceId);
     viewStore.unregisterViewByInstanceId(instanceId);
     const instance = instanceStore.instances.get(instanceId);
     if (instance) {
@@ -473,14 +423,14 @@ class AppStore{
       }
     }
     const types = instance.types.map(({name}) => name);
-    historyStore.updateInstanceHistory(instance.id, instance.name, types, "edited");
+    historyStore.updateInstanceHistory(instance.id, types, "edited");
     statusStore.flush();
   }
 
   syncInstancesHistory(instance, mode) {
     if(instance && viewStore.views.has(instance.id)){
       const types = instance.types.map(({name}) => name);
-      historyStore.updateInstanceHistory(instance.id, instance, types, mode);
+      historyStore.updateInstanceHistory(instance.id, types, mode);
     }
   }
 

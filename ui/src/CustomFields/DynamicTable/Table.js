@@ -186,41 +186,41 @@ class Table extends React.Component {
 
   render() {
     const { classes, list } = this.props;
-    
+
     return (
-        <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
-            <TableComponent
-                width={this.state.containerWidth}
-                height={300}
-                headerHeight={20}
-                rowHeight={30}
-                rowClassName={this.rowClassName}
-                rowCount={list.length}
-                rowGetter={this.rowGetter}
-                onRowClick={this.handleRowClick}
-                onRowMouseOver={this.handleRowMouseOver}
-                onRowMouseOut={this.handleRowMouseOut}
-                rowRenderer={this.rowRenderer}
-                scrollToIndex={this.state.scrollToIndex-1}
-            >
-                <Column
-                    label="Name"
-                    dataKey="name"
-                    flexGrow={1}
-                    flexShrink={0}
-                    width={20}
-                    cellRenderer={this.labelCellRenderer}
-                    />
-                <Column
-                    label={""}
-                    dataKey="Actions"
-                    flexGrow={0}
-                    flexShrink={1}
-                    width={20}
-                    cellRenderer={this.actionsCellRenderer}
-                    />
-            </TableComponent>
-        </div>
+      <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
+        <TableComponent
+          width={this.state.containerWidth}
+          height={300}
+          headerHeight={20}
+          rowHeight={30}
+          rowClassName={this.rowClassName}
+          rowCount={list.length}
+          rowGetter={this.rowGetter}
+          onRowClick={this.handleRowClick}
+          onRowMouseOver={this.handleRowMouseOver}
+          onRowMouseOut={this.handleRowMouseOut}
+          rowRenderer={this.rowRenderer}
+          scrollToIndex={this.state.scrollToIndex-1}
+        >
+          <Column
+            label="Name"
+            dataKey="name"
+            flexGrow={1}
+            flexShrink={0}
+            width={20}
+            cellRenderer={this.labelCellRenderer}
+          />
+          <Column
+            label={""}
+            dataKey="Actions"
+            flexGrow={0}
+            flexShrink={1}
+            width={20}
+            cellRenderer={this.actionsCellRenderer}
+          />
+        </TableComponent>
+      </div>
     );
   }
 }

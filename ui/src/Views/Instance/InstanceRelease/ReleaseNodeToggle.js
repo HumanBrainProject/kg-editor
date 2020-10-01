@@ -19,7 +19,7 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import MultiToggle from "../../../Components/MultiToggle";
 import releaseStore from "../../../Stores/ReleaseStore";
-import appStore from "../../../Stores/AppStore";
+import instanceStore from "../../../Stores/InstanceStore";
 
 const styles = {
   container: {
@@ -39,7 +39,7 @@ const styles = {
 @observer
 class ReleaseNodeToggle extends React.Component {
   handleChange = status => {
-    appStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     const { node } = this.props;
     releaseStore.markNodeForChange(node, status);
     releaseStore.handleWarning(node, status);

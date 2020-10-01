@@ -25,11 +25,11 @@ export const transformSummaryField = field  =>  {
 
 export const normalizeLabelInstanceData = data => {
   const instance = {
-    id: null, 
+    id: null,
     name: null,
     types: [],
     primaryType: { name: "", color: "", label: "" },
-    workspace: "", name: "",
+    workspace: "",
     error: null
   };
 
@@ -186,15 +186,13 @@ export const normalizeInstanceData = (data, transformField = null) => {
     });
   };
 
-  const LabelInstance = normalizeLabelInstanceData(data);
-
   const instance = {
     ...normalizeLabelInstanceData(data),
     fields: {},
     labelField: null,
-    promotedFields: [], 
-    alternatives: {}, 
-    metadata: {}, 
+    promotedFields: [],
+    alternatives: {},
+    metadata: {},
     permissions: {}
   };
 

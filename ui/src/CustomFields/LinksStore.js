@@ -20,9 +20,9 @@ import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
 import appStore from "../Stores/AppStore";
+import instanceStore from "../Stores/InstanceStore";
 
-
-const defaultNumberOfVisibleLinks = 10;
+//const defaultNumberOfVisibleLinks = 10;
 
 class LinksStore extends FormStore.typesMapping.Default{
   @observable value = [];
@@ -104,7 +104,7 @@ class LinksStore extends FormStore.typesMapping.Default{
   @action
   moveValueAfter(value, afterValue) {
     if(!this.disabled && !this.readOnly && value) {
-      field.removeValue(value);
+      super.removeValue(value);
       super.addValue(value, this.value.indexOf(afterValue));
       this.resetOptionsSearch();
     }

@@ -16,31 +16,42 @@
 
 import React from "react";
 import {observer} from "mobx-react";
+import injectStyles from "react-jss";
+
+import viewStore, { ViewContext} from "../../Stores/ViewStore";
 
 import InstanceForm from "./InstanceForm";
 import Pane from "./Pane";
 import Links from "./Links";
-import PaneContainer from "./PaneContainer";
 
+const styles = {
+  container: {
+    height: "100%",
+    width: "100%",
+    display: "grid",
+    position:"relative",
+    overflow: "hidden",
+    "--selected-index":"0"
+  }
+};
+@injectStyles(styles)
 @observer
 class InstanceView extends React.Component {
 
   render() {
-    const { instance, paneStore } = this.props;
+    const { classes, instance } = this.props;
     const { id } = instance;
-
     return (
-
-      <PaneContainer key={id} paneStore={paneStore}>
-        <React.Fragment>
-          <Pane paneId={id} key={id}>
-            <InstanceForm level={0} id={id} mainInstanceId={id} />
+      <ViewContext.Provider value={viewStore.selectedView} >
+        <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
+          <Pane paneId={id} >
+            <InstanceForm id={id} />
           </Pane>
-          {!instance.hasFetchError?
-            <Links level={1} id={id} mainInstanceId={id} />
-            :null}
-        </React.Fragment>
-      </PaneContainer>
+          {!instance.hasFetchError && (
+            <Links instanceId={id} />
+          )}
+        </div>
+      </ViewContext.Provider>
     );
   }
 }

@@ -98,8 +98,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
     let beforeValues = {};
     let afterValues = {};
 
-    let promotedFields = [];
-    let nonPromotedFields = [];
+    let fields = [];
 
     if ((!instanceBefore || (instanceBefore.isFetched && !instanceBefore.fetchError && instanceBefore.form && instanceBefore.form.structure && instanceBefore.form.structure.fields))
       && instanceAfter.isFetched && !instanceAfter.fetchError && instanceAfter.form && instanceAfter.form.structure && instanceAfter.form.structure.fields) {
@@ -112,8 +111,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
       const formStoreAfter = instanceAfter.readModeFormStore;
       afterValues = formStoreAfter.getValues();
 
-      promotedFields = instanceAfter.promotedFields;
-      nonPromotedFields = instanceAfter.nonPromotedFields;
+      fields = [...instanceAfter.promotedFields, ...instanceAfter.nonPromotedFields];
     }
 
     return(
@@ -144,10 +142,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
               </BGMessage>
               :
               <React.Fragment>
-                {promotedFields.map(key => (
-                  <CompareFieldChanges key={key} field={instanceAfter.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
-                ))}
-                {nonPromotedFields.map(key => (
+                {fields.map(key => (
                   <CompareFieldChanges key={key} field={instanceAfter.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
                 ))}
               </React.Fragment>

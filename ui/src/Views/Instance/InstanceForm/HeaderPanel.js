@@ -41,13 +41,30 @@ const styles = {
 
 @injectStyles(styles)
 class HeaderPanel extends React.Component{
+
+  componentDidMount() {
+    if (this.props.highlight) {
+      this.scrollIntoView();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.highlight && this.props.hightlight !== prevProps.hightlight) {
+      this.scrollIntoView();
+    }
+  }
+
+  scrollIntoView = ()=> {
+    this.scrollIntoViewRef && this.scrollIntoViewRef.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+
   render(){
     const { classes, className, types, hasChanged } = this.props;
     return(
       <div className={`${classes.panel} ${className ? className : ""}`}>
         <Row>
           <Col xs={12}>
-            <h6>
+            <h6 ref={ref => this.scrollIntoViewRef = ref}>
               {types && types.map(({name, label, color}) => (
                 <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
               ))}

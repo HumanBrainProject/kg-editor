@@ -44,15 +44,13 @@ class CompareChanges extends React.Component{
     const formStoreAfter = new FormStore(toJS(instance.form.structure));
     formStoreAfter.toggleReadMode(true);
 
+    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
     const beforeValues = formStoreBefore.getValues();
     const afterValues = formStoreAfter.getValues();
 
     return(
       <div className={classes.container}>
-        {instance.promotedFields.map(key => (
-          <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
-        ))}
-        {instance.nonPromotedFields.map(key => (
+        {fields.map(key => (
           <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
         ))}
       </div>

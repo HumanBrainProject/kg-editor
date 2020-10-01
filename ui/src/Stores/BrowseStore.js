@@ -19,20 +19,13 @@ import { debounce } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
 import appStore from "./AppStore";
-import { normalizeInstanceData } from "../Helpers/InstanceHelper";
+import { normalizeInstanceData, transformSummaryField } from "../Helpers/InstanceHelper";
 
 import API from "../Services/API";
 
-const transformField = field  =>  {
-  if(field.type === "TextArea") {
-    field.value = field.value?field.value.substr(0, 197) + "...": null;
-    delete field.label;
-  }
-};
-
 const normalizeInstancesData = data => {
   return (data && data.data instanceof Array)?data.data.map(item => {
-    const instance = normalizeInstanceData(item, transformField);
+    const instance = normalizeInstanceData(item, transformSummaryField);
     instance.formStore = new FormStore(instance);
     instance.formStore.toggleReadMode(true);
     return instance;

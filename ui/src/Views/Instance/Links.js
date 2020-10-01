@@ -17,10 +17,12 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
+
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
+
 import instanceStore from "../../Stores/InstanceStore";
-import instanceTabStore from "../../Stores/InstanceTabStore";
+import viewStore from "../../Stores/ViewStore";
 
 const styles = {
   pane: {
@@ -31,10 +33,9 @@ const styles = {
 @injectStyles(styles)
 @observer
 class Links extends React.Component{
+
   componentDidMount() {
-    if (this.props.id) {
-      this.fetchInstance();
-    }
+    this.fetchInstance();
   }
 
   componentDidUpdate(prevProps) {
@@ -44,47 +45,45 @@ class Links extends React.Component{
   }
 
   fetchInstance = (forceFetch = false) => {
-    const instance = instanceStore.createInstanceOrGet(this.props.id);
-    instance.fetch(forceFetch);
+    if (this.props.id) {
+      const instance = instanceStore.createInstanceOrGet(this.props.id);
+      instance.fetch(forceFetch);
+    }
   }
 
   render(){
-    const {classes, mainInstanceId } = this.props;
+    const {classes, instanceId, view, level } = this.props;
 
-    const instance = instanceStore.instances.get(this.props.id);
+    const instance = instanceStore.instances.get(instanceId);
     if (!instance) {
       return null;
     }
-    const mainInstance = instanceTabStore.instanceTabs.get(mainInstanceId);
-    const currentInstancePath = mainInstance.currentInstancePath;
 
     const groups = instance.childrenIdsGroupedByField;
+    if (!groups.length) {
+      return null;
+    }
+
+    const path = viewStore.selectedView.instancePath;
+    const index = path.findIndex(id => id === instanceId);
+    const childInstanceId = (index > 0)?path[index+1]:null;
 
     return (
       <React.Fragment>
-        {groups.length > 0?
-          <Pane paneId={"ChildrenOf"+this.props.id} key={"ChildrenOf"+this.props.id} className={classes.pane}>
-            {groups.map(group => (
-              <div key={group.label} data-provenence={group.label}>
-                <h4>{group.label}{group.pagination?
-                  <em style={{fontWeight:"lighter"}}>
-                        (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
-                </h4>
-                {group.ids.map(id => (
-                  <InstanceForm key={id} level={this.props.level} id={id} provenence={group.label} mainInstanceId={mainInstanceId} />
-                ))}
-              </div>
-            ))}
-          </Pane>
-          :
-          null
-        }
-        {currentInstancePath.length-1 >= this.props.level &&
-          <DecoratedLinks
-            level={this.props.level+1}
-            id={currentInstancePath[this.props.level]}
-            mainInstanceId={mainInstanceId} />
-        }
+        <Pane className={classes.pane} paneId={`ChildrenOf${instanceId}`}>
+          {groups.map(group => (
+            <div key={group.label} data-provenance={group.label}>
+              <h4>{group.label}{group.pagination?
+                <em style={{fontWeight:"lighter"}}>
+                      (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
+              </h4>
+              {group.ids.map(id => (
+                <InstanceForm key={id} id={id} provenance={group.label} />
+              ))}
+            </div>
+          ))}
+        </Pane>
+        {childInstanceId && <DecoratedLinks instanceId={childInstanceId} />}
       </React.Fragment>
     );
   }

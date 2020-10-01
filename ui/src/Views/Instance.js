@@ -21,8 +21,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
 import instanceStore from "../Stores/InstanceStore";
-import instanceTabStore from "../Stores/InstanceTabStore";
+import viewStore from "../Stores/ViewStore";
 import appStore from "../Stores/AppStore";
+
+import {PaneContext} from "../Stores/ViewStore";
 
 import InstanceCreate from "./Instance/InstanceCreate";
 import InstanceView from "./Instance/InstanceView";
@@ -114,7 +116,7 @@ const styles = {
 @observer
 class Instance extends React.Component {
   render() {
-    const { className, instance, mode, paneStore, onRetry} = this.props;
+    const { className, instance, mode, onRetry} = this.props;
     if (instance.hasFetchError) {
       return (
         <BGMessage icon={"ban"}>
@@ -142,7 +144,7 @@ class Instance extends React.Component {
     case "edit":
     case "view":
       return (
-        <InstanceView instance={instance} paneStore={paneStore} />
+        <InstanceView instance={instance} />
       );
     case "invite":
       return (
@@ -170,13 +172,13 @@ class Instance extends React.Component {
 @observer
 class Edit extends React.Component {
   componentDidMount() {
-    appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
+    appStore.openInstance(this.props.match.params.id, null, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
   }
 
   componentDidUpdate(prevProps) {
     const path = `/instance/${this.props.mode}/${this.props.match.params.id}`;
     if (!appStore.replaceInstanceResolvedIdPath(path) && this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
-      appStore.openInstance(this.props.match.params.id, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
+      appStore.openInstance(this.props.match.params.id, null, this.props.mode, this.props.mode !== "edit" && this.props.mode !== "create");
     }
   }
 
@@ -190,25 +192,26 @@ class Edit extends React.Component {
   render() {
     const {classes} = this.props;
     const id = this.props.match.params.id;
-    const openedInstance = id?instanceTabStore.instanceTabs.get(id):null;
+    viewStore.selectViewByInstanceId(id);
+    const openedInstance = id?viewStore.views.get(id):null;
     const instance = id?instanceStore.instances.get(id):null;
 
-    if (!openedInstance || (!instance && openedInstance.viewMode !== "create")) {
+    if (!openedInstance || (!instance && openedInstance.mode !== "create")) {
       return null;
     }
 
     const previewInstance = appStore.previewInstance;
     const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
-
+  
     return (
       <React.Fragment>
-        <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.viewMode !== "edit"? "hide-savebar":""}`}>
-          <Tabs mode={openedInstance.viewMode} instance={instance} />
+        <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && openedInstance.mode !== "edit"? "hide-savebar":""}`}>
+          <Tabs mode={openedInstance.mode} instance={instance} />
           <div className={classes.body}>
-            {openedInstance.viewMode === "create"?
-              <InstanceCreate instanceId={id} paneStore={openedInstance.paneStore} />
+            {openedInstance.mode === "create"?
+              <InstanceCreate instanceId={id} />
               :
-              <Instance className={classes.loader} instance={instance} mode={openedInstance.viewMode} paneStore={openedInstance.paneStore} onRetry={this.handleRetry} />
+              <Instance className={classes.loader} instance={instance} mode={openedInstance.mode} onRetry={this.handleRetry} />
             }
           </div>
           <div className={classes.sidebar}>

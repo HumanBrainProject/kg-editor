@@ -15,7 +15,9 @@
 */
 
 import React from "react";
+import { inject } from "mobx-react";
 import InputText from "../InputText/InputText";
+import RenderMarkdownField from "../../Components/Markdown";
 
 /**
  * Textarea input field.
@@ -25,8 +27,21 @@ import InputText from "../InputText/InputText";
  * @namespace TextArea
  */
 
+@inject("formStore")
 class TextArea extends React.Component {
   render() {
+
+    const { formStore, field } = this.props;
+    if (formStore.readMode || field.readMode) {
+      if (field.markdown) {
+        return (
+          <RenderMarkdownField value={field.value}/>
+        );
+      }
+      return (
+        <p>{field.value}</p>
+      );
+    }
     return (
       <InputText {...this.props} componentClass="textarea" />
     );

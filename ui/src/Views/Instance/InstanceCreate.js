@@ -58,7 +58,7 @@ class InstanceCreate extends React.Component {
   handleCheckInstanceIdAvailability = () => appStore.checkInstanceIdAvailability(this.props.instanceId);
 
   handleCreateNewInstanceOfType = type => {
-    instanceStore.createNewInstance(appStore.currentWorkspace.id, type, this.props.instanceId);
+    instanceStore.createNewInstance(type, this.props.instanceId);
     appStore.resetInstanceIdAvailability();
   }
 

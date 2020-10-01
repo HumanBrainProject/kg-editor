@@ -16,17 +16,21 @@
 
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { get, toJS } from "mobx";
-import { FormGroup, Glyphicon, Alert } from "react-bootstrap";
+import { toJS } from "mobx";
+import { FormGroup, Alert } from "react-bootstrap";
 import { isFunction } from "lodash";
 import injectStyles from "react-jss";
+import _  from "lodash-uuid";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import FieldError from "../FieldError";
 import Alternatives from "../Alternatives";
+import List from "./List";
 
 import appStore from "../../Stores/AppStore";
 import instanceStore from "../../Stores/InstanceStore";
+import typesStore from "../../Stores/TypesStore";
+import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 
@@ -42,29 +46,6 @@ const styles = {
     "&:disabled $remove, &[disabled] $remove, &.disabled $remove, & :disabled $remove, & [disabled] $remove, & .disabled $remove, &[readonly] $remove, &:disabled $remove, & [readonly] $remove, & :disabled $remove":{
       pointerEvents:"none",
       display: "none !important"
-    }
-  },
-  valueDisplay:{
-    display:"inline-block",
-    maxWidth:"200px",
-    overflow:"hidden",
-    textOverflow:"ellipsis",
-    whiteSpace:"nowrap",
-    verticalAlign:"bottom"
-  },
-  remove:{
-    fontSize:"0.8em",
-    opacity:0.5,
-    marginLeft:"3px",
-    "&:hover":{
-      opacity:1
-    }
-  },
-  notFound:{
-    fontStyle: "italic",
-    backgroundColor: "lightgrey",
-    "&:hover":{
-      backgroundColor: "lightgrey"
     }
   },
   readMode:{
@@ -83,12 +64,22 @@ const styles = {
 @inject("formStore")
 @injectStyles(styles)
 @observer
-class DynamicDropdown extends React.Component {
+class DynamicDropdownWithContext extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       alternatives: []
     };
+  }
+
+  componentDidMount(){
+    this.getAlternatives();
+  }
+
+  componentDidUpdate(prevProps){
+    if (this.props.formStore && this.props.formStore.structure && (!prevProps.formStore || !prevProps.formStore.structure || (JSON.stringify(toJS(this.props.formStore.structure.alternatives)) !== JSON.stringify(toJS(prevProps.formStore.structure.alternatives))))) {
+      this.getAlternatives();
+    }
   }
 
   //The only way to trigger an onChange event in React is to do the following
@@ -116,60 +107,6 @@ class DynamicDropdown extends React.Component {
     const prototype = window.HTMLInputElement.prototype;
     Object.getOwnPropertyDescriptor(prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(value));
-  }
-
-  handleDropdownReset = () => {
-    appStore.togglePreviewInstance();
-    this.props.field.resetOptionsSearch();
-  }
-
-  handleOnAddNewValue = (value, type) => {
-    const {field, onAddCustomValue} = this.props;
-    onAddCustomValue(value, type, field);
-    field.resetOptionsSearch();
-    this.triggerOnChange();
-  }
-
-  handleOnAddValue = id => {
-    const {field} = this.props;
-    field.addValue({[field.mappingValue]: id});
-    field.resetOptionsSearch();
-    this.triggerOnChange();
-  }
-
-  handleRemove(value, e){
-    if(this.props.field.disabled || this.props.field.readOnly){
-      return;
-    }
-    e.stopPropagation();
-    this.beforeRemoveValue(value);
-    this.triggerOnChange();
-  }
-
-  handleRemoveBackspace(value, e){
-    if(this.props.field.disabled || this.props.field.readOnly){
-      return;
-    }
-    //User pressed "Backspace" while focus on a value
-    if(e.keyCode === 8){
-      e.preventDefault();
-      this.beforeRemoveValue(value);
-      this.triggerOnChange();
-    }
-  }
-
-  handleAlternativeSelect = values => {
-    const field = this.props.field;
-    field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
-    values.forEach(value => field.addValue(value));
-    this.triggerOnChange();
-    field.resetOptionsSearch();
-  }
-
-  handleRemoveSuggestion = () => {
-    let field = this.props.field;
-    field.value.map(value => value).forEach(value => this.beforeRemoveValue(value));
-    this.triggerRemoveSuggestionOnChange();
   }
 
   getAlternativeOptions = value => {
@@ -214,9 +151,11 @@ class DynamicDropdown extends React.Component {
   }
 
   getAlternatives = () => {
-    const { formStore, field: { path} } = this.props;
+    const { formStore, field: { path, fullyQualifiedName} } = this.props;
 
-    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
+
+
+    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char, later if we go for hierarchical field 
     const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
       .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
       .map(alternative => ({
@@ -227,62 +166,138 @@ class DynamicDropdown extends React.Component {
     this.setState({alternatives: alternatives});
   }
 
-  handleDeleteLastValue = () => {
-    const field = this.props.field;
-    if(field.disabled || field.readOnly || !field.value.length){
-      return;
-    }
-    this.beforeRemoveValue(field.value[field.value.length-1]);
+  dropValue(droppedValue) {
+    this.props.field.moveValueAfter(this.draggedValue, droppedValue);
+    this.draggedValue = null;
+    appStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
-  handleDrop(droppedVal, e){
-    let field = this.props.field;
-    if(field.disabled || field.readOnly){
-      return;
-    }
-    e.preventDefault();
-    this.dropValue(droppedVal);
-  }
-
-  dropValue(droppedVal){
-    const field = this.props.field;
-    if(field.disabled || field.readOnly){
-      return;
-    }
-    field.removeValue(this.draggedValue);
-    field.addValue(this.draggedValue, field.value.indexOf(droppedVal));
-    this.triggerOnChange();
-    appStore.togglePreviewInstance();
-    field.resetOptionsSearch();
-  }
-
-  componentDidMount(){
-    this.getAlternatives();
-  }
-
-  componentDidUpdate(prevProps){
-    if (this.props.formStore && this.props.formStore.structure && (!prevProps.formStore || !prevProps.formStore.structure || (JSON.stringify(toJS(this.props.formStore.structure.alternatives)) !== JSON.stringify(toJS(prevProps.formStore.structure.alternatives))))) {
-      this.getAlternatives();
-    }
-  }
-
-  beforeRemoveValue(value){
-    this.props.field.removeValue(value);
-    appStore.togglePreviewInstance();
+  handleDropdownReset = () => {
     this.props.field.resetOptionsSearch();
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
   }
 
-  handleTagInteraction(interaction, value, event){
-    const onInteraction = this.props[`onValue${interaction}`];
-    if(isFunction(onInteraction)){
-      onInteraction(this.props.field, value, event);
-    } else if(interaction === "Focus"){
-      event.stopPropagation();
+  handleOnAddNewValue = (name, typeName) => {
+    const {field, onAddCustomValue} = this.props;
+    if (field.allowCustomValues) {
+      const id = _.uuid();
+      const type = typesStore.typesMap.get(typeName);
+      instanceStore.createNewInstance(type, id, name);
+      const value = {[field.mappingValue]: id};
+      field.addValue(value);
+      onAddCustomValue(value, type, field);
+    }
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
+  }
+
+  handleOnAddValue = id => {
+    const { field } = this.props;
+    const value = {[field.mappingValue]: id};
+    field.addValue(value);
+  }
+
+  handleAlternativeSelect = values => {
+    this.props.field.setValues(values);
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
+  }
+
+  handleRemoveSuggestion = () => {
+    let field = this.props.field.removeAllValues();
+    appStore.togglePreviewInstance();
+    this.triggerRemoveSuggestionOnChange();
+  }
+
+  handleDeleteLastValue = () => {
+    this.props.field.removeLastValue();
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
+  }
+
+  handleClick = index => {
+    const { field, view, pane } = this.props;
+    if (view && pane) {
+      const { value: values } = field;
+      const value = values[index];
+      const id = value[field.mappingValue];
+      if (id) {
+        view.resetInstanceHighlight();
+        view.setCurrentInstanceId(pane, id);
+        view.selectPane(pane);
+      }
+    }
+  };
+
+  handleDelete = index => {
+    const { field } = this.props;
+    const { value: values } = field;
+    const value = values[index];
+    field.removeValue(value);
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
+  };
+
+  handleDragEnd = () => {
+    this.draggedValue = null;
+  };
+
+  handleDragStart = value => {
+    this.draggedValue = value;
+  };
+
+  handleDrop = value => {
+    this.dropValue(value);
+  };
+
+  handleKeyDown = (value, e) => {
+    if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
+      e.preventDefault();
+      this.props.field.removeValue(value);
       appStore.togglePreviewInstance();
-      this.props.field.resetOptionsSearch();
+      this.triggerOnChange();
     }
   }
+
+  handleFocus = index => {
+    const { field, view } = this.props;
+    if (view) {
+      const { value: values } = field;
+      const value = values[index];
+      const id = value[field.mappingValue];
+      view.setInstanceHighlight(id, field.label);
+      appStore.togglePreviewInstance();
+    }
+    field.resetOptionsSearch();
+  };
+
+  handleBlur = () => {
+    const { view } = this.props;
+    if (view) {
+      view.resetInstanceHighlight();
+    }
+  };
+
+  handleMouseOver = index => {
+    const { field, view } = this.props;
+    if (view) {
+      const { value: values } = field;
+      const value = values[index];
+      const id = value[field.mappingValue];
+      if (id) {
+        view.setInstanceHighlight(id, field.label);
+      }
+    }
+  };
+
+  handleMouseOut = () => {
+    const { view } = this.props;
+    if (view) {
+      view.resetInstanceHighlight();
+    }
+  };
 
   handleOptionPreview = (instanceId, instanceName) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
@@ -297,27 +312,30 @@ class DynamicDropdown extends React.Component {
     this.props.field.loadMoreOptions();
   }
 
-  valueLabelRendering = (field, value) => {
-    return field.valueLabelRendering(field, value, this.props.valueLabelRendering);
-  }
-
   renderReadMode(){
-    const { classes, field, readModeRendering } = this.props;
-    const { instanceId, value, disabled, readOnly } = field;
+    const { classes, field, view } = this.props;
+    const { instanceId, links, disabled, readOnly } = field;
     return (
       <FieldError id={instanceId} field={field}>
-        <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+        <div className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
           <FieldLabel field={field}/>
-          {isFunction(readModeRendering)?
-            this.props.readModeRendering(field)
+          {view?
+            <List
+              list={links}
+              readOnly={true}
+              disabled={false}
+              enablePointerEvents={true}
+              onClick={this.handleClick}
+              onMouseOver={this.handleMouseOver}
+              onMouseOut={this.handleMouseOut}
+            />
             :
-            <span className={"quickfire-readmode-list"}>
-              {value.map(value => (
-                <span key={this.props.formStore.getGeneratedKey(value, "dropdown-read-item")} className="quickfire-readmode-item">
-                  {this.valueLabelRendering(field, value)}
-                </span>
-              ))}
-            </span>
+            <List
+              list={links}
+              readOnly={true}
+              disabled={false}
+              enablePointerEvents={false}
+            />
           }
           <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
         </div>
@@ -329,9 +347,8 @@ class DynamicDropdown extends React.Component {
     const { classes, formStore, field } = this.props;
     const {
       instanceId,
-      value: values,
+      links,
       fullyQualifiedName,
-      mappingLabel,
       disabled,
       readOnly,
       readMode,
@@ -354,13 +371,13 @@ class DynamicDropdown extends React.Component {
     const selectedInstance = instanceStore.instances.get(instanceId);
     const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
     const isDisabled = formStore.readMode || readMode || readOnly || disabled;
-    const canAddValues = !isDisabled && values.length < max;
+    const canAddValues = !isDisabled && links.length < max;
 
     return (
       <FieldError id={instanceId} field={field}>
         <div>
           <FormGroup
-            className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
+            className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${disabled || readOnly? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
             validationState={validationState}>
             <FieldLabel field={this.props.field}/>
             <Alternatives className={classes.alternatives}
@@ -373,31 +390,24 @@ class DynamicDropdown extends React.Component {
               parentContainerClassName="form-group"
               ref={ref=>this.alternativesRef = ref}/>
             <div className={`form-control ${classes.values}`} disabled={disabled} readOnly={readOnly} >
-              {values.map(value => (
-                <div key={formStore.getGeneratedKey(value, "quickfire-dropdown-item-button")}
-                  tabIndex={"0"}
-                  className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled||readOnly? "disabled": ""} ${value.fetchError ? classes.notFound : ""}`}
-                  disabled={disabled}
-                  readOnly={readOnly}
-                  draggable={true}
-                  onDragEnd={()=>this.draggedValue = null}
-                  onDragStart={()=>this.draggedValue = value}
-                  onDragOver={e=>e.preventDefault()}
-                  onDrop={this.handleDrop.bind(this, value)}
-                  onKeyDown={this.handleRemoveBackspace.bind(this, value)}
-
-                  onClick={this.handleTagInteraction.bind(this, "Click", value)}
-                  onFocus={this.handleTagInteraction.bind(this, "Focus", value)}
-                  onBlur={this.handleTagInteraction.bind(this, "Blur", value)}
-                  onMouseOver={this.handleTagInteraction.bind(this, "MouseOver", value)}
-                  onMouseOut={this.handleTagInteraction.bind(this, "MouseOut", value)}
-                  onMouseEnter={this.handleTagInteraction.bind(this, "MouseEnter", value)}
-                  onMouseLeave={this.handleTagInteraction.bind(this, "MouseLeave", value)}
-                  title={get(value, mappingLabel)}>
-                  <span className={classes.valueDisplay}>{this.valueLabelRendering(this.props.field, value)}</span>
-                  <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={this.handleRemove.bind(this, value)}/>
-                </div>
-              ))}
+              <List
+                list={links}
+                readOnly={false}
+                disabled={disabled}
+                enablePointerEvents={true}
+                onClick={this.handleClick}
+                onDelete={this.handleDelete}
+                onDragEnd={this.handleDragEnd}
+                onDragStart={this.handleDragStart}
+                onDrop={this.handleDrop}
+                onKeyDown={this.handleKeyDown}
+                onFocus={this.handleFocus}
+                onBlur={this.handleBlur}
+                onMouseOver={this.handleMouseOver}
+                onMouseOut={this.handleMouseOut}
+                onMouseEnter={this.handleMouseEnter}
+                onMouseLeave={this.handleMouseLeave}
+              />
               {canAddValues && (
                 <React.Fragment>
                   <Dropdown
@@ -428,6 +438,22 @@ class DynamicDropdown extends React.Component {
       </FieldError>
     );
   }
+}
+
+class DynamicDropdown extends React.Component { // because Quickfire request class
+ render() {
+   return (
+    <ViewContext.Consumer>
+      {view => (
+        <PaneContext.Consumer>
+          {pane => (
+            <DynamicDropdownWithContext view={view} pane={pane} {...this.props} />
+          )}
+        </PaneContext.Consumer> 
+      )}
+    </ViewContext.Consumer> 
+   );
+ }
 }
 
 export default DynamicDropdown;

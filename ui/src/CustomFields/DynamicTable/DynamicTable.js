@@ -18,17 +18,16 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { FormGroup, Alert } from "react-bootstrap";
-import { Column, Table } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import FieldError from "../FieldError";
+import Dropdown from "../../Components/DynamicDropdown/Dropdown";
+import Table from "./Table";
 
 import appStore from "../../Stores/AppStore";
-
-import FetchingLoader from "../../Components/FetchingLoader";
-import Dropdown from "../../Components/DynamicDropdown/Dropdown";
+import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 const styles = {
   container: {
@@ -45,28 +44,8 @@ const styles = {
       background: "rgb(238, 238, 238)",
       color: "rgb(85,85,85)"
     },
-    "& .ReactVirtualized__Table__headerTruncatedText": {
-      textTransform:"initial",
-      fontWeight:"600"
-    },
     "& .form-control": {
       paddingLeft: "9px"
-    }
-  },
-  headerRow:{
-    borderBottom: "1px solid #e0e0e0"
-  },
-  evenRow: {
-    borderBottom: "1px solid #e0e0e0"
-  },
-  oddRow: {
-    borderBottom: "1px solid #e0e0e0"
-  },
-  activeRow: {
-    cursor: "pointer",
-    "&:hover":{
-      color: "#143048",
-      backgroundColor: "#a5c7e9"
     }
   },
   dropdownContainer:{
@@ -106,30 +85,8 @@ const styles = {
 @inject("formStore")
 @injectStyles(styles)
 @observer
-class DynamicTable extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      containerWidth: 0,
-      scrollToIndex: -1
-    };
-  }
-
-  componentDidMount() {
-    this.setContainerWidth();
-    window.addEventListener("resize", this.setContainerWidth);
-  }
-
-  componentDidUpdate(prevProps, prevState){
-    if(this.wrapperRef && (prevState.containerWidth !== this.wrapperRef.offsetWidth)) {
-      this.setContainerWidth();
-    }
-  }
-
-  componentWillUnmount(){
-    window.removeEventListener("resize", this.setContainerWidth);
-  }
-
+class DynamicTableWithContext extends React.Component {
+  
   //The only way to trigger an onChange event in React is to do the following
   //Basically changing the field value, bypassing the react setter and dispatching an "input"
   // event on a proper html input node
@@ -143,31 +100,48 @@ class DynamicTable extends React.Component {
   }
 
   handleDropdownReset = () => {
-    appStore.togglePreviewInstance();
     this.props.field.resetOptionsSearch();
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
   }
 
-  handleOnAddNewValue = (value, type) => {
+  handleOnAddNewValue = (name, typeName) => {
     const {field, onAddCustomValue} = this.props;
-    const {mappingValue, mappingLabel} = field;
-    const id = onAddCustomValue(value, type, field);
-    field.addInstance(id, mappingValue, mappingLabel, value, true);
-    field.resetOptionsSearch();
+    if (field.allowCustomValues) {
+      const id = _.uuid();
+      const type = typesStore.typesMap.get(typeName);
+      instanceStore.createNewInstance(type, id, name);
+      const value = {[field.mappingValue]: id};
+      field.addValue(value);
+      onAddCustomValue(value, type, field);
+    }
+    appStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
   handleOnAddValue = id => {
-    const {field} = this.props;
-    const {mappingValue, mappingLabel} = field;
-    field.addInstance(id, mappingValue, mappingLabel);
-    field.addValue({[field.mappingValue]: id});
-    field.resetOptionsSearch();
+    const { field } = this.props;
+    const value = {[field.mappingValue]: id};
+    field.addValue(value);
     this.triggerOnChange();
   }
 
-  handleOptionPreview = (instanceId, instanceName) => {
+  handleDelete = id => e => {
+    e.stopPropagation();
+    this.props.field.removeValue({[this.props.field.mappingValue]: id});
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
+  }
+
+  handleDeleteAll = () => {
+    this.props.field.removeAllValues();
+    appStore.togglePreviewInstance();
+    this.triggerOnChange();
+  }
+
+  handleOptionPreview = (id, name) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    appStore.togglePreviewInstance(instanceId, instanceName, options);
+    appStore.togglePreviewInstance(id, name, options);
   }
 
   handleSearchOptions = term => {
@@ -178,131 +152,54 @@ class DynamicTable extends React.Component {
     this.props.field.loadMoreOptions();
   }
 
-  setContainerWidth = () => {
-    if(this.wrapperRef){
-      this.setState({containerWidth: this.wrapperRef.offsetWidth});
-    }
-  }
-
-  onRowClick = ({rowData}) => {
-    const { field, onValueClick } = this.props;
-    field.showInstance(rowData.id);
-    typeof onValueClick === "function" &&
-    setTimeout(() => onValueClick(field, {[field.mappingValue]: rowData.id}), 1000);
-  }
-
-  onRowMouseOver = ({index, rowData}) => {
-    const { field, onValueMouseEnter } = this.props;
-    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseEnter === "function" && onValueMouseEnter(field, {[field.mappingValue]: rowData.id});
-  }
-
-  onRowMouseOut = ({index, rowData}) => {
-    const { field, onValueMouseLeave } = this.props;
-    field.isInstanceVisible(index, rowData.id) && typeof onValueMouseLeave === "function" && onValueMouseLeave(field, {[field.mappingValue]: rowData.id});
-  }
-
-  _rowClassName = ({index}) => {
-    if (index < 0) {
-      return this.props.classes.headerRow;
-    } else {
-      return `${index % 2 === 0 ? this.props.classes.evenRow : this.props.classes.oddRow} ${this.props.field.isInteractive?this.props.classes.activeRow:""}`;
-    }
-  }
-
-  handleDelete = id => e => {
-    e.stopPropagation();
-    this.props.field.removeInstance(id);
+  handleRowDelete = index => {
+    const { field } = this.props;
+    const { value: values } = field;
+    const value = values[index];
+    field.removeValue(value);
     appStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
-  handleDeleteAll = () => {
-    this.props.field.removeAllInstancesAndValues();
-    this.triggerOnChange();
-  }
-
-  handleRetry = id => e => {
-    e.stopPropagation();
-    this.props.field.fetchInstance(id);
-  }
-
-  lastCellRenderer = ({rowData}) => {
-    const { formStore, field } = this.props;
-    const { isInitialized, readMode, readOnly, disabled } = field;
-    const { id, instance } = rowData;
-    const { isFetched, fetchError } = instance;
-    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
-    if (isInitialized && isFetched) {
-      if (isDisabled) {
-        return null;
+  handleRowClick = index => {
+    const { field, view, pane } = this.props;
+    if (view && pane) {
+      const { value: values } = field;
+      const value = values[index];
+      const id = value[field.mappingValue];
+      if (id) {
+        field.showLink(id);
+        view.resetInstanceHighlight();
+        view.setCurrentInstanceId(pane, id);
+        view.selectPane(pane);
       }
-      return (
-        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDelete(id)} >
-          <FontAwesomeIcon icon="times"/>
-        </Button>
-      );
     }
-    if (id && fetchError) {
-      return (
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(id)} >
-          <FontAwesomeIcon icon="redo-alt"/>
-        </Button>
-      );
-    }
-    return null;
   }
 
-  firstCellRenderer = ({rowData, cellData}) => {
-    const { field } = this.props;
-    const { isInitialized } = field;
-    const { id, instance } = rowData;
-    const { isFetched, fetchError } = instance;
-    if (fetchError) {
-      if(id) {
-        return fetchError;
-      } else {
-        return (
-          <span style={{color: "var(--ft-color-error)"}}>
-            <FontAwesomeIcon icon="exclamation-triangle"/>
-            &nbsp; {fetchError}
-          </span>
-        );
+  handleRowMouseOver = index => {
+    const { field, view } = this.props;
+    if (view) {
+      const { value: values } = field;
+      const value = values[index];
+      const id = value[field.mappingValue];
+      if (id && field.isLinkVisible(id)) {
+        view.setInstanceHighlight(id, field.label);
       }
-
     }
-    if (isFetched) {
-      return cellData;
-    }
-    if (isInitialized) {
-      return (
-        <span>
-          <FontAwesomeIcon icon="circle-notch" spin/>
-          &nbsp; fetching {id}...
-        </span>
-      );
-    }
-    return id;
   }
 
-  cellRenderer = index => {
-    const { formStore, field } = this.props;
-    const { columns, readMode, readOnly, disabled } = field;
-    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
-    if(index === 0) {
-      return this.firstCellRenderer;
+  handleRowMouseOut = () => {
+    const { view } = this.props;
+    if (view) {
+      view.resetInstanceHighlight();
     }
-    if(index === columns.length-1 && !isDisabled) {
-      return this.lastCellRenderer;
-    }
-    return undefined;
   }
 
   render() {
     const { classes, formStore, field } = this.props;
     const {
       instanceId,
-      list,
-      value: values,
+      links,
       label,
       disabled,
       readOnly,
@@ -320,55 +217,34 @@ class DynamicTable extends React.Component {
     } = field;
 
     const fieldLabel = label.toLowerCase();
-    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
-    const canAddValues =  !isDisabled && values.length < max;
-
+    const isReadOnly = formStore.readMode || readMode || readOnly || disabled;
+    const canAddValues =  !isReadOnly && links.length < max;
+    
     return (
       <FieldError id={instanceId} field={field}>
-        <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
+        <div className={classes.container}>
           <div>
             <FormGroup
               onClick={this.handleFocus}
-              className={`quickfire-field-dropdown-select ${!values.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.field}`}
+              className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.field}`}
               validationState={validationState}>
               <FieldLabel field={field}/>
-              {!isDisabled && (
+              {!isReadOnly && (
                 <div className={classes.deleteBtn}>
-                  <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={list.length === 0}>
+                  <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={links.length === 0}>
                     <FontAwesomeIcon icon="times"/>
                   </Button>
                 </div>
               )}
               <div className={`${classes.table} ${((readOnly || disabled) && !(formStore.readMode || readMode))?"disabled":""}`}>
                 <Table
-                  width={this.state.containerWidth}
-                  height={300}
-                  headerHeight={20}
-                  rowHeight={30}
-                  rowClassName={this._rowClassName}
-                  rowCount={list.length}
-                  rowGetter={({ index }) => list[index]}
-                  onRowClick={this.onRowClick}
-                  onRowMouseOver={this.onRowMouseOver}
-                  onRowMouseOut={this.onRowMouseOut}
-                  rowRenderer={this.rowRenderer}
-                  scrollToIndex={this.state.scrollToIndex-1}
-                >
-                  {field.columns.map((col,index) => {
-                    const isLastCell = index === field.columns.length-1;
-                    return(
-                      <Column
-                        label={col.label}
-                        dataKey={col.name}
-                        key={col.name}
-                        flexGrow={isLastCell ? 0:1}
-                        flexShrink={isLastCell ? 1:0}
-                        width={20}
-                        cellRenderer={this.cellRenderer(index)}
-                      />
-                    );}
-                  )}
-                </Table>
+                  list={links}
+                  readOnly={isReadOnly}
+                  onRowDelete={this.handleRowDelete}
+                  onRowClick={this.handleRowClick}
+                  onRowMouseOver={this.handleRowMouseOver}
+                  onRowMouseOut={this.handleRowMouseOut}
+                />
                 {canAddValues && (
                   <div className={`form-control ${classes.dropdownContainer}`}>
                     <Dropdown
@@ -395,7 +271,7 @@ class DynamicTable extends React.Component {
                   {validationErrors.map(error => <p key={error}>{error}</p>)}
                 </Alert>
               )}
-              {!list.length && (
+              {!links.length && (
                 <div className={classes.emptyMessage}>
                   <span className={classes.emptyMessageLabel}>
                     No {fieldLabel} available
@@ -404,15 +280,26 @@ class DynamicTable extends React.Component {
               )}
             </FormGroup>
           </div>
-          {!field.isInitialized && list.length > 0 && (
-            <FetchingLoader>
-              <span>Fetching content...</span>
-            </FetchingLoader>
-          )}
         </div>
       </FieldError>
     );
   }
 }
 
+class DynamicTable extends React.Component { // because Quickfire request class
+  render() {
+    return (
+     <ViewContext.Consumer>
+       {view => (
+         <PaneContext.Consumer>
+           {pane => (
+             <DynamicTableWithContext view={view} pane={pane} {...this.props} />
+           )}
+         </PaneContext.Consumer> 
+       )}
+     </ViewContext.Consumer> 
+    );
+  }
+ }
+ 
 export default DynamicTable;

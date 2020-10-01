@@ -196,8 +196,8 @@ class InstanceRow extends React.Component {
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
-    if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === "function" && onCtrlClick(instance);
+    if ((event.metaKey || event.ctrlKey) && typeof onCtrlClick === "function") {
+      onCtrlClick(instance);
     } else {
       typeof onActionClick === "function" && onActionClick(instance, "view");
     }

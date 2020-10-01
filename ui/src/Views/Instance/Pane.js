@@ -14,11 +14,13 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import injectStyles from "react-jss";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 import { debounce } from "lodash";
+
+import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 const styles = {
   pane: {
@@ -63,19 +65,11 @@ const styles = {
 };
 
 @injectStyles(styles)
-@inject("paneStore")
 @observer
-class Pane extends React.Component {
-  componentDidMount() {
-    this.props.paneStore.registerPane(this.props.paneId);
-  }
-
-  componentWillUnmount() {
-    this.props.paneStore.unregisterPane(this.props.paneId);
-  }
-
+class PaneWithContext extends React.Component {
+  
   componentDidUpdate(){
-    if (this.props.paneStore.selectedPane !== this.props.paneId) {
+    if (this.props.view.selectedPane !== this.props.pane) {
       this.paneRef.style.pointerEvents = "none";
       this.restorePointerEvents();
     } else {
@@ -89,26 +83,53 @@ class Pane extends React.Component {
   }, 1000);
 
   handleFocus = () => {
-    if (this.props.paneStore.selectedPane !== this.props.paneId) {
-      this.props.paneStore.selectPane(this.props.paneId);
+    if (this.props.view.selectedPane !== this.props.pane) {
+      this.props.view.selectPane(this.props.pane);
     }
   }
 
   render() {
-    const { classes, paneStore, paneId } = this.props;
-    const index = paneStore.panes.indexOf(paneId);
-    const mainClass = index === 0 ? " main" : "";
-    const activeClass = paneStore.selectedIndex < index ? "after" : paneStore.selectedIndex > index ? "before" : "active";
+    const { classes, view, pane } = this.props;
+
+    const index = view.getPaneIndex(pane);
+    const mainClass = index === 0?"main":"";
+    const activeClass = pane === view.selectPane?"active":(index > view.selectedPaneIndex?"after":"before");
     return (
-      <div ref={ref => this.paneRef = ref} className={`${classes.pane}${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus}>
+      <div ref={ref => this.paneRef = ref} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus}>
         <Scrollbars autoHide>
           <div className={classes.scrolledView}>
-            {this.props.children}
+              {this.props.children}
           </div>
         </Scrollbars>
       </div>
     );
   }
 }
+
+const WrappedPane = ({view, paneId, children}) => {
+
+  useEffect(() => {
+    view.registerPane(paneId);
+    return () => {
+      view.unregisterPane(paneId);
+    };
+  }, []);
+
+  const pane = view.getPane(paneId);
+
+  return (
+    <PaneContext.Provider value={pane}>
+      <PaneWithContext view={view} pane={pane} children={children} />
+    </PaneContext.Provider>
+  );
+}
+
+const Pane = ({paneId, children}) => (
+  <ViewContext.Consumer>
+    {view => (
+        <WrappedPane view={view} paneId={paneId} children={children} />
+    )} 
+  </ViewContext.Consumer> 
+);
 
 export default Pane;

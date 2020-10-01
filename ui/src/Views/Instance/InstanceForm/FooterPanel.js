@@ -86,28 +86,28 @@ const styles = {
 class FooterPanel extends React.Component {
 
   handleOpenInstance = event => {
-    const { id } = this.props;
+    const { instance } = this.props;
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
-      appStore.openInstance(id, "view");
+      appStore.openInstance(instance.id, instance.name, "view");
     } else {
-      routerStore.history.push(`/instance/view/${id}`);
+      routerStore.history.push(`/instance/view/${instance.id}`);
     }
   }
 
   render() {
-    const { classes, className, id, workspace, showOpenActions } = this.props;
+    const { classes, className, instance, showOpenActions } = this.props;
 
     return(
       <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
         <Row>
           <Col xs={10}>
-            <div className={classes.info}>ID: {id}</div>
-            <div className={classes.info}>Workspace: {workspace}</div>
+            <div className={classes.info}>ID: {instance.id?instance.id:"<New>"}</div>
+            <div className={classes.info}>Workspace: {instance.workspace}</div>
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              {appStore.currentWorkspace.id === workspace && (
+              {appStore.currentWorkspace.id === instance.workspace && (
                 <div className={classes.action} onClick={this.handleOpenInstance}>
                   <FontAwesomeIcon icon="folder-open"/>
                 </div>

@@ -86,8 +86,7 @@ class Table extends React.Component {
     super(props);
     this.state = {
       containerWidth: 0,
-      scrollToIndex: -1,
-      t: null
+      scrollToIndex: -1
     };
   }
 
@@ -113,7 +112,6 @@ class Table extends React.Component {
   fetchInstances = () => {
     const { list } = this.props;
     list.forEach(id => id && instanceStore.createInstanceOrGet(id).fetchLabel());
-    setTimeout(() => this.setState({t: new Date().getTime()}), 2000);
   };
 
   handleDeleteRow = index => e => {

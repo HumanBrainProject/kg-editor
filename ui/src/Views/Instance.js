@@ -71,11 +71,11 @@ class Instance extends React.Component {
   setupInstance = () => {
     const { match, mode } = this.props;
     const id = match.params.id;
-    appStore.openInstance(id, instance?instance.name:null, this.props.mode);
+    const instance = instanceStore.instances.get(id);
+    appStore.openInstance(id, instance?instance.name:id, this.props.mode);
     instanceStore.togglePreviewInstance();
     instanceStore.setReadMode(mode !== "edit" && mode !== "create");
     viewStore.selectViewByInstanceId(id);
-    const instance = instanceStore.instances.get(id);
     if (instance) {
       if (mode === "create") {
         routerStore.history.replace(`/instance/edit/${id}`);

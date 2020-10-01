@@ -270,8 +270,7 @@ class InstanceForm extends React.Component {
                     }
                     <FooterPanel
                       className={classes.panelFooter}
-                      id={id?id:"<new>"}
-                      workspace={instance.workspace}
+                      instance={instance}
                       showOpenActions={isCurrentInstance && !isMainInstance} />
                   </Form>
                   <ConfirmCancelEditPanel

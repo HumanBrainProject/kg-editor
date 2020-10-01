@@ -35,22 +35,26 @@ const styles = {
 @observer
 class InstanceTab extends React.Component {
 
-  /* use local storage info for name
   componentDidMount() {
-    this.fetchInstanceLabel();
+    this.syncInstanceLabel();
   }
 
   componentDidUpdate(previousProps) {
     if (previousProps.instanceId !== this.props.instanceId) {
-      this.fetchInstanceLabel();
+      this.syncInstanceLabel();
     }
   }
 
-  fetchInstanceLabel = () => {
-    const { instanceId } = this.props;
-    instanceId && instanceStore.createInstanceOrGet(instanceId).fetchLabel();
-  };
-  */
+  syncInstanceLabel = () => {
+    const { view } = this.props;
+    const instance = instanceStore.instances.get(view.instanceId);
+    if (instance && instance.name !== view.instanceId) {
+      view.name = instance.name;
+      viewStore.syncStoredViews();
+    }
+
+    view.instanceId && instanceStore.createInstanceOrGet(view.instanceId).fetchLabel();
+  }
 
   handleClose = () => {
     const { instanceId } = this.props;
@@ -58,10 +62,10 @@ class InstanceTab extends React.Component {
   }
 
   render() {
-    const { instanceId, name, mode, pathname } = this.props;
+    const { view, pathname } = this.props;
 
-    const instance = instanceStore.instances.get(instanceId);
-    const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(name?name:instanceId);
+    const instance = instanceStore.instances.get(view.instanceId);
+    const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
     const color = ((instance && (instance.isFetched || instance.isLabelFetched) && instance.primaryType.color))?instance.primaryType.color:undefined;
 
     return (
@@ -69,8 +73,8 @@ class InstanceTab extends React.Component {
         icon={instance && instance.isFetching ? "circle-notch" : "circle"}
         iconSpin={instance && instance.isFetching}
         iconColor={color}
-        current={matchPath(pathname, { path: `/instance/${mode}/${instanceId}`, exact: "true" })}
-        path={`/instance/${mode}/${instanceId}`}
+        current={matchPath(pathname, { path: `/instance/${view.mode}/${view.instanceId}`, exact: "true" })}
+        path={`/instance/${view.mode}/${view.instanceId}`}
         onClose={this.handleClose}
         label={label}
       />
@@ -85,8 +89,8 @@ class InstanceTabs extends React.Component {
     const { classes, pathname } = this.props;
     return (
       <div className={classes.container} >
-        {authStore.isFullyAuthenticated && Array.from(viewStore.views.entries()).map(([instanceId, infos]) => (
-          <InstanceTab key={instanceId} instanceId={instanceId} name={infos.name} mode={infos.mode} pathname={pathname} />
+        {authStore.isFullyAuthenticated && Array.from(viewStore.views.values()).map(view => (
+          <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
         ))}
       </div>
     );

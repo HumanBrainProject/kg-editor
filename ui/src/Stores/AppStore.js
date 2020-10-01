@@ -37,14 +37,14 @@ const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 const getLinkedInstanceIds = instanceIds => {
   const result = instanceIds.reduce((acc, id) => {
     const instance = instanceStore.instances.get(id);
-      if (instance) {
-        const linkedIds = instance.linkedIds;
-        acc.push(...linkedIds);
-      }
-      return acc;
+    if (instance) {
+      const linkedIds = instance.linkedIds;
+      acc.push(...linkedIds);
+    }
+    return acc;
   }, []);
   return Array.from(new Set(result));
-}
+};
 
 class AppStore{
   @observable globalError = null;
@@ -446,7 +446,7 @@ class AppStore{
     const instance = instanceStore.instances.get(instanceId);
     if (instance) {
       const instanceIdsToBeKept = getLinkedInstanceIds(viewStore.instancesIds);
-      const instanceIdsToBeRemoved = instance.linkedInstances.filter(id => !instanceIdsToBeKept.includes(id));
+      const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
       instanceStore.removeInstances(instanceIdsToBeRemoved);
     }
   }

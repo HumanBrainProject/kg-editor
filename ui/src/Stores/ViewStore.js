@@ -16,6 +16,7 @@
 
 import React from "react";
 import {observable, action, computed} from "mobx";
+import {remove} from "lodash";
 import appStore from "./AppStore";
 
 const STORED_INSTANCE_VIEWS_KEY = "views";
@@ -66,6 +67,11 @@ class View {
     return this.instancePath[this.instancePath.length-1];
   }
 
+  @computed
+  get currentInstanceIdPane() {
+    return this.panes[this.instancePath.length];
+  }
+
   @action
   setCurrentInstanceId(pane, instanceId){
     const start = this.panes.findIndex(p => p === pane);
@@ -74,8 +80,8 @@ class View {
 
   @action
   setInstanceHighlight(instanceId, provenance) {
-   this.instanceHighlight.instanceId = instanceId;
-   this.instanceHighlight.provenance = provenance;
+    this.instanceHighlight.instanceId = instanceId;
+    this.instanceHighlight.provenance = provenance;
   }
 
   @action
@@ -112,7 +118,7 @@ class View {
 
   @action
   unregisterPane(paneId) {
-    const pane = getPane(paneId);
+    const pane = this.getPane(paneId);
     remove(this.panes, p => p === pane);
   }
 }
@@ -146,7 +152,7 @@ class ViewStore{
 
   @action
   selectViewByInstanceId(instanceId) {
-     this.selectedView = this.views.get(instanceId);
+    this.selectedView = this.views.get(instanceId);
   }
 
   @action

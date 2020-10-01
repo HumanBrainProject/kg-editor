@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect } from "react";
+import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -67,7 +67,7 @@ const styles = {
 @injectStyles(styles)
 @observer
 class PaneWithContext extends React.Component {
-  
+
   componentDidUpdate(){
     if (this.props.view.selectedPane !== this.props.pane) {
       this.paneRef.style.pointerEvents = "none";
@@ -93,12 +93,12 @@ class PaneWithContext extends React.Component {
 
     const index = view.getPaneIndex(pane);
     const mainClass = index === 0?"main":"";
-    const activeClass = pane === view.selectPane?"active":(index > view.selectedPaneIndex?"after":"before");
+    const activeClass = pane === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
     return (
       <div ref={ref => this.paneRef = ref} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus}>
         <Scrollbars autoHide>
           <div className={classes.scrolledView}>
-              {this.props.children}
+            {this.props.children}
           </div>
         </Scrollbars>
       </div>
@@ -106,30 +106,43 @@ class PaneWithContext extends React.Component {
   }
 }
 
-const WrappedPane = ({view, paneId, children}) => {
+@observer
+class WrappedPane extends React.Component {
 
-  useEffect(() => {
-    view.registerPane(paneId);
-    return () => {
-      view.unregisterPane(paneId);
-    };
-  }, []);
+  componentDidMount() {
+    this.props.view.registerPane(this.props.paneId);
+  }
 
-  const pane = view.getPane(paneId);
+  componentWillUnmount() {
+    this.props.view.unregisterPane(this.props.paneId);
+  }
 
-  return (
-    <PaneContext.Provider value={pane}>
-      <PaneWithContext view={view} pane={pane} children={children} />
-    </PaneContext.Provider>
-  );
+  render() {
+    const { view, paneId, children} = this.props;
+
+    const pane = view.getPane(paneId);
+    if (!pane) {
+      return null;
+    }
+
+    return (
+      <PaneContext.Provider value={pane}>
+        <PaneWithContext view={view} pane={pane}>
+          {children}
+        </PaneWithContext>
+      </PaneContext.Provider>
+    );
+  }
 }
 
 const Pane = ({paneId, children}) => (
   <ViewContext.Consumer>
     {view => (
-        <WrappedPane view={view} paneId={paneId} children={children} />
-    )} 
-  </ViewContext.Consumer> 
+      <WrappedPane view={view} paneId={paneId} >
+        {children}
+      </WrappedPane>
+    )}
+  </ViewContext.Consumer>
 );
 
 export default Pane;

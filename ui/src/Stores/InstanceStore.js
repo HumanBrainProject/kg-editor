@@ -23,14 +23,19 @@ import appStore from "./AppStore";
 import { normalizeInstanceData, normalizeLabelInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper"
 
 class ReadModeFormStore {
-  constructor(form) {
-    this.form = form;
+  constructor(store) {
+    this.store = store;
     this.readMode = true;
   }
   
   getGeneratedKey =  (item, namespace) => this.store.getGeneratedKey(item, namespace);
 
   getValues = (fields, applyMapping) => this.store.getValues(fields, applyMapping);
+
+  @computed
+  get structure() {
+    return this.store.structure;
+  }
 
   get values(){
     return this.store.values;
@@ -51,7 +56,7 @@ class ReadModeFormStore {
   @action
   update = (path, updated) => this.store.update(path, updated)
 
-  parentPath = field => this.store.parentPath
+  parentPath = field => this.store.parentPath(field)
 
   genSiblingPath = (field, name) => this.store.genSiblingPath(field, name)
 
@@ -68,7 +73,7 @@ class ReadModeFormStore {
 
   registerCustomValidationFunction = (name, func, errorMessage) => this.store.registerCustomValidationFunction(name, func, errorMessage);
 
-  registerAxiosInstance = axiosInstance => this.registerAxiosInstance;
+  registerAxiosInstance = axiosInstance => this.registerAxiosInstance(axiosInstance);
 
   toggleReadMode = () => {}
 }

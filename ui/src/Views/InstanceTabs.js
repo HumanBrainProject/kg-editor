@@ -60,9 +60,9 @@ class InstanceTab extends React.Component {
   render() {
     const { instanceId, name, mode, pathname } = this.props;
 
-    const instance = instanceStore.instances.get(instanceId)
-    const label = instance?instance.name:(name?name:instanceId);
-    const color = ((instance && instance.isFetched && instance.primaryType.color))?instance.primaryType.color:undefined;
+    const instance = instanceStore.instances.get(instanceId);
+    const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(name?name:instanceId);
+    const color = ((instance && (instance.isFetched || instance.isLabelFetched) && instance.primaryType.color))?instance.primaryType.color:undefined;
 
     return (
       <Tab
@@ -72,7 +72,7 @@ class InstanceTab extends React.Component {
         current={matchPath(pathname, { path: `/instance/${mode}/${instanceId}`, exact: "true" })}
         path={`/instance/${mode}/${instanceId}`}
         onClose={this.handleClose}
-        label={label} 
+        label={label}
       />
     );
   }

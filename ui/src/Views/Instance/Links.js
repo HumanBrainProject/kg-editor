@@ -52,7 +52,7 @@ class Links extends React.Component{
   }
 
   render(){
-    const {classes, instanceId, view, level } = this.props;
+    const {classes, instanceId } = this.props;
 
     const instance = instanceStore.instances.get(instanceId);
     if (!instance) {
@@ -64,7 +64,8 @@ class Links extends React.Component{
       return null;
     }
 
-    const path = viewStore.selectedView.instancePath;
+    const view = viewStore.selectedView;
+    const path = view.instancePath;
     const index = path.findIndex(id => id === instanceId);
     const childInstanceId = (index > 0)?path[index+1]:null;
 
@@ -78,7 +79,7 @@ class Links extends React.Component{
                       (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
               </h4>
               {group.ids.map(id => (
-                <InstanceForm key={id} id={id} provenance={group.label} />
+                <InstanceForm key={id} view={view} id={id} provenance={group.label} />
               ))}
             </div>
           ))}

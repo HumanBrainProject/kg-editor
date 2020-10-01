@@ -18,7 +18,6 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import { toJS } from "mobx";
 import { FormGroup, Alert } from "react-bootstrap";
-import { isFunction } from "lodash";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
@@ -226,7 +225,7 @@ class DynamicDropdownWithContext extends React.Component {
       if (id) {
         view.resetInstanceHighlight();
         view.setCurrentInstanceId(pane, id);
-        view.selectPane(pane);
+        view.selectPane(view.currentInstanceIdPane);
       }
     }
   };

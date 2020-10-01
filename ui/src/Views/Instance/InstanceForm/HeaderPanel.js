@@ -49,7 +49,7 @@ class HeaderPanel extends React.Component{
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.highlight && this.props.hightlight !== prevProps.hightlight) {
+    if (this.props.highlight && this.props.highlight !== prevProps.highlight) {
       this.scrollIntoView();
     }
   }

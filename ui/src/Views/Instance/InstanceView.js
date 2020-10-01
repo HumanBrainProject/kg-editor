@@ -45,7 +45,7 @@ class InstanceView extends React.Component {
       <ViewContext.Provider value={viewStore.selectedView} >
         <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
           <Pane paneId={id} >
-            <InstanceForm id={id} />
+            <InstanceForm view={viewStore.selectedView} id={id} />
           </Pane>
           {!instance.hasFetchError && (
             <Links instanceId={id} />

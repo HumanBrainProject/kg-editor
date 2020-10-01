@@ -25,7 +25,6 @@ import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 import typesStore from "../../Stores/TypesStore";
 import instanceStore from "../../Stores/InstanceStore";
-import viewStore from "../../Stores/ViewStore";
 
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -164,8 +163,8 @@ class InstanceForm extends React.Component {
   handleListLoadRetry = () => typesStore.fetch();
 
   handleFocus = () => {
-    if (viewStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
-      viewStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
+    if (this.props.view.currentInstanceId !== this.props.id) {
+      this.props.view.setCurrentInstanceId(this.props.pane, this.props.id);
     }
   }
 
@@ -224,17 +223,17 @@ class InstanceForm extends React.Component {
   }
 
   render() {
-    const { classes, id } = this.props;
+    const { classes, view, id, provenance } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
     if (!instance) {
       return null;
     }
 
-    const mainInstanceId = viewStore.selectedView.instanceId;
+    const mainInstanceId = view.instanceId;
     const isMainInstance = id === mainInstanceId;
-    const isCurrentInstance = id === viewStore.selectedView.currentInstanceId;
-    const highlight = viewStore.selectedView.instanceHighlight && viewStore.selectedView.instanceHighlight.instanceId === id &&  viewStore.selectedView.instanceHighlight.provenance === this.props.provenance;
+    const isCurrentInstance = id === view.currentInstanceId;
+    const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
 
     let className = `${classes.container} ${instance.isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
 

@@ -171,7 +171,7 @@ class DynamicTableWithContext extends React.Component {
         field.showLink(id);
         view.resetInstanceHighlight();
         view.setCurrentInstanceId(pane, id);
-        view.selectPane(pane);
+        view.selectPane(view.currentInstanceIdPane);
       }
     }
   }

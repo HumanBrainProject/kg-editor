@@ -250,6 +250,7 @@ class Instance {
     this._name = normalizedData.name,
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;
+    this.primaryType = normalizedData.primaryType;
     this.isLabelFetching = false;
     this.isLabelFetched = true;
     this.fetchLabelError = null;

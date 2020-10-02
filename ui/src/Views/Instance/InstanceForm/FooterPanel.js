@@ -89,7 +89,7 @@ class FooterPanel extends React.Component {
     const { instance } = this.props;
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
-      appStore.openInstance(instance.id, instance.name, "view");
+      appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
       routerStore.history.push(`/instance/view/${instance.id}`);
     }

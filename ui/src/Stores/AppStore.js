@@ -357,8 +357,9 @@ class AppStore{
     routerStore.history.push(`/instance/create/${uuid}`);
   }
 
-  @action openInstance(instanceId, instanceName, viewMode = "view"){
-    viewStore.registerViewByInstanceId(instanceId, instanceName, viewMode);
+  @action
+  openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view"){
+    viewStore.registerViewByInstanceId(instanceId, instanceName, instancePrimaryType, viewMode);
     if(viewMode !== "create") {
       historyStore.updateInstanceHistory(instanceId, "viewed");
     }

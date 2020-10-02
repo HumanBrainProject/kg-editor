@@ -42,14 +42,16 @@ class View {
   @observable instanceId = null;
   @observable name = "";
   @observable mode = "edit";
+  @observable color = "";
   @observable instancePath = [];
   @observable instanceHighlight = {instanceId: null, provenance: null};
   @observable selectedPane;
   @observable panes = [];
 
-  constructor(instanceId, name, mode) {
+  constructor(instanceId, name, color, mode) {
     this.instanceId = instanceId;
     this.name = name;
+    this.color = color;
     this.mode = mode;
     this.instancePath = [instanceId];
   }
@@ -79,6 +81,12 @@ class View {
   @action
   resetInstanceHighlight() {
     this.setInstanceHighlight(null, null);
+  }
+
+  @action
+  setNameAndColor(name, color) {
+    this.name = name;
+    this.color = color;
   }
 
   @computed
@@ -121,7 +129,7 @@ class ViewStore{
   syncStoredViews(){
     if (appStore.currentWorkspace) {
       const views = getStoredViews();
-      views[appStore.currentWorkspace.id] = [...this.views.entries()].map(([id, view])=>[id, view.name, view.mode]);
+      views[appStore.currentWorkspace.id] = [...this.views.entries()].map(([id, view])=>[id, view.name, view.color, view.mode]);
       localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
     }
   }
@@ -136,7 +144,7 @@ class ViewStore{
       const views = getStoredViews();
       const workspaceViews = views[appStore.currentWorkspace.id];
       if (Array.isArray(workspaceViews)) {
-        workspaceViews.forEach(([id, name, mode]) => this.views.set(id, new View(id, name, mode)));
+        workspaceViews.forEach(([id, name, color, mode]) => this.views.set(id, new View(id, name, color, mode)));
       }
     }
   }
@@ -168,11 +176,11 @@ class ViewStore{
   }
 
   @action
-  registerViewByInstanceId(instanceId, name, viewMode) {
+  registerViewByInstanceId(instanceId, name, type, viewMode) {
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
     } else {
-      this.views.set(instanceId, new View(instanceId, name, viewMode));
+      this.views.set(instanceId, new View(instanceId, name, type?type.color:"", viewMode));
     }
   }
 

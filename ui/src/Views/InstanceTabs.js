@@ -48,8 +48,8 @@ class InstanceTab extends React.Component {
   syncInstanceLabel = () => {
     const { view } = this.props;
     const instance = instanceStore.instances.get(view.instanceId);
-    if (instance && instance.name !== view.instanceId) {
-      view.name = instance.name;
+    if (instance && instance.name !== view.instanceId && instance.primaryType.color !== view.color) {
+      view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
     }
   }
@@ -64,8 +64,7 @@ class InstanceTab extends React.Component {
 
     const instance = instanceStore.instances.get(view.instanceId);
     const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
-    const color = ((instance && (instance.isFetched || instance.isLabelFetched) && instance.primaryType.color))?instance.primaryType.color:undefined;
-
+    const color = (instance && (instance.isFetched || instance.isLabelFetched))?instance.primaryType.color:(view.color?view.color:"");
     return (
       <Tab
         icon={instance && instance.isFetching ? "circle-notch" : "circle"}
@@ -88,7 +87,7 @@ class InstanceTabs extends React.Component {
     return (
       <div className={classes.container} >
         {authStore.isFullyAuthenticated && Array.from(viewStore.views.values()).map(view => (
-          <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
+          <InstanceTab key={view.instanceId} view={view} pathname={pathname} instanceId={view.instanceId} />
         ))}
       </div>
     );

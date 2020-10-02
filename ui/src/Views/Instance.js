@@ -71,7 +71,7 @@ class Instance extends React.Component {
     const { match, mode } = this.props;
     const id = match.params.id;
     const instance = instanceStore.instances.get(id);
-    appStore.openInstance(id, instance?instance.name:id, this.props.mode);
+    appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, this.props.mode);
     instanceStore.togglePreviewInstance();
     instanceStore.setReadMode(mode !== "edit" && mode !== "create");
     viewStore.selectViewByInstanceId(id);

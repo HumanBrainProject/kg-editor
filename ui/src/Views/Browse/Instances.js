@@ -111,7 +111,7 @@ class Instances extends React.Component{
 
   handleInstanceCtrlClick(instance){
     if (instance && instance.id) {
-      appStore.openInstance(instance.id, instance.name);
+      appStore.openInstance(instance.id, instance.name, instance.primaryType);
     }
   }
 

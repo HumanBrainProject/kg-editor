@@ -174,7 +174,7 @@ class InstancesHistory extends React.Component{
   handleInstanceCtrlClick = instance => {
     const id = instance && instance.id;
     if (id) {
-      appStore.openInstance(id, instance.name);
+      appStore.openInstance(id, instance.name, instance.primaryType);
     }
   }
 

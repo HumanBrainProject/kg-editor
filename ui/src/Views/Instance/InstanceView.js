@@ -42,7 +42,7 @@ class InstanceView extends React.Component {
     const { classes, instance } = this.props;
     const { id } = instance;
 
-    if (!viewStore.selectedView) {
+    if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== id) {
       return null;
     }
 
@@ -52,9 +52,7 @@ class InstanceView extends React.Component {
           <Pane paneId={id} >
             <InstanceForm view={viewStore.selectedView} id={id} />
           </Pane>
-          {!instance.hasFetchError && (
-            <Links instanceId={id} />
-          )}
+          <Links instanceId={id} />
         </div>
       </ViewContext.Provider>
     );

@@ -69,7 +69,7 @@ const styles = {
 class PaneWithContext extends React.Component {
 
   componentDidUpdate(){
-    if (this.props.view.selectedPane !== this.props.pane) {
+    if (this.props.view.selectedPane !== this.props.paneId) {
       this.paneRef.style.pointerEvents = "none";
       this.restorePointerEvents();
     } else {
@@ -83,17 +83,17 @@ class PaneWithContext extends React.Component {
   }, 1000);
 
   handleFocus = () => {
-    if (this.props.view.selectedPane !== this.props.pane) {
-      this.props.view.selectPane(this.props.pane);
+    if (this.props.view.selectedPane !== this.props.paneId) {
+      this.props.view.selectPane(this.props.paneId);
     }
   }
 
   render() {
-    const { classes, view, pane } = this.props;
+    const { classes, view, paneId } = this.props;
 
-    const index = view.getPaneIndex(pane);
+    const index = view.getPaneIndex(paneId);
     const mainClass = index === 0?"main":"";
-    const activeClass = pane === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
+    const activeClass = paneId === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
     return (
       <div ref={ref => this.paneRef = ref} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus}>
         <Scrollbars autoHide>
@@ -120,14 +120,9 @@ class WrappedPane extends React.Component {
   render() {
     const { view, paneId, children} = this.props;
 
-    const pane = view.getPane(paneId);
-    if (!pane) {
-      return null;
-    }
-
     return (
-      <PaneContext.Provider value={pane}>
-        <PaneWithContext view={view} pane={pane}>
+      <PaneContext.Provider value={paneId} >
+        <PaneWithContext view={view} paneId={paneId}>
           {children}
         </PaneWithContext>
       </PaneContext.Provider>

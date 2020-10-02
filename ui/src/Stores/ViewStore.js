@@ -38,16 +38,8 @@ const getStoredViews = () => {
 };
 
 
-class Pane {
-  paneId = null;
-
-  constructor(paneId) {
-    this.paneId = paneId;
-  }
-}
-
 class View {
-  instanceId = null;
+  @observable instanceId = null;
   @observable name = "";
   @observable mode = "edit";
   @observable instancePath = [];
@@ -91,11 +83,12 @@ class View {
 
   @computed
   get selectedPaneIndex() {
-    return this.panes.indexOf(this.selectedPane);
+    const index = this.getPaneIndex(this.selectedPane);
+    return index;
   }
 
-  getPaneIndex(pane) {
-    return this.panes.indexOf(pane);
+  getPaneIndex(paneId) {
+    return this.panes.indexOf(paneId);
   }
 
   getPane(paneId) {
@@ -104,10 +97,9 @@ class View {
 
   @action
   registerPane(paneId) {
-    const pane = new Pane(paneId);
-    this.panes.push(pane);
+    this.panes.push(paneId);
     if(!this.selectedPane){
-      this.selectedPane = pane;
+      this.selectedPane = paneId;
     }
   }
 
@@ -118,8 +110,7 @@ class View {
 
   @action
   unregisterPane(paneId) {
-    const pane = this.getPane(paneId);
-    remove(this.panes, p => p === pane);
+    remove(this.panes, p => p === paneId);
   }
 }
 

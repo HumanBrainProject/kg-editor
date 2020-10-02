@@ -23,7 +23,6 @@ import { Button } from "react-bootstrap";
 import instanceStore from "../Stores/InstanceStore";
 import viewStore from "../Stores/ViewStore";
 import appStore from "../Stores/AppStore";
-import historyStore from "../Stores/HistoryStore";
 import routerStore from "../Stores/RouterStore";
 
 import View from "./Instance/Instance";
@@ -103,45 +102,46 @@ class Instance extends React.Component {
     const { classes, match, mode } = this.props;
     const id = match.params.id;
 
-    if (!instanceStore.instances.has(id)) {
-
-      const status = instanceStore.instanceIdAvailability.get(id);
-
-      if (!status || status.isChecking) {
-        return (
-          <div className={classes.error}>
-            <FetchingLoader>
-              <span>{`Fetching instance "${id}" information...`}</span>
-            </FetchingLoader>
-          </div>
-        );
-      }
-
-      if (status.error || (status.isAvailable && mode !== "create")) {
-        return (
-          <BGMessage icon={"ban"}>
-            There was a network problem fetching the instance.<br />
-            If the problem persists, please contact the support.<br />
-            <small>{status.error}</small><br /><br />
-            <Button bsStyle={"primary"} onClick={this.handleRetry}>
-              <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-            </Button>
-            <Button bsStyle={"primary"} onClick={this.handleContinue}>Continue</Button>
-          </BGMessage>
-        );
-      }
-
-      if (status.isAvailable && mode === "create") {
-        return (
-          <TypeSelection onSelect={this.handleCreateNewInstanceOfType} />
-        );
-      }
+    const instance = instanceStore.instances.get(id);
+    if (instance && instance.isFetched) {
+      return (
+        <View instance={instance} mode={mode} />
+      );
     }
 
-    const instance = instanceStore.instances.get(id);
-    return (
-      <View instance={instance} mode={mode} />
-    );
+    const status = instanceStore.instanceIdAvailability.get(id);
+
+    if (!status || status.isChecking) {
+      return (
+        <div className={classes.error}>
+          <FetchingLoader>
+            <span>{`Fetching instance "${id}" information...`}</span>
+          </FetchingLoader>
+        </div>
+      );
+    }
+
+    if (status.error || (status.isAvailable && mode !== "create")) {
+      return (
+        <BGMessage icon={"ban"}>
+          There was a network problem fetching the instance.<br />
+          If the problem persists, please contact the support.<br />
+          <small>{status.error}</small><br /><br />
+          <Button bsStyle={"primary"} onClick={this.handleRetry}>
+            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+          </Button>
+          <Button bsStyle={"primary"} onClick={this.handleContinue}>Continue</Button>
+        </BGMessage>
+      );
+    }
+
+    if (status.isAvailable && mode === "create") {
+      return (
+        <TypeSelection onSelect={this.handleCreateNewInstanceOfType} />
+      );
+    }
+
+    return null;
   }
 }
 

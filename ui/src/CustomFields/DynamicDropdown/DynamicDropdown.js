@@ -319,7 +319,7 @@ class DynamicDropdownWithContext extends React.Component {
       <FieldError id={instanceId} field={field}>
         <div className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
           <FieldLabel field={field}/>
-          {view?
+          {(view && view.currentInstanceId === instanceId)?
             <List
               list={links}
               readOnly={true}

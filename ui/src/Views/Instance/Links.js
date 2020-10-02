@@ -65,13 +65,14 @@ class Links extends React.Component{
     }
 
     const view = viewStore.selectedView;
+    const paneId = `ChildrenOf${instanceId}`;
     const path = view.instancePath;
     const index = path.findIndex(id => id === instanceId);
-    const childInstanceId = (index > 0)?path[index+1]:null;
+    const childInstanceId = (index >= 0)?path[index+1]:null;
 
     return (
       <React.Fragment>
-        <Pane className={classes.pane} paneId={`ChildrenOf${instanceId}`}>
+        <Pane className={classes.pane} paneId={paneId}>
           {groups.map(group => (
             <div key={group.label} data-provenance={group.label}>
               <h4>{group.label}{group.pagination?
@@ -79,7 +80,7 @@ class Links extends React.Component{
                       (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
               </h4>
               {group.ids.map(id => (
-                <InstanceForm key={id} view={view} id={id} provenance={group.label} />
+                <InstanceForm key={id} view={view} pane={paneId} id={id} provenance={group.label} />
               ))}
             </div>
           ))}

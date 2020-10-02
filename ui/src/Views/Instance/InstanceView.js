@@ -50,7 +50,7 @@ class InstanceView extends React.Component {
       <ViewContext.Provider value={viewStore.selectedView} >
         <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
           <Pane paneId={id} >
-            <InstanceForm view={viewStore.selectedView} id={id} />
+            <InstanceForm view={viewStore.selectedView} pane={id} id={id} />
           </Pane>
           <Links instanceId={id} />
         </div>

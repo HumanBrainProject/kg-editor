@@ -76,7 +76,7 @@ class Instance extends React.Component {
     instanceStore.togglePreviewInstance();
     instanceStore.setReadMode(mode !== "edit" && mode !== "create");
     viewStore.selectViewByInstanceId(id);
-    if (instance) {
+    if (instance && instance.isFetched) {
       if (mode === "create") {
         routerStore.history.replace(`/instance/edit/${id}`);
       }

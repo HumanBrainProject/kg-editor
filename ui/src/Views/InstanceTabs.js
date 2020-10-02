@@ -52,8 +52,6 @@ class InstanceTab extends React.Component {
       view.name = instance.name;
       viewStore.syncStoredViews();
     }
-
-    view.instanceId && instanceStore.createInstanceOrGet(view.instanceId).fetchLabel();
   }
 
   handleClose = () => {

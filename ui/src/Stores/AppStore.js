@@ -360,11 +360,7 @@ class AppStore{
   @action openInstance(instanceId, instanceName, viewMode = "view"){
     viewStore.registerViewByInstanceId(instanceId, instanceName, viewMode);
     if(viewMode !== "create") {
-      const instance = instanceStore.createInstanceOrGet(instanceId);
-      if(instance.isFetched || instance.isLabelFetched) {
-        const types = instance.types.map(({name}) => name);
-        historyStore.updateInstanceHistory(instanceId, types, "viewed");
-      }
+      historyStore.updateInstanceHistory(instanceId, "viewed");
     }
     viewStore.syncStoredViews();
   }
@@ -422,15 +418,13 @@ class AppStore{
         viewStore.syncStoredViews();
       }
     }
-    const types = instance.types.map(({name}) => name);
-    historyStore.updateInstanceHistory(instance.id, types, "edited");
+    historyStore.updateInstanceHistory(instance.id, "edited");
     statusStore.flush();
   }
 
   syncInstancesHistory(instance, mode) {
     if(instance && viewStore.views.has(instance.id)){
-      const types = instance.types.map(({name}) => name);
-      historyStore.updateInstanceHistory(instance.id, types, mode);
+      historyStore.updateInstanceHistory(instance.id, mode);
     }
   }
 

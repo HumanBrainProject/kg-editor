@@ -43,7 +43,7 @@ class HistoryStore {
   }
 
   @action
-  updateInstanceHistory(id, type, mode, remove) {
+  updateInstanceHistory(id, mode, remove) {
     if (!appStore.currentWorkspace) {
       return;
     }
@@ -61,7 +61,7 @@ class HistoryStore {
       this.instancesHistory.pop();
     }
     if (!remove && appStore.currentWorkspace) {
-      this.instancesHistory.unshift({id: id, type: type, workspace: appStore.currentWorkspace.id, mode: mode});
+      this.instancesHistory.unshift({id: id, workspace: appStore.currentWorkspace.id, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;

@@ -41,7 +41,7 @@ const styles = {
       marginRight:"3px",
       marginBottom:"3px"
     },
-    "&:disabled $remove, &[disabled] $remove, &.disabled $remove, & :disabled $remove, & [disabled] $remove, & .disabled $remove, &[readonly] $remove, &:disabled $remove, & [readonly] $remove, & :disabled $remove":{
+    "&:disabled":{
       pointerEvents:"none",
       display: "none !important"
     }

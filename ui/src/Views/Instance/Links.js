@@ -51,6 +51,14 @@ class Links extends React.Component{
     }
   }
 
+  getChildInstanceId = (path, index) => {
+    let childInstanceId = null;
+    if(index >=0 && path.length>index+1){
+      childInstanceId = path[index+1];
+    }
+    return childInstanceId;
+  }
+
   render(){
     const {classes, instanceId } = this.props;
 
@@ -68,8 +76,7 @@ class Links extends React.Component{
     const paneId = `ChildrenOf${instanceId}`;
     const path = view.instancePath;
     const index = path.findIndex(id => id === instanceId);
-    const childInstanceId = (index >= 0)?path[index+1]:null;
-
+    const childInstanceId = this.getChildInstanceId(path, index);
     return (
       <React.Fragment>
         <Pane className={classes.pane} paneId={paneId}>

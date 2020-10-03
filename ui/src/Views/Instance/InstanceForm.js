@@ -107,9 +107,6 @@ const styles = {
       margin: "10px 0",
       color: "#333"
     },
-    "&:not(.main) $panelSummary": {
-      padding: "10px 10px 0 10px"
-    },
     "&:not(.main) $panelBody": {
       padding: "0 10px"
     },

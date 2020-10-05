@@ -70,7 +70,7 @@ class LinksStore extends FormStore.typesMapping.Default{
       if(!value || this.value.length >= this.max){
         return;
       }
-      super.addValue(value);
+      this.addValue(value);
     });
   }
 
@@ -86,9 +86,14 @@ class LinksStore extends FormStore.typesMapping.Default{
 
   @action
   addValue(value) {
-    if(!this.disabled && !this.readOnly) {
-      this.visibleLinks.add(value[this.mappingValue]);
+    if(!this.disabled && !this.readOnly) {;
       super.addValue(value);
+      if (this.lazyShowLinks) {
+        const values = (typeof value === "object")?[value]:value;
+        for (let i=0; i<defaultNumberOfVisibleLinks && i<values.length; i++) {
+          this.visibleLinks.add(values[i][this.mappingValue]);
+        }
+      }
       this.resetOptionsSearch();
     }
   }
@@ -98,6 +103,7 @@ class LinksStore extends FormStore.typesMapping.Default{
     if(!this.disabled && !this.readOnly) {
       super.setValue(values);
       if (this.lazyShowLinks) {
+        this.visibleLinks.clear();
         for (let i=0; i<defaultNumberOfVisibleLinks && i<values.length; i++) {
           this.visibleLinks.add(values[i][this.mappingValue]);
         }

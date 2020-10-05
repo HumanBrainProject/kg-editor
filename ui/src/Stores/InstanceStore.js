@@ -185,7 +185,9 @@ class Instance {
   @computed
   get childrenIdsGroupedByField() {
     if (this.isFetched && !this.fetchError) {
-      return getChildrenIdsGroupedByField(Object.values(toJS(this.form.structure.fields)));
+      const keys = Object.keys(toJS(this.form.structure.fields));
+      const fields = keys.map(key => this.form.getField(key));
+      return getChildrenIdsGroupedByField(fields);
     }
     return [];
   }
@@ -234,11 +236,8 @@ class Instance {
 
   @action
   fetchLabel(forceFetch=false) {
-    if (!this.isFetching || this.isLabelFetching) {
-      if (forceFetch
-        || !this.isFetched || this.fetchError
-        || !this.isLabelFetched || this.fetchLabelError
-      ) {
+    if (!this.isFetching && !this.isLabelFetching) {
+      if (forceFetch || (!this.isFetched && !this.isLabelFetched)) {
         this.instanceStore.fetchInstanceLabel(this);
       }
     }

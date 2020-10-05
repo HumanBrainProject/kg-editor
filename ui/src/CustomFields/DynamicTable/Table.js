@@ -125,15 +125,15 @@ class Table extends React.Component {
   }
 
   handleRowClick = ({index}) => {
-    this.props.onRowClick(index);
+    typeof this.props.onRowMouseOver === "function" && this.props.onRowClick(index);
   }
 
   handleRowMouseOver = ({index}) => {
-    this.props.onRowMouseOver(index);
+    typeof this.props.onRowMouseOver === "function" && this.props.onRowMouseOver(index);
   }
 
   handleRowMouseOut = ({index}) => {
-    this.props.onRowMouseOut(index);
+    typeof this.props.onRowMouseOut === "function" && this.props.onRowMouseOut(index);
   }
 
   setContainerWidth = () => {
@@ -183,7 +183,7 @@ class Table extends React.Component {
   labelCellRenderer = ({rowData: instance}) => <LabelCellRenderer instance={instance} />;
 
   render() {
-    const { classes, list } = this.props;
+    const { classes, list, enablePointerEvents } = this.props;
 
     return (
       <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
@@ -195,9 +195,9 @@ class Table extends React.Component {
           rowClassName={this.rowClassName}
           rowCount={list.length}
           rowGetter={this.rowGetter}
-          onRowClick={this.handleRowClick}
-          onRowMouseOver={this.handleRowMouseOver}
-          onRowMouseOut={this.handleRowMouseOut}
+          onRowClick={enablePointerEvents?this.handleRowClick:null}
+          onRowMouseOver={enablePointerEvents?this.handleRowMouseOver:null}
+          onRowMouseOut={enablePointerEvents?this.handleRowMouseOut:null}
           rowRenderer={this.rowRenderer}
           scrollToIndex={this.state.scrollToIndex-1}
         >

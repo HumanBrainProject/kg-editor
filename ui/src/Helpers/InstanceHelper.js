@@ -315,5 +315,5 @@ export const getChildrenIdsGroupedByField = fields => {
     const groups = getGroups(field, values);
     acc.push(...groups);
     return acc;
-  }, []);
+  }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };

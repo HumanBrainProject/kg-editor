@@ -194,8 +194,10 @@ class DynamicDropdownWithContext extends React.Component {
 
   handleOnAddValue = id => {
     const { field } = this.props;
+    instanceStore.createInstanceOrGet(id);
     const value = {[field.mappingValue]: id};
     field.addValue(value);
+    this.triggerOnChange();
   }
 
   handleAlternativeSelect = values => {

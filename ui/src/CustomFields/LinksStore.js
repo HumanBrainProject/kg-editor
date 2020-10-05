@@ -22,7 +22,7 @@ import API from "../Services/API";
 import appStore from "../Stores/AppStore";
 import instanceStore from "../Stores/InstanceStore";
 
-//const defaultNumberOfVisibleLinks = 10;
+const defaultNumberOfVisibleLinks = 10;
 
 class LinksStore extends FormStore.typesMapping.Default{
   @observable value = [];
@@ -97,6 +97,11 @@ class LinksStore extends FormStore.typesMapping.Default{
   setValues(values) {
     if(!this.disabled && !this.readOnly) {
       super.setValue(values);
+      if (this.lazyShowLinks) {
+        for (let i=0; i<defaultNumberOfVisibleLinks && i<values.length; i++) {
+          this.visibleLinks.add(values[i][this.mappingValue]);
+        }
+      }
       this.resetOptionsSearch();
     }
   }

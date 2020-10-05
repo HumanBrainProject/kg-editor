@@ -124,6 +124,7 @@ class DynamicTableWithContext extends React.Component {
 
   handleOnAddValue = id => {
     const { field } = this.props;
+    instanceStore.createInstanceOrGet(id);
     const value = {[field.mappingValue]: id};
     field.addValue(value);
     this.triggerOnChange();
@@ -172,9 +173,11 @@ class DynamicTableWithContext extends React.Component {
       const id = value[field.mappingValue];
       if (id) {
         field.showLink(id);
-        view.resetInstanceHighlight();
-        view.setCurrentInstanceId(pane, id);
-        view.selectPane(view.currentInstanceIdPane);
+        setTimeout(() => {
+          view.resetInstanceHighlight();
+          view.setCurrentInstanceId(pane, id);
+          view.selectPane(view.currentInstanceIdPane);
+        }, field.isLinkVisible(id)?0:1000);
       }
     }
   }
@@ -199,7 +202,7 @@ class DynamicTableWithContext extends React.Component {
   }
 
   render() {
-    const { classes, formStore, field } = this.props;
+    const { classes, formStore, field, view } = this.props;
     const {
       instanceId,
       links,
@@ -240,14 +243,23 @@ class DynamicTableWithContext extends React.Component {
                 </div>
               )}
               <div className={`${classes.table} ${((readOnly || disabled) && !(formStore.readMode || readMode))?"disabled":""}`}>
-                <Table
-                  list={links}
-                  readOnly={isReadOnly}
-                  onRowDelete={this.handleRowDelete}
-                  onRowClick={this.handleRowClick}
-                  onRowMouseOver={this.handleRowMouseOver}
-                  onRowMouseOut={this.handleRowMouseOut}
-                />
+                {(view && view.currentInstanceId === instanceId)?
+                  <Table
+                    list={links}
+                    readOnly={isReadOnly}
+                    enablePointerEvents={true}
+                    onRowDelete={this.handleRowDelete}
+                    onRowClick={this.handleRowClick}
+                    onRowMouseOver={this.handleRowMouseOver}
+                    onRowMouseOut={this.handleRowMouseOut}
+                  />
+                  :
+                  <Table
+                    list={links}
+                    readOnly={isReadOnly}
+                    enablePointerEvents={false}
+                  />
+                }
                 {canAddValues && (
                   <div className={`form-control ${classes.dropdownContainer}`}>
                     <Dropdown

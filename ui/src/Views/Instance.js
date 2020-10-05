@@ -73,14 +73,14 @@ class Instance extends React.Component {
     const instance = instanceStore.instances.get(id);
     appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, this.props.mode);
     instanceStore.togglePreviewInstance();
-    instanceStore.setReadMode(mode !== "edit" && mode !== "create");
     viewStore.selectViewByInstanceId(id);
     if (instance && instance.isFetched) {
       if (mode === "create") {
         routerStore.history.replace(`/instance/edit/${id}`);
       }
+      instanceStore.setReadMode(mode !== "edit" && mode !== "create");
     } else {
-      instanceStore.checkInstanceIdAvailability(id, mode === "create");
+      instanceStore.checkInstanceIdAvailability(id, mode);
     }
   }
 

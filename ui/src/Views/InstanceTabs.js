@@ -54,10 +54,7 @@ class InstanceTab extends React.Component {
     }
   }
 
-  handleClose = () => {
-    const { instanceId } = this.props;
-    instanceId && appStore.closeInstance(instanceId);
-  }
+  handleClose = () => appStore.closeInstance(this.props.view.instanceId);
 
   render() {
     const { view, pathname } = this.props;
@@ -87,7 +84,7 @@ class InstanceTabs extends React.Component {
     return (
       <div className={classes.container} >
         {authStore.isFullyAuthenticated && Array.from(viewStore.views.values()).map(view => (
-          <InstanceTab key={view.instanceId} view={view} pathname={pathname} instanceId={view.instanceId} />
+          <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
         ))}
       </div>
     );

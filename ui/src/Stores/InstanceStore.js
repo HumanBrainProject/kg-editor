@@ -271,7 +271,11 @@ class Instance {
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
     if (this.form) {
-      this.form.injectValues({ fields: normalizedData.fields });
+      const values = Object.entries(normalizedData.fields).reduce((acc, [key,field]) => {
+        acc[key] = field.value;
+        return acc;
+      }, {});
+      this.form.injectValues(values);
     } else {
       this.form = new FormStore(normalizedData);
     }
@@ -434,7 +438,7 @@ class InstanceStore {
   }
 
   @action
-  async checkInstanceIdAvailability(instanceId, isCreateMode) {
+  async checkInstanceIdAvailability(instanceId, mode) {
     this.instanceIdAvailability.set(instanceId, {
       isAvailable: false,
       isChecking: true,
@@ -447,12 +451,11 @@ class InstanceStore {
         if (!resolvedId) {
           throw `${API.endpoints.instance(instanceId)} response is invalid" (${data})`;
         }
-
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(data && data.data);
+        instance.initializeData(data && data.data, mode !== "edit" && mode !== "create");
 
-        if (isCreateMode) {
+        if (mode === "create") {
           routerStore.history.replace(`/instance/edit/${resolvedId}`);
         }
       });

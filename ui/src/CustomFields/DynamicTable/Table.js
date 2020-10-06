@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
 import instanceStore from "../../Stores/InstanceStore";
+import { render } from "react-dom";
 
 const styles = {
   container: {
@@ -98,6 +99,34 @@ class LabelCellRenderer extends React.Component {
   }
 }
 
+@observer
+class ActionsCellRenderer extends React.Component {
+  render() {
+    const {instanceId, index, readOnly, onRetry, onDeleteRow} = this.props;
+    if (readOnly) {
+      return null;
+    }
+
+    const instance = instanceId && instanceStore.instances.get(instanceId);
+
+    if (instance && instance.fetchError) {
+      return (
+        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={onRetry(instanceId)} >
+          <FontAwesomeIcon icon="redo-alt"/>
+        </Button>
+      );
+    }
+    if (!instance || instance.isFetched || instance.isLabelFetched) {
+      return (
+        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={onDeleteRow(index)} >
+          <FontAwesomeIcon icon="times"/>
+        </Button>
+      );
+    }
+    return null;
+  }
+}
+
 @injectStyles(styles)
 @observer
 class Table extends React.Component {
@@ -166,30 +195,15 @@ class Table extends React.Component {
     return list[index];
   }
 
-  actionsCellRenderer = ({rowData: instanceId, index}) => {
-    const { readOnly } = this.props;
-    if (readOnly) {
-      return null;
-    }
-
-    const instance = instanceId && instanceStore.instances.get(instanceId);
-
-    if (instance && instance.fetchError) {
-      return (
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(instanceId)} >
-          <FontAwesomeIcon icon="redo-alt"/>
-        </Button>
-      );
-    }
-    if (!instance || instance.isFetched) {
-      return (
-        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteRow(index)} >
-          <FontAwesomeIcon icon="times"/>
-        </Button>
-      );
-    }
-    return null;
-  }
+  actionsCellRenderer = ({rowData: instanceId, index}) => (
+    <ActionsCellRenderer
+      instanceId={instanceId}
+      index={index}
+      readOnly={this.props.readOnly}
+      onRetry={this.handleRetry}
+      onDeleteRow={this.handleDeleteRow}
+    />
+  );
 
   labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} />;
 

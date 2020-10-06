@@ -16,6 +16,47 @@
 
 import { toJS } from "mobx";
 
+export const transformSummaryField = field  =>  {
+  if(field.type === "KgTextArea") {
+    field.value = field.value.substr(0, 197) + "...";
+    delete field.label;
+  }
+};
+
+export const normalizeLabelInstanceData = data => {
+  const instance = {
+    id: null,
+    name: null,
+    types: [],
+    primaryType: { name: "", color: "", label: "" },
+    workspace: "",
+    error: null
+  };
+
+  if (!data) {
+    return instance;
+  }
+  if (data.id) {
+    instance.id = data.id;
+  }
+  if (data.types instanceof Array) {
+    instance.types = data.types;
+    if (instance.types.length) {
+      instance.primaryType = instance.types[0];
+    }
+  }
+  if (data.workspace) {
+    instance.workspace = data.workspace;
+  }
+  if (data.name) {
+    instance.name = data.name;
+  }
+  if (typeof data.error === "object") {
+    instance.error = data.error;
+  }
+  return instance;
+};
+
 export const normalizeInstanceData = (data, transformField = null) => {
 
   // TODO: Remove the mockup, this is just a test for embedded
@@ -123,6 +164,7 @@ export const normalizeInstanceData = (data, transformField = null) => {
       field.mappingValue = "@id";
       field.mappingReturn = ["@id"];
       field.allowCustomValues = true;
+      field.lazyShowLinks = false;
       break;
     case "DynamicTable":
       field.type = "KgDynamicTable";
@@ -132,6 +174,7 @@ export const normalizeInstanceData = (data, transformField = null) => {
       field.mappingValue = "@id";
       field.mappingReturn = ["@id"];
       field.allowCustomValues = true;
+      field.lazyShowLinks = true;
       break;
     }
   };
@@ -143,7 +186,16 @@ export const normalizeInstanceData = (data, transformField = null) => {
     });
   };
 
-  const instance = { id: null, types: [], primaryType: { name: "", color: "", label: "" }, workspace: "", name: "", fields: {}, labelField: null, promotedFields: [], alternatives: {}, metadata: {}, permissions: {}, error: null };
+  const instance = {
+    ...normalizeLabelInstanceData(data),
+    fields: {},
+    labelField: null,
+    promotedFields: [],
+    alternatives: {},
+    metadata: {},
+    permissions: {}
+  };
+
   if (!data) {
     return instance;
   }
@@ -188,19 +240,16 @@ export const normalizeInstanceData = (data, transformField = null) => {
   if (typeof data.permissions === "object") {
     instance.permissions = data.permissions;
   }
-  if (typeof data.error === "object") {
-    instance.error = data.error;
-  }
   return instance;
 };
 
 export const getChildrenIdsGroupedByField = fields => {
   function getPagination(field) {
-    if (field.type === "KgDynamicTable") {
-      const total = field.instances.length;
+    if (field.lazyShowLinks) {
+      const total = field.numberOfValues;
       if (total) {
         return {
-          count: field.visibleInstancesCount ? field.visibleInstancesCount : 0,
+          count: field.numberOfVisibleLinks,
           total: total
         };
       }
@@ -210,12 +259,8 @@ export const getChildrenIdsGroupedByField = fields => {
 
   function showId(field, id) {
     if (id) {
-      if (field.type === "KgDynamicTable") {
-        if (field.defaultVisibleInstances) {
-          return true;
-        }
-        const instance = field.instancesMap.get(id);
-        return !!instance && !!instance.show;
+      if (field.lazyShowLinks) {
+        return field.isLinkVisible(id);
       }
       return true;
     }
@@ -270,5 +315,5 @@ export const getChildrenIdsGroupedByField = fields => {
     const groups = getGroups(field, values);
     acc.push(...groups);
     return acc;
-  }, []);
+  }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };

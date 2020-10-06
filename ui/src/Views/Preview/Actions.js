@@ -75,8 +75,8 @@ class Actions extends React.Component {
 
   handleCtrlClick = mode => {
     const { instance } = this.props;
-    const { id } = instance;
-    appStore.openInstance(id, mode);
+    const { id, name, primaryType } = instance;
+    appStore.openInstance(id, name, primaryType, mode);
   }
 
   handleClick = mode => {

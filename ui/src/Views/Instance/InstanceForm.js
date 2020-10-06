@@ -25,10 +25,8 @@ import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 import typesStore from "../../Stores/TypesStore";
 import instanceStore from "../../Stores/InstanceStore";
-import instanceTabStore from "../../Stores/InstanceTabStore";
 
 import HeaderPanel from "./InstanceForm/HeaderPanel";
-import SummaryPanel from "./InstanceForm/SummaryPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
 import FooterPanel from "./InstanceForm/FooterPanel";
 import FetchErrorPanel from "./InstanceForm/FetchErrorPanel";
@@ -40,19 +38,7 @@ import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePane
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 
 const styles = {
-  panelHeader: {
-    padding: "0"
-  },
-  panelSummary: {
-    padding: "10px 0 0 0"
-  },
-  panelBody: {
-    padding: "0"
-  },
-  panelFooter: {
-    padding: "0"
-  },
-  panel: {
+  container: {
     transition: "all 0.25s linear",
     "&:not(.current)": {
       borderRadius: "10px",
@@ -121,9 +107,6 @@ const styles = {
       margin: "10px 0",
       color: "#333"
     },
-    "&:not(.main) $panelSummary": {
-      padding: "10px 10px 0 10px"
-    },
     "&:not(.main) $panelBody": {
       padding: "0 10px"
     },
@@ -133,6 +116,15 @@ const styles = {
     "&.readMode .quickfire-empty-field": {
       display: "none"
     }
+  },
+  panelHeader: {
+    padding: "0"
+  },
+  panelBody: {
+    padding: "10px 0 0 0"
+  },
+  panelFooter: {
+    padding: "0"
   },
   hasChangedIndicator: {
     height: "9px",
@@ -168,14 +160,15 @@ class InstanceForm extends React.Component {
   handleListLoadRetry = () => typesStore.fetch();
 
   handleFocus = () => {
-    if (instanceTabStore.getCurrentInstanceId(this.props.mainInstanceId) !== this.props.id) {
-      instanceTabStore.setCurrentInstanceId(this.props.mainInstanceId, this.props.id, this.props.level);
+    if (this.props.view.currentInstanceId !== this.props.id) {
+      this.props.view.setCurrentInstanceId(this.props.pane, this.props.id);
     }
   }
 
-  handleOpenInstance = (e) => {
+  handleOpenInstance = e => {
     if ((e.metaKey || e.ctrlKey)) {
-      appStore.openInstance(this.props.id);
+      const instance = instanceStore.instances.get(this.props.id);
+      appStore.openInstance(this.props.id, instance.name, instance.primaryType);
     } else {
       routerStore.history.push(`/instance/view/${this.props.id}`);
     }
@@ -227,43 +220,29 @@ class InstanceForm extends React.Component {
   }
 
   render() {
-    const { classes, mainInstanceId, id } = this.props;
+    const { classes, view, id, provenance } = this.props;
 
     const instance = instanceStore.instances.get(this.props.id);
     if (!instance) {
       return null;
     }
 
+    const mainInstanceId = view.instanceId;
     const isMainInstance = id === mainInstanceId;
-    const isCurrentInstance = id === instanceTabStore.getCurrentInstanceId(mainInstanceId);
+    const isCurrentInstance = id === view.currentInstanceId;
+    const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
 
-    const panelClassName = () => {
-      let className = classes.panel;
-      if (instance.isReadMode) {
-        className += " readMode";
-      }
-      if (isCurrentInstance) {
-        className += " current";
-      }
-      if (isMainInstance) {
-        className += " main";
-      }
-      if (instance.hasChanged) {
-        className += " hasChanged";
-      }
-      if (instance.highlight === this.props.provenence) {
-        className += " highlight";
-      }
-      return className;
-    };
+    let className = `${classes.container} ${instance.isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
+
+    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
 
     return (
-      <div className={panelClassName()} data-id={this.props.id}>
+      <div className={className} data-id={id}>
         {instance.hasFetchError?
-          <FetchErrorPanel id={this.props.id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
+          <FetchErrorPanel id={id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
           :
           instance.isFetching?
-            <FetchingPanel id={this.props.id} show={instance.isFetching} inline={!isMainInstance} />
+            <FetchingPanel id={id} show={instance.isFetching} inline={!isMainInstance} />
             :
             instance.isFetched?
               <React.Fragment>
@@ -274,22 +253,21 @@ class InstanceForm extends React.Component {
                   onChange={this.handleChange}
                   onLoad={this.handleLoad}
                 >
-                  <Form store={instance.form} key={mainInstanceId}>
+                  <Form store={instance.form}>
                     <HeaderPanel
                       className={classes.panelHeader}
                       types={instance.types}
-                      hasChanged={instance.hasChanged} />
+                      hasChanged={instance.hasChanged}
+                      highlight={highlight} />
 
-                    {instance.hasFieldErrors ? <GlobalFieldErrors instance={instance} />:
-                      <React.Fragment>
-                        <SummaryPanel className={classes.panelSummary} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.promotedFields} disableLinks={!isCurrentInstance} />
-                        <BodyPanel className={classes.panelBody} level={this.props.level} id={this.props.id} mainInstanceId={mainInstanceId} instance={instance} fields={instance.nonPromotedFields} show={true} disableLinks={!isCurrentInstance} />
-                      </React.Fragment>
+                    {instance.hasFieldErrors?
+                      <GlobalFieldErrors instance={instance} />
+                      :
+                      <BodyPanel className={classes.panelBody} fields={fields} />
                     }
                     <FooterPanel
                       className={classes.panelFooter}
-                      id={id?id:"<new>"}
-                      workspace={instance.workspace}
+                      instance={instance}
                       showOpenActions={isCurrentInstance && !isMainInstance} />
                   </Form>
                   <ConfirmCancelEditPanel
@@ -298,7 +276,7 @@ class InstanceForm extends React.Component {
                     onConfirm={this.handleConfirmCancelEdit}
                     onCancel={this.handleContinueEditing}
                     inline={!isMainInstance} />
-                  <SavingPanel id={this.props.id} show={instance.isSaving} inline={!isMainInstance} />
+                  <SavingPanel id={id} show={instance.isSaving} inline={!isMainInstance} />
                   <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
                   <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
                 </div>

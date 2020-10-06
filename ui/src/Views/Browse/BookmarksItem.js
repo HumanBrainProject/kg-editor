@@ -194,11 +194,11 @@ class BookmarksItem extends React.Component {
     }
   }
 
-  handelCancelActions = ()  => {
+  handelCancelActions = () => {
     this.setState({ showDeleteBookmarkDialog: false });
   }
 
-  handleEditBookmark = event =>  {
+  handleEditBookmark = event => {
     event && event.stopPropagation();
     bookmarkStore.setCurrentlyEditedBookmark(this.props.bookmark);
   }
@@ -222,7 +222,7 @@ class BookmarksItem extends React.Component {
     bookmarkStore.cancelCurrentlyEditedBookmark(this.props.bookmark);
   }
 
-  handleBookmarkNameKeyUp = event =>{
+  handleBookmarkNameKeyUp = event => {
     event && event.stopPropagation();
     if (event.keyCode === 27) {
       this.handleCancelEditBookmark();

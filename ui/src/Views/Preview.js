@@ -28,7 +28,6 @@ import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
 // import BookmarkStatus from "./Instance/BookmarkStatus";
-import RenderMarkdownField from "../Components/Markdown";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 
@@ -148,10 +147,6 @@ class Preview extends React.Component {
     this.fetchInstance(true);
   }
 
-  markdownDescriptionRendering = field => (
-    <RenderMarkdownField value={field.getValue()} />
-  );
-
   render() {
     // const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
     const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
@@ -161,11 +156,8 @@ class Preview extends React.Component {
       return null;
     }
 
-    const promotedFields = instance && instance.promotedFields;
-    const promotedFieldsWithMarkdown =
-      instance && instance.promotedFieldsWithMarkdown;
-    const nonPromotedFields =
-      instance && instance.nonPromotedFields;
+    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
+
     return (
       <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
         {(!instance.isFetched || instance.isFetching)? (
@@ -210,33 +202,11 @@ class Preview extends React.Component {
                   store={instance.readModeFormStore}
                   key={instanceId}
                 >
-                  {promotedFields.map(fieldKey => {
-                    return (
-                      <div
-                        key={instanceId + fieldKey}
-                        className={classes.field}
-                      >
-                        {promotedFieldsWithMarkdown.includes(fieldKey) ? (
-                          <Field
-                            name={fieldKey}
-                            readModeRendering={this.markdownDescriptionRendering}
-                          />
-                        ) : (
-                          <Field name={fieldKey} />
-                        )}
-                      </div>
-                    );
-                  })}
-                  {nonPromotedFields.map(fieldKey => {
-                    return (
-                      <div
-                        key={instanceId + fieldKey}
-                        className={classes.field}
-                      >
-                        <Field name={fieldKey} />
-                      </div>
-                    );
-                  })}
+                  {fields.map(fieldKey => (
+                    <div key={instanceId + fieldKey} className={classes.field}>
+                      <Field name={fieldKey} />
+                    </div>
+                  ))}
                   {showMetaData && instance.metadata && instance.metadata.length > 0 && (
                     <div>
                       <hr />

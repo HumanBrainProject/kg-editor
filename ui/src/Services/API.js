@@ -38,7 +38,6 @@ const endpoints = {
   "instance": id => `/editor/api/instances/${id}`,
   "instanceScope": id => `/editor/api/instances/${id}/scope`,
   "createInstance": (id=null) => `/editor/api/instances${id?("/" + id):""}?workspace=${appStore.currentWorkspace.id}`,
-  "getInstance": id => `/editor/api/instances/${id}`,
   "release": id => `/editor/api/releases/${id}/release`,
   "messages": () => "/editor/api/directives/messages",
   "releaseStatusTopInstance": () => "/editor/api/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY",

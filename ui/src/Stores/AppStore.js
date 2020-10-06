@@ -27,12 +27,24 @@ import instanceStore from "./InstanceStore";
 import routerStore from "./RouterStore";
 import API from "../Services/API";
 import historyStore from "./HistoryStore";
-import instanceTabStore from "./InstanceTabStore";
+import viewStore from "./ViewStore";
 import typesStore from "./TypesStore";
 import browseStore from "./BrowseStore";
 import statusStore from "./StatusStore";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
+
+const getLinkedInstanceIds = instanceIds => {
+  const result = instanceIds.reduce((acc, id) => {
+    const instance = instanceStore.instances.get(id);
+    if (instance) {
+      const linkedIds = instance.linkedIds;
+      acc.push(...linkedIds);
+    }
+    return acc;
+  }, []);
+  return Array.from(new Set(result));
+};
 
 class AppStore{
   @observable globalError = null;
@@ -44,9 +56,7 @@ class AppStore{
   @observable canLogin = true;
   @observable currentTheme;
   @observable historySettings;
-  @observable instanceIdAvailability = new Map();
   @observable currentWorkspace = null;
-  @observable previewInstance = null;
   @observable showSaveBar = false;
   @observable instanceToDelete = null;
   @observable isDeletingInstance = false;
@@ -145,7 +155,6 @@ class AppStore{
   flush(){
     instanceStore.flush();
     statusStore.flush();
-    this.resetInstanceIdAvailability();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
@@ -180,9 +189,13 @@ class AppStore{
   async getInitialInstanceWorkspace(instanceId){
     this.initializingMessage = `Retrieving instance "${instanceId}"...`;
     try{
-      const response = await API.axios.get(API.endpoints.getInstance(instanceId));
+      const response = await API.axios.get(API.endpoints.instance(instanceId));
       const data = response.data && response.data.data;
       if(data){
+
+        const instance = instanceStore.createInstanceOrGet(instanceId);
+        instance.initializeData(data);
+
         if(data.workspace){
           return data.workspace;
         }
@@ -226,31 +239,24 @@ class AppStore{
     this.isInitialized = true;
   }
 
-  restoreWorkspaceInstanceTabs() {
-    const instanceTabs = instanceTabStore.getWorkspaceStoredInstanceTabs();
-    instanceTabs.forEach(([id, viewMode]) => {
-      this.openInstance(id, viewMode, viewMode !== "edit" && viewMode !== "create");
-    });
-  }
-
   closeAllInstances() {
-    this.resetInstanceIdAvailability();
+    instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
       routerStore.history.push("/browse");
     }
-    instanceTabStore.closeAllInstanceTabs();
+    viewStore.unregisterAllViews();
   }
 
-  clearInstanceTabs() {
-    this.resetInstanceIdAvailability();
+  clearViews() {
+    instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
       routerStore.history.push("/browse");
     }
-    instanceTabStore.clearInstanceTabs();
+    viewStore.clearViews();
   }
 
   @action
@@ -321,9 +327,9 @@ class AppStore{
       workspace = authStore.workspaces[0];
     }
     if(this.currentWorkspace !== workspace) {
-      if(instanceTabStore.instanceTabs.size > 0) {
+      if(viewStore.views.size > 0) {
         if (window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
-          this.clearInstanceTabs();
+          this.clearViews();
         } else {
           return;
         }
@@ -331,7 +337,7 @@ class AppStore{
       this.currentWorkspace = workspace;
       if (this.currentWorkspace) {
         localStorage.setItem("currentWorkspace", workspace.id);
-        this.restoreWorkspaceInstanceTabs();
+        viewStore.restoreViews();
         typesStore.fetch(true);
         browseStore.clearInstances();
       } else {
@@ -345,82 +351,19 @@ class AppStore{
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
 
-  @action
-  togglePreviewInstance(instanceId, instanceName, options) {
-    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
-      this.previewInstance = null;
-    } else {
-      this.previewInstance = {id: instanceId, name: instanceName, options: options};
-    }
-  }
-
-
-  @action
-  resetInstanceIdAvailability() {
-    this.instanceIdAvailability.clear();
-  }
-
-  @action
-  async checkInstanceIdAvailability(instanceId){
-    this.instanceIdAvailability.set(instanceId, {
-      resolvedId: null,
-      isAvailable: false,
-      isChecking: true,
-      error: null
-    });
-    try{
-      const { data } = await API.axios.get(API.endpoints.getInstance(instanceId));
-      runInAction(() => {
-        const resolvedId = (data && data.data && data.data.id)?data.data.id:instanceId;
-        this.instanceIdAvailability.delete(instanceId);
-        routerStore.history.replace(`/instance/edit/${resolvedId}`);
-      });
-    } catch(e){
-      runInAction(() => {
-        const status =  this.instanceIdAvailability.get(instanceId);
-        if (e.response && e.response.status === 404) {
-          status.isAvailable = true;
-          status.isChecking = false;
-        } else {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          status.error = `Failed to check instance "${instanceId}" (${message}) ${errorMessage}`;
-          status.isAvailable = false;
-          status.isChecking = false;
-        }
-      });
-    }
-  }
-
-  @action
-  removeUnusedInstances(instanceId, linkedInstanceIds) {
-    const instanceIdsToBeKept = instanceTabStore.getOpenedInstanceTabsExceptCurrent(instanceId);
-    const instanceIdsToBeRemoved = linkedInstanceIds.filter(id => !instanceIdsToBeKept.includes(id));
-    instanceStore.removeInstances(instanceIdsToBeRemoved);
-  }
 
   createInstance = () => {
     const uuid = _.uuid();
     routerStore.history.push(`/instance/create/${uuid}`);
   }
 
-  @action openInstance(instanceId, viewMode = "view", readMode = true){
-    this.togglePreviewInstance();
-    instanceStore.setReadMode(readMode);
-    instanceTabStore.openInstanceTab(instanceId, viewMode);
-    if(viewMode === "create") {
-      this.checkInstanceIdAvailability(instanceId);
-    } else {
-      const instance = instanceStore.createInstanceOrGet(instanceId);
-      if(instance.isFetched && !instance.fetchError) {
-        const types = instance.types.map(({name}) => name);
-        historyStore.updateInstanceHistory(instance.id, types, "viewed");
-      } else {
-        instance.fetch();
-      }
+  @action
+  openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view"){
+    viewStore.registerViewByInstanceId(instanceId, instanceName, instancePrimaryType, viewMode);
+    if(viewMode !== "create") {
+      historyStore.updateInstanceHistory(instanceId, "viewed");
     }
-    instanceTabStore.setCurrentInstanceId(instanceId, instanceId, 0);
-    instanceTabStore.syncStoredInstanceTabs();
+    viewStore.syncStoredViews();
   }
 
   getReadMode() {
@@ -428,26 +371,31 @@ class AppStore{
     return !(path && (path.params.mode === "edit" || path.params.mode === "create"));
   }
 
+  @action
   closeInstance(instanceId) {
     if (matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" })) {
       if (matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-        if (instanceTabStore.instanceTabs.size > 1) {
-          let openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
-          let currentInstanceIndex = openedInstances.indexOf(instanceId);
-          let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
+        if (viewStore.views.size > 1) {
+          const openedInstances = viewStore.instancesIds;
+          const currentInstanceIndex = openedInstances.indexOf(instanceId);
+          const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
-          let openedInstance = instanceTabStore.instanceTabs.get(newCurrentInstanceId);
-          routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
+          const openedInstance = viewStore.views.get(newCurrentInstanceId);
+          routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
         } else {
           routerStore.history.push("/browse");
           browseStore.clearSelectedInstance();
         }
       }
     }
-    this.instanceIdAvailability.delete(instanceId);
-    instanceTabStore.closeInstanceTab(instanceId);
+    instanceStore.instanceIdAvailability.delete(instanceId);
+    viewStore.unregisterViewByInstanceId(instanceId);
     const instance = instanceStore.instances.get(instanceId);
-    instance && this.removeUnusedInstances(instanceId, instance.linkedIds);
+    if (instance) {
+      const instanceIdsToBeKept = getLinkedInstanceIds(viewStore.instancesIds);
+      const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
+      instanceStore.removeInstances(instanceIdsToBeRemoved);
+    }
   }
 
   @action
@@ -459,27 +407,25 @@ class AppStore{
     if (!instance.hasSaveError) {
       if (isNew) {
         runInAction(() => {
-          const instanceTab = instanceTabStore.instanceTabs.get(id);
+          const view = viewStore.views.get(id);
           if (newId !== id) {
-            instanceTabStore.replaceInstanceId(id, newId);
+            viewStore.replaceViewByNewInstanceId(id, newId);
             this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${newId}`);
           } else {
-            instanceTab.viewMode = "edit";
+            view.mode = "edit";
             this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${id}`);
           }
         });
-        instanceTabStore.syncStoredInstanceTabs();
+        viewStore.syncStoredViews();
       }
     }
-    const types = instance.types.map(({name}) => name);
-    historyStore.updateInstanceHistory(instance.id, types, "edited");
+    historyStore.updateInstanceHistory(instance.id, "edited");
     statusStore.flush();
   }
 
   syncInstancesHistory(instance, mode) {
-    if(instance && instanceTabStore.instanceTabs.has(instance.id)){
-      const types = instance.types.map(({name}) => name);
-      historyStore.updateInstanceHistory(instance.id, types, mode);
+    if(instance && viewStore.views.has(instance.id)){
+      historyStore.updateInstanceHistory(instance.id, mode);
     }
   }
 
@@ -497,19 +443,19 @@ class AppStore{
           let nextLocation = null;
           if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
             if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
-              const openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
-              if(openedInstances.size > 1){
-                let currentInstanceIndex = openedInstances.indexOf(instanceId);
-                let newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
-                let openedInstance = openedInstances.get(newInstanceId);
-                nextLocation = `/instance/${openedInstance.viewMode}/${newInstanceId}`;
+              const openedInstances = viewStore.instancesIds;
+              if(openedInstances.length > 1){
+                const currentInstanceIndex = openedInstances.indexOf(instanceId);
+                const newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
+                const openedInstance = openedInstances.get(newInstanceId);
+                nextLocation = `/instance/${openedInstance.mode}/${newInstanceId}`;
               } else {
                 nextLocation = "/browse";
               }
             }
           }
           browseStore.refreshFilter();
-          instanceTabStore.closeInstanceTab(instanceId);
+          viewStore.unregisterViewByInstanceId(instanceId);
           this.flush();
           if (nextLocation) {
             routerStore.history.push(nextLocation);
@@ -577,22 +523,22 @@ class AppStore{
 
   focusPreviousInstance(instanceId) {
     if (instanceId && matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceTabStore.instanceTabs.size > 1) {
-        let openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
+      if (viewStore.views.size > 1) {
+        let openedInstances = viewStore.instancesIds;
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
-        let openedInstance = instanceTabStore.instanceTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
+        let openedInstance = viewStore.views.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
-      if (instanceTabStore.instanceTabs.size > 1) {
-        const openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
+      if (viewStore.views.size > 1) {
+        const openedInstances = viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
-        const openedInstance = instanceTabStore.instanceTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
+        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -601,22 +547,22 @@ class AppStore{
 
   focusNextInstance(instanceId) {
     if (instanceId && matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
-      if (instanceTabStore.instanceTabs.size > 1) {
-        let openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
-        let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
+      if (viewStore.views.size > 1) {
+        const openedInstances = viewStore.instancesIds;
+        const currentInstanceIndex = openedInstances.indexOf(instanceId);
+        const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
-        let openedInstance = instanceTabStore.instanceTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
+        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
     } else {
-      if (instanceTabStore.instanceTabs.size > 1) {
-        const openedInstances = Array.from(instanceTabStore.instanceTabs.keys());
+      if (viewStore.views.size > 1) {
+        const openedInstances = viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[0];
-        const openedInstance = instanceTabStore.instanceTabs.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.viewMode}/${newCurrentInstanceId}`);
+        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -650,7 +596,7 @@ class AppStore{
 
   logout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      instanceTabStore.flushStoredInstanceTabs();
+      viewStore.flushStoredViews();
       authStore.logout();
     }
   }

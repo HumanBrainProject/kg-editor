@@ -14,18 +14,75 @@
 *   limitations under the License.
 */
 
-import {observable, action, runInAction, computed, toJS} from "mobx";
-import { uniqueId, debounce, isEqual } from "lodash";
+import {observable, action, runInAction, computed, toJS, values, entries} from "mobx";
+import { debounce, isEqual } from "lodash";
 import { FormStore } from "hbp-quickfire";
-import _  from "lodash-uuid";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
+import routerStore from "./RouterStore";
 
-import { normalizeInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper";
+import { normalizeInstanceData, normalizeLabelInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper";
+
+class ReadModeFormStore {
+  constructor(store) {
+    this.store = store;
+    this.readMode = true;
+  }
+
+  getGeneratedKey =  (item, namespace) => this.store.getGeneratedKey(item, namespace);
+
+  getValues = (fields, applyMapping) => this.store.getValues(fields, applyMapping);
+
+  @computed
+  get structure() {
+    return this.store.structure;
+  }
+
+  get values(){
+    return this.store.values;
+  }
+
+  @action
+  injectValues = (values, merge, fields) => this.store.injectValues(values, merge, fields);
+
+  set values(values){
+    this.store.values(values);
+  }
+
+  @action
+  reset = fields => this.store.reset(fields)
+
+  getField = path => this.store.getField(path)
+
+  @action
+  update = (path, updated) => this.store.update(path, updated)
+
+  parentPath = field => this.store.parentPath(field)
+
+  genSiblingPath = (field, name) => this.store.genSiblingPath(field, name)
+
+  isURL = str => this.store.isUrl(str)
+
+  async resolveURL(url, cacheResult) {
+    return this.store.resolveURL(url, cacheResult);
+  }
+
+  @action
+  async validate() {
+    return this.store.validate();
+  }
+
+  registerCustomValidationFunction = (name, func, errorMessage) => this.store.registerCustomValidationFunction(name, func, errorMessage);
+
+  registerAxiosInstance = axiosInstance => this.registerAxiosInstance(axiosInstance);
+
+  toggleReadMode = () => {}
+}
 
 class Instance {
   @observable id = null;
+  @observable _name = null;
   @observable types = [];
   @observable isNew = false;
   @observable fields = {};
@@ -37,16 +94,23 @@ class Instance {
   @observable metadata = {};
   @observable permissions = {};
   @observable form = null;
-  @observable cancelChangesPending = null;
+
+  @observable isLabelFetching = false;
+  @observable isLabelFetched = false;
+  @observable fetchLabelError = null;
+  @observable hasLabelFetchError = false;
+
+  @observable isFetching = false;
+  @observable isFetched = false;
   @observable fetchError = null;
   @observable hasFetchError = false;
+
+  @observable hasChanged = false;
+  @observable cancelChangesPending = null;
   @observable saveError = null;
   @observable hasSaveError = false;
   @observable isSaving = false;
-  @observable hasChanged = false;
-  @observable isFetching = false;
-  @observable isFetched = false;
-  @observable highlight = null;
+
   @observable fieldsToSetAsNull = [];
   @observable fieldErrorsMap = new Map();
 
@@ -60,6 +124,15 @@ class Instance {
   }
 
   @computed
+  get name() {
+    const field = this.isFetched && this.labelField && this.form && this.form.getField(this.labelField);
+    if (field) {
+      return (this.isNew && !field.value)?`<New ${this.primaryType.label}>`:field.value;
+    }
+    return this._name?this._name:this.id;
+  }
+
+  @computed
   get hasFieldErrors() {
     return this.fieldErrors.length;
   }
@@ -70,14 +143,12 @@ class Instance {
   }
 
   @computed
-  get promotedFieldsWithMarkdown() {
-    return this.promotedFields.filter(name => this.fields[name].markdown);
-  }
-
-  @computed
   get nonPromotedFields() {
-    if (this.isFetched && !this.fetchError && this.fields) {
-      return Object.keys(this.fields).filter(key => !this.promotedFields.includes(key));
+    if (this.isFetched && !this.fetchError && this.form && this.form.structure.fields) {
+      return entries(this.form.structure.fields)
+        .filter(([key]) => !this.promotedFields.includes(key))
+        .sort(([, a], [, b]) => a.label.localeCompare(b.label))
+        .map(([key]) => key);
     }
     return [];
   }
@@ -113,9 +184,8 @@ class Instance {
 
   @computed
   get childrenIdsGroupedByField() {
-    if(this.isFetched && !this.fetchError && this.fields){
-      const fields = Object.keys(this.fields).map(fieldKey => this.form.getField(fieldKey));
-      return getChildrenIdsGroupedByField(fields);
+    if (this.isFetched && !this.fetchError) {
+      return getChildrenIdsGroupedByField(values(this.form.structure.fields));
     }
     return [];
   }
@@ -134,11 +204,13 @@ class Instance {
 
   @computed
   get readModeFormStore() {
+    if (!this.form) {
+      return null;
+    }
     if (this._readModeFormStore) {
       return this._readModeFormStore;
     }
-    this._readModeFormStore = new FormStore(toJS(this.form.structure));
-    this._readModeFormStore.toggleReadMode(true);
+    this._readModeFormStore = new ReadModeFormStore(this.form);
     return this._readModeFormStore;
   }
 
@@ -152,6 +224,7 @@ class Instance {
     !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
     this.hasChanged = true;
   }
+
   @action
   fetch(forceFetch=false) {
     if(!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
@@ -160,13 +233,35 @@ class Instance {
   }
 
   @action
+  fetchLabel(forceFetch=false) {
+    if (!this.isFetching && !this.isLabelFetching) {
+      if (forceFetch || (!this.isFetched && !this.isLabelFetched)) {
+        this.instanceStore.fetchInstanceLabel(this);
+      }
+    }
+  }
+
+  @action
+  initializeLabelData(data) {
+    const normalizedData =  normalizeLabelInstanceData(data);
+    this._name = normalizedData.name,
+    this.workspace = normalizedData.workspace;
+    this.types = normalizedData.types;
+    this.primaryType = normalizedData.primaryType;
+    this.isLabelFetching = false;
+    this.isLabelFetched = true;
+    this.fetchLabelError = null;
+    this.hasLabelFetchError = false;
+  }
+
+  @action
   initializeData(data, readMode=false, isNew=false) {
     const normalizedData =  normalizeInstanceData(data);
     this._readModeFormStore = null;
+    this._name = normalizedData.name,
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;
     this.isNew = isNew;
-    this.fields = normalizedData.fields;
     this.labelField = normalizedData.labelField;
     this.primaryType = normalizedData.primaryType;
     this.promotedFields = normalizedData.promotedFields;
@@ -174,14 +269,11 @@ class Instance {
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
     if (this.form) {
-      this.form.structure.workspace = normalizedData.workspace;
-      this.form.structure.types = normalizedData.types;
-      this.form.structure.name = normalizedData.name;
-      this.form.structure.primaryType = normalizedData.primaryType;
-      this.form.structure.promotedFields = normalizedData.promotedFields;
-      this.form.structure.alternatives = normalizedData.alternatives;
-      this.form.structure.metadata = normalizedData.metadata;
-      this.form.structure.permissions = normalizedData.permissions;
+      const values = Object.entries(normalizedData.fields).reduce((acc, [key,field]) => {
+        acc[key] = field.value;
+        return acc;
+      }, {});
+      this.form.injectValues(values);
     } else {
       this.form = new FormStore(normalizedData);
     }
@@ -193,16 +285,26 @@ class Instance {
     this.setReadMode(readMode);
   }
 
-  @action
-  errorInstance(e) {
+  buildErrorMessage(e) {
     const message = e.message?e.message:e;
     const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-    if(e.response && e.response.status === 404){
-      this.fetchError = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+    if (e.response && e.response.status === 404) {
+      return `The instance "${this.id}" can not be found - it either could have been removed or it is not accessible by your user account.`;
     }
-    else {
-      this.fetchError = `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
-    }
+    return `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
+  }
+
+  @action
+  errorLabelInstance(e) {
+    this.fetchLabelError = this.buildErrorMessage(e);
+    this.hasLabelFetchError = true;
+    this.isLabelFetched = false;
+    this.isLabelFetching = false;
+  }
+
+  @action
+  errorInstance(e) {
+    this.fetchError = this.buildErrorMessage(e);
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;
@@ -291,12 +393,15 @@ class Instance {
 class InstanceStore {
   @observable stage = null;
   @observable instances = new Map();
+  @observable previewInstance = null;
+  @observable instanceIdAvailability = new Map();
 
-  instancesQueue = new Map();
+  instancesQueue = new Set();
+  instanceLabelsQueue = new Set();
+  isFetchingQueue = false;
+  isFetchingLabelsQueue = false;
   queueThreshold = 1000;
   queueTimeout = 250;
-
-  generatedKeys = new WeakMap();
 
   constructor(stage=null) {
     this.stage = stage?stage:null;
@@ -304,14 +409,79 @@ class InstanceStore {
 
   fetchInstance(instance){
     if(!this.instancesQueue.has(instance.id)){
-      this.instancesQueue.set(instance.id, instance);
+      this.instancesQueue.add(instance.id);
       this.processQueue();
     }
   }
 
+  fetchInstanceLabel(instance){
+    if(!this.instanceLabelsQueue.has(instance.id)){
+      this.instanceLabelsQueue.add(instance.id);
+      this.processLabelsQueue();
+    }
+  }
+
+  @action
+  togglePreviewInstance(instanceId, instanceName, options) {
+    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
+      this.previewInstance = null;
+    } else {
+      this.previewInstance = {id: instanceId, name: instanceName, options: options};
+    }
+  }
+
+  @action
+  resetInstanceIdAvailability() {
+    this.instanceIdAvailability.clear();
+  }
+
+  @action
+  async checkInstanceIdAvailability(instanceId, mode) {
+    this.instanceIdAvailability.set(instanceId, {
+      isAvailable: false,
+      isChecking: true,
+      error: null
+    });
+    try{
+      const { data } = await API.axios.get(API.endpoints.instance(instanceId));
+      runInAction(() => {
+        const resolvedId = data && data.data && data.data.id;
+        if (!resolvedId) {
+          throw `${API.endpoints.instance(instanceId)} response is invalid" (${data})`;
+        }
+        this.instanceIdAvailability.delete(instanceId);
+        const instance = this.createInstanceOrGet(resolvedId);
+        instance.initializeData(data && data.data, mode !== "edit" && mode !== "create");
+
+        if (mode === "create") {
+          routerStore.history.replace(`/instance/edit/${resolvedId}`);
+        }
+      });
+    } catch(e){
+      runInAction(() => {
+        const status =  this.instanceIdAvailability.get(instanceId);
+        if (e.response && e.response.status === 404) {
+          status.isAvailable = true;
+          status.isChecking = false;
+        } else {
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
+          status.isAvailable = false;
+          status.isChecking = false;
+        }
+      });
+    }
+  }
+
+  @computed
+  get getUnsavedInstances() {
+    return Array.from(this.instances.values()).filter(instance => instance.hasChanged).reverse();
+  }
+
   @computed
   get hasUnsavedChanges(){
-    return Array.from(this.instances.entries()).filter(([, instance]) => instance.hasChanged).length > 0;
+    return this.getUnsavedInstances.length > 0;
   }
 
   @action
@@ -326,7 +496,20 @@ class InstanceStore {
     }
   }
 
+  @action
+  processLabelsQueue(){
+    if(this.instanceLabelsQueue.size <= 0){
+      this._debouncedFetchLabelsQueue.cancel();
+    } else if(this.instanceLabelsQueue.size < this.queueThreshold){
+      this._debouncedFetchLabelsQueue();
+    } else if(!this.isFetchingLabelsQueue){
+      this._debouncedFetchLabelsQueue.cancel();
+      this.fetchLabelsQueue();
+    }
+  }
+
   _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+  _debouncedFetchLabelsQueue = debounce(()=>{this.fetchLabelsQueue();}, this.queueTimeout);
 
   @action
   async fetchQueue(){
@@ -334,7 +517,7 @@ class InstanceStore {
       return;
     }
     this.isFetchingQueue = true;
-    let toProcess = Array.from(this.instancesQueue.keys()).splice(0, this.queueThreshold);
+    const toProcess = Array.from(this.instancesQueue).splice(0, this.queueThreshold);
     toProcess.forEach(identifier => {
       if(this.instances.has(identifier)) {
         const instance = this.instances.get(identifier);
@@ -350,7 +533,7 @@ class InstanceStore {
       }
     });
     try{
-      let response = await API.axios.post(API.endpoints.instancesList(this.stage), toProcess);
+      const response = await API.axios.post(API.endpoints.instancesList(this.stage), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
@@ -396,8 +579,71 @@ class InstanceStore {
   }
 
   @action
+  async fetchLabelsQueue(){
+    if(this.isFetchingLabelsQueue){
+      return;
+    }
+    this.isFetchingLabelsQueue = true;
+    const toProcess = Array.from(this.instanceLabelsQueue).splice(0, this.queueThreshold);
+    toProcess.forEach(identifier => {
+      if(this.instances.has(identifier)) {
+        const instance = this.instances.get(identifier);
+        instance.isLabelFetching = true;
+        instance.isLabelFetched = false;
+        instance.labelFetchError = null;
+        instance.hasLabelFetchError = false;
+        instance.saveError = null;
+      }
+    });
+    try{
+      let response = await API.axios.post(API.endpoints.instancesLabel(this.stage), toProcess);
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          if(this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            const data = response && response.data && response.data.data && response.data.data[identifier];
+            if(data){
+              instance.initializeLabelData(data);
+            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
+              const error = response.data.error[identifier];
+              const message = JSON.stringify(error); // TODO: check and handle properly error object
+              instance.errorLabelInstance(message);
+              instance.isLabelFetching = false;
+              instance.isLabelFetched = false;
+            } else {
+              const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+              instance.errorLabelInstance(message);
+              instance.isLabelFetching = false;
+              instance.isLabelFetched = false;
+            }
+            this.instanceLabelsQueue.delete(identifier);
+          }
+        });
+        this.isFetchingLabelsQueue = false;
+        this.processLabelsQueue();
+      });
+    } catch(e){
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          if(this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            instance.errorLabelInstance(e);
+            instance.isLabelFetching = false;
+            instance.isLabelFetched = false;
+            this.instanceLabelsQueue.delete(identifier);
+          }
+        });
+        this.isFetchingQueue = false;
+        this.processQueue();
+      });
+      appStore.captureSentryException(e);
+    }
+  }
+
+  @action
   flush(){
     this.instances.clear();
+    this.resetInstanceIdAvailability();
   }
 
   @action
@@ -405,21 +651,21 @@ class InstanceStore {
     if (!this.instances.has(instanceId)) {
       const instance = new Instance(instanceId, this);
       this.instances.set(instanceId, instance);
-      return instance;
     }
     return this.instances.get(instanceId);
   }
 
   @action
-  createNewInstance(workspace, type, id, name=""){
+  createNewInstance(type, id, name=""){
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
     const data = {
-      workspace: workspace,
       id: id,
+      _name: name,
       types: [instanceType],
-      fields: toJS(fields),
       primaryType: instanceType,
+      workspace: appStore.currentWorkspace.id,
+      fields: toJS(fields),
       labelField: type.labelField,
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
@@ -433,43 +679,11 @@ class InstanceStore {
     instance.initializeData(data, false, true);
     instance.hasChanged = true;
     this.instances.set(id, instance);
-    return instance.id;
-  }
-
-  @action
-  createNewInstanceAsOption(workspace, type, field, name){
-    const uuid = _.uuid();
-    try{
-      const newInstanceId =  this.createNewInstance(workspace, type, uuid, name);
-      field.options.push({
-        [field.mappingValue]: newInstanceId,
-        [field.mappingLabel]: name
-      });
-      field.addValue(field.options[field.options.length-1]);
-      return newInstanceId;
-    } catch(e){
-      appStore.captureSentryException(e);
-      return false;
-    }
   }
 
   @action
   removeInstances(instanceIds) {
     instanceIds.forEach(id => this.instances.delete(id));
-  }
-
-  @action
-  setInstanceHighlight(instanceId, provenence) {
-    if (this.instances.has(instanceId)) {
-      this.instances.get(instanceId).highlight = provenence;
-    }
-  }
-
-  getGeneratedKey(from, namespace){
-    if(!this.generatedKeys.has(from)){
-      this.generatedKeys.set(from, uniqueId(namespace));
-    }
-    return this.generatedKeys.get(from);
   }
 
   @action

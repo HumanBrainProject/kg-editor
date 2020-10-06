@@ -84,31 +84,34 @@ const styles = {
 
 @injectStyles(styles)
 class FooterPanel extends React.Component {
-  handleOpenInstance(mode, instanceId, event){
+
+  handleOpenInstance = event => {
+    const { instance } = this.props;
     event.stopPropagation();
     if(event.metaKey || event.ctrlKey){
-      appStore.openInstance(instanceId, mode);
+      appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
-      routerStore.history.push(`/instance/${mode}/${instanceId}`);
+      routerStore.history.push(`/instance/view/${instance.id}`);
     }
   }
 
-  render(){
-    const { classes, className, id, workspace, showOpenActions } = this.props;
+  render() {
+    const { classes, className, instance, showOpenActions } = this.props;
 
     return(
       <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
         <Row>
           <Col xs={10}>
-            <div className={classes.info}>ID: {id}</div>
-            <div className={classes.info}>Workspace: {workspace}</div>
+            <div className={classes.info}>ID: {instance.id?instance.id:"<New>"}</div>
+            <div className={classes.info}>Workspace: {instance.workspace}</div>
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              {appStore.currentWorkspace.id === workspace ?
-                <div className={classes.action} onClick={this.handleOpenInstance.bind(this, "view", id)}>
+              {appStore.currentWorkspace.id === instance.workspace && (
+                <div className={classes.action} onClick={this.handleOpenInstance}>
                   <FontAwesomeIcon icon="folder-open"/>
-                </div>:null}
+                </div>
+              )}
             </div>
           </Col>
         </Row>

@@ -134,12 +134,7 @@ class SavePanel extends React.Component{
   }
 
   handleSaveAll = () => {
-    Array.from(instanceStore.instances.entries())
-      .filter(([, instance]) => instance.hasChanged && !instance.isSaving)
-      .forEach(([id, ]) => {
-        const instance = instanceStore.instances.get(id);
-        instance && appStore.saveInstance(instance);
-      });
+    instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
   }
 
   handleSave(instanceId){
@@ -175,7 +170,7 @@ class SavePanel extends React.Component{
 
   render(){
     const { classes } = this.props;
-    const changedInstances = Array.from(instanceStore.instances.entries()).filter(([, instance]) => instance.hasChanged).reverse();
+    const changedInstances = instanceStore.getUnsavedInstances;
 
     const comparedInstance = appStore.comparedInstanceId?instanceStore.instances.get(appStore.comparedInstanceId):null;
     const comparedInstanceLabelField = comparedInstance && comparedInstance.labelField;
@@ -207,9 +202,9 @@ class SavePanel extends React.Component{
                 <div className={classes.allGreenText}>You have no unsaved modifications !</div>
               </div>
             }
-            {changedInstances.map(([id, instance]) => {
-              return(
-                <div className={classes.instance} key={instanceStore.getGeneratedKey(instance, "savePanel")}>
+            {changedInstances.map(instance => {
+              return (
+                <div key={instance.id} className={classes.instance}>
                   <div className={classes.type}>
                     {instance.primaryType.label}
                   </div>
@@ -218,9 +213,9 @@ class SavePanel extends React.Component{
                       <FontAwesomeIcon className={classes.saveIcon} icon="dot-circle"/>
                       :
                       <ButtonGroup vertical>
-                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, id)} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
-                        <Button bsSize="small" onClick={this.handleReset.bind(this, id)} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
-                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, id)} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
+                        <Button bsStyle="primary" bsSize="small" onClick={this.handleSave.bind(this, instance.id)} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
+                        <Button bsSize="small" onClick={this.handleReset.bind(this, instance.id)} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
+                        <Button bsSize="small" onClick={this.handleShowCompare.bind(this, instance.id)} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
                       </ButtonGroup>
                     }
                   </div>
@@ -228,11 +223,11 @@ class SavePanel extends React.Component{
                     {instance.name}
                   </div>
                   <div className={classes.id}>
-                    {id}
+                    {instance.id}
                   </div>
                   {instance.hasSaveError &&
                     <div className={classes.errors}>
-                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, id)}><FontAwesomeIcon icon="check"/></Button>
+                      {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={this.handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
                     </div>
                   }
                 </div>

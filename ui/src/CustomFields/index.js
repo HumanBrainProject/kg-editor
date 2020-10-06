@@ -26,13 +26,11 @@ import TextArea from "./TextArea/TextArea";
 import TextAreaStore from "./TextArea/TextAreaStore";
 
 import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
-import DynamicDropdownStore from "./DynamicDropdown/DynamicDropdownStore";
-
 import DynamicTable from "./DynamicTable/DynamicTable";
-import DynamicTableStore from "./DynamicTable/DynamicTableStore";
+import LinksStore from "./LinksStore";
 
 FormStore.registerCustomField("KgInputText", InputText, InputTextStore);
 FormStore.registerCustomField("KgAnnotatedInputText",  AnnotatedInputText, AnnotatedInputTextStore);
 FormStore.registerCustomField("KgTextArea", TextArea, TextAreaStore);
-FormStore.registerCustomField("KgDynamicDropdown", DynamicDropdown, DynamicDropdownStore);
-FormStore.registerCustomField("KgDynamicTable", DynamicTable, DynamicTableStore);
+FormStore.registerCustomField("KgDynamicDropdown", DynamicDropdown, LinksStore);
+FormStore.registerCustomField("KgDynamicTable", DynamicTable, LinksStore);

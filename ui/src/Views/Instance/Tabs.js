@@ -18,7 +18,6 @@ import React from "react";
 import {observer} from "mobx-react";
 import injectStyles from "react-jss";
 
-import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -95,7 +94,6 @@ class Tabs extends React.Component {
 
   handleClick = mode => {
     const { instance } = this.props;
-    appStore.togglePreviewInstance();
     routerStore.history.push(`/instance/${mode}/${instance.id}`);
   }
 

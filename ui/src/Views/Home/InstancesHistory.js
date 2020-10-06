@@ -15,15 +15,18 @@
 */
 
 import React from "react";
+import { toJS } from "mobx";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import InstanceRow from "../Instance/InstanceRow";
+import PopOverButton from "../../Components/PopOverButton";
+
 import historyStore from "../../Stores/HistoryStore";
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
-import InstanceRow from "../Instance/InstanceRow";
-import PopOverButton from "../../Components/PopOverButton";
+import instanceStore from "../../Stores/InstanceStore";
 
 const styles = {
   container: {
@@ -160,7 +163,7 @@ class InstancesHistory extends React.Component{
     this.fetchInstances();
   }
 
-  handleInstanceClick(instance){
+  handleInstanceClick = instance => {
     let id = instance && instance.id;
     if (id) {
       id = id.split("/").slice(-1); //todo retrieve id from url
@@ -168,16 +171,20 @@ class InstancesHistory extends React.Component{
     }
   }
 
-  handleInstanceCtrlClick(instance){
+  handleInstanceCtrlClick = instance => {
     const id = instance && instance.id;
     if (id) {
-      appStore.openInstance(id);
+      appStore.openInstance(id, instance.name, instance.primaryType);
     }
   }
 
-  handleInstanceActionClick(instance, mode){
-    const id = instance && instance.id;
+  handleInstanceActionClick = (historyInstance, mode) => {
+    const id = historyInstance && historyInstance.id;
     if (id) {
+      if (!instanceStore.instances.has(id)) {
+        const instance = instanceStore.createInstanceOrGet(id);
+        instance.initializeLabelData(toJS(historyInstance));
+      }
       routerStore.history.push(`/instance/${mode}/${id}`);
     }
   }

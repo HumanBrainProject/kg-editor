@@ -301,7 +301,7 @@ class ReleaseStore{
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} released successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node.id, node.types, "released", false);
+        historyStore.updateInstanceHistory(node.id, "released", false);
       });
     } catch(e){
       runInAction(()=>{
@@ -324,7 +324,7 @@ class ReleaseStore{
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} unreleased successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node.id, node.types, "released", true);
+        historyStore.updateInstanceHistory(node.id, "released", true);
       });
     } catch(e){
       runInAction(()=>{

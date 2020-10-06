@@ -19,16 +19,9 @@ import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
-import { normalizeInstanceData } from "../Helpers/InstanceHelper";
+import { normalizeInstanceData, transformSummaryField } from "../Helpers/InstanceHelper";
 
 const maxItems = 100;
-
-const transformField = field  =>  {
-  if(field.type === "TextArea") {
-    field.value = field.value.substr(0, 197) + "...";
-    delete field.label;
-  }
-};
 
 class HistoryStore {
   @observable instancesHistory = [];
@@ -50,7 +43,7 @@ class HistoryStore {
   }
 
   @action
-  updateInstanceHistory(id, type, mode, remove) {
+  updateInstanceHistory(id, mode, remove) {
     if (!appStore.currentWorkspace) {
       return;
     }
@@ -68,7 +61,7 @@ class HistoryStore {
       this.instancesHistory.pop();
     }
     if (!remove && appStore.currentWorkspace) {
-      this.instancesHistory.unshift({id: id, type: type, workspace: appStore.currentWorkspace.id, mode: mode});
+      this.instancesHistory.unshift({id: id, workspace: appStore.currentWorkspace.id, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
@@ -126,7 +119,7 @@ class HistoryStore {
               } else if (data.error) {
                 // TODO: check if we need to handle error
               } else {
-                const instance = normalizeInstanceData(data, transformField);
+                const instance = normalizeInstanceData(data, transformSummaryField);
                 instance.formStore = new FormStore(instance);
                 instance.formStore.toggleReadMode(true);
                 this.instances.push(instance);

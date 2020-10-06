@@ -17,6 +17,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 
+import { toJS } from "mobx";
 import { observer } from "mobx-react";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,6 +31,7 @@ import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
 import InstanceRow from "../Instance/InstanceRow";
 import appStore from "../../Stores/AppStore";
+import instanceStore from "../../Stores/InstanceStore";
 
 const styles = {
   container:{
@@ -109,13 +111,18 @@ class Instances extends React.Component{
 
   handleInstanceCtrlClick(instance){
     if (instance && instance.id) {
-      appStore.openInstance(instance.id);
+      appStore.openInstance(instance.id, instance.name, instance.primaryType);
     }
   }
 
-  handleInstanceActionClick(instance, mode){
-    if (instance && instance.id) {
-      routerStore.history.push(`/instance/${mode}/${instance.id}`);
+  handleInstanceActionClick(summaryInstance, mode){
+    const id = summaryInstance && summaryInstance.id;
+    if (id) {
+      if (!instanceStore.instances.has(id)) {
+        const instance = instanceStore.createInstanceOrGet(id);
+        instance.initializeLabelData(toJS(summaryInstance));
+      }
+      routerStore.history.push(`/instance/${mode}/${id}`);
     }
   }
 

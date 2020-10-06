@@ -68,7 +68,7 @@ const styles = {
     marginBottom:"10px",
     wordBreak:"break-word"
   },
-  id:{
+  info:{
     color:"grey",
     fontWeight:"300",
     fontSize:"0.7em",
@@ -124,7 +124,10 @@ class InstanceInvite extends React.Component{
               <div>
                 <Row>
                   <Col xs={12}>
-                    <div className={classes.id}>ID: {instance.id}</div>
+                    <div className={classes.info}>
+                      <div>ID: {instance.id}</div>
+                      <div>Workspace: {instance.workspace}</div>
+                    </div>
                   </Col>
                 </Row>
               </div>

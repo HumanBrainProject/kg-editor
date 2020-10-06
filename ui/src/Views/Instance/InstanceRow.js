@@ -176,6 +176,10 @@ class Action extends React.PureComponent {
 @injectStyles(styles)
 @observer
 class InstanceRow extends React.Component {
+  constructor(props) {
+    super(props);
+    this.timeout = null;
+  }
 
   handleClick = event => {
     const { instance, onClick, onCtrlClick } = this.props;
@@ -183,21 +187,26 @@ class InstanceRow extends React.Component {
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
-    if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === "function" && onCtrlClick(instance);
-    } else {
-      typeof onClick === "function" && onClick(instance);
+    if(this.timeout === null) {
+      let action = typeof onClick === "function"?onClick:null;
+      if (event.metaKey || event.ctrlKey) {
+        action = typeof onCtrlClick === "function"?onCtrlClick:null;
+      }
+      if (action) {
+        this.timeout = setTimeout((i, action) => action(i), 300, instance, action);
+      }
     }
   }
 
   handleDoubleClick = event => {
     const { instance, onCtrlClick, onActionClick } = this.props;
     event.stopPropagation();
+    clearTimeout(this.timeout);
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
-    if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === "function" && onCtrlClick(instance);
+    if ((event.metaKey || event.ctrlKey) && typeof onCtrlClick === "function") {
+      onCtrlClick(instance);
     } else {
       typeof onActionClick === "function" && onActionClick(instance, "view");
     }

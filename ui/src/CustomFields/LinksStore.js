@@ -64,13 +64,18 @@ class LinksStore extends FormStore.typesMapping.Default{
       this.registerProvidedValue(value, true);
     }
     this.value = this.__emptyValue();
-
+    if (this.lazyShowLinks) {
+      this.visibleLinks.clear();
+    }
     let providedValue = this.getProvidedValue();
-    providedValue.forEach(value => {
+    providedValue.forEach((value, index) => {
       if(!value || this.value.length >= this.max){
         return;
       }
-      this.addValue(value);
+      super.addValue(value);
+      if (this.lazyShowLinks && index < defaultNumberOfVisibleLinks) {
+        this.visibleLinks.add(value[this.mappingValue]);
+      }
     });
   }
 
@@ -86,13 +91,11 @@ class LinksStore extends FormStore.typesMapping.Default{
 
   @action
   addValue(value) {
-    if(!this.disabled && !this.readOnly) {;
+    if(!this.disabled && !this.readOnly && this.value.length < this.max) {
       super.addValue(value);
       if (this.lazyShowLinks) {
         const values = (typeof value === "object")?[value]:value;
-        for (let i=0; i<defaultNumberOfVisibleLinks && i<values.length; i++) {
-          this.visibleLinks.add(values[i][this.mappingValue]);
-        }
+        values.forEach(v => this.visibleLinks.add(v[this.mappingValue]));
       }
       this.resetOptionsSearch();
     }

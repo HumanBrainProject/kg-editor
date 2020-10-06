@@ -40,7 +40,7 @@ class InstanceTab extends React.Component {
   }
 
   componentDidUpdate(previousProps) {
-    if (previousProps.instanceId !== this.props.instanceId) {
+    if (previousProps.view !== this.props.view) {
       this.syncInstanceLabel();
     }
   }
@@ -48,7 +48,7 @@ class InstanceTab extends React.Component {
   syncInstanceLabel = () => {
     const { view } = this.props;
     const instance = instanceStore.instances.get(view.instanceId);
-    if (instance && instance.name !== view.instanceId && instance.primaryType.color !== view.color) {
+    if (instance && instance.name !== view.name && instance.primaryType.color !== view.color) {
       view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
     }

@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import {observable, action, runInAction, computed, toJS} from "mobx";
+import {observable, action, runInAction, computed, toJS, values, entries} from "mobx";
 import { debounce, isEqual } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
@@ -145,7 +145,7 @@ class Instance {
   @computed
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError && this.form && this.form.structure.fields) {
-      return Object.entries(this.form.structure.fields)
+      return entries(this.form.structure.fields)
         .filter(([key]) => !this.promotedFields.includes(key))
         .sort(([, a], [, b]) => a.label.localeCompare(b.label))
         .map(([key]) => key);
@@ -185,9 +185,7 @@ class Instance {
   @computed
   get childrenIdsGroupedByField() {
     if (this.isFetched && !this.fetchError) {
-      const keys = Object.keys(toJS(this.form.structure.fields));
-      const fields = keys.map(key => this.form.getField(key));
-      return getChildrenIdsGroupedByField(fields);
+      return getChildrenIdsGroupedByField(values(this.form.structure.fields));
     }
     return [];
   }

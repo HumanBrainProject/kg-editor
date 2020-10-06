@@ -51,9 +51,28 @@ const styles = {
 
 @observer
 class LabelCellRenderer extends React.Component {
+
+  componentDidMount() {
+    this.fetchInstance();
+  }
+
+  componentDidUpdate(previousProps) {
+    if (previousProps.instanceId !== this.props.instanceId) {
+      this.fetchInstance();
+    }
+  }
+
+  fetchInstance = () => {
+    const { instanceId } = this.props;
+    instanceId && instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+  };
+
   render() {
-    const {instance} = this.props;
-    if (!instance.id) {
+    const {instanceId} = this.props;
+
+    const instance = instanceId && instanceStore.instances.get(instanceId);
+
+    if (!instance) {
       return "Unknown instance";
     }
     if (instance.fetchError || instance.labelFetchError) {
@@ -93,26 +112,17 @@ class Table extends React.Component {
   componentDidMount() {
     this.setContainerWidth();
     window.addEventListener("resize", this.setContainerWidth);
-    this.fetchInstances();
   }
 
   componentDidUpdate(previousProps, previousState) {
     if(this.wrapperRef && (previousState.containerWidth !== this.wrapperRef.offsetWidth)) {
       this.setContainerWidth();
     }
-    if (previousProps.list !== this.props.list) {
-      this.fetchInstances();
-    }
   }
 
   componentWillUnmount(){
     window.removeEventListener("resize", this.setContainerWidth);
   }
-
-  fetchInstances = () => {
-    const { list } = this.props;
-    list.forEach(id => id && instanceStore.createInstanceOrGet(id).fetchLabel());
-  };
 
   handleDeleteRow = index => e => {
     e.stopPropagation();
@@ -153,24 +163,25 @@ class Table extends React.Component {
 
   rowGetter = ({index}) => {
     const { list } = this.props;
-    const id = list[index];
-    const instance = id?instanceStore.instances.get(id):{id: null};
-    return instance;
+    return list[index];
   }
 
-  actionsCellRenderer = ({rowData: instance, index}) => {
+  actionsCellRenderer = ({rowData: instanceId, index}) => {
     const { readOnly } = this.props;
     if (readOnly) {
       return null;
     }
-    if (instance.id && instance.fetchError) {
+
+    const instance = instanceId && instanceStore.instances.get(instanceId);
+
+    if (instance && instance.fetchError) {
       return (
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(instance.id)} >
+        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry(instanceId)} >
           <FontAwesomeIcon icon="redo-alt"/>
         </Button>
       );
     }
-    if (!instance.id || instance.isFetched) {
+    if (!instance || instance.isFetched) {
       return (
         <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteRow(index)} >
           <FontAwesomeIcon icon="times"/>
@@ -180,7 +191,7 @@ class Table extends React.Component {
     return null;
   }
 
-  labelCellRenderer = ({rowData: instance}) => <LabelCellRenderer instance={instance} />;
+  labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} />;
 
   render() {
     const { classes, list, enablePointerEvents } = this.props;

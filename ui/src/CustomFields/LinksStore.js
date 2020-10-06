@@ -59,7 +59,7 @@ class LinksStore extends FormStore.typesMapping.Default{
   }
 
   @action
-  injectValue(value){
+  injectValue(value){ // call in constructor
     if(value !== undefined){
       this.registerProvidedValue(value, true);
     }
@@ -67,7 +67,7 @@ class LinksStore extends FormStore.typesMapping.Default{
     if (this.lazyShowLinks) {
       this.visibleLinks.clear();
     }
-    let providedValue = this.getProvidedValue();
+    const providedValue = this.getProvidedValue();
     providedValue.forEach((value, index) => {
       if(!value || this.value.length >= this.max){
         return;
@@ -90,7 +90,7 @@ class LinksStore extends FormStore.typesMapping.Default{
   }
 
   @action
-  addValue(value) {
+  addValue(value) { // only called when adding new value
     if(!this.disabled && !this.readOnly && this.value.length < this.max) {
       super.addValue(value);
       if (this.lazyShowLinks) {

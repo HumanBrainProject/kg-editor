@@ -162,7 +162,7 @@ class Preview extends React.Component {
       <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
         {(!instance.isFetched || instance.isFetching)? (
           <FetchingLoader>
-            <span>Fetching instance information...</span>
+            <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
           </FetchingLoader>
         ) : !instance.hasFetchError ? (
           <div className={classes.content}>
@@ -231,7 +231,7 @@ class Preview extends React.Component {
           </div>
         ) : (
           <BGMessage icon={"ban"}>
-              There was a network problem fetching the instance.
+              There was a network problem fetching the instance &quot;<i>{instanceId}&quot;</i>.
             <br />
               If the problem persists, please contact the support.
             <br />

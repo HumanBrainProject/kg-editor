@@ -115,7 +115,7 @@ class Instance extends React.Component {
       return (
         <div className={classes.error}>
           <FetchingLoader>
-            <span>{`Fetching instance "${id}" information...`}</span>
+            <span>Fetching instance &quot;<i>{id}&quot;</i> information...</span>
           </FetchingLoader>
         </div>
       );

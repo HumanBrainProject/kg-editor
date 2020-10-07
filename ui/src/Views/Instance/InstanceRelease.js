@@ -135,8 +135,8 @@ class InstanceRelease extends React.Component {
           </BGMessage>
         ) : releaseStore.fetchError ? (
           <BGMessage icon="ban">
-            There has been an error while fetching the release data for this
-            instance.
+            There has been an error while fetching the release data for the
+            instance &quot;<i>{this.props.instance.id}&quot;</i>.
             <br />
             Please try again or contact our support if the problem persists.
             <br />
@@ -151,7 +151,7 @@ class InstanceRelease extends React.Component {
         ) : (
           releaseStore.isFetching ? (
             <FetchingLoader>
-              <span>Fetching release data...</span>
+              <span>Fetching release data of instance &quot;<i>{this.props.instance.id}&quot;</i>...</span>
             </FetchingLoader>
           ) : (
             <div className={classes.panel}>

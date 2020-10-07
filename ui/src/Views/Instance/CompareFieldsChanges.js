@@ -120,7 +120,7 @@ class CompareFieldsChanges extends React.Component{
     if (leftStatus.isFetching || rightStatus.isFetching) {
       return (
         <div className={classes.container}>
-          <FetchingLoader>Fetching instance {instanceId} data...</FetchingLoader>
+          <FetchingLoader>Fetching instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
         </div>
       );
     }
@@ -129,7 +129,7 @@ class CompareFieldsChanges extends React.Component{
       return (
         <div className={classes.container}>
           <BGMessage icon={"ban"}>
-            There was a network problem fetching the links of instance {instanceId}.<br/>
+            There was a network problem fetching the links of instance &quot;<i>{instanceId}</i>&quot;.<br/>
             If the problem persists, please contact the support.<br/><br/>
             <div>
               <Button onClick={onClose}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>

@@ -94,7 +94,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
     if ((releasedInstance && releasedInstance.isFetching) || instance.isFetching) {
       return(
         <div className={classes.container}>
-          <FetchingLoader>Fetching instance {instanceId} data...</FetchingLoader>
+          <FetchingLoader>Fetching instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
         </div>
       );
     }
@@ -103,7 +103,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
       return(
         <div className={classes.container}>
           <BGMessage icon={"ban"}>
-            There was a network problem fetching the released instance {instanceId}.<br/>
+            There was a network problem fetching the released instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
             <small>{releasedInstance.fetchError}</small><br/><br/>
             <div>

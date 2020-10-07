@@ -18,6 +18,7 @@ import React from "react";
 import {observer} from "mobx-react";
 import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 import instanceStore from "../../Stores/InstanceStore";
 
@@ -29,6 +30,7 @@ import InstanceRelease from "./InstanceRelease";
 import InstanceManage from "./InstanceManage";
 import SaveBar from "./SaveBar";
 import Tabs from "./Tabs";
+import BGMessage from "../../Components/BGMessage";
 
 const styles = {
   container: {
@@ -102,6 +104,9 @@ const styles = {
     padding: "5px",
     textAlign: "center",
     cursor: "pointer"
+  },
+  errorMessage: {
+    color: "var(--ft-color-loud)"
   }
 };
 
@@ -111,33 +116,74 @@ class Instance extends React.Component {
 
   handleHidePreview = () => instanceStore.togglePreviewInstance();
 
+  renderNoPermissionForView = (instance, mode) => {
+    return (
+      <div className={this.props.classes.errorMessage} >
+        <BGMessage icon={"ban"}>
+          You do not have permission to {mode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
+          {instance.permissions.canRead?
+            <Link className="btn btn-primary" to={`/instance/view/${instance.id}`}>Go to view</Link>:
+            <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}
+        </BGMessage>
+      </div>
+    );
+  }
+
   renderView = (instance, mode) => {
     switch (mode) {
     case "create":
+      if(instance.permissions.canCreate) {
+        return (
+          <InstanceView instance={instance} />
+        );
+      }
+      break;
     case "edit":
+      if(instance.permissions.canWrite) {
+        return (
+          <InstanceView instance={instance} />
+        );
+      }
+      break;
     case "view":
-      return (
-        <InstanceView instance={instance} />
-      );
+      if(instance.permissions.canRead) {
+        return (
+          <InstanceView instance={instance} />
+        );
+      }
+      break;
     case "invite":
-      return (
-        <InstanceInvite instance={instance} />
-      );
+      if(instance.permissions.canInvite) {
+        return (
+          <InstanceInvite instance={instance} />
+        );
+      }
+      break;
     case "graph":
-      return (
-        <InstanceGraph instance={instance} />
-      );
+      if(instance.permissions.canCreate) {
+        return (
+          <InstanceGraph instance={instance} />
+        );
+      }
+      break;
     case "release":
-      return (
-        <InstanceRelease instance={instance} />
-      );
+      if(instance.permissions.canRelease) {
+        return (
+          <InstanceRelease instance={instance} />
+        );
+      }
+      break;
     case "manage":
-      return (
-        <InstanceManage instance={instance} />
-      );
+      if(instance.permissions.canRead) {
+        return (
+          <InstanceManage instance={instance} />
+        );
+      }
+      break;
     default:
-      return null;
+      break;
     }
+    return this.renderNoPermissionForView(instance, mode);
   }
 
   render() {

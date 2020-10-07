@@ -124,7 +124,7 @@ class Reviewers extends React.Component{
             </div>
             :
             <BGMessage icon={"ban"} className={classes.error}>
-              There was a network problem fetching the reviewers for instance {this.props.id}.<br/>
+              There was a network problem fetching the reviewers for instance &quot;<i>{this.props.id}&quot;</i>.<br/>
               If the problem persists, please contact the support.<br/>
               <small>{instanceReviews.fetchError}</small><br/><br/>
               <Button bsStyle="primary" onClick={this.fetchInstanceReviews.bind(this)}>

@@ -24,7 +24,6 @@ import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
 import Features from "./Home/Features";
-// import DatasetsStatistics from "./Home/DatasetsStatistics";
 import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
 
@@ -249,7 +248,6 @@ class Home extends React.Component{
               <Hub/>
             </div>
             <div className={classes.main}>
-              {/* <DatasetsStatistics /> */}
               <InstancesHistory workspace={appStore.currentWorkspace && appStore.currentWorkspace.id}/>
             </div>
             <div className={classes.features}>

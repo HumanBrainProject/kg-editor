@@ -66,6 +66,9 @@ const getValue = (instanceStore, instance, name) => {
     if (typeof value === "object") {
       return "Unknown value";
     }
+    if (typeof value === "boolean") {
+      return value.toString();
+    }
     return value;
   }
   const vals = Array.isArray(value)?value:[value];

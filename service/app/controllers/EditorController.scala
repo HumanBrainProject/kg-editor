@@ -20,6 +20,7 @@ import helpers.InstanceHelper
 import javax.inject.{Inject, Singleton}
 import models._
 import models.instance._
+import models.permissions.Permissions
 import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.{JsObject, _}
@@ -122,6 +123,7 @@ class EditorController @Inject()(
     }
 
     val status = (statuses \ (data \ "id").as[String] \ "data").as[JsString]
+    val permissions = Permissions((data \ "permissions").asOpt[List[String]])
 
     val children = (data \ "children").asOpt[List[JsObject]] match {
       case Some(children) => children.foldLeft(List[JsValue]()) {
@@ -133,7 +135,9 @@ class EditorController @Inject()(
     val result = Json.obj("id" -> (data \ "id").as[JsString],
       "status" -> status,
       "label" -> (data \ "label").asOpt[JsString],
-      "types" -> Json.toJson(types))
+      "types" -> Json.toJson(types),
+      "permissions" -> Json.toJson(permissions)
+    )
 
     if (children.nonEmpty) {
       result ++ Json.obj("children" -> Json.toJson(children))

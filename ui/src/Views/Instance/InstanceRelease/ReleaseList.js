@@ -62,13 +62,10 @@ class ReleaseList extends React.Component {
     }
   }
 
-  rowRenderer = ({key, index,style }) => {
+  rowRenderer = ({ key, index, style }) => {
     const rowData =  releaseStore.instanceList[index];
     return (
-      <div
-        key={key}
-        style={style}
-      >
+      <div key={key} style={style}>
         <ReleaseNode node={rowData.node} level={rowData.level} />
       </div>
     );

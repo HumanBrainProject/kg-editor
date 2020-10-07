@@ -20,6 +20,7 @@ import { observer } from "mobx-react";
 import MultiToggle from "../../../Components/MultiToggle";
 import releaseStore from "../../../Stores/ReleaseStore";
 import instanceStore from "../../../Stores/InstanceStore";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const styles = {
   container: {
@@ -55,17 +56,17 @@ class ReleaseNodeToggle extends React.Component {
       return null;
     }
 
-    return (
-      <div
-        className={`${classes.container} ${
-          node.status === "RELEASED" ? "no-release" : ""
-        } ${node.status === "UNRELEASED" ? "no-unrelease" : ""}`}
-        onClick={this.handleStopClick}
-      >
-        <MultiToggle
-          selectedValue={node.pending_status}
-          onChange={this.handleChange}
-        >
+    if(!node.permissions.canRelease) {
+      return (
+        <div className={classes.container} title="You do not have permission to release the instance.">
+          <FontAwesomeIcon icon="ban" />
+        </div>
+      );
+    }
+
+    return(
+      <div className={`${classes.container} ${node.status === "RELEASED" ? "no-release" : ""} ${node.status === "UNRELEASED" ? "no-unrelease" : ""}`} onClick={this.handleStopClick}>
+        <MultiToggle selectedValue={node.pending_status} onChange={this.handleChange}>
           {node.status !== "RELEASED" && (
             <MultiToggle.Toggle
               color={"#3498db"}

@@ -136,7 +136,7 @@ class ReleaseNode extends React.Component {
     instanceStore.togglePreviewInstance(instanceId, instanceName, options );
   }
 
-  handleShowCompare(node, e) {
+  handleShowCompare = node => e => {
     e && e.stopPropagation();
     appStore.setComparedWithReleasedVersionInstance(node);
   }
@@ -152,12 +152,8 @@ class ReleaseNode extends React.Component {
       return null;
     }
 
-    const statusClass =
-      node["pending_" + "status"] === "UNRELEASED"
-        ? "not-released"
-        : node["pending_" + "status"] === "HAS_CHANGED"
-          ? "has-changed"
-          : "released";
+    const statusClass = node["pending_" + "status"] === "UNRELEASED" ? "not-released" :
+      node["pending_" + "status"] === "HAS_CHANGED" ? "has-changed": "released";
     return (
       <div className={`${classes.container} ${statusClass}`} style={{marginLeft: 32*level}}>
         <div
@@ -171,17 +167,13 @@ class ReleaseNode extends React.Component {
           </div>
           <span className={"node-type"}>({node.typesName})</span>
           <span className={classes.label}>{node.label}</span>
-          <ReleaseNodeToggle
-            key={`${node.pending_status}-${node.pending_childrenStatus}-${
-              node.pending_globalStatus
-            }`}
+          <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`}
             node={node}
             classes={classes}
           />
         </div>
         <div className="node-actions">
-          <div
-            className={`node-action ${node.isAssociation ? "disabled" : ""}`}
+          <div className={`node-action ${node.isAssociation ? "disabled" : ""}`}
             onClick={
               node.isAssociation
                 ? null
@@ -190,12 +182,11 @@ class ReleaseNode extends React.Component {
           >
             <FontAwesomeIcon icon="eye" />
           </div>
-          <div
-            className={`node-action ${node.isAssociation ? "disabled" : ""}`}
+          <div className={`node-action ${node.isAssociation ? "disabled" : ""}`}
             onClick={
               node.isAssociation
                 ? null
-                : this.handleShowCompare.bind(this, node)
+                : this.handleShowCompare(node)
             }
             title={
               node.isAssociation

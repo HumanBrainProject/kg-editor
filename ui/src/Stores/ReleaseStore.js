@@ -33,24 +33,26 @@ const setNodeTypes = node => {
 };
 
 const populateStatuses = (node, prefix = "") => {
-  node[prefix+"childrenStatus"] = null;
-  if(node.children && node.children.length > 0){
-    let childrenStatuses = node.children.map(child => populateStatuses(child, prefix));
-    if(childrenStatuses.some(status => status === "NOT_RELEASED")){
-      node[prefix+"childrenStatus"] = "NOT_RELEASED";
-      node[prefix+"globalStatus"] = "NOT_RELEASED";
-    } else if(childrenStatuses.some(status => status === "HAS_CHANGED")){
-      node[prefix+"childrenStatus"] = "HAS_CHANGED";
-      node[prefix+"globalStatus"] = node[prefix+"status"] === "NOT_RELEASED"? "NOT_RELEASED": "HAS_CHANGED";
+  if(node.permissions.canRelease) {
+    node[prefix+"childrenStatus"] = null;
+    if(node.children && node.children.length > 0){
+      let childrenStatuses = node.children.map(child => populateStatuses(child, prefix));
+      if(childrenStatuses.some(status => status === "NOT_RELEASED")){
+        node[prefix+"childrenStatus"] = "NOT_RELEASED";
+        node[prefix+"globalStatus"] = "NOT_RELEASED";
+      } else if(childrenStatuses.some(status => status === "HAS_CHANGED")){
+        node[prefix+"childrenStatus"] = "HAS_CHANGED";
+        node[prefix+"globalStatus"] = node[prefix+"status"] === "NOT_RELEASED"? "NOT_RELEASED": "HAS_CHANGED";
+      } else {
+        node[prefix+"childrenStatus"] = "RELEASED";
+        node[prefix+"globalStatus"] = node[prefix+"status"];
+      }
     } else {
-      node[prefix+"childrenStatus"] = "RELEASED";
+      node[prefix+"childrenStatus"] = null;
       node[prefix+"globalStatus"] = node[prefix+"status"];
     }
-  } else {
-    node[prefix+"childrenStatus"] = null;
-    node[prefix+"globalStatus"] = node[prefix+"status"];
+    return node[prefix+"globalStatus"];
   }
-  return node[prefix+"globalStatus"];
 };
 
 
@@ -382,10 +384,12 @@ class ReleaseStore{
 
   @action
   recursiveMarkNodeForChange(node, newStatus){
-    node.pending_status = newStatus? newStatus: node.status;
-    this.handleWarning(node, node.pending_status);
-    if(node.children && node.children.length > 0){
-      node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
+    if(node.permissions.canRelease) {
+      node.pending_status = newStatus? newStatus: node.status;
+      this.handleWarning(node, node.pending_status);
+      if(node.children && node.children.length > 0){
+        node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
+      }
     }
   }
 

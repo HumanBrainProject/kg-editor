@@ -111,7 +111,8 @@ trait InstanceAPIService {
       .url(s"$apiBaseEndpoint/$apiVersion/instances/$id/scope")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
-        "stage" -> "IN_PROGRESS"
+        "stage" -> "IN_PROGRESS",
+        "returnPermissions" -> "true"
       )
     val r = Task.deferFuture(q.get())
     r.map { res =>

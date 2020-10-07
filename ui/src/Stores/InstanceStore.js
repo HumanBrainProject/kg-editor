@@ -152,7 +152,8 @@ class Instance {
     return [];
   }
 
-  getLinkedIds(recursive=false) { // get all instanceIds linked to this instance if they are fetched
+  @computed
+  get childrenIds() {
     if(this.isFetched && !this.fetchError && this.form.structure.fields){
       const ids = values(this.form.structure.fields)
         .reduce((acc, field) => {
@@ -164,30 +165,28 @@ class Instance {
               const id = obj[field.mappingValue];
               if (!acc.has(id)) {
                 acc.add(id);
-                if (recursive) {
-                  const instance = this.instanceStore.instances.get(id);
-                  if(instance) {
-                    const linkedIds = instance.getLinkedIds(true);
-                    linkedIds.forEach(child => acc.add(child));
-                  }
-                }
               }
             });
           }
           return acc;
-        }, new Set().add(this.id));
+        }, new Set());
       return Array.from(ids);
     }
-    return [this.id];
-  }
-  @computed
-  get childrenIds() {
-    return this.getLinkedIds();
+    return [];
   }
 
   @computed
   get linkedIds() {
-    return this.getLinkedIds(true);
+    const ids = this.childrenIds.reduce((acc, id) => {
+      if (id !== this.id) {
+        const instance = this.instanceStore.instances.get(id);
+        if(instance) {
+          instance.linkedIds.forEach(child => acc.add(child));
+        }
+      }
+      return acc;
+    }, new Set().add(this.id));
+    return Array.from(ids);
   }
 
   @computed

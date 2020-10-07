@@ -35,10 +35,12 @@ import statusStore from "./StatusStore";
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
 const getLinkedInstanceIds = instanceIds => {
+  //window.console.log("list: ", instanceIds);
   const result = instanceIds.reduce((acc, id) => {
     const instance = instanceStore.instances.get(id);
     if (instance) {
       const linkedIds = instance.linkedIds;
+      //window.console.log(id, linkedIds);
       acc.push(...linkedIds);
     }
     return acc;

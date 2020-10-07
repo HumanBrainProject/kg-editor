@@ -43,11 +43,11 @@ const styles = {
 @injectStyles(styles)
 class BGMessage extends React.Component{
   render(){
-    const { classes } = this.props;
+    const { classes, icon, transform } = this.props;
     return(
       <div className={classes.container}>
         <div className={classes.icon}>
-          <FontAwesomeIcon icon={this.props.icon} transform={this.props.transform}/>
+          <FontAwesomeIcon icon={icon} transform={transform}/>
         </div>
         <div className={classes.text}>
           {this.props.children}

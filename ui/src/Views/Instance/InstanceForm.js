@@ -17,7 +17,6 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { observer } from "mobx-react";
-import { Form } from "hbp-quickfire";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -108,7 +107,7 @@ const styles = {
       color: "#333"
     },
     "&:not(.main) $panelBody": {
-      padding: "0 10px"
+      padding: "10px 10px 0 10px"
     },
     "&:not(.main) $panelFooter": {
       padding: "0 10px"
@@ -234,59 +233,63 @@ class InstanceForm extends React.Component {
 
     let className = `${classes.container} ${instance.isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
 
-    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
-
-    return (
-      <div className={className} data-id={id}>
-        {instance.hasFetchError?
+    if (instance.hasFetchError) {
+      return (
+        <div className={className} data-id={id}>
           <FetchErrorPanel id={id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
-          :
-          instance.isFetching?
-            <FetchingPanel id={id} show={instance.isFetching} inline={!isMainInstance} />
-            :
-            instance.isFetched?
-              <React.Fragment>
-                <div
-                  onFocus={this.handleFocus}
-                  onClick={this.handleFocus}
-                  onDoubleClick={instance.isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
-                  onChange={this.handleChange}
-                  onLoad={this.handleLoad}
-                >
-                  <Form store={instance.form}>
-                    <HeaderPanel
-                      className={classes.panelHeader}
-                      types={instance.types}
-                      hasChanged={instance.hasChanged}
-                      highlight={highlight} />
+        </div>
+      );
+    }
 
-                    {instance.hasFieldErrors?
-                      <GlobalFieldErrors instance={instance} />
-                      :
-                      <BodyPanel className={classes.panelBody} fields={fields} />
-                    }
-                    <FooterPanel
-                      className={classes.panelFooter}
-                      instance={instance}
-                      showOpenActions={isCurrentInstance && !isMainInstance} />
-                  </Form>
-                  <ConfirmCancelEditPanel
-                    show={instance.cancelChangesPending}
-                    text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
-                    onConfirm={this.handleConfirmCancelEdit}
-                    onCancel={this.handleContinueEditing}
-                    inline={!isMainInstance} />
-                  <SavingPanel id={id} show={instance.isSaving} inline={!isMainInstance} />
-                  <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
-                  <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
-                </div>
-                <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
-              </React.Fragment>
+    if (instance.isFetching) {
+      return (
+        <div className={className} data-id={id}>
+          <FetchingPanel id={id} show={instance.isFetching} inline={!isMainInstance} />
+        </div>
+      );
+    }
+
+    if (instance.isFetched) {
+      return (
+        <div className={className} data-id={id}>
+          <div
+            onFocus={this.handleFocus}
+            onClick={this.handleFocus}
+            onDoubleClick={instance.isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
+            onChange={this.handleChange}
+            onLoad={this.handleLoad}
+          >
+            <HeaderPanel
+              className={classes.panelHeader}
+              types={instance.types}
+              hasChanged={instance.hasChanged}
+              highlight={highlight} />
+
+            {instance.hasFieldErrors?
+              <GlobalFieldErrors instance={instance} />
               :
-              null
-        }
-      </div>
-    );
+              <BodyPanel className={classes.panelBody} instance={instance} />
+            }
+            <FooterPanel
+              className={classes.panelFooter}
+              instance={instance}
+              showOpenActions={isCurrentInstance && !isMainInstance} />
+            <ConfirmCancelEditPanel
+              show={instance.cancelChangesPending}
+              text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
+              onConfirm={this.handleConfirmCancelEdit}
+              onCancel={this.handleContinueEditing}
+              inline={!isMainInstance} />
+            <SavingPanel id={id} show={instance.isSaving} inline={!isMainInstance} />
+            <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
+            <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
+          </div>
+          <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
+        </div>
+      );
+    }
+
+    return null;
   }
 }
 

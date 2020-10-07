@@ -41,9 +41,6 @@ const styles = {
     "& $panel":{
       height:"36px"
     },
-    "& $info":{
-      paddingTop: "10px"
-    },
     "& $actions":{
       display:"grid"
     }
@@ -107,7 +104,7 @@ class FooterPanel extends React.Component {
           </Col>
           <Col xs={2}>
             <div className={classes.actions}>
-              {appStore.currentWorkspace.id === instance.workspace && (
+              {appStore.currentWorkspace.id === instance.workspace && instance.permissions.canRead && (
                 <div className={classes.action} onClick={this.handleOpenInstance}>
                   <FontAwesomeIcon icon="folder-open"/>
                 </div>

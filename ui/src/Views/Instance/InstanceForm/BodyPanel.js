@@ -16,7 +16,8 @@
 
 import React from "react";
 import injectStyles from "react-jss";
-import { Field } from "hbp-quickfire";
+import { Form, Field } from "hbp-quickfire";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const styles = {
   container: {
@@ -71,16 +72,58 @@ const styles = {
         }
       }
     }
+  },
+  errorMessage: {
+    marginBottom: "15px",
+    fontWeight:"300",
+    fontSize:"1em",
+    color: "var(--ft-color-error)",
+    "& path":{
+      fill:"var(--ft-color-error)",
+      stroke:"rgba(200,200,200,.1)",
+      strokeWidth:"3px"
+    }
   }
 };
 
 @injectStyles(styles)
 class BodyPanel extends React.Component{
+
+  renderNoPermissionForView = mode => {
+    const { classes, className, instance} = this.props;
+
+    return (
+      <div className={`${classes.container} ${className}`} >
+        <Form store={instance.readModeFormStore}>
+          <Field name={instance.labelField} className={classes.field} />
+        </Form>
+        <div className={classes.errorMessage}>
+          <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
+        </div>
+      </div>
+    );
+  }
+
   render(){
-    const { classes, className, fields } = this.props;
+    const { classes, className, instance } = this.props;
+
+    if (instance.isReadMode) {
+      if(!instance.permissions.canRead) {
+        return this.renderNoPermissionForView("view");
+      }
+    } else { // edit
+      if(!instance.permissions.canWrite) {
+        return this.renderNoPermissionForView("edit");
+      }
+    }
+
+    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
+
     return(
       <div className={`${classes.container} ${className}`} >
-        {fields.map(name => <Field key={name} name={name} className={classes.field} />)}
+        <Form store={instance.form}>
+          {fields.map(name => <Field key={name} name={name} className={classes.field} />)}
+        </Form>
       </div>
     );
   }

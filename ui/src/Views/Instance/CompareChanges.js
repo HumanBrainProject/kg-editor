@@ -16,11 +16,11 @@
 
 import React from "react";
 import injectStyles from "react-jss";
+import { entries, toJS } from "mobx";
 import { observer } from "mobx-react";
-import { toJS } from "mobx";
 import { FormStore } from "hbp-quickfire";
-import CompareFieldChanges from "./CompareFieldChanges";
-import instanceStore from "../../Stores/InstanceStore";
+import CompareFieldsChanges from "./CompareFieldsChanges";
+import instanceStore, {createInstanceStore} from "../../Stores/InstanceStore";
 
 const styles = {
   container: {
@@ -28,31 +28,91 @@ const styles = {
   }
 };
 
+const cloneInstanceData = instance => {
+  const fields = entries(instance.form.structure.fields).reduce((acc, [name, f]) => {
+    const field = FormStore.typesMapping[f.type].properties
+      .filter(prop => !["customErrorMessages", "validationOptions", "customValidationFunctions", "value"].includes(prop))
+      .reduce((acc2, prop) => {
+        let value = toJS(f[prop]);
+        if (typeof value !== "function") {
+          if (Array.isArray(value)) {
+            value = value.map(v => toJS(v));
+          } else if (typeof value === "object") {
+            value = {...value};
+          }
+          //window.console.log(name, f.type, prop, value);
+          acc2[prop] = value;
+        }
+        return acc2;
+      }, {});
+    //window.console.log(name, f.type, "value", instance.initialValues[name]);
+    field.value = instance.initialValues[name];
+    acc[name] = field;
+    return acc;
+  }, {});
+  return {
+    id: instance.id,
+    name: instance.name,
+    types: instance.types.map(t => ({...t})),
+    primaryType: {...instance.primaryType},
+    workspace: instance.workspace,
+    fields: fields,
+    labelField: instance.labelField,
+    promotedFields: [...instance.promotedFields],
+    alternatives: {...instance.alternatives},
+    metadata: {...instance.metadata},
+    permissions: {...instance.permissions}
+  };
+};
+
 @injectStyles(styles)
 @observer
 class CompareChanges extends React.Component{
+  constructor(props){
+    super(props);
+    this.savedInstanceStore = createInstanceStore();
+  }
+
+  componentDidMount() {
+    this.setInstance();
+  }
+
+  componentDidUpdate(prevProps) {
+    if(prevProps.instanceId !== this.props.instanceId) {
+      this.setInstance();
+    }
+  }
+
+  setInstance = () => {
+    const { instanceId } = this.props;
+    this.savedInstanceStore.flush();
+    const savedInstance = this.savedInstanceStore.createInstanceOrGet(instanceId);
+    const instance = instanceStore.instances.get(instanceId);
+    const data = cloneInstanceData(instance);
+    //window.console.log(data);
+    savedInstance.initializeData(data, true, false);
+  }
+
   render(){
-    const { classes } = this.props;
-    const instance = instanceStore.instances.get(this.props.instanceId);
-    if (!instance) {
+    const { classes, instanceId, onClose } = this.props;
+    const instance = instanceStore.instances.get(instanceId);
+    const savedInstance = this.savedInstanceStore.instances.get(instanceId);
+    if (!instance || !savedInstance) {
       return null;
     }
 
-    const formStoreBefore = new FormStore(toJS(instance.form.structure));
-    formStoreBefore.injectValues(instance.initialValues);
-    formStoreBefore.toggleReadMode(true);
-    const formStoreAfter = new FormStore(toJS(instance.form.structure));
-    formStoreAfter.toggleReadMode(true);
-
-    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
-    const beforeValues = formStoreBefore.getValues();
-    const afterValues = formStoreAfter.getValues();
-
     return(
       <div className={classes.container}>
-        {fields.map(key => (
-          <CompareFieldChanges key={key} field={instance.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
-        ))}
+        <CompareFieldsChanges
+          instanceId={instanceId}
+          leftInstance={savedInstance}
+          rightInstance={instance}
+          leftInstanceStore={instanceStore}
+          rightInstanceStore={instanceStore}
+          leftChildrenIds={savedInstance.childrenIds}
+          rightChildrenIds={instance.childrenIds}
+          onClose={onClose}
+        />
       </div>
     );
   }

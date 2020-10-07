@@ -22,7 +22,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
 import instanceStore from "../../Stores/InstanceStore";
-import { render } from "react-dom";
 
 const styles = {
   container: {

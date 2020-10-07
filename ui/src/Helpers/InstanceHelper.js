@@ -157,6 +157,7 @@ export const normalizeInstanceData = (data, transformField = null) => {
       field.type = "KgTextArea";
       break;
     case "DynamicDropdown":
+    case "KgDynamicDropdown":
       field.type = "KgDynamicDropdown";
       field.instanceId = instanceId;
       field.isLink = true;
@@ -167,6 +168,7 @@ export const normalizeInstanceData = (data, transformField = null) => {
       field.lazyShowLinks = false;
       break;
     case "DynamicTable":
+    case "KgDynamicTable":
       field.type = "KgDynamicTable";
       field.instanceId = instanceId;
       field.isLink = true;

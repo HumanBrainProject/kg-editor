@@ -50,7 +50,7 @@ class LinksStore extends FormStore.typesMapping.Default{
 
   static get properties(){
     return union(super.properties,["value", "defaultValue", "instanceId", "fullyQualifiedName", "allowCustomValues",
-      "mappingValue", "mappingLabel", "mappingReturn", "returnSingle", "max", "lazyShowLinks"]);
+      "mappingValue", "mappingLabel", "mappingReturn", "returnSingle", "max", "isLink", "lazyShowLinks"]);
   }
 
   constructor(fieldData, store, path){
@@ -94,7 +94,7 @@ class LinksStore extends FormStore.typesMapping.Default{
     if(!this.disabled && !this.readOnly && this.value.length < this.max) {
       super.addValue(value);
       if (this.lazyShowLinks) {
-        const values = (typeof value === "object")?[value]:value;
+        const values = Array.isArray(value)?value:[value];
         values.forEach(v => this.visibleLinks.add(v[this.mappingValue]));
       }
       this.resetOptionsSearch();

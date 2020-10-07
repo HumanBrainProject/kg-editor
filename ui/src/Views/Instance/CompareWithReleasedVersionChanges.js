@@ -24,7 +24,7 @@ import appStore from "../../Stores/AppStore";
 import instanceStore, { createInstanceStore } from "../../Stores/InstanceStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
-import CompareFieldChanges from "./CompareFieldChanges";
+import CompareFieldsChanges from "./CompareFieldsChanges";
 
 const styles = {
   container: {
@@ -68,17 +68,13 @@ class CompareWithReleasedVersionChanges extends React.Component{
     instance.fetch(forceFetch);
   }
 
-  handleCloseComparison = () => {
-    appStore.setComparedWithReleasedVersionInstance(null);
-  }
+  handleCloseComparison = () => appStore.setComparedWithReleasedVersionInstance(null);
 
-  handleRetryFetchInstance = () => {
-    this.fetchInstance(true);
-  }
+  handleRetryFetchInstance = () => this.fetchInstance(true);
 
   handleRetryFetchReleasedInstance = () => {
     if (this.props.status !== "UNRELEASED") {
-      this.releasedInstanceStore.getInstance(this.props.instanceId, true);
+      this.fetchInstance(true);
     }
   }
 
@@ -88,67 +84,54 @@ class CompareWithReleasedVersionChanges extends React.Component{
     if (!instanceId) {
       return null;
     }
-    const instanceBefore = status !== "UNRELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
-    const instanceAfter = instanceStore.instances.get(instanceId);
+    const releasedInstance = status !== "UNRELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
+    const instance = instanceStore.instances.get(instanceId);
 
-    if (!instanceAfter) {
+    if (!instance) {
       return null;
     }
 
-    let beforeValues = {};
-    let afterValues = {};
-
-    let fields = [];
-
-    if ((!instanceBefore || (instanceBefore.isFetched && !instanceBefore.fetchError && instanceBefore.form && instanceBefore.form.structure && instanceBefore.form.structure.fields))
-      && instanceAfter.isFetched && !instanceAfter.fetchError && instanceAfter.form && instanceAfter.form.structure && instanceAfter.form.structure.fields) {
-
-      if (instanceBefore) {
-        const formStoreBefore = instanceBefore.readModeFormStore;
-        beforeValues = formStoreBefore.getValues();
-      }
-
-      const formStoreAfter = instanceAfter.readModeFormStore;
-      afterValues = formStoreAfter.getValues();
-
-      fields = [...instanceAfter.promotedFields, ...instanceAfter.nonPromotedFields];
+    if ((releasedInstance && releasedInstance.isFetching) || instance.isFetching) {
+      return(
+        <div className={classes.container}>
+          <FetchingLoader>Fetching instance {instanceId} data...</FetchingLoader>
+        </div>
+      );
     }
 
-    return(
-      <div className={classes.container}>
-        {(instanceBefore && instanceBefore.isFetching) || instanceAfter.isFetching?
-          <FetchingLoader>Fetching instance {instanceId} data...</FetchingLoader>
-          :
-          instanceBefore && instanceBefore.fetchError?
-            <BGMessage icon={"ban"}>
-              There was a network problem fetching the released instance {instanceId}.<br/>
-              If the problem persists, please contact the support.<br/>
-              <small>{instanceBefore.fetchError}</small><br/><br/>
-              <div>
-                <Button onClick={this.handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-                <Button bsStyle={"primary"} onClick={this.handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
-              </div>
-            </BGMessage>
-            :
-            instanceAfter.fetchError?
-              <BGMessage icon={"ban"}>
-                There was a network problem fetching the instance {instanceId}.<br/>
-                If the problem persists, please contact the support.<br/>
-                <small>{instanceBefore && instanceBefore.fetchError}</small><br/><br/>
-                <div>
-                  <Button onClick={this.handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-                  <Button bsStyle={"primary"} onClick={this.handleRetryFetchInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
-                </div>
-              </BGMessage>
-              :
-              <React.Fragment>
-                {fields.map(key => (
-                  <CompareFieldChanges key={key} field={instanceAfter.form.structure.fields[key]} beforeValue={beforeValues[key]} afterValue={afterValues[key]} />
-                ))}
-              </React.Fragment>
-        }
-      </div>
-    );
+    if(releasedInstance && releasedInstance.fetchError) {
+      return(
+        <div className={classes.container}>
+          <BGMessage icon={"ban"}>
+            There was a network problem fetching the released instance {instanceId}.<br/>
+            If the problem persists, please contact the support.<br/>
+            <small>{releasedInstance.fetchError}</small><br/><br/>
+            <div>
+              <Button onClick={this.handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
+              <Button bsStyle={"primary"} onClick={this.handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            </div>
+          </BGMessage>
+        </div>
+      );
+    }
+
+    if ((!releasedInstance || releasedInstance.isFetched) && instance.isFetched) {
+      return (
+        <div className={classes.container}>
+          <CompareFieldsChanges
+            instanceId={instanceId}
+            leftInstance={releasedInstance}
+            rightInstance={instance}
+            leftInstanceStore={this.releasedInstanceStore}
+            rightInstanceStore={instanceStore}
+            leftChildrenIds={releasedInstance?releasedInstance.childrenIds:[]}
+            rightChildrenIds={instance.childrenIds}
+            onClose={this.handleCloseComparison}
+          />
+        </div>
+      );
+    }
+    return null;
   }
 }
 

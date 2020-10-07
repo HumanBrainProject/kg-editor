@@ -85,7 +85,6 @@ class Instance {
   @observable _name = null;
   @observable types = [];
   @observable isNew = false;
-  @observable fields = {};
   @observable alternatives = {};
   @observable labelField = null;
   @observable promotedFields = [];
@@ -153,11 +152,9 @@ class Instance {
     return [];
   }
 
-  @computed
-  get linkedIds() {
-    if(this.isFetched && !this.fetchError && this.fields){
-      const ids = Object.keys(this.fields)
-        .map(fieldKey => this.form.getField(fieldKey))
+  getLinkedIds(recursive=false) { // get all instanceIds linked to this instance if they are fetched
+    if(this.isFetched && !this.fetchError && this.form.structure.fields){
+      const ids = values(this.form.structure.fields)
         .reduce((acc, field) => {
           if (field.type === "Nested") {
             //TODO
@@ -167,10 +164,12 @@ class Instance {
               const id = obj[field.mappingValue];
               if (!acc.has(id)) {
                 acc.add(id);
-                const instance = this.instanceStore.instances.get(id);
-                if(instance) {
-                  const linkedIds = instance.linkedIds;
-                  linkedIds.forEach(child => acc.add(child));
+                if (recursive) {
+                  const instance = this.instanceStore.instances.get(id);
+                  if(instance) {
+                    const linkedIds = instance.getLinkedIds(true);
+                    linkedIds.forEach(child => acc.add(child));
+                  }
                 }
               }
             });
@@ -180,6 +179,15 @@ class Instance {
       return Array.from(ids);
     }
     return [this.id];
+  }
+  @computed
+  get childrenIds() {
+    return this.getLinkedIds();
+  }
+
+  @computed
+  get linkedIds() {
+    return this.getLinkedIds(true);
   }
 
   @computed

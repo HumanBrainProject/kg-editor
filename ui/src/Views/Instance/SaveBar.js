@@ -187,7 +187,7 @@ class SavePanel extends React.Component{
                 </Modal.Header>
                 <Modal.Body>
                   <Scrollbars autoHide>
-                    <CompareChanges instanceId={appStore.comparedInstanceId}/>
+                    <CompareChanges instanceId={appStore.comparedInstanceId} onClose={this.handleShowCompare.bind(this,null)}/>
                   </Scrollbars>
                 </Modal.Body>
                 <Modal.Footer>

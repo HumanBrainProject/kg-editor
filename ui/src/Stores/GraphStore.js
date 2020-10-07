@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, runInAction, set } from "mobx";
+import { observable, action, computed, runInAction, set, values } from "mobx";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
@@ -104,7 +104,7 @@ class GraphStore {
 
   @computed
   get groupsList() {
-    return Object.values(this.groups).sort((a, b) => a.name.localeCompare(b.name));
+    return values(this.groups).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   @action
@@ -239,7 +239,7 @@ class GraphStore {
 
     extractData(data, null, null, false);
 
-    Object.values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
+    values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
 
     this.links =  Object.values(links);
   };

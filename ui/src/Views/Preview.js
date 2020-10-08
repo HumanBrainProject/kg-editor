@@ -57,6 +57,9 @@ const styles = {
     },
     "&.hide-empty-fields .quickfire-empty-field": {
       display: "none"
+    },
+    "&.no-permission":{
+      padding: "10px"
     }
   },
   content: {
@@ -119,6 +122,17 @@ const styles = {
   },
   errorReport: {
     margin: "10px"
+  },
+  errorMessage: {
+    marginBottom: "15px",
+    fontWeight:"300",
+    fontSize:"1em",
+    color: "var(--ft-color-error)",
+    "& path":{
+      fill:"var(--ft-color-error)",
+      stroke:"rgba(200,200,200,.1)",
+      strokeWidth:"3px"
+    }
   }
 };
 
@@ -156,9 +170,38 @@ class Preview extends React.Component {
       return null;
     }
 
+    if(instance.hasFetchError) {
+      return(
+        <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
+          <BGMessage icon={"ban"}>
+                There was a network problem fetching the instance &quot;<i>{instanceId}&quot;</i>.
+            <br />
+                If the problem persists, please contact the support.
+            <br />
+            <small>{instance.fetchError}</small>
+            <br />
+            <br />
+            <Button bsStyle={"primary"} onClick={this.handleRetry}>
+              <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+            </Button>
+          </BGMessage>
+        </div>
+      );
+    }
+
+    if(!instance.isFetched || instance.isFetching) {
+      return(
+        <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
+          <FetchingLoader>
+            <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
+          </FetchingLoader>
+        </div>
+      );
+    }
+
     if(instance.isFetched && !instance.permissions.canRead) {
       return(
-        <div className={`${classes.container} ${className}`} >
+        <div className={`${classes.container} ${className?className:""} no-permission`} >
           <Form store={instance.readModeFormStore}>
             <Field name={instance.labelField} className={classes.field} />
           </Form>
@@ -173,81 +216,62 @@ class Preview extends React.Component {
 
     return (
       <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
-        {(!instance.isFetched || instance.isFetching)? (
-          <FetchingLoader>
-            <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
-          </FetchingLoader>
-        ) : !instance.hasFetchError ? (
-          <div className={classes.content}>
-            <div className="header">
-              {showAction && (
-                <Actions instance={instance} />
-              )}
-              <div className={classes.titlePanel}>
-                {/* {showBookmarkStatus && (
+        <div className={classes.content}>
+          <div className="header">
+            {showAction && (
+              <Actions instance={instance} />
+            )}
+            <div className={classes.titlePanel}>
+              {/* {showBookmarkStatus && (
                   <BookmarkStatus className={classes.bookmarkStatus} id={instanceId} />
                 )} */}
-                {showTypes && (
-                  <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
-                    <FontAwesomeIcon fixedWidth icon="circle" />
-                  </div>
-                )}
-                <span className={classes.title}>
-                  {instanceName?instanceName:instance.name}
-                </span>
-                {showStatus && (
-                  <div className={`${classes.status}`}>
-                    <Status
-                      darkmode={true}
-                      id={instanceId}
-                    />
-                  </div>
-                )}
-              </div>
-              <div className={classes.info}>
-                <div>ID: {instanceId}</div>
-                <div>Workspace: {instance.workspace}</div>
-              </div>
+              {showTypes && (
+                <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
+                  <FontAwesomeIcon fixedWidth icon="circle" />
+                </div>
+              )}
+              <span className={classes.title}>
+                {instanceName?instanceName:instance.name}
+              </span>
+              {showStatus && (
+                <div className={`${classes.status}`}>
+                  <Status
+                    darkmode={true}
+                    id={instanceId}
+                  />
+                </div>
+              )}
             </div>
-            <Scrollbars autoHide>
-              {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
-                <Form store={instance.readModeFormStore}>
-                  {fields.map(fieldKey => (
-                    <div key={instanceId + fieldKey} className={classes.field}>
-                      <Field name={fieldKey} />
-                    </div>
-                  ))}
-                  {showMetaData && instance.metadata && instance.metadata.length > 0 && (
-                    <div>
-                      <hr />
-                      <span className={`${classes.title} ${classes.metadataTitle}`}>
-                        {" "}
-                      Metadata{" "}
-                      </span>
-                      {instance.metadata.map(field => (
-                        <div key={instanceId + field.label} className={classes.field}>
-                          <label>{field.label}: </label> {field.value}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Form>}
-            </Scrollbars>
+            <div className={classes.info}>
+              <div>ID: {instanceId}</div>
+              <div>Workspace: {instance.workspace}</div>
+            </div>
           </div>
-        ) : (
-          <BGMessage icon={"ban"}>
-              There was a network problem fetching the instance &quot;<i>{instanceId}&quot;</i>.
-            <br />
-              If the problem persists, please contact the support.
-            <br />
-            <small>{instance.fetchError}</small>
-            <br />
-            <br />
-            <Button bsStyle={"primary"} onClick={this.handleRetry}>
-              <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-            </Button>
-          </BGMessage>
-        )}
+          <Scrollbars autoHide>
+            {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
+              <Form store={instance.readModeFormStore}>
+                {fields.map(fieldKey => (
+                  <div key={instanceId + fieldKey} className={classes.field}>
+                    <Field name={fieldKey} />
+                  </div>
+                ))}
+                {showMetaData && instance.metadata && instance.metadata.length > 0 && (
+                  <div>
+                    <hr />
+                    <span className={`${classes.title} ${classes.metadataTitle}`}>
+                      {" "}
+                      Metadata{" "}
+                    </span>
+                    {instance.metadata.map(field => (
+                      <div key={instanceId + field.label} className={classes.field}>
+                        <label>{field.label}: </label> {field.value}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Form>}
+          </Scrollbars>
+        </div>
       </div>
     );
   }

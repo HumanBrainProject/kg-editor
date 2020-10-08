@@ -156,6 +156,19 @@ class Preview extends React.Component {
       return null;
     }
 
+    if(instance.isFetched && !instance.permissions.canRead) {
+      return(
+        <div className={`${classes.container} ${className}`} >
+          <Form store={instance.readModeFormStore}>
+            <Field name={instance.labelField} className={classes.field} />
+          </Form>
+          <div className={classes.errorMessage}>
+            <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
+          </div>
+        </div>
+      );
+    }
+
     const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
 
     return (
@@ -198,10 +211,7 @@ class Preview extends React.Component {
             </div>
             <Scrollbars autoHide>
               {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
-                <Form
-                  store={instance.readModeFormStore}
-                  key={instanceId}
-                >
+                <Form store={instance.readModeFormStore}>
                   {fields.map(fieldKey => (
                     <div key={instanceId + fieldKey} className={classes.field}>
                       <Field name={fieldKey} />
@@ -210,17 +220,12 @@ class Preview extends React.Component {
                   {showMetaData && instance.metadata && instance.metadata.length > 0 && (
                     <div>
                       <hr />
-                      <span
-                        className={`${classes.title} ${classes.metadataTitle}`}
-                      >
+                      <span className={`${classes.title} ${classes.metadataTitle}`}>
                         {" "}
                       Metadata{" "}
                       </span>
                       {instance.metadata.map(field => (
-                        <div
-                          key={instanceId + field.label}
-                          className={classes.field}
-                        >
+                        <div key={instanceId + field.label} className={classes.field}>
                           <label>{field.label}: </label> {field.value}
                         </div>
                       ))}

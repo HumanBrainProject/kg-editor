@@ -178,7 +178,7 @@ class ReleaseNode extends React.Component {
               node.isAssociation
                 ? null
                 : this.handleOptionPreview(node.id, node.label)}
-            title={node.isAssociation ? "linking instances are not available for preview" : `view ${node.type} ${node.label}`}
+            title={node.isAssociation ? "linking instances are not available for preview" : `view ${node.typesName} ${node.label}`}
           >
             <FontAwesomeIcon icon="eye" />
           </div>

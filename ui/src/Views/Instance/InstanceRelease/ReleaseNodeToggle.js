@@ -26,12 +26,14 @@ const styles = {
   container: {
     height: 0,
     marginTop: "-1px",
-    marginRight: "20px",
     "&.no-release": {
       marginLeft: "24px"
     },
     "&.no-unrelease": {
       marginRight: "24px"
+    },
+    "& .ban": {
+      marginRight: "29px"
     }
   },
 };
@@ -59,7 +61,7 @@ class ReleaseNodeToggle extends React.Component {
     if(!node.permissions.canRelease) {
       return (
         <div className={classes.container} title="You do not have permission to release the instance.">
-          <FontAwesomeIcon icon="ban" />
+          <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
         </div>
       );
     }

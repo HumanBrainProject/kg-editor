@@ -71,9 +71,10 @@ const styles = {
   },
   listHeader: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginRight: "23px",
+    paddingTop: "5px",
     paddingBottom: "5px"
   },
   list: {
@@ -81,12 +82,6 @@ const styles = {
     backgroundColor: "var(--bg-color-ui-contrast3)",
     padding: "10px",
     border: "1px solid var(--border-color-ui-contrast1)"
-  },
-  listFooter: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    paddingTop: "5px"
   }
 };
 
@@ -160,13 +155,11 @@ class InstanceRelease extends React.Component {
               </div>
               <div className={classes.listPnl}>
                 <div className={classes.listHeader}>
+                  <HideReleasedInstancesToggle />
                   <ReleaseNodeAndChildrenToggle />
                 </div>
                 <div className={classes.list}>
                   <ReleaseList />
-                </div>
-                <div className={classes.listFooter}>
-                  <HideReleasedInstancesToggle />
                 </div>
               </div>
               <div className={classes.action}>

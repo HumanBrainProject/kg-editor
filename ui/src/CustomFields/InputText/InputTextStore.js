@@ -14,33 +14,60 @@
 *   limitations under the License.
 */
 
-import { observable, action } from "mobx";
+import { observable, action, computed } from "mobx";
 import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-export default class InputTextStore extends FormStore.typesMapping.Default{
-  @observable value = "";
-  @observable defaultValue = "";
-  @observable inputType = "text";
-  @observable autoComplete = false;
-  @observable useVirtualClipboard = false;
-
-  __emptyValue = () => "";
+class InputTextStore extends FormStore.typesMapping.InputText {
+  @observable returnAsNull = false;
+  @observable emptyToNull = false;
+  @observable initialValue = "";
 
   static get properties(){
-    return union(super.properties, ["value", "defaultValue", "inputType", "useVirtualClipboard"]);
+    return union(super.properties,["emptyToNull"]);
+  }
+
+  constructor(fieldData, store, path) {
+    super(fieldData, store, path);
+    this.injectValue(this.value);
+  }
+
+  @computed
+  get hasChanged() {
+    return this.getValue(true) !== this.initialValue;
   }
 
   @action
-  getValue(applyMapping){
-    let value = this.value;
-    if (this.inputType === "number") {
-      if (value !== "") {
-        value = parseFloat(value);
-      } else {
-        value = null;
-      }
+  injectValue(value) {
+    this.returnAsNull = false;
+    if (value !== null && value !== undefined) {
+      this.value = value;
+    } else {
+      this.value = this.__emptyValue();
     }
-    return applyMapping? this.mapReturnValue(value): value;
+    this.initialValue = this.value;
+  }
+
+  @action
+  setValue(value) {
+    if (value !== null && value !== undefined) {
+      if (value !== this.__emptyValue() || !this.returnAsNull) {
+        this.returnAsNull = false;
+        this.value = value;
+      }
+    } else  {
+      this.returnAsNull = true;
+      this.value = this.__emptyValue();
+    }
+  }
+
+  getValue(applyMapping = true) {
+    const value = super.getValue(applyMapping);
+    if (value === this.__emptyValue() && this.returnAsNull) {
+      return null;
+    }
+    return value;
   }
 }
+
+export default InputTextStore;

@@ -105,10 +105,10 @@ class Alternatives extends React.Component {
     }
   }
 
-  handleClick = e => {
-    const { onClick } = this.props;
+  handleRemove = e => {
+    const { onRemove } = this.props;
     e && e.preventDefault();
-    typeof onClick === "function" && onClick();
+    typeof onRemove === "function" && onRemove();
     this.setState({ open: false });
   }
 
@@ -216,7 +216,7 @@ class Alternatives extends React.Component {
           {list.map(alternative => {
             const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => acc += user.id, "");
             return (
-              <Alternative key={key} alternative={alternative} field={field} onClick={this.handleClick} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
+              <Alternative key={key} alternative={alternative} field={field} onRemove={this.handleRemove} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
             );
           })}
         </ul>

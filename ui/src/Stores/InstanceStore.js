@@ -104,13 +104,11 @@ class Instance {
   @observable fetchError = null;
   @observable hasFetchError = false;
 
-  @observable hasChanged = false;
   @observable cancelChangesPending = null;
   @observable saveError = null;
   @observable hasSaveError = false;
   @observable isSaving = false;
 
-  @observable fieldsToSetAsNull = [];
   @observable fieldErrorsMap = new Map();
 
   constructor(id, instanceStore) {
@@ -120,6 +118,12 @@ class Instance {
 
   memorizeInstanceInitialValues() {
     this.initialValues = this.form.getValues();
+  }
+
+  @computed
+  get hasChanged() {
+    //return this.form && JSON.stringify(this.initialValues) !== JSON.stringify(this.form.getValues());
+    return this.isNew || (this.form && values(this.form.structure.fields).reduce((acc, field) => acc || field.hasChanged, false));
   }
 
   @computed
@@ -227,12 +231,6 @@ class Instance {
   }
 
   @action
-  setFieldAsNull(id) {
-    !this.fieldsToSetAsNull.includes(id) && this.fieldsToSetAsNull.push(id);
-    this.hasChanged = true;
-  }
-
-  @action
   fetch(forceFetch=false) {
     if(!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
       this.instanceStore.fetchInstance(this);
@@ -317,6 +315,21 @@ class Instance {
     this.isFetching = false;
   }
 
+  constructPayloadToSave = () => {
+    if (!this.form) {
+      return null;
+    }
+    const payload = {
+      "@type": this.types.map(t => t.name)
+    };
+    return entries(this.form.structure.fields).reduce((acc, [name, field]) => {
+      if (field.hasChanged) {
+        acc[name] = field.getValue(true);
+      }
+      return acc;
+    }, payload);
+  }
+
   @action
   async save() {
 
@@ -324,19 +337,16 @@ class Instance {
     this.hasSaveError = false;
     this.isSaving = true;
 
+    const payload = this.constructPayloadToSave();
     try {
       if (this.isNew) {
-        const payload = this.form.getValues();
-        payload["@type"] = this.types.map(t => t.name);
         const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
         runInAction(() => {
           const newId = data.data.id;
           this.isNew = false;
-          this.hasChanged = false;
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
-          this.fieldsToSetAsNull = [];
           if (newId !== this.id) {
             this.instanceStore.instances.set(newId, this);
             this.instanceStore.instance.delete(this.id);
@@ -345,25 +355,11 @@ class Instance {
           this.initializeData(data.data);
         });
       } else {
-        const values = this.form.getValues();
-        if (this.fieldsToSetAsNull.length > 0) {
-          this.fieldsToSetAsNull.forEach(key=> values[key] = null);
-        }
-        const payload = Object.entries(values).reduce((result, [key, value]) => {
-          const previous = this.initialValues[key];
-          if (!isEqual(value, previous)) {
-            result[key] = value;
-          }
-          return result;
-        }, {});
-        payload["@type"] = this.types.map(t => t.name);
         const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
         runInAction(() => {
-          this.hasChanged = false;
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
-          this.fieldsToSetAsNull = [];
           this.initializeData(data.data);
         });
       }
@@ -388,11 +384,9 @@ class Instance {
   @action
   cancelChanges(){
     this.form && this.form.injectValues(this.initialValues);
-    this.hasChanged = false;
     this.cancelChangesPending = false;
     this.saveError = null;
     this.hasSaveError = false;
-    this.fieldsToSetAsNull = [];
   }
 
 }
@@ -677,14 +671,13 @@ class InstanceStore {
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},
-      permissions: {}
+      permissions: { canRead: true, canCreate: true, canWrite: true }
     };
     if (name && data.labelField && data.fields && data.fields[data.labelField]) {
       data.fields[data.labelField].value = name;
     }
     const instance  = new Instance(id, this);
     instance.initializeData(data, false, true);
-    instance.hasChanged = true;
     this.instances.set(id, instance);
   }
 
@@ -696,14 +689,6 @@ class InstanceStore {
   @action
   setReadMode(readMode){
     this.instances.forEach(instance => instance.setReadMode(readMode));
-  }
-
-  @action
-  instanceHasChanged(instanceId){
-    const instance = this.instances.get(instanceId);
-    if(!instance.hasChanged){
-      instance.hasChanged = true;
-    }
   }
 
   @action

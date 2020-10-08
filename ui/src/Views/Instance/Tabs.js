@@ -64,17 +64,16 @@ class Tab extends React.PureComponent {
   }
 
   render() {
-    const {className, show, disbled, active, icon} = this.props;
+    const {className, show, disabled, active, icon} = this.props;
 
     if(!show) {
       return null;
     }
 
-    const props = disbled || active?
+    const props = disabled || active ?
       {
-        className: `${className} ${disbled?"disbled":""} ${active?"active":""}`
-      }
-      :
+        className: `${className} ${disabled?"disabled":""} ${active?"active":""}`
+      }:
       {
         className: className,
         onClick: this.handleClick
@@ -92,10 +91,7 @@ class Tab extends React.PureComponent {
 @observer
 class Tabs extends React.Component {
 
-  handleClick = mode => {
-    const { instance } = this.props;
-    routerStore.history.push(`/instance/${mode}/${instance.id}`);
-  }
+  handleClick = mode => routerStore.history.push(`/instance/${mode}/${this.props.instance.id}`);
 
   render() {
     const {classes, instance, mode} = this.props;
@@ -103,12 +99,12 @@ class Tabs extends React.Component {
 
     return (
       <div className={classes.tabs}>
-        <Tab className={classes.tab} show={permissions.canRead}                            icon="eye"              mode="view"    disabled={mode === "create"} active={mode === "view"}                      onClick={this.handleClick} />
-        <Tab className={classes.tab} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    disabled={false}             active={mode === "edit" || mode === "create"} onClick={this.handleClick} />
-        <Tab className={classes.tab} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  disabled={mode === "create"} active={mode === "invite"}                    onClick={this.handleClick} />
-        <Tab className={classes.tab} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   disabled={mode === "create"} active={mode === "graph"}                     onClick={this.handleClick} />
-        <Tab className={classes.tab} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" disabled={mode === "create"} active={mode === "release"}                   onClick={this.handleClick} />
-        <Tab className={classes.tab} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  disabled={mode === "create"} active={mode === "manage"}                    onClick={this.handleClick} />
+        <Tab className={classes.tab} icon="eye"              mode="view"    disabled={mode === "create"} active={mode === "view"}                      onClick={this.handleClick} show={permissions.canRead} />
+        <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    disabled={false}             active={mode === "edit" || mode === "create"} onClick={this.handleClick} show={permissions.canWrite || permissions.canCreate } />
+        <Tab className={classes.tab} icon="user-edit"        mode="invite"  disabled={mode === "create"} active={mode === "invite"}                    onClick={this.handleClick} show={!instance.isNew && permissions.canInviteForSuggestion} />
+        <Tab className={classes.tab} icon="project-diagram"  mode="graph"   disabled={mode === "create"} active={mode === "graph"}                     onClick={this.handleClick} show={!instance.isNew && permissions.canRead} />
+        <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" disabled={mode === "create"} active={mode === "release"}                   onClick={this.handleClick} show={!instance.isNew && permissions.canRelease} />
+        <Tab className={classes.tab} icon="cog"              mode="manage"  disabled={mode === "create"} active={mode === "manage"}                    onClick={this.handleClick} show={!instance.isNew && (permissions.canDelete || permissions.canCreate)} />
       </div>
     );
   }

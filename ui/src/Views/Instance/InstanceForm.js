@@ -138,22 +138,18 @@ const styles = {
 @observer
 class InstanceForm extends React.Component {
   componentDidMount() {
-    if (this.props.id) {
-      this.fetchInstance();
-    }
+    this.fetchInstance();
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.id && this.props.id !== prevProps.id) {
+    if (this.props.id !== prevProps.id) {
       this.fetchInstance();
     }
   }
 
   fetchInstance(forceFetch = false) {
-    if (this.props.id) {
-      const instance = instanceStore.createInstanceOrGet(this.props.id);
-      instance.fetch(forceFetch);
-    }
+    const instance = instanceStore.createInstanceOrGet(this.props.id);
+    instance.fetch(forceFetch);
   }
 
   handleListLoadRetry = () => typesStore.fetch();
@@ -171,15 +167,6 @@ class InstanceForm extends React.Component {
     } else {
       routerStore.history.push(`/instance/view/${this.props.id}`);
     }
-  }
-
-  handleChange = () => {
-    instanceStore.instanceHasChanged(this.props.id);
-  }
-
-  handleLoad = () => {
-    const instance = instanceStore.instances.get(this.props.id);
-    instance && instance.memorizeInstanceInitialValues();
   }
 
   handleCancelEdit = e => {
@@ -256,8 +243,6 @@ class InstanceForm extends React.Component {
             onFocus={this.handleFocus}
             onClick={this.handleFocus}
             onDoubleClick={instance.isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
-            onChange={this.handleChange}
-            onLoad={this.handleLoad}
           >
             <HeaderPanel
               className={classes.panelHeader}

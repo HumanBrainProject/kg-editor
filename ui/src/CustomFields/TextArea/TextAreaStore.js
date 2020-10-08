@@ -14,21 +14,61 @@
 *   limitations under the License.
 */
 
-import { observable } from "mobx";
+import { observable, computed, action } from "mobx";
 import { union } from "lodash";
 import { FormStore } from "hbp-quickfire";
 
-export default class TextAreaStore extends FormStore.typesMapping.Default{
-    @observable value = "";
-    @observable defaultValue = "";
-    @observable autosize = true;
-    @observable rows = 1;
-    @observable maxRows = null;
-    @observable resizable = false;
+class TextAreaStore extends FormStore.typesMapping.TextArea {
+  @observable returnAsNull = false;
+  @observable emptyToNull = false;
+  @observable initialValue = "";
 
-    __emptyValue = () => "";
+  static get properties(){
+    return union(super.properties,["emptyToNull"]);
+  }
 
-    static get properties(){
-      return union(super.properties,["value", "defaultValue", "autosize", "rows", "maxRows", "resizable"]);
+  constructor(fieldData, store, path) {
+    super(fieldData, store, path);
+    this.injectValue(this.value);
+  }
+
+  @computed
+  get hasChanged() {
+    return this.getValue(true) !== this.initialValue;
+  }
+
+  @action
+  injectValue(value) {
+    this.returnAsNull = false;
+    if (value !== null && value !== undefined) {
+      this.value = value;
+      this.initialValue = value;
+    } else {
+      this.value = this.__emptyValue();
+      this.initialValue = this.__emptyValue();
     }
+  }
+
+  @action
+  setValue(value) {
+    if (value !== null && value !== undefined) {
+      if (value !== this.__emptyValue() || !this.returnAsNull) {
+        this.returnAsNull = false;
+        this.value = value;
+      }
+    } else  {
+      this.returnAsNull = true;
+      this.value = this.__emptyValue();
+    }
+  }
+
+  getValue(applyMapping = true) {
+    const value = super.getValue(applyMapping);
+    if (value === this.__emptyValue() && this.returnAsNull) {
+      return null;
+    }
+    return value;
+  }
 }
+
+export default TextAreaStore;

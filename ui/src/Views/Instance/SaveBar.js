@@ -163,7 +163,7 @@ class SavePanel extends React.Component{
     if(!instanceStore.hasUnsavedChanges){
       return null;
     }
-    instanceStore.toggleSavebarDisplay(true);
+    appStore.toggleSavebarDisplay(true);
     event.returnValue = "You have unsaved modifications. Are you sure you want to leave this page?";
     return event.returnValue;
   }

@@ -28,8 +28,6 @@ import clipboard from "hbp-quickfire/lib/Stores/ClipboardStore";
 import Alternatives from "../Alternatives";
 import FieldError from "../FieldError";
 
-import instanceStore from "../../Stores/InstanceStore";
-
 const styles = {
   readMode: {
     "& .quickfire-label:after":{
@@ -75,16 +73,18 @@ const FieldValue = ({field, readModeRendering, splitLines}) => {
 @inject("formStore")
 @injectStyles(styles)
 @observer
-/**
- * A simple text input
- * @class InputText
- * @memberof FormFields
- * @namespace InputText
- */
 class InputText extends React.Component {
   static defaultProps = {
     componentClass: undefined
   };
+
+  componentDidMount() {
+    this.handleAutosize();
+  }
+
+  componentDidUpdate() {
+    this.handleAutosize();
+  }
 
   handleAutosize() {
     if (!this.props.field.autosize) {
@@ -101,78 +101,17 @@ class InputText extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.handleAutosize();
-  }
-
-  componentDidUpdate() {
-    this.handleAutosize();
-  }
-
   handleChange = e => {
-    let field = this.props.field;
-    //This shouldn't be necessary although some inputType don't behave well with readOnly => see inputType color
-    if(!field.disabled && !field.readOnly){
-      this.beforeSetValue(e.target.value);
+    if(!this.props.field.disabled && !this.props.field.readOnly){
+      this.props.field.setValue(e.target.value);
     }
   };
 
-  //The only way to trigger an onChange event in React is to do the following
-  //Basically changing the field value, bypassing the react setter and dispatching an "input"
-  // event on a proper html input node
-  //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
-  triggerOnChange = () => {
-    const selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
-    const prototype = this.props.componentClass === "textarea"?window.HTMLTextAreaElement.prototype:window.HTMLInputElement.prototype;
-    if (selectedInstance && this.props.field.value === null) {
-      Object.getOwnPropertyDescriptor(prototype, "disabled").set
-        .call(this.inputRef, true);
-      selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
-    } else {
-      Object.getOwnPropertyDescriptor(prototype, "disabled").set
-        .call(this.inputRef, false);
-    }
-    Object.getOwnPropertyDescriptor(prototype, "value").set
-      .call(this.inputRef, this.props.field.value);
-    var event = new Event("input", { bubbles: true });
-    this.inputRef.dispatchEvent(event);
-  }
+  handlePaste = () => this.props.field.setValue(clipboard.selection);
 
-  handlePaste = () => {
-    this.beforeSetValue(clipboard.selection);
-    this.triggerOnChange();
-  }
+  handleSelectAlternative = value => this.props.field.setValue(value);
 
-  beforeSetValue(value){
-    this.props.field.setValue(value);
-  }
-
-  handleAlternativeSelect = value => {
-    this.beforeSetValue(value);
-    this.triggerOnChange();
-  }
-
-  handleRemoveSuggestion = () => {
-    let _value = null;
-    this.beforeSetValue(_value);
-    this.triggerOnChange();
-  }
-
-  getStyle = () => {
-    let { style = {} } = this.props;
-    let { maxRows, resizable } = this.props.field;
-
-    const maxHeight = maxRows && this.lineHeight ? this.lineHeight * (maxRows + 1) : null;
-    const resize = resizable ? null : "none";
-
-    style = {
-      ...style,
-      ...(maxHeight ? {maxHeight} : {}),
-      ...(resize ? {resize} : {})
-    };
-
-    return style;
-  }
+  handleRemoveMySuggestion = () => this.props.field.setValue(null);
 
   render() {
     const { classes, formStore } = this.props;
@@ -181,41 +120,19 @@ class InputText extends React.Component {
       return this.renderReadMode();
     }
 
-    let {
+    const {
       value,
       inputType,
       autoComplete,
-      useVirtualClipboard,
       disabled,
       readOnly,
       validationErrors,
       validationState,
       placeholder,
       rows,
-      path
+      path,
+      returnAsNull
     } = this.props.field;
-
-    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
-    let isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(path.substr(1));
-
-    const style = this.getStyle();
-
-    const formControl = () => (
-      <FormControl
-        value={value}
-        type={inputType}
-        className={"quickfire-user-input"}
-        componentClass={this.props.componentClass}
-        onChange={this.handleChange}
-        inputRef={ref=>this.inputRef = ref}
-        disabled={disabled || isAlternativeDisabled}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        style={style}
-        rows={rows}
-        autoComplete={autoComplete?"on":"off"}
-      />
-    );
 
     const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
     const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
@@ -233,23 +150,25 @@ class InputText extends React.Component {
           <Alternatives
             className={classes.alternatives}
             show={!disabled && !readOnly && !!alternatives.length}
-            disabled={disabled || readOnly || isAlternativeDisabled}
+            disabled={disabled || readOnly || returnAsNull}
             list={alternatives}
-            onSelect={this.handleAlternativeSelect}
-            onClick={this.handleRemoveSuggestion}
-            parentContainerClassName="form-group" />
-          {useVirtualClipboard?
-            <InputGroup>
-              {formControl()}
-              <InputGroup.Button>
-                <Button className={"quickfire-paste-button"} onClick={this.handlePaste}>
-                  <Glyphicon glyph="paste"/>
-                </Button>
-              </InputGroup.Button>
-            </InputGroup>
-            :
-            formControl()
-          }
+            onSelect={this.handleSelectAlternative}
+            onRemove={this.handleRemoveMySuggestion}
+            parentContainerClassName="form-group"
+          />
+          <FormControl
+            value={value}
+            type={inputType}
+            className={"quickfire-user-input"}
+            componentClass={this.props.componentClass}
+            onChange={this.handleChange}
+            inputRef={ref=>this.inputRef = ref}
+            disabled={disabled || returnAsNull}
+            readOnly={readOnly}
+            placeholder={placeholder}
+            rows={rows}
+            autoComplete={autoComplete?"on":"off"}
+          />
           {validationErrors && <Alert bsStyle="danger">
             {validationErrors.map(error => <p key={error}>{error}</p>)}
           </Alert>}

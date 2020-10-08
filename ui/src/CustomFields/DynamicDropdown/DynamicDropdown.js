@@ -94,7 +94,7 @@ class DynamicDropdownWithContext extends React.Component {
 
   triggerRemoveSuggestionOnChange = () => {
     let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
-    selectedInstance && selectedInstance.setFieldAsNull(this.props.field.path.substr(1));
+    selectedInstance && selectedInstance.setFieldAsNull(this.props.field.path.substr(1)); //TODO: Remove setFieldAsNull
     this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
     this.handleNodesStyles(this.props.field.getValue(false));
     let event = new Event("input", { bubbles: true });
@@ -149,7 +149,6 @@ class DynamicDropdownWithContext extends React.Component {
   }
 
   getAlternatives = () => {
-    //const { formStore, field: { path, fullyQualifiedName} } = this.props;
     const { formStore, field: { path } } = this.props;
 
 
@@ -200,13 +199,13 @@ class DynamicDropdownWithContext extends React.Component {
     this.triggerOnChange();
   }
 
-  handleAlternativeSelect = values => {
+  handleSelectAlternative = values => {
     this.props.field.setValues(values);
     instanceStore.togglePreviewInstance();
     this.triggerOnChange();
   }
 
-  handleRemoveSuggestion = () => {
+  handleRemoveMySuggestion = () => {
     //let field = this.props.field.removeAllValues();
     this.props.field.removeAllValues();
     instanceStore.togglePreviewInstance();
@@ -350,7 +349,6 @@ class DynamicDropdownWithContext extends React.Component {
     const {
       instanceId,
       links,
-      fullyQualifiedName,
       disabled,
       readOnly,
       readMode,
@@ -371,7 +369,7 @@ class DynamicDropdownWithContext extends React.Component {
     }
 
     const selectedInstance = instanceStore.instances.get(instanceId);
-    const isAlternativeDisabled = !selectedInstance || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
+    const isAlternativeDisabled = !selectedInstance; // || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
     const isDisabled = formStore.readMode || readMode || readOnly || disabled;
     const canAddValues = !isDisabled && links.length < max;
 
@@ -386,8 +384,8 @@ class DynamicDropdownWithContext extends React.Component {
               show={!disabled && !readOnly && !!this.state.alternatives.length}
               disabled={disabled || readOnly || isAlternativeDisabled}
               list={this.state.alternatives}
-              onSelect={this.handleAlternativeSelect}
-              onClick={this.handleRemoveSuggestion}
+              onSelect={this.handleSelectAlternative}
+              onRemove={this.handleRemoveMySuggestion}
               field={field}
               parentContainerClassName="form-group"
               ref={ref=>this.alternativesRef = ref}/>

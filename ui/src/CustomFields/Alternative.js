@@ -90,10 +90,10 @@ class Alternative extends React.Component {
     typeof onSelect === "function" && onSelect(alternative, event);
   }
 
-  handleClick = event => {
+  handleRemoveClick = event => {
     event.stopPropagation();
-    const { onClick } = this.props;
-    typeof onClick === "function" && onClick(event);
+    const { onRemove } = this.props;
+    typeof onRemove === "function" && onRemove(event);
   }
 
   render() {
@@ -116,7 +116,7 @@ class Alternative extends React.Component {
             :null
           }
           {isOwnAlternative && (
-            <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleClick} icon="times" /></span>
+            <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleRemoveClick} icon="times" /></span>
           )}
         </div>
       </MenuItem>

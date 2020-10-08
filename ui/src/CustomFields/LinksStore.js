@@ -26,6 +26,7 @@ const defaultNumberOfVisibleLinks = 10;
 
 class LinksStore extends FormStore.typesMapping.Default{
   @observable value = [];
+  @observable initialValue = [];
   @observable options = [];
   @observable instanceId = null;
   @observable fullyQualifiedName = null;
@@ -43,6 +44,7 @@ class LinksStore extends FormStore.typesMapping.Default{
   @observable optionsCurrentTotal = Infinity;
   @observable fetchingOptions = false;
 
+
   @observable lazyShowLinks = false;
   @observable visibleLinks = new Set();
 
@@ -56,6 +58,11 @@ class LinksStore extends FormStore.typesMapping.Default{
   constructor(fieldData, store, path){
     super(fieldData, store, path);
     this.injectValue(this.value);
+  }
+
+  @computed
+  get hasChanged() {
+    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val[this.mappingValue] !== this.initialValue[index][this.mappingValue]);
   }
 
   @action
@@ -77,6 +84,7 @@ class LinksStore extends FormStore.typesMapping.Default{
         this.visibleLinks.add(value[this.mappingValue]);
       }
     });
+    this.initialValue = [...this.value];
   }
 
   @computed
@@ -125,7 +133,7 @@ class LinksStore extends FormStore.typesMapping.Default{
   }
 
   @action
-  removeValue(value) {
+  removeValue(value) { 
     if(!this.disabled && !this.readOnly) {
       this.visibleLinks.delete(value[this.mappingValue]);
       super.removeValue(value);

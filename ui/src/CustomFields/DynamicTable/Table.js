@@ -100,8 +100,21 @@ class LabelCellRenderer extends React.Component {
 
 @observer
 class ActionsCellRenderer extends React.Component {
+
+  handleRetry = e => {
+    e.stopPropagation();
+    const { instanceId, onRetry } = this.props;
+    onRetry(instanceId);
+  }
+
+  handleDelete = e => {
+    e.stopPropagation();
+    const { index, onDeleteRow} = this.props;
+    onDeleteRow(index);
+  }
+
   render() {
-    const {instanceId, index, readOnly, onRetry, onDeleteRow} = this.props;
+    const {instanceId, readOnly} = this.props;
     if (readOnly) {
       return null;
     }
@@ -110,14 +123,14 @@ class ActionsCellRenderer extends React.Component {
 
     if (instance && instance.fetchError) {
       return (
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={onRetry(instanceId)} >
+        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry} >
           <FontAwesomeIcon icon="redo-alt"/>
         </Button>
       );
     }
     if (!instance || instance.isFetched || instance.isLabelFetched) {
       return (
-        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={onDeleteRow(index)} >
+        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDelete} >
           <FontAwesomeIcon icon="times"/>
         </Button>
       );
@@ -152,27 +165,15 @@ class Table extends React.Component {
     window.removeEventListener("resize", this.setContainerWidth);
   }
 
-  handleDeleteRow = index => e => {
-    e.stopPropagation();
-    this.props.onRowDelete(index);
-  }
+  handleDeleteRow = index => this.props.onRowDelete(index);
 
-  handleRetry = id => e => {
-    e.stopPropagation();
-    this.props.field.fetchInstance(id);
-  }
+  handleRetry = id => this.props.field.fetchInstance(id);
 
-  handleRowClick = ({index}) => {
-    typeof this.props.onRowMouseOver === "function" && this.props.onRowClick(index);
-  }
+  handleRowClick = ({index}) => typeof this.props.onRowMouseOver === "function" && this.props.onRowClick(index);
 
-  handleRowMouseOver = ({index}) => {
-    typeof this.props.onRowMouseOver === "function" && this.props.onRowMouseOver(index);
-  }
+  handleRowMouseOver = ({index}) => typeof this.props.onRowMouseOver === "function" && this.props.onRowMouseOver(index);
 
-  handleRowMouseOut = ({index}) => {
-    typeof this.props.onRowMouseOut === "function" && this.props.onRowMouseOut(index);
-  }
+  handleRowMouseOut = ({index}) => typeof this.props.onRowMouseOut === "function" && this.props.onRowMouseOut(index);
 
   setContainerWidth = () => {
     if(this.wrapperRef){
@@ -189,15 +190,12 @@ class Table extends React.Component {
     }
   }
 
-  rowGetter = ({index}) => {
-    const { list } = this.props;
-    return list[index];
-  }
+  rowGetter = ({index}) => this.props.list[index];
 
-  actionsCellRenderer = ({rowData: instanceId, index}) => (
+  actionsCellRenderer = ({rowData: instanceId, rowIndex}) => (
     <ActionsCellRenderer
       instanceId={instanceId}
-      index={index}
+      index={rowIndex}
       readOnly={this.props.readOnly}
       onRetry={this.handleRetry}
       onDeleteRow={this.handleDeleteRow}

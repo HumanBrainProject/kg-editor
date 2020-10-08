@@ -17,7 +17,7 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { FormGroup, FormControl, InputGroup, Button, Glyphicon, Alert } from "react-bootstrap";
+import { FormGroup, FormControl, Alert } from "react-bootstrap";
 import autosize from "autosize";
 import getLineHeight from "line-height";
 import { isFunction } from "lodash";

@@ -133,7 +133,7 @@ class LinksStore extends FormStore.typesMapping.Default{
   }
 
   @action
-  removeValue(value) { 
+  removeValue(value) {
     if(!this.disabled && !this.readOnly) {
       this.visibleLinks.delete(value[this.mappingValue]);
       super.removeValue(value);

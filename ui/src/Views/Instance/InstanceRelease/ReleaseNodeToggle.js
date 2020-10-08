@@ -32,8 +32,9 @@ const styles = {
     "&.no-unrelease": {
       marginRight: "24px"
     },
-    "& .ban": {
-      marginRight: "29px"
+    "& .ban svg": {
+      color: "var(--release-color-not-released)",
+      fontSize: "1.5em"
     }
   },
 };

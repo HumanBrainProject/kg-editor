@@ -23,11 +23,9 @@ import historyStore from "./HistoryStore";
 import appStore from "./AppStore";
 
 const setNodeTypes = node => {
+  node.typesName = node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
   if (Array.isArray(node.children) && node.children.length) {
-    node.children.forEach(child => {
-      child.typesName = child.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
-      setNodeTypes(child);
-    });
+    node.children.forEach(child => setNodeTypes(child)); // Change child permissions here in case you want to test permissions.
     node.children = node.children.sort((a, b) =>  a.typesName.toUpperCase().localeCompare(b.typesName.toUpperCase()));
   }
 };

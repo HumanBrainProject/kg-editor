@@ -63,7 +63,7 @@ const styles = {
     }
   },
   action: {
-    marginTop: "29px"
+    marginTop: "64px"
   },
   listPnl: {
     display: "flex",
@@ -73,8 +73,8 @@ const styles = {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginRight: "23px",
-    paddingTop: "5px",
+    marginRight: "45px",
+    paddingTop: "35px",
     paddingBottom: "5px"
   },
   list: {

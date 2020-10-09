@@ -85,6 +85,7 @@ class UsersStore {
         familyName: null,
         emails: [],
         picture: null,
+        profileUrl: null,
         isCurator: false,
         isFetching: false,
         isFetched: false,
@@ -107,6 +108,7 @@ class UsersStore {
           user.familyName = userData && userData.familyName;
           user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
           user.picture = userData && userData.picture;
+          user.profileUrl = userData && userData.profileUrl;
           user.isCurator = !!userData && !!userData.isCurator;
           user.isFetching = false;
           user.isFetched = true;
@@ -119,6 +121,7 @@ class UsersStore {
           user.familyName = null;
           user.emails = [];
           user.picture = null;
+          user.profileUrl = null;
           user.isCurator = false;
           const error = e.message ? e.message : e;
           user.fetchError = `Error while retrieving user "${userId}" (${error})`;

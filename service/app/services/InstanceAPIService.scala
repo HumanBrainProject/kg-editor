@@ -197,7 +197,8 @@ trait InstanceAPIService {
       .addQueryStringParameters(
         "stage" -> "IN_PROGRESS",
         "metadata" -> "true",
-        "returnPermissions" -> "true"
+        "returnPermissions" -> "true",
+        "returnAlternatives" -> "true"
       )
     val r = Task.deferFuture(q.get())
     r.map { res =>

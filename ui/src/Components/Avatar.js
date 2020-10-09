@@ -35,8 +35,7 @@ const styles = {
 class Avatar extends React.Component {
 
   render() {
-    const {classes, userId, name, picture} = this.props;
-    const size = 20;
+    const {classes, userId, name, picture, title, size=20} = this.props;
 
     if (!userId) {
       return null;
@@ -44,7 +43,7 @@ class Avatar extends React.Component {
 
     if (picture) {
       return (
-        <img alt={name?name:userId} width={size} height={size} src={picture} title={name?name:userId} className={`${classes.avatar} avatar picture`} />
+        <img alt={name?name:userId} width={size} height={size} src={picture} title={title?title:(name?name:userId)} className={`${classes.avatar} avatar picture`} />
       );
     }
 

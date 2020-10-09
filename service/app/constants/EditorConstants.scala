@@ -34,6 +34,7 @@ object EditorConstants {
   val VOCAB_PROPERTY_UPDATES = s"${CORE_META}propertyUpdates"
   val VOCAB_PROPERTIES = s"${CORE_META}properties"
   val VOCAB_LABEL_PROPERTY = s"${CORE_META}type/labelProperty"
+  val VOCAB_PICTURE = s"${CORE_META}picture"
   val VOCAB_WORKSPACES = s"${CORE_META}workspaces"
   val VOCAB_SEARCHABLE = s"${CORE_META}property/searchable"
   val VOCAB_TARGET_TYPES = s"${CORE_META}targetTypes"

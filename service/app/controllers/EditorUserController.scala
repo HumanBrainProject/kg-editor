@@ -35,6 +35,16 @@ class EditorUserController @Inject()(
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
+  def md5HashString(s: String): String = {
+    import java.security.MessageDigest
+    import java.math.BigInteger
+    val md = MessageDigest.getInstance("MD5")
+    val digest = md.digest(s.getBytes)
+    val bigInt = new BigInteger(1,digest)
+    val hashedString = bigInt.toString(16)
+    hashedString
+  }
+
   def getUserInfo(profile: JsValue, workspaces: Option[JsValue]): JsValue = {
     val info = profile.as[Map[String, JsValue]]
     val ids: JsArray = info.get(SchemaFieldsConstants.NATIVE_ID) match {
@@ -43,9 +53,18 @@ class EditorUserController @Inject()(
     }
     val userInfo: Map[String, JsValue] = info
       .updated(SchemaFieldsConstants.IDENTIFIER, ids)
-    val user = workspaces match {
-      case Some(w) => userInfo.updated(EditorConstants.VOCAB_WORKSPACES, w)
+    val userWithPicture: Map[String, JsValue] = userInfo.get(SchemaFieldsConstants.EMAIL) match {
+      case Some(email) => {
+        val hash = md5HashString(email.as[String])
+        userInfo
+          .updated(SchemaFieldsConstants.PICTURE, Json.toJson("https://www.gravatar.com/avatar/" + hash))
+          .updated(SchemaFieldsConstants.PROFILE_URL, Json.toJson("https://www.gravatar.com/" + hash))
+      }
       case _ => userInfo
+    }
+    val user = workspaces match {
+      case Some(w) => userWithPicture.updated(EditorConstants.VOCAB_WORKSPACES, w)
+      case _ => userWithPicture
     }
     Json.toJson(user)
   }

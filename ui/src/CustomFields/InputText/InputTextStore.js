@@ -21,10 +21,11 @@ import { FormStore } from "hbp-quickfire";
 class InputTextStore extends FormStore.typesMapping.InputText {
   @observable returnAsNull = false;
   @observable emptyToNull = false;
-  @observable initialValue = "";
+  @observable instanceId = null;
+  initialValue = "";
 
   static get properties(){
-    return union(super.properties,["emptyToNull"]);
+    return union(super.properties,["emptyToNull", "instanceId"]);
   }
 
   constructor(fieldData, store, path) {
@@ -34,6 +35,10 @@ class InputTextStore extends FormStore.typesMapping.InputText {
 
   @computed
   get hasChanged() {
+    //window.console.log("instance: " + this.instanceId + ", field=" + this.label +  " hasChanged=" + (this.getValue(true) !== this.initialValue )+ ", value=" + this.getValue(true) + ", value=" + this.initialValue);
+    if (typeof this.initialValue  === "object") {
+      return typeof currentValue !== "object"; // user did not change the value
+    }
     return this.getValue(true) !== this.initialValue;
   }
 

@@ -21,10 +21,11 @@ import { FormStore } from "hbp-quickfire";
 class TextAreaStore extends FormStore.typesMapping.TextArea {
   @observable returnAsNull = false;
   @observable emptyToNull = false;
-  @observable initialValue = "";
+  @observable instanceId = null;
+  initialValue = "";
 
   static get properties(){
-    return union(super.properties,["emptyToNull"]);
+    return union(super.properties,["emptyToNull", "instanceId"]);
   }
 
   constructor(fieldData, store, path) {
@@ -34,6 +35,10 @@ class TextAreaStore extends FormStore.typesMapping.TextArea {
 
   @computed
   get hasChanged() {
+    //window.console.log("instance: " + this.instanceId + ", field=" + this.label +  " hasChanged=" + (this.getValue(true) !== this.initialValue) + ", value=" + this.getValue(true) + ", value=" + this.initialValue);
+    if (typeof this.initialValue  === "object") {
+      return typeof this.getValue(true) !== "object"; // user did not change the value
+    }
     return this.getValue(true) !== this.initialValue;
   }
 
@@ -42,11 +47,10 @@ class TextAreaStore extends FormStore.typesMapping.TextArea {
     this.returnAsNull = false;
     if (value !== null && value !== undefined) {
       this.value = value;
-      this.initialValue = value;
     } else {
       this.value = this.__emptyValue();
-      this.initialValue = this.__emptyValue();
     }
+    this.initialValue = this.value;
   }
 
   @action

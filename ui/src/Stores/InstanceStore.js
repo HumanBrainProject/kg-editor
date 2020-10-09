@@ -206,10 +206,15 @@ class Instance {
     return !this.isFetched || (this.form && this.form.readMode);
   }
 
+  @computed
+  get belongsToCurrentWorkspace() {
+    return appStore.currentWorkspace && this.workspace !== appStore.currentWorkspace.id;
+  }
+
   @action
   setReadMode(readMode){
     if (this.isFetched) {
-      this.form.toggleReadMode(!!readMode || (appStore.currentWorkspace && this.workspace !== appStore.currentWorkspace.id));
+      this.form.toggleReadMode(!!readMode || this.belongsToCurrentWorkspace);
     }
   }
 

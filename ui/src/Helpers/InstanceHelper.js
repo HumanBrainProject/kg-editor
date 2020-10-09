@@ -153,10 +153,12 @@ export const normalizeInstanceData = (data, transformField = null) => {
     case "InputText":
     case "KgInputText":
       field.type = "KgInputText";
+      field.instanceId = instanceId;
       break;
     case "TextArea":
     case "KgTextArea":
       field.type = "KgTextArea";
+      field.instanceId = instanceId;
       break;
     case "DynamicDropdown":
     case "KgDynamicDropdown":

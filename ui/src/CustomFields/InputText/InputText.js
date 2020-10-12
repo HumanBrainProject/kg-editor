@@ -70,6 +70,8 @@ const FieldValue = ({field, readModeRendering, splitLines}) => {
   );
 };
 
+const AlternativeValue = ({value}) => value;
+
 @inject("formStore")
 @injectStyles(styles)
 @observer
@@ -114,7 +116,7 @@ class InputText extends React.Component {
   handleRemoveMySuggestion = () => this.props.field.setValue(null);
 
   render() {
-    const { classes, formStore } = this.props;
+    const { classes } = this.props;
 
     if(this.props.formStore.readMode || this.props.field.readMode){
       return this.renderReadMode();
@@ -130,18 +132,9 @@ class InputText extends React.Component {
       validationState,
       placeholder,
       rows,
-      path,
-      returnAsNull
+      returnAsNull,
+      alternatives
     } = this.props.field;
-
-    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char
-    const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
-      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
-      .map(alternative => ({
-        value: alternative.value,
-        users: alternative.users,
-        selected: !!alternative.selected
-      }));
 
     return (
       <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
@@ -155,6 +148,7 @@ class InputText extends React.Component {
             onSelect={this.handleSelectAlternative}
             onRemove={this.handleRemoveMySuggestion}
             parentContainerClassName="form-group"
+            ValueRenderer={AlternativeValue}
           />
           <FormControl
             value={value}

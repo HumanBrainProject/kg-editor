@@ -16,14 +16,12 @@
 
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { toJS } from "mobx";
 import { FormGroup, Alert } from "react-bootstrap";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
 import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import FieldError from "../FieldError";
-import Alternatives from "../Alternatives";
 import List from "./List";
 
 import instanceStore from "../../Stores/InstanceStore";
@@ -31,6 +29,7 @@ import typesStore from "../../Stores/TypesStore";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
+import LinksAlternatives from "../LinksAlternatives";
 
 const styles = {
   values:{
@@ -63,23 +62,6 @@ const styles = {
 @injectStyles(styles)
 @observer
 class DynamicDropdownWithContext extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      alternatives: []
-    };
-  }
-
-  componentDidMount(){
-    this.getAlternatives();
-  }
-
-  componentDidUpdate(prevProps){
-    if (this.props.formStore && this.props.formStore.structure && (!prevProps.formStore || !prevProps.formStore.structure || (JSON.stringify(toJS(this.props.formStore.structure.alternatives)) !== JSON.stringify(toJS(prevProps.formStore.structure.alternatives))))) {
-      this.getAlternatives();
-    }
-  }
-
   //The only way to trigger an onChange event in React is to do the following
   //Basically changing the field value, bypassing the react setter and dispatching an "input"
   // event on a proper html input node
@@ -105,63 +87,6 @@ class DynamicDropdownWithContext extends React.Component {
     const prototype = window.HTMLInputElement.prototype;
     Object.getOwnPropertyDescriptor(prototype, "value").set
       .call(this.hiddenInputRef, JSON.stringify(value));
-  }
-
-  getAlternativeOptions = value => {
-    const { field } = this.props;
-    const { options, mappingValue } = field;
-    const valueAttributeName = mappingValue?mappingValue:"id";
-
-    if (!value) {
-      return [];
-    }
-
-    if (typeof value !== "object") {
-      return [value];
-    }
-
-    if (value.length) {
-      return value.map(item => {
-        if (item[valueAttributeName]) {
-          if (options instanceof Array) {
-            const option = options.find(option => option[valueAttributeName] === item[valueAttributeName]);
-            if (option) {
-              return option;
-            }
-          }
-          return field.getOption(item);
-        }
-        return item;
-      });
-    }
-
-    if (value[valueAttributeName]) {
-      if (options instanceof Array) {
-        const option = options.find(option => option[valueAttributeName] === value[valueAttributeName]);
-        if (option) {
-          return [option];
-        }
-      }
-      return [field.getOption(value)];
-    }
-
-    return [];
-  }
-
-  getAlternatives = () => {
-    const { formStore, field: { path } } = this.props;
-
-
-
-    const fieldPath = (typeof path === "string")?path.substr(1):null; // remove first | char, later if we go for hierarchical field
-    const alternatives = ((fieldPath && formStore && formStore.structure && formStore.structure.alternatives && formStore.structure.alternatives[fieldPath])?formStore.structure.alternatives[fieldPath]:[])
-      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
-      .map(alternative => ({
-        value: this.getAlternativeOptions(alternative.value),
-        userIds: alternative.userIds,
-        selected: !!alternative.selected
-      }));
-    this.setState({alternatives: alternatives});
   }
 
   dropValue(droppedValue) {
@@ -241,17 +166,11 @@ class DynamicDropdownWithContext extends React.Component {
     this.triggerOnChange();
   };
 
-  handleDragEnd = () => {
-    this.draggedValue = null;
-  };
+  handleDragEnd = () => this.draggedValue = null;
 
-  handleDragStart = value => {
-    this.draggedValue = value;
-  };
+  handleDragStart = value => this.draggedValue = value;
 
-  handleDrop = value => {
-    this.dropValue(value);
-  };
+  handleDrop = value => this.dropValue(value);
 
   handleKeyDown = (value, e) => {
     if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
@@ -305,13 +224,9 @@ class DynamicDropdownWithContext extends React.Component {
     instanceStore.togglePreviewInstance(instanceId, instanceName, options);
   }
 
-  handleSearchOptions = term => {
-    this.props.field.searchOptions(term);
-  }
+  handleSearchOptions = term => this.props.field.searchOptions(term);
 
-  handleLoadMoreOptions = () => {
-    this.props.field.loadMoreOptions();
-  }
+  handleLoadMoreOptions = () => this.props.field.loadMoreOptions();
 
   renderReadMode(){
     const { classes, field, view } = this.props;
@@ -353,6 +268,7 @@ class DynamicDropdownWithContext extends React.Component {
       readOnly,
       readMode,
       max,
+      mappingValue,
       allowCustomValues,
       validationErrors,
       validationState,
@@ -361,7 +277,8 @@ class DynamicDropdownWithContext extends React.Component {
       optionsTypes,
       optionsExternalTypes,
       hasMoreOptions,
-      fetchingOptions
+      fetchingOptions,
+      alternatives
     } = field;
 
     if(formStore.readMode || readMode){
@@ -369,7 +286,7 @@ class DynamicDropdownWithContext extends React.Component {
     }
 
     const selectedInstance = instanceStore.instances.get(instanceId);
-    const isAlternativeDisabled = !selectedInstance; // || selectedInstance.fieldsToSetAsNull.includes(fullyQualifiedName);
+    const isAlternativeDisabled = !selectedInstance;
     const isDisabled = formStore.readMode || readMode || readOnly || disabled;
     const canAddValues = !isDisabled && links.length < max;
 
@@ -377,18 +294,21 @@ class DynamicDropdownWithContext extends React.Component {
       <FieldError id={instanceId} field={field}>
         <div>
           <FormGroup
+            ref={ref=>this.formGroupRef = ref}
             className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${disabled || readOnly? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
             validationState={validationState}>
-            <FieldLabel field={this.props.field}/>
-            <Alternatives className={classes.alternatives}
-              show={!disabled && !readOnly && !!this.state.alternatives.length}
+            <FieldLabel field={field}/>
+            <LinksAlternatives
+              className={classes.alternatives}
+              show={!disabled && !readOnly && !!alternatives.length}
               disabled={disabled || readOnly || isAlternativeDisabled}
-              list={this.state.alternatives}
+              list={alternatives}
               onSelect={this.handleSelectAlternative}
               onRemove={this.handleRemoveMySuggestion}
-              field={field}
+              mappingValue={mappingValue}
               parentContainerClassName="form-group"
-              ref={ref=>this.alternativesRef = ref}/>
+              // formGroupRef={this.formGroupRef}
+            />
             <div className={`form-control ${classes.values}`} disabled={disabled} readOnly={readOnly} >
               <List
                 list={links}

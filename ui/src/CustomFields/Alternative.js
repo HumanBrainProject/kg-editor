@@ -22,40 +22,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
 
-const Value = ({value, field}) => {
-  if (value === undefined || value === null) {
-    return null;
-  }
 
-  const labelAttributeName = (field && field.mappingLabel)?field.mappingLabel:"name";
-  const valueAttributeName = (field && field.mappingValue)?field.mappingValue:"id";
-
-  if (typeof value === "object") {
-    return value[labelAttributeName]?value[labelAttributeName]:(value[valueAttributeName]?value[valueAttributeName]:null);
-  }
-
-  return value;
-};
-
-const Values = ({value, field, separator= "; "}) => {
-
-  if (typeof value === "object" && value.length) {
-
-    const valueAttributeName = (field && field.mappingValue)?field.mappingValue:"id";
-
-    return value.map((item, index) => {
-      return(
-        <React.Fragment key={typeof item === "object"?(item[valueAttributeName]?item[valueAttributeName]:index):item}>
-          {index?separator:""}<Value value={item} field={field} />
-        </React.Fragment>
-      );
-    });
-  }
-
-  return (
-    <Value value={value} />
-  );
-};
 
 const styles = {
   container: {
@@ -97,7 +64,7 @@ class Alternative extends React.Component {
   }
 
   render() {
-    const { classes, alternative, field, className } = this.props;
+    const { classes, alternative, ValueRenderer, className } = this.props;
 
     const users = (!alternative || !alternative.users)?[]:alternative.users;
     const isOwnAlternative = users.includes(authStore.user.id);
@@ -106,7 +73,7 @@ class Alternative extends React.Component {
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
         <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect(alternative)}>
           <strong>
-            <Values value={alternative.value} field={field} /></strong> <em><div className="parenthesis">(</div>{
+            <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
             users.map(user => (
               <User userId={user.id} name={user.name} key={user.id} />
             ))

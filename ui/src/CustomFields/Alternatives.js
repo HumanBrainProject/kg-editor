@@ -184,7 +184,7 @@ class Alternatives extends React.Component {
   }
 
   render() {
-    const {classes, className, show, disabled, list, field } = this.props;
+    const {classes, className, show, disabled, list, ValueRenderer } = this.props;
 
     if (!show || !list || !list.length) {
       return null;
@@ -216,7 +216,7 @@ class Alternatives extends React.Component {
           {list.map(alternative => {
             const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => acc += user.id, "");
             return (
-              <Alternative key={key} alternative={alternative} field={field} onRemove={this.handleRemove} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
+              <Alternative key={key} alternative={alternative} ValueRenderer={ValueRenderer} onRemove={this.handleRemove} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
             );
           })}
         </ul>

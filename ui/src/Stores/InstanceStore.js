@@ -279,11 +279,12 @@ class Instance {
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
     if (this.form) {
-      const values = Object.entries(normalizedData.fields).reduce((acc, [key,field]) => {
-        acc[key] = field.value;
-        return acc;
-      }, {});
-      this.form.injectValues(values);
+      Object.entries(normalizedData.fields).forEach(([key, field]) => {
+        const target = this.form.structure.fields[key];
+        target.injectValue(field.value);
+        const alternatives = normalizedData.fields[key].alternatives;
+        target.alternatives = alternatives ? alternatives:[];
+      });
     } else {
       this.form = new FormStore(normalizedData);
     }

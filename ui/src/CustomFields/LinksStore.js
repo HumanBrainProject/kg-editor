@@ -27,6 +27,7 @@ const defaultNumberOfVisibleLinks = 10;
 class LinksStore extends FormStore.typesMapping.Default{
   @observable value = [];
   @observable options = [];
+  @observable alternatives = {};
   @observable instanceId = null;
   @observable fullyQualifiedName = null;
   @observable allowCustomValues =  false;

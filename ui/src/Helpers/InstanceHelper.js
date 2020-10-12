@@ -136,6 +136,16 @@ export const normalizeInstanceData = (data, transformField = null) => {
   // };
   // END of TODO
 
+  const normalizeAlternative = (name, field, alternatives) => {
+    field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
+      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
+      .map(alternative => ({
+        value: alternative.value,
+        users: alternative.users,
+        selected: !!alternative.selected
+      }));
+  };
+
   const normalizeField = (field, instanceId) => {
     switch (field.type) {
     case "Nested":
@@ -185,10 +195,11 @@ export const normalizeInstanceData = (data, transformField = null) => {
     }
   };
 
-  const normalizeFields = (fields, instanceId) => {
-    Object.values(fields).forEach(field => {
+  const normalizeFields = (fields, instanceId, alternatives) => {
+    Object.entries(fields).forEach(([name, field]) => {
       typeof transformField === "function" && transformField(field);
       normalizeField(field, instanceId);
+      normalizeAlternative(name, field, alternatives);
     });
   };
 
@@ -227,11 +238,8 @@ export const normalizeInstanceData = (data, transformField = null) => {
     instance.promotedFields = data.promotedFields;
   }
   if (typeof data.fields === "object") {
-    normalizeFields(data.fields, instance.id);
+    normalizeFields(data.fields, instance.id, data.alternatives);
     instance.fields = data.fields;
-  }
-  if (typeof data.alternatives === "object") {
-    instance.alternatives = data.alternatives;
   }
   if (typeof data.metadata === "object") {
     const metadata = data.metadata;

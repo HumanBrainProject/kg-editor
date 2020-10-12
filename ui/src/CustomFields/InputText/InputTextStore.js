@@ -22,6 +22,7 @@ class InputTextStore extends FormStore.typesMapping.InputText {
   @observable returnAsNull = false;
   @observable emptyToNull = false;
   @observable instanceId = null;
+  @observable alternatives = {};
   initialValue = "";
 
   static get properties(){

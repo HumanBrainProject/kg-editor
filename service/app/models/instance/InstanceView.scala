@@ -46,6 +46,7 @@ object InstanceView {
     res match {
       case Some((instanceId, instanceTypes)) =>
         val structure = StructureOfInstance(instanceTypes, typeInfoMap)
+        val alternatives = InstanceHelper.getAlternatives(data, apiInstancesPrefix)
         InstanceView(
           instanceId,
           (data \ EditorConstants.VOCAB_SPACE).asOpt[String],
@@ -54,7 +55,7 @@ object InstanceView {
           structure.labelField.headOption,
           InstanceHelper.getFields(data, structure.fields, apiInstancesPrefix),
           InstanceHelper.getPermissions(data),
-          InstanceHelper.getAlternatives(data),
+          alternatives,
           InstanceHelper.getUser(data, apiInstancesPrefix),
           None
         )

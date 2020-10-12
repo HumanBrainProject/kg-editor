@@ -17,20 +17,33 @@
 package models.instance
 
 import constants.EditorConstants
+import helpers.DocumentId
 import models.user.User
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json.{JsPath, JsValue, Json, Reads}
 
-final case class Alternative(value: String, selected: Boolean, users: List[User])
+final case class Alternative(value: JsValue, selected: Boolean, users: List[User])
 
 object Alternative {
 
+  def normalizeAlternative(alternative: Alternative, apiInstancesPrefix: String) : Alternative =
+    alternative.value.asOpt[List[JsValue]] match {
+      case Some(v) =>
+        val list: List[JsValue] = v.map(i =>
+          (i \ "@id").asOpt[String] match {
+            case Some(x) => Json.obj("@id" -> DocumentId.getIdFromPath(x, apiInstancesPrefix))
+            case _ => i
+          })
+        Alternative(Json.toJson(list), alternative.selected, alternative.users)
+      case _ => alternative
+    }
+
   implicit val alternativeReads: Reads[Alternative] = (
-    (JsPath \ EditorConstants.VOCAB_VALUE).read[String] and
-    (JsPath \ EditorConstants.VOCAB_SELECTED).read[Boolean] and
-    (JsPath \ EditorConstants.VOCAB_USER).read[List[User]]
-  )(Alternative.apply _)
+    (JsPath \ EditorConstants.VOCAB_VALUE).read[JsValue] and
+      (JsPath \ EditorConstants.VOCAB_SELECTED).read[Boolean] and
+      (JsPath \ EditorConstants.VOCAB_USER).read[List[User]]
+    ) (Alternative.apply _)
 
   implicit val alternativeWrites = Json.writes[Alternative]
 }

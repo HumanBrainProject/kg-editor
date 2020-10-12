@@ -21,7 +21,7 @@ import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
 import models.instance._
 import models.permissions.Permissions
-import play.api.libs.json.{JsObject, JsString, JsValue}
+import play.api.libs.json.{JsObject, JsString, JsValue, _}
 import play.api.mvc.AnyContent
 
 object InstanceHelper {
@@ -147,21 +147,17 @@ object InstanceHelper {
 
   def getPermissions(data: JsObject): Permissions = Permissions((data \ EditorConstants.VOCAB_PERMISSIONS).asOpt[List[String]])
 
-  def getAlternatives(data: JsObject): Map[String, List[Alternative]] =
-    (data \ s"${EditorConstants.VOCAB_ALTERNATIVES}").asOpt[Map[String, JsValue]] match {
+  def getAlternatives(data: JsObject, apiInstancesPrefix: String): Map[String, List[Alternative]] =
+    (data \ s"${EditorConstants.VOCAB_ALTERNATIVES}").asOpt[List[Map[String, JsValue]]] match {
       case Some(alternatives) =>
-        alternatives.foldLeft(Map[String, List[Alternative]]()) {
-          case (acc, data) =>
-            data._2.asOpt[List[Alternative]] match {
-              case Some(alt) =>
-                if (!data._1.contains("https://schema.hbp.eu/relativeUrl")) {
-                  acc.updated(data._1, alt)
-                } else {
-                  acc
-                }
-              case _ => acc
-            }
-        }
+        alternatives.head
+          .filter(x => !x._1.equals(EditorConstants.VOCAB_SPACE)) //TODO: Remove space from kg core
+          .foldLeft(Map[String, List[Alternative]]()) {
+            case (acc, (k, v)) =>
+              val vv = v.as[List[Alternative]]
+              val l = vv.map(a => Alternative.normalizeAlternative(a, apiInstancesPrefix))
+              acc.updated(k, l)
+          }
       case None => Map()
     }
 
@@ -183,7 +179,7 @@ object InstanceHelper {
           case _ => ""
         }
       case _ => ""
-      }
+    }
 
   def filterStructureOfFields(
                                fieldsInfo: Map[String, StructureOfField],

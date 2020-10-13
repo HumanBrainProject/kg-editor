@@ -89,23 +89,9 @@ const styles = {
 @injectStyles(styles)
 @observer
 class DynamicTableWithContext extends React.Component {
-
-  //The only way to trigger an onChange event in React is to do the following
-  //Basically changing the field value, bypassing the react setter and dispatching an "input"
-  // event on a proper html input node
-  //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
-  triggerOnChange = () => {
-    this.hiddenInputRef.value = "";
-    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
-      .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
-    var event = new Event("input", { bubbles: true });
-    this.hiddenInputRef.dispatchEvent(event);
-  }
-
   handleDropdownReset = () => {
     this.props.field.resetOptionsSearch();
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleOnAddNewValue = (name, typeName) => {
@@ -119,7 +105,6 @@ class DynamicTableWithContext extends React.Component {
       onAddCustomValue(value, type, field);
     }
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleOnAddValue = id => {
@@ -127,20 +112,17 @@ class DynamicTableWithContext extends React.Component {
     instanceStore.createInstanceOrGet(id);
     const value = {[field.mappingValue]: id};
     field.addValue(value);
-    this.triggerOnChange();
   }
 
   handleDelete = id => e => {
     e.stopPropagation();
     this.props.field.removeValue({[this.props.field.mappingValue]: id});
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleDeleteAll = () => {
     this.props.field.removeAllValues();
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleOptionPreview = (id, name) => {
@@ -162,7 +144,6 @@ class DynamicTableWithContext extends React.Component {
     const value = values[index];
     field.removeValue(value);
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleRowClick = index => {
@@ -277,7 +258,6 @@ class DynamicTableWithContext extends React.Component {
                       onAddNewValue={this.handleOnAddNewValue}
                       onPreview={this.handleOptionPreview}
                     />
-                    <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
                   </div>
                 )}
               </div>

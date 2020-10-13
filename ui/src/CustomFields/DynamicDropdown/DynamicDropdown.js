@@ -62,44 +62,15 @@ const styles = {
 @injectStyles(styles)
 @observer
 class DynamicDropdownWithContext extends React.Component {
-  //The only way to trigger an onChange event in React is to do the following
-  //Basically changing the field value, bypassing the react setter and dispatching an "input"
-  // event on a proper html input node
-  //See for example the discussion here : https://stackoverflow.com/a/46012210/9429503
-  triggerOnChange = () => {
-    this.hiddenInputRef.value = "";
-    Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set
-      .call(this.hiddenInputRef, JSON.stringify(this.props.field.getValue(false)));
-    var event = new Event("input", { bubbles: true });
-    this.hiddenInputRef.dispatchEvent(event);
-  }
-
-  triggerRemoveSuggestionOnChange = () => {
-    let selectedInstance = instanceStore.instances.get(this.props.formStore.structure.id);
-    selectedInstance && selectedInstance.setFieldAsNull(this.props.field.path.substr(1)); //TODO: Remove setFieldAsNull
-    this.inputRef.parentNode.style.height = "34px"; // Only for dropdown as it is wrapped in a div
-    this.handleNodesStyles(this.props.field.getValue(false));
-    let event = new Event("input", { bubbles: true });
-    this.hiddenInputRef.dispatchEvent(event);
-  }
-
-  handleNodesStyles(value){
-    const prototype = window.HTMLInputElement.prototype;
-    Object.getOwnPropertyDescriptor(prototype, "value").set
-      .call(this.hiddenInputRef, JSON.stringify(value));
-  }
-
   dropValue(droppedValue) {
     this.props.field.moveValueAfter(this.draggedValue, droppedValue);
     this.draggedValue = null;
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleDropdownReset = () => {
     this.props.field.resetOptionsSearch();
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleOnAddNewValue = (name, typeName) => {
@@ -113,7 +84,6 @@ class DynamicDropdownWithContext extends React.Component {
       onAddCustomValue(value, type, field);
     }
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleOnAddValue = id => {
@@ -121,26 +91,22 @@ class DynamicDropdownWithContext extends React.Component {
     instanceStore.createInstanceOrGet(id);
     const value = {[field.mappingValue]: id};
     field.addValue(value);
-    this.triggerOnChange();
   }
 
   handleSelectAlternative = values => {
     this.props.field.setValues(values);
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleRemoveMySuggestion = () => {
     //let field = this.props.field.removeAllValues();
     this.props.field.removeAllValues();
     instanceStore.togglePreviewInstance();
-    this.triggerRemoveSuggestionOnChange();
   }
 
   handleDeleteLastValue = () => {
     this.props.field.removeLastValue();
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   }
 
   handleClick = index => {
@@ -163,7 +129,6 @@ class DynamicDropdownWithContext extends React.Component {
     const value = values[index];
     field.removeValue(value);
     instanceStore.togglePreviewInstance();
-    this.triggerOnChange();
   };
 
   handleDragEnd = () => this.draggedValue = null;
@@ -177,7 +142,6 @@ class DynamicDropdownWithContext extends React.Component {
       e.preventDefault();
       this.props.field.removeValue(value);
       instanceStore.togglePreviewInstance();
-      this.triggerOnChange();
     }
   }
 
@@ -253,7 +217,6 @@ class DynamicDropdownWithContext extends React.Component {
               enablePointerEvents={false}
             />
           }
-          <input style={{display:"none"}} type="text" ref={ref=>this.hiddenInputRef = ref}/>
         </div>
       </FieldError>
     );
@@ -346,7 +309,6 @@ class DynamicDropdownWithContext extends React.Component {
                     onDrop={this.dropValue}
                     onPreview={this.handleOptionPreview}
                   />
-                  <input style={{ display: "none" }} type="text" ref={ref => this.hiddenInputRef = ref} />
                 </React.Fragment>
               )}
             </div>

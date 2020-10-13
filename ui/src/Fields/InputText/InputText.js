@@ -15,15 +15,11 @@
 */
 
 import React from "react";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { FormGroup, FormControl, Alert } from "react-bootstrap";
+import { ControlLabel, FormGroup, FormControl, Alert } from "react-bootstrap";
 import autosize from "autosize";
 import getLineHeight from "line-height";
-import { isFunction } from "lodash";
-
-import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
-import clipboard from "hbp-quickfire/lib/Stores/ClipboardStore";
 
 import Alternatives from "../Alternatives";
 import FieldError from "../FieldError";
@@ -52,12 +48,7 @@ const renderLines = value => {
   );
 };
 
-const FieldValue = ({field, readModeRendering, splitLines}) => {
-
-  if (isFunction(readModeRendering)) {
-    return readModeRendering(field);
-  }
-
+const FieldValue = ({field, splitLines}) => {
   const { value } = field;
   const val = !value || typeof value === "string"? value:value.toString();
 
@@ -72,14 +63,9 @@ const FieldValue = ({field, readModeRendering, splitLines}) => {
 
 const AlternativeValue = ({value}) => value;
 
-@inject("formStore")
 @injectStyles(styles)
 @observer
 class InputText extends React.Component {
-  static defaultProps = {
-    componentClass: undefined
-  };
-
   componentDidMount() {
     this.handleAutosize();
   }
@@ -89,7 +75,7 @@ class InputText extends React.Component {
   }
 
   handleAutosize() {
-    if (!this.props.field.autosize) {
+    if (!this.props.autosize) {
       return;
     }
     if (this.inputRef) {
@@ -103,47 +89,38 @@ class InputText extends React.Component {
     }
   }
 
-  handleChange = e => {
-    if(!this.props.field.disabled && !this.props.field.readOnly){
-      this.props.field.setValue(e.target.value);
-    }
-  };
+  handleChange = e => this.props.fieldStore.setValue(e.target.value);
 
-  handlePaste = () => this.props.field.setValue(clipboard.selection);
+  handleSelectAlternative = value => this.props.fieldStore.setValue(value);
 
-  handleSelectAlternative = value => this.props.field.setValue(value);
-
-  handleRemoveMySuggestion = () => this.props.field.setValue(null);
+  handleRemoveMySuggestion = () => this.props.fieldStore.setValue(null);
 
   render() {
     const { classes } = this.props;
 
-    if(this.props.formStore.readMode || this.props.field.readMode){
+    if(this.props.readMode){
       return this.renderReadMode();
     }
 
     const {
       value,
       inputType,
-      autoComplete,
       disabled,
       readOnly,
-      validationErrors,
-      validationState,
-      placeholder,
       rows,
       returnAsNull,
-      alternatives
-    } = this.props.field;
+      alternatives,
+      label
+    } = this.props.fieldStore;
 
     return (
-      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
+      <FieldError fieldStore={this.props.fieldStore}>
         <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
-          <FieldLabel field={this.props.field}/>
+          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <Alternatives
             className={classes.alternatives}
-            show={!disabled && !readOnly && !!alternatives.length}
-            disabled={disabled || readOnly || returnAsNull}
+            show={!!alternatives.length}
+            disabled={returnAsNull}
             list={alternatives}
             onSelect={this.handleSelectAlternative}
             onRemove={this.handleRemoveMySuggestion}
@@ -157,29 +134,21 @@ class InputText extends React.Component {
             componentClass={this.props.componentClass}
             onChange={this.handleChange}
             inputRef={ref=>this.inputRef = ref}
-            disabled={disabled || returnAsNull}
-            readOnly={readOnly}
-            placeholder={placeholder}
+            disabled={returnAsNull}
             rows={rows}
-            autoComplete={autoComplete?"on":"off"}
           />
-          {validationErrors && <Alert bsStyle="danger">
-            {validationErrors.map(error => <p key={error}>{error}</p>)}
-          </Alert>}
         </FormGroup>
       </FieldError>
     );
   }
 
-
   renderReadMode(){
-    const { classes, field, formStore, readModeRendering, componentClass } = this.props;
-    const { value, disabled, readOnly} = field;
+    const { value, label, disabled, readOnly} = this.props.fieldStore;
     return (
-      <FieldError id={formStore.structure.id} field={field}>
-        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
-          <FieldLabel field={field}/>
-          <FieldValue field={field} readModeRendering={readModeRendering} splitLines={componentClass=== "textarea"} />
+      <FieldError fieldStore={this.props.fieldStore}>
+        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${this.props.classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <FieldValue field={this.props.fieldStore} splitLines={this.props.componentClass=== "textarea"} />
         </div>
       </FieldError>
     );

@@ -18,7 +18,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 import Preview from "../Preview";
 // import Reviewers from "./InstanceInvite/Reviewers";
@@ -62,12 +62,12 @@ const styles = {
 @observer
 class InstanceInvite extends React.Component{
   componentDidMount() {
-    instanceStore.setReadMode(true);
+    instancesStore.setReadMode(true);
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.instance && this.props.instance !== prevProps.instance) {
-      instanceStore.setReadMode(true);
+      instancesStore.setReadMode(true);
     }
   }
 

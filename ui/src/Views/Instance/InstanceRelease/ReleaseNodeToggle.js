@@ -19,7 +19,7 @@ import injectStyles from "react-jss";
 import { observer } from "mobx-react";
 import MultiToggle from "../../../Components/MultiToggle";
 import releaseStore from "../../../Stores/ReleaseStore";
-import instanceStore from "../../../Stores/InstanceStore";
+import instancesStore from "../../../Stores/InstancesStore";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const styles = {
@@ -43,7 +43,7 @@ const styles = {
 @observer
 class ReleaseNodeToggle extends React.Component {
   handleChange = status => {
-    instanceStore.togglePreviewInstance();
+    instancesStore.togglePreviewInstance();
     const { node } = this.props;
     releaseStore.markNodeForChange(node, status);
     releaseStore.handleWarning(node, status);

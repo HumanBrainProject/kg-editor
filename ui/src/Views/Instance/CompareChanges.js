@@ -20,7 +20,7 @@ import { entries, toJS } from "mobx";
 import { observer } from "mobx-react";
 import { FormStore } from "hbp-quickfire";
 import CompareFieldsChanges from "./CompareFieldsChanges";
-import instanceStore, {createInstanceStore} from "../../Stores/InstanceStore";
+import instancesStore, {createInstanceStore} from "../../Stores/InstancesStore";
 
 const styles = {
   container: {
@@ -87,7 +87,7 @@ class CompareChanges extends React.Component{
     const { instanceId } = this.props;
     this.savedInstanceStore.flush();
     const savedInstance = this.savedInstanceStore.createInstanceOrGet(instanceId);
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
     const data = cloneInstanceData(instance);
     //window.console.log(data);
     savedInstance.initializeData(data, true, false);
@@ -95,7 +95,7 @@ class CompareChanges extends React.Component{
 
   render(){
     const { classes, instanceId, onClose } = this.props;
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
     const savedInstance = this.savedInstanceStore.instances.get(instanceId);
     if (!instance || !savedInstance) {
       return null;
@@ -107,8 +107,8 @@ class CompareChanges extends React.Component{
           instanceId={instanceId}
           leftInstance={savedInstance}
           rightInstance={instance}
-          leftInstanceStore={instanceStore}
-          rightInstanceStore={instanceStore}
+          leftInstanceStore={instancesStore}
+          rightInstanceStore={instancesStore}
           leftChildrenIds={savedInstance.childrenIds}
           rightChildrenIds={instance.childrenIds}
           onClose={onClose}

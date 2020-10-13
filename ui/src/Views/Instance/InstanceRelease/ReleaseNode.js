@@ -21,7 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import releaseStore from "../../../Stores/ReleaseStore";
 import appStore from "../../../Stores/AppStore";
-import instanceStore from "../../../Stores/InstanceStore";
+import instancesStore from "../../../Stores/InstancesStore";
 
 import ReleaseStatus from "../../../Components/ReleaseStatus";
 import ReleaseNodeToggle from "./ReleaseNodeToggle";
@@ -133,7 +133,7 @@ class ReleaseNode extends React.Component {
   handleOptionPreview = (instanceId, instanceName) => event => {
     event && event.stopPropagation();
     const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(instanceId, instanceName, options );
+    instancesStore.togglePreviewInstance(instanceId, instanceName, options );
   }
 
   handleShowCompare = node => e => {

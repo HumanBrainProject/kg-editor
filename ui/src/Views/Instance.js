@@ -20,7 +20,7 @@ import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
-import instanceStore from "../Stores/InstanceStore";
+import instancesStore from "../Stores/InstancesStore";
 import viewStore from "../Stores/ViewStore";
 import appStore from "../Stores/AppStore";
 import routerStore from "../Stores/RouterStore";
@@ -70,46 +70,46 @@ class Instance extends React.Component {
   setupInstance = () => {
     const { match, mode } = this.props;
     const id = match.params.id;
-    const instance = instanceStore.instances.get(id);
+    const instance = instancesStore.instances.get(id);
     appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, this.props.mode);
-    instanceStore.togglePreviewInstance();
+    instancesStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);
     if (instance && instance.isFetched) {
       if (mode === "create") {
         routerStore.history.replace(`/instance/edit/${id}`);
       }
-      instanceStore.setReadMode(mode !== "edit" && mode !== "create");
+      instancesStore.setReadMode(mode !== "edit" && mode !== "create");
     } else {
-      instanceStore.checkInstanceIdAvailability(id, mode);
+      instancesStore.checkInstanceIdAvailability(id, mode);
     }
   }
 
   handleRetry = () => {
-    instanceStore.checkInstanceIdAvailability(this.props.match.params.id, this.props.mode === "create");
+    instancesStore.checkInstanceIdAvailability(this.props.match.params.id, this.props.mode === "create");
   }
 
   handleContinue = () => {
-    instanceStore.instanceIdAvailability.delete(this.props.match.params.id);
+    instancesStore.instanceIdAvailability.delete(this.props.match.params.id);
     routerStore.history.replace("/browse");
   }
 
   handleCreateNewInstanceOfType = type => {
-    instanceStore.createNewInstance(type, this.props.match.params.id);
-    instanceStore.resetInstanceIdAvailability();
+    instancesStore.createNewInstance(type, this.props.match.params.id);
+    instancesStore.resetInstanceIdAvailability();
   }
 
   render() {
     const { classes, match, mode } = this.props;
     const id = match.params.id;
 
-    const instance = instanceStore.instances.get(id);
+    const instance = instancesStore.instances.get(id);
     if (instance && instance.isFetched) {
       return (
         <View instance={instance} mode={mode} />
       );
     }
 
-    const status = instanceStore.instanceIdAvailability.get(id);
+    const status = instancesStore.instanceIdAvailability.get(id);
 
     if (!status || status.isChecking) {
       return (

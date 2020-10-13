@@ -21,7 +21,7 @@ import injectStyles from "react-jss";
 
 import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
-import instanceStore from "../Stores/InstanceStore";
+import instancesStore from "../Stores/InstancesStore";
 import viewStore from "../Stores/ViewStore";
 
 import Tab from "../Components/Tab";
@@ -47,7 +47,7 @@ class InstanceTab extends React.Component {
 
   syncInstanceLabel = () => {
     const { view } = this.props;
-    const instance = instanceStore.instances.get(view.instanceId);
+    const instance = instancesStore.instances.get(view.instanceId);
     if (instance && instance.name !== view.name && instance.primaryType.color !== view.color) {
       view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
@@ -59,7 +59,7 @@ class InstanceTab extends React.Component {
   render() {
     const { view, pathname } = this.props;
 
-    const instance = instanceStore.instances.get(view.instanceId);
+    const instance = instancesStore.instances.get(view.instanceId);
     const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
     const color = (instance && (instance.isFetched || instance.isLabelFetched))?instance.primaryType.color:(view.color?view.color:"");
     return (

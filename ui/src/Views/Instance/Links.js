@@ -21,7 +21,7 @@ import { observer } from "mobx-react";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 import viewStore from "../../Stores/ViewStore";
 
 const styles = {
@@ -46,7 +46,7 @@ class Links extends React.Component{
 
   fetchInstance = (forceFetch = false) => {
     if (this.props.id) {
-      const instance = instanceStore.createInstanceOrGet(this.props.id);
+      const instance = instancesStore.createInstanceOrGet(this.props.id);
       instance.fetch(forceFetch);
     }
   }
@@ -62,7 +62,7 @@ class Links extends React.Component{
   render(){
     const {classes, instanceId } = this.props;
 
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
     if (!instance) {
       return null;
     }

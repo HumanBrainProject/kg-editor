@@ -44,9 +44,9 @@ class GlobalFieldErrors extends React.Component {
           {`The ${instance.primaryTypeLabel?instance.primaryTypeLabel:"instance"} ${instance.id} could not be rendered because it contains unexpected type of values in the below fields:`}
         </h4>
         <ul>
-          {instance.fieldErrors.map(field =>
-            <li key={field.path}>
-              {field.label} ({field.path.substr(1)}) with value {JSON.stringify(field.value)}
+          {instance.fields.filter(field => field.hasError).map(field =>
+            <li key={field.fullQualifiedName}>
+              {field.label} (${field.fullQualifiedName}) with value &quot;{JSON.stringify(field.value)}&quot; [{JSON.stringify(field.errorMessage)}: {JSON.stringify(field.errorInfo)}]
             </li>
           )}
         </ul>

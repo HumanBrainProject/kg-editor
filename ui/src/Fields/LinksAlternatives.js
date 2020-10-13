@@ -15,7 +15,7 @@
 */
 
 import React, {useState, useEffect} from "react";
-import instanceStore from "../Stores/InstanceStore";
+import instancesStore from "../Stores/InstancesStore";
 import Alternatives from "./Alternatives";
 
 
@@ -27,7 +27,7 @@ const LinksAlternatives = ({className, list, show, onSelect, onRemove, disabled,
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
       const instances = value.map(v => {
-        const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
+        const instance = instancesStore.createInstanceOrGet(v[mappingValue]);
         instance.fetchLabel();
         return instance;
       });

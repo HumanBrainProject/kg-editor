@@ -16,8 +16,10 @@
 
 import React from "react";
 import injectStyles from "react-jss";
-import { Form, Field } from "hbp-quickfire";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import { ViewContext } from "../../../Stores/ViewStore";
+import Field from "../../../Fields/Field";
 
 const styles = {
   container: {
@@ -91,12 +93,10 @@ class BodyPanel extends React.Component{
 
   renderNoPermissionForView = mode => {
     const { classes, className, instance} = this.props;
-
+    const fieldStore = instance.fields[instance.labelField];
     return (
       <div className={`${classes.container} ${className}`} >
-        <Form store={instance.readModeFormStore}>
-          <Field name={instance.labelField} className={classes.field} />
-        </Form>
+        <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
         <div className={classes.errorMessage}>
           <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
         </div>
@@ -121,9 +121,14 @@ class BodyPanel extends React.Component{
 
     return(
       <div className={`${classes.container} ${className}`} >
-        <Form store={instance.form}>
-          {fields.map(name => <Field key={name} name={name} className={classes.field} />)}
-        </Form>
+        <ViewContext.Consumer>
+          {view => fields.map(name => {
+            const fieldStore = instance.fields[name];
+            return (
+              <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={view.mode === "view"} />
+            );
+          })}
+        </ViewContext.Consumer>
       </div>
     );
   }

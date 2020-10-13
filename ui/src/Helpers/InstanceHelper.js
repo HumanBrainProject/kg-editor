@@ -147,8 +147,7 @@ export const normalizeInstanceData = (data, transformField = null) => {
   };
 
   const normalizeField = (field, instanceId) => {
-    switch (field.type) {
-    case "Nested":
+    if (field.type === "Nested") {
       field.topAddButton = false;
       if (!field.min) {
         field.min = 0;
@@ -159,39 +158,6 @@ export const normalizeInstanceData = (data, transformField = null) => {
       if (typeof field.fields === "object") {
         normalizeFields(field.fields, instanceId);
       }
-      break;
-    case "InputText":
-    case "KgInputText":
-      field.type = "KgInputText";
-      field.instanceId = instanceId;
-      break;
-    case "TextArea":
-    case "KgTextArea":
-      field.type = "KgTextArea";
-      field.instanceId = instanceId;
-      break;
-    case "DynamicDropdown":
-    case "KgDynamicDropdown":
-      field.type = "KgDynamicDropdown";
-      field.instanceId = instanceId;
-      field.isLink = true;
-      field.mappingLabel = "name";
-      field.mappingValue = "@id";
-      field.mappingReturn = ["@id"];
-      field.allowCustomValues = true;
-      field.lazyShowLinks = false;
-      break;
-    case "DynamicTable":
-    case "KgDynamicTable":
-      field.type = "KgDynamicTable";
-      field.instanceId = instanceId;
-      field.isLink = true;
-      field.mappingLabel = "name";
-      field.mappingValue = "@id";
-      field.mappingReturn = ["@id"];
-      field.allowCustomValues = true;
-      field.lazyShowLinks = true;
-      break;
     }
   };
 

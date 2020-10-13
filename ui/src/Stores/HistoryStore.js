@@ -15,11 +15,11 @@
 */
 
 import { observable, action, runInAction } from "mobx";
-import { FormStore } from "hbp-quickfire";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
 import { normalizeInstanceData, transformSummaryField } from "../Helpers/InstanceHelper";
+import InstanceStore from "./InstanceStore";
 
 const maxItems = 100;
 
@@ -119,9 +119,9 @@ class HistoryStore {
               } else if (data.error) {
                 // TODO: check if we need to handle error
               } else {
-                const instance = normalizeInstanceData(data, transformSummaryField);
-                instance.formStore = new FormStore(instance);
-                instance.formStore.toggleReadMode(true);
+                const normalizedData = normalizeInstanceData(data, transformSummaryField);
+                const instance = new InstanceStore(identifier, null);
+                instance.initializeData(normalizedData);
                 this.instances.push(instance);
               }
             } else {

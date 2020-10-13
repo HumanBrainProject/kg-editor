@@ -21,7 +21,7 @@ import { Column, Table as TableComponent } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 const styles = {
   container: {
@@ -64,13 +64,13 @@ class LabelCellRenderer extends React.Component {
 
   fetchInstance = () => {
     const { instanceId } = this.props;
-    instanceId && instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+    instanceId && instancesStore.createInstanceOrGet(instanceId).fetchLabel();
   };
 
   render() {
     const {instanceId} = this.props;
 
-    const instance = instanceId && instanceStore.instances.get(instanceId);
+    const instance = instanceId && instancesStore.instances.get(instanceId);
 
     if (!instance) {
       return "Unknown instance";
@@ -119,7 +119,7 @@ class ActionsCellRenderer extends React.Component {
       return null;
     }
 
-    const instance = instanceId && instanceStore.instances.get(instanceId);
+    const instance = instanceId && instancesStore.instances.get(instanceId);
 
     if (instance && instance.fetchError) {
       return (

@@ -1,3 +1,5 @@
+
+
 /*
 *   Copyright (c) 2020, EPFL/Human Brain Project PCO
 *
@@ -15,30 +17,17 @@
 */
 
 import React from "react";
-import instanceStore from "../Stores/InstanceStore";
+import { fieldsMapping } from "../Fields";
 
-
-class FieldError extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
+const Field = (props) => {
+  const fieldMapping = fieldsMapping[props.fieldStore.type];
+  if (!fieldMapping) {
+    throw `${props.name} field is not supported!`;
   }
+  const Component = fieldMapping.Component;
+  return (
+    <Component {...props} />
+  );
+};
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(){
-    const instance = instanceStore.instances.get(this.props.id);
-    instance && instance.setFieldError(this.props.field);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return null;
-    }
-    return this.props.children;
-  }
-}
-
-export default FieldError;
+export default Field;

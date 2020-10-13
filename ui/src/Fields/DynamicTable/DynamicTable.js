@@ -15,19 +15,18 @@
 */
 
 import React from "react";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
-import { FormGroup, Alert } from "react-bootstrap";
+import { ControlLabel, FormGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
-import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import FieldError from "../FieldError";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 import typesStore from "../../Stores/TypesStore";
 
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
@@ -85,92 +84,87 @@ const styles = {
   }
 };
 
-@inject("formStore")
 @injectStyles(styles)
 @observer
 class DynamicTableWithContext extends React.Component {
   handleDropdownReset = () => {
-    this.props.field.resetOptionsSearch();
-    instanceStore.togglePreviewInstance();
+    this.props.fieldStore.resetOptionsSearch();
+    instancesStore.togglePreviewInstance();
   }
 
   handleOnAddNewValue = (name, typeName) => {
-    const {field, onAddCustomValue} = this.props;
-    if (field.allowCustomValues) {
+    const {fieldStore, onAddCustomValue} = this.props;
+    if (fieldStore.allowCustomValues) {
       const id = _.uuid();
       const type = typesStore.typesMap.get(typeName);
-      instanceStore.createNewInstance(type, id, name);
-      const value = {[field.mappingValue]: id};
-      field.addValue(value);
-      onAddCustomValue(value, type, field);
+      instancesStore.createNewInstance(type, id, name);
+      const value = {[fieldStore.mappingValue]: id};
+      fieldStore.addValue(value);
+      onAddCustomValue(value, type, fieldStore);
     }
-    instanceStore.togglePreviewInstance();
+    instancesStore.togglePreviewInstance();
   }
 
   handleOnAddValue = id => {
-    const { field } = this.props;
-    instanceStore.createInstanceOrGet(id);
-    const value = {[field.mappingValue]: id};
-    field.addValue(value);
+    const { fieldStore } = this.props;
+    instancesStore.createInstanceOrGet(id);
+    const value = {[fieldStore.mappingValue]: id};
+    fieldStore.addValue(value);
   }
 
   handleDelete = id => e => {
     e.stopPropagation();
-    this.props.field.removeValue({[this.props.field.mappingValue]: id});
-    instanceStore.togglePreviewInstance();
+    this.props.fieldStore.removeValue({[this.props.fieldStore.mappingValue]: id});
+    instancesStore.togglePreviewInstance();
   }
 
   handleDeleteAll = () => {
-    this.props.field.removeAllValues();
-    instanceStore.togglePreviewInstance();
+    this.props.fieldStore.removeAllValues();
+    instancesStore.togglePreviewInstance();
   }
 
   handleOptionPreview = (id, name) => {
-    const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(id, name, options);
+    const options = { showEmptyfieldStores:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
+    instancesStore.togglePreviewInstance(id, name, options);
   }
 
-  handleSearchOptions = term => {
-    this.props.field.searchOptions(term);
-  }
+  handleSearchOptions = term => this.props.fieldStore.searchOptions(term);
 
-  handleLoadMoreOptions = () => {
-    this.props.field.loadMoreOptions();
-  }
+  handleLoadMoreOptions = () => this.props.fieldStore.loadMoreOptions();
 
   handleRowDelete = index => {
-    const { field } = this.props;
-    const { value: values } = field;
+    const { fieldStore } = this.props;
+    const { value: values } = fieldStore;
     const value = values[index];
-    field.removeValue(value);
-    instanceStore.togglePreviewInstance();
+    fieldStore.removeValue(value);
+    instancesStore.togglePreviewInstance();
   }
 
   handleRowClick = index => {
-    const { field, view, pane } = this.props;
+    const { fieldStore, view, pane } = this.props;
     if (view && pane) {
-      const { value: values } = field;
+      const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[field.mappingValue];
+      const id = value[fieldStore.mappingValue];
       if (id) {
-        field.showLink(id);
+        fieldStore.showLink(id);
         setTimeout(() => {
           view.resetInstanceHighlight();
           view.setCurrentInstanceId(pane, id);
           view.selectPane(view.currentInstanceIdPane);
-        }, field.isLinkVisible(id)?0:1000);
+        }, fieldStore.isLinkVisible(id)?0:1000);
       }
     }
   }
 
   handleRowMouseOver = index => {
-    const { field, view } = this.props;
+    const { fieldStore, view } = this.props;
     if (view) {
-      const { value: values } = field;
+      const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[field.mappingValue];
-      if (id && field.isLinkVisible(id)) {
-        view.setInstanceHighlight(id, field.label);
+      const id = value[fieldStore.mappingValue];
+      if (id && fieldStore.isLinkVisible(id)) {
+        view.setInstanceHighlight(id, fieldStore.label);
       }
     }
   }
@@ -183,51 +177,45 @@ class DynamicTableWithContext extends React.Component {
   }
 
   render() {
-    const { classes, formStore, field, view } = this.props;
+    const { classes, fieldStore, view, readMode } = this.props;
     const {
-      instanceId,
+      instance,
       links,
       label,
-      disabled,
-      readOnly,
-      readMode,
-      max,
       allowCustomValues,
-      validationErrors,
-      validationState,
       optionsSearchTerm,
       options,
       optionsTypes,
       optionsExternalTypes,
       hasMoreOptions,
-      fetchingOptions
-    } = field;
+      fetchingOptions,
+      returnAsNull
+    } = fieldStore;
 
-    const fieldLabel = label.toLowerCase();
-    const isReadOnly = formStore.readMode || readMode || readOnly || disabled;
-    const canAddValues =  !isReadOnly && links.length < max;
+    const fieldStoreLabel = label.toLowerCase();
+    const isDisabled =  readMode || returnAsNull;
 
     return (
-      <FieldError id={instanceId} field={field}>
+      <FieldError fieldStore={fieldStore}>
         <div className={classes.container}>
           <div>
             <FormGroup
               onClick={this.handleFocus}
-              className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""} ${classes.field}`}
-              validationState={validationState}>
-              <FieldLabel field={field}/>
-              {!isReadOnly && (
+              className={`quickfire-fieldStore-dropdown-select ${!links.length? "quickfire-empty-fieldStore": ""}  ${isDisabled? "quickfire-fieldStore-disabled quickfire-fieldStore-readonly": ""} ${classes.fields}`}
+            >
+              <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+              {!isDisabled && (
                 <div className={classes.deleteBtn}>
                   <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={links.length === 0}>
                     <FontAwesomeIcon icon="times"/>
                   </Button>
                 </div>
               )}
-              <div className={`${classes.table} ${((readOnly || disabled) && !(formStore.readMode || readMode))?"disabled":""}`}>
-                {(view && view.currentInstanceId === instanceId)?
+              <div className={`${classes.table} ${isDisabled?"disabled":""}`}>
+                {(view && view.currentInstanceId === instance.id)?
                   <Table
                     list={links}
-                    readOnly={isReadOnly}
+                    readOnly={isDisabled}
                     enablePointerEvents={true}
                     onRowDelete={this.handleRowDelete}
                     onRowClick={this.handleRowClick}
@@ -237,11 +225,11 @@ class DynamicTableWithContext extends React.Component {
                   :
                   <Table
                     list={links}
-                    readOnly={isReadOnly}
+                    readOnly={isDisabled}
                     enablePointerEvents={false}
                   />
                 }
-                {canAddValues && (
+                {!isDisabled && (
                   <div className={`form-control ${classes.dropdownContainer}`}>
                     <Dropdown
                       searchTerm={optionsSearchTerm}
@@ -250,7 +238,7 @@ class DynamicTableWithContext extends React.Component {
                       externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
                       loading={fetchingOptions}
                       hasMore={hasMoreOptions}
-                      inputPlaceholder={`type to add a ${fieldLabel}`}
+                      inputPlaceholder={`type to add a ${fieldStoreLabel}`}
                       onSearch={this.handleSearchOptions}
                       onLoadMore={this.handleLoadMoreOptions}
                       onReset={this.handleDropdownReset}
@@ -261,15 +249,10 @@ class DynamicTableWithContext extends React.Component {
                   </div>
                 )}
               </div>
-              {validationErrors && (
-                <Alert bsStyle="danger">
-                  {validationErrors.map(error => <p key={error}>{error}</p>)}
-                </Alert>
-              )}
               {!links.length && (
                 <div className={classes.emptyMessage}>
                   <span className={classes.emptyMessageLabel}>
-                    No {fieldLabel} available
+                    No {fieldStoreLabel} available
                   </span>
                 </div>
               )}

@@ -15,16 +15,15 @@
 */
 
 import React from "react";
-import { inject, observer } from "mobx-react";
-import { FormGroup, Alert } from "react-bootstrap";
+import { observer } from "mobx-react";
+import { FormGroup, ControlLabel } from "react-bootstrap";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
-import FieldLabel from "hbp-quickfire/lib/Components/FieldLabel";
 
 import FieldError from "../FieldError";
 import List from "./List";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 import typesStore from "../../Stores/TypesStore";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
@@ -58,63 +57,62 @@ const styles = {
   }
 };
 
-@inject("formStore")
 @injectStyles(styles)
 @observer
 class DynamicDropdownWithContext extends React.Component {
   dropValue(droppedValue) {
-    this.props.field.moveValueAfter(this.draggedValue, droppedValue);
+    this.props.fieldStoreStore.moveValueAfter(this.draggedValue, droppedValue);
     this.draggedValue = null;
-    instanceStore.togglePreviewInstance();
+    instancesStore.togglePreviewInstance();
   }
 
   handleDropdownReset = () => {
-    this.props.field.resetOptionsSearch();
-    instanceStore.togglePreviewInstance();
+    this.props.fieldStoreStore.resetOptionsSearch();
+    instancesStore.togglePreviewInstance();
   }
 
   handleOnAddNewValue = (name, typeName) => {
-    const {field, onAddCustomValue} = this.props;
-    if (field.allowCustomValues) {
+    const {fieldStore, onAddCustomValue} = this.props;
+    if (fieldStore.allowCustomValues) {
       const id = _.uuid();
       const type = typesStore.typesMap.get(typeName);
-      instanceStore.createNewInstance(type, id, name);
-      const value = {[field.mappingValue]: id};
-      field.addValue(value);
-      onAddCustomValue(value, type, field);
+      instancesStore.createNewInstance(type, id, name);
+      const value = {[fieldStore.mappingValue]: id};
+      fieldStore.addValue(value);
+      onAddCustomValue(value, type, fieldStore);
     }
-    instanceStore.togglePreviewInstance();
+    instancesStore.togglePreviewInstance();
   }
 
   handleOnAddValue = id => {
-    const { field } = this.props;
-    instanceStore.createInstanceOrGet(id);
-    const value = {[field.mappingValue]: id};
-    field.addValue(value);
+    const { fieldStore } = this.props;
+    instancesStore.createInstanceOrGet(id);
+    const value = {[fieldStore.mappingValue]: id};
+    fieldStore.addValue(value);
   }
 
   handleSelectAlternative = values => {
-    this.props.field.setValues(values);
-    instanceStore.togglePreviewInstance();
+    this.props.fieldStore.setValues(values);
+    instancesStore.togglePreviewInstance();
   }
 
   handleRemoveMySuggestion = () => {
-    //let field = this.props.field.removeAllValues();
-    this.props.field.removeAllValues();
-    instanceStore.togglePreviewInstance();
+    //let field = this.props.fieldStore.removeAllValues();
+    this.props.fieldStore.removeAllValues();
+    instancesStore.togglePreviewInstance();
   }
 
   handleDeleteLastValue = () => {
-    this.props.field.removeLastValue();
-    instanceStore.togglePreviewInstance();
+    this.props.fieldStore.removeLastValue();
+    instancesStore.togglePreviewInstance();
   }
 
   handleClick = index => {
-    const { field, view, pane } = this.props;
+    const { fieldStore, view, pane } = this.props;
     if (view && pane) {
-      const { value: values } = field;
+      const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[field.mappingValue];
+      const id = value[fieldStore.mappingValue];
       if (id) {
         view.resetInstanceHighlight();
         view.setCurrentInstanceId(pane, id);
@@ -124,11 +122,11 @@ class DynamicDropdownWithContext extends React.Component {
   };
 
   handleDelete = index => {
-    const { field } = this.props;
-    const { value: values } = field;
+    const { fieldStore } = this.props;
+    const { value: values } = fieldStore;
     const value = values[index];
-    field.removeValue(value);
-    instanceStore.togglePreviewInstance();
+    fieldStore.removeValue(value);
+    instancesStore.togglePreviewInstance();
   };
 
   handleDragEnd = () => this.draggedValue = null;
@@ -140,8 +138,8 @@ class DynamicDropdownWithContext extends React.Component {
   handleKeyDown = (value, e) => {
     if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
       e.preventDefault();
-      this.props.field.removeValue(value);
-      instanceStore.togglePreviewInstance();
+      this.props.fieldStore.removeValue(value);
+      instancesStore.togglePreviewInstance();
     }
   }
 
@@ -152,7 +150,7 @@ class DynamicDropdownWithContext extends React.Component {
       const value = values[index];
       const id = value[field.mappingValue];
       view.setInstanceHighlight(id, field.label);
-      instanceStore.togglePreviewInstance();
+      instancesStore.togglePreviewInstance();
     }
     field.resetOptionsSearch();
   };
@@ -185,20 +183,20 @@ class DynamicDropdownWithContext extends React.Component {
 
   handleOptionPreview = (instanceId, instanceName) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(instanceId, instanceName, options);
+    instancesStore.togglePreviewInstance(instanceId, instanceName, options);
   }
 
-  handleSearchOptions = term => this.props.field.searchOptions(term);
+  handleSearchOptions = term => this.props.fieldStore.searchOptions(term);
 
-  handleLoadMoreOptions = () => this.props.field.loadMoreOptions();
+  handleLoadMoreOptions = () => this.props.fieldStore.loadMoreOptions();
 
   renderReadMode(){
-    const { classes, field, view } = this.props;
-    const { instanceId, links, disabled, readOnly } = field;
+    const { classes, fieldStore, view } = this.props;
+    const { label, instanceId, links, disabled, readOnly } = fieldStore;
     return (
-      <FieldError id={instanceId} field={field}>
+      <FieldError fieldStore={fieldStore}>
         <div className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
-          <FieldLabel field={field}/>
+          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           {(view && view.currentInstanceId === instanceId)?
             <List
               list={links}
@@ -223,48 +221,41 @@ class DynamicDropdownWithContext extends React.Component {
   }
 
   render() {
-    const { classes, formStore, field } = this.props;
+    const { classes, fieldStore, readMode } = this.props;
     const {
-      instanceId,
       links,
-      disabled,
-      readOnly,
-      readMode,
-      max,
+      label,
       mappingValue,
       allowCustomValues,
-      validationErrors,
-      validationState,
       optionsSearchTerm,
       options,
       optionsTypes,
       optionsExternalTypes,
       hasMoreOptions,
       fetchingOptions,
-      alternatives
-    } = field;
+      alternatives,
+      returnAsNull
+    } = fieldStore;
 
-    if(formStore.readMode || readMode){
+    if(readMode){
       return this.renderReadMode();
     }
 
-    const selectedInstance = instanceStore.instances.get(instanceId);
-    const isAlternativeDisabled = !selectedInstance;
-    const isDisabled = formStore.readMode || readMode || readOnly || disabled;
-    const canAddValues = !isDisabled && links.length < max;
+    const isDisabled = readMode || returnAsNull;
+    const canAddValues = !isDisabled;
 
     return (
-      <FieldError id={instanceId} field={field}>
+      <FieldError fieldStore={fieldStore}>
         <div>
           <FormGroup
             ref={ref=>this.formGroupRef = ref}
-            className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${disabled || readOnly? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}
-            validationState={validationState}>
-            <FieldLabel field={field}/>
+            className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
+          >
+            <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
             <LinksAlternatives
               className={classes.alternatives}
-              show={!disabled && !readOnly && !!alternatives.length}
-              disabled={disabled || readOnly || isAlternativeDisabled}
+              show={!isDisabled}
+              disabled={isDisabled}
               list={alternatives}
               onSelect={this.handleSelectAlternative}
               onRemove={this.handleRemoveMySuggestion}
@@ -272,11 +263,11 @@ class DynamicDropdownWithContext extends React.Component {
               parentContainerClassName="form-group"
               // formGroupRef={this.formGroupRef}
             />
-            <div className={`form-control ${classes.values}`} disabled={disabled} readOnly={readOnly} >
+            <div className={`form-control ${classes.values}`} disabled={isDisabled} readOnly={isDisabled} >
               <List
                 list={links}
                 readOnly={false}
-                disabled={disabled}
+                disabled={isDisabled}
                 enablePointerEvents={true}
                 onClick={this.handleClick}
                 onDelete={this.handleDelete}
@@ -312,9 +303,6 @@ class DynamicDropdownWithContext extends React.Component {
                 </React.Fragment>
               )}
             </div>
-            {validationErrors && <Alert bsStyle="danger">
-              {validationErrors.map(error => <p key={error}>{error}</p>)}
-            </Alert>}
           </FormGroup>
         </div>
       </FieldError>

@@ -14,23 +14,35 @@
 *   limitations under the License.
 */
 
-import { FormStore } from "hbp-quickfire";
-
 import InputText from "./InputText/InputText";
-import InputTextStore from "./InputText/InputTextStore";
-
-import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
-import AnnotatedInputTextStore from "./AnnotedInputText/AnnotatedInputTextStore";
-
 import TextArea from "./TextArea/TextArea";
-import TextAreaStore from "./TextArea/TextAreaStore";
+import InputTextStore from "./InputTextStore";
+
+// import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
+// import AnnotatedInputTextStore from "./AnnotedInputText/AnnotatedInputTextStore";
 
 import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
 import DynamicTable from "./DynamicTable/DynamicTable";
 import LinksStore from "./LinksStore";
 
-FormStore.registerCustomField("KgInputText", InputText, InputTextStore);
-FormStore.registerCustomField("KgAnnotatedInputText",  AnnotatedInputText, AnnotatedInputTextStore);
-FormStore.registerCustomField("KgTextArea", TextArea, TextAreaStore);
-FormStore.registerCustomField("KgDynamicDropdown", DynamicDropdown, LinksStore);
-FormStore.registerCustomField("KgDynamicTable", DynamicTable, LinksStore);
+export const fieldsMapping = {
+  "InputText":  {
+    Component: InputText,
+    Store: InputTextStore
+  },
+  "TextArea": {
+    Component: TextArea,
+    Store: InputTextStore
+  },
+  "DynamicDropdown": {
+    Component: DynamicDropdown,
+    Store: LinksStore
+  },
+  "DynamicTable": {
+    Component: DynamicTable,
+    Store: LinksStore,
+    options: {
+      lazyShowLinks: true
+    }
+  }
+};

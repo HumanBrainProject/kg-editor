@@ -35,13 +35,13 @@ const styles = {
 
 const separator = "; ";
 
-const getLabel = (instanceStore, field, value) => {
+const getLabel = (instancesStore, field, value) => {
   const id = value[field.mappingValue];
   if (!id) {
     return "Unkown instance";
   }
 
-  const instance = instanceStore.instances.get(id);
+  const instance = instancesStore.instances.get(id);
 
   if (instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.name;
@@ -49,7 +49,7 @@ const getLabel = (instanceStore, field, value) => {
   return id;
 };
 
-const getValue = (instanceStore, instance, name) => {
+const getValue = (instancesStore, instance, name) => {
   if (!instance) {
     return "";
   }
@@ -73,7 +73,7 @@ const getValue = (instanceStore, instance, name) => {
   }
   const vals = Array.isArray(value)?value:[value];
   if (vals.length) {
-    return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
+    return vals.map(val => getLabel(instancesStore, field, val)).join(separator);
   }
   return "";
 };

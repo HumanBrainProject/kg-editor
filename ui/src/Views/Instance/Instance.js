@@ -20,7 +20,7 @@ import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 import Preview from "../Preview";
 import InstanceView from "./InstanceView";
@@ -114,7 +114,7 @@ const styles = {
 @observer
 class Instance extends React.Component {
 
-  handleHidePreview = () => instanceStore.togglePreviewInstance();
+  handleHidePreview = () => instancesStore.togglePreviewInstance();
 
   renderNoPermissionForView = (instance, mode) => {
     return (
@@ -188,12 +188,12 @@ class Instance extends React.Component {
 
   render() {
     const {classes, instance, mode} = this.props;
-    const previewInstance = instanceStore.previewInstance;
+    const previewInstance = instancesStore.previewInstance;
     const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
 
     return (
       <React.Fragment>
-        <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
+        <div className={`${classes.container} ${!instancesStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
           <Tabs mode={mode} instance={instance} />
           <div className={classes.body}>
             {this.renderView(instance, mode)}

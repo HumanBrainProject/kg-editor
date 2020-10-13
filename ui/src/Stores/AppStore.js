@@ -23,7 +23,7 @@ import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 import authStore from "./AuthStore";
-import instanceStore from "./InstanceStore";
+import instancesStore from "./instancesStore";
 import routerStore from "./RouterStore";
 import API from "../Services/API";
 import historyStore from "./HistoryStore";
@@ -37,7 +37,7 @@ const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 const getLinkedInstanceIds = instanceIds => {
   //window.console.log("list: ", instanceIds);
   const result = instanceIds.reduce((acc, id) => {
-    const instance = instanceStore.instances.get(id);
+    const instance = instancesStore.instances.get(id);
     if (instance) {
       const linkedIds = instance.linkedIds;
       //window.console.log(id, linkedIds);
@@ -155,7 +155,7 @@ class AppStore{
 
   @action
   flush(){
-    instanceStore.flush();
+    instancesStore.flush();
     statusStore.flush();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
@@ -195,7 +195,7 @@ class AppStore{
       const data = response.data && response.data.data;
       if(data){
 
-        const instance = instanceStore.createInstanceOrGet(instanceId);
+        const instance = instancesStore.createInstanceOrGet(instanceId);
         instance.initializeData(data);
 
         if(data.workspace){
@@ -242,7 +242,7 @@ class AppStore{
   }
 
   closeAllInstances() {
-    instanceStore.resetInstanceIdAvailability();
+    instancesStore.resetInstanceIdAvailability();
     if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
@@ -252,7 +252,7 @@ class AppStore{
   }
 
   clearViews() {
-    instanceStore.resetInstanceIdAvailability();
+    instancesStore.resetInstanceIdAvailability();
     if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
@@ -390,13 +390,13 @@ class AppStore{
         }
       }
     }
-    instanceStore.instanceIdAvailability.delete(instanceId);
+    instancesStore.instanceIdAvailability.delete(instanceId);
     viewStore.unregisterViewByInstanceId(instanceId);
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
     if (instance) {
       const instanceIdsToBeKept = getLinkedInstanceIds(viewStore.instancesIds);
       const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
-      instanceStore.removeInstances(instanceIdsToBeRemoved);
+      instancesStore.removeInstances(instanceIdsToBeRemoved);
     }
   }
 
@@ -476,7 +476,7 @@ class AppStore{
 
   @action
   async duplicateInstance(fromInstanceId){
-    let instanceToCopy = instanceStore.instances.get(fromInstanceId);
+    let instanceToCopy = instancesStore.instances.get(fromInstanceId);
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
     const labelField = instanceToCopy.labelField;
@@ -491,7 +491,7 @@ class AppStore{
         this.isCreatingNewInstance = false;
       });
       const newId = data.data.id;
-      const newInstance = instanceStore.createInstanceOrGet(newId);
+      const newInstance = instancesStore.createInstanceOrGet(newId);
       newInstance.initializeData(data.data, false, false);
       routerStore.history.push("/instance/edit/" + newId);
     } catch(e){
@@ -597,7 +597,7 @@ class AppStore{
   }
 
   logout = () => {
-    if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
+    if (!instancesStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       viewStore.flushStoredViews();
       authStore.logout();
     }

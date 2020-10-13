@@ -20,7 +20,7 @@ import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Row, Col } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
-import { Form, Field } from "hbp-quickfire";
+import Field from "../../../Fields/Field";
 
 
 const styles = {
@@ -86,17 +86,14 @@ class InstanceInvite extends React.Component{
       return null;
     }
 
-    const promotedFields = instance.promotedFields;
-    const nonPromotedFields = instance.nonPromotedFields;
-
     const nodeType = instance.primaryType.label;
-
     const color = instance.primaryType.color;
+    const fields = [...instance.nonPromotedFields, ...instance.promotedFields];
 
     return (
       <div className={classes.container}>
         <Scrollbars autoHide>
-          <Form store={instance.form}>
+          <div>
             <div className={classes.panel}>
               <div className={classes.header}>
                 <Row>
@@ -108,18 +105,14 @@ class InstanceInvite extends React.Component{
                 </Row>
               </div>
               <div>
-                {promotedFields.map(fieldKey => (
-                  <div key={this.props.id+fieldKey} className={classes.field}>
-                    <Field name={fieldKey}/>
-                  </div>
-                ))}
-              </div>
-              <div>
-                {nonPromotedFields.map(fieldKey => (
-                  <div key={this.props.id+fieldKey} className={classes.field}>
-                    <Field name={fieldKey} />
-                  </div>
-                ))}
+                {fields.map(name => {
+                  const fieldStore = instance.fields[name];
+                  return (
+                    <div key={name} className={classes.field}>
+                      <Field name={name} fieldStore={fieldStore} readMode={true} />
+                    </div>
+                  );
+                })}
               </div>
               <div>
                 <Row>
@@ -132,7 +125,7 @@ class InstanceInvite extends React.Component{
                 </Row>
               </div>
             </div>
-          </Form>
+          </div>
         </Scrollbars>
       </div>
     );

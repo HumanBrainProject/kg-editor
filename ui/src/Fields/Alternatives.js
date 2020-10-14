@@ -214,7 +214,10 @@ class Alternatives extends React.Component {
         </button>
         <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} style={style} ref={ref=>{this.alternativesRef = ref;}}>
           {list.map(alternative => {
-            const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => acc += user.id, "");
+            const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => {
+              acc += user.id;
+              return acc;
+            }, "");
             return (
               <Alternative key={key} alternative={alternative} ValueRenderer={ValueRenderer} onRemove={this.handleRemove} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
             );

@@ -18,23 +18,26 @@ import { observable, action, computed, toJS } from "mobx";
 
 import FieldStore from "./FieldStore";
 
-class InputTextStore extends FieldStore {
-  @observable value = "";
-  @observable returnAsNull = false;
-  initialValue = "";
+class CheckBoxStore extends FieldStore {
+  @observable value = false;
+  initialValue = false;
 
   @computed
   get returnValue() {
-    if (this.value === "" && this.returnAsNull) {
-      return null;
-    }
     return toJS(this.value);
+  }
+
+  @computed
+  get cloneWithInitialValue() {
+    return {
+      ...this.definition,
+      value: this.initialValue
+    };
   }
 
   @action
   updateValue(value) {
-    this.returnAsNull = false;
-    this.initialValue = (value !== null && value !== undefined)?value:"";
+    this.initialValue = (value !== null && value !== undefined)?!!value:false;
     this.value = this.initialValue;
   }
 
@@ -45,7 +48,6 @@ class InputTextStore extends FieldStore {
 
   @computed
   get hasChanged() {
-    //window.console.log("instance: " + this.instance.id + ", field=" + this.label +  " hasChanged=" + (this.getValue(true) !== this.initialValue )+ ", value=" + this.getValue(true) + ", value=" + this.initialValue);
     if (typeof this.initialValue  === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
     }
@@ -53,17 +55,9 @@ class InputTextStore extends FieldStore {
   }
 
   @action
-  setValue(value) {
-    if (value !== null && value !== undefined) {
-      if (value !== "" || !this.returnAsNull) {
-        this.returnAsNull = false;
-        this.value = value;
-      }
-    } else  {
-      this.returnAsNull = true;
-      this.value = "";
-    }
+  toggleValue() {
+    this.value = !this.value;
   }
 }
 
-export default InputTextStore;
+export default CheckBoxStore;

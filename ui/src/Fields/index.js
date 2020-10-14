@@ -16,14 +16,17 @@
 
 import InputText from "./InputText/InputText";
 import TextArea from "./TextArea/TextArea";
-import InputTextStore from "./InputTextStore";
+import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
+import DynamicTable from "./DynamicTable/DynamicTable";
+import CheckBox from "./CheckBox/CheckBox";
+
 
 // import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
 // import AnnotatedInputTextStore from "./AnnotedInputText/AnnotatedInputTextStore";
 
-import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
-import DynamicTable from "./DynamicTable/DynamicTable";
-import LinksStore from "./LinksStore";
+import InputTextStore from "./Stores/InputTextStore";
+import LinksStore from "./Stores/LinksStore";
+import CheckBoxStore from "./Stores/CheckBoxStore";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -44,5 +47,9 @@ export const fieldsMapping = {
     options: {
       lazyShowLinks: true
     }
+  },
+  "CheckBox": {
+    Component: CheckBox,
+    Store: CheckBoxStore
   }
 };

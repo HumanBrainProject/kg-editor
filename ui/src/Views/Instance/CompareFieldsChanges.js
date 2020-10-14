@@ -53,9 +53,8 @@ const getValue = (instancesStore, instance, name) => {
   if (!instance) {
     return "";
   }
-  const formStore = instance.readModeFormStore;
-  const field = formStore.getField(name);
-  const value = field.getValue(true);
+  const field = instance.fields[name];
+  const value = field.returnValue;
   if (!value) {
     return "";
   }
@@ -144,7 +143,7 @@ class CompareFieldsChanges extends React.Component{
       const fields = [...rightInstance.promotedFields, ...rightInstance.nonPromotedFields].map(name => (
         {
           name: name,
-          label: rightInstance.form.getField(name).label,
+          label: rightInstance.fields[name].label,
           leftValue: getValue(leftInstanceStore, leftInstance, name),
           rightValue: getValue(rightInstanceStore, rightInstance, name),
         })

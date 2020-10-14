@@ -27,9 +27,15 @@ const LinksAlternatives = ({className, list, show, onSelect, onRemove, disabled,
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
       const instances = value.map(v => {
-        const instance = instancesStore.createInstanceOrGet(v[mappingValue]);
-        instance.fetchLabel();
-        return instance;
+        if (v[mappingValue]) {
+          const instance = instancesStore.createInstanceOrGet(v[mappingValue]);
+          instance.fetchLabel();
+          return instance;
+        }
+        return {
+          name: "Unknown instance",
+          value: value
+        };
       });
       return {
         users: users,

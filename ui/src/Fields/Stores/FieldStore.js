@@ -57,19 +57,15 @@ class FieldStore {
   }
 
   @computed
+  get cloneWithInitialValue() {
+    throw `cloneWithInitialValue getter is not implemented for ${this.type} store`;
+  }
+
   get definition() {
     return {
       type: this.type,
       label: this.label,
       fullyQualifiedName: this.fullyQualifiedName
-    };
-  }
-
-  @computed
-  get clone() {
-    return {
-      ...this.definition,
-      value: this.returnValue
     };
   }
 

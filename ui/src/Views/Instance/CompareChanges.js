@@ -49,8 +49,8 @@ class CompareChanges extends React.Component{
     this.savedInstanceStore.flush();
     const savedInstance = this.savedInstanceStore.createInstanceOrGet(instanceId);
     const instance = instancesStore.instances.get(instanceId);
-    const data = instance.clone;
-    savedInstance.initializeData(data, true, false);
+    const data = instance.cloneInitialData;
+    savedInstance.initializeData(data, false);
   }
 
   render(){

@@ -293,20 +293,6 @@ const getChildrenIdsGroupedByField = fields => {
   }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };
 
-const copy = (instance, fieldProperty) => ({
-  id: instance.id,
-  name: instance.name,
-  types: instance.types.map(t => ({...t})),
-  primaryType: {...instance.primaryType},
-  workspace: instance.workspace,
-  fields: Object.entries(instance.fields).reduce((acc, [name, field]) => acc[name] = field[fieldProperty], {}),
-  labelField: instance.labelField,
-  promotedFields: [...instance.promotedFields],
-  alternatives: {...instance.alternatives},
-  metadata: {...instance.metadata},
-  permissions: {...instance.permissions}
-});
-
 class InstanceStore {
   @observable id = null;
   @observable _name = null;
@@ -335,13 +321,22 @@ class InstanceStore {
   }
 
   @computed
-  get definition() {
-    return copy(this, "definition");
-  }
-
-  @computed
-  get clone() {
-    return copy(this, "clone");
+  get cloneInitialData() {
+    return {
+      id: this.id,
+      name: this.name,
+      types: this.types.map(t => ({...t})),
+      primaryType: {...this.primaryType},
+      workspace: this.workspace,
+      fields: Object.entries(this.fields).reduce((acc, [name, field]) => {
+        acc[name] = field.cloneWithInitialValue;
+        return acc;
+      }, {}),
+      labelField: this.labelField,
+      promotedFields: [...this.promotedFields],
+      metadata: {},
+      permissions: {...this.permissions}
+    };
   }
 
   @computed
@@ -483,7 +478,7 @@ class InstanceStore {
     this.permissions = normalizedData.permissions;
     Object.entries(normalizedData.fields).forEach(([name, field]) => {
       if (!this.fields[name]) {
-        if(field.type === "InputTextMultiple" ||  field.type ==="CheckBox") {
+        if(field.type === "InputTextMultiple") {
           field.type = "InputText";
         }
         const fieldMapping = fieldsMapping[field.type];

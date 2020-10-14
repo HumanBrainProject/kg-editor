@@ -61,13 +61,13 @@ const styles = {
 @observer
 class DynamicDropdownWithContext extends React.Component {
   dropValue(droppedValue) {
-    this.props.fieldStorere.moveValueAfter(this.draggedValue, droppedValue);
+    this.props.fieldStore.moveValueAfter(this.draggedValue, droppedValue);
     this.draggedValue = null;
     instancesStore.togglePreviewInstance();
   }
 
   handleDropdownReset = () => {
-    this.props.fieldStorere.resetOptionsSearch();
+    this.props.fieldStore.resetOptionsSearch();
     instancesStore.togglePreviewInstance();
   }
 

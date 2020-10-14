@@ -174,7 +174,7 @@ class SavePanel extends React.Component{
 
     const comparedInstance = appStore.comparedInstanceId?instancesStore.instances.get(appStore.comparedInstanceId):null;
     const comparedInstanceLabelField = comparedInstance && comparedInstance.labelField;
-    const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.form?comparedInstance.form.getField(comparedInstanceLabelField).getValue():"";
+    const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.fields[comparedInstanceLabelField]?comparedInstance.fields[comparedInstanceLabelField].returnValue:"";
     return(
       <div className={classes.container}>
         <Scrollbars autoHide>

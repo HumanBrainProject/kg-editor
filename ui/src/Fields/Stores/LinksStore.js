@@ -19,8 +19,8 @@ import { debounce, remove } from "lodash";
 
 import FieldStore from "./FieldStore";
 
-import API from "../Services/API";
-import appStore from "../Stores/AppStore";
+import API from "../../Services/API";
+import appStore from "../../Stores/AppStore";
 
 const defaultNumberOfVisibleLinks = 10;
 
@@ -55,7 +55,6 @@ class LinksStore extends FieldStore {
     }
   }
 
-  @computed
   get definition() {
     return {
       ...super.definition,
@@ -65,10 +64,10 @@ class LinksStore extends FieldStore {
   }
 
   @computed
-  get clone() {
+  get cloneWithInitialValue() {
     return {
-      ...super.clone,
-      ...this.definition
+      ...this.definition,
+      value: [...this.initialValue]
     };
   }
 
@@ -230,7 +229,7 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instance.id, this.fullyQualifiedName, this.optionsSelectedType, this.optionsSearchTerm, this.optionsPageStart, this.optionsPageSize, payload), payload);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instance.id, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm), payload);
       const options = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (append) {

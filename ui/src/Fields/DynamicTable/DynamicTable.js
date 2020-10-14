@@ -145,7 +145,7 @@ class DynamicTableWithContext extends React.Component {
     if (view && pane) {
       const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[fieldStore.mappingValue];
+      const id = value && value[fieldStore.mappingValue];
       if (id) {
         fieldStore.showLink(id);
         setTimeout(() => {
@@ -162,7 +162,7 @@ class DynamicTableWithContext extends React.Component {
     if (view) {
       const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[fieldStore.mappingValue];
+      const id = value && value[fieldStore.mappingValue];
       if (id && fieldStore.isLinkVisible(id)) {
         view.setInstanceHighlight(id, fieldStore.label);
       }

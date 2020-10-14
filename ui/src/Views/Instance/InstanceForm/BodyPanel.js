@@ -18,7 +18,6 @@ import React from "react";
 import injectStyles from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import { ViewContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";
 
 const styles = {
@@ -105,9 +104,9 @@ class BodyPanel extends React.Component{
   }
 
   render(){
-    const { classes, className, instance } = this.props;
+    const { classes, className, instance, readMode } = this.props;
 
-    if (instance.isReadMode) {
+    if (readMode) {
       if(!instance.permissions.canRead) {
         return this.renderNoPermissionForView("view");
       }
@@ -121,14 +120,12 @@ class BodyPanel extends React.Component{
 
     return(
       <div className={`${classes.container} ${className}`} >
-        <ViewContext.Consumer>
-          {view => fields.map(name => {
-            const fieldStore = instance.fields[name];
-            return (
-              <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={view.mode === "view"} />
-            );
-          })}
-        </ViewContext.Consumer>
+        {fields.map(name => {
+          const fieldStore = instance.fields[name];
+          return (
+            <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={readMode} />
+          );
+        })}
       </div>
     );
   }

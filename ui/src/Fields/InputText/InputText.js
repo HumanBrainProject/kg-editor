@@ -17,7 +17,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { ControlLabel, FormGroup, FormControl, Alert } from "react-bootstrap";
+import { ControlLabel, FormGroup, FormControl } from "react-bootstrap";
 import autosize from "autosize";
 import getLineHeight from "line-height";
 
@@ -115,7 +115,7 @@ class InputText extends React.Component {
 
     return (
       <FieldError fieldStore={this.props.fieldStore}>
-        <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} validationState={validationState}>
+        <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} >
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <Alternatives
             className={classes.alternatives}

@@ -18,7 +18,6 @@ import { observable, action, runInAction } from "mobx";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
-import { normalizeInstanceData, transformSummaryField } from "../Helpers/InstanceHelper";
 import InstanceStore from "./InstanceStore";
 
 const maxItems = 100;
@@ -112,21 +111,21 @@ class HistoryStore {
         const response = await API.axios.post(API.endpoints.instancesSummary(), list);
         runInAction(() => {
           list.forEach(identifier => {
-            const data =  response && response.data && response.data.data && response.data.data[identifier];
-            if(data){
-              if (data.error && data.error.code && [401, 403, 404, 410].includes(data.error.code)) {
-                // ignore those errors because instance id in localstorage may have been deleted or permissions may have changed
-              } else if (data.error) {
-                // TODO: check if we need to handle error
+            const data = response && response.data && response.data.data && response.data.data[identifier];
+            if (data.error) {
+              if(data.error.code && [401, 403, 404, 410].includes(data.error.code)) {
+                //TODO: ignore those errors because instance id in localstorage may have been deleted or permissions may have changed
               } else {
-                const normalizedData = normalizeInstanceData(data, transformSummaryField);
-                const instance = new InstanceStore(identifier, null);
-                instance.initializeData(normalizedData);
-                this.instances.push(instance);
+                //TODO: set error message to the instance
               }
             } else {
-              // should never happen
-              // TODO: check if we need to handle error
+              if(data.type === "TextArea") {
+                data.value = data.value.substr(0, 197) + "...";
+                delete data.label;
+              }
+              const instance = new InstanceStore(identifier);
+              instance.initializeData(data);
+              this.instances.push(instance);
             }
           });
           this.isFetching = false;

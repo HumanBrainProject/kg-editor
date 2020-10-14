@@ -23,7 +23,7 @@ import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 import authStore from "./AuthStore";
-import instancesStore from "./instancesStore";
+import instancesStore from "./InstancesStore";
 import routerStore from "./RouterStore";
 import API from "../Services/API";
 import historyStore from "./HistoryStore";

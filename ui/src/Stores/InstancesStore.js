@@ -22,6 +22,111 @@ import appStore from "./AppStore";
 import routerStore from "./RouterStore";
 import InstanceStore from "./InstanceStore";
 
+class Instance extends InstanceStore {
+
+  @observable cancelChangesPending = null;
+  @observable saveError = null;
+  @observable hasSaveError = false;
+  @observable isSaving = false;
+
+  store = null;
+
+  constructor(id, store) {
+    super(id);
+    this.store = store;
+  }
+
+  @computed
+  get linkedIds() {
+    const ids = this.childrenIds.reduce((acc, id) => {
+      if (id !== this.id) {
+        const instance = this.store.instances.get(id);
+        if (instance) {
+          instance.linkedIds.forEach(child => acc.add(child));
+        }
+      }
+      return acc;
+    }, new Set().add(this.id));
+    return Array.from(ids);
+  }
+
+  @action
+  fetch(forceFetch = false) {
+    if (!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
+      this.store.fetchInstance(this);
+    }
+  }
+
+  @action
+  fetchLabel(forceFetch = false) {
+    if (!this.isFetching && !this.isLabelFetching) {
+      if (forceFetch || (!this.isFetched && !this.isLabelFetched)) {
+        this.store.fetchInstanceLabel(this);
+      }
+    }
+  }
+
+  @action
+  async save() {
+
+    this.cancelChangesPending = false;
+    this.hasSaveError = false;
+    this.isSaving = true;
+
+    const payload = this.returnValue;
+    try {
+      if (this.isNew) {
+        const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
+        runInAction(() => {
+          const newId = data.data.id;
+          this.isNew = false;
+          this.saveError = null;
+          this.hasSaveError = false;
+          this.isSaving = false;
+          if (newId !== this.id) {
+            this.store.instances.set(newId, this);
+            this.store.instance.delete(this.id);
+            this.id = newId;
+          }
+          this.initializeData(data.data);
+        });
+      } else {
+        const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
+        runInAction(() => {
+          this.saveError = null;
+          this.hasSaveError = false;
+          this.isSaving = false;
+          this.initializeData(data.data);
+        });
+      }
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message ? e.message : e;
+        const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
+        this.saveError = `Error while saving instance "${this.id}" (${message}) ${errorMessage}`;
+        this.hasSaveError = true;
+        this.isSaving = false;
+      });
+      appStore.captureSentryException(e);
+    }
+  }
+
+  @action
+  cancelSave() {
+    this.saveError = null;
+    this.hasSaveError = false;
+  }
+
+  @action
+  cancelChanges() {
+    Object.values(this.fields).forEach(field => field.reset());
+    this.cancelChangesPending = false;
+    this.saveError = null;
+    this.hasSaveError = false;
+  }
+
+}
+
 class InstancesStore {
   @observable stage = null;
   @observable instances = new Map();
@@ -281,7 +386,7 @@ class InstancesStore {
   @action
   createInstanceOrGet(instanceId){
     if (!this.instances.has(instanceId)) {
-      const instance = new InstanceStore(instanceId, this);
+      const instance = new Instance(instanceId, this);
       this.instances.set(instanceId, instance);
     }
     return this.instances.get(instanceId);
@@ -307,7 +412,7 @@ class InstancesStore {
     if (name && data.labelField && data.fields && data.fields[data.labelField]) {
       data.fields[data.labelField].value = name;
     }
-    const instance  = new instancesStore(id, this);
+    const instance  = new Instance(id, this);
     instance.initializeData(data, false, true);
     this.instances.set(id, instance);
   }

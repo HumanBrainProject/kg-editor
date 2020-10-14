@@ -17,18 +17,17 @@
 import { observable, action, runInAction, computed, toJS } from "mobx";
 import { debounce, remove } from "lodash";
 
+import FieldStore from "./FieldStore";
+
 import API from "../Services/API";
 import appStore from "../Stores/AppStore";
 
 const defaultNumberOfVisibleLinks = 10;
 
-class LinksStore {
+class LinksStore extends FieldStore {
   @observable value = [];
-  @observable errorMessage = null;
-  @observable errorInfo = null;
   @observable options = [];
-  @observable alternatives = {};
-  @observable fullyQualifiedName = null;
+  @observable alternatives = [];
   @observable allowCustomValues =  true;
   @observable returnAsNull = false;
   @observable optionsTypes = [];
@@ -40,18 +39,12 @@ class LinksStore {
   @observable fetchingOptions = false;
   @observable lazyShowLinks = false;
   @observable visibleLinks = new Set();
-
   initialValue = [];
-  instance = null;
   isLink = true;
   mappingValue = "@id";
-  instance = null;
 
   constructor(definition, options, instance) {
-    this.type = definition.type;
-    this.label = definition.label;
-    this.fullyQualifiedName = definition.fullyQualifiedName;
-    this.instance = instance;
+    super(definition, options, instance);
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;
     }
@@ -62,42 +55,35 @@ class LinksStore {
     }
   }
 
+  @computed
   get definition() {
     return {
-      type: this.type,
-      label: this.label,
-      fullyQualifiedName: this.fullyQualifiedName,
+      ...super.definition,
       allowCustomValues: this.allowCustomValues,
       lazyShowLinks: this.lazyShowLinks
     };
   }
 
+  @computed
   get clone() {
     return {
-      ...this.definition,
-      value: toJS(this.value)
+      ...super.clone,
+      ...this.definition
     };
   }
 
-  @action
-  setError(message, info) {
-    this.errorMessage = message;
-    this.errorInfo = info;
-  }
-
-  @action
-  clearError() {
-    this.setError(null, null);
-  }
-
   @computed
-  get hasError() {
-    return this.errorMessage || this.errorInfo;
+  get returnValue() {
+    if (!this.value.length && this.returnAsNull) {
+      return null;
+    }
+    return toJS(this.value);
   }
 
   @action
-  update(value, alternatives) {
-    const values =  Array.isArray(value)?value:[value]
+  updateValue(value) {
+    this.returnAsNull = false;
+    const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
     this.initialValue = [...values];
     this.value = values;
     if (this.lazyShowLinks) {
@@ -109,18 +95,17 @@ class LinksStore {
           this.visibleLinks.add(value[this.mappingValue]);
         }
       }
-      this.alternatives = alternatives;
     });
   }
 
   @action
   reset() {
-    this.value = this.initialValue;
+    this.value = [...this.initialValue];
   }
 
   @computed
   get hasChanged() {
-    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val[this.mappingValue] !== this.initialValue[index][this.mappingValue]);
+    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
   }
 
   @computed
@@ -178,14 +163,13 @@ class LinksStore {
       }
     } else  {
       this.returnAsNull = true;
-      this.value = "";
+      this.value = [];
       if (this.lazyShowLinks) {
         this.visibleLinks.clear();
       }
     }
     this.resetOptionsSearch();
   }
-
 
   @action
   moveValueAfter(value, afterValue) {
@@ -219,16 +203,9 @@ class LinksStore {
     }
   }
 
-  get returnValue() {
-    if (!this.value.length && this.returnAsNull) {
-      return null;
-    }
-    return toJS(this.value);
-  }
-
   @computed
   get links() { // be aware that it may contains null values and null value are needed!
-    return this.value.map(value => value[this.mappingValue]);
+    return this.value.map(value => value && value[this.mappingValue]);
   }
 
   @action
@@ -250,7 +227,7 @@ class LinksStore {
     }
     this.fetchingOptions = true;
     this.optionsPageStart = append?this.options.length:0;
-    const payload = this.store.getValues();
+    const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
       const { data: { data: { suggestions: { data: values, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instance.id, this.fullyQualifiedName, this.optionsSelectedType, this.optionsSearchTerm, this.optionsPageStart, this.optionsPageSize, payload), payload);

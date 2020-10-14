@@ -16,58 +16,26 @@
 
 import { observable, action, computed, toJS } from "mobx";
 
-class InputTextStore {
+import FieldStore from "./FieldStore";
+
+class InputTextStore extends FieldStore {
   @observable value = "";
-  @observable label = null;
   @observable returnAsNull = false;
-  @observable alternatives = {};
-  @observable errorMessage = null;
-  @observable errorInfo = null;
-  instance = null;
-  type = null;
   initialValue = "";
 
-  constructor(definition, instance) {
-    this.type = definition.type;
-    this.type = definition.type;
-    this.instance = instance;
-  }
-
-  get definition() {
-    return {
-      type: this.type,
-      label: this.label
-    };
-  }
-
-  get clone() {
-    return {
-      ...this.definition,
-      value: toJS(this.value)
-    };
-  }
-
-  @action
-  setError(message, info) {
-    this.errorMessage = message;
-    this.errorInfo = info;
-  }
-
-  @action
-  clearError() {
-    this.setError(null, null);
-  }
-
   @computed
-  get hasError() {
-    return this.errorMessage || this.errorInfo;
+  get returnValue() {
+    if (this.value === "" && this.returnAsNull) {
+      return null;
+    }
+    return toJS(this.value);
   }
 
   @action
-  update(value, alternatives) {
-    this.initialValue = value;
-    this.value = value;
-    this.alternatives = alternatives;
+  updateValue(value) {
+    this.returnAsNull = false;
+    this.initialValue = (value !== null && value !== undefined)?value:"";
+    this.value = this.initialValue;
   }
 
   @action
@@ -85,17 +53,6 @@ class InputTextStore {
   }
 
   @action
-  injectValue(value) {
-    this.returnAsNull = false;
-    if (value !== null && value !== undefined) {
-      this.value = value;
-    } else {
-      this.value = "";
-    }
-    this.initialValue = this.value;
-  }
-
-  @action
   setValue(value) {
     if (value !== null && value !== undefined) {
       if (value !== "" || !this.returnAsNull) {
@@ -106,13 +63,6 @@ class InputTextStore {
       this.returnAsNull = true;
       this.value = "";
     }
-  }
-
-  get returnValue() {
-    if (this.value === "" && this.returnAsNull) {
-      return null;
-    }
-    return toJS(this.value);
   }
 }
 

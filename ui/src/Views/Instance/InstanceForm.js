@@ -213,12 +213,14 @@ class InstanceForm extends React.Component {
       return null;
     }
 
+    const isReadMode = view.mode === "view" || !instance.belongsToCurrentWorkspace;
+
     const mainInstanceId = view.instanceId;
     const isMainInstance = id === mainInstanceId;
     const isCurrentInstance = id === view.currentInstanceId;
     const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
 
-    let className = `${classes.container} ${instance.isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
+    let className = `${classes.container} ${isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
 
     if (instance.hasFetchError) {
       return (
@@ -242,7 +244,7 @@ class InstanceForm extends React.Component {
           <div
             onFocus={this.handleFocus}
             onClick={this.handleFocus}
-            onDoubleClick={instance.isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
+            onDoubleClick={isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
           >
             <HeaderPanel
               className={classes.panelHeader}
@@ -253,7 +255,7 @@ class InstanceForm extends React.Component {
             {instance.hasFieldErrors?
               <GlobalFieldErrors instance={instance} />
               :
-              <BodyPanel className={classes.panelBody} instance={instance} />
+              <BodyPanel className={classes.panelBody} instance={instance} readMode={isReadMode} />
             }
             <FooterPanel
               className={classes.panelFooter}

@@ -20,7 +20,6 @@ import { observer } from "mobx-react";
 import { Router, Route, Switch } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FormStore } from "hbp-quickfire";
 import { Button } from "react-bootstrap";
 import injectStyles from "react-jss";
 
@@ -48,10 +47,8 @@ import GlobalError from "./Views/GlobalError";
 import * as Sentry from "@sentry/browser";
 
 import "babel-polyfill";
-import "./CustomFields";
-import WorkspaceModal from "./Views/WorkspaceModal";
 
-FormStore.setPathNodeSeparator("|");
+import WorkspaceModal from "./Views/WorkspaceModal";
 
 const styles = {
   "@global html, body, #root": {

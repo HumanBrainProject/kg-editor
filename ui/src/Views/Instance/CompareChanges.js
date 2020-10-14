@@ -16,9 +16,7 @@
 
 import React from "react";
 import injectStyles from "react-jss";
-import { entries, toJS } from "mobx";
 import { observer } from "mobx-react";
-import { FormStore } from "hbp-quickfire";
 import CompareFieldsChanges from "./CompareFieldsChanges";
 import instancesStore, {createInstanceStore} from "../../Stores/InstancesStore";
 
@@ -26,43 +24,6 @@ const styles = {
   container: {
     padding: "12px 15px"
   }
-};
-
-const cloneInstanceData = instance => {
-  const fields = entries(instance.form.structure.fields).reduce((acc, [name, f]) => {
-    const field = FormStore.typesMapping[f.type].properties
-      .filter(prop => !["customErrorMessages", "validationOptions", "customValidationFunctions", "value"].includes(prop))
-      .reduce((acc2, prop) => {
-        let value = toJS(f[prop]);
-        if (typeof value !== "function") {
-          if (Array.isArray(value)) {
-            value = value.map(v => toJS(v));
-          } else if (typeof value === "object") {
-            value = {...value};
-          }
-          //window.console.log(name, f.type, prop, value);
-          acc2[prop] = value;
-        }
-        return acc2;
-      }, {});
-    //window.console.log(name, f.type, "value", instance.initialValues[name]);
-    field.value = instance.initialValues[name];
-    acc[name] = field;
-    return acc;
-  }, {});
-  return {
-    id: instance.id,
-    name: instance.name,
-    types: instance.types.map(t => ({...t})),
-    primaryType: {...instance.primaryType},
-    workspace: instance.workspace,
-    fields: fields,
-    labelField: instance.labelField,
-    promotedFields: [...instance.promotedFields],
-    alternatives: {...instance.alternatives},
-    metadata: {...instance.metadata},
-    permissions: {...instance.permissions}
-  };
 };
 
 @injectStyles(styles)
@@ -88,8 +49,7 @@ class CompareChanges extends React.Component{
     this.savedInstanceStore.flush();
     const savedInstance = this.savedInstanceStore.createInstanceOrGet(instanceId);
     const instance = instancesStore.instances.get(instanceId);
-    const data = cloneInstanceData(instance);
-    //window.console.log(data);
+    const data = instance.clone;
     savedInstance.initializeData(data, true, false);
   }
 

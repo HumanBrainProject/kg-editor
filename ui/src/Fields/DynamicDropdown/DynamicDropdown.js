@@ -61,13 +61,13 @@ const styles = {
 @observer
 class DynamicDropdownWithContext extends React.Component {
   dropValue(droppedValue) {
-    this.props.fieldStoreStore.moveValueAfter(this.draggedValue, droppedValue);
+    this.props.fieldStorere.moveValueAfter(this.draggedValue, droppedValue);
     this.draggedValue = null;
     instancesStore.togglePreviewInstance();
   }
 
   handleDropdownReset = () => {
-    this.props.fieldStoreStore.resetOptionsSearch();
+    this.props.fieldStorere.resetOptionsSearch();
     instancesStore.togglePreviewInstance();
   }
 
@@ -97,7 +97,6 @@ class DynamicDropdownWithContext extends React.Component {
   }
 
   handleRemoveMySuggestion = () => {
-    //let field = this.props.fieldStore.removeAllValues();
     this.props.fieldStore.removeAllValues();
     instancesStore.togglePreviewInstance();
   }
@@ -112,7 +111,7 @@ class DynamicDropdownWithContext extends React.Component {
     if (view && pane) {
       const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[fieldStore.mappingValue];
+      const id = value && value[fieldStore.mappingValue];
       if (id) {
         view.resetInstanceHighlight();
         view.setCurrentInstanceId(pane, id);
@@ -144,15 +143,17 @@ class DynamicDropdownWithContext extends React.Component {
   }
 
   handleFocus = index => {
-    const { field, view } = this.props;
+    const { fieldStore, view } = this.props;
     if (view) {
-      const { value: values } = field;
+      const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[field.mappingValue];
-      view.setInstanceHighlight(id, field.label);
+      const id = value && value[fieldStore.mappingValue];
+      if (id) {
+        view.setInstanceHighlight(id, fieldStore.label);
+      }
       instancesStore.togglePreviewInstance();
     }
-    field.resetOptionsSearch();
+    fieldStore.resetOptionsSearch();
   };
 
   handleBlur = () => {
@@ -163,13 +164,13 @@ class DynamicDropdownWithContext extends React.Component {
   };
 
   handleMouseOver = index => {
-    const { field, view } = this.props;
+    const { fieldStore, view } = this.props;
     if (view) {
-      const { value: values } = field;
+      const { value: values } = fieldStore;
       const value = values[index];
-      const id = value[field.mappingValue];
+      const id = value && value[fieldStore.mappingValue];
       if (id) {
-        view.setInstanceHighlight(id, field.label);
+        view.setInstanceHighlight(id, fieldStore.label);
       }
     }
   };

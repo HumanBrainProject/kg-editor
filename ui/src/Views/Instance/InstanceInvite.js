@@ -18,8 +18,6 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 
-import instancesStore from "../../Stores/InstancesStore";
-
 import Preview from "../Preview";
 // import Reviewers from "./InstanceInvite/Reviewers";
 import BGMessage from "../../Components/BGMessage";
@@ -61,16 +59,6 @@ const styles = {
 @injectStyles(styles)
 @observer
 class InstanceInvite extends React.Component{
-  componentDidMount() {
-    instancesStore.setReadMode(true);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.instance && this.props.instance !== prevProps.instance) {
-      instancesStore.setReadMode(true);
-    }
-  }
-
   render(){
     const { classes, instance } = this.props;
     const { permissions } = instance;

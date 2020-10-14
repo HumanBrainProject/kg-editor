@@ -79,7 +79,7 @@ class LabelCellRenderer extends React.Component {
       return (
         <span style={{color: "var(--ft-color-error)"}}>
           <FontAwesomeIcon icon="exclamation-triangle"/>
-          &nbsp; {instance.fetchError}
+          &nbsp; {instance.fetchError || instance.labelFetchError}
         </span>
       );
     }
@@ -94,7 +94,7 @@ class LabelCellRenderer extends React.Component {
         </span>
       );
     }
-    return instance.id;
+    return instanceId;
   }
 }
 

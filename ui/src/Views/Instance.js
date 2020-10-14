@@ -78,7 +78,6 @@ class Instance extends React.Component {
       if (mode === "create") {
         routerStore.history.replace(`/instance/edit/${id}`);
       }
-      instancesStore.setReadMode(mode !== "edit" && mode !== "create");
     } else {
       instancesStore.checkInstanceIdAvailability(id, mode);
     }

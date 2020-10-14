@@ -14,14 +14,300 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, computed, toJS } from "mobx";
-import API from "../Services/API";
+import { observable, action, computed, toJS } from "mobx";
+
 import appStore from "./AppStore";
 import { fieldsMapping } from "../Fields";
 
-import { normalizeInstanceData, normalizeLabelInstanceData, getChildrenIdsGroupedByField } from "../Helpers/InstanceHelper";
+export const normalizeLabelInstanceData = data => {
+  const instance = {
+    id: null,
+    name: null,
+    types: [],
+    primaryType: { name: "", color: "", label: "" },
+    workspace: "",
+    error: null
+  };
 
-class instancesStore {
+  if (!data) {
+    return instance;
+  }
+  if (data.id) {
+    instance.id = data.id;
+  }
+  if (data.types instanceof Array) {
+    instance.types = data.types;
+    if (instance.types.length) {
+      instance.primaryType = instance.types[0];
+    }
+  }
+  if (data.workspace) {
+    instance.workspace = data.workspace;
+  }
+  if (data.name) {
+    instance.name = data.name;
+  }
+  if (typeof data.error === "object") {
+    instance.error = data.error;
+  }
+  return instance;
+};
+
+export const normalizeInstanceData = data => {
+
+  // TODO: Remove the mockup, this is just a test for embedded
+  // data.fields["http://schema.org/address"] = {
+  //   type: "Nested",
+  //   fullyQualifiedName: "http://schema.org/address",
+  //   name: "address",
+  //   label: "Address",
+  //   min:0,
+  //   max: Number.POSITIVE_INFINITY,
+  //   value: [
+  //     {
+  //       "http://schema.org/addressLocality": "Springfield",
+  //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
+  //       "http://schema.org/country" : [
+  //         {id: "e583e6a5-d621-4724-90aa-8706326ede44"},
+  //         {id: "933048fa-f314-4a70-8839-0ce346ac0c36"},
+  //         {id: "ced19d52-78e7-4e3f-a68b-6e42ba77d83b"}
+  //       ],
+  //       "http://schema.org/zipCode": [
+  //         { "http://schema.org/test": "Testing...",
+  //           "http://schema.org/region":  [
+  //             {id: "f9590f64-b8f9-4d70-a966-7af3b60ea2ae"},
+  //             {id: "3b10cce0-c452-4217-94b4-631fff56d854"},
+  //             {id: "8f3a518b-8224-447c-bf41-0da18797d969"}
+  //           ]
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   fields: {
+  //     "http://schema.org/addressLocality": {
+  //       fullyQualifiedName: "http://schema.org/addressLocality",
+  //       name: "addressLocality",
+  //       label: "Address Locality",
+  //       type: "InputText"
+  //     },
+  //     "http://schema.org/streetAddress": {
+  //       fullyQualifiedName: "http://schema.org/streetAddress",
+  //       name: "streetAddress",
+  //       label: "Street Address",
+  //       type: "InputText"
+  //     },
+  //     "http://schema.org/country" : {
+  //       fullyQualifiedName: "http://schema.org/country",
+  //       name: "country",
+  //       label: "Country",
+  //       type: "DropdownSelect",
+  //       isLink: true,
+  //       allowCustomValues: true
+  //     },
+  //     "http://schema.org/zipCode": {
+  //       type: "Nested",
+  //       fullyQualifiedName: "http://schema.org/zipCode",
+  //       name: "zipCode",
+  //       label: "Zip Code",
+  //       min:0,
+  //       max: Number.POSITIVE_INFINITY,
+  //       fields: {
+  //         "http://schema.org/test": {
+  //           fullyQualifiedName: "http://schema.org/test",
+  //           name: "test",
+  //           label: "Test",
+  //           type: "InputText"
+  //         },
+  //         "http://schema.org/region" :{
+  //           fullyQualifiedName: "http://schema.org/region",
+  //           name: "region",
+  //           label: "Region",
+  //           type: "DropdownSelect",
+  //           isLink: true,
+  //           allowCustomValues: true
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
+  // END of TODO
+
+  const normalizeAlternative = (name, field, alternatives) => {
+    field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
+      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
+      .map(alternative => ({
+        value: alternative.value,
+        users: alternative.users,
+        selected: !!alternative.selected
+      }));
+  };
+
+  const normalizeField = (field, instanceId) => {
+    if (field.type === "Nested") {
+      field.topAddButton = false;
+      if (!field.min) {
+        field.min = 0;
+      }
+      if (!field.max) {
+        field.max = Number.POSITIVE_INFINITY;
+      }
+      if (typeof field.fields === "object") {
+        normalizeFields(field.fields, instanceId);
+      }
+    }
+  };
+
+  const normalizeFields = (fields, instanceId, alternatives) => {
+    Object.entries(fields).forEach(([name, field]) => {
+      normalizeField(field, instanceId);
+      normalizeAlternative(name, field, alternatives);
+    });
+  };
+
+  const instance = {
+    ...normalizeLabelInstanceData(data),
+    fields: {},
+    labelField: null,
+    promotedFields: [],
+    alternatives: {},
+    metadata: {},
+    permissions: {}
+  };
+
+  if (!data) {
+    return instance;
+  }
+  if (data.id) {
+    instance.id = data.id;
+  }
+  if (data.types instanceof Array) {
+    instance.types = data.types;
+    if (instance.types.length) {
+      instance.primaryType = instance.types[0];
+    }
+  }
+  if (data.workspace) {
+    instance.workspace = data.workspace;
+  }
+  if (data.name) {
+    instance.name = data.name;
+  }
+  if (data.labelField) {
+    instance.labelField = data.labelField;
+  }
+  if (data.promotedFields instanceof Array) {
+    instance.promotedFields = data.promotedFields;
+  }
+  if (typeof data.fields === "object") {
+    normalizeFields(data.fields, instance.id, data.alternatives);
+    instance.fields = data.fields;
+  }
+  if (typeof data.metadata === "object") {
+    const metadata = data.metadata;
+    instance.metadata = Object.keys(metadata).map(key => {
+      if (key == "lastUpdateAt" || key == "createdAt") {
+        const d = new Date(metadata[key].value);
+        metadata[key].value = d.toLocaleString();
+      }
+      return metadata[key];
+    });
+  }
+  if (typeof data.permissions === "object") {
+    instance.permissions = data.permissions;
+  }
+  return instance;
+};
+
+const getChildrenIdsGroupedByField = fields => {
+  function getPagination(field) {
+    if (field.lazyShowLinks) {
+      const total = field.numberOfValues;
+      if (total) {
+        return {
+          count: field.numberOfVisibleLinks,
+          total: total
+        };
+      }
+    }
+    return null;
+  }
+
+  function showId(field, id) {
+    if (id) {
+      if (field.lazyShowLinks) {
+        return field.isLinkVisible(id);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function getIds(field, values, mappingValue) {
+    return Array.isArray(values) ? values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
+  }
+
+  function getGroup(field, values) {
+    const ids = getIds(field, values, field.mappingValue);
+    if (ids.length) {
+      const group = {
+        //name: field.name,
+        label: field.label,
+        ids: ids
+      };
+      const pagination = getPagination(field);
+      if (pagination) {
+        group.pagination = pagination;
+      }
+      return group;
+    }
+    return null;
+  }
+
+  function getGroups(field, values) {
+    const groups = [];
+    if (field.type === "Nested") {
+      groups.push(...getNestedFields(field.fields, values));
+    } else if (field.isLink) {
+      const group = getGroup(field, values);
+      if (group) {
+        groups.push(group);
+      }
+    }
+    return groups;
+  }
+
+  function getNestedFields(fields, vals) {
+    return Object.entries(fields).reduce((acc, [fieldKey, field]) => {
+      const values = vals.flatMap(v => v[fieldKey].value);
+      const groups = getGroups(field, values);
+      acc.push(...groups);
+      return acc;
+    }, []);
+  }
+
+  return fields.reduce((acc, field) => {
+    const values = toJS(field.value);
+    const groups = getGroups(field, values);
+    acc.push(...groups);
+    return acc;
+  }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+};
+
+const copy = (instance, fieldProperty) => ({
+  id: instance.id,
+  name: instance.name,
+  types: instance.types.map(t => ({...t})),
+  primaryType: {...instance.primaryType},
+  workspace: instance.workspace,
+  fields: Object.entries(instance.fields).reduce((acc, [name, field]) => acc[name] = field[fieldProperty], {}),
+  labelField: instance.labelField,
+  promotedFields: [...instance.promotedFields],
+  alternatives: {...instance.alternatives},
+  metadata: {...instance.metadata},
+  permissions: {...instance.permissions}
+});
+
+class InstanceStore {
   @observable id = null;
   @observable _name = null;
   @observable types = [];
@@ -44,19 +330,47 @@ class instancesStore {
   @observable fetchError = null;
   @observable hasFetchError = false;
 
-  @observable cancelChangesPending = null;
-  @observable saveError = null;
-  @observable hasSaveError = false;
-  @observable isSaving = false;
-
-  constructor(id, store) {
+  constructor(id) {
     this.id = id;
-    this.store = store;
+  }
+
+  @computed
+  get definition() {
+    return copy(this, "definition");
+  }
+
+  @computed
+  get clone() {
+    return copy(this, "clone");
+  }
+
+  @computed
+  get returnValue() {
+    const payload = {
+      "@type": this.types.map(t => t.name)
+    };
+    return Object.entries(this.fields).reduce((acc, [name, field]) => {
+      if (field.hasChanged) {
+        acc[name] = field.returnValue;
+      }
+      return acc;
+    }, payload);
+  }
+
+  @computed
+  get payload() {
+    const payload = {
+      "@type": this.types.map(t => t.name)
+    };
+    return Object.entries(this.fields).reduce((acc, [name, field]) => {
+      acc[name] = field.returnValue;
+      return acc;
+    }, payload);
   }
 
   @computed
   get hasChanged() {
-    return this.isNew || Object.values(this.fields).reduce((acc, field) => acc || field.hasChanged, false);
+    return this.isNew || Object.values(this.fields).some(field => field.hasChanged);
   }
 
   @computed
@@ -65,10 +379,14 @@ class instancesStore {
   }
 
   @action
+  reset() {
+    Object.values(this.fields).forEach(field => field.reset());
+  }
+
+  @action
   clearFieldsErrors() {
     Object.values(this.fields).forEach(field => field.clearError);
   }
-
 
   @computed
   get name() {
@@ -84,7 +402,18 @@ class instancesStore {
     if (this.isFetched && !this.fetchError) {
       return Object.entries(this.fields)
         .filter(([key]) => !this.promotedFields.includes(key))
-        .sort(([, a], [, b]) => a.label.localeCompare(b.label))
+        .sort(([, a], [, b]) => {
+          if (!a.label && !b.label) {
+            return 0;
+          }
+          if (!a.label) {
+            return 1;
+          }
+          if (!b.label) {
+            return -1;
+          }
+          return a.label.localeCompare(b.label);
+        })
         .map(([key]) => key);
     }
     return [];
@@ -100,8 +429,8 @@ class instancesStore {
           } else if (field.isLink) {
             const values = toJS(field.value);
             Array.isArray(values) && values.map(obj => {
-              const id = obj[field.mappingValue];
-              if (!acc.has(id)) {
+              const id = obj && obj[field.mappingValue];
+              if (id && !acc.has(id)) {
                 acc.add(id);
               }
             });
@@ -114,20 +443,6 @@ class instancesStore {
   }
 
   @computed
-  get linkedIds() {
-    const ids = this.childrenIds.reduce((acc, id) => {
-      if (id !== this.id) {
-        const instance = this.store.instances.get(id);
-        if (instance) {
-          instance.linkedIds.forEach(child => acc.add(child));
-        }
-      }
-      return acc;
-    }, new Set().add(this.id));
-    return Array.from(ids);
-  }
-
-  @computed
   get childrenIdsGroupedByField() {
     if (this.isFetched && !this.fetchError) {
       return getChildrenIdsGroupedByField(Object.values(this.fields));
@@ -137,23 +452,7 @@ class instancesStore {
 
   @computed
   get belongsToCurrentWorkspace() {
-    return appStore.currentWorkspace && this.workspace !== appStore.currentWorkspace.id;
-  }
-
-  @action
-  fetch(forceFetch = false) {
-    if (!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
-      this.store.fetchInstance(this);
-    }
-  }
-
-  @action
-  fetchLabel(forceFetch = false) {
-    if (!this.isFetching && !this.isLabelFetching) {
-      if (forceFetch || (!this.isFetched && !this.isLabelFetched)) {
-        this.store.fetchInstanceLabel(this);
-      }
-    }
+    return appStore.currentWorkspace && this.workspace === appStore.currentWorkspace.id;
   }
 
   @action
@@ -194,8 +493,8 @@ class instancesStore {
         this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this);
       }
       const store = this.fields[name];
-      const alternatives = normalizedData.fields[name].alternatives;
-      store.update(field.value, alternatives);
+      store.updateValue(field.value);
+      store.setAlternatives(field.alternatives);
     });
     this.fetchError = null;
     this.hasFetchError = false;
@@ -227,78 +526,6 @@ class instancesStore {
     this.isFetched = false;
     this.isFetching = false;
   }
-
-  constructPayloadToSave = () => {
-    const payload = {
-      "@type": this.types.map(t => t.name)
-    };
-    return Object.entries(this.fields).reduce((acc, [name, field]) => {
-      if (field.hasChanged) {
-        acc[name] = field.getValue(true);
-      }
-      return acc;
-    }, payload);
-  }
-
-  @action
-  async save() {
-
-    this.cancelChangesPending = false;
-    this.hasSaveError = false;
-    this.isSaving = true;
-
-    const payload = this.constructPayloadToSave();
-    try {
-      if (this.isNew) {
-        const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
-        runInAction(() => {
-          const newId = data.data.id;
-          this.isNew = false;
-          this.saveError = null;
-          this.hasSaveError = false;
-          this.isSaving = false;
-          if (newId !== this.id) {
-            this.store.instances.set(newId, this);
-            this.store.instance.delete(this.id);
-            this.id = newId;
-          }
-          this.initializeData(data.data);
-        });
-      } else {
-        const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
-        runInAction(() => {
-          this.saveError = null;
-          this.hasSaveError = false;
-          this.isSaving = false;
-          this.initializeData(data.data);
-        });
-      }
-    } catch (e) {
-      runInAction(() => {
-        const message = e.message ? e.message : e;
-        const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
-        this.saveError = `Error while saving instance "${this.id}" (${message}) ${errorMessage}`;
-        this.hasSaveError = true;
-        this.isSaving = false;
-      });
-      appStore.captureSentryException(e);
-    }
-  }
-
-  @action
-  cancelSave() {
-    this.saveError = null;
-    this.hasSaveError = false;
-  }
-
-  @action
-  cancelChanges() {
-    Object.values(this.fields).forEach(field => field.reset());
-    this.cancelChangesPending = false;
-    this.saveError = null;
-    this.hasSaveError = false;
-  }
-
 }
 
-export default instancesStore;
+export default InstanceStore;

@@ -136,15 +136,13 @@ class LinksStore extends FieldStore {
   }
 
   @action
-  addValue(value) { // only called when adding new value
-    if(!this.disabled && !this.readOnly && this.value.length < this.max) {
-      this.insertValue(value);
-      if (this.lazyShowLinks) {
-        const values = Array.isArray(value)?value:[value];
-        values.forEach(v => this.visibleLinks.add(v[this.mappingValue]));
-      }
-      this.resetOptionsSearch();
+  addValue(value) {
+    this.insertValue(value);
+    if (this.lazyShowLinks) {
+      const values = Array.isArray(value)?value:[value];
+      values.forEach(v => this.visibleLinks.add(v[this.mappingValue]));
     }
+    this.resetOptionsSearch();
   }
 
   @action

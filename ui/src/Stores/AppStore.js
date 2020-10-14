@@ -492,7 +492,7 @@ class AppStore{
       });
       const newId = data.data.id;
       const newInstance = instancesStore.createInstanceOrGet(newId);
-      newInstance.initializeData(data.data, false, false);
+      newInstance.initializeData(data.data);
       routerStore.history.push("/instance/edit/" + newId);
     } catch(e){
       runInAction(() => {

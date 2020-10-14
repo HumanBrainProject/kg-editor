@@ -188,8 +188,7 @@ class InstancesStore {
         }
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(data && data.data, mode !== "edit" && mode !== "create");
-
+        instance.initializeData(data && data.data);
         if (mode === "create") {
           routerStore.history.replace(`/instance/edit/${resolvedId}`);
         }
@@ -413,7 +412,7 @@ class InstancesStore {
       data.fields[data.labelField].value = name;
     }
     const instance  = new Instance(id, this);
-    instance.initializeData(data, false, true);
+    instance.initializeData(data, true);
     this.instances.set(id, instance);
   }
 

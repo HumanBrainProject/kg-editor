@@ -122,7 +122,7 @@ class EditorController @Inject()(
       case _ => List()
     }
 
-    val status = (statuses \ (data \ "id").as[String] \ "data").as[JsString]
+    val status = (statuses \ (data \ "id").as[String] \ "data").asOpt[JsString]
     val permissions = Permissions((data \ "permissions").asOpt[List[String]])
 
     val children = (data \ "children").asOpt[List[JsObject]] match {

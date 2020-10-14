@@ -35,6 +35,9 @@ const styles = {
     "& .ban svg": {
       color: "var(--release-color-not-released)",
       fontSize: "1.5em"
+    },
+    "&:not([status]) .ban svg": {
+      color: "gray"
     }
   },
 };
@@ -59,9 +62,9 @@ class ReleaseNodeToggle extends React.Component {
       return null;
     }
 
-    if(!node.permissions.canRelease) {
+    if(!node.permissions.canRelease || node.status === null) {
       return (
-        <div className={classes.container} title="You do not have permission to release the instance.">
+        <div className={classes.container} title={node.status === null ? "Unknown entity": "You do not have permission to release the instance."} status={node.status}>
           <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
         </div>
       );

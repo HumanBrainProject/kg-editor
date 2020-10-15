@@ -21,7 +21,7 @@ import Alternatives from "./Alternatives";
 
 const AlternativeValue = ({value:instances}) => instances.map(instance => instance.name).join("; ");
 
-const LinksAlternatives = ({className, list, show, onSelect, onRemove, disabled, mappingValue}) => {
+const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue}) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -48,8 +48,6 @@ const LinksAlternatives = ({className, list, show, onSelect, onRemove, disabled,
   return (
     <Alternatives
       className={className}
-      show={show}
-      disabled={disabled}
       list={items}
       onSelect={onSelect}
       onRemove={onRemove}

@@ -410,12 +410,13 @@ class AppStore{
       if (isNew) {
         runInAction(() => {
           const view = viewStore.views.get(id);
-          if (newId !== id) {
-            viewStore.replaceViewByNewInstanceId(id, newId);
+          if(view) {
+            if (newId !== id) {
+              viewStore.replaceViewByNewInstanceId(id, newId);
+            } else {
+              view.mode = "edit";
+            }
             this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${newId}`);
-          } else {
-            view.mode = "edit";
-            this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${id}`);
           }
         });
         viewStore.syncStoredViews();

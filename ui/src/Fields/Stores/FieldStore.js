@@ -24,7 +24,6 @@ class FieldStore {
   @observable errorInfo = null;
   instance = null;
   type = null;
-  initialValue = "";
 
   constructor(definition, options, instance) {
     this.type = definition.type;

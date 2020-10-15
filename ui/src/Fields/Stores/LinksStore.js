@@ -99,6 +99,7 @@ class LinksStore extends FieldStore {
 
   @action
   reset() {
+    this.returnAsNull = false;
     this.value = [...this.initialValue];
   }
 
@@ -186,10 +187,7 @@ class LinksStore extends FieldStore {
 
   @action
   removeAllValues() {
-    this.visibleLinks.clear();
-    this.value = [];
-    this.resetOptionsSearch();
-
+    this.setValues(null);
   }
 
   @action

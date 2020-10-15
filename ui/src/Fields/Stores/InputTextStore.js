@@ -48,6 +48,7 @@ class InputTextStore extends FieldStore {
 
   @action
   reset() {
+    this.returnAsNull = false;
     this.value = this.initialValue;
   }
 

@@ -408,11 +408,9 @@ class InstancesStore {
       metadata: {},
       permissions: { canRead: true, canCreate: true, canWrite: true }
     };
-    if (name && data.labelField && data.fields && data.fields[data.labelField]) {
-      data.fields[data.labelField].value = name;
-    }
     const instance  = new Instance(id, this);
     instance.initializeData(data, true);
+    instance.fields[instance.labelField].setValue(name);
     this.instances.set(id, instance);
   }
 

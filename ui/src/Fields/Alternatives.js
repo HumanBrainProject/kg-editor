@@ -69,16 +69,11 @@ class Alternatives extends React.Component {
 
   handleToggle = e => {
     e.preventDefault();
-    if (!this.props.disabled) {
-      this.setState(state => ({ open: !state.open }));
-    }
+    this.setState(state => ({ open: !state.open }));
   }
 
   handleSelect = (alternative, e) => {
-    const { disabled, onSelect } = this.props;
-    if (disabled) {
-      return;
-    }
+    const { onSelect } = this.props;
     if(e && e.keyCode === 40){ // Down
       e && e.preventDefault();
       const alternatives = this.alternativesRef.querySelectorAll(".option");
@@ -184,9 +179,9 @@ class Alternatives extends React.Component {
   }
 
   render() {
-    const {classes, className, show, disabled, list, ValueRenderer } = this.props;
+    const {classes, className, list, ValueRenderer } = this.props;
 
-    if (!show || !list || !list.length) {
+    if (!list || !list.length) {
       return null;
     }
 
@@ -200,7 +195,6 @@ class Alternatives extends React.Component {
       <div className={`${classes.container} ${className?className:""}`} ref={ref=>this.wrapperRef=ref}>
         <button className={classes.button}
           title="show alternatives"
-          disabled={disabled}
           onKeyDown={this.handleInputKeyStrokes}
           onClick={this.handleToggle}>
           {list.map(alternative => {

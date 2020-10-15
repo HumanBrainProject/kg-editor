@@ -96,7 +96,7 @@ class InputText extends React.Component {
   handleRemoveMySuggestion = () => this.props.fieldStore.setValue(null);
 
   render() {
-    const { classes } = this.props;
+    const { classes, readMode } = this.props;
 
     if(this.props.readMode){
       return this.renderReadMode();
@@ -105,8 +105,6 @@ class InputText extends React.Component {
     const {
       value,
       inputType,
-      disabled,
-      readOnly,
       rows,
       returnAsNull,
       alternatives,
@@ -115,12 +113,10 @@ class InputText extends React.Component {
 
     return (
       <FieldError fieldStore={this.props.fieldStore}>
-        <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`} >
+        <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${readMode? "quickfire-field-readonly": ""}`} >
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <Alternatives
             className={classes.alternatives}
-            show={!!alternatives.length}
-            disabled={returnAsNull}
             list={alternatives}
             onSelect={this.handleSelectAlternative}
             onRemove={this.handleRemoveMySuggestion}
@@ -143,12 +139,12 @@ class InputText extends React.Component {
   }
 
   renderReadMode(){
-    const { value, label, disabled, readOnly} = this.props.fieldStore;
+    const { value, label } = this.props.fieldStore;
     return (
       <FieldError fieldStore={this.props.fieldStore}>
-        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${this.props.classes.readMode} ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${this.props.classes.readMode} quickfire-field-readonly`}>
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
-          <FieldValue field={this.props.fieldStore} splitLines={this.props.componentClass=== "textarea"} />
+          <FieldValue field={this.props.fieldStore} splitLines={this.props.componentClass === "textarea"} />
         </div>
       </FieldError>
     );

@@ -45,7 +45,7 @@ const styles = {
     }
   },
   removeIcon: {
-    marginLeft: "1%"
+    marginLeft: "3%"
   }
 };
 
@@ -67,7 +67,7 @@ class Alternative extends React.Component {
     const { classes, alternative, ValueRenderer, className } = this.props;
 
     const users = (!alternative || !alternative.users)?[]:alternative.users;
-    const isOwnAlternative = users.includes(authStore.user.id);
+    const isOwnAlternative = users.find(user => authStore.user.id === user.id);
 
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>

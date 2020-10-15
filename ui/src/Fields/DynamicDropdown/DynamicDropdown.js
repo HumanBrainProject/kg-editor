@@ -35,6 +35,7 @@ const styles = {
     height:"auto",
     paddingBottom:"3px",
     position:"relative",
+    minHeight: "34px",
     "& .btn":{
       marginRight:"3px",
       marginBottom:"3px"
@@ -49,7 +50,7 @@ const styles = {
       content: "':\\00a0'"
     },
     "& .quickfire-readmode-item:not(:last-child):after":{
-      content: "',\\00a0'"
+      content: "';\\00a0'"
     }
   },
   alternatives: {
@@ -98,7 +99,9 @@ class DynamicDropdownWithContext extends React.Component {
     instancesStore.togglePreviewInstance();
   }
 
-  handleSelectAlternative = values => {
+  handleSelectAlternative = instances => {
+    const { fieldStore } = this.props;
+    const values = instances.map(instance => ({[fieldStore.mappingValue]: instance.id}));
     this.props.fieldStore.setValues(values);
     instancesStore.togglePreviewInstance();
   }
@@ -249,9 +252,8 @@ class DynamicDropdownWithContext extends React.Component {
       return this.renderReadMode();
     }
 
-    const isDisabled = readMode || returnAsNull;
+    const isDisabled = returnAsNull;
     const canAddValues = !isDisabled;
-
     return (
       <FieldError fieldStore={fieldStore}>
         <div>
@@ -262,16 +264,13 @@ class DynamicDropdownWithContext extends React.Component {
             <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
             <LinksAlternatives
               className={classes.alternatives}
-              show={!isDisabled}
-              disabled={isDisabled}
               list={alternatives}
               onSelect={this.handleSelectAlternative}
               onRemove={this.handleRemoveMySuggestion}
               mappingValue={mappingValue}
               parentContainerClassName="form-group"
-              // formGroupRef={this.formGroupRef}
             />
-            <div className={`form-control ${classes.values}`} disabled={isDisabled} readOnly={isDisabled} >
+            <div className={`form-control ${classes.values}`} disabled={isDisabled} >
               <List
                 list={links}
                 readOnly={false}

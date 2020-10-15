@@ -39,7 +39,7 @@ class LinksStore extends FieldStore {
   @observable fetchingOptions = false;
   @observable lazyShowLinks = false;
   @observable visibleLinks = new Set();
-  initialValue = [];
+  @observable initialValue = [];
   isLink = true;
   mappingValue = "@id";
 
@@ -67,7 +67,7 @@ class LinksStore extends FieldStore {
   get cloneWithInitialValue() {
     return {
       ...this.definition,
-      value: [...this.initialValue]
+      value: [...toJS(this.initialValue)]
     };
   }
 

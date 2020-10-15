@@ -20,7 +20,7 @@ import FieldStore from "./FieldStore";
 
 class CheckBoxStore extends FieldStore {
   @observable value = false;
-  initialValue = false;
+  @observable initialValue = false;
 
   @computed
   get returnValue() {
@@ -31,7 +31,7 @@ class CheckBoxStore extends FieldStore {
   get cloneWithInitialValue() {
     return {
       ...this.definition,
-      value: this.initialValue
+      value: toJS(this.initialValue)
     };
   }
 

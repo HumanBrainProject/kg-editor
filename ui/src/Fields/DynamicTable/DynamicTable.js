@@ -113,7 +113,7 @@ class DynamicTableWithContext extends React.Component {
   }
 
   handleOnAddValue = id => {
-    const { fieldStore, view, pane } = this.props;
+    const { fieldStore, view } = this.props;
     instancesStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
@@ -121,9 +121,6 @@ class DynamicTableWithContext extends React.Component {
       if (fieldStore.isLinkVisible(id)) {
         view.setInstanceHighlight(id, fieldStore.label);
       }
-      view.setCurrentInstanceId(pane, id);
-      view.selectPane(view.currentInstanceIdPane);
-      view.resetInstanceHighlight();
     }, 1000);
     instancesStore.togglePreviewInstance();
   }

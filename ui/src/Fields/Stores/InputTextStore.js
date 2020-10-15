@@ -21,7 +21,7 @@ import FieldStore from "./FieldStore";
 class InputTextStore extends FieldStore {
   @observable value = "";
   @observable returnAsNull = false;
-  initialValue = "";
+  @observable initialValue = "";
 
   @computed
   get returnValue() {
@@ -35,7 +35,7 @@ class InputTextStore extends FieldStore {
   get cloneWithInitialValue() {
     return {
       ...this.definition,
-      value: this.initialValue
+      value: toJS(this.initialValue)
     };
   }
 

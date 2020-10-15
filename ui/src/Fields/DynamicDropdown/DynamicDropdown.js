@@ -90,16 +90,11 @@ class DynamicDropdownWithContext extends React.Component {
   }
 
   handleOnAddValue = id => {
-    const { fieldStore, view, pane } = this.props;
+    const { fieldStore, view } = this.props;
     instancesStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
-    setTimeout(() => {
-      view.setInstanceHighlight(id, fieldStore.label);
-      view.setCurrentInstanceId(pane, id);
-      view.selectPane(view.currentInstanceIdPane);
-      view.resetInstanceHighlight();
-    }, 1000);
+    setTimeout(() => view.setInstanceHighlight(id, fieldStore.label), 1000);
     instancesStore.togglePreviewInstance();
   }
 

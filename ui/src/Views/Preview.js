@@ -141,13 +141,11 @@ const styles = {
 class Preview extends React.Component {
 
   componentDidMount() {
-    if (this.props.instanceId) {
-      this.fetchInstance();
-    }
+    this.fetchInstance();
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.instanceId && prevProps.instanceId !== this.props.instanceId) {
+    if (prevProps.instanceId !== this.props.instanceId) {
       this.fetchInstance();
     }
   }
@@ -157,9 +155,7 @@ class Preview extends React.Component {
     instance.fetch(forceFetch);
   }
 
-  handleRetry = () => {
-    this.fetchInstance(true);
-  }
+  handleRetry = () => this.fetchInstance(true);
 
   render() {
     // const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;

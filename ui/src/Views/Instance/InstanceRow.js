@@ -193,7 +193,10 @@ class InstanceRow extends React.Component {
         action = typeof onCtrlClick === "function"?onCtrlClick:null;
       }
       if (action) {
-        this.timeout = setTimeout((i, action) => action(i), 300, instance, action);
+        this.timeout = setTimeout((i, action) => {
+          this.timeout = null;
+          action(i);
+        }, 300, instance, action);
       }
     }
   }
@@ -202,6 +205,7 @@ class InstanceRow extends React.Component {
     const { instance, onCtrlClick, onActionClick } = this.props;
     event.stopPropagation();
     clearTimeout(this.timeout);
+    this.timeout = null;
     if (!event.currentTarget.contains(event.target)) {
       return;
     }

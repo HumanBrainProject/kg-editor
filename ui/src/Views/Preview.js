@@ -17,13 +17,13 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { Form, Field } from "hbp-quickfire";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import instanceStore from "../Stores/InstanceStore";
+import instancesStore from "../Stores/InstancesStore";
 
+import Field from "../Fields/Field";
 import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
@@ -68,9 +68,6 @@ const styles = {
     gridTemplateColumns: "100%",
     height: "100%",
     "& > .header": {
-      padding: "0 10px"
-    },
-    "& .quickfire-form": {
       padding: "0 10px"
     },
     "& .popover-popup": {
@@ -133,6 +130,9 @@ const styles = {
       stroke:"rgba(200,200,200,.1)",
       strokeWidth:"3px"
     }
+  },
+  form: {
+    padding: "0 10px"
   }
 };
 
@@ -141,31 +141,27 @@ const styles = {
 class Preview extends React.Component {
 
   componentDidMount() {
-    if (this.props.instanceId) {
-      this.fetchInstance();
-    }
+    this.fetchInstance();
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.instanceId && prevProps.instanceId !== this.props.instanceId) {
+    if (prevProps.instanceId !== this.props.instanceId) {
       this.fetchInstance();
     }
   }
 
   fetchInstance(forceFetch=false) {
-    const instance = instanceStore.createInstanceOrGet(this.props.instanceId);
+    const instance = instancesStore.createInstanceOrGet(this.props.instanceId);
     instance.fetch(forceFetch);
   }
 
-  handleRetry = () => {
-    this.fetchInstance(true);
-  }
+  handleRetry = () => this.fetchInstance(true);
 
   render() {
     // const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
     const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
 
-    const instance = instanceId?instanceStore.instances.get(instanceId):null;
+    const instance = instanceId?instancesStore.instances.get(instanceId):null;
     if (!instance) {
       return null;
     }
@@ -200,11 +196,10 @@ class Preview extends React.Component {
     }
 
     if(instance.isFetched && !instance.permissions.canRead) {
+      const fieldStore = instance.fields[instance.labelField];
       return(
         <div className={`${classes.container} ${className?className:""} no-permission`} >
-          <Form store={instance.readModeFormStore}>
-            <Field name={instance.labelField} className={classes.field} />
-          </Form>
+          <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
           <div className={classes.errorMessage}>
             <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
           </div>
@@ -249,12 +244,13 @@ class Preview extends React.Component {
           </div>
           <Scrollbars autoHide>
             {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
-              <Form store={instance.readModeFormStore}>
-                {fields.map(fieldKey => (
-                  <div key={instanceId + fieldKey} className={classes.field}>
-                    <Field name={fieldKey} />
-                  </div>
-                ))}
+              <div className={classes.form}>
+                {fields.map(name => {
+                  const fieldStore = instance.fields[name];
+                  return (
+                    <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} />
+                  );
+                })}
                 {showMetaData && instance.metadata && instance.metadata.length > 0 && (
                   <div>
                     <hr />
@@ -269,7 +265,7 @@ class Preview extends React.Component {
                     ))}
                   </div>
                 )}
-              </Form>}
+              </div>}
           </Scrollbars>
         </div>
       </div>

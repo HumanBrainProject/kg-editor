@@ -1,3 +1,5 @@
+
+
 /*
 *   Copyright (c) 2020, EPFL/Human Brain Project PCO
 *
@@ -15,23 +17,20 @@
 */
 
 import React from "react";
-import { inject, observer } from "mobx-react";
-import { Components } from "hbp-quickfire";
-import FieldError from "../FieldError";
+import FieldError from "./FieldError";
+import { fieldsMapping } from "../Fields";
 
-const InputTextMultiple =  Components.InputTextMultiple;
-
-@inject("formStore")
-@observer
-class KgAnnotatedInputText extends React.Component {
-
-  render() {
-    return (
-      <FieldError id={this.props.formStore.structure.id} field={this.props.field}>
-        <InputTextMultiple {...this.props}  />
-      </FieldError>
-    );
+const Field = (props) => {
+  const fieldMapping = fieldsMapping[props.fieldStore.type];
+  if (!fieldMapping) {
+    throw `${props.name} field is not supported!`;
   }
-}
+  const Component = fieldMapping.Component;
+  return (
+    <FieldError fieldStore={props.fieldStore}>
+      <Component {...props} />
+    </FieldError>
+  );
+};
 
-export default KgAnnotatedInputText;
+export default Field;

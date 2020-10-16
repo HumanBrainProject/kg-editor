@@ -15,30 +15,35 @@
 */
 
 import React from "react";
-import instanceStore from "../Stores/InstanceStore";
 
+import ListItem from "./ListItem";
 
-class FieldError extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
+const List = ({
+  list,
+  readOnly,
+  disabled,
+  onDelete,
+  onDragEnd,
+  onDragStart,
+  onDrop,
+  onKeyDown
+}) => (
+  <span className={readOnly ? "quickfire-readmode-list" : "quickfire-list"}>
+    {list.map((value, index) => (
+      <ListItem
+        key={`${index}-${value}`}
+        index={index}
+        value={value}
+        readOnly={readOnly}
+        disabled={disabled}
+        onDelete={onDelete}
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+        onKeyDown={onKeyDown}
+      />
+    ))}
+  </span>
+);
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(){
-    const instance = instanceStore.instances.get(this.props.id);
-    instance && instance.setFieldError(this.props.field);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return null;
-    }
-    return this.props.children;
-  }
-}
-
-export default FieldError;
+export default List;

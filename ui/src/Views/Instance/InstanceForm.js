@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 import typesStore from "../../Stores/TypesStore";
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -148,7 +148,7 @@ class InstanceForm extends React.Component {
   }
 
   fetchInstance(forceFetch = false) {
-    const instance = instanceStore.createInstanceOrGet(this.props.id);
+    const instance = instancesStore.createInstanceOrGet(this.props.id);
     instance.fetch(forceFetch);
   }
 
@@ -162,7 +162,7 @@ class InstanceForm extends React.Component {
 
   handleOpenInstance = e => {
     if ((e.metaKey || e.ctrlKey)) {
-      const instance = instanceStore.instances.get(this.props.id);
+      const instance = instancesStore.instances.get(this.props.id);
       appStore.openInstance(this.props.id, instance.name, instance.primaryType);
     } else {
       routerStore.history.push(`/instance/view/${this.props.id}`);
@@ -171,10 +171,10 @@ class InstanceForm extends React.Component {
 
   handleCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = instanceStore.instances.get(this.props.id);
+    const instance = instancesStore.instances.get(this.props.id);
     if (instance) {
       if (instance.hasChanged) {
-        instanceStore.cancelInstanceChanges(this.props.id);
+        instancesStore.cancelInstanceChanges(this.props.id);
       } else {
         this.handleConfirmCancelEdit();
       }
@@ -183,15 +183,15 @@ class InstanceForm extends React.Component {
 
   handleConfirmCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = instanceStore.instances.get(this.props.id);
+    const instance = instancesStore.instances.get(this.props.id);
     if (instance && instance.hasChanged) {
-      instanceStore.confirmCancelInstanceChanges(this.props.id);
+      instancesStore.confirmCancelInstanceChanges(this.props.id);
     }
   }
 
   handleContinueEditing = e => {
     e && e.stopPropagation();
-    instanceStore.abortCancelInstanceChange(this.props.id);
+    instancesStore.abortCancelInstanceChange(this.props.id);
   }
 
   handleSave = e => {
@@ -201,24 +201,26 @@ class InstanceForm extends React.Component {
 
   handleCancelSave = e => {
     e && e.stopPropagation();
-    const instance = instanceStore.instances.get(this.props.id);
+    const instance = instancesStore.instances.get(this.props.id);
     instance && instance.cancelSave();
   }
 
   render() {
     const { classes, view, id, provenance } = this.props;
 
-    const instance = instanceStore.instances.get(this.props.id);
+    const instance = instancesStore.instances.get(this.props.id);
     if (!instance) {
       return null;
     }
+
+    const isReadMode = view.mode === "view" || !instance.belongsToCurrentWorkspace;
 
     const mainInstanceId = view.instanceId;
     const isMainInstance = id === mainInstanceId;
     const isCurrentInstance = id === view.currentInstanceId;
     const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
 
-    let className = `${classes.container} ${instance.isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
+    let className = `${classes.container} ${isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
 
     if (instance.hasFetchError) {
       return (
@@ -242,7 +244,7 @@ class InstanceForm extends React.Component {
           <div
             onFocus={this.handleFocus}
             onClick={this.handleFocus}
-            onDoubleClick={instance.isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
+            onDoubleClick={isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
           >
             <HeaderPanel
               className={classes.panelHeader}
@@ -253,7 +255,7 @@ class InstanceForm extends React.Component {
             {instance.hasFieldErrors?
               <GlobalFieldErrors instance={instance} />
               :
-              <BodyPanel className={classes.panelBody} instance={instance} />
+              <BodyPanel className={classes.panelBody} instance={instance} readMode={isReadMode} />
             }
             <FooterPanel
               className={classes.panelFooter}

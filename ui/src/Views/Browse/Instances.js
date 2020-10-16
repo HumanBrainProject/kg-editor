@@ -31,7 +31,7 @@ import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
 import InstanceRow from "../Instance/InstanceRow";
 import appStore from "../../Stores/AppStore";
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 const styles = {
   container:{
@@ -118,8 +118,8 @@ class Instances extends React.Component{
   handleInstanceActionClick(summaryInstance, mode){
     const id = summaryInstance && summaryInstance.id;
     if (id) {
-      if (!instanceStore.instances.has(id)) {
-        const instance = instanceStore.createInstanceOrGet(id);
+      if (!instancesStore.instances.has(id)) {
+        const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
       routerStore.history.push(`/instance/${mode}/${id}`);

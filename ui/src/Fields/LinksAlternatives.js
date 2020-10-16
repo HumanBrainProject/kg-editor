@@ -15,21 +15,27 @@
 */
 
 import React, {useState, useEffect} from "react";
-import instanceStore from "../Stores/InstanceStore";
+import instancesStore from "../Stores/InstancesStore";
 import Alternatives from "./Alternatives";
 
 
 const AlternativeValue = ({value:instances}) => instances.map(instance => instance.name).join("; ");
 
-const LinksAlternatives = ({className, list, show, onSelect, onRemove, disabled, mappingValue}) => {
+const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue}) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
       const instances = value.map(v => {
-        const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
-        instance.fetchLabel();
-        return instance;
+        if (v[mappingValue]) {
+          const instance = instancesStore.createInstanceOrGet(v[mappingValue]);
+          instance.fetchLabel();
+          return instance;
+        }
+        return {
+          name: "Unknown instance",
+          value: value
+        };
       });
       return {
         users: users,
@@ -42,8 +48,6 @@ const LinksAlternatives = ({className, list, show, onSelect, onRemove, disabled,
   return (
     <Alternatives
       className={className}
-      show={show}
-      disabled={disabled}
       list={items}
       onSelect={onSelect}
       onRemove={onRemove}

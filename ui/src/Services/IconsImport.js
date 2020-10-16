@@ -22,6 +22,7 @@ import {faUserEdit} from "@fortawesome/free-solid-svg-icons/faUserEdit";
 import {faUserCheck} from "@fortawesome/free-solid-svg-icons/faUserCheck";
 import {faUserClock} from "@fortawesome/free-solid-svg-icons/faUserClock";
 import {faUserPlus} from "@fortawesome/free-solid-svg-icons/faUserPlus";
+import {faQuestion} from "@fortawesome/free-solid-svg-icons/faQuestion";
 import {faQuestionCircle} from "@fortawesome/free-solid-svg-icons/faQuestionCircle";
 import {faHome} from "@fortawesome/free-solid-svg-icons/faHome";
 import {faSearch} from "@fortawesome/free-solid-svg-icons/faSearch";
@@ -88,6 +89,7 @@ library.add(
   faUserCheck,
   faUserClock,
   faUserPlus,
+  faQuestion,
   faQuestionCircle,
   faHome,
   faSearch,

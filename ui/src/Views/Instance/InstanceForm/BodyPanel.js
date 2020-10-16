@@ -16,8 +16,9 @@
 
 import React from "react";
 import injectStyles from "react-jss";
-import { Form, Field } from "hbp-quickfire";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import Field from "../../../Fields/Field";
 
 const styles = {
   container: {
@@ -29,6 +30,8 @@ const styles = {
     backgroundColor: "transparent"
   },
   field: {
+    marginBottom: "10px",
+    wordBreak: "break-word",
     "& textarea": {
       minHeight: "200px"
     },
@@ -91,12 +94,10 @@ class BodyPanel extends React.Component{
 
   renderNoPermissionForView = mode => {
     const { classes, className, instance} = this.props;
-
+    const fieldStore = instance.fields[instance.labelField];
     return (
       <div className={`${classes.container} ${className}`} >
-        <Form store={instance.readModeFormStore}>
-          <Field name={instance.labelField} className={classes.field} />
-        </Form>
+        <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
         <div className={classes.errorMessage}>
           <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
         </div>
@@ -105,9 +106,9 @@ class BodyPanel extends React.Component{
   }
 
   render(){
-    const { classes, className, instance } = this.props;
+    const { classes, className, instance, readMode } = this.props;
 
-    if (instance.isReadMode) {
+    if (readMode) {
       if(!instance.permissions.canRead) {
         return this.renderNoPermissionForView("view");
       }
@@ -121,9 +122,12 @@ class BodyPanel extends React.Component{
 
     return(
       <div className={`${classes.container} ${className}`} >
-        <Form store={instance.form}>
-          {fields.map(name => <Field key={name} name={name} className={classes.field} />)}
-        </Form>
+        {fields.map(name => {
+          const fieldStore = instance.fields[name];
+          return (
+            <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={readMode} />
+          );
+        })}
       </div>
     );
   }

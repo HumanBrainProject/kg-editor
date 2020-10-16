@@ -148,9 +148,9 @@ object InstanceHelper {
   def getPermissions(data: JsObject): Permissions = Permissions((data \ EditorConstants.VOCAB_PERMISSIONS).asOpt[List[String]])
 
   def getAlternatives(data: JsObject, apiInstancesPrefix: String): Map[String, List[Alternative]] =
-    (data \ s"${EditorConstants.VOCAB_ALTERNATIVES}").asOpt[List[Map[String, JsValue]]] match {
+    (data \ s"${EditorConstants.VOCAB_ALTERNATIVES}").asOpt[Map[String, JsValue]] match {
       case Some(alternatives) =>
-        alternatives.head
+        alternatives
           .filter(x => !x._1.equals(EditorConstants.VOCAB_SPACE)) //TODO: Remove space from kg core
           .foldLeft(Map[String, List[Alternative]]()) {
             case (acc, (k, v)) =>

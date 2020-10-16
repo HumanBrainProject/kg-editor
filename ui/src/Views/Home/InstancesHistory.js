@@ -26,7 +26,7 @@ import PopOverButton from "../../Components/PopOverButton";
 import historyStore from "../../Stores/HistoryStore";
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 const styles = {
   container: {
@@ -181,8 +181,8 @@ class InstancesHistory extends React.Component{
   handleInstanceActionClick = (historyInstance, mode) => {
     const id = historyInstance && historyInstance.id;
     if (id) {
-      if (!instanceStore.instances.has(id)) {
-        const instance = instanceStore.createInstanceOrGet(id);
+      if (!instancesStore.instances.has(id)) {
+        const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
       routerStore.history.push(`/instance/${mode}/${id}`);

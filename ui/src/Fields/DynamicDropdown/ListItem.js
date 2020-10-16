@@ -19,7 +19,7 @@ import { observer } from "mobx-react";
 import { Glyphicon } from "react-bootstrap";
 import injectStyles from "react-jss";
 
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 const styles = {
   valueDisplay: {
@@ -63,7 +63,7 @@ class ListItem extends React.Component {
 
   fetchInstance = () => {
     const { instanceId } = this.props;
-    instanceId && instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+    instanceId && instancesStore.createInstanceOrGet(instanceId).fetchLabel();
   };
 
   handleClick = e => {
@@ -127,7 +127,7 @@ class ListItem extends React.Component {
       enablePointerEvents
     } = this.props;
 
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
 
     const hasError = !instance || instance.fetchError || instance.fetchLabelError;
     const isFetching = instance && (instance.isFetching || instance.isfFetchingLabel);

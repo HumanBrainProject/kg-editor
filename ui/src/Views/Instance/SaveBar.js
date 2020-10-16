@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import CompareChanges from "./CompareChanges";
 import appStore from "../../Stores/AppStore";
-import instanceStore from "../../Stores/InstanceStore";
+import instancesStore from "../../Stores/InstancesStore";
 
 const animationId = uniqueId("animationId");
 
@@ -134,11 +134,11 @@ class SavePanel extends React.Component{
   }
 
   handleSaveAll = () => {
-    instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
+    instancesStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
   }
 
   handleSave(instanceId){
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
     if (instance) {
       appStore.saveInstance(instance);
       appStore.setComparedInstance(null);
@@ -146,12 +146,12 @@ class SavePanel extends React.Component{
   }
 
   handleReset(instanceId){
-    instanceStore.confirmCancelInstanceChanges(instanceId);
+    instancesStore.confirmCancelInstanceChanges(instanceId);
     appStore.setComparedInstance(null);
   }
 
   handleDismissSaveError(instanceId){
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
     instance && instance.cancelSave();
   }
 
@@ -160,7 +160,7 @@ class SavePanel extends React.Component{
   }
 
   onUnload = (event) => { // the method that will be used for both add and remove event
-    if(!instanceStore.hasUnsavedChanges){
+    if(!instancesStore.hasUnsavedChanges){
       return null;
     }
     appStore.toggleSavebarDisplay(true);
@@ -170,11 +170,11 @@ class SavePanel extends React.Component{
 
   render(){
     const { classes } = this.props;
-    const changedInstances = instanceStore.getUnsavedInstances;
+    const changedInstances = instancesStore.getUnsavedInstances;
 
-    const comparedInstance = appStore.comparedInstanceId?instanceStore.instances.get(appStore.comparedInstanceId):null;
+    const comparedInstance = appStore.comparedInstanceId?instancesStore.instances.get(appStore.comparedInstanceId):null;
     const comparedInstanceLabelField = comparedInstance && comparedInstance.labelField;
-    const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.form?comparedInstance.form.getField(comparedInstanceLabelField).getValue():"";
+    const comparedInstanceLabel = comparedInstanceLabelField && comparedInstance && comparedInstance.fields[comparedInstanceLabelField]?comparedInstance.fields[comparedInstanceLabelField].returnValue:"";
     return(
       <div className={classes.container}>
         <Scrollbars autoHide>
@@ -196,7 +196,7 @@ class SavePanel extends React.Component{
                 </Modal.Footer>
               </Modal>
             }
-            {!instanceStore.hasUnsavedChanges &&
+            {!instancesStore.hasUnsavedChanges &&
               <div className={classes.noChanges}>
                 <div className={classes.allGreenIcon}><FontAwesomeIcon icon="check"/></div>
                 <div className={classes.allGreenText}>You have no unsaved modifications !</div>

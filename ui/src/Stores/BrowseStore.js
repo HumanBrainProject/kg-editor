@@ -16,18 +16,20 @@
 
 import { observable, action, runInAction } from "mobx";
 import { debounce } from "lodash";
-import { FormStore } from "hbp-quickfire";
 
 import appStore from "./AppStore";
-import { normalizeInstanceData, transformSummaryField } from "../Helpers/InstanceHelper";
+import InstanceStore from "./InstanceStore";
 
 import API from "../Services/API";
 
 const normalizeInstancesData = data => {
-  return (data && data.data instanceof Array)?data.data.map(item => {
-    const instance = normalizeInstanceData(item, transformSummaryField);
-    instance.formStore = new FormStore(instance);
-    instance.formStore.toggleReadMode(true);
+  return (data && Array.isArray(data.data))?data.data.map(rowData => {
+    if(rowData.type === "TextArea") {
+      rowData.value = rowData.value.substr(0, 197) + "...";
+      delete rowData.label;
+    }
+    const instance = new InstanceStore(rowData.id);
+    instance.initializeData(rowData);
     return instance;
   }):[];
 };

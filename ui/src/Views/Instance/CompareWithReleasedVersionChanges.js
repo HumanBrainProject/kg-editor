@@ -21,7 +21,7 @@ import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import appStore from "../../Stores/AppStore";
-import instanceStore, { createInstanceStore } from "../../Stores/InstanceStore";
+import instancesStore, { createInstanceStore } from "../../Stores/InstancesStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import CompareFieldsChanges from "./CompareFieldsChanges";
@@ -64,7 +64,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
   }
 
   fetchInstance = (forceFetch=false) => {
-    const instance = instanceStore.createInstanceOrGet(this.props.instanceId);
+    const instance = instancesStore.createInstanceOrGet(this.props.instanceId);
     instance.fetch(forceFetch);
   }
 
@@ -85,7 +85,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
       return null;
     }
     const releasedInstance = status !== "UNRELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
-    const instance = instanceStore.instances.get(instanceId);
+    const instance = instancesStore.instances.get(instanceId);
 
     if (!instance) {
       return null;
@@ -123,7 +123,7 @@ class CompareWithReleasedVersionChanges extends React.Component{
             leftInstance={releasedInstance}
             rightInstance={instance}
             leftInstanceStore={this.releasedInstanceStore}
-            rightInstanceStore={instanceStore}
+            rightInstanceStore={instancesStore}
             leftChildrenIds={releasedInstance?releasedInstance.childrenIds:[]}
             rightChildrenIds={instance.childrenIds}
             onClose={this.handleCloseComparison}

@@ -29,26 +29,21 @@ const styles = {
     padding: "2px",
     lineHeight: "normal",
     background: "currentColor",
-    "&.released ": {
-      color: "#337ab7",
-    },
-    "&.has-changed": {
-      color: "#f39c12",
-    },
-    "&.not-released": {
-      color: "var(--ft-color-error)",
-    },
-    "&.released.high-contrast $instanceStatus": {
-      color: "#337ab7",
-    },
-    "&.has-changed.high-contrast $instanceStatus": {
-      color: "#f39c12",
-    },
-    "&.not-released.high-contrast $instanceStatus": {
-      color: "var(--ft-color-error)",
-    },
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",
+    color: "#404040",
+    "&[status=UNRELEASED]": {
+      color: "var(--ft-color-error)"
+    },
+    "&[status=HAS_CHANGED]": {
+      color: "#f39c12"
+    },
+    "&[status=RELEASED]": {
+      color: "#337ab7"
+    },
+    "&:not([status]) $instanceStatus": {
+      color: "gray"
+    },
     "&.darkmode $instanceStatus": {
       color: "var(--bg-color-ui-contrast2)"
     },
@@ -71,6 +66,26 @@ const styles = {
   },
 };
 
+const getIconStatus = status => {
+  switch (status) {
+  case "UNRELEASED": return "unlink";
+  case "HAS_CHANGED": return "pencil-alt";
+  case "RELEASED": return "check";
+  }
+  return "question";
+};
+
+const MessageStatus = ({status}) => {
+  switch (status) {
+  case "UNRELEASED": return <span>This instance is <strong>not released</strong>.</span>;
+  case "HAS_CHANGED": return <span>This instance is <strong>different</strong> than its released version</span>;
+  case "RELEASED": return <span>This instance is <strong>released</strong></span>;
+  }
+  return <strong>Unknown entity</strong>;
+};
+
+
+
 @injectStyles(styles)
 class ReleaseStatus extends React.Component {
   constructor(props) {
@@ -78,46 +93,27 @@ class ReleaseStatus extends React.Component {
     this.tooltipId = uniqueId("release-tooltip");
   }
 
+  renderTooltip() {
+    const {instanceStatus} = this.props;
+    return(
+      <Tooltip id={this.tooltipId}>
+        <div>
+          <MessageStatus status={instanceStatus} />
+        </div>
+      </Tooltip>
+    );
+  }
+
   render() {
-    const { classes, instanceStatus, isChildren, highContrastChildren } = this.props;
-    const instanceStatusClass = (instanceStatus === "UNRELEASED") ? "not-released"
-      : (instanceStatus === "HAS_CHANGED") ? "has-changed"
-        : "released";
-
-    const hightContrast = highContrastChildren && isChildren ? "high-contrast" : "";
-
+    const { classes, instanceStatus } = this.props;
 
     return (
-      <OverlayTrigger placement="top" overlay={
-        <Tooltip id={this.tooltipId}>
-          {isChildren ?
-            <div>
-              {instanceStatus === "UNRELEASED" ? <span>At least one of this instance children is <strong>not released</strong></span> :
-                instanceStatus === "HAS_CHANGED" ? <span>At least one of this instance is <strong>different</strong> than its released version</span> :
-                  <span>All of this instance children are <strong>released</strong></span>}
-            </div>
-            : <div>
-              {instanceStatus === "UNRELEASED" ? <span>This instance is <strong>not released</strong>.</span> :
-                instanceStatus === "HAS_CHANGED" ? <span>This instance is <strong>different</strong> than its released version</span> :
-                  <span>This instance is <strong>released</strong></span>}
-            </div>}
-        </Tooltip>
-      }>
-        {!isChildren || (isChildren && instanceStatus) ?
-          <div className={`${classes.status} ${instanceStatusClass} ${hightContrast} ${this.props.darkmode && !highContrastChildren ? "darkmode" : ""} `}>
-            <div className={`${classes.instanceStatus}  `}>
-              {instanceStatus === "UNRELEASED" ?
-                <FontAwesomeIcon icon="unlink" />
-                : instanceStatus === "HAS_CHANGED" ?
-                  <FontAwesomeIcon icon="pencil-alt" />
-                  : instanceStatus === "RELEASED" ?
-                    <FontAwesomeIcon icon="check" />
-                    :
-                    <strong>?</strong>
-              }
-            </div>
+      <OverlayTrigger placement="top" overlay={this.renderTooltip()}>
+        <div className={`${classes.status} ${this.props.darkmode? "darkmode" : ""} `} status={instanceStatus}>
+          <div className={`${classes.instanceStatus}  `}>
+            <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
           </div>
-          : <span></span>}
+        </div>
       </OverlayTrigger>
     );
   }

@@ -35,13 +35,13 @@ const styles = {
 
 const separator = "; ";
 
-const getLabel = (instanceStore, field, value) => {
+const getLabel = (instancesStore, field, value) => {
   const id = value[field.mappingValue];
   if (!id) {
     return "Unkown instance";
   }
 
-  const instance = instanceStore.instances.get(id);
+  const instance = instancesStore.instances.get(id);
 
   if (instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.name;
@@ -49,13 +49,12 @@ const getLabel = (instanceStore, field, value) => {
   return id;
 };
 
-const getValue = (instanceStore, instance, name) => {
+const getValue = (instancesStore, instance, name) => {
   if (!instance) {
     return "";
   }
-  const formStore = instance.readModeFormStore;
-  const field = formStore.getField(name);
-  const value = field.getValue(true);
+  const field = instance.fields[name];
+  const value = field.returnValue;
   if (!value) {
     return "";
   }
@@ -73,7 +72,7 @@ const getValue = (instanceStore, instance, name) => {
   }
   const vals = Array.isArray(value)?value:[value];
   if (vals.length) {
-    return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
+    return vals.map(val => getLabel(instancesStore, field, val)).join(separator);
   }
   return "";
 };
@@ -144,7 +143,7 @@ class CompareFieldsChanges extends React.Component{
       const fields = [...rightInstance.promotedFields, ...rightInstance.nonPromotedFields].map(name => (
         {
           name: name,
-          label: rightInstance.form.getField(name).label,
+          label: rightInstance.fields[name].label,
           leftValue: getValue(leftInstanceStore, leftInstance, name),
           rightValue: getValue(rightInstanceStore, rightInstance, name),
         })

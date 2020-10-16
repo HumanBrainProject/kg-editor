@@ -21,23 +21,38 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import releaseStore from "../../../Stores/ReleaseStore";
 import appStore from "../../../Stores/AppStore";
-import instanceStore from "../../../Stores/InstanceStore";
+import instancesStore from "../../../Stores/InstancesStore";
 
 import ReleaseStatus from "../../../Components/ReleaseStatus";
 import ReleaseNodeToggle from "./ReleaseNodeToggle";
 
 const styles = {
   container: {
+    backgroundColor: "#4b4d4c",
+    paddingLeft: "32px",
+    position: "relative",
+    transition: "outline-color 0.25s ease, background 0.25s ease",
+    outlineColor: "transparent",
+    "&[status=UNRELEASED] > .node-content": {
+      backgroundColor: "var(--release-bg-not-released)"
+    },
+    "&[status=HAS_CHANGED] > .node-content": {
+      backgroundColor: "var(--release-bg-has-changed)"
+    },
+    "&[status=RELEASED] > .node-content": {
+      backgroundColor: "var(--release-bg-released)"
+    },
     "& .glyphicon + $label": {
       marginLeft: "10px"
     },
     "&:hover": {
       outline: "1"
     },
-    paddingLeft: "32px",
-    position: "relative",
-    transition: "outline-color 0.25s ease, background 0.25s ease",
-    outlineColor: "transparent",
+    "&:not([status])": {
+      "& .node-type,& $label": {
+        color: "gray"
+      }
+    },
     "& .node-actions": {
       position: "absolute",
       top: "7px",
@@ -85,15 +100,6 @@ const styles = {
         }
       }
     },
-    "&.released > .node-content": {
-      backgroundColor: "var(--release-bg-released)"
-    },
-    "&.not-released > .node-content": {
-      backgroundColor: "var(--release-bg-not-released)"
-    },
-    "&.has-changed > .node-content": {
-      backgroundColor: "var(--release-bg-has-changed)"
-    },
     "& .status-indicator": {
       display: "inline-block",
       verticalAlign: "middle",
@@ -133,7 +139,7 @@ class ReleaseNode extends React.Component {
   handleOptionPreview = (instanceId, instanceName) => event => {
     event && event.stopPropagation();
     const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(instanceId, instanceName, options );
+    instancesStore.togglePreviewInstance(instanceId, instanceName, options );
   }
 
   handleShowCompare = node => e => {
@@ -152,10 +158,8 @@ class ReleaseNode extends React.Component {
       return null;
     }
 
-    const statusClass = node["pending_" + "status"] === "UNRELEASED" ? "not-released" :
-      node["pending_" + "status"] === "HAS_CHANGED" ? "has-changed": "released";
     return (
-      <div className={`${classes.container} ${statusClass}`} style={{marginLeft: 32*level}}>
+      <div className={`${classes.container}`} status={node["pending_" + "status"]} style={{marginLeft: 32*level}}>
         <div
           className="node-content">
           <div className={"status-indicator"}>
@@ -172,31 +176,19 @@ class ReleaseNode extends React.Component {
             classes={classes}
           />
         </div>
-        <div className="node-actions">
-          <div className={`node-action ${node.isAssociation ? "disabled" : ""}`}
-            onClick={
-              node.isAssociation
-                ? null
-                : this.handleOptionPreview(node.id, node.label)}
-            title={node.isAssociation ? "linking instances are not available for preview" : `view ${node.typesName} ${node.label}`}
-          >
-            <FontAwesomeIcon icon="eye" />
-          </div>
-          <div className={`node-action ${node.isAssociation ? "disabled" : ""}`}
-            onClick={
-              node.isAssociation
-                ? null
-                : this.handleShowCompare(node)
-            }
-            title={
-              node.isAssociation
-                ? "linking instances are not available for comparison"
-                : "compare the changes with released vesion"
-            }
-          >
-            <FontAwesomeIcon icon="glasses" />
-          </div>
-        </div>
+        {node.status !== null && (
+          <div className="node-actions">
+            <div className={`node-action ${node.isAssociation ? "disabled" : ""}`}
+              onClick={node.isAssociation? null: this.handleOptionPreview(node.id, node.label)}
+              title={node.isAssociation ? "linking instances are not available for preview" : `view ${node.typesName} ${node.label}`}>
+              <FontAwesomeIcon icon="eye" />
+            </div>
+            <div className={`node-action ${node.isAssociation ? "disabled" : ""}`}
+              onClick={node.isAssociation? null: this.handleShowCompare(node)}
+              title={node.isAssociation? "linking instances are not available for comparison": "compare the changes with released vesion"}>
+              <FontAwesomeIcon icon="glasses" />
+            </div>
+          </div>)}
       </div>
     );
   }

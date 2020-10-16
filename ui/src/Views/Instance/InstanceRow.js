@@ -17,7 +17,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Form, Field } from "hbp-quickfire";
+import Field from "../../Fields/Field";
 import Status from "./Status";
 // import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
@@ -141,6 +141,10 @@ const styles = {
   statusAndNameRow: {
     display: "flex",
     alignItems: "center"
+  },
+  fields: {
+    marginTop: "8px",
+    wordBreak: "break-word"
   }
 };
 
@@ -193,7 +197,10 @@ class InstanceRow extends React.Component {
         action = typeof onCtrlClick === "function"?onCtrlClick:null;
       }
       if (action) {
-        this.timeout = setTimeout((i, action) => action(i), 300, instance, action);
+        this.timeout = setTimeout((i, action) => {
+          this.timeout = null;
+          action(i);
+        }, 300, instance, action);
       }
     }
   }
@@ -202,6 +209,7 @@ class InstanceRow extends React.Component {
     const { instance, onCtrlClick, onActionClick } = this.props;
     event.stopPropagation();
     clearTimeout(this.timeout);
+    this.timeout = null;
     if (!event.currentTarget.contains(event.target)) {
       return;
     }
@@ -225,7 +233,6 @@ class InstanceRow extends React.Component {
   render() {
     const { classes, instance, selected } = this.props;
     const { permissions } = instance;
-    const fields = Object.keys(instance.fields);
     return (
       <div className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleClick} onDoubleClick={this.handleDoubleClick} >
         <div className={classes.statusAndNameRow}>
@@ -235,9 +242,11 @@ class InstanceRow extends React.Component {
           </div>
           <div className={classes.name}>{instance.name}</div>
         </div>
-        <Form store={instance.formStore} >
-          {fields.map(field => <Field name={field} key={field} />)}
-        </Form>
+        <div>
+          {Object.entries(instance.fields).map(([name, fieldStore]) => (
+            <Field name={name} key={name} fieldStore={fieldStore} readMode={true} className={classes.fields} />
+          ))}
+        </div>
         <div className={classes.actions}>
           <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
           <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />

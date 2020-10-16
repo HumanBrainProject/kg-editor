@@ -30,6 +30,8 @@ const styles = {
     backgroundColor: "transparent"
   },
   field: {
+    marginBottom: "10px",
+    wordBreak: "break-word",
     "& textarea": {
       minHeight: "200px"
     },

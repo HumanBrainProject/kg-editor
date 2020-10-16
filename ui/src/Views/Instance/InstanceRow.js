@@ -141,6 +141,10 @@ const styles = {
   statusAndNameRow: {
     display: "flex",
     alignItems: "center"
+  },
+  fields: {
+    marginTop: "8px",
+    wordBreak: "break-word"
   }
 };
 
@@ -240,7 +244,7 @@ class InstanceRow extends React.Component {
         </div>
         <div>
           {Object.entries(instance.fields).map(([name, fieldStore]) => (
-            <Field name={name} key={name} fieldStore={fieldStore} readMode={true} />
+            <Field name={name} key={name} fieldStore={fieldStore} readMode={true} className={classes.fields} />
           ))}
         </div>
         <div className={classes.actions}>

@@ -18,13 +18,12 @@ import { observable, action, computed, toJS } from "mobx";
 import FieldStore from "./FieldStore";
 import { remove } from "lodash";
 
-class AnnotatedInputTextStore extends FieldStore {
+class InputTextMultipleStore extends FieldStore {
   @observable value = [];
   @observable options = [];
   @observable alternatives = [];
   @observable returnAsNull = false;
   @observable initialValue = [];
-  mappingValue = "@id";
 
   @computed
   get cloneWithInitialValue() {
@@ -58,7 +57,7 @@ class AnnotatedInputTextStore extends FieldStore {
 
   @computed
   get hasChanged() {
-    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
+    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
   }
 
   @action
@@ -121,11 +120,6 @@ class AnnotatedInputTextStore extends FieldStore {
       this.deleteValue(this.value[this.value.length-1]);
     }
   }
-
-  @computed
-  get resources() { // be aware that it may contains null values and null value are needed!
-    return this.value.map(value => (value && value[this.mappingValue])?value[this.mappingValue]:"Unknown ressource");
-  }
 }
 
-export default AnnotatedInputTextStore;
+export default InputTextMultipleStore;

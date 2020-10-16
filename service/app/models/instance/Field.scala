@@ -26,8 +26,7 @@ object Field {
   type Link = Map[String, JsValue]
   type ListOfLinks = List[Link]
 
-  def normalizeFieldValue(value: JsValue, fieldInfo: StructureOfField, apiInstancesPrefix: String): JsValue =
-    if (fieldInfo.isLink) {
+  def normalizeFieldValue(value: JsValue, apiInstancesPrefix: String): JsValue =
       value.asOpt[ListOfLinks] match {
         case Some(valueArray) => Json.toJson(InstanceHelper.normalizeIdOfArray(valueArray, apiInstancesPrefix))
         case None =>
@@ -36,16 +35,11 @@ object Field {
             case None           => value
           }
       }
-    } else {
-      value
-    }
 
   def getValue(data: JsValue, fieldInfo: StructureOfField, apiInstancesPrefix: String): JsValue = {
     val name = fieldInfo.fullyQualifiedName
     (data \ name).asOpt[JsValue] match {
-      case Some(value) => {
-        normalizeFieldValue(value, fieldInfo, apiInstancesPrefix)
-      }
+      case Some(value) => normalizeFieldValue(value, apiInstancesPrefix)
       case None => JsNull
     }
   }

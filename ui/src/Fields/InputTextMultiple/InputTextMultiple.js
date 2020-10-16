@@ -19,7 +19,7 @@ import { observer } from "mobx-react";
 import { FormGroup, ControlLabel } from "react-bootstrap";
 import injectStyles from "react-jss";
 
-import List from "../InputTextMultiple/List";
+import List from "./List";
 
 import Alternatives from "../Alternatives";
 
@@ -65,7 +65,7 @@ const styles = {
 
 @injectStyles(styles)
 @observer
-class AnnotatedInputText extends React.Component {
+class InputTextMultiple extends React.Component {
   dropValue(droppedValue) {
     this.props.fieldStore.moveValueAfter(this.draggedValue, droppedValue);
     this.draggedValue = null;
@@ -76,9 +76,8 @@ class AnnotatedInputText extends React.Component {
     return values.map(value => (value && value[fieldStore.mappingValue])?value[fieldStore.mappingValue]:"Unknown ressource").join("; ");
   }
 
-  handleOnAddValue = resource => {
+  handleOnAddValue = value => {
     const { fieldStore } = this.props;
-    const value = {[fieldStore.mappingValue]: resource};
     fieldStore.addValue(value);
   }
 
@@ -141,7 +140,7 @@ class AnnotatedInputText extends React.Component {
         this.handleOnAddValue(value);
       }
       e.target.value = "";
-    } else if(!e.target.value && fieldStore.resources.length > 0 && e.keyCode === 8){
+    } else if(!e.target.value && fieldStore.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
       e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
@@ -151,13 +150,13 @@ class AnnotatedInputText extends React.Component {
 
   renderReadMode(){
     const { classes, className, fieldStore } = this.props;
-    const { label, resources } = fieldStore;
+    const { label, value } = fieldStore;
     return (
       <div className={className}>
-        <div className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
+        <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <List
-            list={resources}
+            list={value}
             readOnly={true}
             disabled={false}
           />
@@ -169,7 +168,7 @@ class AnnotatedInputText extends React.Component {
   render() {
     const { classes, className, fieldStore, readMode } = this.props;
     const {
-      resources,
+      value,
       label,
       alternatives,
       returnAsNull
@@ -184,7 +183,7 @@ class AnnotatedInputText extends React.Component {
       <div className={className}>
         <FormGroup
           ref={ref=>this.formGroupRef = ref}
-          className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
+          className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
         >
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <Alternatives
@@ -197,7 +196,7 @@ class AnnotatedInputText extends React.Component {
           />
           <div className={`form-control ${classes.values}`} disabled={isDisabled} >
             <List
-              list={resources}
+              list={value}
               readOnly={false}
               disabled={isDisabled}
               onDelete={this.handleDelete}
@@ -222,4 +221,4 @@ class AnnotatedInputText extends React.Component {
   }
 }
 
-export default AnnotatedInputText;
+export default InputTextMultiple;

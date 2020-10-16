@@ -478,9 +478,6 @@ class InstanceStore {
     this.permissions = normalizedData.permissions;
     Object.entries(normalizedData.fields).forEach(([name, field]) => {
       if (!this.fields[name]) {
-        if(field.type === "InputTextMultiple") {
-          field.type = "InputText";
-        }
         const fieldMapping = fieldsMapping[field.type];
         if (!fieldMapping) {
           throw `${field.type} type is not supported!`;

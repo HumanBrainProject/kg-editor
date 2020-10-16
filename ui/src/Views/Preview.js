@@ -70,9 +70,6 @@ const styles = {
     "& > .header": {
       padding: "0 10px"
     },
-    "& .quickfire-form": {
-      padding: "0 10px"
-    },
     "& .popover-popup": {
       display: "none !important"
     },
@@ -133,6 +130,9 @@ const styles = {
       stroke:"rgba(200,200,200,.1)",
       strokeWidth:"3px"
     }
+  },
+  form: {
+    padding: "0 10px"
   }
 };
 
@@ -244,7 +244,7 @@ class Preview extends React.Component {
           </div>
           <Scrollbars autoHide>
             {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
-              <div>
+              <div className={classes.form}>
                 {fields.map(name => {
                   const fieldStore = instance.fields[name];
                   return (

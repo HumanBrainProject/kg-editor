@@ -19,15 +19,19 @@ import InputText from "../InputText/InputText";
 import RenderMarkdownField from "../../Components/Markdown";
 
 const TextArea = (props) => {
-  const { readMode, fieldStore } = props;
+  const { readMode, fieldStore, className } = props;
   if (readMode) {
     if (fieldStore.markdown) {
       return (
-        <RenderMarkdownField value={fieldStore.value}/>
+        <div className={className}>
+          <RenderMarkdownField value={fieldStore.value}/>
+        </div>
       );
     }
     return (
-      <p>{fieldStore.value}</p>
+      <div className={className}>
+        <p>{fieldStore.value}</p>
+      </div>
     );
   }
   return (

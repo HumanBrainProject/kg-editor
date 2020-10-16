@@ -22,7 +22,6 @@ import autosize from "autosize";
 import getLineHeight from "line-height";
 
 import Alternatives from "../Alternatives";
-import FieldError from "../FieldError";
 
 const styles = {
   readMode: {
@@ -96,7 +95,7 @@ class InputText extends React.Component {
   handleRemoveMySuggestion = () => this.props.fieldStore.setValue(null);
 
   render() {
-    const { classes, readMode } = this.props;
+    const { classes, className, readMode } = this.props;
 
     if(this.props.readMode){
       return this.renderReadMode();
@@ -112,7 +111,7 @@ class InputText extends React.Component {
     } = this.props.fieldStore;
 
     return (
-      <FieldError fieldStore={this.props.fieldStore}>
+      <div className={className}>
         <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${readMode? "quickfire-field-readonly": ""}`} >
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <Alternatives
@@ -134,19 +133,20 @@ class InputText extends React.Component {
             rows={rows}
           />
         </FormGroup>
-      </FieldError>
+      </div>
     );
   }
 
   renderReadMode(){
-    const { value, label } = this.props.fieldStore;
+    const { className, fieldStore } = this.props;
+    const { value, label } = fieldStore;
     return (
-      <FieldError fieldStore={this.props.fieldStore}>
+      <div className={className}>
         <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${this.props.classes.readMode} quickfire-field-readonly`}>
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           <FieldValue field={this.props.fieldStore} splitLines={this.props.componentClass === "textarea"} />
         </div>
-      </FieldError>
+      </div>
     );
   }
 }

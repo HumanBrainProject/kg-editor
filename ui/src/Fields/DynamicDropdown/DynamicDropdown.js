@@ -20,7 +20,6 @@ import { FormGroup, ControlLabel } from "react-bootstrap";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
 
-import FieldError from "../FieldError";
 import List from "./List";
 
 import instancesStore from "../../Stores/InstancesStore";
@@ -202,11 +201,11 @@ class DynamicDropdownWithContext extends React.Component {
   handleLoadMoreOptions = () => this.props.fieldStore.loadMoreOptions();
 
   renderReadMode(){
-    const { classes, fieldStore, view } = this.props;
-    const { label, instanceId, links, disabled, readOnly } = fieldStore;
+    const { classes, className, fieldStore, view } = this.props;
+    const { label, instanceId, links } = fieldStore;
     return (
-      <FieldError fieldStore={fieldStore}>
-        <div className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  ${disabled? "quickfire-field-disabled": ""} ${readOnly? "quickfire-field-readonly": ""}`}>
+      <div className={className}>
+        <div className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  quickfire-field-readonly`}>
           <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
           {(view && view.currentInstanceId === instanceId)?
             <List
@@ -227,12 +226,12 @@ class DynamicDropdownWithContext extends React.Component {
             />
           }
         </div>
-      </FieldError>
+      </div>
     );
   }
 
   render() {
-    const { classes, fieldStore, readMode } = this.props;
+    const { classes, className, fieldStore, readMode } = this.props;
     const {
       links,
       label,
@@ -255,64 +254,60 @@ class DynamicDropdownWithContext extends React.Component {
     const isDisabled = returnAsNull;
     const canAddValues = !isDisabled;
     return (
-      <FieldError fieldStore={fieldStore}>
-        <div>
-          <FormGroup
-            ref={ref=>this.formGroupRef = ref}
-            className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
-          >
-            <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
-            <LinksAlternatives
-              className={classes.alternatives}
-              list={alternatives}
-              onSelect={this.handleSelectAlternative}
-              onRemove={this.handleRemoveMySuggestion}
-              mappingValue={mappingValue}
-              parentContainerClassName="form-group"
+      <div className={className}>
+        <FormGroup
+          ref={ref=>this.formGroupRef = ref}
+          className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
+        >
+          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <LinksAlternatives
+            className={classes.alternatives}
+            list={alternatives}
+            onSelect={this.handleSelectAlternative}
+            onRemove={this.handleRemoveMySuggestion}
+            mappingValue={mappingValue}
+            parentContainerClassName="form-group"
+          />
+          <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+            <List
+              list={links}
+              readOnly={false}
+              disabled={isDisabled}
+              enablePointerEvents={true}
+              onClick={this.handleClick}
+              onDelete={this.handleDelete}
+              onDragEnd={this.handleDragEnd}
+              onDragStart={this.handleDragStart}
+              onDrop={this.handleDrop}
+              onKeyDown={this.handleKeyDown}
+              onFocus={this.handleFocus}
+              onBlur={this.handleBlur}
+              onMouseOver={this.handleMouseOver}
+              onMouseOut={this.handleMouseOut}
             />
-            <div className={`form-control ${classes.values}`} disabled={isDisabled} >
-              <List
-                list={links}
-                readOnly={false}
-                disabled={isDisabled}
-                enablePointerEvents={true}
-                onClick={this.handleClick}
-                onDelete={this.handleDelete}
-                onDragEnd={this.handleDragEnd}
-                onDragStart={this.handleDragStart}
-                onDrop={this.handleDrop}
-                onKeyDown={this.handleKeyDown}
-                onFocus={this.handleFocus}
-                onBlur={this.handleBlur}
-                onMouseOver={this.handleMouseOver}
-                onMouseOut={this.handleMouseOut}
-                onMouseEnter={this.handleMouseEnter}
-                onMouseLeave={this.handleMouseLeave}
-              />
-              {canAddValues && (
-                <React.Fragment>
-                  <Dropdown
-                    searchTerm={optionsSearchTerm}
-                    options={options}
-                    types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-                    externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
-                    loading={fetchingOptions}
-                    hasMore={hasMoreOptions}
-                    onSearch={this.handleSearchOptions}
-                    onLoadMore={this.handleLoadMoreOptions}
-                    onReset={this.handleDropdownReset}
-                    onAddValue={this.handleOnAddValue}
-                    onAddNewValue={this.handleOnAddNewValue}
-                    onDeleteLastValue={this.handleDeleteLastValue}
-                    onDrop={this.dropValue}
-                    onPreview={this.handleOptionPreview}
-                  />
-                </React.Fragment>
-              )}
-            </div>
-          </FormGroup>
-        </div>
-      </FieldError>
+            {canAddValues && (
+              <React.Fragment>
+                <Dropdown
+                  searchTerm={optionsSearchTerm}
+                  options={options}
+                  types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+                  externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+                  loading={fetchingOptions}
+                  hasMore={hasMoreOptions}
+                  onSearch={this.handleSearchOptions}
+                  onLoadMore={this.handleLoadMoreOptions}
+                  onReset={this.handleDropdownReset}
+                  onAddValue={this.handleOnAddValue}
+                  onAddNewValue={this.handleOnAddNewValue}
+                  onDeleteLastValue={this.handleDeleteLastValue}
+                  onDrop={this.dropValue}
+                  onPreview={this.handleOptionPreview}
+                />
+              </React.Fragment>
+            )}
+          </div>
+        </FormGroup>
+      </div>
     );
   }
 }

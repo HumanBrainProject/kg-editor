@@ -22,7 +22,6 @@ import { ControlLabel, FormGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
-import FieldError from "../FieldError";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 
@@ -190,7 +189,7 @@ class DynamicTableWithContext extends React.Component {
   }
 
   render() {
-    const { classes, fieldStore, view, readMode } = this.props;
+    const { classes, fieldStore, view, readMode, className } = this.props;
     const {
       instance,
       links,
@@ -209,70 +208,66 @@ class DynamicTableWithContext extends React.Component {
     const isDisabled =  readMode || returnAsNull;
 
     return (
-      <FieldError fieldStore={fieldStore}>
-        <div className={classes.container}>
-          <div>
-            <FormGroup
-              onClick={this.handleFocus}
-              className={`quickfire-fieldStore-dropdown-select ${!links.length? "quickfire-empty-fieldStore": ""}  ${isDisabled? "quickfire-fieldStore-disabled quickfire-fieldStore-readonly": ""} ${classes.fields}`}
-            >
-              <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
-              {!isDisabled && (
-                <div className={classes.deleteBtn}>
-                  <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={links.length === 0}>
-                    <FontAwesomeIcon icon="times"/>
-                  </Button>
-                </div>
-              )}
-              <div className={`${classes.table} ${isDisabled?"disabled":""}`}>
-                {(view && view.currentInstanceId === instance.id)?
-                  <Table
-                    list={links}
-                    readOnly={isDisabled}
-                    enablePointerEvents={true}
-                    onRowDelete={this.handleRowDelete}
-                    onRowClick={this.handleRowClick}
-                    onRowMouseOver={this.handleRowMouseOver}
-                    onRowMouseOut={this.handleRowMouseOut}
-                  />
-                  :
-                  <Table
-                    list={links}
-                    readOnly={isDisabled}
-                    enablePointerEvents={false}
-                  />
-                }
-                {!isDisabled && (
-                  <div className={`form-control ${classes.dropdownContainer}`}>
-                    <Dropdown
-                      searchTerm={optionsSearchTerm}
-                      options={options}
-                      types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-                      externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
-                      loading={fetchingOptions}
-                      hasMore={hasMoreOptions}
-                      inputPlaceholder={`type to add a ${fieldStoreLabel}`}
-                      onSearch={this.handleSearchOptions}
-                      onLoadMore={this.handleLoadMoreOptions}
-                      onReset={this.handleDropdownReset}
-                      onAddValue={this.handleOnAddValue}
-                      onAddNewValue={this.handleOnAddNewValue}
-                      onPreview={this.handleOptionPreview}
-                    />
-                  </div>
-                )}
+      <div className={`${classes.container} ${className}`}>
+        <FormGroup
+          onClick={this.handleFocus}
+          className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
+        >
+          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          {!isDisabled && (
+            <div className={classes.deleteBtn}>
+              <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={links.length === 0}>
+                <FontAwesomeIcon icon="times"/>
+              </Button>
+            </div>
+          )}
+          <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
+            {(view && view.currentInstanceId === instance.id)?
+              <Table
+                list={links}
+                readOnly={isDisabled}
+                enablePointerEvents={true}
+                onRowDelete={this.handleRowDelete}
+                onRowClick={this.handleRowClick}
+                onRowMouseOver={this.handleRowMouseOver}
+                onRowMouseOut={this.handleRowMouseOut}
+              />
+              :
+              <Table
+                list={links}
+                readOnly={isDisabled}
+                enablePointerEvents={false}
+              />
+            }
+            {!isDisabled && (
+              <div className={`form-control ${classes.dropdownContainer}`}>
+                <Dropdown
+                  searchTerm={optionsSearchTerm}
+                  options={options}
+                  types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+                  externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+                  loading={fetchingOptions}
+                  hasMore={hasMoreOptions}
+                  inputPlaceholder={`type to add a ${fieldStoreLabel}`}
+                  onSearch={this.handleSearchOptions}
+                  onLoadMore={this.handleLoadMoreOptions}
+                  onReset={this.handleDropdownReset}
+                  onAddValue={this.handleOnAddValue}
+                  onAddNewValue={this.handleOnAddNewValue}
+                  onPreview={this.handleOptionPreview}
+                />
               </div>
-              {!links.length && (
-                <div className={classes.emptyMessage}>
-                  <span className={classes.emptyMessageLabel}>
-                    No {fieldStoreLabel} available
-                  </span>
-                </div>
-              )}
-            </FormGroup>
+            )}
           </div>
-        </div>
-      </FieldError>
+          {!links.length && (
+            <div className={classes.emptyMessage}>
+              <span className={classes.emptyMessageLabel}>
+                    No {fieldStoreLabel} available
+              </span>
+            </div>
+          )}
+        </FormGroup>
+      </div>
     );
   }
 }

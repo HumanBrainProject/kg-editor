@@ -21,8 +21,11 @@ import DynamicTable from "./DynamicTable/DynamicTable";
 import CheckBox from "./CheckBox/CheckBox";
 
 
-// import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
-// import AnnotatedInputTextStore from "./AnnotedInputText/AnnotatedInputTextStore";
+import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
+import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
+
+import InputTextMultiple from "./InputTextMultiple/InputTextMultiple";
+import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
@@ -51,5 +54,13 @@ export const fieldsMapping = {
   "CheckBox": {
     Component: CheckBox,
     Store: CheckBoxStore
+  },
+  "AnnotatedInputText" : {
+    Component: AnnotatedInputText,
+    Store: AnnotatedInputTextStore
+  },
+  "InputTextMultiple": {
+    Component: InputTextMultiple,
+    Store: InputTextMultipleStore
   }
 };

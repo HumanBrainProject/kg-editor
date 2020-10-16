@@ -1,5 +1,3 @@
-
-
 /*
 *   Copyright (c) 2020, EPFL/Human Brain Project PCO
 *
@@ -17,20 +15,35 @@
 */
 
 import React from "react";
-import FieldError from "./FieldError";
-import { fieldsMapping } from "../Fields";
 
-const Field = (props) => {
-  const fieldMapping = fieldsMapping[props.fieldStore.type];
-  if (!fieldMapping) {
-    throw `${props.name} field is not supported!`;
-  }
-  const Component = fieldMapping.Component;
-  return (
-    <FieldError fieldStore={props.fieldStore}>
-      <Component {...props} />
-    </FieldError>
-  );
-};
+import ListItem from "./ListItem";
 
-export default Field;
+const List = ({
+  list,
+  readOnly,
+  disabled,
+  onDelete,
+  onDragEnd,
+  onDragStart,
+  onDrop,
+  onKeyDown
+}) => (
+  <span className={readOnly ? "quickfire-readmode-list" : "quickfire-list"}>
+    {list.map((value, index) => (
+      <ListItem
+        key={`${index}-${value}`}
+        index={index}
+        value={value}
+        readOnly={readOnly}
+        disabled={disabled}
+        onDelete={onDelete}
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+        onDrop={onDrop}
+        onKeyDown={onKeyDown}
+      />
+    ))}
+  </span>
+);
+
+export default List;

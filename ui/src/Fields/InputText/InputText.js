@@ -17,11 +17,12 @@
 import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
-import { ControlLabel, FormGroup, FormControl } from "react-bootstrap";
+import { FormGroup, FormControl } from "react-bootstrap";
 import autosize from "autosize";
 import getLineHeight from "line-height";
 
 import Alternatives from "../Alternatives";
+import Label from "../Label";
 
 const styles = {
   readMode: {
@@ -107,13 +108,14 @@ class InputText extends React.Component {
       rows,
       returnAsNull,
       alternatives,
-      label
+      label,
+      labelTooltip
     } = this.props.fieldStore;
 
     return (
       <div className={className}>
         <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${readMode? "quickfire-field-readonly": ""}`} >
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <Alternatives
             className={classes.alternatives}
             list={alternatives}
@@ -139,11 +141,11 @@ class InputText extends React.Component {
 
   renderReadMode(){
     const { className, fieldStore } = this.props;
-    const { value, label } = fieldStore;
+    const { value, label, labelTooltip } = fieldStore;
     return (
       <div className={className}>
         <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${this.props.classes.readMode} quickfire-field-readonly`}>
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <FieldValue field={this.props.fieldStore} splitLines={this.props.componentClass === "textarea"} />
         </div>
       </div>

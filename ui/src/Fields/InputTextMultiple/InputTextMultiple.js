@@ -16,12 +16,13 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { FormGroup, ControlLabel } from "react-bootstrap";
+import { FormGroup } from "react-bootstrap";
 import injectStyles from "react-jss";
 
 import List from "./List";
 
 import Alternatives from "../Alternatives";
+import Label from "../Label";
 
 const styles = {
   values:{
@@ -150,11 +151,11 @@ class InputTextMultiple extends React.Component {
 
   renderReadMode(){
     const { classes, className, fieldStore } = this.props;
-    const { label, value } = fieldStore;
+    const { label, labelTooltip, value } = fieldStore;
     return (
       <div className={className}>
         <div className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <List
             list={value}
             readOnly={true}
@@ -170,6 +171,7 @@ class InputTextMultiple extends React.Component {
     const {
       value,
       label,
+      labelTooltip,
       alternatives,
       returnAsNull
     } = fieldStore;
@@ -185,7 +187,7 @@ class InputTextMultiple extends React.Component {
           ref={ref=>this.formGroupRef = ref}
           className={`quickfire-field-dropdown-select ${!value.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
         >
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <Alternatives
             className={classes.alternatives}
             list={alternatives}

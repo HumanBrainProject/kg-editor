@@ -16,7 +16,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { FormGroup, ControlLabel } from "react-bootstrap";
+import { FormGroup } from "react-bootstrap";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
 
@@ -28,6 +28,8 @@ import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import LinksAlternatives from "../LinksAlternatives";
+import Label from "../Label";
+
 
 const styles = {
   values:{
@@ -202,11 +204,11 @@ class DynamicDropdownWithContext extends React.Component {
 
   renderReadMode(){
     const { classes, className, fieldStore, view } = this.props;
-    const { label, instanceId, links } = fieldStore;
+    const { label, labelTooltip, instanceId, links } = fieldStore;
     return (
       <div className={className}>
         <div className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  quickfire-field-readonly`}>
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           {(view && view.currentInstanceId === instanceId)?
             <List
               list={links}
@@ -235,6 +237,7 @@ class DynamicDropdownWithContext extends React.Component {
     const {
       links,
       label,
+      labelTooltip,
       mappingValue,
       allowCustomValues,
       optionsSearchTerm,
@@ -259,7 +262,7 @@ class DynamicDropdownWithContext extends React.Component {
           ref={ref=>this.formGroupRef = ref}
           className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
         >
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <LinksAlternatives
             className={classes.alternatives}
             list={alternatives}

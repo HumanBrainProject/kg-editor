@@ -18,6 +18,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import { ControlLabel, FormGroup, Checkbox } from "react-bootstrap";
+import Label from "../Label";
 
 const styles = {
   readMode: {
@@ -56,11 +57,11 @@ class CheckBox extends React.Component {
 
   renderReadMode() {
     const { fieldStore, classes } = this.props;
-    const { value, label } = fieldStore;
+    const { value, label, labelTooltip } = fieldStore;
 
     return (
       <div className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
-        <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+        <Label label={label} labelTooltip={labelTooltip} />
         <span>&nbsp;<input className={"quickfire-readmode-checkbox"} type="checkbox" readOnly={true} checked={value} /></span>
       </div>
     );

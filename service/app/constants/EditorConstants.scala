@@ -41,5 +41,6 @@ object EditorConstants {
   val VOCAB_AUTO_RELEASE = s"${CORE_META}space/autorelease"
   val VOCAB_CLIENT_SPACE = s"${CORE_META}space/clientSpace"
 
+  val VOCAB_LABEL_TOOLTIP = s"${EDITOR_META}property/labelTooltip"
   val VOCAB_WIDGET = s"${EDITOR_META}property/widget"
 }

@@ -18,6 +18,7 @@ import { observable, action, computed } from "mobx";
 
 class FieldStore {
   @observable label = null;
+  @observable labelTooltip = null;
   @observable fullyQualifiedName = null;
   @observable alternatives = [];
   @observable errorMessage = null;
@@ -28,6 +29,7 @@ class FieldStore {
   constructor(definition, options, instance) {
     this.type = definition.type;
     this.label = definition.label;
+    this.labelTooltip = definition.labelTooltip;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
   }

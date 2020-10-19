@@ -18,12 +18,13 @@ import React from "react";
 import { observer } from "mobx-react";
 import injectStyles from "react-jss";
 import _  from "lodash-uuid";
-import { ControlLabel, FormGroup } from "react-bootstrap";
+import { FormGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
+import Label from "../Label";
 
 import instancesStore from "../../Stores/InstancesStore";
 import typesStore from "../../Stores/TypesStore";
@@ -80,6 +81,11 @@ const styles = {
   deleteBtn: {
     float: "right",
     marginRight: "9px"
+  },
+  readMode: {
+    "& .quickfire-label:after": {
+      content: "':\\00a0'"
+    }
   }
 };
 
@@ -194,6 +200,7 @@ class DynamicTableWithContext extends React.Component {
       instance,
       links,
       label,
+      labelTooltip,
       allowCustomValues,
       optionsSearchTerm,
       options,
@@ -211,9 +218,9 @@ class DynamicTableWithContext extends React.Component {
       <div className={`${classes.container} ${className}`}>
         <FormGroup
           onClick={this.handleFocus}
-          className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
+          className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""}`}
         >
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           {!isDisabled && (
             <div className={classes.deleteBtn}>
               <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={links.length === 0}>

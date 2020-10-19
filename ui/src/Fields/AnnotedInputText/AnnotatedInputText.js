@@ -16,10 +16,11 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { FormGroup, ControlLabel } from "react-bootstrap";
+import { FormGroup } from "react-bootstrap";
 import injectStyles from "react-jss";
 
 import List from "../InputTextMultiple/List";
+import Label from "../Label";
 
 import Alternatives from "../Alternatives";
 
@@ -151,11 +152,11 @@ class AnnotatedInputText extends React.Component {
 
   renderReadMode(){
     const { classes, className, fieldStore } = this.props;
-    const { label, resources } = fieldStore;
+    const { label, labelTooltip, resources } = fieldStore;
     return (
       <div className={className}>
         <div className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <List
             list={resources}
             readOnly={true}
@@ -171,6 +172,7 @@ class AnnotatedInputText extends React.Component {
     const {
       resources,
       label,
+      labelTooltip,
       alternatives,
       returnAsNull
     } = fieldStore;
@@ -186,7 +188,7 @@ class AnnotatedInputText extends React.Component {
           ref={ref=>this.formGroupRef = ref}
           className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
         >
-          <ControlLabel className={"quickfire-label"}>{label}</ControlLabel>
+          <Label label={label} labelTooltip={labelTooltip} />
           <Alternatives
             className={classes.alternatives}
             list={alternatives}

@@ -43,7 +43,7 @@ object StructureOfField {
       case Some(v) => Some(v.capitalize)
       case _       => None
     } and
-    (JsPath \ "labelTooltip").readNullable[String] and
+    (JsPath \ EditorConstants.VOCAB_LABEL_TOOLTIP).readNullable[String] and
     (JsPath \ "markdown").readNullable[Boolean] and
     (JsPath \ "allowCustomValues").readNullable[Boolean] and
     (JsPath \ EditorConstants.VOCAB_OCCURRENCES).readNullable[Int] and

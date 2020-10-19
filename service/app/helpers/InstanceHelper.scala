@@ -154,8 +154,7 @@ object InstanceHelper {
           .filter(x => !x._1.equals(EditorConstants.VOCAB_SPACE)) //TODO: Remove space from kg core
           .foldLeft(Map[String, List[Alternative]]()) {
             case (acc, (k, v)) =>
-              val vv = v.as[List[Alternative]]
-              val l = vv.map(a => Alternative.normalizeAlternative(a, apiInstancesPrefix))
+              val l =  v.as[List[Alternative]].map(a => Alternative.normalizeAlternative(a, apiInstancesPrefix))
               acc.updated(k, l)
           }
       case None => Map()
@@ -205,13 +204,13 @@ object InstanceHelper {
   def normalizeIdOfArray(fieldArray: ListOfLinks, apiInstancesPrefix: String): ListOfLinks =
     fieldArray.map(field => normalizeIdOfField(field, apiInstancesPrefix))
 
-  def getInstanceView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): Instance =
+  def getInstanceView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceView =
     InstanceView(id, data, typeInfoMap, apiInstancesPrefix)
 
-  def getInstanceSummaryView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): Instance =
+  def getInstanceSummaryView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceSummaryView =
     InstanceSummaryView(id, data, typeInfoMap, apiInstancesPrefix)
 
-  def getInstanceLabelView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): Instance =
+  def getInstanceLabelView(id: String, data: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceLabelView =
     InstanceLabelView(id, data, typeInfoMap, apiInstancesPrefix)
 
   def generateInstancesView(

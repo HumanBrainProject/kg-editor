@@ -207,7 +207,7 @@ class UserProfileTab extends React.Component{
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         <button className={classes.button} onClick={this.handleButtonClick.bind(this)} title="Account" ref={this.buttonRef}>
-          <Avatar userId={authStore.user.id} name={authStore.user.name} picture={`${authStore.user.picture}?s=${size}&d=monsterid`} size={size} />
+          <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={size} />
         </button>
         <Overlay
           show={this.state.showPopOver}
@@ -221,9 +221,7 @@ class UserProfileTab extends React.Component{
           <Popover id={this.popOverId} className={classes.popOver}>
             <PopOverContent onSizeChange={this.handlePopOverPosition.bind(this)}>
               <div className={classes.popOverContent}>
-                <a href={authStore.user.profileUrl} target="_blank" rel="noreferrer">
-                  <Avatar userId={authStore.user.id} name={authStore.user.name} picture={`${authStore.user.picture}?s=100&d=monsterid`} size={100}  title={`edit the profile picture associated with your email ${authStore.user.email} on https://www.gravatar.com`} />
-                </a>
+                <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={100}  title={authStore.user.name} />
                 <div>
                   <div className={classes.name}>{authStore.user.name}</div>
                   <div className={classes.email}>{authStore.user.email}</div>

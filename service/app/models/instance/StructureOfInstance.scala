@@ -46,14 +46,7 @@ final case class StructureOfInstance(
           f
         )
       case _ => this
-//        StructureOfInstance(
-//        types,
-//        labelField,
-//        promotedFields,
-//        fields
-//      )
     }
-
   }
 
 }

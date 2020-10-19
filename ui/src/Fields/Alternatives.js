@@ -201,7 +201,7 @@ class Alternatives extends React.Component {
             const users = (!alternative || !alternative.users)?[]:alternative.users;
             return (
               users.map(user => (
-                <Avatar userId={user.id} name={user.name} key={user.id} />
+                <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
               ))
             );
           })}

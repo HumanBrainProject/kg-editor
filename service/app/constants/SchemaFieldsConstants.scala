@@ -29,6 +29,5 @@ object SchemaFieldsConstants {
   val FAMILY_NAME = s"${SCHEMA_ORG}familyName"
   val EMAIL = s"${SCHEMA_ORG}email"
   val PICTURE = s"${SCHEMA_ORG}picture"
-  val PROFILE_URL = s"${SCHEMA_ORG}profileUrl"
   val CURATOR = s"${SCHEMA_HBP}curator"
 }

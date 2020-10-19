@@ -30,9 +30,17 @@ final case class User(
                        familyName: Option[String],
                        email: Option[String],
                        picture: Option[String],
-                       profileUrl: Option[String],
                        isCurator: Option[Boolean],
-                       workspaces: Option[List[Workspace]])
+                       workspaces: Option[List[Workspace]]) {
+
+  def setPicture(p: Option[String]): User = {
+    User(id, username, name, givenName, familyName, email, p, isCurator, workspaces)
+  }
+
+  def setWorkspaces(w: Option[List[Workspace]]): User = {
+    User(id, username, name, givenName, familyName, email, picture, isCurator, w)
+  }
+}
 
 object User {
   implicit val userReads: Reads[User] = (
@@ -45,7 +53,6 @@ object User {
       (JsPath \ SchemaFieldsConstants.FAMILY_NAME).readNullable[String] and
       (JsPath \ SchemaFieldsConstants.EMAIL).readNullable[String] and
       (JsPath \ SchemaFieldsConstants.PICTURE).readNullable[String] and
-      (JsPath \ SchemaFieldsConstants.PROFILE_URL).readNullable[String] and
       (JsPath \ SchemaFieldsConstants.CURATOR).readNullable[Boolean] and
       (JsPath \ EditorConstants.VOCAB_WORKSPACES).readNullable[List[Workspace]]
   )(User.apply _)

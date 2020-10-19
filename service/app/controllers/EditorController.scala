@@ -26,12 +26,14 @@ import play.api.Logger
 import play.api.libs.json.{JsObject, _}
 import play.api.mvc.{Action, _}
 import services._
+import models.user.User
 
 @Singleton
 class EditorController @Inject()(
                                   cc: ControllerComponents,
                                   authenticatedUserAction: AuthenticatedUserAction,
                                   editorService: EditorService,
+                                  editorUserService: EditorUserService,
                                   workspaceServiceLive: WorkspaceServiceLive,
                                   releaseServiceLive: ReleaseServiceLive,
                                   configurationServiceLive: ConfigurationServiceLive
@@ -574,14 +576,32 @@ class EditorController @Inject()(
       case Some(t) =>
         workspaceServiceLive
           .retrieveTypesListByName(t, token, clientToken, true)
-          .map {
+          .flatMap {
             case Right(typesWithFields) =>
               implicit val writer = InstanceProtocol.instanceWrites
               val typeInfoList = extractTypeList(typesWithFields)
               val typeInfoMap = InstanceHelper.getTypeInfoMap(typeInfoList)
               val instanceView = InstanceHelper.getInstanceView(id, coreInstance, typeInfoMap, configurationServiceLive.kgApiInstancesPrefix)
-              Ok(Json.toJson(EditorResponseObject(Json.toJson(instanceView))))
-            case _ => InternalServerError("Something went wrong with types! Please try again!")
+              val usersFromAlternatives = instanceView.getUsersFromAlternatives
+              val userIdsFromAlternative = usersFromAlternatives.map(u => u.id)
+              editorUserService
+                .getUsersPicture(token, clientToken, userIdsFromAlternative)
+                .map {
+                  case Right(value) =>
+                   val res = value.asOpt[Map[String, String]] match {
+                      case Some(r) =>
+                        val users = usersFromAlternatives.foldLeft(Map[String, User]()) {
+                          case (acc, current) =>
+                            val picture = r.get(current.id)
+                            acc.updated(current.id, current.setPicture(picture))
+                        }
+                        instanceView.updateUsersInAlternatives(users)
+                      case _ => instanceView
+                    }
+                    Ok(Json.toJson(EditorResponseObject(Json.toJson(res))))
+                  case _ => Ok(Json.toJson(EditorResponseObject(Json.toJson(instanceView))))
+                }
+            case _ => Task.pure(InternalServerError("Something went wrong with types! Please try again!"))
           }
       case _ =>
         Task.pure(InternalServerError("Something went wrong while extracting the types! Please try again!"))

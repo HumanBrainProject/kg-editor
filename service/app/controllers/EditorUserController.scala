@@ -18,74 +18,63 @@ package controllers
 
 import com.google.inject.Inject
 import constants.{EditorConstants, SchemaFieldsConstants}
-import models._
+import models.{user, _}
 import models.user.User
+import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.{JsArray, _}
 import play.api.mvc.{AnyContent, _}
 import services._
+import models.workspace.Workspace
 
 class EditorUserController @Inject()(
-  cc: ControllerComponents,
-  authenticatedUserAction: AuthenticatedUserAction,
-  workspaceServiceLive: WorkspaceServiceLive,
-  editorUserService: EditorUserService
-) extends AbstractController(cc) {
+                                      cc: ControllerComponents,
+                                      authenticatedUserAction: AuthenticatedUserAction,
+                                      workspaceServiceLive: WorkspaceServiceLive,
+                                      editorUserService: EditorUserService
+                                    ) extends AbstractController(cc) {
   val logger = Logger(this.getClass)
 
   implicit val s = monix.execution.Scheduler.Implicits.global
 
-  def md5HashString(s: String): String = {
-    import java.security.MessageDigest
-    import java.math.BigInteger
-    val md = MessageDigest.getInstance("MD5")
-    val digest = md.digest(s.getBytes)
-    val bigInt = new BigInteger(1,digest)
-    val hashedString = bigInt.toString(16)
-    hashedString
-  }
-
-  def getUserInfo(profile: JsValue, workspaces: Option[JsValue]): JsValue = {
+  def getUserInfo(profile: JsValue): JsValue = {
     val info = profile.as[Map[String, JsValue]]
     val ids: JsArray = info.get(SchemaFieldsConstants.NATIVE_ID) match {
       case Some(id) => JsArray() :+ id
       case _ => JsArray()
     }
-    val userInfo: Map[String, JsValue] = info
-      .updated(SchemaFieldsConstants.IDENTIFIER, ids)
-    val userWithPicture: Map[String, JsValue] = userInfo.get(SchemaFieldsConstants.EMAIL) match {
-      case Some(email) => {
-        val hash = md5HashString(email.as[String])
-        userInfo
-          .updated(SchemaFieldsConstants.PICTURE, Json.toJson("https://www.gravatar.com/avatar/" + hash))
-          .updated(SchemaFieldsConstants.PROFILE_URL, Json.toJson("https://www.gravatar.com/" + hash))
-      }
-      case _ => userInfo
-    }
-    val user = workspaces match {
-      case Some(w) => userWithPicture.updated(EditorConstants.VOCAB_WORKSPACES, w)
-      case _ => userWithPicture
-    }
-    Json.toJson(user)
+    val userInfo: Map[String, JsValue] = info.updated(SchemaFieldsConstants.IDENTIFIER, ids)
+    Json.toJson(userInfo)
   }
 
   def getUserProfile(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    val res = for {
-      userProfile    <- editorUserService.getUserProfile(request.userToken)
-      userWorkspaces <- workspaceServiceLive.retrieveWorkspaces(request.userToken, request.clientToken)
-    } yield (userProfile, userWorkspaces)
-    val result = res.map {
-      case (Right(profile), Right(workspaces)) =>
-        val userInfo: JsValue = getUserInfo((profile \ "data").as[JsValue], Some((workspaces \ "data").as[JsValue]))
-        val user = userInfo.as[User]
-        Ok(Json.toJson(EditorResponseObject(Json.toJson(user))))
-      case (Right(profile), _) =>
-        val userInfo: JsValue = getUserInfo((profile \ "data").as[JsValue], None)
-        val user = userInfo.as[User]
-        Ok(Json.toJson(EditorResponseObject(Json.toJson(user))))
-      case (Left(err), _)   => err.toResult
-    }
-    result.runToFuture
+    editorUserService
+      .getUserProfile(request.userToken)
+      .flatMap{
+        case Right(profile) =>
+          val user: User = getUserInfo((profile \ "data").as[JsValue]).as[User]
+          val res = for {
+            userWorkspaces <- workspaceServiceLive.retrieveWorkspaces(request.userToken, request.clientToken)
+            workspaces = userWorkspaces match {
+              case Right(w) => (w \ "data").asOpt[List[Workspace]]
+              case _  => None
+            }
+            userPicture <- editorUserService.getUsersPicture(request.userToken, request.clientToken, List(user.id))
+            picture = userPicture match {
+              case Right(p) => p.as[Map[String,String]].get(user.id)
+              case _  => None
+            }
+          } yield (workspaces, picture)
+          res.map{r =>
+            val resolvedUser = user.setWorkspaces(r._1).setPicture(r._2)
+            Ok(
+              Json.toJson(
+                EditorResponseObject(Json.toJson(resolvedUser))
+              )
+            )
+          }
+        case Left(err) => Task.pure(err.toResult)
+      }.runToFuture
   }
 
 }

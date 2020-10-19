@@ -23,7 +23,12 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{JsPath, JsValue, Json, Reads}
 
-final case class Alternative(value: JsValue, selected: Boolean, users: List[User])
+final case class Alternative(value: JsValue, selected: Boolean, users: List[User]) {
+  def updateUsers(usersMap: Map[String, User]): Alternative= {
+    val resolvedUsers = users.map(u => usersMap.getOrElse(u.id, u))
+    Alternative(value, selected, resolvedUsers)
+  }
+}
 
 object Alternative {
 

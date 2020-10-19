@@ -20,28 +20,49 @@ import constants.EditorConstants
 import helpers.InstanceHelper
 import models.errors.CoreDataError
 import models.permissions.Permissions
+import models.user.User
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
 
 final case class InstanceView(
-  id: String,
-  workspace: Option[String],
-  types: List[InstanceType],
-  promotedFields: Option[List[String]],
-  labelField: Option[String],
-  fields: Map[String, Field],
-  permissions: Permissions,
-  alternatives: Map[String, List[Alternative]],
-  user: Option[String],
-  error: Option[CoreDataError]
-) extends Instance
+                               id: String,
+                               workspace: Option[String],
+                               types: List[InstanceType],
+                               promotedFields: Option[List[String]],
+                               labelField: Option[String],
+                               fields: Map[String, Field],
+                               permissions: Permissions,
+                               alternatives: Map[String, List[Alternative]],
+                               user: Option[String],
+                               error: Option[CoreDataError]
+                             ) extends Instance {
+
+  def getUsersFromAlternatives: List[User] = {
+    alternatives.foldLeft(List[User]()) {
+      case (acc, current) => current._2.foldLeft(acc) {
+        case (acc2, alt) => acc2 ::: alt.users
+      }
+    }.distinct
+  }
+
+  def updateUsersInAlternatives(users: Map[String, User]): InstanceView = {
+    val alt = alternatives.foldLeft(Map[String, List[Alternative]]()) {
+      case (acc, alternative) =>
+        val l = alternative._2.foldLeft(List[Alternative]()) {
+          case (acc2, a) => acc2 :+ a.updateUsers(users)
+        }
+        acc.updated(alternative._1, l)
+    }
+    InstanceView(id, workspace, types, promotedFields, labelField, fields, permissions, alt, user, error)
+  }
+}
 
 object InstanceView {
 
   def generateInstanceView(id: String, data: JsObject, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceView = {
     val res = for {
       resolvedId <- InstanceHelper.getId(data, apiInstancesPrefix)
-      types      <- InstanceHelper.getTypes(data)
+      types <- InstanceHelper.getTypes(data)
     } yield (resolvedId, types)
     res match {
       case Some((instanceId, instanceTypes)) =>
@@ -69,8 +90,8 @@ object InstanceView {
   def apply(id: String, coreInstance: CoreData, typeInfoMap: Map[String, StructureOfType], apiInstancesPrefix: String): InstanceView =
     coreInstance match {
       case CoreData(Some(data), None) => generateInstanceView(id, data, typeInfoMap, apiInstancesPrefix)
-      case CoreData(_, Some(error))   => generateInstanceError(id, error)
-      case _                          => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
+      case CoreData(_, Some(error)) => generateInstanceError(id, error)
+      case _ => generateInstanceError(id, CoreDataError(NOT_IMPLEMENTED, "Instance is not supported"))
     }
 
   implicit val instanceViewWrites = Json.writes[InstanceView]

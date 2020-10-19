@@ -68,14 +68,13 @@ class Alternative extends React.Component {
 
     const users = (!alternative || !alternative.users)?[]:alternative.users;
     const isOwnAlternative = users.find(user => authStore.user.id === user.id);
-
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
         <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect(alternative)}>
           <strong>
             <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
             users.map(user => (
-              <User userId={user.id} name={user.name} key={user.id} />
+              <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
             ))
           }<div className="parenthesis">)</div></em>
           {alternative.selected?

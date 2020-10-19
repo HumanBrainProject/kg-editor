@@ -61,8 +61,7 @@ class Instance extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const path = `/instance/${this.props.mode}/${this.props.match.params.id}`;
-    if (!appStore.replaceInstanceResolvedIdPath(path) && this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
+    if (this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
       this.setupInstance();
     }
   }

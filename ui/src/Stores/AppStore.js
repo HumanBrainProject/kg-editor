@@ -417,6 +417,7 @@ class AppStore{
               view.mode = "edit";
             }
             this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${newId}`);
+            this.replaceInstanceResolvedIdPath(`/instance/create/${id}`);
           }
         });
         viewStore.syncStoredViews();
@@ -519,9 +520,7 @@ class AppStore{
       const newPath = this.pathsToResolve.get(path);
       this.pathsToResolve.delete(path);
       routerStore.history.replace(newPath);
-      return true;
     }
-    return false;
   }
 
   focusPreviousInstance(instanceId) {

@@ -190,7 +190,7 @@ class InstancesStore {
         const instance = this.createInstanceOrGet(resolvedId);
         instance.initializeData(data && data.data);
         if (mode === "create") {
-          routerStore.history.replace(`/instance/edit/${resolvedId}`);
+          routerStore.history.replace(`/instances/${resolvedId}/edit`);
         }
       });
     } catch(e){

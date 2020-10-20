@@ -67,8 +67,8 @@ class InstanceTab extends React.Component {
         icon={instance && instance.isFetching ? "circle-notch" : "circle"}
         iconSpin={instance && instance.isFetching}
         iconColor={color}
-        current={matchPath(pathname, { path: `/instance/${view.mode}/${view.instanceId}`, exact: "true" })}
-        path={`/instance/${view.mode}/${view.instanceId}`}
+        current={matchPath(pathname, { path: `/instances/${view.instanceId}/${view.mode}`, exact: "true" })}
+        path={`/instances/${view.instanceId}/${view.mode}`}
         onClose={this.handleClose}
         label={label}
       />

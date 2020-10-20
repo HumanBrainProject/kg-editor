@@ -165,7 +165,7 @@ class InstanceForm extends React.Component {
       const instance = instancesStore.instances.get(this.props.id);
       appStore.openInstance(this.props.id, instance.name, instance.primaryType);
     } else {
-      routerStore.history.push(`/instance/view/${this.props.id}`);
+      routerStore.history.push(`/instances/${this.props.id}/view`);
     }
   }
 

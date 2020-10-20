@@ -75,7 +75,7 @@ class Instance extends React.Component {
     viewStore.selectViewByInstanceId(id);
     if (instance && instance.isFetched) {
       if (mode === "create") {
-        routerStore.history.replace(`/instance/edit/${id}`);
+        routerStore.history.replace(`/instances/${id}/edit`);
       }
     } else {
       instancesStore.checkInstanceIdAvailability(id, mode);

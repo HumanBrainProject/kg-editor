@@ -122,7 +122,7 @@ class Instance extends React.Component {
         <BGMessage icon={"ban"}>
           You do not have permission to {mode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
           {instance.permissions.canRead?
-            <Link className="btn btn-primary" to={`/instance/view/${instance.id}`}>Go to view</Link>:
+            <Link className="btn btn-primary" to={`/instances/${instance.id}/view/`}>Go to view</Link>:
             <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}
         </BGMessage>
       </div>

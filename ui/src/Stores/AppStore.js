@@ -170,7 +170,7 @@ class AppStore{
   async initializeWorkspace() {
     let workspace = null;
     this.initializingMessage = "Setting workspace...";
-    const path = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+    const path = matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" });
     if (path && path.params.mode !== "create") {
       workspace = await this.getInitialInstanceWorkspace(path.params.id);
       if (workspace) {
@@ -356,7 +356,7 @@ class AppStore{
 
   createInstance = () => {
     const uuid = _.uuid();
-    routerStore.history.push(`/instance/create/${uuid}`);
+    routerStore.history.push(`/instances/${uuid}/create`);
   }
 
   @action
@@ -369,21 +369,21 @@ class AppStore{
   }
 
   getReadMode() {
-    const path = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+    const path = matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" });
     return !(path && (path.params.mode === "edit" || path.params.mode === "create"));
   }
 
   @action
   closeInstance(instanceId) {
-    if (matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" })) {
-      if (matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
+    if (matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" })) {
+      if (matchPath(routerStore.history.location.pathname, { path: `/instances/${instanceId}/:mode`, exact: "true" })) {
         if (viewStore.views.size > 1) {
           const openedInstances = viewStore.instancesIds;
           const currentInstanceIndex = openedInstances.indexOf(instanceId);
           const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
           const openedInstance = viewStore.views.get(newCurrentInstanceId);
-          routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
+          routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         } else {
           routerStore.history.push("/browse");
           browseStore.clearSelectedInstance();
@@ -416,8 +416,8 @@ class AppStore{
             } else {
               view.mode = "edit";
             }
-            this.pathsToResolve.set(`/instance/create/${id}`, `/instance/edit/${newId}`);
-            this.replaceInstanceResolvedIdPath(`/instance/create/${id}`);
+            this.pathsToResolve.set(`/instances/${id}/create`, `/instances/${newId}/edit`);
+            this.replaceInstanceResolvedIdPath(`/instances/${id}/create`);
           }
         });
         viewStore.syncStoredViews();
@@ -445,14 +445,14 @@ class AppStore{
           this.instanceToDelete = null;
           this.isDeletingInstance = false;
           let nextLocation = null;
-          if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
-            if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
+          if(matchPath(routerStore.history.location.pathname, {path:"/instances/:id*/:mode", exact:"true"})){
+            if(matchPath(routerStore.history.location.pathname, {path:`/instances/${instanceId}/:mode`, exact:"true"})){
               const openedInstances = viewStore.instancesIds;
               if(openedInstances.length > 1){
                 const currentInstanceIndex = openedInstances.indexOf(instanceId);
                 const newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
                 const openedInstance = openedInstances.get(newInstanceId);
-                nextLocation = `/instance/${openedInstance.mode}/${newInstanceId}`;
+                nextLocation = `/instances/${newInstanceId}/${openedInstance.mode}`;
               } else {
                 nextLocation = "/browse";
               }
@@ -495,7 +495,7 @@ class AppStore{
       const newId = data.data.id;
       const newInstance = instancesStore.createInstanceOrGet(newId);
       newInstance.initializeData(data.data);
-      routerStore.history.push("/instance/edit/" + newId);
+      routerStore.history.push(`/instances/${newId}/edit`);
     } catch(e){
       runInAction(() => {
         this.isCreatingNewInstance = false;
@@ -524,14 +524,14 @@ class AppStore{
   }
 
   focusPreviousInstance(instanceId) {
-    if (instanceId && matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
+    if (instanceId && matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" }) && matchPath(routerStore.history.location.pathname, { path: `/instances/${instanceId}/:mode`, exact: "true" })) {
       if (viewStore.views.size > 1) {
         let openedInstances = viewStore.instancesIds;
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
         let openedInstance = viewStore.views.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
+        routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -540,7 +540,7 @@ class AppStore{
         const openedInstances = viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
         const openedInstance = viewStore.views.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
+        routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -548,14 +548,14 @@ class AppStore{
   }
 
   focusNextInstance(instanceId) {
-    if (instanceId && matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" }) && matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
+    if (instanceId && matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" }) && matchPath(routerStore.history.location.pathname, { path: `/instances/${instanceId}/:mode`, exact: "true" })) {
       if (viewStore.views.size > 1) {
         const openedInstances = viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
         const openedInstance = viewStore.views.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
+        routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -564,7 +564,7 @@ class AppStore{
         const openedInstances = viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[0];
         const openedInstance = viewStore.views.get(newCurrentInstanceId);
-        routerStore.history.push(`/instance/${openedInstance.mode}/${newCurrentInstanceId}`);
+        routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
       } else {
         routerStore.history.push("/browse");
       }
@@ -581,9 +581,7 @@ class AppStore{
     this.comparedWithReleasedVersionInstance = instance;
   }
 
-  goToDashboard = () => {
-    routerStore.history.push("/");
-  }
+  goToDashboard = () => routerStore.history.push("/");
 
   @action
   login = () => {
@@ -618,16 +616,16 @@ class AppStore{
       if (e.shiftKey) { // alt+shift+w, close all
         this.closeAllInstances();
       } else {
-        let matchInstanceTab = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+        let matchInstanceTab = matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" });
         if (matchInstanceTab) {
           this.handleCloseInstance(matchInstanceTab.params.id);
         }
       }
     } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
-      let matchInstanceTab = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+      let matchInstanceTab = matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" });
       this.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
     } else if (e.altKey && e.keyCode === 39) { // right arrow, next
-      let matchInstanceTab = matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" });
+      let matchInstanceTab = matchPath(routerStore.history.location.pathname, { path: "/instances/:id*/:mode", exact: "true" });
       this.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
     } else {
       kCode.step = kCode.ref[kCode.step] === e.keyCode ? kCode.step + 1 : 0;

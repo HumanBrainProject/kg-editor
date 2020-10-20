@@ -167,7 +167,7 @@ class InstancesHistory extends React.Component{
     let id = instance && instance.id;
     if (id) {
       id = id.split("/").slice(-1); //todo retrieve id from url
-      routerStore.history.push(`/instance/view/${id}`);
+      routerStore.history.push(`/instances/${id}/view`);
     }
   }
 
@@ -185,7 +185,7 @@ class InstancesHistory extends React.Component{
         const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
-      routerStore.history.push(`/instance/${mode}/${id}`);
+      routerStore.history.push(`/instances/${id}/${mode}`);
     }
   }
 

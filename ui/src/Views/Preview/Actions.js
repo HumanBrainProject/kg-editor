@@ -82,7 +82,7 @@ class Actions extends React.Component {
   handleClick = mode => {
     const { instance } = this.props;
     const { id } = instance;
-    routerStore.history.push(`/instance/${mode}/${id}`);
+    routerStore.history.push(`/instances/${id}/${mode}`);
   }
 
   render() {

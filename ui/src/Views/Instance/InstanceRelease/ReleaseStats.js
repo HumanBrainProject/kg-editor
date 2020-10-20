@@ -16,10 +16,10 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import releaseStore from "../../../Stores/ReleaseStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     width: "100%",
     padding: "0 10px",
@@ -86,148 +86,144 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ReleaseStats extends React.Component {
-  render() {
-    const { classes } = this.props;
+const ReleaseStats = observer(() => {
 
-    if (!releaseStore.treeStats) {
-      return null;
-    }
+  if (!releaseStore.treeStats) {
+    return null;
+  }
 
-    return (
-      <div className={classes.container}>
-        <div className={"section"}>
-          <h5>Pending changes:</h5>
-          <div className={"stat pending"}>
-            <div className={"name"}>Instances released</div>
-            <div className={"pending-count"}>
-              {releaseStore.treeStats.proceed_release}
-            </div>
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <div className={"section"}>
+        <h5>Pending changes:</h5>
+        <div className={"stat pending"}>
+          <div className={"name"}>Instances released</div>
+          <div className={"pending-count"}>
+            {releaseStore.treeStats.proceed_release}
           </div>
-          <div className={"stat pending"}>
-            <div className={"name"}>Instances unreleased</div>
-            <div className={"pending-count"}>
-              {releaseStore.treeStats.proceed_unrelease}
+        </div>
+        <div className={"stat pending"}>
+          <div className={"name"}>Instances unreleased</div>
+          <div className={"pending-count"}>
+            {releaseStore.treeStats.proceed_unrelease}
+          </div>
+        </div>
+      </div>
+
+      <div className={"section"}>
+        <h5>Current state:</h5>
+        <div className={"stat"}>
+          <div className={"name"}>Released</div>
+          <div className={"bar released"}>
+            <div
+              className={"bar-inner"}
+              style={{
+                width: `${(releaseStore.treeStats.released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+              }}
+            />
+            <div className={"bar-label"}>
+              {releaseStore.treeStats.released} /{" "}
+              {releaseStore.treeStats.total}
             </div>
           </div>
         </div>
-
-        <div className={"section"}>
-          <h5>Current state:</h5>
-          <div className={"stat"}>
-            <div className={"name"}>Released</div>
-            <div className={"bar released"}>
-              <div
-                className={"bar-inner"}
-                style={{
-                  width: `${(releaseStore.treeStats.released /
+        <div className={"stat"}>
+          <div className={"name"}>Not released</div>
+          <div className={"bar not-released"}>
+            <div
+              className={"bar-inner"}
+              style={{
+                width: `${(releaseStore.treeStats.not_released /
                       releaseStore.treeStats.total) *
                       100}%`
-                }}
-              />
-              <div className={"bar-label"}>
-                {releaseStore.treeStats.released} /{" "}
-                {releaseStore.treeStats.total}
-              </div>
-            </div>
-          </div>
-          <div className={"stat"}>
-            <div className={"name"}>Not released</div>
-            <div className={"bar not-released"}>
-              <div
-                className={"bar-inner"}
-                style={{
-                  width: `${(releaseStore.treeStats.not_released /
-                      releaseStore.treeStats.total) *
-                      100}%`
-                }}
-              />
-              <div className={"bar-label"}>
-                {releaseStore.treeStats.not_released} /{" "}
-                {releaseStore.treeStats.total}
-              </div>
-            </div>
-          </div>
-          <div className={"stat"}>
-            <div className={"name"}>Has changed</div>
-            <div className={"bar has-changed"}>
-              <div
-                className={"bar-inner"}
-                style={{
-                  width: `${(releaseStore.treeStats.has_changed /
-                      releaseStore.treeStats.total) *
-                      100}%`
-                }}
-              />
-              <div className={"bar-label"}>
-                {releaseStore.treeStats.has_changed} /{" "}
-                {releaseStore.treeStats.total}
-              </div>
+              }}
+            />
+            <div className={"bar-label"}>
+              {releaseStore.treeStats.not_released} /{" "}
+              {releaseStore.treeStats.total}
             </div>
           </div>
         </div>
-
-        <div className={"section"}>
-          <h5>State after precessing:</h5>
-          <div className={"stat"}>
-            <div className={"name"}>Released</div>
-            <div className={"bar released"}>
-              <div
-                className={"bar-inner"}
-                style={{
-                  width: `${(releaseStore.treeStats.pending_released /
+        <div className={"stat"}>
+          <div className={"name"}>Has changed</div>
+          <div className={"bar has-changed"}>
+            <div
+              className={"bar-inner"}
+              style={{
+                width: `${(releaseStore.treeStats.has_changed /
                       releaseStore.treeStats.total) *
                       100}%`
-                }}
-              />
-              <div className={"bar-label"}>
-                {releaseStore.treeStats.pending_released} /{" "}
-                {releaseStore.treeStats.total}
-              </div>
-            </div>
-          </div>
-          <div className={"stat"}>
-            <div className={"name"}>Not released</div>
-            <div className={"bar not-released"}>
-              <div
-                className={"bar-inner"}
-                style={{
-                  width: `${(releaseStore.treeStats.pending_not_released /
-                      releaseStore.treeStats.total) *
-                      100}%`
-                }}
-              />
-              <div className={"bar-label"}>
-                {releaseStore.treeStats.pending_not_released} /{" "}
-                {releaseStore.treeStats.total}
-              </div>
-            </div>
-          </div>
-          <div className={"stat"}>
-            <div className={"name"}>Has changed</div>
-            <div className={"bar has-changed"}>
-              <div
-                className={"bar-inner"}
-                style={{
-                  width: `${(releaseStore.treeStats.pending_has_changed /
-                      releaseStore.treeStats.total) *
-                      100}%`
-                }}
-              />
-              <div className={"bar-label"}>
-                {releaseStore.treeStats.pending_has_changed} /{" "}
-                {releaseStore.treeStats.total}
-              </div>
+              }}
+            />
+            <div className={"bar-label"}>
+              {releaseStore.treeStats.has_changed} /{" "}
+              {releaseStore.treeStats.total}
             </div>
           </div>
         </div>
       </div>
-    );
-  }
-}
+
+      <div className={"section"}>
+        <h5>State after precessing:</h5>
+        <div className={"stat"}>
+          <div className={"name"}>Released</div>
+          <div className={"bar released"}>
+            <div
+              className={"bar-inner"}
+              style={{
+                width: `${(releaseStore.treeStats.pending_released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+              }}
+            />
+            <div className={"bar-label"}>
+              {releaseStore.treeStats.pending_released} /{" "}
+              {releaseStore.treeStats.total}
+            </div>
+          </div>
+        </div>
+        <div className={"stat"}>
+          <div className={"name"}>Not released</div>
+          <div className={"bar not-released"}>
+            <div
+              className={"bar-inner"}
+              style={{
+                width: `${(releaseStore.treeStats.pending_not_released /
+                      releaseStore.treeStats.total) *
+                      100}%`
+              }}
+            />
+            <div className={"bar-label"}>
+              {releaseStore.treeStats.pending_not_released} /{" "}
+              {releaseStore.treeStats.total}
+            </div>
+          </div>
+        </div>
+        <div className={"stat"}>
+          <div className={"name"}>Has changed</div>
+          <div className={"bar has-changed"}>
+            <div
+              className={"bar-inner"}
+              style={{
+                width: `${(releaseStore.treeStats.pending_has_changed /
+                      releaseStore.treeStats.total) *
+                      100}%`
+              }}
+            />
+            <div className={"bar-label"}>
+              {releaseStore.treeStats.pending_has_changed} /{" "}
+              {releaseStore.treeStats.total}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
 
 export default ReleaseStats;

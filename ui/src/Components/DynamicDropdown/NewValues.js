@@ -1,15 +1,15 @@
 import React from "react";
 import {  MenuItem } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     "& .option": {
       position: "relative"
     }
   }
-};
+});
 
 
 const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, onSelect, onCancel}) => (
@@ -18,7 +18,6 @@ const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, o
   </React.Fragment>
 );
 
-@injectStyles(styles)
 class  NewValue extends React.Component {
   componentDidMount() {
     this.setFocus();
@@ -69,7 +68,8 @@ class  NewValue extends React.Component {
     }
 
     render() {
-      const  {classes, type, value} = this.props;
+      const classes = useStyles();
+      const  {type, value} = this.props;
       return(
         <MenuItem className={`quickfire-dropdown-item ${classes.container}`} key={type.name} onSelect={this.handleOnSelect}>
           <div tabIndex={-1} className="option" onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>

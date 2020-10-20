@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PopOverButton from "./PopOverButton";
 import { SingleField } from "hbp-quickfire";
 
-const styles = {
+const useStyles = createUseStyles({
   button: {
     textAlign:"center",
     lineHeight:"normal",
@@ -45,9 +45,8 @@ const styles = {
       strokeWidth: 0
     }
   }
-};
+});
 
-@injectStyles(styles)
 class BookmarkButton extends React.Component {
   constructor (props) {
     super(props);
@@ -68,7 +67,8 @@ class BookmarkButton extends React.Component {
   }
 
   render() {
-    const {classes, className, values, list, onSave} = this.props;
+    const classes = useStyles();
+    const {className, values, list, onSave} = this.props;
     const isBookmark = values && values.length;
     return (
       <PopOverButton

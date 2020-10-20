@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 
 import appStore from "../Stores/AppStore";
@@ -23,23 +23,20 @@ import BGMessage from "../Components/BGMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Sentry from "@sentry/browser";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "100%",
     color: "var(--ft-color-loud)"
   }
-};
+});
 
-@injectStyles(styles)
-class GlobalError extends React.Component {
+class GlobalError extends React.PureComponent {
   handleDismiss = () => {
     appStore.dismissGlobalError();
   }
 
-
   render() {
-    const { classes } = this.props;
-
+    const classes = useStyles();
     return (
       <div className={classes.container}>
         <BGMessage icon={"exclamation-circle"}>

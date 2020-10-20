@@ -18,10 +18,10 @@ import React from "react";
 import { observer } from "mobx-react";
 import releaseStore from "../../../Stores/ReleaseStore";
 import { Alert } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Scrollbars } from "react-custom-scrollbars";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     width: "100%",
     height: "100%"
@@ -35,30 +35,23 @@ const styles = {
     marginBottom: "10px"
 
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ReleaseMessages extends React.Component {
-  render() {
-    const {classes} = this.props;
-    return (
-      <div className={classes.container}>
-        <Scrollbars autoHide>
-          {releaseStore.visibleWarningMessages.map(
-            (message, index) => (
-              <Alert
-                key={`${message}-${index}`}
-                className={classes.alert}
-              >
-                {message}
-              </Alert>
-            )
-          )}
-        </Scrollbars>
-      </div>
-    );
-  }
-}
+const ReleaseMessages = observer(() => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <Scrollbars autoHide>
+        {releaseStore.visibleWarningMessages.map(
+          (message, index) => (
+            <Alert key={`${message}-${index}`} className={classes.alert} >
+              {message}
+            </Alert>
+          )
+        )}
+      </Scrollbars>
+    </div>
+  );
+});
 
 export default ReleaseMessages;

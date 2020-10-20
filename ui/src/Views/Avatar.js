@@ -14,29 +14,29 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 
 import AvatarComponent from "../Components/Avatar";
 import UsersStore from "../Stores/UsersStore";
 
-@observer
-class Avatar extends React.Component {
-  componentDidMount() {
-    if (this.props.userId) {
-      UsersStore.fetchUser(this.props.userId);
+const Avatar = observer(({ userId }) => {
+
+  useEffect(() => {
+    if (userId) {
+      UsersStore.fetchUser(userId);
     }
+  }, [userId]);
+
+  if (!userId) {
+    return null;
   }
 
-  render() {
-    const { userId } = this.props;
+  const user = UsersStore.users.get(userId);
 
-    const user = UsersStore.users.get(userId);
-
-    return (
-      userId ? <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />:null
-    );
-  }
-}
+  return (
+    <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />
+  );
+});
 
 export default Avatar;

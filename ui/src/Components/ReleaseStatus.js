@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { uniqueId } from "lodash";
 
-const styles = {
+const useStyles = createUseStyles({
   status: {
     borderRadius: "0.14em",
     width: "2.5em",
@@ -64,7 +64,7 @@ const styles = {
     },
 
   },
-};
+});
 
 const getIconStatus = status => {
   switch (status) {
@@ -84,9 +84,6 @@ const MessageStatus = ({status}) => {
   return <strong>Unknown entity</strong>;
 };
 
-
-
-@injectStyles(styles)
 class ReleaseStatus extends React.Component {
   constructor(props) {
     super(props);
@@ -105,7 +102,8 @@ class ReleaseStatus extends React.Component {
   }
 
   render() {
-    const { classes, instanceStatus } = this.props;
+    const classes = useStyles();
+    const { instanceStatus } = this.props;
 
     return (
       <OverlayTrigger placement="top" overlay={this.renderTooltip()}>

@@ -16,15 +16,13 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FormGroup, FormControl } from "react-bootstrap";
-import autosize from "autosize";
-import getLineHeight from "line-height";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";
 
-const styles = {
+const useStyles = createUseStyles({
   readMode: {
     "& .quickfire-label:after":{
       content: "':\\00a0'"
@@ -33,10 +31,9 @@ const styles = {
   alternatives: {
     marginLeft: "3px"
   }
-};
+});
 
-const renderLines = value => {
-  const lines = typeof value === "string"?value.split("\n"):[];
+const Lines = ({lines}) => {
   return (
     <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
       {lines.map((line, index) => {
@@ -53,7 +50,10 @@ const FieldValue = ({field, splitLines}) => {
   const val = !value || typeof value === "string"? value:value.toString();
 
   if (splitLines) {
-    return renderLines(val);
+    const lines = typeof value === "string"?value.split("\n"):[];
+    return (
+      <Lines lines={lines} />
+    );
   }
 
   return (
@@ -63,94 +63,61 @@ const FieldValue = ({field, splitLines}) => {
 
 const AlternativeValue = ({value}) => value;
 
-@injectStyles(styles)
-@observer
-class InputText extends React.Component {
-  componentDidMount() {
-    this.handleAutosize();
-  }
+const InputText = observer(({ fieldStore, className, componentClass, readMode }) => {
 
-  componentDidUpdate() {
-    this.handleAutosize();
-  }
+  const classes = useStyles();
 
-  handleAutosize() {
-    if (!this.props.autosize) {
-      return;
-    }
-    if (this.inputRef) {
-      if (this.inputRef != this.autosizedRef) { // the input ref may change over time. For instance when readmode is toggled. Therefore we might have to autosize the input multiple times over the component lifecycle.
-        autosize(this.inputRef);
-        this.autosizedRef = this.inputRef;
-        this.lineHeight = getLineHeight(this.inputRef);
-      } else {
-        autosize.update(this.inputRef);
-      }
-    }
-  }
+  const {
+    value,
+    inputType,
+    rows,
+    returnAsNull,
+    alternatives,
+    label,
+    labelTooltip
+  } = fieldStore;
 
-  handleChange = e => this.props.fieldStore.setValue(e.target.value);
+  const handleChange = e => fieldStore.setValue(e.target.value);
 
-  handleSelectAlternative = value => this.props.fieldStore.setValue(value);
+  const handleSelectAlternative = value => fieldStore.setValue(value);
 
-  handleRemoveMySuggestion = () => this.props.fieldStore.setValue(null);
+  const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
-  render() {
-    const { classes, className, readMode } = this.props;
-
-    if(this.props.readMode){
-      return this.renderReadMode();
-    }
-
-    const {
-      value,
-      inputType,
-      rows,
-      returnAsNull,
-      alternatives,
-      label,
-      labelTooltip
-    } = this.props.fieldStore;
-
+  if(readMode){
     return (
       <div className={className}>
-        <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${readMode? "quickfire-field-readonly": ""}`} >
+        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
           <Label label={label} labelTooltip={labelTooltip} />
-          <Alternatives
-            className={classes.alternatives}
-            list={alternatives}
-            onSelect={this.handleSelectAlternative}
-            onRemove={this.handleRemoveMySuggestion}
-            parentContainerClassName="form-group"
-            ValueRenderer={AlternativeValue}
-          />
-          <FormControl
-            value={value}
-            type={inputType}
-            className={"quickfire-user-input"}
-            componentClass={this.props.componentClass}
-            onChange={this.handleChange}
-            inputRef={ref=>this.inputRef = ref}
-            disabled={returnAsNull}
-            rows={rows}
-          />
-        </FormGroup>
-      </div>
-    );
-  }
-
-  renderReadMode(){
-    const { className, fieldStore } = this.props;
-    const { value, label, labelTooltip } = fieldStore;
-    return (
-      <div className={className}>
-        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${this.props.classes.readMode} quickfire-field-readonly`}>
-          <Label label={label} labelTooltip={labelTooltip} />
-          <FieldValue field={this.props.fieldStore} splitLines={this.props.componentClass === "textarea"} />
+          <FieldValue field={fieldStore} splitLines={componentClass=== "textarea"} />
         </div>
       </div>
     );
   }
-}
+
+  return (
+    <div className={className}>
+      <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${returnAsNull? "quickfire-field-disabled": ""}`} >
+        <Label label={label} labelTooltip={labelTooltip} />
+        <Alternatives
+          className={classes.alternatives}
+          list={alternatives}
+          onSelect={handleSelectAlternative}
+          onRemove={handleRemoveMySuggestion}
+          parentContainerClassName="form-group"
+          ValueRenderer={AlternativeValue}
+        />
+        <FormControl
+          value={value}
+          type={inputType}
+          className={"quickfire-user-input"}
+          componentClass={componentClass}
+          onChange={handleChange}
+          disabled={returnAsNull}
+          rows={rows}
+        />
+      </FormGroup>
+    </div>
+  );
+});
 
 export default InputText;

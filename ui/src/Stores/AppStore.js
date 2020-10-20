@@ -66,8 +66,6 @@ class AppStore{
   @observable isCreatingNewInstance = false;
   @observable instanceCreationError = null;
   @observable pathsToResolve = new Map();
-  @observable comparedInstanceId = null;
-  @observable comparedWithReleasedVersionInstance = null;
 
   availableThemes = {
     "default": DefaultTheme,
@@ -569,16 +567,6 @@ class AppStore{
         routerStore.history.push("/browse");
       }
     }
-  }
-
-  @action
-  setComparedInstance(instanceId){
-    this.comparedInstanceId = instanceId;
-  }
-
-  @action
-  setComparedWithReleasedVersionInstance(instance){
-    this.comparedWithReleasedVersionInstance = instance;
   }
 
   goToDashboard = () => {

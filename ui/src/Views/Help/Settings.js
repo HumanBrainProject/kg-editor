@@ -15,24 +15,11 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
 
-const styles = {
-  container:{
+const HelpView = () => (
+  <div>
 
-  }
-};
-
-@injectStyles(styles)
-class HelpView extends React.Component{
-  render(){
-    const {classes} = this.props;
-    return (
-      <div className={classes.container}>
-
-      </div>
-    );
-  }
-}
+  </div>
+);
 
 export default HelpView;

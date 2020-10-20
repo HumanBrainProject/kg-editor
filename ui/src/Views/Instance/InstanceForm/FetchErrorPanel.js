@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HeaderPanel from "./HeaderPanel";
 
-const styles = {
+const useStyles = createUseStyles({
   fetchErrorPanel: {
     position: "absolute !important",
     top: "50%",
@@ -66,9 +66,8 @@ const styles = {
   retryIcon: {
     marginRight: "4px"
   }
-};
+});
 
-@injectStyles(styles)
 class FetchErrorPanel extends React.Component{
   handleRetry = (e) => {
     e.stopPropagation();
@@ -76,10 +75,13 @@ class FetchErrorPanel extends React.Component{
   };
 
   render(){
-    const { classes, id, show, error, inline } = this.props;
+    const { id, show, error, inline } = this.props;
+
     if (!show) {
       return null;
     }
+
+    const classes = useStyles();
     return(
       (!inline)?
         <div className={classes.fetchErrorPanel}>

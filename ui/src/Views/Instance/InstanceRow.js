@@ -15,14 +15,14 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Field from "../../Fields/Field";
 import Status from "./Status";
 // import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     minHeight: "47px",
@@ -146,54 +146,47 @@ const styles = {
     marginTop: "8px",
     wordBreak: "break-word"
   }
-};
+});
 
-class Action extends React.PureComponent {
-  handleClick = event => {
-    const { mode, onClick, onCtrlClick } = this.props;
-    event.stopPropagation();
-    if (!event.currentTarget.contains(event.target)) {
+const Action = ({ className, show, icon, mode, onClick, onCtrlClick }) => {
+
+  if(!show) {
+    return null;
+  }
+
+  const handleClick = e => {
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.target)) {
       return;
     }
-    if (event.metaKey || event.ctrlKey) {
+    if (e.metaKey || e.ctrlKey) {
       typeof onCtrlClick === "function" && onCtrlClick(mode);
     } else {
       typeof onClick === "function" && onClick(mode);
     }
-  }
+  };
 
-  render() {
-    const {className, show, icon} = this.props;
+  return (
+    <div className={className} onClick={handleClick}>
+      <FontAwesomeIcon icon={icon} />
+    </div>
+  );
+};
 
-    if(!show) {
-      return null;
-    }
+const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActionClick }) => {
 
-    return(
-      <div className={className} onClick={this.handleClick}>
-        <FontAwesomeIcon icon={icon} />
-      </div>
-    );
-  }
-}
+  const classes = useStyles();
 
-@injectStyles(styles)
-@observer
-class InstanceRow extends React.Component {
-  constructor(props) {
-    super(props);
-    this.timeout = null;
-  }
+  const { permissions } = instance;
 
-  handleClick = event => {
-    const { instance, onClick, onCtrlClick } = this.props;
-    event.stopPropagation();
-    if (!event.currentTarget.contains(event.target)) {
+  const handleClick = e => {
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.target)) {
       return;
     }
     if(this.timeout === null) {
       let action = typeof onClick === "function"?onClick:null;
-      if (event.metaKey || event.ctrlKey) {
+      if (e.metaKey || e.ctrlKey) {
         action = typeof onCtrlClick === "function"?onCtrlClick:null;
       }
       if (action) {
@@ -203,63 +196,56 @@ class InstanceRow extends React.Component {
         }, 300, instance, action);
       }
     }
-  }
+  };
 
-  handleDoubleClick = event => {
-    const { instance, onCtrlClick, onActionClick } = this.props;
-    event.stopPropagation();
+  const handleDoubleClick = e => {
+    e.stopPropagation();
     clearTimeout(this.timeout);
     this.timeout = null;
-    if (!event.currentTarget.contains(event.target)) {
+    if (!e.currentTarget.contains(e.target)) {
       return;
     }
-    if ((event.metaKey || event.ctrlKey) && typeof onCtrlClick === "function") {
+    if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === "function") {
       onCtrlClick(instance);
     } else {
       typeof onActionClick === "function" && onActionClick(instance, "view");
     }
-  }
+  };
 
-  handleActionCtrlClick = () => {
-    const { instance, onCtrlClick } = this.props;
+  const handleActionCtrlClick = () => {
     typeof onCtrlClick === "function" && onCtrlClick(instance);
-  }
+  };
 
-  handleActionClick = mode => {
-    const { instance, onActionClick } = this.props;
+  const handleActionClick = mode => {
     typeof onActionClick === "function" && onActionClick(instance, mode);
-  }
+  };
 
-  render() {
-    const { classes, instance, selected } = this.props;
-    const { permissions } = instance;
-    return (
-      <div className={`${classes.container} ${selected ? "selected" : ""}`} onClick={this.handleClick} onDoubleClick={this.handleDoubleClick} >
-        <div className={classes.statusAndNameRow}>
-          <Status id={instance.id} darkmode={true} />
-          <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
-            <FontAwesomeIcon fixedWidth icon="circle" />
-          </div>
-          <div className={classes.name}>{instance.name}</div>
+  return (
+    <div className={`${classes.container} ${selected ? "selected" : ""}`} onClick={handleClick} onDoubleClick={handleDoubleClick} >
+      <div className={classes.statusAndNameRow}>
+        <Status id={instance.id} darkmode={true} />
+        <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
+          <FontAwesomeIcon fixedWidth icon="circle" />
         </div>
-        <div>
-          {Object.entries(instance.fields).map(([name, fieldStore]) => (
-            <Field name={name} key={name} fieldStore={fieldStore} readMode={true} className={classes.fields} />
-          ))}
-        </div>
-        <div className={classes.actions}>
-          <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
-          <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
-          <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
-          <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
-          <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
-          <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  onClick={this.handleActionClick} onCtrlClick={this.handleActionCtrlClick} />
-        </div>
-        {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
-        {/* <div className={classes.separator}></div> */}
+        <div className={classes.name}>{instance.name}</div>
       </div>
-    );
-  }
-}
+      <div>
+        {Object.entries(instance.fields).map(([name, fieldStore]) => (
+          <Field name={name} key={name} fieldStore={fieldStore} readMode={true} className={classes.fields} />
+        ))}
+      </div>
+      <div className={classes.actions}>
+        <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+      </div>
+      {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
+      {/* <div className={classes.separator}></div> */}
+    </div>
+  );
+});
 
 export default InstanceRow;

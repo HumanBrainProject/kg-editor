@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Sentry from "@sentry/browser";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "100%",
     color: "var(--ft-color-error)",
@@ -32,12 +32,12 @@ const styles = {
     textAlign: "center",
     margin: "30px 0"
   }
-};
+});
 
-@injectStyles(styles)
 class GlobalFieldErrors extends React.Component {
   render() {
-    const { classes, instance } = this.props;
+    const classes = useStyles();
+    const { instance } = this.props;
     return (
       <div className={classes.container}>
         <h4>

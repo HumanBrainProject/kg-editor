@@ -15,14 +15,14 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import {observer} from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import appStore from "../../Stores/AppStore";
 import MultiToggle from "../../Components/MultiToggle";
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     textAlign:"center"/*,
     marginBottom:"10px"*/
@@ -32,31 +32,29 @@ const styles = {
     fontSize:"3em",
     marginBottom:"3px"//"10px"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ThemeSwitcher extends React.Component{
-  handleChange = (theme) => {
+const ThemeSwitcher = observer(() => {
+
+  const classes = useStyles();
+
+  const handleChange = theme => {
     appStore.setTheme(theme);
-  }
+  };
 
-  render(){
-    const { classes } = this.props;
-    return(
-      <div className={classes.container}>
-        <div className={classes.icon}>
-          <FontAwesomeIcon icon={appStore.currentTheme === "bright"? "sun": "moon"}/>
-        </div>
-        <div className={classes.switcher}>
-          <MultiToggle selectedValue={appStore.currentTheme} onChange={this.handleChange}>
-            <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"moon"} value="default"/>
-            <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"sun"} value="bright"/>
-          </MultiToggle>
-        </div>
+  return (
+    <div className={classes.container}>
+      <div className={classes.icon}>
+        <FontAwesomeIcon icon={appStore.currentTheme === "bright"? "sun": "moon"}/>
       </div>
-    );
-  }
-}
+      <div className={classes.switcher}>
+        <MultiToggle selectedValue={appStore.currentTheme} onChange={handleChange}>
+          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"moon"} value="default"/>
+          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"sun"} value="bright"/>
+        </MultiToggle>
+      </div>
+    </div>
+  );
+});
 
 export default ThemeSwitcher;

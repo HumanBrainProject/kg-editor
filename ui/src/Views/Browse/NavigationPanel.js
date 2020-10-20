@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import browseStore from "../../Stores/BrowseStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,7 +25,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import Types from "./Types";
 import typesStore from "../../Stores/TypesStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     background: "var(--bg-color-ui-contrast2)",
     borderRight: "1px solid var(--border-color-ui-contrast1)",
@@ -58,42 +58,40 @@ const styles = {
   noMatch: {
     padding: "0 15px"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class NavigationPanel extends React.Component {
-  handleFilterChange = event => {
-    browseStore.setNavigationFilterTerm(event.target.value);
-  }
+const NavigationPanel = observer(() => {
 
-  render() {
-    const { classes } = this.props;
-    // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
-    const typeList = typesStore.filteredList(browseStore.navigationFilter);
-    return (
-      <div className={classes.container}>
-        <div className={classes.header}>
-          <input
-            ref={ref => this.inputRef = ref}
-            className={`form-control ${classes.search}`}
-            placeholder="Filter lists"
-            type="text"
-            value={browseStore.navigationFilter}
-            onChange={this.handleFilterChange} />
-          <FontAwesomeIcon icon="search" className={classes.searchIcon} />
-        </div>
-        <Scrollbars autoHide>
-          {browseStore.navigationFilter.trim() &&
+  const classes = useStyles();
+
+  const handleFilterChange = e => {
+    browseStore.setNavigationFilterTerm(e.target.value);
+  };
+
+  // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
+  const typeList = typesStore.filteredList(browseStore.navigationFilter);
+
+  return (
+    <div className={classes.container}>
+      <div className={classes.header}>
+        <input
+          className={`form-control ${classes.search}`}
+          placeholder="Filter lists"
+          type="text"
+          value={browseStore.navigationFilter}
+          onChange={handleFilterChange} />
+        <FontAwesomeIcon icon="search" className={classes.searchIcon} />
+      </div>
+      <Scrollbars autoHide>
+        {browseStore.navigationFilter.trim() &&
               // bookmarkList.length === 0 && typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
               typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
-          }
-          {/* <Bookmarks /> */}
-          <Types />
-        </Scrollbars>
-      </div>
-    );
-  }
-}
+        }
+        {/* <Bookmarks /> */}
+        <Types />
+      </Scrollbars>
+    </div>
+  );
+});
 
 export default NavigationPanel;

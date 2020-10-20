@@ -15,13 +15,13 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { uniqueId } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const animationId = uniqueId("animationId");
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "absolute",
     top: "0",
@@ -85,15 +85,15 @@ const styles = {
   label: {
     paddingLeft: "6px"
   },
-};
+});
 
-@injectStyles(styles)
 class SavingPanel extends React.Component{
   render(){
-    const { classes, id, show, inline } = this.props;
+    const { id, show, inline } = this.props;
     if (!show) {
       return null;
     }
+    const classes = useStyles();
     return (
       <div className={classes.container} inline={inline?"true":"false"}>
         <div className={classes.panel} >

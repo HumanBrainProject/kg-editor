@@ -14,16 +14,17 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
+import { debounce } from "lodash";
 import { Column, Table as TableComponent } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
 import instancesStore from "../../Stores/InstancesStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     " .ReactVirtualized__Table__headerTruncatedText": {
@@ -47,202 +48,166 @@ const styles = {
       backgroundColor: "#a5c7e9"
     }
   }
-};
+});
 
-@observer
-class LabelCellRenderer extends React.Component {
+const LabelCellRenderer = observer(({ instanceId }) => {
 
-  componentDidMount() {
-    this.fetchInstance();
+  useEffect(() => instancesStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
+
+  const instance = instanceId && instancesStore.instances.get(instanceId);
+
+  if (!instance) {
+    return "Unknown instance";
   }
 
-  componentDidUpdate(previousProps) {
-    if (previousProps.instanceId !== this.props.instanceId) {
-      this.fetchInstance();
-    }
+  if (instance.fetchError || instance.labelFetchError) {
+    return (
+      <span style={{color: "var(--ft-color-error)"}}>
+        <FontAwesomeIcon icon="exclamation-triangle"/>
+        &nbsp; {instance.fetchError || instance.labelFetchError}
+      </span>
+    );
   }
 
-  fetchInstance = () => {
-    const { instanceId } = this.props;
-    instanceId && instancesStore.createInstanceOrGet(instanceId).fetchLabel();
-  };
+  if (instance.isFetched || instance.isLabelFetched) {
+    return instance.name;
+  }
 
-  render() {
-    const {instanceId} = this.props;
-
-    const instance = instanceId && instancesStore.instances.get(instanceId);
-
-    if (!instance) {
-      return "Unknown instance";
-    }
-    if (instance.fetchError || instance.labelFetchError) {
-      return (
-        <span style={{color: "var(--ft-color-error)"}}>
-          <FontAwesomeIcon icon="exclamation-triangle"/>
-          &nbsp; {instance.fetchError || instance.labelFetchError}
-        </span>
-      );
-    }
-    if (instance.isFetched || instance.isLabelFetched) {
-      return instance.name;
-    }
-    if (instance.isFetching || instance.isLabelFetching) {
-      return (
-        <span>
-          <FontAwesomeIcon icon="circle-notch" spin/>
+  if (instance.isFetching || instance.isLabelFetching) {
+    return (
+      <span>
+        <FontAwesomeIcon icon="circle-notch" spin/>
           &nbsp; fetching {instance.id}...
-        </span>
-      );
-    }
-    return instanceId;
-  }
-}
-
-@observer
-class ActionsCellRenderer extends React.Component {
-
-  handleRetry = e => {
-    e.stopPropagation();
-    const { instanceId, onRetry } = this.props;
-    onRetry(instanceId);
+      </span>
+    );
   }
 
-  handleDelete = e => {
-    e.stopPropagation();
-    const { index, onDeleteRow} = this.props;
-    onDeleteRow(index);
-  }
+  return instanceId;
+});
 
-  render() {
-    const {instanceId, readOnly} = this.props;
-    if (readOnly) {
-      return null;
-    }
+const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, onDeleteRow }) => {
 
-    const instance = instanceId && instancesStore.instances.get(instanceId);
-
-    if (instance && instance.fetchError) {
-      return (
-        <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={this.handleRetry} >
-          <FontAwesomeIcon icon="redo-alt"/>
-        </Button>
-      );
-    }
-    if (!instance || instance.isFetched || instance.isLabelFetched) {
-      return (
-        <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDelete} >
-          <FontAwesomeIcon icon="times"/>
-        </Button>
-      );
-    }
+  if (readOnly) {
     return null;
   }
-}
 
-@injectStyles(styles)
-@observer
-class Table extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      containerWidth: 0,
-      scrollToIndex: -1
+  const handleRetry = e => {
+    e.stopPropagation();
+    onRetry(instanceId);
+  };
+
+  const handleDelete = e => {
+    e.stopPropagation();
+    onDeleteRow(index);
+  };
+
+  const instance = instanceId && instancesStore.instances.get(instanceId);
+
+  if (instance && instance.fetchError) {
+    return (
+      <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={handleRetry} >
+        <FontAwesomeIcon icon="redo-alt"/>
+      </Button>
+    );
+  }
+
+  if (!instance || instance.isFetched || instance.isLabelFetched) {
+    return (
+      <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={handleDelete} >
+        <FontAwesomeIcon icon="times"/>
+      </Button>
+    );
+  }
+  return null;
+});
+
+const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
+
+  const classes = useStyles();
+  const scrollToIndex = -1;
+
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    updateContainerWidth();
+    window.addEventListener("resize", updateContainerWidth);
+    return () => {
+      window.removeEventListener("resize", updateContainerWidth);
     };
-  }
+  }, []);
 
-  componentDidMount() {
-    this.setContainerWidth();
-    window.addEventListener("resize", this.setContainerWidth);
-  }
+  const handleDeleteRow = index => onRowDelete(index);
 
-  componentDidUpdate(previousProps, previousState) {
-    if(this.wrapperRef && (previousState.containerWidth !== this.wrapperRef.offsetWidth)) {
-      this.setContainerWidth();
-    }
-  }
+  const handleRetry = id => fieldStore.fetchInstance(id);
 
-  componentWillUnmount(){
-    window.removeEventListener("resize", this.setContainerWidth);
-  }
+  const handleRowClick = ({index}) => onRowMouseOver && onRowClick(index);
 
-  handleDeleteRow = index => this.props.onRowDelete(index);
+  const handleRowMouseOver = ({index}) => onRowMouseOver && onRowMouseOver(index);
 
-  handleRetry = id => this.props.field.fetchInstance(id);
+  const handleRowMouseOut = ({index}) => onRowMouseOut && onRowMouseOut(index);
 
-  handleRowClick = ({index}) => typeof this.props.onRowMouseOver === "function" && this.props.onRowClick(index);
-
-  handleRowMouseOver = ({index}) => typeof this.props.onRowMouseOver === "function" && this.props.onRowMouseOver(index);
-
-  handleRowMouseOut = ({index}) => typeof this.props.onRowMouseOut === "function" && this.props.onRowMouseOut(index);
-
-  setContainerWidth = () => {
+  const updateContainerWidth = debounce(() => {
     if(this.wrapperRef){
-      this.setState({containerWidth: this.wrapperRef.offsetWidth});
+      setContainerWidth(this.wrapperRef.offsetWidth);
     }
-  }
+  }, 250);
 
-  rowClassName = ({index}) => {
-    const { classes, enablePointerEvents } = this.props;
+  const rowClassName = ({index}) => {
     if (index < 0) {
       return classes.headerRow;
     } else {
       return `${index % 2 === 0 ? classes.evenRow : classes.oddRow} ${enablePointerEvents?classes.activeRow:""}`;
     }
-  }
+  };
 
-  rowGetter = ({index}) => this.props.list[index];
+  const rowGetter = ({index}) => list[index];
 
-  actionsCellRenderer = ({rowData: instanceId, rowIndex}) => (
+  const actionsCellRenderer = ({rowData: instanceId, rowIndex}) => (
     <ActionsCellRenderer
       instanceId={instanceId}
       index={rowIndex}
-      readOnly={this.props.readOnly}
-      onRetry={this.handleRetry}
-      onDeleteRow={this.handleDeleteRow}
+      readOnly={readOnly}
+      onRetry={handleRetry}
+      onDeleteRow={handleDeleteRow}
     />
   );
 
-  labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} />;
+  const labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} />;
 
-  render() {
-    const { classes, list, enablePointerEvents } = this.props;
-
-    return (
-      <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
-        <TableComponent
-          width={this.state.containerWidth}
-          height={300}
-          headerHeight={20}
-          rowHeight={30}
-          rowClassName={this.rowClassName}
-          rowCount={list.length}
-          rowGetter={this.rowGetter}
-          onRowClick={enablePointerEvents?this.handleRowClick:null}
-          onRowMouseOver={enablePointerEvents?this.handleRowMouseOver:null}
-          onRowMouseOut={enablePointerEvents?this.handleRowMouseOut:null}
-          rowRenderer={this.rowRenderer}
-          scrollToIndex={this.state.scrollToIndex-1}
-        >
-          <Column
-            label="Name"
-            dataKey="name"
-            flexGrow={1}
-            flexShrink={0}
-            width={20}
-            cellRenderer={this.labelCellRenderer}
-          />
-          <Column
-            label={""}
-            dataKey="Actions"
-            flexGrow={0}
-            flexShrink={1}
-            width={20}
-            cellRenderer={this.actionsCellRenderer}
-          />
-        </TableComponent>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
+      <TableComponent
+        width={containerWidth}
+        height={300}
+        headerHeight={20}
+        rowHeight={30}
+        rowClassName={rowClassName}
+        rowCount={list.length}
+        rowGetter={rowGetter}
+        onRowClick={enablePointerEvents?handleRowClick:null}
+        onRowMouseOver={enablePointerEvents?handleRowMouseOver:null}
+        onRowMouseOut={enablePointerEvents?handleRowMouseOut:null}
+        scrollToIndex={scrollToIndex-1}
+      >
+        <Column
+          label="Name"
+          dataKey="name"
+          flexGrow={1}
+          flexShrink={0}
+          width={20}
+          cellRenderer={labelCellRenderer}
+        />
+        <Column
+          label={""}
+          dataKey="Actions"
+          flexGrow={0}
+          flexShrink={1}
+          width={20}
+          cellRenderer={actionsCellRenderer}
+        />
+      </TableComponent>
+    </div>
+  );
+});
 
 export default Table;

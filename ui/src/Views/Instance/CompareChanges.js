@@ -14,68 +14,55 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import CompareFieldsChanges from "./CompareFieldsChanges";
 import instancesStore, {createInstanceStore} from "../../Stores/InstancesStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     padding: "12px 15px"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class CompareChanges extends React.Component{
-  constructor(props){
-    super(props);
-    this.savedInstanceStore = createInstanceStore();
-  }
+const CompareChanges = observer(({ instanceId, onClose }) => {
 
-  componentDidMount() {
-    this.setInstance();
-  }
+  const classes = useStyles();
 
-  componentDidUpdate(prevProps) {
-    if(prevProps.instanceId !== this.props.instanceId) {
-      this.setInstance();
+  useEffect(() => {
+    if (this.savedInstanceStore) {
+      this.savedInstanceStore = createInstanceStore();
     }
-  }
-
-  setInstance = () => {
-    const { instanceId } = this.props;
-    this.savedInstanceStore.flush();
     const savedInstance = this.savedInstanceStore.createInstanceOrGet(instanceId);
     const instance = instancesStore.instances.get(instanceId);
     const data = instance.cloneInitialData;
     savedInstance.initializeData(data);
+    return () => {
+      this.savedInstanceStore.flush();
+    };
+  }, [instanceId]);
+
+  const instance = instancesStore.instances.get(instanceId);
+  const savedInstance = this.savedInstanceStore.instances.get(instanceId);
+  if (!instance || !savedInstance) {
+    return null;
   }
 
-  render(){
-    const { classes, instanceId, onClose } = this.props;
-    const instance = instancesStore.instances.get(instanceId);
-    const savedInstance = this.savedInstanceStore.instances.get(instanceId);
-    if (!instance || !savedInstance) {
-      return null;
-    }
-
-    return(
-      <div className={classes.container}>
-        <CompareFieldsChanges
-          instanceId={instanceId}
-          leftInstance={savedInstance}
-          rightInstance={instance}
-          leftInstanceStore={instancesStore}
-          rightInstanceStore={instancesStore}
-          leftChildrenIds={savedInstance.childrenIds}
-          rightChildrenIds={instance.childrenIds}
-          onClose={onClose}
-        />
-      </div>
-    );
-  }
-}
+  return(
+    <div className={classes.container}>
+      <CompareFieldsChanges
+        instanceId={instanceId}
+        leftInstance={savedInstance}
+        rightInstance={instance}
+        leftInstanceStore={instancesStore}
+        rightInstanceStore={instancesStore}
+        leftChildrenIds={savedInstance.childrenIds}
+        rightChildrenIds={instance.childrenIds}
+        onClose={onClose}
+      />
+    </div>
+  );
+});
 
 export default CompareChanges;

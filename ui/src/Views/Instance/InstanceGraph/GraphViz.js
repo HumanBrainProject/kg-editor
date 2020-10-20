@@ -14,8 +14,8 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect, useState } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import ForceGraph2D from "react-force-graph-2d";
 import { debounce } from "lodash";
@@ -138,7 +138,7 @@ const getLinkColor = link => {
 
 const getLinkWidth = link => (graphStore.highlightedNode && link.highlighted)?2:1;
 
-const styles = {
+const useStyles = createUseStyles({
   graph: {
     width: "100%",
     height: "100%",
@@ -169,71 +169,52 @@ const styles = {
     top: "20px",
     right: "74px"
   }
-};
+});
 
+const Graph = observer(() => {
 
-@injectStyles(styles)
-@observer
-class Graph extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      graphWidth: 0,
-      graphHeight: 0
+  const classes = useStyles();
+
+  const [dimensions, setDimensions] = useState({width: 0, height: 0});
+
+  useEffect(() => {
+
+    const updateDimensions = debounce(() => {
+      if(this.wrapperRef){
+        setDimensions({width: this.wrapperRef.offsetWidth, height: this.wrapperRef.offsetHeight});
+      }
+    }, 250);
+
+    updateDimensions();
+    this.wrapperRef.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
+    window.addEventListener("resize", updateDimensions);
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+      this.graphRef && this.graphRef.stopAnimation();
     };
-    this.initialZoom = false;
-  }
+  }, []);
 
-  componentDidMount() {
-    this.resizeDebounceFn = debounce(this.resizeWrapper, 250);
-    window.addEventListener("resize", this.resizeDebounceFn);
-    this.resizeWrapper();
-  }
-
-  componentDidUpdate() {
-    if (!this.initialZoom && this.graphRef) {
-      this.resizeWrapper();
-      this.graphRef.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
-      this.initialZoom = true;
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.resizeDebounceFn);
-    this.graphRef && this.graphRef.stopAnimation();
-  }
-
-  resizeWrapper = () => {
-    this.setState({
-      graphWidth: this.graphWrapper.offsetWidth,
-      graphHeight: this.graphWrapper.offsetHeight
-    });
-  }
-
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.graph} ref={ref => this.graphWrapper = ref}>
-        <ForceGraph2D
-          ref={ref => this.graphRef = ref}
-          width={this.state.graphWidth}
-          height={this.state.graphHeight}
-          graphData={graphStore.graphData}
-          nodeAutoColorBy={getNodeAutoColorBy}
-          nodeLabel={getNodeLabel}
-          nodeCanvasObject={getNodeCanvasObject}
-          onNodeClick={handleNodeClick}
-          onNodeHover={handleNodeHover}
-          cooldownTime={4000}
-          linkColor={getLinkColor}
-          linkWidth={getLinkWidth}
-          nodeRelSize={7}
-          linkDirectionalArrowLength={3}
-        />
-        <a className={`${classes.capture} btn btn-primary`} onClick={handleCapture}><FontAwesomeIcon icon="camera" /></a>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.graph} ref={ref => this.wrapperRef = ref}>
+      <ForceGraph2D
+        ref={ref => this.graphRef = ref}
+        width={dimensions.width}
+        height={dimensions.height}
+        graphData={graphStore.graphData}
+        nodeAutoColorBy={getNodeAutoColorBy}
+        nodeLabel={getNodeLabel}
+        nodeCanvasObject={getNodeCanvasObject}
+        onNodeClick={handleNodeClick}
+        onNodeHover={handleNodeHover}
+        cooldownTime={4000}
+        linkColor={getLinkColor}
+        linkWidth={getLinkWidth}
+        nodeRelSize={7}
+        linkDirectionalArrowLength={3}
+      />
+      <a className={`${classes.capture} btn btn-primary`} onClick={handleCapture}><FontAwesomeIcon icon="camera" /></a>
+    </div>
+  );
+});
 
 export default Graph;

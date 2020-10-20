@@ -14,13 +14,12 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useState } from "react";
+import { createUseStyles } from "react-jss";
 import {observer} from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "flex",
     position: "absolute",
@@ -73,46 +72,44 @@ const styles = {
   bookmarkIcon: {
     color: "var(--bookmark-on-color)"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class TipsOfTheDay extends React.Component {
-  constructor(props){
-    super(props);
-    this.tips = [
-      <span key="1">to create a new bookmark list click on the <FontAwesomeIcon icon="star" className={this.props.classes.bookmarkIcon} /> button of an instance and type the name of the new desired bookmark list.</span>,
-      <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
-      <span key="3">press <span className="kbd">Alt</span> + <span className="kbd">b</span> to browse the instances.</span>,
-      <span key="4">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,
-      <span key="5">press <span className="kbd">Alt</span> + <span className="kbd">n</span> to create a new instance.</span>,
-      <span key="6">press <span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</span>,
-      <span key="7">press <span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</span>,
-      <span key="8">press <span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</span>,
-      <span key="9">press <span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</span>,
-      <span key="10">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
-    ];
-    this.state = { currentIndex: Math.floor(Math.random() * 10) % this.tips.length };
+const TipsOfTheDay = observer(() => {
+
+  const tips = [
+    <span key="1">to create a new bookmark list click on the <FontAwesomeIcon icon="star" className={classes.bookmarkIcon} /> button of an instance and type the name of the new desired bookmark list.</span>,
+    <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
+    <span key="3">press <span className="kbd">Alt</span> + <span className="kbd">b</span> to browse the instances.</span>,
+    <span key="4">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,
+    <span key="5">press <span className="kbd">Alt</span> + <span className="kbd">n</span> to create a new instance.</span>,
+    <span key="6">press <span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</span>,
+    <span key="7">press <span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</span>,
+    <span key="8">press <span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</span>,
+    <span key="9">press <span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</span>,
+    <span key="10">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
+  ];
+
+  const classes = useStyles();
+
+  const [currentIndex, seCurrentIndex] = useState(Math.floor(Math.random() * 10) % tips.length);
+
+
+  const handleShowNextTip = () => {
+    seCurrentIndex((currentIndex + 1 === tips.length)?0:(currentIndex + 1));
+  };
+
+  if (!this.tips.length) {
+    return null;
   }
 
-  handleShowNextTip = () => {
-    this.setState(state => ({currentIndex: (state.currentIndex + 1 === this.tips.length)?0:state.currentIndex + 1}));
-  }
-
-  render(){
-    const { classes } = this.props;
-    if (!this.tips.length) {
-      return null;
-    }
-    return (
-      <div className={classes.container}>
-        <FontAwesomeIcon icon={"lightbulb"} />
-        <h3>Tips of the day:</h3>
-        <div className={classes.tip}>{this.tips[this.state.currentIndex]}</div>
-        <button onClick={this.handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.container}>
+      <FontAwesomeIcon icon={"lightbulb"} />
+      <h3>Tips of the day:</h3>
+      <div className={classes.tip}>{tips[currentIndex]}</div>
+      <button onClick={handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>
+    </div>
+  );
+});
 
 export default TipsOfTheDay;

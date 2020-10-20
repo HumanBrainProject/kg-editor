@@ -15,30 +15,27 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Link } from "react-router-dom";
 import routerStore from "../Stores/RouterStore";
 import BGMessage from "../Components/BGMessage";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     color: "var(--ft-color-loud)"
   }
-};
+});
 
-@injectStyles(styles)
-class NotFound extends React.Component{
-  render(){
-    const {classes} =  this.props;
-    return (
-      <div className={classes.container} >
-        <BGMessage icon={"ban"}>
-          The page &quot;<i>{routerStore.history.location.pathname}</i>&quot; does not exist.<br /><br />
-          <Link className="btn btn-primary" to={"/"}>Go back to the dashboard</Link>
-        </BGMessage>
-      </div>
-    );
-  }
-}
+const NotFound = () => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container} >
+      <BGMessage icon={"ban"}>
+        The page &quot;<i>{routerStore.history.location.pathname}</i>&quot; does not exist.<br /><br />
+        <Link className="btn btn-primary" to={"/"}>Go back to the dashboard</Link>
+      </BGMessage>
+    </div>
+  );
+};
 
 export default NotFound;

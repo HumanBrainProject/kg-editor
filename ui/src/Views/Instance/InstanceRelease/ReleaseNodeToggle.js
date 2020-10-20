@@ -15,14 +15,14 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import MultiToggle from "../../../Components/MultiToggle";
 import releaseStore from "../../../Stores/ReleaseStore";
 import instancesStore from "../../../Stores/InstancesStore";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: 0,
     marginTop: "-1px",
@@ -40,63 +40,60 @@ const styles = {
       color: "gray"
     }
   },
-};
+});
 
-@injectStyles(styles)
-@observer
-class ReleaseNodeToggle extends React.Component {
-  handleChange = status => {
+const ReleaseNodeToggle = observer(({ node }) => {
+
+  const classes = useStyles();
+
+  const handleChange = status => {
     instancesStore.togglePreviewInstance();
-    const { node } = this.props;
     releaseStore.markNodeForChange(node, status);
     releaseStore.handleWarning(node, status);
   };
 
-  handleStopClick = e => {
+  const handleStopClick = e => {
     e && e.stopPropagation();
   };
 
-  render() {
-    const { classes, node } = this.props;
-    if (!node || !releaseStore) {
-      return null;
-    }
+  if (!node || !releaseStore) {
+    return null;
+  }
 
-    if(!node.permissions.canRelease || node.status === null) {
-      return (
-        <div className={classes.container} title={node.status === null ? "Unknown entity": "You do not have permission to release the instance."} status={node.status}>
-          <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
-        </div>
-      );
-    }
-
-    return(
-      <div className={`${classes.container} ${node.status === "RELEASED" ? "no-release" : ""} ${node.status === "UNRELEASED" ? "no-unrelease" : ""}`} onClick={this.handleStopClick}>
-        <MultiToggle selectedValue={node.pending_status} onChange={this.handleChange}>
-          {node.status !== "RELEASED" && (
-            <MultiToggle.Toggle
-              color={"#3498db"}
-              value={"RELEASED"}
-              icon="check"
-            />
-          )}
-          <MultiToggle.Toggle
-            color={"#999"}
-            value={node.status}
-            icon="dot-circle"
-            noscale
-          />
-          {node.status !== "UNRELEASED" && (
-            <MultiToggle.Toggle
-              color={"#e74c3c"}
-              value={"UNRELEASED"}
-              icon="unlink"
-            />
-          )}
-        </MultiToggle>
+  if(!node.permissions.canRelease || node.status === null) {
+    return (
+      <div className={classes.container} title={node.status === null ? "Unknown entity": "You do not have permission to release the instance."} status={node.status}>
+        <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
       </div>
     );
   }
-}
+
+  return(
+    <div className={`${classes.container} ${node.status === "RELEASED" ? "no-release" : ""} ${node.status === "UNRELEASED" ? "no-unrelease" : ""}`} onClick={handleStopClick}>
+      <MultiToggle selectedValue={node.pending_status} onChange={handleChange}>
+        {node.status !== "RELEASED" && (
+          <MultiToggle.Toggle
+            color={"#3498db"}
+            value={"RELEASED"}
+            icon="check"
+          />
+        )}
+        <MultiToggle.Toggle
+          color={"#999"}
+          value={node.status}
+          icon="dot-circle"
+          noscale
+        />
+        {node.status !== "UNRELEASED" && (
+          <MultiToggle.Toggle
+            color={"#e74c3c"}
+            value={"UNRELEASED"}
+            icon="unlink"
+          />
+        )}
+      </MultiToggle>
+    </div>
+  );
+});
 
 export default ReleaseNodeToggle;

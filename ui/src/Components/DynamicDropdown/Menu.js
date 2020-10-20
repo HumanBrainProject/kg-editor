@@ -1,13 +1,13 @@
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import {  MenuItem } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Options from "./Options";
 import NewValues from "./NewValues";
 import ExternalTypes from "./ExternalTypes";
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     display:"block",
     position: "absolute",
@@ -43,17 +43,16 @@ const styles = {
       position: "relative"
     }
   }
-};
+});
 
-@injectStyles(styles)
 class Menu extends React.Component {
 
   render() {
+    const classes = useStyles();
     const { types,
       externalTypes,
       currentType,
       currentOption,
-      classes,
       hasMore,
       searchTerm,
       values,

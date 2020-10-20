@@ -14,10 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
@@ -26,7 +26,7 @@ import typesStore from "../../Stores/TypesStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position:"absolute",
     width:"50%",
@@ -65,56 +65,77 @@ const styles = {
   icon: {
     alignSelf: "center"
   }
+});
+
+const Type = ({ type, onClick }) => {
+
+  const classes = useStyles();
+
+  const handleClick = () => onClick(type);
+
+  return (
+    <div className={classes.type} onClick={handleClick}>
+      <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
+        <FontAwesomeIcon fixedWidth icon="circle" />
+      </div>{type.label}
+    </div>
+  );
 };
 
-@injectStyles(styles)
-@observer
-class TypeSelection extends React.Component {
-  componentDidMount() {
-    if (!typesStore.isFetched) {
+const TypeSelection = observer(({ onSelect }) => {
+
+  const classes = useStyles();
+
+  const fetch = (force=false) => {
+    if (force || !typesStore.isFetched) {
       typesStore.fetch();
     }
-  }
+  };
 
-  handleFetchInstanceTypes = () => typesStore.fetch();
+  useEffect(() => fetch(), []);
 
-  render() {
-    const { classes, onSelect } = this.props;
+  const handleRetry = () => fetch(true);
 
+  const handleClick = type => onSelect(type);
+
+  if (typesStore.isFetching) {
     return (
       <div className={classes.container}>
-        {typesStore.isFetching ?
-          <FetchingLoader>Fetching data types...</FetchingLoader>
-          :
-          typesStore.fetchError ?
-            <BGMessage icon={"ban"}>
-              There was a network problem fetching data types.<br />
-              If the problem persists, please contact the support.<br />
-              <small>{typesStore.fetchError}</small><br /><br />
-              <div>
-                <Button bsStyle={"primary"} onClick={this.handleFetchInstanceTypes}>
-                  <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-                </Button>
-              </div>
-            </BGMessage>
-            :
-            <Scrollbars autoHide>
-              <div className={classes.lists}>
-                <div className={classes.list}>
-                  {typesStore.types.map(type => (
-                    <div key={type.name} className={classes.type} onClick={onSelect.bind(this, type)}>
-                      <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
-                        <FontAwesomeIcon fixedWidth icon="circle" />
-                      </div>{type.label}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Scrollbars>
-        }
+        <FetchingLoader>Fetching data types...</FetchingLoader>
       </div>
     );
   }
-}
+
+  if (typesStore.fetchError) {
+    return (
+      <div className={classes.container}>
+        <BGMessage icon={"ban"}>
+              There was a network problem fetching data types.<br />
+              If the problem persists, please contact the support.<br />
+          <small>{typesStore.fetchError}</small><br /><br />
+          <div>
+            <Button bsStyle={"primary"} onClick={handleRetry}>
+              <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+            </Button>
+          </div>
+        </BGMessage>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.container}>
+      <Scrollbars autoHide>
+        <div className={classes.lists}>
+          <div className={classes.list}>
+            {typesStore.types.map(type => (
+              <Type key={type.name} type={type} onClick={handleClick} />
+            ))}
+          </div>
+        </div>
+      </Scrollbars>
+    </div>
+  );
+});
 
 export default TypeSelection;

@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import Color from "color";
 import uniqueId from "lodash/uniqueId";
 const jsdiff = require("diff");
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     margin: "0 0 5px 0",
     padding: 0,
@@ -59,12 +59,12 @@ const styles = {
   unchanged: {
 
   }
-};
+});
 
-@injectStyles(styles)
 class CompareValue extends React.Component{
   render(){
-    const {classes, label, leftValue, rightValue, separator} = this.props;
+    const classes = useStyles();
+    const {label, leftValue, rightValue, separator} = this.props;
 
     //window.console.log(label, leftValue, rightValue);
 

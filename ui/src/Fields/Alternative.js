@@ -15,16 +15,14 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { MenuItem } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
 
-
-
-const styles = {
+const useStyles = createUseStyles({
   container: {
     "& .option em .user + .user:before": {
       content: "'; '"
@@ -47,10 +45,9 @@ const styles = {
   removeIcon: {
     marginLeft: "3%"
   }
-};
+});
 
-@injectStyles(styles)
-class Alternative extends React.Component {
+class Alternative extends React.PureComponent {
 
   handleSelect = alternative => event => {
     const { onSelect } = this.props;
@@ -64,7 +61,8 @@ class Alternative extends React.Component {
   }
 
   render() {
-    const { classes, alternative, ValueRenderer, className } = this.props;
+    const classes = useStyles();
+    const { alternative, ValueRenderer, className } = this.props;
 
     const users = (!alternative || !alternative.users)?[]:alternative.users;
     const isOwnAlternative = users.find(user => authStore.user.id === user.id);

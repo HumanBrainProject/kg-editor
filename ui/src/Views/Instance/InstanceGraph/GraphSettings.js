@@ -16,7 +16,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
 import Color from "color";
 import { Glyphicon } from "react-bootstrap";
@@ -26,7 +26,7 @@ import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
 import appStore from "../../../Stores/AppStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "100%"
   },
@@ -116,8 +116,8 @@ const styles = {
     cursor: "pointer",
     transition: "transform 0.25s ease-in-out"
   }
-};
-@injectStyles(styles)
+});
+
 class Node extends React.Component {
 
   handelMouseOver = () => {
@@ -139,7 +139,8 @@ class Node extends React.Component {
   }
 
   render() {
-    const { classes, node, isGrouped } = this.props;
+    const classes = useStyles();
+    const { node, isGrouped } = this.props;
     let actions = {onClick: this.handleClick};
     if(!isGrouped) {
       actions = {
@@ -162,22 +163,18 @@ const Nodes = ({className, nodes, isGrouped}) => (
   </div>
 );
 
-@injectStyles(styles)
-class TypeIcon extends React.Component {
-  render() {
-    const {classes, color, grouped} = this.props;
+const TypeIcon= ({color, grouped}) => {
+  const classes = useStyles();
+  const style = {
+    borderRadius: grouped?"0":"50%",
+    background: color,
+    borderColor: new Color(color).darken(0.25).hex()
+  };
 
-    const style = {
-      borderRadius: grouped?"0":"50%",
-      background: color,
-      borderColor: new Color(color).darken(0.25).hex()
-    };
-
-    return (
-      <div className={classes.typeIcon} style={style} />
-    );
-  }
-}
+  return (
+    <div className={classes.typeIcon} style={style} />
+  );
+};
 
 const Type = ({type, defaultColor, grouped}) => (
   <span>
@@ -186,43 +183,28 @@ const Type = ({type, defaultColor, grouped}) => (
   </span>
 );
 
-@observer
-class GroupLabel extends React.Component {
+const GroupLabel = observer(({ className, group }) => {
 
-  handelMouseOver = () => {
-    const { group } = this.props;
-    graphStore.setHighlightNodeConnections(group, true);
+  let actions = {};
+  if(group.grouped) {
+    actions = {
+      onMouseOver: () => graphStore.setHighlightNodeConnections(group, true),
+      onMouseOut: () => graphStore.setHighlightNodeConnections(group, false)
+    };
   }
 
-  handelMouseOut = () => {
-    const { group } = this.props;
-    graphStore.setHighlightNodeConnections(group, false);
-  }
+  return (
+    <span className={className}  {...actions}>
+      {group.types.map(type => (
+        <Type key={type.name} type={type} grouped={group.grouped} />
+      ))}
+    </span>
+  );
+});
 
-  render() {
-    const { className, group } = this.props;
-    let actions = {};
-    if(group.grouped) {
-      actions = {
-        onMouseOver: this.handelMouseOver,
-        onMouseOut: this.handelMouseOut
-      };
-    }
+const Actions = observer(({ className, group }) => {
 
-    return (
-      <span className={className}  {...actions}>
-        {group.types.map(type => (
-          <Type key={type.name} type={type} grouped={group.grouped} />
-        ))}
-      </span>
-    );
-  }
-}
-
-@observer
-class Actions extends React.Component {
-
-  handleChange = action => {
+  const handleChange = action => {
     const { group } = this.props;
     switch (action) {
     case "show":
@@ -238,38 +220,33 @@ class Actions extends React.Component {
       graphStore.setGrouping(group, false);
       break;
     }
-  }
+  };
 
-  render() {
-    const { className, group } = this.props;
-
-    let value = group.show?"show":"hide";
-    let actions = [
-      {value: "show", icon:"eye"},
-      {value: "hide", icon:"eye-slash"}
+  let value = group.show?"show":"hide";
+  let actions = [
+    {value: "show", icon:"eye"},
+    {value: "hide", icon:"eye-slash"}
+  ];
+  if (group.show && group.nodes.length > 1) {
+    value = group.grouped?"group":"ungroup";
+    actions = [
+      {value: "group",   icon: "compress"},
+      {value: "ungroup", icon: "expand-arrows-alt"},
+      {value: "hide",    icon: "eye-slash"}
     ];
-    if (group.show && group.nodes.length > 1) {
-      value = group.grouped?"group":"ungroup";
-      actions = [
-        {value: "group",   icon: "compress"},
-        {value: "ungroup", icon: "expand-arrows-alt"},
-        {value: "hide",    icon: "eye-slash"}
-      ];
-    }
-
-    return (
-      <div className={className}>
-        <MultiToggle selectedValue={value} onChange={this.handleChange}>
-          {actions.map(action => (
-            <MultiToggle.Toggle key={action.value} color={"var(--ft-color-loud)"} value={action.value} icon={action.icon} />
-          ))}
-        </MultiToggle>
-      </div>
-    );
   }
-}
 
-@injectStyles(styles)
+  return (
+    <div className={className}>
+      <MultiToggle selectedValue={value} onChange={handleChange}>
+        {actions.map(action => (
+          <MultiToggle.Toggle key={action.value} color={"var(--ft-color-loud)"} value={action.value} icon={action.icon} />
+        ))}
+      </MultiToggle>
+    </div>
+  );
+});
+
 class Group extends React.Component {
 
   constructor(props) {
@@ -282,7 +259,8 @@ class Group extends React.Component {
   }
 
   render() {
-    const { classes, group } = this.props;
+    const classes = useStyles();
+    const { group } = this.props;
     return (
       <div className={`${classes.group} ${this.state.expanded ? "expanded" : ""}`}>
         <Glyphicon glyph="chevron-right" className={classes.expandButton} onClick={this.handleClick} />
@@ -304,21 +282,19 @@ const Groups = ({className, groups}) => (
   </div>
 );
 
-@injectStyles(styles)
-@observer
-class GraphSettings extends React.Component {
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <Scrollbars autoHide>
-          {graphStore.isFetched && (
-            <Groups className={classes.groups} groups={graphStore.groupsList} />
-          )}
-        </Scrollbars>
-      </div>
-    );
-  }
-}
+const GraphSettings = observer(() => {
+
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container}>
+      <Scrollbars autoHide>
+        {graphStore.isFetched && (
+          <Groups className={classes.groups} groups={graphStore.groupsList} />
+        )}
+      </Scrollbars>
+    </div>
+  );
+});
 
 export default GraphSettings;

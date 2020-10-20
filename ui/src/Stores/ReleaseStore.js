@@ -74,6 +74,12 @@ class ReleaseStore{
   @observable isFetchingWarningMessages = false;
   @observable isStopped = false;
   @observable hideReleasedInstances = false;
+  @observable comparededInstance = null;
+
+  @action
+  setComparedInstance(instance){
+    this.comparededInstance = instance;
+  }
 
   @computed
   get visibleWarningMessages() {

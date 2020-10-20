@@ -14,78 +14,66 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect, useState } from "react";
+import { createUseStyles } from "react-jss";
 import { List } from "react-virtualized";
 import { observer } from "mobx-react";
+import { debounce } from "lodash";
+
 import releaseStore from "../../../Stores/ReleaseStore";
 import ReleaseNode from "./ReleaseNode";
 
-const styles = {
+
+const RowRenderer = observer(({ key, index, style }) => {
+  const rowData = releaseStore.instanceList[index];
+  return (
+    <div key={key} style={style}>
+      <ReleaseNode node={rowData.node} level={rowData.level} />
+    </div>
+  );
+});
+
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width:"100%",
     height:"100%",
     maxHeight: "100%"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ReleaseList extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      width: 0,
-      height: 0
+const ReleaseList = observer(() => {
+
+  const classes = useStyles();
+
+  const [dimensions, setDimensions] = useState({width: 0, height: 0});
+
+  useEffect(() => {
+
+    const updateDimensions = debounce(() => {
+      if(this.wrapperRef){
+        setDimensions({width: this.wrapperRef.offsetWidth, height: this.wrapperRef.offsetHeight});
+      }
+    }, 250);
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
     };
-  }
+  }, []);
 
-  componentDidMount() {
-    this.setDimensions();
-    window.addEventListener("resize", this.setDimensions);
-  }
-
-  componentDidUpdate(prevProps, prevState){
-    if(this.wrapperRef && ((prevState.width !== this.wrapperRef.offsetWidth) || (prevState.height !== this.wrapperRef.offsetHeight))) {
-      this.setDimensions();
-    }
-  }
-
-  componentWillUnmount(){
-    window.removeEventListener("resize", this.setDimensions);
-  }
-
-  setDimensions = () => {
-    if(this.wrapperRef){
-      this.setState({width: this.wrapperRef.offsetWidth, height: this.wrapperRef.offsetHeight});
-    }
-  }
-
-  rowRenderer = ({ key, index, style }) => {
-    const rowData =  releaseStore.instanceList[index];
-    return (
-      <div key={key} style={style}>
-        <ReleaseNode node={rowData.node} level={rowData.level} />
-      </div>
-    );
-  }
-
-  render() {
-    const { classes } = this.props;
-
-    return (
-      <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
-        <List
-          width={this.state.width}
-          height={this.state.height}
-          rowHeight={42}
-          rowCount={releaseStore.instanceList.length}
-          rowRenderer={this.rowRenderer}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
+      <List
+        width={dimensions.width}
+        height={dimensions.height}
+        rowHeight={42}
+        rowCount={releaseStore.instanceList.length}
+        rowRenderer={RowRenderer}
+      />
+    </div>
+  );
+});
 
 export default ReleaseList;

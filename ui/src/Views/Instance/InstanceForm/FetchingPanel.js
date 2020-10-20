@@ -15,10 +15,10 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   panel: {
     position: "relative",
     padding: "10px 10px 0 10px",
@@ -54,15 +54,17 @@ const styles = {
   label: {
     paddingLeft: "6px"
   }
-};
+});
 
-@injectStyles(styles)
-class FetchingPanel extends React.Component{
+class FetchingPanel extends React.PureComponent{
   render(){
-    const { classes, id, show, inline } = this.props;
+    const { id, show, inline } = this.props;
+
     if (!show) {
       return null;
     }
+
+    const classes = useStyles();
     return(
       <div className={classes.panel} inline={inline?"true":"false"}>
         <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>

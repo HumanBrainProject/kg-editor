@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
@@ -29,7 +29,27 @@ import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
 
-const styles = {
+const DisplayName = observer(() => {
+  if (authStore.hasUserProfile && authStore.user && authStore.user.givenName) {
+    return authStore.user.givenName;
+  }
+
+  if (authStore.user.name) {
+    const firstNameReg = /^([^ ]+) .*$/;
+    if (firstNameReg.test(authStore.user.name)) {
+      return authStore.user.name.match(firstNameReg)[1];
+    }
+    return authStore.user.name;
+  }
+
+  if (authStore.user.username) {
+    return authStore.user.username;
+  }
+
+  return "";
+});
+
+const useStyles = createUseStyles({
   container: {
     width: "100%",
     height: "100%",
@@ -213,57 +233,35 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Home extends React.Component{
-
-  render(){
-    const { classes } =  this.props;
-    const firstNameReg = /^([^ ]+) .*$/;
-    const name = authStore.hasUserProfile
-      && authStore.user
-      && authStore.user.givenName?
-      authStore.user.givenName
-      :
-      authStore.user.name?
-        (firstNameReg.test(authStore.user.name)?
-          authStore.user.name.match(firstNameReg)[1]
-          :
-          authStore.user.name)
-        :
-        authStore.user.username?
-          authStore.user.username
-          :
-          "";
-    return (
-      <div className={classes.container}>
-        <Scrollbars autoHide>
-          <div className={classes.panel}>
-            <div className={classes.welcome}>
-              <h1>Welcome <span title={name}>{name}</span></h1>
-            </div>
-            <div className={classes.nav}>
-              <Hub/>
-            </div>
-            <div className={classes.main}>
-              <InstancesHistory workspace={appStore.currentWorkspace && appStore.currentWorkspace.id}/>
-            </div>
-            <div className={classes.features}>
-              <div className="widget-list">
-                <KeyboardShortcuts />
-                <Features />
-              </div>
+const Home = observer(() => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <Scrollbars autoHide>
+        <div className={classes.panel}>
+          <div className={classes.welcome}>
+            <h1>Welcome <span title={name}><DisplayName /></span></h1>
+          </div>
+          <div className={classes.nav}>
+            <Hub/>
+          </div>
+          <div className={classes.main}>
+            <InstancesHistory workspace={appStore.currentWorkspace && appStore.currentWorkspace.id}/>
+          </div>
+          <div className={classes.features}>
+            <div className="widget-list">
+              <KeyboardShortcuts />
+              <Features />
             </div>
           </div>
-          <TipsOfTheDay />
-        </Scrollbars>
-        <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
-      </div>
-    );
-  }
-}
-
+        </div>
+        <TipsOfTheDay />
+      </Scrollbars>
+      <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
+    </div>
+  );
+});
 
 export default Home;

@@ -15,13 +15,13 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import routerStore from "../../../Stores/RouterStore";
 import appStore from "../../../Stores/AppStore";
 
-const styles = {
+const useStyles = createUseStyles({
   panel:{
     "& .btn":{
       display:"block",
@@ -77,10 +77,9 @@ const styles = {
       borderRadius:"4px"
     }
   }
-};
+});
 
-@injectStyles(styles)
-class FooterPanel extends React.Component {
+class FooterPanel extends React.PureComponent {
 
   handleOpenInstance = event => {
     const { instance } = this.props;
@@ -93,7 +92,8 @@ class FooterPanel extends React.Component {
   }
 
   render() {
-    const { classes, className, instance, showOpenActions } = this.props;
+    const classes = useStyles();
+    const { className, instance, showOpenActions } = this.props;
 
     return(
       <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>

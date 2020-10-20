@@ -1,8 +1,8 @@
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import Menu from "./Menu";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "inline"
   },
@@ -15,9 +15,8 @@ const styles = {
     maxWidth:"33%",
     marginBottom:"3px"
   }
-};
+});
 
-@injectStyles(styles)
 class Dropdown extends React.Component {
   constructor(props) {
     super(props);
@@ -194,7 +193,8 @@ class Dropdown extends React.Component {
   }
 
   render() {
-    const { classes, searchTerm, options, types, externalTypes, inputPlaceholder, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
+    const classes = useStyles();
+    const { searchTerm, options, types, externalTypes, inputPlaceholder, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
 
     const showMenu = this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || searchTerm);
 

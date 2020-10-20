@@ -15,10 +15,10 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
-import {observer} from "mobx-react";
+import { createUseStyles } from "react-jss";
+import { observer } from "mobx-react";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     padding: "15px",
@@ -53,30 +53,26 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class KeyboardShortcuts extends React.Component {
-  render(){
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <h3>Keyboard shortcuts</h3>
-        <ul>
-          <li><span className="kbd">Alt</span> + <span className="kbd">d</span> show dashboard.</li>
-          <li><span className="kbd">Alt</span> + <span className="kbd">b</span> browse the instances.</li>
-          <li><span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</li>
-          <li><span className="kbd">Alt</span> + <span className="kbd">n</span> create a new instance.</li>
-          <li><span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</li>
-          <li><span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</li>
-          <li><span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</li>
-          <li><span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</li>
-          <li><span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</li>
-        </ul>
-      </div>
-    );
-  }
-}
+const KeyboardShortcuts = observer(() => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <h3>Keyboard shortcuts</h3>
+      <ul>
+        <li><span className="kbd">Alt</span> + <span className="kbd">d</span> show dashboard.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">b</span> browse the instances.</li>
+        <li><span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">n</span> create a new instance.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</li>
+        <li><span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</li>
+      </ul>
+    </div>
+  );
+});
 
 export default KeyboardShortcuts;

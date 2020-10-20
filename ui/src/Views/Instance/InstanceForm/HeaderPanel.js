@@ -15,11 +15,11 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   panel: {
     position:"relative",
     "& h6": {
@@ -37,9 +37,8 @@ const styles = {
   type: {
     paddingRight: "10px"
   }
-};
+});
 
-@injectStyles(styles)
 class HeaderPanel extends React.Component{
 
   componentDidMount() {
@@ -59,7 +58,8 @@ class HeaderPanel extends React.Component{
   }
 
   render(){
-    const { classes, className, types, hasChanged } = this.props;
+    const classes = useStyles();
+    const { className, types, hasChanged } = this.props;
     return(
       <div className={`${classes.panel} ${className ? className : ""}`}>
         <Row>

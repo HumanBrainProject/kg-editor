@@ -16,49 +16,30 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
-import { ControlLabel, FormGroup, Checkbox } from "react-bootstrap";
+import { createUseStyles } from "react-jss";
+import { FormGroup, Checkbox } from "react-bootstrap";
 import Label from "../Label";
 
-const styles = {
+const useStyles = createUseStyles({
   readMode: {
     "& .quickfire-label:after": {
       content: "':\\00a0'"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class CheckBox extends React.Component {
+const CheckBox = observer(({ fieldStore, readMode }) => {
 
-  handleChange = () => {
-    const { fieldStore } = this.props;
+  const { value, label, labelTooltip } = fieldStore;
+  const classes = useStyles();
+
+  const handleChange = () => {;
     if (!fieldStore.disabled && !fieldStore.readOnly) {
       fieldStore.toggleValue();
     }
   };
 
-  render() {
-    const { fieldStore, readMode } = this.props;
-    const { value, label } = fieldStore;
-
-    if (readMode) {
-      return this.renderReadMode();
-    }
-
-    return (
-      <FormGroup className="quickfire-field-checkbox" >
-        <ControlLabel className="quickfire-label">{label}</ControlLabel>
-        <Checkbox readOnly={false} onChange={this.handleChange} checked={value} />
-      </FormGroup>
-    );
-  }
-
-  renderReadMode() {
-    const { fieldStore, classes } = this.props;
-    const { value, label, labelTooltip } = fieldStore;
-
+  if (readMode) {
     return (
       <div className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
         <Label label={label} labelTooltip={labelTooltip} />
@@ -66,6 +47,13 @@ class CheckBox extends React.Component {
       </div>
     );
   }
-}
+
+  return (
+    <FormGroup className="quickfire-field-checkbox" >
+      <Label label={label} labelTooltip={labelTooltip} />
+      <Checkbox readOnly={false} onChange={handleChange} checked={value} />
+    </FormGroup>
+  );
+});
 
 export default CheckBox;

@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ButtonGroup, Button } from "react-bootstrap";
@@ -24,8 +24,7 @@ import PopOverButton from "../../Components/PopOverButton";
 import browseStore from "../../Stores/BrowseStore";
 import bookmarkStore from "../../Stores/BookmarkStore";
 
-
-const styles = {
+const useStyles = createUseStyles({
   container: {
     padding: "5px 5px 5px 30px",
     borderLeft: "2px solid transparent",
@@ -177,9 +176,8 @@ const styles = {
     margin: 0,
     wordBreak: "keep-all"
   }
-};
+});
 
-@injectStyles(styles)
 @observer
 class BookmarksItem extends React.Component {
   constructor(props) {
@@ -248,7 +246,8 @@ class BookmarksItem extends React.Component {
   }
 
   render() {
-    const { classes, bookmark } = this.props;
+    //const classes = useStyles();
+    const { bookmark } = this.props;
     const selected = browseStore.selectedItem === bookmark;
     const edited = bookmarkStore.currentlyEditedBookmark === bookmark;
     return (

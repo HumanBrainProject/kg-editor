@@ -17,11 +17,11 @@
 import React from "react";
 import {Modal, ProgressBar, Button} from "react-bootstrap";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import releaseStore from "../../../Stores/ReleaseStore";
 
-let styles = {
+const useStyles = createUseStyles({
   lastEndedOperation:{
     fontWeight:"bold",
     fontSize:"0.8em",
@@ -53,45 +53,44 @@ let styles = {
     transform: "translateY(-10px)",
     marginTop: "-10px"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class SavingModal extends React.Component{
-  handleDismissSavingReport = () => {
+const SavingModal = observer(() => {
+
+  const classes = useStyles();
+
+  const handleDismissSavingReport = () => {
     releaseStore.dismissSaveError();
-  }
+  };
 
-  handleStop = () => {
+  const handleStop = () => {
     releaseStore.stopRelease();
-  }
+  };
 
-  render(){
-    const {classes} = this.props;
-    return(
-      <Modal show={releaseStore.isSaving}>
-        <Modal.Body>
-          <ProgressBar
-            active={releaseStore.savingProgress !== releaseStore.savingTotal}
-            now={releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}
-            label={`${releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}%`} />
-          <div className={classes.absoluteProgress}>{releaseStore.savingProgress} / {releaseStore.savingTotal}</div>
-          {releaseStore.savingProgress !== releaseStore.savingTotal?
-            <React.Fragment>
-              <div className={classes.lastEndedInstance}>
-                {releaseStore.savingLastEndedNode && releaseStore.savingLastEndedNode.label}
-              </div>
-              <div className={classes.lastEndedOperation}>
-                {releaseStore.savingLastEndedRequest}
-              </div>
-            </React.Fragment>
-            :releaseStore.savingErrors.length === 0?
-              <div className={classes.reloadRelease}>
-                <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Reloading current instance release status
-              </div>
-              :null
-          }
-          {releaseStore.savingErrors.length > 0 &&
+  return (
+    <Modal show={releaseStore.isSaving}>
+      <Modal.Body>
+        <ProgressBar
+          active={releaseStore.savingProgress !== releaseStore.savingTotal}
+          now={releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}
+          label={`${releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}%`} />
+        <div className={classes.absoluteProgress}>{releaseStore.savingProgress} / {releaseStore.savingTotal}</div>
+        {releaseStore.savingProgress !== releaseStore.savingTotal?
+          <React.Fragment>
+            <div className={classes.lastEndedInstance}>
+              {releaseStore.savingLastEndedNode && releaseStore.savingLastEndedNode.label}
+            </div>
+            <div className={classes.lastEndedOperation}>
+              {releaseStore.savingLastEndedRequest}
+            </div>
+          </React.Fragment>
+          :releaseStore.savingErrors.length === 0?
+            <div className={classes.reloadRelease}>
+              <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Reloading current instance release status
+            </div>
+            :null
+        }
+        {releaseStore.savingErrors.length > 0 &&
             <div className={classes.errors}>
               {releaseStore.savingErrors.map(error => {
                 return(
@@ -103,18 +102,17 @@ class SavingModal extends React.Component{
                 );
               })}
             </div>
-          }
-        </Modal.Body>
-        {releaseStore.savingErrors.length > 0 && releaseStore.savingProgress === releaseStore.savingTotal ?
-          <Modal.Footer>
-            <Button bsStyle="primary" onClick={this.handleDismissSavingReport}>Dismiss</Button>
-          </Modal.Footer> : <Modal.Footer>
-            <Button bsStyle="danger" onClick={this.handleStop}>Stop</Button>
-          </Modal.Footer>
         }
-      </Modal>
-    );
-  }
-}
+      </Modal.Body>
+      {releaseStore.savingErrors.length > 0 && releaseStore.savingProgress === releaseStore.savingTotal ?
+        <Modal.Footer>
+          <Button bsStyle="primary" onClick={handleDismissSavingReport}>Dismiss</Button>
+        </Modal.Footer> : <Modal.Footer>
+          <Button bsStyle="danger" onClick={handleStop}>Stop</Button>
+        </Modal.Footer>
+      }
+    </Modal>
+  );
+});
 
 export default SavingModal;

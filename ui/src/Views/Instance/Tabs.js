@@ -16,13 +16,13 @@
 
 import React from "react";
 import {observer} from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import routerStore from "../../Stores/RouterStore";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   tabs: {
     borderRight: "1px solid var(--border-color-ui-contrast1)",
     background: "var(--bg-color-ui-contrast2)"
@@ -54,7 +54,7 @@ const styles = {
       cursor: "not-allowed"
     }
   }
-};
+});
 
 class Tab extends React.PureComponent {
 
@@ -87,27 +87,24 @@ class Tab extends React.PureComponent {
   }
 }
 
-@injectStyles(styles)
-@observer
-class Tabs extends React.Component {
+const Tabs = observer(({ instance, mode }) => {
 
-  handleClick = mode => routerStore.history.push(`/instance/${mode}/${this.props.instance.id}`);
+  const classes = useStyles();
 
-  render() {
-    const {classes, instance, mode} = this.props;
-    const permissions = instance?instance.permissions:{};
+  const handleClick = mode => routerStore.history.push(`/instance/${mode}/${instance.id}`);
 
-    return (
-      <div className={classes.tabs}>
-        <Tab className={classes.tab} icon="eye"              mode="view"    disabled={mode === "create"} active={mode === "view"}                      onClick={this.handleClick} show={permissions.canRead} />
-        <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    disabled={false}             active={mode === "edit" || mode === "create"} onClick={this.handleClick} show={permissions.canWrite || permissions.canCreate } />
-        <Tab className={classes.tab} icon="user-edit"        mode="invite"  disabled={mode === "create"} active={mode === "invite"}                    onClick={this.handleClick} show={!instance.isNew && permissions.canInviteForSuggestion} />
-        <Tab className={classes.tab} icon="project-diagram"  mode="graph"   disabled={mode === "create"} active={mode === "graph"}                     onClick={this.handleClick} show={!instance.isNew && permissions.canRead} />
-        <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" disabled={mode === "create"} active={mode === "release"}                   onClick={this.handleClick} show={!instance.isNew && permissions.canRelease} />
-        <Tab className={classes.tab} icon="cog"              mode="manage"  disabled={mode === "create"} active={mode === "manage"}                    onClick={this.handleClick} show={!instance.isNew && (permissions.canDelete || permissions.canCreate)} />
-      </div>
-    );
-  }
-}
+  const permissions = instance?instance.permissions:{};
+
+  return (
+    <div className={classes.tabs}>
+      <Tab className={classes.tab} icon="eye"              mode="view"    disabled={mode === "create"} active={mode === "view"}                      onClick={handleClick} show={permissions.canRead} />
+      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    disabled={false}             active={mode === "edit" || mode === "create"} onClick={handleClick} show={permissions.canWrite || permissions.canCreate } />
+      <Tab className={classes.tab} icon="user-edit"        mode="invite"  disabled={mode === "create"} active={mode === "invite"}                    onClick={handleClick} show={!instance.isNew && permissions.canInviteForSuggestion} />
+      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   disabled={mode === "create"} active={mode === "graph"}                     onClick={handleClick} show={!instance.isNew && permissions.canRead} />
+      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" disabled={mode === "create"} active={mode === "release"}                   onClick={handleClick} show={!instance.isNew && permissions.canRelease} />
+      <Tab className={classes.tab} icon="cog"              mode="manage"  disabled={mode === "create"} active={mode === "manage"}                    onClick={handleClick} show={!instance.isNew && (permissions.canDelete || permissions.canCreate)} />
+    </div>
+  );
+});
 
 export default Tabs;

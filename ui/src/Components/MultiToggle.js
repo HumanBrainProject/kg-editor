@@ -15,20 +15,19 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import {isFunction} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     display:"inline-grid",
     background:"var(--bg-color-ui-contrast4)",
     borderRadius:"20px",
     height:"24px"
   }
-};
+});
 
-@injectStyles(styles)
 class MultiToggle extends React.Component{
 
   constructor(props){
@@ -42,7 +41,8 @@ class MultiToggle extends React.Component{
   }
 
   render(){
-    const { classes, children } = this.props;
+    const classes = useStyles();
+    const { children } = this.props;
 
     let childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: this.props.selectedValue, onSelect: this.handleSelect.bind(this) }));
 
@@ -54,7 +54,7 @@ class MultiToggle extends React.Component{
   }
 }
 
-const toggleStyles = {
+const useToggleStyles = createUseStyles({
   container:{
     textAlign:"center",
     height:"24px",
@@ -77,10 +77,9 @@ const toggleStyles = {
       }
     }
   }
-};
+});
 
-@injectStyles(toggleStyles)
-class Toggle extends React.Component{
+class Toggle extends React.PureComponent{
   handleClick = () => {
     if(isFunction(this.props.onSelect)){
       this.props.onSelect(this.props.value);
@@ -88,7 +87,8 @@ class Toggle extends React.Component{
   }
 
   render(){
-    const {classes, selectedValue, value, noscale} = this.props;
+    const classes = useToggleStyles();
+    const {selectedValue, value, noscale} = this.props;
     return(
       <div onClick={this.handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:this.props.color}}>
         <FontAwesomeIcon icon={this.props.icon || "dot-circle"}/>

@@ -21,7 +21,7 @@ import { Router, Route, Switch } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import "react-virtualized/styles.css";
 
@@ -50,7 +50,7 @@ import "babel-polyfill";
 
 import WorkspaceModal from "./Views/WorkspaceModal";
 
-const styles = {
+const useStyles = createUseStyles({
   "@global html, body, #root": {
     height: "100%",
     overflow: "hidden",
@@ -149,15 +149,96 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
+const AppComponent = observer(() => {
+
+  const classes = useStyles();
+  const Theme = appStore.availableThemes[appStore.currentTheme];
+
+  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
+
+  const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
+  return (
+    <Router history={routerStore.history}>
+      <div className={classes.layout}>
+        <Theme />
+        <Tabs />
+        <div className={classes.body}>
+          {appStore.globalError ?
+            <Route component={GlobalError} />
+            :
+            !appStore.isInitialized || !authStore.isAuthenticated ?
+              <Route component={Login} />
+              :
+              authStore.hasWorkspaces?
+                appStore.currentWorkspace?
+                  <Switch>
+                    <Route path="/instance/create/:id*" render={(props) => (<Instance {...props} mode="create" />)} />
+                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
+                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
+                    <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
+                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
+                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
+                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
+
+                    <Route path="/browse" exact={true} component={Browse} />
+                    <Route path="/help" component={Help} />
+                    {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
+                    <Route path="/" exact={true} component={Home} />
+                    <Route component={NotFound} />
+                  </Switch>
+                  :
+                  <Route component={WorkspaceModal} />
+                :
+                <Modal dialogClassName={classes.noWorkspacesModal} show={true}>
+                  <Modal.Body>
+                    <h1>Welcome <span title={name}>{name}</span></h1>
+                    <p>You are currently not granted permission to acccess any workspaces.</p>
+                    <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
+                  </Modal.Body>
+                </Modal>
+          }
+        </div>
+        {authStore.isFullyAuthenticated && (
+          <React.Fragment>
+            {appStore.deleteInstanceError ?
+              <div className={classes.deleteInstanceErrorModal}>
+                <Modal.Dialog>
+                  <Modal.Body>
+                    <div className={classes.deleteInstanceError}>{appStore.deleteInstanceError}</div>
+                    <div className={classes.deleteInstanceErrorFooterBar}>
+                      <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
+                      <Button bsStyle="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+                    </div>
+                  </Modal.Body>
+                </Modal.Dialog>
+              </div>
+              :
+              appStore.isDeletingInstance && !!appStore.instanceToDelete ?
+                <div className={classes.deletingInstanceModal}>
+                  <Modal.Dialog>
+                    <Modal.Body>
+                      <FetchingLoader>{`Deleting instance "${appStore.instanceToDelete}" ...`}</FetchingLoader>
+                    </Modal.Body>
+                  </Modal.Dialog>
+                </div>
+                : null
+            }
+          </React.Fragment>
+        )}
+        <div className={`${classes.status} layout-status`}>
+              Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
+        </div>
+      </div>
+    </Router>
+  );
+});
+
 class App extends React.Component {
   componentDidMount() {
     appStore.initialize();
     document.addEventListener("keydown", appStore.handleGlobalShortcuts);
-    // Init of sentry (logs) bucket
     const cookies = new Cookies();
     const sentryUrl = cookies.get("sentry_url");
     if (sentryUrl) {
@@ -167,98 +248,17 @@ class App extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    document.removeEventListener("keydown", appStore.handleGlobalShortcuts);
+  }
+
   componentDidCatch(error, info) {
     appStore.setGlobalError(error, info);
   }
 
-  handleToggleSaveBar = () => {
-    appStore.toggleSavebarDisplay();
-  }
-
-  handleRetryDeleteInstance = async () => {
-    appStore.retryDeleteInstance();
-  }
-
-  handleCancelDeleteInstance = () => {
-    appStore.cancelDeleteInstance();
-  }
-
   render() {
-    const { classes } = this.props;
-    const Theme = appStore.availableThemes[appStore.currentTheme];
     return (
-      <Router history={routerStore.history}>
-        <div className={classes.layout}>
-          <Theme />
-          <Tabs />
-          <div className={classes.body}>
-            {appStore.globalError ?
-              <Route component={GlobalError} />
-              :
-              !appStore.isInitialized || !authStore.isAuthenticated ?
-                <Route component={Login} />
-                :
-                authStore.hasWorkspaces?
-                  appStore.currentWorkspace?
-                    <Switch>
-                      <Route path="/instance/create/:id*" render={(props) => (<Instance {...props} mode="create" />)} />
-                      <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
-                      <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
-                      <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
-                      <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
-                      <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
-                      <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
-
-                      <Route path="/browse" exact={true} component={Browse} />
-                      <Route path="/help" component={Help} />
-                      {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                      <Route path="/" exact={true} component={Home} />
-                      <Route component={NotFound} />
-                    </Switch>
-                    :
-                    <Route component={WorkspaceModal} />
-                  :
-                  <Modal dialogClassName={classes.noWorkspacesModal} show={true}>
-                    <Modal.Body>
-                      <h1>Welcome <span title={name}>{name}</span></h1>
-                      <p>You are currently not granted permission to acccess any workspaces.</p>
-                      <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
-                    </Modal.Body>
-                  </Modal>
-            }
-          </div>
-          {authStore.isFullyAuthenticated && (
-            <React.Fragment>
-              {appStore.deleteInstanceError ?
-                <div className={classes.deleteInstanceErrorModal}>
-                  <Modal.Dialog>
-                    <Modal.Body>
-                      <div className={classes.deleteInstanceError}>{appStore.deleteInstanceError}</div>
-                      <div className={classes.deleteInstanceErrorFooterBar}>
-                        <Button onClick={this.handleCancelDeleteInstance}>Cancel</Button>
-                        <Button bsStyle="primary" onClick={this.handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-                      </div>
-                    </Modal.Body>
-                  </Modal.Dialog>
-                </div>
-                :
-                appStore.isDeletingInstance && !!appStore.instanceToDelete ?
-                  <div className={classes.deletingInstanceModal}>
-                    <Modal.Dialog>
-                      <Modal.Body>
-                        <FetchingLoader>{`Deleting instance "${appStore.instanceToDelete}" ...`}</FetchingLoader>
-                      </Modal.Body>
-                    </Modal.Dialog>
-                  </div>
-                  : null
-              }
-            </React.Fragment>
-          )}
-          <div className={`${classes.status} layout-status`}>
-              Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
-          </div>
-        </div>
-      </Router>
+      <AppComponent />
     );
   }
 }

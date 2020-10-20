@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 import { Modal } from "react-bootstrap";
@@ -25,7 +25,7 @@ import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     width: "100%",
     height: "100%",
@@ -89,54 +89,50 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class WorkspaceModal extends React.Component{
+const WorkspaceModal = observer(() => {
+  const classes = useStyles();
 
-  handleClick = workspace => appStore.setCurrentWorkspace(workspace);
+  const handleClick = workspace => appStore.setCurrentWorkspace(workspace);
 
-  render(){
-    const { classes } =  this.props;
-    const firstNameReg = /^([^ ]+) .*$/;
-    const name = authStore.hasUserProfile
+  const firstNameReg = /^([^ ]+) .*$/;
+  const name = authStore.hasUserProfile
       && authStore.user
       && authStore.user.givenName?
-      authStore.user.givenName
-      :
-      authStore.user.name?
-        (firstNameReg.test(authStore.user.name)?
-          authStore.user.name.match(firstNameReg)[1]
-          :
-          authStore.user.name)
+    authStore.user.givenName
+    :
+    authStore.user.name?
+      (firstNameReg.test(authStore.user.name)?
+        authStore.user.name.match(firstNameReg)[1]
         :
-        authStore.user.username?
-          authStore.user.username
-          :
-          "";
-    return (
-      <div className={classes.container}>
-        <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
-          <Modal.Body>
-            <div className={classes.workspacesSelection}>
-              <h1>Welcome <span title={name}>{name}</span></h1>
-              <p>Please select a workspace:</p>
-              <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(authStore.workspaces.length / 3) * 80))}px`}}>
-                <Scrollbars>
-                  <div className={classes.workspaces}>
-                    {authStore.workspaces.map(workspace =>
-                      <div className={classes.workspace} key={workspace.id} onClick={() => this.handleClick(workspace.id)}>{workspace.name||workspace.id}</div>
-                    )}
-                  </div>
-                </Scrollbars>
-              </div>
+        authStore.user.name)
+      :
+      authStore.user.username?
+        authStore.user.username
+        :
+        "";
+  return (
+    <div className={classes.container}>
+      <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
+        <Modal.Body>
+          <div className={classes.workspacesSelection}>
+            <h1>Welcome <span title={name}>{name}</span></h1>
+            <p>Please select a workspace:</p>
+            <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(authStore.workspaces.length / 3) * 80))}px`}}>
+              <Scrollbars>
+                <div className={classes.workspaces}>
+                  {authStore.workspaces.map(workspace =>
+                    <div className={classes.workspace} key={workspace.id} onClick={() => handleClick(workspace.id)}>{workspace.name||workspace.id}</div>
+                  )}
+                </div>
+              </Scrollbars>
             </div>
-          </Modal.Body>
-        </Modal>
-      </div>
-    );
-  }
-}
+          </div>
+        </Modal.Body>
+      </Modal>
+    </div>
+  );
+});
 
 export default WorkspaceModal;

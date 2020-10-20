@@ -14,9 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
+
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -28,7 +29,7 @@ import Search from "./Search";
 import FetchingLoader from "../../../Components/FetchingLoader";
 import BGMessage from "../../../Components/BGMessage";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "100%",
@@ -64,77 +65,71 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Reviewers extends React.Component{
-  componentDidMount() {
-    this.fetchInstanceReviews();
+const Reviewers = observer(({ id }) => {
+
+  const classes = useStyles();
+
+  const [org] = id?id.split("/"):[""];
+
+  useEffect(() => {
+    reviewsStore.getInstanceReviews(id);
+  }, []);
+
+  const fetchInstanceReviews = () => {
+    reviewsStore.getInstanceReviews(id);
+  };
+
+  const handleCancelUserInvitation = userId => {
+    //window.console.log(`cancel invitation to user "${userId}" to review instance "${id}"`);
+    reviewsStore.removeInstanceReviewRequest(id, userId);
+  };
+
+  const handleInviteUser = userId => {
+    //window.console.log(`invite user "${userId}" to review instance "${id}"`);
+    reviewsStore.addInstanceReviewRequest(id, org, userId);
+  };
+
+  const instanceReviews = reviewsStore.getInstanceReviews(id);
+
+  const excludedUsers = instanceReviews.reviews.map(review => review.userId);
+  if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
+    excludedUsers.push(authStore.user.id);
   }
 
-  get org() {
-    const [org, , , , ] = this.props.id?this.props.id.split("/"):["", "", "", "", ""];
-    return org;
-  }
-
-  fetchInstanceReviews = () => {
-    reviewsStore.getInstanceReviews(this.props.id);
-  }
-
-  handleCancelUserInvitation = userId => {
-    //window.console.log(`cancel invitation to user "${userId}" to review instance "${this.props.id}"`);
-    reviewsStore.removeInstanceReviewRequest(this.props.id, userId);
-  }
-
-  handleInviteUser = userId => {
-    //window.console.log(`invite user "${userId}" to review instance "${this.props.id}"`);
-    reviewsStore.addInstanceReviewRequest(this.props.id, this.org, userId);
-  }
-
-  render(){
-    const { classes } = this.props;
-
-    const instanceReviews = reviewsStore.getInstanceReviews(this.props.id);
-
-    const excludedUsers = instanceReviews.reviews.map(review => review.userId);
-    if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
-      excludedUsers.push(authStore.user.id);
-    }
-
-    return (
-      <div className={classes.container}>
-        {instanceReviews.isFetching?
-          <FetchingLoader>
-            <span>Fetching reviewers...</span>
-          </FetchingLoader>
-          :!instanceReviews.hasFetchError?
-            <div className={classes.panel}>
-              <div className={classes.reviewers} >
-                <h4>{instanceReviews.reviews.length?"Users invited to review the instance:":(this.org?"Invite users to review":"")}</h4>
-                <ul>
-                  {instanceReviews.reviews.map(review => (
-                    <li key={review.userId}>
-                      <Reviewer review={review} onCancelInvitation={this.handleCancelUserInvitation} onInvite={this.handleInviteUser} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <Search onSelect={this.handleInviteUser} excludedUsers={excludedUsers} />
+  return (
+    <div className={classes.container}>
+      {instanceReviews.isFetching?
+        <FetchingLoader>
+          <span>Fetching reviewers...</span>
+        </FetchingLoader>
+        :!instanceReviews.hasFetchError?
+          <div className={classes.panel}>
+            <div className={classes.reviewers} >
+              <h4>{instanceReviews.reviews.length?"Users invited to review the instance:":(org?"Invite users to review":"")}</h4>
+              <ul>
+                {instanceReviews.reviews.map(review => (
+                  <li key={review.userId}>
+                    <Reviewer review={review} onCancelInvitation={handleCancelUserInvitation} onInvite={handleInviteUser} />
+                  </li>
+                ))}
+              </ul>
             </div>
-            :
-            <BGMessage icon={"ban"} className={classes.error}>
-              There was a network problem fetching the reviewers for instance &quot;<i>{this.props.id}&quot;</i>.<br/>
+            <Search onSelect={handleInviteUser} excludedUsers={excludedUsers} />
+          </div>
+          :
+          <BGMessage icon={"ban"} className={classes.error}>
+              There was a network problem fetching the reviewers for instance &quot;<i>{id}&quot;</i>.<br/>
               If the problem persists, please contact the support.<br/>
-              <small>{instanceReviews.fetchError}</small><br/><br/>
-              <Button bsStyle="primary" onClick={this.fetchInstanceReviews.bind(this)}>
-                <FontAwesomeIcon icon="redo-alt"/>&nbsp;&nbsp; Retry
-              </Button>
-            </BGMessage>
-        }
-      </div>
-    );
-  }
-}
+            <small>{instanceReviews.fetchError}</small><br/><br/>
+            <Button bsStyle="primary" onClick={fetchInstanceReviews}>
+              <FontAwesomeIcon icon="redo-alt"/>&nbsp;&nbsp; Retry
+            </Button>
+          </BGMessage>
+      }
+    </div>
+  );
+});
 
 export default Reviewers;

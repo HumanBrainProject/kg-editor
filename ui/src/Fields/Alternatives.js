@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import Avatar from "../Components/Avatar";
 import Alternative from "./Alternative";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "inline-block",
     position: "relative"
@@ -46,7 +46,7 @@ const styles = {
     wordWBreak: "normal",
     whiteSpace: "normal"
   }
-};
+});
 
 const getContainerWidth = (node, className) => {
   if (node && className) {
@@ -60,7 +60,6 @@ const getContainerWidth = (node, className) => {
   return null;
 };
 
-@injectStyles(styles)
 class Alternatives extends React.Component {
   constructor (props) {
     super(props);
@@ -179,12 +178,13 @@ class Alternatives extends React.Component {
   }
 
   render() {
-    const {classes, className, list, ValueRenderer } = this.props;
+    const { className, list, ValueRenderer } = this.props;
 
     if (!list || !list.length) {
       return null;
     }
 
+    const classes = useStyles();
     const style = this.state.fixedWidth?
       {
         width: this.state.fixedWidth + "px"

@@ -16,7 +16,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import _  from "lodash-uuid";
 import { FormGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,7 +31,7 @@ import typesStore from "../../Stores/TypesStore";
 
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative"
   },
@@ -87,18 +87,33 @@ const styles = {
       content: "':\\00a0'"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class DynamicTableWithContext extends React.Component {
-  handleDropdownReset = () => {
-    this.props.fieldStore.resetOptionsSearch();
+const DynamicTableWithContext = observer(({ fieldStore, view, pane, readMode, className }) => {
+
+  const classes = useStyles();
+
+  const {
+    instance,
+    links,
+    label,
+    labelTooltip,
+    allowCustomValues,
+    optionsSearchTerm,
+    options,
+    optionsTypes,
+    optionsExternalTypes,
+    hasMoreOptions,
+    fetchingOptions,
+    returnAsNull
+  } = fieldStore;
+
+  const handleDropdownReset = () => {
+    fieldStore.resetOptionsSearch();
     instancesStore.togglePreviewInstance();
-  }
+  };
 
-  handleOnAddNewValue = (name, typeName) => {
-    const { fieldStore, view, pane } = this.props;
+  const handleOnAddNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
       const id = _.uuid();
       const type = typesStore.typesMap.get(typeName);
@@ -115,10 +130,9 @@ class DynamicTableWithContext extends React.Component {
       }, 1000);
     }
     instancesStore.togglePreviewInstance();
-  }
+  };
 
-  handleOnAddValue = id => {
-    const { fieldStore, view } = this.props;
+  const handleOnAddValue = id => {
     instancesStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
@@ -128,38 +142,30 @@ class DynamicTableWithContext extends React.Component {
       }
     }, 1000);
     instancesStore.togglePreviewInstance();
-  }
+  };
 
-  handleDelete = id => e => {
-    e.stopPropagation();
-    this.props.fieldStore.removeValue({[this.props.fieldStore.mappingValue]: id});
+  const handleDeleteAll = () => {
+    fieldStore.removeAllValues();
     instancesStore.togglePreviewInstance();
-  }
+  };
 
-  handleDeleteAll = () => {
-    this.props.fieldStore.removeAllValues();
-    instancesStore.togglePreviewInstance();
-  }
-
-  handleOptionPreview = (id, name) => {
+  const handleOptionPreview = (id, name) => {
     const options = { showEmptyfieldStores:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
     instancesStore.togglePreviewInstance(id, name, options);
-  }
+  };
 
-  handleSearchOptions = term => this.props.fieldStore.searchOptions(term);
+  const handleSearchOptions = term => fieldStore.searchOptions(term);
 
-  handleLoadMoreOptions = () => this.props.fieldStore.loadMoreOptions();
+  const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
-  handleRowDelete = index => {
-    const { fieldStore } = this.props;
+  const handleRowDelete = index => {
     const { value: values } = fieldStore;
     const value = values[index];
     fieldStore.removeValue(value);
     instancesStore.togglePreviewInstance();
-  }
+  };
 
-  handleRowClick = index => {
-    const { fieldStore, view, pane } = this.props;
+  const handleRowClick = index => {
     if (view && pane) {
       const { value: values } = fieldStore;
       const value = values[index];
@@ -173,10 +179,9 @@ class DynamicTableWithContext extends React.Component {
         }, fieldStore.isLinkVisible(id)?0:1000);
       }
     }
-  }
+  };
 
-  handleRowMouseOver = index => {
-    const { fieldStore, view } = this.props;
+  const handleRowMouseOver = index => {
     if (view) {
       const { value: values } = fieldStore;
       const value = values[index];
@@ -185,114 +190,90 @@ class DynamicTableWithContext extends React.Component {
         view.setInstanceHighlight(id, fieldStore.label);
       }
     }
-  }
+  };
 
-  handleRowMouseOut = () => {
-    const { view } = this.props;
+  const handleRowMouseOut = () => {
     if (view) {
       view.resetInstanceHighlight();
     }
-  }
+  };
 
-  render() {
-    const { classes, fieldStore, view, readMode, className } = this.props;
-    const {
-      instance,
-      links,
-      label,
-      labelTooltip,
-      allowCustomValues,
-      optionsSearchTerm,
-      options,
-      optionsTypes,
-      optionsExternalTypes,
-      hasMoreOptions,
-      fetchingOptions,
-      returnAsNull
-    } = fieldStore;
+  const fieldStoreLabel = label.toLowerCase();
+  const isDisabled =  readMode || returnAsNull;
 
-    const fieldStoreLabel = label.toLowerCase();
-    const isDisabled =  readMode || returnAsNull;
-
-    return (
-      <div className={`${classes.container} ${className}`}>
-        <FormGroup
-          onClick={this.handleFocus}
-          className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""}`}
-        >
-          <Label label={label} labelTooltip={labelTooltip} />
-          {!isDisabled && (
-            <div className={classes.deleteBtn}>
-              <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={this.handleDeleteAll} disabled={links.length === 0}>
-                <FontAwesomeIcon icon="times"/>
-              </Button>
-            </div>
-          )}
-          <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
-            {(view && view.currentInstanceId === instance.id)?
-              <Table
-                list={links}
-                readOnly={isDisabled}
-                enablePointerEvents={true}
-                onRowDelete={this.handleRowDelete}
-                onRowClick={this.handleRowClick}
-                onRowMouseOver={this.handleRowMouseOver}
-                onRowMouseOut={this.handleRowMouseOut}
-              />
-              :
-              <Table
-                list={links}
-                readOnly={isDisabled}
-                enablePointerEvents={false}
-              />
-            }
-            {!isDisabled && (
-              <div className={`form-control ${classes.dropdownContainer}`}>
-                <Dropdown
-                  searchTerm={optionsSearchTerm}
-                  options={options}
-                  types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-                  externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
-                  loading={fetchingOptions}
-                  hasMore={hasMoreOptions}
-                  inputPlaceholder={`type to add a ${fieldStoreLabel}`}
-                  onSearch={this.handleSearchOptions}
-                  onLoadMore={this.handleLoadMoreOptions}
-                  onReset={this.handleDropdownReset}
-                  onAddValue={this.handleOnAddValue}
-                  onAddNewValue={this.handleOnAddNewValue}
-                  onPreview={this.handleOptionPreview}
-                />
-              </div>
-            )}
+  return (
+    <div className={`${classes.container} ${className}`}>
+      <FormGroup className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""}`}>
+        <Label label={label} labelTooltip={labelTooltip} />
+        {!isDisabled && (
+          <div className={classes.deleteBtn}>
+            <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
+              <FontAwesomeIcon icon="times"/>
+            </Button>
           </div>
-          {!links.length && (
-            <div className={classes.emptyMessage}>
-              <span className={classes.emptyMessageLabel}>
-                    No {fieldStoreLabel} available
-              </span>
+        )}
+        <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
+          {(view && view.currentInstanceId === instance.id)?
+            <Table
+              list={links}
+              fieldStore={fieldStore}
+              readOnly={isDisabled}
+              enablePointerEvents={true}
+              onRowDelete={handleRowDelete}
+              onRowClick={handleRowClick}
+              onRowMouseOver={handleRowMouseOver}
+              onRowMouseOut={handleRowMouseOut}
+            />
+            :
+            <Table
+              list={links}
+              fieldStore={fieldStore}
+              readOnly={isDisabled}
+              enablePointerEvents={false}
+            />
+          }
+          {!isDisabled && (
+            <div className={`form-control ${classes.dropdownContainer}`}>
+              <Dropdown
+                searchTerm={optionsSearchTerm}
+                options={options}
+                types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+                externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+                loading={fetchingOptions}
+                hasMore={hasMoreOptions}
+                inputPlaceholder={`type to add a ${fieldStoreLabel}`}
+                onSearch={handleSearchOptions}
+                onLoadMore={handleLoadMoreOptions}
+                onReset={handleDropdownReset}
+                onAddValue={handleOnAddValue}
+                onAddNewValue={handleOnAddNewValue}
+                onPreview={handleOptionPreview}
+              />
             </div>
           )}
-        </FormGroup>
-      </div>
-    );
-  }
-}
-
-class DynamicTable extends React.Component { // because Quickfire request class
-  render() {
-    return (
-      <ViewContext.Consumer>
-        {view => (
-          <PaneContext.Consumer>
-            {pane => (
-              <DynamicTableWithContext view={view} pane={pane} {...this.props} />
-            )}
-          </PaneContext.Consumer>
+        </div>
+        {!links.length && (
+          <div className={classes.emptyMessage}>
+            <span className={classes.emptyMessageLabel}>
+                    No {fieldStoreLabel} available
+            </span>
+          </div>
         )}
-      </ViewContext.Consumer>
-    );
-  }
-}
+      </FormGroup>
+    </div>
+  );
+});
+
+const DynamicTable = props => (
+  <ViewContext.Consumer>
+    {view => (
+      <PaneContext.Consumer>
+        {pane => (
+          <DynamicTableWithContext view={view} pane={pane} {...props} />
+        )}
+      </PaneContext.Consumer>
+    )}
+  </ViewContext.Consumer>
+);
 
 export default DynamicTable;

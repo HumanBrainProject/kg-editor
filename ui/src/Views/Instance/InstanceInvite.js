@@ -16,7 +16,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import Preview from "../Preview";
 // import Reviewers from "./InstanceInvite/Reviewers";
@@ -24,7 +24,7 @@ import BGMessage from "../../Components/BGMessage";
 
 const rootPath = window.rootPath || "";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "100%",
@@ -54,31 +54,26 @@ const styles = {
     backgroundColor: "var(--bg-color-ui-contrast2)",
     color: "var(--ft-color-normal)"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class InstanceInvite extends React.Component{
-  render(){
-    const { classes, instance } = this.props;
-    const { permissions } = instance;
-    return (
-      <div className={classes.container}>
-        <div className={classes.panel}>
-          {permissions.canInviteForSuggestion?
-            <React.Fragment>
-              <Preview className={classes.preview} instanceId={instance.id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
-              {/* <Reviewers id={this.props.id} /> */}
-            </React.Fragment>
-            :
-            <BGMessage icon={"ban"} className={classes.error}>
+const InstanceInvite = observer(({ instance: { id, permissions} }) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <div className={classes.panel}>
+        {permissions.canInviteForSuggestion?
+          <React.Fragment>
+            <Preview className={classes.preview} instanceId={id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
+            {/* <Reviewers id={this.props.id} /> */}
+          </React.Fragment>
+          :
+          <BGMessage icon={"ban"} className={classes.error}>
               You are note entitled to invite people for suggestions.
-            </BGMessage>
-          }
-        </div>
+          </BGMessage>
+        }
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
 
 export default InstanceInvite;

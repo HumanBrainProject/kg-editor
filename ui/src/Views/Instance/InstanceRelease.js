@@ -15,12 +15,11 @@
 */
 
 /* eslint-disable indent */
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 
-import appStore from "../../Stores/AppStore";
 import releaseStore from "../../Stores/ReleaseStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -34,10 +33,9 @@ import ReleaseAction from "./InstanceRelease/ReleaseAction";
 import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
 import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
 
-
 const rootPath = window.rootPath || "";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "calc(100% - 30px)",
@@ -83,100 +81,104 @@ const styles = {
     padding: "10px",
     border: "1px solid var(--border-color-ui-contrast1)"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class InstanceRelease extends React.Component {
-  componentDidMount() {
-    releaseStore.setTopInstanceId(this.props.instance.id);
+const InstanceRelease = observer(({ instance }) => {
+
+  const classes = useStyles();
+
+  useEffect(() => {
+    releaseStore.setTopInstanceId(instance.id);
+    releaseStore.clearWarningMessages();
     releaseStore.fetchReleaseData();
-    //releaseStore.fetchWarningMessages(); TODO:check if this is still valid
+  }, [instance.id]);
+
+  const handleDismissSaveError = () => releaseStore.dismissSaveError();
+
+  const handleRetryFetching = () => releaseStore.fetchReleaseData();
+
+  if (!releaseStore) {
+    return (
+      <div className={classes.container}></div>
+    );
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.instance !== prevProps.instance) {
-      releaseStore.setTopInstanceId(this.props.instance.id);
-      releaseStore.clearWarningMessages();
-      releaseStore.fetchReleaseData();
-    }
-  }
-
-  handleDismissSaveError = () => {
-    releaseStore.dismissSaveError();
-  };
-
-  handleRetryFetching = () => {
-    releaseStore.fetchReleaseData();
-  };
-
-  render() {
-    const { classes } = this.props;
-    return releaseStore ? (
+  if (releaseStore.saveError) {
+    return (
       <div className={classes.container}>
-        {releaseStore.saveError ? (
-          <BGMessage icon="ban">
-            There has been an error while releasing one or more instances.
-            <br />
-            Please try again or contact our support if the problem persists.
-            <br />
-            <br />
-            <small>{releaseStore.saveError}</small>
-            <br />
-            <br />
-            <Button bsStyle="primary" onClick={this.handleDismissSaveError}>
-              OK
-            </Button>
-          </BGMessage>
-        ) : releaseStore.fetchError ? (
-          <BGMessage icon="ban">
-            There has been an error while fetching the release data for the
-            instance &quot;<i>{this.props.instance.id}&quot;</i>.
-            <br />
-            Please try again or contact our support if the problem persists.
-            <br />
-            <br />
-            <small>{releaseStore.fetchError}</small>
-            <br />
-            <br />
-            <Button bsStyle="primary" onClick={this.handleRetryFetching}>
-              Retry
-            </Button>
-          </BGMessage>
-        ) : (
-          releaseStore.isFetching ? (
-            <FetchingLoader>
-              <span>Fetching release data of instance &quot;<i>{this.props.instance.id}&quot;</i>...</span>
-            </FetchingLoader>
-          ) : (
-            <div className={classes.panel}>
-              <div className={classes.header}>
-                <h2>Release Management</h2>
-              </div>
-              <div className={classes.listPnl}>
-                <div className={classes.listHeader}>
-                  <HideReleasedInstancesToggle />
-                  <ReleaseNodeAndChildrenToggle />
-                </div>
-                <div className={classes.list}>
-                  <ReleaseList />
-                </div>
-              </div>
-              <div className={classes.action}>
-                <ReleaseAction />
-              </div>
-              <SavingModal />
-              {appStore.comparedWithReleasedVersionInstance &&
-                  appStore.comparedWithReleasedVersionInstance
-                    .id && (
-                <CompareInstancesModal />
-              )}
-            </div>
-          )
+        <BGMessage icon="ban">
+          There has been an error while releasing one or more instances.
+          <br />
+          Please try again or contact our support if the problem persists.
+          <br />
+          <br />
+          <small>{releaseStore.saveError}</small>
+          <br />
+          <br />
+          <Button bsStyle="primary" onClick={handleDismissSaveError}>
+            OK
+          </Button>
+        </BGMessage>
+      </div>
+    );
+  }
+
+  if (releaseStore.fetchError) {
+    return (
+      <div className={classes.container}>
+        <BGMessage icon="ban">
+          There has been an error while fetching the release data for the
+          instance &quot;<i>{instance.id}&quot;</i>.
+          <br />
+          Please try again or contact our support if the problem persists.
+          <br />
+          <br />
+          <small>{releaseStore.fetchError}</small>
+          <br />
+          <br />
+          <Button bsStyle="primary" onClick={handleRetryFetching}>
+            Retry
+          </Button>
+        </BGMessage>
+      </div>
+    );
+  }
+
+  if (releaseStore.isFetching) {
+    return (
+      <div className={classes.container}>
+        <FetchingLoader>
+          <span>Fetching release data of instance &quot;<i>{instance.id}&quot;</i>...</span>
+        </FetchingLoader>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.container}>
+      <div className={classes.panel}>
+        <div className={classes.header}>
+          <h2>Release Management</h2>
+        </div>
+        <div className={classes.listPnl}>
+          <div className={classes.listHeader}>
+            <HideReleasedInstancesToggle />
+            <ReleaseNodeAndChildrenToggle />
+          </div>
+          <div className={classes.list}>
+            <ReleaseList />
+          </div>
+        </div>
+        <div className={classes.action}>
+          <ReleaseAction />
+        </div>
+        <SavingModal />
+        {releaseStore.comparedInstance && releaseStore.comparedInstance.id && (
+          <CompareInstancesModal />
         )}
       </div>
-    ) : null;
-  }
-}
+    </div>
+  );
+});
 
 export default InstanceRelease;

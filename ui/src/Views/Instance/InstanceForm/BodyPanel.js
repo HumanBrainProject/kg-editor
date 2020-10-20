@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import Field from "../../../Fields/Field";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     margin: "0",
     padding: "0",
@@ -87,10 +87,9 @@ const styles = {
       strokeWidth:"3px"
     }
   }
-};
+});
 
-@injectStyles(styles)
-class BodyPanel extends React.Component{
+class BodyPanel extends React.PureComponent{
 
   renderNoPermissionForView = mode => {
     const { classes, className, instance} = this.props;
@@ -106,7 +105,7 @@ class BodyPanel extends React.Component{
   }
 
   render(){
-    const { classes, className, instance, readMode } = this.props;
+    const { className, instance, readMode } = this.props;
 
     if (readMode) {
       if(!instance.permissions.canRead) {
@@ -118,6 +117,7 @@ class BodyPanel extends React.Component{
       }
     }
 
+    const classes = useStyles();
     const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
 
     return(

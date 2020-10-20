@@ -14,14 +14,14 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { Glyphicon } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import instancesStore from "../../Stores/InstancesStore";
 
-const styles = {
+const useStyles = createUseStyles({
   valueDisplay: {
     display: "inline-block",
     maxWidth: "200px",
@@ -45,137 +45,114 @@ const styles = {
       backgroundColor: "lightgrey"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ListItem extends React.Component {
+const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut }) => {
 
-  componentDidMount() {
-    this.fetchInstance();
-  }
+  const classes = useStyles();
 
-  componentDidUpdate(previousProps) {
-    if (previousProps.instanceId !== this.props.instanceId) {
-      this.fetchInstance();
-    }
-  }
+  useEffect(() => instancesStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
 
-  fetchInstance = () => {
-    const { instanceId } = this.props;
-    instanceId && instancesStore.createInstanceOrGet(instanceId).fetchLabel();
-  };
-
-  handleClick = e => {
+  const handleClick = e => {
     e.stopPropagation();
-    this.props.onClick && this.props.onClick(this.props.index);
+    onClick && onClick(index);
   };
 
-  handleDelete = e => {
+  const handleDelete = e => {
     e.stopPropagation();
-    this.props.onDelete && this.props.onDelete(this.props.index);
+    onDelete && onDelete(index);
   };
 
-  handleDragEnd = e => {
+  const handleDragEnd = e => {
     e.stopPropagation();
-    this.props.onDragEnd && this.props.onDragEnd();
+    onDragEnd && onDragEnd();
   };
 
-  handleDragOver = e => e.preventDefault();
+  const handleDragOver = e => e.preventDefault();
 
-  handleDragStart = e => {
+  const handleDragStart = e => {
     e.stopPropagation();
-    this.props.onDragStart && this.props.onDragStart(this.props.index);
+    onDragStart && onDragStart(index);
   };
 
-  handleDrop = e => {
+  const handleDrop = e => {
     e.stopPropagation();
-    this.props.onDrop && this.props.onDrop(this.props.index);
+    onDrop && onDrop(index);
   };
 
-  handleKeyDown = e => {
+  const handleKeyDown = e => {
     e.stopPropagation();
-    this.props.onKeyDown && this.props.onKeyDown(this.props.index, e);
+    onKeyDown && onKeyDown(index, e);
   };
 
-  handleFocus = e => {
+  const handleFocus = e => {
     e.stopPropagation();
-    this.props.onFocus && this.props.onFocus(this.props.index);
+    onFocus && onFocus(index);
   };
 
-  handleBlur = e => {
+  const handleBlur = e => {
     e.stopPropagation();
-    this.props.onBlur && this.props.onBlur(this.props.index);
+    onBlur && onBlur(index);
   };
 
-  handleMouseOver = e => {
+  const handleMouseOver = e => {
     e.stopPropagation();
-    this.props.onMouseOver && this.props.onMouseOver(this.props.index);
+    onMouseOver && onMouseOver(index);
   };
 
-  handleMouseOut = e => {
+  const handleMouseOut = e => {
     e.stopPropagation();
-    this.props.onMouseOut && this.props.onMouseOut(this.props.index);
+    onMouseOut && onMouseOut(index);
   };
 
-  render() {
-    const {
-      classes,
-      instanceId,
-      readOnly,
-      disabled,
-      enablePointerEvents
-    } = this.props;
+  const instance = instancesStore.instances.get(instanceId);
 
-    const instance = instancesStore.instances.get(instanceId);
+  const hasError = !instance || instance.fetchError || instance.fetchLabelError;
+  const isFetching = instance && (instance.isFetching || instance.isfFetchingLabel);
+  const label = instance ? (hasError ? "Not found" : (isFetching ? instance.id : instance.name)) : "Unknown instance";
 
-    const hasError = !instance || instance.fetchError || instance.fetchLabelError;
-    const isFetching = instance && (instance.isFetching || instance.isfFetchingLabel);
-    const label = instance ? (hasError ? "Not found" : (isFetching ? instance.id : instance.name)) : "Unknown instance";
-
-    if (readOnly) {
-      if (!enablePointerEvents) {
-        return (
-          <span className="quickfire-readmode-item">{label}</span>
-        );
-      }
-
+  if (readOnly) {
+    if (!enablePointerEvents) {
       return (
-        <span className="quickfire-readmode-item">
-          <button type="button" className={`btn btn-xs btn-default ${hasError ? classes.notFound : ""}`}
-            onClick={this.handleClick}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
-            onMouseOver={this.handleMouseOver}
-            onMouseOut={this.handleMouseOut}
-          >{label}</button>
-        </span>
+        <span className="quickfire-readmode-item">{label}</span>
       );
     }
 
     return (
-      <div
-        tabIndex={"0"}
-        className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
-        disabled={disabled}
-        draggable={!!disabled}
-        onClick={this.handleClick}
-        onDragEnd={this.handleDragEnd}
-        onDragOver={this.handleDragOver}
-        onDragStart={this.handleDragStart}
-        onDrop={this.handleDrop}
-        onKeyDown={this.handleKeyDown}
-        onFocus={this.handleFocus}
-        onBlur={this.handleBlur}
-        onMouseOver={this.handleMouseOver}
-        onMouseOut={this.handleMouseOut}
-        title={label}
-      >
-        <span className={classes.valueDisplay}>{label}</span>
-        <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={this.handleDelete} />
-      </div>
+      <span className="quickfire-readmode-item">
+        <button type="button" className={`btn btn-xs btn-default ${hasError ? classes.notFound : ""}`}
+          onClick={handleClick}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
+        >{label}</button>
+      </span>
     );
   }
-}
+
+  return (
+    <div
+      tabIndex={"0"}
+      className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
+      disabled={disabled}
+      draggable={!!disabled}
+      onClick={handleClick}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragStart={handleDragStart}
+      onDrop={handleDrop}
+      onKeyDown={handleKeyDown}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onMouseOver={handleMouseOver}
+      onMouseOut={handleMouseOut}
+      title={label}
+    >
+      <span className={classes.valueDisplay}>{label}</span>
+      <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={handleDelete} />
+    </div>
+  );
+});
 
 export default ListItem;

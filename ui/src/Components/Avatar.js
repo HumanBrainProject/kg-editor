@@ -15,10 +15,10 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   avatar: {
     verticalAlign: "middle",
     "&.picture": {
@@ -29,27 +29,25 @@ const styles = {
       transform: "scale(1.35)"
     }
   }
-};
+});
 
-@injectStyles(styles)
-class Avatar extends React.Component {
+const Avatar = ({userId, name, picture, title, size=20}) => {
 
-  render() {
-    const {classes, userId, name, picture, title, size=20} = this.props;
-    if (!userId) {
-      return null;
-    }
+  const classes = useStyles();
 
-    if (picture) {
-      return (
-        <img alt={name?name:userId} width={size} height={size} src={picture} title={title?title:(name?name:userId)} className={`${classes.avatar} avatar picture`} />
-      );
-    }
+  if (!userId) {
+    return null;
+  }
 
+  if (picture) {
     return (
-      <FontAwesomeIcon icon="user" title={name?name:userId} className={`${classes.avatar} avatar default`} />
+      <img alt={name?name:userId} width={size} height={size} src={picture} title={title?title:(name?name:userId)} className={`${classes.avatar} avatar picture`} />
     );
   }
-}
+
+  return (
+    <FontAwesomeIcon icon="user" title={name?name:userId} className={`${classes.avatar} avatar default`} />
+  );
+};
 
 export default Avatar;

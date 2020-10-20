@@ -14,7 +14,6 @@
 *   limitations under the License.
 */
 
-import React from "react";
 import { createUseStyles } from "react-jss";
 
 import Color from "color";

@@ -104,7 +104,7 @@ const ReleaseStatus = ({instanceStatus, darkmode}) => {
         </div>
       </div>
     </OverlayTrigger>
-  );  
+  );
 };
 
 export default ReleaseStatus;

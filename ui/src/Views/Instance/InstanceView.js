@@ -46,7 +46,7 @@ const InstanceView = observer(({ instance }) => {
   return (
     <ViewContext.Provider value={viewStore.selectedView} >
       <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
-        <Pane paneId={id} >
+        <Pane paneId={instance.id} >
           <InstanceForm view={viewStore.selectedView} pane={instance.id} id={instance.id} />
         </Pane>
         <Links instanceId={instance.id} />

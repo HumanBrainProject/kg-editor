@@ -33,7 +33,7 @@ const CheckBox = observer(({ fieldStore, readMode }) => {
   const { value, label, labelTooltip } = fieldStore;
   const classes = useStyles();
 
-  const handleChange = () => {;
+  const handleChange = () => {
     if (!fieldStore.disabled && !fieldStore.readOnly) {
       fieldStore.toggleValue();
     }

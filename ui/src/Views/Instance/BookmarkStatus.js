@@ -17,42 +17,42 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { toJS } from "mobx";
-import { createUseStyles } from "react-jss";
+//import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import bookmarkStatusStore from "../../Stores/BookmarkStatusStore";
 import BookmarkButton from "../../Components/BookmarkButton";
 import PopOverButton from "../../Components/PopOverButton";
 import bookmarkStore from "../../Stores/BookmarkStore";
 
-const useStyles = createUseStyles({
-  container:{
-    display:"inline-block",
-    fontSize:"0.75em"
-  },
-  loader: {
-    borderRadius:"0.14em",
-    width: "20px",
-    background:"var(--bg-color-ui-contrast2)",
-    textAlign:"center",
-    color:"var(--ft-color-loud)",
-    //border:"1px solid var(--ft-color-loud)",
-    minWidth: "1.4em",
-    "& .svg-inline--fa":{
-      fontSize:"0.8em",
-      verticalAlign:"baseline"
-    }
-  },
-  fetchErrorButton: {
-    color: "var(--bookmark-off-color)",  // #e67e22 #e74c3c
-  },
-  saveErrorButton: {
-    color: "var(--ft-color-error)"
-  },
-  textError: {
-    margin: 0,
-    wordBreak: "keep-all"
-  }
-});
+// const styles = {
+//   container:{
+//     display:"inline-block",
+//     fontSize:"0.75em"
+//   },
+//   loader: {
+//     borderRadius:"0.14em",
+//     width: "20px",
+//     background:"var(--bg-color-ui-contrast2)",
+//     textAlign:"center",
+//     color:"var(--ft-color-loud)",
+//     //border:"1px solid var(--ft-color-loud)",
+//     minWidth: "1.4em",
+//     "& .svg-inline--fa":{
+//       fontSize:"0.8em",
+//       verticalAlign:"baseline"
+//     }
+//   },
+//   fetchErrorButton: {
+//     color: "var(--bookmark-off-color)",  // #e67e22 #e74c3c
+//   },
+//   saveErrorButton: {
+//     color: "var(--ft-color-error)"
+//   },
+//   textError: {
+//     margin: 0,
+//     wordBreak: "keep-all"
+//   }
+// };
 
 const BookmarkStatus = observer(class BookmarkStatus extends React.Component {
   componentDidMount() {
@@ -84,8 +84,7 @@ const BookmarkStatus = observer(class BookmarkStatus extends React.Component {
       return null;
     }
 
-    //const classes = useStyles();
-    const { className } = this.props;
+    const { classes, className } = this.props;
     const containerClassName = `${classes.container} ${className?className:""}`;
 
     const values = (instanceStatus && instanceStatus.data && !!instanceStatus.data.bookmarkLists.length)?toJS(instanceStatus.data.bookmarkLists):[];

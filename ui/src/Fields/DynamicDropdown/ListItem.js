@@ -51,7 +51,9 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
 
   const classes = useStyles();
 
-  useEffect(() => instancesStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
+  useEffect(() => {
+    instancesStore.createInstanceOrGet(instanceId).fetchLabel();
+  }, [instanceId]);
 
   const handleClick = e => {
     e.stopPropagation();

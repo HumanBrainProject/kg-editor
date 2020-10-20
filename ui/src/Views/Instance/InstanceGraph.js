@@ -91,7 +91,7 @@ const GraphInstance = observer(({ instance }) => {
 
   const classes = useStyles();
 
-  useEffect(fetch, [instance]);
+  useEffect(() => fetch(), [instance]);
 
   const fetch = () => graphStore.fetch(instance.id);
 

@@ -81,7 +81,7 @@ const InstanceManage = observer(({instance}) => {
 
   const classes = useStyles();
 
-  useEffect(fetchStatus, [instance]);
+  useEffect(() => fetchStatus(), [instance]);
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 

@@ -93,7 +93,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
 
   const classes = useStyles();
 
-  useEffect(fetchInstances, [leftChildrenIds, rightChildrenIds]);
+  useEffect(() => fetchInstances(), [leftChildrenIds, rightChildrenIds]);
 
   const fetchInstances = (forceFetch=false) => {
     leftChildrenIds.forEach(id => leftInstanceStore.createInstanceOrGet(id).fetchLabel(forceFetch));

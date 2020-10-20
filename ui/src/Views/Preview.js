@@ -140,12 +140,12 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   const classes = useStyles();
 
+  useEffect(() => fetchInstance(), [instanceId]);
+
   const fetchInstance = (forceFetch=false) =>  {
     const instance = instancesStore.createInstanceOrGet(instanceId);
     instance.fetch(forceFetch);
   };
-
-  useEffect(fetchInstance, [instanceId]);
 
   const handleRetry = () => fetchInstance(true);
 

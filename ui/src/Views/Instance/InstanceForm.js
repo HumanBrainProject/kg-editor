@@ -137,7 +137,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const classes = useStyles();
 
-  useEffect(fetchInstance, [id]);
+  useEffect(() => fetchInstance(), [id]);
 
   const fetchInstance = (forceFetch = false) => {
     const instance = instancesStore.createInstanceOrGet(id);

@@ -63,7 +63,9 @@ const Status = observer(({ id, darkmode }) => {
 
   const classes = useStyles();
 
-  useEffect(() => statusStore.fetchStatus(id), []);
+  useEffect(() => {
+    statusStore.fetchStatus(id);
+  }, []);
 
   const instanceStatus = statusStore.getInstance(id);
 

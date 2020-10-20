@@ -71,7 +71,9 @@ const Types = observer(() => {
 
   const [showTypes, setShowTypes] = useState(true);
 
-  useEffect(() => typesStore.fetch(), []);
+  useEffect(() => {
+    typesStore.fetch();
+  }, []);
 
   const handleLoadRetry = () => typesStore.fetch();
 

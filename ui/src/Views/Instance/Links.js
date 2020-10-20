@@ -39,7 +39,7 @@ const Links = observer(({ instanceId }) => {
 
   const classes = useStyles();
 
-  useEffect(fetchInstance, [instanceId]);
+  useEffect(() => fetchInstance(), [instanceId]);
 
   const fetchInstance = (forceFetch = false) => {
     if (instanceId) {

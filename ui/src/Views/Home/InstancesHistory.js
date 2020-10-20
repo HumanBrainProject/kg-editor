@@ -118,6 +118,8 @@ const InstancesHistory = observer(({ workspace }) => {
 
   const classes = useStyles();
 
+  useEffect(() => fetchInstances(), [workspace]);
+
   const fetchInstances = () => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
       if (eventValue) {
@@ -128,8 +130,6 @@ const InstancesHistory = observer(({ workspace }) => {
     const history = historyStore.getFileredInstancesHistory(eventTypes, appStore.historySettings.size);
     historyStore.fetchInstances(history);
   };
-
-  useEffect(fetchInstances, [workspace]);
 
   const handleHistorySizeChange = e => {
     appStore.setSizeHistorySetting(e.target.value);

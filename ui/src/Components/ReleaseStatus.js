@@ -84,37 +84,27 @@ const MessageStatus = ({status}) => {
   return <strong>Unknown entity</strong>;
 };
 
-class ReleaseStatus extends React.Component {
-  constructor(props) {
-    super(props);
-    this.tooltipId = uniqueId("release-tooltip");
-  }
+const OverlayTooltip = ({instanceStatus}) => {
+  return(
+    <Tooltip id={uniqueId("release-tooltip")}>
+      <div>
+        <MessageStatus status={instanceStatus} />
+      </div>
+    </Tooltip>
+  );
+};
 
-  renderTooltip() {
-    const {instanceStatus} = this.props;
-    return(
-      <Tooltip id={this.tooltipId}>
-        <div>
-          <MessageStatus status={instanceStatus} />
+const ReleaseStatus = ({instanceStatus, darkmode}) => {
+  const classes = useStyles();
+  return (
+    <OverlayTrigger placement="top" overlay={<OverlayTooltip instanceStatus={instanceStatus}/>}>
+      <div className={`${classes.status} ${darkmode? "darkmode" : ""} `} status={instanceStatus}>
+        <div className={`${classes.instanceStatus}  `}>
+          <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
         </div>
-      </Tooltip>
-    );
-  }
-
-  render() {
-    const classes = useStyles();
-    const { instanceStatus } = this.props;
-
-    return (
-      <OverlayTrigger placement="top" overlay={this.renderTooltip()}>
-        <div className={`${classes.status} ${this.props.darkmode? "darkmode" : ""} `} status={instanceStatus}>
-          <div className={`${classes.instanceStatus}  `}>
-            <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
-          </div>
-        </div>
-      </OverlayTrigger>
-    );
-  }
-}
+      </div>
+    </OverlayTrigger>
+  );  
+};
 
 export default ReleaseStatus;

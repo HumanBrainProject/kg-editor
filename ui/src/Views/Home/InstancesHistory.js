@@ -114,22 +114,22 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstancesHistory =  observer(({ workspace }) => {
+const InstancesHistory = observer(({ workspace }) => {
 
   const classes = useStyles();
 
-  useEffect(fetchInstances, [workspace]);
-
   const fetchInstances = () => {
-    const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((result, [eventType, eventValue]) => {
+    const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
       if (eventValue) {
-        result.push(eventType);
+        acc.push(eventType);
       }
-      return result;
+      return acc;
     }, []);
     const history = historyStore.getFileredInstancesHistory(eventTypes, appStore.historySettings.size);
     historyStore.fetchInstances(history);
   };
+
+  useEffect(fetchInstances, [workspace]);
 
   const handleHistorySizeChange = e => {
     appStore.setSizeHistorySetting(e.target.value);

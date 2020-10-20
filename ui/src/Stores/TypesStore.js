@@ -14,14 +14,25 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, runInAction } from "mobx";
+import { observable, action, computed, runInAction, makeObservable } from "mobx";
 import API from "../Services/API";
 
 class TypesStore {
-  @observable types = [];
-  @observable typesMap = new Map();
-  @observable fetchError = null;
-  @observable isFetching = false;
+  types = [];
+  typesMap = new Map();
+  fetchError = null;
+  isFetching = false;
+
+  constructor() {
+    makeObservable(this, {
+      types: observable,
+      typesMap: observable,
+      fetchError: observable,
+      isFetching: observable,
+      isFetched: computed,
+      fetch: action
+    });
+  }
 
   filteredList(term) {
     term = typeof term === "string" && term.trim().toLowerCase();
@@ -31,12 +42,10 @@ class TypesStore {
     return this.types;
   }
 
-  @computed
   get isFetched() {
     return !this.fetchError && this.types.length;
   }
 
-  @action
   async fetch(forceFetch=false) {
     if (!this.isFetching && (!this.types.length || !!forceFetch)) {
       this.isFetching = true;

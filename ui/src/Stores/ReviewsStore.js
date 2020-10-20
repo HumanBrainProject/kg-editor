@@ -14,14 +14,23 @@
 *   limitations under the License.
 */
 
-import {observable, action, runInAction} from "mobx";
+import { observable, action, runInAction, makeObservable } from "mobx";
 import API from "../Services/API";
 import appStore from "./AppStore";
 
 class ReviewsStore {
-  @observable instancesReviews = new Map();
+  instancesReviews = new Map();
 
-  @action
+  constructor() {
+    makeObservable(this, {
+      instancesReviews: observable,
+      getInstanceReviews: action,
+      fetchInstanceReviews: action,
+      addInstanceReviewRequest: action,
+      removeInstanceReviewRequest: action
+    });
+  }
+
   getInstanceReviews(instanceId) {
     if (!this.instancesReviews.has(instanceId)) {
       this.fetchInstanceReviews(instanceId);
@@ -30,7 +39,6 @@ class ReviewsStore {
   }
 
 
-  @action
   async fetchInstanceReviews(instanceId) {
     let instanceReviews = null;
     if (this.instancesReviews.has(instanceId)) {
@@ -78,7 +86,6 @@ class ReviewsStore {
     return instanceReviews;
   }
 
-  @action
   async addInstanceReviewRequest(instanceId, org, userId) {
     if (userId && this.instancesReviews.has(instanceId)) {
       const instanceReviews = this.instancesReviews.get(instanceId);
@@ -111,7 +118,6 @@ class ReviewsStore {
     }
   }
 
-  @action
   async removeInstanceReviewRequest(instanceId, userId) {
     if (userId && this.instancesReviews.has(instanceId)) {
       const instanceReviews = this.instancesReviews.get(instanceId);

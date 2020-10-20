@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, runInAction, set, values } from "mobx";
+import { observable, action, computed, runInAction, set, values, makeObservable } from "mobx";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
@@ -85,16 +85,35 @@ const getGraphNodes = groups => Object.values(groups).reduce((acc, group) => {
 const getGraphLinks = (groups, links) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target));
 
 class GraphStore {
-  @observable isFetching = false;
-  @observable isFetched = false;
-  @observable fetchError = null;
-  @observable mainId = null;
-  @observable groups = {};
-  @observable nodes = {};
-  @observable links = [];
-  @observable highlightedNode = null;
+  isFetching = false;
+  isFetched = false;
+  fetchError = null;
+  mainId = null;
+  groups = {};
+  nodes = {};
+  links = [];
+  highlightedNode = null;
 
-  @computed
+  constructor() {
+    makeObservable(this, {
+      isFetching: observable,
+      isFetched: observable,
+      fetchError: observable,
+      mainId: observable,
+      groups: observable,
+      nodes: observable,
+      links: observable,
+      highlightedNode: observable,
+      graphData: computed,
+      groupsList: computed,
+      fetch: action,
+      reset: action,
+      setHighlightNodeConnections: action,
+      setGroupVisibility: action,
+      setGrouping: action
+    });
+  }
+
   get graphData() {
     return {
       nodes: getGraphNodes(this.groups),
@@ -102,12 +121,10 @@ class GraphStore {
     };
   }
 
-  @computed
   get groupsList() {
     return values(this.groups).sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  @action
   async fetch(id) {
     this.fetchError = null;
     this.isFetched = false;
@@ -133,7 +150,6 @@ class GraphStore {
     }
   }
 
-  @action
   reset() {
     this.isFetched = false;
     this.isFetching = false;
@@ -142,7 +158,6 @@ class GraphStore {
     this.mainId = null;
   }
 
-  @action
   setHighlightNodeConnections(node, highlighted=false) {
     this.highlightedNode = highlighted?node:null;
     if(node) {
@@ -164,12 +179,10 @@ class GraphStore {
     }
   }
 
-  @action
   setGroupVisibility(group, show=true) {
     set(group, "show", show);
   }
 
-  @action
   setGrouping(group, grouped=true) {
     set(group, "grouped", grouped);
   }
@@ -243,7 +256,6 @@ class GraphStore {
 
     this.links =  Object.values(links);
   };
-
 }
 
 export default new GraphStore();

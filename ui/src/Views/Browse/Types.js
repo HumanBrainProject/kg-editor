@@ -90,7 +90,7 @@ const Types = observer(() => {
       </div>
       {!typesStore.fetchError ?
         !typesStore.isFetching ?
-          this.state.showTypes && list.map(type =>
+          showTypes && list.map(type =>
             <TypesItem key={type.name} type={type}/>
           )
           :

@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import appStore from "./AppStore";
 import { fieldsMapping } from "../Fields";
@@ -294,33 +294,70 @@ const getChildrenIdsGroupedByField = fields => {
 };
 
 class InstanceStore {
-  @observable id = null;
-  @observable _name = null;
-  @observable types = [];
-  @observable isNew = false;
-  @observable labelField = null;
-  @observable promotedFields = [];
-  @observable primaryType = { name: "", color: "", label: "" };
-  @observable workspace = "";
-  @observable metadata = {};
-  @observable permissions = {};
-  @observable fields = {};
+  id = null;
+  _name = null;
+  types = [];
+  isNew = false;
+  labelField = null;
+  promotedFields = [];
+  primaryType = { name: "", color: "", label: "" };
+  workspace = "";
+  metadata = {};
+  permissions = {};
+  fields = {};
 
-  @observable isLabelFetching = false;
-  @observable isLabelFetched = false;
-  @observable fetchLabelError = null;
-  @observable hasLabelFetchError = false;
+  isLabelFetching = false;
+  isLabelFetched = false;
+  fetchLabelError = null;
+  hasLabelFetchError = false;
 
-  @observable isFetching = false;
-  @observable isFetched = false;
-  @observable fetchError = null;
-  @observable hasFetchError = false;
+  isFetching = false;
+  isFetched = false;
+  fetchError = null;
+  hasFetchError = false;
 
   constructor(id) {
+    makeObservable(this, {
+      id: observable,
+      _name: observable,
+      types: observable,
+      isNew: observable,
+      labelField: observable,
+      promotedFields: observable,
+      primaryType: observable,
+      workspace: observable,
+      metadata: observable,
+      permissions: observable,
+      fields: observable,
+      isLabelFetching: observable,
+      isLabelFetched: observable,
+      fetchLabelError: observable,
+      hasLabelFetchError: observable,
+      isFetching: observable,
+      isFetched: observable,
+      fetchError: observable,
+      hasFetchError: observable,
+      cloneInitialData: computed,
+      returnValue: computed,
+      payload: computed,
+      hasChanged: computed,
+      hasFieldErrors: computed,
+      reset: action,
+      clearFieldsErrors: action,
+      name: computed,
+      nonPromotedFields: computed,
+      childrenIds: computed,
+      childrenIdsGroupedByField: computed,
+      belongsToCurrentWorkspace: computed,
+      initializeLabelData: action,
+      initializeData: action,
+      errorLabelInstance: action,
+      errorInstance: action
+    });
+
     this.id = id;
   }
 
-  @computed
   get cloneInitialData() {
     return {
       id: this.id,
@@ -339,7 +376,6 @@ class InstanceStore {
     };
   }
 
-  @computed
   get returnValue() {
     const payload = {
       "@type": this.types.map(t => t.name)
@@ -352,7 +388,6 @@ class InstanceStore {
     }, payload);
   }
 
-  @computed
   get payload() {
     const payload = {
       "@type": this.types.map(t => t.name)
@@ -363,27 +398,22 @@ class InstanceStore {
     }, payload);
   }
 
-  @computed
   get hasChanged() {
     return this.isNew || Object.values(this.fields).some(field => field.hasChanged);
   }
 
-  @computed
   get hasFieldErrors() {
     return Object.values(this.fields).some(field => field.hasError);
   }
 
-  @action
   reset() {
     Object.values(this.fields).forEach(field => field.reset());
   }
 
-  @action
   clearFieldsErrors() {
     Object.values(this.fields).forEach(field => field.clearError);
   }
 
-  @computed
   get name() {
     const field = this.isFetched && this.labelField && this.fields[this.labelField];
     if (field) {
@@ -392,7 +422,6 @@ class InstanceStore {
     return this._name ? this._name : this.id;
   }
 
-  @computed
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError) {
       return Object.entries(this.fields)
@@ -414,7 +443,6 @@ class InstanceStore {
     return [];
   }
 
-  @computed
   get childrenIds() {
     if (this.isFetched && !this.fetchError && this.fields) {
       const ids = Object.values(this.fields)
@@ -437,7 +465,6 @@ class InstanceStore {
     return [];
   }
 
-  @computed
   get childrenIdsGroupedByField() {
     if (this.isFetched && !this.fetchError) {
       return getChildrenIdsGroupedByField(Object.values(this.fields));
@@ -445,12 +472,10 @@ class InstanceStore {
     return [];
   }
 
-  @computed
   get belongsToCurrentWorkspace() {
     return appStore.currentWorkspace && this.workspace === appStore.currentWorkspace.id;
   }
 
-  @action
   initializeLabelData(data) {
     const normalizedData = normalizeLabelInstanceData(data);
     this._name = normalizedData.name,
@@ -463,7 +488,6 @@ class InstanceStore {
     this.hasLabelFetchError = false;
   }
 
-  @action
   initializeData(data, isNew = false) {
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name,
@@ -503,7 +527,6 @@ class InstanceStore {
     return `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
   }
 
-  @action
   errorLabelInstance(e) {
     this.fetchLabelError = this.buildErrorMessage(e);
     this.hasLabelFetchError = true;
@@ -511,7 +534,6 @@ class InstanceStore {
     this.isLabelFetching = false;
   }
 
-  @action
   errorInstance(e) {
     this.fetchError = this.buildErrorMessage(e);
     this.hasFetchError = true;

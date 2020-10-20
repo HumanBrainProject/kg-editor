@@ -14,16 +14,31 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
 
 class InputTextStore extends FieldStore {
-  @observable value = "";
-  @observable returnAsNull = false;
-  @observable initialValue = "";
+  value = "";
+  returnAsNull = false;
+  initialValue = "";
 
-  @computed
+  constructor(definition, options, instance) {
+    super(definition, options, instance);
+
+    makeObservable(this, {
+      value: observable,
+      returnAsNull: observable,
+      initialValue: observable,
+      returnValue: computed,
+      cloneWithInitialValue: computed,
+      updateValue: action,
+      reset: action,
+      hasChanged: computed,
+      setValue: action
+    });
+  }
+
   get returnValue() {
     if (this.value === "" && this.returnAsNull) {
       return null;
@@ -31,7 +46,6 @@ class InputTextStore extends FieldStore {
     return toJS(this.value);
   }
 
-  @computed
   get cloneWithInitialValue() {
     return {
       ...this.definition,
@@ -39,20 +53,17 @@ class InputTextStore extends FieldStore {
     };
   }
 
-  @action
   updateValue(value) {
     this.returnAsNull = false;
     this.initialValue = (value !== null && value !== undefined)?value:"";
     this.value = this.initialValue;
   }
 
-  @action
   reset() {
     this.returnAsNull = false;
     this.value = this.initialValue;
   }
 
-  @computed
   get hasChanged() {
     if (typeof this.initialValue  === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
@@ -60,7 +71,6 @@ class InputTextStore extends FieldStore {
     return this.returnValue !== this.initialValue;
   }
 
-  @action
   setValue(value) {
     if (value !== null && value !== undefined) {
       if (value !== "" || !this.returnAsNull) {

@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import {observable, computed, action, runInAction} from "mobx";
+import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import * as Sentry from "@sentry/browser";
 import { matchPath } from "react-router-dom";
 import _  from "lodash-uuid";
@@ -49,23 +49,23 @@ const getLinkedInstanceIds = instanceIds => {
 };
 
 class AppStore{
-  @observable globalError = null;
-  @observable initializingMessage = null;
-  @observable initializationError = null;
-  @observable initialInstanceError = null;
-  @observable initialInstanceWorkspaceError = null;
-  @observable isInitialized = false;
-  @observable canLogin = true;
-  @observable currentTheme;
-  @observable historySettings;
-  @observable currentWorkspace = null;
-  @observable showSaveBar = false;
-  @observable instanceToDelete = null;
-  @observable isDeletingInstance = false;
-  @observable deleteInstanceError = null;
-  @observable isCreatingNewInstance = false;
-  @observable instanceCreationError = null;
-  @observable pathsToResolve = new Map();
+  globalError = null;
+  initializingMessage = null;
+  initializationError = null;
+  initialInstanceError = null;
+  initialInstanceWorkspaceError = null;
+  isInitialized = false;
+  canLogin = true;
+  currentTheme = "default";
+  historySettings = null;
+  currentWorkspace = null;
+  showSaveBar = false;
+  instanceToDelete = null;
+  isDeletingInstance = false;
+  deleteInstanceError = null;
+  isCreatingNewInstance = false;
+  instanceCreationError = null;
+  pathsToResolve = new Map();
 
   availableThemes = {
     "default": DefaultTheme,
@@ -74,6 +74,45 @@ class AppStore{
   }
 
   constructor(){
+    makeObservable(this, {
+      globalError: observable,
+      initializingMessage: observable,
+      initializationError: observable,
+      initialInstanceError: observable,
+      initialInstanceWorkspaceError: observable,
+      isInitialized: observable,
+      canLogin: observable,
+      currentTheme: observable,
+      historySettings: observable,
+      currentWorkspace: observable,
+      showSaveBar: observable,
+      instanceToDelete: observable,
+      isDeletingInstance: observable,
+      deleteInstanceError: observable,
+      isCreatingNewInstance: observable,
+      instanceCreationError: observable,
+      pathsToResolve: observable,
+      currentWorkspaceName: computed,
+      currentWorkspacePermissions: computed,
+      initialize: action,
+      flush: action,
+      initializeWorkspace: action,
+      getInitialInstanceWorkspace: action,
+      cancelInitialInstance: action,
+      setGlobalError: action,
+      dismissGlobalError: action,
+      setCurrentWorkspace: action,
+      toggleSavebarDisplay: action,
+      openInstance: action,
+      closeInstance: action,
+      saveInstance: action,
+      deleteInstance: action,
+      duplicateInstance: action,
+      retryDeleteInstance: action,
+      cancelDeleteInstance: action,
+      login: action
+    });
+
     this.canLogin = !matchPath(routerStore.history.location.pathname, { path: "/logout", exact: "true" });
     let savedTheme = localStorage.getItem("currentTheme");
     this.currentTheme = savedTheme === "bright"? "bright": "default";
@@ -99,7 +138,6 @@ class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
-  @computed
   get currentWorkspaceName() {
     if (this.currentWorkspace) {
       return this.currentWorkspace.name || this.currentWorkspace.id;
@@ -107,12 +145,10 @@ class AppStore{
     return "";
   }
 
-  @computed
   get currentWorkspacePermissions() {
     return this.currentWorkspace?this.currentWorkspace.permissions:{};
   }
 
-  @action
   async initialize() {
     if (this.canLogin && !this.isInitialized) {
       this.initializingMessage = "Initializing the application...";
@@ -151,8 +187,7 @@ class AppStore{
     }
   }
 
-  @action
-  flush(){
+  flush() {
     instancesStore.flush();
     statusStore.flush();
     this.showSaveBar = false;
@@ -164,7 +199,6 @@ class AppStore{
     this.pathsToResolve.clear();
   }
 
-  @action
   async initializeWorkspace() {
     let workspace = null;
     this.initializingMessage = "Setting workspace...";
@@ -185,8 +219,7 @@ class AppStore{
     }
   }
 
-  @action
-  async getInitialInstanceWorkspace(instanceId){
+  async getInitialInstanceWorkspace(instanceId) {
     this.initializingMessage = `Retrieving instance "${instanceId}"...`;
     try{
       const response = await API.axios.get(API.endpoints.instance(instanceId));
@@ -227,7 +260,6 @@ class AppStore{
     return null;
   }
 
-  @action
   cancelInitialInstance() {
     routerStore.history.replace("/browse");
     this.initializationError = null;
@@ -259,13 +291,11 @@ class AppStore{
     viewStore.clearViews();
   }
 
-  @action
-  setGlobalError(error, info){
+  setGlobalError(error, info) {
     this.globalError = {error, info};
   }
 
-  @action
-  dismissGlobalError(){
+  dismissGlobalError() {
     this.globalError = null;
   }
 
@@ -320,7 +350,6 @@ class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  @action
   setCurrentWorkspace = space => {
     let workspace = space?authStore.workspaces.find( w => w.id === space):null;
     if (!workspace && authStore.hasWorkspaces && authStore.workspaces.length === 1) {
@@ -344,10 +373,9 @@ class AppStore{
         localStorage.removeItem("currentWorkspace");
       }
     }
-  }
+  };
 
-  @action
-  toggleSavebarDisplay(state){
+  toggleSavebarDisplay(state) {
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
 
@@ -357,8 +385,7 @@ class AppStore{
     routerStore.history.push(`/instance/create/${uuid}`);
   }
 
-  @action
-  openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view"){
+  openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view") {
     viewStore.registerViewByInstanceId(instanceId, instanceName, instancePrimaryType, viewMode);
     if(viewMode !== "create") {
       historyStore.updateInstanceHistory(instanceId, "viewed");
@@ -371,7 +398,6 @@ class AppStore{
     return !(path && (path.params.mode === "edit" || path.params.mode === "create"));
   }
 
-  @action
   closeInstance(instanceId) {
     if (matchPath(routerStore.history.location.pathname, { path: "/instance/:mode/:id*", exact: "true" })) {
       if (matchPath(routerStore.history.location.pathname, { path: `/instance/:mode/${instanceId}`, exact: "true" })) {
@@ -398,7 +424,6 @@ class AppStore{
     }
   }
 
-  @action
   async saveInstance(instance) {
     const isNew = instance.isNew;
     const id = instance.id;
@@ -431,8 +456,7 @@ class AppStore{
     }
   }
 
-  @action
-  async deleteInstance(instanceId){
+  async deleteInstance(instanceId) {
     if (instanceId) {
       this.instanceToDelete = instanceId;
       this.isDeletingInstance = true;
@@ -474,8 +498,7 @@ class AppStore{
     }
   }
 
-  @action
-  async duplicateInstance(fromInstanceId){
+  async duplicateInstance(fromInstanceId) {
     let instanceToCopy = instancesStore.instances.get(fromInstanceId);
     let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
     delete values.id;
@@ -502,12 +525,10 @@ class AppStore{
     }
   }
 
-  @action
   async retryDeleteInstance() {
     return await this.deleteInstance(this.instanceToDelete);
   }
 
-  @action
   cancelDeleteInstance() {
     this.instanceToDelete = null;
     this.deleteInstanceError = null;
@@ -573,7 +594,6 @@ class AppStore{
     routerStore.history.push("/");
   }
 
-  @action
   login = () => {
     if (this.canLogin) {
       authStore.login();
@@ -582,7 +602,7 @@ class AppStore{
       this.canLogin = true;
       this.initialize(true);
     }
-  }
+  };
 
   logout = () => {
     if (!instancesStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {

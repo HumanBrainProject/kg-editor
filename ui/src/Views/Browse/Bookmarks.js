@@ -70,9 +70,7 @@ const styles = {
   }
 };
 
-@injectStyles(styles)
-@observer
-class Bookmarks extends React.Component {
+const Bookmarks = observer(class Bookmarks extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -115,6 +113,6 @@ class Bookmarks extends React.Component {
       </div>
     );
   }
-}
+});
 
 export default Bookmarks;

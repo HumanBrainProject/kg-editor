@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction } from "mobx";
+import { observable, action, runInAction, makeObservable } from "mobx";
 import { debounce } from "lodash";
 
 import appStore from "./AppStore";
@@ -35,63 +35,81 @@ const normalizeInstancesData = data => {
 };
 
 class BrowseStore {
-  @observable lists = [];
-  @observable isFetching = {
+  lists = [];
+  isFetching = {
     lists: false,
     instances: false
   };
-  @observable isFetched = {
+  isFetched = {
     lists: false
   };
-  @observable fetchError = {
+  fetchError = {
     lists: null,
     instances: null
   };
-  @observable selectedItem = null;
-  @observable selectedInstance = null;
+  selectedItem = null;
+  selectedInstance = null;
 
-  @observable instances = [];
-  @observable instancesFilter = "";
+  instances = [];
+  instancesFilter = "";
 
-  @observable canLoadMoreInstances = false;
-  @observable totalInstances = 0;
+  canLoadMoreInstances = false;
+  totalInstances = 0;
 
-  @observable navigationFilter = "";
+  navigationFilter = "";
 
   pageStart = 0;
   pageSize = 20;
 
-  @action
-  selectItem(item){
+  constructor() {
+    makeObservable(this, {
+      lists: observable,
+      isFetching: observable,
+      isFetched: observable,
+      fetchError: observable,
+      selectedItem: observable,
+      selectedInstance: observable,
+      instances: observable,
+      instancesFilter: observable,
+      canLoadMoreInstances: observable,
+      totalInstances: observable,
+      navigationFilter: observable,
+      selectItem: action,
+      clearInstances: action,
+      setNavigationFilterTerm: action,
+      selectInstance: action,
+      clearSelectedInstance: action,
+      setInstancesFilter: action,
+      fetchInstances: action,
+      refreshFilter: action
+    });
+  }
+
+  selectItem(item) {
     this.instancesFilter = "";
     this.selectedItem = item;
     this.fetchInstances();
   }
 
-  @action
   clearInstances() {
     this.instances.length = 0;
     this.totalInstances = 0;
     this.clearSelectedInstance();
   }
 
-  @action
   setNavigationFilterTerm(filter) {
     this.navigationFilter = filter;
   }
 
-  @action
-  selectInstance(selectedInstance){
+  selectInstance(selectedInstance) {
     this.selectedInstance = selectedInstance;
   }
 
-  @action
   clearSelectedInstance() {
     this.selectedInstance = null;
   }
 
-  @action
-  setInstancesFilter(filter){
+  setInstancesFilter(filter) {
     this.instancesFilter = filter;
     this.isFetching.instances = true;
     this.applyInstancesFilter();
@@ -101,7 +119,6 @@ class BrowseStore {
     this.fetchInstances();
   }, 750);
 
-  @action
   async fetchInstances(loadMore = false) {
     if(!this.selectedItem) {
       return;
@@ -163,11 +180,9 @@ class BrowseStore {
     }
   }
 
-  @action
   refreshFilter() {
     this.applyInstancesFilter();
   }
-
 }
 
 export default new BrowseStore();

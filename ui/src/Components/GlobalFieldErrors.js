@@ -34,30 +34,27 @@ const useStyles = createUseStyles({
   }
 });
 
-class GlobalFieldErrors extends React.Component {
-  render() {
-    const classes = useStyles();
-    const { instance } = this.props;
-    return (
-      <div className={classes.container}>
-        <h4>
-          {`The ${instance.primaryTypeLabel?instance.primaryTypeLabel:"instance"} ${instance.id} could not be rendered because it contains unexpected type of values in the below fields:`}
-        </h4>
-        <ul>
-          {Object.values(instance.fields).filter(field => field.hasError).map(field => ( // [{field.errorMessage?field.errorMessage.toString():"null"}: {JSON.stringify(field.errorInfo)}]
-            <li key={field.fullyQualifiedName}>
-              {field.label} ({field.fullyQualifiedName}) with value &quot;{JSON.stringify(field.value)}&quot;
-            </li>
-          ))}
-        </ul>
-        <div className={classes.errorReport}>
-          <Button bsStyle={"warning"} onClick={() => Sentry.showReportDialog({ title: "An unexpected error has occured.", subtitle2: "We recommend you to save all your changes and reload the application in your browser. The KG team has been notified. If you'd like to help, tell us what happened below.", labelEmail: "Email(optional)", labelName: "Name(optional)", user: { email: "error@kgeditor.com", name: "Error Reporter" }, labelComments: "Please fill in a description of your error use case" })}>
-            <FontAwesomeIcon icon={"envelope"} /> &nbsp; Send an error report
-          </Button>
-        </div>
-      </div >
-    );
-  }
-}
+const GlobalFieldErrors = ({ instance }) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container}>
+      <h4>
+        {`The ${instance.primaryTypeLabel?instance.primaryTypeLabel:"instance"} ${instance.id} could not be rendered because it contains unexpected type of values in the below fields:`}
+      </h4>
+      <ul>
+        {Object.values(instance.fields).filter(field => field.hasError).map(field => ( // [{field.errorMessage?field.errorMessage.toString():"null"}: {JSON.stringify(field.errorInfo)}]
+          <li key={field.fullyQualifiedName}>
+            {field.label} ({field.fullyQualifiedName}) with value &quot;{JSON.stringify(field.value)}&quot;
+          </li>
+        ))}
+      </ul>
+      <div className={classes.errorReport}>
+        <Button bsStyle={"warning"} onClick={() => Sentry.showReportDialog({ title: "An unexpected error has occured.", subtitle2: "We recommend you to save all your changes and reload the application in your browser. The KG team has been notified. If you'd like to help, tell us what happened below.", labelEmail: "Email(optional)", labelName: "Name(optional)", user: { email: "error@kgeditor.com", name: "Error Reporter" }, labelComments: "Please fill in a description of your error use case" })}>
+          <FontAwesomeIcon icon={"envelope"} /> &nbsp; Send an error report
+        </Button>
+      </div>
+    </div >
+  );
+};
 
 export default GlobalFieldErrors;

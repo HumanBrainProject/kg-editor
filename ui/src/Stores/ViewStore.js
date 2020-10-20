@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import {observable, action, computed} from "mobx";
+import { observable, action, computed, makeObservable } from "mobx";
 import {remove} from "lodash";
 import appStore from "./AppStore";
 
@@ -39,16 +39,37 @@ const getStoredViews = () => {
 
 
 class View {
-  @observable instanceId = null;
-  @observable name = "";
-  @observable mode = "edit";
-  @observable color = "";
-  @observable instancePath = [];
-  @observable instanceHighlight = {instanceId: null, provenance: null};
-  @observable selectedPane;
-  @observable panes = [];
+  instanceId = null;
+  name = "";
+  mode = "edit";
+  color = "";
+  instancePath = [];
+  instanceHighlight = {instanceId: null, provenance: null};
+  selectedPane = null;
+  panes = [];
 
   constructor(instanceId, name, color, mode) {
+    makeObservable(this, {
+      instanceId: observable,
+      name: observable,
+      mode: observable,
+      color: observable,
+      instancePath: observable,
+      instanceHighlight: observable,
+      selectedPane: observable,
+      panes: observable,
+      currentInstanceId: computed,
+      currentInstanceIdPane: computed,
+      setCurrentInstanceId: action,
+      setInstanceHighlight: action,
+      resetInstanceHighlight: action,
+      setNameAndColor: action,
+      selectedPaneIndex: computed,
+      registerPane: action,
+      selectPane: action,
+      unregisterPane: action
+    });
+
     this.instanceId = instanceId;
     this.name = name;
     this.color = color;
@@ -56,40 +77,33 @@ class View {
     this.instancePath = [instanceId];
   }
 
-  @computed
   get currentInstanceId() {
     return this.instancePath[this.instancePath.length-1];
   }
 
-  @computed
   get currentInstanceIdPane() {
     return this.panes[this.instancePath.length];
   }
 
-  @action
-  setCurrentInstanceId(pane, instanceId){
+  setCurrentInstanceId(pane, instanceId) {
     const start = this.panes.findIndex(p => p === pane);
     this.instancePath.splice(start, this.instancePath.length-start, instanceId);
   }
 
-  @action
   setInstanceHighlight(instanceId, provenance) {
     this.instanceHighlight.instanceId = instanceId;
     this.instanceHighlight.provenance = provenance;
   }
 
-  @action
   resetInstanceHighlight() {
     this.setInstanceHighlight(null, null);
   }
 
-  @action
   setNameAndColor(name, color) {
     this.name = name;
     this.color = color;
   }
 
-  @computed
   get selectedPaneIndex() {
     const index = this.getPaneIndex(this.selectedPane);
     return index;
@@ -103,7 +117,6 @@ class View {
     return this.panes.find(p => p.paneId === paneId);
   }
 
-  @action
   registerPane(paneId) {
     this.panes.push(paneId);
     if(!this.selectedPane){
@@ -111,20 +124,32 @@ class View {
     }
   }
 
-  @action
   selectPane(pane) {
     this.selectedPane = pane;
   }
 
-  @action
   unregisterPane(paneId) {
     remove(this.panes, p => p === paneId);
   }
 }
 
 class ViewStore{
-  @observable views = new Map();
-  @observable selectedView = null;
+  views = new Map();
+  selectedView = null;
+
+  constructor() {
+    makeObservable(this, {
+      views: observable,
+      selectedView: observable,
+      selectViewByInstanceId: action,
+      unregisterViewByInstanceId: action,
+      unregisterAllViews: action,
+      clearViews: action,
+      registerViewByInstanceId: action,
+      replaceViewByNewInstanceId: action,
+      instancesIds: computed
+    });
+  }
 
   syncStoredViews(){
     if (appStore.currentWorkspace) {
@@ -149,13 +174,11 @@ class ViewStore{
     }
   }
 
-  @action
   selectViewByInstanceId(instanceId) {
     this.selectedView = this.views.get(instanceId);
   }
 
-  @action
-  unregisterViewByInstanceId(instanceId){
+  unregisterViewByInstanceId(instanceId) {
     if (this.selectedView && this.selectedView.instanceId === instanceId) {
       this.selectedView = null;
     }
@@ -163,19 +186,16 @@ class ViewStore{
     this.syncStoredViews();
   }
 
-  @action
-  unregisterAllViews(){
+  unregisterAllViews() {
     this.clearViews();
     this.syncStoredViews();
   }
 
-  @action
   clearViews() {
     this.selectedView = null;
     this.views.clear();
   }
 
-  @action
   registerViewByInstanceId(instanceId, name, type, viewMode) {
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
@@ -184,14 +204,12 @@ class ViewStore{
     }
   }
 
-  @action
   replaceViewByNewInstanceId(id, newId) {
     const view = this.views.get(id);
     this.views.set(newId, new View(newId, view?view.name:"", "edit"));
     this.views.delete(id);
   }
 
-  @computed
   get instancesIds() {
     return Array.from(this.views.keys());
   }

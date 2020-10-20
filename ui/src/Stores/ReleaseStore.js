@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, computed } from "mobx";
+import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import {uniq} from "lodash";
 
 import API from "../Services/API";
@@ -55,33 +55,75 @@ const populateStatuses = (node, prefix = "") => {
 
 
 class ReleaseStore{
-  @observable topInstanceId = null;
-  @observable instancesTree = null;
-  @observable isFetching = false;
-  @observable isFetched = false;
-  @observable isSaving = false;
-  @observable savingTotal = 0;
-  @observable savingProgress = 0;
-  @observable savingErrors = [];
-  @observable savingLastEndedNode = null;
-  @observable savingLastEndedRequest = "";
-  @observable hasWarning = false;
-  @observable fetchError = null;
-  @observable saveError = null;
-  @observable warningMessages = new Map();
-  @observable fetchWarningMessagesError = null;
-  @observable isWarningMessagesFetched = false;
-  @observable isFetchingWarningMessages = false;
-  @observable isStopped = false;
-  @observable hideReleasedInstances = false;
-  @observable comparededInstance = null;
+  topInstanceId = null;
+  instancesTree = null;
+  isFetching = false;
+  isFetched = false;
+  isSaving = false;
+  savingTotal = 0;
+  savingProgress = 0;
+  savingErrors = [];
+  savingLastEndedNode = null;
+  savingLastEndedRequest = "";
+  hasWarning = false;
+  fetchError = null;
+  saveError = null;
+  warningMessages = new Map();
+  fetchWarningMessagesError = null;
+  isWarningMessagesFetched = false;
+  isFetchingWarningMessages = false;
+  isStopped = false;
+  hideReleasedInstances = false;
+  comparededInstance = null;
 
-  @action
-  setComparedInstance(instance){
+  constructor() {
+    makeObservable(this, {
+      topInstanceId: observable,
+      instancesTree: observable,
+      isFetching: observable,
+      isFetched: observable,
+      isSaving: observable,
+      savingTotal: observable,
+      savingProgress: observable,
+      savingErrors: observable,
+      savingLastEndedNode: observable,
+      savingLastEndedRequest: observable,
+      hasWarning: observable,
+      fetchError: observable,
+      saveError: observable,
+      warningMessages: observable,
+      fetchWarningMessagesError: observable,
+      isWarningMessagesFetched: observable,
+      isFetchingWarningMessages: observable,
+      isStopped: observable,
+      hideReleasedInstances: observable,
+      comparededInstance: observable,
+      setComparedInstance: action,
+      visibleWarningMessages: computed,
+      treeStats: computed,
+      instanceList: computed,
+      toggleHideReleasedInstances: action,
+      stopRelease: action,
+      setTopInstanceId: action,
+      fetchReleaseData: action,
+      fetchWarningMessages: action,
+      commitStatusChanges: action,
+      releaseNode: action,
+      unreleaseNode: action,
+      afterSave: action,
+      dismissSaveError: action,
+      markNodeForChange: action,
+      markAllNodeForChange: action,
+      recursiveMarkNodeForChange: action,
+      clearWarningMessages: action,
+      handleWarning: action
+    });
+  }
+
+  setComparedInstance(instance) {
     this.comparededInstance = instance;
   }
 
-  @computed
   get visibleWarningMessages() {
     let results = [];
     this.warningMessages.forEach(message =>{
@@ -100,8 +142,7 @@ class ReleaseStore{
     return results;
   }
 
-  @computed
-  get treeStats(){
+  get treeStats() {
     if (!this.isFetched) {
       return null;
     }
@@ -149,7 +190,6 @@ class ReleaseStore{
     return count;
   }
 
-  @computed
   get instanceList() {
 
     const processChildrenInstanceList = (node, result, level, hideReleasedInstances)  => {
@@ -191,23 +231,19 @@ class ReleaseStore{
     return nodesByStatus;
   }
 
-  @action
   toggleHideReleasedInstances(hideReleasedInstances) {
     this.hideReleasedInstances = hideReleasedInstances === undefined?!this.hideReleasedInstances:!!hideReleasedInstances;
   }
 
-  @action
   stopRelease() {
     this.isStopped = true;
   }
 
-  @action
   setTopInstanceId(instanceId) {
     this.topInstanceId = instanceId;
   }
 
-  @action
-  async fetchReleaseData(){
+  async fetchReleaseData() {
     this.isFetched = false;
     this.isFetching = true;
     this.fetchError = null;
@@ -234,7 +270,6 @@ class ReleaseStore{
   }
 
 
-  @action
   async fetchWarningMessages() {
     if(this.isFetchingWarningMessages || this.isWarningMessagesFetched) {
       return;
@@ -274,8 +309,7 @@ class ReleaseStore{
     }
   }
 
-  @action
-  async commitStatusChanges(){
+  async commitStatusChanges() {
     let nodesToProceed = this.getNodesToProceed();
     this.savingProgress = 0;
     this.savingTotal = nodesToProceed["UNRELEASED"].length + nodesToProceed["RELEASED"].length;
@@ -300,7 +334,6 @@ class ReleaseStore{
     this.afterSave();
   }
 
-  @action
   async releaseNode(node) {
     try {
       await API.axios.put(API.endpoints.release(node.id, {}));
@@ -323,7 +356,6 @@ class ReleaseStore{
     }
   }
 
-  @action
   async unreleaseNode(node) {
     try {
       await API.axios.delete(API.endpoints.release(node.id, {}));
@@ -346,8 +378,7 @@ class ReleaseStore{
     }
   }
 
-  @action
-  afterSave(){
+  afterSave() {
     if((this.savingErrors.length === 0 && this.savingProgress === this.savingTotal) || this.isStopped){
       setTimeout(()=>{
         runInAction(()=>{
@@ -364,8 +395,7 @@ class ReleaseStore{
     }
   }
 
-  @action
-  dismissSaveError(){
+  dismissSaveError() {
     this.isSaving = false;
     statusStore.flush();
     this.savingErrors = [];
@@ -374,20 +404,17 @@ class ReleaseStore{
     this.fetchReleaseData();
   }
 
-  @action
-  markNodeForChange(node, newStatus){
+  markNodeForChange(node, newStatus) {
     node.pending_status = newStatus;
     populateStatuses(this.instancesTree, "pending_");
   }
 
-  @action
-  markAllNodeForChange(node, newStatus){
+  markAllNodeForChange(node, newStatus) {
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
     populateStatuses(this.instancesTree, "pending_");
   }
 
-  @action
-  recursiveMarkNodeForChange(node, newStatus){
+  recursiveMarkNodeForChange(node, newStatus) {
     if(node.permissions.canRelease) {
       node.pending_status = newStatus? newStatus: node.status;
       this.handleWarning(node, node.pending_status);
@@ -397,13 +424,11 @@ class ReleaseStore{
     }
   }
 
-  @action
   clearWarningMessages() {
     this.warningMessages.forEach(message => message.releaseFlags.clear());
   }
 
   //TODO: Check if this logic is still valid
-  @action
   handleWarning(node, newStatus) {
     if(this.warningMessages.has(node.typePath)) {
       const messages = this.warningMessages.get(node.typePath);

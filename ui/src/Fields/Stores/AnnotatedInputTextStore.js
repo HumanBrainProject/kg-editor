@@ -14,19 +14,42 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 import { remove } from "lodash";
 
 class AnnotatedInputTextStore extends FieldStore {
-  @observable value = [];
-  @observable options = [];
-  @observable alternatives = [];
-  @observable returnAsNull = false;
-  @observable initialValue = [];
+  value = [];
+  options = [];
+  returnAsNull = false;
+  initialValue = [];
   mappingValue = "@id";
 
-  @computed
+  constructor(definition, options, instance) {
+    super(definition, options, instance);
+
+    makeObservable(this, {
+      value: observable,
+      options: observable,
+      returnAsNull: observable,
+      initialValue: observable,
+      cloneWithInitialValue: computed,
+      returnValue: computed,
+      updateValue: action,
+      reset: action,
+      hasChanged: computed,
+      insertValue: action,
+      deleteValue: action,
+      addValue: action,
+      setValues: action,
+      moveValueAfter: action,
+      removeValue: action,
+      removeAllValues: action,
+      removeLastValue: action,
+      resources: computed
+    });
+  }
+
   get cloneWithInitialValue() {
     return {
       ...this.definition,
@@ -34,7 +57,6 @@ class AnnotatedInputTextStore extends FieldStore {
     };
   }
 
-  @computed
   get returnValue() {
     if (!this.value.length && this.returnAsNull) {
       return null;
@@ -42,7 +64,6 @@ class AnnotatedInputTextStore extends FieldStore {
     return toJS(this.value);
   }
 
-  @action
   updateValue(value) {
     this.returnAsNull = false;
     const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
@@ -50,18 +71,15 @@ class AnnotatedInputTextStore extends FieldStore {
     this.value = values;
   }
 
-  @action
   reset() {
     this.returnAsNull = false;
     this.value = [...this.initialValue];
   }
 
-  @computed
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
   }
 
-  @action
   insertValue(value, index) {
     if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
@@ -72,19 +90,16 @@ class AnnotatedInputTextStore extends FieldStore {
     }
   }
 
-  @action
   deleteValue(value) {
     if(this.value.length !== undefined){
       remove(this.value, val=>val === value);
     }
   }
 
-  @action
   addValue(value) {
     this.insertValue(value);
   }
 
-  @action
   setValues(values) {
     if (values !== null && values !== undefined) {
       if (values.length  || !this.returnAsNull) {
@@ -97,7 +112,6 @@ class AnnotatedInputTextStore extends FieldStore {
     }
   }
 
-  @action
   moveValueAfter(value, afterValue) {
     if(value) {
       this.deleteValue(value);
@@ -105,24 +119,20 @@ class AnnotatedInputTextStore extends FieldStore {
     }
   }
 
-  @action
   removeValue(value) {
     this.deleteValue(value);
   }
 
-  @action
   removeAllValues() {
     this.setValues(null);
   }
 
-  @action
   removeLastValue() {
     if (this.value.length) {
       this.deleteValue(this.value[this.value.length-1]);
     }
   }
 
-  @computed
   get resources() { // be aware that it may contains null values and null value are needed!
     return this.value.map(value => (value && value[this.mappingValue])?value[this.mappingValue]:"Unknown ressource");
   }

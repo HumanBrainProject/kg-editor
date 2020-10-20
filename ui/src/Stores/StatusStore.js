@@ -14,19 +14,33 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction } from "mobx";
+import { observable, action, runInAction, makeObservable } from "mobx";
 import { debounce } from "lodash";
 import API from "../Services/API";
 import appStore from "./AppStore";
 
 class StatusStore {
-  @observable statuses = new Map();
-  @observable isFetching = false;
-  @observable isFetchingChildren = false;
+  statuses = new Map();
+  isFetching = false;
+  isFetchingChildren = false;
 
   processSize = 20;
   fetchQueue = [];
   fetchQueueChildren = [];
+
+  constructor() {
+    makeObservable(this, {
+      statuses: observable,
+      isFetching: observable,
+      isFetchingChildren: observable,
+      flush: action,
+      fetchStatus: action,
+      smartProcessQueue: action,
+      smartProcessQueueChildren: action,
+      processQueue: action,
+      processQueueChildren: action
+    });
+  }
 
   getInstance(id) {
     return this.statuses.get(id);
@@ -35,12 +49,10 @@ class StatusStore {
   _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
   _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
 
-  @action
   flush() {
     this.statuses.clear();
   }
 
-  @action
   fetchStatus(instanceIds) {
     if (!Array.isArray(instanceIds)) {
       instanceIds = [instanceIds];
@@ -68,7 +80,6 @@ class StatusStore {
   }
 
 
-  @action
   smartProcessQueue() {
     if (this.fetchQueue.length <= 0) {
       this._debouncedProcessQueue.cancel();
@@ -80,7 +91,6 @@ class StatusStore {
     }
   }
 
-  @action
   smartProcessQueueChildren() {
     if (this.fetchQueueChildren.length <= 0) {
       this._debouncedProcessQueueChildren.cancel();
@@ -92,7 +102,6 @@ class StatusStore {
     }
   }
 
-  @action
   async processQueue() {
     if (this.isFetching) {
       return;
@@ -134,7 +143,6 @@ class StatusStore {
 
   }
 
-  @action
   async processQueueChildren() {
     if (this.isFetchingChildren) {
       return;

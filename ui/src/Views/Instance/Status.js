@@ -59,13 +59,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const Status = observer(({ id }) => {
+const Status = observer(({ id, darkmode }) => {
 
   const classes = useStyles();
 
   useEffect(() => statusStore.fetchStatus(id), []);
 
-  const instanceStatus = statusStore.getInstance(this.props.id);
+  const instanceStatus = statusStore.getInstance(id);
 
   if(!instanceStatus) {
     return null;
@@ -82,7 +82,7 @@ const Status = observer(({ id }) => {
             <FontAwesomeIcon icon={"circle-notch"} spin />
           </div>
           :
-          <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data} isChildren={false} />
+          <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.data} isChildren={false} />
       }
       {instanceStatus.hasFetchErrorChildren ?
         <div className={classes.loader}>
@@ -93,7 +93,7 @@ const Status = observer(({ id }) => {
             <FontAwesomeIcon icon={"circle-notch"} spin />
           </div>
           :
-          <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.childrenData ? instanceStatus.childrenData : null} highContrastChildren={true} isChildren={true} />)
+          <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.childrenData ? instanceStatus.childrenData : null} highContrastChildren={true} isChildren={true} />)
       }
     </div>
   );

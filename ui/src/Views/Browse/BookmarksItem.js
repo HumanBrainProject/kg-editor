@@ -178,8 +178,7 @@ const useStyles = createUseStyles({
   }
 });
 
-@observer
-class BookmarksItem extends React.Component {
+const BookmarksItem = observer(class BookmarksItem extends React.Component {
   constructor(props) {
     super(props);
     this.editBookmarkNameRef = React.createRef();
@@ -343,6 +342,6 @@ class BookmarksItem extends React.Component {
     );
 
   }
-}
+});
 
 export default BookmarksItem;

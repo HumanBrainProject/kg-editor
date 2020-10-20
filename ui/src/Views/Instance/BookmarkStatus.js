@@ -54,8 +54,7 @@ const useStyles = createUseStyles({
   }
 });
 
-@observer
-class BookmarkStatus extends React.Component{
+const BookmarkStatus = observer(class BookmarkStatus extends React.Component {
   componentDidMount() {
     bookmarkStatusStore.fetchStatus(this.props.id);
   }
@@ -156,6 +155,6 @@ class BookmarkStatus extends React.Component{
       </div>
     );
   }
-}
+});
 
 export default BookmarkStatus;

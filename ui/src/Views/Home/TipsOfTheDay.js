@@ -76,6 +76,8 @@ const useStyles = createUseStyles({
 
 const TipsOfTheDay = observer(() => {
 
+  const classes = useStyles();
+
   const tips = [
     <span key="1">to create a new bookmark list click on the <FontAwesomeIcon icon="star" className={classes.bookmarkIcon} /> button of an instance and type the name of the new desired bookmark list.</span>,
     <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
@@ -89,8 +91,6 @@ const TipsOfTheDay = observer(() => {
     <span key="10">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
   ];
 
-  const classes = useStyles();
-
   const [currentIndex, seCurrentIndex] = useState(Math.floor(Math.random() * 10) % tips.length);
 
 
@@ -98,7 +98,7 @@ const TipsOfTheDay = observer(() => {
     seCurrentIndex((currentIndex + 1 === tips.length)?0:(currentIndex + 1));
   };
 
-  if (!this.tips.length) {
+  if (!tips.length) {
     return null;
   }
 

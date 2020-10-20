@@ -109,7 +109,7 @@ const Browse = observer(() => {
         show={!!browseStore.bookmarkListCreationError}
         keyboard={true}
         autoFocus={true}
-        onHide={this.handleDismissBookmarkCreationError}
+        onHide={handleDismissBookmarkCreationError}
         backdrop={false}
       >
         <Modal.Header

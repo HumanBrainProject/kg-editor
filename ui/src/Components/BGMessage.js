@@ -40,7 +40,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const BGMessage = ({ icon, transform }) => {
+const BGMessage = ({ icon, transform, children }) => {
   const classes = useStyles();
   return(
     <div className={classes.container}>
@@ -48,7 +48,7 @@ const BGMessage = ({ icon, transform }) => {
         <FontAwesomeIcon icon={icon} transform={transform}/>
       </div>
       <div className={classes.text}>
-        {this.props.children}
+        {children}
       </div>
     </div>
   );

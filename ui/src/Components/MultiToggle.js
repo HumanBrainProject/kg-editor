@@ -28,31 +28,25 @@ const useStyles = createUseStyles({
   }
 });
 
-class MultiToggle extends React.Component{
+const MultiToggle = ({ selectedValue, children , onChange}) => {
 
-  constructor(props){
-    super(props);
-  }
 
-  handleSelect(value){
-    if(isFunction(this.props.onChange)){
-      this.props.onChange(value);
+  const handleSelect = value => {
+    if(isFunction(onChange)){
+      onChange(value);
     }
-  }
+  };
 
-  render(){
-    const classes = useStyles();
-    const { children } = this.props;
+  const classes = useStyles();
 
-    let childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: this.props.selectedValue, onSelect: this.handleSelect.bind(this) }));
+  const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: selectedValue, onSelect: handleSelect }));
 
-    return(
-      <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps.length}, 24px)`}}>
-        {childrenWithProps}
-      </div>
-    );
-  }
-}
+  return(
+    <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps.length}, 24px)`}}>
+      {childrenWithProps}
+    </div>
+  );
+};
 
 const useToggleStyles = createUseStyles({
   container:{
@@ -79,23 +73,20 @@ const useToggleStyles = createUseStyles({
   }
 });
 
-class Toggle extends React.PureComponent{
-  handleClick = () => {
-    if(isFunction(this.props.onSelect)){
-      this.props.onSelect(this.props.value);
+const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
+  const handleClick = () => {
+    if(isFunction(onSelect)){
+      onSelect(value);
     }
-  }
+  };
 
-  render(){
-    const classes = useToggleStyles();
-    const {selectedValue, value, noscale} = this.props;
-    return(
-      <div onClick={this.handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:this.props.color}}>
-        <FontAwesomeIcon icon={this.props.icon || "dot-circle"}/>
-      </div>
-    );
-  }
-}
+  const classes = useToggleStyles();
+  return(
+    <div onClick={handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:color}}>
+      <FontAwesomeIcon icon={icon || "dot-circle"}/>
+    </div>
+  );
+};
 
 MultiToggle.Toggle = Toggle;
 

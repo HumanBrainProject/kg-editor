@@ -14,28 +14,36 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, computed } from "mobx";
+import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import API from "../Services/API";
 import appStore from "./AppStore";
 
 class FeaturesStore{
+  releases = [];
+  isFetched = false;
+  isFetching = false;
+  fetchError = null;
 
-  @observable releases = [];
-  @observable isFetched = false;
-  @observable isFetching = false;
-  @observable fetchError = null;
+  constructor() {
+    makeObservable(this, {
+      releases: observable,
+      isFetched: observable,
+      isFetching: observable,
+      fetchError: observable,
+      latestReleases: computed,
+      olderReleases: computed,
+      fetchFeatures: action
+    });
+  }
 
-  @computed
   get latestReleases() {
     return this.releases.slice(0, 3);
   }
 
-  @computed
   get olderReleases() {
     return this.releases.slice(3);
   }
 
-  @action
   async fetchFeatures() {
     try {
       this.isFetching = true;

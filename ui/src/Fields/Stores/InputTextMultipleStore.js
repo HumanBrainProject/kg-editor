@@ -14,18 +14,40 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 import { remove } from "lodash";
 
 class InputTextMultipleStore extends FieldStore {
-  @observable value = [];
-  @observable options = [];
-  @observable alternatives = [];
-  @observable returnAsNull = false;
-  @observable initialValue = [];
+  value = [];
+  options = [];
+  returnAsNull = false;
+  initialValue = [];
 
-  @computed
+  constructor(definition, options, instance) {
+    super(definition, options, instance);
+
+    makeObservable(this, {
+      value: observable,
+      options: observable,
+      returnAsNull: observable,
+      initialValue: observable,
+      cloneWithInitialValue: computed,
+      returnValue: computed,
+      updateValue: action,
+      reset: action,
+      hasChanged: computed,
+      insertValue: action,
+      deleteValue: action,
+      addValue: action,
+      setValues: action,
+      moveValueAfter: action,
+      removeValue: action,
+      removeAllValues: action,
+      removeLastValue: action
+    });
+  }
+
   get cloneWithInitialValue() {
     return {
       ...this.definition,
@@ -33,7 +55,6 @@ class InputTextMultipleStore extends FieldStore {
     };
   }
 
-  @computed
   get returnValue() {
     if (!this.value.length && this.returnAsNull) {
       return null;
@@ -41,7 +62,6 @@ class InputTextMultipleStore extends FieldStore {
     return toJS(this.value);
   }
 
-  @action
   updateValue(value) {
     this.returnAsNull = false;
     const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
@@ -49,18 +69,15 @@ class InputTextMultipleStore extends FieldStore {
     this.value = values;
   }
 
-  @action
   reset() {
     this.returnAsNull = false;
     this.value = [...this.initialValue];
   }
 
-  @computed
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
   }
 
-  @action
   insertValue(value, index) {
     if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
@@ -71,19 +88,16 @@ class InputTextMultipleStore extends FieldStore {
     }
   }
 
-  @action
   deleteValue(value) {
     if(this.value.length !== undefined){
       remove(this.value, val=>val === value);
     }
   }
 
-  @action
   addValue(value) {
     this.insertValue(value);
   }
 
-  @action
   setValues(values) {
     if (values !== null && values !== undefined) {
       if (values.length  || !this.returnAsNull) {
@@ -96,7 +110,6 @@ class InputTextMultipleStore extends FieldStore {
     }
   }
 
-  @action
   moveValueAfter(value, afterValue) {
     if(value) {
       this.deleteValue(value);
@@ -104,17 +117,14 @@ class InputTextMultipleStore extends FieldStore {
     }
   }
 
-  @action
   removeValue(value) {
     this.deleteValue(value);
   }
 
-  @action
   removeAllValues() {
     this.setValues(null);
   }
 
-  @action
   removeLastValue() {
     if (this.value.length) {
       this.deleteValue(this.value[this.value.length-1]);

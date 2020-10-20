@@ -62,7 +62,7 @@ const Instance = observer(({ match, mode }) => {
   useEffect(() => {
     const id = match.params.id;
     const instance = instancesStore.instances.get(id);
-    appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, this.props.mode);
+    appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, mode);
     instancesStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);
     if (instance && instance.isFetched) {

@@ -201,13 +201,13 @@ class App extends React.Component {
                 authStore.hasWorkspaces?
                   appStore.currentWorkspace?
                     <Switch>
-                      <Route path="/instances/:id*/create" render={(props) => (<Instance {...props} mode="create" />)} />
-                      <Route path="/instances/:id*/view" render={(props) => (<Instance {...props} mode="view" />)} />
-                      <Route path="/instances/:id*/edit" render={(props) => (<Instance {...props} mode="edit" />)} />
-                      <Route path="/instances/:id*/invite" render={(props) => (<Instance {...props} mode="invite" />)} />
-                      <Route path="/instances/:id*/graph" render={(props) => (<Instance {...props} mode="graph" />)} />
-                      <Route path="/instances/:id*/release" render={(props) => (<Instance {...props} mode="release" />)} />
-                      <Route path="/instances/:id*/manage" render={(props) => (<Instance {...props} mode="manage" />)} />
+                      <Route path="/instances/:id" exact={true} render={(props) => (<Instance {...props} mode="view" />)} />
+                      <Route path="/instances/:id/create" exact={true} render={(props) => (<Instance {...props} mode="create" />)} />
+                      <Route path="/instances/:id/edit" exact={true} render={(props) => (<Instance {...props} mode="edit" />)} />
+                      <Route path="/instances/:id/invite" exact={true} render={(props) => (<Instance {...props} mode="invite" />)} />
+                      <Route path="/instances/:id/graph" exact={true} render={(props) => (<Instance {...props} mode="graph" />)} />
+                      <Route path="/instances/:id/release" exact={true} render={(props) => (<Instance {...props} mode="release" />)} />
+                      <Route path="/instances/:id/manage" exact={true} render={(props) => (<Instance {...props} mode="manage" />)} />
 
                       <Route path="/browse" exact={true} component={Browse} />
                       <Route path="/help" component={Help} />

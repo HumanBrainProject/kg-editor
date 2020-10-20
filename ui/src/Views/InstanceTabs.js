@@ -34,7 +34,6 @@ const styles = {
 };
 @observer
 class InstanceTab extends React.Component {
-
   componentDidMount() {
     this.syncInstanceLabel();
   }
@@ -54,10 +53,17 @@ class InstanceTab extends React.Component {
     }
   }
 
+  isCurrent = (instanceId, mode) => {
+    if(mode !== "view") {
+      return matchPath(this.props.pathname, { path: `/instances/${instanceId}/${mode}`, exact: "true" });
+    }
+    return matchPath(this.props.pathname, { path: `/instances/${instanceId}`, exact: "true" });
+  }
+
   handleClose = () => appStore.closeInstance(this.props.view.instanceId);
 
   render() {
-    const { view, pathname } = this.props;
+    const { view } = this.props;
 
     const instance = instancesStore.instances.get(view.instanceId);
     const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
@@ -67,8 +73,8 @@ class InstanceTab extends React.Component {
         icon={instance && instance.isFetching ? "circle-notch" : "circle"}
         iconSpin={instance && instance.isFetching}
         iconColor={color}
-        current={matchPath(pathname, { path: `/instances/${view.instanceId}/${view.mode}`, exact: "true" })}
-        path={`/instances/${view.instanceId}/${view.mode}`}
+        current={this.isCurrent(view.instanceId, view.mode)}
+        path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
         onClose={this.handleClose}
         label={label}
       />

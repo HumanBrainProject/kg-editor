@@ -21,6 +21,7 @@ import API from "../Services/API";
 import appStore from "./AppStore";
 import routerStore from "./RouterStore";
 import InstanceStore from "./InstanceStore";
+import viewStore from "./ViewStore";
 
 class Instance extends InstanceStore {
 
@@ -189,6 +190,11 @@ class InstancesStore {
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
         instance.initializeData(data && data.data);
+        const view = viewStore.views.get(resolvedId);
+        if(view) {
+          view.setNameAndColor(instance.name, instance.primaryType.color);
+          viewStore.syncStoredViews();
+        }
         if (mode === "create") {
           routerStore.history.replace(`/instances/${resolvedId}/edit`);
         }

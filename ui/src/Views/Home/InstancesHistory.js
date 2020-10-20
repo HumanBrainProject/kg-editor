@@ -164,11 +164,8 @@ class InstancesHistory extends React.Component{
   }
 
   handleInstanceClick = instance => {
-    let id = instance && instance.id;
-    if (id) {
-      id = id.split("/").slice(-1); //todo retrieve id from url
-      routerStore.history.push(`/instances/${id}/view`);
-    }
+    const id = instance && instance.id;
+    routerStore.history.push(`/instances/${id}`);
   }
 
   handleInstanceCtrlClick = instance => {
@@ -185,7 +182,11 @@ class InstancesHistory extends React.Component{
         const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
-      routerStore.history.push(`/instances/${id}/${mode}`);
+      if(mode === "view") {
+        routerStore.history.push(`/instances/${id}`);
+      } else {
+        routerStore.history.push(`/instances/${id}/${mode}`);
+      }
     }
   }
 

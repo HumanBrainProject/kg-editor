@@ -122,7 +122,11 @@ class Instances extends React.Component{
         const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
-      routerStore.history.push(`/instances/${id}/${mode}`);
+      if(mode === "view") {
+        routerStore.history.push(`/instances/${id}`);
+      } else {
+        routerStore.history.push(`/instances/${id}/${mode}`);
+      }
     }
   }
 

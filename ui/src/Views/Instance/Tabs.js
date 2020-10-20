@@ -91,7 +91,13 @@ class Tab extends React.PureComponent {
 @observer
 class Tabs extends React.Component {
 
-  handleClick = mode => routerStore.history.push(`/instances/${this.props.instance.id}/${mode}`);
+  handleClick = mode => {
+    if(mode === "view") {
+      routerStore.history.push(`/instances/${this.props.instance.id}`);
+    } else {
+      routerStore.history.push(`/instances/${this.props.instance.id}/${mode}`);
+    }
+  };
 
   render() {
     const {classes, instance, mode} = this.props;

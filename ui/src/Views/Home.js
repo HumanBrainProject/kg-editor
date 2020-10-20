@@ -60,7 +60,7 @@ const useStyles = createUseStyles({
   panel: {
     display: "grid",
     width: "100%",
-    padding: "10px",
+    padding: "15px",
     gridGap: "10px",
     gridTemplateColumns: "calc(80% - 10px) 20%",
     gridTemplateRows: "auto auto",
@@ -105,6 +105,7 @@ const useStyles = createUseStyles({
   features: {
     gridArea: "features",
     position: "relative",
+    marginTop: "61px",
     "& .widget-list": {
       "& > * + *": {
         margin: "10px 0 0 0"

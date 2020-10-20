@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import Menu from "./Menu";
 
@@ -17,17 +17,19 @@ const useStyles = createUseStyles({
   }
 });
 
-class Dropdown extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentType: null,
-      currentOption: null
-    };
-  }
+const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onAddValue, onAddNewValue, onDeleteLastValue, onLoadMore, onDrop, onPreview }) => {
 
-  handleInputKeyStrokes = e => {
-    const { options, types, onDeleteLastValue} = this.props;
+  const classes = useStyles();
+
+  const [current, setCurrent] = useState({ type: null, option: null});
+
+  useEffect(() => {
+    return () => {
+      unlistenClickOutHandler();
+    };
+  }, []);
+
+  const handleInputKeyStrokes = e => {
     if(e.keyCode === 8 && !e.target.value){
       e.preventDefault();
       onDeleteLastValue && onDeleteLastValue();
@@ -35,204 +37,185 @@ class Dropdown extends React.Component {
       e.preventDefault();
       if(types.length){
         const type = types[0];
-        this.setState({currentType: type.name, currentOption: null});
+        setCurrent({type: type.name, option: null});
       } else if(options.length){
         const value = options[0];
-        this.setState({currentType: null, currentOption: value.id});
+        setCurrent({type: null, option: value.id});
       } else if(types.length) {
         const type = types[types.length-1];
-        this.setState({currentType: type.name, currentOption: null});
+        setCurrent({type: type.name, option: null});
       } else {
-        this.setState({currentType: null, currentOption: null});
+        setCurrent({type: null, option: null});
       }
     } else if(e.keyCode === 38){
       e.preventDefault();
       if(options.length){
         const value = options[options.length - 1];
-        this.setState({currentType: null, currentOption: value.id});
+        setCurrent({type: null, option: value.id});
       } else if(types.length){
         const type = types[options.length-1];
-        this.setState({currentType: type.name, currentOption: null});
+        setCurrent({type: type.name, option: null});
       } else if(options.length){
         const value = options[0];
-        this.setState({currentType: null, currentOption: value.id});
+        setCurrent({type: null, option: value.id});
       } else {
-        this.setState({currentType: null, currentOption: null});
+        setCurrent({type: null, option: null});
       }
     } else if(e.keyCode === 27) {
       //escape key -> we want to reset the search
-      this.handleReset();
+      handleReset();
     }
   };
 
-  handleChangeUserInput = e => {
-    const { onSearch } = this.props;
+  const handleChangeUserInput = e => {
     e.stopPropagation();
     onSearch(e.target.value);
-  }
+  };
 
-  handleOnAddNewValue = type => {
-    const { searchTerm } = this.props;
-    const { onAddNewValue } = this.props;
+  const handleOnAddNewValue = type => {
     const name = searchTerm.trim();
     if(name) {
       onAddNewValue(name, type);
-      this.setState({currentType: null, currentOption: null});
-      this.handleFocus();
+      setCurrent({type: null, option: null});
+      handleFocus();
     }
-  }
+  };
 
-  handleOnAddValue = id => {
-    const { onAddValue } = this.props;
+  const handleOnAddValue = id => {
     onAddValue(id);
-    this.setState({currentType: null, currentOption: null});
-    this.handleFocus();
-  }
+    setCurrent({type: null, option: null});
+    handleFocus();
+  };
 
-  handleOnSelectNextType = name => {
-    const { types, options } = this.props;
+  const handleOnSelectNextType = name => {
     const index = types.findIndex(o => o.name === name);
     if(index < types.length - 1){
       const type = types[index + 1] ;
-      this.setState({currentType: type.name, currentOption: null});
+      setCurrent({type: type.name, option: null});
     } else if(options.length){
       const value = options[0];
-      this.setState({currentType: null, currentOption: value.id});
+      setCurrent({type: null, option: value.id});
     } else if(types.length) {
       const type = types[0];
-      this.setState({currentType: type.name, currentOption: null});
+      setCurrent({type: type.name, option: null});
     } else {
-      this.setState({currentType: null, currentOption: null});
+      setCurrent({type: null, option: null});
     }
-  }
+  };
 
-  handleOnSelectPreviousType = name => {
-    const { types, options } = this.props;
+  const handleOnSelectPreviousType = name => {
     const index = types.findIndex(o => o.name === name);
     if(index > 0){
       const type = types[index - 1] ;
-      this.setState({currentType: type.name, currentOption: null});
+      setCurrent({type: type.name, option: null});
     } else if(options.length){
       const value = options[options.length-1];
-      this.setState({currentType: null, currentOption: value.id});
+      setCurrent({type: null, option: value.id});
     } else if(types.length) {
       const type = types[0];
-      this.setState({currentType: type.name, currentOption:null});
+      setCurrent({type: type.name, option:null});
     } else {
-      this.setState({currentType: null, currentOption: null});
+      setCurrent({type: null, option: null});
     }
-  }
+  };
 
-  handleOnSelectNextValue = id => {
-    const { types, options } = this.props;
+  const handleOnSelectNextValue = id => {
     const index = options.findIndex(o => o.id === id);
     if(index < options.length - 1){
       const value = options[index + 1] ;
-      this.setState({currentType:null, currentOption: value.id});
+      setCurrent({type:null, option: value.id});
     } else if(types.length) {
       const type = types[0];
-      this.setState({currentType: type.name, currentOption: null});
+      setCurrent({type: type.name, option: null});
     } else if(options.length) {
       const value = options[0];
-      this.setState({currentType: null, currentOption: value.id});
+      setCurrent({type: null, option: value.id});
     } else {
-      this.setState({currentType: null, currentOption: null});
+      setCurrent({type: null, option: null});
     }
-  }
+  };
 
-  handleOnSelectPreviousValue = id => {
-    const { types, options } = this.props;
+  const handleOnSelectPreviousValue = id => {
     const index = options.findIndex(o => o.id === id);
     if(index > 0){
       const value = options[index- 1] ;
-      this.setState({currentType: null, currentOption: value.id});
+      setCurrent({type: null, option: value.id});
     } else if(types.length){
       const type = types[types.length-1];
-      this.setState({currentType: type.name, currentOption: null});
+      setCurrent({type: type.name, option: null});
     } else if(options.length){
       const value = options[0];
-      this.setState({currentType: null, currentOption: value.id});
+      setCurrent({type: null, option: value.id});
     } else {
-      this.setState({currentType: null, currentOption: null});
+      setCurrent({type: null, option: null});
     }
-  }
+  };
 
-  handleReset = () => {
-    const { onReset } = this.props;
-    this.setState({currentType: null, currentOption: null});
+  const handleReset = () => {
+    setCurrent({type: null, option: null});
     onReset();
-  }
-
-  handleFocus = () => {
-    const { onSearch } = this.props;
-    onSearch("");
-    this.listenClickOutHandler();
   };
 
-  clickOutHandler = e => {
+  const handleFocus = () => {
+    onSearch("");
+    listenClickOutHandler();
+  };
+
+  const clickOutHandler = e => {
     if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
-      this.unlistenClickOutHandler();
-      this.handleReset();
+      unlistenClickOutHandler();
+      handleReset();
     }
   };
 
-  listenClickOutHandler(){
-    window.addEventListener("mouseup", this.clickOutHandler, false);
-    window.addEventListener("touchend", this.clickOutHandler, false);
-    window.addEventListener("keyup", this.clickOutHandler, false);
-  }
+  const listenClickOutHandler = () => {
+    window.addEventListener("mouseup", clickOutHandler, false);
+    window.addEventListener("touchend", clickOutHandler, false);
+    window.addEventListener("keyup", clickOutHandler, false);
+  };
 
-  unlistenClickOutHandler(){
-    window.removeEventListener("mouseup", this.clickOutHandler, false);
-    window.removeEventListener("touchend", this.clickOutHandler, false);
-    window.removeEventListener("keyup", this.clickOutHandler, false);
-  }
+  const unlistenClickOutHandler = () => {
+    window.removeEventListener("mouseup", clickOutHandler, false);
+    window.removeEventListener("touchend", clickOutHandler, false);
+    window.removeEventListener("keyup", clickOutHandler, false);
+  };
 
-  componentWillUnmount(){
-    this.unlistenClickOutHandler();
-  }
+  const showMenu = this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || searchTerm);
 
-  render() {
-    const classes = useStyles();
-    const { searchTerm, options, types, externalTypes, inputPlaceholder, loading, hasMore, onLoadMore, onDrop, onPreview } = this.props;
-
-    const showMenu = this.wrapperRef && this.wrapperRef.contains(document.activeElement) && (options.length || searchTerm);
-
-    return (
-      <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
-        <input className={`quickfire-user-input ${classes.userInput}`}
-          onDrop={e => e.preventDefault() && onDrop && onDrop()}
-          onDragOver={e => e.preventDefault()}
-          ref={ref => this.inputRef = ref}
-          type="text"
-          onKeyDown={this.handleInputKeyStrokes}
-          onChange={this.handleChangeUserInput}
-          onFocus={this.handleFocus}
-          value={searchTerm}
-          placeholder={inputPlaceholder} />
-        {showMenu && (
-          <Menu currentType={this.state.currentType}
-            currentOption={this.state.currentOption}
-            searchTerm={searchTerm}
-            values={options}
-            types={types}
-            externalTypes={externalTypes}
-            loading={loading}
-            hasMore={hasMore}
-            onLoadMore={onLoadMore}
-            onAddNewValue={this.handleOnAddNewValue}
-            onAddValue={this.handleOnAddValue}
-            onSelectNextType={this.handleOnSelectNextType}
-            onSelectPreviousType={this.handleOnSelectPreviousType}
-            onSelectNextValue={this.handleOnSelectNextValue}
-            onSelectPreviousValue={this.handleOnSelectPreviousValue}
-            onCancel={this.handleReset}
-            onPreview={onPreview}
-          />
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
+      <input className={`quickfire-user-input ${classes.userInput}`}
+        onDrop={e => e.preventDefault() && onDrop && onDrop()}
+        onDragOver={e => e.preventDefault()}
+        ref={ref => this.inputRef = ref}
+        type="text"
+        onKeyDown={handleInputKeyStrokes}
+        onChange={handleChangeUserInput}
+        onFocus={handleFocus}
+        value={searchTerm}
+        placeholder={inputPlaceholder} />
+      {showMenu && (
+        <Menu type={current.type}
+          option={current.option}
+          searchTerm={searchTerm}
+          values={options}
+          types={types}
+          externalTypes={externalTypes}
+          loading={loading}
+          hasMore={hasMore}
+          onLoadMore={onLoadMore}
+          onAddNewValue={handleOnAddNewValue}
+          onAddValue={handleOnAddValue}
+          onSelectNextType={handleOnSelectNextType}
+          onSelectPreviousType={handleOnSelectPreviousType}
+          onSelectNextValue={handleOnSelectNextValue}
+          onSelectPreviousValue={handleOnSelectPreviousValue}
+          onCancel={handleReset}
+          onPreview={onPreview}
+        />
+      )}
+    </div>
+  );
+};
 
 export default Dropdown;

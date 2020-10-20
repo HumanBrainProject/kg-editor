@@ -87,23 +87,23 @@ const useStyles = createUseStyles({
   },
 });
 
-class SavingPanel extends React.Component{
-  render(){
-    const { id, show, inline } = this.props;
-    if (!show) {
-      return null;
-    }
-    const classes = useStyles();
-    return (
-      <div className={classes.container} inline={inline?"true":"false"}>
-        <div className={classes.panel} >
-          <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
-          <span className={classes.label}>Saving instance...</span>
-          <small>ID: {id}</small>
-        </div>
-      </div>
-    );
+const SavingPanel = ({ id, show, inline }) => {
+
+  if (!show) {
+    return null;
   }
-}
+
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container} inline={inline?"true":"false"}>
+      <div className={classes.panel} >
+        <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
+        <span className={classes.label}>Saving instance...</span>
+        <small>ID: {id}</small>
+      </div>
+    </div>
+  );
+};
 
 export default SavingPanel;

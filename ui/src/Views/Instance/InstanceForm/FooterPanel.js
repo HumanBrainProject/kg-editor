@@ -79,42 +79,38 @@ const useStyles = createUseStyles({
   }
 });
 
-class FooterPanel extends React.PureComponent {
+const FooterPanel = ({ className, instance, showOpenActions }) => {
 
-  handleOpenInstance = event => {
-    const { instance } = this.props;
-    event.stopPropagation();
-    if(event.metaKey || event.ctrlKey){
+  const classes = useStyles();
+
+  const handleOpenInstance = e => {
+    e.stopPropagation();
+    if(e.metaKey || e.ctrlKey){
       appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
       routerStore.history.push(`/instance/view/${instance.id}`);
     }
-  }
+  };
 
-  render() {
-    const classes = useStyles();
-    const { className, instance, showOpenActions } = this.props;
-
-    return(
-      <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
-        <Row>
-          <Col xs={10}>
-            <div className={classes.info}>ID: {instance.id?instance.id:"<New>"}</div>
-            <div className={classes.info}>Workspace: {instance.workspace}</div>
-          </Col>
-          <Col xs={2}>
-            <div className={classes.actions}>
-              {appStore.currentWorkspace.id === instance.workspace && instance.permissions.canRead && (
-                <div className={classes.action} onClick={this.handleOpenInstance}>
-                  <FontAwesomeIcon icon="folder-open"/>
-                </div>
-              )}
-            </div>
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-}
+  return(
+    <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
+      <Row>
+        <Col xs={10}>
+          <div className={classes.info}>ID: {instance.id?instance.id:"<New>"}</div>
+          <div className={classes.info}>Workspace: {instance.workspace}</div>
+        </Col>
+        <Col xs={2}>
+          <div className={classes.actions}>
+            {appStore.currentWorkspace.id === instance.workspace && instance.permissions.canRead && (
+              <div className={classes.action} onClick={handleOpenInstance}>
+                <FontAwesomeIcon icon="folder-open"/>
+              </div>
+            )}
+          </div>
+        </Col>
+      </Row>
+    </div>
+  );
+};
 
 export default FooterPanel;

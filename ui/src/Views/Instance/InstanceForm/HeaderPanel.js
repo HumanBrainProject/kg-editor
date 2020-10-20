@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -39,48 +39,36 @@ const useStyles = createUseStyles({
   }
 });
 
-class HeaderPanel extends React.Component{
+const HeaderPanel = ({ className, types, hasChanged, highlight }) => {
 
-  componentDidMount() {
-    if (this.props.highlight) {
-      this.scrollIntoView();
+  const classes = useStyles();
+
+  useEffect(() => {
+    if (highlight) {
+      this.scrollIntoViewRef && this.scrollIntoViewRef.scrollIntoView({behavior:"smooth", block:"center"});
     }
-  }
+  }, [highlight]);
 
-  componentDidUpdate(prevProps) {
-    if (this.props.highlight && this.props.highlight !== prevProps.highlight) {
-      this.scrollIntoView();
-    }
-  }
-
-  scrollIntoView = ()=> {
-    this.scrollIntoViewRef && this.scrollIntoViewRef.scrollIntoView({behavior:"smooth", block:"center"});
-  }
-
-  render(){
-    const classes = useStyles();
-    const { className, types, hasChanged } = this.props;
-    return(
-      <div className={`${classes.panel} ${className ? className : ""}`}>
-        <Row>
-          <Col xs={12}>
-            <h6 ref={ref => this.scrollIntoViewRef = ref}>
-              {types && types.map(({name, label, color}) => (
-                <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
-              ))}
-            </h6>
-          </Col>
-        </Row>
-        {hasChanged &&
-          <div className={classes.hasChanged}>
-            <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;
-            <FontAwesomeIcon icon={"caret-right"}/>&nbsp;
-            <FontAwesomeIcon icon={"pencil-alt"}/>
-          </div>
-        }
-      </div>
-    );
-  }
-}
+  return (
+    <div className={`${classes.panel} ${className ? className : ""}`}>
+      <Row>
+        <Col xs={12}>
+          <h6 ref={ref => this.scrollIntoViewRef = ref}>
+            {types && types.map(({name, label, color}) => (
+              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
+            ))}
+          </h6>
+        </Col>
+      </Row>
+      {hasChanged && (
+        <div className={classes.hasChanged}>
+          <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;
+          <FontAwesomeIcon icon={"caret-right"}/>&nbsp;
+          <FontAwesomeIcon icon={"pencil-alt"}/>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default HeaderPanel;

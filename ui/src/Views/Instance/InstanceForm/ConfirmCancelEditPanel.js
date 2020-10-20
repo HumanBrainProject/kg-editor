@@ -61,38 +61,35 @@ const useStyles = createUseStyles({
   },
 });
 
-class ConfirmCancelEditPanel extends React.PureComponent{
+const ConfirmCancelEditPanel = ({ show, text, inline, onConfirm, onCancel }) => {
 
-  handleConfirm = e => {
+  const classes = useStyles();
+
+  const handleConfirm = e => {
     e.stopPropagation();
-    this.props.onConfirm(e);
+    onConfirm(e);
   };
 
-  handleCancel = e => {
+  const handleCancel = e => {
     e.stopPropagation();
-    this.props.onCancel(e);
+    onCancel(e);
   };
 
-  render(){
-    const { show, text, inline} = this.props;
+  if (!show) {
+    return null;
+  }
 
-    if (!show) {
-      return null;
-    }
-
-    const classes = useStyles();
-    return (
-      <div className={classes.container} inline={inline?"true":"false"}>
-        <div className={classes.panel}>
-          <h4>{text}</h4>
-          <div>
-            <Button bsStyle="default" onClick={this.handleConfirm}>Yes</Button>
-            <Button bsStyle="danger" onClick={this.handleCancel}>No</Button>
-          </div>
+  return (
+    <div className={classes.container} inline={inline?"true":"false"}>
+      <div className={classes.panel}>
+        <h4>{text}</h4>
+        <div>
+          <Button bsStyle="default" onClick={handleConfirm}>Yes</Button>
+          <Button bsStyle="danger" onClick={handleCancel}>No</Button>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default ConfirmCancelEditPanel;

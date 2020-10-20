@@ -45,58 +45,55 @@ const useStyles = createUseStyles({
   }
 });
 
-class Menu extends React.Component {
+const Menu = ({ types,
+  externalTypes,
+  currentType,
+  currentOption,
+  hasMore,
+  searchTerm,
+  values,
+  loading,
+  onAddNewValue,
+  onAddValue,
+  onCancel,
+  onLoadMore,
+  onPreview,
+  onSelectNextType,
+  onSelectPreviousType,
+  onSelectNextValue,
+  onSelectPreviousValue,
+}) => {
 
-  render() {
-    const classes = useStyles();
-    const { types,
-      externalTypes,
-      currentType,
-      currentOption,
-      hasMore,
-      searchTerm,
-      values,
-      loading,
-      onAddNewValue,
-      onAddValue,
-      onCancel,
-      onLoadMore,
-      onPreview,
-      onSelectNextType,
-      onSelectPreviousType,
-      onSelectNextValue,
-      onSelectPreviousValue,
-    } = this.props;
+  const classes = useStyles();
 
-    return(
-      <div className={`quickfire-dropdown ${classes.container}`} ref={ref=>{this.optionsRef = ref;}}>
-        <InfiniteScroll
-          element={"ul"}
-          className={"dropdown-menu"}
-          threshold={100}
-          hasMore={hasMore}
-          loadMore={onLoadMore}
-          useWindow={false}>
-          {!values.length && !types.length &&
+  return(
+    <div className={`quickfire-dropdown ${classes.container}`} ref={ref=>{this.optionsRef = ref;}}>
+      <InfiniteScroll
+        element={"ul"}
+        className={"dropdown-menu"}
+        threshold={100}
+        hasMore={hasMore}
+        loadMore={onLoadMore}
+        useWindow={false}>
+        {!values.length && !types.length &&
             (<MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
               <em>No results found for: </em> <strong>{searchTerm}</strong>
             </MenuItem>)
-          }
-          <ExternalTypes types={externalTypes} />
-          <NewValues value={searchTerm} types={types} currentType={currentType} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onCancel}/>
-          <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
-          {loading?
-            <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
-              <div tabIndex={-1} className="option">
-                <FontAwesomeIcon spin icon="circle-notch"/>
-              </div>
-            </MenuItem>
-            :null}
-        </InfiniteScroll>
-      </div>
+        }
+        <ExternalTypes types={externalTypes} />
+        <NewValues value={searchTerm} types={types} currentType={currentType} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onCancel}/>
+        <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
+        {loading?
+          <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
+            <div tabIndex={-1} className="option">
+              <FontAwesomeIcon spin icon="circle-notch"/>
+            </div>
+          </MenuItem>
+          :null}
+      </InfiniteScroll>
+    </div>
 
-    );
-  }
-}
+  );
+};
 
 export default Menu;

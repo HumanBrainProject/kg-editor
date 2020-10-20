@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
@@ -118,42 +118,37 @@ const useStyles = createUseStyles({
   }
 });
 
-class Node extends React.Component {
+const Node = ({ node, isGrouped }) => {
 
-  handelMouseOver = () => {
-    const { node } = this.props;
+  const classes = useStyles();
+
+  const handelMouseOver = () => {
     graphStore.setHighlightNodeConnections(node, true);
-  }
+  };
 
-  handelMouseOut = () => {
-    const { node } = this.props;
+  const handelMouseOut = () => {
     graphStore.setHighlightNodeConnections(node, false);
-  }
+  };
 
-  handelClick = () => {
-    const { node } = this.props;
+  const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
       routerStore.history.push("/instance/graph/" + node.id);
     }
-  }
+  };
 
-  render() {
-    const classes = useStyles();
-    const { node, isGrouped } = this.props;
-    let actions = {onClick: this.handleClick};
-    if(!isGrouped) {
-      actions = {
-        onMouseOver: this.handelMouseOver,
-        onMouseOut: this.handelMouseOut,
-        onClick: this.handleClick
-      };
-    }
-    return (
-      <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
-    );
+  let actions = {onClick: handleClick};
+  if(!isGrouped) {
+    actions = {
+      onMouseOver: handelMouseOver,
+      onMouseOut: handelMouseOut,
+      onClick: handleClick
+    };
   }
-}
+  return (
+    <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
+  );
+};
 
 const Nodes = ({className, nodes, isGrouped}) => (
   <div className={className}>
@@ -247,32 +242,27 @@ const Actions = observer(({ className, group }) => {
   );
 });
 
-class Group extends React.Component {
+const Group = ({ group }) => {
 
-  constructor(props) {
-    super(props);
-    this.state = { expanded: false};
-  }
+  const classes = useStyles();
 
-  handleClick = () => {
-    this.setState(state => ({ expanded: !state.expanded}));
-  }
+  const [expanded, setExpanded] = useState(false);
 
-  render() {
-    const classes = useStyles();
-    const { group } = this.props;
-    return (
-      <div className={`${classes.group} ${this.state.expanded ? "expanded" : ""}`}>
-        <Glyphicon glyph="chevron-right" className={classes.expandButton} onClick={this.handleClick} />
-        <GroupLabel className={classes.groupLabel} group={group} />
-        <Actions className={classes.groupActions} group={group} />
-        {this.state.expanded && (
-          <Nodes className={classes.nodes} nodes={group.nodes} isGrouped={group.grouped} />
-        )}
-      </div>
-    );
-  }
-}
+  const handleClick = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <div className={`${classes.group} ${expanded ? "expanded" : ""}`}>
+      <Glyphicon glyph="chevron-right" className={classes.expandButton} onClick={handleClick} />
+      <GroupLabel className={classes.groupLabel} group={group} />
+      <Actions className={classes.groupActions} group={group} />
+      {expanded && (
+        <Nodes className={classes.nodes} nodes={group.nodes} isGrouped={group.grouped} />
+      )}
+    </div>
+  );
+};
 
 const Groups = ({className, groups}) => (
   <div className={className}>

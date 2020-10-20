@@ -56,36 +56,27 @@ const useStyles = createUseStyles({
   }
 });
 
-class Tab extends React.PureComponent {
+const Tab = ({ className, show, disabled, active, icon, mode, onClick }) => {
 
-  handleClick = () => {
-    const { mode, onClick } = this.props;
-    typeof onClick === "function" && onClick(mode);
+  if(!show) {
+    return null;
   }
 
-  render() {
-    const {className, show, disabled, active, icon} = this.props;
+  const props = disabled || active ?
+    {
+      className: `${className} ${disabled?"disabled":""} ${active?"active":""}`
+    }:
+    {
+      className: className,
+      onClick: () => typeof onClick === "function" && onClick(mode)
+    };
 
-    if(!show) {
-      return null;
-    }
-
-    const props = disabled || active ?
-      {
-        className: `${className} ${disabled?"disabled":""} ${active?"active":""}`
-      }:
-      {
-        className: className,
-        onClick: this.handleClick
-      };
-
-    return(
-      <div {...props} >
-        <FontAwesomeIcon icon={icon}/>
-      </div>
-    );
-  }
-}
+  return(
+    <div {...props} >
+      <FontAwesomeIcon icon={icon}/>
+    </div>
+  );
+};
 
 const Tabs = observer(({ instance, mode }) => {
 

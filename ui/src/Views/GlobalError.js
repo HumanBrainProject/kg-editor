@@ -30,29 +30,29 @@ const useStyles = createUseStyles({
   }
 });
 
-class GlobalError extends React.PureComponent {
-  handleDismiss = () => {
-    appStore.dismissGlobalError();
-  }
+const GlobalError = () => {
 
-  render() {
-    const classes = useStyles();
-    return (
-      <div className={classes.container}>
-        <BGMessage icon={"exclamation-circle"}>
+  const classes = useStyles();
+
+  const handleDismiss = () => {
+    appStore.dismissGlobalError();
+  };
+
+  return (
+    <div className={classes.container}>
+      <BGMessage icon={"exclamation-circle"}>
           An unexpected error has occured.<br />
           We recommend you to save all your changes and reload the application in your browser.<br />
           If the problem persists, please contact the support.<br /><br />
-          <Button bsStyle={"primary"} onClick={this.handleDismiss}>
-            <FontAwesomeIcon icon={"check"} /> &nbsp; Dismiss
-          </Button>&nbsp;&nbsp;
-          <Button bsStyle={"warning"} onClick={() => Sentry.showReportDialog({ title: "An unexpected error has occured.", subtitle2: "We recommend you to save all your changes and reload the application in your browser. The KG team has been notified. If you'd like to help, tell us what happened below.", labelEmail: "Email(optional)", labelName: "Name(optional)", user: { email: "error@kgeditor.com", name: "Error Reporter" }, labelComments: "Please fill in a description of your error use case" })}>
-            <FontAwesomeIcon icon={"envelope"} /> &nbsp; Send an error report
-          </Button>
-        </BGMessage>
-      </div >
-    );
-  }
-}
+        <Button bsStyle={"primary"} onClick={handleDismiss}>
+          <FontAwesomeIcon icon={"check"} /> &nbsp; Dismiss
+        </Button>&nbsp;&nbsp;
+        <Button bsStyle={"warning"} onClick={() => Sentry.showReportDialog({ title: "An unexpected error has occured.", subtitle2: "We recommend you to save all your changes and reload the application in your browser. The KG team has been notified. If you'd like to help, tell us what happened below.", labelEmail: "Email(optional)", labelName: "Name(optional)", user: { email: "error@kgeditor.com", name: "Error Reporter" }, labelComments: "Please fill in a description of your error use case" })}>
+          <FontAwesomeIcon icon={"envelope"} /> &nbsp; Send an error report
+        </Button>
+      </BGMessage>
+    </div >
+  );
+};
 
 export default GlobalError;

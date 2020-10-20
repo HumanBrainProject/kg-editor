@@ -68,39 +68,37 @@ const useStyles = createUseStyles({
   }
 });
 
-class FetchErrorPanel extends React.Component{
-  handleRetry = (e) => {
+const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
+
+  const classes = useStyles();
+
+  const handleRetry = (e) => {
     e.stopPropagation();
-    this.props.onRetry(e);
+    onRetry(e);
   };
 
-  render(){
-    const { id, show, error, inline } = this.props;
-
-    if (!show) {
-      return null;
-    }
-
-    const classes = useStyles();
-    return(
-      (!inline)?
-        <div className={classes.fetchErrorPanel}>
-          <h4>{error}</h4>
-          <div>
-            <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
-          </div>
-        </div>
-        :
-        <div className={classes.inlineFetchErrorPanel}>
-          <HeaderPanel className={classes.panelHeader} />
-          <h5>{error}</h5>
-          <small>ID: {id}</small>
-          <div>
-            <Button onClick={this.handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
-          </div>
-        </div>
-    );
+  if (!show) {
+    return null;
   }
-}
+
+  return(
+    (!inline)?
+      <div className={classes.fetchErrorPanel}>
+        <h4>{error}</h4>
+        <div>
+          <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
+        </div>
+      </div>
+      :
+      <div className={classes.inlineFetchErrorPanel}>
+        <HeaderPanel className={classes.panelHeader} />
+        <h5>{error}</h5>
+        <small>ID: {id}</small>
+        <div>
+          <Button onClick={handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
+        </div>
+      </div>
+  );
+};
 
 export default FetchErrorPanel;

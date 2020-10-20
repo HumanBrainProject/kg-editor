@@ -58,37 +58,35 @@ const useStyles = createUseStyles({
   }
 });
 
-class SaveErrorPanel extends React.Component{
-  handleCancel = e => {
+const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }) => {
+
+  const classes = useStyles();
+
+  const handleCancel = e => {
     e.stopPropagation();
-    this.props.onCancel(e);
+    onCancel(e);
+  };
+
+  const handleRetry = e => {
+    e.stopPropagation();
+    onRetry(e);
+  };
+
+  if (!show) {
+    return null;
   }
 
-  handleRetry = e => {
-    e.stopPropagation();
-    this.props.onRetry(e);
-  }
-
-  render(){
-    const { show, error, inline } = this.props;
-
-    if (!show) {
-      return null;
-    }
-
-    const classes = useStyles();
-    return (
-      <div className={classes.container} inline={inline?"true":"false"}>
-        <div className={classes.panel}>
-          <h4>{error}</h4>
-          <div>
-            <Button bsStyle="default" onClick={this.handleCancel}>Cancel</Button>
-            <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
-          </div>
+  return (
+    <div className={classes.container} inline={inline?"true":"false"}>
+      <div className={classes.panel}>
+        <h4>{error}</h4>
+        <div>
+          <Button bsStyle="default" onClick={handleCancel}>Cancel</Button>
+          <Button bsStyle="primary" onClick={handleRetry}>Retry</Button>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default SaveErrorPanel;

@@ -89,48 +89,56 @@ const useStyles = createUseStyles({
   }
 });
 
-class BodyPanel extends React.PureComponent{
+const NoPermissionForView = ({ instance, mode }) => {
 
-  renderNoPermissionForView = mode => {
-    const { classes, className, instance} = this.props;
-    const fieldStore = instance.fields[instance.labelField];
-    return (
-      <div className={`${classes.container} ${className}`} >
-        <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
-        <div className={classes.errorMessage}>
-          <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
+  const classes = useStyles();
+
+  const fieldStore = instance.fields[instance.labelField];
+
+  return (
+    <React.Fragment>
+      <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
+      <div className={classes.errorMessage}>
+        <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
+      </div>
+    </React.Fragment>
+  );
+};
+
+const BodyPanel = ({ className, instance, readMode}) => {
+
+  const classes = useStyles();
+
+  if (readMode) {
+    if(!instance.permissions.canRead) {
+      return (
+        <div className={`${classes.container} ${className}`} >
+          <NoPermissionForView instance={instance} mode="view" />
         </div>
-      </div>
-    );
-  }
-
-  render(){
-    const { className, instance, readMode } = this.props;
-
-    if (readMode) {
-      if(!instance.permissions.canRead) {
-        return this.renderNoPermissionForView("view");
-      }
-    } else { // edit
-      if(!instance.permissions.canWrite) {
-        return this.renderNoPermissionForView("edit");
-      }
+      );
     }
-
-    const classes = useStyles();
-    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
-
-    return(
-      <div className={`${classes.container} ${className}`} >
-        {fields.map(name => {
-          const fieldStore = instance.fields[name];
-          return (
-            <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={readMode} />
-          );
-        })}
-      </div>
-    );
+  } else { // edit
+    if(!instance.permissions.canWrite) {
+      return (
+        <div className={`${classes.container} ${className}`} >
+          <NoPermissionForView instance={instance} mode="edit" />
+        </div>
+      );
+    }
   }
-}
+
+  const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
+
+  return(
+    <div className={`${classes.container} ${className}`} >
+      {fields.map(name => {
+        const fieldStore = instance.fields[name];
+        return (
+          <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={readMode} />
+        );
+      })}
+    </div>
+  );
+};
 
 export default BodyPanel;

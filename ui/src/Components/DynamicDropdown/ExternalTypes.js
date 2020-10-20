@@ -11,28 +11,26 @@ const useStyles = createUseStyles({
   }
 });
 
-
 const ExternalTypes = ({types}) => (
   <React.Fragment>
     {types.map(type => <ExternalType key={type.name} type={type} />)}
   </React.Fragment>
 );
 
-class ExternalType extends React.Component {
-  render() {
-    const classes = useStyles();
-    const  {type} = this.props;
-    return(
-      <div className={classes.container}>
-        <em>New instance of type <span style={type.color ? { color: type.color } : {}}>
-          <FontAwesomeIcon fixedWidth icon="circle" />
-        </span>
-        {type.label} could only be created in workspace <strong>{type.space.join(", or ")}</strong></em>
-      </div>
-    );
+const ExternalType = ({ type }) => {
 
-  }
+  const classes = useStyles();
+  const types = type.space.join(", or ");
+  const style = type.color ? { color: type.color } : {};
 
-}
+  return(
+    <div className={classes.container}>
+      <em>New instance of type <span style={style}>
+        <FontAwesomeIcon fixedWidth icon="circle" />
+      </span>
+      {type.label} could only be created in workspace <strong>{types}</strong></em>
+    </div>
+  );
+};
 
 export default ExternalTypes;

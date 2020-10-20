@@ -47,45 +47,41 @@ const useStyles = createUseStyles({
   }
 });
 
-class Alternative extends React.PureComponent {
+const Alternative = ({ alternative, ValueRenderer, className, onSelect, onRemove }) => {
 
-  handleSelect = alternative => event => {
-    const { onSelect } = this.props;
-    typeof onSelect === "function" && onSelect(alternative, event);
-  }
+  const classes = useStyles();
 
-  handleRemoveClick = event => {
-    event.stopPropagation();
-    const { onRemove } = this.props;
-    typeof onRemove === "function" && onRemove(event);
-  }
+  const handleSelect = e => {
+    typeof onSelect === "function" && onSelect(alternative, e);
+  };
 
-  render() {
-    const classes = useStyles();
-    const { alternative, ValueRenderer, className } = this.props;
+  const handleRemoveClick = e => {
+    e.stopPropagation();
+    typeof onRemove === "function" && onRemove(e);
+  };
 
-    const users = (!alternative || !alternative.users)?[]:alternative.users;
-    const isOwnAlternative = users.find(user => authStore.user.id === user.id);
-    return (
-      <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
-        <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect(alternative)}>
-          <strong>
-            <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
-            users.map(user => (
-              <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
-            ))
-          }<div className="parenthesis">)</div></em>
-          {alternative.selected?
-            <FontAwesomeIcon icon="check" className="selected" />
-            :null
-          }
-          {isOwnAlternative && (
-            <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleRemoveClick} icon="times" /></span>
-          )}
-        </div>
-      </MenuItem>
-    );
-  }
-}
+  const users = (!alternative || !alternative.users)?[]:alternative.users;
+  const isOwnAlternative = users.find(user => authStore.user.id === user.id);
+
+  return (
+    <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
+      <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleSelect}>
+        <strong>
+          <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
+          users.map(user => (
+            <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
+          ))
+        }<div className="parenthesis">)</div></em>
+        {alternative.selected?
+          <FontAwesomeIcon icon="check" className="selected" />
+          :null
+        }
+        {isOwnAlternative && (
+          <span className={classes.removeIcon}><FontAwesomeIcon onClick={handleRemoveClick} icon="times" /></span>
+        )}
+      </div>
+    </MenuItem>
+  );
+};
 
 export default Alternative;

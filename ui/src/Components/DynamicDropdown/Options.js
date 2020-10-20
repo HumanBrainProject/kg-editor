@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {  MenuItem } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
@@ -44,79 +44,67 @@ const Options = ({values, current, onSelectNext, onSelectPrevious, onSelect, onC
   </React.Fragment>
 );
 
-class Option  extends React.Component {
-  componentDidMount() {
-    this.setFocus();
-  }
+const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel, onPreview }) => {
 
-  componentDidUpdate() {
-    this.setFocus();
-  }
+  const classes = useStyles();
 
-    setFocus = () => {
-      const { hasFocus } = this.props;
-      if (hasFocus) {
-        this.ref.focus();
+  useEffect(() => {
+    if (hasFocus) {
+      this.ref.focus();
+    }
+  });
+
+  const handleOnSelect = () => {
+    onSelect(value.id);
+  };
+
+  const handleKeyDown = e => {
+    if(e) {
+      switch(e.keyCode) {
+      case 38: {
+        e.preventDefault();
+        onSelectPrevious(value.id);
+        break;
+      }
+      case 40: {
+        e.preventDefault();
+        onSelectNext(value.id);
+        break;
+      }
+      case 13: {
+        e.preventDefault();
+        onSelect(value.id);
+        break;
+      }
+      case 27: {
+        e.preventDefault();
+        onCancel();
+        break;
+      }
       }
     }
+  };
 
-    handleOnSelect = () => {
-      const {onSelect, value} = this.props;
-      onSelect(value.id);
-    }
+  const handleOnPreview = e => {
+    e && e.stopPropagation();
+    onPreview(value.id, value.name);
+  };
 
+  const style = value.type.color ? { color: value.type.color } : {};
 
-    handleKeyDown = e => {
-      const {onSelectNext, onSelectPrevious, onSelect, onCancel, value} = this.props;
-      if(e) {
-        switch(e.keyCode) {
-        case 38: {
-          e.preventDefault();
-          onSelectPrevious(value.id);
-          break;
-        }
-        case 40: {
-          e.preventDefault();
-          onSelectNext(value.id);
-          break;
-        }
-        case 13: {
-          e.preventDefault();
-          onSelect(value.id);
-          break;
-        }
-        case 27: {
-          e.preventDefault();
-          onCancel();
-          break;
-        }
-        }
-      }
-    }
-
-    handleOnPreview = e => {
-      e && e.stopPropagation();
-      this.props.onPreview(this.props.value.id, this.props.value.name);
-    }
-
-    render() {
-      const classes = useStyles();
-      const {value} = this.props;
-      return(
-        <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleOnSelect}>
-          <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>
-            <span className={classes.icon} style={value.type.color ? { color: value.type.color } : {}}>
-              <FontAwesomeIcon fixedWidth icon="circle" />
-            </span>
-            {value.name}
-            <div className={classes.preview} title="preview" onClick={this.handleOnPreview}>
-              <FontAwesomeIcon icon="eye" />
-            </div>
-          </div>
-        </MenuItem>
-      );
-    }
-
-}
+  return (
+    <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleOnSelect}>
+      <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={handleKeyDown} ref={ref => this.ref = ref}>
+        <span className={classes.icon} style={style}>
+          <FontAwesomeIcon fixedWidth icon="circle" />
+        </span>
+        {value.name}
+        <div className={classes.preview} title="preview" onClick={handleOnPreview}>
+          <FontAwesomeIcon icon="eye" />
+        </div>
+      </div>
+    </MenuItem>
+  );
+};
 
 export default Options;

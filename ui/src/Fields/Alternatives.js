@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 
 import Avatar from "../Components/Avatar";
@@ -60,19 +60,19 @@ const getContainerWidth = (node, className) => {
   return null;
 };
 
-class Alternatives extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { open: false, maxWidth:  null};
-  }
+const Alternatives = ({ className, list, disabled, parentContainerClassName, ValueRenderer, onSelect, onRemove }) => {
 
-  handleToggle = e => {
+  const classes = useStyles();
+
+  const [open, setOpen] = useState(false);
+  const [fixedWidth, setFixedWidth] = useState(null);
+
+  const handleToggle = e => {
     e.preventDefault();
-    this.setState(state => ({ open: !state.open }));
-  }
+    setOpen(!open);
+  };
 
-  handleSelect = (alternative, e) => {
-    const { onSelect } = this.props;
+  const handleSelect = (alternative, e) => {
     if(e && e.keyCode === 40){ // Down
       e && e.preventDefault();
       const alternatives = this.alternativesRef.querySelectorAll(".option");
@@ -91,23 +91,21 @@ class Alternatives extends React.Component {
       alternatives[index].focus();
     } else if(e && e.keyCode === 27) { //escape
       e && e.preventDefault();
-      this.setState({ open: false });
+      setOpen(false);
     } else if (alternative && (!e || (e && (!e.keyCode || e.keyCode === 13)))) { // enter
       e && e.preventDefault();
       typeof onSelect === "function" && onSelect(alternative.value);
-      this.setState({ open: false });
+      setOpen(false);
     }
-  }
+  };
 
-  handleRemove = e => {
-    const { onRemove } = this.props;
+  const handleRemove = e => {
     e && e.preventDefault();
     typeof onRemove === "function" && onRemove();
-    this.setState({ open: false });
-  }
+    setOpen(false);
+  };
 
-  handleInputKeyStrokes = e => {
-    const { disabled } = this.props;
+  const handleInputKeyStrokes = e => {
     if (disabled) {
       return;
     }
@@ -129,97 +127,75 @@ class Alternatives extends React.Component {
       alternatives[index].focus();
     } else if(e && e.keyCode === 27) { //escape
       e && e.preventDefault();
-      this.setState({ open: false });
-    }
-  }
-
-  clickOutHandler = e => {
-    if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
-      this.setState({ open: false });
+      setOpen(false);
     }
   };
 
-  listenClickOutHandler(){
-    window.addEventListener("mouseup", this.clickOutHandler, false);
-    window.addEventListener("touchend", this.clickOutHandler, false);
-    window.addEventListener("keyup", this.clickOutHandler, false);
-  }
-
-  unlistenClickOutHandler(){
-    window.removeEventListener("mouseup", this.clickOutHandler, false);
-    window.removeEventListener("touchend", this.clickOutHandler, false);
-    window.removeEventListener("keyup", this.clickOutHandler, false);
-  }
-
-  componentDidMount() {
-    this.listenClickOutHandler();
-  }
-
-  componentWillUnmount(){
-    this.unlistenClickOutHandler();
-  }
-
-  componentDidUpdate() {
-    const { parentContainerClassName } = this.props;
-
-    if (this.state.open && !this.state.fixedWidth && this.wrapperRef) {
+  const clickOutHandler = e => {
+    if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
+      setOpen(false);
+    }
+    if (open && !fixedWidth && this.wrapperRef) {
       const width = getContainerWidth(this.wrapperRef, parentContainerClassName);
       if (width && width > this.wrapperRef.offsetLeft) {
         let maxWidth = width - this.wrapperRef.offsetLeft;
         if (this.alternativesRef && this.alternativesRef.offsetWidth) {
           if (this.alternativesRef.offsetWidth > maxWidth) {
-            this.setState({fixedWidth: maxWidth});
+            setFixedWidth(maxWidth);
           }
         } else {
-          this.setState({fixedWidth: maxWidth});
+          setFixedWidth(maxWidth);
         }
       }
     }
+  };
+
+  useEffect(() => {
+    window.addEventListener("mouseup", clickOutHandler, false);
+    window.addEventListener("touchend", clickOutHandler, false);
+    window.addEventListener("keyup", clickOutHandler, false);
+    return () => {
+      window.removeEventListener("mouseup", clickOutHandler, false);
+      window.removeEventListener("touchend", clickOutHandler, false);
+      window.removeEventListener("keyup", clickOutHandler, false);
+    };
+  });
+
+  if (!list || !list.length) {
+    return null;
   }
 
-  render() {
-    const { className, list, ValueRenderer } = this.props;
 
-    if (!list || !list.length) {
-      return null;
-    }
+  const style = fixedWidth?{ width: fixedWidth + "px" }:{};
 
-    const classes = useStyles();
-    const style = this.state.fixedWidth?
-      {
-        width: this.state.fixedWidth + "px"
-      }
-      :{};
-
-    return (
-      <div className={`${classes.container} ${className?className:""}`} ref={ref=>this.wrapperRef=ref}>
-        <button className={classes.button}
-          title="show alternatives"
-          onKeyDown={this.handleInputKeyStrokes}
-          onClick={this.handleToggle}>
-          {list.map(alternative => {
-            const users = (!alternative || !alternative.users)?[]:alternative.users;
-            return (
-              users.map(user => (
-                <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
-              ))
-            );
-          })}
-        </button>
-        <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${this.state.open?"open":""}`} style={style} ref={ref=>{this.alternativesRef = ref;}}>
-          {list.map(alternative => {
-            const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => {
-              acc += user.id;
-              return acc;
-            }, "");
-            return (
-              <Alternative key={key} alternative={alternative} ValueRenderer={ValueRenderer} onRemove={this.handleRemove} onSelect={this.handleSelect} className={this.state.fixedWidth?classes.fixedWidthDropdownItem:null} />
-            );
-          })}
-        </ul>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={`${classes.container} ${className?className:""}`} ref={ref=>this.wrapperRef=ref}>
+      <button className={classes.button}
+        title="show alternatives"
+        onKeyDown={handleInputKeyStrokes}
+        onClick={handleToggle}>
+        {list.map(alternative => {
+          const users = (!alternative || !alternative.users)?[]:alternative.users;
+          return (
+            users.map(user => (
+              <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
+            ))
+          );
+        })}
+      </button>
+      <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${open?"open":""}`} style={style} ref={ref=>{this.alternativesRef = ref;}}>
+        {list.map(alternative => {
+          const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => {
+            acc += user.id;
+            return acc;
+          }, "");
+          return (
+            <Alternative key={key} alternative={alternative} ValueRenderer={ValueRenderer} onRemove={handleRemove} onSelect={handleSelect} className={fixedWidth?classes.fixedWidthDropdownItem:null} />
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
 
 export default Alternatives;

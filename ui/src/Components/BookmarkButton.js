@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useState } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PopOverButton from "./PopOverButton";
@@ -47,42 +47,38 @@ const useStyles = createUseStyles({
   }
 });
 
-class BookmarkButton extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { listPosition: "bottom" };
-  }
+const BookmarkButton = ({ className, values, list, onSave, onChange, onNew }) => {
 
-  changeBookmarkListPosition(position) {
-    this.setState({listPosition: position?position:"bottom" });
-  }
+  const classes = useStyles();
 
-  handleValueChange(event, field) {
+  const [listPosition, setListPosition] = useState("bottom");
+
+  const changeBookmarkListPosition = position => {
+    setListPosition(position?position:"bottom");
+  };
+
+  const handleValueChange = (event, field) => {
     const bookmarkLists = field.value.map(bookmarkList => bookmarkList.id);
-    typeof this.props.onChange === "function" && this.props.onChange(bookmarkLists);
-  }
+    typeof onChange === "function" && onChange(bookmarkLists);
+  };
 
-  handleNew(name) { // , field, store) {
-    typeof this.props.onNew === "function" && this.props.onNew(name);
-  }
+  const handleNew = name => {
+    typeof onNew === "function" && onNew(name);
+  };
 
-  render() {
-    const classes = useStyles();
-    const {className, values, list, onSave} = this.props;
-    const isBookmark = values && values.length;
-    return (
-      <PopOverButton
-        className={className}
-        buttonClassName={classes.button}
-        iconComponent={FontAwesomeIcon}
-        iconProps={{icon: "star", className: `icon ${isBookmark?"is-bookmark":""}`}}
-        onClose={onSave}
-        onPositionChange={this.changeBookmarkListPosition.bind(this)}
-      >
-        <SingleField key={JSON.stringify(values)} type="DropdownSelect" label="Bookmarks:" value={values} options={list} mappingValue="id" mappingLabel="label" listPosition={this.state.listPosition?this.state.listPosition:"bottom"} allowCustomValues={true} onChange={this.handleValueChange.bind(this)} onAddCustomValue={this.handleNew.bind(this)} />
-      </PopOverButton>
-    );
-  }
-}
+  const isBookmark = values && values.length;
+  return (
+    <PopOverButton
+      className={className}
+      buttonClassName={classes.button}
+      iconComponent={FontAwesomeIcon}
+      iconProps={{icon: "star", className: `icon ${isBookmark?"is-bookmark":""}`}}
+      onClose={onSave}
+      onPositionChange={changeBookmarkListPosition}
+    >
+      <SingleField key={JSON.stringify(values)} type="DropdownSelect" label="Bookmarks:" value={values} options={list} mappingValue="id" mappingLabel="label" listPosition={listPosition?listPosition:"bottom"} allowCustomValues={true} onChange={handleValueChange} onAddCustomValue={handleNew} />
+    </PopOverButton>
+  );
+};
 
 export default BookmarkButton;

@@ -56,23 +56,21 @@ const useStyles = createUseStyles({
   }
 });
 
-class FetchingPanel extends React.PureComponent{
-  render(){
-    const { id, show, inline } = this.props;
+const FetchingPanel = ({ id, show, inline }) => {
 
-    if (!show) {
-      return null;
-    }
+  const classes = useStyles();
 
-    const classes = useStyles();
-    return(
-      <div className={classes.panel} inline={inline?"true":"false"}>
-        <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
-        <span className={classes.label}>Fetching instance...</span>
-        <small>ID: {id}</small>
-      </div>
-    );
+  if (!show) {
+    return null;
   }
-}
+
+  return(
+    <div className={classes.panel} inline={inline?"true":"false"}>
+      <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
+      <span className={classes.label}>Fetching instance...</span>
+      <small>ID: {id}</small>
+    </div>
+  );
+};
 
 export default FetchingPanel;

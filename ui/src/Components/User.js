@@ -34,11 +34,13 @@ const useStyles = createUseStyles({
 });
 
 const User = ({userId, name, picture, isCurator, title})  => {
+
+  const classes = useStyles();
+
   if (!userId) {
     return null;
   }
 
-  const classes = useStyles();
   return (
     <span className={`${classes.user} user`}><Avatar userId={userId} name={name} picture={picture} />{title?
       <span className={`name ${isCurator?"is-curator":""} `} title={title}>{name?name:userId}</span>

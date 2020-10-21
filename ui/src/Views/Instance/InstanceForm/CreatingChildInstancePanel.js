@@ -31,11 +31,13 @@ const useStyles = createUseStyles({
 });
 
 const CreatingChildInstancePanel = ({show}) => {
+
+  const classes = useStyles();
+
   if (!show) {
     return null;
   }
 
-  const classes = useStyles();
   return (
     <div className={classes.container}>
       <FetchingLoader>Creating a new instance...</FetchingLoader>

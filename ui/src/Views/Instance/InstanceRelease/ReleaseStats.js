@@ -90,11 +90,12 @@ const useStyles = createUseStyles({
 
 const ReleaseStats = observer(() => {
 
+  const classes = useStyles();
+
   if (!releaseStore.treeStats) {
     return null;
   }
 
-  const classes = useStyles();
   return (
     <div className={classes.container}>
       <div className={"section"}>

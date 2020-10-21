@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { debounce } from "lodash";
@@ -128,6 +128,8 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
 
   const [containerWidth, setContainerWidth] = useState(0);
 
+  const wrapperRef = useRef();
+
   useEffect(() => {
     updateContainerWidth();
     window.addEventListener("resize", updateContainerWidth);
@@ -147,8 +149,8 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
   const handleRowMouseOut = ({index}) => onRowMouseOut && onRowMouseOut(index);
 
   const updateContainerWidth = debounce(() => {
-    if(this.wrapperRef){
-      setContainerWidth(this.wrapperRef.offsetWidth);
+    if(wrapperRef.current){
+      setContainerWidth(wrapperRef.current.offsetWidth);
     }
   }, 250);
 
@@ -175,7 +177,7 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
   const labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} />;
 
   return (
-    <div className={classes.container} ref={ref=>this.wrapperRef = ref}>
+    <div className={classes.container} ref={wrapperRef}>
       <TableComponent
         width={containerWidth}
         height={300}

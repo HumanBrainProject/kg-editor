@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -43,9 +43,11 @@ const HeaderPanel = ({ className, types, hasChanged, highlight }) => {
 
   const classes = useStyles();
 
+  const scrollIntoViewRef = useRef();
+
   useEffect(() => {
     if (highlight) {
-      this.scrollIntoViewRef && this.scrollIntoViewRef.scrollIntoView({behavior:"smooth", block:"center"});
+      scrollIntoViewRef.current.scrollIntoView({behavior:"smooth", block:"center"});
     }
   }, [highlight]);
 
@@ -53,7 +55,7 @@ const HeaderPanel = ({ className, types, hasChanged, highlight }) => {
     <div className={`${classes.panel} ${className ? className : ""}`}>
       <Row>
         <Col xs={12}>
-          <h6 ref={ref => this.scrollIntoViewRef = ref}>
+          <h6 ref={scrollIntoViewRef}>
             {types && types.map(({name, label, color}) => (
               <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
             ))}

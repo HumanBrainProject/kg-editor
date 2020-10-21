@@ -89,11 +89,11 @@ const useStyles = createUseStyles({
 
 const SavingPanel = ({ id, show, inline }) => {
 
+  const classes = useStyles();
+
   if (!show) {
     return null;
   }
-
-  const classes = useStyles();
 
   return (
     <div className={classes.container} inline={inline?"true":"false"}>

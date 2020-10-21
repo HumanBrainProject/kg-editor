@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -76,10 +76,10 @@ const windowHeight = () => {
 
 const PopOverContent = ({ onSizeChange, children}) => {
 
-  const ref = React.createRef();
+  const ref = useRef();
 
   useEffect(() => {
-    if (ref.current) {
+   if (ref.current) {
       typeof onSizeChange === "function" && onSizeChange(ref.current.getBoundingClientRect());
     }
   });
@@ -104,7 +104,7 @@ const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconC
     };
   }, []);
 
-  const buttonRef = React.createRef();
+  const buttonRef = useRef();
 
   const handlePopOverPosition = popOverRect => {
     if (!popOverRect) { return null; }

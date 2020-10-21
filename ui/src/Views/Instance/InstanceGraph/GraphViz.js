@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import ForceGraph2D from "react-force-graph-2d";
@@ -173,6 +173,9 @@ const useStyles = createUseStyles({
 
 const Graph = observer(() => {
 
+  const wrapperRef = useRef();
+  const graphRef = useRef();
+
   const classes = useStyles();
 
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
@@ -180,24 +183,22 @@ const Graph = observer(() => {
   useEffect(() => {
 
     const updateDimensions = debounce(() => {
-      if(this.wrapperRef){
-        setDimensions({width: this.wrapperRef.offsetWidth, height: this.wrapperRef.offsetHeight});
-      }
+      setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
     }, 250);
 
     updateDimensions();
-    this.wrapperRef.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
+    wrapperRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
     window.addEventListener("resize", updateDimensions);
     return () => {
       window.removeEventListener("resize", updateDimensions);
-      this.graphRef && this.graphRef.stopAnimation();
+      graphRef.current.stopAnimation();
     };
   }, []);
 
   return (
-    <div className={classes.graph} ref={ref => this.wrapperRef = ref}>
+    <div className={classes.graph} ref={wrapperRef}>
       <ForceGraph2D
-        ref={ref => this.graphRef = ref}
+        ref={graphRef}
         width={dimensions.width}
         height={dimensions.height}
         graphData={graphStore.graphData}

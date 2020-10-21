@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { List } from "react-virtualized";
 import { observer } from "mobx-react";
@@ -44,6 +44,8 @@ const useStyles = createUseStyles({
 
 const ReleaseList = observer(() => {
 
+  const wrapperRef = useRef();
+
   const classes = useStyles();
 
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
@@ -51,9 +53,7 @@ const ReleaseList = observer(() => {
   useEffect(() => {
 
     const updateDimensions = debounce(() => {
-      if(this.wrapperRef){
-        setDimensions({width: this.wrapperRef.offsetWidth, height: this.wrapperRef.offsetHeight});
-      }
+      setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
     }, 250);
 
     updateDimensions();
@@ -64,7 +64,7 @@ const ReleaseList = observer(() => {
   }, []);
 
   return (
-    <div ref={ref=>this.wrapperRef = ref} className={classes.container}>
+    <div ref={wrapperRef} className={classes.container}>
       <List
         width={dimensions.width}
         height={dimensions.height}

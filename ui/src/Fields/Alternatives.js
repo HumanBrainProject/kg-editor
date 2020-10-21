@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createUseStyles } from "react-jss";
 
 import Avatar from "../Components/Avatar";
@@ -63,6 +63,9 @@ const getContainerWidth = (node, className) => {
 const Alternatives = ({ className, list, disabled, parentContainerClassName, ValueRenderer, onSelect, onRemove }) => {
 
   const classes = useStyles();
+
+  const wrapperRef = useRef();
+  const alternativesRef = useRef();
 
   const [open, setOpen] = useState(false);
   const [fixedWidth, setFixedWidth] = useState(null);
@@ -132,15 +135,15 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
   };
 
   const clickOutHandler = e => {
-    if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
+    if(wrapperRef.current && !wrapperRef.current.contains(e.target)){
       setOpen(false);
     }
-    if (open && !fixedWidth && this.wrapperRef) {
-      const width = getContainerWidth(this.wrapperRef, parentContainerClassName);
-      if (width && width > this.wrapperRef.offsetLeft) {
-        let maxWidth = width - this.wrapperRef.offsetLeft;
-        if (this.alternativesRef && this.alternativesRef.offsetWidth) {
-          if (this.alternativesRef.offsetWidth > maxWidth) {
+    if (open && !fixedWidth && alternativesRef.current) {
+      const width = getContainerWidth(wrapperRef.current, parentContainerClassName);
+      if (width && width > wrapperRef.current.offsetLeft) {
+        let maxWidth = width - wrapperRef.current.offsetLeft;
+        if (alternativesRef.current.offsetWidth) {
+          if (alternativesRef.current.offsetWidth > maxWidth) {
             setFixedWidth(maxWidth);
           }
         } else {
@@ -169,7 +172,7 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
   const style = fixedWidth?{ width: fixedWidth + "px" }:{};
 
   return (
-    <div className={`${classes.container} ${className?className:""}`} ref={ref=>this.wrapperRef=ref}>
+    <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
       <button className={classes.button}
         title="show alternatives"
         onKeyDown={handleInputKeyStrokes}
@@ -183,7 +186,7 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
           );
         })}
       </button>
-      <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${open?"open":""}`} style={style} ref={ref=>{this.alternativesRef = ref;}}>
+      <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${open?"open":""}`} style={style} ref={alternativesRef} >
         {list.map(alternative => {
           const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => {
             acc += user.id;

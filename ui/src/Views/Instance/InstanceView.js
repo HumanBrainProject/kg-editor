@@ -37,11 +37,11 @@ const useStyles = createUseStyles({
 
 const InstanceView = observer(({ instance }) => {
 
+  const classes = useStyles();
+
   if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== instance.id) {
     return null;
   }
-
-  const classes = useStyles();
 
   return (
     <ViewContext.Provider value={viewStore.selectedView} >

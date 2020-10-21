@@ -28,7 +28,7 @@ import authStore from "../Stores/AuthStore";
 import Avatar from "../Components/Avatar";
 
 const PopOverContent = ({onSizeChange, children}) => {
-  const ref = useRef(null);
+  const ref = useRef();
 
   useEffect(() => {
     if (ref.current) {
@@ -145,7 +145,7 @@ const windowHeight = () => {
 };
 
 const UserProfileTab = observer(({ className, size=30 }) => {
-  const buttonRef = useRef(null);
+  const buttonRef = useRef();
   const classes = useStyles();
 
   const [showPopOver, setShowPopOver] = useState(false);

@@ -30,14 +30,13 @@ const useStyles = createUseStyles({
 
 const MultiToggle = ({ selectedValue, children , onChange}) => {
 
+  const classes = useStyles();
 
   const handleSelect = value => {
     if(isFunction(onChange)){
       onChange(value);
     }
   };
-
-  const classes = useStyles();
 
   const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: selectedValue, onSelect: handleSelect }));
 
@@ -74,13 +73,14 @@ const useToggleStyles = createUseStyles({
 });
 
 const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
+  const classes = useToggleStyles();
+
   const handleClick = () => {
     if(isFunction(onSelect)){
       onSelect(value);
     }
   };
 
-  const classes = useToggleStyles();
   return(
     <div onClick={handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:color}}>
       <FontAwesomeIcon icon={icon || "dot-circle"}/>

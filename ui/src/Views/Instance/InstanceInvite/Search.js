@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { toJS } from "mobx";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
@@ -139,6 +139,10 @@ const useStyles = createUseStyles({
 
 const Search = observer(({ org, excludedUsers, onSelect }) => {
 
+  const wrapperRef = useRef();
+  const usersRef = useRef();
+  const inputRef = useRef();
+
   const classes = useStyles();
 
   const handleLoadMoreSearchResults = () => {
@@ -148,7 +152,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
   const handleSelect = (user, event) => {
     if(event && event.keyCode === 40){ // Down
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
@@ -158,7 +162,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
       }
     } else if(event && event.keyCode === 38){ // Up
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
@@ -172,7 +176,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
       event && event.preventDefault();
       usersStore.addUser(org, toJS(user), true);
-      this.inputRef && this.inputRef.focus();
+      inputRef.current.focus();
       typeof onSelect === "function" && onSelect(user.id);
     }
   };
@@ -180,7 +184,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
   const handleInputKeyStrokes = event => {
     if(event && event.keyCode === 40 ){ // Down
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
@@ -190,7 +194,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
       }
     } else if(event && event.keyCode === 38){ // Up
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
@@ -214,9 +218,8 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
   };
 
   useEffect(() => {
-
     const clickOutHandler = e => {
-      if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
+      if(!wrapperRef.current.contains(e.target)){
         usersStore.clearSearch();
       }
     };
@@ -235,12 +238,12 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
   const showTotalSearchCount = usersStore.isSearchFetched && usersStore.totalSearchCount !== undefined && (!usersStore.searchFetchError || usersStore.totalSearchCount !== 0);
 
   return (
-    <div className={classes.container} ref={ref=>{this.wrapperRef = ref;}} >
+    <div className={classes.container} ref={wrapperRef} >
       <FontAwesomeIcon icon="user-plus" className={classes.addIcon} />
       <div className={classes.search}>
-        <input ref={ref=>{this.inputRef = ref;}} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={usersStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
+        <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={usersStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
         <FontAwesomeIcon icon="search" className={classes.searchIcon} />
-        <div className={`quickfire-dropdown ${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={ref=>{this.usersRef = ref;}}>
+        <div className={`quickfire-dropdown ${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={usersRef}>
           <div className="dropdown-menu">
             <div className="dropdown-list">
               <InfiniteScroll

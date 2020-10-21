@@ -15,7 +15,7 @@
 */
 
 import React, { useEffect, useRef } from "react";
-import {  MenuItem } from "react-bootstrap";
+import {  Dropdown } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
 
@@ -111,7 +111,7 @@ const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onC
   const style = value.type.color ? { color: value.type.color } : {};
 
   return (
-    <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleOnSelect}>
+    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleOnSelect}>
       <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={handleKeyDown} ref={ref}>
         <span className={classes.icon} style={style}>
           <FontAwesomeIcon fixedWidth icon="circle" />
@@ -121,7 +121,7 @@ const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onC
           <FontAwesomeIcon icon="eye" />
         </div>
       </div>
-    </MenuItem>
+    </Dropdown.Item>
   );
 };
 

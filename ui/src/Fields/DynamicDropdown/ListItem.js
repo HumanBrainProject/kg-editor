@@ -16,10 +16,10 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import { Glyphicon } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 
 import instancesStore from "../../Stores/InstancesStore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
   valueDisplay: {
@@ -152,7 +152,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
       title={label}
     >
       <span className={classes.valueDisplay}>{label}</span>
-      <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={handleDelete} />
+      <FontAwesomeIcon className={`quickfire-remove ${classes.remove}`} icon="remove" onClick={handleDelete} />
     </div>
   );
 });

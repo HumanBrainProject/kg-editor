@@ -254,7 +254,7 @@ const Home = observer(() => {
           <div className={classes.features}>
             <div className="widget-list">
               <KeyboardShortcuts />
-              <Features />
+              {/* <Features /> */}
             </div>
           </div>
         </div>

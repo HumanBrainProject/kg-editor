@@ -17,7 +17,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { FormGroup, Checkbox } from "react-bootstrap";
+import { FormGroup, FormCheck } from "react-bootstrap";
 import Label from "../Label";
 
 const useStyles = createUseStyles({
@@ -51,7 +51,7 @@ const CheckBox = observer(({ fieldStore, readMode }) => {
   return (
     <FormGroup className="quickfire-field-checkbox" >
       <Label label={label} labelTooltip={labelTooltip} />
-      <Checkbox readOnly={false} onChange={handleChange} checked={value} />
+      <FormCheck readOnly={false} onChange={handleChange} checked={value} />
     </FormGroup>
   );
 });

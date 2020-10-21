@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import {observer} from "mobx-react";
-import { Panel, Button, Overlay, Popover } from "react-bootstrap";
+import { Card, Button, Overlay, Popover } from "react-bootstrap";
 import {uniqueId} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactMarkdown  from "react-markdown";
@@ -300,9 +300,9 @@ const Features = observer(() => {
                   </ul>
                 </li>
               ))}
-              <Panel>
-                <Panel.Collapse>
-                  <Panel.Body>
+              <Card>
+                <Card.Collapse>
+                  <Card.Body>
                     {featuresStore.olderReleases.map(release => (
                       <li key={release.version}>
                         <h4>{release.version}</h4>
@@ -313,12 +313,12 @@ const Features = observer(() => {
                         </ul>
                       </li>
                     ))}
-                  </Panel.Body>
-                </Panel.Collapse>
-                <Panel.Footer>
-                  <Panel.Toggle componentClass="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
-                </Panel.Footer>
-              </Panel>
+                  </Card.Body>
+                </Card.Collapse>
+                <Card.Footer>
+                  <Card.Toggle componentClass="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Card.Toggle>
+                </Card.Footer>
+              </Card>
               <Overlay
                 show={!!zoom.type}
                 container={document.body}

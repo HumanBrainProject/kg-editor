@@ -17,7 +17,7 @@
 
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import {  MenuItem } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Options from "./Options";
@@ -93,19 +93,19 @@ const Menu = ({ types,
         loadMore={onLoadMore}
         useWindow={false}>
         {!values.length && !types.length &&
-            (<MenuItem key={"no-options"} className={"quickfire-dropdown-item"}>
+            (<Dropdown.Item key={"no-options"} className={"quickfire-dropdown-item"}>
               <em>No results found for: </em> <strong>{searchTerm}</strong>
-            </MenuItem>)
+            </Dropdown.Item>)
         }
         <ExternalTypes types={externalTypes} />
         <NewValues value={searchTerm} types={types} currentType={currentType} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onCancel}/>
         <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
         {loading?
-          <MenuItem className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
+          <Dropdown.Item className={"quickfire-dropdown-item quickfire-dropdown-item-loading"} key={"loading options"}>
             <div tabIndex={-1} className="option">
               <FontAwesomeIcon spin icon="circle-notch"/>
             </div>
-          </MenuItem>
+          </Dropdown.Item>
           :null}
       </InfiniteScroll>
     </div>

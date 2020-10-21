@@ -16,7 +16,7 @@
 
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react";
-import { Dropdown, MenuItem } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
@@ -67,10 +67,11 @@ const WorkspaceSelector = observer(() => {
           <CustomDropdownToggle bsRole="toggle">{appStore.currentWorkspaceName}</CustomDropdownToggle>
           <Dropdown.Menu className={classes.dropdownMenu}>
             {authStore.workspaces.map(workspace =>
-              <MenuItem key={workspace.id}
+              <Dropdown.Item key={workspace.id}
                 eventKey={workspace.id}
                 onSelect={handleSelectWorkspace}>
-                {workspace.name||workspace.id}</MenuItem>
+                {workspace.name||workspace.id}
+              </Dropdown.Item>
             )}
           </Dropdown.Menu>
         </Dropdown>

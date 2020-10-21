@@ -122,13 +122,9 @@ const Node = ({ node, isGrouped }) => {
 
   const classes = useStyles();
 
-  const handelMouseOver = () => {
-    graphStore.setHighlightNodeConnections(node, true);
-  };
+  const handelMouseOver = () =>graphStore.setHighlightNodeConnections(node, true);
 
-  const handelMouseOut = () => {
-    graphStore.setHighlightNodeConnections(node, false);
-  };
+  const handelMouseOut = () => graphStore.setHighlightNodeConnections(node, false);
 
   const handleClick = () => {
     if (node.id !== graphStore.mainId) {
@@ -145,6 +141,7 @@ const Node = ({ node, isGrouped }) => {
       onClick: handleClick
     };
   }
+
   return (
     <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
   );

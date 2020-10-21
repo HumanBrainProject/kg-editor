@@ -110,7 +110,8 @@ class GraphStore {
       reset: action,
       setHighlightNodeConnections: action,
       setGroupVisibility: action,
-      setGrouping: action
+      setGrouping: action,
+      extractGroupsAndLinks: action
     });
   }
 

@@ -23,16 +23,6 @@ import { debounce } from "lodash";
 import releaseStore from "../../../Stores/ReleaseStore";
 import ReleaseNode from "./ReleaseNode";
 
-
-const RowRenderer = observer(({ key, index, style }) => {
-  const rowData = releaseStore.instanceList[index];
-  return (
-    <div key={key} style={style}>
-      <ReleaseNode node={rowData.node} level={rowData.level} />
-    </div>
-  );
-});
-
 const useStyles = createUseStyles({
   container: {
     position: "relative",
@@ -53,7 +43,7 @@ const ReleaseList = observer(() => {
   useEffect(() => {
 
     const updateDimensions = debounce(() => {
-      setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
+      setDimensions({width: wrapperRef.current && wrapperRef.current.offsetWidth, height: wrapperRef.current && wrapperRef.current.offsetHeight});
     }, 250);
 
     updateDimensions();
@@ -63,6 +53,15 @@ const ReleaseList = observer(() => {
     };
   }, []);
 
+  const rowRenderer = ({ key, index, style }) => {
+    const rowData =  releaseStore.instanceList[index];
+    return (
+      <div key={key} style={style}>
+        <ReleaseNode node={rowData.node} level={rowData.level} />
+      </div>
+    );
+  };
+
   return (
     <div ref={wrapperRef} className={classes.container}>
       <List
@@ -70,7 +69,7 @@ const ReleaseList = observer(() => {
         height={dimensions.height}
         rowHeight={42}
         rowCount={releaseStore.instanceList.length}
-        rowRenderer={RowRenderer}
+        rowRenderer={rowRenderer}
       />
     </div>
   );

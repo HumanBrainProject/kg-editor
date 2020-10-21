@@ -75,12 +75,14 @@ const PaneWithContext = observer(({ view, paneId, children }) => {
   }, 1000);
 
   useEffect(() => {
-    if (view.selectedPane !== paneId) {
-      paneRef.current.style.pointerEvents = "none";
-      restorePointerEvents();
-    } else {
-      paneRef.current.style.pointerEvents = "auto";
-      restorePointerEvents.cancel();
+    if(paneRef.current) {
+      if (view.selectedPane !== paneId) {
+        paneRef.current.style.pointerEvents = "none";
+        restorePointerEvents();
+      } else {
+        paneRef.current.style.pointerEvents = "auto";
+        restorePointerEvents.cancel();
+      }
     }
   }, [view.selectedPane]);
 

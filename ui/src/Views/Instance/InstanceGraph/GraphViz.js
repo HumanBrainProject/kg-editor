@@ -37,11 +37,6 @@ const handleNodeClick = node => {
   }
 };
 
-const handleCapture = e => {
-  e.target.href = this.graphWrapper.querySelector("canvas").toDataURL("image/png");
-  e.target.download = "test.png";
-};
-
 const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
 
 const getNodeName = node => {
@@ -183,17 +178,24 @@ const Graph = observer(() => {
   useEffect(() => {
 
     const updateDimensions = debounce(() => {
-      setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
+      if(wrapperRef.current) {
+        setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
+      }
     }, 250);
 
     updateDimensions();
-    wrapperRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
+    graphRef.current && graphRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
     window.addEventListener("resize", updateDimensions);
     return () => {
       window.removeEventListener("resize", updateDimensions);
-      graphRef.current.stopAnimation();
+      graphRef.current && graphRef.current.stopAnimation();
     };
   }, []);
+
+  const handleCapture = e => {
+    e.target.href = wrapperRef.current && wrapperRef.current.querySelector("canvas").toDataURL("image/png");
+    e.target.download = "test.png";
+  };
 
   return (
     <div className={classes.graph} ref={wrapperRef}>

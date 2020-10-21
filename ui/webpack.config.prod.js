@@ -21,7 +21,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  entry: ["babel-polyfill","./src/index.js"],
+  entry: ["@babel/polyfill","./src/index.js"],
   output: {
     path: path.join(__dirname, "build"),
     filename: "./bundle.js"

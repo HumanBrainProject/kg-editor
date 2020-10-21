@@ -46,7 +46,7 @@ import FetchingLoader from "./Components/FetchingLoader";
 import GlobalError from "./Views/GlobalError";
 import * as Sentry from "@sentry/browser";
 
-import "babel-polyfill";
+import "@babel/polyfill";
 
 import WorkspaceModal from "./Views/WorkspaceModal";
 

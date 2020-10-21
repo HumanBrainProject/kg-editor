@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Field from "../../Fields/Field";
@@ -179,32 +179,31 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
 
   const { permissions } = instance;
 
-  const [timer, setTimer] = useState(null);
+  const timeout = useRef(null);
 
   const handleClick = e => {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.target)) {
       return;
     }
-    if(timer === null) {
+    if(timeout.current === null) {
       let action = typeof onClick === "function"?onClick:null;
       if (e.metaKey || e.ctrlKey) {
         action = typeof onCtrlClick === "function"?onCtrlClick:null;
       }
       if (action) {
-        const timeout = setTimeout((i, action) => {
-          setTimer(null);
+        timeout.current = setTimeout((i, action) => {
+          timeout.current = null;
           action(i);
         }, 300, instance, action);
-        setTimer(timeout);
       }
     }
   };
 
   const handleDoubleClick = e => {
     e.stopPropagation();
-    clearTimeout(timer);
-    setTimer(null);
+    clearTimeout(timeout.current);
+    timeout.current = null;
     if (!e.currentTarget.contains(e.target)) {
       return;
     }

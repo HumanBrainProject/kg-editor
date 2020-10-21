@@ -30,7 +30,7 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
 
   const classes = useStyles();
 
-  const savedInstanceStore = useRef(null);
+  const savedInstanceStore = useRef();
 
   useEffect(() => {
     if (!savedInstanceStore.current) {

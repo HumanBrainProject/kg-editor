@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useRef } from "react";
 import { observer } from "mobx-react";
 import { FormGroup } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
@@ -68,6 +68,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
 
   const classes = useStyles();
 
+  const draggedValue = useRef();
+
   const {
     value: values,
     resources,
@@ -78,8 +80,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
   } = fieldStore;
 
   const dropValue = droppedValue => {
-    fieldStore.moveValueAfter(this.draggedValue, droppedValue);
-    this.draggedValue = null;
+    fieldStore.moveValueAfter(draggedValue.current, droppedValue);
+    draggedValue.current = null;
   };
 
   const alternativeValueRenderer = ({value: values}) => {
@@ -102,9 +104,9 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
     fieldStore.removeValue(value);
   };
 
-  const handleDragEnd = () => this.draggedValue = null;
+  const handleDragEnd = () => draggedValue.current = null;
 
-  const handleDragStart = value => this.draggedValue = value;
+  const handleDragStart = value => draggedValue.current = value;
 
   const handleDrop = value => dropValue(value);
 

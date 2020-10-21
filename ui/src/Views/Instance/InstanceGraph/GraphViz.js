@@ -43,7 +43,7 @@ const getNodeName = node => {
   if(node.isGroup) {
     return `Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`;
   }
-  return `(${graphStore.groups[node.groupId].name}) ${node.name}`;
+  return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
 };
 
 const getNodeLabel = node => `${getNodeName(node)} ${node.workspace !== appStore.currentWorkspace.id?`(Workspace: ${node.workspace})`:""}`;

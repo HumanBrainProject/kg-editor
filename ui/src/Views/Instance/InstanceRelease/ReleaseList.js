@@ -43,7 +43,9 @@ const ReleaseList = observer(() => {
   useEffect(() => {
 
     const updateDimensions = debounce(() => {
-      setDimensions({width: wrapperRef.current && wrapperRef.current.offsetWidth, height: wrapperRef.current && wrapperRef.current.offsetHeight});
+      if(wrapperRef.current) {
+        setDimensions({width:  wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
+      }
     }, 250);
 
     updateDimensions();

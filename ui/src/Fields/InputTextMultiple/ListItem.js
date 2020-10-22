@@ -96,7 +96,7 @@ const ListItem = observer(({ index, value, readOnly, disabled, onDelete, onDragS
       title={value}
     >
       <span className={classes.valueDisplay}>{value}</span>
-      <FontAwesomeIcon className={`quickfire-remove ${classes.remove}`} icon="remove" onClick={handleDelete} />
+      <FontAwesomeIcon className={`quickfire-remove ${classes.remove}`} glyph="times" onClick={handleDelete} />
     </div>
   );
 });

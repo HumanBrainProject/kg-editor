@@ -16,7 +16,7 @@
 
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
-import { FormGroup } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 
 import List from "../InputTextMultiple/List";
@@ -169,7 +169,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
   const isDisabled = returnAsNull;
   return (
     <div className={className}>
-      <FormGroup className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`} >
+      <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`} >
         <Label label={label} labelTooltip={labelTooltip} />
         <Alternatives
           className={classes.alternatives}
@@ -200,7 +200,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
             onPaste={handleNativePaste}
           />
         </div>
-      </FormGroup>
+      </Form.Group>
     </div>
   );
 });

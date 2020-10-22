@@ -15,21 +15,21 @@
 */
 
 import React from "react";
-import { OverlayTrigger, FormLabel, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Form, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { uniqueId } from "lodash";
 
 const Label = ({label, labelTooltip}) => (
-  <FormLabel className={"quickfire-label"}>{label}
+  <Form.Label className={"quickfire-label"}>{label}
     {labelTooltip && (
       <React.Fragment>
       &nbsp;
         <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{labelTooltip}</Tooltip>}>
-          <FontAwesomeIcon icon="question-sign"/>
+          <FontAwesomeIcon icon="question-circle"/>
         </OverlayTrigger>
       </React.Fragment>
     )}
-  </FormLabel>
+  </Form.Label>
 );
 
 export default Label;

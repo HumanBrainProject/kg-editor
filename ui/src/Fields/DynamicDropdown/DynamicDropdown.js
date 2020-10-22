@@ -16,7 +16,7 @@
 
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
-import { FormGroup } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import _  from "lodash-uuid";
 
@@ -242,7 +242,7 @@ const DynamicDropdownWithContext = observer(({ className, fieldStore, readMode, 
   const canAddValues = !isDisabled;
   return (
     <div className={className}>
-      <FormGroup className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}>
+      <Form.Group className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}>
         <Label label={label} labelTooltip={labelTooltip} />
         <LinksAlternatives
           className={classes.alternatives}
@@ -290,7 +290,7 @@ const DynamicDropdownWithContext = observer(({ className, fieldStore, readMode, 
             </React.Fragment>
           )}
         </div>
-      </FormGroup>
+      </Form.Group>
     </div>
   );
 });

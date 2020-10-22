@@ -47,7 +47,8 @@ const useStyles = createUseStyles({
             margin: "0",
             padding: "0 25px 0 0",
             "-webkit-appearance": "none",
-            cursor: "pointer"
+            cursor: "pointer",
+            color: "inherit"
           },
           "&:before": {
             content: "\" \"",

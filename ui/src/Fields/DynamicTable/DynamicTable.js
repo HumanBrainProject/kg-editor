@@ -18,7 +18,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import _  from "lodash-uuid";
-import { FormGroup } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {Button} from "react-bootstrap";
 
@@ -203,7 +203,7 @@ const DynamicTableWithContext = observer(({ fieldStore, view, pane, readMode, cl
 
   return (
     <div className={`${classes.container} ${className}`}>
-      <FormGroup className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""}`}>
+      <Form.Group className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""}`}>
         <Label label={label} labelTooltip={labelTooltip} />
         {!isDisabled && (
           <div className={classes.deleteBtn}>
@@ -259,7 +259,7 @@ const DynamicTableWithContext = observer(({ fieldStore, view, pane, readMode, cl
             </span>
           </div>
         )}
-      </FormGroup>
+      </Form.Group>
     </div>
   );
 });

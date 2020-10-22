@@ -20,6 +20,7 @@ import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
+import CustomDropdownMenu from "./CustomDropdownMenu";
 import appStore from "../Stores/AppStore";
 
 const useStyles = createUseStyles({
@@ -37,11 +38,6 @@ const useStyles = createUseStyles({
     "& .btn-group": {
       margin: "-2px"
     }
-  },
-  dropdownMenu: {
-    background: "var(--ft-color-loud)",
-    margin: "0 0 0 -20px",
-    fontSize: "0.9em"
   }
 });
 
@@ -57,9 +53,10 @@ const WorkspaceSelector = observer(() => {
           <Dropdown.Toggle as={CustomDropdownToggle}>
             {appStore.currentWorkspaceName}
           </Dropdown.Toggle>
-          <Dropdown.Menu>
+          <Dropdown.Menu as={CustomDropdownMenu}>
             {authStore.workspaces.map(workspace =>
-              <Dropdown.Item key={workspace.id}
+              <Dropdown.Item
+                key={workspace.id}
                 eventKey={workspace.id}
                 onSelect={handleSelectWorkspace}>
                 {workspace.name||workspace.id}

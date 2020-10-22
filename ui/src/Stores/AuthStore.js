@@ -198,6 +198,21 @@ class AuthStore {
     }
     return this.authSuccess;
   }
+
+  async saveProfilePicture(picture) {
+    try {
+      const payoad = {
+        data: picture
+      };
+      await API.axios.put(API.endpoints.userPicture(), payoad);
+      runInAction(() => {
+        this.user.picture = picture;
+      });
+    } catch (e) {
+      appStore.captureSentryException(e);
+    }
+  }
+
 }
 
 export default new AuthStore();

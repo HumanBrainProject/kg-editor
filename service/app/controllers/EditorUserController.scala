@@ -18,6 +18,7 @@ package controllers
 
 import com.google.inject.Inject
 import constants.{EditorConstants, SchemaFieldsConstants}
+import models.errors.APIEditorError
 import models.{user, _}
 import models.user.User
 import monix.eval.Task
@@ -50,22 +51,22 @@ class EditorUserController @Inject()(
   def getUserProfile(): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     editorUserService
       .getUserProfile(request.userToken)
-      .flatMap{
+      .flatMap {
         case Right(profile) =>
           val user: User = getUserInfo((profile \ "data").as[JsValue]).as[User]
           val res = for {
             userWorkspaces <- workspaceServiceLive.retrieveWorkspaces(request.userToken, request.clientToken)
             workspaces = userWorkspaces match {
               case Right(w) => (w \ "data").asOpt[List[Workspace]]
-              case _  => None
+              case _ => None
             }
             userPicture <- editorUserService.getUsersPicture(request.userToken, request.clientToken, List(user.id))
             picture = userPicture match {
-              case Right(p) => p.as[Map[String,String]].get(user.id)
-              case _  => None
+              case Right(p) => p.as[Map[String, String]].get(user.id)
+              case _ => None
             }
           } yield (workspaces, picture)
-          res.map{r =>
+          res.map { r =>
             val resolvedUser = user.setWorkspaces(r._1).setPicture(r._2)
             Ok(
               Json.toJson(
@@ -77,4 +78,21 @@ class EditorUserController @Inject()(
       }.runToFuture
   }
 
+  def saveUserPicture: Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+    (request.body.asJson match {
+      case Some(picture) =>
+        editorUserService
+          .getUserProfile(request.userToken)
+          .flatMap {
+            case Right(profile) =>
+              val user: User = getUserInfo((profile \ "data").as[JsValue]).as[User]
+              editorUserService.putUserPicture(request.userToken, request.clientToken, user.id, picture).map {
+                case Right(res) => Ok("Picture successfully saved")
+                case Left(err) => err.toResult
+              }
+            case Left(err) => Task.pure(err.toResult)
+          }
+      case _ => Task.pure(BadRequest("Missing picture"))
+    }).runToFuture
+  }
 }

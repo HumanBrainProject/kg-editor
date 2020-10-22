@@ -11,3 +11,17 @@
 #      description: "Ok"
 ###
 GET   /                                             controllers.EditorUserController.getUserProfile
+
+###
+#  summary: update an instance
+#  tags:
+#    - editor
+#  parameters:
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: false
+#    type: string
+###
+PUT   /picture                                     controllers.EditorUserController.saveUserPicture
+

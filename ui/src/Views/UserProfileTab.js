@@ -132,6 +132,32 @@ const useStyles = createUseStyles({
     color: "var(--release-color-highlight)",
     transition: "transform .3s ease-in-out",
     transform: "translateY(-48px)"
+  },
+  profilePictureButton: {
+    margin: 0,
+    padding: 0,
+    border: 0,
+    background: "none",
+    "&:hover $profilePictureCamera": {
+      color: "rgba(0, 0, 0, 0.45)"
+    },
+    "&:hover $profilePicturePlus": {
+      color: "rgba(0, 0, 0, 0.65)"
+    }
+  },
+  profilePictureCamera: {
+    position: "absolute",
+    top: "25px",
+    left: "32px",
+    color: "rgba(0, 0, 0, 0.25)",
+    transition: "color 0.25 ease-in-out"
+  },
+  profilePicturePlus: {
+    position: "absolute",
+    top: "50px",
+    left: "55px",
+    color: "rgba(0, 0, 0, 0.45)",
+    transition: "color 0.25 ease-in-out"
   }
 });
 
@@ -145,8 +171,11 @@ const windowHeight = () => {
 };
 
 const UserProfileTab = observer(({ className, size=30 }) => {
-  const buttonRef = useRef();
+
   const classes = useStyles();
+
+  const buttonRef = useRef();
+  const imageFileRef = useRef();
 
   const [showPopOver, setShowPopOver] = useState(false);
   const [popOverPosition, setPopOverPosition] = useState("bottom");
@@ -185,6 +214,23 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     setTokenCopied(timer);
   };
 
+  const handlePictureClick = e => {
+    e && e.stopPropagation();
+    imageFileRef.current.click();
+  };
+
+  const handleImageFileChange = () => {
+    if (imageFileRef.current.files.length) {
+      const reader = new FileReader();
+      const sendPictureToBackend = () => {
+        authStore.saveProfilePicture(reader.result);
+        reader.removeEventListener("load", sendPictureToBackend);
+      };
+      reader.addEventListener("load", sendPictureToBackend, false);
+      reader.readAsDataURL(imageFileRef.current.files[0]);
+    }
+  };
+
   const handleLogout = () => appStore.logout();
 
   if (!authStore.isFullyAuthenticated || !authStore.hasUserProfile || !authStore.user) {
@@ -208,7 +254,12 @@ const UserProfileTab = observer(({ className, size=30 }) => {
         <Popover id={uniqueId("popover")} className={classes.popOver}>
           <PopOverContent onSizeChange={handlePopOverPosition}>
             <div className={classes.popOverContent}>
-              <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={100}  title={authStore.user.name} />
+              <button className={classes.profilePictureButton} onClick={handlePictureClick} title="Click to change your profile picture." >
+                <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={100}  title={authStore.user.name} />
+                <FontAwesomeIcon icon={"camera"} size="5x" className={classes.profilePictureCamera} />
+                <FontAwesomeIcon icon={"plus"} size="2x" className={classes.profilePicturePlus} />
+              </button>
+              <input type="file" accept="image/*" ref={imageFileRef} style={{display: "none"}} onChange={handleImageFileChange} />
               <div>
                 <div className={classes.name}>{authStore.user.name}</div>
                 <div className={classes.email}>{authStore.user.email}</div>

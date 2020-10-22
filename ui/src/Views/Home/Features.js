@@ -316,7 +316,7 @@ const Features = observer(() => {
                   </Card.Body>
                 </Card.Collapse>
                 <Card.Footer>
-                  <Card.Toggle componentClass="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Card.Toggle>
+                  <Card.Toggle as="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Card.Toggle>
                 </Card.Footer>
               </Card>
               <Overlay
@@ -348,7 +348,7 @@ const Features = observer(() => {
         :
         <div className={classes.featuresFetchErrorPanel}>
           <div>{featuresStore.fetchError}</div>
-          <Button bsStyle="primary" onClick={handleFetchFeaturesRetry}>Retry</Button>
+          <Button variant="primary" onClick={handleFetchFeaturesRetry}>Retry</Button>
         </div>
       }
     </div>

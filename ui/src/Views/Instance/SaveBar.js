@@ -145,8 +145,8 @@ const CompareModal = ({ instance, onSave, onReset, onClose }) => {
         </Scrollbars>
       </Modal.Body>
       <Modal.Footer>
-        <Button bsSize="small" onClick={handleReset}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
-        <Button bsStyle="primary" bsSize="small" onClick={handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
+        <Button size="sm" onClick={handleReset}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
+        <Button variant="primary" size="sm" onClick={handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
       </Modal.Footer>
     </Modal>
   );
@@ -171,9 +171,9 @@ const Instance = ({ instance, onSave, onReset, onCompare, onDismissSaveError }) 
           <FontAwesomeIcon className={classes.saveIcon} icon="dot-circle"/>
           :
           <ButtonGroup vertical>
-            <Button bsStyle="primary" bsSize="small" onClick={handleSave} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
-            <Button bsSize="small" onClick={handleReset} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
-            <Button bsSize="small" onClick={handleCompare} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
+            <Button variant="primary" size="sm" onClick={handleSave} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
+            <Button size="sm" onClick={handleReset} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>
+            <Button size="sm" onClick={handleCompare} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
           </ButtonGroup>
         }
       </div>
@@ -185,7 +185,7 @@ const Instance = ({ instance, onSave, onReset, onCompare, onDismissSaveError }) 
       </div>
       {instance.hasSaveError && (
         <div className={classes.errors}>
-          {instance.saveError} <Button bsSize={"xsmall"} bsStyle={"link"} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
+          {instance.saveError} <Button size="small" variant={"link"} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
         </div>
       )}
     </div>
@@ -240,7 +240,7 @@ const SavePanel = observer(() => {
   return(
     <div className={classes.container}>
       <Scrollbars autoHide>
-        <h4>Unsaved instances &nbsp;<Button bsStyle="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
+        <h4>Unsaved instances &nbsp;<Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
         <div className={classes.instances} >
           <CompareModal instance={comparedInstance} onSave={handleSave} onReset={handleReset} onClose={handleCloseCompararison} />
           {!instancesStore.hasUnsavedChanges &&

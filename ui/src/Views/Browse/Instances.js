@@ -177,7 +177,7 @@ const Instances = observer(() => {
             <BGMessage icon={"ban"}>
                 There was a network problem retrieving the list of instances.<br/>
                 If the problem persists, please contact the support.<br/><br/>
-              <Button bsStyle={"primary"} onClick={handleRetry}>
+              <Button variant={"primary"} onClick={handleRetry}>
                 <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
               </Button>
             </BGMessage>

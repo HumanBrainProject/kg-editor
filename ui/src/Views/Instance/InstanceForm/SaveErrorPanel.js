@@ -81,8 +81,8 @@ const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }) => {
       <div className={classes.panel}>
         <h4>{error}</h4>
         <div>
-          <Button bsStyle="default" onClick={handleCancel}>Cancel</Button>
-          <Button bsStyle="primary" onClick={handleRetry}>Retry</Button>
+          <Button variant="default" onClick={handleCancel}>Cancel</Button>
+          <Button variant="primary" onClick={handleRetry}>Retry</Button>
         </div>
       </div>
     </div>

@@ -118,7 +118,7 @@ const Browse = observer(() => {
         <Modal.Body>{`Creation of bookmark list "${bookmarkStore.newBookmarkName}" failed (${bookmarkStore.bookmarkCreationError}).`} </Modal.Body>
         <Modal.Footer>
           <Button onClick={handleDismissBookmarkCreationError}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel</Button>
-          <Button bsStyle="primary" onClick={handleRetryCreateNewBookmark}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+          <Button variant="primary" onClick={handleRetryCreateNewBookmark}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
         </Modal.Footer>
       </Modal>
       {bookmarkStore.isCreatingBookmark && (

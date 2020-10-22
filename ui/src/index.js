@@ -45,6 +45,7 @@ import Instance from "./Views/Instance";
 import FetchingLoader from "./Components/FetchingLoader";
 import GlobalError from "./Views/GlobalError";
 import * as Sentry from "@sentry/browser";
+// import "bootstrap/dist/css/bootstrap.min.css";
 
 import "@babel/polyfill";
 
@@ -209,7 +210,7 @@ const AppComponent = observer(() => {
                     <div className={classes.deleteInstanceError}>{appStore.deleteInstanceError}</div>
                     <div className={classes.deleteInstanceErrorFooterBar}>
                       <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
-                      <Button bsStyle="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+                      <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
                     </div>
                   </Modal.Body>
                 </Modal.Dialog>

@@ -100,7 +100,7 @@ const Types = observer(() => {
         :
         <div className={classes.fetchErrorPanel}>
           <div>{typesStore.fetchError}</div>
-          <Button bsStyle="primary" onClick={handleLoadRetry}>Retry</Button>
+          <Button variant="primary" onClick={handleLoadRetry}>Retry</Button>
         </div>
       }
     </div>

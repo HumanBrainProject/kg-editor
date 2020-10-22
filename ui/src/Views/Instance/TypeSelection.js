@@ -114,7 +114,7 @@ const TypeSelection = observer(({ onSelect }) => {
               If the problem persists, please contact the support.<br />
           <small>{typesStore.fetchError}</small><br /><br />
           <div>
-            <Button bsStyle={"primary"} onClick={handleRetry}>
+            <Button variant={"primary"} onClick={handleRetry}>
               <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
             </Button>
           </div>

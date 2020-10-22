@@ -99,7 +99,7 @@ const GraphInstance = observer(({ instance }) => {
     return (
       <div className={classes.fetchErrorPanel}>
         <h4>Error while fetching graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})</h4>
-        <Button bsStyle="primary" onClick={fetch}>Retry</Button>
+        <Button variant="primary" onClick={fetch}>Retry</Button>
       </div>
     );
   }

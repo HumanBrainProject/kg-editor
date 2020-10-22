@@ -162,10 +162,10 @@ const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconC
             {(CancelComponent || OkComponent) && (
               <div className={classes.popOverFooterBar}>
                 {CancelComponent && (
-                  <Button bsSize="small" onClick={handleCancelClick}><CancelComponent {...cancelProps} /></Button>
+                  <Button size="sm" onClick={handleCancelClick}><CancelComponent {...cancelProps} /></Button>
                 )}
                 {OkComponent && (
-                  <Button bsStyle="primary" bsSize="small" onClick={handleOkClick}><OkComponent {...okProps}  /></Button>
+                  <Button variant="primary" size="sm" onClick={handleOkClick}><OkComponent {...okProps}  /></Button>
                 )}
               </div>
             )}

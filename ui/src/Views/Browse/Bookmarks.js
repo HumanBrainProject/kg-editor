@@ -107,7 +107,7 @@ const Bookmarks = observer(class Bookmarks extends React.Component {
           :
           <div className={classes.fetchErrorPanel}>
             <div>{bookmarkStore.fetchError}</div>
-            <Button bsStyle="primary" onClick={this.handleLoadRetry}>Retry</Button>
+            <Button variant="primary" onClick={this.handleLoadRetry}>Retry</Button>
           </div>
         }
       </div>

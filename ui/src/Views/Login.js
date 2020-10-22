@@ -94,7 +94,7 @@ const Login = observer(() => {
             <BGMessage icon={"ban"}>
               {`There was a problem initializing (${appStore.initializationError}).
                 If the problem persists, please contact the support.`}<br /><br />
-              <Button bsStyle={"primary"} onClick={handleRetryToInitialize}>
+              <Button variant={"primary"} onClick={handleRetryToInitialize}>
                 <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
               </Button>
             </BGMessage>
@@ -113,7 +113,7 @@ const Login = observer(() => {
                 <Button onClick={handleRetryToInitialize}>
                   <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
                 </Button>
-                <Button bsStyle={"primary"} onClick={handleCancelInitialInstance}>Continue</Button>
+                <Button variant={"primary"} onClick={handleCancelInitialInstance}>Continue</Button>
               </div>
             </BGMessage>
           </div>
@@ -127,7 +127,7 @@ const Login = observer(() => {
           <div className={classes.error}>
             <BGMessage icon={"ban"}>
               {appStore.initialInstanceWorkspaceError}<br /><br />
-              <Button bsStyle={"primary"} onClick={handleCancelInitialInstance}>Continue</Button>
+              <Button variant={"primary"} onClick={handleCancelInitialInstance}>Continue</Button>
             </BGMessage>
           </div>
         </div>
@@ -150,7 +150,7 @@ const Login = observer(() => {
           <h3>You are logged out of the application</h3>
           <p></p>
           <div>
-            <Button bsStyle={"primary"} onClick={handleLogin}>Login</Button>
+            <Button variant={"primary"} onClick={handleLogin}>Login</Button>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@ const Login = observer(() => {
               Click on the following button to ask a new one and continue with your session.
           </p>
           <div>
-            <Button bsStyle={"primary"} onClick={handleLogin}>Re-Login</Button>
+            <Button variant={"primary"} onClick={handleLogin}>Re-Login</Button>
           </div>
         </div>
       </div>

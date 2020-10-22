@@ -31,8 +31,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const CustomDropdownToggle = observer(({onClick, children}) => {
-
+const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => {
   const classes = useStyles();
 
   const handleClick = e => {
@@ -41,10 +40,12 @@ const CustomDropdownToggle = observer(({onClick, children}) => {
   };
 
   return (
-    <a onClick={handleClick} className={classes.dropdownLink}>
+    <a onClick={handleClick} className={classes.dropdownLink} ref={ref}>
       {children} <FontAwesomeIcon icon={"caret-down"} />
     </a>
   );
 });
+
+CustomDropdownToggle.displayName = "CustomDropdownToggle";
 
 export default CustomDropdownToggle;

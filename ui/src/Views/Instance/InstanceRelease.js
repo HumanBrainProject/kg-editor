@@ -115,7 +115,7 @@ const InstanceRelease = observer(({ instance }) => {
           <small>{releaseStore.saveError}</small>
           <br />
           <br />
-          <Button bsStyle="primary" onClick={handleDismissSaveError}>
+          <Button variant="primary" onClick={handleDismissSaveError}>
             OK
           </Button>
         </BGMessage>
@@ -136,7 +136,7 @@ const InstanceRelease = observer(({ instance }) => {
           <small>{releaseStore.fetchError}</small>
           <br />
           <br />
-          <Button bsStyle="primary" onClick={handleRetryFetching}>
+          <Button variant="primary" onClick={handleRetryFetching}>
             Retry
           </Button>
         </BGMessage>

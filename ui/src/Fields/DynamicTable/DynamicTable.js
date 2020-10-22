@@ -207,7 +207,7 @@ const DynamicTableWithContext = observer(({ fieldStore, view, pane, readMode, cl
         <Label label={label} labelTooltip={labelTooltip} />
         {!isDisabled && (
           <div className={classes.deleteBtn}>
-            <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
+            <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
               <FontAwesomeIcon icon="times"/>
             </Button>
           </div>

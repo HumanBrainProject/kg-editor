@@ -16,7 +16,7 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { MenuItem } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Components/User";
@@ -64,7 +64,7 @@ const Alternative = ({ alternative, ValueRenderer, className, onSelect, onRemove
   const isOwnAlternative = users.find(user => authStore.user.id === user.id);
 
   return (
-    <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
+    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleSelect}>
         <strong>
           <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
@@ -80,7 +80,7 @@ const Alternative = ({ alternative, ValueRenderer, className, onSelect, onRemove
           <span className={classes.removeIcon}><FontAwesomeIcon onClick={handleRemoveClick} icon="times" /></span>
         )}
       </div>
-    </MenuItem>
+    </Dropdown.Item>
   );
 };
 

@@ -74,7 +74,7 @@ const CompareInstancesModal = observer(() => {
         </Scrollbars>
       </Modal.Body>
       <Modal.Footer>
-        <Button bsSize="small" onClick={handleHideCompare} >
+        <Button size="sm" onClick={handleHideCompare} >
           <FontAwesomeIcon icon="times" />&nbsp;Close
         </Button>
       </Modal.Footer>

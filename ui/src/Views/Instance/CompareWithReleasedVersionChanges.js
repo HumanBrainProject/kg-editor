@@ -101,7 +101,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
           <small>{instance.fetchError}</small><br/><br/>
           <div>
             <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-            <Button bsStyle={"primary"} onClick={handleRetryFetchInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            <Button variant={"primary"} onClick={handleRetryFetchInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>
@@ -117,7 +117,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
           <small>{releasedInstance.fetchError}</small><br/><br/>
           <div>
             <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-            <Button bsStyle={"primary"} onClick={handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            <Button variant={"primary"} onClick={handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>

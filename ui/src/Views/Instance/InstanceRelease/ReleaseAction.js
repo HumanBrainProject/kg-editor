@@ -153,8 +153,8 @@ const ReleaseAction = observer(() => {
               (releaseStore.treeStats.proceed_release === 0 &&
                 releaseStore.treeStats.proceed_unrelease === 0)
           }
-          bsClass={`${classes.releaseButton} btn btn-primary`}
-          bsStyle={"primary"}
+          bsPrefix={`${classes.releaseButton} btn btn-primary`}
+          variant={"primary"}
           title={
             releaseStore.isSaving
               ? "Saving..."

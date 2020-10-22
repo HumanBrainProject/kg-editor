@@ -14,13 +14,12 @@
 *   limitations under the License.
 */
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { observer } from "mobx-react";
-import { Dropdown, MenuItem } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
-import routerStore from "../Stores/RouterStore";
 import appStore from "../Stores/AppStore";
 
 const useStyles = createUseStyles({
@@ -49,28 +48,22 @@ const useStyles = createUseStyles({
 const WorkspaceSelector = observer(() => {
   const classes = useStyles();
 
-  const [currentLocationPathname, setCurrentLocationPathname] = useState(routerStore.history.location.pathname);
-
-  useEffect(() => {
-    const unlisten = routerStore.history.listen(location => {
-      setCurrentLocationPathname(location.pathname);
-    });
-    return unlisten;
-  }, []);
-
   const handleSelectWorkspace = eventKey => appStore.setCurrentWorkspace(eventKey);
 
   return (
-    <div key={currentLocationPathname} className={classes.container} title={`${appStore.currentWorkspaceName} workspace`}>
+    <div className={classes.container} title={`${appStore.currentWorkspaceName} workspace`}>
       {authStore.workspaces.length > 1 ?
-        <Dropdown id="dropdown-custom-1">
-          <CustomDropdownToggle bsRole="toggle">{appStore.currentWorkspaceName}</CustomDropdownToggle>
-          <Dropdown.Menu className={classes.dropdownMenu}>
+        <Dropdown>
+          <Dropdown.Toggle as={CustomDropdownToggle}>
+            {appStore.currentWorkspaceName}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
             {authStore.workspaces.map(workspace =>
-              <MenuItem key={workspace.id}
+              <Dropdown.Item key={workspace.id}
                 eventKey={workspace.id}
                 onSelect={handleSelectWorkspace}>
-                {workspace.name||workspace.id}</MenuItem>
+                {workspace.name||workspace.id}
+              </Dropdown.Item>
             )}
           </Dropdown.Menu>
         </Dropdown>

@@ -121,7 +121,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
             If the problem persists, please contact the support.<br/><br/>
           <div>
             <Button onClick={onClose}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-            <Button bsStyle={"primary"} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            <Button variant={"primary"} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>

@@ -165,7 +165,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
           <small>{instance.fetchError}</small>
           <br />
           <br />
-          <Button bsStyle={"primary"} onClick={handleRetry}>
+          <Button variant={"primary"} onClick={handleRetry}>
             <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
           </Button>
         </BGMessage>

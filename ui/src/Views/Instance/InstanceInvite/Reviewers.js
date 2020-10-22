@@ -123,7 +123,7 @@ const Reviewers = observer(({ id }) => {
               There was a network problem fetching the reviewers for instance &quot;<i>{id}&quot;</i>.<br/>
               If the problem persists, please contact the support.<br/>
             <small>{instanceReviews.fetchError}</small><br/><br/>
-            <Button bsStyle="primary" onClick={fetchInstanceReviews}>
+            <Button variant="primary" onClick={fetchInstanceReviews}>
               <FontAwesomeIcon icon="redo-alt"/>&nbsp;&nbsp; Retry
             </Button>
           </BGMessage>

@@ -17,7 +17,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { FormGroup, FormControl } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";
@@ -63,7 +63,7 @@ const FieldValue = ({field, splitLines}) => {
 
 const AlternativeValue = ({value}) => value;
 
-const InputText = observer(({ fieldStore, className, componentClass, readMode }) => {
+const InputText = observer(({ fieldStore, className, as, readMode }) => {
 
   const classes = useStyles();
 
@@ -88,7 +88,7 @@ const InputText = observer(({ fieldStore, className, componentClass, readMode })
       <div className={className}>
         <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
           <Label label={label} labelTooltip={labelTooltip} />
-          <FieldValue field={fieldStore} splitLines={componentClass=== "textarea"} />
+          <FieldValue field={fieldStore} splitLines={as=== "textarea"} />
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ const InputText = observer(({ fieldStore, className, componentClass, readMode })
 
   return (
     <div className={className}>
-      <FormGroup className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${returnAsNull? "quickfire-field-disabled": ""}`} >
+      <Form.Group className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${returnAsNull? "quickfire-field-disabled": ""}`} >
         <Label label={label} labelTooltip={labelTooltip} />
         <Alternatives
           className={classes.alternatives}
@@ -106,16 +106,16 @@ const InputText = observer(({ fieldStore, className, componentClass, readMode })
           parentContainerClassName="form-group"
           ValueRenderer={AlternativeValue}
         />
-        <FormControl
+        <Form.Control
           value={value}
           type={inputType}
           className={"quickfire-user-input"}
-          componentClass={componentClass}
+          as={as}
           onChange={handleChange}
           disabled={returnAsNull}
           rows={rows}
         />
-      </FormGroup>
+      </Form.Group>
     </div>
   );
 });

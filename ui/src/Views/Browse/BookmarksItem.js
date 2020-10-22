@@ -262,8 +262,8 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
                 onKeyUp={this.handleBookmarkNameKeyUp}
                 ref={this.editBookmarkNameRef} />
               <ButtonGroup>
-                <Button bsStyle="primary" bsSize="small" onClick={this.handleRenameBookmark} title="confirm rename"><FontAwesomeIcon icon="check" /></Button>
-                <Button bsSize="small" onClick={this.handleCancelEditBookmark} title="cancel rename"><FontAwesomeIcon icon="undo" /></Button>
+                <Button variant="primary" size="sm" onClick={this.handleRenameBookmark} title="confirm rename"><FontAwesomeIcon icon="check" /></Button>
+                <Button size="sm" onClick={this.handleCancelEditBookmark} title="cancel rename"><FontAwesomeIcon icon="undo" /></Button>
               </ButtonGroup>
             </div>
             :
@@ -331,7 +331,7 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
                       </div>
                     </div>
                     <div className={`${classes.deleteBookmarkDialog} ${this.state.showDeleteBookmarkDialog ? "show" : ""}`}>
-                      <Button bsStyle="danger" bsSize="small" onClick={this.handleDeleteBookmark}><FontAwesomeIcon icon="trash-alt" />&nbsp;Delete</Button>
+                      <Button variant="danger" size="sm" onClick={this.handleDeleteBookmark}><FontAwesomeIcon icon="trash-alt" />&nbsp;Delete</Button>
                     </div>
                   </React.Fragment>
                 )

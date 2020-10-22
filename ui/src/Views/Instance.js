@@ -111,10 +111,10 @@ const Instance = observer(({ match, mode }) => {
           There was a network problem fetching the instance.<br />
           If the problem persists, please contact the support.<br />
         <small>{status.error}</small><br /><br />
-        <Button bsStyle={"primary"} onClick={handleRetry}>
+        <Button variant={"primary"} onClick={handleRetry}>
           <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
         </Button>
-        <Button bsStyle={"primary"} onClick={handleContinue}>Continue</Button>
+        <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
       </BGMessage>
     );
   }

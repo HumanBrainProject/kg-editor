@@ -105,7 +105,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 
   if (instance && instance.fetchError) {
     return (
-      <Button bsSize={"xsmall"} bsStyle={"danger"} onClick={handleRetry} >
+      <Button size="small" variant={"danger"} onClick={handleRetry} >
         <FontAwesomeIcon icon="redo-alt"/>
       </Button>
     );
@@ -113,7 +113,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 
   if (!instance || instance.isFetched || instance.isLabelFetched) {
     return (
-      <Button bsSize={"xsmall"} bsStyle={"primary"} onClick={handleDelete} >
+      <Button size="small" variant={"primary"} onClick={handleDelete} >
         <FontAwesomeIcon icon="times"/>
       </Button>
     );

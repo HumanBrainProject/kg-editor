@@ -84,8 +84,8 @@ const ConfirmCancelEditPanel = ({ show, text, inline, onConfirm, onCancel }) => 
       <div className={classes.panel}>
         <h4>{text}</h4>
         <div>
-          <Button bsStyle="default" onClick={handleConfirm}>Yes</Button>
-          <Button bsStyle="danger" onClick={handleCancel}>No</Button>
+          <Button variant="default" onClick={handleConfirm}>Yes</Button>
+          <Button variant="danger" onClick={handleCancel}>No</Button>
         </div>
       </div>
     </div>

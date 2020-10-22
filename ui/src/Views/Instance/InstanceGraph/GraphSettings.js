@@ -19,12 +19,12 @@ import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
 import Color from "color";
-import { Glyphicon } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
 import appStore from "../../../Stores/AppStore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
   container: {
@@ -250,7 +250,7 @@ const Group = ({ group }) => {
 
   return (
     <div className={`${classes.group} ${expanded ? "expanded" : ""}`}>
-      <Glyphicon glyph="chevron-right" className={classes.expandButton} onClick={handleClick} />
+      <FontAwesomeIcon icon="chevron-right" className={classes.expandButton} onClick={handleClick} />
       <GroupLabel className={classes.groupLabel} group={group} />
       <Actions className={classes.groupActions} group={group} />
       {expanded && (

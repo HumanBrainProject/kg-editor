@@ -114,7 +114,7 @@ const InstanceManage = observer(({instance}) => {
                 <li>Be careful. After duplication both instances will look the same.</li>
                 <li>After dupplication you should update the name &amp; description fields.</li>
               </ul>
-              <Button bsStyle={"warning"} onClick={handleDuplicateInstance}>
+              <Button variant={"warning"} onClick={handleDuplicateInstance}>
                 <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance
               </Button>
             </div>
@@ -125,7 +125,7 @@ const InstanceManage = observer(({instance}) => {
               {status && status.hasFetchError ?
                 <div className={classes.error}>
                   <FontAwesomeIcon icon={"exclamation-triangle"} />&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
-                  <Button bsStyle="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+                  <Button variant="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
                 </div>
                 : !status || !status.isFetched ?
                   <React.Fragment>
@@ -143,7 +143,7 @@ const InstanceManage = observer(({instance}) => {
                         <strong>Be careful. Removed instances cannot be restored!</strong>
                       </p>
                     }
-                    <Button bsStyle={"danger"} onClick={handleDeleteInstance} disabled={status.data !== "UNRELEASED"} >
+                    <Button variant={"danger"} onClick={handleDeleteInstance} disabled={status.data !== "UNRELEASED"} >
                       <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
                     </Button>
                   </React.Fragment>

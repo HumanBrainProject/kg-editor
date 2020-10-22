@@ -106,9 +106,9 @@ const SavingModal = observer(() => {
       </Modal.Body>
       {releaseStore.savingErrors.length > 0 && releaseStore.savingProgress === releaseStore.savingTotal ?
         <Modal.Footer>
-          <Button bsStyle="primary" onClick={handleDismissSavingReport}>Dismiss</Button>
+          <Button variant="primary" onClick={handleDismissSavingReport}>Dismiss</Button>
         </Modal.Footer> : <Modal.Footer>
-          <Button bsStyle="danger" onClick={handleStop}>Stop</Button>
+          <Button variant="danger" onClick={handleStop}>Stop</Button>
         </Modal.Footer>
       }
     </Modal>

@@ -30,12 +30,9 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
 
   const classes = useStyles();
 
-  const savedInstanceStore = useRef();
+  const savedInstanceStore = useRef(createInstanceStore());
 
   useEffect(() => {
-    if (!savedInstanceStore.current) {
-      savedInstanceStore.current = createInstanceStore();
-    }
     const savedInstance = savedInstanceStore.current.createInstanceOrGet(instanceId);
     const instance = instancesStore.instances.get(instanceId);
     const data = instance.cloneInitialData;
@@ -46,7 +43,7 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
   }, [instanceId]);
 
   const instance = instancesStore.instances.get(instanceId);
-  const savedInstance = savedInstanceStore.current && savedInstanceStore.current.instances.get(instanceId);
+  const savedInstance = savedInstanceStore.current.instances.get(instanceId);
   if (!instance || !savedInstance) {
     return null;
   }

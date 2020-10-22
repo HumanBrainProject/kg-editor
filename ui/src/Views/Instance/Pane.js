@@ -71,7 +71,9 @@ const PaneWithContext = observer(({ view, paneId, children }) => {
   const paneRef = useRef();
 
   const restorePointerEvents = debounce(() => {
-    paneRef.current.style.pointerEvents = "auto";
+    if(paneRef.current) {
+      paneRef.current.style.pointerEvents = "auto";
+    }
   }, 1000);
 
   useEffect(() => {

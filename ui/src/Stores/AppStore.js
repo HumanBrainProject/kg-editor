@@ -110,7 +110,12 @@ class AppStore{
       duplicateInstance: action,
       retryDeleteInstance: action,
       cancelDeleteInstance: action,
-      login: action
+      login: action,
+      setSizeHistorySetting: action,
+      toggleViewedFlagHistorySetting: action,
+      toggleEditedFlagHistorySetting: action,
+      toggleBookmarkedFlagHistorySetting: action,
+      toggleReleasedFlagHistorySetting: action
     });
 
     this.canLogin = !matchPath(routerStore.history.location.pathname, { path: "/logout", exact: "true" });
@@ -469,12 +474,12 @@ class AppStore{
           let nextLocation = null;
           if(matchPath(routerStore.history.location.pathname, {path:"/instance/:mode/:id*", exact:"true"})){
             if(matchPath(routerStore.history.location.pathname, {path:`/instance/:mode/${instanceId}`, exact:"true"})){
-              const openedInstances = viewStore.instancesIds;
-              if(openedInstances.length > 1){
-                const currentInstanceIndex = openedInstances.indexOf(instanceId);
-                const newInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex-1]: openedInstances[currentInstanceIndex+1];
-                const openedInstance = openedInstances.get(newInstanceId);
-                nextLocation = `/instance/${openedInstance.mode}/${newInstanceId}`;
+              const ids = viewStore.instancesIds;
+              if(ids.length > 1){
+                const currentInstanceIndex = ids.indexOf(instanceId);
+                const newInstanceId = currentInstanceIndex >= ids.length - 1 ? ids[currentInstanceIndex-1]: ids[currentInstanceIndex+1];
+                const view = viewStore.views.get(newInstanceId);
+                nextLocation = `/instance/${view.mode}/${newInstanceId}`;
               } else {
                 nextLocation = "/browse";
               }
@@ -499,17 +504,15 @@ class AppStore{
   }
 
   async duplicateInstance(fromInstanceId) {
-    let instanceToCopy = instancesStore.instances.get(fromInstanceId);
-    let values = JSON.parse(JSON.stringify(instanceToCopy.initialValues));
-    delete values.id;
+    const instanceToCopy = instancesStore.instances.get(fromInstanceId);
+    const payload = instanceToCopy.payload;
     const labelField = instanceToCopy.labelField;
     if(labelField) {
-      values[labelField] = (values[labelField]?(values[labelField] + " "):"") + "(Copy)";
+      payload[labelField] = `${payload[labelField]} (Copy)`;
     }
     this.isCreatingNewInstance = true;
-    values["@type"] = instanceToCopy.types.map(t => t.name);
     try{
-      const { data } = await API.axios.post(API.endpoints.createInstance(), values);
+      const { data } = await API.axios.post(API.endpoints.createInstance(), payload);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });

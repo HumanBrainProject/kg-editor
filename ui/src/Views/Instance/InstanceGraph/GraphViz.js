@@ -119,12 +119,12 @@ const getNodeCanvasObject = (node, ctx, scale) => {
 
 const getLinkColor = link => {
   if (graphStore.highlightedNode) {
-    if (!link.highlighted) {
-      return new Color("#ccc").alpha(0.1).rgb();
-    } else if (link.target === graphStore.highlightedNode) {
+    if (link.target === graphStore.highlightedNode) {
       return new Color("#f39c12").alpha(1).rgb();
     } else if (link.source === graphStore.highlightedNode) {
       return new Color("#1abc9c").alpha(1).rgb();
+    } else {
+      return new Color("#ccc").alpha(0.1).rgb();
     }
   } else {
     return new Color("#ccc").alpha(1).rgb();

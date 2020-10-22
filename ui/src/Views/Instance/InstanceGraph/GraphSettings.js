@@ -197,7 +197,6 @@ const GroupLabel = observer(({ className, group }) => {
 const Actions = observer(({ className, group }) => {
 
   const handleChange = action => {
-    const { group } = this.props;
     switch (action) {
     case "show":
       graphStore.setGroupVisibility(group, true);

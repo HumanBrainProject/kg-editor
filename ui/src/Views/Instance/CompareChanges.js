@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import CompareFieldsChanges from "./CompareFieldsChanges";
@@ -30,23 +30,25 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
 
   const classes = useStyles();
 
-  const savedInstanceStore = useRef();
+  const [savedInstanceStore, setSavedInstanceStore] = useState(null);
 
   useEffect(() => {
-    if (!savedInstanceStore.current) {
-      savedInstanceStore.current = createInstanceStore();
+    let store = savedInstanceStore;
+    if(!store) {
+      store = createInstanceStore();
+      setSavedInstanceStore(store);
     }
-    const savedInstance = savedInstanceStore.current.createInstanceOrGet(instanceId);
+    const savedInstance = store.createInstanceOrGet(instanceId);
     const instance = instancesStore.instances.get(instanceId);
     const data = instance.cloneInitialData;
     savedInstance.initializeData(data);
     return () => {
-      savedInstanceStore.current.flush();
+      savedInstanceStore.flush();
     };
   }, [instanceId]);
 
   const instance = instancesStore.instances.get(instanceId);
-  const savedInstance = savedInstanceStore.current && savedInstanceStore.current.instances.get(instanceId);
+  const savedInstance = savedInstanceStore && savedInstanceStore.instances.get(instanceId);
   if (!instance || !savedInstance) {
     return null;
   }

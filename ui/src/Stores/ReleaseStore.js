@@ -74,7 +74,7 @@ class ReleaseStore{
   isFetchingWarningMessages = false;
   isStopped = false;
   hideReleasedInstances = false;
-  comparededInstance = null;
+  comparedInstance = null;
 
   constructor() {
     makeObservable(this, {
@@ -97,7 +97,7 @@ class ReleaseStore{
       isFetchingWarningMessages: observable,
       isStopped: observable,
       hideReleasedInstances: observable,
-      comparededInstance: observable,
+      comparedInstance: observable,
       setComparedInstance: action,
       visibleWarningMessages: computed,
       treeStats: computed,
@@ -121,7 +121,7 @@ class ReleaseStore{
   }
 
   setComparedInstance(instance) {
-    this.comparededInstance = instance;
+    this.comparedInstance = instance;
   }
 
   get visibleWarningMessages() {

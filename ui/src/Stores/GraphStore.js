@@ -53,8 +53,7 @@ const createNode = (id, name, workspace, color, groupId) => ({
 const createLink = (id, source, target) => ({
   id: id,
   source: source,
-  target: target,
-  highlighted: false
+  target: target
 });
 
 const isNodeVisible = (groups, node) => {
@@ -82,7 +81,11 @@ const getGraphNodes = groups => Object.values(groups).reduce((acc, group) => {
   return acc;
 }, []);
 
-const getGraphLinks = (groups, links) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target));
+const getGraphLinks = (groups, links) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target)).map(link => ({
+  id: link.id,
+  source: link.source,
+  target: link.target
+}));
 
 class GraphStore {
   isFetching = false;
@@ -167,14 +170,12 @@ class GraphStore {
     this.links.forEach(link => {
       set(link.source, "highlighted", false);
       set(link.target, "highlighted", false);
-      set(link, "highlighted", false);
     });
     if (node && highlighted) {
       this.graphData.links.forEach(link => {
         if (link.source.id === node.id || link.target.id === node.id) {
           set(link.source, "highlighted", true);
           set(link.target, "highlighted", true);
-          set(link, "highlighted", true);
         }
       });
     }

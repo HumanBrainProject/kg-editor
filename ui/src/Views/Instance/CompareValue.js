@@ -73,7 +73,7 @@ const CompareValue = ({ label, leftValue, rightValue, separator }) => {
     <pre className={classes.container}>
       <label className={classes.label}>{label}</label>
       <span className={classes.value}>
-        {diff.map(part => {
+        {diff.map((part, index) => {
           if (!part.value) {
             return null;
           }
@@ -91,7 +91,7 @@ const CompareValue = ({ label, leftValue, rightValue, separator }) => {
           }
           const values = value.split(separator);
           return (
-            <React.Fragment key={part.value}>
+            <React.Fragment key={`${part.value}-${index}`}>
               {first && (
                 <span>{separator}</span>
               )}

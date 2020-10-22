@@ -221,7 +221,7 @@ const SavePanel = observer(() => {
 
   const handleSave = instance => {
     appStore.saveInstance(instance);
-    appStore.setComparedInstance(null);
+    setComparedInstance(null);
   };
 
   const handleReset = instance => {
@@ -229,17 +229,11 @@ const SavePanel = observer(() => {
     setComparedInstance(null);
   };
 
-  const handleDismissSaveError = instance => {
-    instance.cancelSave();
-  };
+  const handleDismissSaveError = instance => instance.cancelSave();
 
-  const handleCompare = instance => {
-    setComparedInstance(instance);
-  };
+  const handleCompare = instance => setComparedInstance(instance);
 
-  const handleCloseCompararison = () => {
-    setComparedInstance(null);
-  };
+  const handleCloseCompararison = () => setComparedInstance(null);
 
   const changedInstances = instancesStore.getUnsavedInstances;
 

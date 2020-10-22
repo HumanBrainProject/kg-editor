@@ -108,7 +108,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   if (leftStatus.isFetching || rightStatus.isFetching) {
     return (
       <div className={classes.container}>
-        <FetchingLoader>Fetching instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
+        <FetchingLoader>Fetching children of instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
       </div>
     );
   }
@@ -137,7 +137,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
         rightValue: getValue(rightInstanceStore, rightInstance, name),
       })
     );
-
+    console.log("fields,", fields );
     return (
       <div className={classes.container}>
         {fields.map(({name, label, leftValue, rightValue}) => (

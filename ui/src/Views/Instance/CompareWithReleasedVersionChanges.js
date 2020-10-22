@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
@@ -39,23 +39,26 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
 
   const classes = useStyles();
 
+  const [releasedInstanceStore, setReleasedInstanceStore] = useState(null);
+
   useEffect(() => {
-    if (instanceId && status !== "UNRELEASED") {
-      this.releasedInstanceStore = createInstanceStore("RELEASED");
+    if(!releasedInstanceStore) {
+      setReleasedInstanceStore(createInstanceStore("RELEASED"));
+    }
+    if (instanceId && status !== "UNRELEASED" && releasedInstanceStore) {
       fetchReleasedInstance(true);
       fetchInstance();
     }
     return () => {
-      if (this.releasedInstanceStore) {
-        this.releasedInstanceStore.flush();
-        this.releasedInstanceStore = null;
+      if(releasedInstanceStore) {
+        releasedInstanceStore.flush();
       }
     };
-  }, [instanceId, status]);
+  }, [instanceId, status, releasedInstanceStore]);
 
   const fetchReleasedInstance = (forceFetch=false) => {
     if (status !== "UNRELEASED") {
-      const instance = this.releasedInstanceStore.createInstanceOrGet(instanceId);
+      const instance = releasedInstanceStore.createInstanceOrGet(instanceId);
       instance.fetch(forceFetch);
     }
   };
@@ -74,7 +77,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
   if (!instanceId) {
     return null;
   }
-  const releasedInstance = status !== "UNRELEASED"?this.releasedInstanceStore.instances.get(instanceId):null;
+  const releasedInstance = (releasedInstanceStore && status !== "UNRELEASED")?releasedInstanceStore.instances.get(instanceId):null;
   const instance = instancesStore.instances.get(instanceId);
 
   if (!instance) {
@@ -128,7 +131,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
           instanceId={instanceId}
           leftInstance={releasedInstance}
           rightInstance={instance}
-          leftInstanceStore={this.releasedInstanceStore}
+          leftInstanceStore={releasedInstanceStore}
           rightInstanceStore={instancesStore}
           leftChildrenIds={releasedInstance?releasedInstance.childrenIds:[]}
           rightChildrenIds={instance.childrenIds}

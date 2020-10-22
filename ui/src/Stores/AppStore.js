@@ -110,7 +110,12 @@ class AppStore{
       duplicateInstance: action,
       retryDeleteInstance: action,
       cancelDeleteInstance: action,
-      login: action
+      login: action,
+      setSizeHistorySetting: action,
+      toggleViewedFlagHistorySetting: action,
+      toggleEditedFlagHistorySetting: action,
+      toggleBookmarkedFlagHistorySetting: action,
+      toggleReleasedFlagHistorySetting: action
     });
 
     this.canLogin = !matchPath(routerStore.history.location.pathname, { path: "/logout", exact: "true" });

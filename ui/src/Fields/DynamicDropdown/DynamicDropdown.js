@@ -57,6 +57,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const classes = useStyles();
 
   const draggedValue = useRef();
+  const formGroupRef = useRef();
 
   const {
     instance,
@@ -237,7 +238,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
   return (
-    <Form.Group className={className}>
+    <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <LinksAlternatives
         className={classes.alternatives}
@@ -245,7 +246,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         mappingValue={mappingValue}
-        parentContainerClassName="form-group"
+        parentContainerRef={formGroupRef}
       />
       <div className={`form-control ${classes.values}`} disabled={isDisabled} >
         <List

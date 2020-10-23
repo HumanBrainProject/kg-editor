@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { Form } from "react-bootstrap";
@@ -68,6 +68,8 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   const classes = useStyles();
 
+  const formGroupRef = useRef();
+
   const {
     value,
     inputType,
@@ -97,14 +99,14 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   }
 
   return (
-    <Form.Group className={`${returnAsNull? "quickfire-field-disabled": ""} ${className}`} >
+    <Form.Group className={`${returnAsNull? "quickfire-field-disabled": ""} ${className}`} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
-        parentContainerClassName="form-group"
+        parentContainerRef={formGroupRef}
         ValueRenderer={AlternativeValue}
       />
       <Form.Control

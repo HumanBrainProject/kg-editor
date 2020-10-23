@@ -70,6 +70,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode}) => {
   const classes = useStyles();
 
   const draggedValue = useRef();
+  const formGroupRef = useRef();
 
   const {
     value: list,
@@ -163,14 +164,14 @@ const InputTextMultiple = observer(({className, fieldStore, readMode}) => {
 
   const isDisabled = returnAsNull;
   return (
-    <Form.Group className={`quickfire-field-dropdown-select ${!list.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}  ${className}`}>
+    <Form.Group className={`quickfire-field-dropdown-select ${!list.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}  ${className}`} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
-        parentContainerClassName="form-group"
+        parentContainerRef={formGroupRef}
         ValueRenderer={alternativeValueRenderer}
       />
       <div className={`form-control ${classes.values}`} disabled={isDisabled} >

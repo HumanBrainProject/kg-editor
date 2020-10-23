@@ -291,24 +291,26 @@ class InstancesStore {
         instance.clearFieldsErrors();
       }
     });
-    try{
+    try {
       const response = await API.axios.post(API.endpoints.instancesList(this.stage), toProcess);
-      runInAction(() =>{
+      runInAction(() => {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             const data = response && response.data && response.data.data && response.data.data[identifier];
-            if(data){
-              instance.initializeData(data, false);
-              appStore.syncInstancesHistory(instance, "viewed");
-            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-              const error = response.data.error[identifier];
-              const message = JSON.stringify(error); // TODO: check and handle properly error object
-              instance.errorInstance(message);
-              instance.isFetching = false;
-              instance.isFetched = false;
+            if (data) {
+              if (data.error) {
+                const code = data.error.code?` [${data.error.code}]`:"";
+                const message = `This instance "${identifier}" cannot be found - it either could have been removed or it's not a recognized ressource${code}.`;
+                instance.errorInstance(message);
+                instance.isFetching = false;
+                instance.isFetched = false;
+              } else {
+                instance.initializeData(data, false);
+                appStore.syncInstancesHistory(instance, "viewed");
+              }
             } else {
-              const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+              const message = `Unexpected error while retrieving instance "${identifier}": The server didn't return any response.`;
               instance.errorInstance(message);
               instance.isFetching = false;
               instance.isFetched = false;
@@ -318,11 +320,11 @@ class InstancesStore {
         });
         this.isFetchingQueue = false;
         this.processQueue();
-      });
+      })
     } catch(e){
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          if(this.instances.has(identifier)) {
+          if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             instance.errorInstance(e);
             instance.isFetching = false;
@@ -338,13 +340,13 @@ class InstancesStore {
   }
 
   async fetchLabelsQueue() {
-    if(this.isFetchingLabelsQueue){
+    if (this.isFetchingLabelsQueue) {
       return;
     }
     this.isFetchingLabelsQueue = true;
     const toProcess = Array.from(this.instanceLabelsQueue).splice(0, this.queueThreshold);
     toProcess.forEach(identifier => {
-      if(this.instances.has(identifier)) {
+      if (this.instances.has(identifier)) {
         const instance = this.instances.get(identifier);
         instance.isLabelFetching = true;
         instance.isLabelFetched = false;
@@ -353,23 +355,25 @@ class InstancesStore {
         instance.saveError = null;
       }
     });
-    try{
-      let response = await API.axios.post(API.endpoints.instancesLabel(this.stage), toProcess);
+    try {
+      const response = await API.axios.post(API.endpoints.instancesLabel(this.stage), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          if(this.instances.has(identifier)) {
+          if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             const data = response && response.data && response.data.data && response.data.data[identifier];
-            if(data){
-              instance.initializeLabelData(data);
-            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-              const error = response.data.error[identifier];
-              const message = JSON.stringify(error); // TODO: check and handle properly error object
-              instance.errorLabelInstance(message);
-              instance.isLabelFetching = false;
-              instance.isLabelFetched = false;
+            if (data) {
+              if (data.error) {
+                const code = data.error.code?` [${data.error.code}]`:"";
+                const message = `This instance "${identifier}" cannot be found - it either could have been removed or it's not a recognized ressource${code}.`;
+                instance.errorLabelInstance(message);
+                instance.isLabelFetching = false;
+                instance.isLabelFetched = false;
+              } else {
+                instance.initializeLabelData(data);
+              }
             } else {
-              const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+              const message = `Unexpected error while retrieving instance "${identifier}": The server didn't return any response.`;
               instance.errorLabelInstance(message);
               instance.isLabelFetching = false;
               instance.isLabelFetched = false;
@@ -380,7 +384,7 @@ class InstancesStore {
         this.isFetchingLabelsQueue = false;
         this.processLabelsQueue();
       });
-    } catch(e){
+    } catch (e) {
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {

@@ -87,6 +87,10 @@ const NoPermissionForView = ({ instance, mode }) => {
 
   const classes = useStyles();
 
+  if (!instance.labelField) {
+    return null;
+  }
+
   const fieldStore = instance.fields[instance.labelField];
 
   return (

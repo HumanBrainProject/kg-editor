@@ -21,7 +21,7 @@ import Alternatives from "./Alternatives";
 
 const AlternativeValue = ({value:instances}) => instances.map(instance => instance.name).join("; ");
 
-const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue}) => {
+const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -51,13 +51,10 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue}) 
       list={items}
       onSelect={onSelect}
       onRemove={onRemove}
-      parentContainerClassName="form-group"
-      // parentRef={formGroupRef}
+      parentContainerRef={parentContainerRef}
       ValueRenderer={AlternativeValue}
     />
   );
 };
-
-// const LinksAlternatives = React.forwardRef(LinksAlternativesWithRef, this.props.formGroupRef);
 
 export default LinksAlternatives;

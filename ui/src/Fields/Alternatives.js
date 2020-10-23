@@ -48,19 +48,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getContainerWidth = (node, className) => {
-  if (node && className) {
-    while (node !== document.body && node.className && !node.className.includes(className)) {
-      node = node.parentNode;
-    }
-    if (node) {
-      return node.offsetWidth;
-    }
-  }
-  return null;
-};
-
-const Alternatives = ({ className, list, disabled, parentContainerClassName, ValueRenderer, onSelect, onRemove }) => {
+const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRenderer, onSelect, onRemove }) => {
 
   const classes = useStyles();
 
@@ -68,7 +56,6 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
   const alternativesRef = useRef();
 
   const [open, setOpen] = useState(false);
-  const [fixedWidth, setFixedWidth] = useState(null);
 
   const handleToggle = e => {
     e.preventDefault();
@@ -78,16 +65,16 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
   const handleSelect = (alternative, e) => {
     if(e && e.keyCode === 40){ // Down
       e && e.preventDefault();
-      const alternatives = this.alternativesRef.querySelectorAll(".option");
-      let index = Array.prototype.indexOf.call(alternatives, e.target) + 1;
+      const alternatives = alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
+      let index = alternatives.indexOf(e.target) + 1;
       if (index >= alternatives.length) {
         index = 0;
       }
       alternatives[index].focus();
     } else if(e && e.keyCode === 38){ // Up
       e && e.preventDefault();
-      const alternatives = this.alternativesRef.querySelectorAll(".option");
-      let index = Array.prototype.indexOf.call(alternatives, e.target) - 1;
+      const alternatives =  alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
+      let index = alternatives.indexOf(e.target) - 1;
       if (index < 0) {
         index = alternatives.length - 1;
       }
@@ -114,16 +101,16 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
     }
     if(e && e.keyCode === 40){ // Down
       e && e.preventDefault();
-      const alternatives = this.alternativesRef.querySelectorAll(".option");
-      let index = Array.prototype.indexOf.call(alternatives, e.target) + 1;
+      const alternatives = alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
+      let index = alternatives.indexOf(e.target) + 1;
       if (index >= alternatives.length) {
         index = 0;
       }
       alternatives[index].focus();
     } else if(e && e.keyCode === 38){ // Up
       e && e.preventDefault();
-      const alternatives = this.alternativesRef.querySelectorAll(".option");
-      let index = Array.prototype.indexOf.call(alternatives, e.target) - 1;
+      const alternatives = alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
+      let index = alternatives.indexOf(e.target) - 1;
       if (index < 0) {
         index = alternatives.length - 1;
       }
@@ -135,21 +122,16 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
   };
 
   const clickOutHandler = e => {
-    if(wrapperRef.current && !wrapperRef.current.contains(e.target)){
-      setOpen(false);
-    }
-    if (open && !fixedWidth && alternativesRef.current) {
-      const width = getContainerWidth(wrapperRef.current, parentContainerClassName);
-      if (width && width > wrapperRef.current.offsetLeft) {
-        let maxWidth = width - wrapperRef.current.offsetLeft;
-        if (alternativesRef.current.offsetWidth) {
-          if (alternativesRef.current.offsetWidth > maxWidth) {
-            setFixedWidth(maxWidth);
-          }
-        } else {
-          setFixedWidth(maxWidth);
+    if(!open && wrapperRef.current && wrapperRef.current.contains(e.target)){
+      if (alternativesRef.current) {
+        const containerWidth = parentContainerRef.current.offsetWidth;
+        if (containerWidth && containerWidth > wrapperRef.current.offsetLeft) {
+          const width = containerWidth - wrapperRef.current.offsetLeft;
+          alternativesRef.current.style.width = width + "px";
         }
       }
+    } else {
+      setOpen(false);
     }
   };
 
@@ -162,14 +144,34 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
       window.removeEventListener("touchend", clickOutHandler, false);
       window.removeEventListener("keyup", clickOutHandler, false);
     };
-  });
+  }, []);
 
   if (!list || !list.length) {
     return null;
   }
 
+  const renderUsers = () => {
+    return list.map(alternative => (
+      alternative.users.map(user => (
+        <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
+      ))
+    ));
+  };
 
-  const style = fixedWidth?{ width: fixedWidth + "px" }:{};
+  const renderAlternative = () => {
+    return list.map(alternative => {
+      const key = alternative.users.map(user => user.id).join(";");
+      return (
+        <Alternative
+          key={key}
+          alternative={alternative}
+          ValueRenderer={ValueRenderer}
+          onRemove={handleRemove}
+          onSelect={handleSelect}
+          className={classes.fixedWidthDropdownItem} />
+      );
+    });
+  };
 
   return (
     <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
@@ -177,25 +179,10 @@ const Alternatives = ({ className, list, disabled, parentContainerClassName, Val
         title="show alternatives"
         onKeyDown={handleInputKeyStrokes}
         onClick={handleToggle}>
-        {list.map(alternative => {
-          const users = (!alternative || !alternative.users)?[]:alternative.users;
-          return (
-            users.map(user => (
-              <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
-            ))
-          );
-        })}
+        {renderUsers()}
       </button>
-      <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${open?"open":""}`} style={style} ref={alternativesRef} >
-        {list.map(alternative => {
-          const key = (!alternative || !alternative.users)?"":alternative.users.reduce((acc, user) => {
-            acc += user.id;
-            return acc;
-          }, "");
-          return (
-            <Alternative key={key} alternative={alternative} ValueRenderer={ValueRenderer} onRemove={handleRemove} onSelect={handleSelect} className={fixedWidth?classes.fixedWidthDropdownItem:null} />
-          );
-        })}
+      <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${open?"open":""}`} ref={alternativesRef} >
+        {renderAlternative()}
       </ul>
     </div>
   );

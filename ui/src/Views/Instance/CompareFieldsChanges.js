@@ -137,7 +137,6 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
         rightValue: getValue(rightInstanceStore, rightInstance, name),
       })
     );
-    console.log("fields,", fields );
     return (
       <div className={classes.container}>
         {fields.map(({name, label, leftValue, rightValue}) => (

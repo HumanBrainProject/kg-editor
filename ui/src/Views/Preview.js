@@ -237,7 +237,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
               {fields.map(name => {
                 const fieldStore = instance.fields[name];
                 return (
-                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} />
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} showIfNoValue={showEmptyFields} />
                 );
               })}
               {showMetaData && instance.metadata && instance.metadata.length > 0 && (

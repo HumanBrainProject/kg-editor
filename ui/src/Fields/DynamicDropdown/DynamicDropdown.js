@@ -18,7 +18,7 @@ import React, { useRef } from "react";
 import { observer } from "mobx-react";
 import { Form } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
-import _  from "lodash-uuid";
+import _ from "lodash-uuid";
 
 import List from "./List";
 
@@ -36,22 +36,15 @@ const useStyles = createUseStyles({
     paddingBottom:"3px",
     position:"relative",
     minHeight: "34px",
-    "& .btn":{
-      marginRight:"3px",
-      marginBottom:"3px"
-    },
-    "&:disabled":{
-      pointerEvents:"none",
-      display: "none !important"
+    "&[disabled]": {
+      backgroundColor: "#e9ecef",
+      pointerEvents:"none"
     }
   },
   label: {},
   readMode:{
     "& $label:after": {
       content: "':\\00a0'"
-    },
-    "& .quickfire-readmode-item:not(:last-child):after":{
-      content: "';\\00a0'"
     }
   },
   alternatives: {
@@ -59,14 +52,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const DynamicDropdown = observer(({ className, fieldStore, readMode, view, pane}) => {
+const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}) => {
 
   const classes = useStyles();
 
   const draggedValue = useRef();
 
   const {
-    instanceId,
+    instance,
     value: values,
     links,
     label,
@@ -211,10 +204,15 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, view, pane}
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
   if(readMode){
+
+    if (!links.length && !showIfNoValue) {
+      return null;
+    }
+
     return (
-      <Form.Group  className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode}  quickfire-field-readonly  ${className}`}>
+      <Form.Group  className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
-        {(view && view.currentInstanceId === instanceId)?
+        {(view && view.currentInstanceId === instance.id)?
           <List
             list={links}
             readOnly={true}
@@ -239,7 +237,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, view, pane}
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
   return (
-    <Form.Group className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${className}`}>
+    <Form.Group className={className}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <LinksAlternatives
         className={classes.alternatives}

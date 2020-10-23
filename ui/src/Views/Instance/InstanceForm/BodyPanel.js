@@ -37,14 +37,6 @@ const useStyles = createUseStyles({
     "& textarea": {
       minHeight: "200px"
     },
-    "& .quickfire-field-dropdown-select .quickfire-readmode-item button": {
-      margin: "0 1px 3px 2px"
-    },
-    "& .quickfire-field-dropdown-select .btn.quickfire-value-tag:hover, & .btn.quickfire-value-tag:focus, & .quickfire-field-dropdown-select .quickfire-readmode-item button:hover, & .quickfire-field-dropdown-select .quickfire-readmode-item button:focus": {
-      backgroundColor: "#a5c7e9",
-      borderColor: "#337ab7",
-      color: "#143048"
-    },
     "& .quickfire-field-input-text.quickfire-readmode, & .quickfire-field-dropdown-select.quickfire-readmode": {
       marginBottom: "5px",
       "& label.quickfire-label": {
@@ -140,7 +132,7 @@ const BodyPanel = ({ className, instance, readMode}) => {
               {fields.map(name => {
                 const fieldStore = instance.fields[name];
                 return (
-                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} />
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
                 );
               })}
             </Form>

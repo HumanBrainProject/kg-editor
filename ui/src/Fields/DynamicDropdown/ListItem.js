@@ -22,7 +22,25 @@ import instancesStore from "../../Stores/InstancesStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  valueDisplay: {
+  value: {
+    "&:not(:last-child):after":{
+      content: "';\\00a0'"
+    }
+  },
+  valueTag: {
+    marginBottom: "5px",
+    padding: "1px 5px",
+    border: "1px solid #ced4da",
+    "&:hover": {
+      backgroundColor: "#a5c7e9",
+      borderColor: "#337ab7",
+      color: "#143048"
+    },
+    "& + $valueTag": {
+      marginLeft: "5px"
+    }
+  },
+  valueLabel: {
     display: "inline-block",
     maxWidth: "200px",
     overflow: "hidden",
@@ -116,27 +134,26 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
   if (readOnly) {
     if (!enablePointerEvents) {
       return (
-        <span className="quickfire-readmode-item">{label}</span>
+        <span className={classes.value}>{label}</span>
       );
     }
 
     return (
-      <span className="quickfire-readmode-item">
-        <button type="button" className={`btn btn-xs btn-default ${hasError ? classes.notFound : ""}`}
-          onClick={handleClick}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
-        >{label}</button>
-      </span>
+      <div className={`btn btn-xs btn-default ${classes.valueTag} ${hasError ? classes.notFound : ""}`}
+        onClick={handleClick}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
+      >{label}
+      </div>
     );
   }
 
   return (
     <div
       tabIndex={"0"}
-      className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
+      className={`btn btn-xs btn-default ${classes.valueTag} ${disabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
       disabled={disabled}
       draggable={!!disabled}
       onClick={handleClick}
@@ -151,8 +168,8 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
       onMouseOut={handleMouseOut}
       title={label}
     >
-      <span className={classes.valueDisplay}>{label}</span>
-      <FontAwesomeIcon className={`quickfire-remove ${classes.remove}`} icon="times" onClick={handleDelete} />
+      <span className={classes.valueLabel}>{label}</span>
+      {!disabled && <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />}
     </div>
   );
 });

@@ -64,7 +64,7 @@ const FieldValue = ({field, splitLines}) => {
 
 const AlternativeValue = ({value}) => value;
 
-const InputText = observer(({ fieldStore, className, as, readMode }) => {
+const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
 
   const classes = useStyles();
 
@@ -85,8 +85,11 @@ const InputText = observer(({ fieldStore, className, as, readMode }) => {
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
   if(readMode){
+    if(!value && !showIfNoValue) {
+      return null;
+    }
     return (
-      <Form.Group className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode quickfire-field-readonly ${classes.readMode} ${className}`}>
+      <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
         <FieldValue field={fieldStore} splitLines={as=== "textarea"} />
       </Form.Group>
@@ -94,7 +97,7 @@ const InputText = observer(({ fieldStore, className, as, readMode }) => {
   }
 
   return (
-    <Form.Group className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${returnAsNull? "quickfire-field-disabled": ""} ${className}`} >
+    <Form.Group className={`${returnAsNull? "quickfire-field-disabled": ""} ${className}`} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Alternatives
         className={classes.alternatives}

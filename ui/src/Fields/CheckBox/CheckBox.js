@@ -21,14 +21,10 @@ import { Form } from "react-bootstrap";
 import Label from "../Label";
 
 const useStyles = createUseStyles({
-  readMode: {
-    "& .quickfire-label:after": {
-      content: "':\\00a0'"
-    }
-  }
+  readMode: {}
 });
 
-const CheckBox = observer(({ fieldStore, readMode }) => {
+const CheckBox = observer(({ className, fieldStore, readMode }) => {
 
   const { value, label, labelTooltip } = fieldStore;
   const classes = useStyles();
@@ -41,16 +37,16 @@ const CheckBox = observer(({ fieldStore, readMode }) => {
 
   if (readMode) {
     return (
-      <div className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
-        <Label label={label} labelTooltip={labelTooltip} />
+      <Form.Group className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly ${className}`}>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
         <span>&nbsp;<input className={"quickfire-readmode-checkbox"} type="checkbox" readOnly={true} checked={value} /></span>
-      </div>
+      </Form.Group>
     );
   }
 
   return (
     <Form.Group className="quickfire-field-checkbox" >
-      <Label label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Form.Check readOnly={false} onChange={handleChange} checked={value} />
     </Form.Group>
   );

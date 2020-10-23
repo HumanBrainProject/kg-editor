@@ -16,6 +16,7 @@
 
 import React, { useRef } from "react";
 import { createUseStyles } from "react-jss";
+import { Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Field from "../../Fields/Field";
 import Status from "./Status";
@@ -231,11 +232,11 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         </div>
         <div className={classes.name}>{instance.name}</div>
       </div>
-      <div>
+      <Form>
         {Object.entries(instance.fields).map(([name, fieldStore]) => (
-          <Field name={name} key={name} fieldStore={fieldStore} readMode={true} className={classes.fields} />
+          <Field name={name} key={name} fieldStore={fieldStore} readMode={true} className={classes.fields}  />
         ))}
-      </div>
+      </Form>
       <div className={classes.actions}>
         <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />

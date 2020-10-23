@@ -39,8 +39,9 @@ const useStyles = createUseStyles({
       display: "none !important"
     }
   },
+  label: {},
   readMode:{
-    "& .quickfire-label:after":{
+    "& $label:after": {
       content: "':\\00a0'"
     },
     "& .quickfire-readmode-item:not(:last-child):after":{
@@ -153,55 +154,51 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
 
   if(readMode){
     return (
-      <div className={className}>
-        <div className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
-          <Label label={label} labelTooltip={labelTooltip} />
-          <List
-            list={resources}
-            readOnly={true}
-            disabled={false}
-          />
-        </div>
-      </div>
+      <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly} ${className}`}>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <List
+          list={resources}
+          readOnly={true}
+          disabled={false}
+        />
+      </Form.Group>
     );
   }
 
   const isDisabled = returnAsNull;
   return (
-    <div className={className}>
-      <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`} >
-        <Label label={label} labelTooltip={labelTooltip} />
-        <Alternatives
-          className={classes.alternatives}
-          list={alternatives}
-          onSelect={handleSelectAlternative}
-          onRemove={handleRemoveMySuggestion}
-          parentContainerClassName="form-group"
-          ValueRenderer={alternativeValueRenderer}
+    <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""} ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${className}`} >
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Alternatives
+        className={classes.alternatives}
+        list={alternatives}
+        onSelect={handleSelectAlternative}
+        onRemove={handleRemoveMySuggestion}
+        parentContainerClassName="form-group"
+        ValueRenderer={alternativeValueRenderer}
+      />
+      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+        <List
+          list={resources}
+          readOnly={false}
+          disabled={isDisabled}
+          onDelete={handleDelete}
+          onDragEnd={handleDragEnd}
+          onDragStart={handleDragStart}
+          onDrop={handleDrop}
+          onKeyDown={handleKeyDown}
         />
-        <div className={`form-control ${classes.values}`} disabled={isDisabled} >
-          <List
-            list={resources}
-            readOnly={false}
-            disabled={isDisabled}
-            onDelete={handleDelete}
-            onDragEnd={handleDragEnd}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
-            onKeyDown={handleKeyDown}
-          />
-          <input type="text" className={`quickfire-user-input ${classes.userInput}`}
-            disabled={isDisabled}
-            onDrop={handleDrop}
-            onDragOver={e => e.preventDefault()}
-            onKeyDown={handleKeyStrokes}
-            onBlur={handleBlur}
-            onChange={e => e.stopPropagation()}
-            onPaste={handleNativePaste}
-          />
-        </div>
-      </Form.Group>
-    </div>
+        <input type="text" className={`quickfire-user-input ${classes.userInput}`}
+          disabled={isDisabled}
+          onDrop={handleDrop}
+          onDragOver={e => e.preventDefault()}
+          onKeyDown={handleKeyStrokes}
+          onBlur={handleBlur}
+          onChange={e => e.stopPropagation()}
+          onPaste={handleNativePaste}
+        />
+      </div>
+    </Form.Group>
   );
 });
 

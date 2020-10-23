@@ -29,8 +29,6 @@ import Label from "../Label";
 import instancesStore from "../../Stores/InstancesStore";
 import typesStore from "../../Stores/TypesStore";
 
-import { ViewContext, PaneContext } from "../../Stores/ViewStore";
-
 const useStyles = createUseStyles({
   container: {
     position: "relative"
@@ -82,14 +80,15 @@ const useStyles = createUseStyles({
     float: "right",
     marginRight: "9px"
   },
-  readMode: {
-    "& .quickfire-label:after": {
+  label: {},
+  readMode:{
+    "& $label:after": {
       content: "':\\00a0'"
     }
   }
 });
 
-const DynamicTableWithContext = observer(({ fieldStore, view, pane, readMode, className }) => {
+const DynamicTable = observer(({ className, fieldStore, view, pane, readMode }) => {
 
   const classes = useStyles();
 
@@ -202,78 +201,64 @@ const DynamicTableWithContext = observer(({ fieldStore, view, pane, readMode, cl
   const isDisabled =  readMode || returnAsNull;
 
   return (
-    <div className={`${classes.container} ${className}`}>
-      <Form.Group className={`quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""}`}>
-        <Label label={label} labelTooltip={labelTooltip} />
-        {!isDisabled && (
-          <div className={classes.deleteBtn}>
-            <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
-              <FontAwesomeIcon icon="times"/>
-            </Button>
-          </div>
-        )}
-        <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
-          {(view && view.currentInstanceId === instance.id)?
-            <Table
-              list={links}
-              fieldStore={fieldStore}
-              readOnly={isDisabled}
-              enablePointerEvents={true}
-              onRowDelete={handleRowDelete}
-              onRowClick={handleRowClick}
-              onRowMouseOver={handleRowMouseOver}
-              onRowMouseOut={handleRowMouseOut}
-            />
-            :
-            <Table
-              list={links}
-              fieldStore={fieldStore}
-              readOnly={isDisabled}
-              enablePointerEvents={false}
-            />
-          }
-          {!isDisabled && (
-            <div className={`form-control ${classes.dropdownContainer}`}>
-              <Dropdown
-                searchTerm={optionsSearchTerm}
-                options={options}
-                types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-                externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
-                loading={fetchingOptions}
-                hasMore={hasMoreOptions}
-                inputPlaceholder={`type to add a ${fieldStoreLabel}`}
-                onSearch={handleSearchOptions}
-                onLoadMore={handleLoadMoreOptions}
-                onReset={handleDropdownReset}
-                onAddValue={handleOnAddValue}
-                onAddNewValue={handleOnAddNewValue}
-                onPreview={handleOptionPreview}
-              />
-            </div>
-          )}
+    <Form.Group className={`${classes.container} quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""} ${className}`}>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      {!isDisabled && (
+        <div className={classes.deleteBtn}>
+          <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
+            <FontAwesomeIcon icon="times"/>
+          </Button>
         </div>
-        {!links.length && (
-          <div className={classes.emptyMessage}>
-            <span className={classes.emptyMessageLabel}>
-                    No {fieldStoreLabel} available
-            </span>
+      )}
+      <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
+        {(view && view.currentInstanceId === instance.id)?
+          <Table
+            list={links}
+            fieldStore={fieldStore}
+            readOnly={isDisabled}
+            enablePointerEvents={true}
+            onRowDelete={handleRowDelete}
+            onRowClick={handleRowClick}
+            onRowMouseOver={handleRowMouseOver}
+            onRowMouseOut={handleRowMouseOut}
+          />
+          :
+          <Table
+            list={links}
+            fieldStore={fieldStore}
+            readOnly={isDisabled}
+            enablePointerEvents={false}
+          />
+        }
+        {!isDisabled && (
+          <div className={`form-control ${classes.dropdownContainer}`}>
+            <Dropdown
+              searchTerm={optionsSearchTerm}
+              options={options}
+              types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+              externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+              loading={fetchingOptions}
+              hasMore={hasMoreOptions}
+              inputPlaceholder={`type to add a ${fieldStoreLabel}`}
+              onSearch={handleSearchOptions}
+              onLoadMore={handleLoadMoreOptions}
+              onReset={handleDropdownReset}
+              onAddValue={handleOnAddValue}
+              onAddNewValue={handleOnAddNewValue}
+              onPreview={handleOptionPreview}
+            />
           </div>
         )}
-      </Form.Group>
-    </div>
+      </div>
+      {!links.length && (
+        <div className={classes.emptyMessage}>
+          <span className={classes.emptyMessageLabel}>
+                    No {fieldStoreLabel} available
+          </span>
+        </div>
+      )}
+    </Form.Group>
   );
 });
-
-const DynamicTable = props => (
-  <ViewContext.Consumer>
-    {view => (
-      <PaneContext.Consumer>
-        {pane => (
-          <DynamicTableWithContext view={view} pane={pane} {...props} />
-        )}
-      </PaneContext.Consumer>
-    )}
-  </ViewContext.Consumer>
-);
 
 export default DynamicTable;

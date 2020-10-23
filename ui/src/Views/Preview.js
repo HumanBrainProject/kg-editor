@@ -17,6 +17,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
+import { Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -156,7 +157,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   if(instance.hasFetchError) {
     return(
-      <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
+      <div className={`${classes.container} ${className?className:""}`}>
         <BGMessage icon={"ban"}>
                 There was a network problem fetching the instance &quot;<i>{instanceId}&quot;</i>.
           <br />
@@ -175,7 +176,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   if(!instance.isFetched || instance.isFetching) {
     return(
-      <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
+      <div className={`${classes.container} ${className?className:""}`}>
         <FetchingLoader>
           <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
         </FetchingLoader>
@@ -186,12 +187,12 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(instance.isFetched && !instance.permissions.canRead) {
     const fieldStore = instance.fields[instance.labelField];
     return(
-      <div className={`${classes.container} ${className?className:""} no-permission`} >
+      <Form className={`${classes.container} ${className?className:""} no-permission`} >
         <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
         <div className={classes.errorMessage}>
           <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
         </div>
-      </div>
+      </Form>
     );
   }
 
@@ -232,7 +233,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
         </div>
         <Scrollbars autoHide>
           {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
-            <div className={classes.form}>
+            <Form className={`${classes.form}`}>
               {fields.map(name => {
                 const fieldStore = instance.fields[name];
                 return (
@@ -253,7 +254,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
                   ))}
                 </div>
               )}
-            </div>}
+            </Form>}
         </Scrollbars>
       </div>
     </div>

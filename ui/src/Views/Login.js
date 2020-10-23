@@ -33,7 +33,7 @@ const useStyles = createUseStyles({
   panel: {
     backgroundColor: "var(--bg-color-ui-contrast2)",
     color:"var(--ft-color-loud)",
-    padding: "0px 20px 20px 20px",
+    padding: "20px",
     borderRadius: "4px",
     textAlign: "center",
     width: "auto",

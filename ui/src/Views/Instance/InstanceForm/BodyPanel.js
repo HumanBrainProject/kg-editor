@@ -16,8 +16,10 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
+import { Form } from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
+import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";
 
 const useStyles = createUseStyles({
@@ -112,32 +114,41 @@ const BodyPanel = ({ className, instance, readMode}) => {
   if (readMode) {
     if(!instance.permissions.canRead) {
       return (
-        <div className={`${classes.container} ${className}`} >
+        <Form className={`${classes.container} ${className}`} >
           <NoPermissionForView instance={instance} mode="view" />
-        </div>
+        </Form>
       );
     }
   } else { // edit
     if(!instance.permissions.canWrite) {
       return (
-        <div className={`${classes.container} ${className}`} >
+        <Form className={`${classes.container} ${className}`} >
           <NoPermissionForView instance={instance} mode="edit" />
-        </div>
+        </Form>
       );
     }
   }
 
   const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
 
-  return(
-    <div className={`${classes.container} ${className}`} >
-      {fields.map(name => {
-        const fieldStore = instance.fields[name];
-        return (
-          <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={readMode} />
-        );
-      })}
-    </div>
+  return (
+    <ViewContext.Consumer>
+      {view => (
+        <PaneContext.Consumer>
+          {pane => (
+            <Form className={`${classes.container} ${className}`} >
+              {fields.map(name => {
+                const fieldStore = instance.fields[name];
+                return (
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} />
+                );
+              })}
+            </Form>
+          )}
+        </PaneContext.Consumer>
+      )}
+    </ViewContext.Consumer>
+
   );
 };
 

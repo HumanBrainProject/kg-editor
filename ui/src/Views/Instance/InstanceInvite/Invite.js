@@ -18,7 +18,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Row, Col } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import Field from "../../../Fields/Field";
 
@@ -101,16 +101,14 @@ const InstanceInvite = observer(({ instance }) => {
                 </Col>
               </Row>
             </div>
-            <div>
+            <Form>
               {fields.map(name => {
                 const fieldStore = instance.fields[name];
                 return (
-                  <div key={name} className={classes.field}>
-                    <Field name={name} fieldStore={fieldStore} readMode={true} />
-                  </div>
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} />
                 );
               })}
-            </div>
+            </Form>
             <div>
               <Row>
                 <Col xs={12}>

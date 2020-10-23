@@ -23,13 +23,14 @@ import Alternatives from "../Alternatives";
 import Label from "../Label";
 
 const useStyles = createUseStyles({
-  readMode: {
-    "& .quickfire-label:after":{
-      content: "':\\00a0'"
-    }
-  },
   alternatives: {
     marginLeft: "3px"
+  },
+  label: {},
+  readMode:{
+    "& $label:after": {
+      content: "':\\00a0'"
+    }
   }
 });
 
@@ -85,38 +86,34 @@ const InputText = observer(({ fieldStore, className, as, readMode }) => {
 
   if(readMode){
     return (
-      <div className={className}>
-        <div className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
-          <Label label={label} labelTooltip={labelTooltip} />
-          <FieldValue field={fieldStore} splitLines={as=== "textarea"} />
-        </div>
-      </div>
+      <Form.Group className={`quickfire-field-input-text ${!value? "quickfire-empty-field": ""} quickfire-readmode quickfire-field-readonly ${classes.readMode} ${className}`}>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <FieldValue field={fieldStore} splitLines={as=== "textarea"} />
+      </Form.Group>
     );
   }
 
   return (
-    <div className={className}>
-      <Form.Group className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${returnAsNull? "quickfire-field-disabled": ""}`} >
-        <Label label={label} labelTooltip={labelTooltip} />
-        <Alternatives
-          className={classes.alternatives}
-          list={alternatives}
-          onSelect={handleSelectAlternative}
-          onRemove={handleRemoveMySuggestion}
-          parentContainerClassName="form-group"
-          ValueRenderer={AlternativeValue}
-        />
-        <Form.Control
-          value={value}
-          type={inputType}
-          className={"quickfire-user-input"}
-          as={as}
-          onChange={handleChange}
-          disabled={returnAsNull}
-          rows={rows}
-        />
-      </Form.Group>
-    </div>
+    <Form.Group className={`quickfire-field-input-text ${classes.container?classes.container:""} ${!value? "quickfire-empty-field": ""} ${returnAsNull? "quickfire-field-disabled": ""} ${className}`} >
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Alternatives
+        className={classes.alternatives}
+        list={alternatives}
+        onSelect={handleSelectAlternative}
+        onRemove={handleRemoveMySuggestion}
+        parentContainerClassName="form-group"
+        ValueRenderer={AlternativeValue}
+      />
+      <Form.Control
+        value={value}
+        type={inputType}
+        className={"quickfire-user-input"}
+        as={as}
+        onChange={handleChange}
+        disabled={returnAsNull}
+        rows={rows}
+      />
+    </Form.Group>
   );
 });
 

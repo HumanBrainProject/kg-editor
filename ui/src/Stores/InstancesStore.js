@@ -300,8 +300,8 @@ class InstancesStore {
             const data = response && response.data && response.data.data && response.data.data[identifier];
             if (data) {
               if (data.error) {
-                const code = data.error.code?` [${data.error.code}]`:"";
-                const message = `This instance "${identifier}" cannot be found - it either could have been removed or it's not a recognized ressource${code}.`;
+                const code = data.error.code?` [error ${data.error.code}]`:"";
+                const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
                 instance.errorInstance(message);
                 instance.isFetching = false;
                 instance.isFetched = false;
@@ -310,7 +310,7 @@ class InstancesStore {
                 appStore.syncInstancesHistory(instance, "viewed");
               }
             } else {
-              const message = `Unexpected error while retrieving instance "${identifier}": The server didn't return any response.`;
+              const message = "Unexpected error: no response returned.";
               instance.errorInstance(message);
               instance.isFetching = false;
               instance.isFetched = false;
@@ -320,7 +320,7 @@ class InstancesStore {
         });
         this.isFetchingQueue = false;
         this.processQueue();
-      })
+      });
     } catch(e){
       runInAction(() =>{
         toProcess.forEach(identifier => {
@@ -365,7 +365,7 @@ class InstancesStore {
             if (data) {
               if (data.error) {
                 const code = data.error.code?` [${data.error.code}]`:"";
-                const message = `This instance "${identifier}" cannot be found - it either could have been removed or it's not a recognized ressource${code}.`;
+                const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
                 instance.errorLabelInstance(message);
                 instance.isLabelFetching = false;
                 instance.isLabelFetched = false;
@@ -373,7 +373,7 @@ class InstancesStore {
                 instance.initializeLabelData(data);
               }
             } else {
-              const message = `Unexpected error while retrieving instance "${identifier}": The server didn't return any response.`;
+              const message = "Unexpected error: no response returned.";
               instance.errorLabelInstance(message);
               instance.isLabelFetching = false;
               instance.isLabelFetched = false;

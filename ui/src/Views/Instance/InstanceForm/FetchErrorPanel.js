@@ -52,7 +52,6 @@ const useStyles = createUseStyles({
       fontWeight:"400",
       fontSize:"0.8em",
       fontStyle: "italic",
-      whiteSpace: "nowrap",
       "@media screen and (max-width:576px)": {
         wordBreak: "break-all",
         wordWrap: "break-word",
@@ -65,6 +64,9 @@ const useStyles = createUseStyles({
   },
   retryIcon: {
     marginRight: "4px"
+  },
+  action: {
+    textAlign: "center"
   }
 });
 
@@ -85,7 +87,7 @@ const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
     (!inline)?
       <div className={classes.fetchErrorPanel}>
         <h4>{error}</h4>
-        <div>
+        <div className={classes.action}>
           <Button variant="primary" onClick={this.handleRetry}>Retry</Button>
         </div>
       </div>
@@ -93,8 +95,8 @@ const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
       <div className={classes.inlineFetchErrorPanel}>
         <HeaderPanel className={classes.panelHeader} />
         <h5>{error}</h5>
-        <small>ID: {id}</small>
-        <div>
+        <small><span>ID: </span><span>{id}</span></small>
+        <div className={classes.action}>
           <Button onClick={handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
         </div>
       </div>

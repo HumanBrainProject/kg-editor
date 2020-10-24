@@ -21,6 +21,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";
+import Label from "../../../Fields/Label";
 
 const useStyles = createUseStyles({
   container: {
@@ -70,6 +71,11 @@ const useStyles = createUseStyles({
       }
     }
   },
+  label: {
+    "&:after": {
+      content: "':\\00a0'"
+    }
+  },
   errorMessage: {
     marginBottom: "15px",
     fontWeight:"300",
@@ -87,15 +93,9 @@ const NoPermissionForView = ({ instance, mode }) => {
 
   const classes = useStyles();
 
-  if (!instance.labelField) {
-    return null;
-  }
-
-  const fieldStore = instance.fields[instance.labelField];
-
   return (
     <React.Fragment>
-      <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
+      <Label className={classes.label} label="Name" />{instance.name}
       <div className={classes.errorMessage}>
         <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
       </div>

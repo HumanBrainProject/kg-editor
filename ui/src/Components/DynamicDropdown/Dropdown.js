@@ -59,9 +59,6 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
       } else if(options.length){
         const value = options[0];
         setCurrent({type: null, option: value.id});
-      } else if(types.length) {
-        const type = types[types.length-1];
-        setCurrent({type: type.name, option: null});
       } else {
         setCurrent({type: null, option: null});
       }
@@ -73,9 +70,6 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
       } else if(types.length){
         const type = types[options.length-1];
         setCurrent({type: type.name, option: null});
-      } else if(options.length){
-        const value = options[0];
-        setCurrent({type: null, option: value.id});
       } else {
         setCurrent({type: null, option: null});
       }
@@ -176,6 +170,7 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
 
   const handleFocus = () => {
     onSearch("");
+    setCurrent({type: null, option: null});
     listenClickOutHandler();
   };
 
@@ -200,7 +195,6 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
 
   //const showMenu = wrapperRef.current && wrapperRef.current.contains(document.activeElement) && (options.length || searchTerm);
   const showMenu = options.length || searchTerm;
-
   return (
     <div className={classes.container} ref={wrapperRef}>
       <input className={`quickfire-user-input ${classes.userInput}`}
@@ -213,8 +207,8 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
         value={searchTerm}
         placeholder={inputPlaceholder} />
       {showMenu && (
-        <Menu type={current.type}
-          option={current.option}
+        <Menu currentType={current.type}
+          currentOption={current.option}
           searchTerm={searchTerm}
           values={options}
           types={types}

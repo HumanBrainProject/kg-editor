@@ -79,7 +79,7 @@ const PopOverContent = ({ onSizeChange, children}) => {
   const ref = useRef();
 
   useEffect(() => {
-   if (ref.current) {
+    if (ref.current) {
       typeof onSizeChange === "function" && onSizeChange(ref.current.getBoundingClientRect());
     }
   });

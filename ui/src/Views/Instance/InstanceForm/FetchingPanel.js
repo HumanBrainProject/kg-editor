@@ -43,7 +43,6 @@ const useStyles = createUseStyles({
       fontWeight:"400",
       fontSize:"0.6em",
       fontStyle: "italic",
-      whiteSpace: "nowrap",
       "@media screen and (max-width:576px)": {
         wordBreak: "break-all",
         wordWrap: "break-word",

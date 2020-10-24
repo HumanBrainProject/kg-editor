@@ -23,7 +23,7 @@ import Hub from "./Home/Hub";
 import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
-import Features from "./Home/Features";
+// import Features from "./Home/Features";
 import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
 

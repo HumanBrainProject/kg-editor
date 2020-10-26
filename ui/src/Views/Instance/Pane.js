@@ -14,15 +14,15 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect, useRef } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 import { debounce } from "lodash";
 
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
-const styles = {
+const useStyles = createUseStyles({
   pane: {
     position:"absolute",
     width:"50%",
@@ -62,73 +62,70 @@ const styles = {
   scrolledView:{
     padding:"20px",
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class PaneWithContext extends React.Component {
+const PaneWithContext = observer(({ view, paneId, children }) => {
 
-  componentDidUpdate(){
-    if (this.props.view.selectedPane !== this.props.paneId) {
-      this.paneRef.style.pointerEvents = "none";
-      this.restorePointerEvents();
-    } else {
-      this.paneRef.style.pointerEvents = "auto";
-      this.restorePointerEvents.cancel();
+  const classes = useStyles();
+
+  const paneRef = useRef();
+
+  const restorePointerEvents = debounce(() => {
+    if(paneRef.current) {
+      paneRef.current.style.pointerEvents = "auto";
     }
-  }
-
-  restorePointerEvents = debounce(() => {
-    this.paneRef ? this.paneRef.style.pointerEvents = "auto":null;
   }, 1000);
 
-  handleFocus = () => {
-    if (this.props.view.selectedPane !== this.props.paneId) {
-      this.props.view.selectPane(this.props.paneId);
+  useEffect(() => {
+    if(paneRef.current) {
+      if (view.selectedPane !== paneId) {
+        paneRef.current.style.pointerEvents = "none";
+        restorePointerEvents();
+      } else {
+        paneRef.current.style.pointerEvents = "auto";
+        restorePointerEvents.cancel();
+      }
     }
-  }
+  }, [view.selectedPane]);
 
-  render() {
-    const { classes, view, paneId } = this.props;
+  const handleFocus = () => {
+    if (view.selectedPane !== paneId) {
+      view.selectPane(paneId);
+    }
+  };
 
-    const index = view.getPaneIndex(paneId);
-    const mainClass = index === 0?"main":"";
-    const activeClass = paneId === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
-    return (
-      <div ref={ref => this.paneRef = ref} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={this.handleFocus} onClick={this.handleFocus}>
-        <Scrollbars autoHide>
-          <div className={classes.scrolledView}>
-            {this.props.children}
-          </div>
-        </Scrollbars>
-      </div>
-    );
-  }
-}
+  const index = view.getPaneIndex(paneId);
+  const mainClass = index === 0?"main":"";
+  const activeClass = paneId === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
 
-@observer
-class WrappedPane extends React.Component {
-
-  componentDidMount() {
-    this.props.view.registerPane(this.props.paneId);
-  }
-
-  componentWillUnmount() {
-    this.props.view.unregisterPane(this.props.paneId);
-  }
-
-  render() {
-    const { view, paneId, children} = this.props;
-
-    return (
-      <PaneContext.Provider value={paneId} >
-        <PaneWithContext view={view} paneId={paneId}>
+  return (
+    <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>
+      <Scrollbars autoHide>
+        <div className={classes.scrolledView}>
           {children}
-        </PaneWithContext>
-      </PaneContext.Provider>
-    );
-  }
-}
+        </div>
+      </Scrollbars>
+    </div>
+  );
+});
+
+const WrappedPane = observer(({ view, paneId, children }) => {
+
+  useEffect(() => {
+    view.registerPane(paneId);
+    return () => {
+      view.unregisterPane(paneId);
+    };
+  }, []);
+
+  return (
+    <PaneContext.Provider value={paneId} >
+      <PaneWithContext view={view} paneId={paneId}>
+        {children}
+      </PaneWithContext>
+    </PaneContext.Provider>
+  );
+});
 
 const Pane = ({paneId, children}) => (
   <ViewContext.Consumer>

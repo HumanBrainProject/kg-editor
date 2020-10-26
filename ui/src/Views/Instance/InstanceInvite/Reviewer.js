@@ -16,12 +16,12 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../../User";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     display: "grid",
@@ -77,36 +77,26 @@ const styles = {
     padding: "6px 0",
     verticalAlign: "middle"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Reviewer extends React.Component{
+const Reviewer = observer(({ review, onCancelInvitation }) => {
 
-  handleInvite = userId => {
-    const { onInvite } = this.props;
-    typeof onInvite === "function" && onInvite(userId);
+  const classes = useStyles();
+
+  const handleCancelInvitation = () => {
+    typeof onCancelInvitation === "function" && onCancelInvitation(review.userId);
+  };
+
+  if (!review) {
+    return null;
   }
 
-  handleCancelInvitation = userId => {
-    const { onCancelInvitation } = this.props;
-    typeof onCancelInvitation === "function" && onCancelInvitation(userId);
-  }
-
-  render() {
-    const { classes, review } = this.props;
-
-    if (!review) {
-      return null;
-    }
-
-    return (
-      <div className={classes.container}>
-        <User key={review.userId}  userId={review.userId} />
-        <button title="cancel invitation" onClick={this.handleCancelInvitation.bind(this, review.userId)}><FontAwesomeIcon icon="times"/></button>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.container}>
+      <User key={review.userId}  userId={review.userId} />
+      <button title="cancel invitation" onClick={handleCancelInvitation}><FontAwesomeIcon icon="times"/></button>
+    </div>
+  );
+});
 
 export default Reviewer;

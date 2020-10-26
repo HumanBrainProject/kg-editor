@@ -14,20 +14,33 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
 
 class CheckBoxStore extends FieldStore {
-  @observable value = false;
-  @observable initialValue = false;
+  value = false;
+  initialValue = false;
 
-  @computed
+  constructor(definition, options, instance) {
+    super(definition, options, instance);
+
+    makeObservable(this, {
+      value: observable,
+      initialValue: observable,
+      returnValue: computed,
+      cloneWithInitialValue: computed,
+      updateValue: action,
+      reset: action,
+      hasChanged: computed,
+      toggleValue: action
+    });
+  }
+
   get returnValue() {
     return toJS(this.value);
   }
 
-  @computed
   get cloneWithInitialValue() {
     return {
       ...this.definition,
@@ -35,18 +48,15 @@ class CheckBoxStore extends FieldStore {
     };
   }
 
-  @action
   updateValue(value) {
     this.initialValue = (value !== null && value !== undefined)?!!value:false;
     this.value = this.initialValue;
   }
 
-  @action
   reset() {
     this.value = this.initialValue;
   }
 
-  @computed
   get hasChanged() {
     if (typeof this.initialValue  === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
@@ -54,7 +64,6 @@ class CheckBoxStore extends FieldStore {
     return this.returnValue !== this.initialValue;
   }
 
-  @action
   toggleValue() {
     this.value = !this.value;
   }

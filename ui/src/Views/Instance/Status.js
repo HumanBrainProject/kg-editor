@@ -14,15 +14,15 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import statusStore from "../../Stores/StatusStore";
 import ReleaseStatus from "../../Components/ReleaseStatus";
 
-let styles = {
+const useStyles = createUseStyles({
   container: {
     fontSize: "0.75em",
     display: "inline-block",
@@ -57,49 +57,48 @@ let styles = {
       verticalAlign: "baseline"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Status extends React.Component {
-  componentDidMount() {
-    statusStore.fetchStatus(this.props.id);
+const Status = observer(({ id, darkmode }) => {
+
+  const classes = useStyles();
+
+  useEffect(() => {
+    statusStore.fetchStatus(id);
+  }, []);
+
+  const instanceStatus = statusStore.getInstance(id);
+
+  if(!instanceStatus) {
+    return null;
   }
 
-  render() {
-    const instanceStatus = statusStore.getInstance(this.props.id);
-    const { classes } = this.props;
-    if(!instanceStatus) {
-      return null;
-    }
-
-    return (
-      <div className={`${classes.container} status`}>
-        {instanceStatus.hasFetchError ?
+  return (
+    <div className={`${classes.container} status`}>
+      {instanceStatus.hasFetchError ?
+        <div className={classes.loader}>
+          <FontAwesomeIcon icon={"question-circle"} />
+        </div>
+        : !instanceStatus.isFetched ?
           <div className={classes.loader}>
-            <FontAwesomeIcon icon={"question-circle"} />
+            <FontAwesomeIcon icon={"circle-notch"} spin />
           </div>
-          : !instanceStatus.isFetched ?
-            <div className={classes.loader}>
-              <FontAwesomeIcon icon={"circle-notch"} spin />
-            </div>
-            :
-            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.data} isChildren={false} />
-        }
-        {instanceStatus.hasFetchErrorChildren ?
+          :
+          <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.data} isChildren={false} />
+      }
+      {instanceStatus.hasFetchErrorChildren ?
+        <div className={classes.loader}>
+          <FontAwesomeIcon icon={"question-circle"} />
+        </div>
+        : (!instanceStatus.isFetchedChildren?
           <div className={classes.loader}>
-            <FontAwesomeIcon icon={"question-circle"} />
+            <FontAwesomeIcon icon={"circle-notch"} spin />
           </div>
-          : (!instanceStatus.isFetchedChildren?
-            <div className={classes.loader}>
-              <FontAwesomeIcon icon={"circle-notch"} spin />
-            </div>
-            :
-            <ReleaseStatus darkmode={this.props.darkmode} instanceStatus={instanceStatus.childrenData ? instanceStatus.childrenData : null} highContrastChildren={true} isChildren={true} />)
-        }
-      </div>
-    );
-  }
-}
+          :
+          <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.childrenData ? instanceStatus.childrenData : null} highContrastChildren={true} isChildren={true} />)
+      }
+    </div>
+  );
+});
 
 export default Status;

@@ -14,9 +14,9 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 
 import graphStore from "../../Stores/GraphStore";
@@ -24,7 +24,7 @@ import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
 import FetchingLoader from "../../Components/FetchingLoader";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "100%",
@@ -85,57 +85,44 @@ const styles = {
       marginLeft: "20px"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class GraphInstance extends React.Component {
-  componentDidMount() {
-    this.fetch();
-  }
+const GraphInstance = observer(({ instance }) => {
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.instance !== this.props.instance) {
-      this.fetch();
-    }
-  }
+  const classes = useStyles();
 
-  fetch = () => {
-    graphStore.fetch(this.props.instance.id);
-  }
+  useEffect(() => fetch(), [instance]);
 
-  render() {
-    const { classes, instance } = this.props;
+  const fetch = () => graphStore.fetch(instance.id);
 
-    if (graphStore.fetchError) {
-      return (
-        <div className={classes.fetchErrorPanel}>
-          <h4>Error while fetching graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})</h4>
-          <Button bsStyle="primary" onClick={this.fetch}>Retry</Button>
-        </div>
-      );
-    }
-
-    if (graphStore.isFetching) {
-
-      return (
-        <div className={classes.loader}>
-          <FetchingLoader>Fetching visualization data for instance &quot;{instance.id}&quot; ...</FetchingLoader>
-        </div>
-      );
-    }
-
+  if (graphStore.fetchError) {
     return (
-      <div className={classes.container}>
-        <div className={classes.graph}>
-          <GraphViz />
-        </div>
-        <div className={classes.settings}>
-          <GraphSettings />
-        </div>
+      <div className={classes.fetchErrorPanel}>
+        <h4>Error while fetching graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})</h4>
+        <Button variant="primary" onClick={fetch}>Retry</Button>
       </div>
     );
   }
-}
+
+  if (graphStore.isFetching) {
+
+    return (
+      <div className={classes.loader}>
+        <FetchingLoader>Fetching visualization data for instance &quot;{instance.id}&quot; ...</FetchingLoader>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.container}>
+      <div className={classes.graph}>
+        <GraphViz />
+      </div>
+      <div className={classes.settings}>
+        <GraphSettings />
+      </div>
+    </div>
+  );
+});
 
 export default GraphInstance;

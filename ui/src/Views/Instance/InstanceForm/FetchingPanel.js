@@ -15,10 +15,10 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   panel: {
     position: "relative",
     padding: "10px 10px 0 10px",
@@ -43,7 +43,6 @@ const styles = {
       fontWeight:"400",
       fontSize:"0.6em",
       fontStyle: "italic",
-      whiteSpace: "nowrap",
       "@media screen and (max-width:576px)": {
         wordBreak: "break-all",
         wordWrap: "break-word",
@@ -54,23 +53,23 @@ const styles = {
   label: {
     paddingLeft: "6px"
   }
-};
+});
 
-@injectStyles(styles)
-class FetchingPanel extends React.Component{
-  render(){
-    const { classes, id, show, inline } = this.props;
-    if (!show) {
-      return null;
-    }
-    return(
-      <div className={classes.panel} inline={inline?"true":"false"}>
-        <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
-        <span className={classes.label}>Fetching instance...</span>
-        <small>ID: {id}</small>
-      </div>
-    );
+const FetchingPanel = ({ id, show, inline }) => {
+
+  const classes = useStyles();
+
+  if (!show) {
+    return null;
   }
-}
+
+  return(
+    <div className={classes.panel} inline={inline?"true":"false"}>
+      <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
+      <span className={classes.label}>Fetching instance...</span>
+      <small>ID: {id}</small>
+    </div>
+  );
+};
 
 export default FetchingPanel;

@@ -20,7 +20,8 @@ import React from "react";
 import FieldError from "./FieldError";
 import { fieldsMapping } from "../Fields";
 
-const Field = (props) => {
+const Field = props => {
+
   const fieldMapping = fieldsMapping[props.fieldStore.type];
   if (!fieldMapping) {
     throw `${props.name} field is not supported!`;

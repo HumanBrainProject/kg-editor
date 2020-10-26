@@ -15,12 +15,34 @@
 */
 
 import React from "react";
+import { createUseStyles } from "react-jss";
 
-const HelpView = () => (
-  <div>
-    <h1>Contact us</h1>
-    <p>Should you encounter any problem with this application, please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
-  </div>
+const useStyles = createUseStyles({
+  dropdownMenu: {
+    background: "var(--ft-color-loud)",
+    fontSize: "0.9em"
+  }
+});
+
+
+const CustomDropdownMenu = React.forwardRef(
+  ({ children, className, "aria-labelledby": labeledBy }, ref) => {
+    const classes = useStyles();
+
+    return (
+      <div
+        ref={ref}
+        className={`${className} ${classes.dropdownMenu}`}
+        aria-labelledby={labeledBy}
+      >
+        <ul className="list-unstyled">
+          {children}
+        </ul>
+      </div>
+    );
+  },
 );
 
-export default HelpView;
+CustomDropdownMenu.displayName = "CustomDropdownMenu";
+
+export default CustomDropdownMenu;

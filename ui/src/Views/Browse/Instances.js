@@ -15,7 +15,7 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import { toJS } from "mobx";
 import { observer } from "mobx-react";
@@ -33,7 +33,7 @@ import InstanceRow from "../Instance/InstanceRow";
 import appStore from "../../Stores/AppStore";
 import instancesStore from "../../Stores/InstancesStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     color: "var(--ft-color-loud)",
     overflow:"hidden",
@@ -96,26 +96,23 @@ const styles = {
     background:"var(--bg-color-ui-contrast2)",
     padding:"0 10px"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Instances extends React.Component{
-  handleFilterChange = event => {
-    browseStore.setInstancesFilter(event.target.value);
-  }
+const Instances = observer(() => {
 
-  handleInstanceClick(instance){
-    browseStore.selectInstance(instance);
-  }
+  const classes = useStyles();
 
-  handleInstanceCtrlClick(instance){
+  const handleFilterChange = e => browseStore.setInstancesFilter(e.target.value);
+
+  const handleInstanceClick = instance => browseStore.selectInstance(instance);
+
+  const handleInstanceCtrlClick = instance => {
     if (instance && instance.id) {
       appStore.openInstance(instance.id, instance.name, instance.primaryType);
     }
-  }
+  };
 
-  handleInstanceActionClick(summaryInstance, mode){
+  const handleInstanceActionClick = (summaryInstance, mode) => {
     const id = summaryInstance && summaryInstance.id;
     if (id) {
       if (!instancesStore.instances.has(id)) {
@@ -128,90 +125,83 @@ class Instances extends React.Component{
         routerStore.history.push(`/instances/${id}/${mode}`);
       }
     }
-  }
+  };
 
-  handleLoadMore = () => {
-    browseStore.fetchInstances(true);
-  }
+  const handleLoadMore = () => browseStore.fetchInstances(true);
 
-  handleRetry = () => {
-    browseStore.fetchInstances();
-  }
+  const handleRetry = () => browseStore.fetchInstances();
 
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <div className={classes.header}>
-          {browseStore.selectedItem !== null &&
-            <input ref={ref => this.inputRef = ref}
+  return (
+    <div className={classes.container}>
+      <div className={classes.header}>
+        {browseStore.selectedItem !== null &&
+            <input
               disabled={browseStore.selectedItem === null}
               className={`form-control ${classes.search}`}
               placeholder={`Filter instances of ${browseStore.selectedItem.label}`}
               type="text"
               value={browseStore.instancesFilter}
-              onChange={this.handleFilterChange} />}
-          {browseStore.selectedItem !== null &&
+              onChange={handleFilterChange} />}
+        {browseStore.selectedItem !== null &&
             <div className={classes.instanceCount}>
               {browseStore.totalInstances} Result{`${browseStore.totalInstances !== 0?"s":""}`}
             </div>}
-          {browseStore.selectedItem !== null && <FontAwesomeIcon icon="search" className={classes.searchIcon}/>}
-        </div>
-        <Scrollbars autoHide>
-          {browseStore.selectedItem ?
-            !browseStore.fetchError.instances ?
-              !browseStore.isFetching.instances ?
-                browseStore.instances.length ?
-                  <InfiniteScroll
-                    threshold={400}
-                    pageStart={0}
-                    loadMore={this.handleLoadMore}
-                    hasMore={browseStore.canLoadMoreInstances}
-                    loader={<div className={classes.loader} key={0}><FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;<span>Loading more instances...</span></div>}
-                    useWindow={false}>
-                    <div className={classes.list}>
-                      <ul>
-                        {browseStore.instances.map(instance => (
-                          <li key={instance.id}><InstanceRow instance={instance} selected={instance === browseStore.selectedInstance} onClick={this.handleInstanceClick}  onCtrlClick={this.handleInstanceCtrlClick}  onActionClick={this.handleInstanceActionClick} /></li>
-                        ))}
-                      </ul>
-                    </div>
-                  </InfiniteScroll>
-                  :
-                  <BGMessage icon={"unlink"}>
-                    No instances could be found in this list
-                    {browseStore.instancesFilter && <div>with the search term {`"${browseStore.instancesFilter}"`}</div>}
-                  </BGMessage>
+        {browseStore.selectedItem !== null && <FontAwesomeIcon icon="search" className={classes.searchIcon}/>}
+      </div>
+      <Scrollbars autoHide>
+        {browseStore.selectedItem ?
+          !browseStore.fetchError.instances ?
+            !browseStore.isFetching.instances ?
+              browseStore.instances.length ?
+                <InfiniteScroll
+                  threshold={400}
+                  pageStart={0}
+                  loadMore={handleLoadMore}
+                  hasMore={browseStore.canLoadMoreInstances}
+                  loader={<div className={classes.loader} key={0}><FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;<span>Loading more instances...</span></div>}
+                  useWindow={false}>
+                  <div className={classes.list}>
+                    <ul>
+                      {browseStore.instances.map(instance => (
+                        <li key={instance.id}><InstanceRow instance={instance} selected={instance === browseStore.selectedInstance} onClick={handleInstanceClick}  onCtrlClick={handleInstanceCtrlClick}  onActionClick={handleInstanceActionClick} /></li>
+                      ))}
+                    </ul>
+                  </div>
+                </InfiniteScroll>
                 :
-                <FetchingLoader>
-                  <span>Fetching instances...</span>
-                </FetchingLoader>
+                <BGMessage icon={"unlink"}>
+                    No instances could be found in this list
+                  {browseStore.instancesFilter && <div>with the search term {`"${browseStore.instancesFilter}"`}</div>}
+                </BGMessage>
               :
-              <BGMessage icon={"ban"}>
+              <FetchingLoader>
+                <span>Fetching instances...</span>
+              </FetchingLoader>
+            :
+            <BGMessage icon={"ban"}>
                 There was a network problem retrieving the list of instances.<br/>
                 If the problem persists, please contact the support.<br/><br/>
-                <Button bsStyle={"primary"} onClick={this.handleRetry}>
-                  <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
-                </Button>
-              </BGMessage>
-            :
-            <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
+              <Button variant={"primary"} onClick={handleRetry}>
+                <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
+              </Button>
+            </BGMessage>
+          :
+          <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
               Select a list of instances in the left panel
-            </BGMessage>
-          }
-        </Scrollbars>
-        <div className={classes.preview}>
-          {browseStore.selectedInstance?
-            <Preview instanceId={browseStore.selectedInstance.id} instanceName={browseStore.selectedInstance.name}/>
-            :
-            <BGMessage icon={"money-check"}>
+          </BGMessage>
+        }
+      </Scrollbars>
+      <div className={classes.preview}>
+        {browseStore.selectedInstance?
+          <Preview instanceId={browseStore.selectedInstance.id} instanceName={browseStore.selectedInstance.name}/>
+          :
+          <BGMessage icon={"money-check"}>
               Select an instance to display its preview here.
-            </BGMessage>
-          }
-        </div>
+          </BGMessage>
+        }
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
 
 export default Instances;

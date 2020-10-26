@@ -14,8 +14,8 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,14 +24,14 @@ import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import CompareValue from "./CompareValue";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     padding: "12px 15px",
     "& button + button": {
       marginLeft: "20px"
     }
   }
-};
+});
 
 const separator = "; ";
 
@@ -89,76 +89,63 @@ const getStatus = (store, ids) => ids.reduce((acc, id) => {
   hasFetchError: false
 });
 
-@injectStyles(styles)
-@observer
-class CompareFieldsChanges extends React.Component{
-  componentDidMount() {
-    this.fetchInstances();
-  }
+const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance, leftInstanceStore, rightInstanceStore, leftChildrenIds, rightChildrenIds, onClose }) => {
 
-  componentDidUpdate(prevProps) {
-    if(prevProps.leftChildrenIds !== this.props.leftChildrenIds && prevProps.rightChildrenIds !== this.props.rightChildrenIds) {
-      this.fetchInstances();
-    }
-  }
+  const classes = useStyles();
 
-  fetchInstances = (forceFetch=false) => {
-    const { leftInstanceStore, rightInstanceStore, leftChildrenIds, rightChildrenIds} = this.props;
+  useEffect(() => fetchInstances(), [leftChildrenIds, rightChildrenIds]);
+
+  const fetchInstances = (forceFetch=false) => {
     leftChildrenIds.forEach(id => leftInstanceStore.createInstanceOrGet(id).fetchLabel(forceFetch));
     rightChildrenIds.forEach(id => rightInstanceStore.createInstanceOrGet(id).fetchLabel(forceFetch));
+  };
+
+  const handleRetryFetchInstances = () => fetchInstances(true);
+
+  const leftStatus = getStatus(leftInstanceStore, leftChildrenIds);
+  const rightStatus = getStatus(rightInstanceStore, rightChildrenIds);
+
+  if (leftStatus.isFetching || rightStatus.isFetching) {
+    return (
+      <div className={classes.container}>
+        <FetchingLoader>Fetching children of instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
+      </div>
+    );
   }
 
-  handleRetryFetchInstances = () => this.fetchInstances(true);
-
-  render(){
-    const { classes, instanceId, leftInstance, rightInstance, leftInstanceStore, rightInstanceStore, leftChildrenIds, rightChildrenIds, onClose } = this.props;
-
-    const leftStatus = getStatus(leftInstanceStore, leftChildrenIds);
-    const rightStatus = getStatus(rightInstanceStore, rightChildrenIds);
-
-    if (leftStatus.isFetching || rightStatus.isFetching) {
-      return (
-        <div className={classes.container}>
-          <FetchingLoader>Fetching instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
-        </div>
-      );
-    }
-
-    if (leftStatus.hasFetchError || rightStatus.hasFetchError) {
-      return (
-        <div className={classes.container}>
-          <BGMessage icon={"ban"}>
+  if (leftStatus.hasFetchError || rightStatus.hasFetchError) {
+    return (
+      <div className={classes.container}>
+        <BGMessage icon={"ban"}>
             There was a network problem fetching the links of instance &quot;<i>{instanceId}</i>&quot;.<br/>
             If the problem persists, please contact the support.<br/><br/>
-            <div>
-              <Button onClick={onClose}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-              <Button bsStyle={"primary"} onClick={this.handleRetryFetchInstances}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
-            </div>
-          </BGMessage>
-        </div>
-      );
-    }
-
-    if (leftStatus.isFetched && rightStatus.isFetched) {
-      const fields = [...rightInstance.promotedFields, ...rightInstance.nonPromotedFields].map(name => (
-        {
-          name: name,
-          label: rightInstance.fields[name].label,
-          leftValue: getValue(leftInstanceStore, leftInstance, name),
-          rightValue: getValue(rightInstanceStore, rightInstance, name),
-        })
-      );
-
-      return (
-        <div className={classes.container}>
-          {fields.map(({name, label, leftValue, rightValue}) => (
-            <CompareValue key={name} label={label} leftValue={leftValue} rightValue={rightValue} separator={separator} />
-          ))}
-        </div>
-      );
-    }
-    return null;
+          <div>
+            <Button onClick={onClose}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
+            <Button variant={"primary"} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+          </div>
+        </BGMessage>
+      </div>
+    );
   }
-}
+
+  if (leftStatus.isFetched && rightStatus.isFetched) {
+    const fields = [...rightInstance.promotedFields, ...rightInstance.nonPromotedFields].map(name => (
+      {
+        name: name,
+        label: rightInstance.fields[name].label,
+        leftValue: getValue(leftInstanceStore, leftInstance, name),
+        rightValue: getValue(rightInstanceStore, rightInstance, name),
+      })
+    );
+    return (
+      <div className={classes.container}>
+        {fields.map(({name, label, leftValue, rightValue}) => (
+          <CompareValue key={name} label={label} leftValue={leftValue} rightValue={rightValue} separator={separator} />
+        ))}
+      </div>
+    );
+  }
+  return null;
+});
 
 export default CompareFieldsChanges;

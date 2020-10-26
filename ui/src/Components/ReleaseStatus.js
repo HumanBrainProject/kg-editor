@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { uniqueId } from "lodash";
 
-const styles = {
+const useStyles = createUseStyles({
   status: {
     borderRadius: "0.14em",
     width: "2.5em",
@@ -64,7 +64,7 @@ const styles = {
     },
 
   },
-};
+});
 
 const getIconStatus = status => {
   switch (status) {
@@ -84,39 +84,27 @@ const MessageStatus = ({status}) => {
   return <strong>Unknown entity</strong>;
 };
 
+const OverlayTooltip = ({instanceStatus}) => {
+  return(
+    <Tooltip id={uniqueId("release-tooltip")}>
+      <div>
+        <MessageStatus status={instanceStatus} />
+      </div>
+    </Tooltip>
+  );
+};
 
-
-@injectStyles(styles)
-class ReleaseStatus extends React.Component {
-  constructor(props) {
-    super(props);
-    this.tooltipId = uniqueId("release-tooltip");
-  }
-
-  renderTooltip() {
-    const {instanceStatus} = this.props;
-    return(
-      <Tooltip id={this.tooltipId}>
-        <div>
-          <MessageStatus status={instanceStatus} />
+const ReleaseStatus = ({instanceStatus, darkmode}) => {
+  const classes = useStyles();
+  return (
+    <OverlayTrigger placement="top" overlay={<OverlayTooltip instanceStatus={instanceStatus}/>}>
+      <div className={`${classes.status} ${darkmode? "darkmode" : ""} `} status={instanceStatus}>
+        <div className={`${classes.instanceStatus}  `}>
+          <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
         </div>
-      </Tooltip>
-    );
-  }
-
-  render() {
-    const { classes, instanceStatus } = this.props;
-
-    return (
-      <OverlayTrigger placement="top" overlay={this.renderTooltip()}>
-        <div className={`${classes.status} ${this.props.darkmode? "darkmode" : ""} `} status={instanceStatus}>
-          <div className={`${classes.instanceStatus}  `}>
-            <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
-          </div>
-        </div>
-      </OverlayTrigger>
-    );
-  }
-}
+      </div>
+    </OverlayTrigger>
+  );
+};
 
 export default ReleaseStatus;

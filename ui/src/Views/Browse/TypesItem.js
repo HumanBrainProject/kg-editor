@@ -15,15 +15,14 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import appStore from "../../Stores/AppStore";
 import browseStore from "../../Stores/BrowseStore";
 
-
-const styles = {
+const useStyles = createUseStyles({
   container: {
     padding: "5px 5px 5px 30px",
     borderLeft: "2px solid transparent",
@@ -127,50 +126,50 @@ const styles = {
     display: "none",
     cursor: "pointer"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class TypesItem extends React.Component {
-  handleSelect = event => {
-    event && event.stopPropagation();
-    browseStore.selectItem(this.props.type);
-  }
 
-  handleCreateInstance = () => {
+const TypesItem = observer(({ type }) => {
+
+  const classes = useStyles();
+
+  const handleSelect = e => {
+    e && e.stopPropagation();
+    browseStore.selectItem(type);
+  };
+
+  const handleCreateInstance = () => {
     appStore.createInstance();
-  }
+  };
 
-  render() {
-    const { classes, type } = this.props;
-    const selected = browseStore.selectedItem === type;
-    const color = type.color;
-    return (
-      <div
-        key={type.id}
-        className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`}
-        onClick={this.handleSelect} title={type.label}>
-        {color ?
-          <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.typeIcon}`} style={{ color: color }} />
+  const selected = browseStore.selectedItem === type;
+  const color = type.color;
+
+  return (
+    <div
+      key={type.id}
+      className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`}
+      onClick={handleSelect} title={type.label}>
+      {color ?
+        <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.typeIcon}`} style={{ color: color }} />
+        :
+        <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
+      }
+      <span>{type.label}</span>
+      {appStore.currentWorkspacePermissions.canCreate && (
+        appStore.isCreatingNewInstance ?
+          <div className={classes.createInstance}>
+            <FontAwesomeIcon icon={"circle-notch"} spin />
+          </div>
           :
-          <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
-        }
-        <span>{type.label}</span>
-        {appStore.currentWorkspacePermissions.canCreate && (
-          appStore.isCreatingNewInstance ?
-            <div className={classes.createInstance}>
-              <FontAwesomeIcon icon={"circle-notch"} spin />
+          <div className={classes.actions}>
+            <div className={classes.action} onClick={handleCreateInstance} title={`create a new ${type.label}`}>
+              <FontAwesomeIcon icon={"plus"} />
             </div>
-            :
-            <div className={classes.actions}>
-              <div className={classes.action} onClick={this.handleCreateInstance} title={`create a new ${type.label}`}>
-                <FontAwesomeIcon icon={"plus"} />
-              </div>
-            </div>
-        )}
-      </div>
-    );
-  }
-}
+          </div>
+      )}
+    </div>
+  );
+});
 
 export default TypesItem;

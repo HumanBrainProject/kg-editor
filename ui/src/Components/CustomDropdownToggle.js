@@ -15,11 +15,10 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   dropdownLink: {
     color: "var(--ft-color-normal)",
     fontSize: "0.9em",
@@ -29,24 +28,23 @@ const styles = {
       textDecoration: "none"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class CustomDropdownToggle extends React.Component {
-  handleClick = e => {
+const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => {
+  const classes = useStyles();
+
+  const handleClick = e => {
     e.preventDefault();
-    this.props.onClick(e);
-  }
+    onClick(e);
+  };
 
-  render() {
-    const { classes } = this.props;
-    return (
-      <a onClick={this.handleClick} className={classes.dropdownLink}>
-        {this.props.children} <FontAwesomeIcon icon={"caret-down"} />
-      </a>
-    );
-  }
-}
+  return (
+    <a onClick={handleClick} className={classes.dropdownLink} ref={ref}>
+      {children} <FontAwesomeIcon icon={"caret-down"} />
+    </a>
+  );
+});
+
+CustomDropdownToggle.displayName = "CustomDropdownToggle";
 
 export default CustomDropdownToggle;

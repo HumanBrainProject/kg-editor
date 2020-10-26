@@ -14,19 +14,19 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
 import Color from "color";
-import { Glyphicon } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import routerStore from "../../../Stores/RouterStore";
 import graphStore from "../../../Stores/GraphStore";
 import appStore from "../../../Stores/AppStore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "100%"
   },
@@ -116,43 +116,36 @@ const styles = {
     cursor: "pointer",
     transition: "transform 0.25s ease-in-out"
   }
-};
-@injectStyles(styles)
-class Node extends React.Component {
+});
 
-  handelMouseOver = () => {
-    const { node } = this.props;
-    graphStore.setHighlightNodeConnections(node, true);
-  }
+const Node = ({ node, isGrouped }) => {
 
-  handelMouseOut = () => {
-    const { node } = this.props;
-    graphStore.setHighlightNodeConnections(node, false);
-  }
+  const classes = useStyles();
 
-  handelClick = () => {
-    const { node } = this.props;
+  const handelMouseOver = () =>graphStore.setHighlightNodeConnections(node, true);
+
+  const handelMouseOut = () => graphStore.setHighlightNodeConnections(node, false);
+
+  const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
       routerStore.history.push(`/instances/${node.id}/graph`);
     }
+  };
+
+  let actions = {onClick: handleClick};
+  if(!isGrouped) {
+    actions = {
+      onMouseOver: handelMouseOver,
+      onMouseOut: handelMouseOut,
+      onClick: handleClick
+    };
   }
 
-  render() {
-    const { classes, node, isGrouped } = this.props;
-    let actions = {onClick: this.handleClick};
-    if(!isGrouped) {
-      actions = {
-        onMouseOver: this.handelMouseOver,
-        onMouseOut: this.handelMouseOut,
-        onClick: this.handleClick
-      };
-    }
-    return (
-      <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
-    );
-  }
-}
+  return (
+    <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
+  );
+};
 
 const Nodes = ({className, nodes, isGrouped}) => (
   <div className={className}>
@@ -162,22 +155,18 @@ const Nodes = ({className, nodes, isGrouped}) => (
   </div>
 );
 
-@injectStyles(styles)
-class TypeIcon extends React.Component {
-  render() {
-    const {classes, color, grouped} = this.props;
+const TypeIcon= ({color, grouped}) => {
+  const classes = useStyles();
+  const style = {
+    borderRadius: grouped?"0":"50%",
+    background: color,
+    borderColor: new Color(color).darken(0.25).hex()
+  };
 
-    const style = {
-      borderRadius: grouped?"0":"50%",
-      background: color,
-      borderColor: new Color(color).darken(0.25).hex()
-    };
-
-    return (
-      <div className={classes.typeIcon} style={style} />
-    );
-  }
-}
+  return (
+    <div className={classes.typeIcon} style={style} />
+  );
+};
 
 const Type = ({type, defaultColor, grouped}) => (
   <span>
@@ -186,44 +175,28 @@ const Type = ({type, defaultColor, grouped}) => (
   </span>
 );
 
-@observer
-class GroupLabel extends React.Component {
+const GroupLabel = observer(({ className, group }) => {
 
-  handelMouseOver = () => {
-    const { group } = this.props;
-    graphStore.setHighlightNodeConnections(group, true);
+  let actions = {};
+  if(group.grouped) {
+    actions = {
+      onMouseOver: () => graphStore.setHighlightNodeConnections(group, true),
+      onMouseOut: () => graphStore.setHighlightNodeConnections(group, false)
+    };
   }
 
-  handelMouseOut = () => {
-    const { group } = this.props;
-    graphStore.setHighlightNodeConnections(group, false);
-  }
+  return (
+    <span className={className}  {...actions}>
+      {group.types.map(type => (
+        <Type key={type.name} type={type} grouped={group.grouped} />
+      ))}
+    </span>
+  );
+});
 
-  render() {
-    const { className, group } = this.props;
-    let actions = {};
-    if(group.grouped) {
-      actions = {
-        onMouseOver: this.handelMouseOver,
-        onMouseOut: this.handelMouseOut
-      };
-    }
+const Actions = observer(({ className, group }) => {
 
-    return (
-      <span className={className}  {...actions}>
-        {group.types.map(type => (
-          <Type key={type.name} type={type} grouped={group.grouped} />
-        ))}
-      </span>
-    );
-  }
-}
-
-@observer
-class Actions extends React.Component {
-
-  handleChange = action => {
-    const { group } = this.props;
+  const handleChange = action => {
     switch (action) {
     case "show":
       graphStore.setGroupVisibility(group, true);
@@ -238,63 +211,54 @@ class Actions extends React.Component {
       graphStore.setGrouping(group, false);
       break;
     }
-  }
+  };
 
-  render() {
-    const { className, group } = this.props;
-
-    let value = group.show?"show":"hide";
-    let actions = [
-      {value: "show", icon:"eye"},
-      {value: "hide", icon:"eye-slash"}
+  let value = group.show?"show":"hide";
+  let actions = [
+    {value: "show", icon:"eye"},
+    {value: "hide", icon:"eye-slash"}
+  ];
+  if (group.show && group.nodes.length > 1) {
+    value = group.grouped?"group":"ungroup";
+    actions = [
+      {value: "group",   icon: "compress"},
+      {value: "ungroup", icon: "expand-arrows-alt"},
+      {value: "hide",    icon: "eye-slash"}
     ];
-    if (group.show && group.nodes.length > 1) {
-      value = group.grouped?"group":"ungroup";
-      actions = [
-        {value: "group",   icon: "compress"},
-        {value: "ungroup", icon: "expand-arrows-alt"},
-        {value: "hide",    icon: "eye-slash"}
-      ];
-    }
-
-    return (
-      <div className={className}>
-        <MultiToggle selectedValue={value} onChange={this.handleChange}>
-          {actions.map(action => (
-            <MultiToggle.Toggle key={action.value} color={"var(--ft-color-loud)"} value={action.value} icon={action.icon} />
-          ))}
-        </MultiToggle>
-      </div>
-    );
-  }
-}
-
-@injectStyles(styles)
-class Group extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = { expanded: false};
   }
 
-  handleClick = () => {
-    this.setState(state => ({ expanded: !state.expanded}));
-  }
+  return (
+    <div className={className}>
+      <MultiToggle selectedValue={value} onChange={handleChange}>
+        {actions.map(action => (
+          <MultiToggle.Toggle key={action.value} color={"var(--ft-color-loud)"} value={action.value} icon={action.icon} />
+        ))}
+      </MultiToggle>
+    </div>
+  );
+});
 
-  render() {
-    const { classes, group } = this.props;
-    return (
-      <div className={`${classes.group} ${this.state.expanded ? "expanded" : ""}`}>
-        <Glyphicon glyph="chevron-right" className={classes.expandButton} onClick={this.handleClick} />
-        <GroupLabel className={classes.groupLabel} group={group} />
-        <Actions className={classes.groupActions} group={group} />
-        {this.state.expanded && (
-          <Nodes className={classes.nodes} nodes={group.nodes} isGrouped={group.grouped} />
-        )}
-      </div>
-    );
-  }
-}
+const Group = ({ group }) => {
+
+  const classes = useStyles();
+
+  const [expanded, setExpanded] = useState(false);
+
+  const handleClick = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <div className={`${classes.group} ${expanded ? "expanded" : ""}`}>
+      <FontAwesomeIcon icon="arrow-right" className={classes.expandButton} onClick={handleClick} />
+      <GroupLabel className={classes.groupLabel} group={group} />
+      <Actions className={classes.groupActions} group={group} />
+      {expanded && (
+        <Nodes className={classes.nodes} nodes={group.nodes} isGrouped={group.grouped} />
+      )}
+    </div>
+  );
+};
 
 const Groups = ({className, groups}) => (
   <div className={className}>
@@ -304,21 +268,19 @@ const Groups = ({className, groups}) => (
   </div>
 );
 
-@injectStyles(styles)
-@observer
-class GraphSettings extends React.Component {
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <Scrollbars autoHide>
-          {graphStore.isFetched && (
-            <Groups className={classes.groups} groups={graphStore.groupsList} />
-          )}
-        </Scrollbars>
-      </div>
-    );
-  }
-}
+const GraphSettings = observer(() => {
+
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container}>
+      <Scrollbars autoHide>
+        {graphStore.isFetched && (
+          <Groups className={classes.groups} groups={graphStore.groupsList} />
+        )}
+      </Scrollbars>
+    </div>
+  );
+});
 
 export default GraphSettings;

@@ -20,7 +20,7 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: ["babel-polyfill","./src/index.js"],
+  entry: ["@babel/polyfill","./src/index.js"],
   output: {
     path: __dirname,
     filename: "./bundle.js"

@@ -15,10 +15,10 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "absolute",
     top: "0",
@@ -59,35 +59,37 @@ const styles = {
       marginLeft: "20px"
     }
   },
-};
+});
 
-@injectStyles(styles)
-class ConfirmCancelEditPanel extends React.Component{
-  render(){
-    const { classes, show, text, onConfirm, onCancel, inline} = this.props;
-    const handleConfirm = (e) => {
-      e.stopPropagation();
-      onConfirm(e);
-    };
-    const handleCancel = (e) => {
-      e.stopPropagation();
-      onCancel(e);
-    };
-    return(
-      (show)?
-        <div className={classes.container} inline={inline?"true":"false"}>
-          <div className={classes.panel}>
-            <h4>{text}</h4>
-            <div>
-              <Button bsStyle="default" onClick={handleConfirm}>Yes</Button>
-              <Button bsStyle="danger" onClick={handleCancel}>No</Button>
-            </div>
-          </div>
-        </div>
-        :
-        null
-    );
+const ConfirmCancelEditPanel = ({ show, text, inline, onConfirm, onCancel }) => {
+
+  const classes = useStyles();
+
+  const handleConfirm = e => {
+    e.stopPropagation();
+    onConfirm(e);
+  };
+
+  const handleCancel = e => {
+    e.stopPropagation();
+    onCancel(e);
+  };
+
+  if (!show) {
+    return null;
   }
-}
+
+  return (
+    <div className={classes.container} inline={inline?"true":"false"}>
+      <div className={classes.panel}>
+        <h4>{text}</h4>
+        <div>
+          <Button variant="default" onClick={handleConfirm}>Yes</Button>
+          <Button variant="danger" onClick={handleCancel}>No</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default ConfirmCancelEditPanel;

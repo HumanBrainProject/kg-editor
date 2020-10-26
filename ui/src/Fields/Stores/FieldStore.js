@@ -14,19 +14,32 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed } from "mobx";
+import { observable, action, computed, makeObservable } from "mobx";
 
 class FieldStore {
-  @observable label = null;
-  @observable labelTooltip = null;
-  @observable fullyQualifiedName = null;
-  @observable alternatives = [];
-  @observable errorMessage = null;
-  @observable errorInfo = null;
+  label = null;
+  labelTooltip = null;
+  fullyQualifiedName = null;
+  alternatives = [];
+  errorMessage = null;
+  errorInfo = null;
   instance = null;
   type = null;
 
   constructor(definition, options, instance) {
+    makeObservable(this, {
+      label: observable,
+      labelTooltip: observable,
+      fullyQualifiedName: observable,
+      alternatives: observable,
+      errorMessage: observable,
+      errorInfo: observable,
+      setError: action,
+      clearError: action,
+      hasError: computed,
+      setAlternatives: action
+    });
+
     this.type = definition.type;
     this.label = definition.label;
     this.labelTooltip = definition.labelTooltip;
@@ -34,12 +47,10 @@ class FieldStore {
     this.instance = instance;
   }
 
-  @computed
   get returnValue() {
     throw `returnValue getter is not implemented for ${this.type} store`;
   }
 
-  @action
   /**
    * @param {any} value field value
    */
@@ -47,17 +58,14 @@ class FieldStore {
     throw `update method is not implemented for ${this.type} store`;
   }
 
-  @action
   reset() {
     throw `reset method is not implemented for ${this.type} store`;
   }
 
-  @computed
   get hasChanged() {
     throw `hasChanged getter is not implemented for ${this.type} store`;
   }
 
-  @computed
   get cloneWithInitialValue() {
     throw `cloneWithInitialValue getter is not implemented for ${this.type} store`;
   }
@@ -70,23 +78,19 @@ class FieldStore {
     };
   }
 
-  @action
   setError(message, info) {
     this.errorMessage = message;
     this.errorInfo = info;
   }
 
-  @action
   clearError() {
     this.setError(null, null);
   }
 
-  @computed
   get hasError() {
     return this.errorMessage || this.errorInfo;
   }
 
-  @action
   setAlternatives(alternatives) {
     this.alternatives = alternatives;
   }

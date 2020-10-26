@@ -14,9 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
+import { Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -31,7 +32,7 @@ import Status from "./Instance/Status";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "100%",
     padding: "10px 0",
@@ -134,143 +135,130 @@ const styles = {
   form: {
     padding: "0 10px"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Preview extends React.Component {
+const Preview  = observer(({ className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}) => {
 
-  componentDidMount() {
-    this.fetchInstance();
-  }
+  const classes = useStyles();
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.instanceId !== this.props.instanceId) {
-      this.fetchInstance();
-    }
-  }
+  useEffect(() => fetchInstance(), [instanceId]);
 
-  fetchInstance(forceFetch=false) {
-    const instance = instancesStore.createInstanceOrGet(this.props.instanceId);
+  const fetchInstance = (forceFetch=false) =>  {
+    const instance = instancesStore.createInstanceOrGet(instanceId);
     instance.fetch(forceFetch);
+  };
+
+  const handleRetry = () => fetchInstance(true);
+
+  const instance = instanceId?instancesStore.instances.get(instanceId):null;
+  if (!instance) {
+    return null;
   }
 
-  handleRetry = () => this.fetchInstance(true);
-
-  render() {
-    // const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showBookmarkStatus=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
-    const { classes, className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true } = this.props;
-
-    const instance = instanceId?instancesStore.instances.get(instanceId):null;
-    if (!instance) {
-      return null;
-    }
-
-    if(instance.hasFetchError) {
-      return(
-        <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
-          <BGMessage icon={"ban"}>
+  if(instance.hasFetchError) {
+    return(
+      <div className={`${classes.container} ${className?className:""}`}>
+        <BGMessage icon={"ban"}>
                 There was a network problem fetching the instance &quot;<i>{instanceId}&quot;</i>.
-            <br />
+          <br />
                 If the problem persists, please contact the support.
-            <br />
-            <small>{instance.fetchError}</small>
-            <br />
-            <br />
-            <Button bsStyle={"primary"} onClick={this.handleRetry}>
-              <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-            </Button>
-          </BGMessage>
-        </div>
-      );
-    }
-
-    if(!instance.isFetched || instance.isFetching) {
-      return(
-        <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
-          <FetchingLoader>
-            <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
-          </FetchingLoader>
-        </div>
-      );
-    }
-
-    if(instance.isFetched && !instance.permissions.canRead) {
-      const fieldStore = instance.fields[instance.labelField];
-      return(
-        <div className={`${classes.container} ${className?className:""} no-permission`} >
-          <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
-          <div className={classes.errorMessage}>
-            <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
-          </div>
-        </div>
-      );
-    }
-
-    const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
-
-    return (
-      <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
-        <div className={classes.content}>
-          <div className="header">
-            {showAction && (
-              <Actions instance={instance} />
-            )}
-            <div className={classes.titlePanel}>
-              {/* {showBookmarkStatus && (
-                  <BookmarkStatus className={classes.bookmarkStatus} id={instanceId} />
-                )} */}
-              {showTypes && (
-                <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
-                  <FontAwesomeIcon fixedWidth icon="circle" />
-                </div>
-              )}
-              <span className={classes.title}>
-                {instanceName?instanceName:instance.name}
-              </span>
-              {showStatus && (
-                <div className={`${classes.status}`}>
-                  <Status
-                    darkmode={true}
-                    id={instanceId}
-                  />
-                </div>
-              )}
-            </div>
-            <div className={classes.info}>
-              <div>ID: {instanceId}</div>
-              <div>Workspace: {instance.workspace}</div>
-            </div>
-          </div>
-          <Scrollbars autoHide>
-            {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
-              <div className={classes.form}>
-                {fields.map(name => {
-                  const fieldStore = instance.fields[name];
-                  return (
-                    <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} />
-                  );
-                })}
-                {showMetaData && instance.metadata && instance.metadata.length > 0 && (
-                  <div>
-                    <hr />
-                    <span className={`${classes.title} ${classes.metadataTitle}`}>
-                      {" "}
-                      Metadata{" "}
-                    </span>
-                    {instance.metadata.map(field => (
-                      <div key={instanceId + field.label} className={classes.field}>
-                        <label>{field.label}: </label> {field.value}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>}
-          </Scrollbars>
-        </div>
+          <br />
+          <small>{instance.fetchError}</small>
+          <br />
+          <br />
+          <Button variant={"primary"} onClick={handleRetry}>
+            <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+          </Button>
+        </BGMessage>
       </div>
     );
   }
-}
+
+  if(!instance.isFetched || instance.isFetching) {
+    return(
+      <div className={`${classes.container} ${className?className:""}`}>
+        <FetchingLoader>
+          <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
+        </FetchingLoader>
+      </div>
+    );
+  }
+
+  if(instance.isFetched && !instance.permissions.canRead) {
+    const fieldStore = instance.fields[instance.labelField];
+    return(
+      <Form className={`${classes.container} ${className?className:""} no-permission`} >
+        <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
+        <div className={classes.errorMessage}>
+          <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
+        </div>
+      </Form>
+    );
+  }
+
+  const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
+
+  return (
+    <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
+      <div className={classes.content}>
+        <div className="header">
+          {showAction && (
+            <Actions instance={instance} />
+          )}
+          <div className={classes.titlePanel}>
+            {/* {showBookmarkStatus && (
+                  <BookmarkStatus className={classes.bookmarkStatus} id={instanceId} />
+                )} */}
+            {showTypes && (
+              <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
+                <FontAwesomeIcon fixedWidth icon="circle" />
+              </div>
+            )}
+            <span className={classes.title}>
+              {instanceName?instanceName:instance.name}
+            </span>
+            {showStatus && (
+              <div className={`${classes.status}`}>
+                <Status
+                  darkmode={true}
+                  id={instanceId}
+                />
+              </div>
+            )}
+          </div>
+          <div className={classes.info}>
+            <div>ID: {instanceId}</div>
+            <div>Workspace: {instance.workspace}</div>
+          </div>
+        </div>
+        <Scrollbars autoHide>
+          {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
+            <Form className={`${classes.form}`}>
+              {fields.map(name => {
+                const fieldStore = instance.fields[name];
+                return (
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} showIfNoValue={showEmptyFields} />
+                );
+              })}
+              {showMetaData && instance.metadata && instance.metadata.length > 0 && (
+                <div>
+                  <hr />
+                  <span className={`${classes.title} ${classes.metadataTitle}`}>
+                    {" "}
+                      Metadata{" "}
+                  </span>
+                  {instance.metadata.map(field => (
+                    <div key={instanceId + field.label} className={classes.field}>
+                      <label>{field.label}: </label> {field.value}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Form>}
+        </Scrollbars>
+      </div>
+    </div>
+  );
+});
 
 export default Preview;

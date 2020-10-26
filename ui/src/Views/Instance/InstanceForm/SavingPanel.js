@@ -15,13 +15,13 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { uniqueId } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const animationId = uniqueId("animationId");
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "absolute",
     top: "0",
@@ -85,25 +85,25 @@ const styles = {
   label: {
     paddingLeft: "6px"
   },
-};
+});
 
-@injectStyles(styles)
-class SavingPanel extends React.Component{
-  render(){
-    const { classes, id, show, inline } = this.props;
-    if (!show) {
-      return null;
-    }
-    return (
-      <div className={classes.container} inline={inline?"true":"false"}>
-        <div className={classes.panel} >
-          <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
-          <span className={classes.label}>Saving instance...</span>
-          <small>ID: {id}</small>
-        </div>
-      </div>
-    );
+const SavingPanel = ({ id, show, inline }) => {
+
+  const classes = useStyles();
+
+  if (!show) {
+    return null;
   }
-}
+
+  return (
+    <div className={classes.container} inline={inline?"true":"false"}>
+      <div className={classes.panel} >
+        <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
+        <span className={classes.label}>Saving instance...</span>
+        <small>ID: {id}</small>
+      </div>
+    </div>
+  );
+};
 
 export default SavingPanel;

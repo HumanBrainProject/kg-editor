@@ -14,10 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { toJS } from "mobx";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -25,7 +25,7 @@ import User from "./User";
 
 import usersStore from "../../../Stores/UsersStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "100%",
@@ -135,25 +135,24 @@ const styles = {
       textAlign: "right"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Search extends React.Component{
+const Search = observer(({ org, excludedUsers, onSelect }) => {
 
-  handleLoadMoreSearchResults = () => {
+  const wrapperRef = useRef();
+  const usersRef = useRef();
+  const inputRef = useRef();
+
+  const classes = useStyles();
+
+  const handleLoadMoreSearchResults = () => {
     usersStore.searchUsers(true);
-  }
+  };
 
-  handleRetrySearchUsers = () => {
-    usersStore.searchUsers();
-  }
-
-  handleSelect = (user, event) => {
-    const { org, onSelect } = this.props;
+  const handleSelect = (user, event) => {
     if(event && event.keyCode === 40){ // Down
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
@@ -163,7 +162,7 @@ class Search extends React.Component{
       }
     } else if(event && event.keyCode === 38){ // Up
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
@@ -177,15 +176,15 @@ class Search extends React.Component{
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
       event && event.preventDefault();
       usersStore.addUser(org, toJS(user), true);
-      this.inputRef && this.inputRef.focus();
+      inputRef.current.focus();
       typeof onSelect === "function" && onSelect(user.id);
     }
-  }
+  };
 
-  handleInputKeyStrokes = event => {
+  const handleInputKeyStrokes = event => {
     if(event && event.keyCode === 40 ){ // Down
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
@@ -195,7 +194,7 @@ class Search extends React.Component{
       }
     } else if(event && event.keyCode === 38){ // Up
       event && event.preventDefault();
-      const users = this.usersRef.querySelectorAll(".option");
+      const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
@@ -207,99 +206,86 @@ class Search extends React.Component{
       event && event.preventDefault();
       usersStore.clearSearch();
     }
-  }
+  };
 
-  handleSearchFilterChange = event => {
-    const { excludedUsers } = this.props;
+  const handleSearchFilterChange = event => {
     if (event
       && event.keyCode !== 40   // Down
       && event.keyCode !== 38   // Up
       && event.keyCode !== 27) { //escape
       usersStore.setSearchFilter(event.target.value, excludedUsers);
     }
-  }
-
-  clickOutHandler = e => {
-    if(!this.wrapperRef || !this.wrapperRef.contains(e.target)){
-      usersStore.clearSearch();
-    }
   };
 
-  listenClickOutHandler(){
-    window.addEventListener("mouseup", this.clickOutHandler, false);
-    window.addEventListener("touchend", this.clickOutHandler, false);
-    window.addEventListener("keyup", this.clickOutHandler, false);
-  }
+  useEffect(() => {
+    const clickOutHandler = e => {
+      if(!wrapperRef.current.contains(e.target)){
+        usersStore.clearSearch();
+      }
+    };
 
-  unlistenClickOutHandler(){
-    window.removeEventListener("mouseup", this.clickOutHandler, false);
-    window.removeEventListener("touchend", this.clickOutHandler, false);
-    window.removeEventListener("keyup", this.clickOutHandler, false);
-  }
+    window.addEventListener("mouseup", clickOutHandler, false);
+    window.addEventListener("touchend", clickOutHandler, false);
+    window.addEventListener("keyup", clickOutHandler, false);
 
-  componentDidMount() {
-    this.listenClickOutHandler();
-  }
+    return () => {
+      window.removeEventListener("mouseup", clickOutHandler, false);
+      window.removeEventListener("touchend", clickOutHandler, false);
+      window.removeEventListener("keyup", clickOutHandler, false);
+    };
+  }, []);
 
-  componentWillUnmount(){
-    this.unlistenClickOutHandler();
-  }
+  const showTotalSearchCount = usersStore.isSearchFetched && usersStore.totalSearchCount !== undefined && (!usersStore.searchFetchError || usersStore.totalSearchCount !== 0);
 
-  render() {
-    const { classes } = this.props;
-
-    const showTotalSearchCount = usersStore.isSearchFetched && usersStore.totalSearchCount !== undefined && (!usersStore.searchFetchError || usersStore.totalSearchCount !== 0);
-
-    return (
-      <div className={classes.container} ref={ref=>{this.wrapperRef = ref;}} >
-        <FontAwesomeIcon icon="user-plus" className={classes.addIcon} />
-        <div className={classes.search}>
-          <input ref={ref=>{this.inputRef = ref;}} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={usersStore.searchFilter.queryString} onKeyDown={this.handleInputKeyStrokes} onChange={this.handleSearchFilterChange} />
-          <FontAwesomeIcon icon="search" className={classes.searchIcon} />
-          <div className={`quickfire-dropdown ${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={ref=>{this.usersRef = ref;}}>
-            <div className="dropdown-menu">
-              <div className="dropdown-list">
-                <InfiniteScroll
-                  element={"ul"}
-                  threshold={100}
-                  hasMore={usersStore.canLoadMoreResults}
-                  loadMore={this.handleLoadMoreSearchResults}
-                  useWindow={false}>
-                  {usersStore.searchResult.map(user => (
-                    <User key={user.id} user={user} onSelect={this.handleSelect} />
-                  ))}
-                </InfiniteScroll>
-              </div>
-              { (usersStore.isFetchingSearch || showTotalSearchCount) && (
-                <div className={classes.footerPanel} >
-                  <div>
-                    { usersStore.isFetchingSearch && (
-                      <React.Fragment>
-                        <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; fetching...
-                      </React.Fragment>
-                    )}
-                  </div>
-                  <div className={classes.searchCount}>
-                    { showTotalSearchCount && (
-                      <React.Fragment>
-                        {usersStore.totalSearchCount} user{`${usersStore.totalSearchCount !== 0?"s":""} found`}
-                      </React.Fragment>
-                    )}
-                  </div>
-                </div>
-              )}
-              {usersStore.searchFetchError && (
-                <button className={classes.errorPanel} title={usersStore.searchFetchError} onClick={this.handleLoadMoreSearchResults}>
-                  <div className="error"><FontAwesomeIcon icon="exclamation-triangle" />&nbsp;&nbsp;<span>{usersStore.searchFetchError}</span></div>
-                  <div className="retry"><FontAwesomeIcon icon={"redo-alt"}/></div>
-                </button>
-              )}
+  return (
+    <div className={classes.container} ref={wrapperRef} >
+      <FontAwesomeIcon icon="user-plus" className={classes.addIcon} />
+      <div className={classes.search}>
+        <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={usersStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
+        <FontAwesomeIcon icon="search" className={classes.searchIcon} />
+        <div className={`quickfire-dropdown ${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={usersRef}>
+          <div className="dropdown-menu">
+            <div className="dropdown-list">
+              <InfiniteScroll
+                element={"ul"}
+                threshold={100}
+                hasMore={usersStore.canLoadMoreResults}
+                loadMore={handleLoadMoreSearchResults}
+                useWindow={false}>
+                {usersStore.searchResult.map(user => (
+                  <User key={user.id} user={user} onSelect={handleSelect} />
+                ))}
+              </InfiniteScroll>
             </div>
+            { (usersStore.isFetchingSearch || showTotalSearchCount) && (
+              <div className={classes.footerPanel} >
+                <div>
+                  { usersStore.isFetchingSearch && (
+                    <React.Fragment>
+                      <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; fetching...
+                    </React.Fragment>
+                  )}
+                </div>
+                <div className={classes.searchCount}>
+                  { showTotalSearchCount && (
+                    <React.Fragment>
+                      {usersStore.totalSearchCount} user{`${usersStore.totalSearchCount !== 0?"s":""} found`}
+                    </React.Fragment>
+                  )}
+                </div>
+              </div>
+            )}
+            {usersStore.searchFetchError && (
+              <button className={classes.errorPanel} title={usersStore.searchFetchError} onClick={handleLoadMoreSearchResults}>
+                <div className="error"><FontAwesomeIcon icon="exclamation-triangle" />&nbsp;&nbsp;<span>{usersStore.searchFetchError}</span></div>
+                <div className="retry"><FontAwesomeIcon icon={"redo-alt"}/></div>
+              </button>
+            )}
           </div>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
 
 export default Search;

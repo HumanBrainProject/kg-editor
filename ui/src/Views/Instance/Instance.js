@@ -16,7 +16,7 @@
 
 import React from "react";
 import {observer} from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
@@ -32,7 +32,7 @@ import SaveBar from "./SaveBar";
 import Tabs from "./Tabs";
 import BGMessage from "../../Components/BGMessage";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "grid",
     height: "100%",
@@ -108,120 +108,123 @@ const styles = {
   errorMessage: {
     color: "var(--ft-color-loud)"
   }
+});
+
+const View = ({instance, mode}) => {
+  switch (mode) {
+  case "create":
+    if(instance.permissions.canCreate) {
+      return (
+        <InstanceView instance={instance} />
+      );
+    }
+    break;
+  case "edit":
+    if(instance.permissions.canWrite) {
+      return (
+        <InstanceView instance={instance} />
+      );
+    }
+    break;
+  case "view":
+    if(instance.permissions.canRead) {
+      return (
+        <InstanceView instance={instance} />
+      );
+    }
+    break;
+  case "invite":
+    if(instance.permissions.canInvite) {
+      return (
+        <InstanceInvite instance={instance} />
+      );
+    }
+    break;
+  case "graph":
+    if(instance.permissions.canCreate) {
+      return (
+        <InstanceGraph instance={instance} />
+      );
+    }
+    break;
+  case "release":
+    if(instance.permissions.canRelease) {
+      return (
+        <InstanceRelease instance={instance} />
+      );
+    }
+    break;
+  case "manage":
+    if(instance.permissions.canRead) {
+      return (
+        <InstanceManage instance={instance} />
+      );
+    }
+    break;
+  default:
+    break;
+  }
+  return (
+    <NoPermissionForView instance={instance} mode={mode} />
+  );
 };
 
-@injectStyles(styles)
-@observer
-class Instance extends React.Component {
+const NoPermissionForView = ({instance, mode}) => {
 
-  handleHidePreview = () => instancesStore.togglePreviewInstance();
+  const classes = useStyles();
 
-  renderNoPermissionForView = (instance, mode) => {
-    return (
-      <div className={this.props.classes.errorMessage} >
-        <BGMessage icon={"ban"}>
-          You do not have permission to {mode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
-          {instance.permissions.canRead?
-            <Link className="btn btn-primary" to={`/instances/${instance.id}/view/`}>Go to view</Link>:
-            <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}
-        </BGMessage>
+  return (
+    <div className={classes.errorMessage} >
+      <BGMessage icon={"ban"}>
+      You do not have permission to {mode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
+        {instance.permissions.canRead?
+          <Link className="btn btn-primary" to={`/instances/${instance.id}/view`}>Go to view</Link>:
+          <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}
+      </BGMessage>
+    </div>
+  );
+};
+
+const Instance = observer(({ instance, mode }) =>  {
+
+  const classes = useStyles();
+
+  const handleHidePreview = () => instancesStore.togglePreviewInstance();
+
+  const previewInstance = instancesStore.previewInstance;
+
+  const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
+
+  return (
+    <React.Fragment>
+      <div className={`${classes.container} ${!instancesStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
+        <Tabs mode={mode} instance={instance} />
+        <div className={classes.body}>
+          <View instance={instance} mode={mode} />
+        </div>
+        <div className={classes.sidebar}>
+          <SaveBar/>
+        </div>
       </div>
-    );
-  }
-
-  renderView = (instance, mode) => {
-    switch (mode) {
-    case "create":
-      if(instance.permissions.canCreate) {
-        return (
-          <InstanceView instance={instance} />
-        );
-      }
-      break;
-    case "edit":
-      if(instance.permissions.canWrite) {
-        return (
-          <InstanceView instance={instance} />
-        );
-      }
-      break;
-    case "view":
-      if(instance.permissions.canRead) {
-        return (
-          <InstanceView instance={instance} />
-        );
-      }
-      break;
-    case "invite":
-      if(instance.permissions.canInvite) {
-        return (
-          <InstanceInvite instance={instance} />
-        );
-      }
-      break;
-    case "graph":
-      if(instance.permissions.canCreate) {
-        return (
-          <InstanceGraph instance={instance} />
-        );
-      }
-      break;
-    case "release":
-      if(instance.permissions.canRelease) {
-        return (
-          <InstanceRelease instance={instance} />
-        );
-      }
-      break;
-    case "manage":
-      if(instance.permissions.canRead) {
-        return (
-          <InstanceManage instance={instance} />
-        );
-      }
-      break;
-    default:
-      break;
-    }
-    return this.renderNoPermissionForView(instance, mode);
-  }
-
-  render() {
-    const {classes, instance, mode} = this.props;
-    const previewInstance = instancesStore.previewInstance;
-    const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
-
-    return (
-      <React.Fragment>
-        <div className={`${classes.container} ${!instancesStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
-          <Tabs mode={mode} instance={instance} />
-          <div className={classes.body}>
-            {this.renderView(instance, mode)}
-          </div>
-          <div className={classes.sidebar}>
-            <SaveBar/>
-          </div>
-        </div>
-        <div className={`${classes.previewPanel} ${previewInstance?"show":""}`}>
-          {previewInstance && (
-            <React.Fragment>
-              <h3>Preview</h3>
-              <Preview instanceId={previewInstance.id}
-                instanceName={previewInstance.name}
-                showEmptyFields={previewOptions.showEmptyFields}
-                showAction={previewOptions.showAction}
-                showBookmarkStatus={previewOptions.showBookmarkStatus}
-                showType={previewOptions.showType}
-                showStatus={previewOptions.showStatus} />
-              <div className={classes.closePreviewBtn} title="close preview" onClick={this.handleHidePreview}>
-                <FontAwesomeIcon icon={"times"} />
-              </div>
-            </React.Fragment>
-          )}
-        </div>
-      </React.Fragment>
-    );
-  }
-}
+      <div className={`${classes.previewPanel} ${previewInstance?"show":""}`}>
+        {previewInstance && (
+          <React.Fragment>
+            <h3>Preview</h3>
+            <Preview instanceId={previewInstance.id}
+              instanceName={previewInstance.name}
+              showEmptyFields={previewOptions.showEmptyFields}
+              showAction={previewOptions.showAction}
+              showBookmarkStatus={previewOptions.showBookmarkStatus}
+              showType={previewOptions.showType}
+              showStatus={previewOptions.showStatus} />
+            <div className={classes.closePreviewBtn} title="close preview" onClick={handleHidePreview}>
+              <FontAwesomeIcon icon={"times"} />
+            </div>
+          </React.Fragment>
+        )}
+      </div>
+    </React.Fragment>
+  );
+});
 
 export default Instance;

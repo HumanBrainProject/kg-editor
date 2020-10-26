@@ -16,14 +16,13 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Row, Col } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import Field from "../../../Fields/Field";
 
-
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "calc(100% - 2px)",
@@ -74,62 +73,57 @@ const styles = {
     fontSize:"0.7em",
     wordBreak: "break-all"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class InstanceInvite extends React.Component{
-  render(){
-    const { classes, instance } = this.props;
+const InstanceInvite = observer(({ instance }) => {
 
-    if (!instance || instance.isFetching || instance.hasFetchError) {
-      return null;
-    }
+  const classes = useStyles();
 
-    const nodeType = instance.primaryType.label;
-    const color = instance.primaryType.color;
-    const fields = [...instance.nonPromotedFields, ...instance.promotedFields];
+  if (!instance || instance.isFetching || instance.hasFetchError) {
+    return null;
+  }
 
-    return (
-      <div className={classes.container}>
-        <Scrollbars autoHide>
-          <div>
-            <div className={classes.panel}>
-              <div className={classes.header}>
-                <Row>
-                  <Col xs={12}>
-                    <h6>
-                      <FontAwesomeIcon icon={"circle"} color={color?color:undefined}/>&nbsp;&nbsp;<span>{nodeType}</span>
-                    </h6>
-                  </Col>
-                </Row>
-              </div>
-              <div>
-                {fields.map(name => {
-                  const fieldStore = instance.fields[name];
-                  return (
-                    <div key={name} className={classes.field}>
-                      <Field name={name} fieldStore={fieldStore} readMode={true} />
-                    </div>
-                  );
-                })}
-              </div>
-              <div>
-                <Row>
-                  <Col xs={12}>
-                    <div className={classes.info}>
-                      <div>ID: {instance.id}</div>
-                      <div>Workspace: {instance.workspace}</div>
-                    </div>
-                  </Col>
-                </Row>
-              </div>
+  const nodeType = instance.primaryType.label;
+  const color = instance.primaryType.color;
+  const fields = [...instance.nonPromotedFields, ...instance.promotedFields];
+
+  return (
+    <div className={classes.container}>
+      <Scrollbars autoHide>
+        <div>
+          <div className={classes.panel}>
+            <div className={classes.header}>
+              <Row>
+                <Col xs={12}>
+                  <h6>
+                    <FontAwesomeIcon icon={"circle"} color={color?color:undefined}/>&nbsp;&nbsp;<span>{nodeType}</span>
+                  </h6>
+                </Col>
+              </Row>
+            </div>
+            <Form>
+              {fields.map(name => {
+                const fieldStore = instance.fields[name];
+                return (
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} />
+                );
+              })}
+            </Form>
+            <div>
+              <Row>
+                <Col xs={12}>
+                  <div className={classes.info}>
+                    <div>ID: {instance.id}</div>
+                    <div>Workspace: {instance.workspace}</div>
+                  </div>
+                </Col>
+              </Row>
             </div>
           </div>
-        </Scrollbars>
-      </div>
-    );
-  }
-}
+        </div>
+      </Scrollbars>
+    </div>
+  );
+});
 
 export default InstanceInvite;

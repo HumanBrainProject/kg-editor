@@ -14,33 +14,51 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, computed } from "mobx";
+import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import { debounce } from "lodash";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
 
 class UsersStore {
-  @observable users = new Map();
-  @observable isFetchingSearch = false;
-  @observable isSearchFetched = false;
-  @observable searchFetchError = null;
-  @observable searchResult = [];
-  @observable searchFilter = {
+  users = new Map();
+  isFetchingSearch = false;
+  isSearchFetched = false;
+  searchFetchError = null;
+  searchResult = [];
+  searchFilter = {
     queryString: "",
     excludedUsers: []
   };
-  @observable totalSearchCount = 0;
+  totalSearchCount = 0;
 
   searchPageStart = 0;
   searchPageSize = 20;
 
-  @computed
+  constructor() {
+    makeObservable(this, {
+      users: observable,
+      isFetchingSearch: observable,
+      isSearchFetched: observable,
+      searchFetchError: observable,
+      searchResult: observable,
+      searchFilter: observable,
+      totalSearchCount: observable,
+      hasSearchFilter: computed,
+      canLoadMoreResults: computed,
+      getUser: action,
+      addUser: action,
+      fetchUser: action,
+      setSearchFilter: action,
+      clearSearch: action,
+      searchUsers: action
+    });
+  }
+
   get hasSearchFilter() {
     return this.searchFilter.queryString !== "";
   }
 
-  @computed
   get canLoadMoreResults() {
     if (!this.hasSearchFilter || this.isFetchingSearch || this.searchFetchError || !this.searchResult.length) {
       return false;
@@ -53,12 +71,10 @@ class UsersStore {
     this.searchUsers();
   }, 750);
 
-  @action
   getUser(userId) {
     return this.users.get(userId);
   }
 
-  @action
   addUser(user, clearSearch = false) {
     if (user && user.id && !this.users.has(user.id)) {
       this.users.set(user.id, Object.assign({}, user, {
@@ -73,7 +89,6 @@ class UsersStore {
     }
   }
 
-  @action
   async fetchUser(userId) {
     let user = this.users.get(userId);
     if (!user) {
@@ -133,7 +148,6 @@ class UsersStore {
     return user;
   }
 
-  @action
   setSearchFilter(queryString, excludedUsers = []) {
     if (!queryString) {
       queryString = "";
@@ -148,7 +162,6 @@ class UsersStore {
     }
   }
 
-  @action
   clearSearch() {
     this.searchFilter.queryString = "";
     this.searchFilter.excludedUsers = [];
@@ -158,7 +171,6 @@ class UsersStore {
     this.totalSearchCount = 0;
   }
 
-  @action
   async searchUsers(loadMore = false) {
     if (!this.hasSearchFilter) {
       this.clearSearch();

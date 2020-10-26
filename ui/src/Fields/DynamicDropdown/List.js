@@ -34,7 +34,7 @@ const List = ({
   onMouseOver,
   onMouseOut
 }) => (
-  <span className={readOnly ? "quickfire-readmode-list" : "quickfire-list"}>
+  <span>
     {list.map((id, index) => (
       <ListItem
         key={`${index}-${id}`}

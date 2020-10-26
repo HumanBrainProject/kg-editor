@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction, computed, toJS } from "mobx";
+import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
 import { debounce, remove } from "lodash";
 
 import FieldStore from "./FieldStore";
@@ -25,26 +25,65 @@ import appStore from "../../Stores/AppStore";
 const defaultNumberOfVisibleLinks = 10;
 
 class LinksStore extends FieldStore {
-  @observable value = [];
-  @observable options = [];
-  @observable alternatives = [];
-  @observable allowCustomValues =  true;
-  @observable returnAsNull = false;
-  @observable optionsTypes = [];
-  @observable optionsExternalTypes = [];
-  @observable optionsSearchTerm = "";
-  @observable optionsPageStart = 0;
-  @observable optionsPageSize = 50;
-  @observable optionsCurrentTotal = Infinity;
-  @observable fetchingOptions = false;
-  @observable lazyShowLinks = false;
-  @observable visibleLinks = new Set();
-  @observable initialValue = [];
+  value = [];
+  options = [];
+  allowCustomValues = true;
+  returnAsNull = false;
+  optionsTypes = [];
+  optionsExternalTypes = [];
+  optionsSearchTerm = "";
+  optionsPageStart = 0;
+  optionsPageSize = 50;
+  optionsCurrentTotal = Infinity;
+  fetchingOptions = false;
+  lazyShowLinks = false;
+  visibleLinks = new Set();
+  initialValue = [];
   isLink = true;
   mappingValue = "@id";
 
   constructor(definition, options, instance) {
     super(definition, options, instance);
+
+    makeObservable(this, {
+      value: observable,
+      options: observable,
+      allowCustomValues: observable,
+      returnAsNull: observable,
+      optionsTypes: observable,
+      optionsExternalTypes: observable,
+      optionsSearchTerm: observable,
+      optionsPageStart: observable,
+      optionsPageSize: observable,
+      optionsCurrentTotal: observable,
+      fetchingOptions: observable,
+      lazyShowLinks: observable,
+      visibleLinks: observable,
+      initialValue: observable,
+      cloneWithInitialValue: computed,
+      returnValue: computed,
+      updateValue: action,
+      reset: action,
+      hasChanged: computed,
+      numberOfValues: computed,
+      hasMoreOptions: computed,
+      insertValue: action,
+      deleteValue: action,
+      addValue: action,
+      setValues: action,
+      moveValueAfter: action,
+      removeValue: action,
+      removeAllValues: action,
+      removeLastValue: action,
+      links: computed,
+      showLink: action,
+      numberOfVisibleLinks: computed,
+      performSearchOptions: action,
+      searchOptions: action,
+      resetOptionsSearch: action,
+      loadMoreOptions: action
+    });
+
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;
     }
@@ -63,7 +102,6 @@ class LinksStore extends FieldStore {
     };
   }
 
-  @computed
   get cloneWithInitialValue() {
     return {
       ...this.definition,
@@ -71,7 +109,6 @@ class LinksStore extends FieldStore {
     };
   }
 
-  @computed
   get returnValue() {
     if (!this.value.length && this.returnAsNull) {
       return null;
@@ -79,7 +116,6 @@ class LinksStore extends FieldStore {
     return toJS(this.value);
   }
 
-  @action
   updateValue(value) {
     this.returnAsNull = false;
     const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
@@ -97,28 +133,23 @@ class LinksStore extends FieldStore {
     });
   }
 
-  @action
   reset() {
     this.returnAsNull = false;
     this.value = [...this.initialValue];
   }
 
-  @computed
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
   }
 
-  @computed
   get numberOfValues() {
     return this.value.length;
   }
 
-  @computed
-  get hasMoreOptions(){
+  get hasMoreOptions() {
     return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
   }
 
-  @action
   insertValue(value, index) {
     if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
@@ -129,14 +160,12 @@ class LinksStore extends FieldStore {
     }
   }
 
-  @action
   deleteValue(value) {
     if(this.value.length !== undefined){
       remove(this.value, val=>val === value);
     }
   }
 
-  @action
   addValue(value) {
     this.insertValue(value);
     if (this.lazyShowLinks) {
@@ -146,7 +175,6 @@ class LinksStore extends FieldStore {
     this.resetOptionsSearch();
   }
 
-  @action
   setValues(values) {
     if (values !== null && values !== undefined) {
       if (values.length  || !this.returnAsNull) {
@@ -169,7 +197,6 @@ class LinksStore extends FieldStore {
     this.resetOptionsSearch();
   }
 
-  @action
   moveValueAfter(value, afterValue) {
     if(value) {
       this.deleteValue(value);
@@ -178,19 +205,16 @@ class LinksStore extends FieldStore {
     }
   }
 
-  @action
   removeValue(value) {
     this.visibleLinks.delete(value[this.mappingValue]);
     this.deleteValue(value);
     this.resetOptionsSearch();
   }
 
-  @action
   removeAllValues() {
     this.setValues(null);
   }
 
-  @action
   removeLastValue() {
     if (this.value.length) {
       this.deleteValue(this.value[this.value.length-1]);
@@ -198,25 +222,21 @@ class LinksStore extends FieldStore {
     }
   }
 
-  @computed
   get links() { // be aware that it may contains null values and null value are needed!
     return this.value.map(value => value && value[this.mappingValue]);
   }
 
-  @action
   showLink(id) {
     this.visibleLinks.add(id);
   }
 
-  @computed
   get numberOfVisibleLinks() {
     return this.visibleLinks.size;
   }
 
   isLinkVisible = id => this.visibleLinks.has(id);
 
-  @action
-  async performSearchOptions(append){
+  async performSearchOptions(append) {
     if(this.fetchingOptions){
       return;
     }
@@ -255,8 +275,7 @@ class LinksStore extends FieldStore {
 
   _debouncedSearchOptions = debounce(append=>{this.performSearchOptions(append);}, 250);
 
-  @action
-  searchOptions(search, force=true){
+  searchOptions(search, force=true) {
     this.optionsSearchTerm = search;
     this.options = [];
     this.optionsTypes = [];
@@ -266,13 +285,11 @@ class LinksStore extends FieldStore {
     }
   }
 
-  @action
   resetOptionsSearch() {
     this.searchOptions("", false);
   }
 
-  @action
-  loadMoreOptions(){
+  loadMoreOptions() {
     if(this.hasMoreOptions){
       this.performSearchOptions(true);
     }

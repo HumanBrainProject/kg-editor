@@ -14,8 +14,8 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 
 import Pane from "./Pane";
@@ -24,79 +24,59 @@ import InstanceForm from "./InstanceForm";
 import instancesStore from "../../Stores/InstancesStore";
 import viewStore from "../../Stores/ViewStore";
 
-const styles = {
+const useStyles = createUseStyles({
   pane: {
     position: "relative"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Links extends React.Component{
+const Links = observer(({ instanceId }) => {
 
-  componentDidMount() {
-    this.fetchInstance();
+  const instance = instancesStore.instances.get(instanceId);
+  if (!instance) {
+    return null;
   }
 
-  componentDidUpdate(prevProps) {
-    if(this.props.id && prevProps.id !== this.props.id) {
-      this.fetchInstance();
-    }
-  }
+  const classes = useStyles();
 
-  fetchInstance = (forceFetch = false) => {
-    if (this.props.id) {
-      const instance = instancesStore.createInstanceOrGet(this.props.id);
+  useEffect(() => fetchInstance(), [instanceId]);
+
+  const fetchInstance = (forceFetch = false) => {
+    if (instanceId) {
+      const instance = instancesStore.createInstanceOrGet(instanceId);
       instance.fetch(forceFetch);
     }
+  };
+
+  const groups = instance.childrenIdsGroupedByField;
+  if (!groups.length) {
+    return null;
   }
 
-  getChildInstanceId = (path, index) => {
-    let childInstanceId = null;
-    if(index >=0 && path.length>index+1){
-      childInstanceId = path[index+1];
-    }
-    return childInstanceId;
-  }
-
-  render(){
-    const {classes, instanceId } = this.props;
-
-    const instance = instancesStore.instances.get(instanceId);
-    if (!instance) {
-      return null;
-    }
-
-    const groups = instance.childrenIdsGroupedByField;
-    if (!groups.length) {
-      return null;
-    }
-
-    const view = viewStore.selectedView;
-    const paneId = `ChildrenOf${instanceId}`;
-    const path = view.instancePath;
-    const index = path.findIndex(id => id === instanceId);
-    const childInstanceId = this.getChildInstanceId(path, index);
-    return (
-      <React.Fragment>
-        <Pane className={classes.pane} paneId={paneId}>
-          {groups.map(group => (
-            <div key={group.label} data-provenance={group.label}>
-              <h4>{group.label}{group.pagination?
-                <em style={{fontWeight:"lighter"}}>
+  const view = viewStore.selectedView;
+  const paneId = `ChildrenOf${instanceId}`;
+  const path = view.instancePath;
+  const index = path.findIndex(id => id === instanceId);
+  const childInstanceId = (index >=0 && path.length>index+1)?path[index+1]:null;
+  return (
+    <React.Fragment>
+      <Pane className={classes.pane} paneId={paneId}>
+        {groups.map(group => (
+          <div key={group.label} data-provenance={group.label}>
+            <h4>{group.label}{group.pagination?
+              <em style={{fontWeight:"lighter"}}>
                       (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
-              </h4>
-              {group.ids.map(id => (
-                <InstanceForm key={id} view={view} pane={paneId} id={id} provenance={group.label} />
-              ))}
-            </div>
-          ))}
-        </Pane>
-        {childInstanceId && <DecoratedLinks instanceId={childInstanceId} />}
-      </React.Fragment>
-    );
-  }
-}
+            </h4>
+            {group.ids.map(id => (
+              <InstanceForm key={id} view={view} pane={paneId} id={id} provenance={group.label} />
+            ))}
+          </div>
+        ))}
+      </Pane>
+      {childInstanceId && <DecoratedLinks instanceId={childInstanceId} />}
+    </React.Fragment>
+  );
+});
 
 const DecoratedLinks = Links;
 export default DecoratedLinks;

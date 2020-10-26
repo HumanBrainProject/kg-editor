@@ -16,12 +16,12 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { MenuItem } from "react-bootstrap";
 
 import UserComponent from "../../../Components/User";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     width: "100%",
     padding: "6px 5px",
@@ -65,43 +65,37 @@ const styles = {
     padding: "6px 0",
     verticalAlign: "middle"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class User extends React.Component{
+const User = observer(({ user, onSelect }) => {
 
-  handleSelect = (user, event) => {
-    const { onSelect } = this.props;
-    typeof onSelect === "function" && onSelect(user, event);
-  }
+  const classes = useStyles();
 
-  render() {
-    const { classes, user} = this.props;
+  const handleSelect = e => {
+    typeof onSelect === "function" && onSelect(user, e);
+  };
 
-    const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
-      if (item && item.value && item.verified) {
-        if (item.primary || !email) {
-          return item;
-        }
+  const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
+    if (item && item.value && item.verified) {
+      if (item.primary || !email) {
+        return item;
       }
-      return email;
-    }, null):null;
+    }
+    return email;
+  }, null):null;
 
-    return (
-      <MenuItem  key={user.id} className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect.bind(this, user)}>
-        <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, user)}>
-          <UserComponent
-            userId={user && user.id}
-            name={user && user.name}
-            picture={user && user.picture}
-            isCurator={!!user && !!user.isCurator}
-            title={email} />
-        </div>
-      </MenuItem>
-    );
-  }
-}
-
+  return (
+    <MenuItem  key={user.id} className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
+      <div tabIndex={-1} className="option" onKeyDown={handleSelect}>
+        <UserComponent
+          userId={user && user.id}
+          name={user && user.name}
+          picture={user && user.picture}
+          isCurator={!!user && !!user.isCurator}
+          title={email} />
+      </div>
+    </MenuItem>
+  );
+});
 
 export default User;

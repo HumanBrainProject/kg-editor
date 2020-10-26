@@ -35,7 +35,7 @@ const TextArea = (props) => {
     );
   }
   return (
-    <InputText {...props} componentClass="textarea" autosize={true} />
+    <InputText {...props} as="textarea" autosize={true} />
   );
 };
 

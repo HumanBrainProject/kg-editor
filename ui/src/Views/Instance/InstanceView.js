@@ -16,7 +16,7 @@
 
 import React from "react";
 import {observer} from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import viewStore, { ViewContext} from "../../Stores/ViewStore";
 
@@ -24,7 +24,7 @@ import InstanceForm from "./InstanceForm";
 import Pane from "./Pane";
 import Links from "./Links";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "100%",
     width: "100%",
@@ -33,30 +33,26 @@ const styles = {
     overflow: "hidden",
     "--selected-index":"0"
   }
-};
-@injectStyles(styles)
-@observer
-class InstanceView extends React.Component {
+});
 
-  render() {
-    const { classes, instance } = this.props;
-    const { id } = instance;
+const InstanceView = observer(({ instance }) => {
 
-    if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== id) {
-      return null;
-    }
+  const classes = useStyles();
 
-    return (
-      <ViewContext.Provider value={viewStore.selectedView} >
-        <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
-          <Pane paneId={id} >
-            <InstanceForm view={viewStore.selectedView} pane={id} id={id} />
-          </Pane>
-          <Links instanceId={id} />
-        </div>
-      </ViewContext.Provider>
-    );
+  if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== instance.id) {
+    return null;
   }
-}
+
+  return (
+    <ViewContext.Provider value={viewStore.selectedView} >
+      <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
+        <Pane paneId={instance.id} >
+          <InstanceForm view={viewStore.selectedView} pane={instance.id} id={instance.id} />
+        </Pane>
+        <Links instanceId={instance.id} />
+      </div>
+    </ViewContext.Provider>
+  );
+});
 
 export default InstanceView;

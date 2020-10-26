@@ -16,16 +16,16 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button, Modal } from "react-bootstrap";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../../../Stores/AppStore";
+import releaseStore from "../../../Stores/ReleaseStore";
 
 import CompareWithReleasedVersionChanges from "../CompareWithReleasedVersionChanges";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     width: "90%",
     "@media screen and (min-width:1024px)": {
@@ -41,51 +41,45 @@ const styles = {
       padding: "3px 0"
     }
   },
-};
+});
 
-@injectStyles(styles)
-@observer
-class CompareInstancesModal extends React.Component {
-  handleShowCompare = node => e => {
+const CompareInstancesModal = observer(() => {
+
+  const classes = useStyles();
+
+  const handleHideCompare = e => {
     e && e.stopPropagation();
-    appStore.setComparedWithReleasedVersionInstance(node);
-  }
+    releaseStore.setComparedInstance(null);
+  };
 
-  render() {
-    const {classes} = this.props;
-    return(
-      <Modal
-        show={true}
-        dialogClassName={classes.container}
-        onHide={this.handleShowCompare(null)}
-      >
-        <Modal.Header closeButton>
-            Compare with the released version of &nbsp;
-          <strong>
-            {appStore.comparedWithReleasedVersionInstance.type}&nbsp;
-            {appStore.comparedWithReleasedVersionInstance.label}
-          </strong>
-        </Modal.Header>
-        <Modal.Body>
-          <Scrollbars autoHide>
-            <CompareWithReleasedVersionChanges
-              instanceId={appStore.comparedWithReleasedVersionInstance.id}
-              status={appStore.comparedWithReleasedVersionInstance.status}
-            />
-          </Scrollbars>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            bsSize="small"
-            onClick={this.handleShowCompare(null)}
-          >
-            <FontAwesomeIcon icon="times" />
-                        &nbsp;Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  }
-}
+  return(
+    <Modal
+      show={true}
+      dialogClassName={classes.container}
+      onHide={handleHideCompare}
+    >
+      <Modal.Header closeButton>
+        Compare with the released version of &nbsp;
+        <strong>
+          {releaseStore.comparedInstance.type}&nbsp;
+          {releaseStore.comparedInstance.label}
+        </strong>
+      </Modal.Header>
+      <Modal.Body>
+        <Scrollbars autoHide>
+          <CompareWithReleasedVersionChanges
+            instanceId={releaseStore.comparedInstance.id}
+            status={releaseStore.comparedInstance.status}
+          />
+        </Scrollbars>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button size="sm" onClick={handleHideCompare} >
+          <FontAwesomeIcon icon="times" />&nbsp;Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+});
 
 export default CompareInstancesModal;

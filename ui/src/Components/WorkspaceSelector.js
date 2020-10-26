@@ -1,13 +1,29 @@
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
+
 import React from "react";
 import { observer } from "mobx-react";
-import { Dropdown, MenuItem } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { Dropdown } from "react-bootstrap";
+import { createUseStyles } from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";
-import routerStore from "../Stores/RouterStore";
+import CustomDropdownMenu from "./CustomDropdownMenu";
 import appStore from "../Stores/AppStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     height: "50px",
     lineHeight: "50px",
@@ -22,52 +38,35 @@ const styles = {
     "& .btn-group": {
       margin: "-2px"
     }
-  },
-  dropdownMenu: {
-    background: "var(--ft-color-loud)",
-    margin: "0 0 0 -20px",
-    fontSize: "0.9em"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class WorkspaceSelector extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentLocation: routerStore.history.location.pathname
-    };
-    routerStore.history.listen(location => {
-      this.setState({ currentLocation: location.pathname });
-    });
-  }
+const WorkspaceSelector = observer(() => {
+  const classes = useStyles();
 
-  selectWorkspace = eventKey => {
-    appStore.setCurrentWorkspace(eventKey);
-  }
+  const handleSelectWorkspace = eventKey => appStore.setCurrentWorkspace(eventKey);
 
-  render() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.container} title={`${appStore.currentWorkspaceName} workspace`}>
-        {authStore.workspaces.length > 1 ?
-          <Dropdown id="dropdown-custom-1">
-            <CustomDropdownToggle bsRole="toggle">{appStore.currentWorkspaceName}</CustomDropdownToggle>
-            <Dropdown.Menu className={classes.dropdownMenu}>
-              {authStore.workspaces.map(workspace =>
-                <MenuItem key={workspace.id}
-                  eventKey={workspace.id}
-                  onSelect={this.selectWorkspace}>
-                  {workspace.name||workspace.id}</MenuItem>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
-          : appStore.currentWorkspaceName}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.container} title={`${appStore.currentWorkspaceName} workspace`}>
+      {authStore.workspaces.length > 1 ?
+        <Dropdown>
+          <Dropdown.Toggle as={CustomDropdownToggle}>
+            {appStore.currentWorkspaceName}
+          </Dropdown.Toggle>
+          <Dropdown.Menu as={CustomDropdownMenu}>
+            {authStore.workspaces.map(workspace =>
+              <Dropdown.Item
+                key={workspace.id}
+                eventKey={workspace.id}
+                onSelect={handleSelectWorkspace}>
+                {workspace.name||workspace.id}
+              </Dropdown.Item>
+            )}
+          </Dropdown.Menu>
+        </Dropdown>
+        : appStore.currentWorkspaceName}
+    </div>
+  );
+});
 
 export default WorkspaceSelector;

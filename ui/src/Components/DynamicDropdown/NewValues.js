@@ -1,15 +1,31 @@
-import React from "react";
-import {  MenuItem } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import injectStyles from "react-jss";
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
 
-const styles = {
+import React, { useEffect, useRef } from "react";
+import { Dropdown } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
   container: {
     "& .option": {
       position: "relative"
     }
   }
-};
+});
 
 
 const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, onSelect, onCancel}) => (
@@ -18,71 +34,61 @@ const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, o
   </React.Fragment>
 );
 
-@injectStyles(styles)
-class  NewValue extends React.Component {
-  componentDidMount() {
-    this.setFocus();
-  }
+const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel }) => {
 
-  componentDidUpdate() {
-    this.setFocus();
-  }
+  const classes = useStyles();
 
-    setFocus = () => {
-      const { hasFocus } = this.props;
-      if (hasFocus) {
-        this.ref.focus();
+  const ref = useRef();
+
+  useEffect(() => {
+    if (hasFocus) {
+      ref.current.focus();
+    }
+  });
+
+  const handleOnSelect = () => {
+    onSelect(type.name);
+  };
+
+  const handleKeyDown = e => {
+    if(e) {
+      switch(e.keyCode) {
+      case 38: {
+        e.preventDefault();
+        onSelectPrevious(type.name);
+        break;
+      }
+      case 40: {
+        e.preventDefault();
+        onSelectNext(type.name);
+        break;
+      }
+      case 13: {
+        e.preventDefault();
+        onSelect(type.name);
+        break;
+      }
+      case 27: {
+        e.preventDefault();
+        onCancel();
+        break;
+      }
       }
     }
+  };
 
-    handleOnSelect = () => {
-      const {onSelect, type} = this.props;
-      onSelect(type.name);
-    }
+  const style = type.color ? { color: type.color } : {};
 
-    handleKeyDown = e => {
-      const {onSelectNext, onSelectPrevious, onSelect, onCancel, type} = this.props;
-      if(e) {
-        switch(e.keyCode) {
-        case 38: {
-          e.preventDefault();
-          onSelectPrevious(type.name);
-          break;
-        }
-        case 40: {
-          e.preventDefault();
-          onSelectNext(type.name);
-          break;
-        }
-        case 13: {
-          e.preventDefault();
-          onSelect(type.name);
-          break;
-        }
-        case 27: {
-          e.preventDefault();
-          onCancel();
-          break;
-        }
-        }
-      }
-    }
-
-    render() {
-      const  {classes, type, value} = this.props;
-      return(
-        <MenuItem className={`quickfire-dropdown-item ${classes.container}`} key={type.name} onSelect={this.handleOnSelect}>
-          <div tabIndex={-1} className="option" onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>
-            <em>Add a new <span style={type.color ? { color: type.color } : {}}>
-              <FontAwesomeIcon fixedWidth icon="circle" />
-            </span>
-            {type.label} </em> : <strong>{value}</strong>
-          </div>
-        </MenuItem>
-      );
-
-    }
-
-}
+  return (
+    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} key={type.name} onSelect={handleOnSelect}>
+      <div tabIndex={-1} className="option" onKeyDown={handleKeyDown} ref={ref}>
+        <em>Add a new <span style={style}>
+          <FontAwesomeIcon fixedWidth icon="circle" />
+        </span>
+        {type.label} </em> : <strong>{value}</strong>
+      </div>
+    </Dropdown.Item>
+  );
+};
 
 export default NewValues;

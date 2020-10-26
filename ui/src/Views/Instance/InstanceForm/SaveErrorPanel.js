@@ -15,10 +15,10 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "absolute",
     top: "0",
@@ -56,38 +56,37 @@ const styles = {
       marginLeft: "20px"
     }
   }
-};
+});
 
-@injectStyles(styles)
-class SaveErrorPanel extends React.Component{
-  handleCancel = e => {
+const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }) => {
+
+  const classes = useStyles();
+
+  const handleCancel = e => {
     e.stopPropagation();
-    this.props.onCancel(e);
+    onCancel(e);
+  };
+
+  const handleRetry = e => {
+    e.stopPropagation();
+    onRetry(e);
+  };
+
+  if (!show) {
+    return null;
   }
 
-  handleRetry = e => {
-    e.stopPropagation();
-    this.props.onRetry(e);
-  }
-
-  render(){
-    const { classes, show, error, inline } = this.props;
-
-    return(
-      show?
-        <div className={classes.container} inline={inline?"true":"false"}>
-          <div className={classes.panel}>
-            <h4>{error}</h4>
-            <div>
-              <Button bsStyle="default" onClick={this.handleCancel}>Cancel</Button>
-              <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
-            </div>
-          </div>
+  return (
+    <div className={classes.container} inline={inline?"true":"false"}>
+      <div className={classes.panel}>
+        <h4>{error}</h4>
+        <div>
+          <Button variant="default" onClick={handleCancel}>Cancel</Button>
+          <Button variant="primary" onClick={handleRetry}>Retry</Button>
         </div>
-        :
-        null
-    );
-  }
-}
+      </div>
+    </div>
+  );
+};
 
 export default SaveErrorPanel;

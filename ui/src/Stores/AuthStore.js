@@ -14,62 +14,78 @@
 *   limitations under the License.
 */
 
-import { observable, computed, action, runInAction } from "mobx";
+import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import API from "../Services/API";
 import appStore from "./AppStore";
 
 const rootPath = window.rootPath || "";
 
 class AuthStore {
-  @observable user = null;
-  @observable isRetrievingUserProfile = false;
-  @observable userProfileError = false;
-  @observable authError = null;
-  @observable authSuccess = false;
-  @observable isTokenExpired = false;
-  @observable isInitializing = true;
-  @observable initializationError = null;
-  @observable isLogout = false;
+  user = null;
+  isRetrievingUserProfile = false;
+  userProfileError = false;
+  authError = null;
+  authSuccess = false;
+  isTokenExpired = false;
+  isInitializing = true;
+  initializationError = null;
+  isLogout = false;
   keycloak = null;
   endpoint = null;
 
   constructor() {
+    makeObservable(this, {
+      user: observable,
+      isRetrievingUserProfile: observable,
+      userProfileError: observable,
+      authError: observable,
+      authSuccess: observable,
+      isTokenExpired: observable,
+      isInitializing: observable,
+      initializationError: observable,
+      isLogout: observable,
+      accessToken: computed,
+      isAuthenticated: computed,
+      hasUserProfile: computed,
+      hasWorkspaces: computed,
+      workspaces: computed,
+      isFullyAuthenticated: computed,
+      logout: action,
+      retrieveUserProfile: action,
+      initializeKeycloak: action,
+      login: action,
+      authenticate: action
+    });
+
     if (Storage === undefined) {
       throw "The browser must support WebStorage API";
     }
   }
 
-  @computed
   get accessToken() {
     return this.isAuthenticated ? this.keycloak.token: "";
   }
 
-  @computed
   get isAuthenticated() {
     return this.authSuccess;
   }
 
-  @computed
   get hasUserProfile() {
     return !!this.user;
   }
 
-  @computed
   get hasWorkspaces() {
     return this.user && this.user.workspaces instanceof Array && !!this.user.workspaces.length;
   }
 
-  @computed
   get workspaces() {
     return this.hasWorkspaces ? this.user.workspaces: [];
   }
 
-  @computed
   get isFullyAuthenticated() {
     return this.isAuthenticated && this.hasUserProfile;
   }
 
-  @action
   logout() {
     this.authSuccess = false;
     this.isTokenExpired = true;
@@ -78,7 +94,6 @@ class AuthStore {
     this.isLogout = true;
   }
 
-  @action
   async retrieveUserProfile() {
     if (this.isAuthenticated && !this.user) {
       this.userProfileError = false;
@@ -101,7 +116,6 @@ class AuthStore {
     return this.hasUserProfile;
   }
 
-  @action
   initializeKeycloak(resolve, reject) {
     const keycloak = window.Keycloak({
       "realm": "hbp",
@@ -131,14 +145,12 @@ class AuthStore {
     keycloak.init({ onLoad: "login-required", flow: "implicit" });
   }
 
-  @action
   login() {
     if(!this.isAuthenticated && this.keycloak) {
       this.keycloak.login();
     }
   }
 
-  @action
   async authenticate() {
     this.isLogout = false;
     this.isInitializing = true;
@@ -186,6 +198,21 @@ class AuthStore {
     }
     return this.authSuccess;
   }
+
+  async saveProfilePicture(picture) {
+    try {
+      const payoad = {
+        data: picture
+      };
+      await API.axios.put(API.endpoints.userPicture(), payoad);
+      runInAction(() => {
+        this.user.picture = picture;
+      });
+    } catch (e) {
+      appStore.captureSentryException(e);
+    }
+  }
+
 }
 
 export default new AuthStore();

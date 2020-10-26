@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction } from "mobx";
+import { observable, action, runInAction, makeObservable } from "mobx";
 import { toJS } from "mobx";
 import { debounce } from "lodash";
 
@@ -23,19 +23,32 @@ import historyStore from "./HistoryStore";
 import appStore from "./AppStore";
 
 class BookmarkStatusStore{
-  @observable statuses = new Map();
-  @observable isFetching = false;
+  statuses = new Map();
+  isFetching = false;
 
   processSize = 20;
   fetchQueue = [];
   fetchErrorQueue = [];
 
+  constructor() {
+    makeObservable(this, {
+      statuses: observable,
+      isFetching: observable,
+      fetchStatus: action,
+      updateStatus: action,
+      saveStatus: action,
+      revertSaveStatus: action,
+      retryFetchStatus: action,
+      smartProcessQueue: action,
+      processQueue: action
+    });
+  }
+
   getInstance(id){
     return this.statuses.get(id);
   }
 
-  @action
-  fetchStatus(instanceIds){
+  fetchStatus(instanceIds) {
     if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
@@ -58,8 +71,7 @@ class BookmarkStatusStore{
     this.smartProcessQueue();
   }
 
-  @action
-  updateStatus(instanceIds, bookmarkLists, appendMode){
+  updateStatus(instanceIds, bookmarkLists, appendMode) {
     if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
@@ -101,8 +113,7 @@ class BookmarkStatusStore{
     this.smartProcessQueue();
   }
 
-  @action
-  saveStatus(instanceIds){
+  saveStatus(instanceIds) {
     if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
     }
@@ -137,7 +148,6 @@ class BookmarkStatusStore{
     });
   }
 
-  @action
   revertSaveStatus(instanceIds) {
     if(!Array.isArray(instanceIds)){
       instanceIds = [instanceIds];
@@ -159,15 +169,13 @@ class BookmarkStatusStore{
     });
   }
 
-  @action
-  retryFetchStatus(){
+  retryFetchStatus() {
     const toFetch = this.fetchErrorQueue;
     this.fetchErrorQueue = [];
     this.fetchStatus(toFetch);
   }
 
-  @action
-  smartProcessQueue(){
+  smartProcessQueue() {
     if(this.fetchQueue.length <= 0){
       this._debouncedProcessQueue.cancel();
     } else if(this.fetchQueue.length < this.processSize){
@@ -180,8 +188,7 @@ class BookmarkStatusStore{
 
   _debouncedProcessQueue = debounce(()=>{this.processQueue();}, 250);
 
-  @action
-  async processQueue(){
+  async processQueue() {
     if(this.isFetching){
       return;
     }

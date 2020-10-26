@@ -31,7 +31,8 @@ final case class StructureOfField(
   numOfOccurrences: Option[Int],
   `type`: Option[String],
   searchable: Option[Boolean],
-  fields: Option[List[StructureOfField]]
+  fields: Option[List[StructureOfField]],
+  order: Option[Int]
 )
 
 object StructureOfField {
@@ -51,7 +52,8 @@ object StructureOfField {
       .readNullable[String] and //TODO: Create internal mapping and generate the widget type when one is not provided
     (JsPath \ EditorConstants.VOCAB_SEARCHABLE).readNullable[Boolean] and
     (JsPath \ EditorConstants.VOCAB_EMBEDDED_PROPERTIES)
-      .lazyReadNullable(Reads.list[StructureOfField](structureOfFieldReads))
+      .lazyReadNullable(Reads.list[StructureOfField](structureOfFieldReads)) and
+      (JsPath \ EditorConstants.VOCAB_ORDER).readNullable[Int]
   )(StructureOfField.apply _)
 
   implicit val structureOfFieldWrites = Json.writes[StructureOfField]

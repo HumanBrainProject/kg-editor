@@ -14,17 +14,17 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useRef } from "react";
 import { observer } from "mobx-react";
-import { FormGroup } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { Form } from "react-bootstrap";
+import { createUseStyles } from "react-jss";
 
 import List from "../InputTextMultiple/List";
 import Label from "../Label";
 
 import Alternatives from "../Alternatives";
 
-const styles = {
+const useStyles = createUseStyles({
   values:{
     height:"auto",
     paddingBottom:"3px",
@@ -39,8 +39,9 @@ const styles = {
       display: "none !important"
     }
   },
+  label: {},
   readMode:{
-    "& .quickfire-label:after":{
+    "& $label:after": {
       content: "':\\00a0'"
     },
     "& .quickfire-readmode-item:not(:last-child):after":{
@@ -62,166 +63,144 @@ const styles = {
       cursor: "not-allowed"
     }
   },
-};
+});
 
-@injectStyles(styles)
-@observer
-class AnnotatedInputText extends React.Component {
-  dropValue(droppedValue) {
-    this.props.fieldStore.moveValueAfter(this.draggedValue, droppedValue);
-    this.draggedValue = null;
-  }
+const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
 
-  alternativeValueRenderer = ({value: values}) => {
-    const { fieldStore } = this.props;
-    return values.map(value => (value && value[fieldStore.mappingValue])?value[fieldStore.mappingValue]:"Unknown ressource").join("; ");
-  }
+  const classes = useStyles();
 
-  handleOnAddValue = resource => {
-    const { fieldStore } = this.props;
+  const draggedValue = useRef();
+  const formGroupRef = useRef();
+
+  const {
+    value: values,
+    resources,
+    label,
+    labelTooltip,
+    alternatives,
+    returnAsNull
+  } = fieldStore;
+
+  const dropValue = droppedValue => {
+    fieldStore.moveValueAfter(draggedValue.current, droppedValue);
+    draggedValue.current = null;
+  };
+
+  const alternativeValueRenderer = ({value: values}) => {
+    return values.map(value => (value && value[fieldStore.mappingValue])?value[fieldStore.mappingValue]:"Unknown resource").join("; ");
+  };
+
+  const handleOnAddValue = resource => {
     const value = {[fieldStore.mappingValue]: resource};
     fieldStore.addValue(value);
-  }
+  };
 
-  handleSelectAlternative = values => {
-    this.props.fieldStore.setValues([...values]);
-  }
+  const handleSelectAlternative = values => fieldStore.setValues([...values]);
 
-  handleRemoveMySuggestion = () => {
-    this.props.fieldStore.removeAllValues();
-  }
+  const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 
-  handleDeleteLastValue = () => {
-    this.props.fieldStore.removeLastValue();
-  }
+  const handleDeleteLastValue = () => fieldStore.removeLastValue();
 
-  handleDelete = index => {
-    const { fieldStore } = this.props;
-    const { value: values } = fieldStore;
+  const handleDelete = index => {
     const value = values[index];
     fieldStore.removeValue(value);
   };
 
-  handleDragEnd = () => this.draggedValue = null;
+  const handleDragEnd = () => draggedValue.current = null;
 
-  handleDragStart = value => this.draggedValue = value;
+  const handleDragStart = value => draggedValue.current = value;
 
-  handleDrop = value => this.dropValue(value);
+  const handleDrop = value => dropValue(value);
 
-  handleBlur = e => {
+  const handleBlur = e => {
     const value = e.target.value.trim();
     if (value) {
-      this.handleOnAddValue(value);
+      handleOnAddValue(value);
     }
     e.target.value = "";
   };
 
-  handleKeyDown = (value, e) => {
+  const handleKeyDown = (value, e) => {
     if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
       e.preventDefault();
-      this.props.fieldStore.removeValue(value);
+      fieldStore.removeValue(value);
     }
-  }
+  };
 
-  handleNativePaste = e => {
+  const handleNativePaste = e => {
     e.preventDefault();
     e.clipboardData.getData("text").split("\n").forEach(value => {
       const val = value.trim();
       if (val) {
-        this.handleOnAddValue(val);
+        handleOnAddValue(val);
       }
     });
-  }
+  };
 
-  handleKeyStrokes = e => {
-    const { fieldStore } = this.props;
+  const handleKeyStrokes = e => {
     if(e.keyCode === 13){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
       const value = e.target.value.trim();
       if (value) {
-        this.handleOnAddValue(value);
+        handleOnAddValue(value);
       }
       e.target.value = "";
     } else if(!e.target.value && fieldStore.resources.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
       e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
-      this.handleDeleteLastValue();
+      handleDeleteLastValue();
     }
   };
 
-  renderReadMode(){
-    const { classes, className, fieldStore } = this.props;
-    const { label, labelTooltip, resources } = fieldStore;
+  if(readMode){
     return (
-      <div className={className}>
-        <div className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
-          <Label label={label} labelTooltip={labelTooltip} />
-          <List
-            list={resources}
-            readOnly={true}
-            disabled={false}
-          />
-        </div>
-      </div>
+      <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly} ${className}`}>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <List
+          list={resources}
+          readOnly={true}
+          disabled={false}
+        />
+      </Form.Group>
     );
   }
 
-  render() {
-    const { classes, className, fieldStore, readMode } = this.props;
-    const {
-      resources,
-      label,
-      labelTooltip,
-      alternatives,
-      returnAsNull
-    } = fieldStore;
-
-    if(readMode){
-      return this.renderReadMode();
-    }
-
-    const isDisabled = returnAsNull;
-    return (
-      <div className={className}>
-        <FormGroup
-          ref={ref=>this.formGroupRef = ref}
-          className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}`}
-        >
-          <Label label={label} labelTooltip={labelTooltip} />
-          <Alternatives
-            className={classes.alternatives}
-            list={alternatives}
-            onSelect={this.handleSelectAlternative}
-            onRemove={this.handleRemoveMySuggestion}
-            parentContainerClassName="form-group"
-            ValueRenderer={this.alternativeValueRenderer}
-          />
-          <div className={`form-control ${classes.values}`} disabled={isDisabled} >
-            <List
-              list={resources}
-              readOnly={false}
-              disabled={isDisabled}
-              onDelete={this.handleDelete}
-              onDragEnd={this.handleDragEnd}
-              onDragStart={this.handleDragStart}
-              onDrop={this.handleDrop}
-              onKeyDown={this.handleKeyDown}
-            />
-            <input type="text" className={`quickfire-user-input ${classes.userInput}`}
-              disabled={isDisabled}
-              onDrop={this.handleDrop}
-              onDragOver={e => e.preventDefault()}
-              onKeyDown={this.handleKeyStrokes}
-              onBlur={this.handleBlur}
-              onChange={e => e.stopPropagation()}
-              onPaste={this.handleNativePaste}
-            />
-          </div>
-        </FormGroup>
+  const isDisabled = returnAsNull;
+  return (
+    <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""} ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${className}`} ref={formGroupRef} >
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Alternatives
+        className={classes.alternatives}
+        list={alternatives}
+        onSelect={handleSelectAlternative}
+        onRemove={handleRemoveMySuggestion}
+        parentContainerRef={formGroupRef}
+        ValueRenderer={alternativeValueRenderer}
+      />
+      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+        <List
+          list={resources}
+          readOnly={false}
+          disabled={isDisabled}
+          onDelete={handleDelete}
+          onDragEnd={handleDragEnd}
+          onDragStart={handleDragStart}
+          onDrop={handleDrop}
+          onKeyDown={handleKeyDown}
+        />
+        <input type="text" className={`quickfire-user-input ${classes.userInput}`}
+          disabled={isDisabled}
+          onDrop={handleDrop}
+          onDragOver={e => e.preventDefault()}
+          onKeyDown={handleKeyStrokes}
+          onBlur={handleBlur}
+          onChange={e => e.stopPropagation()}
+          onPaste={handleNativePaste}
+        />
       </div>
-    );
-  }
-}
+    </Form.Group>
+  );
+});
 
 export default AnnotatedInputText;

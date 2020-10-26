@@ -1,9 +1,25 @@
-import React from "react";
-import {  MenuItem } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import injectStyles from "react-jss";
+/*
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
 
-const styles = {
+import React, { useEffect, useRef } from "react";
+import {  Dropdown } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
   container: {
     "& .option": {
       position: "relative"
@@ -27,7 +43,7 @@ const styles = {
   icon: {
     paddingRight: "8px"
   }
-};
+});
 
 const Options = ({values, current, onSelectNext, onSelectPrevious, onSelect, onCancel, onPreview}) => (
   <React.Fragment>
@@ -44,79 +60,70 @@ const Options = ({values, current, onSelectNext, onSelectPrevious, onSelect, onC
   </React.Fragment>
 );
 
-@injectStyles(styles)
-class Option  extends React.Component {
-  componentDidMount() {
-    this.setFocus();
-  }
+const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel, onPreview }) => {
 
-  componentDidUpdate() {
-    this.setFocus();
-  }
+  const ref = useRef();
 
-    setFocus = () => {
-      const { hasFocus } = this.props;
-      if (hasFocus) {
-        this.ref.focus();
+  const classes = useStyles();
+
+  useEffect(() => {
+    if (hasFocus) {
+      ref.current.focus();
+    }
+  });
+
+  const handleOnSelect = () => {
+    onSelect(value.id);
+  };
+
+  const handleKeyDown = e => {
+    if(e) {
+      switch(e.keyCode) {
+      case 38: {
+        e.preventDefault();
+        onSelectPrevious(value.id);
+        break;
+      }
+      case 40: {
+        e.preventDefault();
+        onSelectNext(value.id);
+        break;
+      }
+      case 13: {
+        e.preventDefault();
+        onSelect(value.id);
+        break;
+      }
+      case 27: {
+        e.preventDefault();
+        onCancel();
+        break;
+      }
       }
     }
+  };
 
-    handleOnSelect = () => {
-      const {onSelect, value} = this.props;
-      onSelect(value.id);
-    }
+  const handleOnPreview = e => {
+    e && e.stopPropagation();
+    onPreview(value.id, value.name);
+  };
 
+  const style = value.type.color ? { color: value.type.color } : {};
 
-    handleKeyDown = e => {
-      const {onSelectNext, onSelectPrevious, onSelect, onCancel, value} = this.props;
-      if(e) {
-        switch(e.keyCode) {
-        case 38: {
-          e.preventDefault();
-          onSelectPrevious(value.id);
-          break;
-        }
-        case 40: {
-          e.preventDefault();
-          onSelectNext(value.id);
-          break;
-        }
-        case 13: {
-          e.preventDefault();
-          onSelect(value.id);
-          break;
-        }
-        case 27: {
-          e.preventDefault();
-          onCancel();
-          break;
-        }
-        }
-      }
-    }
+  return (
+    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleOnSelect}>
+      <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={handleKeyDown} ref={ref}>
+        <span className={classes.icon} style={style}>
+          <FontAwesomeIcon fixedWidth icon="circle" />
+        </span>
+        {value.name}
+        <div className={classes.preview} title="preview" onClick={handleOnPreview}>
+          <FontAwesomeIcon icon="eye" />
+        </div>
+      </div>
+    </Dropdown.Item>
+  );
+};
 
-    handleOnPreview = e => {
-      e && e.stopPropagation();
-      this.props.onPreview(this.props.value.id, this.props.value.name);
-    }
-
-    render() {
-      const {value, classes} = this.props;
-      return(
-        <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleOnSelect}>
-          <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={this.handleKeyDown} ref={ref => this.ref = ref}>
-            <span className={classes.icon} style={value.type.color ? { color: value.type.color } : {}}>
-              <FontAwesomeIcon fixedWidth icon="circle" />
-            </span>
-            {value.name}
-            <div className={classes.preview} title="preview" onClick={this.handleOnPreview}>
-              <FontAwesomeIcon icon="eye" />
-            </div>
-          </div>
-        </MenuItem>
-      );
-    }
-
-}
 
 export default Options;

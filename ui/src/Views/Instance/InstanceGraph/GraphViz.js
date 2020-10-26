@@ -14,8 +14,8 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect, useState, useRef } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import ForceGraph2D from "react-force-graph-2d";
 import { debounce } from "lodash";
@@ -37,18 +37,13 @@ const handleNodeClick = node => {
   }
 };
 
-const handleCapture = e => {
-  e.target.href = this.graphWrapper.querySelector("canvas").toDataURL("image/png");
-  e.target.download = "test.png";
-};
-
 const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
 
 const getNodeName = node => {
   if(node.isGroup) {
     return `Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`;
   }
-  return `(${graphStore.groups[node.groupId].name}) ${node.name}`;
+  return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
 };
 
 const getNodeLabel = node => `${getNodeName(node)} ${node.workspace !== appStore.currentWorkspace.id?`(Workspace: ${node.workspace})`:""}`;
@@ -124,12 +119,12 @@ const getNodeCanvasObject = (node, ctx, scale) => {
 
 const getLinkColor = link => {
   if (graphStore.highlightedNode) {
-    if (!link.highlighted) {
-      return new Color("#ccc").alpha(0.1).rgb();
-    } else if (link.target === graphStore.highlightedNode) {
+    if (link.target === graphStore.highlightedNode) {
       return new Color("#f39c12").alpha(1).rgb();
     } else if (link.source === graphStore.highlightedNode) {
       return new Color("#1abc9c").alpha(1).rgb();
+    } else {
+      return new Color("#ccc").alpha(0.1).rgb();
     }
   } else {
     return new Color("#ccc").alpha(1).rgb();
@@ -138,7 +133,7 @@ const getLinkColor = link => {
 
 const getLinkWidth = link => (graphStore.highlightedNode && link.highlighted)?2:1;
 
-const styles = {
+const useStyles = createUseStyles({
   graph: {
     width: "100%",
     height: "100%",
@@ -169,71 +164,60 @@ const styles = {
     top: "20px",
     right: "74px"
   }
-};
+});
 
+const Graph = observer(() => {
 
-@injectStyles(styles)
-@observer
-class Graph extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      graphWidth: 0,
-      graphHeight: 0
+  const wrapperRef = useRef();
+  const graphRef = useRef();
+
+  const classes = useStyles();
+
+  const [dimensions, setDimensions] = useState({width: 0, height: 0});
+
+  useEffect(() => {
+
+    const updateDimensions = debounce(() => {
+      if(wrapperRef.current) {
+        setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
+      }
+    }, 250);
+
+    updateDimensions();
+    graphRef.current && graphRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
+    window.addEventListener("resize", updateDimensions);
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+      graphRef.current && graphRef.current.stopAnimation();
     };
-    this.initialZoom = false;
-  }
+  }, []);
 
-  componentDidMount() {
-    this.resizeDebounceFn = debounce(this.resizeWrapper, 250);
-    window.addEventListener("resize", this.resizeDebounceFn);
-    this.resizeWrapper();
-  }
+  const handleCapture = e => {
+    e.target.href = wrapperRef.current && wrapperRef.current.querySelector("canvas").toDataURL("image/png");
+    e.target.download = "test.png";
+  };
 
-  componentDidUpdate() {
-    if (!this.initialZoom && this.graphRef) {
-      this.resizeWrapper();
-      this.graphRef.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
-      this.initialZoom = true;
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.resizeDebounceFn);
-    this.graphRef && this.graphRef.stopAnimation();
-  }
-
-  resizeWrapper = () => {
-    this.setState({
-      graphWidth: this.graphWrapper.offsetWidth,
-      graphHeight: this.graphWrapper.offsetHeight
-    });
-  }
-
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.graph} ref={ref => this.graphWrapper = ref}>
-        <ForceGraph2D
-          ref={ref => this.graphRef = ref}
-          width={this.state.graphWidth}
-          height={this.state.graphHeight}
-          graphData={graphStore.graphData}
-          nodeAutoColorBy={getNodeAutoColorBy}
-          nodeLabel={getNodeLabel}
-          nodeCanvasObject={getNodeCanvasObject}
-          onNodeClick={handleNodeClick}
-          onNodeHover={handleNodeHover}
-          cooldownTime={4000}
-          linkColor={getLinkColor}
-          linkWidth={getLinkWidth}
-          nodeRelSize={7}
-          linkDirectionalArrowLength={3}
-        />
-        <a className={`${classes.capture} btn btn-primary`} onClick={handleCapture}><FontAwesomeIcon icon="camera" /></a>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.graph} ref={wrapperRef}>
+      <ForceGraph2D
+        ref={graphRef}
+        width={dimensions.width}
+        height={dimensions.height}
+        graphData={graphStore.graphData}
+        nodeAutoColorBy={getNodeAutoColorBy}
+        nodeLabel={getNodeLabel}
+        nodeCanvasObject={getNodeCanvasObject}
+        onNodeClick={handleNodeClick}
+        onNodeHover={handleNodeHover}
+        cooldownTime={4000}
+        linkColor={getLinkColor}
+        linkWidth={getLinkWidth}
+        nodeRelSize={7}
+        linkDirectionalArrowLength={3}
+      />
+      <a className={`${classes.capture} btn btn-primary`} onClick={handleCapture}><FontAwesomeIcon icon="camera" /></a>
+    </div>
+  );
+});
 
 export default Graph;

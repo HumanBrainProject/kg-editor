@@ -14,15 +14,14 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect } from "react";
+import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
-import typesStore from "../../Stores/TypesStore";
 import instancesStore from "../../Stores/InstancesStore";
 
 import HeaderPanel from "./InstanceForm/HeaderPanel";
@@ -36,7 +35,7 @@ import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     transition: "all 0.25s linear",
     "&:not(.current)": {
@@ -132,152 +131,127 @@ const styles = {
     borderRadius: "50%",
     display: "inline-block"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class InstanceForm extends React.Component {
-  componentDidMount() {
-    this.fetchInstance();
-  }
+const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
-  componentDidUpdate(prevProps) {
-    if (this.props.id !== prevProps.id) {
-      this.fetchInstance();
-    }
-  }
+  const classes = useStyles();
 
-  fetchInstance(forceFetch = false) {
-    const instance = instancesStore.createInstanceOrGet(this.props.id);
+  useEffect(() => fetchInstance(), [id]);
+
+  const fetchInstance = (forceFetch = false) => {
+    const instance = instancesStore.createInstanceOrGet(id);
     instance.fetch(forceFetch);
+  };
+
+  const instance = instancesStore.instances.get(id);
+  if (!instance) {
+    return null;
   }
 
-  handleListLoadRetry = () => typesStore.fetch();
+  const handleRetry = () => fetchInstance(true);
 
-  handleFocus = () => {
-    if (this.props.view.currentInstanceId !== this.props.id) {
-      this.props.view.setCurrentInstanceId(this.props.pane, this.props.id);
+  const handleFocus = () => {
+    if (view.currentInstanceId !== id) {
+      view.setCurrentInstanceId(pane, id);
     }
-  }
+  };
 
-  handleOpenInstance = e => {
+  const handleOpenInstance = e => {
     if ((e.metaKey || e.ctrlKey)) {
-      const instance = instancesStore.instances.get(this.props.id);
-      appStore.openInstance(this.props.id, instance.name, instance.primaryType);
+      const instance = instancesStore.instances.get(id);
+      appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
       routerStore.history.push(`/instances/${this.props.id}`);
     }
-  }
+  };
 
-  handleCancelEdit = e => {
+  const handleConfirmCancelEdit = e => {
     e && e.stopPropagation();
-    const instance = instancesStore.instances.get(this.props.id);
-    if (instance) {
-      if (instance.hasChanged) {
-        instancesStore.cancelInstanceChanges(this.props.id);
-      } else {
-        this.handleConfirmCancelEdit();
-      }
+    if (instance.hasChanged) {
+      instancesStore.confirmCancelInstanceChanges(id);
     }
-  }
+  };
 
-  handleConfirmCancelEdit = e => {
+  const handleContinueEditing = e => {
     e && e.stopPropagation();
-    const instance = instancesStore.instances.get(this.props.id);
-    if (instance && instance.hasChanged) {
-      instancesStore.confirmCancelInstanceChanges(this.props.id);
-    }
-  }
+    instancesStore.abortCancelInstanceChange(id);
+  };
 
-  handleContinueEditing = e => {
+  const handleSave = e => {
     e && e.stopPropagation();
-    instancesStore.abortCancelInstanceChange(this.props.id);
-  }
+    instance && appStore.saveInstance(instance);
+  };
 
-  handleSave = e => {
+  const handleCancelSave = e => {
     e && e.stopPropagation();
-    this.instance && appStore.saveInstance(this.instance);
+    instance.cancelSave();
+  };
+
+  const isReadMode = view.mode === "view" || !instance.belongsToCurrentWorkspace;
+
+  const mainInstanceId = view.instanceId;
+  const isMainInstance = id === mainInstanceId;
+  const isCurrentInstance = id === view.currentInstanceId;
+  const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
+
+  const className = `${classes.container} ${isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
+
+  if (instance.hasFetchError) {
+    return (
+      <div className={className} data-id={id}>
+        <FetchErrorPanel id={id} show={instance.hasFetchError} error={instance.fetchError} onRetry={handleRetry} inline={!isMainInstance} />
+      </div>
+    );
   }
 
-  handleCancelSave = e => {
-    e && e.stopPropagation();
-    const instance = instancesStore.instances.get(this.props.id);
-    instance && instance.cancelSave();
+  if (instance.isFetching) {
+    return (
+      <div className={className} data-id={id}>
+        <FetchingPanel id={id} show={instance.isFetching} inline={!isMainInstance} />
+      </div>
+    );
   }
 
-  render() {
-    const { classes, view, id, provenance } = this.props;
+  if (instance.isFetched) {
+    return (
+      <div className={className} data-id={id}>
+        <div
+          onFocus={handleFocus}
+          onClick={handleFocus}
+          onDoubleClick={isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? handleOpenInstance : undefined}
+        >
+          <HeaderPanel
+            className={classes.panelHeader}
+            types={instance.types}
+            hasChanged={instance.hasChanged}
+            highlight={highlight} />
 
-    const instance = instancesStore.instances.get(this.props.id);
-    if (!instance) {
-      return null;
-    }
-
-    const isReadMode = view.mode === "view" || !instance.belongsToCurrentWorkspace;
-
-    const mainInstanceId = view.instanceId;
-    const isMainInstance = id === mainInstanceId;
-    const isCurrentInstance = id === view.currentInstanceId;
-    const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
-
-    let className = `${classes.container} ${isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
-
-    if (instance.hasFetchError) {
-      return (
-        <div className={className} data-id={id}>
-          <FetchErrorPanel id={id} show={instance.hasFetchError} error={instance.fetchError} onRetry={this.fetchInstance.bind(this, true)} inline={!isMainInstance} />
+          {instance.hasFieldErrors?
+            <GlobalFieldErrors instance={instance} />
+            :
+            <BodyPanel className={classes.panelBody} instance={instance} readMode={isReadMode} />
+          }
+          <FooterPanel
+            className={classes.panelFooter}
+            instance={instance}
+            showOpenActions={isCurrentInstance && !isMainInstance} />
+          <ConfirmCancelEditPanel
+            show={instance.cancelChangesPending}
+            text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
+            onConfirm={handleConfirmCancelEdit}
+            onCancel={handleContinueEditing}
+            inline={!isMainInstance} />
+          <SavingPanel id={id} show={instance.isSaving} inline={!isMainInstance} />
+          <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
+          <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={handleCancelSave} onRetry={handleSave} inline={!isMainInstance} />
         </div>
-      );
-    }
-
-    if (instance.isFetching) {
-      return (
-        <div className={className} data-id={id}>
-          <FetchingPanel id={id} show={instance.isFetching} inline={!isMainInstance} />
-        </div>
-      );
-    }
-
-    if (instance.isFetched) {
-      return (
-        <div className={className} data-id={id}>
-          <div
-            onFocus={this.handleFocus}
-            onClick={this.handleFocus}
-            onDoubleClick={isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? this.handleOpenInstance : undefined}
-          >
-            <HeaderPanel
-              className={classes.panelHeader}
-              types={instance.types}
-              hasChanged={instance.hasChanged}
-              highlight={highlight} />
-
-            {instance.hasFieldErrors?
-              <GlobalFieldErrors instance={instance} />
-              :
-              <BodyPanel className={classes.panelBody} instance={instance} readMode={isReadMode} />
-            }
-            <FooterPanel
-              className={classes.panelFooter}
-              instance={instance}
-              showOpenActions={isCurrentInstance && !isMainInstance} />
-            <ConfirmCancelEditPanel
-              show={instance.cancelChangesPending}
-              text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
-              onConfirm={this.handleConfirmCancelEdit}
-              onCancel={this.handleContinueEditing}
-              inline={!isMainInstance} />
-            <SavingPanel id={id} show={instance.isSaving} inline={!isMainInstance} />
-            <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
-            <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={this.handleCancelSave} onRetry={this.handleSave} inline={!isMainInstance} />
-          </div>
-          <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
-        </div>
-      );
-    }
-
-    return null;
+        <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
+      </div>
+    );
   }
-}
+
+  return null;
+});
 
 export default InstanceForm;

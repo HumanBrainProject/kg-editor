@@ -16,13 +16,33 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import appStore from "../../Stores/AppStore";
 import routerStore from "../../Stores/RouterStore";
 
-const styles = {
+const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}) => {
+  const handleClick = event => {
+    if (event.metaKey || event.ctrlKey) {
+      typeof onCtrlClick === "function" && onCtrlClick(mode);
+    } else {
+      typeof onClick === "function" && onClick(mode);
+    }
+  };
+
+  if(!show) {
+    return null;
+  }
+
+  return (
+    <div className={className} onClick={handleClick}>
+      <FontAwesomeIcon icon={icon} />&nbsp;&nbsp;{label}
+    </div>
+  );
+};
+
+const useStyles = createUseStyles({
   actions: {
     display: "grid",
     gridTemplateColumns: "repeat(5, 1fr)",
@@ -42,44 +62,18 @@ const styles = {
       color: "var(--ft-color-loud)"
     }
   }
-};
+});
 
-class Action extends React.PureComponent {
-  handleClick = event => {
-    const { mode, onClick, onCtrlClick } = this.props;
-    if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === "function" && onCtrlClick(mode);
-    } else {
-      typeof onClick === "function" && onClick(mode);
-    }
-  }
+const Actions = observer(({ instance }) => {
 
-  render() {
-    const {className, show, label, icon} = this.props;
+  const { id, name, primaryType, permissions } = instance;
+  const classes = useStyles();
 
-    if(!show) {
-      return null;
-    }
-
-    return(
-      <div className={className} onClick={this.handleClick}>
-        <FontAwesomeIcon icon={icon} />&nbsp;&nbsp;{label}
-      </div>
-    );
-  }
-}
-
-@injectStyles(styles)
-@observer
-class Actions extends React.Component {
-
-  handleCtrlClick = mode => {
-    const { instance } = this.props;
-    const { id, name, primaryType } = instance;
+  const handleCtrlClick = mode => {
     appStore.openInstance(id, name, primaryType, mode);
-  }
+  };
 
-  handleClick = mode => {
+  const handleClick = mode => {
     const { instance } = this.props;
     const { id } = instance;
     if(mode === "view") {
@@ -87,22 +81,18 @@ class Actions extends React.Component {
     } else {
       routerStore.history.push(`/instances/${id}/${mode}`);
     }
-  }
+  };
 
-  render() {
-    const { classes, instance } = this.props;
-    const { permissions } = instance;
-    return (
-      <div className={classes.actions}>
-        <Action className={classes.action} show={permissions.canRead}                            icon="eye"              label="Open"    mode="view"    onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
-        <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       label="Edit"    mode="edit"    onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
-        <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        label="Invite"  mode="invite"  onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  label="Explore" mode="graph"   onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
-        <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" label="Release" mode="release" onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
-        <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              label="Manage"  mode="manage"  onClick={this.handleClick} onCtrlClick={this.handleCtrlClick} />
-      </div>
-    );
-  }
-}
+  return (
+    <div className={classes.actions}>
+      <Action className={classes.action} show={permissions.canRead}                            icon="eye"              label="Open"    mode="view"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       label="Edit"    mode="edit"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        label="Invite"  mode="invite"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  label="Explore" mode="graph"   onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" label="Release" mode="release" onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              label="Manage"  mode="manage"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
+    </div>
+  );
+});
 
 export default Actions;

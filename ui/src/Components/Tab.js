@@ -15,15 +15,14 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react";
-import { isFunction } from "lodash";
 
 import routerStore from "../Stores/RouterStore";
 
-let styles = {
+const useStyles = createUseStyles({
   container:{
     height:"50px",
     lineHeight:"50px",
@@ -90,48 +89,43 @@ let styles = {
       color:"var(--ft-color-loud)"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Tab extends React.Component {
-  handleClick = (e) => {
+const Tab = observer(({label, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
+
+  const classes = useStyles();
+  const closeable = typeof onClose === "function";
+
+  const handleClick = e => {
     e.preventDefault();
-    if(this.props.path){
-      routerStore.history.push(this.props.path);
+    if(path){
+      routerStore.history.push(path);
     }
-    if(isFunction(this.props.onClick)){
-      this.props.onClick(e);
-    }
-  }
+    typeof onClick === "function" && onClick(e);
+  };
 
-  handleClose = (e) => {
+  const handleClose = e => {
     e.stopPropagation();
-    if(isFunction(this.props.onClose)){
-      this.props.onClose();
-    }
-  }
+    onClose(e);
+  };
 
-  render(){
-    const {classes, disabled, current, icon, onClose, iconColor, iconSpin, hideLabel} = this.props;
-    return (
-      <div className={`${classes.container} ${disabled? classes.disabled: ""} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={this.handleClick}>
-        <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={this.props.label}>
-          {icon && <FontAwesomeIcon fixedWidth icon={icon} spin={iconSpin}/>}
-        </div>
-        {hideLabel?null:
-          <div className={classes.text} title={this.props.label}>
-            {this.props.label}
-          </div>
-        }
-        {onClose?
-          <div className={classes.close} onClick={this.handleClose}>
-            <FontAwesomeIcon icon={"times"}/>
-          </div>
-          :null}
+  return (
+    <div className={`${classes.container} ${disabled? classes.disabled: ""} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={handleClick}>
+      <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={label}>
+        {icon && <FontAwesomeIcon fixedWidth icon={icon} spin={iconSpin}/>}
       </div>
-    );
-  }
-}
+      {hideLabel?null:
+        <div className={classes.text} title={label}>
+          {label}
+        </div>
+      }
+      {closeable?
+        <div className={classes.close} onClick={handleClose}>
+          <FontAwesomeIcon icon={"times"}/>
+        </div>
+        :null}
+    </div>
+  );
+});
 
 export default Tab;

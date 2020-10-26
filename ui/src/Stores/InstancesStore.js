@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import {observable, action, runInAction, computed, toJS} from "mobx";
+import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
 import { debounce } from "lodash";
 
 import API from "../Services/API";
@@ -25,19 +25,32 @@ import viewStore from "./ViewStore";
 
 class Instance extends InstanceStore {
 
-  @observable cancelChangesPending = null;
-  @observable saveError = null;
-  @observable hasSaveError = false;
-  @observable isSaving = false;
+  cancelChangesPending = null;
+  saveError = null;
+  hasSaveError = false;
+  isSaving = false;
 
   store = null;
 
   constructor(id, store) {
     super(id);
+
+    makeObservable(this, {
+      cancelChangesPending: observable,
+      saveError: observable,
+      hasSaveError: observable,
+      isSaving: observable,
+      linkedIds: computed,
+      fetch: action,
+      fetchLabel: action,
+      save: action,
+      cancelSave: action,
+      cancelChanges: action
+    });
+
     this.store = store;
   }
 
-  @computed
   get linkedIds() {
     const ids = this.childrenIds.reduce((acc, id) => {
       if (id !== this.id) {
@@ -51,14 +64,12 @@ class Instance extends InstanceStore {
     return Array.from(ids);
   }
 
-  @action
   fetch(forceFetch = false) {
     if (!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
       this.store.fetchInstance(this);
     }
   }
 
-  @action
   fetchLabel(forceFetch = false) {
     if (!this.isFetching && !this.isLabelFetching) {
       if (forceFetch || (!this.isFetched && !this.isLabelFetched)) {
@@ -67,7 +78,6 @@ class Instance extends InstanceStore {
     }
   }
 
-  @action
   async save() {
 
     this.cancelChangesPending = false;
@@ -112,13 +122,11 @@ class Instance extends InstanceStore {
     }
   }
 
-  @action
   cancelSave() {
     this.saveError = null;
     this.hasSaveError = false;
   }
 
-  @action
   cancelChanges() {
     Object.values(this.fields).forEach(field => field.reset());
     this.cancelChangesPending = false;
@@ -129,10 +137,10 @@ class Instance extends InstanceStore {
 }
 
 class InstancesStore {
-  @observable stage = null;
-  @observable instances = new Map();
-  @observable previewInstance = null;
-  @observable instanceIdAvailability = new Map();
+  stage = null;
+  instances = new Map();
+  previewInstance = null;
+  instanceIdAvailability = new Map();
 
   instancesQueue = new Set();
   instanceLabelsQueue = new Set();
@@ -142,6 +150,29 @@ class InstancesStore {
   queueTimeout = 250;
 
   constructor(stage=null) {
+    makeObservable(this, {
+      stage: observable,
+      instances: observable,
+      previewInstance: observable,
+      instanceIdAvailability: observable,
+      togglePreviewInstance: action,
+      resetInstanceIdAvailability: action,
+      checkInstanceIdAvailability: action,
+      getUnsavedInstances: computed,
+      hasUnsavedChanges: computed,
+      processQueue: action,
+      processLabelsQueue: action,
+      fetchQueue: action,
+      fetchLabelsQueue: action,
+      flush: action,
+      createInstanceOrGet: action,
+      createNewInstance: action,
+      removeInstances: action,
+      cancelInstanceChanges: action,
+      confirmCancelInstanceChanges: action,
+      abortCancelInstanceChange: action
+    });
+
     this.stage = stage?stage:null;
   }
 
@@ -159,7 +190,6 @@ class InstancesStore {
     }
   }
 
-  @action
   togglePreviewInstance(instanceId, instanceName, options) {
     if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
       this.previewInstance = null;
@@ -168,12 +198,10 @@ class InstancesStore {
     }
   }
 
-  @action
   resetInstanceIdAvailability() {
     this.instanceIdAvailability.clear();
   }
 
-  @action
   async checkInstanceIdAvailability(instanceId, mode) {
     this.instanceIdAvailability.set(instanceId, {
       isAvailable: false,
@@ -216,18 +244,15 @@ class InstancesStore {
     }
   }
 
-  @computed
   get getUnsavedInstances() {
     return Array.from(this.instances.values()).filter(instance => instance.hasChanged).reverse();
   }
 
-  @computed
-  get hasUnsavedChanges(){
+  get hasUnsavedChanges() {
     return this.getUnsavedInstances.length > 0;
   }
 
-  @action
-  processQueue(){
+  processQueue() {
     if(this.instancesQueue.size <= 0){
       this._debouncedFetchQueue.cancel();
     } else if(this.instancesQueue.size < this.queueThreshold){
@@ -238,8 +263,7 @@ class InstancesStore {
     }
   }
 
-  @action
-  processLabelsQueue(){
+  processLabelsQueue() {
     if(this.instanceLabelsQueue.size <= 0){
       this._debouncedFetchLabelsQueue.cancel();
     } else if(this.instanceLabelsQueue.size < this.queueThreshold){
@@ -253,8 +277,7 @@ class InstancesStore {
   _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
   _debouncedFetchLabelsQueue = debounce(()=>{this.fetchLabelsQueue();}, this.queueTimeout);
 
-  @action
-  async fetchQueue(){
+  async fetchQueue() {
     if(this.isFetchingQueue){
       return;
     }
@@ -274,24 +297,26 @@ class InstancesStore {
         instance.clearFieldsErrors();
       }
     });
-    try{
+    try {
       const response = await API.axios.post(API.endpoints.instancesList(this.stage), toProcess);
-      runInAction(() =>{
+      runInAction(() => {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             const data = response && response.data && response.data.data && response.data.data[identifier];
-            if(data){
-              instance.initializeData(data, false);
-              appStore.syncInstancesHistory(instance, "viewed");
-            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-              const error = response.data.error[identifier];
-              const message = JSON.stringify(error); // TODO: check and handle properly error object
-              instance.errorInstance(message);
-              instance.isFetching = false;
-              instance.isFetched = false;
+            if (data) {
+              if (data.error) {
+                const code = data.error.code?` [error ${data.error.code}]`:"";
+                const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
+                instance.errorInstance(message);
+                instance.isFetching = false;
+                instance.isFetched = false;
+              } else {
+                instance.initializeData(data, false);
+                appStore.syncInstancesHistory(instance, "viewed");
+              }
             } else {
-              const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+              const message = "Unexpected error: no response returned.";
               instance.errorInstance(message);
               instance.isFetching = false;
               instance.isFetched = false;
@@ -305,7 +330,7 @@ class InstancesStore {
     } catch(e){
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          if(this.instances.has(identifier)) {
+          if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             instance.errorInstance(e);
             instance.isFetching = false;
@@ -320,15 +345,14 @@ class InstancesStore {
     }
   }
 
-  @action
-  async fetchLabelsQueue(){
-    if(this.isFetchingLabelsQueue){
+  async fetchLabelsQueue() {
+    if (this.isFetchingLabelsQueue) {
       return;
     }
     this.isFetchingLabelsQueue = true;
     const toProcess = Array.from(this.instanceLabelsQueue).splice(0, this.queueThreshold);
     toProcess.forEach(identifier => {
-      if(this.instances.has(identifier)) {
+      if (this.instances.has(identifier)) {
         const instance = this.instances.get(identifier);
         instance.isLabelFetching = true;
         instance.isLabelFetched = false;
@@ -337,23 +361,25 @@ class InstancesStore {
         instance.saveError = null;
       }
     });
-    try{
-      let response = await API.axios.post(API.endpoints.instancesLabel(this.stage), toProcess);
+    try {
+      const response = await API.axios.post(API.endpoints.instancesLabel(this.stage), toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
-          if(this.instances.has(identifier)) {
+          if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             const data = response && response.data && response.data.data && response.data.data[identifier];
-            if(data){
-              instance.initializeLabelData(data);
-            } else if (response && response.data && response.data.error && response.data.error[identifier]) {
-              const error = response.data.error[identifier];
-              const message = JSON.stringify(error); // TODO: check and handle properly error object
-              instance.errorLabelInstance(message);
-              instance.isLabelFetching = false;
-              instance.isLabelFetched = false;
+            if (data) {
+              if (data.error) {
+                const code = data.error.code?` [${data.error.code}]`:"";
+                const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
+                instance.errorLabelInstance(message);
+                instance.isLabelFetching = false;
+                instance.isLabelFetched = false;
+              } else {
+                instance.initializeLabelData(data);
+              }
             } else {
-              const message = "This instance can not be found - it either could have been removed or it is not accessible by your user account.";
+              const message = "Unexpected error: no response returned.";
               instance.errorLabelInstance(message);
               instance.isLabelFetching = false;
               instance.isLabelFetched = false;
@@ -364,7 +390,7 @@ class InstancesStore {
         this.isFetchingLabelsQueue = false;
         this.processLabelsQueue();
       });
-    } catch(e){
+    } catch (e) {
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
@@ -382,14 +408,12 @@ class InstancesStore {
     }
   }
 
-  @action
-  flush(){
+  flush() {
     this.instances.clear();
     this.resetInstanceIdAvailability();
   }
 
-  @action
-  createInstanceOrGet(instanceId){
+  createInstanceOrGet(instanceId) {
     if (!this.instances.has(instanceId)) {
       const instance = new Instance(instanceId, this);
       this.instances.set(instanceId, instance);
@@ -397,8 +421,7 @@ class InstancesStore {
     return this.instances.get(instanceId);
   }
 
-  @action
-  createNewInstance(type, id, name=""){
+  createNewInstance(type, id, name="") {
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
     const data = {
@@ -420,23 +443,19 @@ class InstancesStore {
     this.instances.set(id, instance);
   }
 
-  @action
   removeInstances(instanceIds) {
     instanceIds.forEach(id => this.instances.delete(id));
   }
 
-  @action
-  cancelInstanceChanges(instanceId){
+  cancelInstanceChanges(instanceId) {
     this.instances.get(instanceId).cancelChangesPending = true;
   }
 
-  @action
-  confirmCancelInstanceChanges(instanceId){
+  confirmCancelInstanceChanges(instanceId) {
     this.instances.get(instanceId).cancelChanges();
   }
 
-  @action
-  abortCancelInstanceChange(instanceId){
+  abortCancelInstanceChange(instanceId) {
     this.instances.get(instanceId).cancelChangesPending = false;
   }
 }

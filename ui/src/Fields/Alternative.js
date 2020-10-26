@@ -14,17 +14,15 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
-import { MenuItem } from "react-bootstrap";
+import React, { useRef, useEffect } from "react";
+import { createUseStyles } from "react-jss";
+import { Dropdown } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
 
-
-
-const styles = {
+const useStyles = createUseStyles({
   container: {
     "& .option em .user + .user:before": {
       content: "'; '"
@@ -47,47 +45,78 @@ const styles = {
   removeIcon: {
     marginLeft: "3%"
   }
+});
+
+const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
+
+  const classes = useStyles();
+
+  const ref = useRef();
+
+  useEffect(() => {
+    if (hasFocus) {
+      ref.current.focus();
+    }
+  });
+
+  const handleSelect = e => {
+    typeof onSelect === "function" && onSelect(alternative, e);
+  };
+
+  const handleKeyDown = e => {
+    if(e) {
+      switch(e.keyCode) {
+      case 38: {
+        e.preventDefault();
+        onSelectPrevious(alternative.value);
+        break;
+      }
+      case 40: {
+        e.preventDefault();
+        onSelectNext(alternative.value);
+        break;
+      }
+      case 13: {
+        e.preventDefault();
+        onSelect(alternative.value);
+        break;
+      }
+      case 27: {
+        e.preventDefault();
+        onCancel();
+        break;
+      }
+      }
+    }
+  };
+
+  const handleRemoveClick = e => {
+    e.stopPropagation();
+    typeof onRemove === "function" && onRemove(e);
+  };
+
+  const users = (!alternative || !alternative.users)?[]:alternative.users;
+  const isOwnAlternative = users.find(user => authStore.user.id === user.id);
+
+  return (
+    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
+      <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
+        <strong>
+          <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
+          users.map(user => (
+            <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
+          ))
+        }<div className="parenthesis">)</div></em>
+        {alternative.selected?
+          <FontAwesomeIcon icon="check" className="selected" />
+          :null
+        }
+        {isOwnAlternative && (
+          <span className={classes.removeIcon}><FontAwesomeIcon onClick={handleRemoveClick} icon="times" /></span>
+        )}
+      </div>
+    </Dropdown.Item>
+  );
 };
-
-@injectStyles(styles)
-class Alternative extends React.Component {
-
-  handleSelect = alternative => event => {
-    const { onSelect } = this.props;
-    typeof onSelect === "function" && onSelect(alternative, event);
-  }
-
-  handleRemoveClick = event => {
-    event.stopPropagation();
-    const { onRemove } = this.props;
-    typeof onRemove === "function" && onRemove(event);
-  }
-
-  render() {
-    const { classes, alternative, ValueRenderer, className } = this.props;
-
-    const users = (!alternative || !alternative.users)?[]:alternative.users;
-    const isOwnAlternative = users.find(user => authStore.user.id === user.id);
-    return (
-      <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>
-        <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={this.handleSelect(alternative)}>
-          <strong>
-            <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
-            users.map(user => (
-              <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
-            ))
-          }<div className="parenthesis">)</div></em>
-          {alternative.selected?
-            <FontAwesomeIcon icon="check" className="selected" />
-            :null
-          }
-          {isOwnAlternative && (
-            <span className={classes.removeIcon}><FontAwesomeIcon onClick={this.handleRemoveClick} icon="times" /></span>
-          )}
-        </div>
-      </MenuItem>
-    );
-  }
-}
 
 export default Alternative;

@@ -14,9 +14,9 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import {observer} from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
@@ -30,7 +30,7 @@ import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 import TypeSelection from "./Instance/TypeSelection";
 
-const styles = {
+const useStyles = createUseStyles({
   loader: {
     position: "fixed",
     top: 0,
@@ -51,26 +51,18 @@ const styles = {
   error: {
     color: "var(--ft-color-loud)"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Instance extends React.Component {
-  componentDidMount() {
-    this.setupInstance();
-  }
+const Instance = observer(({ match, mode }) => {
 
-  componentDidUpdate(prevProps) {
-    if (this.props.match.params.id !== prevProps.match.params.id || this.props.mode !== prevProps.mode) {
-      this.setupInstance();
-    }
-  }
+  const classes = useStyles();
 
-  setupInstance = () => {
-    const { match, mode } = this.props;
+  const id = match.params.id;
+
+  useEffect(() => {
     const id = match.params.id;
     const instance = instancesStore.instances.get(id);
-    appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, this.props.mode);
+    appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, mode);
     instancesStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);
     if (instance && instance.isFetched) {
@@ -80,67 +72,60 @@ class Instance extends React.Component {
     } else {
       instancesStore.checkInstanceIdAvailability(id, mode);
     }
-  }
+  }, [match.params.id, mode]);
 
-  handleRetry = () => {
-    instancesStore.checkInstanceIdAvailability(this.props.match.params.id, this.props.mode === "create");
-  }
+  const handleRetry = () => instancesStore.checkInstanceIdAvailability(id, mode === "create");
 
-  handleContinue = () => {
-    instancesStore.instanceIdAvailability.delete(this.props.match.params.id);
+  const handleContinue = () => {
+    instancesStore.instanceIdAvailability.delete(id);
     routerStore.history.replace("/browse");
-  }
+  };
 
-  handleCreateNewInstanceOfType = type => {
-    instancesStore.createNewInstance(type, this.props.match.params.id);
+  const handleCreateNewInstanceOfType = type => {
+    instancesStore.createNewInstance(type, id);
     instancesStore.resetInstanceIdAvailability();
+  };
+
+  const instance = instancesStore.instances.get(id);
+  if (instance && instance.isFetched) {
+    return (
+      <View instance={instance} mode={mode} />
+    );
   }
 
-  render() {
-    const { classes, match, mode } = this.props;
-    const id = match.params.id;
+  const status = instancesStore.instanceIdAvailability.get(id);
 
-    const instance = instancesStore.instances.get(id);
-    if (instance && instance.isFetched) {
-      return (
-        <View instance={instance} mode={mode} />
-      );
-    }
+  if (!status || status.isChecking) {
+    return (
+      <div className={classes.error}>
+        <FetchingLoader>
+          <span>Fetching instance &quot;<i>{id}&quot;</i> information...</span>
+        </FetchingLoader>
+      </div>
+    );
+  }
 
-    const status = instancesStore.instanceIdAvailability.get(id);
-
-    if (!status || status.isChecking) {
-      return (
-        <div className={classes.error}>
-          <FetchingLoader>
-            <span>Fetching instance &quot;<i>{id}&quot;</i> information...</span>
-          </FetchingLoader>
-        </div>
-      );
-    }
-
-    if (status.error || (status.isAvailable && mode !== "create")) {
-      return (
-        <BGMessage icon={"ban"}>
+  if (status.error || (status.isAvailable && mode !== "create")) {
+    return (
+      <BGMessage icon={"ban"}>
           There was a network problem fetching the instance.<br />
           If the problem persists, please contact the support.<br />
-          <small>{status.error}</small><br /><br />
-          <Button bsStyle={"primary"} onClick={this.handleRetry}>
-            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-          </Button>
-          <Button bsStyle={"primary"} onClick={this.handleContinue}>Continue</Button>
-        </BGMessage>
-      );
-    }
-
-    if (status.isAvailable && mode === "create") {
-      return (
-        <TypeSelection onSelect={this.handleCreateNewInstanceOfType} />
-      );
-    }
-
-    return null;
+        <small>{status.error}</small><br /><br />
+        <Button variant={"primary"} onClick={handleRetry}>
+          <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+        </Button>
+        <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+      </BGMessage>
+    );
   }
-}
+
+  if (status.isAvailable && mode === "create") {
+    return (
+      <TypeSelection onSelect={handleCreateNewInstanceOfType} />
+    );
+  }
+
+  return null;
+});
 
 export default Instance;

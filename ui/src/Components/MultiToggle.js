@@ -15,46 +15,39 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import {isFunction} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     display:"inline-grid",
     background:"var(--bg-color-ui-contrast4)",
     borderRadius:"20px",
     height:"24px"
   }
+});
+
+const MultiToggle = ({ selectedValue, children , onChange}) => {
+
+  const classes = useStyles();
+
+  const handleSelect = value => {
+    if(isFunction(onChange)){
+      onChange(value);
+    }
+  };
+
+  const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: selectedValue, onSelect: handleSelect }));
+
+  return(
+    <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps.length}, 24px)`}}>
+      {childrenWithProps}
+    </div>
+  );
 };
 
-@injectStyles(styles)
-class MultiToggle extends React.Component{
-
-  constructor(props){
-    super(props);
-  }
-
-  handleSelect(value){
-    if(isFunction(this.props.onChange)){
-      this.props.onChange(value);
-    }
-  }
-
-  render(){
-    const { classes, children } = this.props;
-
-    let childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: this.props.selectedValue, onSelect: this.handleSelect.bind(this) }));
-
-    return(
-      <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps.length}, 24px)`}}>
-        {childrenWithProps}
-      </div>
-    );
-  }
-}
-
-const toggleStyles = {
+const useToggleStyles = createUseStyles({
   container:{
     textAlign:"center",
     height:"24px",
@@ -77,25 +70,23 @@ const toggleStyles = {
       }
     }
   }
-};
+});
 
-@injectStyles(toggleStyles)
-class Toggle extends React.Component{
-  handleClick = () => {
-    if(isFunction(this.props.onSelect)){
-      this.props.onSelect(this.props.value);
+const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
+  const classes = useToggleStyles();
+
+  const handleClick = () => {
+    if(isFunction(onSelect)){
+      onSelect(value);
     }
-  }
+  };
 
-  render(){
-    const {classes, selectedValue, value, noscale} = this.props;
-    return(
-      <div onClick={this.handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:this.props.color}}>
-        <FontAwesomeIcon icon={this.props.icon || "dot-circle"}/>
-      </div>
-    );
-  }
-}
+  return(
+    <div onClick={handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:color}}>
+      <FontAwesomeIcon icon={icon || "dot-circle"}/>
+    </div>
+  );
+};
 
 MultiToggle.Toggle = Toggle;
 

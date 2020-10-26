@@ -16,11 +16,11 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
 import releaseStore from "../../../Stores/ReleaseStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "flex",
     flexDirection: "row"
@@ -35,30 +35,27 @@ const styles = {
     marginLeft: "4px",
     lineHeight: "1.7em"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class HideReleasedInstancesToggle extends React.Component {
+const HideReleasedInstancesToggle = observer(() => {
 
-  handleClick = showAll => {
+  const classes = useStyles();
+
+  const handleClick = showAll => {
     releaseStore.toggleHideReleasedInstances(!!showAll);
-  }
+  };
 
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <div className={classes.toggle}>
-          <MultiToggle selectedValue={releaseStore.hideReleasedInstances} onChange={this.handleClick}>
-            <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={false} />
-            <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true} />
-          </MultiToggle>
-        </div>
-        <span className={classes.text}>Hide released instances</span>
+  return (
+    <div className={classes.container}>
+      <div className={classes.toggle}>
+        <MultiToggle selectedValue={releaseStore.hideReleasedInstances} onChange={handleClick}>
+          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={false} />
+          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true} />
+        </MultiToggle>
       </div>
-    );
-  }
-}
+      <span className={classes.text}>Hide released instances</span>
+    </div>
+  );
+});
 
 export default HideReleasedInstancesToggle;

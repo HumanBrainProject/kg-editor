@@ -15,20 +15,32 @@
 */
 
 import React from "react";
-import { OverlayTrigger, ControlLabel, Glyphicon, Tooltip } from "react-bootstrap";
+import { createUseStyles } from "react-jss";
+import { OverlayTrigger, Form, Tooltip } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { uniqueId } from "lodash";
 
-const Label = ({label, labelTooltip}) => (
-  <ControlLabel className={"quickfire-label"}>{label}
-    {labelTooltip && (
-      <React.Fragment>
-      &nbsp;
-        <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{labelTooltip}</Tooltip>}>
-          <Glyphicon glyph={"question-sign"}/>
-        </OverlayTrigger>
-      </React.Fragment>
-    )}
-  </ControlLabel>
-);
+const useStyles = createUseStyles({
+  label: {
+    fontWeight: "bold",
+    marginBottom: "5px"
+  }
+});
+
+const Label = ({ className, label, labelTooltip }) => {
+  const classes = useStyles();
+  return (
+    <Form.Label className={`${classes.label} ${className?className:""}`}>{label}
+      {labelTooltip && (
+        <React.Fragment>
+        &nbsp;
+          <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{labelTooltip}</Tooltip>}>
+            <FontAwesomeIcon icon="question-circle"/>
+          </OverlayTrigger>
+        </React.Fragment>
+      )}
+    </Form.Label>
+  );
+};
 
 export default Label;

@@ -14,37 +14,38 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React,  { useEffect } from "react";
 import { observer } from "mobx-react";
 
 import UserComponent from "../Components/User";
 import UsersStore from "../Stores/UsersStore";
 
-@observer
-class User extends React.Component {
-  componentDidMount() {
-    if (this.props.userId) {
-      UsersStore.fetchUser(this.props.userId);
+const User = observer(({ userId }) => {
+
+  useEffect(() => {
+    if (userId) {
+      UsersStore.fetchUser(userId);
     }
+  }, [userId]);
+
+  if (!userId) {
+    return null;
   }
 
-  render() {
-    const { userId } = this.props;
-    const user = UsersStore.users.get(userId);
+  const user = UsersStore.users.get(userId);
 
-    const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
-      if (item && item.value && item.verified) {
-        if (item.primary || !email) {
-          return item;
-        }
+  const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
+    if (item && item.value && item.verified) {
+      if (item.primary || !email) {
+        return item;
       }
-      return email;
-    }, null):null;
+    }
+    return email;
+  }, null):null;
 
-    return (
-      userId ? <UserComponent userId={userId} name={user && user.name} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />: null
-    );
-  }
-}
+  return (
+    <UserComponent userId={userId} name={user && user.name} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />
+  );
+});
 
 export default User;

@@ -14,25 +14,50 @@
 *   limitations under the License.
 */
 
-import { observable, computed, action, runInAction } from "mobx";
+import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import API from "../Services/API";
 
 class BookmarkStore {
-  @observable list = [];
-  @observable isFetching = false;
-  @observable listFilter = "";
-  @observable fetchError = null;
-  @observable updateError = null;
-  @observable saveError = null;
-  @observable deleteError = null;
+  list = [];
+  isFetching = false;
+  listFilter = "";
+  fetchError = null;
+  updateError = null;
+  saveError = null;
+  deleteError = null;
 
-  @observable newBookmarkName = null;
-  @observable isCreatingBookmark = false;
-  @observable bookmarkCreationError = null;
+  newBookmarkName = null;
+  isCreatingBookmark = false;
+  bookmarkCreationError = null;
 
-  @observable currentlyEditedBookmark = null;
+  currentlyEditedBookmark = null;
 
-  @computed
+  constructor() {
+    makeObservable(this, {
+      list: observable,
+      isFetching: observable,
+      listFilter: observable,
+      fetchError: observable,
+      updateError: observable,
+      saveError: observable,
+      deleteError: observable,
+      newBookmarkName: observable,
+      isCreatingBookmark: observable,
+      bookmarkCreationError: observable,
+      currentlyEditedBookmark: observable,
+      hasFetchError: computed,
+      cancelBookmarkDeletion: action,
+      setCurrentlyEditedBookmark: action,
+      cancelCurrentlyEditedBookmark: action,
+      dismissBookmarkCreationError: action,
+      revertBookmarkChanges: action,
+      deleteBookmark: action,
+      fetch: action,
+      createBookmark: action,
+      updateBookmark: action
+    });
+  }
+
   get hasFetchError() {
     return this.fetchError !== null;
   }
@@ -45,13 +70,11 @@ class BookmarkStore {
     return this.list;
   }
 
-  @action
   cancelBookmarkDeletion(bookmark) {
     if (!bookmark) { return; }
     bookmark.deleteError = null;
   }
 
-  @action
   setCurrentlyEditedBookmark(bookmark) {
     if (bookmark && !bookmark.isUpdating && !bookmark.isDeleting) {
       if (!bookmark.updateError) {
@@ -62,21 +85,18 @@ class BookmarkStore {
     }
   }
 
-  @action
   cancelCurrentlyEditedBookmark(bookmark) {
     if (!bookmark || this.currentlyEditedBookmark === bookmark) {
       this.currentlyEditedBookmark = null;
     }
   }
 
-  @action
   dismissBookmarkCreationError() {
     this.bookmarkCreationError = null;
     this.newBookmarkName = null;
   }
 
 
-  @action
   revertBookmarkChanges(bookmark) {
     if (!bookmark) { return; }
     bookmark.editName = null;
@@ -84,7 +104,6 @@ class BookmarkStore {
     this.cancelCurrentlyEditedBookmark(bookmark);
   }
 
-  @action
   async deleteBookmark(bookmark) {
     if (!bookmark) { return false; }
     bookmark.deleteError = null;
@@ -106,7 +125,6 @@ class BookmarkStore {
     }
   }
 
-  @action
   async fetch() {
     if (this.isFetching) {
       return null;
@@ -127,7 +145,6 @@ class BookmarkStore {
     }
   }
 
-  @action
   async createBookmark(name, instanceIds) {
     this.newBookmarkName = name;
     this.bookmarkCreationError = null;
@@ -155,7 +172,6 @@ class BookmarkStore {
     }
   }
 
-  @action
   async updateBookmark(bookmark, newProps) {
     if (!bookmark) { return false; }
     bookmark.editName = newProps.name;

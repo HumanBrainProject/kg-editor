@@ -14,10 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { matchPath } from "react-router-dom";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
@@ -28,7 +28,7 @@ import UserProfileTab from "./UserProfileTab";
 import WorkspaceSelector from "../Components/WorkspaceSelector";
 import Tab from "../Components/Tab";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     background: "var(--bg-color-ui-contrast1)",
     display: "grid",
@@ -67,67 +67,64 @@ const styles = {
     border: "1px solid var(--border-color-ui-contrast2)",
     borderLeft: "none"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Tabs extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentLocationPathname: routerStore.history.location.pathname
-    };
-    routerStore.history.listen(location => {
-      this.setState({ currentLocationPathname: location.pathname });
+
+const Tabs = observer(() => {
+  const classes = useStyles();
+
+  const [currentLocationPathname, setCurrentLocationPathname] = useState(routerStore.history.location.pathname);
+
+  useEffect(() => {
+    const unlisten = routerStore.history.listen(location => {
+      setCurrentLocationPathname(location.pathname);
     });
-  }
+    return unlisten;
+  }, []);
 
-  handleGoToDashboard = () => {
+  const handleGoToDashboard = () => {
     appStore.goToDashboard();
-  }
+  };
 
-  handleCreateInstance = () => {
+  const handleCreateInstance = () => {
     appStore.createInstance();
-  }
+  };
 
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <div className={`${classes.logo} layout-logo`} onClick={this.handleGoToDashboard}>
-          <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" width="30" height="30" />
-          <span>Knowledge Graph Editor</span>
-        </div>
-        {!appStore.globalError &&
-          <React.Fragment>
-            <div className={classes.fixedTabsLeft}>
-              {authStore.isFullyAuthenticated && authStore.hasWorkspaces && appStore.currentWorkspace?
-                <React.Fragment>
-                  <WorkspaceSelector />
-                  <Tab icon={"home"} current={matchPath(this.state.currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
-                  <Tab icon={"search"} current={matchPath(this.state.currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
-                  {appStore.currentWorkspacePermissions.canCreate && (
-                    <Tab icon={"file"} onClick={this.handleCreateInstance} hideLabel label={"New instance"} />
-                  )}
-                </React.Fragment>
-                : null
-              }
-            </div>
-            <InstanceTabs pathname={this.state.currentLocationPathname} />
-            <div className={classes.fixedTabsRight}>
-              {authStore.isFullyAuthenticated &&
-                <React.Fragment>
-                  <Tab icon={"question-circle"} current={matchPath(this.state.currentLocationPathname, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
-                  <UserProfileTab className={classes.userProfileTab} size={32} />
-                </React.Fragment>
-              }
-            </div>
-          </React.Fragment>
-        }
+  return (
+    <div className={classes.container}>
+      <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
+        <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" width="30" height="30" />
+        <span>Knowledge Graph Editor</span>
       </div>
-    );
-  }
-}
+      {!appStore.globalError &&
+        <React.Fragment>
+          <div className={classes.fixedTabsLeft}>
+            {authStore.isFullyAuthenticated && authStore.hasWorkspaces && appStore.currentWorkspace?
+              <React.Fragment>
+                <WorkspaceSelector />
+                <Tab icon={"home"} current={matchPath(currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
+                <Tab icon={"search"} current={matchPath(currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
+                {appStore.currentWorkspacePermissions.canCreate && (
+                  <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
+                )}
+              </React.Fragment>
+              : null
+            }
+          </div>
+          <InstanceTabs pathname={currentLocationPathname} />
+          <div className={classes.fixedTabsRight}>
+            {authStore.isFullyAuthenticated &&
+              <React.Fragment>
+                <Tab icon={"question-circle"} current={matchPath(currentLocationPathname, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
+                <UserProfileTab className={classes.userProfileTab} size={32} />
+              </React.Fragment>
+            }
+          </div>
+        </React.Fragment>
+      }
+    </div>
+  );
+});
 
 export default Tabs;
 

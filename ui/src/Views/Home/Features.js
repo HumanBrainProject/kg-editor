@@ -14,10 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import React, { useEffect, useState } from "react";
+import { createUseStyles } from "react-jss";
 import {observer} from "mobx-react";
-import { Panel, Button, Overlay, Popover } from "react-bootstrap";
+import { Card, Button, Overlay, Popover } from "react-bootstrap";
 import {uniqueId} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactMarkdown  from "react-markdown";
@@ -25,7 +25,7 @@ import ReactMarkdown  from "react-markdown";
 import featuresStore from "../../Stores/FeaturesStore";
 import FetchingLoader from "../../Components/FetchingLoader";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     position: "relative",
     padding: "15px",
@@ -156,7 +156,7 @@ const styles = {
     backgroundColor: "transparent",
     border: "transparent"
   }
-};
+});
 
 const windowHeight = () => {
   const w = window,
@@ -246,118 +246,113 @@ const getVideoSize = (width, height) => {
   };
 };
 
-@injectStyles(styles)
-@observer
-class Features extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = { zoom: {type: null, src: null, width: 0, height: 0}};
-  }
+const Features = observer(() => {
 
-  componentDidMount() {
+  const classes = useStyles();
+
+  const [zoom, setZoom] = useState({type: null, src: null, width: 0, height: 0});
+
+  useEffect(() => {
     if(!featuresStore.isFetched && !featuresStore.isFetching){
       featuresStore.fetchFeatures();
     }
-  }
+  }, []);
 
-  handlePictureClick = e => {
+  const handlePictureClick = e => {
     if (e && e.target && e.target.tagName === "IMG" && e.target.currentSrc) {
       event.stopPropagation();
       const [altType, altSrc, altWidth, altHeight] = (typeof e.target.alt === "string")?e.target.alt.split("|"):[null, null, null, null];
       if ((altType === "image" || altType === "video") && /^https?:\/\/.+$/.test(altSrc)) {
         const {width, height} = getVideoSize(Number(altWidth), Number(altHeight));
-        this.setState({zoom: {type: altType, src: altSrc, width: width, height: height}});
+        setZoom({type: altType, src: altSrc, width: width, height: height});
       } else {
         const src = e.target.currentSrc;
         const {width, height} = getPictureSize(Number(e.target.naturalWidth), Number(e.target.naturalHeight));
-        this.setState({zoom: {type: "image", src: src, width: width, height: height}});
+        setZoom({type: "image", src: src, width: width, height: height});
       }
     } else {
-      this.handlePopOverClose();
+      handlePopOverClose();
     }
-  }
+  };
 
-  handlePopOverClose = () => {
-    this.setState({zoom: {type: null, src: null, width: 0, height: 0}});
-  }
+  const handlePopOverClose = () => {
+    setZoom({type: null, src: null, width: 0, height: 0});
+  };
 
-  handleFetchFeaturesRetry = () => {
+  const handleFetchFeaturesRetry = () => {
     featuresStore.fetchFeatures();
-  }
+  };
 
-  render(){
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <h3>Latest features</h3>
-        {!featuresStore.fetchError?
-          !featuresStore.isFetching?
-            featuresStore.releases.length?
-              <ul className="list" onClick={this.handlePictureClick}>
-                {featuresStore.latestReleases.map(release => (
-                  <li key={release.version}>
-                    <h4>{release.version}</h4>
-                    <ul>
-                      {release.features.map(feature => (
-                        <li key={feature}><ReactMarkdown source={feature} /></li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-                <Panel>
-                  <Panel.Collapse>
-                    <Panel.Body>
-                      {featuresStore.olderReleases.map(release => (
-                        <li key={release.version}>
-                          <h4>{release.version}</h4>
-                          <ul>
-                            {release.features.map(feature => (
-                              <li key={feature}><ReactMarkdown source={feature} /></li>
-                            ))}
-                          </ul>
-                        </li>
-                      ))}
-                    </Panel.Body>
-                  </Panel.Collapse>
-                  <Panel.Footer>
-                    <Panel.Toggle componentClass="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Panel.Toggle>
-                  </Panel.Footer>
-                </Panel>
-                <Overlay
-                  show={!!this.state.zoom.type}
-                  container={document.body}
-                  rootClose={true}
-                  onHide={this.handlePopOverClose.bind(this)}
-                >
-                  <Popover id={uniqueId("pictureZoom")} className={classes.popOver} positionTop="50%" positionLeft="50%">
-                    {this.state.zoom.type === "video"?
-                      <iframe width={this.state.zoom.width} height={this.state.zoom.height} src={this.state.zoom.src} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
-                      :
-                      this.state.zoom.type === "image"?
-                        <img src={this.state.zoom.src}  width={this.state.zoom.width} height={this.state.zoom.height}/>
-                        :null
-                    }
-                    <button className={classes.popOverCloseButton} onClick={this.handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
-                  </Popover>
-                </Overlay>
-              </ul>
-              :
-              <div className={classes.noFeaturesPanel}>
-                <div>No list of features available.</div>
-              </div>
+  return (
+    <div className={classes.container}>
+      <h3>Latest features</h3>
+      {!featuresStore.fetchError?
+        !featuresStore.isFetching?
+          featuresStore.releases.length?
+            <ul className="list" onClick={handlePictureClick}>
+              {featuresStore.latestReleases.map(release => (
+                <li key={release.version}>
+                  <h4>{release.version}</h4>
+                  <ul>
+                    {release.features.map(feature => (
+                      <li key={feature}><ReactMarkdown source={feature} /></li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+              <Card>
+                <Card.Collapse>
+                  <Card.Body>
+                    {featuresStore.olderReleases.map(release => (
+                      <li key={release.version}>
+                        <h4>{release.version}</h4>
+                        <ul>
+                          {release.features.map(feature => (
+                            <li key={feature}><ReactMarkdown source={feature} /></li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                  </Card.Body>
+                </Card.Collapse>
+                <Card.Footer>
+                  <Card.Toggle as="a"><FontAwesomeIcon icon="angle-down"/> &nbsp;<span className="showButtonLabel">Show previous releases</span><span className="collapseButtonLabel">Collapse previous releases</span></Card.Toggle>
+                </Card.Footer>
+              </Card>
+              <Overlay
+                show={!!zoom.type}
+                container={document.body}
+                rootClose={true}
+                onHide={handlePopOverClose}
+              >
+                <Popover id={uniqueId("pictureZoom")} className={classes.popOver} positionTop="50%" positionLeft="50%">
+                  {zoom.type === "video"?
+                    <iframe width={zoom.width} height={zoom.height} src={zoom.src} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                    :
+                    zoom.type === "image"?
+                      <img src={zoom.src}  width={zoom.width} height={zoom.height}/>
+                      :null
+                  }
+                  <button className={classes.popOverCloseButton} onClick={handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
+                </Popover>
+              </Overlay>
+            </ul>
             :
-            <FetchingLoader>
-              Fetching list of features
-            </FetchingLoader>
+            <div className={classes.noFeaturesPanel}>
+              <div>No list of features available.</div>
+            </div>
           :
-          <div className={classes.featuresFetchErrorPanel}>
-            <div>{featuresStore.fetchError}</div>
-            <Button bsStyle="primary" onClick={this.handleFetchFeaturesRetry}>Retry</Button>
-          </div>
-        }
-      </div>
-    );
-  }
-}
+          <FetchingLoader>
+              Fetching list of features
+          </FetchingLoader>
+        :
+        <div className={classes.featuresFetchErrorPanel}>
+          <div>{featuresStore.fetchError}</div>
+          <Button variant="primary" onClick={handleFetchFeaturesRetry}>Retry</Button>
+        </div>
+      }
+    </div>
+  );
+});
 
 export default Features;

@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HeaderPanel from "./HeaderPanel";
 
-const styles = {
+const useStyles = createUseStyles({
   fetchErrorPanel: {
     position: "absolute !important",
     top: "50%",
@@ -52,7 +52,6 @@ const styles = {
       fontWeight:"400",
       fontSize:"0.8em",
       fontStyle: "italic",
-      whiteSpace: "nowrap",
       "@media screen and (max-width:576px)": {
         wordBreak: "break-all",
         wordWrap: "break-word",
@@ -65,40 +64,43 @@ const styles = {
   },
   retryIcon: {
     marginRight: "4px"
+  },
+  action: {
+    textAlign: "center"
   }
-};
+});
 
-@injectStyles(styles)
-class FetchErrorPanel extends React.Component{
-  handleRetry = (e) => {
+const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
+
+  const classes = useStyles();
+
+  const handleRetry = (e) => {
     e.stopPropagation();
-    this.props.onRetry(e);
+    onRetry(e);
   };
 
-  render(){
-    const { classes, id, show, error, inline } = this.props;
-    if (!show) {
-      return null;
-    }
-    return(
-      (!inline)?
-        <div className={classes.fetchErrorPanel}>
-          <h4>{error}</h4>
-          <div>
-            <Button bsStyle="primary" onClick={this.handleRetry}>Retry</Button>
-          </div>
-        </div>
-        :
-        <div className={classes.inlineFetchErrorPanel}>
-          <HeaderPanel className={classes.panelHeader} />
-          <h5>{error}</h5>
-          <small>ID: {id}</small>
-          <div>
-            <Button onClick={this.handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
-          </div>
-        </div>
-    );
+  if (!show) {
+    return null;
   }
-}
+
+  return(
+    (!inline)?
+      <div className={classes.fetchErrorPanel}>
+        <h4>{error}</h4>
+        <div className={classes.action}>
+          <Button variant="primary" onClick={this.handleRetry}>Retry</Button>
+        </div>
+      </div>
+      :
+      <div className={classes.inlineFetchErrorPanel}>
+        <HeaderPanel className={classes.panelHeader} />
+        <h5>{error}</h5>
+        <small><span>ID: </span><span>{id}</span></small>
+        <div className={classes.action}>
+          <Button onClick={handleRetry}><FontAwesomeIcon className={classes.retryIcon} icon="sync-alt" /><span>Retry</span></Button>
+        </div>
+      </div>
+  );
+};
 
 export default FetchErrorPanel;

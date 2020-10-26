@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, runInAction } from "mobx";
+import { observable, action, runInAction, makeObservable } from "mobx";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
@@ -23,12 +23,22 @@ import InstanceStore from "./InstanceStore";
 const maxItems = 100;
 
 class HistoryStore {
-  @observable instancesHistory = [];
-  @observable instances = [];
-  @observable isFetching = false;
-  @observable fetchError = null;
+  instancesHistory = [];
+  instances = [];
+  isFetching = false;
+  fetchError = null;
 
   constructor(){
+    makeObservable(this, {
+      instancesHistory: observable,
+      instances: observable,
+      isFetching: observable,
+      fetchError: observable,
+      updateInstanceHistory: action,
+      getFileredInstancesHistory: action,
+      fetchInstances: action
+    });
+
     if (localStorage.getItem("instancesHistory")) {
       try {
         this.instancesHistory = JSON.parse(localStorage.getItem("instancesHistory"));
@@ -41,7 +51,6 @@ class HistoryStore {
     }
   }
 
-  @action
   updateInstanceHistory(id, mode, remove) {
     if (!appStore.currentWorkspace) {
       return;
@@ -66,7 +75,6 @@ class HistoryStore {
     return this.instancesHistory;
   }
 
-  @action
   getFileredInstancesHistory(modes, max=10) {
     if (!appStore.currentWorkspace) {
       return [];
@@ -97,7 +105,6 @@ class HistoryStore {
       .slice(0, isNaN(max) || max < 0?0:max);
   }
 
-  @action
   async fetchInstances(list) {
     if (!list.length) {
       this.instances = [];

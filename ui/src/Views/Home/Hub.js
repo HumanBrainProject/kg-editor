@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import injectStyles from "react-jss";
-import {observer} from "mobx-react";
+import { createUseStyles } from "react-jss";
+import { observer } from "mobx-react";
 
 import ThemeSwitcher from "./ThemeSwitcher";
 
-const styles = {
+const useStyles = createUseStyles({
   container:{
     display: "flex",
     position: "relative",
@@ -53,17 +53,14 @@ const styles = {
     textTransform:"uppercase",
     fontWeight:"bold"
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class Hub extends React.Component{
-  render(){
-    const { classes } = this.props;
-    return(
-      <div className={classes.container}>
-        <div className={classes.action}></div>
-        {/* <div className={`${classes.action} statistics`} onClick={()=>routerStore.history.push("/kg-stats")}>
+const Hub = observer(() => {
+  const classes = useStyles();
+  return(
+    <div className={classes.container}>
+      <div className={classes.action}></div>
+      {/* <div className={`${classes.action} statistics`} onClick={()=>routerStore.history.push("/kg-stats")}>
           <div className={classes.actionIcon}>
             <FontAwesomeIcon icon={"chart-bar"}/>
           </div>
@@ -71,12 +68,11 @@ class Hub extends React.Component{
             KG Statistics
           </div>
         </div> */}
-        <div className={classes.action}>
-          <ThemeSwitcher/>
-        </div>
+      <div className={classes.action}>
+        <ThemeSwitcher/>
       </div>
-    );
-  }
-}
+    </div>
+  );
+});
 
 export default Hub;

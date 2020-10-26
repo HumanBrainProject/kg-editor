@@ -14,10 +14,10 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { matchPath } from "react-router-dom";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
@@ -26,75 +26,58 @@ import viewStore from "../Stores/ViewStore";
 
 import Tab from "../Components/Tab";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(120px, 0.5fr))"
   }
-};
-@observer
-class InstanceTab extends React.Component {
-  componentDidMount() {
-    this.syncInstanceLabel();
-  }
+});
 
-  componentDidUpdate(previousProps) {
-    if (previousProps.view !== this.props.view) {
-      this.syncInstanceLabel();
-    }
-  }
+const InstanceTab = observer(({view, pathname}) => {
 
-  syncInstanceLabel = () => {
-    const { view } = this.props;
-    const instance = instancesStore.instances.get(view.instanceId);
+  const instance = instancesStore.instances.get(view.instanceId);
+
+  useEffect(() => {
     if (instance && instance.name !== view.name && instance.primaryType.color !== view.color) {
       view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
     }
-  }
+  }, [view]);
 
-  isCurrent = (instanceId, mode) => {
+  const isCurrent = (instanceId, mode) => {
     if(mode !== "view") {
-      return matchPath(this.props.pathname, { path: `/instances/${instanceId}/${mode}`, exact: "true" });
+      return matchPath(pathname, { path: `/instances/${instanceId}/${mode}`, exact: "true" });
     }
-    return matchPath(this.props.pathname, { path: `/instances/${instanceId}`, exact: "true" });
-  }
+    return matchPath(pathname, { path: `/instances/${instanceId}`, exact: "true" });
+  };
 
-  handleClose = () => appStore.closeInstance(this.props.view.instanceId);
 
-  render() {
-    const { view } = this.props;
+  const handleClose = () => appStore.closeInstance(view.instanceId);
 
-    const instance = instancesStore.instances.get(view.instanceId);
-    const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
-    const color = (instance && (instance.isFetched || instance.isLabelFetched))?instance.primaryType.color:(view.color?view.color:"");
-    return (
-      <Tab
-        icon={instance && instance.isFetching ? "circle-notch" : "circle"}
-        iconSpin={instance && instance.isFetching}
-        iconColor={color}
-        current={this.isCurrent(view.instanceId, view.mode)}
-        path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
-        onClose={this.handleClose}
-        label={label}
-      />
-    );
-  }
-}
+  const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
+  const color = (instance && (instance.isFetched || instance.isLabelFetched))?instance.primaryType.color:(view.color?view.color:"");
+  return (
+    <Tab
+      icon={instance && instance.isFetching ? "circle-notch" : "circle"}
+      iconSpin={instance && instance.isFetching}
+      iconColor={color}
+      current={isCurrent(view.instanceId, view.mode)}
+      path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
+      onClose={handleClose}
+      label={label}
+    />
+  );
+});
 
-@injectStyles(styles)
-@observer
-class InstanceTabs extends React.Component {
-  render() {
-    const { classes, pathname } = this.props;
-    return (
-      <div className={classes.container} >
-        {authStore.isFullyAuthenticated && Array.from(viewStore.views.values()).map(view => (
-          <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
-        ))}
-      </div>
-    );
-  }
-}
+const InstanceTabs = observer(({ pathname }) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.container} >
+      {authStore.isFullyAuthenticated && Array.from(viewStore.views.values()).map(view => (
+        <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
+      ))}
+    </div>
+  );
+});
 
 export default InstanceTabs;

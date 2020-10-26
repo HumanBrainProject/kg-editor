@@ -16,11 +16,11 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import releaseStore from "../../../Stores/ReleaseStore";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "flex",
     flexDirection: "row",
@@ -55,29 +55,32 @@ const styles = {
       transform: "scale(1)"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ReleaseNodeAndChildrenToggle extends React.Component {
-  handleClick = status => {
+const ReleaseNodeAndChildrenToggle = observer(() => {
+
+  const classes = useStyles();
+
+  const handleMarkAllNodeForRelease = () => {
     const node = releaseStore.instancesTree;
-    releaseStore.markAllNodeForChange(node, status);
-  }
+    releaseStore.markAllNodeForChange(node, "RELEASED");
+  };
 
-  render() {
-    const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        <div onClick={() => this.handleClick("RELEASED")} className={classes.releaseBtn} title="release all">
-          <FontAwesomeIcon icon="check"/>
-        </div>
-        <div onClick={() => this.handleClick()} className={classes.doNothingBtn} title="do nothing">
-          <FontAwesomeIcon icon="dot-circle"/>
-        </div>
+  const handleMarkAllNodeToCurrentState = () => {
+    const node = releaseStore.instancesTree;
+    releaseStore.markAllNodeForChange(node, null);
+  };
+
+  return (
+    <div className={classes.container}>
+      <div onClick={handleMarkAllNodeForRelease} className={classes.releaseBtn} title="release all">
+        <FontAwesomeIcon icon="check"/>
       </div>
-    );
-  }
-}
+      <div onClick={handleMarkAllNodeToCurrentState} className={classes.doNothingBtn} title="do nothing">
+        <FontAwesomeIcon icon="dot-circle"/>
+      </div>
+    </div>
+  );
+});
 
 export default ReleaseNodeAndChildrenToggle;

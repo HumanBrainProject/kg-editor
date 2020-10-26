@@ -21,6 +21,7 @@ import appStore from "../Stores/AppStore";
 const endpoints = {
   "auth": () => "/editor/api/auth/endpoint",
   "user": () => "/editor/api/user",
+  "userPicture": () => "/editor/api/user/picture",
   "userInfo": user => `/editor/api/review/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
   "instanceReviews": id => `/editor/api/scopes/${id}`,

@@ -14,12 +14,11 @@
 *   limitations under the License.
 */
 
-import React from "react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 
 import Color from "color";
 
-const styles = {
+const useStyles = createUseStyles({
   "@global":{
     ":root":{
       "--bg-gradient-start":"#e5b8d6",
@@ -98,13 +97,11 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-class Theme extends React.Component{
-  render(){
-    return null;
-  }
-}
+const Theme = () => {
+  useStyles();
+  return null;
+};
 
 export default Theme;

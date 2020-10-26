@@ -16,56 +16,40 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
-import { ControlLabel, FormGroup, Checkbox } from "react-bootstrap";
+import { createUseStyles } from "react-jss";
+import { Form } from "react-bootstrap";
 import Label from "../Label";
 
-const styles = {
-  readMode: {
-    "& .quickfire-label:after": {
-      content: "':\\00a0'"
-    }
-  }
-};
+const useStyles = createUseStyles({
+  readMode: {}
+});
 
-@injectStyles(styles)
-@observer
-class CheckBox extends React.Component {
+const CheckBox = observer(({ className, fieldStore, readMode }) => {
 
-  handleChange = () => {
-    const { fieldStore } = this.props;
+  const { value, label, labelTooltip } = fieldStore;
+  const classes = useStyles();
+
+  const handleChange = () => {
     if (!fieldStore.disabled && !fieldStore.readOnly) {
       fieldStore.toggleValue();
     }
   };
 
-  render() {
-    const { fieldStore, readMode } = this.props;
-    const { value, label } = fieldStore;
-
-    if (readMode) {
-      return this.renderReadMode();
-    }
-
+  if (readMode) {
     return (
-      <FormGroup className="quickfire-field-checkbox" >
-        <ControlLabel className="quickfire-label">{label}</ControlLabel>
-        <Checkbox readOnly={false} onChange={this.handleChange} checked={value} />
-      </FormGroup>
-    );
-  }
-
-  renderReadMode() {
-    const { fieldStore, classes } = this.props;
-    const { value, label, labelTooltip } = fieldStore;
-
-    return (
-      <div className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly`}>
-        <Label label={label} labelTooltip={labelTooltip} />
+      <Form.Group className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly ${className}`}>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
         <span>&nbsp;<input className={"quickfire-readmode-checkbox"} type="checkbox" readOnly={true} checked={value} /></span>
-      </div>
+      </Form.Group>
     );
   }
-}
+
+  return (
+    <Form.Group className="quickfire-field-checkbox" >
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Form.Check readOnly={false} onChange={handleChange} checked={value} />
+    </Form.Group>
+  );
+});
 
 export default CheckBox;

@@ -14,9 +14,9 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useState}  from "react";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ClientPreviewModal from "./ClientPreviewModal";
@@ -24,7 +24,7 @@ import ReleaseStats from "./ReleaseStats";
 import releaseStore from "../../../Stores/ReleaseStore";
 import ReleaseMessages from "./ReleaseMessages";
 
-const styles = {
+const useStyles = createUseStyles({
   container: {
     display: "grid",
     gridTemplateRows: "auto auto 1fr auto",
@@ -99,93 +99,85 @@ const styles = {
       }
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ReleaseAction extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showModal: false
-    };
-  }
 
-  handleProceed = () => {
+const ReleaseAction = observer(() => {
+
+  const classes = useStyles();
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleProceed = () => {
     if (!releaseStore.isSaving) {
       releaseStore.commitStatusChanges();
     }
   };
 
-  handleOpenModal = () => {
-    this.setState({ showModal: true });
+  const handleOpenModal = () => {
+    setShowModal(true);
   };
 
-  handleCloseModal = () => {
-    this.setState({ showModal: false });
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
 
+  if (!releaseStore.treeStats) {
+    return null;
+  }
 
-  render() {
-    const { classes } = this.props;
-
-    if (!releaseStore.treeStats) {
-      return null;
-    }
-
-    return (
-      <div className={classes.container}>
-        <ReleaseStats />
-        <div className={classes.preview}>
-          <div className={classes.section}>
-            <h5>Preview:</h5>
-            <div className={"content previewContent"}>
-              <div className={"type"}>Search</div>
-              <div
-                onClick={this.handleOpenModal}
-                className={"previewIcon"}
-                title="Preview in KG Search"
-              >
-                <FontAwesomeIcon style={{ verticalAlign: "top" }} icon="eye" />
-              </div>
+  return (
+    <div className={classes.container}>
+      <ReleaseStats />
+      <div className={classes.preview}>
+        <div className={classes.section}>
+          <h5>Preview:</h5>
+          <div className={"content previewContent"}>
+            <div className={"type"}>Search</div>
+            <div
+              onClick={handleOpenModal}
+              className={"previewIcon"}
+              title="Preview in KG Search"
+            >
+              <FontAwesomeIcon style={{ verticalAlign: "top" }} icon="eye" />
             </div>
           </div>
         </div>
-        <ReleaseMessages />
-        <div className={classes.releasePnl} >
-          <Button
-            onClick={this.handleProceed}
-            disabled={
-              releaseStore.isSaving ||
+      </div>
+      <ReleaseMessages />
+      <div className={classes.releasePnl} >
+        <Button
+          onClick={handleProceed}
+          disabled={
+            releaseStore.isSaving ||
               (releaseStore.treeStats.proceed_release === 0 &&
                 releaseStore.treeStats.proceed_unrelease === 0)
-            }
-            bsClass={`${classes.releaseButton} btn btn-primary`}
-            bsStyle={"primary"}
-            title={
-              releaseStore.isSaving
-                ? "Saving..."
-                : releaseStore.treeStats.proceed_release === 0 &&
+          }
+          bsPrefix={`${classes.releaseButton} btn btn-primary`}
+          variant={"primary"}
+          title={
+            releaseStore.isSaving
+              ? "Saving..."
+              : releaseStore.treeStats.proceed_release === 0 &&
                   releaseStore.treeStats.proceed_unrelease === 0
-                  ? "No pending changes to release"
-                  : "Proceed"
-            }
-          >
-            <FontAwesomeIcon
-              icon={releaseStore.isSaving ? "circle-notch" : "cloud-upload-alt"}
-              spin={releaseStore.isSaving}
-            />
-            <div>{releaseStore.isSaving ? "Saving..." : "Proceed"}</div>
-          </Button>
-        </div>
-        <ClientPreviewModal
-          store={releaseStore}
-          show={this.state.showModal}
-          handleClose={this.handleCloseModal}
-        />
+                ? "No pending changes to release"
+                : "Proceed"
+          }
+        >
+          <FontAwesomeIcon
+            icon={releaseStore.isSaving ? "circle-notch" : "cloud-upload-alt"}
+            spin={releaseStore.isSaving}
+          />
+          <div>{releaseStore.isSaving ? "Saving..." : "Proceed"}</div>
+        </Button>
       </div>
-    );
-  }
-}
+      <ClientPreviewModal
+        store={releaseStore}
+        show={showModal}
+        handleClose={handleCloseModal}
+      />
+    </div>
+  );
+});
 
 export default ReleaseAction;

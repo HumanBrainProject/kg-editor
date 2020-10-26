@@ -16,10 +16,10 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { Glyphicon } from "react-bootstrap";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const styles = {
+const useStyles = createUseStyles({
   valueDisplay: {
     display: "inline-block",
     maxWidth: "200px",
@@ -43,71 +43,62 @@ const styles = {
       backgroundColor: "lightgrey"
     }
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ListItem extends React.Component {
+const ListItem = observer(({ index, value, readOnly, disabled, onDelete, onDragStart, onDragEnd, onDrop, onKeyDown }) => {
 
-  handleDelete = e => {
+  const classes = useStyles();
+
+  const handleDelete = e => {
     e.stopPropagation();
-    this.props.onDelete && this.props.onDelete(this.props.index);
+    onDelete && onDelete(index);
   };
 
-  handleDragEnd = e => {
+  const handleDragEnd = e => {
     e.stopPropagation();
-    this.props.onDragEnd && this.props.onDragEnd();
+    onDragEnd && onDragEnd();
   };
 
-  handleDragOver = e => e.preventDefault();
+  const handleDragOver = e => e.preventDefault();
 
-  handleDragStart = e => {
+  const handleDragStart = e => {
     e.stopPropagation();
-    this.props.onDragStart && this.props.onDragStart(this.props.index);
+    onDragStart && onDragStart(index);
   };
 
-  handleDrop = e => {
+  const handleDrop = e => {
     e.stopPropagation();
-    this.props.onDrop && this.props.onDrop(this.props.index);
+    onDrop && onDrop(index);
   };
 
-  handleKeyDown = e => {
+  const handleKeyDown = e => {
     e.stopPropagation();
-    this.props.onKeyDown && this.props.onKeyDown(this.props.index, e);
+    onKeyDown && onKeyDown(index, e);
   };
 
-  render() {
-    const {
-      classes,
-      value,
-      readOnly,
-      disabled,
-    } = this.props;
-
-    if (readOnly) {
-      return (
-        <span className="quickfire-readmode-item">{value}</span>
-      );
-    }
-
+  if (readOnly) {
     return (
-      <div
-        tabIndex={"0"}
-        className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled ? "disabled" : ""}`}
-        disabled={disabled}
-        draggable={!!disabled}
-        onDragEnd={this.handleDragEnd}
-        onDragOver={this.handleDragOver}
-        onDragStart={this.handleDragStart}
-        onDrop={this.handleDrop}
-        onKeyDown={this.handleKeyDown}
-        title={value}
-      >
-        <span className={classes.valueDisplay}>{value}</span>
-        <Glyphicon className={`quickfire-remove ${classes.remove}`} glyph="remove" onClick={this.handleDelete} />
-      </div>
+      <span className="quickfire-readmode-item">{value}</span>
     );
   }
-}
+
+  return (
+    <div
+      tabIndex={"0"}
+      className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled ? "disabled" : ""}`}
+      disabled={disabled}
+      draggable={!!disabled}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragStart={handleDragStart}
+      onDrop={handleDrop}
+      onKeyDown={handleKeyDown}
+      title={value}
+    >
+      <span className={classes.valueDisplay}>{value}</span>
+      <FontAwesomeIcon className={`quickfire-remove ${classes.remove}`} glyph="times" onClick={handleDelete} />
+    </div>
+  );
+});
 
 export default ListItem;

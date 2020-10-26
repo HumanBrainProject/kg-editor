@@ -17,10 +17,10 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
 import { observer } from "mobx-react";
-import injectStyles from "react-jss";
+import { createUseStyles } from "react-jss";
 import Iframe from "react-iframe";
 
-let styles = {
+const useStyles = createUseStyles({
   frameContainer: {
     height: "100%"
   },
@@ -43,37 +43,32 @@ let styles = {
     minHeight: "100%",
     minWidth: "100%",
   }
-};
+});
 
-@injectStyles(styles)
-@observer
-class ClientPreviewModal extends React.Component {
-  constructor(props, context) {
-    super(props, context);
-    this.url = `https://kg.ebrains.eu/search/live/${props.store.topInstanceId}`;
-  }
+const ClientPreviewModal = observer(({ store, show, handleClose }) => {
 
-  render() {
-    const { show, handleClose, classes } = this.props;
-    return (
-      <Modal show={show} className={classes.greatModal}>
-        <Modal.Body>
-          <div className={classes.frameContainer}>
-            <Iframe url={this.url}
-              width="100%"
-              height="100%"
-              id="myId"
-              className={classes.frame}
-              display="initial"
-              position="relative" />
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleClose} variant="primary">Close</Button>
-        </Modal.Footer>
-      </Modal>
-    );
-  }
-}
+  const classes = useStyles();
+
+  const url = `https://kg.ebrains.eu/search/live/${store.topInstanceId}`;
+
+  return (
+    <Modal show={show} className={classes.greatModal}>
+      <Modal.Body>
+        <div className={classes.frameContainer}>
+          <Iframe url={url}
+            width="100%"
+            height="100%"
+            id={store.topInstanceId}
+            className={classes.frame}
+            display="initial"
+            position="relative" />
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={handleClose} variant="primary">Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+});
 
 export default ClientPreviewModal;

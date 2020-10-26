@@ -21,7 +21,7 @@ import models.UserRequest
 import models.instance.Field.{Link, ListOfLinks}
 import models.instance._
 import models.permissions.Permissions
-import play.api.libs.json.{JsObject, JsString, JsValue, _}
+import play.api.libs.json.{JsObject, JsString, JsValue}
 import play.api.mvc.AnyContent
 
 object InstanceHelper {

@@ -250,7 +250,7 @@ const Group = ({ group }) => {
 
   return (
     <div className={`${classes.group} ${expanded ? "expanded" : ""}`}>
-      <FontAwesomeIcon icon="chevron-right" className={classes.expandButton} onClick={handleClick} />
+      <FontAwesomeIcon icon="arrow-right" className={classes.expandButton} onClick={handleClick} />
       <GroupLabel className={classes.groupLabel} group={group} />
       <Actions className={classes.groupActions} group={group} />
       {expanded && (

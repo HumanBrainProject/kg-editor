@@ -15,7 +15,6 @@
 */
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
-import uniq from "lodash/uniq";
 
 import API from "../Services/API";
 import statusStore from "./StatusStore";
@@ -226,8 +225,8 @@ class ReleaseStore{
     };
 
     rseek(this.instancesTree);
-    nodesByStatus.RELEASED = uniq(nodesByStatus.RELEASED);
-    nodesByStatus.UNRELEASED = uniq(nodesByStatus.UNRELEASED);
+    nodesByStatus.RELEASED = Array.from(new Set(nodesByStatus.RELEASED));
+    nodesByStatus.UNRELEASED = Array.from(new Set(nodesByStatus.UNRELEASED));
     return nodesByStatus;
   }
 

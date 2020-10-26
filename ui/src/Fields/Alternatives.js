@@ -56,37 +56,61 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
   const alternativesRef = useRef();
 
   const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState(null);
 
   const handleToggle = e => {
     e.preventDefault();
     setOpen(!open);
   };
 
-  const handleSelect = (alternative, e) => {
-    if(e && e.keyCode === 40){ // Down
-      e && e.preventDefault();
-      const alternatives = alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
-      let index = alternatives.indexOf(e.target) + 1;
-      if (index >= alternatives.length) {
-        index = 0;
-      }
-      alternatives[index].focus();
-    } else if(e && e.keyCode === 38){ // Up
-      e && e.preventDefault();
-      const alternatives =  alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
-      let index = alternatives.indexOf(e.target) - 1;
-      if (index < 0) {
-        index = alternatives.length - 1;
-      }
-      alternatives[index].focus();
-    } else if(e && e.keyCode === 27) { //escape
-      e && e.preventDefault();
-      setOpen(false);
-    } else if (alternative && (!e || (e && (!e.keyCode || e.keyCode === 13)))) { // enter
-      e && e.preventDefault();
-      typeof onSelect === "function" && onSelect(alternative.value);
-      setOpen(false);
+  const close = () => {
+    setCurrent(null);
+    setOpen(false);
+  };
+
+  const handleSelect = value => {
+    typeof onSelect === "function" && onSelect(value);
+    close();
+  };
+
+  const handleSelectPrevious = value => {
+    if (!list.length) {
+      setCurrent(null);
+      return;
     }
+    const index = list.findIndex(alternative => alternative.value === value);
+    if (index === -1) {
+      const alternative = list[0] ;
+      setCurrent(alternative.value);
+    } else if (index > 0){
+      const alternative = list[index - 1] ;
+      setCurrent(alternative.value);
+    } else {
+      const alternative = list[list.length-1];
+      setCurrent(alternative.value);
+    }
+  };
+
+  const handleSelectNext = value => {
+    if (!list.length) {
+      setCurrent(null);
+      return;
+    }
+    const index = list.findIndex(alternative => alternative.value === value);
+    if (index === -1) {
+      const alternative = list[0] ;
+      setCurrent(alternative.value);
+    } else if (index < list.length -1){
+      const alternative = list[index + 1] ;
+      setCurrent(alternative.value);
+    } else {
+      const alternative = list[0];
+      setCurrent(alternative.value);
+    }
+  };
+
+  const handleCancel = () => {
+    close();
   };
 
   const handleRemove = e => {
@@ -101,23 +125,23 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     }
     if(e && e.keyCode === 40){ // Down
       e && e.preventDefault();
-      const alternatives = alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
-      let index = alternatives.indexOf(e.target) + 1;
-      if (index >= alternatives.length) {
-        index = 0;
-      }
-      alternatives[index].focus();
+      handleSelectNext(current);
     } else if(e && e.keyCode === 38){ // Up
       e && e.preventDefault();
-      const alternatives = alternativesRef.current && alternativesRef.current.querySelectorAll(".option");
-      let index = alternatives.indexOf(e.target) - 1;
-      if (index < 0) {
-        index = alternatives.length - 1;
-      }
-      alternatives[index].focus();
+      handleSelectPrevious(current);
     } else if(e && e.keyCode === 27) { //escape
       e && e.preventDefault();
-      setOpen(false);
+      close();
+    } else if (e.keyCode === 13) { // enter
+      e && e.preventDefault();
+      if (open) {
+        if (current) {
+          typeof onSelect === "function" && onSelect(current);
+        }
+        close();
+      } else {
+        setOpen(true);
+      }
     }
   };
 
@@ -165,9 +189,13 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
         <Alternative
           key={key}
           alternative={alternative}
+          hasFocus={alternative.value === current}
           ValueRenderer={ValueRenderer}
           onRemove={handleRemove}
           onSelect={handleSelect}
+          onSelectNext={handleSelectNext}
+          onSelectPrevious={handleSelectPrevious}
+          onCancel={handleCancel}
           className={classes.fixedWidthDropdownItem} />
       );
     });

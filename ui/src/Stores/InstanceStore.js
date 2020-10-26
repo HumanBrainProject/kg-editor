@@ -19,6 +19,37 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 import appStore from "./AppStore";
 import { fieldsMapping } from "../Fields";
 
+const compareField = (a, b) => {
+  if (!a && !b) {
+    return 0;
+  }
+  if (!a) {
+    return 1;
+  }
+  if (!b) {
+    return -1;
+  }
+  if ((!a.order || typeof a !== Number) && (!b.order || typeof b !== Number)) {
+    if (!a.label && !b.label) {
+      return 0;
+    }
+    if (!a.label) {
+      return 1;
+    }
+    if (!b.label) {
+      return -1;
+    }
+    return a.label.localeCompare(b.label);
+  }
+  if (!a.order || typeof a !== Number) {
+    return 1;
+  }
+  if (!b.order || typeof b !== Number) {
+    return -1;
+  }
+  return a - b;
+};
+
 export const normalizeLabelInstanceData = data => {
   const instance = {
     id: null,
@@ -370,7 +401,7 @@ class InstanceStore {
         return acc;
       }, {}),
       labelField: this.labelField,
-      promotedFields: [...this.promotedFields],
+      promotedFields: [...this._promotedFields],
       metadata: {},
       permissions: {...this.permissions}
     };
@@ -422,22 +453,20 @@ class InstanceStore {
     return this._name ? this._name : this.id;
   }
 
+  get promotedFields() {
+    if (this.isFetched && !this.fetchError) {
+      return this._promotedFields.map(name => [name, this.fields[name]])
+        .sort(([, a], [, b]) => compareField(a, b))
+        .map(([key]) => key);
+    }
+    return this._promotedFields;
+  }
+
   get nonPromotedFields() {
     if (this.isFetched && !this.fetchError) {
       return Object.entries(this.fields)
         .filter(([key]) => !this.promotedFields.includes(key))
-        .sort(([, a], [, b]) => {
-          if (!a.label && !b.label) {
-            return 0;
-          }
-          if (!a.label) {
-            return 1;
-          }
-          if (!b.label) {
-            return -1;
-          }
-          return a.label.localeCompare(b.label);
-        })
+        .sort(([, a], [, b]) => compareField(a, b))
         .map(([key]) => key);
     }
     return [];
@@ -496,7 +525,7 @@ class InstanceStore {
     this.isNew = isNew;
     this.labelField = normalizedData.labelField;
     this.primaryType = normalizedData.primaryType;
-    this.promotedFields = normalizedData.promotedFields;
+    this._promotedFields = normalizedData.promotedFields;
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;

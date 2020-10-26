@@ -18,7 +18,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Overlay, Popover, Button } from "react-bootstrap";
+import Overlay from "react-bootstrap/Overlay";
+import Popover from "react-bootstrap/Popover";
+import Button from "react-bootstrap/Button";
 import {uniqueId} from "lodash";
 
 const useStyles = createUseStyles({

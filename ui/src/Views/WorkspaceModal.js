@@ -18,7 +18,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
-import { Modal } from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
 
 import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";

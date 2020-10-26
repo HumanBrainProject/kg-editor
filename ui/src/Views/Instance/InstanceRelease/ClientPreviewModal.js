@@ -15,7 +15,8 @@
 */
 
 import React from "react";
-import { Modal, Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import Iframe from "react-iframe";

@@ -16,7 +16,8 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { Row, Col } from "react-bootstrap";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import routerStore from "../../../Stores/RouterStore";
 import appStore from "../../../Stores/AppStore";

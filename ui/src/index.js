@@ -18,9 +18,9 @@ import React from "react";
 import { render } from "react-dom";
 import { observer } from "mobx-react";
 import { Router, Route, Switch } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 
 import "react-virtualized/styles.css";

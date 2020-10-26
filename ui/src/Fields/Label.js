@@ -16,7 +16,9 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { OverlayTrigger, Form, Tooltip } from "react-bootstrap";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Form from "react-bootstrap/Form";
+import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { uniqueId } from "lodash";
 

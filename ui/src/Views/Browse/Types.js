@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import typesStore from "../../Stores/TypesStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import browseStore from "../../Stores/BrowseStore";

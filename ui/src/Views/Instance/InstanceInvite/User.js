@@ -17,7 +17,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { MenuItem } from "react-bootstrap";
+import MenuItem from "react-bootstrap/MenuItem";
 
 import UserComponent from "../../../Components/User";
 

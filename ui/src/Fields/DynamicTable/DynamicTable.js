@@ -18,9 +18,9 @@ import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import _  from "lodash-uuid";
-import { Form } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {Button} from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";

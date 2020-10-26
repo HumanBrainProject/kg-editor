@@ -15,7 +15,9 @@
 */
 
 import React from "react";
-import {Modal, ProgressBar, Button} from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import Button from "react-bootstrap/Button";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

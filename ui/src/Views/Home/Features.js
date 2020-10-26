@@ -17,7 +17,10 @@
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import {observer} from "mobx-react";
-import { Card, Button, Overlay, Popover } from "react-bootstrap";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Overlay from "react-bootstrap/Overlay";
+import Popover from "react-bootstrap/Popover";
 import {uniqueId} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactMarkdown  from "react-markdown";

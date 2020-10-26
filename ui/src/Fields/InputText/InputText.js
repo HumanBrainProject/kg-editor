@@ -17,7 +17,7 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { Form } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";

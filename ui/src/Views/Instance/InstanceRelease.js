@@ -18,7 +18,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 
 import releaseStore from "../../Stores/ReleaseStore";
 

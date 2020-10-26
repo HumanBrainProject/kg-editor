@@ -17,7 +17,7 @@
 
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { Dropdown } from "react-bootstrap";
+import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Options from "./Options";

@@ -18,7 +18,9 @@ import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Form, Row, Col } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import { Scrollbars } from "react-custom-scrollbars";
 import Field from "../../../Fields/Field";
 

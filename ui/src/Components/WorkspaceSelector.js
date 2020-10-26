@@ -16,7 +16,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { Dropdown } from "react-bootstrap";
+import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import authStore from "../Stores/AuthStore";
 import CustomDropdownToggle from "./CustomDropdownToggle";

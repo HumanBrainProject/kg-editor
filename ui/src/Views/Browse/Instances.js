@@ -21,7 +21,7 @@ import { toJS } from "mobx";
 import { observer } from "mobx-react";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import browseStore from "../../Stores/BrowseStore";

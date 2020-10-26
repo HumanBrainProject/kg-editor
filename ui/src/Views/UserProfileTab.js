@@ -17,7 +17,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { Overlay, Popover, Button } from "react-bootstrap";
+import Overlay from "react-bootstrap/Overlay";
+import Popover from "react-bootstrap/Popover";
+import Button from "react-bootstrap/Button";
 import {uniqueId} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";

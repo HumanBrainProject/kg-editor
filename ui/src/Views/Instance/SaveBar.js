@@ -17,7 +17,9 @@
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import {Button, ButtonGroup, Modal} from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Modal from "react-bootstrap/Modal";
 import { uniqueId } from "lodash";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -16,7 +16,7 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { Form } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import { ViewContext, PaneContext } from "../../../Stores/ViewStore";

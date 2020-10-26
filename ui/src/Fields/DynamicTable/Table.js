@@ -20,7 +20,7 @@ import { createUseStyles } from "react-jss";
 import { debounce } from "lodash";
 import { Column, Table as TableComponent } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {Button} from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 
 import instancesStore from "../../Stores/InstancesStore";
 

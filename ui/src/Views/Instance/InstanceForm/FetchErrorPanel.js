@@ -16,7 +16,7 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HeaderPanel from "./HeaderPanel";
 

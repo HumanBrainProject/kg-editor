@@ -19,7 +19,7 @@ import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 
 import appStore from "../../Stores/AppStore";
 import statusStore from "../../Stores/StatusStore";

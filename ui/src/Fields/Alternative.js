@@ -16,7 +16,7 @@
 
 import React, { useRef, useEffect } from "react";
 import { createUseStyles } from "react-jss";
-import { Dropdown } from "react-bootstrap";
+import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Components/User";

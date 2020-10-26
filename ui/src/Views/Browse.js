@@ -18,7 +18,8 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react";
-import { Modal, Button } from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 import Instances from "./Browse/Instances";
 import browseStore from "../Stores/BrowseStore";

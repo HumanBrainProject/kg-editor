@@ -25,6 +25,7 @@ module.exports = {
     path: __dirname,
     filename: "./bundle.js"
   },
+  mode: "development",
   module: {
     rules: [
       {
@@ -35,6 +36,12 @@ module.exports = {
       {
         test: /\.css$/,
         use: [ 'style-loader', 'css-loader' ]
+      },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
       }
     ]
   },

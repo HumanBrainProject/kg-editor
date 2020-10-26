@@ -26,6 +26,7 @@ module.exports = {
     path: path.join(__dirname, "build"),
     filename: "./bundle.js"
   },
+  mode: "production",
   module: {
     rules: [
       {
@@ -36,6 +37,12 @@ module.exports = {
       {
         test: /\.css$/,
         use: [ 'style-loader', 'css-loader' ]
+      },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
       }
     ]
   },
@@ -46,31 +53,17 @@ module.exports = {
     "LOG_LEVEL": '"prod"'
   },
   optimization: {
-    minimizer: [
-      new TerserPlugin({
-        test: /\.js($|\?)/i,
-        cache: false,
-        parallel: true,
-        terserOptions: {
-          compress: true,
-          ecma: 6,
-          mangle: true,
-          ie8: false,
-          output: {
-            comments: false,
-            beautify: false
-          },
-          compress: {
-            dead_code: true,
-            drop_console: true
-          }
-        },
-        sourceMap: false
-      })
-    ]
+    minimizer: [new TerserPlugin()]
   },
   plugins: [
-    new CopyWebpackPlugin([{ from: "**/*", context: "public/", ignore:"index.*" }]),
+    new CopyWebpackPlugin({
+      patterns:[
+        {
+          from: "**/*",
+          context: "public/"
+        }
+      ]
+    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'src/index.template.html',

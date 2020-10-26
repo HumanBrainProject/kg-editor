@@ -44,6 +44,14 @@ const InstanceTab = observer(({view, pathname}) => {
     }
   }, [view]);
 
+  const isCurrent = (instanceId, mode) => {
+    if(mode !== "view") {
+      return matchPath(pathname, { path: `/instances/${instanceId}/${mode}`, exact: "true" });
+    }
+    return matchPath(pathname, { path: `/instances/${instanceId}`, exact: "true" });
+  };
+
+
   const handleClose = () => appStore.closeInstance(view.instanceId);
 
   const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
@@ -53,8 +61,8 @@ const InstanceTab = observer(({view, pathname}) => {
       icon={instance && instance.isFetching ? "circle-notch" : "circle"}
       iconSpin={instance && instance.isFetching}
       iconColor={color}
-      current={matchPath(pathname, { path: `/instance/${view.mode}/${view.instanceId}`, exact: "true" })}
-      path={`/instance/${view.mode}/${view.instanceId}`}
+      current={isCurrent(view.instanceId, view.mode)}
+      path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
       onClose={handleClose}
       label={label}
     />

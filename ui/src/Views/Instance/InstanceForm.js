@@ -162,7 +162,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
       const instance = instancesStore.instances.get(id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
-      routerStore.history.push(`/instance/view/${id}`);
+      routerStore.history.push(`/instances/${this.props.id}`);
     }
   };
 

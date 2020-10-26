@@ -160,7 +160,7 @@ const InstancesHistory = observer(({ workspace }) => {
   const handleInstanceClick = instance => {
     let id = instance && instance.id;
     if (id) {
-      routerStore.history.push(`/instance/view/${id}`);
+      routerStore.history.push(`/instances/${id}`);
     }
   };
 
@@ -178,7 +178,11 @@ const InstancesHistory = observer(({ workspace }) => {
         const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
-      routerStore.history.push(`/instance/${mode}/${id}`);
+      if(mode === "view") {
+        routerStore.history.push(`/instances/${id}`);
+      } else {
+        routerStore.history.push(`/instances/${id}/${mode}`);
+      }
     }
   };
 

@@ -119,7 +119,11 @@ const Instances = observer(() => {
         const instance = instancesStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
-      routerStore.history.push(`/instance/${mode}/${id}`);
+      if(mode === "view") {
+        routerStore.history.push(`/instances/${id}`);
+      } else {
+        routerStore.history.push(`/instances/${id}/${mode}`);
+      }
     }
   };
 

@@ -32,7 +32,7 @@ const handleNodeClick = node => {
   } else if (node.id !== graphStore.mainId) {
     if(node.workspace === appStore.currentWorkspace.id){
       graphStore.reset();
-      routerStore.history.push("/instance/graph/" + node.id);
+      routerStore.history.push(`/instances/${node.id}/graph`);
     }
   }
 };

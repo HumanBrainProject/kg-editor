@@ -176,13 +176,13 @@ const AppComponent = observer(() => {
               authStore.hasWorkspaces?
                 appStore.currentWorkspace?
                   <Switch>
-                    <Route path="/instance/create/:id*" render={(props) => (<Instance {...props} mode="create" />)} />
-                    <Route path="/instance/view/:id*" render={(props) => (<Instance {...props} mode="view" />)} />
-                    <Route path="/instance/edit/:id*" render={(props) => (<Instance {...props} mode="edit" />)} />
-                    <Route path="/instance/invite/:id*" render={(props) => (<Instance {...props} mode="invite" />)} />
-                    <Route path="/instance/graph/:id*" render={(props) => (<Instance {...props} mode="graph" />)} />
-                    <Route path="/instance/release/:id*" render={(props) => (<Instance {...props} mode="release" />)} />
-                    <Route path="/instance/manage/:id*" render={(props) => (<Instance {...props} mode="manage" />)} />
+                    <Route path="/instances/:id" exact={true} render={(props) => (<Instance {...props} mode="view" />)} />
+                    <Route path="/instances/:id/create" exact={true} render={(props) => (<Instance {...props} mode="create" />)} />
+                    <Route path="/instances/:id/edit" exact={true} render={(props) => (<Instance {...props} mode="edit" />)} />
+                    <Route path="/instances/:id/invite" exact={true} render={(props) => (<Instance {...props} mode="invite" />)} />
+                    <Route path="/instances/:id/graph" exact={true} render={(props) => (<Instance {...props} mode="graph" />)} />
+                    <Route path="/instances/:id/release" exact={true} render={(props) => (<Instance {...props} mode="release" />)} />
+                    <Route path="/instances/:id/manage" exact={true} render={(props) => (<Instance {...props} mode="manage" />)} />
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />

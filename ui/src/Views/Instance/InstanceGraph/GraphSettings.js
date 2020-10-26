@@ -129,7 +129,7 @@ const Node = ({ node, isGrouped }) => {
   const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
-      routerStore.history.push("/instance/graph/" + node.id);
+      routerStore.history.push(`/instances/${node.id}/graph`);
     }
   };
 

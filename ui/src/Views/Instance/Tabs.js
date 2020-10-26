@@ -82,7 +82,13 @@ const Tabs = observer(({ instance, mode }) => {
 
   const classes = useStyles();
 
-  const handleClick = mode => routerStore.history.push(`/instance/${mode}/${instance.id}`);
+  const handleClick = mode => {
+    if(mode === "view") {
+      routerStore.history.push(`/instances/${instance.id}`);
+    } else {
+      routerStore.history.push(`/instances/${instance.id}/${mode}`);
+    }
+  };
 
   const permissions = instance?instance.permissions:{};
 

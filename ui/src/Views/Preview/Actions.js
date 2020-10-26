@@ -74,7 +74,13 @@ const Actions = observer(({ instance }) => {
   };
 
   const handleClick = mode => {
-    routerStore.history.push(`/instance/${mode}/${id}`);
+    const { instance } = this.props;
+    const { id } = instance;
+    if(mode === "view") {
+      routerStore.history.push(`/instances/${id}`);
+    } else {
+      routerStore.history.push(`/instances/${id}/${mode}`);
+    }
   };
 
   return (

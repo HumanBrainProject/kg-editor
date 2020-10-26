@@ -88,7 +88,7 @@ const FooterPanel = ({ className, instance, showOpenActions }) => {
     if(e.metaKey || e.ctrlKey){
       appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
-      routerStore.history.push(`/instance/view/${instance.id}`);
+      routerStore.history.push(`/instances/${instance.id}`);
     }
   };
 

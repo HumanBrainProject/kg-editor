@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { Dropdown } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -47,12 +47,47 @@ const useStyles = createUseStyles({
   }
 });
 
-const Alternative = ({ alternative, ValueRenderer, className, onSelect, onRemove }) => {
+const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
 
   const classes = useStyles();
 
+  const ref = useRef();
+
+  useEffect(() => {
+    if (hasFocus) {
+      ref.current.focus();
+    }
+  });
+
   const handleSelect = e => {
     typeof onSelect === "function" && onSelect(alternative, e);
+  };
+
+  const handleKeyDown = e => {
+    if(e) {
+      switch(e.keyCode) {
+      case 38: {
+        e.preventDefault();
+        onSelectPrevious(alternative.value);
+        break;
+      }
+      case 40: {
+        e.preventDefault();
+        onSelectNext(alternative.value);
+        break;
+      }
+      case 13: {
+        e.preventDefault();
+        onSelect(alternative.value);
+        break;
+      }
+      case 27: {
+        e.preventDefault();
+        onCancel();
+        break;
+      }
+      }
+    }
   };
 
   const handleRemoveClick = e => {
@@ -65,7 +100,7 @@ const Alternative = ({ alternative, ValueRenderer, className, onSelect, onRemove
 
   return (
     <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
-      <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleSelect}>
+      <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
         <strong>
           <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
           users.map(user => (

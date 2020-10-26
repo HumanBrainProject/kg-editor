@@ -32,7 +32,7 @@ const MultiToggle = ({ selectedValue, children , onChange}) => {
   const classes = useStyles();
 
   const handleSelect = value => {
-    if(typeof onChange === "funcion")){
+    if(typeof onChange === "function"){
       onChange(value);
     }
   };
@@ -75,7 +75,7 @@ const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
   const classes = useToggleStyles();
 
   const handleClick = () => {
-    if(typeof onSelect === "funcion") {
+    if(typeof onSelect === "function") {
       onSelect(value);
     }
   };

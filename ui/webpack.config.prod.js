@@ -59,8 +59,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns:[
         {
-          from: "**/*", 
-          to: "build/",
+          from: "**/*",
           context: "public/"
         }
       ]

@@ -19,7 +19,7 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 import appStore from "./AppStore";
 import { fieldsMapping } from "../Fields";
 
-const compareField = (a, b) => {
+const compareField = (a, b, ignoreName=false) => {
   if (!a && !b) {
     return 0;
   }
@@ -30,6 +30,9 @@ const compareField = (a, b) => {
     return -1;
   }
   if ((!a.order || typeof a !== Number) && (!b.order || typeof b !== Number)) {
+    if (ignoreName) {
+      return 0;
+    }
     if (!a.label && !b.label) {
       return 0;
     }
@@ -330,7 +333,7 @@ class InstanceStore {
   types = [];
   isNew = false;
   labelField = null;
-  promotedFields = [];
+  _promotedFields = [];
   primaryType = { name: "", color: "", label: "" };
   workspace = "";
   metadata = {};
@@ -354,7 +357,7 @@ class InstanceStore {
       types: observable,
       isNew: observable,
       labelField: observable,
-      promotedFields: observable,
+      _promotedFields: observable,
       primaryType: observable,
       workspace: observable,
       metadata: observable,
@@ -376,6 +379,7 @@ class InstanceStore {
       reset: action,
       clearFieldsErrors: action,
       name: computed,
+      promotedFields: computed,
       nonPromotedFields: computed,
       childrenIds: computed,
       childrenIdsGroupedByField: computed,
@@ -456,7 +460,7 @@ class InstanceStore {
   get promotedFields() {
     if (this.isFetched && !this.fetchError) {
       return this._promotedFields.map(name => [name, this.fields[name]])
-        .sort(([, a], [, b]) => compareField(a, b))
+        .sort(([, a], [, b]) => compareField(a, b, true))
         .map(([key]) => key);
     }
     return this._promotedFields;

@@ -23,6 +23,7 @@ object EditorConstants {
 
   val VOCAB_EMBEDDED_PROPERTIES = s"${CORE_META}embeddedProperties"
   val VOCAB_OCCURRENCES = s"${CORE_META}occurrences"
+  val VOCAB_ORDER = s"${CORE_META}orderNumber"
   val VOCAB_SPACES = s"${CORE_META}spaces"
   val VOCAB_SPACE = s"${CORE_META}space"
   val VOCAB_ALTERNATIVES = s"${CORE_META}alternative"

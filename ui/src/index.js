@@ -45,7 +45,7 @@ import Instance from "./Views/Instance";
 import FetchingLoader from "./Components/FetchingLoader";
 import GlobalError from "./Views/GlobalError";
 import * as Sentry from "@sentry/browser";
-// import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import "@babel/polyfill";
 

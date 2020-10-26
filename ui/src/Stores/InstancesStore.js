@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 import API from "../Services/API";
 import appStore from "./AppStore";

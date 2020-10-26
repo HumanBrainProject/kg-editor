@@ -16,7 +16,7 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const animationId = uniqueId("animationId");

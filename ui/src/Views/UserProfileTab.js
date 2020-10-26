@@ -20,7 +20,7 @@ import { createUseStyles } from "react-jss";
 import Overlay from "react-bootstrap/Overlay";
 import Popover from "react-bootstrap/Popover";
 import Button from "react-bootstrap/Button";
-import {uniqueId} from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 

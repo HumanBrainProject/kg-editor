@@ -16,7 +16,6 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import {isFunction} from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
@@ -33,7 +32,7 @@ const MultiToggle = ({ selectedValue, children , onChange}) => {
   const classes = useStyles();
 
   const handleSelect = value => {
-    if(isFunction(onChange)){
+    if(typeof onChange === "funcion")){
       onChange(value);
     }
   };
@@ -76,7 +75,7 @@ const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
   const classes = useToggleStyles();
 
   const handleClick = () => {
-    if(isFunction(onSelect)){
+    if(typeof onSelect === "funcion") {
       onSelect(value);
     }
   };

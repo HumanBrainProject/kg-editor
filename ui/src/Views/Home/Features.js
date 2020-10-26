@@ -21,7 +21,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Overlay from "react-bootstrap/Overlay";
 import Popover from "react-bootstrap/Popover";
-import {uniqueId} from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactMarkdown  from "react-markdown";
 

@@ -18,7 +18,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { List } from "react-virtualized";
 import { observer } from "mobx-react";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 import releaseStore from "../../../Stores/ReleaseStore";
 import ReleaseNode from "./ReleaseNode";

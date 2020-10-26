@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
-import { debounce, remove } from "lodash";
+import debounce from "lodash/debounce";
 
 import FieldStore from "./FieldStore";
 
@@ -162,7 +162,7 @@ class LinksStore extends FieldStore {
 
   deleteValue(value) {
     if(this.value.length !== undefined){
-      remove(this.value, val=>val === value);
+      this.value = this.value.filter(val => val !== value);
     }
   }
 

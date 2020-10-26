@@ -16,7 +16,6 @@
 
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
-import { remove } from "lodash";
 
 class InputTextMultipleStore extends FieldStore {
   value = [];
@@ -90,7 +89,7 @@ class InputTextMultipleStore extends FieldStore {
 
   deleteValue(value) {
     if(this.value.length !== undefined){
-      remove(this.value, val=>val === value);
+      this.value = this.value.filter(val => val !== value);
     }
   }
 

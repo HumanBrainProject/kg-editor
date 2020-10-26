@@ -17,7 +17,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { Column, Table as TableComponent } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";

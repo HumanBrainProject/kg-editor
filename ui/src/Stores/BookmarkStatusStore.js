@@ -16,7 +16,7 @@
 
 import { observable, action, runInAction, makeObservable } from "mobx";
 import { toJS } from "mobx";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 import API from "../Services/API";
 import historyStore from "./HistoryStore";

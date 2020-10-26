@@ -20,7 +20,7 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Modal from "react-bootstrap/Modal";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

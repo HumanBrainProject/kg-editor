@@ -15,7 +15,7 @@
 */
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
-import {uniq} from "lodash";
+import uniq from "lodash/uniq";
 
 import API from "../Services/API";
 import statusStore from "./StatusStore";

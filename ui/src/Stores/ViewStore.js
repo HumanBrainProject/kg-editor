@@ -16,7 +16,6 @@
 
 import React from "react";
 import { observable, action, computed, makeObservable } from "mobx";
-import {remove} from "lodash";
 import appStore from "./AppStore";
 
 const STORED_INSTANCE_VIEWS_KEY = "views";
@@ -129,7 +128,7 @@ class View {
   }
 
   unregisterPane(paneId) {
-    remove(this.panes, p => p === paneId);
+    this.panes = this.panes.filter(p => p !== paneId);
   }
 }
 

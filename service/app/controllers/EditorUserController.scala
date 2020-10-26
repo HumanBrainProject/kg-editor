@@ -17,16 +17,15 @@
 package controllers
 
 import com.google.inject.Inject
-import constants.{EditorConstants, SchemaFieldsConstants}
-import models.errors.APIEditorError
-import models.{user, _}
+import constants.SchemaFieldsConstants
+import models._
 import models.user.User
+import models.workspace.Workspace
 import monix.eval.Task
 import play.api.Logger
 import play.api.libs.json.{JsArray, _}
 import play.api.mvc.{AnyContent, _}
 import services._
-import models.workspace.Workspace
 
 class EditorUserController @Inject()(
                                       cc: ControllerComponents,
@@ -87,7 +86,7 @@ class EditorUserController @Inject()(
             case Right(profile) =>
               val user: User = getUserInfo((profile \ "data").as[JsValue]).as[User]
               editorUserService.putUserPicture(request.userToken, request.clientToken, user.id, picture).map {
-                case Right(res) => Ok("Picture successfully saved")
+                case Right(_) => Ok("Picture successfully saved")
                 case Left(err) => err.toResult
               }
             case Left(err) => Task.pure(err.toResult)

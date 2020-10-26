@@ -78,7 +78,10 @@ const useStyles = createUseStyles({
   },
   deleteBtn: {
     float: "right",
-    marginRight: "9px"
+    marginRight: "9px",
+    "& .btn": {
+      padding: "1px 6px 1px 6px"
+    }
   },
   label: {},
   readMode:{

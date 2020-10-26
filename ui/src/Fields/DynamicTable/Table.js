@@ -47,6 +47,9 @@ const useStyles = createUseStyles({
       color: "#143048",
       backgroundColor: "#a5c7e9"
     }
+  },
+  actionBtn: {
+    padding: "1px 6px 1px 6px"
   }
 });
 
@@ -87,6 +90,8 @@ const LabelCellRenderer = observer(({ instanceId }) => {
 
 const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, onDeleteRow }) => {
 
+  const classes = useStyles();
+
   if (readOnly) {
     return null;
   }
@@ -105,7 +110,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 
   if (instance && instance.fetchError) {
     return (
-      <Button size="small" variant={"danger"} onClick={handleRetry} >
+      <Button className={classes.actionBtn} size="small" variant={"danger"} onClick={handleRetry} >
         <FontAwesomeIcon icon="redo-alt"/>
       </Button>
     );
@@ -113,7 +118,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 
   if (!instance || instance.isFetched || instance.isLabelFetched) {
     return (
-      <Button size="small" variant={"primary"} onClick={handleDelete} >
+      <Button className={classes.actionBtn} size="small" variant={"primary"} onClick={handleDelete} >
         <FontAwesomeIcon icon="times"/>
       </Button>
     );
@@ -202,9 +207,8 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
         <Column
           label={""}
           dataKey="Actions"
-          flexGrow={0}
-          flexShrink={1}
-          width={20}
+          width={25}
+          style={{marginRight:"6px"}}
           cellRenderer={actionsCellRenderer}
         />
       </TableComponent>

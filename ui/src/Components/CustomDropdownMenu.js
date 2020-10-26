@@ -32,7 +32,6 @@ const CustomDropdownMenu = React.forwardRef(
     return (
       <div
         ref={ref}
-        style={{margin: "0 0 0 -20px"}} // TODO: check how to remove style
         className={`${className} ${classes.dropdownMenu}`}
         aria-labelledby={labeledBy}
       >

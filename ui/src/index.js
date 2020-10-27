@@ -115,6 +115,9 @@ const useStyles = createUseStyles({
     }
   },
   deletingInstanceModal: {
+    position: "absolute",
+    top: "40%",
+    right: "35%",
     "& .modal-dialog": {
       top: "35%",
       width: "max-content",

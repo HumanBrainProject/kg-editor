@@ -87,7 +87,7 @@ const InstanceManage = observer(({instance}) => {
 
   const handleDuplicateInstance = () => appStore.duplicateInstance(instance.id);
 
-  const handleDeleteInstance = () => appStore.deleteInstance(instance.id);
+  const handleDeleteInstance = async () => appStore.deleteInstance(instance.id);
 
   const permissions = instance.permissions;
   const status = statusStore.getInstance(instance.id);

@@ -94,6 +94,7 @@ class AppStore{
       pathsToResolve: observable,
       currentWorkspaceName: computed,
       currentWorkspacePermissions: computed,
+      delete: action,
       initialize: action,
       flush: action,
       initializeWorkspace: action,
@@ -480,7 +481,7 @@ class AppStore{
     }
   }
 
-  async deleteInstance(instanceId) {
+  async delete(instanceId) {
     if (instanceId) {
       this.instanceToDelete = instanceId;
       this.isDeletingInstance = true;
@@ -547,6 +548,10 @@ class AppStore{
 
   async retryDeleteInstance() {
     return await this.deleteInstance(this.instanceToDelete);
+  }
+
+  async deleteInstance(instanceId) {
+    return await this.delete(instanceId);
   }
 
   cancelDeleteInstance() {

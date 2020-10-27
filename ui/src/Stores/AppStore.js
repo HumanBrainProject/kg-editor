@@ -398,10 +398,9 @@ class AppStore{
     }
   };
 
-  toggleSavebarDisplay(state) {
+  toggleSavebarDisplay = state => {
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
-
 
   createInstance = () => {
     const uuid = _.uuid();

@@ -16,6 +16,7 @@
 
 import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
+import _  from "lodash-uuid";
 
 import API from "../Services/API";
 import appStore from "./AppStore";
@@ -203,11 +204,18 @@ class InstancesStore {
   }
 
   async checkInstanceIdAvailability(instanceId, mode) {
-    this.instanceIdAvailability.set(instanceId, {
-      isAvailable: false,
-      isChecking: true,
-      error: null
-    });
+    const status = this.instanceIdAvailability.get(instanceId);
+    if(status) {
+      status.isAvailable = false;
+      status.isChecking = true;
+      status.error = null;
+    } else {
+      this.instanceIdAvailability.set(instanceId, {
+        isAvailable: false,
+        isChecking: true,
+        error: null
+      });
+    }
     try{
       const { data } = await API.axios.get(API.endpoints.instance(instanceId));
       runInAction(() => {
@@ -231,8 +239,13 @@ class InstancesStore {
       runInAction(() => {
         const status =  this.instanceIdAvailability.get(instanceId);
         if (e.response && e.response.status === 404) {
-          status.isAvailable = true;
-          status.isChecking = false;
+          if(status.type) {
+            this.createNewInstance(status.type, instanceId);
+            this.resetInstanceIdAvailability();
+          } else {
+            status.isAvailable = true;
+            status.isChecking = false;
+          }
         } else {
           const message = e.message?e.message:e;
           const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
@@ -441,6 +454,17 @@ class InstancesStore {
     instance.initializeData(data, true);
     instance.fields[instance.labelField].setValue(name);
     this.instances.set(id, instance);
+  }
+
+  createNewInstanceOfType = type => {
+    const uuid = _.uuid();
+    this.instanceIdAvailability.set(uuid, {
+      isAvailable: false,
+      isChecking: true,
+      error: null,
+      type: type
+    });
+    routerStore.history.push(`/instances/${uuid}/create`);
   }
 
   removeInstances(instanceIds) {

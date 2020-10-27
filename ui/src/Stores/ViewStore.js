@@ -153,7 +153,7 @@ class ViewStore{
   syncStoredViews(){
     if (appStore.currentWorkspace) {
       const views = getStoredViews();
-      views[appStore.currentWorkspace.id] = [...this.views.entries()].map(([id, view])=>[id, view.name, view.color, view.mode]);
+      views[appStore.currentWorkspace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, mode: view.mode}));
       localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
     }
   }
@@ -168,7 +168,7 @@ class ViewStore{
       const views = getStoredViews();
       const workspaceViews = views[appStore.currentWorkspace.id];
       if (Array.isArray(workspaceViews)) {
-        workspaceViews.forEach(([id, name, color, mode]) => this.views.set(id, new View(id, name, color, mode)));
+        workspaceViews.forEach(({id, name, color, mode}) => this.views.set(id, new View(id, name, color, mode)));
       }
     }
   }

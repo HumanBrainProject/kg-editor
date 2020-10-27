@@ -21,6 +21,15 @@ const useStyles = createUseStyles({
   dropdownMenu: {
     background: "var(--ft-color-loud)",
     fontSize: "0.9em"
+  },
+  list: {
+    paddingLeft: "0",
+    listStyle: "none",
+    marginBottom: "0",
+    "& .dropdown-item": {
+      lineHeight: "1.3rem",
+      padding: "4px 8px"
+    }
   }
 });
 
@@ -30,12 +39,8 @@ const CustomDropdownMenu = React.forwardRef(
     const classes = useStyles();
 
     return (
-      <div
-        ref={ref}
-        className={`${className} ${classes.dropdownMenu}`}
-        aria-labelledby={labeledBy}
-      >
-        <ul className="list-unstyled">
+      <div ref={ref} className={`${className} ${classes.dropdownMenu}`} aria-labelledby={labeledBy}>
+        <ul className={classes.list}>
           {children}
         </ul>
       </div>

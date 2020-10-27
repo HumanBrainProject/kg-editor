@@ -99,7 +99,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   const isOwnAlternative = users.find(user => authStore.user.id === user.id);
 
   return (
-    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
+    <Dropdown.Item className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
         <strong>
           <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{

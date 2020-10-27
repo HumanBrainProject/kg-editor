@@ -36,7 +36,7 @@ const useStyles = createUseStyles({
 
 const Lines = ({lines}) => {
   return (
-    <div className="quickfire-readmode-value quickfire-readmode-textarea-value">
+    <div>
       {lines.map((line, index) => {
         return(
           <p key={line+(""+index)}>{line}</p>
@@ -58,7 +58,7 @@ const FieldValue = ({field, splitLines}) => {
   }
 
   return (
-    <span className="quickfire-readmode-value">&nbsp;{val}</span>
+    <span>&nbsp;{val}</span>
   );
 };
 
@@ -93,13 +93,13 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
-        <FieldValue field={fieldStore} splitLines={as=== "textarea"} />
+        <FieldValue field={fieldStore} splitLines={as === "textarea"} />
       </Form.Group>
     );
   }
 
   return (
-    <Form.Group className={`${returnAsNull? "quickfire-field-disabled": ""} ${className}`} ref={formGroupRef} >
+    <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Alternatives
         className={classes.alternatives}
@@ -112,7 +112,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
       <Form.Control
         value={value}
         type={inputType}
-        className={"quickfire-user-input"}
         as={as}
         onChange={handleChange}
         disabled={returnAsNull}

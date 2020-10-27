@@ -34,42 +34,7 @@ const useStyles = createUseStyles({
   },
   field: {
     marginBottom: "10px",
-    wordBreak: "break-word",
-    "& textarea": {
-      minHeight: "200px"
-    },
-    "& .quickfire-field-input-text.quickfire-readmode, & .quickfire-field-dropdown-select.quickfire-readmode": {
-      marginBottom: "5px",
-      "& label.quickfire-label": {
-        marginBottom: "0",
-        "& + p": {
-          whiteSpace: "pre-wrap"
-        }
-      }
-    },
-    "& .quickfire-field-disabled.quickfire-empty-field, .quickfire-field-readonly.quickfire-empty-field": {
-      display: "none"
-    },
-    "& .quickfire-field-checkbox .quickfire-label": {
-      "&:after": {
-        display: "none"
-      },
-      "& + .checkbox": {
-        display: "inline-block",
-        margin: "0 0 0 4px",
-        verticalAlign: "middle",
-        "& label input[type=checkbox]": {
-          fontSize: "16px"
-        }
-      },
-      "& + span": {
-        verticalAlign: "text-bottom",
-        "& input[type=checkbox]": {
-          fontSize: "16px",
-          marginTop: "0"
-        }
-      }
-    }
+    wordBreak: "break-word"
   },
   label: {
     "&:after": {

@@ -126,10 +126,12 @@ class HistoryStore {
                 //TODO: set error message to the instance
               }
             } else {
-              if(data.type === "TextArea") {
-                data.value = data.value.substr(0, 197) + "...";
-                delete data.label;
-              }
+              Object.values(data.fields).forEach(d => {
+                if(d.type === "TextArea") {
+                  d.value = d.value && d.value.substr(0, 197) + "...";
+                  delete d.label;
+                }
+              });
               const instance = new InstanceStore(identifier);
               instance.initializeData(data);
               this.instances.push(instance);

@@ -43,9 +43,6 @@ const useStyles = createUseStyles({
   readMode:{
     "& $label:after": {
       content: "':\\00a0'"
-    },
-    "& .quickfire-readmode-item:not(:last-child):after":{
-      content: "';\\00a0'"
     }
   },
   alternatives: {
@@ -65,7 +62,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
+const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -154,8 +151,13 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
   };
 
   if(readMode){
+    if (!resources.length && !showIfNoValue) {
+      return null;
+    }
+
+
     return (
-      <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly} ${className}`}>
+      <Form.Group className={`${classes.readMode}} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
         <List
           list={resources}
@@ -168,7 +170,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
 
   const isDisabled = returnAsNull;
   return (
-    <Form.Group className={`quickfire-field-dropdown-select ${!resources.length? "quickfire-empty-field": ""} ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${className}`} ref={formGroupRef} >
+    <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Alternatives
         className={classes.alternatives}
@@ -189,7 +191,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode}) => {
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
         />
-        <input type="text" className={`quickfire-user-input ${classes.userInput}`}
+        <input type="text"
+          className={classes.userInput}
           disabled={isDisabled}
           onDrop={handleDrop}
           onDragOver={e => e.preventDefault()}

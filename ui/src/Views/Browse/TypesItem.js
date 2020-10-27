@@ -18,7 +18,6 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _  from "lodash-uuid";
 
 import appStore from "../../Stores/AppStore";
 import browseStore from "../../Stores/BrowseStore";
@@ -140,7 +139,7 @@ const TypesItem = observer(({ type }) => {
     browseStore.selectItem(type);
   };
 
-  const handleCreateInstance = () => instancesStore.createNewInstanceOfType(type)
+  const handleCreateInstance = () => instancesStore.createNewInstanceOfType(type);
 
   const selected = browseStore.selectedItem === type;
   const color = type.color;

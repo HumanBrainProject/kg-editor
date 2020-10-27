@@ -209,7 +209,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
         onClick={handleToggle}>
         {renderUsers()}
       </button>
-      <ul className={`quickfire-dropdown dropdown-menu ${classes.dropdown} ${open?"open":""}`} ref={alternativesRef} >
+      <ul className={`dropdown-menu ${classes.dropdown} ${open?"open":""}`} ref={alternativesRef} >
         {renderAlternative()}
       </ul>
     </div>

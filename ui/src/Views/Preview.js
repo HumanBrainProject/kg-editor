@@ -35,33 +35,10 @@ import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 const useStyles = createUseStyles({
   container: {
     height: "100%",
-    padding: "10px 0",
-    "& .quickfire-field-checkbox .quickfire-label": {
-      "&:after": {
-        display: "none"
-      },
-      "& + .checkbox": {
-        display: "inline-block",
-        margin: "0 0 0 4px",
-        verticalAlign: "middle",
-        "& label input[type=checkbox]": {
-          fontSize: "16px"
-        }
-      },
-      "& + span": {
-        verticalAlign: "text-bottom",
-        "& input[type=checkbox]": {
-          fontSize: "16px",
-          marginTop: "0"
-        }
-      }
-    },
-    "&.hide-empty-fields .quickfire-empty-field": {
-      display: "none"
-    },
-    "&.no-permission":{
-      padding: "10px"
-    }
+    padding: "10px 0"
+  },
+  noPermission: {
+    padding: "10px"
   },
   content: {
     display: "grid",
@@ -187,7 +164,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(instance.isFetched && !instance.permissions.canRead) {
     const fieldStore = instance.fields[instance.labelField];
     return(
-      <Form className={`${classes.container} ${className?className:""} no-permission`} >
+      <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
         <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
         <div className={classes.errorMessage}>
           <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.

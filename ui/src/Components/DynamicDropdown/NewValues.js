@@ -20,10 +20,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
-  container: {
-    "& .option": {
-      position: "relative"
-    }
+  option: {
+    position: "relative"
   }
 });
 
@@ -80,8 +78,8 @@ const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSel
   const style = type.color ? { color: type.color } : {};
 
   return (
-    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} key={type.name} onSelect={handleOnSelect}>
-      <div tabIndex={-1} className="option" onKeyDown={handleKeyDown} ref={ref}>
+    <Dropdown.Item onSelect={handleOnSelect}>
+      <div tabIndex={-1} className={classes.option} onKeyDown={handleKeyDown} ref={ref}>
         <em>Add a new <span style={style}>
           <FontAwesomeIcon fixedWidth icon="circle" />
         </span>

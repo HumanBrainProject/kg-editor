@@ -197,7 +197,7 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
   const showMenu = options.length || searchTerm;
   return (
     <div className={classes.container} ref={wrapperRef}>
-      <input className={`quickfire-user-input ${classes.userInput}`}
+      <input className={classes.userInput}
         onDrop={e => e.preventDefault() && onDrop && onDrop()}
         onDragOver={e => e.preventDefault()}
         type="text"

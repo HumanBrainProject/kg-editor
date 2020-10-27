@@ -204,6 +204,7 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
           width={20}
           cellRenderer={labelCellRenderer}
         />
+        {enablePointerEvents &&
         <Column
           label={""}
           dataKey="Actions"
@@ -211,6 +212,7 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
           style={{marginRight:"6px"}}
           cellRenderer={actionsCellRenderer}
         />
+        }
       </TableComponent>
     </div>
   );

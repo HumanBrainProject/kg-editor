@@ -243,7 +243,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
       <div className={classes.search}>
         <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={usersStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
         <FontAwesomeIcon icon="search" className={classes.searchIcon} />
-        <div className={`quickfire-dropdown ${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={usersRef}>
+        <div className={`${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={usersRef}>
           <div className="dropdown-menu">
             <div className="dropdown-list">
               <InfiniteScroll

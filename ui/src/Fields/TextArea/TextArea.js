@@ -17,25 +17,55 @@
 import React from "react";
 import InputText from "../InputText/InputText";
 import RenderMarkdownField from "../../Components/Markdown";
+import { createUseStyles } from "react-jss";
+import Form from "react-bootstrap/Form";
+import Label from "../Label";
+
+const useStyles = createUseStyles({
+  label: {},
+  editMode: {
+    "& textarea": {
+      minHeight: "200px"
+    }
+  },
+  readMode: {
+    "& $label:after": {
+      content: "':\\00a0'"
+    }
+  }
+});
 
 const TextArea = (props) => {
-  const { readMode, fieldStore, className } = props;
+  const classes = useStyles();
+  const { readMode, fieldStore, className, showIfNoValue } = props;
+  const { label, labelTooltip, value } = fieldStore;
   if (readMode) {
+
+    if(!value && !showIfNoValue) {
+      return null;
+    }
+
     if (fieldStore.markdown) {
       return (
-        <div className={className}>
-          <RenderMarkdownField value={fieldStore.value}/>
-        </div>
+        <Form.Group className={`${classes.container} ${className} ${classes.readMode}`} >
+          {label && (
+            <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+          )}
+          <RenderMarkdownField value={value}/>
+        </Form.Group>
       );
     }
     return (
-      <div className={className}>
+      <Form.Group className={`${classes.container} ${className} ${classes.readMode}`} >
+        {label && (
+          <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        )}
         <p>{fieldStore.value}</p>
-      </div>
+      </Form.Group>
     );
   }
   return (
-    <InputText {...props} as="textarea" autosize={true} />
+    <InputText {...props} className={`${classes.editMode} ${className}`} as="textarea" autosize={true} />
   );
 };
 

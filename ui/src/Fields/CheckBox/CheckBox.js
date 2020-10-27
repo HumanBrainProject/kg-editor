@@ -21,10 +21,17 @@ import Form from "react-bootstrap/Form";
 import Label from "../Label";
 
 const useStyles = createUseStyles({
-  readMode: {}
+  container: {
+    "& .form-check": {
+      verticalAlign: "middle",
+      marginLeft: "4px",
+      transform: "translateY(-1px)",
+      display: "inline-block"
+    }
+  }
 });
 
-const CheckBox = observer(({ className, fieldStore, readMode }) => {
+const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) => {
 
   const { value, label, labelTooltip } = fieldStore;
   const classes = useStyles();
@@ -35,19 +42,14 @@ const CheckBox = observer(({ className, fieldStore, readMode }) => {
     }
   };
 
-  if (readMode) {
-    return (
-      <Form.Group className={`quickfire-field-checkbox quickfire-readmode ${classes.readMode} quickfire-field-readonly ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
-        <span>&nbsp;<input className={"quickfire-readmode-checkbox"} type="checkbox" readOnly={true} checked={value} /></span>
-      </Form.Group>
-    );
+  if(readMode && value === null && !showIfNoValue) {
+    return null;
   }
 
   return (
-    <Form.Group className="quickfire-field-checkbox" >
+    <Form.Group className={`${classes.container} ${className}`} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
-      <Form.Check readOnly={false} onChange={handleChange} checked={value} />
+      <Form.Check disabled={readMode} onChange={handleChange} checked={value} />
     </Form.Group>
   );
 });

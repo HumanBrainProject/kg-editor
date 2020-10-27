@@ -41,12 +41,6 @@ const useStyles = createUseStyles({
     "& strong": {
       color: "var(--ft-color-louder)"
     },
-    "& .quickfire-empty-field": {
-      display: "none"
-    },
-    "& .quickfire-readmode-item:not(:last-child):after":{
-      content: "';\\00a0 !important'"
-    },
     "& > div:first-child > div:first-child": {
       overflowY: "auto !important"
     }
@@ -107,7 +101,7 @@ const InstanceInvite = observer(({ instance }) => {
               {fields.map(name => {
                 const fieldStore = instance.fields[name];
                 return (
-                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} />
+                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} showIfNoValue={false} />
                 );
               })}
             </Form>

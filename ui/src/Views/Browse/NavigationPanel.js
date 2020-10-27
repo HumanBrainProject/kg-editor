@@ -46,7 +46,9 @@ const useStyles = createUseStyles({
     border: "1px solid transparent",
     paddingLeft: "30px",
     "&:focus": {
-      borderColor: "rgba(64, 169, 243, 0.5)"
+      borderColor: "rgba(64, 169, 243, 0.5)",
+      backgroundColor: "transparent",
+      color: "var(--ft-color-loud)",
     }
   },
   searchIcon: {

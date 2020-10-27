@@ -85,7 +85,7 @@ const User = observer(({ user, onSelect }) => {
   }, null):null;
 
   return (
-    <MenuItem  key={user.id} className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleSelect}>
+    <MenuItem  key={user.id} className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className="option" onKeyDown={handleSelect}>
         <UserComponent
           userId={user && user.id}

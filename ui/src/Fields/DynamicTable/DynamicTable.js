@@ -56,11 +56,7 @@ const useStyles = createUseStyles({
     borderBottom: "0",
     paddingTop: "4px",
     paddingBottom: "1px",
-    position:"relative",
-    "& input.quickfire-user-input":{
-      width: "100%",
-      maxWidth: "unset"
-    }
+    position:"relative"
   },
   emptyMessage: {
     position: "absolute !important",
@@ -91,7 +87,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const DynamicTable = observer(({ className, fieldStore, view, pane, readMode }) => {
+const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -147,7 +143,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode }) 
   };
 
   const handleDeleteAll = () => {
-    fieldStore.removeAllValues();
+    fieldStore.setValues([]);
     instancesStore.togglePreviewInstance();
   };
 
@@ -203,10 +199,14 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode }) 
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || returnAsNull;
 
+  if (readMode && !links.length && !showIfNoValue) {
+    return null;
+  }
+
   return (
-    <Form.Group className={`${classes.container} quickfire-field-dropdown-select ${!links.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""} ${readMode?classes.readMode:""} ${className}`}>
+    <Form.Group className={`${classes.container} ${readMode?classes.readMode:""} ${className}`}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
-      {!isDisabled && (
+      {!isDisabled && (view && view.currentInstanceId === instance.id) && (
         <div className={classes.deleteBtn}>
           <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
             <FontAwesomeIcon icon="times"/>
@@ -256,7 +256,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode }) 
       {!links.length && (
         <div className={classes.emptyMessage}>
           <span className={classes.emptyMessageLabel}>
-                    No {fieldStoreLabel} available
+              No {fieldStoreLabel} available
           </span>
         </div>
       )}

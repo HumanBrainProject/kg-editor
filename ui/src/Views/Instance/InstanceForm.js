@@ -110,9 +110,6 @@ const useStyles = createUseStyles({
     },
     "&:not(.main) $panelFooter": {
       padding: "0 10px"
-    },
-    "&.readMode .quickfire-empty-field": {
-      display: "none"
     }
   },
   panelHeader: {

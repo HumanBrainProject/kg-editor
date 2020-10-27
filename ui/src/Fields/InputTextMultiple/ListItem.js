@@ -20,7 +20,25 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  valueDisplay: {
+  value: {
+    "&:not(:last-child):after":{
+      content: "';\\00a0'"
+    }
+  },
+  valueTag: {
+    marginBottom: "5px",
+    padding: "1px 5px",
+    border: "1px solid #ced4da",
+    "&:hover": {
+      backgroundColor: "#a5c7e9",
+      borderColor: "#337ab7",
+      color: "#143048"
+    },
+    "& + $valueTag": {
+      marginLeft: "5px"
+    }
+  },
+  valueLabel: {
     display: "inline-block",
     maxWidth: "200px",
     overflow: "hidden",
@@ -34,13 +52,6 @@ const useStyles = createUseStyles({
     marginLeft: "3px",
     "&:hover": {
       opacity: 1
-    }
-  },
-  notFound: {
-    fontStyle: "italic",
-    backgroundColor: "lightgrey",
-    "&:hover": {
-      backgroundColor: "lightgrey"
     }
   }
 });
@@ -78,14 +89,14 @@ const ListItem = observer(({ index, value, readOnly, disabled, onDelete, onDragS
 
   if (readOnly) {
     return (
-      <span className="quickfire-readmode-item">{value}</span>
+      <span className={classes.value}>{value}</span>
     );
   }
 
   return (
     <div
       tabIndex={"0"}
-      className={`value-tag quickfire-value-tag btn btn-xs btn-default ${disabled ? "disabled" : ""}`}
+      className={`btn btn-xs btn-default ${classes.valueTag} ${disabled ? "disabled" : ""}}`}
       disabled={disabled}
       draggable={!!disabled}
       onDragEnd={handleDragEnd}
@@ -95,8 +106,8 @@ const ListItem = observer(({ index, value, readOnly, disabled, onDelete, onDragS
       onKeyDown={handleKeyDown}
       title={value}
     >
-      <span className={classes.valueDisplay}>{value}</span>
-      <FontAwesomeIcon className={`quickfire-remove ${classes.remove}`} glyph="times" onClick={handleDelete} />
+      <span className={classes.valueLabel}>{value}</span>
+      <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />
     </div>
   );
 });

@@ -21,12 +21,12 @@ import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
   container: {
-    "& .option": {
-      position: "relative"
-    },
     "& :hover $preview": {
       display: "block"
     }
+  },
+  option: {
+    position: "relative"
   },
   preview: {
     display: "none",
@@ -111,8 +111,8 @@ const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onC
   const style = value.type.color ? { color: value.type.color } : {};
 
   return (
-    <Dropdown.Item className={`quickfire-dropdown-item ${classes.container}`} onSelect={handleOnSelect}>
-      <div title={value.type.name} tabIndex={-1} className="option" onKeyDown={handleKeyDown} ref={ref}>
+    <Dropdown.Item className={classes.container} onSelect={handleOnSelect}>
+      <div title={value.type.name} tabIndex={-1} className={classes.option} onKeyDown={handleKeyDown} ref={ref}>
         <span className={classes.icon} style={style}>
           <FontAwesomeIcon fixedWidth icon="circle" />
         </span>

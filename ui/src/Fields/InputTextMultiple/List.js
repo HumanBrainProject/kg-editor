@@ -28,7 +28,7 @@ const List = ({
   onDrop,
   onKeyDown
 }) => (
-  <span className={readOnly ? "quickfire-readmode-list" : "quickfire-list"}>
+  <span>
     {list.map((value, index) => (
       <ListItem
         key={`${index}-${value}`}

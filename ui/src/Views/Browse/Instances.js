@@ -49,7 +49,7 @@ const useStyles = createUseStyles({
     width:"100%",
     border:"1px solid transparent",
     paddingLeft:"30px",
-    "&:focus":{
+    "&:focus": {
       borderColor: "rgba(64, 169, 243, 0.5)",
       backgroundColor: "transparent",
       color: "var(--ft-color-loud)",

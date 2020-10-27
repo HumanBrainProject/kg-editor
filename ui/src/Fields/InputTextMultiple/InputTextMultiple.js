@@ -34,7 +34,7 @@ const useStyles = createUseStyles({
       marginRight:"3px",
       marginBottom:"3px"
     },
-    "&:disabled":{
+    "&[disabled]": {
       pointerEvents:"none",
       display: "none !important"
     }
@@ -43,9 +43,6 @@ const useStyles = createUseStyles({
   readMode:{
     "& $label:after": {
       content: "':\\00a0'"
-    },
-    "& .quickfire-readmode-item:not(:last-child):after":{
-      content: "';\\00a0'"
     }
   },
   alternatives: {
@@ -65,7 +62,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const InputTextMultiple = observer(({className, fieldStore, readMode}) => {
+const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -150,8 +147,12 @@ const InputTextMultiple = observer(({className, fieldStore, readMode}) => {
   };
 
   if(readMode){
+    if(!list.length || !showIfNoValue) {
+      return null;
+    }
+
     return (
-      <Form.Group className={`quickfire-field-dropdown-select ${!list.length? "quickfire-empty-field":""} quickfire-readmode ${classes.readMode} quickfire-field-readonly}`}>
+      <Form.Group className={classes.readMode}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
         <List
           list={list}
@@ -164,7 +165,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode}) => {
 
   const isDisabled = returnAsNull;
   return (
-    <Form.Group className={`quickfire-field-dropdown-select ${!list.length? "quickfire-empty-field": ""}  ${isDisabled? "quickfire-field-disabled quickfire-field-readonly": ""}  ${className}`} ref={formGroupRef}>
+    <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
       <Alternatives
         className={classes.alternatives}
@@ -185,7 +186,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode}) => {
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
         />
-        <input type="text" className={`quickfire-user-input ${classes.userInput}`}
+        <input type="text" className={classes.userInput}
           disabled={isDisabled}
           onDrop={handleDrop}
           onDragOver={e => e.preventDefault()}

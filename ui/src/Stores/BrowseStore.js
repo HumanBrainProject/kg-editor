@@ -24,10 +24,12 @@ import API from "../Services/API";
 
 const normalizeInstancesData = data => {
   return (data && Array.isArray(data.data))?data.data.map(rowData => {
-    if(rowData.type === "TextArea") {
-      rowData.value = rowData.value.substr(0, 197) + "...";
-      delete rowData.label;
-    }
+    Object.values(rowData.fields).forEach(d => {
+      if(d.type === "TextArea") {
+        d.value = d.value && d.value.substr(0, 197) + "...";
+        delete d.label;
+      }
+    });
     const instance = new InstanceStore(rowData.id);
     instance.initializeData(rowData);
     return instance;

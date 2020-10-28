@@ -75,7 +75,7 @@ const Reviewers = observer(({ id }) => {
 
   useEffect(() => {
     reviewsStore.getInstanceReviews(id);
-  }, []);
+  }, [id]); // check if id is needed
 
   const fetchInstanceReviews = () => {
     reviewsStore.getInstanceReviews(id);

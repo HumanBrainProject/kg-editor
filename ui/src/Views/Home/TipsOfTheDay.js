@@ -37,6 +37,7 @@ const useStyles = createUseStyles({
     },
     "& > button": {
       position: "absolute",
+      color: "var(--ft-color-loud)",
       right: 0,
       top: 0,
       height: "100%",

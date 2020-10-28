@@ -168,6 +168,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
       window.removeEventListener("touchend", clickOutHandler, false);
       window.removeEventListener("keyup", clickOutHandler, false);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!list || !list.length) {

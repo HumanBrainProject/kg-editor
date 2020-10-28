@@ -134,6 +134,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const classes = useStyles();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [id]);
 
   const fetchInstance = (forceFetch = false) => {

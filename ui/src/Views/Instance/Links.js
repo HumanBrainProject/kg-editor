@@ -39,6 +39,7 @@ const Links = observer(({ instanceId }) => {
 
   const classes = useStyles();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [instanceId]);
 
   const fetchInstance = (forceFetch = false) => {

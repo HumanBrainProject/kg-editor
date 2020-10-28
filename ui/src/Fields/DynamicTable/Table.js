@@ -141,6 +141,7 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
     return () => {
       window.removeEventListener("resize", updateContainerWidth);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDeleteRow = index => onRowDelete(index);

@@ -91,6 +91,7 @@ const GraphInstance = observer(({ instance }) => {
 
   const classes = useStyles();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetch(), [instance]);
 
   const fetch = () => graphStore.fetch(instance.id);

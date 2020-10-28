@@ -81,6 +81,7 @@ const InstanceManage = observer(({instance}) => {
 
   const classes = useStyles();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchStatus(), [instance]);
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);

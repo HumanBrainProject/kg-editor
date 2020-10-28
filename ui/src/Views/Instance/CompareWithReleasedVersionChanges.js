@@ -45,15 +45,17 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
     if(!releasedInstanceStore) {
       setReleasedInstanceStore(createInstanceStore("RELEASED"));
     }
+  }, [releasedInstanceStore]);
+
+  useEffect(() => {
     if (instanceId && status !== "UNRELEASED" && releasedInstanceStore) {
       fetchReleasedInstance(true);
       fetchInstance();
     }
     return () => {
-      if(releasedInstanceStore) {
-        releasedInstanceStore.flush();
-      }
+      releasedInstanceStore && releasedInstanceStore.flush();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId, status, releasedInstanceStore]);
 
   const fetchReleasedInstance = (forceFetch=false) => {

@@ -42,9 +42,10 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
   const [current, setCurrent] = useState({ type: null, option: null});
 
   useEffect(() => {
-    return () => {
+    return () => { // Unmount
       unlistenClickOutHandler();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputKeyStrokes = e => {

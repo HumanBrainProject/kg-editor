@@ -70,14 +70,13 @@ const PaneWithContext = observer(({ view, paneId, children }) => {
 
   const paneRef = useRef();
 
-  const restorePointerEvents = debounce(() => {
-    if(paneRef.current) {
-      paneRef.current.style.pointerEvents = "auto";
-    }
-  }, 1000);
-
   useEffect(() => {
     if(paneRef.current) {
+      const restorePointerEvents = debounce(() => {
+        if(paneRef.current) {
+          paneRef.current.style.pointerEvents = "auto";
+        }
+      }, 1000);
       if (view.selectedPane !== paneId) {
         paneRef.current.style.pointerEvents = "none";
         restorePointerEvents();
@@ -86,7 +85,7 @@ const PaneWithContext = observer(({ view, paneId, children }) => {
         restorePointerEvents.cancel();
       }
     }
-  }, [view.selectedPane]);
+  }, [view.selectedPane, paneId]);
 
   const handleFocus = () => {
     if (view.selectedPane !== paneId) {
@@ -116,7 +115,7 @@ const WrappedPane = observer(({ view, paneId, children }) => {
     return () => {
       view.unregisterPane(paneId);
     };
-  }, []);
+  }, [view, paneId]);
 
   return (
     <PaneContext.Provider value={paneId} >

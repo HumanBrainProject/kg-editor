@@ -43,7 +43,7 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
         value: instances
       };
     }));
-  }, [list]);
+  }, [mappingValue, list]);
 
   return (
     <Alternatives

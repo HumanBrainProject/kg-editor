@@ -27,6 +27,7 @@ const useStyles = createUseStyles({
   },
   greatModal: {
     "& .modal-dialog": {
+      maxWidth: "unset",
       width: "60%",
       height: "95%",
     },

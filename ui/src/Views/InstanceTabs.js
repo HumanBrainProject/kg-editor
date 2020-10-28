@@ -42,7 +42,7 @@ const InstanceTab = observer(({view, pathname}) => {
       view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
     }
-  }, [view]);
+  }, [instance, view]);
 
   const isCurrent = (instanceId, mode) => {
     if(mode !== "view") {

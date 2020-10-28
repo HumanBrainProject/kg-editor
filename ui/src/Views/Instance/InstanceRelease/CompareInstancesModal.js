@@ -30,7 +30,8 @@ const useStyles = createUseStyles({
   container: {
     width: "90%",
     "@media screen and (min-width:1024px)": {
-      width: "900px"
+      width: "900px",
+      maxWidth: "unset"
     },
     "& .modal-header": {
       overflow: "hidden",

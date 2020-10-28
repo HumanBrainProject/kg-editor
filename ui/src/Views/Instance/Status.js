@@ -65,7 +65,7 @@ const Status = observer(({ id, darkmode }) => {
 
   useEffect(() => {
     statusStore.fetchStatus(id);
-  }, []);
+  }, [id]);
 
   const instanceStatus = statusStore.getInstance(id);
 

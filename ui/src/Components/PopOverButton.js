@@ -93,18 +93,12 @@ const PopOverContent = ({ onSizeChange, children}) => {
   );
 };
 
-const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconComponent, iconProps, okComponent, okProps, cancelComponent, cancelProps, children, onClose, onOk, onCancel }) => {
+const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconComponent, iconProps, okComponent, okProps, cancelComponent, cancelProps, children, onOk, onCancel }) => {
 
   const classes = useStyles();
 
   const [showPopOver, setShowPopOver] = useState(false);
   const [popOverPosition, setPopOverPosition] = useState("bottom");
-
-  useEffect(() => {
-    return () => {
-      handlePopOverClose();
-    };
-  }, []);
 
   const buttonRef = useRef();
 
@@ -125,7 +119,6 @@ const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconC
   const handlePopOverClose = e => {
     e && e.stopPropagation();
     setShowPopOver(false);
-    typeof onClose === "function" && onClose();
   };
 
   const handleCancelClick = e => {
@@ -154,7 +147,7 @@ const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconC
         placement={popOverPosition}
         container={document.body}
         rootClose={true}
-        onHide={handlePopOverClose.bind(this)}
+        onHide={handlePopOverClose}
       >
         <Popover id={uniqueId("popover")} className={classes.popOver}>
           <PopOverContent onSizeChange={handlePopOverPosition}>

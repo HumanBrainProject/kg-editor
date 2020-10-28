@@ -66,7 +66,7 @@ const useStyles = createUseStyles({
     display: "grid",
     gridTemplateColumns: "1fr auto",
     border: "1px solid var(--border-color-ui-contrast1)",
-    padding: "0 10px",
+    padding: "10px",
     fontSize: "large",
     background: "var(--bg-color-ui-contrast3)"
   },

@@ -93,6 +93,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
 
   const classes = useStyles();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstances(), [leftChildrenIds, rightChildrenIds]);
 
   const fetchInstances = (forceFetch=false) => {

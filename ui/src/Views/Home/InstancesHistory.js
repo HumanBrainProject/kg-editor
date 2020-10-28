@@ -109,9 +109,13 @@ const useStyles = createUseStyles({
       paddingLeft: "10px"
     }
   },
+  fetchErrorIcon: {
+    color: "var(--ft-color-error)"
+  },
   textError: {
     margin: 0,
-    wordBreak: "keep-all"
+    wordBreak: "keep-all",
+    padding: "5px"
   }
 });
 
@@ -217,7 +221,7 @@ const InstancesHistory = observer(({ workspace }) => {
               buttonClassName={classes.fetchErrorButton}
               buttonTitle="fetching history instances failed, click for more information"
               iconComponent={FontAwesomeIcon}
-              iconProps={{icon: "exclamation-triangle"}}
+              iconProps={{icon: "exclamation-triangle", className:classes.fetchErrorIcon}}
               okComponent={() => (
                 <React.Fragment>
                   <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry

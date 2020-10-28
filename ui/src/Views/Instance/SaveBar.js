@@ -125,12 +125,11 @@ const useStyles = createUseStyles({
 });
 
 const CompareModal = ({ instance, onSave, onReset, onClose }) => {
+  const classes = useStyles();
 
   if (!instance) {
     return null;
   }
-
-  const classes = useStyles();
 
   const handleSave = () => onSave(instance);
   const handleReset = () => onReset(instance);

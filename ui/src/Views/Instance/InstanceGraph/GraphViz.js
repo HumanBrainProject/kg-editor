@@ -176,19 +176,16 @@ const Graph = observer(() => {
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
 
   useEffect(() => {
-
     const updateDimensions = debounce(() => {
       if(wrapperRef.current) {
         setDimensions({width: wrapperRef.current.offsetWidth, height: wrapperRef.current.offsetHeight});
       }
     }, 250);
-
     updateDimensions();
     graphRef.current && graphRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
     window.addEventListener("resize", updateDimensions);
     return () => {
       window.removeEventListener("resize", updateDimensions);
-      graphRef.current && graphRef.current.stopAnimation();
     };
   }, []);
 

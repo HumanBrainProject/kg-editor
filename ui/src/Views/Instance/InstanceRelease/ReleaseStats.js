@@ -22,7 +22,7 @@ import releaseStore from "../../../Stores/ReleaseStore";
 const useStyles = createUseStyles({
   container: {
     width: "100%",
-    padding: "0 10px",
+    padding: "10px",
     background: "var(--bg-color-ui-contrast3)",
     border: "1px solid var(--border-color-ui-contrast1)",
     fontSize: "large",
@@ -66,7 +66,7 @@ const useStyles = createUseStyles({
             left: 0,
             width: "100%",
             textAlign: "center",
-            fontSize: "0.8em",
+            fontSize: "0.7em",
             fontWeight: "bold",
             color: "var(--ft-color-loud)"
           },

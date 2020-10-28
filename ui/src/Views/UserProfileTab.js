@@ -189,7 +189,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
         handlePopOverClose();
       }
     };
-  }, []);
+  }, [showPopOver]);
 
   const handlePopOverPosition = popOverRect => {
     if (!popOverRect) { return null; }

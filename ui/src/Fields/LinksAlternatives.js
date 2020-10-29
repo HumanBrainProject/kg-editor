@@ -15,13 +15,15 @@
 */
 
 import React, {useState, useEffect} from "react";
+import { observer } from "mobx-react";
+
 import instancesStore from "../Stores/InstancesStore";
 import Alternatives from "./Alternatives";
 
 
-const AlternativeValue = ({value:instances}) => instances.map(instance => instance.name).join("; ");
+const AlternativeValue = observer(({value:instances}) => instances.map(instance => instance.name).join("; "));
 
-const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
+const LinksAlternatives = observer(({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -55,6 +57,6 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
       ValueRenderer={AlternativeValue}
     />
   );
-};
+});
 
 export default LinksAlternatives;

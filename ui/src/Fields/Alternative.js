@@ -21,6 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
+import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   container: {
@@ -47,7 +48,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
+const Alternative = observer(({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
 
   const classes = useStyles();
 
@@ -117,6 +118,6 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
       </div>
     </Dropdown.Item>
   );
-};
+});
 
 export default Alternative;

@@ -110,7 +110,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const View = ({instance, mode}) => {
+const View = observer(({instance, mode}) => {
   switch (mode) {
   case "create":
     if(instance.permissions.canCreate) {
@@ -167,9 +167,9 @@ const View = ({instance, mode}) => {
   return (
     <NoPermissionForView instance={instance} mode={mode} />
   );
-};
+});
 
-const NoPermissionForView = ({instance, mode}) => {
+const NoPermissionForView = observer(({instance, mode}) => {
 
   const classes = useStyles();
 
@@ -183,7 +183,7 @@ const NoPermissionForView = ({instance, mode}) => {
       </BGMessage>
     </div>
   );
-};
+});
 
 const Instance = observer(({ instance, mode }) =>  {
 

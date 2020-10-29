@@ -18,6 +18,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react";
 
 import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";
@@ -54,7 +55,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const NoPermissionForView = ({ instance, mode }) => {
+const NoPermissionForView = observer(({ instance, mode }) => {
 
   const classes = useStyles();
 
@@ -66,9 +67,9 @@ const NoPermissionForView = ({ instance, mode }) => {
       </div>
     </React.Fragment>
   );
-};
+});
 
-const BodyPanel = ({ className, instance, readMode}) => {
+const BodyPanel = observer(({ className, instance, readMode}) => {
 
   const classes = useStyles();
 
@@ -111,6 +112,6 @@ const BodyPanel = ({ className, instance, readMode}) => {
     </ViewContext.Consumer>
 
   );
-};
+});
 
 export default BodyPanel;

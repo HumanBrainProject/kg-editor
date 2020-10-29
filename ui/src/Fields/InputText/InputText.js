@@ -62,7 +62,7 @@ const FieldValue = ({field, splitLines}) => {
   );
 };
 
-const AlternativeValue = ({value}) => value;
+const AlternativeValue = observer(({value}) => value);
 
 const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
 

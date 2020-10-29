@@ -83,9 +83,9 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     draggedValue.current = null;
   };
 
-  const alternativeValueRenderer = ({value: values}) => {
+  const alternativeValueRenderer = observer(({value: values}) => {
     return values.map(value => (value && value[fieldStore.mappingValue])?value[fieldStore.mappingValue]:"Unknown resource").join("; ");
-  };
+  });
 
   const handleOnAddValue = resource => {
     const value = {[fieldStore.mappingValue]: resource};

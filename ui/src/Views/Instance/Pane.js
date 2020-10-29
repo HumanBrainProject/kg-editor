@@ -96,7 +96,6 @@ const PaneWithContext = observer(({ view, paneId, children }) => {
   const index = view.getPaneIndex(paneId);
   const mainClass = index === 0?"main":"";
   const activeClass = paneId === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
-
   return (
     <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>
       <Scrollbars autoHide>

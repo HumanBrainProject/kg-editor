@@ -113,7 +113,7 @@ const InstanceManage = observer(({instance}) => {
               <h4>Duplicate this instance</h4>
               <ul>
                 <li>Be careful. After duplication both instances will look the same.</li>
-                <li>After dupplication you should update the name &amp; description fields.</li>
+                <li>After duplication you should update the name &amp; description fields.</li>
               </ul>
               <Button variant={"warning"} onClick={handleDuplicateInstance}>
                 <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance

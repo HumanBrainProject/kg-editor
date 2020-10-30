@@ -16,7 +16,7 @@
 
 import React from "react";
 import { render } from "react-dom";
-import { configure } from "mobx";
+// import { configure } from "mobx";
 import { observer } from "mobx-react";
 import { Router, Route, Switch } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
@@ -52,13 +52,13 @@ import "@babel/polyfill";
 
 import WorkspaceModal from "./Views/WorkspaceModal";
 
-configure({
-  enforceActions: "always",
-  computedRequiresReaction: true,
-  reactionRequiresObservable: true,
-  observableRequiresReaction: false,
-  disableErrorBoundaries: false // help to debug only
-});
+// configure({
+//   enforceActions: "always",
+//   computedRequiresReaction: true,
+//   reactionRequiresObservable: true,
+//   observableRequiresReaction: false,
+//   disableErrorBoundaries: false // help to debug only
+// });
 
 const useStyles = createUseStyles({
   "@global html, body, #root": {

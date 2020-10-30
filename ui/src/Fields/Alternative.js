@@ -21,7 +21,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../Components/User";
 import authStore from "../Stores/AuthStore";
-import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   container: {
@@ -48,7 +47,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Alternative = observer(({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
+const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
 
   const classes = useStyles();
 
@@ -102,7 +101,7 @@ const Alternative = observer(({ alternative, ValueRenderer, className, hasFocus,
     <Dropdown.Item className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
         <strong>
-          <ValueRenderer value={alternative.value} /></strong> <em><div className="parenthesis">(</div>{
+          <ValueRenderer alternative={alternative} /></strong> <em><div className="parenthesis">(</div>{
           users.map(user => (
             <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
           ))
@@ -117,6 +116,6 @@ const Alternative = observer(({ alternative, ValueRenderer, className, hasFocus,
       </div>
     </Dropdown.Item>
   );
-});
+};
 
 export default Alternative;

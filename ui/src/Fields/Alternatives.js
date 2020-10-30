@@ -16,7 +16,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
 
 import Avatar from "../Components/Avatar";
 import Alternative from "./Alternative";
@@ -49,7 +48,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Alternatives = observer(({ className, list, disabled, parentContainerRef, ValueRenderer, onSelect, onRemove }) => {
+const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRenderer, onSelect, onRemove }) => {
 
   const classes = useStyles();
 
@@ -216,6 +215,6 @@ const Alternatives = observer(({ className, list, disabled, parentContainerRef, 
       </ul>
     </div>
   );
-});
+};
 
 export default Alternatives;

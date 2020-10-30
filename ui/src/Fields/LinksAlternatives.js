@@ -21,9 +21,9 @@ import instancesStore from "../Stores/InstancesStore";
 import Alternatives from "./Alternatives";
 
 
-const AlternativeValue = observer(({value:instances}) => instances.map(instance => instance.name).join("; "));
+const AlternativeValue = observer(({alternative}) => alternative.value.map(instance => instance.name).join("; "));
 
-const LinksAlternatives = observer(({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
+const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -57,6 +57,6 @@ const LinksAlternatives = observer(({className, list, onSelect, onRemove, mappin
       ValueRenderer={AlternativeValue}
     />
   );
-});
+};
 
 export default LinksAlternatives;

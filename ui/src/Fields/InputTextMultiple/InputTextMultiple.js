@@ -62,6 +62,8 @@ const useStyles = createUseStyles({
   },
 });
 
+const getAlternativeValue = mappingValue => observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+
 const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
@@ -81,10 +83,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     fieldStore.moveValueAfter(draggedValue.current, droppedValue);
     draggedValue.current = null;
   };
-
-  const alternativeValueRenderer = observer(({value: values}) => {
-    return values.map(value => (value && value[fieldStore.mappingValue])?value[fieldStore.mappingValue]:"Unknown resource").join("; ");
-  });
 
   const handleOnAddValue = value => fieldStore.addValue(value);
 
@@ -173,7 +171,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={alternativeValueRenderer}
+        ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
       />
       <div className={`form-control ${classes.values}`} disabled={isDisabled} >
         <List

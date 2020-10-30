@@ -124,7 +124,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const CompareModal = observer(({ instance, onSave, onReset, onClose }) => {
+const CompareModal = ({ instance, onSave, onReset, onClose }) => {
   const classes = useStyles();
 
   if (!instance) {
@@ -151,7 +151,7 @@ const CompareModal = observer(({ instance, onSave, onReset, onClose }) => {
       </Modal.Footer>
     </Modal>
   );
-});
+};
 
 const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSaveError }) => {
 

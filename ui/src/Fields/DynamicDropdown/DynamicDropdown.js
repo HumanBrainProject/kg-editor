@@ -113,8 +113,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instancesStore.togglePreviewInstance();
   };
 
-  const handleSelectAlternative = instances => {
-    const values = instances.map(instance => ({[fieldStore.mappingValue]: instance.id}));
+  const handleSelectAlternative = value => {
+    const values = value.map(v => ({[fieldStore.mappingValue]: v.id}));
     fieldStore.setValues(values);
     instancesStore.togglePreviewInstance();
   };

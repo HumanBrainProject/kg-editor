@@ -61,7 +61,7 @@ const Alternative = observer(({ alternative, ValueRenderer, className, hasFocus,
   });
 
   const handleSelect = e => {
-    typeof onSelect === "function" && onSelect(alternative, e);
+    typeof onSelect === "function" && onSelect(alternative.value, e);
   };
 
   const handleKeyDown = e => {
@@ -98,7 +98,6 @@ const Alternative = observer(({ alternative, ValueRenderer, className, hasFocus,
 
   const users = (!alternative || !alternative.users)?[]:alternative.users;
   const isOwnAlternative = users.find(user => authStore.user.id === user.id);
-
   return (
     <Dropdown.Item className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >

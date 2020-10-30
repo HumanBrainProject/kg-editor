@@ -17,6 +17,7 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   fetchingPanel: {
@@ -35,7 +36,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const FetchingLoader = ({children}) => {
+const FetchingLoader = observer(({children}) => {
   const classes = useStyles();
   return (
     <div className={`${classes.fetchingPanel} fetchingPanel`}>
@@ -45,6 +46,6 @@ const FetchingLoader = ({children}) => {
       </span>
     </div>
   );
-};
+});
 
 export default FetchingLoader;

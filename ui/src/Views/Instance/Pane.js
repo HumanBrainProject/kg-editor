@@ -64,11 +64,20 @@ const useStyles = createUseStyles({
   }
 });
 
-const PaneWithContext = observer(({ view, paneId, children }) => {
+const Pane = observer(({ paneId, children }) => {
 
   const classes = useStyles();
 
   const paneRef = useRef();
+
+  const view = React.useContext(ViewContext);
+
+  useEffect(() => {
+    view.registerPane(paneId);
+    return () => {
+      view.unregisterPane(paneId);
+    };
+  }, [view, paneId]);
 
   useEffect(() => {
     if(paneRef.current) {
@@ -97,42 +106,16 @@ const PaneWithContext = observer(({ view, paneId, children }) => {
   const mainClass = index === 0?"main":"";
   const activeClass = paneId === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
   return (
-    <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>
-      <Scrollbars autoHide>
-        <div className={classes.scrolledView}>
-          {children}
-        </div>
-      </Scrollbars>
-    </div>
-  );
-});
-
-const WrappedPane = observer(({ view, paneId, children }) => {
-
-  useEffect(() => {
-    view.registerPane(paneId);
-    return () => {
-      view.unregisterPane(paneId);
-    };
-  }, [view, paneId]);
-
-  return (
     <PaneContext.Provider value={paneId} >
-      <PaneWithContext view={view} paneId={paneId}>
-        {children}
-      </PaneWithContext>
+      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>
+        <Scrollbars autoHide>
+          <div className={classes.scrolledView}>
+            {children}
+          </div>
+        </Scrollbars>
+      </div>
     </PaneContext.Provider>
   );
 });
-
-const Pane = ({paneId, children}) => (
-  <ViewContext.Consumer>
-    {view => (
-      <WrappedPane view={view} paneId={paneId} >
-        {children}
-      </WrappedPane>
-    )}
-  </ViewContext.Consumer>
-);
 
 export default Pane;

@@ -21,6 +21,7 @@ import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import routerStore from "../../../Stores/RouterStore";
 import appStore from "../../../Stores/AppStore";
+import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   panel:{
@@ -80,7 +81,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const FooterPanel = ({ className, instance, showOpenActions }) => {
+const FooterPanel = observer(({ className, instance, showOpenActions }) => {
 
   const classes = useStyles();
 
@@ -112,6 +113,6 @@ const FooterPanel = ({ className, instance, showOpenActions }) => {
       </Row>
     </div>
   );
-};
+});
 
 export default FooterPanel;

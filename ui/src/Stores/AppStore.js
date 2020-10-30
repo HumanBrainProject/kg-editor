@@ -408,7 +408,11 @@ class AppStore{
   }
 
   openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view") {
-    viewStore.registerViewByInstanceId(instanceId, instanceName, instancePrimaryType, viewMode);
+    const instance = instancesStore.instances.get(instanceId);
+    const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
+    const name = isFetched?instance.name:instanceName;
+    const primaryType = isFetched?instance.primaryType:instancePrimaryType;
+    viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
     if(viewMode !== "create") {
       historyStore.updateInstanceHistory(instanceId, "viewed");
     }

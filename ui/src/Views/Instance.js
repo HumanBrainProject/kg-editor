@@ -15,7 +15,7 @@
 */
 
 import React, { useEffect } from "react";
-import {observer} from "mobx-react";
+import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
@@ -61,10 +61,10 @@ const Instance = observer(({ match, mode }) => {
 
   useEffect(() => {
     const id = match.params.id;
-    const instance = instancesStore.instances.get(id);
-    appStore.openInstance(id, instance?instance.name:id, instance?instance.primaryType:{}, mode);
+    appStore.openInstance(id, id, {}, mode);
     instancesStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);
+    const instance = instancesStore.instances.get(id);
     if (instance && instance.isFetched) {
       if (mode === "create") {
         routerStore.history.replace(`/instances/${id}/edit`);

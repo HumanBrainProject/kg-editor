@@ -18,6 +18,8 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react";
+
 import HeaderPanel from "./HeaderPanel";
 
 const useStyles = createUseStyles({
@@ -70,7 +72,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
+const FetchErrorPanel = observer(({ id, show, error, inline, onRetry }) => {
 
   const classes = useStyles();
 
@@ -101,6 +103,6 @@ const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
         </div>
       </div>
   );
-};
+});
 
 export default FetchErrorPanel;

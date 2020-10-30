@@ -165,6 +165,8 @@ const useStyles = createUseStyles({
   }
 });
 
+const instanceRender = mode => observer(props => <Instance {...props} mode={mode} />);
+
 const AppComponent = observer(() => {
 
   const classes = useStyles();
@@ -188,13 +190,13 @@ const AppComponent = observer(() => {
               authStore.hasWorkspaces?
                 appStore.currentWorkspace?
                   <Switch>
-                    <Route path="/instances/:id" exact={true} render={(props) => (<Instance {...props} mode="view" />)} />
-                    <Route path="/instances/:id/create" exact={true} render={(props) => (<Instance {...props} mode="create" />)} />
-                    <Route path="/instances/:id/edit" exact={true} render={(props) => (<Instance {...props} mode="edit" />)} />
-                    <Route path="/instances/:id/invite" exact={true} render={(props) => (<Instance {...props} mode="invite" />)} />
-                    <Route path="/instances/:id/graph" exact={true} render={(props) => (<Instance {...props} mode="graph" />)} />
-                    <Route path="/instances/:id/release" exact={true} render={(props) => (<Instance {...props} mode="release" />)} />
-                    <Route path="/instances/:id/manage" exact={true} render={(props) => (<Instance {...props} mode="manage" />)} />
+                    <Route path="/instances/:id" exact={true} component={instanceRender("view")} />
+                    <Route path="/instances/:id/create" exact={true} component={instanceRender("create")} />
+                    <Route path="/instances/:id/edit" exact={true} component={instanceRender("edit")} />
+                    <Route path="/instances/:id/invite" exact={true} component={instanceRender("invite")} />
+                    <Route path="/instances/:id/graph" exact={true} component={instanceRender("graph")} />
+                    <Route path="/instances/:id/release" exact={true} component={instanceRender("release")} />
+                    <Route path="/instances/:id/manage" exact={true} component={instanceRender("manage")} />
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />

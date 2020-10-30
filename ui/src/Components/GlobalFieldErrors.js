@@ -19,6 +19,7 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Sentry from "@sentry/browser";
+import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   container: {
@@ -34,7 +35,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const GlobalFieldErrors = ({ instance }) => {
+const GlobalFieldErrors = observer(({ instance }) => {
   const classes = useStyles();
   return (
     <div className={classes.container}>
@@ -55,6 +56,6 @@ const GlobalFieldErrors = ({ instance }) => {
       </div>
     </div >
   );
-};
+});
 
 export default GlobalFieldErrors;

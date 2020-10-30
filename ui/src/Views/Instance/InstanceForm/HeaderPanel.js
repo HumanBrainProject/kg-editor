@@ -19,6 +19,7 @@ import { createUseStyles } from "react-jss";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   panel: {
@@ -40,7 +41,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const HeaderPanel = ({ className, types, hasChanged, highlight }) => {
+const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
 
   const classes = useStyles();
 
@@ -72,6 +73,6 @@ const HeaderPanel = ({ className, types, hasChanged, highlight }) => {
       )}
     </div>
   );
-};
+});
 
 export default HeaderPanel;

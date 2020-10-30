@@ -52,7 +52,7 @@ class API {
     this._axios = axios.create({});
     this._axios.interceptors.request.use(config => {
       if(authStore.keycloak) {
-        config.headers.Authorization = "Bearer " + authStore.accessToken;
+        config.headers.Authorization = "Bearer " + authStore.keycloak.token;
       }
       return Promise.resolve(config);
     });

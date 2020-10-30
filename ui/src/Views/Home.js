@@ -19,12 +19,10 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import Hub from "./Home/Hub";
+import ThemeSwitcher from "./Home/ThemeSwitcher";
 import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
-// import Features from "./Home/Features";
-import appStore from "../Stores/AppStore";
 import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
@@ -236,7 +234,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Home = observer(() => {
+const Home = () => {
   const classes = useStyles();
   return (
     <div className={classes.container}>
@@ -246,10 +244,10 @@ const Home = observer(() => {
             <h1>Welcome <span title={name}><DisplayName /></span></h1>
           </div>
           <div className={classes.nav}>
-            <Hub/>
+            <ThemeSwitcher/>
           </div>
           <div className={classes.main}>
-            <InstancesHistory workspace={appStore.currentWorkspace && appStore.currentWorkspace.id}/>
+            <InstancesHistory/>
           </div>
           <div className={classes.features}>
             <div className="widget-list">
@@ -263,6 +261,6 @@ const Home = observer(() => {
       <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
     </div>
   );
-});
+};
 
 export default Home;

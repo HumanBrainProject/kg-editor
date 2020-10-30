@@ -91,7 +91,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Tab = observer(({label, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
+const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
 
   const classes = useStyles();
   const closeable = typeof onClose === "function";
@@ -126,6 +126,6 @@ const Tab = observer(({label, disabled, current, icon, iconColor, iconSpin, hide
         :null}
     </div>
   );
-});
+};
 
 export default Tab;

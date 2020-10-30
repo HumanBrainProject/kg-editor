@@ -16,7 +16,6 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
 
 const useStyles = createUseStyles({
   container: {
@@ -55,7 +54,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const KeyboardShortcuts = observer(() => {
+const KeyboardShortcuts = () => {
   const classes = useStyles();
   return (
     <div className={classes.container}>
@@ -73,6 +72,6 @@ const KeyboardShortcuts = observer(() => {
       </ul>
     </div>
   );
-});
+};
 
 export default KeyboardShortcuts;

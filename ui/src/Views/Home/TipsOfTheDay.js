@@ -75,7 +75,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const TipsOfTheDay = observer(() => {
+const TipsOfTheDay = () => {
 
   const classes = useStyles();
 
@@ -111,6 +111,6 @@ const TipsOfTheDay = observer(() => {
       <button onClick={handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>
     </div>
   );
-});
+};
 
 export default TipsOfTheDay;

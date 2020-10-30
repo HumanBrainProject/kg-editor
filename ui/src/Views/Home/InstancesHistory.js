@@ -119,36 +119,36 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstancesHistory = observer(({ workspace }) => {
+const InstancesHistory = observer(() => {
 
   const classes = useStyles();
 
-  useEffect(() => fetchInstances(), [workspace]);
+  useEffect(() => fetchInstances(appStore.currentWorkspace.id), [appStore.currentWorkspace.id]);
 
-  const fetchInstances = () => {
+  const fetchInstances = workspace => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
       if (eventValue) {
         acc.push(eventType);
       }
       return acc;
     }, []);
-    const history = historyStore.getFileredInstancesHistory(eventTypes, appStore.historySettings.size);
+    const history = historyStore.getFileredInstancesHistory(workspace, eventTypes, appStore.historySettings.size);
     historyStore.fetchInstances(history);
   };
 
   const handleHistorySizeChange = e => {
     appStore.setSizeHistorySetting(e.target.value);
-    fetchInstances();
+    fetchInstances(appStore.currentWorkspace.id);
   };
 
   const handleHistoryViewedFlagChange = e => {
     appStore.toggleViewedFlagHistorySetting(e.target.checked);
-    fetchInstances();
+    fetchInstances(appStore.currentWorkspace.id);
   };
 
   const handleHistoryEditedFlagChange = e => {
     appStore.toggleEditedFlagHistorySetting(e.target.checked);
-    fetchInstances();
+    fetchInstances(appStore.currentWorkspace.id);
   };
 
   // const handleHistoryBookmarkedFlagChange = e => {

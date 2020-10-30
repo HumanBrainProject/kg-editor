@@ -211,7 +211,7 @@ const AppComponent = observer(() => {
                   <Modal.Body>
                     <h1>Welcome <span title={name}>{name}</span></h1>
                     <p>You are currently not granted permission to acccess any workspaces.</p>
-                    <p>Please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
+                    <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
                   </Modal.Body>
                 </Modal>
           }

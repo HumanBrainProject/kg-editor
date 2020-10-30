@@ -19,7 +19,7 @@ import React from "react";
 const HelpView = () => (
   <div>
     <h1>Contact us</h1>
-    <p>Should you encounter any problem with this application, please contact our team by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
+    <p>Should you encounter any problem with this application, please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
   </div>
 );
 

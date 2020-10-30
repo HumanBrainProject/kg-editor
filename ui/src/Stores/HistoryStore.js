@@ -75,7 +75,7 @@ class HistoryStore {
     return this.instancesHistory;
   }
 
-  getFileredInstancesHistory(modes, max=10) {
+  getFileredInstancesHistory(workspace, modes, max=10) {
     if (!appStore.currentWorkspace) {
       return [];
     }
@@ -87,7 +87,7 @@ class HistoryStore {
     max = Number(max);
     return this.instancesHistory
       .filter(instance => {
-        if (appStore.currentWorkspace && instance.workspace !== appStore.currentWorkspace.id) {
+        if (instance.workspace !== workspace) {
           return false;
         }
         if (!modes.length) {

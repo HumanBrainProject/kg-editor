@@ -36,7 +36,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const FetchingLoader = observer(({children}) => {
+const FetchingLoader = ({children}) => {
   const classes = useStyles();
   return (
     <div className={`${classes.fetchingPanel} fetchingPanel`}>
@@ -46,6 +46,6 @@ const FetchingLoader = observer(({children}) => {
       </span>
     </div>
   );
-});
+};
 
 export default FetchingLoader;

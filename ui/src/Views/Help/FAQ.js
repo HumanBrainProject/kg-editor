@@ -20,7 +20,7 @@ const HelpView = () => (
   <div>
     <h1>Frequently asked questions</h1>
     <p>This section needs you.</p>
-    <p>Do you have a question or a suggestion for a useful information to mention about a feature of this application? Please contact us by email at : <a href={"mailto:kg-team@humanbrainproject.eu"}>kg-team@humanbrainproject.eu</a></p>
+    <p>Do you have a question or a suggestion for a useful information to mention about a feature of this application? Please contact us by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
   </div>
 );
 

@@ -110,7 +110,6 @@ class AuthStore {
           this.userProfileError = e.message ? e.message : e;
           this.isRetrievingUserProfile = false;
         });
-        console.log(e);
         appStore.captureSentryException(e);
       }
     }

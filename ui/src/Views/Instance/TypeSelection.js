@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React, { useEffect } from "react";
+import React from "react";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 import { createUseStyles } from "react-jss";
@@ -86,15 +86,7 @@ const TypeSelection = observer(({ onSelect }) => {
 
   const classes = useStyles();
 
-  const fetch = (force=false) => {
-    if (force || !typesStore.isFetched) {
-      typesStore.fetch();
-    }
-  };
-
-  useEffect(() => fetch(), []);
-
-  const handleRetry = () => fetch(true);
+  const handleRetry = () => typesStore.fetch();
 
   const handleClick = type => onSelect(type);
 

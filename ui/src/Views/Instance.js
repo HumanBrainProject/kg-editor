@@ -60,7 +60,6 @@ const Instance = observer(({ match, mode }) => {
   const id = match.params.id;
 
   useEffect(() => {
-    const id = match.params.id;
     appStore.openInstance(id, id, {}, mode);
     instancesStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);
@@ -72,7 +71,7 @@ const Instance = observer(({ match, mode }) => {
     } else {
       instancesStore.checkInstanceIdAvailability(id, mode);
     }
-  }, [match.params.id, mode]);
+  }, [id, mode]);
 
   const handleRetry = () => instancesStore.checkInstanceIdAvailability(id, mode === "create");
 

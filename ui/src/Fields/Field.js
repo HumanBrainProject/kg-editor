@@ -17,12 +17,11 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
 
 import FieldError from "./FieldError";
 import { fieldsMapping } from "../Fields";
 
-const Field = observer(props => {
+const Field = props => {
 
   const fieldMapping = fieldsMapping[props.fieldStore.type];
   if (!fieldMapping) {
@@ -34,6 +33,6 @@ const Field = observer(props => {
       <Component {...props} />
     </FieldError>
   );
-});
+};
 
 export default Field;

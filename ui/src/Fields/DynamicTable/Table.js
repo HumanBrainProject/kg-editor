@@ -126,7 +126,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
   return null;
 });
 
-const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
+const Table = ({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
 
   const classes = useStyles();
   const scrollToIndex = -1;
@@ -217,6 +217,6 @@ const Table = observer(({ list, fieldStore, readOnly, enablePointerEvents, onRow
       </TableComponent>
     </div>
   );
-});
+};
 
 export default Table;

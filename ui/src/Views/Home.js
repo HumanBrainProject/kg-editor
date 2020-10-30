@@ -247,12 +247,11 @@ const Home = () => {
             <ThemeSwitcher/>
           </div>
           <div className={classes.main}>
-            <InstancesHistory/>
+            <InstancesHistory />
           </div>
           <div className={classes.features}>
             <div className="widget-list">
               <KeyboardShortcuts />
-              {/* <Features /> */}
             </div>
           </div>
         </div>

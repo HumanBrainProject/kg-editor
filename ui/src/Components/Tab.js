@@ -18,7 +18,6 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react";
 
 import routerStore from "../Stores/RouterStore";
 

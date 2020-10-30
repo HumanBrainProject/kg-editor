@@ -210,7 +210,10 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
           </div>
         </div>
         <Scrollbars autoHide>
-          {instance.hasFieldErrors ? <div className={classes.errorReport}><GlobalFieldErrors instance={instance} /> </div>:
+          {instance.hasFieldErrors ?
+            <div className={classes.errorReport}>
+              <GlobalFieldErrors instance={instance} />
+            </div>:
             <Form className={`${classes.form}`}>
               {fields.map(name => {
                 const fieldStore = instance.fields[name];

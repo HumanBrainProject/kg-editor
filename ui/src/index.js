@@ -152,14 +152,12 @@ const useStyles = createUseStyles({
     }
   },
   noWorkspacesModal: {
+    maxWidth: "min(max(500px, 50%),750px)",
     "&.modal-dialog": {
       marginTop: "40vh",
       "& .modal-body": {
-        padding: "0 30px 15px 30px",
-        fontSize: "1.6rem",
-        "@media screen and (min-width:768px)": {
-          whiteSpace: "nowrap"
-        }
+        padding: "15px 30px",
+        fontSize: "1.6rem"
       }
     }
   }

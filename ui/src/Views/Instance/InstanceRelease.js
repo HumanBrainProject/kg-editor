@@ -43,7 +43,15 @@ const useStyles = createUseStyles({
     backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
     backgroundPosition: "50% 50%",
     color: "var(--ft-color-normal)",
-    margin: "15px"
+    margin: "15px",
+    "& .fetchingPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
   },
   panel: {
     display: "grid",

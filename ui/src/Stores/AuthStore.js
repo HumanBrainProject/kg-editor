@@ -201,10 +201,7 @@ class AuthStore {
 
   async saveProfilePicture(picture) {
     try {
-      const payoad = {
-        data: picture
-      };
-      await API.axios.put(API.endpoints.userPicture(), payoad);
+      await API.axios.put(API.endpoints.userPicture(), picture);
       runInAction(() => {
         this.user.picture = picture;
       });

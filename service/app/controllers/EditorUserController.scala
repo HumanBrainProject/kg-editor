@@ -78,7 +78,7 @@ class EditorUserController @Inject()(
   }
 
   def saveUserPicture: Action[AnyContent] = authenticatedUserAction.async { implicit request =>
-    (request.body.asJson match {
+    (request.body.asFormUrlEncoded match {
       case Some(picture) =>
         editorUserService
           .getUserProfile(request.userToken)

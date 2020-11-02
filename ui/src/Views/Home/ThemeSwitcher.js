@@ -24,8 +24,8 @@ import MultiToggle from "../../Components/MultiToggle";
 
 const useStyles = createUseStyles({
   container:{
-    textAlign:"center"/*,
-    marginBottom:"10px"*/
+    textAlign: "right",
+    paddingTop: "35px"
   },
   icon:{
     color:"var(--ft-color-normal)",

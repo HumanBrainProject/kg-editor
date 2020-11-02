@@ -23,7 +23,7 @@ import monix.eval.Task
 import play.api.Logger
 import play.api.http.HeaderNames._
 import play.api.http.Status._
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
 
 class EditorUserService @Inject()(config: ConfigurationServiceLive, wSClient: WSClient) {
@@ -44,10 +44,10 @@ class EditorUserService @Inject()(config: ConfigurationServiceLive, wSClient: WS
     }
   }
 
-  def putUserPicture(token: AccessToken, clientToken: String, userId: String, picture: JsValue): Task[Either[APIEditorError, JsObject]] = {
+  def putUserPicture(token: AccessToken, clientToken: String, userId: String, picture: Map[String, Seq[String]]): Task[Either[APIEditorError, JsObject]] = {
     val q = wSClient
       .url(s"${config.kgCoreEndpoint}/${config.kgCoreApiVersion}/users/${userId}/picture")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
+      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken, "content-type" -> "application/x-www-form-urlencoded")
     val r = Task.deferFuture(q.put(picture))
     r.map { res =>
       res.status match {

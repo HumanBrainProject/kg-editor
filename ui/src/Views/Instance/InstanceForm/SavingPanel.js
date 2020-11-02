@@ -36,7 +36,10 @@ const useStyles = createUseStyles({
       left: "-10px",
       width: "calc(100% + 20px)",
       height: "calc(100% + 20px)",
-      borderRadius: "0"
+      borderRadius: "0",
+      "& $panel": {
+        position: "fixed",
+      }
     }
   },
   panel: {

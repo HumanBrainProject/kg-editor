@@ -25,9 +25,12 @@ const useStyles = createUseStyles({
     "& .form-check": {
       verticalAlign: "middle",
       marginLeft: "4px",
-      transform: "translateY(-1px)",
+      transform: "translateY(-2px)",
       display: "inline-block"
     }
+  },
+  label: {
+    display: "inline"
   }
 });
 

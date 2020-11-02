@@ -103,7 +103,7 @@ const useStyles = createUseStyles({
   features: {
     gridArea: "features",
     position: "relative",
-    marginTop: "61px",
+    marginTop: "64px",
     "& .widget-list": {
       "& > * + *": {
         margin: "10px 0 0 0"

@@ -14,16 +14,19 @@
 *   limitations under the License.
 */
 
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react";
 
-import instancesStore from "../Stores/InstancesStore";
-import Alternatives from "./Alternatives";
+import { useStores } from "../Hooks/UseStores";
 
+import Alternatives from "./Alternatives";
 
 const AlternativeValue = observer(({alternative}) => alternative.value.map(instance => instance.name).join("; "));
 
 const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
+
+  const { instancesStore } = useStores();
+
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
         value: instances
       };
     }));
-  }, [mappingValue, list]);
+  }, [instancesStore, mappingValue, list]);
 
   return (
     <Alternatives

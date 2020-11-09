@@ -20,10 +20,7 @@ import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
-import instancesStore from "../Stores/InstancesStore";
-import viewStore from "../Stores/ViewStore";
-import appStore from "../Stores/AppStore";
-import routerStore from "../Stores/RouterStore";
+import { useStores } from "../Hooks/UseStores";
 
 import View from "./Instance/Instance";
 import FetchingLoader from "../Components/FetchingLoader";
@@ -59,6 +56,8 @@ const Instance = observer(({ match, mode }) => {
 
   const id = match.params.id;
 
+  const { appStore, history, instancesStore, viewStore } = useStores();
+
   useEffect(() => {
     appStore.openInstance(id, id, {}, mode);
     instancesStore.togglePreviewInstance();
@@ -66,18 +65,18 @@ const Instance = observer(({ match, mode }) => {
     const instance = instancesStore.instances.get(id);
     if (instance && instance.isFetched) {
       if (mode === "create") {
-        routerStore.history.replace(`/instances/${id}/edit`);
+        history.replace(`/instances/${id}/edit`);
       }
     } else {
       instancesStore.checkInstanceIdAvailability(id, mode);
     }
-  }, [id, mode]);
+  }, [appStore, instancesStore, viewStore, history, id, mode]);
 
   const handleRetry = () => instancesStore.checkInstanceIdAvailability(id, mode === "create");
 
   const handleContinue = () => {
     instancesStore.instanceIdAvailability.delete(id);
-    routerStore.history.replace("/browse");
+    history.replace("/browse");
   };
 
   const handleCreateNewInstanceOfType = type => {

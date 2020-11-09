@@ -20,7 +20,8 @@ import { List } from "react-virtualized";
 import { observer } from "mobx-react";
 import debounce from "lodash/debounce";
 
-import releaseStore from "../../../Stores/ReleaseStore";
+import { useStores } from "../../../Hooks/UseStores";
+
 import ReleaseNode from "./ReleaseNode";
 
 const useStyles = createUseStyles({
@@ -37,6 +38,8 @@ const ReleaseList = observer(() => {
   const wrapperRef = useRef();
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
 

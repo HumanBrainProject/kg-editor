@@ -20,9 +20,7 @@ import { observer } from "mobx-react";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../../Stores/AppStore";
-import routerStore from "../../Stores/RouterStore";
-import instancesStore from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";
@@ -134,6 +132,8 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const classes = useStyles();
 
+  const { appStore, history, instancesStore } = useStores();
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [id]);
 
@@ -160,7 +160,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
       const instance = instancesStore.instances.get(id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
-      routerStore.history.push(`/instances/${this.props.id}`);
+      history.push(`/instances/${this.props.id}`);
     }
   };
 
@@ -186,7 +186,9 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
     instance.cancelSave();
   };
 
-  const isReadMode = view.mode === "view" || !instance.belongsToCurrentWorkspace;
+  const belongsToCurrentWorkspace = appStore.currentWorkspace && instance.workspace === appStore.currentWorkspace.id;
+
+  const isReadMode = view.mode === "view" || !belongsToCurrentWorkspace;
 
   const mainInstanceId = view.instanceId;
   const isMainInstance = id === mainInstanceId;

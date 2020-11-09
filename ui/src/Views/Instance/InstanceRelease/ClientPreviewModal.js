@@ -54,7 +54,7 @@ const ClientPreviewModal = observer(({ store, show, handleClose }) => {
   const url = `https://kg.ebrains.eu/search/live/${store.topInstanceId}`;
 
   return (
-    <Modal show={show} className={classes.greatModal}>
+    <Modal show={show} className={classes.greatModal} onHide={() => {}}>
       <Modal.Body>
         <div className={classes.frameContainer}>
           <Iframe url={url}

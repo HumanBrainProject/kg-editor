@@ -18,7 +18,8 @@ import React from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import releaseStore from "../../../Stores/ReleaseStore";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -60,6 +61,8 @@ const useStyles = createUseStyles({
 const ReleaseNodeAndChildrenToggle = observer(() => {
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   const handleMarkAllNodeForRelease = () => {
     const node = releaseStore.instancesTree;

@@ -21,8 +21,7 @@ import { observer } from "mobx-react";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 
-import instancesStore from "../../Stores/InstancesStore";
-import viewStore from "../../Stores/ViewStore";
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   pane: {
@@ -32,12 +31,14 @@ const useStyles = createUseStyles({
 
 const Links = observer(({ instanceId }) => {
 
+  const classes = useStyles();
+
+  const { instancesStore, viewStore } = useStores();
+
   const instance = instancesStore.instances.get(instanceId);
   if (!instance) {
     return null;
   }
-
-  const classes = useStyles();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [instanceId]);

@@ -14,30 +14,12 @@
 *   limitations under the License.
 */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react";
+import React from "react";
 
-import { usersStore } from "../Hooks/UseStores";
+import { RootStore } from "../Stores/RootStore";
+import { TransportLayer } from "../Services/TransportLayer";
 
-import AvatarComponent from "../Components/Avatar";
+const transportLayer = new TransportLayer();
+const stores = new RootStore(transportLayer);
 
-const Avatar = observer(({ userId }) => {
-
-  useEffect(() => {
-    if (userId) {
-      usersStore.fetchUser(userId);
-    }
-  }, [userId]);
-
-  if (!userId) {
-    return null;
-  }
-
-  const user = usersStore.users.get(userId);
-
-  return (
-    <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />
-  );
-});
-
-export default Avatar;
+export const storesContext = React.createContext(stores);

@@ -16,11 +16,11 @@
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import API from "../Services/API";
-import appStore from "./AppStore";
 
 const rootPath = window.rootPath || "";
 
-class AuthStore {
+export class AuthStore {
+  isUserAuthorized = false;
   user = null;
   isRetrievingUserProfile = false;
   userProfileError = false;
@@ -33,8 +33,11 @@ class AuthStore {
   keycloak = null;
   endpoint = null;
 
-  constructor() {
+  transportLayer = null;
+
+  constructor(transportLayer) {
     makeObservable(this, {
+      isUserAuthorized: observable,
       user: observable,
       isRetrievingUserProfile: observable,
       userProfileError: observable,
@@ -49,7 +52,6 @@ class AuthStore {
       hasUserProfile: computed,
       hasWorkspaces: computed,
       workspaces: computed,
-      isFullyAuthenticated: computed,
       logout: action,
       retrieveUserProfile: action,
       initializeKeycloak: action,
@@ -60,6 +62,8 @@ class AuthStore {
     if (Storage === undefined) {
       throw "The browser must support WebStorage API";
     }
+
+    this.transportLayer = transportLayer;
   }
 
   get accessToken() {
@@ -82,13 +86,10 @@ class AuthStore {
     return this.hasWorkspaces ? this.user.workspaces: [];
   }
 
-  get isFullyAuthenticated() {
-    return this.isAuthenticated && this.hasUserProfile;
-  }
-
   logout() {
     this.authSuccess = false;
     this.isTokenExpired = true;
+    this.isUserAuthorized = false;
     this.user = null;
     this.keycloak.logout({redirectUri: `${window.location.protocol}//${window.location.host}${rootPath}/logout`});
     this.isLogout = true;
@@ -99,18 +100,26 @@ class AuthStore {
       this.userProfileError = false;
       this.isRetrievingUserProfile = true;
       try {
-        const { data } = await API.axios.get(API.endpoints.user());
+        const { data } = await this.transportLayer.getUserProfile();
+        //throw {response: { status: 403}};
         runInAction(() => {
           //data.data.workspaces = []; // uncomment to simulate a user without any workspace
+          this.isUserAuthorized = true;
           this.user = (data && data.data)?data.data:{};
           this.isRetrievingUserProfile = false;
         });
       } catch (e) {
         runInAction(() => {
-          this.userProfileError = e.message ? e.message : e;
-          this.isRetrievingUserProfile = false;
+          if (e.response && e.response.status === 403) {
+            this.isUserAuthorized = false;
+            this.isRetrievingUserProfile = false;
+          } else {
+            this.isUserAuthorized = false;
+            this.userProfileError = e.message ? e.message : e;
+            this.isRetrievingUserProfile = false;
+          }
         });
-        appStore.captureSentryException(e);
+        API.captureException(e);
       }
     }
     return this.hasUserProfile;
@@ -156,7 +165,7 @@ class AuthStore {
     this.isInitializing = true;
     this.authError = null;
     try {
-      const { data } = await API.axios.get(API.endpoints.auth());
+      const { data } = await this.transportLayer.getAuthEndpoint();
       runInAction(() => {
         this.endpoint =  data && data.data? data.data.endpoint :null;
       });
@@ -201,15 +210,15 @@ class AuthStore {
 
   async saveProfilePicture(picture) {
     try {
-      await API.axios.put(API.endpoints.userPicture(), picture);
+      await this.transportLayer.updateUserPicture(picture);
       runInAction(() => {
         this.user.picture = picture;
       });
     } catch (e) {
-      appStore.captureSentryException(e);
+      API.captureException(e);
     }
   }
 
 }
 
-export default new AuthStore();
+export default AuthStore;

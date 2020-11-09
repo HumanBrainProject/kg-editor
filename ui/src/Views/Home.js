@@ -19,15 +19,19 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { Scrollbars } from "react-custom-scrollbars";
 
+import { useStores } from "../Hooks/UseStores";
+
 import ThemeSwitcher from "./Home/ThemeSwitcher";
 import InstancesHistory from "./Home/InstancesHistory";
 import TipsOfTheDay from "./Home/TipsOfTheDay";
 import KeyboardShortcuts from "./Home/KeyboardShortcuts";
-import authStore from "../Stores/AuthStore";
 
 const rootPath = window.rootPath || "";
 
 const DisplayName = observer(() => {
+
+  const { authStore } = useStores();
+
   if (authStore.hasUserProfile && authStore.user && authStore.user.givenName) {
     return authStore.user.givenName;
   }
@@ -236,6 +240,7 @@ const useStyles = createUseStyles({
 
 const Home = () => {
   const classes = useStyles();
+
   return (
     <div className={classes.container}>
       <Scrollbars autoHide>

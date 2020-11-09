@@ -15,15 +15,17 @@
 */
 
 import { observable, action, computed, runInAction, makeObservable } from "mobx";
-import API from "../Services/API";
 
-class TypesStore {
+export class TypesStore {
   types = [];
   typesMap = new Map();
   fetchError = null;
   isFetching = false;
 
-  constructor() {
+  transportLayer = null;
+  rootStore = null;
+
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       types: observable,
       typesMap: observable,
@@ -32,6 +34,9 @@ class TypesStore {
       isFetched: computed,
       fetch: action
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   filteredList(term) {
@@ -51,7 +56,7 @@ class TypesStore {
       this.isFetching = true;
       this.fetchError = null;
       try {
-        const response = await API.axios.get(API.endpoints.workspaceTypes());
+        const response = await this.transportLayer.getWorkspaceTypes(this.rootStore.appStore.currentWorkspace.id);
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
           this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
@@ -68,4 +73,4 @@ class TypesStore {
   }
 }
 
-export default new TypesStore();
+export default TypesStore;

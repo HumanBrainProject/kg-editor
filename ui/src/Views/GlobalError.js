@@ -18,7 +18,8 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 
-import appStore from "../Stores/AppStore";
+import { useStores } from "../Hooks/UseStores";
+
 import BGMessage from "../Components/BGMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Sentry from "@sentry/browser";
@@ -33,6 +34,8 @@ const useStyles = createUseStyles({
 const GlobalError = () => {
 
   const classes = useStyles();
+
+  const { appStore } = useStores();
 
   const handleDismiss = () => {
     appStore.dismissGlobalError();

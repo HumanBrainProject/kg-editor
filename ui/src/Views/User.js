@@ -17,22 +17,25 @@
 import React,  { useEffect } from "react";
 import { observer } from "mobx-react";
 
+import { useStores } from "../Hooks/UseStores";
+
 import UserComponent from "../Components/User";
-import UsersStore from "../Stores/UsersStore";
 
 const User = observer(({ userId }) => {
 
+  const { usersStore } = useStores();
+
   useEffect(() => {
     if (userId) {
-      UsersStore.fetchUser(userId);
+      usersStore.fetchUser(userId);
     }
-  }, [userId]);
+  }, [usersStore, userId]);
 
   if (!userId) {
     return null;
   }
 
-  const user = UsersStore.users.get(userId);
+  const user = usersStore.users.get(userId);
 
   const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
     if (item && item.value && item.verified) {

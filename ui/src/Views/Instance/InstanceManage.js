@@ -21,8 +21,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
-import appStore from "../../Stores/AppStore";
-import statusStore from "../../Stores/StatusStore";
+import { useStores } from "../../Hooks/UseStores";
 
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 
@@ -80,6 +79,8 @@ const useStyles = createUseStyles({
 const InstanceManage = observer(({instance}) => {
 
   const classes = useStyles();
+
+  const { appStore, statusStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchStatus(), [instance]);

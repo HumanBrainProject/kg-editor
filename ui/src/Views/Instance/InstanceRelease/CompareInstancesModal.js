@@ -22,7 +22,7 @@ import Modal from "react-bootstrap/Modal";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import releaseStore from "../../../Stores/ReleaseStore";
+import { useStores } from "../../../Hooks/UseStores";
 
 import CompareWithReleasedVersionChanges from "../CompareWithReleasedVersionChanges";
 
@@ -48,6 +48,8 @@ const useStyles = createUseStyles({
 const CompareInstancesModal = observer(() => {
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   const handleHideCompare = e => {
     e && e.stopPropagation();

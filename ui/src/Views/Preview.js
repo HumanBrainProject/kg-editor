@@ -22,7 +22,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import instancesStore from "../Stores/InstancesStore";
+import { useStores } from "../Hooks/UseStores";
 
 import Field from "../Fields/Field";
 import FetchingLoader from "../Components/FetchingLoader";
@@ -117,6 +117,8 @@ const useStyles = createUseStyles({
 const Preview  = observer(({ className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}) => {
 
   const classes = useStyles();
+
+  const { instancesStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [instanceId]);

@@ -23,7 +23,7 @@ import InfiniteScroll from "react-infinite-scroller";
 
 import User from "./User";
 
-import usersStore from "../../../Stores/UsersStore";
+import { usersStore } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {

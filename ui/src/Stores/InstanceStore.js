@@ -16,7 +16,6 @@
 
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 
-import appStore from "./AppStore";
 import { fieldsMapping } from "../Fields";
 
 const compareField = (a, b, ignoreName=false) => {
@@ -327,7 +326,7 @@ const getChildrenIdsGroupedByField = fields => {
   }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };
 
-class InstanceStore {
+export class InstanceStore {
   id = null;
   _name = null;
   types = [];
@@ -350,7 +349,7 @@ class InstanceStore {
   fetchError = null;
   hasFetchError = false;
 
-  constructor(id) {
+  constructor(id, transportLayer) {
     makeObservable(this, {
       id: observable,
       _name: observable,
@@ -383,7 +382,6 @@ class InstanceStore {
       nonPromotedFields: computed,
       childrenIds: computed,
       childrenIdsGroupedByField: computed,
-      belongsToCurrentWorkspace: computed,
       initializeLabelData: action,
       initializeData: action,
       errorLabelInstance: action,
@@ -391,6 +389,7 @@ class InstanceStore {
     });
 
     this.id = id;
+    this.transportLayer = transportLayer;
   }
 
   get cloneInitialData() {
@@ -505,10 +504,6 @@ class InstanceStore {
     return [];
   }
 
-  get belongsToCurrentWorkspace() {
-    return appStore.currentWorkspace && this.workspace === appStore.currentWorkspace.id;
-  }
-
   initializeLabelData(data) {
     const normalizedData = normalizeLabelInstanceData(data);
     this._name = normalizedData.name,
@@ -521,7 +516,7 @@ class InstanceStore {
     this.hasLabelFetchError = false;
   }
 
-  initializeData(data, isNew = false) {
+  initializeData(transportLayer, data, isNew = false) {
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name,
     this.workspace = normalizedData.workspace;
@@ -539,7 +534,7 @@ class InstanceStore {
         if (!fieldMapping) {
           throw `${field.type} type is not supported!`;
         }
-        this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this);
+        this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
       }
       const store = this.fields[name];
       store.updateValue(field.value);

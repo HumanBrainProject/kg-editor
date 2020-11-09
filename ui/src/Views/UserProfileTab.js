@@ -24,8 +24,7 @@ import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import appStore from "../Stores/AppStore";
-import authStore from "../Stores/AuthStore";
+import { useStores } from "../Hooks/UseStores";
 
 import Avatar from "../Components/Avatar";
 
@@ -149,8 +148,8 @@ const useStyles = createUseStyles({
   },
   profilePictureCamera: {
     position: "absolute",
-    top: "25px",
-    left: "32px",
+    top: "30px",
+    left: "35px",
     color: "rgba(0, 0, 0, 0.25)",
     transition: "color 0.25 ease-in-out"
   },
@@ -182,6 +181,8 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   const [showPopOver, setShowPopOver] = useState(false);
   const [popOverPosition, setPopOverPosition] = useState("bottom");
   const [tokenCopied, setTokenCopied] = useState(null);
+
+  const { appStore, authStore } = useStores();
 
   useEffect(() => {
     return () => {
@@ -235,7 +236,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
 
   const handleLogout = () => appStore.logout();
 
-  if (!authStore.isFullyAuthenticated || !authStore.hasUserProfile || !authStore.user) {
+  if (!authStore.isAuthenticated || !authStore.isUserAuthorized || !authStore.user) {
     return null;
   }
 

@@ -17,8 +17,10 @@
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
+
 import CompareFieldsChanges from "./CompareFieldsChanges";
-import instancesStore, {createInstanceStore} from "../../Stores/InstancesStore";
+import { createInstanceStore } from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -32,24 +34,26 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
 
   const [savedInstanceStore, setSavedInstanceStore] = useState(null);
 
+  const { instancesStore } = useStores();
+
   useEffect(() => {
     if(!savedInstanceStore){
-      const store = createInstanceStore();
+      const store = createInstanceStore(instancesStore.transportLayer);
       setSavedInstanceStore(store);
     }
-  }, [savedInstanceStore]);
+  }, [instancesStore.transportLayer, savedInstanceStore]);
 
   useEffect(() => {
     if(savedInstanceStore) {
       const savedInstance = savedInstanceStore.createInstanceOrGet(instanceId);
       const instance = instancesStore.instances.get(instanceId);
       const data = instance.cloneInitialData;
-      savedInstance.initializeData(data);
+      savedInstance.initializeData(savedInstanceStore.transportLayer, data);
     }
     return () => {
       savedInstanceStore && savedInstanceStore.flush();
     };
-  }, [savedInstanceStore, instanceId]);
+  }, [instancesStore.transportLayer, instancesStore.instances, savedInstanceStore, instanceId]);
 
 
   const instance = instancesStore.instances.get(instanceId);

@@ -20,15 +20,13 @@ import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
 
-import List from "./List";
-
-import instancesStore from "../../Stores/InstancesStore";
-import typesStore from "../../Stores/TypesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
 
+import List from "./List";
 
 const useStyles = createUseStyles({
   values:{
@@ -55,6 +53,8 @@ const useStyles = createUseStyles({
 const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}) => {
 
   const classes = useStyles();
+
+  const { typesStore, instancesStore } = useStores();
 
   const draggedValue = useRef();
   const formGroupRef = useRef();

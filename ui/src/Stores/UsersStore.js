@@ -18,9 +18,8 @@ import { observable, action, runInAction, computed, makeObservable } from "mobx"
 import debounce from "lodash/debounce";
 
 import API from "../Services/API";
-import appStore from "./AppStore";
 
-class UsersStore {
+export class UsersStore {
   users = new Map();
   isFetchingSearch = false;
   isSearchFetched = false;
@@ -35,7 +34,9 @@ class UsersStore {
   searchPageStart = 0;
   searchPageSize = 20;
 
-  constructor() {
+  transportLayer = null;
+
+  constructor(transportLayer) {
     makeObservable(this, {
       users: observable,
       isFetchingSearch: observable,
@@ -53,6 +54,8 @@ class UsersStore {
       clearSearch: action,
       searchUsers: action
     });
+
+    this.transportLayer = transportLayer;
   }
 
   get hasSearchFilter() {
@@ -114,7 +117,7 @@ class UsersStore {
         user.isFetching = true;
         user.hasFetchError = false;
         user.fetchError = null;
-        const { data } = await API.axios.get(API.endpoints.userInfo(userId));
+        const { data } = await this.transportLayer.getUserInfo(userId);
         runInAction(() => {
           const userData = data && data.data;
           user.username = userData && userData.username;
@@ -142,7 +145,7 @@ class UsersStore {
           user.isFetched = true;
           user.isFetching = false;
         });
-        appStore.captureSentryException(e);
+        API.captureException(e);
       }
     }
     return user;
@@ -187,7 +190,7 @@ class UsersStore {
         this.isFetchingSearch = true;
         this.searchFetchError = null;
 
-        const { data } = await API.axios.get(API.endpoints.reviewUsers(this.searchPageStart * this.searchPageSize, this.searchPageSize, this.searchFilter.queryString));
+        const { data } = await this.transportLayer.getUsersForReview(this.searchPageStart * this.searchPageSize, this.searchPageSize, this.searchFilter.queryString);
         runInAction(() => {
           if (!this.hasSearchFilter) {
             this.clearSearch();
@@ -220,10 +223,10 @@ class UsersStore {
             this.isFetchingSearch = false;
           }
         });
-        appStore.captureSentryException(e);
+        API.captureException(e);
       }
     }
   }
 }
 
-export default new UsersStore();
+export default UsersStore;

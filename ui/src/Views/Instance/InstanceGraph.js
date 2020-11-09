@@ -19,7 +19,8 @@ import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 
-import graphStore from "../../Stores/GraphStore";
+import { useStores } from "../../Hooks/UseStores";
+
 import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
 import FetchingLoader from "../../Components/FetchingLoader";
@@ -90,6 +91,8 @@ const useStyles = createUseStyles({
 const GraphInstance = observer(({ instance }) => {
 
   const classes = useStyles();
+
+  const { graphStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetch(), [instance]);

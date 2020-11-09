@@ -17,13 +17,13 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
-import browseStore from "../../Stores/BrowseStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import Bookmarks from "./Bookmarks";
 import { Scrollbars } from "react-custom-scrollbars";
-// import bookmarkStore from "../../Stores/BookmarkStore";
+
+import { useStores } from "../../Hooks/UseStores";
+
+// import Bookmarks from "./Bookmarks";
 import Types from "./Types";
-import typesStore from "../../Stores/TypesStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -65,6 +65,9 @@ const useStyles = createUseStyles({
 const NavigationPanel = observer(() => {
 
   const classes = useStyles();
+
+  //const { typesStore, browseStore, bookmarkStore } = useStores();
+  const { typesStore, browseStore } = useStores();
 
   const handleFilterChange = e => {
     browseStore.setNavigationFilterTerm(e.target.value);

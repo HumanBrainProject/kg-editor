@@ -19,7 +19,8 @@ import { createUseStyles } from "react-jss";
 import {observer} from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../../Stores/AppStore";
+import { useStores } from "../../Hooks/UseStores";
+
 import MultiToggle from "../../Components/MultiToggle";
 
 const useStyles = createUseStyles({
@@ -37,6 +38,8 @@ const useStyles = createUseStyles({
 const ThemeSwitcher = observer(() => {
 
   const classes = useStyles();
+
+  const { appStore } = useStores();
 
   const handleChange = theme => {
     appStore.setTheme(theme);

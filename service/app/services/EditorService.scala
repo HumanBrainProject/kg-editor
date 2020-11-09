@@ -83,7 +83,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
   }
 
   def doSearchInstances(
-                         space: String,
+                         workspace: String,
                          typeId: String,
                          from: Option[Int],
                          size: Option[Int],
@@ -96,7 +96,7 @@ class EditorService @Inject()(wSClient: WSClient, configuration: ConfigurationSe
         wSClient,
         configuration.kgCoreEndpoint,
         configuration.kgCoreApiVersion,
-        space,
+        workspace,
         typeId,
         from,
         size,

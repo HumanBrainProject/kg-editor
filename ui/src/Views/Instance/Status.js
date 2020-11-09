@@ -19,7 +19,8 @@ import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import statusStore from "../../Stores/StatusStore";
+import { useStores } from "../../Hooks/UseStores";
+
 import ReleaseStatus from "../../Components/ReleaseStatus";
 
 const useStyles = createUseStyles({
@@ -63,9 +64,11 @@ const Status = observer(({ id, darkmode }) => {
 
   const classes = useStyles();
 
+  const { statusStore } = useStores();
+
   useEffect(() => {
     statusStore.fetchStatus(id);
-  }, [id]);
+  }, [statusStore, id]);
 
   const instanceStatus = statusStore.getInstance(id);
 

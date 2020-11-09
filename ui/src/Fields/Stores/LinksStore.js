@@ -14,13 +14,11 @@
 *   limitations under the License.
 */
 
+
 import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
 import FieldStore from "./FieldStore";
-
-import API from "../../Services/API";
-import appStore from "../../Stores/AppStore";
 
 const defaultNumberOfVisibleLinks = 10;
 
@@ -42,8 +40,10 @@ class LinksStore extends FieldStore {
   isLink = true;
   mappingValue = "@id";
 
-  constructor(definition, options, instance) {
-    super(definition, options, instance);
+  appStore = null;
+
+  constructor(definition, options, instance, transportLayer) {
+    super(definition, options, instance, transportLayer);
 
     makeObservable(this, {
       value: observable,
@@ -245,7 +245,7 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await API.axios.post(API.endpoints.suggestions(this.instance.id, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm), payload);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
       const options = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (append) {
@@ -256,7 +256,7 @@ class LinksStore extends FieldStore {
         this.optionsTypes = [];
         this.optionsExternalTypes = [];
         Object.values(types).forEach(type => {
-          if(type.space.includes(appStore.currentWorkspace.id)) {
+          if(type.space.includes(this.workspace)) {
             this.optionsTypes.push(type);
           } else {
             this.optionsExternalTypes.push(type);

@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { render } from "react-dom";
 // import { configure } from "mobx";
 import { observer } from "mobx-react";
@@ -30,9 +30,7 @@ import Cookies from "universal-cookie";
 
 import "./Services/IconsImport";
 
-import appStore from "./Stores/AppStore";
-import authStore from "./Stores/AuthStore";
-import routerStore from "./Stores/RouterStore";
+import { useStores } from "./Hooks/UseStores";
 
 import Tabs from "./Views/Tabs";
 
@@ -151,7 +149,7 @@ const useStyles = createUseStyles({
       }
     }
   },
-  noWorkspacesModal: {
+  noAccessModal: {
     maxWidth: "min(max(500px, 50%),750px)",
     "&.modal-dialog": {
       marginTop: "40vh",
@@ -165,14 +163,17 @@ const useStyles = createUseStyles({
 
 const AppComponent = observer(() => {
 
+  const { appStore, authStore, history } = useStores();
+
   const classes = useStyles();
+
   const Theme = appStore.availableThemes[appStore.currentTheme];
 
   const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
 
   const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
   return (
-    <Router history={routerStore.history}>
+    <Router history={history}>
       <div className={classes.layout}>
         <Theme />
         <Tabs />
@@ -183,36 +184,45 @@ const AppComponent = observer(() => {
             !appStore.isInitialized || !authStore.isAuthenticated ?
               <Route component={Login} />
               :
-              authStore.hasWorkspaces?
-                appStore.currentWorkspace?
-                  <Switch>
-                    <Route path="/instances/:id" exact={true} render={props=><Instance {...props} mode="view" />} />
-                    <Route path="/instances/:id/create" exact={true} render={props=><Instance {...props} mode="create" />} />
-                    <Route path="/instances/:id/edit" exact={true} render={props=><Instance {...props} mode="edit" />} />
-                    <Route path="/instances/:id/invite" exact={true} render={props=><Instance {...props} mode="invite" />} />
-                    <Route path="/instances/:id/graph" exact={true} render={props=><Instance {...props} mode="graph" />} />
-                    <Route path="/instances/:id/release" exact={true} render={props=><Instance {...props} mode="release" />} />
-                    <Route path="/instances/:id/manage" exact={true}  render={props=><Instance {...props} mode="manage" />} />
+              authStore.isUserAuthorized?
+                authStore.hasWorkspaces?
+                  appStore.currentWorkspace?
+                    <Switch>
+                      <Route path="/instances/:id" exact={true} render={props=><Instance {...props} mode="view" />} />
+                      <Route path="/instances/:id/create" exact={true} render={props=><Instance {...props} mode="create" />} />
+                      <Route path="/instances/:id/edit" exact={true} render={props=><Instance {...props} mode="edit" />} />
+                      <Route path="/instances/:id/invite" exact={true} render={props=><Instance {...props} mode="invite" />} />
+                      <Route path="/instances/:id/graph" exact={true} render={props=><Instance {...props} mode="graph" />} />
+                      <Route path="/instances/:id/release" exact={true} render={props=><Instance {...props} mode="release" />} />
+                      <Route path="/instances/:id/manage" exact={true}  render={props=><Instance {...props} mode="manage" />} />
 
-                    <Route path="/browse" exact={true} component={Browse} />
-                    <Route path="/help" component={Help} />
-                    {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                    <Route path="/" exact={true} component={Home} />
-                    <Route component={NotFound} />
-                  </Switch>
+                      <Route path="/browse" exact={true} component={Browse} />
+                      <Route path="/help" component={Help} />
+                      {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
+                      <Route path="/" exact={true} component={Home} />
+                      <Route component={NotFound} />
+                    </Switch>
+                    :
+                    <Route component={WorkspaceModal} />
                   :
-                  <Route component={WorkspaceModal} />
+                  <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
+                    <Modal.Body>
+                      <h1>Welcome <span title={name}>{name}</span></h1>
+                      <p>You are currently not granted permission to acccess any workspaces.</p>
+                      <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+                    </Modal.Body>
+                  </Modal>
                 :
-                <Modal dialogClassName={classes.noWorkspacesModal} show={true}>
+                <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
                   <Modal.Body>
-                    <h1>Welcome <span title={name}>{name}</span></h1>
-                    <p>You are currently not granted permission to acccess any workspaces.</p>
+                    <h1>Welcome</h1>
+                    <p>You are currently not granted permission to acccess the application.</p>
                     <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
                   </Modal.Body>
                 </Modal>
           }
         </div>
-        {authStore.isFullyAuthenticated && (
+        {authStore.isAuthenticated && authStore.isUserAuthorized && (
           <React.Fragment>
             {appStore.deleteInstanceError ?
               <div className={classes.deleteInstanceErrorModal}>
@@ -247,10 +257,9 @@ const AppComponent = observer(() => {
   );
 });
 
-class App extends React.Component {
+class ErrorReport extends React.Component {
+
   componentDidMount() {
-    appStore.initialize();
-    document.addEventListener("keydown", appStore.handleGlobalShortcuts);
     const cookies = new Cookies();
     const sentryUrl = cookies.get("sentry_url");
     if (sentryUrl) {
@@ -260,23 +269,41 @@ class App extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    document.removeEventListener("keydown", appStore.handleGlobalShortcuts);
-  }
-
   componentDidCatch(error, info) {
+    const { stores } = this.props;
+    const { appStore } = stores;
     appStore.setGlobalError(error, info);
   }
 
   render() {
-    return (
-      <AppComponent />
-    );
+    const { children } = this.props;
+    return children;
   }
 }
 
+const App = ({ children }) => {
+
+  const stores = useStores();
+  const { appStore } = stores;
+
+  useEffect(() => {
+    appStore.initialize();
+    document.addEventListener("keydown", appStore.handleGlobalShortcuts);
+    return () => {
+      document.removeEventListener("keydown", appStore.handleGlobalShortcuts);
+    };
+  }, [appStore]);
+
+  return children(stores);
+};
+
 render(
   <React.StrictMode>
-    <App />
-  </React.StrictMode>
-  , document.getElementById("root"));
+    <App>
+      {stores => (
+        <ErrorReport stores={stores}>
+          <AppComponent />
+        </ErrorReport>
+      )}
+    </App>
+  </React.StrictMode>, document.getElementById("root"));

@@ -19,9 +19,7 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../../Stores/AppStore";
-import browseStore from "../../Stores/BrowseStore";
-import instancesStore from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -133,6 +131,8 @@ const useStyles = createUseStyles({
 const TypesItem = observer(({ type }) => {
 
   const classes = useStyles();
+
+  const { appStore, browseStore, instancesStore } = useStores();
 
   const handleSelect = e => {
     e && e.stopPropagation();

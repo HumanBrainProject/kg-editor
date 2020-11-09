@@ -22,12 +22,11 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
+import { useStores } from "../../Hooks/UseStores";
+
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 import Label from "../Label";
-
-import instancesStore from "../../Stores/InstancesStore";
-import typesStore from "../../Stores/TypesStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -90,6 +89,8 @@ const useStyles = createUseStyles({
 const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
+
+  const { typesStore, instancesStore } = useStores();
 
   const {
     instance,

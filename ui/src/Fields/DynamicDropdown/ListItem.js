@@ -17,9 +17,9 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { createUseStyles } from "react-jss";
-
-import instancesStore from "../../Stores/InstancesStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   value: {
@@ -69,9 +69,11 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
 
   const classes = useStyles();
 
+  const { instancesStore } = useStores();
+
   useEffect(() => {
     instancesStore.createInstanceOrGet(instanceId).fetchLabel();
-  }, [instanceId]);
+  }, [instancesStore, instanceId]);
 
   const handleClick = e => {
     e.stopPropagation();

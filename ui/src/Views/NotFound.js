@@ -17,7 +17,9 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { Link } from "react-router-dom";
-import routerStore from "../Stores/RouterStore";
+
+import { useStores } from "../Hooks/UseStores";
+
 import BGMessage from "../Components/BGMessage";
 
 const useStyles = createUseStyles({
@@ -27,11 +29,15 @@ const useStyles = createUseStyles({
 });
 
 const NotFound = () => {
+
   const classes = useStyles();
+
+  const { history } = useStores();
+
   return (
     <div className={classes.container} >
       <BGMessage icon={"ban"}>
-        The page &quot;<i>{routerStore.history.location.pathname}</i>&quot; does not exist.<br /><br />
+        The page &quot;<i>{history.location.pathname}</i>&quot; does not exist.<br /><br />
         <Link className="btn btn-primary" to={"/"}>Go back to the dashboard</Link>
       </BGMessage>
     </div>

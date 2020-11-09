@@ -22,7 +22,7 @@ import { Column, Table as TableComponent } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
-import instancesStore from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -55,7 +55,9 @@ const useStyles = createUseStyles({
 
 const LabelCellRenderer = observer(({ instanceId }) => {
 
-  useEffect(() => instancesStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
+  const { instancesStore } = useStores();
+
+  useEffect(() => instancesStore.createInstanceOrGet(instanceId).fetchLabel(), [instancesStore, instanceId]);
 
   const instance = instanceId && instancesStore.instances.get(instanceId);
 
@@ -105,6 +107,8 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
     e.stopPropagation();
     onDeleteRow(index);
   };
+
+  const { instancesStore } = useStores();
 
   const instance = instanceId && instancesStore.instances.get(instanceId);
 

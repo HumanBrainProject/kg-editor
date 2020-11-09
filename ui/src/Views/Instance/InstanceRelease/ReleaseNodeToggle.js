@@ -18,9 +18,9 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react";
 import MultiToggle from "../../../Components/MultiToggle";
-import releaseStore from "../../../Stores/ReleaseStore";
-import instancesStore from "../../../Stores/InstancesStore";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -45,6 +45,8 @@ const useStyles = createUseStyles({
 const ReleaseNodeToggle = observer(({ node }) => {
 
   const classes = useStyles();
+
+  const { instancesStore, releaseStore } = useStores();
 
   const handleChange = status => {
     instancesStore.togglePreviewInstance();

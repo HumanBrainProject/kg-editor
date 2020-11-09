@@ -17,18 +17,20 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 
 import API from "../Services/API";
-import appStore from "./AppStore";
 import InstanceStore from "./InstanceStore";
 
 const maxItems = 100;
 
-class HistoryStore {
+export class HistoryStore {
   instancesHistory = [];
   instances = [];
   isFetching = false;
   fetchError = null;
 
-  constructor(){
+  transportLayer = null;
+  rootStore = null;
+
+  constructor(transportLayer, rootStore){
     makeObservable(this, {
       instancesHistory: observable,
       instances: observable,
@@ -38,6 +40,9 @@ class HistoryStore {
       getFileredInstancesHistory: action,
       fetchInstances: action
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
 
     if (localStorage.getItem("instancesHistory")) {
       try {
@@ -52,12 +57,12 @@ class HistoryStore {
   }
 
   updateInstanceHistory(id, mode, remove) {
-    if (!appStore.currentWorkspace) {
+    if (!this.rootStore.appStore.currentWorkspace) {
       return;
     }
     let index = -1;
     this.instancesHistory.some((instance, idx) => {
-      if (instance.id === id && appStore.currentWorkspace && instance.workspace === appStore.currentWorkspace.id && instance.mode === mode) {
+      if (instance.id === id && this.rootStore.appStore.currentWorkspace && instance.workspace === this.rootStore.appStore.currentWorkspace.id && instance.mode === mode) {
         index = idx;
         return true;
       }
@@ -68,15 +73,15 @@ class HistoryStore {
     } else if (this.instancesHistory.length >= maxItems) {
       this.instancesHistory.pop();
     }
-    if (!remove && appStore.currentWorkspace) {
-      this.instancesHistory.unshift({id: id, workspace: appStore.currentWorkspace.id, mode: mode});
+    if (!remove && this.rootStore.appStore.currentWorkspace) {
+      this.instancesHistory.unshift({id: id, workspace: this.rootStore.appStore.currentWorkspace.id, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
   }
 
   getFileredInstancesHistory(workspace, modes, max=10) {
-    if (!appStore.currentWorkspace) {
+    if (!workspace) {
       return [];
     }
     if (!modes) {
@@ -115,7 +120,7 @@ class HistoryStore {
         this.instances = [];
         this.isFetching = true;
         this.fetchError = null;
-        const response = await API.axios.post(API.endpoints.instancesSummary(), list);
+        const response = await this.transportLayer.getInstancesSummary(null, list);
         runInAction(() => {
           list.forEach(identifier => {
             const data = response && response.data && response.data.data && response.data.data[identifier];
@@ -133,7 +138,7 @@ class HistoryStore {
                 }
               });
               const instance = new InstanceStore(identifier);
-              instance.initializeData(data);
+              instance.initializeData(this.transportLayer, data);
               this.instances.push(instance);
             }
           });
@@ -145,11 +150,11 @@ class HistoryStore {
           this.fetchError = `Error while retrieving history instances (${message})`;
           this.isFetching = false;
         });
-        appStore.captureSentryException(e);
+        API.captureException(e);
       }
     }
   }
 
 }
 
-export default new HistoryStore();
+export default HistoryStore;

@@ -15,26 +15,16 @@
 */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import * as Sentry from "@sentry/browser";
 import { matchPath } from "react-router-dom";
 import _  from "lodash-uuid";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
-import authStore from "./AuthStore";
-import instancesStore from "./InstancesStore";
-import routerStore from "./RouterStore";
-import API from "../Services/API";
-import historyStore from "./HistoryStore";
-import viewStore from "./ViewStore";
-import typesStore from "./TypesStore";
-import browseStore from "./BrowseStore";
-import statusStore from "./StatusStore";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
-const getLinkedInstanceIds = instanceIds => {
+const getLinkedInstanceIds = (instancesStore, instanceIds) => {
   //window.console.log("list: ", instanceIds);
   const result = instanceIds.reduce((acc, id) => {
     const instance = instancesStore.instances.get(id);
@@ -48,8 +38,9 @@ const getLinkedInstanceIds = instanceIds => {
   return Array.from(new Set(result));
 };
 
-class AppStore{
+export class AppStore{
   globalError = null;
+  currentWorkspace = null;
   initializingMessage = null;
   initializationError = null;
   initialInstanceError = null;
@@ -58,7 +49,6 @@ class AppStore{
   canLogin = true;
   currentTheme = "default";
   historySettings = null;
-  currentWorkspace = null;
   showSaveBar = false;
   instanceToDelete = null;
   isDeletingInstance = false;
@@ -67,15 +57,20 @@ class AppStore{
   instanceCreationError = null;
   pathsToResolve = new Map();
 
+  transportLayer = null;
+  rootStore = null;
+
   availableThemes = {
     "default": DefaultTheme,
     "bright": BrightTheme,
     "cupcake": CupcakeTheme
   }
 
-  constructor(){
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       globalError: observable,
+      currentWorkspace: observable,
+      setCurrentWorkspace: action,
       initializingMessage: observable,
       initializationError: observable,
       initialInstanceError: observable,
@@ -84,7 +79,6 @@ class AppStore{
       canLogin: observable,
       currentTheme: observable,
       historySettings: observable,
-      currentWorkspace: observable,
       showSaveBar: observable,
       instanceToDelete: observable,
       isDeletingInstance: observable,
@@ -102,7 +96,6 @@ class AppStore{
       cancelInitialInstance: action,
       setGlobalError: action,
       dismissGlobalError: action,
-      setCurrentWorkspace: action,
       toggleSavebarDisplay: action,
       openInstance: action,
       closeInstance: action,
@@ -119,7 +112,10 @@ class AppStore{
       toggleReleasedFlagHistorySetting: action
     });
 
-    this.canLogin = !matchPath(routerStore.history.location.pathname, { path: "/logout", exact: "true" });
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
+
+    this.canLogin = !matchPath(this.rootStore.history.location.pathname, { path: "/logout", exact: "true" });
     let savedTheme = localStorage.getItem("currentTheme");
     this.currentTheme = savedTheme === "bright"? "bright": "default";
     let savedHistorySettings = null;
@@ -144,46 +140,38 @@ class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
-  get currentWorkspaceName() {
-    if (this.currentWorkspace) {
-      return this.currentWorkspace.name || this.currentWorkspace.id;
-    }
-    return "";
-  }
-
-  get currentWorkspacePermissions() {
-    return this.currentWorkspace?this.currentWorkspace.permissions:{};
-  }
-
   async initialize() {
     if (this.canLogin && !this.isInitialized) {
       this.initializingMessage = "Initializing the application...";
       this.initializationError = null;
       this.initialInstanceError = null;
       this.initialInstanceWorkspaceError = null;
-      if(!authStore.isAuthenticated) {
+      if(!this.rootStore.authStore.isAuthenticated) {
         this.initializingMessage = "User authenticating...";
-        await authStore.authenticate();
-        if (authStore.authError) {
+        await this.rootStore.authStore.authenticate();
+        if (this.rootStore.authStore.authError) {
           runInAction(() => {
-            this.initializationError = authStore.authError;
+            this.initializationError = this.rootStore.authStore.authError;
             this.initializingMessage = null;
           });
         }
       }
-      if(authStore.isAuthenticated && !authStore.hasUserProfile) {
+      if(this.rootStore.authStore.isAuthenticated && !this.rootStore.authStore.hasUserProfile) {
         runInAction(() => {
           this.initializingMessage = "Retrieving user profile...";
         });
-        await authStore.retrieveUserProfile();
-        if (authStore.userProfileError) {
-          runInAction(() => {
-            this.initializationError = authStore.userProfileError;
+        await this.rootStore.authStore.retrieveUserProfile();
+        runInAction(() => {
+          if (this.rootStore.authStore.userProfileError) {
+            this.initializationError = this.rootStore.authStore.userProfileError;
             this.initializingMessage = null;
-          });
-        }
+          } else if (!this.rootStore.authStore.isUserAuthorized && !this.rootStore.authStore.isRetrievingUserProfile) {
+            this.isInitialized = true;
+            this.initializingMessage = null;
+          }
+        });
       }
-      if(authStore.isFullyAuthenticated) {
+      if(this.rootStore.authStore.isAuthenticated && this.rootStore.authStore.isUserAuthorized) {
         await this.initializeWorkspace();
         runInAction(() => {
           this.initializingMessage = null;
@@ -194,8 +182,8 @@ class AppStore{
   }
 
   flush() {
-    instancesStore.flush();
-    statusStore.flush();
+    this.rootStore.instancesStore.flush();
+    this.rootStore.statusStore.flush();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
@@ -206,11 +194,11 @@ class AppStore{
   }
 
   matchInstancePath = (id=":id") => {
-    let path =  matchPath(routerStore.history.location.pathname, { path: `/instances/${id}/:mode`, exact: "true" });
+    let path =  matchPath(this.rootStore.history.location.pathname, { path: `/instances/${id}/:mode`, exact: "true" });
     if(path) {
       return path;
     }
-    path = matchPath(routerStore.history.location.pathname, { path: `/instances/${id}`, exact: "true" });
+    path = matchPath(this.rootStore.history.location.pathname, { path: `/instances/${id}`, exact: "true" });
     if(!path) {
       return null;
     }
@@ -245,12 +233,12 @@ class AppStore{
   async getInitialInstanceWorkspace(instanceId) {
     this.initializingMessage = `Retrieving instance "${instanceId}"...`;
     try{
-      const response = await API.axios.get(API.endpoints.instance(instanceId));
+      const response = await this.transportLayer.getInstance(instanceId);
       const data = response.data && response.data.data;
       if(data){
 
-        const instance = instancesStore.createInstanceOrGet(instanceId);
-        instance.initializeData(data);
+        const instance = this.rootStore.instancesStore.createInstanceOrGet(instanceId);
+        instance.initializeData(this.transportLayer, data);
 
         if(data.workspace){
           return data.workspace;
@@ -284,7 +272,7 @@ class AppStore{
   }
 
   cancelInitialInstance() {
-    routerStore.history.replace("/browse");
+    this.rootStore.history.replace("/browse");
     this.initializationError = null;
     this.initialInstanceError = null;
     this.initialInstanceWorkspaceError = null;
@@ -295,23 +283,23 @@ class AppStore{
   }
 
   closeAllInstances() {
-    instancesStore.resetInstanceIdAvailability();
-    if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
-      || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
-      || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
-      routerStore.history.push("/browse");
+    this.rootStore.instancesStore.resetInstanceIdAvailability();
+    if (!(matchPath(this.rootStore.history.location.pathname, { path: "/", exact: "true" })
+      || matchPath(this.rootStore.history.location.pathname, { path: "/browse", exact: "true" })
+      || matchPath(this.rootStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
+      this.rootStore.history.push("/browse");
     }
-    viewStore.unregisterAllViews();
+    this.rootStore.viewStore.unregisterAllViews();
   }
 
   clearViews() {
-    instancesStore.resetInstanceIdAvailability();
-    if (!(matchPath(routerStore.history.location.pathname, { path: "/", exact: "true" })
-      || matchPath(routerStore.history.location.pathname, { path: "/browse", exact: "true" })
-      || matchPath(routerStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
-      routerStore.history.push("/browse");
+    this.rootStore.instancesStore.resetInstanceIdAvailability();
+    if (!(matchPath(this.rootStore.history.location.pathname, { path: "/", exact: "true" })
+      || matchPath(this.rootStore.history.location.pathname, { path: "/browse", exact: "true" })
+      || matchPath(this.rootStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
+      this.rootStore.history.push("/browse");
     }
-    viewStore.clearViews();
+    this.rootStore.viewStore.clearViews();
   }
 
   setGlobalError(error, info) {
@@ -320,18 +308,6 @@ class AppStore{
 
   dismissGlobalError() {
     this.globalError = null;
-  }
-
-  captureSentryException = e => {
-    const { response } = e;
-    const { status } = response;
-    switch(status) {
-    case 500:
-    {
-      Sentry.captureException(e);
-      break;
-    }
-    }
   }
 
   setTheme(theme){
@@ -345,6 +321,17 @@ class AppStore{
     } else {
       this.setTheme("bright");
     }
+  }
+
+  get currentWorkspaceName() {
+    if (this.currentWorkspace) {
+      return this.currentWorkspace.name || this.currentWorkspace.id;
+    }
+    return "";
+  }
+
+  get currentWorkspacePermissions() {
+    return this.currentWorkspace?this.currentWorkspace.permissions:{};
   }
 
   setSizeHistorySetting(size){
@@ -374,12 +361,12 @@ class AppStore{
   }
 
   setCurrentWorkspace = space => {
-    let workspace = space?authStore.workspaces.find( w => w.id === space):null;
-    if (!workspace && authStore.hasWorkspaces && authStore.workspaces.length === 1) {
-      workspace = authStore.workspaces[0];
+    let workspace = space?this.rootStore.authStore.workspaces.find( w => w.id === space):null;
+    if (!workspace && this.rootStore.authStore.hasWorkspaces && this.rootStore.authStore.workspaces.length === 1) {
+      workspace = this.rootStore.authStore.workspaces[0];
     }
     if(this.currentWorkspace !== workspace) {
-      if(viewStore.views.size > 0) {
+      if(this.rootStore.viewStore.views.size > 0) {
         if (window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
           this.clearViews();
         } else {
@@ -389,9 +376,9 @@ class AppStore{
       this.currentWorkspace = workspace;
       if (this.currentWorkspace) {
         localStorage.setItem("currentWorkspace", workspace.id);
-        viewStore.restoreViews();
-        typesStore.fetch(true);
-        browseStore.clearInstances();
+        this.rootStore.viewStore.restoreViews();
+        this.rootStore.typesStore.fetch(true);
+        this.rootStore.browseStore.clearInstances();
       } else {
         localStorage.removeItem("currentWorkspace");
       }
@@ -404,19 +391,19 @@ class AppStore{
 
   createInstance = () => {
     const uuid = _.uuid();
-    routerStore.history.push(`/instances/${uuid}/create`);
+    this.rootStore.history.push(`/instances/${uuid}/create`);
   }
 
   openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view") {
-    const instance = instancesStore.instances.get(instanceId);
+    const instance = this.rootStore.instancesStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
     const name = isFetched?instance.name:instanceName;
     const primaryType = isFetched?instance.primaryType:instancePrimaryType;
-    viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
+    this.rootStore.viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
     if(viewMode !== "create") {
-      historyStore.updateInstanceHistory(instanceId, "viewed");
+      this.rootStore.historyStore.updateInstanceHistory(instanceId, "viewed");
     }
-    viewStore.syncStoredViews();
+    this.rootStore.viewStore.syncStoredViews();
   }
 
   getReadMode() {
@@ -426,29 +413,29 @@ class AppStore{
 
   closeInstance(instanceId) {
     if (this.matchInstancePath(instanceId)) {
-      if (viewStore.views.size > 1) {
-        const openedInstances = viewStore.instancesIds;
+      if (this.rootStore.viewStore.views.size > 1) {
+        const openedInstances = this.rootStore.viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
-        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          routerStore.history.push(`/instances/${newCurrentInstanceId}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
         } else {
-          routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        routerStore.history.push("/browse");
-        browseStore.clearSelectedInstance();
+        this.rootStore.history.push("/browse");
+        this.rootStore.browseStore.clearSelectedInstance();
       }
     }
-    instancesStore.instanceIdAvailability.delete(instanceId);
-    viewStore.unregisterViewByInstanceId(instanceId);
-    const instance = instancesStore.instances.get(instanceId);
+    this.rootStore.instancesStore.instanceIdAvailability.delete(instanceId);
+    this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
+    const instance = this.rootStore.instancesStore.instances.get(instanceId);
     if (instance) {
-      const instanceIdsToBeKept = getLinkedInstanceIds(viewStore.instancesIds);
+      const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore.instancesStore, this.rootStore.viewStore.instancesIds);
       const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
-      instancesStore.removeInstances(instanceIdsToBeRemoved);
+      this.rootStore.instancesStore.removeInstances(instanceIdsToBeRemoved);
     }
   }
 
@@ -460,10 +447,10 @@ class AppStore{
     if (!instance.hasSaveError) {
       if (isNew) {
         runInAction(() => {
-          const view = viewStore.views.get(id);
+          const view = this.rootStore.viewStore.views.get(id);
           if(view) {
             if (newId !== id) {
-              viewStore.replaceViewByNewInstanceId(id, newId);
+              this.rootStore.viewStore.replaceViewByNewInstanceId(id, newId);
             } else {
               view.mode = "edit";
             }
@@ -471,16 +458,16 @@ class AppStore{
             this.replaceInstanceResolvedIdPath(`/instances/${id}/create`);
           }
         });
-        viewStore.syncStoredViews();
+        this.rootStore.viewStore.syncStoredViews();
       }
     }
-    historyStore.updateInstanceHistory(instance.id, "edited");
-    statusStore.flush();
+    this.rootStore.historyStore.updateInstanceHistory(instance.id, "edited");
+    this.rootStore.statusStore.flush();
   }
 
   syncInstancesHistory(instance, mode) {
-    if(instance && viewStore.views.has(instance.id)){
-      historyStore.updateInstanceHistory(instance.id, mode);
+    if(instance && this.rootStore.viewStore.views.has(instance.id)){
+      this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
     }
   }
 
@@ -490,27 +477,27 @@ class AppStore{
       this.isDeletingInstance = true;
       this.deleteInstanceError = null;
       try{
-        await API.axios.delete(API.endpoints.instance(instanceId));
+        await this.transportLayer.deleteInstance(instanceId);
         runInAction(() => {
           this.instanceToDelete = null;
           this.isDeletingInstance = false;
           let nextLocation = null;
           if(this.matchInstancePath(instanceId)){
-            const ids = viewStore.instancesIds;
+            const ids = this.rootStore.viewStore.instancesIds;
             if(ids.length > 1){
               const currentInstanceIndex = ids.indexOf(instanceId);
               const newInstanceId = currentInstanceIndex >= ids.length - 1 ? ids[currentInstanceIndex-1]: ids[currentInstanceIndex+1];
-              const view = viewStore.views.get(newInstanceId);
+              const view = this.rootStore.viewStore.views.get(newInstanceId);
               nextLocation = `/instances/${newInstanceId}/${view.mode}`;
             } else {
               nextLocation = "/browse";
             }
           }
-          browseStore.refreshFilter();
-          viewStore.unregisterViewByInstanceId(instanceId);
+          this.rootStore.browseStore.refreshFilter();
+          this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
           this.flush();
           if (nextLocation) {
-            routerStore.history.push(nextLocation);
+            this.rootStore.history.push(nextLocation);
           }
         });
       } catch(e){
@@ -525,7 +512,7 @@ class AppStore{
   }
 
   async duplicateInstance(fromInstanceId) {
-    const instanceToCopy = instancesStore.instances.get(fromInstanceId);
+    const instanceToCopy = this.rootStore.instancesStore.instances.get(fromInstanceId);
     const payload = instanceToCopy.payload;
     const labelField = instanceToCopy.labelField;
     if(labelField) {
@@ -533,14 +520,14 @@ class AppStore{
     }
     this.isCreatingNewInstance = true;
     try{
-      const { data } = await API.axios.post(API.endpoints.createInstance(), payload);
+      const { data } = await this.transportLayer.createInstance(this.currentWorkspace.id, null, payload);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });
       const newId = data.data.id;
-      const newInstance = instancesStore.createInstanceOrGet(newId);
-      newInstance.initializeData(data.data);
-      routerStore.history.push(`/instances/${newId}/edit`);
+      const newInstance = this.rootStore.instancesStore.createInstanceOrGet(newId);
+      newInstance.initializeData(this.transportLayer, data.data);
+      this.rootStore.history.push(`/instances/${newId}/edit`);
     } catch(e){
       runInAction(() => {
         this.isCreatingNewInstance = false;
@@ -566,90 +553,90 @@ class AppStore{
     if (this.pathsToResolve.has(path)) {
       const newPath = this.pathsToResolve.get(path);
       this.pathsToResolve.delete(path);
-      routerStore.history.replace(newPath);
+      this.rootStore.history.replace(newPath);
     }
   }
 
   focusPreviousInstance(instanceId) {
     if (this.matchInstancePath(instanceId)) {
-      if (viewStore.views.size > 1) {
-        let openedInstances = viewStore.instancesIds;
+      if (this.rootStore.viewStore.views.size > 1) {
+        let openedInstances = this.rootStore.viewStore.instancesIds;
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
         let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
-        let openedInstance = viewStore.views.get(newCurrentInstanceId);
+        let openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          routerStore.history.push(`/instances/${newCurrentInstanceId}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
         } else {
-          routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        routerStore.history.push("/browse");
+        this.rootStore.history.push("/browse");
       }
     } else {
-      if (viewStore.views.size > 1) {
-        const openedInstances = viewStore.instancesIds;
+      if (this.rootStore.viewStore.views.size > 1) {
+        const openedInstances = this.rootStore.viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
-        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          routerStore.history.push(`/instances/${newCurrentInstanceId}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
         } else {
-          routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        routerStore.history.push("/browse");
+        this.rootStore.history.push("/browse");
       }
     }
   }
 
   focusNextInstance(instanceId) {
     if (this.matchInstancePath(instanceId)) {
-      if (viewStore.views.size > 1) {
-        const openedInstances = viewStore.instancesIds;
+      if (this.rootStore.viewStore.views.size > 1) {
+        const openedInstances = this.rootStore.viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
-        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          routerStore.history.push(`/instances/${newCurrentInstanceId}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
         } else {
-          routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        routerStore.history.push("/browse");
+        this.rootStore.history.push("/browse");
       }
     } else {
-      if (viewStore.views.size > 1) {
-        const openedInstances = viewStore.instancesIds;
+      if (this.rootStore.viewStore.views.size > 1) {
+        const openedInstances = this.rootStore.viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[0];
-        const openedInstance = viewStore.views.get(newCurrentInstanceId);
+        const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          routerStore.history.push(`/instances/${newCurrentInstanceId}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
         } else {
-          routerStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        routerStore.history.push("/browse");
+        this.rootStore.history.push("/browse");
       }
     }
   }
 
-  goToDashboard = () => routerStore.history.push("/");
+  goToDashboard = () => this.rootStore.history.push("/");
 
   login = () => {
     if (this.canLogin) {
-      authStore.login();
+      this.rootStore.authStore.login();
     } else {
-      routerStore.history.replace("/");
+      this.rootStore.history.replace("/");
       this.canLogin = true;
       this.initialize(true);
     }
   };
 
   logout = () => {
-    if (!instancesStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
-      viewStore.flushStoredViews();
-      authStore.logout();
+    if (!this.rootStore.instancesStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
+      this.rootStore.viewStore.flushStoredViews();
+      this.rootStore.authStore.logout();
     }
   }
 
@@ -657,13 +644,13 @@ class AppStore{
     if ((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84) {
       this.toggleTheme();
     } else if (e.altKey && e.keyCode === 66) { // alt+b, browse
-      routerStore.history.push("/browse");
+      this.rootStore.history.push("/browse");
     } else if (e.altKey && e.keyCode === 78) { // alt+n, new
       this.createInstance();
     } else if (e.altKey && e.keyCode === 68) { // alt+d, dashboard
-      routerStore.history.push("/");
+      this.rootStore.history.push("/");
     } else if (e.keyCode === 112) { // F1, help
-      routerStore.history.push("/help");
+      this.rootStore.history.push("/help");
     } else if (e.altKey && e.keyCode === 87) { // alt+w, close
       if (e.shiftKey) { // alt+shift+w, close all
         this.closeAllInstances();
@@ -689,6 +676,4 @@ class AppStore{
   }
 }
 
-
-
-export default new AppStore();
+export default AppStore;

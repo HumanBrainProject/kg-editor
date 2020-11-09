@@ -24,9 +24,9 @@ import uniqueId from "lodash/uniqueId";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { useStores } from "../../Hooks/UseStores";
+
 import CompareChanges from "./CompareChanges";
-import appStore from "../../Stores/AppStore";
-import instancesStore from "../../Stores/InstancesStore";
 
 const animationId = uniqueId("animationId");
 
@@ -197,6 +197,8 @@ const SavePanel = observer(() => {
 
   const classes = useStyles();
 
+  const { appStore, instancesStore } = useStores();
+
   const [comparedInstance, setComparedInstance] = useState(null);
 
   useEffect(() => {
@@ -214,7 +216,7 @@ const SavePanel = observer(() => {
     return () => {
       window.removeEventListener("beforeunload", onUnload);
     };
-  }, []);
+  }, [appStore, instancesStore]);
 
   const handleSaveAll = () => {
     instancesStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));

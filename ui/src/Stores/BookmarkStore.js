@@ -15,9 +15,9 @@
 */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import API from "../Services/API";
+import _ from "lodash-uuid";
 
-class BookmarkStore {
+export class BookmarkStore {
   list = [];
   isFetching = false;
   listFilter = "";
@@ -31,8 +31,9 @@ class BookmarkStore {
   bookmarkCreationError = null;
 
   currentlyEditedBookmark = null;
+  rootStore = null;
 
-  constructor() {
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       list: observable,
       isFetching: observable,
@@ -56,6 +57,9 @@ class BookmarkStore {
       createBookmark: action,
       updateBookmark: action
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   get hasFetchError() {
@@ -109,7 +113,7 @@ class BookmarkStore {
     bookmark.deleteError = null;
     bookmark.isDeleting = true;
     try {
-      await API.axios.delete(API.endpoints.bookmarkList(bookmark.id));
+      await this.transportLayer.deleteBookmark(bookmark.id);
       runInAction(() => {
         bookmark.isDeleting = false;
         const index = this.list.findIndex(item => item.id === bookmark.id);
@@ -132,7 +136,7 @@ class BookmarkStore {
     try {
       this.isFetching = true;
       this.fetchError = null;
-      const { data } = await API.axios.get(API.endpoints.bookmarks());
+      const { data } = await this.transportLayer.getBookmarks(this.rootStore.appStore.currentWorkspace.id);
       runInAction(() => {
         this.list = data.data;
         this.isFetching = false;
@@ -149,8 +153,9 @@ class BookmarkStore {
     this.newBookmarkName = name;
     this.bookmarkCreationError = null;
     this.isCreatingBookmark = true;
+    const id = _.uuid();
     try {
-      const { data } = await API.axios.post(API.endpoints.bookmarkList(), { name: name, list: instanceIds || [] });
+      const { data } = await this.transportLayer.createBookmark(id, this.rootStore.appStore.currentWorkspace.id, name, instanceIds || []);
       runInAction(() => {
         const bookmarkData = data && data.data;
         this.list.push({
@@ -178,7 +183,7 @@ class BookmarkStore {
     bookmark.updateError = null;
     bookmark.isUpdating = true;
     try {
-      const { data } = await API.axios.put(API.endpoints.bookmarkList(bookmark.id), { name: newProps.name });
+      const { data } = await this.transportLayer.renameBookmark(bookmark.id, newProps.name);
       runInAction(() => {
         bookmark.label = data && data.data ? data.data.label : null;
         bookmark.isUpdating = false;
@@ -192,4 +197,4 @@ class BookmarkStore {
     }
   }
 }
-export default new BookmarkStore();
+export default BookmarkStore;

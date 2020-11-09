@@ -73,6 +73,9 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
 
   const classes = useStyles();
 
+  const view = React.useContext(ViewContext);
+  const pane = React.useContext(PaneContext);
+
   if (readMode) {
     if(!instance.permissions.canRead) {
       return (
@@ -94,23 +97,14 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
   const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
 
   return (
-    <ViewContext.Consumer>
-      {view => (
-        <PaneContext.Consumer>
-          {pane => (
-            <Form className={`${classes.container} ${className}`} >
-              {fields.map(name => {
-                const fieldStore = instance.fields[name];
-                return (
-                  <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
-                );
-              })}
-            </Form>
-          )}
-        </PaneContext.Consumer>
-      )}
-    </ViewContext.Consumer>
-
+    <Form className={`${classes.container} ${className}`} >
+      {fields.map(name => {
+        const fieldStore = instance.fields[name];
+        return (
+          <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
+        );
+      })}
+    </Form>
   );
 });
 

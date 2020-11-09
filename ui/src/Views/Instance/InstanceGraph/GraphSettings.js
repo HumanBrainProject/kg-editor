@@ -20,11 +20,9 @@ import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
 import Color from "color";
 import { Scrollbars } from "react-custom-scrollbars";
-
-import routerStore from "../../../Stores/RouterStore";
-import graphStore from "../../../Stores/GraphStore";
-import appStore from "../../../Stores/AppStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -122,14 +120,16 @@ const Node = ({ node, isGrouped }) => {
 
   const classes = useStyles();
 
-  const handelMouseOver = () =>graphStore.setHighlightNodeConnections(node, true);
+  const { appStore, history, graphStore } = useStores();
+
+  const handelMouseOver = () => graphStore.setHighlightNodeConnections(node, true);
 
   const handelMouseOut = () => graphStore.setHighlightNodeConnections(node, false);
 
   const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
-      routerStore.history.push(`/instances/${node.id}/graph`);
+      history.push(`/instances/${node.id}/graph`);
     }
   };
 
@@ -177,6 +177,8 @@ const Type = ({type, defaultColor, grouped}) => (
 
 const GroupLabel = observer(({ className, group }) => {
 
+  const { graphStore } = useStores();
+
   let actions = {};
   if(group.grouped) {
     actions = {
@@ -195,6 +197,8 @@ const GroupLabel = observer(({ className, group }) => {
 });
 
 const Actions = observer(({ className, group }) => {
+
+  const { graphStore } = useStores();
 
   const handleChange = action => {
     switch (action) {
@@ -271,6 +275,8 @@ const Groups = ({className, groups}) => (
 const GraphSettings = observer(() => {
 
   const classes = useStyles();
+
+  const { graphStore } = useStores();
 
   return (
     <div className={classes.container}>

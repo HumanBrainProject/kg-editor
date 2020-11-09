@@ -26,7 +26,10 @@ class FieldStore {
   instance = null;
   type = null;
 
-  constructor(definition, options, instance) {
+  instance = null;
+  transportLayer = null;
+
+  constructor(definition, options, instance, transportLayer) {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,
@@ -45,6 +48,8 @@ class FieldStore {
     this.labelTooltip = definition.labelTooltip;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
+
+    this.transportLayer = transportLayer;
   }
 
   get returnValue() {

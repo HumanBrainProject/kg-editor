@@ -19,7 +19,7 @@ import { createUseStyles } from "react-jss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import routerStore from "../Stores/RouterStore";
+import { useStores } from "../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container:{
@@ -92,13 +92,15 @@ const useStyles = createUseStyles({
 
 const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
 
+  const  { history } = useStores();
+
   const classes = useStyles();
   const closeable = typeof onClose === "function";
 
   const handleClick = e => {
     e.preventDefault();
     if(path){
-      routerStore.history.push(path);
+      history.push(path);
     }
     typeof onClick === "function" && onClick(e);
   };

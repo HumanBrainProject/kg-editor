@@ -19,10 +19,7 @@ import debounce from "lodash/debounce";
 import _  from "lodash-uuid";
 
 import API from "../Services/API";
-import appStore from "./AppStore";
-import routerStore from "./RouterStore";
 import InstanceStore from "./InstanceStore";
-import viewStore from "./ViewStore";
 
 class Instance extends InstanceStore {
 
@@ -80,7 +77,6 @@ class Instance extends InstanceStore {
   }
 
   async save() {
-
     this.cancelChangesPending = false;
     this.hasSaveError = false;
     this.isSaving = true;
@@ -88,7 +84,7 @@ class Instance extends InstanceStore {
     const payload = this.returnValue;
     try {
       if (this.isNew) {
-        const { data } = await API.axios.post(API.endpoints.createInstance(this.id), payload);
+        const { data } = await this.store.transportLayer.createInstance(this.workspace, this.id, payload);
         runInAction(() => {
           const newId = data.data.id;
           this.isNew = false;
@@ -100,15 +96,15 @@ class Instance extends InstanceStore {
             this.store.instance.delete(this.id);
             this.id = newId;
           }
-          this.initializeData(data.data);
+          this.initializeData(this.store.transportLayer, data.data);
         });
       } else {
-        const { data } = await API.axios.patch(API.endpoints.instance(this.id), payload);
+        const { data } = await this.store.transportLayer.patchInstance(this.id, payload);
         runInAction(() => {
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
-          this.initializeData(data.data);
+          this.initializeData(this.store.transportLayer, data.data);
         });
       }
     } catch (e) {
@@ -119,7 +115,7 @@ class Instance extends InstanceStore {
         this.hasSaveError = true;
         this.isSaving = false;
       });
-      appStore.captureSentryException(e);
+      API.captureException(e);
     }
   }
 
@@ -137,7 +133,7 @@ class Instance extends InstanceStore {
 
 }
 
-class InstancesStore {
+export class InstancesStore {
   stage = null;
   instances = new Map();
   previewInstance = null;
@@ -150,7 +146,10 @@ class InstancesStore {
   queueThreshold = 1000;
   queueTimeout = 250;
 
-  constructor(stage=null) {
+  transportLayer = null;
+  rootStore = null;
+
+  constructor(transportLayer, rootStore, stage=null) {
     makeObservable(this, {
       stage: observable,
       instances: observable,
@@ -175,6 +174,9 @@ class InstancesStore {
     });
 
     this.stage = stage?stage:null;
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   fetchInstance(instance){
@@ -217,22 +219,22 @@ class InstancesStore {
       });
     }
     try{
-      const { data } = await API.axios.get(API.endpoints.instance(instanceId));
+      const { data } = await this.transportLayer.getInstance(instanceId);
       runInAction(() => {
         const resolvedId = data && data.data && data.data.id;
         if (!resolvedId) {
-          throw `${API.endpoints.instance(instanceId)} response is invalid" (${data})`;
+          throw `Failed to fetch instance "${instanceId}" (Invalid response) (${data})`;
         }
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(data && data.data);
-        const view = viewStore.views.get(resolvedId);
+        instance.initializeData(this.transportLayer, data && data.data);
+        const view = this.rootStore.viewStore.views.get(resolvedId);
         if(view) {
           view.setNameAndColor(instance.name, instance.primaryType.color);
-          viewStore.syncStoredViews();
+          this.rootStore.viewStore.syncStoredViews();
         }
         if (mode === "create") {
-          routerStore.history.replace(`/instances/${resolvedId}/edit`);
+          this.rootStore.history.replace(`/instances/${resolvedId}/edit`);
         }
       });
     } catch(e){
@@ -311,7 +313,7 @@ class InstancesStore {
       }
     });
     try {
-      const response = await API.axios.post(API.endpoints.instancesList(this.stage), toProcess);
+      const response = await this.transportLayer.getInstancesList(this.stage, toProcess);
       runInAction(() => {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
@@ -325,8 +327,8 @@ class InstancesStore {
                 instance.isFetching = false;
                 instance.isFetched = false;
               } else {
-                instance.initializeData(data, false);
-                appStore.syncInstancesHistory(instance, "viewed");
+                instance.initializeData(this.transportLayer, data, false);
+                this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
               }
             } else {
               const message = "Unexpected error: no response returned.";
@@ -354,7 +356,7 @@ class InstancesStore {
         this.isFetchingQueue = false;
         this.processQueue();
       });
-      appStore.captureSentryException(e);
+      API.captureException(e);
     }
   }
 
@@ -375,7 +377,7 @@ class InstancesStore {
       }
     });
     try {
-      const response = await API.axios.post(API.endpoints.instancesLabel(this.stage), toProcess);
+      const response = await this.transportLayer.getInstancesLabel(this.stage, toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if (this.instances.has(identifier)) {
@@ -417,7 +419,7 @@ class InstancesStore {
         this.isFetchingQueue = false;
         this.processQueue();
       });
-      appStore.captureSentryException(e);
+      API.captureException(e);
     }
   }
 
@@ -442,7 +444,7 @@ class InstancesStore {
       _name: name,
       types: [instanceType],
       primaryType: instanceType,
-      workspace: appStore.currentWorkspace.id,
+      workspace: this.rootStore.appStore.currentWorkspace.id,
       fields: toJS(fields),
       labelField: type.labelField,
       promotedFields: toJS(type.promotedFields),
@@ -451,7 +453,7 @@ class InstancesStore {
       permissions: { canRead: true, canCreate: true, canWrite: true }
     };
     const instance  = new Instance(id, this);
-    instance.initializeData(data, true);
+    instance.initializeData(this.transportLayer, data, true);
     instance.fields[instance.labelField].setValue(name);
     this.instances.set(id, instance);
   }
@@ -464,7 +466,7 @@ class InstancesStore {
       error: null,
       type: type
     });
-    routerStore.history.push(`/instances/${uuid}/create`);
+    history.push(`/instances/${uuid}/create`);
   }
 
   removeInstances(instanceIds) {
@@ -484,8 +486,8 @@ class InstancesStore {
   }
 }
 
-export const createInstanceStore = (stage=null) => {
-  return new InstancesStore(stage);
+export const createInstanceStore = (transportLayer, rootStore, stage=null) => {
+  return new InstancesStore(transportLayer, rootStore, stage);
 };
 
-export default new InstancesStore();
+export default InstancesStore;

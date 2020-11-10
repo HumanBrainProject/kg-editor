@@ -342,11 +342,13 @@ export class InstanceStore {
   isLabelFetching = false;
   isLabelFetched = false;
   fetchLabelError = null;
+  isLabelNotFound = false;
   hasLabelFetchError = false;
 
   isFetching = false;
   isFetched = false;
   fetchError = null;
+  isNotFound = false
   hasFetchError = false;
 
   constructor(id, transportLayer) {
@@ -365,10 +367,12 @@ export class InstanceStore {
       isLabelFetching: observable,
       isLabelFetched: observable,
       fetchLabelError: observable,
+      isLabelNotFound: observable,
       hasLabelFetchError: observable,
       isFetching: observable,
       isFetched: observable,
       fetchError: observable,
+      isNotFound: observable,
       hasFetchError: observable,
       cloneInitialData: computed,
       returnValue: computed,
@@ -513,6 +517,7 @@ export class InstanceStore {
     this.isLabelFetching = false;
     this.isLabelFetched = true;
     this.fetchLabelError = null;
+    this.isLabelNotFound = false;
     this.hasLabelFetchError = false;
   }
 
@@ -541,6 +546,7 @@ export class InstanceStore {
       store.setAlternatives(field.alternatives);
     });
     this.fetchError = null;
+    this.isNotFound = false;
     this.hasFetchError = false;
     this.isFetching = false;
     this.isFetched = true;
@@ -555,14 +561,16 @@ export class InstanceStore {
     return `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
   }
 
-  errorLabelInstance(e) {
+  errorLabelInstance(e, isNotFound=false) {
+    this.isLabelNotFound = isNotFound;
     this.fetchLabelError = this.buildErrorMessage(e);
     this.hasLabelFetchError = true;
     this.isLabelFetched = false;
     this.isLabelFetching = false;
   }
 
-  errorInstance(e) {
+  errorInstance(e, isNotFound=false) {
+    this.isNotFound = isNotFound;
     this.fetchError = this.buildErrorMessage(e);
     this.hasFetchError = true;
     this.isFetched = false;

@@ -322,7 +322,7 @@ export class InstancesStore {
               if (data.error) {
                 const code = data.error.code?` [error ${data.error.code}]`:"";
                 const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
-                instance.errorInstance(message);
+                instance.errorInstance(message, data.error.code === 404);
                 instance.isFetching = false;
                 instance.isFetched = false;
               } else {
@@ -386,7 +386,7 @@ export class InstancesStore {
               if (data.error) {
                 const code = data.error.code?` [${data.error.code}]`:"";
                 const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
-                instance.errorLabelInstance(message);
+                instance.errorLabelInstance(message, data.error.code === 404);
                 instance.isLabelFetching = false;
                 instance.isLabelFetched = false;
               } else {

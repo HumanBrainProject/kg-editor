@@ -115,7 +115,7 @@ class Instance extends InstanceStore {
         this.hasSaveError = true;
         this.isSaving = false;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -356,7 +356,7 @@ export class InstancesStore {
         this.isFetchingQueue = false;
         this.processQueue();
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -419,7 +419,7 @@ export class InstancesStore {
         this.isFetchingQueue = false;
         this.processQueue();
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 

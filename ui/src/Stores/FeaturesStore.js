@@ -65,7 +65,7 @@ export class FeaturesStore{
         this.fetchError = `Error while retrieving list of features (${message})`;
         this.isFetching = false;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 }

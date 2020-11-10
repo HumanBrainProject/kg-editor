@@ -150,7 +150,7 @@ export class HistoryStore {
           this.fetchError = `Error while retrieving history instances (${message})`;
           this.isFetching = false;
         });
-        API.captureException(e);
+        this.transportLayer.captureException(e);
       }
     }
   }

@@ -142,7 +142,7 @@ export class StatusStore {
         this.isFetching = false;
         this.smartProcessQueue();
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
 
   }
@@ -183,7 +183,7 @@ export class StatusStore {
         this.isFetchingChildren = false;
         this.smartProcessQueueChildren();
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 }

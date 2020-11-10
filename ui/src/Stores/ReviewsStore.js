@@ -84,7 +84,7 @@ export class ReviewsStore {
         instanceReviews.isFetched = false;
         instanceReviews.isFetching = false;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
     return instanceReviews;
   }
@@ -115,7 +115,7 @@ export class ReviewsStore {
             instanceReview.status = "ADD_ERROR";
             instanceReview.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
           });
-          API.captureException(e);
+          this.transportLayer.captureException(e);
         }
       }
     }
@@ -139,7 +139,7 @@ export class ReviewsStore {
             instanceReview.status = "REMOVE_ERROR";
             instanceReview.error = `Error while trying to cancel invite to user "${userId}" to review instance "${instanceId}" (${message})`;
           });
-          API.captureException(e);
+          this.transportLayer.captureException(e);
         }
       }
     }

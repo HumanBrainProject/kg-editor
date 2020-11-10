@@ -181,7 +181,7 @@ export class BrowseStore {
           this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
           this.isFetching.instances = false;
         });
-        API.captureException(e);
+        this.transportLayer.captureException(e);
       }
     }
   }

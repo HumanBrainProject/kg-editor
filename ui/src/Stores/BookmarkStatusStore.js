@@ -145,7 +145,7 @@ export class BookmarkStatusStore{
               status.hasSaveError = true;
               status.isSaving = false;
             });
-            API.captureException(e);
+            this.transportLayer.captureException(e);
           }
         }
       }
@@ -235,7 +235,7 @@ export class BookmarkStatusStore{
         this.isFetching = false;
         this.smartProcessQueue();
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 }

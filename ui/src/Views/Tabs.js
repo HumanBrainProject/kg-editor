@@ -83,13 +83,9 @@ const Tabs = observer(() => {
     return unlisten;
   }, [history]);
 
-  const handleGoToDashboard = () => {
-    appStore.goToDashboard();
-  };
+  const handleGoToDashboard = () => appStore.goToDashboard();
 
-  const handleCreateInstance = () => {
-    appStore.createInstance();
-  };
+  const handleCreateInstance = () => appStore.createInstance();
 
   return (
     <div className={classes.container}>

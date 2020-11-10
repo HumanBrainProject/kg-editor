@@ -145,7 +145,7 @@ export class UsersStore {
           user.isFetched = true;
           user.isFetching = false;
         });
-        API.captureException(e);
+        this.transportLayer.captureException(e);
       }
     }
     return user;
@@ -223,7 +223,7 @@ export class UsersStore {
             this.isFetchingSearch = false;
           }
         });
-        API.captureException(e);
+        this.transportLayer.captureException(e);
       }
     }
   }

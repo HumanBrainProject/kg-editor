@@ -119,7 +119,7 @@ export class AuthStore {
             this.isRetrievingUserProfile = false;
           }
         });
-        API.captureException(e);
+        this.transportLayer.captureException(e);
       }
     }
     return this.hasUserProfile;
@@ -215,7 +215,7 @@ export class AuthStore {
         this.user.picture = picture;
       });
     } catch (e) {
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 

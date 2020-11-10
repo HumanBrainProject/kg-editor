@@ -109,7 +109,10 @@ export class AppStore{
       toggleViewedFlagHistorySetting: action,
       toggleEditedFlagHistorySetting: action,
       toggleBookmarkedFlagHistorySetting: action,
-      toggleReleasedFlagHistorySetting: action
+      toggleReleasedFlagHistorySetting: action,
+      setTheme: action,
+      toggleTheme: action,
+      handleGlobalShortcuts: action
     });
 
     this.transportLayer = transportLayer;

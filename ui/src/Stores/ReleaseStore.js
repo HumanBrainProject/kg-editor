@@ -270,7 +270,7 @@ export class ReleaseStore {
         const message = e.message?e.message:e;
         this.fetchError = message;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -310,7 +310,7 @@ export class ReleaseStore {
         this.isWarningMessagesFetched = false;
         this.isFetchingWarningMessages = false;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -353,7 +353,7 @@ export class ReleaseStore {
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     } finally {
       runInAction(()=>{
         this.savingProgress++;
@@ -375,7 +375,7 @@ export class ReleaseStore {
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     } finally {
       runInAction(()=>{
         this.savingProgress++;

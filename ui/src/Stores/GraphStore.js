@@ -151,7 +151,7 @@ export class GraphStore {
         this.fetchError = e.message ? e.message : e;
         this.isFetching = false;
       });
-      API.captureException(e);
+      this.transportLayer.captureException(e);
     }
   }
 

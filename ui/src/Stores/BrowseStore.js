@@ -17,7 +17,6 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
-import API from "../Services/API";
 import InstanceStore from "./InstanceStore";
 
 const normalizeInstancesData = (transportLayer, data) => {

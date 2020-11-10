@@ -16,8 +16,6 @@
 
 import { observable, action, computed, runInAction, set, values, makeObservable } from "mobx";
 
-import API from "../Services/API";
-
 const typeDefaultColor = "white";
 const typeDefaultName = "-";
 const typeDefaultLabel = "Unknown";

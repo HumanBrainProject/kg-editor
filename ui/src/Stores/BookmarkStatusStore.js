@@ -18,8 +18,6 @@ import { observable, action, runInAction, makeObservable } from "mobx";
 import { toJS } from "mobx";
 import debounce from "lodash/debounce";
 
-import API from "../Services/API";
-
 export class BookmarkStatusStore{
   statuses = new Map();
   isFetching = false;

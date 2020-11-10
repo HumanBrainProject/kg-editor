@@ -17,8 +17,6 @@
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
-import API from "../Services/API";
-
 export class UsersStore {
   users = new Map();
   isFetchingSearch = false;

@@ -15,7 +15,6 @@
 */
 
 import { observable, action, runInAction, makeObservable } from "mobx";
-import API from "../Services/API";
 
 export class ReviewsStore {
   instancesReviews = new Map();

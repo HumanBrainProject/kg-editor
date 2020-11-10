@@ -18,8 +18,6 @@ import React from "react";
 import { render } from "react-dom";
 // import { configure } from "mobx";
 
-import "@babel/polyfill";
-
 import "react-virtualized/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 

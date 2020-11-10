@@ -16,8 +16,6 @@
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 
-import API from "../Services/API";
-
 const setNodeTypes = node => {
   node.typesName = node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
   if (Array.isArray(node.children) && node.children.length) {

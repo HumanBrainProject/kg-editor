@@ -16,7 +16,6 @@
 
 import { observable, action, runInAction, makeObservable } from "mobx";
 
-import API from "../Services/API";
 import InstanceStore from "./InstanceStore";
 
 const maxItems = 100;

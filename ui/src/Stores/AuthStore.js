@@ -15,7 +15,6 @@
 */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import API from "../Services/API";
 
 const rootPath = window.rootPath || "";
 

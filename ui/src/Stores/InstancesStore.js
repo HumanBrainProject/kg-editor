@@ -18,7 +18,6 @@ import { observable, action, runInAction, computed, toJS, makeObservable } from 
 import debounce from "lodash/debounce";
 import _  from "lodash-uuid";
 
-import API from "../Services/API";
 import InstanceStore from "./InstanceStore";
 
 class Instance extends InstanceStore {

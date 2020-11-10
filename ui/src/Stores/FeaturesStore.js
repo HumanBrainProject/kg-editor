@@ -16,8 +16,6 @@
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 
-import API from "../Services/API";
-
 export class FeaturesStore{
   releases = [];
   isFetched = false;

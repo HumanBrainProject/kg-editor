@@ -17,8 +17,6 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
-import API from "../Services/API";
-
 export class StatusStore {
   statuses = new Map();
   isFetching = false;

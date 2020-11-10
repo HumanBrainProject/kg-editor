@@ -18,4 +18,4 @@
   #    required: false
   #    type: string
   ###
-  GET    /                 controllers.EditorController.searchInstancesSummary(space: String,`type`:String, from:Option[Int], size:Option[Int], searchByLabel:String?="")
+  GET    /                 controllers.EditorController.searchInstancesSummary(workspace: String,`type`:String, from:Option[Int], size:Option[Int], searchByLabel:String?="")

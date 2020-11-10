@@ -21,7 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Field from "../../Fields/Field";
 import Status from "./Status";
 // import BookmarkStatus from "./BookmarkStatus";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 
 const useStyles = createUseStyles({
   container: {

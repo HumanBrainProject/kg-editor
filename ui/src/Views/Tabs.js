@@ -15,7 +15,7 @@
 */
 
 import React, { useEffect, useState } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { matchPath } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 

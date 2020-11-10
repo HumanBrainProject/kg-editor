@@ -16,7 +16,7 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import { useStores } from "../Hooks/UseStores";

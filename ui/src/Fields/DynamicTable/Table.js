@@ -15,7 +15,7 @@
 */
 
 import React, { useEffect, useState, useRef } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import debounce from "lodash/debounce";
 import { Column, Table as TableComponent } from "react-virtualized";

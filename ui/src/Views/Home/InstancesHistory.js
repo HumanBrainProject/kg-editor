@@ -17,7 +17,7 @@
 import React, { useEffect } from "react";
 import { toJS } from "mobx";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import InstanceRow from "../Instance/InstanceRow";

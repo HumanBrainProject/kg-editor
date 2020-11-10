@@ -16,7 +16,7 @@
 
 import React, { useEffect } from "react";
 import { toJS } from "mobx";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { Router } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
 

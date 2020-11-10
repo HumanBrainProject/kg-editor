@@ -16,7 +16,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 
 import CompareFieldsChanges from "./CompareFieldsChanges";
 import { createInstanceStore } from "../../Stores/InstancesStore";

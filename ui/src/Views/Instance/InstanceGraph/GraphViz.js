@@ -16,7 +16,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import ForceGraph2D from "react-force-graph-2d";
 import debounce from "lodash/debounce";
 import Color from "color";

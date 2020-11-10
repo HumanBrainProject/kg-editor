@@ -18,7 +18,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 
 import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";

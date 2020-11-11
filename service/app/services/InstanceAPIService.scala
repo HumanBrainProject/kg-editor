@@ -161,7 +161,7 @@ trait InstanceAPIService {
                        clientToken: String
                      ): Task[Either[WSResponse, JsObject]] = {
     val wsc = wSClient
-      .url(s"$apiBaseEndpoint/$apiVersion/extra/instances/$id/suggestedLinksForProperty")
+      .url(s"$apiBaseEndpoint/$apiVersion/instances/$id/suggestedLinksForProperty")
       .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
       .addQueryStringParameters(
         "property" -> field,

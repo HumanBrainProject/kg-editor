@@ -256,7 +256,7 @@ class LinksStore extends FieldStore {
         this.optionsTypes = [];
         this.optionsExternalTypes = [];
         Object.values(types).forEach(type => {
-          if(type.space.includes(this.workspace)) {
+          if(type.space.includes(this.instance.workspace)) {
             this.optionsTypes.push(type);
           } else {
             this.optionsExternalTypes.push(type);

@@ -119,7 +119,7 @@ export class AppStore{
     this.rootStore = rootStore;
 
     this.canLogin = !matchPath(this.rootStore.history.location.pathname, { path: "/logout", exact: "true" });
-    this.setTheme(localStorage.getItem("currentTheme"));
+    this.setTheme(localStorage.getItem("theme"));
     let savedHistorySettings = null;
     if (localStorage.getItem("historySettings")) {
       try {
@@ -226,7 +226,7 @@ export class AppStore{
       }
       return this.currentWorkspace;
     } else {
-      workspace = localStorage.getItem("currentWorkspace");
+      workspace = localStorage.getItem("workspace");
       this.setCurrentWorkspace(workspace);
       return this.currentWorkspace;
     }
@@ -279,7 +279,7 @@ export class AppStore{
     this.initialInstanceError = null;
     this.initialInstanceWorkspaceError = null;
     this.initializingMessage = null;
-    const workspace = localStorage.getItem("currentWorkspace");
+    const workspace = localStorage.getItem("workspace");
     this.setCurrentWorkspace(workspace);
     this.isInitialized = true;
   }
@@ -318,7 +318,7 @@ export class AppStore{
 
   setTheme(name){
     this._currentThemeName = themes[name]? name: DefaultTheme.name;
-    localStorage.setItem("currentTheme", this._currentThemeName);
+    localStorage.setItem("theme", this._currentThemeName);
   }
 
   toggleTheme(){
@@ -381,12 +381,12 @@ export class AppStore{
       }
       this.currentWorkspace = workspace;
       if (this.currentWorkspace) {
-        localStorage.setItem("currentWorkspace", workspace.id);
+        localStorage.setItem("workspace", workspace.id);
         this.rootStore.viewStore.restoreViews();
         this.rootStore.typesStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       } else {
-        localStorage.removeItem("currentWorkspace");
+        localStorage.removeItem("workspace");
       }
     }
   };

@@ -15,10 +15,11 @@
 */
 
 import React from "react";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 
-import viewStore, { ViewContext} from "../../Stores/ViewStore";
+import { useStores } from "../../Hooks/UseStores";
+import { ViewContext} from "../../Stores/ViewStore";
 
 import InstanceForm from "./InstanceForm";
 import Pane from "./Pane";
@@ -38,6 +39,8 @@ const useStyles = createUseStyles({
 const InstanceView = observer(({ instance }) => {
 
   const classes = useStyles();
+
+  const { viewStore } = useStores();
 
   if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== instance.id) {
     return null;

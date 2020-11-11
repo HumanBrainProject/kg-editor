@@ -17,10 +17,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { List } from "react-virtualized";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import debounce from "lodash/debounce";
 
-import releaseStore from "../../../Stores/ReleaseStore";
+import { useStores } from "../../../Hooks/UseStores";
+
 import ReleaseNode from "./ReleaseNode";
 
 const useStyles = createUseStyles({
@@ -37,6 +38,8 @@ const ReleaseList = observer(() => {
   const wrapperRef = useRef();
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
 

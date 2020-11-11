@@ -16,13 +16,13 @@
 
 import React from "react";
 //import injectStyles from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import FetchingLoader from "../../Components/FetchingLoader";
 
-import bookmarkStore from "../../Stores/BookmarkStore";
-import browseStore from "../../Stores/BrowseStore";
+import { useStores } from "../../Hooks/UseStores";
+
+import FetchingLoader from "../../Components/FetchingLoader";
 import BookmarksItem from "./BookmarksItem";
 
 // const styles = {
@@ -71,6 +71,7 @@ import BookmarksItem from "./BookmarksItem";
 // };
 
 const Bookmarks = observer(class Bookmarks extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -79,15 +80,23 @@ const Bookmarks = observer(class Bookmarks extends React.Component {
   }
 
   componentDidMount() {
+    const { bookmarkStore } = useStores();
     bookmarkStore.fetch();
   }
 
   handleToggleBookmarks = () => this.setState((state) => ({ showBookmarks: !state.showBookmarks }));
 
-  handleLoadRetry = () => bookmarkStore.fetch();
+  handleLoadRetry = () => {
+    const { bookmarkStore } = useStores();
+    bookmarkStore.fetch();
+  }
 
   render() {
+
     const { classes } = this.props;
+
+    const { browseStore, bookmarkStore } = useStores();
+
     const list = bookmarkStore.filteredList(browseStore.navigationFilter);
     if (!bookmarkStore.fetchError && !bookmarkStore.isFetching && !list.length) {
       return null;

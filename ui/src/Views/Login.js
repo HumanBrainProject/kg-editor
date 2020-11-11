@@ -15,13 +15,12 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../Stores/AppStore";
-import authStore from "../Stores/AuthStore";
+import { useStores } from "../Hooks/UseStores";
 
 import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
@@ -74,6 +73,8 @@ const useStyles = createUseStyles({
 const Login = observer(() => {
 
   const classes = useStyles();
+
+  const { appStore, authStore } = useStores();
 
   const handleLogin = () => appStore.login();
 

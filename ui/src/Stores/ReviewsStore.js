@@ -15,13 +15,13 @@
 */
 
 import { observable, action, runInAction, makeObservable } from "mobx";
-import API from "../Services/API";
-import appStore from "./AppStore";
 
-class ReviewsStore {
+export class ReviewsStore {
   instancesReviews = new Map();
 
-  constructor() {
+  transportLayer = null;
+
+  constructor(transportLayer) {
     makeObservable(this, {
       instancesReviews: observable,
       getInstanceReviews: action,
@@ -29,6 +29,8 @@ class ReviewsStore {
       addInstanceReviewRequest: action,
       removeInstanceReviewRequest: action
     });
+
+    this.transportLayer = transportLayer;
   }
 
   getInstanceReviews(instanceId) {
@@ -62,7 +64,7 @@ class ReviewsStore {
     }
 
     try {
-      const {data} = await API.axios.get(API.endpoints.instanceReviews(instanceId));
+      const {data} = await this.transportLayer.getInstanceReviews(instanceId);
 
       runInAction(() => {
         const reviews = data.length ? data : [];
@@ -81,7 +83,7 @@ class ReviewsStore {
         instanceReviews.isFetched = false;
         instanceReviews.isFetching = false;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
     return instanceReviews;
   }
@@ -101,7 +103,7 @@ class ReviewsStore {
         }
         delete instanceReview.error;
         try {
-          const {data} = await API.axios.put(API.endpoints.instanceReviewsByUser(instanceId, userId));
+          const {data} = await this.transportLayer.inviteUserToReviewInstance(userId, instanceId);
 
           runInAction(async () => {
             instanceReview.status = data && data.status ? data.status : "PENDING";
@@ -112,7 +114,7 @@ class ReviewsStore {
             instanceReview.status = "ADD_ERROR";
             instanceReview.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
           });
-          appStore.captureSentryException(e);
+          this.transportLayer.captureException(e);
         }
       }
     }
@@ -126,7 +128,7 @@ class ReviewsStore {
         instanceReviews.reviews.remove(instanceReview);
         delete instanceReview.error;
         try {
-          await API.axios.delete(API.endpoints.instanceReviewsByUser(instanceId, userId));
+          await this.transportLayer.deleteInstanceReviewsByUser(instanceId, userId);
           runInAction(async () => {
             instanceReviews.reviews.remove(instanceReview);
           });
@@ -136,7 +138,7 @@ class ReviewsStore {
             instanceReview.status = "REMOVE_ERROR";
             instanceReview.error = `Error while trying to cancel invite to user "${userId}" to review instance "${instanceId}" (${message})`;
           });
-          appStore.captureSentryException(e);
+          this.transportLayer.captureException(e);
         }
       }
     }

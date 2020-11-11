@@ -16,7 +16,6 @@
 
 import React from "react";
 import { observable, action, computed, makeObservable } from "mobx";
-import appStore from "./AppStore";
 
 const STORED_INSTANCE_VIEWS_KEY = "views";
 
@@ -35,7 +34,6 @@ const getStoredViews = () => {
     return {};
   }
 };
-
 
 class View {
   instanceId = null;
@@ -132,11 +130,15 @@ class View {
   }
 }
 
-class ViewStore{
+export class ViewStore{
   views = new Map();
   selectedView = null;
 
-  constructor() {
+  transportLayer = null;
+
+  rootStore = null;
+
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       views: observable,
       selectedView: observable,
@@ -148,12 +150,15 @@ class ViewStore{
       replaceViewByNewInstanceId: action,
       instancesIds: computed
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   syncStoredViews(){
-    if (appStore.currentWorkspace) {
+    if (this.rootStore.appStore.currentWorkspace) {
       const views = getStoredViews();
-      views[appStore.currentWorkspace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, mode: view.mode}));
+      views[this.rootStore.appStore.currentWorkspace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, mode: view.mode}));
       localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
     }
   }
@@ -164,9 +169,9 @@ class ViewStore{
 
   restoreViews(){
     this.clearViews();
-    if(appStore.currentWorkspace) {
+    if(this.rootStore.appStore.currentWorkspace) {
       const views = getStoredViews();
-      const workspaceViews = views[appStore.currentWorkspace.id];
+      const workspaceViews = views[this.rootStore.appStore.currentWorkspace.id];
       if (Array.isArray(workspaceViews)) {
         workspaceViews.forEach(({id, name, color, mode}) => this.views.set(id, new View(id, name, color, mode)));
       }
@@ -217,4 +222,4 @@ class ViewStore{
 export const PaneContext = React.createContext(null);
 export const ViewContext = React.createContext(null);
 
-export default new ViewStore();
+export default ViewStore;

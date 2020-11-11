@@ -16,11 +16,10 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import releaseStore from "../../../Stores/ReleaseStore";
-import instancesStore from "../../../Stores/InstancesStore";
+import { useStores } from "../../../Hooks/UseStores";
 
 import ReleaseStatus from "../../../Components/ReleaseStatus";
 import ReleaseNodeToggle from "./ReleaseNodeToggle";
@@ -135,6 +134,8 @@ const useStyles = createUseStyles({
 const ReleaseNode = observer(({ node, level = 0 }) => {
 
   const classes = useStyles();
+
+  const { instancesStore, releaseStore } = useStores();
 
   const handleOptionPreview = e => {
     e && e.stopPropagation();

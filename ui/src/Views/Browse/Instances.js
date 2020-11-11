@@ -18,20 +18,18 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 
 import { toJS } from "mobx";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars";
 
-import browseStore from "../../Stores/BrowseStore";
-import routerStore from "../../Stores/RouterStore";
+import { useStores } from "../../Hooks/UseStores";
+
 import FetchingLoader from "../../Components/FetchingLoader";
 import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
 import InstanceRow from "../Instance/InstanceRow";
-import appStore from "../../Stores/AppStore";
-import instancesStore from "../../Stores/InstancesStore";
 
 const useStyles = createUseStyles({
   container:{
@@ -104,6 +102,8 @@ const Instances = observer(() => {
 
   const classes = useStyles();
 
+  const { appStore, history, browseStore, instancesStore } = useStores();
+
   const handleFilterChange = e => browseStore.setInstancesFilter(e.target.value);
 
   const handleInstanceClick = instance => browseStore.selectInstance(instance);
@@ -122,9 +122,9 @@ const Instances = observer(() => {
         instance.initializeLabelData(toJS(summaryInstance));
       }
       if(mode === "view") {
-        routerStore.history.push(`/instances/${id}`);
+        history.push(`/instances/${id}`);
       } else {
-        routerStore.history.push(`/instances/${id}/${mode}`);
+        history.push(`/instances/${id}/${mode}`);
       }
     }
   };

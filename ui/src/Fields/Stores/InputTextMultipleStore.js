@@ -23,8 +23,8 @@ class InputTextMultipleStore extends FieldStore {
   returnAsNull = false;
   initialValue = [];
 
-  constructor(definition, options, instance) {
-    super(definition, options, instance);
+  constructor(definition, options, instance, transportLayer) {
+    super(definition, options, instance, transportLayer);
 
     makeObservable(this, {
       value: observable,

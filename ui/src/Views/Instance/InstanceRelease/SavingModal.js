@@ -18,10 +18,11 @@ import React from "react";
 import Modal from "react-bootstrap/Modal";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Button from "react-bootstrap/Button";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import releaseStore from "../../../Stores/ReleaseStore";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   lastEndedOperation:{
@@ -61,6 +62,8 @@ const SavingModal = observer(() => {
 
   const classes = useStyles();
 
+  const { releaseStore } = useStores();
+
   const handleDismissSavingReport = () => {
     releaseStore.dismissSaveError();
   };
@@ -70,7 +73,7 @@ const SavingModal = observer(() => {
   };
 
   return (
-    <Modal show={releaseStore.isSaving}>
+    <Modal show={releaseStore.isSaving} onHide={() => {}}>
       <Modal.Body>
         <ProgressBar
           active={releaseStore.savingProgress !== releaseStore.savingTotal}

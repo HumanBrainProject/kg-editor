@@ -19,8 +19,9 @@ import { createUseStyles } from "react-jss";
 import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { useStores } from "../Hooks/UseStores";
+
 import User from "../Components/User";
-import authStore from "../Stores/AuthStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -48,6 +49,8 @@ const useStyles = createUseStyles({
 });
 
 const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
+
+  const { authStore } = useStores();
 
   const classes = useStyles();
 

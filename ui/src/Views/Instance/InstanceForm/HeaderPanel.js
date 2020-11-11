@@ -19,7 +19,7 @@ import { createUseStyles } from "react-jss";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 
 const useStyles = createUseStyles({
   panel: {

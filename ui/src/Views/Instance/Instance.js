@@ -15,12 +15,12 @@
 */
 
 import React from "react";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import instancesStore from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 import Preview from "../Preview";
 import InstanceView from "./InstanceView";
@@ -188,6 +188,8 @@ const NoPermissionForView = observer(({instance, mode}) => {
 const Instance = observer(({ instance, mode }) =>  {
 
   const classes = useStyles();
+
+  const { instancesStore } = useStores();
 
   const handleHidePreview = () => instancesStore.togglePreviewInstance();
 

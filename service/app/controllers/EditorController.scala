@@ -276,7 +276,7 @@ class EditorController @Inject()(
     }
 
   def searchInstancesSummary(
-                              space: String,
+                              workspace: String,
                               typeId: String,
                               from: Option[Int],
                               size: Option[Int],
@@ -284,7 +284,7 @@ class EditorController @Inject()(
                             ): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>
       editorService
-        .doSearchInstances(space, typeId, from, size, searchByLabel, request.userToken, request.clientToken)
+        .doSearchInstances(workspace, typeId, from, size, searchByLabel, request.userToken, request.clientToken)
         .flatMap {
           case Right(instancesResult) =>
             (instancesResult \ "data").asOpt[List[JsObject]] match {

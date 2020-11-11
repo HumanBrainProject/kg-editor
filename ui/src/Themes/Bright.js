@@ -14,71 +14,122 @@
 *   limitations under the License.
 */
 
-import { createUseStyles } from "react-jss";
-
-const useStyles = createUseStyles({
-  "@global":{
-    ":root":{
-      "--bg-gradient-start":"#ffffff",
-      "--bg-gradient-end":"#a8caba",
-      "--bg-gradient-angle":"165deg",
-
-      "--bg-color-ui-contrast1":"#ffffff",
-      "--bg-color-ui-contrast2":"#eeeeee",
-      "--bg-color-ui-contrast3":"#dddddd",
-      "--bg-color-ui-contrast4":"#cccccc",
-
-      "--border-color-ui-contrast1":"#ffffff",
-      "--border-color-ui-contrast2":"#ffffff",
-      "--border-color-ui-contrast5":"rgba(0, 0, 0, 0.3)",
-
-      "--bg-color-blend-contrast1":"rgba(0, 0, 0, 0.1)",
-
-      "--list-bg-hover":"#def0fd",
-      "--list-border-hover":"#68b6f5",
-      "--list-bg-selected":"#c6e2f5",
-      "--list-border-selected":"#259dff",
-
-      "--ft-color-quiet":"rgba(0, 0, 0, 0.4)",
-      "--ft-color-normal":"rgba(0, 0, 0, 0.5)",
-      "--ft-color-loud":"#444444",
-      "--ft-color-louder":"#222222",
-
-      "--ft-color-error":"#e74c3c",
-      "--bg-color-error-quiet":"#5b130b",
-      "--bg-color-error-normal":"#ac2415",
-      "--bg-color-error-loud":"#ac2415",
-
-      "--bg-color-warn-quiet":"#473600",
-      "--bg-color-warn-normal":"#8f6b00",
-      "--bg-color-warn-loud":"#b88a00",
-
-      "--ft-color-info":"#24282a",
-      "--bg-color-info-normal":"#ffc107",
-
-      "--pane-box-shadow":"rgba(0,0,0,0.3)",
-      "--release-status-box-shadow":"#00000080",
-      "--release-color-released":"rgb(52, 152, 219)",
-      "--release-bg-released":"rgba(52, 152, 219, 0.25)",
-      "--release-color-not-released":"rgb(231, 76, 60)",
-      "--release-bg-not-released":"rgba(231, 76, 60, 0.25)",
-      "--release-color-has-changed":"rgb(241, 196, 15)",
-      "--release-bg-has-changed":"rgba(241, 196, 15, 0.25)",
-
-      "--release-color-highlight":"rgb(46, 204, 113)",
-      "--release-bg-highlight":"rgb(46, 204, 113, 0.25)",
-
-      "--bookmark-on-color":"#f2c85c",
-      "--bookmark-on-color-highlight":"#ffe100",
-      "--bookmark-off-color":"var(--ft-color-normal)",
-      "--bookmark-off-color-highlight":"var(--bookmark-on-color-highlight)"
+const theme = {
+  name: "bright",
+  background: {
+    gradient: {
+      colorStart: "#ffffff",
+      colorEnd: "a8caba",
+      angle: "165deg"
+    }
+  },
+  contrast1: {
+    backgroundColor: "#ffffff",
+    borderColor: "#ffffff"
+  },
+  contrast2: {
+    backgroundColor: "#eeeeee",
+    borderColor: "#ffffff"
+  },
+  contrast3: {
+    borderColor: "#dddddd"
+  },
+  contrast4: {
+    backgroundColor: "#cccccc"
+  },
+  contrast5: {
+    borderColor: "rgba(0, 0, 0, 0.3)"
+  },
+  blendContrast1: {
+    backgroundColor: "rgba(0, 0, 0, 0.1)"
+  },
+  list: {
+    hover: {
+      backgroundColor: "#def0fd",
+      borderColor: "#68b6f5"
+    },
+    selected: {
+      backgroundColor: "#c6e2f5",
+      borderColor: "#259dff"
+    }
+  },
+  quiet: {
+    color: "rgba(0, 0, 0, 0.4)"
+  },
+  normal: {
+    color: "rgba(0, 0, 0, 0.5)"
+  },
+  loud: {
+    color: "#444444"
+  },
+  louder: {
+    color: "#222222"
+  },
+  error: {
+    color: "#e74c3c",
+    quiet: {
+      color: "#5b130b"
+    },
+    normal: {
+      color: "#ac2415"
+    },
+    loud: {
+      color: "#ac2415"
+    }
+  },
+  warn: {
+    quiet: {
+      color: "#473600"
+    },
+    normal: {
+      color: "#8f6b00"
+    },
+    loud: {
+      color: "#b88a00"
+    }
+  },
+  info: {
+    color: "#24282a",
+    normal: {
+      color: "#ffc107"
+    }
+  },
+  pane: {
+    boxShadow: {
+      color: "rgba(0,0,0,0.3)"
+    }
+  },
+  release: {
+    status: {
+      boxShadow: {
+        color: "#00000080"
+      },
+      released: {
+        backgroundColor: "rgba(52, 152, 219, 0.25)",
+        color: "rgb(52, 152, 219)"
+      },
+      notReleased: {
+        backgroundColor: "rgba(231, 76, 60, 0.25)",
+        color: "rgb(231, 76, 60)"
+      },
+      hasChanged: {
+        backgroundColor: "rgba(241, 196, 15, 0.25)",
+        color: "rgb(241, 196, 15)"
+      }
+    },
+    highlight: {
+      backgroundColor: "rgb(46, 204, 113, 0.25)",
+      color: "rgb(46, 204, 113)"
+    }
+  },
+  bookmark: {
+    on: {
+      color: "#f2c85c",
+      highlight: {
+        color: "#ffe100"
+      }
     }
   }
-});
-
-const Theme = () => {
-  useStyles();
-  return null;
 };
 
-export default Theme;
+export default theme;

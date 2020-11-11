@@ -33,7 +33,10 @@ const useStyles = createUseStyles({
       left: "-10px",
       width: "calc(100% + 20px)",
       height: "calc(100% + 20px)",
-      borderRadius: "0"
+      borderRadius: "0",
+      "& $panel": {
+        position: "fixed",
+      }
     }
   },
   panel: {
@@ -81,7 +84,7 @@ const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }) => {
       <div className={classes.panel}>
         <h4>{error}</h4>
         <div>
-          <Button variant="default" onClick={handleCancel}>Cancel</Button>
+          <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
           <Button variant="primary" onClick={handleRetry}>Retry</Button>
         </div>
       </div>

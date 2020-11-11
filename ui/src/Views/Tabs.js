@@ -15,13 +15,11 @@
 */
 
 import React, { useEffect, useState } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { matchPath } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 
-import appStore from "../Stores/AppStore";
-import authStore from "../Stores/AuthStore";
-import routerStore from "../Stores/RouterStore";
+import { useStores } from "../Hooks/UseStores";
 
 import InstanceTabs from "./InstanceTabs";
 import UserProfileTab from "./UserProfileTab";
@@ -71,24 +69,23 @@ const useStyles = createUseStyles({
 
 
 const Tabs = observer(() => {
+
   const classes = useStyles();
 
-  const [currentLocationPathname, setCurrentLocationPathname] = useState(routerStore.history.location.pathname);
+  const { appStore, history, authStore } = useStores();
+
+  const [currentLocationPathname, setCurrentLocationPathname] = useState(history.location.pathname);
 
   useEffect(() => {
-    const unlisten = routerStore.history.listen(location => {
+    const unlisten = history.listen(location => {
       setCurrentLocationPathname(location.pathname);
     });
     return unlisten;
-  }, []);
+  }, [history]);
 
-  const handleGoToDashboard = () => {
-    appStore.goToDashboard();
-  };
+  const handleGoToDashboard = () => appStore.goToDashboard();
 
-  const handleCreateInstance = () => {
-    appStore.createInstance();
-  };
+  const handleCreateInstance = () => appStore.createInstance();
 
   return (
     <div className={classes.container}>
@@ -99,7 +96,7 @@ const Tabs = observer(() => {
       {!appStore.globalError &&
         <React.Fragment>
           <div className={classes.fixedTabsLeft}>
-            {authStore.isFullyAuthenticated && authStore.hasWorkspaces && appStore.currentWorkspace?
+            {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasWorkspaces && appStore.currentWorkspace?
               <React.Fragment>
                 <WorkspaceSelector />
                 <Tab icon={"home"} current={matchPath(currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
@@ -113,12 +110,12 @@ const Tabs = observer(() => {
           </div>
           <InstanceTabs pathname={currentLocationPathname} />
           <div className={classes.fixedTabsRight}>
-            {authStore.isFullyAuthenticated &&
+            {authStore.isAuthenticated && authStore.isUserAuthorized && (
               <React.Fragment>
                 <Tab icon={"question-circle"} current={matchPath(currentLocationPathname, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
                 <UserProfileTab className={classes.userProfileTab} size={32} />
               </React.Fragment>
-            }
+            )}
           </div>
         </React.Fragment>
       }

@@ -16,9 +16,6 @@
 
 import { observable, action, computed, runInAction, set, values, makeObservable } from "mobx";
 
-import API from "../Services/API";
-import appStore from "./AppStore";
-
 const typeDefaultColor = "white";
 const typeDefaultName = "-";
 const typeDefaultLabel = "Unknown";
@@ -87,7 +84,7 @@ const getGraphLinks = (groups, links) => links.filter(link => isNodeVisible(grou
   target: link.target
 }));
 
-class GraphStore {
+export class GraphStore {
   isFetching = false;
   isFetched = false;
   fetchError = null;
@@ -97,7 +94,7 @@ class GraphStore {
   links = [];
   highlightedNode = null;
 
-  constructor() {
+  constructor(transportLayer) {
     makeObservable(this, {
       isFetching: observable,
       isFetched: observable,
@@ -116,6 +113,8 @@ class GraphStore {
       setGrouping: action,
       extractGroupsAndLinks: action
     });
+
+    this.transportLayer = transportLayer;
   }
 
   get graphData() {
@@ -138,7 +137,7 @@ class GraphStore {
     this.groups = {};
     this.links = [];
     try {
-      const { data } = await API.axios.get(API.endpoints.neighbors(id));
+      const { data } = await this.transportLayer.getInstanceNeighbors(id);
       runInAction(() => {
         this.mainId = id;
         this.extractGroupsAndLinks(data.data);
@@ -150,7 +149,7 @@ class GraphStore {
         this.fetchError = e.message ? e.message : e;
         this.isFetching = false;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -260,4 +259,4 @@ class GraphStore {
   };
 }
 
-export default new GraphStore();
+export default GraphStore;

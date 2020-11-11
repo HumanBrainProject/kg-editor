@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "settings": {
     "react": {        
       "version": "detect"
@@ -23,7 +23,10 @@
     },
     "sourceType": "module"
   },
-  "plugins": ["react"],
+  "plugins": [
+    "@babel",
+    "react"
+  ],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

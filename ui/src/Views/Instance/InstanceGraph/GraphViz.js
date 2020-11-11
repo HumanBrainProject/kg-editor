@@ -16,122 +16,13 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import ForceGraph2D from "react-force-graph-2d";
 import debounce from "lodash/debounce";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import graphStore from "../../../Stores/GraphStore";
-import routerStore from "../../../Stores/RouterStore";
-import appStore from "../../../Stores/AppStore";
-
-const handleNodeClick = node => {
-  if (node.isGroup) {
-    graphStore.setGrouping(node, false);
-  } else if (node.id !== graphStore.mainId) {
-    if(node.workspace === appStore.currentWorkspace.id){
-      graphStore.reset();
-      routerStore.history.push(`/instances/${node.id}/graph`);
-    }
-  }
-};
-
-const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
-
-const getNodeName = node => {
-  if(node.isGroup) {
-    return `Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`;
-  }
-  return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
-};
-
-const getNodeLabel = node => `${getNodeName(node)} ${node.workspace !== appStore.currentWorkspace.id?`(Workspace: ${node.workspace})`:""}`;
-
-const getNodeAutoColorBy = node => node.color;
-
-const wrapText = (context, text, x, y, maxWidth, lineHeight, node) => {
-  if (node.labelLines === undefined) {
-    let words = text.split(/( |_|-|\.)/gi);
-    let line = "";
-    let lines = [];
-
-    for (let n = 0; n < words.length; n++) {
-      let testLine = line + words[n];
-      let metrics = context.measureText(testLine);
-      let testWidth = metrics.width;
-      if (testWidth > maxWidth && n > 0) {
-        lines.push(line);
-        line = words[n];
-      } else {
-        line = testLine;
-      }
-    }
-    lines.push(line);
-
-    node.labelLines = lines;
-  }
-
-  y = y - (lineHeight * (node.labelLines.length - 2) / 2);
-  node.labelLines.forEach(line => {
-    context.fillText(line, x, y);
-    y += lineHeight;
-  });
-};
-
-const getNodeCanvasObject = (node, ctx, scale) => {
-  ctx.beginPath();
-  if (node.isGroup) {
-    ctx.rect(node.x - 6, node.y - 6, 12, 12);
-  } else {
-    ctx.arc(node.x, node.y, node.isMainNode ? 10 : 6, 0, 2 * Math.PI);
-  }
-
-  if (graphStore.highlightedNode) {
-    if (!node.highlighted) {
-      ctx.globalAlpha = 0.1;
-    }
-  }
-  const color = node.color;
-  ctx.strokeStyle = new Color(color).darken(0.25).hex();
-  ctx.fillStyle = color;
-
-  if (node.isMainNode) {
-    ctx.setLineDash([2, 0.5]);
-  } else {
-    ctx.setLineDash([]);
-  }
-  ctx.stroke();
-  ctx.fill();
-  if (scale > 3) {
-    ctx.beginPath();
-    ctx.font = "1.2px Arial";
-    ctx.textAlign = "center";
-    ctx.fillStyle = "black";
-
-    const label = getNodeName(node);
-
-    wrapText(ctx, label, node.x, node.y, 10, 1.3, node);
-  }
-
-  ctx.globalAlpha = 1;
-};
-
-const getLinkColor = link => {
-  if (graphStore.highlightedNode) {
-    if (link.target === graphStore.highlightedNode) {
-      return new Color("#f39c12").alpha(1).rgb();
-    } else if (link.source === graphStore.highlightedNode) {
-      return new Color("#1abc9c").alpha(1).rgb();
-    } else {
-      return new Color("#ccc").alpha(0.1).rgb();
-    }
-  } else {
-    return new Color("#ccc").alpha(1).rgb();
-  }
-};
-
-const getLinkWidth = link => (graphStore.highlightedNode && link.highlighted)?2:1;
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   graph: {
@@ -173,6 +64,8 @@ const Graph = observer(() => {
 
   const classes = useStyles();
 
+  const { appStore, history, graphStore } = useStores();
+
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
 
   useEffect(() => {
@@ -188,6 +81,112 @@ const Graph = observer(() => {
       window.removeEventListener("resize", updateDimensions);
     };
   }, []);
+  const handleNodeClick = node => {
+    if (node.isGroup) {
+      graphStore.setGrouping(node, false);
+    } else if (node.id !== graphStore.mainId) {
+      if(node.workspace === appStore.currentWorkspace.id){
+        graphStore.reset();
+        history.push(`/instances/${node.id}/graph`);
+      }
+    }
+  };
+
+  const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
+
+  const getNodeName = node => {
+    if(node.isGroup) {
+      return `Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`;
+    }
+    return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
+  };
+
+  const getNodeLabel = node => `${getNodeName(node)} ${node.workspace !== appStore.currentWorkspace.id?`(Workspace: ${node.workspace})`:""}`;
+
+  const getNodeAutoColorBy = node => node.color;
+
+  const wrapText = (context, text, x, y, maxWidth, lineHeight, node) => {
+    if (node.labelLines === undefined) {
+      let words = text.split(/( |_|-|\.)/gi);
+      let line = "";
+      let lines = [];
+
+      for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n];
+        let metrics = context.measureText(testLine);
+        let testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          lines.push(line);
+          line = words[n];
+        } else {
+          line = testLine;
+        }
+      }
+      lines.push(line);
+
+      node.labelLines = lines;
+    }
+
+    y = y - (lineHeight * (node.labelLines.length - 2) / 2);
+    node.labelLines.forEach(line => {
+      context.fillText(line, x, y);
+      y += lineHeight;
+    });
+  };
+
+  const getNodeCanvasObject = (node, ctx, scale) => {
+    ctx.beginPath();
+    if (node.isGroup) {
+      ctx.rect(node.x - 6, node.y - 6, 12, 12);
+    } else {
+      ctx.arc(node.x, node.y, node.isMainNode ? 10 : 6, 0, 2 * Math.PI);
+    }
+
+    if (graphStore.highlightedNode) {
+      if (!node.highlighted) {
+        ctx.globalAlpha = 0.1;
+      }
+    }
+    const color = node.color;
+    ctx.strokeStyle = new Color(color).darken(0.25).hex();
+    ctx.fillStyle = color;
+
+    if (node.isMainNode) {
+      ctx.setLineDash([2, 0.5]);
+    } else {
+      ctx.setLineDash([]);
+    }
+    ctx.stroke();
+    ctx.fill();
+    if (scale > 3) {
+      ctx.beginPath();
+      ctx.font = "1.2px Arial";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "black";
+
+      const label = getNodeName(node);
+
+      wrapText(ctx, label, node.x, node.y, 10, 1.3, node);
+    }
+
+    ctx.globalAlpha = 1;
+  };
+
+  const getLinkColor = link => {
+    if (graphStore.highlightedNode) {
+      if (link.target === graphStore.highlightedNode) {
+        return new Color("#f39c12").alpha(1).rgb();
+      } else if (link.source === graphStore.highlightedNode) {
+        return new Color("#1abc9c").alpha(1).rgb();
+      } else {
+        return new Color("#ccc").alpha(0.1).rgb();
+      }
+    } else {
+      return new Color("#ccc").alpha(1).rgb();
+    }
+  };
+
+  const getLinkWidth = link => (graphStore.highlightedNode && link.highlighted)?2:1;
 
   const handleCapture = e => {
     e.target.href = wrapperRef.current && wrapperRef.current.querySelector("canvas").toDataURL("image/png");

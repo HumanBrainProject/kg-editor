@@ -15,12 +15,11 @@
 */
 
 import React from "react";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-
-import routerStore from "../../Stores/RouterStore";
-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   tabs: {
@@ -82,11 +81,13 @@ const Tabs = observer(({ instance, mode }) => {
 
   const classes = useStyles();
 
+  const { history } = useStores();
+
   const handleClick = mode => {
     if(mode === "view") {
-      routerStore.history.push(`/instances/${instance.id}`);
+      history.push(`/instances/${instance.id}`);
     } else {
-      routerStore.history.push(`/instances/${instance.id}/${mode}`);
+      history.push(`/instances/${instance.id}/${mode}`);
     }
   };
 

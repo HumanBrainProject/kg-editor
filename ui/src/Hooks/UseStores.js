@@ -14,10 +14,8 @@
 *   limitations under the License.
 */
 
-import { createBrowserHistory } from "history";
+import React from "react";
 
-class RouterStore{
-  history = createBrowserHistory({basename:window.rootPath});
-}
+import { storesContext } from "../Contexts/StoresContext";
 
-export default new RouterStore();
+export const useStores = () => React.useContext(storesContext);

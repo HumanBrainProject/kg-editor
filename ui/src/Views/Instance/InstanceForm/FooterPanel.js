@@ -15,13 +15,13 @@
 */
 
 import React from "react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import routerStore from "../../../Stores/RouterStore";
-import appStore from "../../../Stores/AppStore";
-import { observer } from "mobx-react";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   panel:{
@@ -85,12 +85,14 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
 
   const classes = useStyles();
 
+  const { appStore, history } = useStores();
+
   const handleOpenInstance = e => {
     e.stopPropagation();
     if(e.metaKey || e.ctrlKey){
       appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
-      routerStore.history.push(`/instances/${instance.id}`);
+      history.push(`/instances/${instance.id}`);
     }
   };
 

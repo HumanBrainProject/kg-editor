@@ -15,12 +15,11 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../../Stores/AppStore";
-import routerStore from "../../Stores/RouterStore";
+import { useStores } from "../../Hooks/UseStores";
 
 const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}) => {
   const handleClick = event => {
@@ -69,6 +68,8 @@ const Actions = observer(({ instance }) => {
   const { id, name, primaryType, permissions } = instance;
   const classes = useStyles();
 
+  const { appStore, history } = useStores();
+
   const handleCtrlClick = mode => {
     appStore.openInstance(id, name, primaryType, mode);
   };
@@ -76,9 +77,9 @@ const Actions = observer(({ instance }) => {
   const handleClick = mode => {
     const { id } = instance;
     if(mode === "view") {
-      routerStore.history.push(`/instances/${id}`);
+      history.push(`/instances/${id}`);
     } else {
-      routerStore.history.push(`/instances/${id}/${mode}`);
+      history.push(`/instances/${id}/${mode}`);
     }
   };
 

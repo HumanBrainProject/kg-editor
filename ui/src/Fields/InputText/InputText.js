@@ -15,7 +15,7 @@
 */
 
 import React, { useRef } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 

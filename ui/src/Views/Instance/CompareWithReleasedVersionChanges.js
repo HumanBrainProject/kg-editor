@@ -16,12 +16,13 @@
 
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import releaseStore from "../../Stores/ReleaseStore";
-import instancesStore, { createInstanceStore } from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
+import { createInstanceStore } from "../../Stores/InstancesStore";
+
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
 import CompareFieldsChanges from "./CompareFieldsChanges";
@@ -39,13 +40,15 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
 
   const classes = useStyles();
 
+  const { instancesStore, releaseStore } = useStores();
+
   const [releasedInstanceStore, setReleasedInstanceStore] = useState(null);
 
   useEffect(() => {
     if(!releasedInstanceStore) {
-      setReleasedInstanceStore(createInstanceStore("RELEASED"));
+      setReleasedInstanceStore(createInstanceStore(instancesStore.transportLayer, instancesStore.rootStore, "RELEASED"));
     }
-  }, [releasedInstanceStore]);
+  }, [instancesStore.transportLayer, instancesStore.rootStore, releasedInstanceStore]);
 
   useEffect(() => {
     if (instanceId && status !== "UNRELEASED" && releasedInstanceStore) {

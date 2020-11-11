@@ -16,7 +16,7 @@
 
 import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -79,9 +79,9 @@ const getValue = (instancesStore, instance, name) => {
 
 const getStatus = (store, ids) => ids.reduce((acc, id) => {
   const instance = store.instances.get(id);
-  acc.isFetched = acc.isFetched && instance && (instance.isFetched || instance.isLabelFetched);
+  acc.isFetched = acc.isFetched && instance && (instance.isFetched || instance.isLabelFetched || instance.isNotFound || instance.isLabelNotFound);
   acc.isFetching = acc.isFetching || (instance && (instance.isFetching || instance.isLabelFetching));
-  acc.hasFetchError = acc.hasFetchError || (instance && instance.fetchLabelError);
+  acc.hasFetchError = acc.hasFetchError || (instance && instance.fetchLabelError && !instance.isLabelNotFound);
   return acc;
 }, {
   isFetched: true,

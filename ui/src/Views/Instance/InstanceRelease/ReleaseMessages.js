@@ -15,11 +15,12 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
-import releaseStore from "../../../Stores/ReleaseStore";
+import { observer } from "mobx-react-lite";
 import Alert from "react-bootstrap/Alert";
 import { createUseStyles } from "react-jss";
 import { Scrollbars } from "react-custom-scrollbars";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -38,7 +39,11 @@ const useStyles = createUseStyles({
 });
 
 const ReleaseMessages = observer(() => {
+
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
+
   return (
     <div className={classes.container}>
       <Scrollbars autoHide>

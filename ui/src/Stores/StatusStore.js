@@ -16,10 +16,8 @@
 
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
-import API from "../Services/API";
-import appStore from "./AppStore";
 
-class StatusStore {
+export class StatusStore {
   statuses = new Map();
   isFetching = false;
   isFetchingChildren = false;
@@ -28,7 +26,9 @@ class StatusStore {
   fetchQueue = [];
   fetchQueueChildren = [];
 
-  constructor() {
+  transportLayer = null;
+
+  constructor(transportLayer) {
     makeObservable(this, {
       statuses: observable,
       isFetching: observable,
@@ -40,6 +40,8 @@ class StatusStore {
       processQueue: action,
       processQueueChildren: action
     });
+
+    this.transportLayer = transportLayer;
   }
 
   getInstance(id) {
@@ -115,7 +117,7 @@ class StatusStore {
       status.fetchError = null;
     });
     try {
-      let { data } = await API.axios.post(API.endpoints.releaseStatusTopInstance(), toProcess);
+      let { data } = await this.transportLayer.getReleaseStatusTopInstance(toProcess);
       runInAction(() => {
         Object.entries(data.data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
@@ -138,7 +140,7 @@ class StatusStore {
         this.isFetching = false;
         this.smartProcessQueue();
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
 
   }
@@ -156,7 +158,7 @@ class StatusStore {
       status.fetchErrorChildren = null;
     });
     try {
-      let { data } = await API.axios.post(API.endpoints.releaseStatusChildren(), toProcessChildren);
+      let { data } = await this.transportLayer.getReleaseStatusChildren(toProcessChildren);
       runInAction(() => {
         Object.entries(data.data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
@@ -179,12 +181,9 @@ class StatusStore {
         this.isFetchingChildren = false;
         this.smartProcessQueueChildren();
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
   }
 }
 
-
-
-
-export default new StatusStore();
+export default StatusStore;

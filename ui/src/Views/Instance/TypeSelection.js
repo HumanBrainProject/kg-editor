@@ -15,13 +15,13 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
-import typesStore from "../../Stores/TypesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
@@ -85,6 +85,8 @@ const Type = ({ type, onClick }) => {
 const TypeSelection = observer(({ onSelect }) => {
 
   const classes = useStyles();
+
+  const { typesStore } = useStores();
 
   const handleRetry = () => typesStore.fetch();
 

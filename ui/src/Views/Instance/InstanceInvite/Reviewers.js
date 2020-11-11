@@ -16,13 +16,12 @@
 
 
 import React, { useEffect } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import reviewsStore from "../../../Stores/ReviewsStore";
-import authStore from "../../../Stores/AuthStore";
+import { useStores } from "../../../Hooks/UseStores";
 
 import Reviewer from "./Reviewer";
 import Search from "./Search";
@@ -71,11 +70,13 @@ const Reviewers = observer(({ id }) => {
 
   const classes = useStyles();
 
+  const { authStore, reviewsStore } = useStores();
+
   const [org] = id?id.split("/"):[""];
 
   useEffect(() => {
     reviewsStore.getInstanceReviews(id);
-  }, [id]); // check if id is needed
+  }, [reviewsStore, id]); // check if id is needed
 
   const fetchInstanceReviews = () => {
     reviewsStore.getInstanceReviews(id);

@@ -16,14 +16,14 @@
 
 import React from "react";
 //import injectStyles from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Button from "react-bootstrap/Button";
-import PopOverButton from "../../Components/PopOverButton";
 
-import browseStore from "../../Stores/BrowseStore";
-import bookmarkStore from "../../Stores/BookmarkStore";
+import { useStores } from "../../Hooks/UseStores";
+
+import PopOverButton from "../../Components/PopOverButton";
 
 // const styles = {
 //   container: {
@@ -187,6 +187,7 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
   }
 
   handleSelect = () => {
+    const { browseStore, bookmarkStore } = useStores();
     if (bookmarkStore.currentlyEditedBookmark !== this.props.bookmark && !this.state.showDeleteBookmarkDialog) {
       browseStore.selectItem(this.props.bookmark);
     }
@@ -197,21 +198,25 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
   }
 
   handleEditBookmark = event => {
+    const { bookmarkStore } = useStores();
     event && event.stopPropagation();
     bookmarkStore.setCurrentlyEditedBookmark(this.props.bookmark);
   }
 
   handleCancelEditBookmark = event => {
+    const { bookmarkStore } = useStores();
     event && event.stopPropagation();
     bookmarkStore.revertBookmarkChanges(this.props.bookmark);
   }
 
   handleRevertEditBookmark = event => {
+    const { bookmarkStore } = useStores();
     event && event.stopPropagation();
     bookmarkStore.revertBookmarkChanges(this.props.bookmark);
   }
 
   handleRenameBookmark = event => {
+    const { bookmarkStore } = useStores();
     event && event.stopPropagation();
     const editName = this.editBookmarkNameRef.current.value.trim();
     if (this.props.bookmark.label !== editName) {
@@ -235,18 +240,23 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
   }
 
   handleDeleteBookmark = event => {
+    const { bookmarkStore } = useStores();
     event && event.stopPropagation();
     this.setState({ showDeleteBookmarkDialog: false });
     bookmarkStore.deleteBookmark(this.props.bookmark);
   }
 
   handleCancelDeleteBookmark = event => {
+    const { bookmarkStore } = useStores();
     event && event.stopPropagation();
     bookmarkStore.cancelBookmarkDeletion(this.props.bookmark);
   }
 
   render() {
     const { classes, bookmark } = this.props;
+
+    const { browseStore, bookmarkStore } = useStores();
+
     const selected = browseStore.selectedItem === bookmark;
     const edited = bookmarkStore.currentlyEditedBookmark === bookmark;
     return (

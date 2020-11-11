@@ -15,10 +15,11 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
-import releaseStore from "../../../Stores/ReleaseStore";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -40,6 +41,8 @@ const useStyles = createUseStyles({
 const HideReleasedInstancesToggle = observer(() => {
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   const handleClick = showAll => {
     releaseStore.toggleHideReleasedInstances(!!showAll);

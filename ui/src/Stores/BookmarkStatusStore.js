@@ -18,11 +18,7 @@ import { observable, action, runInAction, makeObservable } from "mobx";
 import { toJS } from "mobx";
 import debounce from "lodash/debounce";
 
-import API from "../Services/API";
-import historyStore from "./HistoryStore";
-import appStore from "./AppStore";
-
-class BookmarkStatusStore{
+export class BookmarkStatusStore{
   statuses = new Map();
   isFetching = false;
 
@@ -30,7 +26,10 @@ class BookmarkStatusStore{
   fetchQueue = [];
   fetchErrorQueue = [];
 
-  constructor() {
+  transportLayer = null;
+  rootStore = null;
+
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       statuses: observable,
       isFetching: observable,
@@ -42,6 +41,9 @@ class BookmarkStatusStore{
       smartProcessQueue: action,
       processQueue: action
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   getInstance(id){
@@ -121,12 +123,12 @@ class BookmarkStatusStore{
       if(this.statuses.has(id)){
         const status = this.statuses.get(id);
         if(status.hasChanged && !status.isSaving && !status.isFetching && !status.hasFetchError) {
-          historyStore.updateInstanceHistory(id, "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length); // TODO: get instance types
+          this.rootStore.historyStore.updateInstanceHistory(id, "bookmarked", !status.data || !status.data.bookmarkLists || !status.data.bookmarkLists.length); // TODO: get instance types
           try {
             status.hasSaveError = false;
             status.isSaving = true;
-            const payload = (status.data && status.data.bookmarkLists)?toJS(status.data.bookmarkLists):[];
-            await API.axios.put(API.endpoints.setInstanceBookmarkLists(id), payload);
+            const bookmarks = (status.data && status.data.bookmarkLists)?toJS(status.data.bookmarkLists):[];
+            await this.transportLayer.updateInstanceBookmarks(id, bookmarks);
             runInAction(() => {
               status.hasChanged = false;
               status.saveError = null;
@@ -141,7 +143,7 @@ class BookmarkStatusStore{
               status.hasSaveError = true;
               status.isSaving = false;
             });
-            appStore.captureSentryException(e);
+            this.transportLayer.captureException(e);
           }
         }
       }
@@ -198,7 +200,7 @@ class BookmarkStatusStore{
       this.statuses.get(id).isFetching = true;
     });
     try{
-      const { data } = await API.axios.post(API.endpoints.bookmarks(), toProcess);
+      const { data } = await this.transportLayer.getBookmarksByInstances(toProcess);
       runInAction(() =>{
         const statuses = Array.isArray(data.data)?data.data:[];
         statuses.forEach(responseStatus => {
@@ -231,9 +233,9 @@ class BookmarkStatusStore{
         this.isFetching = false;
         this.smartProcessQueue();
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
   }
 }
 
-export default new BookmarkStatusStore();
+export default BookmarkStatusStore;

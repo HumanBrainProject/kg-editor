@@ -15,14 +15,11 @@
 */
 
 import React, { useEffect } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { matchPath } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 
-import appStore from "../Stores/AppStore";
-import authStore from "../Stores/AuthStore";
-import instancesStore from "../Stores/InstancesStore";
-import viewStore from "../Stores/ViewStore";
+import { useStores } from "../Hooks/UseStores";
 
 import Tab from "../Components/Tab";
 
@@ -35,6 +32,8 @@ const useStyles = createUseStyles({
 
 const InstanceTab = observer(({view, pathname}) => {
 
+  const { appStore, instancesStore, viewStore } = useStores();
+
   const instance = instancesStore.instances.get(view.instanceId);
 
   useEffect(() => {
@@ -42,7 +41,7 @@ const InstanceTab = observer(({view, pathname}) => {
       view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
     }
-  }, [instance, view]);
+  }, [viewStore, instance, view]);
 
   const isCurrent = (instanceId, mode) => {
     if(mode !== "view") {
@@ -70,10 +69,14 @@ const InstanceTab = observer(({view, pathname}) => {
 });
 
 const InstanceTabs = observer(({ pathname }) => {
+
   const classes = useStyles();
+
+  const { authStore, viewStore } = useStores();
+
   return (
     <div className={classes.container} >
-      {authStore.isFullyAuthenticated && Array.from(viewStore.views.values()).map(view => (
+      {authStore.isAuthenticated && authStore.isUserAuthorized && Array.from(viewStore.views.values()).map(view => (
         <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
       ))}
     </div>

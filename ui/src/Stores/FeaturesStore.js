@@ -15,16 +15,17 @@
 */
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
-import API from "../Services/API";
-import appStore from "./AppStore";
 
-class FeaturesStore{
+export class FeaturesStore{
   releases = [];
   isFetched = false;
   isFetching = false;
   fetchError = null;
 
-  constructor() {
+  transportLayer = null;
+
+
+  constructor(transportLayer) {
     makeObservable(this, {
       releases: observable,
       isFetched: observable,
@@ -34,6 +35,8 @@ class FeaturesStore{
       olderReleases: computed,
       fetchFeatures: action
     });
+
+    this.transportLayer = transportLayer;
   }
 
   get latestReleases() {
@@ -48,7 +51,7 @@ class FeaturesStore{
     try {
       this.isFetching = true;
       this.fetchError = null;
-      const { data } = await API.axios.get(API.endpoints.features());
+      const { data } = await this.transportLayer.getFeatures();
       runInAction(() => {
         this.isFetched = true;
         this.isFetching = false;
@@ -60,9 +63,9 @@ class FeaturesStore{
         this.fetchError = `Error while retrieving list of features (${message})`;
         this.isFetching = false;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
   }
 }
 
-export default new FeaturesStore();
+export default FeaturesStore;

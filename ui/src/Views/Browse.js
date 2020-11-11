@@ -16,16 +16,16 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
+//import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react-lite";
+//import Modal from "react-bootstrap/Modal";
+//import Button from "react-bootstrap/Button";
+
+//import { useStores } from "../Hooks/UseStores";
 
 import Instances from "./Browse/Instances";
-import browseStore from "../Stores/BrowseStore";
-import FetchingLoader from "../Components/FetchingLoader";
+//import FetchingLoader from "../Components/FetchingLoader";
 import NavigationPanel from "./Browse/NavigationPanel";
-import bookmarkStore from "../Stores/BookmarkStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -93,40 +93,49 @@ const Browse = observer(() => {
 
   const classes = useStyles();
 
-  const handleDismissBookmarkCreationError = () => {
-    bookmarkStore.dismissBookmarkCreationError();
-  };
+  // const { browseStore, bookmarkStore } = useStores();
 
-  const handleRetryCreateNewBookmark = () => {
-    bookmarkStore.createBookmark(bookmarkStore.newBookmarkName);
-  };
+  // const handleDismissBookmarkCreationError = () => {
+  //   bookmarkStore.dismissBookmarkCreationError();
+  // };
+
+  // const handleRetryCreateNewBookmark = () => {
+  //   bookmarkStore.createBookmark(bookmarkStore.newBookmarkName);
+  // };
+
+  // return (
+  //   <div className={classes.container}>
+  //     <NavigationPanel />
+  //     <Instances/>
+  //     <Modal
+  //       dialogClassName={classes.modal}
+  //       show={!!browseStore.bookmarkListCreationError}
+  //       keyboard={true}
+  //       autoFocus={true}
+  //       onHide={handleDismissBookmarkCreationError}
+  //       backdrop={false}
+  //     >
+  //       <Modal.Header
+  //         closeButton={true}
+  //       />
+  //       <Modal.Body>{`Creation of bookmark list "${bookmarkStore.newBookmarkName}" failed (${bookmarkStore.bookmarkCreationError}).`} </Modal.Body>
+  //       <Modal.Footer>
+  //         <Button onClick={handleDismissBookmarkCreationError}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel</Button>
+  //         <Button variant="primary" onClick={handleRetryCreateNewBookmark}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+  //       </Modal.Footer>
+  //     </Modal>
+  //     {bookmarkStore.isCreatingBookmark && (
+  //       <div className={classes.loader}>
+  //         <FetchingLoader>{`Creating a bookmark list "${bookmarkStore.newBookmarkName}"...`}</FetchingLoader>
+  //       </div>
+  //     )}
+  //   </div>
+  // );
 
   return(
     <div className={classes.container}>
       <NavigationPanel />
       <Instances/>
-      <Modal
-        dialogClassName={classes.modal}
-        show={!!browseStore.bookmarkListCreationError}
-        keyboard={true}
-        autoFocus={true}
-        onHide={handleDismissBookmarkCreationError}
-        backdrop={false}
-      >
-        <Modal.Header
-          closeButton={true}
-        />
-        <Modal.Body>{`Creation of bookmark list "${bookmarkStore.newBookmarkName}" failed (${bookmarkStore.bookmarkCreationError}).`} </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleDismissBookmarkCreationError}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel</Button>
-          <Button variant="primary" onClick={handleRetryCreateNewBookmark}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
-        </Modal.Footer>
-      </Modal>
-      {bookmarkStore.isCreatingBookmark && (
-        <div className={classes.loader}>
-          <FetchingLoader>{`Creating a bookmark list "${bookmarkStore.newBookmarkName}"...`}</FetchingLoader>
-        </div>
-      )}
     </div>
   );
 });

@@ -16,11 +16,6 @@
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 
-import API from "../Services/API";
-import statusStore from "./StatusStore";
-import historyStore from "./HistoryStore";
-import appStore from "./AppStore";
-
 const setNodeTypes = node => {
   node.typesName = node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
   if (Array.isArray(node.children) && node.children.length) {
@@ -53,7 +48,7 @@ const populateStatuses = (node, prefix = "") => {
 };
 
 
-class ReleaseStore{
+export class ReleaseStore {
   topInstanceId = null;
   instancesTree = null;
   isFetching = false;
@@ -75,7 +70,13 @@ class ReleaseStore{
   hideReleasedInstances = false;
   comparedInstance = null;
 
-  constructor() {
+  historyStore = null;
+  statusStore = null;
+
+  transportLayer = null;
+  rootStore = null;
+
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       topInstanceId: observable,
       instancesTree: observable,
@@ -117,6 +118,9 @@ class ReleaseStore{
       clearWarningMessages: action,
       handleWarning: action
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   setComparedInstance(instance) {
@@ -247,7 +251,7 @@ class ReleaseStore{
     this.isFetching = true;
     this.fetchError = null;
     try{
-      const { data } = await API.axios.get(API.endpoints.instanceScope(this.topInstanceId));
+      const { data } = await this.transportLayer.getInstanceScope(this.topInstanceId);
       runInAction(()=>{
         this.hideReleasedInstances = false;
         populateStatuses(data.data);
@@ -264,7 +268,7 @@ class ReleaseStore{
         const message = e.message?e.message:e;
         this.fetchError = message;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -277,7 +281,7 @@ class ReleaseStore{
     this.fetchWarningMessagesError = null;
     this.warningMessages.clear();
     try {
-      const { data } = await API.axios.get(API.endpoints.messages());
+      const { data } = await this.transportLayer.getMessages();
       // const data = {
       //   data: {
       //       "datacite/core/doi/v1.0.0": {
@@ -304,7 +308,7 @@ class ReleaseStore{
         this.isWarningMessagesFetched = false;
         this.isFetchingWarningMessages = false;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     }
   }
 
@@ -335,11 +339,11 @@ class ReleaseStore{
 
   async releaseNode(node) {
     try {
-      await API.axios.put(API.endpoints.release(node.id, {}));
+      await this.transportLayer.releaseInstance(node.id);
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} released successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node.id, "released", false);
+        this.rootStore.historyStore.updateInstanceHistory(node.id, "released", false);
       });
     } catch(e){
       runInAction(()=>{
@@ -347,7 +351,7 @@ class ReleaseStore{
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     } finally {
       runInAction(()=>{
         this.savingProgress++;
@@ -357,11 +361,11 @@ class ReleaseStore{
 
   async unreleaseNode(node) {
     try {
-      await API.axios.delete(API.endpoints.release(node.id, {}));
+      await this.transportLayer.unreleaseInstance(node.id);
       runInAction(()=>{
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} unreleased successfully`;
         this.savingLastEndedNode = node;
-        historyStore.updateInstanceHistory(node.id, "released", true);
+        this.rootStore.historyStore.updateInstanceHistory(node.id, "released", true);
       });
     } catch(e){
       runInAction(()=>{
@@ -369,7 +373,7 @@ class ReleaseStore{
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
-      appStore.captureSentryException(e);
+      this.transportLayer.captureException(e);
     } finally {
       runInAction(()=>{
         this.savingProgress++;
@@ -382,7 +386,7 @@ class ReleaseStore{
       setTimeout(()=>{
         runInAction(()=>{
           this.isSaving = false;
-          statusStore.flush();
+          this.rootStore.statusStore.flush();
           this.savingErrors = [];
           this.savingTotal = 0;
           this.savingProgress = 0;
@@ -396,7 +400,7 @@ class ReleaseStore{
 
   dismissSaveError() {
     this.isSaving = false;
-    statusStore.flush();
+    this.rootStore.statusStore.flush();
     this.savingErrors = [];
     this.savingTotal = 0;
     this.savingProgress = 0;
@@ -441,4 +445,4 @@ class ReleaseStore{
     }
   }
 }
-export default new ReleaseStore();
+export default ReleaseStore;

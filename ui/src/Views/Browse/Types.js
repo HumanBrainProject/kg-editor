@@ -16,12 +16,13 @@
 
 import React, { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
-import typesStore from "../../Stores/TypesStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import browseStore from "../../Stores/BrowseStore";
 import FetchingLoader from "../../Components/FetchingLoader";
+
+import { useStores } from "../../Hooks/UseStores";
+
 import TypesItem from "./TypesItem";
 
 const useStyles = createUseStyles({
@@ -69,11 +70,13 @@ const Types = observer(() => {
 
   const classes = useStyles();
 
+  const { typesStore, browseStore } = useStores();
+
   const [showTypes, setShowTypes] = useState(true);
 
   useEffect(() => {
     typesStore.fetch();
-  }, []);
+  }, [typesStore]);
 
   const handleLoadRetry = () => typesStore.fetch();
 

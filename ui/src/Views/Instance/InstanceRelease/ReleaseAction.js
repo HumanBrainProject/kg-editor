@@ -15,13 +15,15 @@
 */
 
 import React, { useState}  from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { useStores } from "../../../Hooks/UseStores";
+
 import ClientPreviewModal from "./ClientPreviewModal";
 import ReleaseStats from "./ReleaseStats";
-import releaseStore from "../../../Stores/ReleaseStore";
 import ReleaseMessages from "./ReleaseMessages";
 
 const useStyles = createUseStyles({
@@ -105,6 +107,8 @@ const useStyles = createUseStyles({
 const ReleaseAction = observer(() => {
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   const [showModal, setShowModal] = useState(false);
 

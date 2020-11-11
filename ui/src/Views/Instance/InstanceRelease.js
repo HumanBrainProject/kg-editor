@@ -16,11 +16,11 @@
 
 /* eslint-disable indent */
 import React, { useEffect } from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 
-import releaseStore from "../../Stores/ReleaseStore";
+import { useStores } from "../../Hooks/UseStores";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
@@ -95,11 +95,13 @@ const InstanceRelease = observer(({ instance }) => {
 
   const classes = useStyles();
 
+  const { releaseStore } = useStores();
+
   useEffect(() => {
     releaseStore.setTopInstanceId(instance.id);
     releaseStore.clearWarningMessages();
     releaseStore.fetchReleaseData();
-  }, [instance.id]);
+  }, [releaseStore, instance.id]);
 
   const handleDismissSaveError = () => releaseStore.dismissSaveError();
 

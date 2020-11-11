@@ -16,10 +16,11 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import {observer} from "mobx-react";
+import {observer} from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import appStore from "../../Stores/AppStore";
+import { useStores } from "../../Hooks/UseStores";
+
 import MultiToggle from "../../Components/MultiToggle";
 
 const useStyles = createUseStyles({
@@ -38,6 +39,8 @@ const ThemeSwitcher = observer(() => {
 
   const classes = useStyles();
 
+  const { appStore } = useStores();
+
   const handleChange = theme => {
     appStore.setTheme(theme);
   };
@@ -45,10 +48,10 @@ const ThemeSwitcher = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.icon}>
-        <FontAwesomeIcon icon={appStore.currentTheme === "bright"? "sun": "moon"}/>
+        <FontAwesomeIcon icon={appStore.currentTheme.name === "bright"? "sun": "moon"}/>
       </div>
       <div className={classes.switcher}>
-        <MultiToggle selectedValue={appStore.currentTheme} onChange={handleChange}>
+        <MultiToggle selectedValue={appStore.currentTheme.name} onChange={handleChange}>
           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"moon"} value="default"/>
           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"sun"} value="bright"/>
         </MultiToggle>

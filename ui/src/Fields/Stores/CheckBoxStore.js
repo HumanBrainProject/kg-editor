@@ -22,8 +22,8 @@ class CheckBoxStore extends FieldStore {
   value = false;
   initialValue = false;
 
-  constructor(definition, options, instance) {
-    super(definition, options, instance);
+  constructor(definition, options, instance, transportLayer) {
+    super(definition, options, instance, transportLayer);
 
     makeObservable(this, {
       value: observable,

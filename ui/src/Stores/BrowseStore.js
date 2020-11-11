@@ -17,12 +17,9 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
-import appStore from "./AppStore";
 import InstanceStore from "./InstanceStore";
 
-import API from "../Services/API";
-
-const normalizeInstancesData = data => {
+const normalizeInstancesData = (transportLayer, data) => {
   return (data && Array.isArray(data.data))?data.data.map(rowData => {
     Object.values(rowData.fields).forEach(d => {
       if(d.type === "TextArea") {
@@ -31,12 +28,12 @@ const normalizeInstancesData = data => {
       }
     });
     const instance = new InstanceStore(rowData.id);
-    instance.initializeData(rowData);
+    instance.initializeData(transportLayer, rowData);
     return instance;
   }):[];
 };
 
-class BrowseStore {
+export class BrowseStore {
   lists = [];
   isFetching = {
     lists: false,
@@ -63,7 +60,10 @@ class BrowseStore {
   pageStart = 0;
   pageSize = 20;
 
-  constructor() {
+  transportLayer = null;
+  rootStore = null;
+
+  constructor(transportLayer, rootStore) {
     makeObservable(this, {
       lists: observable,
       isFetching: observable,
@@ -85,6 +85,9 @@ class BrowseStore {
       fetchInstances: action,
       refreshFilter: action
     });
+
+    this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   selectItem(item) {
@@ -137,14 +140,14 @@ class BrowseStore {
     if(this.selectedItem.list) {
       if(this.selectedItem.list.length > 0) {
         try {
-          const { data } = await API.axios.get(API.endpoints.filterBookmarkInstances(this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
+          const { data } = await this.transportLayer.searchInstancesByBookmark(this.rootStore.appStore.currentWorkspace.id, this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
           runInAction(() => {
             this.isFetching.instances = false;
-            const instances = normalizeInstancesData(data);
+            const instances = normalizeInstancesData(this.transportLayer, data);
             if(loadMore){
               this.instances = [...this.instances, ...instances];
             } else {
-              this.instances = (data && data.data)?data.data:[];
+              this.instances = instances;
             }
             this.canLoadMoreInstances = this.instances.length < data.total;
             this.totalInstances = data.total;
@@ -159,10 +162,10 @@ class BrowseStore {
       }
     } else {
       try {
-        const { data } = await API.axios.get(API.endpoints.searchInstances(appStore.currentWorkspace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter));
+        const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentWorkspace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
         runInAction(() => {
           this.isFetching.instances = false;
-          const instances = normalizeInstancesData(data);
+          const instances = normalizeInstancesData(this.transportLayer, data);
           if(loadMore){
             this.instances = [...this.instances, ...instances];
           } else {
@@ -177,7 +180,7 @@ class BrowseStore {
           this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
           this.isFetching.instances = false;
         });
-        appStore.captureSentryException(e);
+        this.transportLayer.captureException(e);
       }
     }
   }
@@ -187,4 +190,4 @@ class BrowseStore {
   }
 }
 
-export default new BrowseStore();
+export default BrowseStore;

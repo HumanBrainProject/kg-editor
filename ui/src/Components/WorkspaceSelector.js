@@ -15,13 +15,14 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
-import authStore from "../Stores/AuthStore";
+
+import { useStores } from "../Hooks/UseStores";
+
 import CustomDropdownToggle from "./CustomDropdownToggle";
 import CustomDropdownMenu from "./CustomDropdownMenu";
-import appStore from "../Stores/AppStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -43,6 +44,8 @@ const useStyles = createUseStyles({
 
 const WorkspaceSelector = observer(() => {
   const classes = useStyles();
+
+  const { appStore, authStore } = useStores();
 
   const handleSelectWorkspace = eventKey => appStore.setCurrentWorkspace(eventKey);
 

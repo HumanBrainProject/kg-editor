@@ -17,16 +17,13 @@
 import React, { useEffect } from "react";
 import { toJS } from "mobx";
 import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
 
-import historyStore from "../../Stores/HistoryStore";
-import appStore from "../../Stores/AppStore";
-import routerStore from "../../Stores/RouterStore";
-import instancesStore from "../../Stores/InstancesStore";
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -123,6 +120,9 @@ const InstancesHistory = observer(() => {
 
   const classes = useStyles();
 
+  const { appStore, history, historyStore, instancesStore } = useStores();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstances(appStore.currentWorkspace.id), [appStore.currentWorkspace.id]);
 
   const fetchInstances = workspace => {
@@ -164,7 +164,7 @@ const InstancesHistory = observer(() => {
   const handleInstanceClick = instance => {
     let id = instance && instance.id;
     if (id) {
-      routerStore.history.push(`/instances/${id}`);
+      history.push(`/instances/${id}`);
     }
   };
 
@@ -183,9 +183,9 @@ const InstancesHistory = observer(() => {
         instance.initializeLabelData(toJS(historyInstance));
       }
       if(mode === "view") {
-        routerStore.history.push(`/instances/${id}`);
+        history.push(`/instances/${id}`);
       } else {
-        routerStore.history.push(`/instances/${id}/${mode}`);
+        history.push(`/instances/${id}/${mode}`);
       }
     }
   };

@@ -15,9 +15,10 @@
 */
 
 import React from "react";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import releaseStore from "../../../Stores/ReleaseStore";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -91,6 +92,8 @@ const useStyles = createUseStyles({
 const ReleaseStats = observer(() => {
 
   const classes = useStyles();
+
+  const { releaseStore } = useStores();
 
   if (!releaseStore.treeStats) {
     return null;

@@ -16,14 +16,14 @@
 
 import React, { useEffect, useRef } from "react";
 import { toJS } from "mobx";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InfiniteScroll from "react-infinite-scroller";
 
 import User from "./User";
 
-import usersStore from "../../../Stores/UsersStore";
+import { usersStore } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {

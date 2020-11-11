@@ -19,6 +19,7 @@ const path = require("path");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = {
   entry: ["@babel/polyfill","./src/index.js"],
@@ -53,6 +54,7 @@ module.exports = {
     "LOG_LEVEL": '"prod"'
   },
   optimization: {
+    minimize: true,
     minimizer: [new TerserPlugin()]
   },
   plugins: [
@@ -69,8 +71,9 @@ module.exports = {
       template: 'src/index.template.html',
       inject: false,
       env:{
-        rootPath: process.env.ROOT_PATH || ""
+        rootPath: process.env.ROOT_PATH || ""
       }
-    })
+    }),
+    new CompressionPlugin()
   ]
 };

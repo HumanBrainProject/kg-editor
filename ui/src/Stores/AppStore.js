@@ -22,6 +22,11 @@ import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 
+const themes = {};
+themes[DefaultTheme.name] = DefaultTheme;
+themes[BrightTheme.name] = BrightTheme;
+themes[CupcakeTheme.name] = CupcakeTheme;
+
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
 const getLinkedInstanceIds = (instancesStore, instanceIds) => {
@@ -47,7 +52,7 @@ export class AppStore{
   initialInstanceWorkspaceError = null;
   isInitialized = false;
   canLogin = true;
-  currentTheme = "default";
+  _currentThemeName = DefaultTheme.name;
   historySettings = null;
   showSaveBar = false;
   instanceToDelete = null;
@@ -60,12 +65,6 @@ export class AppStore{
   transportLayer = null;
   rootStore = null;
 
-  availableThemes = {
-    "default": DefaultTheme,
-    "bright": BrightTheme,
-    "cupcake": CupcakeTheme
-  }
-
   constructor(transportLayer, rootStore) {
     makeObservable(this, {
       globalError: observable,
@@ -77,7 +76,8 @@ export class AppStore{
       initialInstanceWorkspaceError: observable,
       isInitialized: observable,
       canLogin: observable,
-      currentTheme: observable,
+      _currentThemeName: observable,
+      currentTheme: computed,
       historySettings: observable,
       showSaveBar: observable,
       instanceToDelete: observable,
@@ -119,8 +119,7 @@ export class AppStore{
     this.rootStore = rootStore;
 
     this.canLogin = !matchPath(this.rootStore.history.location.pathname, { path: "/logout", exact: "true" });
-    let savedTheme = localStorage.getItem("currentTheme");
-    this.currentTheme = savedTheme === "bright"? "bright": "default";
+    this.setTheme(localStorage.getItem("currentTheme"));
     let savedHistorySettings = null;
     if (localStorage.getItem("historySettings")) {
       try {
@@ -313,16 +312,20 @@ export class AppStore{
     this.globalError = null;
   }
 
-  setTheme(theme){
-    this.currentTheme = this.availableThemes[theme]? theme: "default";
-    localStorage.setItem("currentTheme", this.currentTheme);
+  get currentTheme() {
+    return themes[this._currentThemeName];
+  }
+
+  setTheme(name){
+    this._currentThemeName = themes[name]? name: DefaultTheme.name;
+    localStorage.setItem("currentTheme", this._currentThemeName);
   }
 
   toggleTheme(){
-    if(this.currentTheme === "bright"){
-      this.setTheme("default");
+    if(this.currentThemeName === BrightTheme.name){
+      this.setTheme(DefaultTheme.name);
     } else {
-      this.setTheme("bright");
+      this.setTheme(BrightTheme.name);
     }
   }
 

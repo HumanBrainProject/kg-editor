@@ -48,10 +48,10 @@ const ThemeSwitcher = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.icon}>
-        <FontAwesomeIcon icon={appStore.currentTheme === "bright"? "sun": "moon"}/>
+        <FontAwesomeIcon icon={appStore.currentTheme.name === "bright"? "sun": "moon"}/>
       </div>
       <div className={classes.switcher}>
-        <MultiToggle selectedValue={appStore.currentTheme} onChange={handleChange}>
+        <MultiToggle selectedValue={appStore.currentTheme.name} onChange={handleChange}>
           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"moon"} value="default"/>
           <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"sun"} value="bright"/>
         </MultiToggle>

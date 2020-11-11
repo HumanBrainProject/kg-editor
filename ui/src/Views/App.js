@@ -15,7 +15,6 @@
 */
 
 import React, { useEffect } from "react";
-import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 import { Router } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
@@ -29,7 +28,7 @@ const App = observer(() => {
 
   const { appStore, history } = useStores();
 
-  const theme = toJS(appStore.availableThemes[appStore.currentTheme]);
+  const theme = appStore.currentTheme;
 
   useEffect(() => {
     appStore.initialize();

@@ -37,8 +37,7 @@ import WorkspaceModal from "./WorkspaceModal";
 
 import FetchingLoader from "../Components/FetchingLoader";
 
-const useStyles = createUseStyles(theme => {
-  console.log("Layout createUseStyles: " + theme.name);
+const getGlobalUseStyles = () => createUseStyles(theme => {
   const styles = {
     "@global": {
       ":root": {
@@ -114,90 +113,6 @@ const useStyles = createUseStyles(theme => {
       "-webkit-touch-callout": "none",
       userSelect: "none"
     },
-    layout: {
-      height: "100vh",
-      display: "grid",
-      overflow: "hidden",
-      gridTemplateColumns: "1fr",
-      gridTemplateRows: "auto 1fr 20px"
-    },
-    body: {
-      position: "relative",
-      overflow: "hidden",
-      background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
-      backgroundSize: "200%"
-    },
-    status: {
-      background: "var(--bg-color-ui-contrast1)",
-      color: "var(--ft-color-loud)",
-      paddingLeft: "10px"
-    },
-    deleteInstanceErrorModal: {
-      "& .modal-dialog": {
-        top: "35%",
-        width: "max-content",
-        maxWidth: "800px",
-        "& .modal-body": {
-          padding: "15px 25px",
-          border: "1px solid var(--ft-color-loud)",
-          borderRadius: "4px",
-          color: "var(--ft-color-loud)",
-          background: "var(--list-bg-hover)"
-        }
-      }
-    },
-    deleteInstanceError: {
-      margin: "20px 0",
-      color: "var(--ft-color-error)"
-    },
-    deleteInstanceErrorFooterBar: {
-      marginBottom: "10px",
-      width: "100%",
-      textAlign: "center",
-      wordBreak: "keep-all",
-      whiteSpace: "nowrap",
-      "& button + button": {
-        marginLeft: "20px"
-      }
-    },
-    deletingInstanceModal: {
-      position: "absolute",
-      top: "40%",
-      right: "35%",
-      "& .modal-dialog": {
-        top: "35%",
-        width: "max-content",
-        maxWidth: "800px",
-        "& .modal-body": {
-          padding: "30px",
-          border: "1px solid var(--ft-color-loud)",
-          borderRadius: "4px",
-          color: "var(--ft-color-loud)",
-          background: "var(--list-bg-hover)",
-          "& .fetchingPanel": {
-            position: "unset !important",
-            top: "unset",
-            left: "unset",
-            width: "unset",
-            transform: "none",
-            wordBreak: "break-word",
-            "& .fetchingLabel": {
-              display: "inline"
-            }
-          }
-        }
-      }
-    },
-    noAccessModal: {
-      maxWidth: "min(max(500px, 50%),750px)",
-      "&.modal-dialog": {
-        marginTop: "40vh",
-        "& .modal-body": {
-          padding: "15px 30px",
-          fontSize: "1.6rem"
-        }
-      }
-    }
   };
 
   if (theme.name === "cupcake") {
@@ -231,14 +146,102 @@ const useStyles = createUseStyles(theme => {
   return styles;
 });
 
+const useStyles = createUseStyles({
+  layout: {
+    height: "100vh",
+    display: "grid",
+    overflow: "hidden",
+    gridTemplateColumns: "1fr",
+    gridTemplateRows: "auto 1fr 20px"
+  },
+  body: {
+    position: "relative",
+    overflow: "hidden",
+    background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
+    backgroundSize: "200%"
+  },
+  status: {
+    background: "var(--bg-color-ui-contrast1)",
+    color: "var(--ft-color-loud)",
+    paddingLeft: "10px"
+  },
+  deleteInstanceErrorModal: {
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "15px 25px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)"
+      }
+    }
+  },
+  deleteInstanceError: {
+    margin: "20px 0",
+    color: "var(--ft-color-error)"
+  },
+  deleteInstanceErrorFooterBar: {
+    marginBottom: "10px",
+    width: "100%",
+    textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
+    "& button + button": {
+      marginLeft: "20px"
+    }
+  },
+  deletingInstanceModal: {
+    position: "absolute",
+    top: "40%",
+    right: "35%",
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "30px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)",
+        "& .fetchingPanel": {
+          position: "unset !important",
+          top: "unset",
+          left: "unset",
+          width: "unset",
+          transform: "none",
+          wordBreak: "break-word",
+          "& .fetchingLabel": {
+            display: "inline"
+          }
+        }
+      }
+    }
+  },
+  noAccessModal: {
+    maxWidth: "min(max(500px, 50%),750px)",
+    "&.modal-dialog": {
+      marginTop: "40vh",
+      "& .modal-body": {
+        padding: "15px 30px",
+        fontSize: "1.6rem"
+      }
+    }
+  }
+});
+
 const Layout = observer(() => {
 
   const { appStore, authStore } = useStores();
 
   const theme = useTheme();
-  console.log("Layout useTheme: " + theme.name);
+  const useGlobalStyles = getGlobalUseStyles();
+  useGlobalStyles({ theme });
 
-  const classes = useStyles({ theme });
+  const classes = useStyles();
 
   const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
 

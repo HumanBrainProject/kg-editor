@@ -18,12 +18,14 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { Scrollbars } from "react-custom-scrollbars";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../Hooks/UseStores";
 
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
+import FetchingLoader from "../../Components/FetchingLoader";
 
 const rootPath = window.rootPath || "";
 
@@ -73,6 +75,71 @@ const useStyles = createUseStyles({
   },
   error: {
     color: "var(--ft-color-error)"
+  },
+  deleteInstanceErrorModal: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    background: "rgba(0, 0, 0, 0.3)",
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "15px 25px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)"
+      }
+    }
+  },
+  deleteInstanceError: {
+    margin: "20px 0",
+    color: "var(--ft-color-error)"
+  },
+  deleteInstanceErrorFooterBar: {
+    marginBottom: "10px",
+    width: "100%",
+    textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
+    "& button + button": {
+      marginLeft: "20px"
+    }
+  },
+  deletingInstanceModal: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    background: "rgba(0, 0, 0, 0.3)",
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "30px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)",
+        "& .fetchingPanel": {
+          position: "unset !important",
+          top: "unset",
+          left: "unset",
+          width: "unset",
+          transform: "none",
+          wordBreak: "break-word",
+          "& .fetchingLabel": {
+            display: "inline"
+          }
+        }
+      }
+    }
   }
 });
 
@@ -90,6 +157,10 @@ const InstanceManage = observer(({instance}) => {
   const handleDuplicateInstance = () => appStore.duplicateInstance(instance.id);
 
   const handleDeleteInstance = async () => appStore.deleteInstance(instance.id);
+
+  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
+
+  const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
 
   const permissions = instance.permissions;
   const status = statusStore.getInstance(instance.id);
@@ -154,6 +225,28 @@ const InstanceManage = observer(({instance}) => {
           )}
         </div>
       </Scrollbars>
+      {appStore.deleteInstanceError && (
+        <div className={classes.deleteInstanceErrorModal}>
+          <Modal.Dialog>
+            <Modal.Body>
+              <div className={classes.deleteInstanceError}>Il y a une erreur {appStore.deleteInstanceError}</div>
+              <div className={classes.deleteInstanceErrorFooterBar}>
+                <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
+                <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+              </div>
+            </Modal.Body>
+          </Modal.Dialog>
+        </div>
+      )}
+      {!appStore.deleteInstanceError && appStore.isDeletingInstance && !!appStore.instanceToDelete && (
+        <div className={classes.deletingInstanceModal}>
+          <Modal.Dialog>
+            <Modal.Body>
+              <FetchingLoader>{`Deleting instance "${appStore.instanceToDelete}" ...`}</FetchingLoader>
+            </Modal.Body>
+          </Modal.Dialog>
+        </div>
+      )}
     </div>
   );
 });

@@ -18,8 +18,6 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { Route, Switch } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles, useTheme } from "react-jss";
 
 import { useStores } from "../Hooks/UseStores";
@@ -34,8 +32,6 @@ import Browse from "./Browse";
 import Instance from "./Instance";
 import GlobalError from "./GlobalError";
 import WorkspaceModal from "./WorkspaceModal";
-
-import FetchingLoader from "../Components/FetchingLoader";
 
 const getGlobalUseStyles = () => createUseStyles(theme => {
   const styles = {
@@ -165,62 +161,6 @@ const useStyles = createUseStyles({
     color: "var(--ft-color-loud)",
     paddingLeft: "10px"
   },
-  deleteInstanceErrorModal: {
-    "& .modal-dialog": {
-      top: "35%",
-      width: "max-content",
-      maxWidth: "800px",
-      "& .modal-body": {
-        padding: "15px 25px",
-        border: "1px solid var(--ft-color-loud)",
-        borderRadius: "4px",
-        color: "var(--ft-color-loud)",
-        background: "var(--list-bg-hover)"
-      }
-    }
-  },
-  deleteInstanceError: {
-    margin: "20px 0",
-    color: "var(--ft-color-error)"
-  },
-  deleteInstanceErrorFooterBar: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
-    }
-  },
-  deletingInstanceModal: {
-    position: "absolute",
-    top: "40%",
-    right: "35%",
-    "& .modal-dialog": {
-      top: "35%",
-      width: "max-content",
-      maxWidth: "800px",
-      "& .modal-body": {
-        padding: "30px",
-        border: "1px solid var(--ft-color-loud)",
-        borderRadius: "4px",
-        color: "var(--ft-color-loud)",
-        background: "var(--list-bg-hover)",
-        "& .fetchingPanel": {
-          position: "unset !important",
-          top: "unset",
-          left: "unset",
-          width: "unset",
-          transform: "none",
-          wordBreak: "break-word",
-          "& .fetchingLabel": {
-            display: "inline"
-          }
-        }
-      }
-    }
-  },
   noAccessModal: {
     maxWidth: "min(max(500px, 50%),750px)",
     "&.modal-dialog": {
@@ -242,10 +182,6 @@ const Layout = observer(() => {
   useGlobalStyles({ theme });
 
   const classes = useStyles();
-
-  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
-
-  const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
 
   return (
     <div className={classes.layout}>
@@ -295,33 +231,6 @@ const Layout = observer(() => {
               </Modal>
         }
       </div>
-      {authStore.isAuthenticated && authStore.isUserAuthorized && (
-        <React.Fragment>
-          {appStore.deleteInstanceError ?
-            <div className={classes.deleteInstanceErrorModal}>
-              <Modal.Dialog>
-                <Modal.Body>
-                  <div className={classes.deleteInstanceError}>{appStore.deleteInstanceError}</div>
-                  <div className={classes.deleteInstanceErrorFooterBar}>
-                    <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
-                    <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-                  </div>
-                </Modal.Body>
-              </Modal.Dialog>
-            </div>
-            :
-            appStore.isDeletingInstance && !!appStore.instanceToDelete ?
-              <div className={classes.deletingInstanceModal}>
-                <Modal.Dialog>
-                  <Modal.Body>
-                    <FetchingLoader>{`Deleting instance "${appStore.instanceToDelete}" ...`}</FetchingLoader>
-                  </Modal.Body>
-                </Modal.Dialog>
-              </div>
-              : null
-          }
-        </React.Fragment>
-      )}
       <div className={`${classes.status} layout-status`}>
         Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
       </div>

@@ -17,13 +17,13 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import { useStores } from "../../Hooks/UseStores";
 
 // import Bookmarks from "./Bookmarks";
 import Types from "./Types";
+import Filter from "../../Components/Filter";
 
 const useStyles = createUseStyles({
   container: {
@@ -37,26 +37,6 @@ const useStyles = createUseStyles({
   header: {
     position: "relative"
   },
-  search: {
-    borderRadius: "2px",
-    backgroundColor: "var(--bg-color-blend-contrast1)",
-    color: "var(--ft-color-loud)",
-    margin: "10px",
-    width: "calc(100% - 20px)",
-    border: "1px solid transparent",
-    paddingLeft: "30px",
-    "&:focus": {
-      borderColor: "rgba(64, 169, 243, 0.5)",
-      backgroundColor: "transparent",
-      color: "var(--ft-color-loud)",
-    }
-  },
-  searchIcon: {
-    position: "absolute",
-    top: "20px",
-    left: "20px",
-    color: "var(--ft-color-normal)",
-  },
   noMatch: {
     padding: "0 15px"
   }
@@ -69,9 +49,7 @@ const NavigationPanel = observer(() => {
   //const { typesStore, browseStore, bookmarkStore } = useStores();
   const { typesStore, browseStore } = useStores();
 
-  const handleFilterChange = e => {
-    browseStore.setNavigationFilterTerm(e.target.value);
-  };
+  const handleFilterChange = value => browseStore.setNavigationFilterTerm(value);
 
   // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
   const typeList = typesStore.filteredList(browseStore.navigationFilter);
@@ -79,13 +57,7 @@ const NavigationPanel = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.header}>
-        <input
-          className={`form-control ${classes.search}`}
-          placeholder="Filter lists"
-          type="text"
-          value={browseStore.navigationFilter}
-          onChange={handleFilterChange} />
-        <FontAwesomeIcon icon="search" className={classes.searchIcon} />
+        <Filter value={browseStore.navigationFilter} placeholder="Filter types" onChange={handleFilterChange} />
       </div>
       <Scrollbars autoHide>
         {browseStore.navigationFilter.trim() &&

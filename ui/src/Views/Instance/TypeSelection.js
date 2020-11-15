@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars";
 import { createUseStyles } from "react-jss";
@@ -25,41 +25,57 @@ import { useStores } from "../../Hooks/UseStores";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
+import Filter from "../../Components/Filter";
 
 const useStyles = createUseStyles({
   container: {
-    position:"absolute",
+    position: "absolute",
+    display: "flex",
+    flexDirection: "column",
     width:"50%",
-    height:"calc(100% - 40px)",
-    top:"20px",
+    height:"calc(100% - 160px)",
+    top:"80px",
     left:"25%",
+    background: "var(--bg-color-ui-contrast2)",
+    color: "var(--ft-color-normal)",
+    border: "1px solid var(--border-color-ui-contrast1)",
     boxShadow: "0 2px 10px var(--pane-box-shadow)",
-    background: "white",
     "& button": {
       margin: "0 10px"
     }
   },
-  lists: {
-    padding: "15px"
+  body: {
+    flex: 1,
+    padding: "0 0 10px 0"
   },
-  list: {
+  content: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gridGap: "10px"
+    gridTemplateColumns: "repeat(1, 1fr)",
+    gridGap: "10px",
+    padding: "0 10px",
+    "@media screen and (min-width:1200px)": {
+      gridTemplateColumns: "repeat(2, 1fr)"
+    },
+    "@media screen and (min-width:1600px)": {
+      gridTemplateColumns: "repeat(3, 1fr)"
+    }
   },
   type: {
     display: "grid",
     gridTemplateColumns: "auto 1fr",
     gridGap: "8px",
     position: "relative",
-    padding: "10px",
+    padding: "15px",
     fontSize: "1.1em",
     fontWeight: "300",
+    background: "var(--bg-color-ui-contrast3)",
     border: "1px solid var(--border-color-ui-contrast2)",
+    borderRadius: "10px",
     cursor: "pointer",
     wordBreak: "break-word",
     "&:hover": {
-      background: "#f3f3f3"
+      background: "var(--bg-color-blend-contrast1)",
+      color: "var(--ft-color-loud)",
     }
   },
   icon: {
@@ -88,9 +104,15 @@ const TypeSelection = observer(({ onSelect }) => {
 
   const { typesStore } = useStores();
 
+  const [ filter, setFilter ] = useState();
+
+  const handleChange = value => setFilter(value);
+
   const handleRetry = () => typesStore.fetch();
 
   const handleClick = type => onSelect(type);
+
+  const types = typesStore.filteredList(filter);
 
   if (typesStore.isFetching) {
     return (
@@ -119,15 +141,16 @@ const TypeSelection = observer(({ onSelect }) => {
 
   return (
     <div className={classes.container}>
-      <Scrollbars autoHide>
-        <div className={classes.lists}>
-          <div className={classes.list}>
-            {typesStore.types.map(type => (
+      <Filter value={filter} placeholder="Filter types" onChange={handleChange} />
+      <div className={classes.body}>
+        <Scrollbars autoHide>
+          <div className={classes.content}>
+            {types.map(type => (
               <Type key={type.name} type={type} onClick={handleClick} />
             ))}
           </div>
-        </div>
-      </Scrollbars>
+        </Scrollbars>
+      </div>
     </div>
   );
 });

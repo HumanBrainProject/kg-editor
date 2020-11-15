@@ -53,7 +53,7 @@ const useStyles = createUseStyles({
     },
     "@media screen and (min-width:1024px)": {
       gridTemplateColumns: "repeat(3, 1fr)"
-    },
+    }
   },
   workspace: {
     position: "relative",

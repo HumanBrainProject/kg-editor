@@ -76,7 +76,8 @@ const Types = observer(() => {
 
   useEffect(() => {
     typesStore.fetch();
-  }, [typesStore]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLoadRetry = () => typesStore.fetch();
 

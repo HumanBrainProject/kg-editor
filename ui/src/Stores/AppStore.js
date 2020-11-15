@@ -322,7 +322,7 @@ export class AppStore{
   }
 
   toggleTheme(){
-    if(this.currentThemeName === BrightTheme.name){
+    if(this._currentThemeName === BrightTheme.name){
       this.setTheme(DefaultTheme.name);
     } else {
       this.setTheme(BrightTheme.name);

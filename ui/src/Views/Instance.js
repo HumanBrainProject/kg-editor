@@ -70,7 +70,8 @@ const Instance = observer(({ match, mode }) => {
     } else {
       instancesStore.checkInstanceIdAvailability(id, mode);
     }
-  }, [appStore, instancesStore, viewStore, history, id, mode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, mode]);
 
   const handleRetry = () => instancesStore.checkInstanceIdAvailability(id, mode === "create");
 

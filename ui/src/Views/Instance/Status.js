@@ -68,7 +68,8 @@ const Status = observer(({ id, darkmode }) => {
 
   useEffect(() => {
     statusStore.fetchStatus(id);
-  }, [statusStore, id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const instanceStatus = statusStore.getInstance(id);
 

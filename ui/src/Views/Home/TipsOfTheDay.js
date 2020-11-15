@@ -57,7 +57,7 @@ const useStyles = createUseStyles({
       display: "inline-block",
       margin: "0 0.1em",
       padding: "0.1em 0.6em",
-      border: "1px solid #ccc",
+      border: "1px solid var(--border-color-ui-contrast2)",
       borderRadius: "3px",
       backgroundColor: "#f7f7f7",
       fontFamily: "Arial,Helvetica,sans-serif",

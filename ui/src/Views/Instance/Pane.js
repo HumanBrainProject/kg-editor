@@ -77,7 +77,8 @@ const Pane = observer(({ paneId, children }) => {
     return () => {
       view.unregisterPane(paneId);
     };
-  }, [view, paneId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paneId]);
 
   useEffect(() => {
     if(paneRef.current) {

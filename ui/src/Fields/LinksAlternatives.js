@@ -48,7 +48,8 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
         value: instances
       };
     }));
-  }, [instancesStore, mappingValue, list]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list]);
 
   return (
     <Alternatives

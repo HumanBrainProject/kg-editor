@@ -76,7 +76,8 @@ const Reviewers = observer(({ id }) => {
 
   useEffect(() => {
     reviewsStore.getInstanceReviews(id);
-  }, [reviewsStore, id]); // check if id is needed
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // check if id is needed
 
   const fetchInstanceReviews = () => {
     reviewsStore.getInstanceReviews(id);

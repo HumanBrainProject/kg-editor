@@ -73,7 +73,8 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
 
   useEffect(() => {
     instancesStore.createInstanceOrGet(instanceId).fetchLabel();
-  }, [instancesStore, instanceId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instanceId]);
 
   const handleClick = e => {
     e.stopPropagation();

@@ -55,7 +55,7 @@ const useStyles = createUseStyles({
     padding: "10px",
     fontSize: "1.1em",
     fontWeight: "300",
-    border: "1px solid #ccc",
+    border: "1px solid var(--border-color-ui-contrast2)",
     cursor: "pointer",
     wordBreak: "break-word",
     "&:hover": {

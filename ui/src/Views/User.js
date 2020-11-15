@@ -29,7 +29,8 @@ const User = observer(({ userId }) => {
     if (userId) {
       usersStore.fetchUser(userId);
     }
-  }, [usersStore, userId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   if (!userId) {
     return null;

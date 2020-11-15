@@ -196,7 +196,7 @@ const useStyles = createUseStyles({
     padding: "20px",
     fontWeight: "300",
     textAlign: "center",
-    border: "1px solid #ccc",
+    border: "1px solid var(--border-color-ui-contrast2)",
     borderRadius: "3px",
     cursor: "pointer",
     fontSize: "1.2em",

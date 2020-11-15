@@ -216,7 +216,8 @@ const SavePanel = observer(() => {
     return () => {
       window.removeEventListener("beforeunload", onUnload);
     };
-  }, [appStore, instancesStore]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSaveAll = () => {
     instancesStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));

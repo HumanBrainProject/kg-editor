@@ -36,7 +36,7 @@ const useStyles = createUseStyles({
     marginBottom: "0"
   },
   table: {
-    border: "1px solid #ccc",
+    border: "1px solid var(--border-color-ui-contrast2)",
     paddingTop: "10px",
     marginBottom: "15px",
     "&.disabled": {

@@ -36,7 +36,8 @@ const App = observer(() => {
     return () => {
       document.removeEventListener("keydown", appStore.handleGlobalShortcuts);
     };
-  }, [appStore]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ErrorBoundary>

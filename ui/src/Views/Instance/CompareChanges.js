@@ -41,7 +41,8 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
       const store = createInstanceStore(instancesStore.transportLayer);
       setSavedInstanceStore(store);
     }
-  }, [instancesStore.transportLayer, savedInstanceStore]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if(savedInstanceStore) {

@@ -58,18 +58,21 @@ const useStyles = createUseStyles({
   workspace: {
     position: "relative",
     padding: "20px",
+    background: "var(--bg-color-ui-contrast3)",
+    border: "1px solid var(--border-color-ui-contrast2)",
+    borderRadius: "10px",
+    cursor: "pointer",
     fontWeight: "300",
     textAlign: "center",
-    border: "1px solid #ccc",
-    borderRadius: "3px",
-    cursor: "pointer",
     fontSize: "1.2em",
     wordBreak: "break-word",
+    transition: "background .3s ease-in-out, color .3s ease-in-out",
     "@media screen and (min-width:768px)": {
       whiteSpace: "nowrap"
     },
     "&:hover": {
-      background: "#f3f3f3"
+      background: "var(--bg-color-blend-contrast1)",
+      color: "var(--ft-color-loud)",
     }
   },
   workspaceSelectionModal: {
@@ -82,10 +85,15 @@ const useStyles = createUseStyles({
     "&.modal-dialog": {
       marginTop: "25vh",
       maxWidth: "unset",
-      "& .modal-body": {
-        padding: "0",
-        maxHeight: "calc(100vh - 30vh -80px)",
-        overflowY: "hidden"
+      "& .modal-content": {
+        background: "var(--bg-color-ui-contrast2)",
+        color: "var(--ft-color-normal)",
+        border: "1px solid var(--border-color-ui-contrast1)",
+        "& .modal-body": {
+          padding: "0",
+          maxHeight: "calc(100vh - 30vh -80px)",
+          overflowY: "hidden"
+        }
       }
     }
   }

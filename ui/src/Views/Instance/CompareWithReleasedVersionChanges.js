@@ -48,7 +48,8 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
     if(!releasedInstanceStore) {
       setReleasedInstanceStore(createInstanceStore(instancesStore.transportLayer, instancesStore.rootStore, "RELEASED"));
     }
-  }, [instancesStore.transportLayer, instancesStore.rootStore, releasedInstanceStore]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (instanceId && status !== "UNRELEASED" && releasedInstanceStore) {
@@ -59,7 +60,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
       releasedInstanceStore && releasedInstanceStore.flush();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instanceId, status, releasedInstanceStore]);
+  }, [instanceId, status]);
 
   const fetchReleasedInstance = (forceFetch=false) => {
     if (status !== "UNRELEASED") {

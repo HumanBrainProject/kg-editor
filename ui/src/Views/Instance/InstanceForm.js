@@ -48,7 +48,7 @@ const useStyles = createUseStyles({
     "&:not(.main)": {
       position: "relative",
       marginBottom: "10px",
-      border: "1px solid #ccc",
+      border: "1px solid var(--border-color-ui-contrast2)",
       borderRadius: "10px"
     },
     "&:not(.main).current": {

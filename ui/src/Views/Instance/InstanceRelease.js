@@ -101,7 +101,8 @@ const InstanceRelease = observer(({ instance }) => {
     releaseStore.setTopInstanceId(instance.id);
     releaseStore.clearWarningMessages();
     releaseStore.fetchReleaseData();
-  }, [releaseStore, instance.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance.id]);
 
   const handleDismissSaveError = () => releaseStore.dismissSaveError();
 

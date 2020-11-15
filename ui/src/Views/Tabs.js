@@ -81,7 +81,8 @@ const Tabs = observer(() => {
       setCurrentLocationPathname(location.pathname);
     });
     return unlisten;
-  }, [history]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGoToDashboard = () => appStore.goToDashboard();
 

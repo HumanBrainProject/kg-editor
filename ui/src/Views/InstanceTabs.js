@@ -41,7 +41,8 @@ const InstanceTab = observer(({view, pathname}) => {
       view.setNameAndColor(instance.name, instance.primaryType.color);
       viewStore.syncStoredViews();
     }
-  }, [viewStore, instance, view]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance, view]);
 
   const isCurrent = (instanceId, mode) => {
     if(mode !== "view") {

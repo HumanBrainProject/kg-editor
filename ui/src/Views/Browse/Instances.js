@@ -16,7 +16,6 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-
 import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroller";
@@ -27,8 +26,9 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { useStores } from "../../Hooks/UseStores";
 
 import FetchingLoader from "../../Components/FetchingLoader";
-import Preview from "../Preview";
 import BGMessage from "../../Components/BGMessage";
+import Filter from "../../Components/Filter";
+import Preview from "../Preview";
 import InstanceRow from "../Instance/InstanceRow";
 
 const useStyles = createUseStyles({
@@ -39,22 +39,6 @@ const useStyles = createUseStyles({
     display:"grid",
     gridTemplateColumns:"1fr 33%",
     gridTemplateRows:"auto 1fr"
-  },
-  search:{
-    borderRadius: "2px",
-    backgroundColor: "var(--bg-color-blend-contrast1)",
-    color: "var(--ft-color-loud)",
-    width:"100%",
-    border:"1px solid transparent",
-    paddingLeft:"30px",
-    "&:focus": {
-      borderColor: "rgba(64, 169, 243, 0.5)",
-      backgroundColor: "transparent",
-      color: "var(--ft-color-loud)",
-    },
-    "&.disabled,&:disabled":{
-      backgroundColor: "var(--bg-color-blend-contrast1)",
-    }
   },
   preview:{
     position:"relative",
@@ -81,20 +65,15 @@ const useStyles = createUseStyles({
     display:"grid",
     gridTemplateColumns:"1fr auto",
     gridGap:"10px",
-    padding:"10px",
+    padding:"5px 10px 0 0",
     position:"relative"
-  },
-  searchIcon:{
-    position:"absolute",
-    top:"20px",
-    left:"20px",
-    color: "var(--ft-color-normal)",
   },
   instanceCount:{
     color: "var(--ft-color-normal)",
     lineHeight:"34px",
     background:"var(--bg-color-ui-contrast2)",
-    padding:"0 10px"
+    padding:"0 10px",
+    margin: "10px 0 10px -10px"
   }
 });
 
@@ -104,7 +83,7 @@ const Instances = observer(() => {
 
   const { appStore, history, browseStore, instanceStore } = useStores();
 
-  const handleFilterChange = e => browseStore.setInstancesFilter(e.target.value);
+  const handleFilterChange = value => browseStore.setInstancesFilter(value);
 
   const handleInstanceClick = instance => browseStore.selectInstance(instance);
 
@@ -136,19 +115,14 @@ const Instances = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.header}>
-        {browseStore.selectedItem !== null &&
-            <input
-              disabled={browseStore.selectedItem === null}
-              className={`form-control ${classes.search}`}
-              placeholder={`Filter instances of ${browseStore.selectedItem.label}`}
-              type="text"
-              value={browseStore.instancesFilter}
-              onChange={handleFilterChange} />}
-        {browseStore.selectedItem !== null &&
+        {browseStore.selectedItem !== null && (
+          <React.Fragment>
+            <Filter value={browseStore.instancesFilter} placeholder={`Filter instances of ${browseStore.selectedItem.label}`} onChange={handleFilterChange} />
             <div className={classes.instanceCount}>
               {browseStore.totalInstances} Result{`${browseStore.totalInstances !== 0?"s":""}`}
-            </div>}
-        {browseStore.selectedItem !== null && <FontAwesomeIcon icon="search" className={classes.searchIcon}/>}
+            </div>
+          </React.Fragment>
+        )}
       </div>
       <Scrollbars autoHide>
         {browseStore.selectedItem ?

@@ -118,19 +118,19 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   const classes = useStyles();
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [instanceId]);
 
   const fetchInstance = (forceFetch=false) =>  {
-    const instance = instancesStore.createInstanceOrGet(instanceId);
+    const instance = instanceStore.createInstanceOrGet(instanceId);
     instance.fetch(forceFetch);
   };
 
   const handleRetry = () => fetchInstance(true);
 
-  const instance = instanceId?instancesStore.instances.get(instanceId):null;
+  const instance = instanceId?instanceStore.instances.get(instanceId):null;
   if (!instance) {
     return null;
   }

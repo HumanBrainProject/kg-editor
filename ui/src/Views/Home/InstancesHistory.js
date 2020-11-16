@@ -120,7 +120,7 @@ const InstancesHistory = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, historyStore, instancesStore } = useStores();
+  const { appStore, history, historyStore, instanceStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstances(appStore.currentWorkspace.id), [appStore.currentWorkspace.id]);
@@ -178,8 +178,8 @@ const InstancesHistory = observer(() => {
   const handleInstanceActionClick = (historyInstance, mode) => {
     const id = historyInstance && historyInstance.id;
     if (id) {
-      if (!instancesStore.instances.has(id)) {
-        const instance = instancesStore.createInstanceOrGet(id);
+      if (!instanceStore.instances.has(id)) {
+        const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
       if(mode === "view") {

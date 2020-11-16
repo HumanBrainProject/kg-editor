@@ -29,10 +29,10 @@ themes[CupcakeTheme.name] = CupcakeTheme;
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
-const getLinkedInstanceIds = (instancesStore, instanceIds) => {
+const getLinkedInstanceIds = (instanceStore, instanceIds) => {
   //window.console.log("list: ", instanceIds);
   const result = instanceIds.reduce((acc, id) => {
-    const instance = instancesStore.instances.get(id);
+    const instance = instanceStore.instances.get(id);
     if (instance) {
       const linkedIds = instance.linkedIds;
       //window.console.log(id, linkedIds);
@@ -184,7 +184,7 @@ export class AppStore{
   }
 
   flush() {
-    this.rootStore.instancesStore.flush();
+    this.rootStore.instanceStore.flush();
     this.rootStore.statusStore.flush();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
@@ -239,7 +239,7 @@ export class AppStore{
       const data = response.data && response.data.data;
       if(data){
 
-        const instance = this.rootStore.instancesStore.createInstanceOrGet(instanceId);
+        const instance = this.rootStore.instanceStore.createInstanceOrGet(instanceId);
         instance.initializeData(this.transportLayer, data);
 
         if(data.workspace){
@@ -285,7 +285,7 @@ export class AppStore{
   }
 
   closeAllInstances() {
-    this.rootStore.instancesStore.resetInstanceIdAvailability();
+    this.rootStore.instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(this.rootStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(this.rootStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(this.rootStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
@@ -295,7 +295,7 @@ export class AppStore{
   }
 
   clearViews() {
-    this.rootStore.instancesStore.resetInstanceIdAvailability();
+    this.rootStore.instanceStore.resetInstanceIdAvailability();
     if (!(matchPath(this.rootStore.history.location.pathname, { path: "/", exact: "true" })
       || matchPath(this.rootStore.history.location.pathname, { path: "/browse", exact: "true" })
       || matchPath(this.rootStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
@@ -383,7 +383,7 @@ export class AppStore{
       if (this.currentWorkspace) {
         localStorage.setItem("workspace", workspace.id);
         this.rootStore.viewStore.restoreViews();
-        this.rootStore.typesStore.fetch(true);
+        this.rootStore.typeStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       } else {
         localStorage.removeItem("workspace");
@@ -401,7 +401,7 @@ export class AppStore{
   }
 
   openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view") {
-    const instance = this.rootStore.instancesStore.instances.get(instanceId);
+    const instance = this.rootStore.instanceStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
     const name = isFetched?instance.name:instanceName;
     const primaryType = isFetched?instance.primaryType:instancePrimaryType;
@@ -435,13 +435,13 @@ export class AppStore{
         this.rootStore.browseStore.clearSelectedInstance();
       }
     }
-    this.rootStore.instancesStore.instanceIdAvailability.delete(instanceId);
+    this.rootStore.instanceStore.instanceIdAvailability.delete(instanceId);
     this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
-    const instance = this.rootStore.instancesStore.instances.get(instanceId);
+    const instance = this.rootStore.instanceStore.instances.get(instanceId);
     if (instance) {
-      const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore.instancesStore, this.rootStore.viewStore.instancesIds);
+      const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore.instanceStore, this.rootStore.viewStore.instancesIds);
       const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
-      this.rootStore.instancesStore.removeInstances(instanceIdsToBeRemoved);
+      this.rootStore.instanceStore.removeInstances(instanceIdsToBeRemoved);
     }
   }
 
@@ -518,7 +518,7 @@ export class AppStore{
   }
 
   async duplicateInstance(fromInstanceId) {
-    const instanceToCopy = this.rootStore.instancesStore.instances.get(fromInstanceId);
+    const instanceToCopy = this.rootStore.instanceStore.instances.get(fromInstanceId);
     const payload = instanceToCopy.payload;
     const labelField = instanceToCopy.labelField;
     if(labelField) {
@@ -531,7 +531,7 @@ export class AppStore{
         this.isCreatingNewInstance = false;
       });
       const newId = data.data.id;
-      const newInstance = this.rootStore.instancesStore.createInstanceOrGet(newId);
+      const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
       newInstance.initializeData(this.transportLayer, data.data);
       this.rootStore.history.push(`/instances/${newId}/edit`);
     } catch(e){
@@ -640,7 +640,7 @@ export class AppStore{
   };
 
   logout = () => {
-    if (!this.rootStore.instancesStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
+    if (!this.rootStore.instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       this.rootStore.viewStore.flushStoredViews();
       this.rootStore.authStore.logout();
     }

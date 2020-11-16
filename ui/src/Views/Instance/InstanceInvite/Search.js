@@ -23,7 +23,7 @@ import InfiniteScroll from "react-infinite-scroller";
 
 import User from "./User";
 
-import { usersStore } from "../../../Hooks/UseStores";
+import { userStore } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -146,7 +146,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
   const classes = useStyles();
 
   const handleLoadMoreSearchResults = () => {
-    usersStore.searchUsers(true);
+    userStore.searchUsers(true);
   };
 
   const handleSelect = (user, event) => {
@@ -172,10 +172,10 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
       }
     } else if(event && event.keyCode === 27) { //escape
       event && event.preventDefault();
-      usersStore.clearSearch();
+      userStore.clearSearch();
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
       event && event.preventDefault();
-      usersStore.addUser(org, toJS(user), true);
+      userStore.addUser(org, toJS(user), true);
       inputRef.current.focus();
       typeof onSelect === "function" && onSelect(user.id);
     }
@@ -204,7 +204,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
       }
     } else if(event && event.keyCode === 27) { //escape
       event && event.preventDefault();
-      usersStore.clearSearch();
+      userStore.clearSearch();
     }
   };
 
@@ -213,14 +213,14 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
       && event.keyCode !== 40   // Down
       && event.keyCode !== 38   // Up
       && event.keyCode !== 27) { //escape
-      usersStore.setSearchFilter(event.target.value, excludedUsers);
+      userStore.setSearchFilter(event.target.value, excludedUsers);
     }
   };
 
   useEffect(() => {
     const clickOutHandler = e => {
       if(!wrapperRef.current.contains(e.target)){
-        usersStore.clearSearch();
+        userStore.clearSearch();
       }
     };
 
@@ -235,32 +235,32 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
     };
   }, []);
 
-  const showTotalSearchCount = usersStore.isSearchFetched && usersStore.totalSearchCount !== undefined && (!usersStore.searchFetchError || usersStore.totalSearchCount !== 0);
+  const showTotalSearchCount = userStore.isSearchFetched && userStore.totalSearchCount !== undefined && (!userStore.searchFetchError || userStore.totalSearchCount !== 0);
 
   return (
     <div className={classes.container} ref={wrapperRef} >
       <FontAwesomeIcon icon="user-plus" className={classes.addIcon} />
       <div className={classes.search}>
-        <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={usersStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
+        <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={userStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
         <FontAwesomeIcon icon="search" className={classes.searchIcon} />
-        <div className={`${classes.searchDropdown} ${usersStore.hasSearchFilter?"open":""}`} ref={usersRef}>
+        <div className={`${classes.searchDropdown} ${userStore.hasSearchFilter?"open":""}`} ref={usersRef}>
           <div className="dropdown-menu">
             <div className="dropdown-list">
               <InfiniteScroll
                 element={"ul"}
                 threshold={100}
-                hasMore={usersStore.canLoadMoreResults}
+                hasMore={userStore.canLoadMoreResults}
                 loadMore={handleLoadMoreSearchResults}
                 useWindow={false}>
-                {usersStore.searchResult.map(user => (
+                {userStore.searchResult.map(user => (
                   <User key={user.id} user={user} onSelect={handleSelect} />
                 ))}
               </InfiniteScroll>
             </div>
-            { (usersStore.isFetchingSearch || showTotalSearchCount) && (
+            { (userStore.isFetchingSearch || showTotalSearchCount) && (
               <div className={classes.footerPanel} >
                 <div>
-                  { usersStore.isFetchingSearch && (
+                  { userStore.isFetchingSearch && (
                     <React.Fragment>
                       <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; fetching...
                     </React.Fragment>
@@ -269,15 +269,15 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
                 <div className={classes.searchCount}>
                   { showTotalSearchCount && (
                     <React.Fragment>
-                      {usersStore.totalSearchCount} user{`${usersStore.totalSearchCount !== 0?"s":""} found`}
+                      {userStore.totalSearchCount} user{`${userStore.totalSearchCount !== 0?"s":""} found`}
                     </React.Fragment>
                   )}
                 </div>
               </div>
             )}
-            {usersStore.searchFetchError && (
-              <button className={classes.errorPanel} title={usersStore.searchFetchError} onClick={handleLoadMoreSearchResults}>
-                <div className="error"><FontAwesomeIcon icon="exclamation-triangle" />&nbsp;&nbsp;<span>{usersStore.searchFetchError}</span></div>
+            {userStore.searchFetchError && (
+              <button className={classes.errorPanel} title={userStore.searchFetchError} onClick={handleLoadMoreSearchResults}>
+                <div className="error"><FontAwesomeIcon icon="exclamation-triangle" />&nbsp;&nbsp;<span>{userStore.searchFetchError}</span></div>
                 <div className="retry"><FontAwesomeIcon icon={"redo-alt"}/></div>
               </button>
             )}

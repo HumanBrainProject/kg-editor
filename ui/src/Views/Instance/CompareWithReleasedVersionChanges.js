@@ -21,7 +21,7 @@ import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../Hooks/UseStores";
-import { createInstanceStore } from "../../Stores/InstancesStore";
+import { createInstanceStore } from "../../Stores/InstanceStore";
 
 import FetchingLoader from "../../Components/FetchingLoader";
 import BGMessage from "../../Components/BGMessage";
@@ -40,13 +40,13 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
 
   const classes = useStyles();
 
-  const { instancesStore, releaseStore } = useStores();
+  const { instanceStore, releaseStore } = useStores();
 
   const [releasedInstanceStore, setReleasedInstanceStore] = useState(null);
 
   useEffect(() => {
     if(!releasedInstanceStore) {
-      setReleasedInstanceStore(createInstanceStore(instancesStore.transportLayer, instancesStore.rootStore, "RELEASED"));
+      setReleasedInstanceStore(createInstanceStore(instanceStore.transportLayer, instanceStore.rootStore, "RELEASED"));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -70,7 +70,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
   };
 
   const fetchInstance = (forceFetch=false) => {
-    const instance = instancesStore.createInstanceOrGet(instanceId);
+    const instance = instanceStore.createInstanceOrGet(instanceId);
     instance.fetch(forceFetch);
   };
 
@@ -84,7 +84,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
     return null;
   }
   const releasedInstance = (releasedInstanceStore && status !== "UNRELEASED")?releasedInstanceStore.instances.get(instanceId):null;
-  const instance = instancesStore.instances.get(instanceId);
+  const instance = instanceStore.instances.get(instanceId);
 
   if (!instance) {
     return null;
@@ -138,7 +138,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
           leftInstance={releasedInstance}
           rightInstance={instance}
           leftInstanceStore={releasedInstanceStore}
-          rightInstanceStore={instancesStore}
+          rightInstanceStore={instanceStore}
           leftChildrenIds={releasedInstance?releasedInstance.childrenIds:[]}
           rightChildrenIds={instance.childrenIds}
           onClose={handleCloseComparison}

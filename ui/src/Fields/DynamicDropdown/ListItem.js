@@ -69,10 +69,10 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
 
   const classes = useStyles();
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
   useEffect(() => {
-    instancesStore.createInstanceOrGet(instanceId).fetchLabel();
+    instanceStore.createInstanceOrGet(instanceId).fetchLabel();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
@@ -128,7 +128,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
     onMouseOut && onMouseOut(index);
   };
 
-  const instance = instancesStore.instances.get(instanceId);
+  const instance = instanceStore.instances.get(instanceId);
 
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
   const isFetching = instance && (instance.isFetching || instance.isfFetchingLabel);

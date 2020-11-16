@@ -132,14 +132,14 @@ const TypesItem = observer(({ type }) => {
 
   const classes = useStyles();
 
-  const { appStore, browseStore, instancesStore } = useStores();
+  const { appStore, browseStore, instanceStore } = useStores();
 
   const handleSelect = e => {
     e && e.stopPropagation();
     browseStore.selectItem(type);
   };
 
-  const handleCreateInstance = () => instancesStore.createNewInstanceOfType(type);
+  const handleCreateInstance = () => instanceStore.createNewInstanceOfType(type);
 
   const selected = browseStore.selectedItem === type;
   const color = type.color;

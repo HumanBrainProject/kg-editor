@@ -132,17 +132,17 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const classes = useStyles();
 
-  const { appStore, history, instancesStore } = useStores();
+  const { appStore, history, instanceStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [id]);
 
   const fetchInstance = (forceFetch = false) => {
-    const instance = instancesStore.createInstanceOrGet(id);
+    const instance = instanceStore.createInstanceOrGet(id);
     instance.fetch(forceFetch);
   };
 
-  const instance = instancesStore.instances.get(id);
+  const instance = instanceStore.instances.get(id);
   if (!instance) {
     return null;
   }
@@ -157,7 +157,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const handleOpenInstance = e => {
     if ((e.metaKey || e.ctrlKey)) {
-      const instance = instancesStore.instances.get(id);
+      const instance = instanceStore.instances.get(id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
       history.push(`/instances/${this.props.id}`);
@@ -167,13 +167,13 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
   const handleConfirmCancelEdit = e => {
     e && e.stopPropagation();
     if (instance.hasChanged) {
-      instancesStore.confirmCancelInstanceChanges(id);
+      instanceStore.confirmCancelInstanceChanges(id);
     }
   };
 
   const handleContinueEditing = e => {
     e && e.stopPropagation();
-    instancesStore.abortCancelInstanceChange(id);
+    instanceStore.abortCancelInstanceChange(id);
   };
 
   const handleSave = e => {

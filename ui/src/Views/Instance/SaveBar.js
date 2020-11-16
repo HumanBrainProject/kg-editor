@@ -197,14 +197,14 @@ const SavePanel = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, instancesStore } = useStores();
+  const { appStore, instanceStore } = useStores();
 
   const [comparedInstance, setComparedInstance] = useState(null);
 
   useEffect(() => {
 
     const onUnload = e => { // the method that will be used for both add and remove event
-      if(!instancesStore.hasUnsavedChanges){
+      if(!instanceStore.hasUnsavedChanges){
         return null;
       }
       appStore.toggleSavebarDisplay(true);
@@ -220,7 +220,7 @@ const SavePanel = observer(() => {
   }, []);
 
   const handleSaveAll = () => {
-    instancesStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
+    instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
   };
 
   const handleSave = instance => {
@@ -229,7 +229,7 @@ const SavePanel = observer(() => {
   };
 
   const handleReset = instance => {
-    instancesStore.confirmCancelInstanceChanges(instance.id);
+    instanceStore.confirmCancelInstanceChanges(instance.id);
     setComparedInstance(null);
   };
 
@@ -239,7 +239,7 @@ const SavePanel = observer(() => {
 
   const handleCloseCompararison = () => setComparedInstance(null);
 
-  const changedInstances = instancesStore.getUnsavedInstances;
+  const changedInstances = instanceStore.getUnsavedInstances;
 
   return(
     <div className={classes.container}>
@@ -247,7 +247,7 @@ const SavePanel = observer(() => {
         <h4>Unsaved instances &nbsp;<Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
         <div className={classes.instances} >
           <CompareModal instance={comparedInstance} onSave={handleSave} onReset={handleReset} onClose={handleCloseCompararison} />
-          {!instancesStore.hasUnsavedChanges &&
+          {!instanceStore.hasUnsavedChanges &&
               <div className={classes.noChanges}>
                 <div className={classes.allGreenIcon}><FontAwesomeIcon icon="check"/></div>
                 <div className={classes.allGreenText}>You have no unsaved modifications !</div>

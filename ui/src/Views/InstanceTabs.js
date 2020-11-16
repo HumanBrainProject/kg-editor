@@ -32,9 +32,9 @@ const useStyles = createUseStyles({
 
 const InstanceTab = observer(({view, pathname}) => {
 
-  const { appStore, instancesStore, viewStore } = useStores();
+  const { appStore, instanceStore, viewStore } = useStores();
 
-  const instance = instancesStore.instances.get(view.instanceId);
+  const instance = instanceStore.instances.get(view.instanceId);
 
   useEffect(() => {
     if (instance && instance.name !== view.name && instance.primaryType.color !== view.color) {

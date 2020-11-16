@@ -19,14 +19,14 @@ import { createBrowserHistory } from "history";
 import { AppStore } from "./AppStore";
 import { AuthStore } from "./AuthStore";
 import { HistoryStore } from "./HistoryStore";
-import { TypesStore } from "./TypesStore";
+import { TypeStore } from "./TypeStore";
 import { BrowseStore } from "./BrowseStore";
-import { InstancesStore } from "./InstancesStore";
+import { InstanceStore } from "./InstanceStore";
 import { StatusStore } from "./StatusStore";
 import { ViewStore } from "./ViewStore";
 import { GraphStore } from "./GraphStore";
 import { ReleaseStore } from "./ReleaseStore";
-import { UsersStore } from "./UsersStore";
+import { UserStore } from "./UserStore";
 //import { BookmarkStore } from "./BookmarkStore";
 //import { BookmarkStatusStore } from "./BookmarkStatusStore";
 import { FeaturesStore } from "./FeaturesStore";
@@ -37,14 +37,14 @@ export class RootStore  {
 
   authStore= null
   historyStore= null
-  typesStore= null
+  typeStore= null
   browseStore= null
-  instancesStore= null
+  instanceStore= null
   statusStore= null
   viewStore= null
   graphStore= null
   releaseStore= null
-  usersStore= null
+  userStore= null
   //bookmarkStore= null
   //bookmarkStatusStore= null
   featuresStore= null
@@ -59,14 +59,14 @@ export class RootStore  {
 
     // Domain stores
     this.historyStore = new HistoryStore(transportLayer, this);
-    this.typesStore = new TypesStore(transportLayer, this);
+    this.typeStore = new TypeStore(transportLayer, this);
     this.browseStore = new BrowseStore(transportLayer, this);
-    this.instancesStore = new InstancesStore(transportLayer, this);
+    this.instanceStore = new InstanceStore(transportLayer, this);
     this.statusStore = new StatusStore(transportLayer, this);
     this.viewStore = new ViewStore(transportLayer, this);
     this.graphStore = new GraphStore(transportLayer, this);
     this.releaseStore = new ReleaseStore(transportLayer, this);
-    this.usersStore = new UsersStore(transportLayer, this);
+    this.userStore = new UserStore(transportLayer, this);
     //this.bookmarkStore = new BookmarkStore(transportLayer, this);
     //this.bookmarkStatusStore = new BookmarkStatusStore(transportLayer, this);
     this.featuresStore = new FeaturesStore(transportLayer, this);

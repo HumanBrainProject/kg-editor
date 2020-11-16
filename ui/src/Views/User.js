@@ -23,11 +23,11 @@ import UserComponent from "../Components/User";
 
 const User = observer(({ userId }) => {
 
-  const { usersStore } = useStores();
+  const { userStore } = useStores();
 
   useEffect(() => {
     if (userId) {
-      usersStore.fetchUser(userId);
+      userStore.fetchUser(userId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -36,7 +36,7 @@ const User = observer(({ userId }) => {
     return null;
   }
 
-  const user = usersStore.users.get(userId);
+  const user = userStore.users.get(userId);
 
   const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
     if (item && item.value && item.verified) {

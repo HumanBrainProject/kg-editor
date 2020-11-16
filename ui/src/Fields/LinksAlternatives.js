@@ -25,7 +25,7 @@ const AlternativeValue = observer(({alternative}) => alternative.value.map(insta
 
 const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
   const [items, setItems] = useState([]);
 
@@ -33,7 +33,7 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
     setItems(list.map(({users, selected, value }) => {
       const instances = value.map(v => {
         if (v[mappingValue]) {
-          const instance = instancesStore.createInstanceOrGet(v[mappingValue]);
+          const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
           instance.fetchLabel();
           return instance;
         }

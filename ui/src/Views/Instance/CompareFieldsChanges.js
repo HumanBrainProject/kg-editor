@@ -35,13 +35,13 @@ const useStyles = createUseStyles({
 
 const separator = "; ";
 
-const getLabel = (instancesStore, field, value) => {
+const getLabel = (instanceStore, field, value) => {
   const id = value[field.mappingValue];
   if (!id) {
     return "Unkown instance";
   }
 
-  const instance = instancesStore.instances.get(id);
+  const instance = instanceStore.instances.get(id);
 
   if (instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.name;
@@ -49,7 +49,7 @@ const getLabel = (instancesStore, field, value) => {
   return id;
 };
 
-const getValue = (instancesStore, instance, name) => {
+const getValue = (instanceStore, instance, name) => {
   if (!instance) {
     return "";
   }
@@ -72,7 +72,7 @@ const getValue = (instancesStore, instance, name) => {
   }
   const vals = Array.isArray(value)?value:[value];
   if (vals.length) {
-    return vals.map(val => getLabel(instancesStore, field, val)).join(separator);
+    return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
   }
   return "";
 };

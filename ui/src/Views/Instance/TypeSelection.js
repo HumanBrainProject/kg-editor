@@ -102,19 +102,19 @@ const TypeSelection = observer(({ onSelect }) => {
 
   const classes = useStyles();
 
-  const { typesStore } = useStores();
+  const { typeStore } = useStores();
 
   const [ filter, setFilter ] = useState();
 
   const handleChange = value => setFilter(value);
 
-  const handleRetry = () => typesStore.fetch();
+  const handleRetry = () => typeStore.fetch();
 
   const handleClick = type => onSelect(type);
 
-  const types = typesStore.filteredList(filter);
+  const types = typeStore.filteredList(filter);
 
-  if (typesStore.isFetching) {
+  if (typeStore.isFetching) {
     return (
       <div className={classes.container}>
         <FetchingLoader>Fetching data types...</FetchingLoader>
@@ -122,13 +122,13 @@ const TypeSelection = observer(({ onSelect }) => {
     );
   }
 
-  if (typesStore.fetchError) {
+  if (typeStore.fetchError) {
     return (
       <div className={classes.container}>
         <BGMessage icon={"ban"}>
               There was a network problem fetching data types.<br />
               If the problem persists, please contact the support.<br />
-          <small>{typesStore.fetchError}</small><br /><br />
+          <small>{typeStore.fetchError}</small><br /><br />
           <div>
             <Button variant={"primary"} onClick={handleRetry}>
               <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry

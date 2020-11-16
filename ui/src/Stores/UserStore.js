@@ -17,7 +17,7 @@
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
-export class UsersStore {
+export class UserStore {
   users = new Map();
   isFetchingSearch = false;
   isSearchFetched = false;
@@ -227,4 +227,4 @@ export class UsersStore {
   }
 }
 
-export default UsersStore;
+export default UserStore;

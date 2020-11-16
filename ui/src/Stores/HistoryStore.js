@@ -16,7 +16,7 @@
 
 import { observable, action, runInAction, makeObservable } from "mobx";
 
-import InstanceStore from "./InstanceStore";
+import Instance from "./Instance";
 
 const maxItems = 100;
 
@@ -136,7 +136,7 @@ export class HistoryStore {
                   delete d.label;
                 }
               });
-              const instance = new InstanceStore(identifier);
+              const instance = new Instance(identifier);
               instance.initializeData(this.transportLayer, data);
               this.instances.push(instance);
             }

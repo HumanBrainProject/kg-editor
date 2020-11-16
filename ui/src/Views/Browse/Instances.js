@@ -102,7 +102,7 @@ const Instances = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, browseStore, instancesStore } = useStores();
+  const { appStore, history, browseStore, instanceStore } = useStores();
 
   const handleFilterChange = e => browseStore.setInstancesFilter(e.target.value);
 
@@ -117,8 +117,8 @@ const Instances = observer(() => {
   const handleInstanceActionClick = (summaryInstance, mode) => {
     const id = summaryInstance && summaryInstance.id;
     if (id) {
-      if (!instancesStore.instances.has(id)) {
-        const instance = instancesStore.createInstanceOrGet(id);
+      if (!instanceStore.instances.has(id)) {
+        const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
       if(mode === "view") {

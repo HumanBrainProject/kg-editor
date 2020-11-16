@@ -56,43 +56,43 @@ const Instance = observer(({ match, mode }) => {
 
   const id = match.params.id;
 
-  const { appStore, history, instancesStore, viewStore } = useStores();
+  const { appStore, history, instanceStore, viewStore } = useStores();
 
   useEffect(() => {
     appStore.openInstance(id, id, {}, mode);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);
-    const instance = instancesStore.instances.get(id);
+    const instance = instanceStore.instances.get(id);
     if (instance && instance.isFetched) {
       if (mode === "create") {
         history.replace(`/instances/${id}/edit`);
       }
     } else {
-      instancesStore.checkInstanceIdAvailability(id, mode);
+      instanceStore.checkInstanceIdAvailability(id, mode);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode]);
 
-  const handleRetry = () => instancesStore.checkInstanceIdAvailability(id, mode === "create");
+  const handleRetry = () => instanceStore.checkInstanceIdAvailability(id, mode === "create");
 
   const handleContinue = () => {
-    instancesStore.instanceIdAvailability.delete(id);
+    instanceStore.instanceIdAvailability.delete(id);
     history.replace("/browse");
   };
 
   const handleCreateNewInstanceOfType = type => {
-    instancesStore.createNewInstance(type, id);
-    instancesStore.resetInstanceIdAvailability();
+    instanceStore.createNewInstance(type, id);
+    instanceStore.resetInstanceIdAvailability();
   };
 
-  const instance = instancesStore.instances.get(id);
+  const instance = instanceStore.instances.get(id);
   if (instance && instance.isFetched) {
     return (
       <View instance={instance} mode={mode} />
     );
   }
 
-  const status = instancesStore.instanceIdAvailability.get(id);
+  const status = instanceStore.instanceIdAvailability.get(id);
 
   if (!status || status.isChecking) {
     return (

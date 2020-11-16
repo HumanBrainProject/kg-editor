@@ -70,22 +70,22 @@ const Types = observer(() => {
 
   const classes = useStyles();
 
-  const { typesStore, browseStore } = useStores();
+  const { typeStore, browseStore } = useStores();
 
   const [showTypes, setShowTypes] = useState(true);
 
   useEffect(() => {
-    typesStore.fetch();
+    typeStore.fetch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLoadRetry = () => typesStore.fetch();
+  const handleLoadRetry = () => typeStore.fetch();
 
   const handleToggleType = () => setShowTypes(!showTypes);
 
-  const list = typesStore.filteredList(browseStore.navigationFilter);
+  const list = typeStore.filteredList(browseStore.navigationFilter);
 
-  if (!typesStore.fetchError && !typesStore.isFetching && !list.length) {
+  if (!typeStore.fetchError && !typeStore.isFetching && !list.length) {
     return null;
   }
 
@@ -94,8 +94,8 @@ const Types = observer(() => {
       <div className={classes.folderName} onClick={handleToggleType}>
         <FontAwesomeIcon fixedWidth icon={showTypes ? "caret-down" : "caret-right"} /> &nbsp;Types
       </div>
-      {!typesStore.fetchError ?
-        !typesStore.isFetching ?
+      {!typeStore.fetchError ?
+        !typeStore.isFetching ?
           showTypes && list.map(type =>
             <TypesItem key={type.name} type={type}/>
           )
@@ -103,7 +103,7 @@ const Types = observer(() => {
           <FetchingLoader>fetching...</FetchingLoader>
         :
         <div className={classes.fetchErrorPanel}>
-          <div>{typesStore.fetchError}</div>
+          <div>{typeStore.fetchError}</div>
           <Button variant="primary" onClick={handleLoadRetry}>Retry</Button>
         </div>
       }

@@ -54,7 +54,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const classes = useStyles();
 
-  const { typesStore, instancesStore } = useStores();
+  const { typeStore, instanceStore } = useStores();
 
   const draggedValue = useRef();
   const formGroupRef = useRef();
@@ -80,19 +80,19 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const dropValue = droppedValue => {
     fieldStore.moveValueAfter(draggedValue.current, droppedValue);
     draggedValue.current = null;
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleDropdownReset = () => {
     fieldStore.resetOptionsSearch();
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleOnAddNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
       const id = _.uuid();
-      const type = typesStore.typesMap.get(typeName);
-      instancesStore.createNewInstance(type, id, name);
+      const type = typeStore.typesMap.get(typeName);
+      instanceStore.createNewInstance(type, id, name);
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {
@@ -102,31 +102,31 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         view.resetInstanceHighlight();
       }, 1000);
     }
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleOnAddValue = id => {
-    instancesStore.createInstanceOrGet(id);
+    instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
     setTimeout(() => view.setInstanceHighlight(id, fieldStore.label), 1000);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleSelectAlternative = value => {
     const values = value.map(v => ({[fieldStore.mappingValue]: v.id}));
     fieldStore.setValues(values);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleRemoveMySuggestion = () => {
     fieldStore.removeAllValues();
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleDeleteLastValue = () => {
     fieldStore.removeLastValue();
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleClick = index => {
@@ -145,7 +145,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const handleDelete = index => {
     const value = values[index];
     fieldStore.removeValue(value);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleDragEnd = () => draggedValue.current = null;
@@ -158,7 +158,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
-      instancesStore.togglePreviewInstance();
+      instanceStore.togglePreviewInstance();
     }
   };
 
@@ -169,7 +169,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       if (id) {
         view.setInstanceHighlight(id, fieldStore.label);
       }
-      instancesStore.togglePreviewInstance();
+      instanceStore.togglePreviewInstance();
     }
     fieldStore.resetOptionsSearch();
   };
@@ -198,7 +198,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const handleOptionPreview = (instanceId, instanceName) => {
     const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instancesStore.togglePreviewInstance(instanceId, instanceName, options);
+    instanceStore.togglePreviewInstance(instanceId, instanceName, options);
   };
 
   const handleSearchOptions = term => fieldStore.searchOptions(term);

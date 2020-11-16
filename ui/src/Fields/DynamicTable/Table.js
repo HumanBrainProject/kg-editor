@@ -55,12 +55,12 @@ const useStyles = createUseStyles({
 
 const LabelCellRenderer = observer(({ instanceId }) => {
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => instancesStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
+  useEffect(() => instanceStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
 
-  const instance = instanceId && instancesStore.instances.get(instanceId);
+  const instance = instanceId && instanceStore.instances.get(instanceId);
 
   if (!instance) {
     return "Unknown instance";
@@ -109,9 +109,9 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
     onDeleteRow(index);
   };
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
-  const instance = instanceId && instancesStore.instances.get(instanceId);
+  const instance = instanceId && instanceStore.instances.get(instanceId);
 
   if (instance && instance.fetchError) {
     return (

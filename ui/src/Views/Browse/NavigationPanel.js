@@ -46,13 +46,13 @@ const NavigationPanel = observer(() => {
 
   const classes = useStyles();
 
-  //const { typesStore, browseStore, bookmarkStore } = useStores();
-  const { typesStore, browseStore } = useStores();
+  //const { typeStore, browseStore, bookmarkStore } = useStores();
+  const { typeStore, browseStore } = useStores();
 
   const handleFilterChange = value => browseStore.setNavigationFilterTerm(value);
 
   // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
-  const typeList = typesStore.filteredList(browseStore.navigationFilter);
+  const typeList = typeStore.filteredList(browseStore.navigationFilter);
 
   return (
     <div className={classes.container}>

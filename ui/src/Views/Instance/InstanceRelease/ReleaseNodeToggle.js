@@ -46,10 +46,10 @@ const ReleaseNodeToggle = observer(({ node }) => {
 
   const classes = useStyles();
 
-  const { instancesStore, releaseStore } = useStores();
+  const { instanceStore, releaseStore } = useStores();
 
   const handleChange = status => {
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
     releaseStore.markNodeForChange(node, status);
     releaseStore.handleWarning(node, status);
   };

@@ -16,7 +16,7 @@
 
 import { observable, action, computed, runInAction, makeObservable } from "mobx";
 
-export class TypesStore {
+export class TypeStore {
   types = [];
   typesMap = new Map();
   fetchError = null;
@@ -73,4 +73,4 @@ export class TypesStore {
   }
 }
 
-export default TypesStore;
+export default TypeStore;

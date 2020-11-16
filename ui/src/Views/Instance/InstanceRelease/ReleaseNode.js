@@ -135,12 +135,12 @@ const ReleaseNode = observer(({ node, level = 0 }) => {
 
   const classes = useStyles();
 
-  const { instancesStore, releaseStore } = useStores();
+  const { instanceStore, releaseStore } = useStores();
 
   const handleOptionPreview = e => {
     e && e.stopPropagation();
     const options = { showEmptyFields:false, showAction:true, showBookmarkStatus:false, showType:true, showStatus:false };
-    instancesStore.togglePreviewInstance(node.id, node.label, options );
+    instanceStore.togglePreviewInstance(node.id, node.label, options );
   };
 
   const handleShowCompare = e => {

@@ -90,7 +90,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const classes = useStyles();
 
-  const { typesStore, instancesStore } = useStores();
+  const { typeStore, instanceStore } = useStores();
 
   const {
     instance,
@@ -109,14 +109,14 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const handleDropdownReset = () => {
     fieldStore.resetOptionsSearch();
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleOnAddNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
       const id = _.uuid();
-      const type = typesStore.typesMap.get(typeName);
-      instancesStore.createNewInstance(type, id, name);
+      const type = typeStore.typesMap.get(typeName);
+      instanceStore.createNewInstance(type, id, name);
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {
@@ -128,11 +128,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         view.resetInstanceHighlight();
       }, 1000);
     }
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleOnAddValue = id => {
-    instancesStore.createInstanceOrGet(id);
+    instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
     setTimeout(() => {
@@ -140,17 +140,17 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         view.setInstanceHighlight(id, fieldStore.label);
       }
     }, 1000);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleDeleteAll = () => {
     fieldStore.setValues([]);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleOptionPreview = (id, name) => {
     const options = { showEmptyfieldStores:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instancesStore.togglePreviewInstance(id, name, options);
+    instanceStore.togglePreviewInstance(id, name, options);
   };
 
   const handleSearchOptions = term => fieldStore.searchOptions(term);
@@ -161,7 +161,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     const { value: values } = fieldStore;
     const value = values[index];
     fieldStore.removeValue(value);
-    instancesStore.togglePreviewInstance();
+    instanceStore.togglePreviewInstance();
   };
 
   const handleRowClick = index => {

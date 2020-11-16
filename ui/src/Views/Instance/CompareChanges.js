@@ -19,7 +19,7 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 
 import CompareFieldsChanges from "./CompareFieldsChanges";
-import { createInstanceStore } from "../../Stores/InstancesStore";
+import { createInstanceStore } from "../../Stores/InstanceStore";
 import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
@@ -34,11 +34,11 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
 
   const [savedInstanceStore, setSavedInstanceStore] = useState(null);
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
   useEffect(() => {
     if(!savedInstanceStore){
-      const store = createInstanceStore(instancesStore.transportLayer);
+      const store = createInstanceStore(instanceStore.transportLayer);
       setSavedInstanceStore(store);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,17 +47,17 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
   useEffect(() => {
     if(savedInstanceStore) {
       const savedInstance = savedInstanceStore.createInstanceOrGet(instanceId);
-      const instance = instancesStore.instances.get(instanceId);
+      const instance = instanceStore.instances.get(instanceId);
       const data = instance.cloneInitialData;
       savedInstance.initializeData(savedInstanceStore.transportLayer, data);
     }
     return () => {
       savedInstanceStore && savedInstanceStore.flush();
     };
-  }, [instancesStore.transportLayer, instancesStore.instances, savedInstanceStore, instanceId]);
+  }, [instanceStore.transportLayer, instanceStore.instances, savedInstanceStore, instanceId]);
 
 
-  const instance = instancesStore.instances.get(instanceId);
+  const instance = instanceStore.instances.get(instanceId);
   const savedInstance = savedInstanceStore && savedInstanceStore.instances.get(instanceId);
   if (!instance || !savedInstance) {
     return null;
@@ -69,8 +69,8 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
         instanceId={instanceId}
         leftInstance={savedInstance}
         rightInstance={instance}
-        leftInstanceStore={instancesStore}
-        rightInstanceStore={instancesStore}
+        leftInstanceStore={instanceStore}
+        rightInstanceStore={instanceStore}
         leftChildrenIds={savedInstance.childrenIds}
         rightChildrenIds={instance.childrenIds}
         onClose={onClose}

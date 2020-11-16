@@ -17,7 +17,7 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
-import { usersStore } from "../Hooks/UseStores";
+import { userStore } from "../Hooks/UseStores";
 
 import AvatarComponent from "../Components/Avatar";
 
@@ -25,7 +25,7 @@ const Avatar = observer(({ userId }) => {
 
   useEffect(() => {
     if (userId) {
-      usersStore.fetchUser(userId);
+      userStore.fetchUser(userId);
     }
   }, [userId]);
 
@@ -33,7 +33,7 @@ const Avatar = observer(({ userId }) => {
     return null;
   }
 
-  const user = usersStore.users.get(userId);
+  const user = userStore.users.get(userId);
 
   return (
     <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />

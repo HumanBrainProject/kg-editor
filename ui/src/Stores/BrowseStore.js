@@ -17,7 +17,7 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
-import InstanceStore from "./InstanceStore";
+import Instance from "./Instance";
 
 const normalizeInstancesData = (transportLayer, data) => {
   return (data && Array.isArray(data.data))?data.data.map(rowData => {
@@ -27,7 +27,7 @@ const normalizeInstancesData = (transportLayer, data) => {
         delete d.label;
       }
     });
-    const instance = new InstanceStore(rowData.id);
+    const instance = new Instance(rowData.id);
     instance.initializeData(transportLayer, rowData);
     return instance;
   }):[];

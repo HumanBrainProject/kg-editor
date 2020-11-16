@@ -33,9 +33,9 @@ const Links = observer(({ instanceId }) => {
 
   const classes = useStyles();
 
-  const { instancesStore, viewStore } = useStores();
+  const { instanceStore, viewStore } = useStores();
 
-  const instance = instancesStore.instances.get(instanceId);
+  const instance = instanceStore.instances.get(instanceId);
   if (!instance) {
     return null;
   }
@@ -45,7 +45,7 @@ const Links = observer(({ instanceId }) => {
 
   const fetchInstance = (forceFetch = false) => {
     if (instanceId) {
-      const instance = instancesStore.createInstanceOrGet(instanceId);
+      const instance = instanceStore.createInstanceOrGet(instanceId);
       instance.fetch(forceFetch);
     }
   };

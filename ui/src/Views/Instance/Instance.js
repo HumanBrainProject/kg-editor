@@ -189,17 +189,17 @@ const Instance = observer(({ instance, mode }) =>  {
 
   const classes = useStyles();
 
-  const { instancesStore } = useStores();
+  const { instanceStore } = useStores();
 
-  const handleHidePreview = () => instancesStore.togglePreviewInstance();
+  const handleHidePreview = () => instanceStore.togglePreviewInstance();
 
-  const previewInstance = instancesStore.previewInstance;
+  const previewInstance = instanceStore.previewInstance;
 
   const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
 
   return (
     <React.Fragment>
-      <div className={`${classes.container} ${!instancesStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
+      <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
         <Tabs mode={mode} instance={instance} />
         <div className={classes.body}>
           <View instance={instance} mode={mode} />

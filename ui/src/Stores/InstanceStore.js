@@ -14,568 +14,479 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
+import debounce from "lodash/debounce";
+import _  from "lodash-uuid";
 
-import { fieldsMapping } from "../Fields";
+import { Instance as BaseInstance } from "./Instance";
 
-const compareField = (a, b, ignoreName=false) => {
-  if (!a && !b) {
-    return 0;
-  }
-  if (!a) {
-    return 1;
-  }
-  if (!b) {
-    return -1;
-  }
-  if ((!a.order || typeof a !== Number) && (!b.order || typeof b !== Number)) {
-    if (ignoreName) {
-      return 0;
-    }
-    if (!a.label && !b.label) {
-      return 0;
-    }
-    if (!a.label) {
-      return 1;
-    }
-    if (!b.label) {
-      return -1;
-    }
-    return a.label.localeCompare(b.label);
-  }
-  if (!a.order || typeof a !== Number) {
-    return 1;
-  }
-  if (!b.order || typeof b !== Number) {
-    return -1;
-  }
-  return a - b;
-};
+class Instance extends BaseInstance {
 
-export const normalizeLabelInstanceData = data => {
-  const instance = {
-    id: null,
-    name: null,
-    types: [],
-    primaryType: { name: "", color: "", label: "" },
-    workspace: "",
-    error: null
-  };
+  cancelChangesPending = null;
+  saveError = null;
+  hasSaveError = false;
+  isSaving = false;
 
-  if (!data) {
-    return instance;
-  }
-  if (data.id) {
-    instance.id = data.id;
-  }
-  if (data.types instanceof Array) {
-    instance.types = data.types;
-    if (instance.types.length) {
-      instance.primaryType = instance.types[0];
-    }
-  }
-  if (data.workspace) {
-    instance.workspace = data.workspace;
-  }
-  if (data.name) {
-    instance.name = data.name;
-  }
-  if (typeof data.error === "object") {
-    instance.error = data.error;
-  }
-  return instance;
-};
+  store = null;
 
-export const normalizeInstanceData = data => {
+  constructor(id, store) {
+    super(id);
 
-  // TODO: Remove the mockup, this is just a test for embedded
-  // data.fields["http://schema.org/address"] = {
-  //   type: "Nested",
-  //   fullyQualifiedName: "http://schema.org/address",
-  //   name: "address",
-  //   label: "Address",
-  //   min:0,
-  //   max: Number.POSITIVE_INFINITY,
-  //   value: [
-  //     {
-  //       "http://schema.org/addressLocality": "Springfield",
-  //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
-  //       "http://schema.org/country" : [
-  //         {id: "e583e6a5-d621-4724-90aa-8706326ede44"},
-  //         {id: "933048fa-f314-4a70-8839-0ce346ac0c36"},
-  //         {id: "ced19d52-78e7-4e3f-a68b-6e42ba77d83b"}
-  //       ],
-  //       "http://schema.org/zipCode": [
-  //         { "http://schema.org/test": "Testing...",
-  //           "http://schema.org/region":  [
-  //             {id: "f9590f64-b8f9-4d70-a966-7af3b60ea2ae"},
-  //             {id: "3b10cce0-c452-4217-94b4-631fff56d854"},
-  //             {id: "8f3a518b-8224-447c-bf41-0da18797d969"}
-  //           ]
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   fields: {
-  //     "http://schema.org/addressLocality": {
-  //       fullyQualifiedName: "http://schema.org/addressLocality",
-  //       name: "addressLocality",
-  //       label: "Address Locality",
-  //       type: "InputText"
-  //     },
-  //     "http://schema.org/streetAddress": {
-  //       fullyQualifiedName: "http://schema.org/streetAddress",
-  //       name: "streetAddress",
-  //       label: "Street Address",
-  //       type: "InputText"
-  //     },
-  //     "http://schema.org/country" : {
-  //       fullyQualifiedName: "http://schema.org/country",
-  //       name: "country",
-  //       label: "Country",
-  //       type: "DropdownSelect",
-  //       isLink: true,
-  //       allowCustomValues: true
-  //     },
-  //     "http://schema.org/zipCode": {
-  //       type: "Nested",
-  //       fullyQualifiedName: "http://schema.org/zipCode",
-  //       name: "zipCode",
-  //       label: "Zip Code",
-  //       min:0,
-  //       max: Number.POSITIVE_INFINITY,
-  //       fields: {
-  //         "http://schema.org/test": {
-  //           fullyQualifiedName: "http://schema.org/test",
-  //           name: "test",
-  //           label: "Test",
-  //           type: "InputText"
-  //         },
-  //         "http://schema.org/region" :{
-  //           fullyQualifiedName: "http://schema.org/region",
-  //           name: "region",
-  //           label: "Region",
-  //           type: "DropdownSelect",
-  //           isLink: true,
-  //           allowCustomValues: true
-  //         }
-  //       }
-  //     }
-  //   }
-  // };
-  // END of TODO
-
-  const normalizeAlternative = (name, field, alternatives) => {
-    field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
-      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
-      .map(alternative => ({
-        value: alternative.value,
-        users: alternative.users,
-        selected: !!alternative.selected
-      }));
-  };
-
-  const normalizeField = (field, instanceId) => {
-    if (field.type === "Nested") {
-      field.topAddButton = false;
-      if (!field.min) {
-        field.min = 0;
-      }
-      if (!field.max) {
-        field.max = Number.POSITIVE_INFINITY;
-      }
-      if (typeof field.fields === "object") {
-        normalizeFields(field.fields, instanceId);
-      }
-    }
-  };
-
-  const normalizeFields = (fields, instanceId, alternatives) => {
-    Object.entries(fields).forEach(([name, field]) => {
-      normalizeField(field, instanceId);
-      normalizeAlternative(name, field, alternatives);
+    makeObservable(this, {
+      cancelChangesPending: observable,
+      saveError: observable,
+      hasSaveError: observable,
+      isSaving: observable,
+      linkedIds: computed,
+      fetch: action,
+      fetchLabel: action,
+      save: action,
+      cancelSave: action,
+      cancelChanges: action
     });
-  };
 
-  const instance = {
-    ...normalizeLabelInstanceData(data),
-    fields: {},
-    labelField: null,
-    promotedFields: [],
-    alternatives: {},
-    metadata: {},
-    permissions: {}
-  };
+    this.store = store;
+  }
 
-  if (!data) {
-    return instance;
-  }
-  if (data.id) {
-    instance.id = data.id;
-  }
-  if (data.types instanceof Array) {
-    instance.types = data.types;
-    if (instance.types.length) {
-      instance.primaryType = instance.types[0];
-    }
-  }
-  if (data.workspace) {
-    instance.workspace = data.workspace;
-  }
-  if (data.name) {
-    instance.name = data.name;
-  }
-  if (data.labelField) {
-    instance.labelField = data.labelField;
-  }
-  if (data.promotedFields instanceof Array) {
-    instance.promotedFields = data.promotedFields;
-  }
-  if (typeof data.fields === "object") {
-    normalizeFields(data.fields, instance.id, data.alternatives);
-    instance.fields = data.fields;
-  }
-  if (typeof data.metadata === "object") {
-    const metadata = data.metadata;
-    instance.metadata = Object.keys(metadata).map(key => {
-      if (key == "lastUpdateAt" || key == "createdAt") {
-        const d = new Date(metadata[key].value);
-        metadata[key].value = d.toLocaleString();
+  get linkedIds() {
+    const ids = this.childrenIds.reduce((acc, id) => {
+      if (id !== this.id) {
+        const instance = this.store.instances.get(id);
+        if (instance) {
+          instance.linkedIds.forEach(child => acc.add(child));
+        }
       }
-      return metadata[key];
-    });
-  }
-  if (typeof data.permissions === "object") {
-    instance.permissions = data.permissions;
-  }
-  return instance;
-};
-
-const getChildrenIdsGroupedByField = fields => {
-  function getPagination(field) {
-    if (field.lazyShowLinks) {
-      const total = field.numberOfValues;
-      if (total) {
-        return {
-          count: field.numberOfVisibleLinks,
-          total: total
-        };
-      }
-    }
-    return null;
-  }
-
-  function showId(field, id) {
-    if (id) {
-      if (field.lazyShowLinks) {
-        return field.isLinkVisible(id);
-      }
-      return true;
-    }
-    return false;
-  }
-
-  function getIds(field, values, mappingValue) {
-    return Array.isArray(values) ? values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
-  }
-
-  function getGroup(field, values) {
-    const ids = getIds(field, values, field.mappingValue);
-    if (ids.length) {
-      const group = {
-        //name: field.name,
-        label: field.label,
-        ids: ids
-      };
-      const pagination = getPagination(field);
-      if (pagination) {
-        group.pagination = pagination;
-      }
-      return group;
-    }
-    return null;
-  }
-
-  function getGroups(field, values) {
-    const groups = [];
-    if (field.type === "Nested") {
-      groups.push(...getNestedFields(field.fields, values));
-    } else if (field.isLink) {
-      const group = getGroup(field, values);
-      if (group) {
-        groups.push(group);
-      }
-    }
-    return groups;
-  }
-
-  function getNestedFields(fields, vals) {
-    return Object.entries(fields).reduce((acc, [fieldKey, field]) => {
-      const values = vals.flatMap(v => v[fieldKey].value);
-      const groups = getGroups(field, values);
-      acc.push(...groups);
       return acc;
-    }, []);
+    }, new Set().add(this.id));
+    return Array.from(ids);
   }
 
-  return fields.reduce((acc, field) => {
-    const values = toJS(field.value);
-    const groups = getGroups(field, values);
-    acc.push(...groups);
-    return acc;
-  }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
-};
+  fetch(forceFetch = false) {
+    if (!this.isFetching && (!this.isFetched || this.fetchError || forceFetch)) {
+      this.store.fetchInstance(this);
+    }
+  }
+
+  fetchLabel(forceFetch = false) {
+    if (!this.isFetching && !this.isLabelFetching) {
+      if (forceFetch || (!this.isFetched && !this.isLabelFetched)) {
+        this.store.fetchInstanceLabel(this);
+      }
+    }
+  }
+
+  async save() {
+    this.cancelChangesPending = false;
+    this.hasSaveError = false;
+    this.isSaving = true;
+
+    const payload = this.returnValue;
+    try {
+      if (this.isNew) {
+        const { data } = await this.store.transportLayer.createInstance(this.workspace, this.id, payload);
+        runInAction(() => {
+          const newId = data.data.id;
+          this.isNew = false;
+          this.saveError = null;
+          this.hasSaveError = false;
+          this.isSaving = false;
+          if (newId !== this.id) {
+            this.store.instances.set(newId, this);
+            this.store.instance.delete(this.id);
+            this.id = newId;
+          }
+          this.initializeData(this.store.transportLayer, data.data);
+        });
+      } else {
+        const { data } = await this.store.transportLayer.patchInstance(this.id, payload);
+        runInAction(() => {
+          this.saveError = null;
+          this.hasSaveError = false;
+          this.isSaving = false;
+          this.initializeData(this.store.transportLayer, data.data);
+        });
+      }
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message ? e.message : e;
+        const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
+        this.saveError = `Error while saving instance "${this.id}" (${message}) ${errorMessage}`;
+        this.hasSaveError = true;
+        this.isSaving = false;
+      });
+      this.transportLayer.captureException(e);
+    }
+  }
+
+  cancelSave() {
+    this.saveError = null;
+    this.hasSaveError = false;
+  }
+
+  cancelChanges() {
+    Object.values(this.fields).forEach(field => field.reset());
+    this.cancelChangesPending = false;
+    this.saveError = null;
+    this.hasSaveError = false;
+  }
+
+}
 
 export class InstanceStore {
-  id = null;
-  _name = null;
-  types = [];
-  isNew = false;
-  labelField = null;
-  _promotedFields = [];
-  primaryType = { name: "", color: "", label: "" };
-  workspace = "";
-  metadata = {};
-  permissions = {};
-  fields = {};
+  stage = null;
+  instances = new Map();
+  previewInstance = null;
+  instanceIdAvailability = new Map();
 
-  isLabelFetching = false;
-  isLabelFetched = false;
-  fetchLabelError = null;
-  isLabelNotFound = false;
-  hasLabelFetchError = false;
+  instancesQueue = new Set();
+  instanceLabelsQueue = new Set();
+  isFetchingQueue = false;
+  isFetchingLabelsQueue = false;
+  queueThreshold = 1000;
+  queueTimeout = 250;
 
-  isFetching = false;
-  isFetched = false;
-  fetchError = null;
-  isNotFound = false
-  hasFetchError = false;
+  transportLayer = null;
+  rootStore = null;
 
-  constructor(id, transportLayer) {
+  constructor(transportLayer, rootStore, stage=null) {
     makeObservable(this, {
-      id: observable,
-      _name: observable,
-      types: observable,
-      isNew: observable,
-      labelField: observable,
-      _promotedFields: observable,
-      primaryType: observable,
-      workspace: observable,
-      metadata: observable,
-      permissions: observable,
-      fields: observable,
-      isLabelFetching: observable,
-      isLabelFetched: observable,
-      fetchLabelError: observable,
-      isLabelNotFound: observable,
-      hasLabelFetchError: observable,
-      isFetching: observable,
-      isFetched: observable,
-      fetchError: observable,
-      isNotFound: observable,
-      hasFetchError: observable,
-      cloneInitialData: computed,
-      returnValue: computed,
-      payload: computed,
-      hasChanged: computed,
-      hasFieldErrors: computed,
-      reset: action,
-      clearFieldsErrors: action,
-      name: computed,
-      promotedFields: computed,
-      nonPromotedFields: computed,
-      childrenIds: computed,
-      childrenIdsGroupedByField: computed,
-      initializeLabelData: action,
-      initializeData: action,
-      errorLabelInstance: action,
-      errorInstance: action
+      stage: observable,
+      instances: observable,
+      previewInstance: observable,
+      instanceIdAvailability: observable,
+      togglePreviewInstance: action,
+      resetInstanceIdAvailability: action,
+      checkInstanceIdAvailability: action,
+      getUnsavedInstances: computed,
+      hasUnsavedChanges: computed,
+      processQueue: action,
+      processLabelsQueue: action,
+      fetchQueue: action,
+      fetchLabelsQueue: action,
+      flush: action,
+      createInstanceOrGet: action,
+      createNewInstance: action,
+      removeInstances: action,
+      cancelInstanceChanges: action,
+      confirmCancelInstanceChanges: action,
+      abortCancelInstanceChange: action
     });
 
-    this.id = id;
+    this.stage = stage?stage:null;
+
     this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
-  get cloneInitialData() {
-    return {
-      id: this.id,
-      name: this.name,
-      types: this.types.map(t => ({...t})),
-      primaryType: {...this.primaryType},
-      workspace: this.workspace,
-      fields: Object.entries(this.fields).reduce((acc, [name, field]) => {
-        acc[name] = field.cloneWithInitialValue;
-        return acc;
-      }, {}),
-      labelField: this.labelField,
-      promotedFields: [...this._promotedFields],
-      metadata: {},
-      permissions: {...this.permissions}
-    };
-  }
-
-  get returnValue() {
-    const payload = {
-      "@type": this.types.map(t => t.name)
-    };
-    return Object.entries(this.fields).reduce((acc, [name, field]) => {
-      if (field.hasChanged) {
-        acc[name] = field.returnValue;
-      }
-      return acc;
-    }, payload);
-  }
-
-  get payload() {
-    const payload = {
-      "@type": this.types.map(t => t.name)
-    };
-    return Object.entries(this.fields).reduce((acc, [name, field]) => {
-      acc[name] = field.returnValue;
-      return acc;
-    }, payload);
-  }
-
-  get hasChanged() {
-    return this.isNew || Object.values(this.fields).some(field => field.hasChanged);
-  }
-
-  get hasFieldErrors() {
-    return Object.values(this.fields).some(field => field.hasError);
-  }
-
-  reset() {
-    Object.values(this.fields).forEach(field => field.reset());
-  }
-
-  clearFieldsErrors() {
-    Object.values(this.fields).forEach(field => field.clearError);
-  }
-
-  get name() {
-    const field = this.isFetched && this.labelField && this.fields[this.labelField];
-    if (field) {
-      return (this.isNew && !field.value) ? `<New ${this.primaryType.label}>` : field.value;
+  fetchInstance(instance){
+    if(!this.instancesQueue.has(instance.id)){
+      this.instancesQueue.add(instance.id);
+      this.processQueue();
     }
-    return this._name ? this._name : this.id;
   }
 
-  get promotedFields() {
-    if (this.isFetched && !this.fetchError) {
-      return this._promotedFields.map(name => [name, this.fields[name]])
-        .sort(([, a], [, b]) => compareField(a, b, true))
-        .map(([key]) => key);
+  fetchInstanceLabel(instance){
+    if(!this.instanceLabelsQueue.has(instance.id)){
+      this.instanceLabelsQueue.add(instance.id);
+      this.processLabelsQueue();
     }
-    return this._promotedFields;
   }
 
-  get nonPromotedFields() {
-    if (this.isFetched && !this.fetchError) {
-      return Object.entries(this.fields)
-        .filter(([key]) => !this.promotedFields.includes(key))
-        .sort(([, a], [, b]) => compareField(a, b))
-        .map(([key]) => key);
+  togglePreviewInstance(instanceId, instanceName, options) {
+    if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
+      this.previewInstance = null;
+    } else {
+      this.previewInstance = {id: instanceId, name: instanceName, options: options};
     }
-    return [];
   }
 
-  get childrenIds() {
-    if (this.isFetched && !this.fetchError && this.fields) {
-      const ids = Object.values(this.fields)
-        .reduce((acc, field) => {
-          if (field.type === "Nested") {
-            //TODO
-          } else if (field.isLink) {
-            const values = toJS(field.value);
-            Array.isArray(values) && values.map(obj => {
-              const id = obj && obj[field.mappingValue];
-              if (id && !acc.has(id)) {
-                acc.add(id);
-              }
-            });
-          }
-          return acc;
-        }, new Set());
-      return Array.from(ids);
+  resetInstanceIdAvailability() {
+    this.instanceIdAvailability.clear();
+  }
+
+  async checkInstanceIdAvailability(instanceId, mode) {
+    const status = this.instanceIdAvailability.get(instanceId);
+    if(status) {
+      status.isAvailable = false;
+      status.isChecking = true;
+      status.error = null;
+    } else {
+      this.instanceIdAvailability.set(instanceId, {
+        isAvailable: false,
+        isChecking: true,
+        error: null
+      });
     }
-    return [];
-  }
-
-  get childrenIdsGroupedByField() {
-    if (this.isFetched && !this.fetchError) {
-      return getChildrenIdsGroupedByField(Object.values(this.fields));
-    }
-    return [];
-  }
-
-  initializeLabelData(data) {
-    const normalizedData = normalizeLabelInstanceData(data);
-    this._name = normalizedData.name,
-    this.workspace = normalizedData.workspace;
-    this.types = normalizedData.types;
-    this.primaryType = normalizedData.primaryType;
-    this.isLabelFetching = false;
-    this.isLabelFetched = true;
-    this.fetchLabelError = null;
-    this.isLabelNotFound = false;
-    this.hasLabelFetchError = false;
-  }
-
-  initializeData(transportLayer, data, isNew = false) {
-    const normalizedData = normalizeInstanceData(data);
-    this._name = normalizedData.name,
-    this.workspace = normalizedData.workspace;
-    this.types = normalizedData.types;
-    this.isNew = isNew;
-    this.labelField = normalizedData.labelField;
-    this.primaryType = normalizedData.primaryType;
-    this._promotedFields = normalizedData.promotedFields;
-    this.alternatives = normalizedData.alternatives;
-    this.metadata = normalizedData.metadata;
-    this.permissions = normalizedData.permissions;
-    Object.entries(normalizedData.fields).forEach(([name, field]) => {
-      if (!this.fields[name]) {
-        const fieldMapping = fieldsMapping[field.type];
-        if (!fieldMapping) {
-          throw `${field.type} type is not supported!`;
+    try{
+      const { data } = await this.transportLayer.getInstance(instanceId);
+      runInAction(() => {
+        const resolvedId = data && data.data && data.data.id;
+        if (!resolvedId) {
+          throw `Failed to fetch instance "${instanceId}" (Invalid response) (${data})`;
         }
-        this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
-      }
-      const store = this.fields[name];
-      store.updateValue(field.value);
-      store.setAlternatives(field.alternatives);
-    });
-    this.fetchError = null;
-    this.isNotFound = false;
-    this.hasFetchError = false;
-    this.isFetching = false;
-    this.isFetched = true;
-  }
-
-  buildErrorMessage(e) {
-    const message = e.message ? e.message : e;
-    const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
-    if (e.response && e.response.status === 404) {
-      return `The instance "${this.id}" can not be found - it either could have been removed or it is not accessible by your user account.`;
+        this.instanceIdAvailability.delete(instanceId);
+        const instance = this.createInstanceOrGet(resolvedId);
+        instance.initializeData(this.transportLayer, data && data.data);
+        const view = this.rootStore.viewStore.views.get(resolvedId);
+        if(view) {
+          view.setNameAndColor(instance.name, instance.primaryType.color);
+          this.rootStore.viewStore.syncStoredViews();
+        }
+        if (mode === "create") {
+          this.rootStore.history.replace(`/instances/${resolvedId}/edit`);
+        }
+      });
+    } catch(e){
+      runInAction(() => {
+        const status =  this.instanceIdAvailability.get(instanceId);
+        if (e.response && e.response.status === 404) {
+          if(status.type) {
+            this.createNewInstance(status.type, instanceId);
+            this.resetInstanceIdAvailability();
+          } else {
+            status.isAvailable = true;
+            status.isChecking = false;
+          }
+        } else {
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
+          status.isAvailable = false;
+          status.isChecking = false;
+        }
+      });
     }
-    return `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
   }
 
-  errorLabelInstance(e, isNotFound=false) {
-    this.isLabelNotFound = isNotFound;
-    this.fetchLabelError = this.buildErrorMessage(e);
-    this.hasLabelFetchError = true;
-    this.isLabelFetched = false;
-    this.isLabelFetching = false;
+  get getUnsavedInstances() {
+    return Array.from(this.instances.values()).filter(instance => instance.hasChanged).reverse();
   }
 
-  errorInstance(e, isNotFound=false) {
-    this.isNotFound = isNotFound;
-    this.fetchError = this.buildErrorMessage(e);
-    this.hasFetchError = true;
-    this.isFetched = false;
-    this.isFetching = false;
+  get hasUnsavedChanges() {
+    return this.getUnsavedInstances.length > 0;
+  }
+
+  processQueue() {
+    if(this.instancesQueue.size <= 0){
+      this._debouncedFetchQueue.cancel();
+    } else if(this.instancesQueue.size < this.queueThreshold){
+      this._debouncedFetchQueue();
+    } else if(!this.isFetchingQueue){
+      this._debouncedFetchQueue.cancel();
+      this.fetchQueue();
+    }
+  }
+
+  processLabelsQueue() {
+    if(this.instanceLabelsQueue.size <= 0){
+      this._debouncedFetchLabelsQueue.cancel();
+    } else if(this.instanceLabelsQueue.size < this.queueThreshold){
+      this._debouncedFetchLabelsQueue();
+    } else if(!this.isFetchingLabelsQueue){
+      this._debouncedFetchLabelsQueue.cancel();
+      this.fetchLabelsQueue();
+    }
+  }
+
+  _debouncedFetchQueue = debounce(()=>{this.fetchQueue();}, this.queueTimeout);
+  _debouncedFetchLabelsQueue = debounce(()=>{this.fetchLabelsQueue();}, this.queueTimeout);
+
+  async fetchQueue() {
+    if(this.isFetchingQueue){
+      return;
+    }
+    this.isFetchingQueue = true;
+    const toProcess = Array.from(this.instancesQueue).splice(0, this.queueThreshold);
+    toProcess.forEach(identifier => {
+      if(this.instances.has(identifier)) {
+        const instance = this.instances.get(identifier);
+        instance.cancelChangesPending = false;
+        instance.isFetching = true;
+        instance.isSaving = false;
+        instance.isFetched = false;
+        instance.fetchError = null;
+        instance.hasFetchError = false;
+        instance.saveError = null;
+        instance.hasSaveError = false;
+        instance.clearFieldsErrors();
+      }
+    });
+    try {
+      const response = await this.transportLayer.getInstancesList(this.stage, toProcess);
+      runInAction(() => {
+        toProcess.forEach(identifier => {
+          if(this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            const data = response && response.data && response.data.data && response.data.data[identifier];
+            if (data) {
+              if (data.error) {
+                const code = data.error.code?` [error ${data.error.code}]`:"";
+                const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
+                instance.errorInstance(message, data.error.code === 404);
+                instance.isFetching = false;
+                instance.isFetched = false;
+              } else {
+                instance.initializeData(this.transportLayer, data, false);
+                this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
+              }
+            } else {
+              const message = "Unexpected error: no response returned.";
+              instance.errorInstance(message);
+              instance.isFetching = false;
+              instance.isFetched = false;
+            }
+            this.instancesQueue.delete(identifier);
+          }
+        });
+        this.isFetchingQueue = false;
+        this.processQueue();
+      });
+    } catch(e){
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          if (this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            instance.errorInstance(e);
+            instance.isFetching = false;
+            instance.isFetched = false;
+            this.instancesQueue.delete(identifier);
+          }
+        });
+        this.isFetchingQueue = false;
+        this.processQueue();
+      });
+      this.transportLayer.captureException(e);
+    }
+  }
+
+  async fetchLabelsQueue() {
+    if (this.isFetchingLabelsQueue) {
+      return;
+    }
+    this.isFetchingLabelsQueue = true;
+    const toProcess = Array.from(this.instanceLabelsQueue).splice(0, this.queueThreshold);
+    toProcess.forEach(identifier => {
+      if (this.instances.has(identifier)) {
+        const instance = this.instances.get(identifier);
+        instance.isLabelFetching = true;
+        instance.isLabelFetched = false;
+        instance.labelFetchError = null;
+        instance.hasLabelFetchError = false;
+        instance.saveError = null;
+      }
+    });
+    try {
+      const response = await this.transportLayer.getInstancesLabel(this.stage, toProcess);
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          if (this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            const data = response && response.data && response.data.data && response.data.data[identifier];
+            if (data) {
+              if (data.error) {
+                const code = data.error.code?` [${data.error.code}]`:"";
+                const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
+                instance.errorLabelInstance(message, data.error.code === 404);
+                instance.isLabelFetching = false;
+                instance.isLabelFetched = false;
+              } else {
+                instance.initializeLabelData(data);
+              }
+            } else {
+              const message = "Unexpected error: no response returned.";
+              instance.errorLabelInstance(message);
+              instance.isLabelFetching = false;
+              instance.isLabelFetched = false;
+            }
+            this.instanceLabelsQueue.delete(identifier);
+          }
+        });
+        this.isFetchingLabelsQueue = false;
+        this.processLabelsQueue();
+      });
+    } catch (e) {
+      runInAction(() =>{
+        toProcess.forEach(identifier => {
+          if(this.instances.has(identifier)) {
+            const instance = this.instances.get(identifier);
+            instance.errorLabelInstance(e);
+            instance.isLabelFetching = false;
+            instance.isLabelFetched = false;
+            this.instanceLabelsQueue.delete(identifier);
+          }
+        });
+        this.isFetchingQueue = false;
+        this.processQueue();
+      });
+      this.transportLayer.captureException(e);
+    }
+  }
+
+  flush() {
+    this.instances.clear();
+    this.resetInstanceIdAvailability();
+  }
+
+  createInstanceOrGet(instanceId) {
+    if (!this.instances.has(instanceId)) {
+      const instance = new Instance(instanceId, this);
+      this.instances.set(instanceId, instance);
+    }
+    return this.instances.get(instanceId);
+  }
+
+  createNewInstance(type, id, name="") {
+    const instanceType = {name: type.name, label: type.label, color: type.color};
+    const fields = toJS(type.fields);
+    const data = {
+      id: id,
+      _name: name,
+      types: [instanceType],
+      primaryType: instanceType,
+      workspace: this.rootStore.appStore.currentWorkspace.id,
+      fields: toJS(fields),
+      labelField: type.labelField,
+      promotedFields: toJS(type.promotedFields),
+      alternatives: {},
+      metadata: {},
+      permissions: { canRead: true, canCreate: true, canWrite: true }
+    };
+    const instance  = new Instance(id, this);
+    instance.initializeData(this.transportLayer, data, true);
+    instance.fields[instance.labelField].setValue(name);
+    this.instances.set(id, instance);
+  }
+
+  createNewInstanceOfType = type => {
+    const uuid = _.uuid();
+    this.instanceIdAvailability.set(uuid, {
+      isAvailable: false,
+      isChecking: true,
+      error: null,
+      type: type
+    });
+    history.push(`/instances/${uuid}/create`);
+  }
+
+  removeInstances(instanceIds) {
+    instanceIds.forEach(id => this.instances.delete(id));
+  }
+
+  cancelInstanceChanges(instanceId) {
+    this.instances.get(instanceId).cancelChangesPending = true;
+  }
+
+  confirmCancelInstanceChanges(instanceId) {
+    this.instances.get(instanceId).cancelChanges();
+  }
+
+  abortCancelInstanceChange(instanceId) {
+    this.instances.get(instanceId).cancelChangesPending = false;
   }
 }
+
+export const createInstanceStore = (transportLayer, rootStore, stage=null) => {
+  return new InstanceStore(transportLayer, rootStore, stage);
+};
 
 export default InstanceStore;

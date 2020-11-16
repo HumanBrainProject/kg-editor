@@ -250,5 +250,6 @@ const InstanceManage = observer(({instance}) => {
     </div>
   );
 });
+InstanceManage.displayName = "InstanceManage";
 
 export default InstanceManage;

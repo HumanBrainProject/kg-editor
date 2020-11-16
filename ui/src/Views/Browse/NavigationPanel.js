@@ -70,5 +70,6 @@ const NavigationPanel = observer(() => {
     </div>
   );
 });
+NavigationPanel.displayName = "NavigationPanel";
 
 export default NavigationPanel;

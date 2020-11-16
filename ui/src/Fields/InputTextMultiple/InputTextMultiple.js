@@ -62,7 +62,11 @@ const useStyles = createUseStyles({
   },
 });
 
-const getAlternativeValue = mappingValue => observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+const getAlternativeValue = mappingValue => {
+  const AlternativeValue = observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+  AlternativeValue.displayName = "AlternativeValue";
+  return;
+};
 
 const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
@@ -197,5 +201,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     </Form.Group>
   );
 });
+InputTextMultiple.displayName = "InputTextMultiple";
 
 export default InputTextMultiple;

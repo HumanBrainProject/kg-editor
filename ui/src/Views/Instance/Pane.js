@@ -118,5 +118,6 @@ const Pane = observer(({ paneId, children }) => {
     </PaneContext.Provider>
   );
 });
+Pane.displayName = "Pane";
 
 export default Pane;

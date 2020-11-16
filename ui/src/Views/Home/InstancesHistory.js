@@ -250,5 +250,6 @@ const InstancesHistory = observer(() => {
     </div>
   );
 });
+InstancesHistory.displayName = "InstancesHistory";
 
 export default InstancesHistory;

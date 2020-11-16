@@ -183,5 +183,6 @@ const ReleaseAction = observer(() => {
     </div>
   );
 });
+ReleaseAction.displayName = "ReleaseAction";
 
 export default ReleaseAction;

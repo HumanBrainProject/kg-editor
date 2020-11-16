@@ -180,5 +180,6 @@ const Login = observer(() => {
     <div className={classes.container}></div>
   );
 });
+Login.displayName = "Login";
 
 export default Login;

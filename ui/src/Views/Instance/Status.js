@@ -104,5 +104,6 @@ const Status = observer(({ id, darkmode }) => {
     </div>
   );
 });
+Status.displayName = "Status";
 
 export default Status;

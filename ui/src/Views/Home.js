@@ -50,6 +50,7 @@ const DisplayName = observer(() => {
 
   return "";
 });
+DisplayName.displayName = "DisplayName";
 
 const useStyles = createUseStyles({
   container: {

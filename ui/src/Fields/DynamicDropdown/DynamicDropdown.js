@@ -288,5 +288,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     </Form.Group>
   );
 });
+DynamicDropdown.displayName = "DynamicDropdown";
 
 export default DynamicDropdown;

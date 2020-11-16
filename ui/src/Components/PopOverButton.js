@@ -171,5 +171,6 @@ const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconC
     </div>
   );
 });
+PopOverButton.displayName = "PopOverButton";
 
 export default PopOverButton;

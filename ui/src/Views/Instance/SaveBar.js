@@ -192,6 +192,7 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
     </div>
   );
 });
+Instance.displayName = "Instance";
 
 const SavePanel = observer(() => {
 
@@ -261,5 +262,6 @@ const SavePanel = observer(() => {
     </div>
   );
 });
+SavePanel.displayName = "SavePanel";
 
 export default SavePanel;

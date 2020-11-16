@@ -74,5 +74,6 @@ const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
     </div>
   );
 });
+HeaderPanel.displayName = "HeaderPanel";
 
 export default HeaderPanel;

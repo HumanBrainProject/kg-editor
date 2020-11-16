@@ -71,5 +71,6 @@ const WorkspaceSelector = observer(() => {
     </div>
   );
 });
+WorkspaceSelector.displayName = "WorkspaceSelector";
 
 export default WorkspaceSelector;

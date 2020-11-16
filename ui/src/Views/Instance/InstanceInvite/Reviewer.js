@@ -98,5 +98,6 @@ const Reviewer = observer(({ review, onCancelInvitation }) => {
     </div>
   );
 });
+Reviewer.displayName = "Reviewer";
 
 export default Reviewer;

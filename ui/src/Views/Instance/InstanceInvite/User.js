@@ -97,5 +97,6 @@ const User = observer(({ user, onSelect }) => {
     </MenuItem>
   );
 });
+User.displayName = "User";
 
 export default User;

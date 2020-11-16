@@ -133,5 +133,6 @@ const Reviewers = observer(({ id }) => {
     </div>
   );
 });
+Reviewers.displayName = "Reviewers";
 
 export default Reviewers;

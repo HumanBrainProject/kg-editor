@@ -79,6 +79,7 @@ const Links = observer(({ instanceId }) => {
     </React.Fragment>
   );
 });
+Links.displayName = "Links";
 
 const DecoratedLinks = Links;
 export default DecoratedLinks;

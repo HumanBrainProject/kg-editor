@@ -215,5 +215,6 @@ const Graph = observer(() => {
     </div>
   );
 });
+Graph.displayName = "Graph";
 
 export default Graph;

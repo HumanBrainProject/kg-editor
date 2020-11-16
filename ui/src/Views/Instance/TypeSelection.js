@@ -154,5 +154,6 @@ const TypeSelection = observer(({ onSelect }) => {
     </div>
   );
 });
+TypeSelection.displayName = "TypeSelection";
 
 export default TypeSelection;

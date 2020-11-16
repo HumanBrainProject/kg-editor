@@ -264,5 +264,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     </Form.Group>
   );
 });
+DynamicTable.displayName = "DynamicTable";
 
 export default DynamicTable;

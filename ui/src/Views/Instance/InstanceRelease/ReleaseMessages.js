@@ -58,5 +58,6 @@ const ReleaseMessages = observer(() => {
     </div>
   );
 });
+ReleaseMessages.displayName = "ReleaseMessages";
 
 export default ReleaseMessages;

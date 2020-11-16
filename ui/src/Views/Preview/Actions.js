@@ -94,5 +94,6 @@ const Actions = observer(({ instance }) => {
     </div>
   );
 });
+Actions.displayName = "Actions";
 
 export default Actions;

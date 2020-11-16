@@ -128,5 +128,6 @@ const GraphInstance = observer(({ instance }) => {
     </div>
   );
 });
+GraphInstance.displayName = "GraphInstance";
 
 export default GraphInstance;

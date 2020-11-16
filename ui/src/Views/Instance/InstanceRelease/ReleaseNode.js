@@ -186,5 +186,6 @@ const ReleaseNode = observer(({ node, level = 0 }) => {
     </div>
   );
 });
+ReleaseNode.displayName = "ReleaseNode";
 
 export default ReleaseNode;

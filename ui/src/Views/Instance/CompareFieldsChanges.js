@@ -148,5 +148,6 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   }
   return null;
 });
+CompareFieldsChanges.displayName = "CompareFieldsChanges";
 
 export default CompareFieldsChanges;

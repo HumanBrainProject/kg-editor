@@ -75,5 +75,6 @@ const InstanceInvite = observer(({ instance: { id, permissions} }) => {
     </div>
   );
 });
+InstanceInvite.displayName = "InstanceInvite";
 
 export default InstanceInvite;

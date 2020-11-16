@@ -90,6 +90,7 @@ const LabelCellRenderer = observer(({ instanceId }) => {
 
   return instanceId;
 });
+LabelCellRenderer.displayName = "LabelCellRenderer";
 
 const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, onDeleteRow }) => {
 
@@ -130,6 +131,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
   }
   return null;
 });
+ActionsCellRenderer.displayName = "ActionsCellRenderer";
 
 const Table = ({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
 

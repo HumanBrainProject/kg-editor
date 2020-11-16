@@ -60,5 +60,6 @@ const HideReleasedInstancesToggle = observer(() => {
     </div>
   );
 });
+HideReleasedInstancesToggle.displayName = "HideReleasedInstancesToggle";
 
 export default HideReleasedInstancesToggle;

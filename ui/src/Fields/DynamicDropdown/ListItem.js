@@ -176,5 +176,6 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
     </div>
   );
 });
+ListItem.displayName = "ListItem";
 
 export default ListItem;

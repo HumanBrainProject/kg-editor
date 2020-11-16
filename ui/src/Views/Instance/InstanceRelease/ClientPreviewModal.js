@@ -72,5 +72,6 @@ const ClientPreviewModal = observer(({ store, show, handleClose }) => {
     </Modal>
   );
 });
+ClientPreviewModal.displayName = "ClientPreviewModal";
 
 export default ClientPreviewModal;

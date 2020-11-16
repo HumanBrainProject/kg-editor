@@ -121,5 +121,6 @@ const InstanceInvite = observer(({ instance }) => {
     </div>
   );
 });
+InstanceInvite.displayName = "InstanceInvite";
 
 export default InstanceInvite;

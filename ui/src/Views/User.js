@@ -51,5 +51,6 @@ const User = observer(({ userId }) => {
     <UserComponent userId={userId} name={user && user.name} picture={user && user.picture} isCurator={!!user && !!user.isCurator} title={email && email.value} />
   );
 });
+User.displayName = "User";
 
 export default User;

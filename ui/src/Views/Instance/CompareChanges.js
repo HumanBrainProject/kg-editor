@@ -78,5 +78,6 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
     </div>
   );
 });
+CompareChanges.displayName = "CompareChanges";
 
 export default CompareChanges;

@@ -205,5 +205,6 @@ const Instances = observer(() => {
     </div>
   );
 });
+Instances.displayName = "Instances";
 
 export default Instances;

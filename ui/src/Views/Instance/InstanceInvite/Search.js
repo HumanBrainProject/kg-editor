@@ -287,5 +287,6 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
     </div>
   );
 });
+Search.displayName = "Search";
 
 export default Search;

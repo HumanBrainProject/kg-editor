@@ -126,5 +126,6 @@ const Instance = observer(({ match, mode }) => {
 
   return null;
 });
+Instance.displayName = "Instance";
 
 export default Instance;

@@ -288,5 +288,6 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     </div>
   );
 });
+UserProfileTab.displayName = "UserProfileTab";
 
 export default UserProfileTab;

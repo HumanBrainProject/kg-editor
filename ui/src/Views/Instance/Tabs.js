@@ -104,5 +104,6 @@ const Tabs = observer(({ instance, mode }) => {
     </div>
   );
 });
+Tabs.displayName = "Tabs";
 
 export default Tabs;

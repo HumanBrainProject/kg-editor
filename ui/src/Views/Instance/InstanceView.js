@@ -57,5 +57,6 @@ const InstanceView = observer(({ instance }) => {
     </ViewContext.Provider>
   );
 });
+InstanceView.displayName = "InstanceView";
 
 export default InstanceView;

@@ -39,5 +39,6 @@ const Avatar = observer(({ userId }) => {
     <AvatarComponent userId={userId} name={user && user.name} picture={user && user.picture} />
   );
 });
+Avatar.displayName = "Avatar";
 
 export default Avatar;

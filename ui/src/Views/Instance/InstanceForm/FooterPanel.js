@@ -116,5 +116,6 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
     </div>
   );
 });
+FooterPanel.displayName = "FooterPanel";
 
 export default FooterPanel;

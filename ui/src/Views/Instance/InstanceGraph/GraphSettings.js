@@ -195,6 +195,7 @@ const GroupLabel = observer(({ className, group }) => {
     </span>
   );
 });
+GroupLabel.displayName = "GroupLabel";
 
 const Actions = observer(({ className, group }) => {
 
@@ -241,6 +242,7 @@ const Actions = observer(({ className, group }) => {
     </div>
   );
 });
+Actions.displayName = "Actions";
 
 const Group = ({ group }) => {
 
@@ -288,5 +290,6 @@ const GraphSettings = observer(() => {
     </div>
   );
 });
+GraphSettings.displayName = "GraphSettings";
 
 export default GraphSettings;

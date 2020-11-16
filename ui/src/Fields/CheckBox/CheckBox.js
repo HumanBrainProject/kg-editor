@@ -56,5 +56,6 @@ const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) =
     </Form.Group>
   );
 });
+CheckBox.displayName = "CheckBox";
 
 export default CheckBox;

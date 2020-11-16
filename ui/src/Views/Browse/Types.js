@@ -110,5 +110,6 @@ const Types = observer(() => {
     </div>
   );
 });
+Types.displayName = "Types";
 
 export default Types;

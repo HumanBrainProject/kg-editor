@@ -139,5 +139,6 @@ const Browse = observer(() => {
     </div>
   );
 });
+Browse.displayName = "Browse";
 
 export default Browse;

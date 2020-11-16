@@ -168,6 +168,7 @@ const View = observer(({instance, mode}) => {
     <NoPermissionForView instance={instance} mode={mode} />
   );
 });
+View.displayName = "View";
 
 const NoPermissionForView = observer(({instance, mode}) => {
 
@@ -184,6 +185,7 @@ const NoPermissionForView = observer(({instance, mode}) => {
     </div>
   );
 });
+NoPermissionForView.displayName = "NoPermissionForView";
 
 const Instance = observer(({ instance, mode }) =>  {
 
@@ -228,5 +230,6 @@ const Instance = observer(({ instance, mode }) =>  {
     </React.Fragment>
   );
 });
+Instance.displayName = "Instance";
 
 export default Instance;

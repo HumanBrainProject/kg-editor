@@ -123,5 +123,6 @@ const Bookmarks = observer(class Bookmarks extends React.Component {
     );
   }
 });
+Bookmarks.displayName = "Bookmarks";
 
 export default Bookmarks;

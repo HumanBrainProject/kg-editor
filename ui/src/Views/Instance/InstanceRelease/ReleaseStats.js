@@ -229,5 +229,6 @@ const ReleaseStats = observer(() => {
     </div>
   );
 });
+ReleaseStats.displayName = "ReleaseStats";
 
 export default ReleaseStats;

@@ -22,6 +22,7 @@ import { useStores } from "../Hooks/UseStores";
 import Alternatives from "./Alternatives";
 
 const AlternativeValue = observer(({alternative}) => alternative.value.map(instance => instance.name).join("; "));
+AlternativeValue.displayName = "AlternativeValue";
 
 const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
 

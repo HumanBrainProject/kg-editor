@@ -191,5 +191,6 @@ const InstanceRelease = observer(({ instance }) => {
     </div>
   );
 });
+InstanceRelease.displayName = "InstanceRelease";
 
 export default InstanceRelease;

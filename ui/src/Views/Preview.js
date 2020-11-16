@@ -243,5 +243,6 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
     </div>
   );
 });
+Preview.displayName = "Preview";
 
 export default Preview;

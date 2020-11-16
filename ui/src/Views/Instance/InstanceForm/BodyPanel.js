@@ -68,6 +68,7 @@ const NoPermissionForView = observer(({ instance, mode }) => {
     </React.Fragment>
   );
 });
+NoPermissionForView.displayName = "NoPermissionForView";
 
 const BodyPanel = observer(({ className, instance, readMode}) => {
 
@@ -107,5 +108,6 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
     </Form>
   );
 });
+BodyPanel.displayName = "BodyPanel";
 
 export default BodyPanel;

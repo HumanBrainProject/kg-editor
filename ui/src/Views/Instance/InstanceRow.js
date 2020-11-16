@@ -250,5 +250,6 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     </div>
   );
 });
+InstanceRow.displayName = "InstanceRow";
 
 export default InstanceRow;

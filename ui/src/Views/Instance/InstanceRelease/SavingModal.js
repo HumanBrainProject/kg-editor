@@ -119,5 +119,6 @@ const SavingModal = observer(() => {
     </Modal>
   );
 });
+SavingModal.displayName = "SavingModal";
 
 export default SavingModal;

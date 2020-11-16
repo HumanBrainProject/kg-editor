@@ -79,5 +79,6 @@ const ReleaseList = observer(() => {
     </div>
   );
 });
+ReleaseList.displayName = "ReleaseList";
 
 export default ReleaseList;

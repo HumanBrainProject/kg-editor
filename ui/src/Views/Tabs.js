@@ -123,6 +123,7 @@ const Tabs = observer(() => {
     </div>
   );
 });
+Tabs.displayName = "Tabs";
 
 export default Tabs;
 

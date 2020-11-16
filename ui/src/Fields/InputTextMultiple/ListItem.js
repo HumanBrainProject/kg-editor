@@ -111,5 +111,6 @@ const ListItem = observer(({ index, value, readOnly, disabled, onDelete, onDragS
     </div>
   );
 });
+ListItem.displayName = "ListItem";
 
 export default ListItem;

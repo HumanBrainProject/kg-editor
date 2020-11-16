@@ -59,5 +59,6 @@ const ThemeSwitcher = observer(() => {
     </div>
   );
 });
+ThemeSwitcher.displayName = "ThemeSwitcher";
 
 export default ThemeSwitcher;

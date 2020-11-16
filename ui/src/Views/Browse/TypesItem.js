@@ -170,5 +170,6 @@ const TypesItem = observer(({ type }) => {
     </div>
   );
 });
+TypesItem.displayName = "TypesItem";
 
 export default TypesItem;

@@ -57,5 +57,6 @@ const GlobalFieldErrors = observer(({ instance }) => {
     </div >
   );
 });
+GlobalFieldErrors.displayName = "GlobalFieldErrors";
 
 export default GlobalFieldErrors;

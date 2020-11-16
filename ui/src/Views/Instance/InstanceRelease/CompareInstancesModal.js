@@ -85,5 +85,6 @@ const CompareInstancesModal = observer(() => {
     </Modal>
   );
 });
+CompareInstancesModal.displayName = "CompareInstancesModal";
 
 export default CompareInstancesModal;

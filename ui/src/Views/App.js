@@ -49,5 +49,6 @@ const App = observer(() => {
     </ErrorBoundary>
   );
 });
+App.displayName = "App";
 
 export default App;

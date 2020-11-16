@@ -63,6 +63,7 @@ const FieldValue = ({field, splitLines}) => {
 };
 
 const AlternativeValue = observer(({alternative}) => alternative.value);
+AlternativeValue.displayName = "AlternativeValue";
 
 const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
 
@@ -120,5 +121,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     </Form.Group>
   );
 });
+InputText.displayName = "InputText";
 
 export default InputText;

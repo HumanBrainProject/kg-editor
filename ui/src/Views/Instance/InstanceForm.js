@@ -253,5 +253,6 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   return null;
 });
+InstanceForm.displayName = "InstanceForm";
 
 export default InstanceForm;

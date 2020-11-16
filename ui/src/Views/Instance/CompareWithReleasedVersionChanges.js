@@ -148,5 +148,6 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
   }
   return null;
 });
+CompareWithReleasedVersionChanges.displayName = "CompareWithReleasedVersionChanges";
 
 export default CompareWithReleasedVersionChanges;

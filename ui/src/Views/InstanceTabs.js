@@ -68,6 +68,7 @@ const InstanceTab = observer(({view, pathname}) => {
     />
   );
 });
+InstanceTab.displayName = "InstanceTab";
 
 const InstanceTabs = observer(({ pathname }) => {
 
@@ -83,5 +84,6 @@ const InstanceTabs = observer(({ pathname }) => {
     </div>
   );
 });
+InstanceTabs.displayName = "InstanceTabs";
 
 export default InstanceTabs;

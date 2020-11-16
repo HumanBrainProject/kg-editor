@@ -97,5 +97,6 @@ const ReleaseNodeToggle = observer(({ node }) => {
     </div>
   );
 });
+ReleaseNodeToggle.displayName = "ReleaseNodeToggle";
 
 export default ReleaseNodeToggle;

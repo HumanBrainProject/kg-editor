@@ -16,7 +16,6 @@
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import { matchPath } from "react-router-dom";
-import _  from "lodash-uuid";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -26,8 +25,6 @@ const themes = {};
 themes[DefaultTheme.name] = DefaultTheme;
 themes[BrightTheme.name] = BrightTheme;
 themes[CupcakeTheme.name] = CupcakeTheme;
-
-const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
 const getLinkedInstanceIds = (instanceStore, instanceIds) => {
   //window.console.log("list: ", instanceIds);
@@ -98,6 +95,9 @@ export class AppStore{
       dismissGlobalError: action,
       toggleSavebarDisplay: action,
       openInstance: action,
+      focusPreviousInstance: action,
+      focusNextInstance: action,
+      closeAllInstances: action,
       closeInstance: action,
       saveInstance: action,
       deleteInstance: action,
@@ -112,7 +112,6 @@ export class AppStore{
       toggleReleasedFlagHistorySetting: action,
       setTheme: action,
       toggleTheme: action,
-      handleGlobalShortcuts: action
     });
 
     this.transportLayer = transportLayer;
@@ -395,11 +394,6 @@ export class AppStore{
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
 
-  createInstance = () => {
-    const uuid = _.uuid();
-    this.rootStore.history.push(`/instances/${uuid}/create`);
-  }
-
   openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view") {
     const instance = this.rootStore.instanceStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
@@ -643,41 +637,6 @@ export class AppStore{
     if (!this.rootStore.instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       this.rootStore.viewStore.flushStoredViews();
       this.rootStore.authStore.logout();
-    }
-  }
-
-  handleGlobalShortcuts = e => {
-    if ((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84) {
-      this.toggleTheme();
-    } else if (e.altKey && e.keyCode === 66) { // alt+b, browse
-      this.rootStore.history.push("/browse");
-    } else if (e.altKey && e.keyCode === 78) { // alt+n, new
-      this.createInstance();
-    } else if (e.altKey && e.keyCode === 68) { // alt+d, dashboard
-      this.rootStore.history.push("/");
-    } else if (e.keyCode === 112) { // F1, help
-      this.rootStore.history.push("/help");
-    } else if (e.altKey && e.keyCode === 87) { // alt+w, close
-      if (e.shiftKey) { // alt+shift+w, close all
-        this.closeAllInstances();
-      } else {
-        let matchInstanceTab = this.matchInstancePath();
-        if (matchInstanceTab) {
-          this.handleCloseInstance(matchInstanceTab.params.id);
-        }
-      }
-    } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
-      let matchInstanceTab = this.matchInstancePath();
-      this.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
-    } else if (e.altKey && e.keyCode === 39) { // right arrow, next
-      let matchInstanceTab = this.matchInstancePath();
-      this.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
-    } else {
-      kCode.step = kCode.ref[kCode.step] === e.keyCode ? kCode.step + 1 : 0;
-      if (kCode.step === kCode.ref.length) {
-        kCode.step = 0;
-        this.setTheme("cupcake");
-      }
     }
   }
 }

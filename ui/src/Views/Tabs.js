@@ -18,6 +18,7 @@ import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { matchPath } from "react-router-dom";
 import { createUseStyles } from "react-jss";
+import _  from "lodash-uuid";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -86,7 +87,10 @@ const Tabs = observer(() => {
 
   const handleGoToDashboard = () => appStore.goToDashboard();
 
-  const handleCreateInstance = () => appStore.createInstance();
+  const handleCreateInstance = () => {
+    const uuid = _.uuid();
+    history.push(`/instances/${uuid}/create`);
+  };
 
   return (
     <div className={classes.container}>

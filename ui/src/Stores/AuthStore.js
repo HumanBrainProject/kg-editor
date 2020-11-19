@@ -55,7 +55,8 @@ export class AuthStore {
       retrieveUserProfile: action,
       initializeKeycloak: action,
       login: action,
-      authenticate: action
+      authenticate: action,
+      firstName: computed
     });
 
     if (Storage === undefined) {
@@ -85,6 +86,25 @@ export class AuthStore {
     return this.hasWorkspaces ? this.user.workspaces: [];
   }
 
+  get firstName() {
+    const firstNameReg = /^([^ ]+) .*$/;
+    if (this.hasUserProfile && this.user) {
+      if (this.user.givenName) {
+        return this.user.givenName;
+      }
+      if (this.user.name) {
+        if (firstNameReg.test(this.user.name)) {
+          return this.user.name.match(firstNameReg)[1];
+        }
+        return this.user.name;
+      }
+      if (this.user.username) {
+        return this.user.username;
+      }
+    }
+    return "";
+  }
+
   logout() {
     this.authSuccess = false;
     this.isTokenExpired = true;
@@ -102,9 +122,11 @@ export class AuthStore {
         const { data } = await this.transportLayer.getUserProfile();
         //throw {response: { status: 403}};
         runInAction(() => {
-          //data.data.workspaces = []; // uncomment to simulate a user without any workspace
           this.isUserAuthorized = true;
-          this.user = (data && data.data)?data.data:{};
+          const user = (data && data.data)?data.data:{ workspaces: []};
+          user.workspaces = Array.isArray(user.workspaces)?user.workspaces.sort((a, b) => a.name.localeCompare(b.name)):[];
+          //user.workspaces = []; // uncomment to simulate a user without any workspace
+          this.user = user;
           this.isRetrievingUserProfile = false;
         });
       } catch (e) {

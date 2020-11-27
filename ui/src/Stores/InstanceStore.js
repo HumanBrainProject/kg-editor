@@ -465,7 +465,7 @@ export class InstanceStore {
       error: null,
       type: type
     });
-    history.push(`/instances/${uuid}/create`);
+    this.rootStore.history.push(`/instances/${uuid}/create`);
   }
 
   removeInstances(instanceIds) {

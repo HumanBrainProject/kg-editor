@@ -32,6 +32,8 @@ import SaveBar from "./SaveBar";
 import Tabs from "./Tabs";
 import BGMessage from "../../Components/BGMessage";
 
+const rootPath = window.rootPath || "";
+
 const useStyles = createUseStyles({
   container: {
     display: "grid",
@@ -64,7 +66,9 @@ const useStyles = createUseStyles({
   },
   body: {
     position: "relative",
-    overflow: "hidden"
+    overflow: "hidden",
+    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
+    backgroundPosition: "50% 50%"
   },
   sidebar: {
     position: "relative",

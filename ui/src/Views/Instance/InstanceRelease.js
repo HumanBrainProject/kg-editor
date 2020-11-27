@@ -33,15 +33,11 @@ import ReleaseAction from "./InstanceRelease/ReleaseAction";
 import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
 import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
 
-const rootPath = window.rootPath || "";
-
 const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "calc(100% - 30px)",
     height: "calc(100% - 30px)",
-    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
-    backgroundPosition: "50% 50%",
     color: "var(--ft-color-normal)",
     margin: "15px",
     "& .fetchingPanel": {

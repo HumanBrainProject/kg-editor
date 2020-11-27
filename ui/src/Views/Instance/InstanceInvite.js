@@ -22,15 +22,11 @@ import Preview from "../Preview";
 // import Reviewers from "./InstanceInvite/Reviewers";
 import BGMessage from "../../Components/BGMessage";
 
-const rootPath = window.rootPath || "";
-
 const useStyles = createUseStyles({
   container: {
     position: "relative",
     width: "100%",
     height: "100%",
-    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
-    backgroundPosition: "50% 50%",
     "& .errorPanel, & .fetchingPanel": {
       color: "var(--ft-color-loud)",
       "& svg path": {

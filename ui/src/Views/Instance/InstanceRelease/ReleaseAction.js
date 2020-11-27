@@ -41,6 +41,12 @@ const useStyles = createUseStyles({
   releaseButton: {
     fontSize: "1.5em",
     outline: "none",
+    "&[disabled]": {
+      opacity: 1,
+      backgroundColor: "#748ca6",
+      borderColor: "#748ca6",
+      color: "#9f9f9f"
+    },
     "&:focus, &:active, &:focus:active, &:hover, &[disabled], &[disabled]:focus, &[disabled]:active, &[disabled]:focus:active, &[disabled]:hover": {
       outline: "none"
     },

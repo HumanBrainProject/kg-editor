@@ -66,10 +66,8 @@ const useStyles = createUseStyles({
     textAlign: "center",
     fontSize: "1.2em",
     wordBreak: "break-word",
+    alignSelf: "center",
     transition: "background .3s ease-in-out, color .3s ease-in-out",
-    "@media screen and (min-width:768px)": {
-      whiteSpace: "nowrap"
-    },
     "&:hover": {
       background: "var(--bg-color-blend-contrast1)",
       color: "var(--ft-color-loud)",

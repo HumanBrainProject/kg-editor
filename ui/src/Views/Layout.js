@@ -154,8 +154,9 @@ const useStyles = createUseStyles(theme => ({
     position: "relative",
     overflow: "hidden",
     background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
-    backgroundSize: theme.background.image?"unset":"200%",
-    backgroundImage: theme.background.image?`url('${theme.background.image}')`:"unset"
+    backgroundSize: theme.background.size?theme.background.size:(theme.background.image?"unset":"200%"),
+    backgroundImage: theme.background.image?`url('${theme.background.image}')`:"unset",
+    backgroundPosition: theme.background.position?theme.background.position:"unset"
   },
   status: {
     background: "var(--bg-color-ui-contrast1)",

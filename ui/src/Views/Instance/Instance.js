@@ -66,9 +66,7 @@ const useStyles = createUseStyles({
   },
   body: {
     position: "relative",
-    overflow: "hidden",
-    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
-    backgroundPosition: "50% 50%"
+    overflow: "hidden"
   },
   sidebar: {
     position: "relative",

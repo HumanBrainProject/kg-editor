@@ -23,7 +23,9 @@ const theme = {
       colorStart: "#e5b8d6",
       colorEnd: "#edac95",
       angle: "165deg"
-    }
+    },
+    image: `${window.rootPath}/assets/background-bright.png`,
+    position: "50% 50%"
   },
   contrast1: {
     backgroundColor: new Color("#94789a").darken(0.5).rgb().string(),

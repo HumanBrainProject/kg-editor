@@ -22,14 +22,10 @@ import Modal from "react-bootstrap/Modal";
 
 import { useStores } from "../Hooks/UseStores";
 
-const rootPath = window.rootPath || "";
-
 const useStyles = createUseStyles({
   container: {
     width: "100%",
     height: "100%",
-    backgroundImage: `url('${window.location.protocol}//${window.location.host}${rootPath}/assets/graph.png')`,
-    backgroundPosition: "50% 50%",
     color: "var(--ft-color-normal)"
   },
   workspacesSelection: {

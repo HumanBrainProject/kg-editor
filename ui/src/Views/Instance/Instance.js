@@ -32,8 +32,6 @@ import SaveBar from "./SaveBar";
 import Tabs from "./Tabs";
 import BGMessage from "../../Components/BGMessage";
 
-const rootPath = window.rootPath || "";
-
 const useStyles = createUseStyles({
   container: {
     display: "grid",

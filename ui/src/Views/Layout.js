@@ -18,6 +18,7 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { Route, Switch } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import { createUseStyles, useTheme } from "react-jss";
 
 import { useStores } from "../Hooks/UseStores";
@@ -167,10 +168,21 @@ const useStyles = createUseStyles(theme => ({
     maxWidth: "min(max(500px, 50%),750px)",
     "&.modal-dialog": {
       marginTop: "40vh",
-      "& .modal-body": {
-        padding: "15px 30px",
-        fontSize: "1.6rem"
+      "& .modal-content":{
+        backgroundColor: "var(--bg-color-ui-contrast2)",
+        color: "var(--ft-color-loud)",
+        "& .modal-body": {
+          padding: "15px 30px",
+          fontSize: "1.6rem"
+        }
       }
+    }
+  },
+  actionPanel: {
+    textAlign: "center",
+    "& button": {
+      paddingLeft: "30px",
+      paddingRight: "30px"
     }
   }
 }));
@@ -184,6 +196,8 @@ const Layout = observer(() => {
   useGlobalStyles({ theme });
 
   const classes = useStyles({ theme });
+
+  const handleLogout = () => appStore.logout();
 
   return (
     <div className={classes.layout}>
@@ -221,6 +235,9 @@ const Layout = observer(() => {
                     <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
                     <p>You are currently not granted permission to acccess any workspaces.</p>
                     <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+                    <div className={classes.actionPanel}>
+                      <Button onClick={handleLogout}>Logout</Button>
+                    </div>
                   </Modal.Body>
                 </Modal>
               :
@@ -229,6 +246,9 @@ const Layout = observer(() => {
                   <h1>Welcome</h1>
                   <p>You are currently not granted permission to acccess the application.</p>
                   <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+                  <div className={classes.actionPanel}>
+                    <Button onClick={handleLogout}>Logout</Button>
+                  </div>
                 </Modal.Body>
               </Modal>
         }

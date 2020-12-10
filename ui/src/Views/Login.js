@@ -67,6 +67,13 @@ const useStyles = createUseStyles({
     "& button + button": {
       marginLeft: "60px"
     }
+  },
+  actionPanel: {
+    textAlign: "center",
+    "& button": {
+      paddingLeft: "30px",
+      paddingRight: "30px"
+    }
   }
 });
 
@@ -150,7 +157,7 @@ const Login = observer(() => {
         <div className={classes.panel}>
           <h3>You are logged out of the application</h3>
           <p></p>
-          <div>
+          <div className={classes.actionPanel}>
             <Button variant={"primary"} onClick={handleLogin}>Login</Button>
           </div>
         </div>
@@ -168,7 +175,7 @@ const Login = observer(() => {
               Your session token has expired or has become invalid.<br/>
               Click on the following button to ask a new one and continue with your session.
           </p>
-          <div>
+          <div className={classes.actionPanel}>
             <Button variant={"primary"} onClick={handleLogin}>Re-Login</Button>
           </div>
         </div>

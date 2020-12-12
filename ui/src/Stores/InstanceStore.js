@@ -440,20 +440,24 @@ export class InstanceStore {
     const fields = toJS(type.fields);
     const data = {
       id: id,
-      _name: name,
+      _name: type.labelField?name:id,
       types: [instanceType],
       primaryType: instanceType,
       workspace: this.rootStore.appStore.currentWorkspace.id,
       fields: toJS(fields),
-      labelField: type.labelField,
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},
       permissions: { canRead: true, canCreate: true, canWrite: true }
     };
+    if (type.labelField) {
+      data.labelField = type.labelField;
+    }
     const instance  = new Instance(id, this);
     instance.initializeData(this.transportLayer, data, true);
-    instance.fields[instance.labelField].setValue(name);
+    if (instance.labelField) {
+      instance.fields[instance.labelField].setValue(name);
+    }
     this.instances.set(id, instance);
   }
 

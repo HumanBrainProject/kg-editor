@@ -19,6 +19,8 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
 
+import { useStores } from "../../Hooks/UseStores";
+
 const useStyles = createUseStyles({
   option: {
     position: "relative"
@@ -35,6 +37,8 @@ const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, o
 const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel }) => {
 
   const classes = useStyles();
+
+  const  { typeStore } = useStores();
 
   const ref = useRef();
 
@@ -77,13 +81,17 @@ const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSel
 
   const style = type.color ? { color: type.color } : {};
 
+  const typeDefinition = typeStore.typesMap.get(type.name);
+
   return (
     <Dropdown.Item onSelect={handleOnSelect}>
       <div tabIndex={-1} className={classes.option} onKeyDown={handleKeyDown} ref={ref}>
         <em>Add a new <span style={style}>
           <FontAwesomeIcon fixedWidth icon="circle" />
         </span>
-        {type.label} </em> : <strong>{value}</strong>
+        {type.label} </em>{!!typeDefinition && !!typeDefinition.labelField && (
+          <strong>{value}</strong>
+        )}
       </div>
     </Dropdown.Item>
   );

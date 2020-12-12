@@ -165,15 +165,29 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   }
 
   if(instance.isFetched && !instance.permissions.canRead) {
-    const fieldStore = instance.fields[instance.labelField];
-    return(
-      <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
-        <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
-        <div className={classes.errorMessage}>
-          <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
-        </div>
-      </Form>
-    );
+    if (instance.labelField) {
+      const fieldStore = instance.fields[instance.labelField];
+      return (
+        <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
+          <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
+          <div className={classes.errorMessage}>
+            <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
+          </div>
+        </Form>
+      );
+    } else {
+      return (
+        <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
+          <div className={classes.info}>
+            <div>ID: {instanceId}</div>
+            <div>Workspace: {instance.workspace}</div>
+          </div>
+          <div className={classes.errorMessage}>
+            <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
+          </div>
+        </Form>
+      );
+    }
   }
 
   const fields = [...instance.promotedFields, ...instance.nonPromotedFields];

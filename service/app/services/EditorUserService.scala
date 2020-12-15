@@ -58,15 +58,19 @@ class EditorUserService @Inject()(config: ConfigurationServiceLive, wSClient: WS
   }
 
   def getUsersPicture(token: AccessToken, clientToken: String, userIds: List[String]): Task[Either[APIEditorError, JsObject]] = {
-    val payload = Json.toJson(userIds)
-    val q = wSClient
-      .url(s"${config.kgCoreEndpoint}/${config.kgCoreApiVersion}/users/pictures")
-      .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
-    val r = Task.deferFuture(q.post(payload))
-    r.map { res =>
-      res.status match {
-        case OK => Right(res.json.as[JsObject])
-        case _  => Left(APIEditorError(res.status, res.body))
+    if (userIds.isEmpty) {
+      Task.pure(Right(Json.obj()))
+    } else {
+      val payload = Json.toJson(userIds)
+      val q = wSClient
+        .url(s"${config.kgCoreEndpoint}/${config.kgCoreApiVersion}/users/pictures")
+        .withHttpHeaders(AUTHORIZATION -> token.token, "Client-Authorization" -> clientToken)
+      val r = Task.deferFuture(q.post(payload))
+      r.map { res =>
+        res.status match {
+          case OK => Right(res.json.as[JsObject])
+          case _ => Left(APIEditorError(res.status, res.body))
+        }
       }
     }
   }

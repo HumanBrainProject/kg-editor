@@ -20,8 +20,8 @@ import com.google.inject.Inject
 import models.AccessToken
 import models.errors.APIEditorError
 import monix.eval.Task
-import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
+import play.api.libs.json.{JsObject, _}
 
 trait WorkspaceService {
 
@@ -53,13 +53,18 @@ class WorkspaceServiceLive @Inject()(
     token: AccessToken,
     clientToken: String,
     withProperties:  Boolean
-  ): Task[Either[APIEditorError, JsObject]] =
-    workspaceAPIServiceLive
-      .getTypesByName(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, token, types, clientToken, withProperties)
-      .map {
-        case Right(value) => Right(value)
-        case Left(res)    => Left(APIEditorError(res.status, res.body))
-      }
+  ): Task[Either[APIEditorError, JsObject]] = {
+    if (types.isEmpty) {
+      Task.pure(Right(Json.obj("data" -> Json.obj())))
+    } else {
+      workspaceAPIServiceLive
+        .getTypesByName(wSClient, configuration.kgCoreEndpoint, configuration.kgCoreApiVersion, token, types, clientToken, withProperties)
+        .map {
+          case Right(value) => Right(value)
+          case Left(res) => Left(APIEditorError(res.status, res.body))
+        }
+    }
+  }
 
   def retrieveWorkspaceTypes(
     workspace: String,

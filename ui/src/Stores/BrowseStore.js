@@ -22,7 +22,7 @@ import Instance from "./Instance";
 const normalizeInstancesData = (transportLayer, data) => {
   return (data && Array.isArray(data.data))?data.data.map(rowData => {
     Object.values(rowData.fields).forEach(d => {
-      if(d.type === "TextArea") {
+      if(d.widget === "TextArea") {
         d.value = d.value && d.value.substr(0, 197) + "...";
         delete d.label;
       }

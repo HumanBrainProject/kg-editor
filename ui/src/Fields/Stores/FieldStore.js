@@ -43,7 +43,7 @@ class FieldStore {
       setAlternatives: action
     });
 
-    this.type = definition.type;
+    this.widget = definition.widget;
     this.label = definition.label;
     this.labelTooltip = definition.labelTooltip;
     this.fullyQualifiedName = definition.fullyQualifiedName;
@@ -53,31 +53,31 @@ class FieldStore {
   }
 
   get returnValue() {
-    throw `returnValue getter is not implemented for ${this.type} store`;
+    throw `returnValue getter is not implemented for ${this.widget} store`;
   }
 
   /**
    * @param {any} value field value
    */
   updateValue() {
-    throw `update method is not implemented for ${this.type} store`;
+    throw `update method is not implemented for ${this.widget} store`;
   }
 
   reset() {
-    throw `reset method is not implemented for ${this.type} store`;
+    throw `reset method is not implemented for ${this.widget} store`;
   }
 
   get hasChanged() {
-    throw `hasChanged getter is not implemented for ${this.type} store`;
+    throw `hasChanged getter is not implemented for ${this.widget} store`;
   }
 
   get cloneWithInitialValue() {
-    throw `cloneWithInitialValue getter is not implemented for ${this.type} store`;
+    throw `cloneWithInitialValue getter is not implemented for ${this.widget} store`;
   }
 
   get definition() {
     return {
-      type: this.type,
+      widget: this.widget,
       label: this.label,
       fullyQualifiedName: this.fullyQualifiedName
     };

@@ -176,7 +176,7 @@ export const normalizeInstanceData = data => {
   };
 
   const normalizeField = (field, instanceId) => {
-    if (field.type === "Nested") {
+    if (field.widget === "Nested") {
       field.topAddButton = false;
       if (!field.min) {
         field.min = 0;
@@ -298,7 +298,7 @@ const getChildrenIdsGroupedByField = fields => {
 
   function getGroups(field, values) {
     const groups = [];
-    if (field.type === "Nested") {
+    if (field.widget === "Nested") {
       groups.push(...getNestedFields(field.fields, values));
     } else if (field.isLink) {
       const group = getGroup(field, values);
@@ -483,7 +483,7 @@ export class Instance {
     if (this.isFetched && !this.fetchError && this.fields) {
       const ids = Object.values(this.fields)
         .reduce((acc, field) => {
-          if (field.type === "Nested") {
+          if (field.widget === "Nested") {
             //TODO
           } else if (field.isLink) {
             const values = toJS(field.value);
@@ -535,12 +535,12 @@ export class Instance {
     this.permissions = normalizedData.permissions;
     Object.entries(normalizedData.fields).forEach(([name, field]) => {
       if (!this.fields[name]) {
-        const fieldMapping = fieldsMapping[field.type];
+        const fieldMapping = fieldsMapping[field.widget];
         if (!fieldMapping) {
-          if (!field.type) {
+          if (!field.widget) {
             throw `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
           } else {
-            throw `widget "${field.type}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+            throw `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
           }
         }
         this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);

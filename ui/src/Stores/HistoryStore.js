@@ -131,7 +131,7 @@ export class HistoryStore {
               }
             } else {
               Object.values(data.fields).forEach(d => {
-                if(d.type === "TextArea") {
+                if(d.widget === "TextArea") {
                   d.value = d.value && d.value.substr(0, 197) + "...";
                   delete d.label;
                 }

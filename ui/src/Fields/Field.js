@@ -23,7 +23,7 @@ import { fieldsMapping } from "../Fields";
 
 const Field = props => {
 
-  const fieldMapping = fieldsMapping[props.fieldStore.type];
+  const fieldMapping = fieldsMapping[props.fieldStore.widget];
   if (!fieldMapping) {
     throw `${props.name} field is not supported!`;
   }

@@ -29,7 +29,7 @@ final case class StructureOfField(
   markdown: Option[Boolean],
   allowCustomValues: Option[Boolean],
   numOfOccurrences: Option[Int],
-  `type`: Option[String],
+  widget: Option[String],
   searchable: Option[Boolean],
   fields: Option[List[StructureOfField]],
   order: Option[Int]

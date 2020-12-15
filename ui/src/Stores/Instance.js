@@ -537,7 +537,11 @@ export class Instance {
       if (!this.fields[name]) {
         const fieldMapping = fieldsMapping[field.type];
         if (!fieldMapping) {
-          throw `${field.type} type is not supported!`;
+          if (!field.type) {
+            throw `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
+          } else {
+            throw `widget "${field.type}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+          }
         }
         this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
       }

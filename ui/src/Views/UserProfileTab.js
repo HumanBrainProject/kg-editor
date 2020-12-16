@@ -144,6 +144,11 @@ const useStyles = createUseStyles({
     },
     "&:hover $profilePicturePlus": {
       color: "rgba(0, 0, 0, 0.65)"
+    },
+    "& .avatar.default.fa-user": {
+      width: "100px",
+      transform: "scale(8)",
+      color: "#1b1b1b"
     }
   },
   profilePictureCamera: {

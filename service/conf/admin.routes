@@ -1,1 +1,0 @@
-DELETE /cache/:name    controllers.AdminController.clearCache(name:String)

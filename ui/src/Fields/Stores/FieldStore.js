@@ -21,6 +21,7 @@ class FieldStore {
   labelTooltip = null;
   fullyQualifiedName = null;
   alternatives = [];
+  warning = null;
   errorMessage = null;
   errorInfo = null;
   instance = null;
@@ -35,6 +36,7 @@ class FieldStore {
       labelTooltip: observable,
       fullyQualifiedName: observable,
       alternatives: observable,
+      warning: observable,
       errorMessage: observable,
       errorInfo: observable,
       setError: action,
@@ -81,6 +83,18 @@ class FieldStore {
       label: this.label,
       fullyQualifiedName: this.fullyQualifiedName
     };
+  }
+
+  setWarning(message) {
+    this.warning = message;
+  }
+
+  clearWarning() {
+    this.setWarning(null);
+  }
+
+  get hasWarning() {
+    return this.warning;
   }
 
   setError(message, info) {

@@ -89,7 +89,7 @@ const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
       <div className={classes.fetchErrorPanel}>
         <h4>{error}</h4>
         <div className={classes.action}>
-          <Button variant="primary" onClick={this.handleRetry}>Retry</Button>
+          <Button variant="primary" onClick={handleRetry}>Retry</Button>
         </div>
       </div>
       :

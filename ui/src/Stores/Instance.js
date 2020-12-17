@@ -449,7 +449,10 @@ export class Instance {
   }
 
   clearFieldsErrors() {
-    Object.values(this.fields).forEach(field => field.clearError);
+    Object.values(this.fields).forEach(field => {
+      field.clearError();
+      field.clearWarning();
+    });
   }
 
   get name() {
@@ -534,20 +537,24 @@ export class Instance {
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
     Object.entries(normalizedData.fields).forEach(([name, field]) => {
+      let warning = null;
       if (!this.fields[name]) {
-        const fieldMapping = fieldsMapping[field.widget];
-        if (!fieldMapping) {
-          if (!field.widget) {
-            throw `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
-          } else {
-            throw `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
-          }
+        if (!field.widget) {
+          warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
+          field.widget = "UnsupportedField";
+        } else if (!fieldsMapping[field.widget]) {
+          warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+          field.widget = "UnsupportedField";
         }
+        const fieldMapping = fieldsMapping[field.widget];
         this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
       }
       const store = this.fields[name];
       store.updateValue(field.value);
       store.setAlternatives(field.alternatives);
+      if (warning) {
+        store.setWarning(warning);
+      }
     });
     this.fetchError = null;
     this.isNotFound = false;

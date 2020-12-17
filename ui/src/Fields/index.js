@@ -19,6 +19,7 @@ import TextArea from "./TextArea/TextArea";
 import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
 import DynamicTable from "./DynamicTable/DynamicTable";
 import CheckBox from "./CheckBox/CheckBox";
+import UnsupportedField from "./UnsupportedField/UnsupportedField";
 
 
 import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
@@ -30,6 +31,7 @@ import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
+import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -62,5 +64,9 @@ export const fieldsMapping = {
   "InputTextMultiple": {
     Component: InputTextMultiple,
     Store: InputTextMultipleStore
+  },
+  "UnsupportedField": {
+    Component: UnsupportedField,
+    Store: UnsupportedFieldStore
   }
 };

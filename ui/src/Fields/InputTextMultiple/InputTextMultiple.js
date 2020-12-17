@@ -62,10 +62,10 @@ const useStyles = createUseStyles({
   },
 });
 
-const getAlternativeValue = mappingValue => {
-  const AlternativeValue = observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+const getAlternativeValue = () => {
+  const AlternativeValue = observer(({alternative}) => alternative.value.join("; "));
   AlternativeValue.displayName = "AlternativeValue";
-  return;
+  return AlternativeValue;
 };
 
 const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
@@ -175,7 +175,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
+        ValueRenderer={getAlternativeValue()}
       />
       <div className={`form-control ${classes.values}`} disabled={isDisabled} >
         <List

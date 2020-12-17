@@ -104,7 +104,8 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
     <Dropdown.Item className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
         <strong>
-          <ValueRenderer alternative={alternative} /></strong> <em><div className="parenthesis">(</div>{
+          <ValueRenderer alternative={alternative} />
+        </strong><em><div className="parenthesis">(</div>{
           users.map(user => (
             <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
           ))

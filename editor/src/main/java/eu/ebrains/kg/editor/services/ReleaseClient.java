@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class WorkspaceClient {
+public class ReleaseClient {
     private final WebClient webClient = WebClient.builder().build();
 
     @Value("${kgcore.endpoint}")
@@ -20,8 +20,9 @@ public class WorkspaceClient {
     @Value("${kgcore.apiVersion}")
     String apiVersion;
 
-    public Map getWorkspaces(String token, String clientToken) {
-        String uri = String.format("%s/%s/spaces?stage=IN_PROGRESS&permissions=true", kgCoreEndpoint, apiVersion);
+
+    public Map getRelease(String id, String token, String clientToken) {
+        String uri = String.format("%s/%s/%s/graph", kgCoreEndpoint, apiVersion, id);
         return webClient.get()
                 .uri(uri)
                 .headers(h -> {
@@ -33,9 +34,9 @@ public class WorkspaceClient {
                 .block();
     }
 
-    public Map getWorkspaceTypes(String workspace, String token, String clientToken) {
-        String uri = String.format("%s/%s/types?stage=IN_PROGRESS&space=%s&withProperties=true", kgCoreEndpoint, apiVersion, workspace);
-        return webClient.get()
+    public Map putRelease(String id, String token, String clientToken) {
+        String uri = String.format("%s/%s/instances/%s/release", kgCoreEndpoint, apiVersion, id);
+        return webClient.put()
                 .uri(uri)
                 .headers(h -> {
                     h.add(HttpHeaders.AUTHORIZATION, token);
@@ -46,15 +47,28 @@ public class WorkspaceClient {
                 .block();
     }
 
-    public Map getTypesByName(List<String> types, boolean withProperties, String token, String clientToken) {
-        String uri = String.format("%s/%s/typesByName?stage=IN_PROGRESS&withProperties=%s", kgCoreEndpoint, apiVersion, withProperties);
+    public void deleteRelease(String id, String token, String clientToken) {
+        String uri = String.format("%s/%s/instances/%s/release", kgCoreEndpoint, apiVersion, id);
+        webClient.delete()
+                .uri(uri)
+                .headers(h -> {
+                    h.add(HttpHeaders.AUTHORIZATION, token);
+                    h.add(CustomHeaders.CLIENT_AUTHORIZATION, clientToken);
+                })
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+    }
+
+    public Map getReleaseStatus(List<String> ids, String releaseTreeScope, String token, String clientToken) {
+        String uri = String.format("%s/%s/instancesByIds/release/status?releaseTreeScope=%s", kgCoreEndpoint, apiVersion, releaseTreeScope);
         return webClient.post()
                 .uri(uri)
                 .headers(h -> {
                     h.add(HttpHeaders.AUTHORIZATION, token);
                     h.add(CustomHeaders.CLIENT_AUTHORIZATION, clientToken);
                 })
-                .body(BodyInserters.fromValue(types))
+                .body(BodyInserters.fromValue(ids))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();

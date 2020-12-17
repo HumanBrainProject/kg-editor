@@ -19,7 +19,6 @@ public class AuthClient {
     @Value("${kgcore.apiVersion}")
     String apiVersion;
 
-
     @Value("${client.secret}")
     String clientSecret;
 

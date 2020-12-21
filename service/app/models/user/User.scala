@@ -38,7 +38,11 @@ final case class User(
   }
 
   def setWorkspaces(w: Option[List[Workspace]]): User = {
-    User(id, username, name, givenName, familyName, email, picture, isCurator, w)
+    val ws = w match {
+      case Some(list) => Some(list.filterNot(v => v.internalSpace.getOrElse(false) || v.clientSpace.getOrElse(false)))
+      case _ => w
+    }
+    User(id, username, name, givenName, familyName, email, picture, isCurator, ws)
   }
 }
 

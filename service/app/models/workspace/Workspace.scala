@@ -27,6 +27,7 @@ final case class Workspace(
                        name: Option[String],
                        autorelease: Option[Boolean],
                        clientSpace: Option[Boolean],
+                       internalSpace: Option[Boolean],
                        permissions: Permissions)
 
 object Workspace {
@@ -36,16 +37,18 @@ object Workspace {
              name: Option[String],
              autorelease: Option[Boolean],
              clientSpace: Option[Boolean],
+             internalSpace: Option[Boolean],
              permissions: Option[List[String]]
-           ): Workspace = Workspace(id, name, autorelease, clientSpace, Permissions(permissions));
+           ): Workspace = Workspace(id, name, autorelease, clientSpace, internalSpace, Permissions(permissions));
 
   implicit val workspaceReads: Reads[Workspace] = (
     (JsPath \ SchemaFieldsConstants.IDENTIFIER).read[String] and
       (JsPath \ SchemaFieldsConstants.NAME).readNullable[String] and
       (JsPath \ EditorConstants.VOCAB_AUTO_RELEASE).readNullable[Boolean] and
       (JsPath \ EditorConstants.VOCAB_CLIENT_SPACE).readNullable[Boolean] and
+      (JsPath \ EditorConstants.VOCAB_INTERNAL_SPACE).readNullable[Boolean] and
       (JsPath \ EditorConstants.VOCAB_PERMISSIONS).readNullable[List[String]]
-    )(Workspace.apply(_, _, _, _, _))
+    )(Workspace.apply(_, _, _, _, _, _))
 
   implicit val workspaceWrites = Json.writes[Workspace]
 }

@@ -26,6 +26,7 @@ class FieldStore {
   errorInfo = null;
   instance = null;
   type = null;
+  order = null;
 
   instance = null;
   transportLayer = null;
@@ -50,6 +51,7 @@ class FieldStore {
     this.labelTooltip = definition.labelTooltip;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
+    this.order = definition.order;
 
     this.transportLayer = transportLayer;
   }

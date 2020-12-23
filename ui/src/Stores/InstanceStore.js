@@ -268,7 +268,13 @@ export class InstanceStore {
   }
 
   clearUnsavedChanges() {
-    this.getUnsavedInstances.forEach(i => this.instances.get(i.id).cancelChanges());
+    this.getUnsavedInstances.forEach(i => {
+      const instance = this.instances.get(i.id);
+      instance.cancelChanges();
+      if(instance.isNew) {
+        instance.isNew = false;
+      }
+    });
   }
 
   processQueue() {

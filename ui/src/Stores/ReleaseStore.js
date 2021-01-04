@@ -29,12 +29,12 @@ const populateStatuses = (node, prefix = "") => {
     node[prefix+"childrenStatus"] = null;
     if(node.children && node.children.length > 0){
       let childrenStatuses = node.children.map(child => populateStatuses(child, prefix));
-      if(childrenStatuses.some(status => status === "NOT_RELEASED")){
-        node[prefix+"childrenStatus"] = "NOT_RELEASED";
-        node[prefix+"globalStatus"] = "NOT_RELEASED";
+      if(childrenStatuses.some(status => status === "UNRELEASED")){
+        node[prefix+"childrenStatus"] = "UNRELEASED";
+        node[prefix+"globalStatus"] = "UNRELEASED";
       } else if(childrenStatuses.some(status => status === "HAS_CHANGED")){
         node[prefix+"childrenStatus"] = "HAS_CHANGED";
-        node[prefix+"globalStatus"] = node[prefix+"status"] === "NOT_RELEASED"? "NOT_RELEASED": "HAS_CHANGED";
+        node[prefix+"globalStatus"] = node[prefix+"status"] === "UNRELEASED"? "UNRELEASED": "HAS_CHANGED";
       } else {
         node[prefix+"childrenStatus"] = "RELEASED";
         node[prefix+"globalStatus"] = node[prefix+"status"];
@@ -197,8 +197,8 @@ export class ReleaseStore {
 
     const processChildrenInstanceList = (node, result, level, hideReleasedInstances)  => {
       if (!hideReleasedInstances
-          || node.status === "NOT_RELEASED" || node.status === "HAS_CHANGED"
-          || node.childrenStatus === "NOT_RELEASED" || node.childrenStatus === "HAS_CHANGED"
+          || node.status === "UNRELEASED" || node.status === "HAS_CHANGED"
+          || node.childrenStatus === "UNRELEASED" || node.childrenStatus === "HAS_CHANGED"
           || node.pending_status !== node.status
           || node.pending_childrenStatus !== node.childrenStatus) {
         const obj = { node: node, level:level };

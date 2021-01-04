@@ -173,7 +173,7 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
           :
           <ButtonGroup vertical>
             <Button variant="primary" size="sm" onClick={handleSave} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
-             {!instance.isNew && <Button size="sm" onClick={handleReset} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>}
+            {!instance.isNew && <Button size="sm" onClick={handleReset} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>}
             <Button size="sm" onClick={handleCompare} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
           </ButtonGroup>
         }

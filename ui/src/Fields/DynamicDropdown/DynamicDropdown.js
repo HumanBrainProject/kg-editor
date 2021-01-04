@@ -65,6 +65,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     links,
     label,
     labelTooltip,
+    labelTooltipIcon,
     mappingValue,
     allowCustomValues,
     optionsSearchTerm,
@@ -213,7 +214,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
         {(view && view.currentInstanceId === instance.id)?
           <List
             list={links}
@@ -240,7 +241,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const canAddValues = !isDisabled;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       <LinksAlternatives
         className={classes.alternatives}
         list={alternatives}

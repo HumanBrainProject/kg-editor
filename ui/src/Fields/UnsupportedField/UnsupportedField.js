@@ -48,7 +48,8 @@ const UnsupportedField = observer(({ fieldStore, className, readMode, showIfNoVa
     value,
     warning,
     label,
-    labelTooltip
+    labelTooltip,
+    labelTooltipIcon
   } = fieldStore;
 
 
@@ -57,7 +58,7 @@ const UnsupportedField = observer(({ fieldStore, className, readMode, showIfNoVa
   }
   return (
     <Form.Group className={`${classes.readMode} ${className}`}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       {value && (
         <div className={classes.value}>{JSON.stringify(value)}</div>
       )}

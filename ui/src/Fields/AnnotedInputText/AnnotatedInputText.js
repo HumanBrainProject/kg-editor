@@ -81,6 +81,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     resources,
     label,
     labelTooltip,
+    labelTooltipIcon,
     alternatives,
     returnAsNull
   } = fieldStore;
@@ -161,7 +162,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
 
     return (
       <Form.Group className={`${classes.readMode}} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
         <List
           list={resources}
           readOnly={true}
@@ -174,7 +175,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   const isDisabled = returnAsNull;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

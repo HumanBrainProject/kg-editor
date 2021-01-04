@@ -19,6 +19,7 @@ import { observable, action, computed, makeObservable } from "mobx";
 class FieldStore {
   label = null;
   labelTooltip = null;
+  labelTooltipIcon = null;
   fullyQualifiedName = null;
   alternatives = [];
   warning = null;
@@ -35,6 +36,7 @@ class FieldStore {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,
+      labelTooltipIcon: observable,
       fullyQualifiedName: observable,
       alternatives: observable,
       warning: observable,
@@ -49,6 +51,7 @@ class FieldStore {
     this.widget = definition.widget;
     this.label = definition.label;
     this.labelTooltip = definition.labelTooltip;
+    this.labelTooltipIcon = definition.labelTooltipIcon;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
     this.order = definition.order;

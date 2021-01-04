@@ -538,6 +538,10 @@ export class Instance {
     this.permissions = normalizedData.permissions;
     Object.entries(normalizedData.fields).forEach(([name, field]) => {
       let warning = null;
+      if(name === this.labelField) {
+        field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+        field.labelTooltipIcon = "globe";
+      }
       if (!this.fields[name]) {
         if (!field.widget) {
           warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;

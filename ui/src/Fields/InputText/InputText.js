@@ -78,7 +78,8 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     returnAsNull,
     alternatives,
     label,
-    labelTooltip
+    labelTooltip,
+    labelTooltipIcon
   } = fieldStore;
 
   const handleChange = e => fieldStore.setValue(e.target.value);
@@ -93,7 +94,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     }
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip}labelTooltipIcon={labelTooltipIcon} />
         <FieldValue field={fieldStore} splitLines={as === "textarea"} />
       </Form.Group>
     );
@@ -101,7 +102,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

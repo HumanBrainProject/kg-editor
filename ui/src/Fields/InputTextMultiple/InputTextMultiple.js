@@ -79,6 +79,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     value: list,
     label,
     labelTooltip,
+    labelTooltipIcon,
     alternatives,
     returnAsNull
   } = fieldStore;
@@ -155,7 +156,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
     return (
       <Form.Group className={classes.readMode}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
         <List
           list={list}
           readOnly={true}
@@ -168,7 +169,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   const isDisabled = returnAsNull;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

@@ -15,22 +15,10 @@
 */
 
 import React from "react";
-import * as Sentry from "@sentry/browser";
-import Cookies from "universal-cookie";
 
 import { useStores } from "../Hooks/UseStores";
 
 class ErrorBoundaryComponent extends React.Component {
-
-  componentDidMount() {
-    const cookies = new Cookies();
-    const sentryUrl = cookies.get("sentry_url");
-    if (sentryUrl) {
-      Sentry.init({
-        dsn: sentryUrl
-      });
-    }
-  }
 
   static getDerivedStateFromError() {
     return null;

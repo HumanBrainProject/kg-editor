@@ -20,13 +20,15 @@ import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import services.AuthServiceLive
+import services.{AuthServiceLive, ConfigurationServiceLive}
+import play.api.libs.json._
 
 class AuthController @Inject()(
-  cc: ControllerComponents,
-  wsClient: WSClient,
-  authServiceLive: AuthServiceLive
-) extends AbstractController(cc) {
+                                cc: ControllerComponents,
+                                wsClient: WSClient,
+                                authServiceLive: AuthServiceLive,
+                                configurationServiceLive: ConfigurationServiceLive
+                              ) extends AbstractController(cc) {
 
   val logger = Logger(this.getClass)
 
@@ -36,8 +38,16 @@ class AuthController @Inject()(
     authServiceLive
       .getEndpoint(wsClient)
       .map {
-        case Left(err)    => err.toResult
-        case Right(value) => Ok(value)
+        case Left(err) => err.toResult
+        case Right(value) =>
+          val authEndpoint = (value \ "data" \ "endpoint").as[String]
+          Ok(
+            Json.obj("data" ->
+              Json.obj("endpoint" -> authEndpoint,
+                "sentryUrl" -> configurationServiceLive.sentryUrl
+              )
+            )
+          )
       }
       .runToFuture
   }

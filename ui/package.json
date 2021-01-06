@@ -34,8 +34,7 @@
     "react-router-dom": "^5.2.0",
     "react-virtualized": "^9.22.2",
     "showdown": "^1.8.6",
-    "showdown-xss-filter": "^0.2.0",
-    "universal-cookie": "^4.0.4"
+    "showdown-xss-filter": "^0.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",

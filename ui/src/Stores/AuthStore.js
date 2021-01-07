@@ -194,7 +194,11 @@ export class AuthStore {
         if (sentryUrl) {
           Sentry.init({
             dsn: sentryUrl,
-            environment: window.location.host
+            environment: window.location.host,
+            beforeSend: event => {
+              event.fingerprint = [(Math.random() * 1000000).toString()];
+              return event;
+            }
           });
         }
       });

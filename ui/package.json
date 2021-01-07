@@ -8,7 +8,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.12",
-    "@sentry/browser": "^5.27.3",
+    "@sentry/browser": "^5.29.2",
     "autosize": "4.0.2",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",

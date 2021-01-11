@@ -150,7 +150,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   };
 
   if(readMode){
-    if(!list.length || !showIfNoValue) {
+    if(!list.length && !showIfNoValue) {
       return null;
     }
 

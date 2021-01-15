@@ -31,5 +31,5 @@ class ConfigurationServiceLive @Inject()(config: Configuration) extends Configur
   val kgCoreApiVersion: String = config.get[String]("kgcore.apiVersion")
   val kgApiInstancesPrefix: String = config.getOptional[String]("kgcore.apiInstancesPrefix").getOrElse("https://kg.ebrains.eu/api/instances/")
   val clientSecret: String = config.get[String]("client.secret")
-  val sentryUrl: String = config.get[String]("sentry.url")
+  val sentryUrl: String = config.getOptional[String]("sentry.url").getOrElse("")
 }

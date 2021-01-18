@@ -28,6 +28,7 @@ class FieldStore {
   instance = null;
   type = null;
   order = null;
+  widget=null;
 
   instance = null;
   transportLayer = null;

@@ -32,11 +32,17 @@ import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
 import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
+import InputNumber from "./InputNumber/InputNumber";
+import InputNumberStore from "./Stores/InputNumberStore";
 
 export const fieldsMapping = {
   "InputText":  {
     Component: InputText,
     Store: InputTextStore
+  },
+  "InputNumber":  {
+    Component: InputNumber,
+    Store: InputNumberStore
   },
   "TextArea": {
     Component: TextArea,

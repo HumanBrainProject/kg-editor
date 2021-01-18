@@ -27,4 +27,52 @@ public class Workspace {
     @JsonDeserialize(using = PermissionDeserializer.class)
     private Permissions permissions;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Boolean getAutorelease() {
+        return autorelease;
+    }
+
+    public void setAutorelease(Boolean autorelease) {
+        this.autorelease = autorelease;
+    }
+
+    public Boolean getClientSpace() {
+        return clientSpace;
+    }
+
+    public void setClientSpace(Boolean clientSpace) {
+        this.clientSpace = clientSpace;
+    }
+
+    public Boolean getInternalSpace() {
+        return internalSpace;
+    }
+
+    public void setInternalSpace(Boolean internalSpace) {
+        this.internalSpace = internalSpace;
+    }
+
+    public Permissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Permissions permissions) {
+        this.permissions = permissions;
+    }
+
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import eu.ebrains.kg.editor.models.Permissions;
 
+import java.io.IOException;
 import java.util.List;
 
 public class PermissionDeserializer extends JsonDeserializer<Permissions> {
@@ -23,7 +24,7 @@ public class PermissionDeserializer extends JsonDeserializer<Permissions> {
             p.setCanWrite(permissions.contains("WRITE"));
             p.setCanRelease(permissions.contains("RELEASE"));
             return p;
-        } catch (Exception e) { //TODO: Change to a specific exception
+        } catch (IOException e) {
             return null;
         }
     }

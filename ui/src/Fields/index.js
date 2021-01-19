@@ -14,7 +14,6 @@
 *   limitations under the License.
 */
 
-import InputDate from "./InputDate/InputDate";
 import InputText from "./InputText/InputText";
 import InputNumber from "./InputNumber/InputNumber";
 import TextArea from "./TextArea/TextArea";
@@ -37,6 +36,8 @@ import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
 import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
 import InputNumberStore from "./Stores/InputNumberStore";
+import InputDateStore from "./Stores/InputDateStore";
+import InputDateTime from "./InputDateTime/InputDateTime";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -48,7 +49,11 @@ export const fieldsMapping = {
     Store: InputNumberStore
   },
   "InputDate": {
-    Component: InputDate,
+    Component: InputText,
+    Store: InputDateStore
+  },
+  "InputDateTime": {
+    Component: InputDateTime,
     Store: InputTextStore
   },
   "InputNumberMultiple":  {

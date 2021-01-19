@@ -63,10 +63,10 @@ const useStyles = createUseStyles({
 });
 
 
-const AlternativeValue = observer(({alternative}) => new Date(alternative.value).toLocaleDateString());
+const AlternativeValue = observer(({alternative}) => alternative.value);
 AlternativeValue.displayName = "AlternativeValue";
 
-const InputDate = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
+const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
 
   const classes = useStyles();
 
@@ -92,11 +92,10 @@ const InputDate = observer(({ fieldStore, className, readMode, showIfNoValue }) 
       return null;
     }
     const val = !value || typeof value === "string"? value:value.toString();
-    const dateValue = new Date(val).toLocaleDateString();
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip}labelTooltipIcon={labelTooltipIcon} />
-        <span>&nbsp;{dateValue}</span>
+        <span>&nbsp;{val}</span>
       </Form.Group>
     );
   }
@@ -114,14 +113,17 @@ const InputDate = observer(({ fieldStore, className, readMode, showIfNoValue }) 
       />
       <DatePicker
         className={classes.datePicker}
-        dateFormat="dd/MM/yyyy"
         selected={dateValue}
         disabled={returnAsNull}
         onChange={handleChange}
+        showTimeSelect
+        timeFormat="p"
+        timeIntervals={15}
+        dateFormat="Pp"
       />
     </Form.Group>
   );
 });
-InputDate.displayName = "InputDate";
+InputDateTime.displayName = "InputDateTime";
 
-export default InputDate;
+export default InputDateTime;

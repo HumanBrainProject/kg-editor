@@ -63,7 +63,7 @@ const useStyles = createUseStyles({
 });
 
 const getAlternativeValue = () => {
-  const AlternativeValue = observer(({alternative}) => alternative.value.join("; "));
+  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };
@@ -149,7 +149,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     } else if(!e.target.value && fieldStore.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
-      e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
+      e.target.value = list[list.length-1];
       handleDeleteLastValue();
     }
   };

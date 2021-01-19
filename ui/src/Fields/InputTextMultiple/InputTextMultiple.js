@@ -63,7 +63,7 @@ const useStyles = createUseStyles({
 });
 
 const getAlternativeValue = () => {
-  const AlternativeValue = observer(({alternative}) => alternative.value.join("; "));
+  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };
@@ -136,7 +136,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   const handleKeyStrokes = e => {
     if(e.keyCode === 13){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
-      e.stopPropagation();
       const value = e.target.value.trim();
       if (value) {
         handleOnAddValue(value);
@@ -145,7 +144,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     } else if(!e.target.value && fieldStore.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
-      e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
+      e.target.value = list[list.length-1];
       handleDeleteLastValue();
     }
   };

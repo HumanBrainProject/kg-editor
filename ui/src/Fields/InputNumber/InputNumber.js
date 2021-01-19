@@ -34,7 +34,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const AlternativeValue = observer(({alternative}) => alternative.value);
+const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
 AlternativeValue.displayName = "AlternativeValue";
 
 const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }) => {

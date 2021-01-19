@@ -19,7 +19,7 @@ import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
 
-import List from "./List";
+import List from "../InputTextMultiple/List";
 import Label from "../Label";
 
 import Alternatives from "../Alternatives";
@@ -68,7 +68,7 @@ const getAlternativeValue = () => {
   return AlternativeValue;
 };
 
-const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -89,7 +89,12 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     draggedValue.current = null;
   };
 
-  const handleOnAddValue = value => fieldStore.addValue(value);
+  const handleOnAddValue = value => {
+    const val = parseFloat(value);
+    if(val) {
+      fieldStore.addValue(value);
+    }
+  };
 
   const handleSelectAlternative = values => fieldStore.setValues([...values]);
 
@@ -136,7 +141,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   const handleKeyStrokes = e => {
     if(e.keyCode === 13){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
-      e.stopPropagation();
       const value = e.target.value.trim();
       if (value) {
         handleOnAddValue(value);
@@ -190,7 +194,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
         />
-        <input type="text" className={classes.userInput}
+        <input type="number" className={classes.userInput}
           disabled={isDisabled}
           onDrop={handleDrop}
           onDragOver={e => e.preventDefault()}
@@ -203,6 +207,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     </Form.Group>
   );
 });
-InputTextMultiple.displayName = "InputTextMultiple";
+InputNumberMultiple.displayName = "InputNumberMultiple";
 
-export default InputTextMultiple;
+export default InputNumberMultiple;

@@ -34,6 +34,7 @@ import CheckBoxStore from "./Stores/CheckBoxStore";
 import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
 import InputNumber from "./InputNumber/InputNumber";
 import InputNumberStore from "./Stores/InputNumberStore";
+import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -43,6 +44,10 @@ export const fieldsMapping = {
   "InputNumber":  {
     Component: InputNumber,
     Store: InputNumberStore
+  },
+  "InputNumberMultiple":  {
+    Component: InputNumberMultiple,
+    Store: InputTextMultipleStore
   },
   "TextArea": {
     Component: TextArea,

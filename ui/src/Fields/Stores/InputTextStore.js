@@ -40,6 +40,10 @@ class InputTextStore extends FieldStore {
   }
 
   get returnValue() {
+    return this.doReturnValue();
+  }
+
+  doReturnValue() {
     if (this.value === "" && this.returnAsNull) {
       return null;
     }

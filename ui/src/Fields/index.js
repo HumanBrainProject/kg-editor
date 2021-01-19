@@ -14,7 +14,9 @@
 *   limitations under the License.
 */
 
+import InputDate from "./InputDate/InputDate";
 import InputText from "./InputText/InputText";
+import InputNumber from "./InputNumber/InputNumber";
 import TextArea from "./TextArea/TextArea";
 import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
 import DynamicTable from "./DynamicTable/DynamicTable";
@@ -28,13 +30,13 @@ import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
 import InputTextMultiple from "./InputTextMultiple/InputTextMultiple";
 import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 
+import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
+
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
 import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
-import InputNumber from "./InputNumber/InputNumber";
 import InputNumberStore from "./Stores/InputNumberStore";
-import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -44,6 +46,10 @@ export const fieldsMapping = {
   "InputNumber":  {
     Component: InputNumber,
     Store: InputNumberStore
+  },
+  "InputDate": {
+    Component: InputDate,
+    Store: InputTextStore
   },
   "InputNumberMultiple":  {
     Component: InputNumberMultiple,

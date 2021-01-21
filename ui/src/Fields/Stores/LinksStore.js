@@ -66,6 +66,8 @@ class LinksStore extends FieldStore {
       reset: action,
       hasChanged: computed,
       requiredValidationWarning: computed,
+      warningMessages: computed,
+      numberOfItemsWarning: computed,
       numberOfValues: computed,
       hasMoreOptions: computed,
       insertValue: action,
@@ -125,6 +127,32 @@ class LinksStore extends FieldStore {
       return true;
     }
     return false;
+  }
+
+  get numberOfItemsWarning() {
+    if(!this.minItems && !this.maxItems) {
+      return false;
+    }
+    if(this.minItems || this.maxItems) {
+      return true;
+    }
+    return false;
+  }
+
+  get warningMessages() {
+    const messages = {};
+    if(this.numberOfItemsWarning) {
+      if(this.minItems && this.maxItems) {
+        if(this.value.length < this.minItems || this.value.length > this.maxItems) {
+          messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
+        }
+      } else if(this.value.length < this.minItems) {
+        messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
+      } else if(this.value.length > this.maxItems) {
+        messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
+      }
+    }
+    return messages;
   }
 
   updateValue(value) {

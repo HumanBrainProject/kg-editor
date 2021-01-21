@@ -27,6 +27,7 @@ import { useStores } from "../../Hooks/UseStores";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 import Label from "../Label";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   container: {
@@ -204,7 +205,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const warningMessages = fieldStore.warningMessages;
 
   if (readMode && !links.length && !showIfNoValue) {
     return null;
@@ -267,6 +269,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           </span>
         </div>
       )}
+      {hasWarning && warningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

@@ -25,6 +25,7 @@ import { useStores } from "../../Hooks/UseStores";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
+import Invalid from "../Invalid";
 
 import List from "./List";
 
@@ -243,7 +244,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const warningMessages = fieldStore.warningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
@@ -290,6 +292,9 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             onPreview={handleOptionPreview}
           />
         )}
+        {hasWarning && warningMessages &&
+          <Invalid  messages={warningMessages}/>
+        }
       </div>
     </Form.Group>
   );

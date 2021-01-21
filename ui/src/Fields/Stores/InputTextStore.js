@@ -22,14 +22,12 @@ class InputTextStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
-  messages = {};
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
 
     makeObservable(this, {
       value: observable,
-      messages: observable,
       returnAsNull: observable,
       initialValue: observable,
       returnValue: computed,
@@ -86,22 +84,17 @@ class InputTextStore extends FieldStore {
   }
 
   get warningMessages() {
+    const messages = {};
     if(this.requiredValidationWarning) {
-      this.messages.required = "This field is marked as required.";
-    } else {
-      delete this.messages.required;
+      messages.required = "This field is marked as required.";
     }
     if(this.maxLengthWarning) {
-      this.messages.maxLength = `Maximum characters: ${this.maxLength}`;
-    } else {
-      delete this.messages.maxLength;
+      messages.maxLength = `Maximum characters: ${this.maxLength}`;
     }
     if(this.regexWarning) {
-      this.messages.regex = `${this.value} is not a valid value`;
-    } else {
-      delete this.messages.regex;
+      messages.regex = `${this.value} is not a valid value`;
     }
-    return this.messages;
+    return messages;
   }
 
   get cloneWithInitialValue() {

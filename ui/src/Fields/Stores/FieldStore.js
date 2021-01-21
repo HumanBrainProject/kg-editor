@@ -32,6 +32,8 @@ class FieldStore {
   isRequired = false;
   maxLength = null;
   regex = null;
+  minItems = null;
+  maxItems = null;
 
   instance = null;
   transportLayer = null;
@@ -43,6 +45,8 @@ class FieldStore {
       labelTooltipIcon: observable,
       fullyQualifiedName: observable,
       regex: observable,
+      minItems: observable,
+      maxItems: observable,
       alternatives: observable,
       warning: observable,
       errorMessage: observable,
@@ -65,6 +69,8 @@ class FieldStore {
     this.isRequired = definition.isRequired;
     this.maxLength = definition.maxLength;
     this.regex = definition.regex;
+    this.minItems = 2; // definition.minItems;
+    this.maxItems = 5; // definition.maxItems;
 
     this.transportLayer = transportLayer;
   }
@@ -103,7 +109,9 @@ class FieldStore {
       fullyQualifiedName: this.fullyQualifiedName,
       isRequired: this.isRequired,
       maxLength: this.maxLength,
-      regex: this.regex
+      regex: this.regex,
+      minItems: this.minItems,
+      maxItems: this.maxItems
     };
   }
 

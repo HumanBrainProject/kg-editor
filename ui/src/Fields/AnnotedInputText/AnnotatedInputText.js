@@ -23,6 +23,7 @@ import List from "../InputTextMultiple/List";
 import Label from "../Label";
 
 import Alternatives from "../Alternatives";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   values:{
@@ -177,7 +178,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const warningMessages = fieldStore.warningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label}
@@ -216,6 +218,9 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
           onPaste={handleNativePaste}
         />
       </div>
+      {hasWarning && warningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

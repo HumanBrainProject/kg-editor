@@ -39,11 +39,15 @@ class LinksStore extends FieldStore {
   initialValue = [];
   isLink = true;
   mappingValue = "@id";
+  minItems = null;
+  maxItems = null;
 
   appStore = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
+    this.minItems = definition.minItems;
+    this.maxItems = definition.maxItems;
 
     makeObservable(this, {
       value: observable,
@@ -60,6 +64,8 @@ class LinksStore extends FieldStore {
       lazyShowLinks: observable,
       visibleLinks: observable,
       initialValue: observable,
+      minItems: observable,
+      maxItems: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
@@ -141,15 +147,17 @@ class LinksStore extends FieldStore {
 
   get warningMessages() {
     const messages = {};
-    if(this.numberOfItemsWarning) {
-      if(this.minItems && this.maxItems) {
-        if(this.value.length < this.minItems || this.value.length > this.maxItems) {
-          messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
+    if (this.hasChanged) {
+      if(this.numberOfItemsWarning) {
+        if(this.minItems && this.maxItems) {
+          if(this.value.length < this.minItems || this.value.length > this.maxItems) {
+            messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
+          }
+        } else if(this.value.length < this.minItems) {
+          messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
+        } else if(this.value.length > this.maxItems) {
+          messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
         }
-      } else if(this.value.length < this.minItems) {
-        messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
-      } else if(this.value.length > this.maxItems) {
-        messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
       }
     }
     return messages;

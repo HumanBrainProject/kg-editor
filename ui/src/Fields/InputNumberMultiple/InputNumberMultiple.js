@@ -23,6 +23,7 @@ import List from "../InputTextMultiple/List";
 import Label from "../Label";
 
 import Alternatives from "../Alternatives";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   values:{
@@ -176,7 +177,8 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.minMaxValueWarning || fieldStore.numberOfItemsWarning);
+  const warningMessages = fieldStore.warningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
@@ -209,6 +211,9 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
           onPaste={handleNativePaste}
         />
       </div>
+      {hasWarning && warningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

@@ -30,6 +30,7 @@ import InputTextMultiple from "./InputTextMultiple/InputTextMultiple";
 import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 
 import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
+import InputNumberMultipleStore from "./Stores/InputNumberMultipleStore";
 
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
@@ -58,7 +59,7 @@ export const fieldsMapping = {
   },
   "InputNumberMultiple":  {
     Component: InputNumberMultiple,
-    Store: InputTextMultipleStore
+    Store: InputNumberMultipleStore
   },
   "TextArea": {
     Component: TextArea,

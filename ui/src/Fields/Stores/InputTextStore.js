@@ -22,14 +22,20 @@ class InputTextStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
+  maxLength = null;
+  regex = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
+    this.maxLength = definition.maxLength;
+    this.regex = definition.regex;
 
     makeObservable(this, {
       value: observable,
       returnAsNull: observable,
       initialValue: observable,
+      maxLength: observable,
+      regex: observable,
       returnValue: computed,
       requiredValidationWarning: computed,
       maxLengthWarning: computed,
@@ -85,14 +91,16 @@ class InputTextStore extends FieldStore {
 
   get warningMessages() {
     const messages = {};
-    if(this.requiredValidationWarning) {
-      messages.required = "This field is marked as required.";
-    }
-    if(this.maxLengthWarning) {
-      messages.maxLength = `Maximum characters: ${this.maxLength}`;
-    }
-    if(this.regexWarning) {
-      messages.regex = `${this.value} is not a valid value`;
+    if (this.hasChanged) {
+      if(this.requiredValidationWarning) {
+        messages.required = "This field is marked as required.";
+      }
+      if(this.maxLengthWarning) {
+        messages.maxLength = `Maximum characters: ${this.maxLength}`;
+      }
+      if(this.regexWarning) {
+        messages.regex = `${this.value} is not a valid value`;
+      }
     }
     return messages;
   }

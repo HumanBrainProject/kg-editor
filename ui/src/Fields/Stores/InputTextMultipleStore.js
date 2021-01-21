@@ -22,15 +22,26 @@ class InputTextMultipleStore extends FieldStore {
   options = [];
   returnAsNull = false;
   initialValue = [];
+  maxLength = null;
+  regex = null;
+  minItems = null;
+  maxItems = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
+    this.minItems = definition.minItems;
+    this.maxItems = definition.maxItems;
+    this.maxLength = definition.maxLength;
+    this.regex = definition.regex;
 
     makeObservable(this, {
       value: observable,
       options: observable,
       returnAsNull: observable,
       initialValue: observable,
+      maxLength: observable,
+      minItems: observable,
+      maxItems: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       requiredValidationWarning: computed,
@@ -98,15 +109,17 @@ class InputTextMultipleStore extends FieldStore {
 
   get warningMessages() {
     const messages = {};
-    if(this.numberOfItemsWarning) {
-      if(this.minItems && this.maxItems) {
-        if(this.value.length < this.minItems || this.value.length > this.maxItems) {
-          messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
+    if (this.hasChanged) {
+      if(this.numberOfItemsWarning) {
+        if(this.minItems && this.maxItems) {
+          if(this.value.length < this.minItems || this.value.length > this.maxItems) {
+            messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
+          }
+        } else if(this.value.length < this.minItems) {
+          messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
+        } else if(this.value.length > this.maxItems) {
+          messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
         }
-      } else if(this.value.length < this.minItems) {
-        messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
-      } else if(this.value.length > this.maxItems) {
-        messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
       }
     }
     return messages;

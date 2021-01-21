@@ -17,30 +17,38 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 
-class AnnotatedInputTextStore extends FieldStore {
+class InputNumberMultipleStore extends FieldStore {
   value = [];
   options = [];
   returnAsNull = false;
   initialValue = [];
-  mappingValue = "@id";
+  maxLength = null;
+  regex = null;
   minItems = null;
   maxItems = null;
+  minValue = null;
+  maxValue = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
+    this.minValue = definition.minValue;
+    this.maxValue = definition.maxValue;
 
     makeObservable(this, {
       value: observable,
       options: observable,
       returnAsNull: observable,
       initialValue: observable,
+      maxLength: observable,
+      minItems: observable,
+      maxItems: observable,
+      minValue: observable,
+      maxValue: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       requiredValidationWarning: computed,
-      minItems: observable,
-      maxItems: observable,
       warningMessages: computed,
       numberOfItemsWarning: computed,
       updateValue: action,
@@ -53,8 +61,7 @@ class AnnotatedInputTextStore extends FieldStore {
       moveValueAfter: action,
       removeValue: action,
       removeAllValues: action,
-      removeLastValue: action,
-      resources: computed
+      removeLastValue: action
     });
   }
 
@@ -82,11 +89,33 @@ class AnnotatedInputTextStore extends FieldStore {
     return false;
   }
 
+  updateValue(value) {
+    this.returnAsNull = false;
+    const values = Array.isArray(value)?value:(value !== null && value !== undefined?[value]:[]);
+    this.initialValue = [...values];
+    this.value = values;
+  }
+
+  reset() {
+    this.returnAsNull = false;
+    this.value = [...this.initialValue];
+  }
+
   get numberOfItemsWarning() {
     if(!this.minItems && !this.maxItems) {
       return false;
     }
     if(this.minItems || this.maxItems) {
+      return true;
+    }
+    return false;
+  }
+
+  get minMaxValueWarning() {
+    if(!this.minValue && !this.maxValue) {
+      return false;
+    }
+    if(this.minValue || this.maxValue) {
       return true;
     }
     return false;
@@ -106,24 +135,23 @@ class AnnotatedInputTextStore extends FieldStore {
           messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
         }
       }
+      if(this.minMaxValueWarning) {
+        if(this.minValue && this.maxValue) {
+          if (this.value.some(val => val < this.minValue || val > this.maxValue)) {
+            messages.minMaxValues = `Values should be between ${this.minValue} and ${this.maxValue}`;
+          }
+        } else if (this.value.some(val => val < this.minValue)) {
+          messages.minMaxValues = `Values should be bigger than ${this.minValue}`;
+        } else if (this.value.some(val => val > this.maxValue)) {
+          messages.minMaxValues = `Values should be smaller than ${this.maxValue}`;
+        }
+      }
     }
     return messages;
   }
 
-  updateValue(value) {
-    this.returnAsNull = false;
-    const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
-    this.initialValue = [...values];
-    this.value = values;
-  }
-
-  reset() {
-    this.returnAsNull = false;
-    this.value = [...this.initialValue];
-  }
-
   get hasChanged() {
-    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
+    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
   }
 
   insertValue(value, index) {
@@ -137,7 +165,7 @@ class AnnotatedInputTextStore extends FieldStore {
   }
 
   deleteValue(value) {
-    if (this.value.length !== undefined) {
+    if(this.value.length !== undefined){
       this.value = this.value.filter(val => val !== value);
     }
   }
@@ -178,10 +206,6 @@ class AnnotatedInputTextStore extends FieldStore {
       this.deleteValue(this.value[this.value.length-1]);
     }
   }
-
-  get resources() { // be aware that it may contains null values and null value are needed!
-    return this.value.map(value => (value && value[this.mappingValue])?value[this.mappingValue]:"Unknown ressource");
-  }
 }
 
-export default AnnotatedInputTextStore;
+export default InputNumberMultipleStore;

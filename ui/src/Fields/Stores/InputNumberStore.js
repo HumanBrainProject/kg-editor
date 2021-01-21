@@ -13,26 +13,121 @@
 *   See the License for the specific language governing permissions and
 *   limitations under the License.
 */
+import { observable, toJS, makeObservable, action, computed } from "mobx";
 
-import { toJS } from "mobx";
+import FieldStore from "./FieldStore";
 
-import InputTextStore from "./InputTextStore";
-
-class InputNumberStore extends InputTextStore {
+class InputNumberStore extends FieldStore {
+  value = "";
+  returnAsNull = false;
+  initialValue = "";
   inputType = "number";
+  minValue = null;
+  maxValue = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
+    this.minValue = definition.minValue;
+    this.maxValue = definition.maxValue;
+
+    makeObservable(this, {
+      value: observable,
+      returnAsNull: observable,
+      initialValue: observable,
+      minValue: observable,
+      maxValue: observable,
+      updateValue: action,
+      reset: action,
+      hasChanged: computed,
+      setValue: action,
+      returnValue: computed,
+      minMaxValueWarning: computed,
+      warningMessages: computed,
+      requiredValidationWarning: computed
+    });
   }
 
-  doReturnValue() {
-    if (this.value === "" && this.returnAsNull) {
+  get minMaxValueWarning() {
+    if(!this.minValue && !this.maxValue) {
+      return false;
+    }
+    if(this.minValue || this.maxValue) {
+      return true;
+    }
+    return false;
+  }
+
+  get warningMessages() {
+    const messages = {};
+    if (this.hasChanged) {
+      console.log("warningMessages hasChanged");
+      if(this.minMaxValueWarning) {
+        if(this.minValue && this.maxValue) {
+          if(this.value < this.minValue || this.value > this.maxValue) {
+            messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
+          }
+        } else if(this.value < this.minValue) {
+          messages.minMaxValue = `Value should be bigger than ${this.minValue}`;
+        } else if(this.value.length > this.maxValue) {
+          messages.minMaxValue = `Value should be smaller than ${this.maxValue}`;
+        }
+      }
+    }
+    return messages;
+  }
+
+  get returnValue() {
+    if (this.value === null && this.returnAsNull) {
       return null;
     }
-    if(this.value === "" ) {
-      return toJS(this.value);
+    return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    if(!this.isRequired) {
+      return false;
     }
-    return toJS(parseFloat(this.value));
+    if(this.value === null) {
+      return true;
+    }
+    return false;
+  }
+
+  get cloneWithInitialValue() {
+    return {
+      ...this.definition,
+      value: toJS(this.initialValue)
+    };
+  }
+
+  updateValue(value) {
+    this.returnAsNull = false;
+    this.initialValue = (value !== null && value !== undefined)?value:"";
+    this.value = this.initialValue;
+  }
+
+  reset() {
+    this.returnAsNull = false;
+    this.value = this.initialValue;
+  }
+
+  get hasChanged() {
+    if (typeof this.initialValue  === "object") {
+      return typeof this.returnValue !== "object"; // user did not change the value
+    }
+    return this.returnValue !== this.initialValue;
+  }
+
+  setValue(value) {
+    if (value !== null && value !== undefined) {
+      if (value !== "" || !this.returnAsNull) {
+        this.returnAsNull = false;
+        this.value = value;
+      }
+    } else  {
+      this.returnAsNull = true;
+      this.value = "";
+    }
   }
 }
 

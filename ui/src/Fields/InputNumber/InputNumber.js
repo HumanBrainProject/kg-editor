@@ -21,6 +21,7 @@ import Form from "react-bootstrap/Form";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   alternatives: {
@@ -78,7 +79,8 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.minMaxValueWarning);
+  const warningMessages = fieldStore.warningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
@@ -97,6 +99,9 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         disabled={isDisabled}
         className={hasWarning?classes.warning:""}
       />
+      {hasWarning && warningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

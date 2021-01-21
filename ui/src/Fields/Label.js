@@ -29,10 +29,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const Label = ({ className, label, labelTooltip, labelTooltipIcon }) => {
+const Label = ({ className, label, labelTooltip, labelTooltipIcon, isRequired }) => {
   const classes = useStyles();
   return (
-    <Form.Label className={`${classes.label} ${className?className:""}`}>{label}
+    <Form.Label className={`${classes.label} ${className?className:""}`}>
+      {label}{isRequired && " *"}
       {labelTooltip && (
         <React.Fragment>
         &nbsp;

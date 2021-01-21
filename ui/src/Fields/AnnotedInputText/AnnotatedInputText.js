@@ -60,6 +60,9 @@ const useStyles = createUseStyles({
       cursor: "not-allowed"
     }
   },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
+  }
 });
 
 
@@ -83,7 +86,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     labelTooltip,
     labelTooltipIcon,
     alternatives,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -173,9 +177,15 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   }
 
   const isDisabled = returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
+      <Label className={classes.label}
+        label={label}
+        labelTooltip={labelTooltip}
+        labelTooltipIcon={labelTooltipIcon}
+        isRequired={isRequired}
+      />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -184,7 +194,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
       />
-      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={resources}
           readOnly={false}

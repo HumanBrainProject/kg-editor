@@ -65,6 +65,7 @@ class LinksStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      requiredValidationWarning: computed,
       numberOfValues: computed,
       hasMoreOptions: computed,
       insertValue: action,
@@ -114,6 +115,16 @@ class LinksStore extends FieldStore {
       return null;
     }
     return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    if(!this.isRequired) {
+      return false;
+    }
+    if(this.value.length === 0) {
+      return true;
+    }
+    return false;
   }
 
   updateValue(value) {

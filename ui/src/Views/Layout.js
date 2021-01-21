@@ -68,9 +68,10 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
         "--bg-color-error-normal": theme.error.normal.color,
         "--bg-color-error-loud": theme.error.loud.color,
 
-        "--bg-color-warn-quiet": theme.warn.quiet.color,
-        "--bg-color-warn-normal": theme.warn.normal.color,
-        "--bg-color-warn-loud": theme.warn.loud.color,
+        "--bg-color-warn-quiet": theme.warn.quiet.backgroundColor,
+        "--bg-color-warn-normal": theme.warn.normal.backgroundColor,
+        "--bg-color-warn-loud": theme.warn.loud.backgroundColor,
+        "--ft-color-warn": theme.warn.color,
 
         "--ft-color-info": theme.info.color,
         "--bg-color-info-normal": theme.info.normal.color,

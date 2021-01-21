@@ -59,6 +59,9 @@ const useStyles = createUseStyles({
     position: "relative",
     minHeight: "34px",
     paddingBottom: "3px"
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -78,7 +81,8 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     alternatives,
     label,
     labelTooltip,
-    labelTooltipIcon
+    labelTooltipIcon,
+    isRequired
   } = fieldStore;
 
   const handleChange = value => fieldStore.setValue(value);
@@ -100,9 +104,11 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     );
   }
   const dateValue = value === "" ? null:new Date(value);
+  const isDisabled = returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -112,9 +118,9 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
         ValueRenderer={AlternativeValue}
       />
       <DatePicker
-        className={classes.datePicker}
+        className={`${classes.datePicker} ${hasWarning?classes.warning:""}`}
         selected={dateValue}
-        disabled={returnAsNull}
+        disabled={isDisabled}
         onChange={handleChange}
         showTimeSelect
         timeFormat="p"

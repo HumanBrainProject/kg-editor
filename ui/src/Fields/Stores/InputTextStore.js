@@ -22,16 +22,21 @@ class InputTextStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
+  messages = {};
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
 
     makeObservable(this, {
       value: observable,
+      messages: observable,
       returnAsNull: observable,
       initialValue: observable,
       returnValue: computed,
+      requiredValidationWarning: computed,
+      maxLengthWarning: computed,
       cloneWithInitialValue: computed,
+      warningMessages: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
@@ -48,6 +53,55 @@ class InputTextStore extends FieldStore {
       return null;
     }
     return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    if(!this.isRequired) {
+      return false;
+    }
+    if(this.value === "") {
+      return true;
+    }
+    return false;
+  }
+
+  get maxLengthWarning() {
+    if(!this.maxLength) {
+      return false;
+    }
+    if(this.value.length > this.maxLength) {
+      return true;
+    }
+    return false;
+  }
+
+  get regexWarning() {
+    if(!this.regex) {
+      return false;
+    }
+    if(!this.regex.test(this.value)) {
+      return true;
+    }
+    return false;
+  }
+
+  get warningMessages() {
+    if(this.requiredValidationWarning) {
+      this.messages.required = "This field is marked as required.";
+    } else {
+      delete this.messages.required;
+    }
+    if(this.maxLengthWarning) {
+      this.messages.maxLength = `Maximum characters: ${this.maxLength}`;
+    } else {
+      delete this.messages.maxLength;
+    }
+    if(this.regexWarning) {
+      this.messages.regex = `${this.value} is not a valid value`;
+    } else {
+      delete this.messages.regex;
+    }
+    return this.messages;
   }
 
   get cloneWithInitialValue() {

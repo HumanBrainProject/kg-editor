@@ -28,7 +28,10 @@ class FieldStore {
   instance = null;
   type = null;
   order = null;
-  widget=null;
+  widget = null;
+  isRequired = false;
+  maxLength = null;
+  regex = null;
 
   instance = null;
   transportLayer = null;
@@ -39,10 +42,13 @@ class FieldStore {
       labelTooltip: observable,
       labelTooltipIcon: observable,
       fullyQualifiedName: observable,
+      regex: observable,
       alternatives: observable,
       warning: observable,
       errorMessage: observable,
       errorInfo: observable,
+      isRequired: observable,
+      maxLength: observable,
       setError: action,
       clearError: action,
       hasError: computed,
@@ -56,6 +62,9 @@ class FieldStore {
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
     this.order = definition.order;
+    this.isRequired = definition.isRequired;
+    this.maxLength = definition.maxLength;
+    this.regex = definition.regex;
 
     this.transportLayer = transportLayer;
   }
@@ -83,11 +92,18 @@ class FieldStore {
     throw `cloneWithInitialValue getter is not implemented for ${this.widget} store`;
   }
 
+  get requiredValidationWarning() {
+    throw `requiredValidationWarning getter is not implemented for ${this.widget} store`;
+  }
+
   get definition() {
     return {
       widget: this.widget,
       label: this.label,
-      fullyQualifiedName: this.fullyQualifiedName
+      fullyQualifiedName: this.fullyQualifiedName,
+      isRequired: this.isRequired,
+      maxLength: this.maxLength,
+      regex: this.regex
     };
   }
 

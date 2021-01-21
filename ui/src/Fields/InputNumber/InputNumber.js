@@ -31,6 +31,9 @@ const useStyles = createUseStyles({
     "& $label:after": {
       content: "':\\00a0'"
     }
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -50,7 +53,8 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
     alternatives,
     label,
     labelTooltip,
-    labelTooltipIcon
+    labelTooltipIcon,
+    isRequired
   } = fieldStore;
 
   const handleChange = e => fieldStore.setValue(e.target.value);
@@ -73,9 +77,11 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
     );
   }
 
+  const isDisabled = returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -88,7 +94,8 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         value={value}
         type={inputType}
         onChange={handleChange}
-        disabled={returnAsNull}
+        disabled={isDisabled}
+        className={hasWarning?classes.warning:""}
       />
     </Form.Group>
   );

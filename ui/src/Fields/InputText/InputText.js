@@ -21,6 +21,7 @@ import Form from "react-bootstrap/Form";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   alternatives: {
@@ -31,6 +32,9 @@ const useStyles = createUseStyles({
     "& $label:after": {
       content: "':\\00a0'"
     }
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -79,7 +83,8 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     alternatives,
     label,
     labelTooltip,
-    labelTooltipIcon
+    labelTooltipIcon,
+    isRequired
   } = fieldStore;
 
   const handleChange = e => fieldStore.setValue(e.target.value);
@@ -100,9 +105,12 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     );
   }
 
+  const isDisabled = returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const warningMessages = fieldStore.warningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -116,9 +124,13 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         type={inputType}
         as={as}
         onChange={handleChange}
-        disabled={returnAsNull}
+        disabled={isDisabled}
         rows={rows}
+        className={hasWarning?classes.warning:""}
       />
+      {hasWarning && warningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

@@ -47,6 +47,9 @@ const useStyles = createUseStyles({
   },
   alternatives: {
     marginLeft: "3px"
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -75,7 +78,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     hasMoreOptions,
     fetchingOptions,
     alternatives,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -214,7 +218,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} />
         {(view && view.currentInstanceId === instance.id)?
           <List
             list={links}
@@ -239,9 +243,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <LinksAlternatives
         className={classes.alternatives}
         list={alternatives}
@@ -250,7 +255,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         mappingValue={mappingValue}
         parentContainerRef={formGroupRef}
       />
-      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={links}
           readOnly={false}

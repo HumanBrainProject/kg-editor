@@ -60,6 +60,9 @@ const useStyles = createUseStyles({
       cursor: "not-allowed"
     }
   },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
+  }
 });
 
 const getAlternativeValue = () => {
@@ -81,7 +84,8 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     labelTooltip,
     labelTooltipIcon,
     alternatives,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -161,7 +165,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
 
     return (
       <Form.Group className={classes.readMode}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
         <List
           list={list}
           readOnly={true}
@@ -172,6 +176,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
   }
 
   const isDisabled = returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
@@ -183,7 +188,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={list}
           readOnly={false}

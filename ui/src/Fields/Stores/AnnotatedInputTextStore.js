@@ -34,6 +34,7 @@ class AnnotatedInputTextStore extends FieldStore {
       initialValue: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
+      requiredValidationWarning: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
@@ -61,6 +62,16 @@ class AnnotatedInputTextStore extends FieldStore {
       return null;
     }
     return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    if(!this.isRequired) {
+      return false;
+    }
+    if(this.value.length === 0) {
+      return true;
+    }
+    return false;
   }
 
   updateValue(value) {

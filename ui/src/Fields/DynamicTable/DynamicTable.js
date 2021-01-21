@@ -83,6 +83,9 @@ const useStyles = createUseStyles({
     "& $label:after": {
       content: "':\\00a0'"
     }
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -105,7 +108,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     optionsExternalTypes,
     hasMoreOptions,
     fetchingOptions,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const handleDropdownReset = () => {
@@ -200,6 +204,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
 
   if (readMode && !links.length && !showIfNoValue) {
     return null;
@@ -207,7 +212,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   return (
     <Form.Group className={`${classes.container} ${readMode?classes.readMode:""} ${className}`}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       {!isDisabled && (view && view.currentInstanceId === instance.id) && (
         <div className={classes.deleteBtn}>
           <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
@@ -215,7 +220,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           </Button>
         </div>
       )}
-      <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
+      <div className={`${classes.table} ${hasWarning?classes.warning:""} ${returnAsNull?"disabled":""}`}>
         {(view && view.currentInstanceId === instance.id)?
           <Table
             list={links}

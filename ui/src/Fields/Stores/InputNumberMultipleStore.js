@@ -51,6 +51,7 @@ class InputNumberMultipleStore extends FieldStore {
       requiredValidationWarning: computed,
       warningMessages: computed,
       numberOfItemsWarning: computed,
+      hasWarningMessages: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
@@ -148,6 +149,10 @@ class InputNumberMultipleStore extends FieldStore {
       }
     }
     return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   get hasChanged() {

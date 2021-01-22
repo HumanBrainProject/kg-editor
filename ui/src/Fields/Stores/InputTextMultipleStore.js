@@ -47,6 +47,7 @@ class InputTextMultipleStore extends FieldStore {
       requiredValidationWarning: computed,
       warningMessages: computed,
       numberOfItemsWarning: computed,
+      hasWarningMessages: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
@@ -85,17 +86,26 @@ class InputTextMultipleStore extends FieldStore {
     return false;
   }
 
-  updateValue(value) {
-    this.returnAsNull = false;
-    const values = Array.isArray(value)?value:(value !== null && value !== undefined?[value]:[]);
-    this.initialValue = [...values];
-    this.value = values;
+  get maxLengthWarning() {
+    if(!this.maxLength) {
+      return false;
+    }
+    if(this.maxLength) {
+      return true;
+    }
+    return false;
   }
 
-  reset() {
-    this.returnAsNull = false;
-    this.value = [...this.initialValue];
+  get regexWarning() {
+    if(!this.regex) {
+      return false;
+    }
+    if(this.regex) {
+      return true;
+    }
+    return false;
   }
+
 
   get numberOfItemsWarning() {
     if(!this.minItems && !this.maxItems) {
@@ -118,16 +128,43 @@ class InputTextMultipleStore extends FieldStore {
         } else if(this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
         } else if(this.value.length > this.maxItems) {
-          messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
+          messages.numberOfItems = `Number of values should be smaller than ${this.maxItems}`;
+        }
+      }
+      if(this.maxLengthWarning) {
+        if (this.value.some(val => val.length > this.maxLength)) {
+          messages.maxValues = `Maximum characters allowed per value: ${this.maxLength}`;
+        }
+      }
+      if(this.regexWarning) {
+        if (this.value.some(val => !this.regex.test(val))) {
+          messages.regex = "Invalid value";
         }
       }
     }
     return messages;
   }
 
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
+  }
+
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
   }
+
+  updateValue(value) {
+    this.returnAsNull = false;
+    const values = Array.isArray(value)?value:(value !== null && value !== undefined?[value]:[]);
+    this.initialValue = [...values];
+    this.value = values;
+  }
+
+  reset() {
+    this.returnAsNull = false;
+    this.value = [...this.initialValue];
+  }
+
 
   insertValue(value, index) {
     if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){

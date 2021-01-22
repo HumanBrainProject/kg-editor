@@ -207,7 +207,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const isDisabled =  readMode || returnAsNull;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
   const warningMessages = fieldStore.warningMessages;
-
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   if (readMode && !links.length && !showIfNoValue) {
     return null;
   }
@@ -222,7 +222,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           </Button>
         </div>
       )}
-      <div className={`${classes.table} ${hasWarning?classes.warning:""} ${returnAsNull?"disabled":""}`}>
+      <div className={`${classes.table} ${hasWarning && hasWarningMessages?classes.warning:""} ${returnAsNull?"disabled":""}`}>
         {(view && view.currentInstanceId === instance.id)?
           <Table
             list={links}
@@ -269,7 +269,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           </span>
         </div>
       )}
-      {hasWarning && warningMessages &&
+      {hasWarning && hasWarningMessages &&
         <Invalid  messages={warningMessages}/>
       }
     </Form.Group>

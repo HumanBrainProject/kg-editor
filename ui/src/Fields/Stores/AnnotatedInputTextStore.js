@@ -43,6 +43,7 @@ class AnnotatedInputTextStore extends FieldStore {
       maxItems: observable,
       warningMessages: computed,
       numberOfItemsWarning: computed,
+      hasWarningMessages: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
@@ -108,6 +109,10 @@ class AnnotatedInputTextStore extends FieldStore {
       }
     }
     return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   updateValue(value) {

@@ -27,9 +27,6 @@ class InputNumberStore extends FieldStore {
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
-    this.minValue = definition.minValue;
-    this.maxValue = definition.maxValue;
-
     makeObservable(this, {
       value: observable,
       returnAsNull: observable,
@@ -43,8 +40,11 @@ class InputNumberStore extends FieldStore {
       returnValue: computed,
       minMaxValueWarning: computed,
       warningMessages: computed,
-      requiredValidationWarning: computed
+      requiredValidationWarning: computed,
+      hasWarningMessages: computed
     });
+    this.minValue = 2; //definition.minValue;
+    this.maxValue = definition.maxValue;
   }
 
   get minMaxValueWarning() {
@@ -60,7 +60,6 @@ class InputNumberStore extends FieldStore {
   get warningMessages() {
     const messages = {};
     if (this.hasChanged) {
-      console.log("warningMessages hasChanged");
       if(this.minMaxValueWarning) {
         if(this.minValue && this.maxValue) {
           if(this.value < this.minValue || this.value > this.maxValue) {
@@ -74,6 +73,10 @@ class InputNumberStore extends FieldStore {
       }
     }
     return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   get returnValue() {

@@ -27,9 +27,6 @@ class InputTextStore extends FieldStore {
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
-    this.maxLength = definition.maxLength;
-    this.regex = definition.regex;
-
     makeObservable(this, {
       value: observable,
       returnAsNull: observable,
@@ -41,11 +38,14 @@ class InputTextStore extends FieldStore {
       maxLengthWarning: computed,
       cloneWithInitialValue: computed,
       warningMessages: computed,
+      hasWarningMessages: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
       setValue: action
     });
+    this.maxLength = definition.maxLength;
+    this.regex = definition.regex;
   }
 
   get returnValue() {
@@ -96,13 +96,17 @@ class InputTextStore extends FieldStore {
         messages.required = "This field is marked as required.";
       }
       if(this.maxLengthWarning) {
-        messages.maxLength = `Maximum characters: ${this.maxLength}`;
+        messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
       }
       if(this.regexWarning) {
         messages.regex = `${this.value} is not a valid value`;
       }
     }
     return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   get cloneWithInitialValue() {

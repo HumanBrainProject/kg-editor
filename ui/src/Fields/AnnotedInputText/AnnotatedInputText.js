@@ -180,6 +180,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   const isDisabled = returnAsNull;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
   const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label}
@@ -196,7 +197,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
       />
-      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={resources}
           readOnly={false}
@@ -218,7 +219,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
           onPaste={handleNativePaste}
         />
       </div>
-      {hasWarning && warningMessages &&
+      {hasWarning && hasWarningMessages &&
         <Invalid  messages={warningMessages}/>
       }
     </Form.Group>

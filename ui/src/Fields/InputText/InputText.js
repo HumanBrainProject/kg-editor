@@ -108,6 +108,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const isDisabled = returnAsNull;
   const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
   const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
@@ -126,9 +127,9 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         onChange={handleChange}
         disabled={isDisabled}
         rows={rows}
-        className={hasWarning?classes.warning:""}
+        className={hasWarning && hasWarningMessages?classes.warning:""}
       />
-      {hasWarning && warningMessages &&
+      {hasWarning && hasWarningMessages &&
         <Invalid  messages={warningMessages}/>
       }
     </Form.Group>

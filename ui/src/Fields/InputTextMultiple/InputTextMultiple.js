@@ -23,6 +23,7 @@ import List from "./List";
 import Label from "../Label";
 
 import Alternatives from "../Alternatives";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   values:{
@@ -171,7 +172,9 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.numberOfItemsWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
@@ -183,7 +186,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={list}
           readOnly={false}
@@ -204,6 +207,9 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
           onPaste={handleNativePaste}
         />
       </div>
+      {hasWarning && hasWarningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

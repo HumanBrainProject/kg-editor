@@ -246,6 +246,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const canAddValues = !isDisabled;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
   const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
@@ -257,7 +258,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         mappingValue={mappingValue}
         parentContainerRef={formGroupRef}
       />
-      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={links}
           readOnly={false}
@@ -292,10 +293,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             onPreview={handleOptionPreview}
           />
         )}
-        {hasWarning && warningMessages &&
-          <Invalid  messages={warningMessages}/>
-        }
       </div>
+      {hasWarning && hasWarningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

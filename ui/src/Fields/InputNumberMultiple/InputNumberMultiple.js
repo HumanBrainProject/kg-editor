@@ -179,6 +179,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
   const isDisabled = returnAsNull;
   const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.minMaxValueWarning || fieldStore.numberOfItemsWarning);
   const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
@@ -190,7 +191,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasWarning?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={list}
           readOnly={false}
@@ -211,7 +212,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
           onPaste={handleNativePaste}
         />
       </div>
-      {hasWarning && warningMessages &&
+      {hasWarning && hasWarningMessages &&
         <Invalid  messages={warningMessages}/>
       }
     </Form.Group>

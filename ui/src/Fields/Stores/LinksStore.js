@@ -76,6 +76,7 @@ class LinksStore extends FieldStore {
       numberOfItemsWarning: computed,
       numberOfValues: computed,
       hasMoreOptions: computed,
+      hasWarningMessages: computed,
       insertValue: action,
       deleteValue: action,
       addValue: action,
@@ -161,6 +162,10 @@ class LinksStore extends FieldStore {
       }
     }
     return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   updateValue(value) {

@@ -7,67 +7,44 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class ReleaseClient {
-    private final WebClient webClient = WebClient.builder().build();
+public class ReleaseClient extends AbstractServiceClient{
 
-    @Value("${kgcore.endpoint}")
-    String kgCoreEndpoint;
+    public ReleaseClient(HttpServletRequest request) {
+        super(request);
+    }
 
-    @Value("${kgcore.apiVersion}")
-    String apiVersion;
-
-
-    public Map getRelease(String id, String token, String clientToken) {
-        String uri = String.format("%s/%s/%s/graph", kgCoreEndpoint, apiVersion, id);
-        return webClient.get()
-                .uri(uri)
-                .headers(h -> {
-                    h.add(HttpHeaders.AUTHORIZATION, token);
-                    h.add(CustomHeaders.CLIENT_AUTHORIZATION, clientToken);
-                })
+    public Map getRelease(String id) {
+        String uri = String.format("%s/graph",  id);
+        return get(uri)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
     }
 
-    public Map putRelease(String id, String token, String clientToken) {
-        String uri = String.format("%s/%s/instances/%s/release", kgCoreEndpoint, apiVersion, id);
-        return webClient.put()
-                .uri(uri)
-                .headers(h -> {
-                    h.add(HttpHeaders.AUTHORIZATION, token);
-                    h.add(CustomHeaders.CLIENT_AUTHORIZATION, clientToken);
-                })
+    public Map putRelease(String id) {
+        String uri = String.format("instances/%s/release",  id);
+        return put(uri)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
     }
 
-    public void deleteRelease(String id, String token, String clientToken) {
-        String uri = String.format("%s/%s/instances/%s/release", kgCoreEndpoint, apiVersion, id);
-        webClient.delete()
-                .uri(uri)
-                .headers(h -> {
-                    h.add(HttpHeaders.AUTHORIZATION, token);
-                    h.add(CustomHeaders.CLIENT_AUTHORIZATION, clientToken);
-                })
+    public void deleteRelease(String id) {
+        String uri = String.format("instances/%s/release", id);
+        delete(uri)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
     }
 
-    public Map getReleaseStatus(List<String> ids, String releaseTreeScope, String token, String clientToken) {
-        String uri = String.format("%s/%s/instancesByIds/release/status?releaseTreeScope=%s", kgCoreEndpoint, apiVersion, releaseTreeScope);
-        return webClient.post()
-                .uri(uri)
-                .headers(h -> {
-                    h.add(HttpHeaders.AUTHORIZATION, token);
-                    h.add(CustomHeaders.CLIENT_AUTHORIZATION, clientToken);
-                })
+    public Map getReleaseStatus(List<String> ids, String releaseTreeScope) {
+        String uri = String.format("instancesByIds/release/status?releaseTreeScope=%s", releaseTreeScope);
+        return post(uri)
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()
                 .bodyToMono(Map.class)

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>eu.ebrains.kg</groupId>
-	<artifactId>search</artifactId>
+	<artifactId>editor</artifactId>
 	<version>3.0.0</version>
 	<name>KG Editor service</name>
 	<properties>
@@ -17,6 +17,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.4.6</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>

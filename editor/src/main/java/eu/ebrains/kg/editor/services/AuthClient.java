@@ -1,49 +1,41 @@
 package eu.ebrains.kg.editor.services;
 
-import org.springframework.beans.factory.annotation.Value;
+import eu.ebrains.kg.editor.models.KGCoreResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Component
-public class AuthClient {
-    private final WebClient webClient = WebClient.builder().build();
+public class AuthClient extends AbstractServiceClient {
 
-    @Value("${kgcore.endpoint}")
-    String kgCoreEndpoint;
+    public AuthClient(HttpServletRequest request) {
+        super(request);
+    }
 
-    @Value("${kgcore.apiVersion}")
-    String apiVersion;
-
-    @Value("${client.secret}")
-    String clientSecret;
-
-    public Map getEndpoint() {
-        String uri = String.format("%s/%s/users/authorization", kgCoreEndpoint, apiVersion);
-        return webClient.get()
-                .uri(uri)
+    public KGCoreResult.Single getEndpoint() {
+        return get("users/authorization")
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(KGCoreResult.Single.class)
                 .block();
     }
 
     private Map getClientTokenEndpoint() {
-        String uri = String.format("%s/%s/users/authorization/tokenEndpoint", kgCoreEndpoint, apiVersion);
-        return webClient.get()
-                .uri(uri)
+        return get("users/authorization/tokenEndpoint")
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
     }
+
 
     private Map getClientToken(String endpoint) {
         Map<String, String> payload = Map.of("grant_type", "client_credentials",
                 "client_id", "kg-editor",
                 "client_secret", clientSecret);
+// We're making direct use of the webclient because this is a special call not making use of standard authentication and using an absolute endpoint
         return webClient.post()
                 .uri(endpoint)
                 .headers(h -> {

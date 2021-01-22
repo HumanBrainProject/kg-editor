@@ -1,8 +1,8 @@
 package eu.ebrains.kg.editor.services;
 
-import eu.ebrains.kg.editor.api.Workspace;
 import eu.ebrains.kg.editor.models.KGCoreResult;
-import eu.ebrains.kg.editor.models.StructureOfType;
+import eu.ebrains.kg.editor.models.user.Workspace;
+import eu.ebrains.kg.editor.models.workspace.StructureOfType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
@@ -17,25 +17,26 @@ public class WorkspaceClient extends AbstractServiceClient{
         super(request);
     }
 
-    public Map getWorkspaces() {
+    private static class WorkspacesResultFromKG extends KGCoreResult<List<Workspace.FromKG>>{}
+
+    public List<Workspace> getWorkspaces() {
         String uri = "spaces?stage=IN_PROGRESS&permissions=true";
-        return get(uri)
+        KGCoreResult<List<Workspace.FromKG>> block = get(uri)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(WorkspacesResultFromKG.class)
                 .block();
+        return castResultList(block);
     }
 
-    public static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType.FromKG>>{}
+    private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType.FromKG>>{}
 
-
-    public KGCoreResult<List<StructureOfType.FromKG>> getWorkspaceTypes(String workspace) {
+    public List<StructureOfType> getWorkspaceTypes(String workspace) {
         String uri = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true", workspace);
-        return get(uri)
+        return castResultList(get(uri)
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)
-                .block();
+                .block());
     }
-
 
 
 

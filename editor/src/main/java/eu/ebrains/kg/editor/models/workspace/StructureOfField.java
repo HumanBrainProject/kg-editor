@@ -1,4 +1,4 @@
-package eu.ebrains.kg.editor.models;
+package eu.ebrains.kg.editor.models.workspace;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;

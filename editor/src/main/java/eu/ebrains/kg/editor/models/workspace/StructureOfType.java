@@ -1,10 +1,12 @@
-package eu.ebrains.kg.editor.models;
+package eu.ebrains.kg.editor.models.workspace;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class StructureOfType {

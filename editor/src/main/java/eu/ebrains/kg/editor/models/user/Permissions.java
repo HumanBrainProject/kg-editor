@@ -1,4 +1,4 @@
-package eu.ebrains.kg.editor.models;
+package eu.ebrains.kg.editor.models.user;
 
 public class Permissions {
     private boolean canCreate;

@@ -1,4 +1,4 @@
-package eu.ebrains.kg.editor.models.user;
+package eu.ebrains.kg.editor.models.commons;
 
 import java.util.List;
 

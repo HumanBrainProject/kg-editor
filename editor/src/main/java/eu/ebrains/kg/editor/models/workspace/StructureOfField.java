@@ -14,9 +14,7 @@ public class StructureOfField {
     protected Integer numOfOccurrences;
     protected String widget;
     protected String labelTooltip;
-    protected Boolean markdown;
     protected Boolean searchable;
-    protected Boolean allowCustomValues;
     protected Integer order;
     protected List<StructureOfField> fields;
 
@@ -44,16 +42,10 @@ public class StructureOfField {
         return labelTooltip;
     }
 
-    public Boolean getMarkdown() {
-        return markdown;
-    }
+    //TODO validate if it's correct to not translate the "markdown" and "allowCustomValues" fields anymore
 
     public Boolean getSearchable() {
         return searchable;
-    }
-
-    public Boolean getAllowCustomValues() {
-        return allowCustomValues;
     }
 
     public Integer getOrder() {
@@ -97,17 +89,6 @@ public class StructureOfField {
             this.labelTooltip = labelTooltip;
         }
 
-        //TODO why is this not qualified?
-        @JsonProperty("markdown")
-        public void vocabMarkdown(Boolean markdown){
-            this.markdown = markdown;
-        }
-
-        //TODO why is this not qualified?
-        @JsonProperty("allowCustomValues")
-        public void vocabAllowCustomValues(Boolean allowCustomValues){
-            this.allowCustomValues = allowCustomValues;
-        }
 
         @JsonProperty(EditorConstants.VOCAB_SEARCHABLE)
         public void vocabSearchable(Boolean searchable){

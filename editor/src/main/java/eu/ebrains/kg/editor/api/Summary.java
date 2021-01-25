@@ -31,10 +31,10 @@ public class Summary {
     @GetMapping
     //FIXME The pagination parameters differ from the one in instances -> they should be homogenized.
     //TODO check if it would make sense to introduce a default pagination
-
-    //TODO is the type optional? If not: Why do we need to lazily fetch the type information? Can't we just ask for the parametrized type?
     public List<InstanceSummary> searchInstancesSummary(@RequestParam("workspace") String workspace, @RequestParam("type") String type, @RequestParam(required = false, value = "from") Integer from, @RequestParam(required = false, value = "size") Integer size, @RequestParam(value = "searchByLabel", required = false) String searchByLabel) {
         List<InstanceSummary> result = instanceClient.searchInstances(workspace, type, from, size, searchByLabel);
+        // Load for parametrized type only, execute second request for fetching simple information (label / color)
+        // for other occurring types.
         List<String> involvedTypes = result.stream().map(InstanceSummary::getTypes).flatMap(Collection::stream).map(SimpleType::getName).distinct().collect(Collectors.toList());
         Map<String, StructureOfType> typesByName = workspaceClient.getTypesByName(involvedTypes, true);
         result.forEach(r -> {

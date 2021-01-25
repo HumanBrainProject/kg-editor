@@ -92,6 +92,9 @@ public class StructureOfType {
             ensureLabelPropertyInPromotedFields();
         }
 
+
+        // This has to be done a little special because we need to
+        // ensure the code to work no matter in which order the fields are deserialized.
         private void ensureLabelPropertyInPromotedFields(){
             if(this.promotedFields != null && this.labelField != null){
                 //Ensure the label field is at the first position

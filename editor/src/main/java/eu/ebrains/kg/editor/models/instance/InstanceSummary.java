@@ -2,7 +2,7 @@ package eu.ebrains.kg.editor.models.instance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
-import eu.ebrains.kg.editor.models.user.Permissions;
+import eu.ebrains.kg.editor.models.commons.Permissions;
 import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 
 import java.util.List;

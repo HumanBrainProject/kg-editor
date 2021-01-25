@@ -4,12 +4,16 @@ import eu.ebrains.kg.editor.controllers.IdController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
+import eu.ebrains.kg.editor.models.instance.SimpleType;
+import eu.ebrains.kg.editor.models.workspace.StructureOfField;
+import eu.ebrains.kg.editor.models.workspace.StructureOfType;
 import eu.ebrains.kg.editor.services.InstanceClient;
+import eu.ebrains.kg.editor.services.UserClient;
+import eu.ebrains.kg.editor.services.WorkspaceClient;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/instances")
 @RestController
@@ -18,23 +22,56 @@ public class Instances {
 
     private final InstanceClient instanceClient;
     private final IdController idController;
+    private final WorkspaceClient workspaceClient;
+    private final UserClient userClient;
 
-    public Instances(InstanceClient instanceClient, IdController idController) {
+    public Instances(InstanceClient instanceClient, IdController idController, WorkspaceClient workspaceClient, UserClient userClient) {
         this.instanceClient = instanceClient;
         this.idController = idController;
+        this.workspaceClient = workspaceClient;
+        this.userClient = userClient;
     }
+
+    private Object returnNormalizedIds(Object e) {
+        if (e instanceof Map) {
+            Map map = ((Map) e);
+            Object atId = map.get("@id");
+            if (atId != null) {
+                UUID uuid = idController.simplifyFullyQualifiedId(atId.toString());
+                if (uuid != null) {
+                    //We only replace it when it's a proper UUID
+                    map.put("@id", uuid.toString());
+                }
+            }
+        }
+        return e;
+    }
+
 
     @GetMapping("/{id}")
     public KGCoreResult<InstanceFull> getInstance(@PathVariable("id") String id) {
         ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.getInstance(id);
         InstanceFull instance = simplifyId(instanceWithMap.getResult());
+        Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(instance.getTypes().stream().map(SimpleType::getName).collect(Collectors.toList()), true);
+        if (typesByName != null) {
+            List<StructureOfField> foundFields = typesByName.values().stream().map(KGCoreResult::getData).filter(Objects::nonNull).map(t -> t.getFields().values()).flatMap(Collection::stream).distinct().collect(Collectors.toList());
+            foundFields.forEach(f -> {
+                Object fromMap = instanceWithMap.getOriginalMap().get(f.getFullyQualifiedName());
+                if (fromMap instanceof Collection) {
+                    f.setValue(((Collection<?>) fromMap).stream().map(this::returnNormalizedIds));
+                } else if (fromMap != null) {
+                    f.setValue(returnNormalizedIds(fromMap));
+                }
+            });
+            instance.setFields(foundFields);
+        }
         //return instanceController.normalizeInstance(id, instance);
         return new KGCoreResult<InstanceFull>().setData(instance);
     }
 
-    private InstanceFull simplifyId(InstanceFull instance){
+    private InstanceFull simplifyId(InstanceFull instance) {
         //Simplify the ID because we want to operate with the UUID on the UI only
-        if(instance!=null && instance.getId()!=null) {
+        if (instance != null && instance.getId() != null) {
             UUID uuid = idController.simplifyFullyQualifiedId(instance.getId());
             if (uuid != null) {
                 instance.setId(uuid.toString());
@@ -46,7 +83,7 @@ public class Instances {
 
     @PostMapping("/{id}")
     public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
-        Map<?,?> normalizedPayload = idController.fullyQualifyAtId(payload);
+        Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
         ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
         InstanceFull instance = simplifyId(instanceWithMap.getResult());
 

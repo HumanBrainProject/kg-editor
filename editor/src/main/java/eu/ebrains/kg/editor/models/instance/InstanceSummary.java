@@ -1,5 +1,6 @@
 package eu.ebrains.kg.editor.models.instance;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.models.commons.Permissions;
@@ -10,90 +11,68 @@ import java.util.stream.Collectors;
 
 public class InstanceSummary {
 
-    protected String id;
-    protected String workspace;
-    protected List<SimpleType> types;
-    protected String name;
-    protected List<StructureOfField> fields;
-    protected Permissions permissions;
-
-    public String getId() {
-        return id;
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public InstanceSummary(
+            @JsonProperty("@id") String kgId,
+            @JsonProperty("@type") List<String> kgType,
+            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgWorkspace,
+            @JsonProperty(EditorConstants.VOCAB_PERMISSIONS) List<String> kgPermissions
+    ) {
+        this.id = getLastPathItem(kgId);
+        this.types = handleTypes(kgType);
+        this.workspace = kgWorkspace;
+        this.permissions = Permissions.fromPermissionList(kgPermissions);
     }
+
+    private List<SimpleType> handleTypes(List<String> types) {
+        return types != null ? types.stream().map(SimpleType::new).collect(Collectors.toList()) : null;
+    }
+
+    private final String workspace;
+    private final List<SimpleType> types;
+    private final Permissions permissions;
+
+    private String id;
+    private String name;
+    private List<StructureOfField> fields;
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getWorkspace() {
         return workspace;
     }
 
-    public void setWorkspace(String workspace) {
-        this.workspace = workspace;
-    }
-
     public List<SimpleType> getTypes() {
         return types;
-    }
-
-    public void setTypes(List<SimpleType> types) {
-        this.types = types;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<StructureOfField> getFields() {
         return fields;
-    }
-
-    public void setFields(List<StructureOfField> fields) {
-        this.fields = fields;
     }
 
     public Permissions getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Permissions permissions) {
-        this.permissions = permissions;
+    private static String getLastPathItem(String url) {
+        return url != null ? url.substring(url.lastIndexOf("/") + 1) : null;
     }
 
-    public static class FromKG extends InstanceSummary {
+    public void setName(String name) {
+        this.name = name;
+    }
 
-        private static String getLastPathItem(String url){
-            return url!=null ? url.substring(url.lastIndexOf("/")+1) : null;
-        }
-
-
-        @JsonProperty("@id")
-        public void atId(String id){
-            this.id = getLastPathItem(id);
-        }
-
-        @JsonProperty("@type")
-        public void atType(List<String> types){
-            this.types = types != null ? types.stream().map(t -> {
-                SimpleType type = new SimpleType();
-                type.setName(t);
-                return type;
-            }).collect(Collectors.toList()) : null;
-        }
-
-        @JsonProperty(EditorConstants.VOCAB_SPACE)
-        public void vocabSpace(String space){
-            this.workspace = space;
-        }
-
-        @JsonProperty(EditorConstants.VOCAB_PERMISSIONS)
-        public void vocabPermissions(List<String> permissions) {
-            this.permissions = Permissions.fromPermissionList(permissions);
-        }
+    public void setFields(List<StructureOfField> fields) {
+        this.fields = fields;
     }
 }

@@ -16,14 +16,15 @@ public class UserClient extends AbstractServiceClient{
         super(request);
     }
 
-    private static class UserFromKG extends KGCoreResult<UserProfile.FromKG>{}
+    private static class UserFromKG extends KGCoreResult<UserProfile>{}
 
     public UserProfile getUserProfile() {
         String uri = "users/me";
-        return castResult(get(uri)
+        UserFromKG response = get(uri)
                 .retrieve()
                 .bodyToMono(UserFromKG.class)
-                .block());
+                .block();
+        return response != null ? response.getData() : null;
     }
 
     public Map<?,?> getUserPictures(List<String> userIds){

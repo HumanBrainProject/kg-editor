@@ -1,5 +1,6 @@
 package eu.ebrains.kg.editor.models.workspace;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
@@ -8,18 +9,56 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public class StructureOfField {
-    protected String fullyQualifiedName;
-    protected String name;
-    protected String label;
-    protected Integer numOfOccurrences;
-    protected String widget;
-    protected String labelTooltip;
-    protected Boolean searchable;
-    protected Integer order;
-    protected List<StructureOfField> fields;
+
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public StructureOfField(
+            @JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgFullyQualifiedName,
+            @JsonProperty(EditorConstants.VOCAB_OCCURRENCES) Integer kgNumOfOccurrences,
+            @JsonProperty(EditorConstants.VOCAB_ORDER) Integer kgOrder,
+            @JsonProperty(SchemaFieldsConstants.NAME) String kgName,
+            @JsonProperty(EditorConstants.VOCAB_WIDGET) String kgWidget,
+            @JsonProperty(EditorConstants.VOCAB_LABEL_TOOLTIP) String kgLabelTooltip,
+            @JsonProperty(EditorConstants.VOCAB_SEARCHABLE) Boolean kgSearchable
+    ){
+        this.fullyQualifiedName = kgFullyQualifiedName;
+        this.numOfOccurrences = kgNumOfOccurrences;
+        this.order = kgOrder;
+        this.name = kgName;
+        this.label = kgName != null ? StringUtils.capitalize(kgName) : null;
+        this.widget = kgWidget;
+        this.labelTooltip = kgLabelTooltip;
+        this.searchable = kgSearchable;
+    }
+
+    private final String fullyQualifiedName;
+    private final Integer numOfOccurrences;
+    private final Integer order;
+    private final String name;
+    private final String label;
+    private final String widget;
+    private final String labelTooltip;
+    private final Boolean searchable;
+    private List<StructureOfField> fields;
+    private Object value;
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
 
     public String getFullyQualifiedName() {
         return fullyQualifiedName;
+    }
+
+    public Integer getNumOfOccurrences() {
+        return numOfOccurrences;
+    }
+
+    public Integer getOrder() {
+        return order;
     }
 
     public String getName() {
@@ -30,10 +69,6 @@ public class StructureOfField {
         return label;
     }
 
-    public Integer getNumOfOccurrences() {
-        return numOfOccurrences;
-    }
-
     public String getWidget() {
         return widget;
     }
@@ -42,57 +77,15 @@ public class StructureOfField {
         return labelTooltip;
     }
 
-    //TODO validate if it's correct to not translate the "markdown" and "allowCustomValues" fields anymore
-
     public Boolean getSearchable() {
         return searchable;
-    }
-
-    public Integer getOrder() {
-        return order;
     }
 
     public List<StructureOfField> getFields() {
         return fields;
     }
 
-    public static class FromKG extends StructureOfField{
-
-        @JsonProperty(SchemaFieldsConstants.IDENTIFIER)
-        public void identifier(String identifier){
-            this.fullyQualifiedName = identifier;
-        }
-
-        @JsonProperty(EditorConstants.VOCAB_OCCURRENCES)
-        public void occurrences(Integer occ){
-            this.numOfOccurrences = occ;
-        }
-
-        @JsonProperty(EditorConstants.VOCAB_ORDER)
-        public void orderNumber(Integer orderNumber){
-            this.order = orderNumber;
-        }
-
-        @JsonProperty(SchemaFieldsConstants.NAME)
-        public void schemaOrgName(String name){
-            this.name = name;
-            this.label = name != null ? StringUtils.capitalize(name) : null;
-        }
-
-        @JsonProperty(EditorConstants.VOCAB_WIDGET)
-        public void vocabWidget(String widget){
-            this.widget  = widget;
-        }
-
-        @JsonProperty(EditorConstants.VOCAB_LABEL_TOOLTIP)
-        public void vocabLabelTooltip(String labelTooltip){
-            this.labelTooltip = labelTooltip;
-        }
-
-
-        @JsonProperty(EditorConstants.VOCAB_SEARCHABLE)
-        public void vocabSearchable(Boolean searchable){
-            this.searchable = searchable;
-        }
+    public void setFields(List<StructureOfField> fields) {
+        this.fields = fields;
     }
 }

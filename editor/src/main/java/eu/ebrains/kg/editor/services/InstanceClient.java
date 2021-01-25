@@ -33,7 +33,7 @@ public class InstanceClient extends AbstractServiceClient {
         return post(uri).body(BodyInserters.fromValue(ids)).retrieve().bodyToMono(Map.class).block();
     }
 
-    private static class SummaryFromKG extends KGCoreResult<List<InstanceSummary.FromKG>> {}
+    private static class InstanceSummaryFromKG extends KGCoreResult<List<InstanceSummary>> {}
 
     public List<InstanceSummary> searchInstances(String space,
                                                  String type,
@@ -47,7 +47,8 @@ public class InstanceClient extends AbstractServiceClient {
         if (size != null) {
             uri += String.format("&size=%s", size);
         }
-        return castResultList(get(uri).retrieve().bodyToMono(SummaryFromKG.class).block());
+        InstanceSummaryFromKG response = get(uri).retrieve().bodyToMono(InstanceSummaryFromKG.class).block();
+        return response != null  ? response.getData() : null;
     }
 
     public Map getInstanceScope(String id) {
@@ -86,12 +87,11 @@ public class InstanceClient extends AbstractServiceClient {
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {
         String uri = String.format("instances/%s?stage=IN_PROGRESS&metadata=true&returnPermissions=true&returnAlternatives=true", id);
-        Map<?,?> result = get(uri)
+        KGCoreResult.Single response = get(uri)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(KGCoreResult.Single.class)
                 .block();
-        InstanceFull fromKG = castResult(objectMapper.convertValue(result, InstanceFullFromKG.class));
-        return new ResultWithOriginalMap<>(result, fromKG);
+        return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
     public void deleteInstance(String id) {
@@ -111,17 +111,24 @@ public class InstanceClient extends AbstractServiceClient {
                 .block();
     }
 
-    private static class InstanceFullFromKG extends KGCoreResult<InstanceFull.FromKG>{}
+
+    private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(KGCoreResult.Single response, Class<T> target){
+        if(response!=null) {
+            Map<String, Object> data = response.getData();
+            T mapped = objectMapper.convertValue(data, target);
+            return new ResultWithOriginalMap<T>(data, mapped);
+        }
+        return null;
+    }
 
     public ResultWithOriginalMap<InstanceFull> postInstance(String id, String workspace, Map<?, ?> body) {
         String uri = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, workspace);
-        Map<?, ?> result = post(uri)
+        KGCoreResult.Single response = post(uri)
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(KGCoreResult.Single.class)
                 .block();
-        InstanceFull fromKG = castResult(objectMapper.convertValue(result, InstanceFullFromKG.class));
-        return new ResultWithOriginalMap<>(result, fromKG);
+        return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
 }

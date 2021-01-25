@@ -1,5 +1,6 @@
 package eu.ebrains.kg.editor.api;
 
+import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.instance.InstanceSummary;
 import eu.ebrains.kg.editor.models.instance.SimpleType;
 import eu.ebrains.kg.editor.models.workspace.StructureOfType;
@@ -36,14 +37,14 @@ public class Summary {
         // Load for parametrized type only, execute second request for fetching simple information (label / color)
         // for other occurring types.
         List<String> involvedTypes = result.stream().map(InstanceSummary::getTypes).flatMap(Collection::stream).map(SimpleType::getName).distinct().collect(Collectors.toList());
-        Map<String, StructureOfType> typesByName = workspaceClient.getTypesByName(involvedTypes, true);
+        Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(involvedTypes, true);
         result.forEach(r -> {
             r.getTypes().forEach(t -> {
-                StructureOfType byName = typesByName.get(t.getName());
-                if(byName!=null){
+                KGCoreResult<StructureOfType> byName = typesByName.get(t.getName());
+                if(byName!=null && byName.getData()!=null){
                     //Enrich the simple type information from the structure of type...
-                    t.setLabel(byName.getLabel());
-                    t.setColor(byName.getColor());
+                    t.setLabel(byName.getData().getLabel());
+                    t.setColor(byName.getData().getColor());
 
                     //Extract the fields which are either label fields or
                 }

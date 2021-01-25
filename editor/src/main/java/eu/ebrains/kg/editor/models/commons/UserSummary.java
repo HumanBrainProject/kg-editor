@@ -1,21 +1,25 @@
 package eu.ebrains.kg.editor.models.commons;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserSummary {
 
-    protected String id;
-    protected String username;
-    protected String name;
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public UserSummary(
+            @JsonProperty("@id") String kgId
+    ){
+        this.id = kgId;
+    }
+
+    private final String id;
+    private String username;
+    private String name;
     //This is actually a data url...
-    protected String picture;
+    private String picture;
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getUsername() {
@@ -40,14 +44,5 @@ public class UserSummary {
 
     public void setPicture(String picture) {
         this.picture = picture;
-    }
-
-    public static class FromKG extends UserSummary{
-
-        @JsonProperty("@id")
-        public void atId(String id){
-            this.id = id;
-        }
-
     }
 }

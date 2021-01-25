@@ -1,16 +1,10 @@
 package eu.ebrains.kg.editor.services;
 
 
-import eu.ebrains.kg.editor.models.KGCoreResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AbstractServiceClient {
 
@@ -66,32 +60,6 @@ public class AbstractServiceClient {
         return addAuthorizationHeader(webClient.delete()
                 .uri(combineEndpoint(relativeUri)));
 
-    }
-
-
-    protected <F, T extends F> Map<String, F> castResultMap(KGCoreResult<Map<String, KGCoreResult<T>>> result){
-        if(result!=null && result.getData()!=null){
-            Map<String, F> map = new HashMap<>();
-            result.getData().forEach((k, v) -> map.put(k, castResult(result.getData().get(k))));
-            return map;
-        }
-        return Collections.emptyMap();
-    }
-
-    protected <F, T extends F> List<F> castResultList(KGCoreResult<List<T>> result){
-        if(result!=null && result.getData()!=null){
-            return result.getData().stream().map(r -> (F)r).collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
-
-    protected <F, T extends F> F castResult(KGCoreResult<T> result){
-        if(result!=null && result.getData()!=null){
-            return (F)result.getData();
-        }
-        else {
-            return null;
-        }
     }
 
 }

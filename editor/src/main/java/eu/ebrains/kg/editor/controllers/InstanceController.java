@@ -22,7 +22,7 @@ public class InstanceController {
         if(CollectionUtils.isEmpty(typesToRetrieve)) {
            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong while extracting the types! Please try again!");
         }
-        Map<String, StructureOfType> typesByName = workspaceClient.getTypesByName(typesToRetrieve, true);
+        Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(typesToRetrieve, true);
         if(CollectionUtils.isEmpty(typesByName)) {
             throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong while processing the types! Please try again!");
         }

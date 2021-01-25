@@ -4,58 +4,68 @@ import java.util.List;
 
 public class Permissions {
 
-    public static Permissions fromPermissionList(List<String> permissions){
-        Permissions p = new Permissions();
-        p.setCanCreate(permissions.contains("CREATE"));
-        p.setCanInviteForReview(permissions.contains("INVITE_FOR_REVIEW"));
-        p.setCanDelete(permissions.contains("DELETE"));
-        p.setCanInviteForSuggestion(permissions.contains("INVITE_FOR_SUGGESTION"));
-        p.setCanRead(permissions.contains("READ"));
-        p.setCanSuggest(permissions.contains("SUGGEST"));
-        p.setCanWrite(permissions.contains("WRITE"));
-        p.setCanRelease(permissions.contains("RELEASE"));
-        return p;
+    public Permissions(boolean canCreate, boolean canInviteForReview, boolean canDelete, boolean canInviteForSuggestion, boolean canRead, boolean canSuggest, boolean canWrite, boolean canRelease) {
+        this.canCreate = canCreate;
+        this.canInviteForReview = canInviteForReview;
+        this.canDelete = canDelete;
+        this.canInviteForSuggestion = canInviteForSuggestion;
+        this.canRead = canRead;
+        this.canSuggest = canSuggest;
+        this.canWrite = canWrite;
+        this.canRelease = canRelease;
     }
 
+    public static Permissions fromPermissionList(List<String> permissions){
+        return new Permissions(
+                permissions.contains("CREATE"),
+                permissions.contains("INVITE_FOR_REVIEW"),
+                permissions.contains("DELETE"),
+                permissions.contains("INVITE_FOR_SUGGESTION"),
+                permissions.contains("READ"),
+                permissions.contains("SUGGEST"),
+                permissions.contains("WRITE"),
+                permissions.contains("RELEASE")
+        );
+    }
 
-    private boolean canCreate;
-    private boolean canInviteForReview;
-    private boolean canDelete;
-    private boolean canInviteForSuggestion;
-    private boolean canRead;
-    private boolean canSuggest;
-    private boolean canWrite;
-    private boolean canRelease;
+    private final boolean canCreate;
+    private final boolean canInviteForReview;
+    private final boolean canDelete;
+    private final boolean canInviteForSuggestion;
+    private final boolean canRead;
+    private final boolean canSuggest;
+    private final boolean canWrite;
+    private final boolean canRelease;
 
-    public boolean isCanCreate() { return canCreate; }
+    public boolean isCanCreate() {
+        return canCreate;
+    }
 
-    public void setCanCreate(boolean canCreate) { this.canCreate = canCreate; }
+    public boolean isCanInviteForReview() {
+        return canInviteForReview;
+    }
 
-    public boolean isCanInviteForReview() { return canInviteForReview; }
+    public boolean isCanDelete() {
+        return canDelete;
+    }
 
-    public void setCanInviteForReview(boolean canInviteForReview) { this.canInviteForReview = canInviteForReview; }
+    public boolean isCanInviteForSuggestion() {
+        return canInviteForSuggestion;
+    }
 
-    public boolean isCanDelete() { return canDelete; }
+    public boolean isCanRead() {
+        return canRead;
+    }
 
-    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
+    public boolean isCanSuggest() {
+        return canSuggest;
+    }
 
-    public boolean isCanInviteForSuggestion() { return canInviteForSuggestion; }
+    public boolean isCanWrite() {
+        return canWrite;
+    }
 
-    public void setCanInviteForSuggestion(boolean canInviteForSuggestion) { this.canInviteForSuggestion = canInviteForSuggestion; }
-
-    public boolean isCanRead() { return canRead; }
-
-    public void setCanRead(boolean canRead) { this.canRead = canRead; }
-
-    public boolean isCanSuggest() { return canSuggest; }
-
-    public void setCanSuggest(boolean canSuggest) { this.canSuggest = canSuggest; }
-
-    public boolean isCanWrite() { return canWrite; }
-
-    public void setCanWrite(boolean canWrite) { this.canWrite = canWrite; }
-
-    public boolean isCanRelease() { return canRelease; }
-
-    public void setCanRelease(boolean canRelease) { this.canRelease = canRelease; }
+    public boolean isCanRelease() {
+        return canRelease;
+    }
 }

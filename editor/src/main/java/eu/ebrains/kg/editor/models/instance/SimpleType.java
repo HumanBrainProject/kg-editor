@@ -1,16 +1,17 @@
 package eu.ebrains.kg.editor.models.instance;
 
 public class SimpleType {
-    protected String name;
-    protected String label;
-    protected String color;
+
+    public SimpleType(String name) {
+        this.name = name;
+    }
+
+    private final String name;
+    private String label;
+    private String color;
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getLabel() {

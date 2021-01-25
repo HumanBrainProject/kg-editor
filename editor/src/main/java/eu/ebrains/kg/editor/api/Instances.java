@@ -1,38 +1,57 @@
 package eu.ebrains.kg.editor.api;
 
-import eu.ebrains.kg.editor.controllers.InstanceController;
-import eu.ebrains.kg.editor.helpers.InstanceHelper;
+import eu.ebrains.kg.editor.controllers.IdController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
+import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
+import eu.ebrains.kg.editor.models.instance.InstanceFull;
 import eu.ebrains.kg.editor.services.InstanceClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RequestMapping("/instances")
 @RestController
 public class Instances {
-    @Value("${kgcore.instancesPrefix}")
-    String kgCoreInstancesPrefix;
+
 
     private final InstanceClient instanceClient;
-    private final InstanceController instanceController;
+    private final IdController idController;
 
-    public Instances(InstanceClient instanceClient, InstanceController instanceController) {
+    public Instances(InstanceClient instanceClient, IdController idController) {
         this.instanceClient = instanceClient;
-        this.instanceController = instanceController;
+        this.idController = idController;
     }
 
     @GetMapping("/{id}")
-    public void getInstance(@PathVariable("id") String id) {
+    public KGCoreResult<InstanceFull> getInstance(@PathVariable("id") String id) {
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.getInstance(id);
+        InstanceFull instance = simplifyId(instanceWithMap.getResult());
+        //return instanceController.normalizeInstance(id, instance);
+        return new KGCoreResult<InstanceFull>().setData(instance);
+    }
+
+    private InstanceFull simplifyId(InstanceFull instance){
+        //Simplify the ID because we want to operate with the UUID on the UI only
+        if(instance!=null && instance.getId()!=null) {
+            UUID uuid = idController.simplifyFullyQualifiedId(instance.getId());
+            if (uuid != null) {
+                instance.setId(uuid.toString());
+            }
+            return instance;
+        }
+        return null;
     }
 
     @PostMapping("/{id}")
-    public KGCoreResult.Single createInstance(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
-        Map normalizedPayload = InstanceHelper.normalizePayloadWithId(payload, kgCoreInstancesPrefix);
-        KGCoreResult.Single instance = instanceClient.postInstance(id, workspace, normalizedPayload);
-        return instanceController.normalizeInstance(id, instance);
+    public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
+        Map<?,?> normalizedPayload = idController.fullyQualifyAtId(payload);
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
+        InstanceFull instance = simplifyId(instanceWithMap.getResult());
+
+        //return instanceController.normalizeInstance(id, instance);
+        return new KGCoreResult<InstanceFull>().setData(instance);
     }
 
     @PatchMapping("/{id}")

@@ -11,10 +11,10 @@ public class EditorConstants {
     public static final String VOCAB_ORDER = CORE_META + "orderNumber";
     public static final String VOCAB_SPACES = CORE_META + "spaces";
     public static final String VOCAB_SPACE = CORE_META + "space";
-    public static final String VOCAB_ALTERNATIVES = CORE_META + "alternative";
-    public static final String VOCAB_public = CORE_META + "public static final Stringue";
+    public static final String VOCAB_ALTERNATIVE = CORE_META + "alternative";
     public static final String VOCAB_SELECTED = CORE_META + "selected";
     public static final String VOCAB_USER = CORE_META + "user";
+    public static final String VOCAB_VALUE = CORE_META + "value";
     public static final String VOCAB_PERMISSIONS = CORE_META + "permissions";
     public static final String VOCAB_COLOR = CORE_META + "color";
     public static final String VOCAB_PROPERTY_UPDATES = CORE_META + "propertyUpdates";

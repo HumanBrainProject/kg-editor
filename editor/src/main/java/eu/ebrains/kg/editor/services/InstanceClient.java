@@ -1,6 +1,9 @@
 package eu.ebrains.kg.editor.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.ebrains.kg.editor.models.KGCoreResult;
+import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
+import eu.ebrains.kg.editor.models.instance.InstanceFull;
 import eu.ebrains.kg.editor.models.instance.InstanceSummary;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -13,8 +16,11 @@ import java.util.Map;
 @Component
 public class InstanceClient extends AbstractServiceClient {
 
-    public InstanceClient(HttpServletRequest request) {
+    private ObjectMapper objectMapper;
+
+    public InstanceClient(HttpServletRequest request, ObjectMapper jacksonObjectMapper) {
         super(request);
+        this.objectMapper = jacksonObjectMapper;
     }
 
     public Map getInstances(List<String> ids,
@@ -78,12 +84,14 @@ public class InstanceClient extends AbstractServiceClient {
                 .block();
     }
 
-    public Map getInstance(String id) {
+    public ResultWithOriginalMap<InstanceFull> getInstance(String id) {
         String uri = String.format("instances/%s?stage=IN_PROGRESS&metadata=true&returnPermissions=true&returnAlternatives=true", id);
-        return get(uri)
+        Map<?,?> result = get(uri)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
+        InstanceFull fromKG = castResult(objectMapper.convertValue(result, InstanceFullFromKG.class));
+        return new ResultWithOriginalMap<>(result, fromKG);
     }
 
     public void deleteInstance(String id) {
@@ -103,15 +111,17 @@ public class InstanceClient extends AbstractServiceClient {
                 .block();
     }
 
+    private static class InstanceFullFromKG extends KGCoreResult<InstanceFull.FromKG>{}
 
-    public KGCoreResult.Single postInstance(String id, String workspace, Map<String, Object> body) {
-        String uri = String.format("instances/%s?returnPermissions=true&space=%s", id, workspace);
-        return post(uri)
+    public ResultWithOriginalMap<InstanceFull> postInstance(String id, String workspace, Map<?, ?> body) {
+        String uri = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, workspace);
+        Map<?, ?> result = post(uri)
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
-                .bodyToMono(KGCoreResult.Single.class)
+                .bodyToMono(Map.class)
                 .block();
+        InstanceFull fromKG = castResult(objectMapper.convertValue(result, InstanceFullFromKG.class));
+        return new ResultWithOriginalMap<>(result, fromKG);
     }
-
 
 }

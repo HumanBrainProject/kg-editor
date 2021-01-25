@@ -68,7 +68,7 @@ public class StructureOfType {
 
     public static class FromKG extends StructureOfType{
 
-        private static final List<String> FIELDS_BLACKLIST = Arrays.asList("@id", "@type", SchemaFieldsConstants.IDENTIFIER, EditorConstants.VOCAB_ALTERNATIVES, EditorConstants.VOCAB_USER, EditorConstants.VOCAB_SPACES, EditorConstants.VOCAB_PROPERTY_UPDATES);
+        private static final List<String> FIELDS_BLACKLIST = Arrays.asList("@id", "@type", SchemaFieldsConstants.IDENTIFIER, EditorConstants.VOCAB_ALTERNATIVE, EditorConstants.VOCAB_USER, EditorConstants.VOCAB_SPACES, EditorConstants.VOCAB_PROPERTY_UPDATES);
 
 
         @JsonProperty(SchemaFieldsConstants.NAME)

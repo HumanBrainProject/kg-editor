@@ -20,4 +20,9 @@ public class RestControllerAdvice {
     protected ResponseEntity<?> forbidden(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
+
+    @ExceptionHandler({WebClientResponseException.InternalServerError.class})
+    protected ResponseEntity<?> internalServerError(RuntimeException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
 }

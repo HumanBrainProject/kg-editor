@@ -104,16 +104,12 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
 
-    public Map postInstance(String id, String workspace, String body) {
-        String uri = "instances";
-        if (StringUtils.isNotBlank(id)) {
-            uri = String.format("%s/%s", uri, id);
-        }
-        uri += String.format("?returnPermissions=true&space=%s", workspace);
+    public KGCoreResult.Single postInstance(String id, String workspace, Map<String, Object> body) {
+        String uri = String.format("instances/%s?returnPermissions=true&space=%s", id, workspace);
         return post(uri)
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(KGCoreResult.Single.class)
                 .block();
     }
 

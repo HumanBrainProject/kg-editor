@@ -1,4 +1,10 @@
 package eu.ebrains.kg.editor.api;
+
+import eu.ebrains.kg.editor.controllers.InstanceController;
+import eu.ebrains.kg.editor.helpers.InstanceHelper;
+import eu.ebrains.kg.editor.models.KGCoreResult;
+import eu.ebrains.kg.editor.services.InstanceClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -7,10 +13,15 @@ import java.util.Map;
 @RequestMapping("/instances")
 @RestController
 public class Instances {
+    @Value("${kgcore.instancesPrefix}")
+    String kgCoreInstancesPrefix;
 
+    private final InstanceClient instanceClient;
+    private final InstanceController instanceController;
 
-    @PostMapping
-    public void createInstanceWithoutId(@RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
+    public Instances(InstanceClient instanceClient, InstanceController instanceController) {
+        this.instanceClient = instanceClient;
+        this.instanceController = instanceController;
     }
 
     @GetMapping("/{id}")
@@ -18,7 +29,10 @@ public class Instances {
     }
 
     @PostMapping("/{id}")
-    public void createInstanceWithId(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
+    public KGCoreResult.Single createInstance(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
+        Map normalizedPayload = InstanceHelper.normalizePayloadWithId(payload, kgCoreInstancesPrefix);
+        KGCoreResult.Single instance = instanceClient.postInstance(id, workspace, normalizedPayload);
+        return instanceController.normalizeInstance(id, instance);
     }
 
     @PatchMapping("/{id}")

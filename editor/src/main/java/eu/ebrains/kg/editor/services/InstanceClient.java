@@ -1,5 +1,7 @@
 package eu.ebrains.kg.editor.services;
 
+import eu.ebrains.kg.editor.models.KGCoreResult;
+import eu.ebrains.kg.editor.models.instance.InstanceSummary;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -25,11 +27,13 @@ public class InstanceClient extends AbstractServiceClient {
         return post(uri).body(BodyInserters.fromValue(ids)).retrieve().bodyToMono(Map.class).block();
     }
 
-    public Map searchInstances(String space,
-                               String type,
-                               Integer from,
-                               Integer size,
-                               String searchByLabel) {
+    private static class SummaryFromKG extends KGCoreResult<List<InstanceSummary.FromKG>> {}
+
+    public List<InstanceSummary> searchInstances(String space,
+                                                 String type,
+                                                 Integer from,
+                                                 Integer size,
+                                                 String searchByLabel) {
         String uri = String.format("instances?stage=IN_PROGRESS&returnPermissions=true&type=%s&space=%s&searchByLabel=%s", type, space, searchByLabel);
         if (from != null) {
             uri += String.format("&from=%s", from);
@@ -37,7 +41,7 @@ public class InstanceClient extends AbstractServiceClient {
         if (size != null) {
             uri += String.format("&size=%s", size);
         }
-        return get(uri).retrieve().bodyToMono(Map.class).block();
+        return castResultList(get(uri).retrieve().bodyToMono(SummaryFromKG.class).block());
     }
 
     public Map getInstanceScope(String id) {

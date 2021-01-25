@@ -91,15 +91,7 @@ public class Workspace {
 
         @JsonProperty(EditorConstants.VOCAB_PERMISSIONS)
         public void vocabPermissions(List<String> permissions) {
-            this.permissions = new Permissions();
-            this.permissions.setCanCreate(permissions.contains("CREATE"));
-            this.permissions.setCanInviteForReview(permissions.contains("INVITE_FOR_REVIEW"));
-            this.permissions.setCanDelete(permissions.contains("DELETE"));
-            this.permissions.setCanInviteForSuggestion(permissions.contains("INVITE_FOR_SUGGESTION"));
-            this.permissions.setCanRead(permissions.contains("READ"));
-            this.permissions.setCanSuggest(permissions.contains("SUGGEST"));
-            this.permissions.setCanWrite(permissions.contains("WRITE"));
-            this.permissions.setCanRelease(permissions.contains("RELEASE"));
+            this.permissions = Permissions.fromPermissionList(permissions);
         }
     }
 }

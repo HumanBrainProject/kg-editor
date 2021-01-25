@@ -5,7 +5,9 @@ import eu.ebrains.kg.editor.models.user.UserProfile;
 import eu.ebrains.kg.editor.models.user.Workspace;
 import eu.ebrains.kg.editor.services.UserClient;
 import eu.ebrains.kg.editor.services.WorkspaceClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +44,10 @@ public class User {
         return new KGCoreResult<UserProfile>().setData(userProfile);
     }
 
-    @PutMapping("/picture")
-    public void saveUserPicture(@PathVariable("id") String id, @RequestBody Object payload) {
-    }
+    //FIXME this endpoint does not work properly yet (already with the old service).
+//    @PutMapping(value = "/picture", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//    public void saveUserPicture(@RequestBody String payload) {
+//        System.out.println(payload);
+//    }
 
 }

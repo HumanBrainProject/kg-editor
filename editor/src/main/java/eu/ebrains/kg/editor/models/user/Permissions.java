@@ -1,6 +1,23 @@
 package eu.ebrains.kg.editor.models.user;
 
+import java.util.List;
+
 public class Permissions {
+
+    public static Permissions fromPermissionList(List<String> permissions){
+        Permissions p = new Permissions();
+        p.setCanCreate(permissions.contains("CREATE"));
+        p.setCanInviteForReview(permissions.contains("INVITE_FOR_REVIEW"));
+        p.setCanDelete(permissions.contains("DELETE"));
+        p.setCanInviteForSuggestion(permissions.contains("INVITE_FOR_SUGGESTION"));
+        p.setCanRead(permissions.contains("READ"));
+        p.setCanSuggest(permissions.contains("SUGGEST"));
+        p.setCanWrite(permissions.contains("WRITE"));
+        p.setCanRelease(permissions.contains("RELEASE"));
+        return p;
+    }
+
+
     private boolean canCreate;
     private boolean canInviteForReview;
     private boolean canDelete;

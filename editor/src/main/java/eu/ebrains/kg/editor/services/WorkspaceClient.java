@@ -28,7 +28,7 @@ public class WorkspaceClient extends AbstractServiceClient{
         return castResultList(block);
     }
 
-    private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType.FromKG>>{}
+    private static class StructureTypeResultFromKG extends KGCoreResult<List<eu.ebrains.kg.editor.models.workspace.StructureOfType.FromKG>>{}
 
     public List<StructureOfType> getWorkspaceTypes(String workspace) {
         String uri = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true", workspace);
@@ -39,14 +39,15 @@ public class WorkspaceClient extends AbstractServiceClient{
     }
 
 
+    private static class StructureOfTypeByNameFromKG extends KGCoreResult<Map<String, KGCoreResult<StructureOfType.FromKG>>>{}
 
-    public Map getTypesByName(java.util.List types, boolean withProperties) {
+    public Map<String, StructureOfType> getTypesByName(List<String> types, boolean withProperties) {
         String uri = String.format("typesByName?stage=IN_PROGRESS&withProperties=%s", withProperties);
-        return post(uri)
+        return castResultMap(post(uri)
                 .body(BodyInserters.fromValue(types))
                 .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+                .bodyToMono(StructureOfTypeByNameFromKG.class)
+                .block());
     }
 
 }

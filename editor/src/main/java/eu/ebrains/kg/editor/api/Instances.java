@@ -5,8 +5,8 @@ import eu.ebrains.kg.editor.controllers.InstanceController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
-import eu.ebrains.kg.editor.models.instance.InstanceLabel;
-import eu.ebrains.kg.editor.models.instance.InstanceSummary;
+import eu.ebrains.kg.editor.models.instance.SimpleTypeWithSpaces;
+import eu.ebrains.kg.editor.models.instance.SuggestionStructure;
 import eu.ebrains.kg.editor.services.InstanceClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,8 +69,8 @@ public class Instances {
 
     @PostMapping("/list")
     public KGCoreResult<Map<String, InstanceFull>> getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
-                                 @RequestParam(required = false, defaultValue = "false") boolean metadata,
-                                 @RequestBody List<String> ids) {
+                                                                    @RequestParam(required = false, defaultValue = "false") boolean metadata,
+                                                                    @RequestBody List<String> ids) {
         Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
         Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result);
         return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
@@ -92,12 +92,23 @@ public class Instances {
     }
 
     @PostMapping("/{id}/suggestions")
-    public void getSuggestions(@PathVariable("id") String id,
-                               @RequestParam("field") String field,
-                               @RequestParam(value = "type", required = false) String type,
-                               @RequestParam(value = "start", required = false, defaultValue = "0") int start,
-                               @RequestParam(value = "size", required = false, defaultValue = "50") int size,
-                               @RequestParam(value = "search", required = false) String search) {
+    public KGCoreResult<SuggestionStructure> getSuggestions(@PathVariable("id") String id,
+                                                            @RequestParam("field") String field,
+                                                            @RequestParam(value = "type", required = false) String type,
+                                                            @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+                                                            @RequestParam(value = "size", required = false, defaultValue = "50") int size,
+                                                            @RequestParam(value = "search", required = false) String search,
+                                                            @RequestBody Map<String, Object> payload) {
+        SuggestionStructure suggestionStructure = instanceClient.postSuggestions(id, field, type, start, size, search, payload);
+        suggestionStructure.getSuggestions().getData().forEach(s -> {
+            if(s!=null && s.getType()!=null){
+                SimpleTypeWithSpaces fullType = suggestionStructure.getTypes().get(s.getType().getName());
+                if(fullType!=null){
+                    s.setType(fullType);
+                }
+            }
+        });
+        return new KGCoreResult<SuggestionStructure>().setData(suggestionStructure);
     }
 
     @GetMapping("/{id}/neighbors")

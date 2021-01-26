@@ -5,6 +5,7 @@ import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
 import eu.ebrains.kg.editor.models.instance.InstanceSummary;
+import eu.ebrains.kg.editor.models.instance.SuggestionStructure;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -83,22 +84,29 @@ public class InstanceClient extends AbstractServiceClient {
                 .block();
     }
 
-    public Map postSuggestions(String id,
-                               String field,
-                               String type,
-                               Integer start,
-                               Integer size,
-                               String search,
-                               String payload) {
-        String uri = String.format("instances/%s/suggestedLinksForProperty?stage=IN_PROGRESS&property=%s&from=%d&size=%d&search=%s", id, field, start, size, search);
+    private static class SuggestionFromKG extends KGCoreResult<SuggestionStructure> {
+    }
+
+    public SuggestionStructure postSuggestions(String id,
+                                               String field,
+                                               String type,
+                                               Integer start,
+                                               Integer size,
+                                               String search,
+                                               Map<String, Object> payload) {
+        String uri = String.format("instances/%s/suggestedLinksForProperty?stage=IN_PROGRESS&property=%s&from=%d&size=%d", id, field, start, size);
+        if(StringUtils.isNotBlank(search)){
+            uri += String.format("&search=%s", search);
+        }
         if (StringUtils.isNotBlank(type)) {
             uri += String.format("&type=%s", type);
         }
-        return post(uri)
+        SuggestionFromKG response = post(uri)
                 .body(BodyInserters.fromValue(payload))
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(SuggestionFromKG.class)
                 .block();
+        return response!=null ? response.getData() : null;
     }
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {

@@ -3,7 +3,6 @@ package eu.ebrains.kg.editor.models.user;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -11,13 +10,13 @@ public class UserProfile {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public UserProfile(
-            @JsonProperty(SchemaFieldsConstants.IDENTIFIER) List<String> kgIdentifiers,
+            @JsonProperty("@id") String kgId,
             @JsonProperty(SchemaFieldsConstants.ALTERNATENAME) String kgUserName,
             @JsonProperty(SchemaFieldsConstants.NAME) String kgName,
             @JsonProperty(SchemaFieldsConstants.GIVEN_NAME) String kgGivenName,
             @JsonProperty(SchemaFieldsConstants.FAMILY_NAME) String kgFamilyName,
             @JsonProperty(SchemaFieldsConstants.EMAIL) String kgEmail){
-        this.id = !CollectionUtils.isEmpty(kgIdentifiers) ? kgIdentifiers.get(0) : null;
+        this.id = kgId;
         this.username = kgUserName;
         this.name = kgName;
         this.givenName = kgGivenName;
@@ -25,7 +24,7 @@ public class UserProfile {
         this.email = kgEmail;
     }
 
-    private final String id;
+    private String id;
     private final String username;
     private final String name;
     private final String givenName;
@@ -34,6 +33,10 @@ public class UserProfile {
     private String picture;
     private Boolean isCurator;
     private List<Workspace> workspaces;
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getId() {
         return id;

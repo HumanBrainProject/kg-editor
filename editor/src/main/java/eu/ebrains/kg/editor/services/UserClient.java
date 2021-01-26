@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +28,11 @@ public class UserClient extends AbstractServiceClient{
         return response != null ? response.getData() : null;
     }
 
-    public Map<?,?> getUserPictures(List<String> userIds){
+    private static class UserPictureMap extends HashMap<String, String> {}
+
+    public Map<String, String> getUserPictures(List<String> userIds){
         String uri = "users/pictures";
-        return post(uri).body(BodyInserters.fromValue(userIds)).retrieve().bodyToMono(Map.class).block();
+        return post(uri).body(BodyInserters.fromValue(userIds)).retrieve().bodyToMono(UserPictureMap.class).block();
     }
 
 }

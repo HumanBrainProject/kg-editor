@@ -5,6 +5,7 @@ import eu.ebrains.kg.editor.controllers.InstanceController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
+import eu.ebrains.kg.editor.models.instance.InstanceSummary;
 import eu.ebrains.kg.editor.services.InstanceClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,19 +38,22 @@ public class Instances {
 
 
     @PostMapping("/{id}")
-    public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
-       Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
-       ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
-       InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);   
-       return new KGCoreResult<InstanceFull>().setData(instanceFull);
+    public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id,
+                                                     @RequestParam("workspace") String workspace,
+                                                     @RequestBody Map<String, Object> payload) {
+        Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
+        InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);
+        return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
     @PatchMapping("/{id}")
-    public KGCoreResult<InstanceFull> updateInstance(@PathVariable("id") String id, @RequestBody Map<String, Object> payload) {
+    public KGCoreResult<InstanceFull> updateInstance(@PathVariable("id") String id,
+                                                     @RequestBody Map<String, Object> payload) {
         Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
         ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.patchInstance(id, normalizedPayload);
-        InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);   
-        return new KGCoreResult<InstanceFull>().setData(instanceFull);   
+        InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);
+        return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
     @DeleteMapping("/{id}")
@@ -62,19 +66,35 @@ public class Instances {
     }
 
     @PostMapping("/list")
-    public void getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage, @RequestParam(required = false, defaultValue = "false") boolean metadata, @RequestBody List<String> ids) {
+    public void getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+                                 @RequestParam(required = false, defaultValue = "false") boolean metadata,
+                                 @RequestBody List<String> ids) {
+        InstanceFull instances = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
+
     }
 
     @PostMapping("/summary")
-    public void getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage, @RequestParam(required = false, defaultValue = "false") boolean metadata, @RequestBody List<String> ids) {
+    public void getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+                                    @RequestParam(required = false, defaultValue = "false") boolean metadata,
+                                    @RequestBody List<String> ids) {
+        InstanceSummary instances = instanceClient.getInstances(ids, stage, metadata, false, true, false, InstanceSummary.class);
+//        instances.
+
     }
 
     @PostMapping("/label")
-    public void getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage, @RequestParam(required = false, defaultValue = "false") boolean metadata, @RequestBody List<String> ids) {
+    public void getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+                                  @RequestParam(required = false, defaultValue = "false") boolean metadata,
+                                  @RequestBody List<String> ids) {
     }
 
     @PostMapping("/{id}/suggestions")
-    public void getSuggestions(@PathVariable("id") String id, @RequestParam("field") String field, @RequestParam(value = "type", required = false) String type, @RequestParam(value = "start", required = false, defaultValue = "0") int start, @RequestParam(value = "size", required = false, defaultValue = "50") int size, @RequestParam(value = "search", required = false) String search) {
+    public void getSuggestions(@PathVariable("id") String id,
+                               @RequestParam("field") String field,
+                               @RequestParam(value = "type", required = false) String type,
+                               @RequestParam(value = "start", required = false, defaultValue = "0") int start,
+                               @RequestParam(value = "size", required = false, defaultValue = "50") int size,
+                               @RequestParam(value = "search", required = false) String search) {
     }
 
     @GetMapping("/{id}/neighbors")

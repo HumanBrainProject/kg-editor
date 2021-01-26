@@ -23,14 +23,19 @@ public class InstanceClient extends AbstractServiceClient {
         this.objectMapper = jacksonObjectMapper;
     }
 
-    public Map getInstances(List<String> ids,
+    public <T> T getInstances(List<String> ids,
                             String stage,
                             boolean metadata,
                             boolean returnAlternatives,
                             boolean returnPermissions,
-                            boolean returnEmbedded) {
+                            boolean returnEmbedded,
+                            Class<T> clazz) {
         String uri = String.format("instancesByIds?stage=%s&metadata=%s&returnAlternatives=%s&returnPermissions=%s&returnEmbedded=%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded);
-        return post(uri).body(BodyInserters.fromValue(ids)).retrieve().bodyToMono(Map.class).block();
+        return post(uri)
+            .body(BodyInserters.fromValue(ids))
+            .retrieve()
+            .bodyToMono(clazz)
+            .block();
     }
 
     private static class InstanceSummaryFromKG extends KGCoreResult<List<InstanceSummary>> {}

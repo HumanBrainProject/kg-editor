@@ -88,7 +88,7 @@ public class IdController {
     }
 
     private String addPrefix(String s, String prefix) {
-        return s.startsWith("http") ? s : String.format("%s/%s", prefix, s);
+        return s.startsWith("http") ? s : String.format("%s%s", prefix, s);
     }
 
 }

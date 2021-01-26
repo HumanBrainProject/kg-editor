@@ -1,5 +1,6 @@
 package eu.ebrains.kg.editor.api;
 
+import eu.ebrains.kg.editor.controllers.IdController;
 import eu.ebrains.kg.editor.controllers.InstanceController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
@@ -17,11 +18,13 @@ public class Instances {
 
     private final InstanceClient instanceClient;
     private final InstanceController instanceController;
+    private final IdController idController;
 
 
-    public Instances(InstanceClient instanceClient, InstanceController instanceController) {
+    public Instances(InstanceClient instanceClient, InstanceController instanceController, IdController idController) {
         this.instanceClient = instanceClient;
         this.instanceController = instanceController;
+        this.idController = idController;
     }
 
     @GetMapping("/{id}")
@@ -34,12 +37,10 @@ public class Instances {
 
     @PostMapping("/{id}")
     public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id, @RequestParam("workspace") String workspace, @RequestBody Map<String, Object> payload) {
-//        Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
-//        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
-//
-//        //return instanceController.normalizeInstance(id, instance);
-//        return new KGCoreResult<InstanceFull>().setData(instance);
-        return null;
+       Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
+       ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
+       InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);   
+       return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
     @PatchMapping("/{id}")

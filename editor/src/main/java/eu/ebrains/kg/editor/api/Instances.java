@@ -76,7 +76,6 @@ public class Instances {
         return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
     }
 
-    private static class InstancesSummaryFromKG extends KGCoreResult<Map<String, InstanceSummary>> {}
     @PostMapping("/summary")
     public void getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
@@ -86,7 +85,6 @@ public class Instances {
 
     }
 
-    private static class InstancesLableFromKG extends KGCoreResult<Map<String, InstanceLabel>> {}
     @PostMapping("/label")
     public void getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                   @RequestParam(required = false, defaultValue = "false") boolean metadata,

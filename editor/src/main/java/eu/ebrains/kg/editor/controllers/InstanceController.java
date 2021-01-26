@@ -8,6 +8,7 @@ import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 import eu.ebrains.kg.editor.models.workspace.StructureOfType;
 import eu.ebrains.kg.editor.services.UserClient;
 import eu.ebrains.kg.editor.services.WorkspaceClient;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -37,18 +38,17 @@ public class InstanceController {
         return instance;
     }
 
-    public List<ResultWithOriginalMap<InstanceFull>> enrichInstances(List<ResultWithOriginalMap<InstanceFull>> instancesWithMap) {
-//        List<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.stream().map(instanceWithMap -> {
-//            InstanceFull instanceFull = idController.simplifyId(instanceWithMap.getResult());
-//            return new ResultWithOriginalMap<>(instanceWithMap.getOriginalMap(), instanceFull);
-//        }).collect(Collectors.toList());
-//        Map<String, KGCoreResult<StructureOfType>> typesByName = getTypesByName((InstanceLabel) instancesWithResult);
-//        instancesWithResult.forEach(instanceWithResult -> {
-//            Map<String, KGCoreResult<StructureOfType>> filteredTypes = getFilteredTypes(typesByName, instanceWithResult.getResult());
-//            enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), filteredTypes);
-//        });
-//        return instancesWithResult;
-        return null;
+    public Map<String, InstanceFull> enrichInstances(Map<String, ResultWithOriginalMap<InstanceFull>> instancesWithMap) {
+        Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
+        instancesWithResult.forEach(i -> idController.simplifyId(i.getResult()));
+        List<InstanceLabel> instanceLabelList = instancesWithResult.stream().map(instanceResult -> (InstanceLabel)instanceResult.getResult()).collect(Collectors.toList());
+        Map<String, KGCoreResult<StructureOfType>> typesByName = getTypesByName(instanceLabelList);
+        instancesWithResult.forEach(instanceWithResult -> {
+            Map<String, KGCoreResult<StructureOfType>> filteredTypes = getFilteredTypes(typesByName, instanceWithResult.getResult());
+            enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), filteredTypes);
+            enrichAlternatives(instanceWithResult.getResult());
+        });
+        return instancesWithResult.stream().collect(Collectors.toMap(k->k.getResult().getId(), ResultWithOriginalMap::getResult));
     }
 
     private Map<String, KGCoreResult<StructureOfType>> getFilteredTypes(Map<String, KGCoreResult<StructureOfType>> typesByName, InstanceLabel instance) {
@@ -85,7 +85,7 @@ public class InstanceController {
             // Define the fields with the structure of the type and the values of the instance
             List<StructureOfField> fields = typesByName.values().stream().map(KGCoreResult::getData).
                     filter(Objects::nonNull).map(t -> t.getFields().values()).
-                    flatMap(Collection::stream).distinct().collect(Collectors.toList());
+                    flatMap(Collection::stream).distinct().map(SerializationUtils::clone).collect(Collectors.toList());
             fields.forEach(f -> simplifyIdsOfLinks(f, originalMap));
             instance.setFields(fields);
 

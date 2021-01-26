@@ -5,6 +5,7 @@ import eu.ebrains.kg.editor.controllers.InstanceController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
+import eu.ebrains.kg.editor.models.instance.InstanceLabel;
 import eu.ebrains.kg.editor.models.instance.InstanceSummary;
 import eu.ebrains.kg.editor.services.InstanceClient;
 import org.springframework.web.bind.annotation.*;
@@ -65,23 +66,27 @@ public class Instances {
     public void getInstanceScope(@PathVariable("id") String id) {
     }
 
+
     @PostMapping("/list")
-    public void getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+    public KGCoreResult<Map<String, InstanceFull>> getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                  @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                  @RequestBody List<String> ids) {
-        InstanceFull instances = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
-
+        Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
+        Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result);
+        return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
     }
 
+    private static class InstancesSummaryFromKG extends KGCoreResult<Map<String, InstanceSummary>> {}
     @PostMapping("/summary")
     public void getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                     @RequestBody List<String> ids) {
-        InstanceSummary instances = instanceClient.getInstances(ids, stage, metadata, false, true, false, InstanceSummary.class);
+//        InstanceSummary instances = instanceClient.getInstances(ids, stage, metadata, false, true, false, InstancesSummaryFromKG.class);
 //        instances.
 
     }
 
+    private static class InstancesLableFromKG extends KGCoreResult<Map<String, InstanceLabel>> {}
     @PostMapping("/label")
     public void getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                   @RequestParam(required = false, defaultValue = "false") boolean metadata,

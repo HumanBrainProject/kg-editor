@@ -4,6 +4,7 @@ import eu.ebrains.kg.editor.models.HasId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,8 +59,10 @@ public class IdController {
     }
 
     public Object simplifyIdIfObjectIsAMap(Object e) {
-        if (e instanceof Map) {
-            Map map = ((Map) e);
+        if(e instanceof Collection) {
+            ((Collection<?>) e).forEach(col -> simplifyIdIfObjectIsAMap(col));
+        } else if (e instanceof Map) {
+            Map map = (Map) e;
             Object atId = map.get("@id");
             if (atId != null) {
                 UUID uuid = simplifyFullyQualifiedId(atId.toString());

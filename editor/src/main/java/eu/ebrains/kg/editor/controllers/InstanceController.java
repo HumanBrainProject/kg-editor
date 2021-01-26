@@ -37,7 +37,7 @@ public class InstanceController {
     public InstanceFull enrichInstance(ResultWithOriginalMap<InstanceFull> instanceWithMap){
         InstanceFull instance = idController.simplifyId(instanceWithMap.getResult());
         enrichTypesAndFields(instance, instanceWithMap.getOriginalMap());
-        enrichAlternativesWithUserInformation(instance);
+        enrichAlternatives(instance);
         return instance;
     }
 
@@ -87,13 +87,15 @@ public class InstanceController {
     /**
      * Normalize users of alternatives and add pictures
      */
-    private void enrichAlternativesWithUserInformation(InstanceFull instance){
+    private void enrichAlternatives(InstanceFull instance){
         Stream<UserSummary> allUsers = instance.getAlternatives().values().stream().flatMap(Collection::stream)
                 .map(Alternative::getUsers).flatMap(Collection::stream);
         List<String> userIds = allUsers.map(u -> {
             UserSummary userSummary = idController.simplifyId(u);
             return userSummary.getId();
         }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+
+        instance.getAlternatives().values().stream().forEach(value -> value.forEach(v -> idController.simplifyIdIfObjectIsAMap(v.getValue())));
 
         /* TODO there's a lot of replication of big payloads here since we're keeping the picture in every sub element.
          *  Can't we just provide an additional map at the root level which is then looked up by the UI?

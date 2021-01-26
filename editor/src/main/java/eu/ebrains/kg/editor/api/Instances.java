@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RequestMapping("/instances")
 @RestController
+// TODO Add proper error handling
 public class Instances {
 
 
@@ -44,11 +45,16 @@ public class Instances {
     }
 
     @PatchMapping("/{id}")
-    public void updateInstance(@PathVariable("id") String id, @RequestBody Map<String, Object> payload) {
+    public KGCoreResult<InstanceFull> updateInstance(@PathVariable("id") String id, @RequestBody Map<String, Object> payload) {
+        Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.patchInstance(id, normalizedPayload);
+        InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);   
+        return new KGCoreResult<InstanceFull>().setData(instanceFull);   
     }
 
     @DeleteMapping("/{id}")
     public void deleteInstance(@PathVariable("id") String id) {
+        instanceClient.deleteInstance(id);
     }
 
     @GetMapping("/{id}/scope")

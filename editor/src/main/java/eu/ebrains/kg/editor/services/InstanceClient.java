@@ -102,13 +102,14 @@ public class InstanceClient extends AbstractServiceClient {
                 .block();
     }
 
-    public Map patchInstance(String id, String body) {
+    public ResultWithOriginalMap<InstanceFull> patchInstance(String id, Map<?, ?> body) {
         String uri = String.format("instances/%s?returnPermissions=true&returnAlternatives=true", id);
-        return patch(uri)
+        KGCoreResult.Single response = patch(uri)
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(KGCoreResult.Single.class)
                 .block();
+        return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
 

@@ -6,9 +6,10 @@ import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class StructureOfField {
+public class StructureOfField implements Serializable {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public StructureOfField(

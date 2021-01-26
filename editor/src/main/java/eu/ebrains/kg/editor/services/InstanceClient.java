@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,22 +24,32 @@ public class InstanceClient extends AbstractServiceClient {
         this.objectMapper = jacksonObjectMapper;
     }
 
-    public <T> T getInstances(List<String> ids,
-                            String stage,
-                            boolean metadata,
-                            boolean returnAlternatives,
-                            boolean returnPermissions,
-                            boolean returnEmbedded,
-                            Class<T> clazz) {
+    public <T> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
+                                                                  String stage,
+                                                                  boolean metadata,
+                                                                  boolean returnAlternatives,
+                                                                  boolean returnPermissions,
+                                                                  boolean returnEmbedded,
+                                                                  Class<T> clazz) {
         String uri = String.format("instancesByIds?stage=%s&metadata=%s&returnAlternatives=%s&returnPermissions=%s&returnEmbedded=%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded);
-        return post(uri)
-            .body(BodyInserters.fromValue(ids))
-            .retrieve()
-            .bodyToMono(clazz)
-            .block();
+        KGCoreResult.Single originalMap = post(uri)
+                .body(BodyInserters.fromValue(ids))
+                .retrieve()
+                .bodyToMono(KGCoreResult.Single.class)
+                .block();
+        HashMap<String, ResultWithOriginalMap<T>> result = new HashMap<>();
+        if (originalMap != null && originalMap.getData() != null) {
+            originalMap.getData().keySet().forEach(f -> {
+                Object o = originalMap.getData().get(f);
+                KGCoreResult.Single r = objectMapper.convertValue(o, KGCoreResult.Single.class);
+                result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+            });
+        }
+        return result;
     }
 
-    private static class InstanceSummaryFromKG extends KGCoreResult<List<InstanceSummary>> {}
+    private static class InstanceSummaryFromKG extends KGCoreResult<List<InstanceSummary>> {
+    }
 
     public List<InstanceSummary> searchInstances(String space,
                                                  String type,
@@ -53,7 +64,7 @@ public class InstanceClient extends AbstractServiceClient {
             uri += String.format("&size=%s", size);
         }
         InstanceSummaryFromKG response = get(uri).retrieve().bodyToMono(InstanceSummaryFromKG.class).block();
-        return response != null  ? response.getData() : null;
+        return response != null ? response.getData() : null;
     }
 
     public Map getInstanceScope(String id) {
@@ -118,14 +129,21 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
 
-    private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(KGCoreResult.Single response, Class<T> target){
-        if(response!=null) {
-            Map<String, Object> data = response.getData();
+    private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(KGCoreResult.Single response, Class<T> target) {
+        if (response != null) {
+            return buildResultWithOriginalMap(response.getData(), target);
+        }
+        return null;
+    }
+
+    private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(Map data, Class<T> target) {
+        if (data != null) {
             T mapped = objectMapper.convertValue(data, target);
             return new ResultWithOriginalMap<T>(data, mapped);
         }
         return null;
     }
+
 
     public ResultWithOriginalMap<InstanceFull> postInstance(String id, String workspace, Map<?, ?> body) {
         String uri = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, workspace);

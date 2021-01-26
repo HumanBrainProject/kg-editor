@@ -3,8 +3,9 @@ package eu.ebrains.kg.editor.models.commons;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
+import eu.ebrains.kg.editor.models.HasId;
 
-public class UserSummary {
+public class UserSummary implements HasId {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public UserSummary(
@@ -23,10 +24,12 @@ public class UserSummary {
     //This is actually a data url...
     private String picture;
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getId() {
         return id;
     }

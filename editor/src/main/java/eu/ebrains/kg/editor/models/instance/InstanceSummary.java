@@ -3,13 +3,14 @@ package eu.ebrains.kg.editor.models.instance;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
+import eu.ebrains.kg.editor.models.HasId;
 import eu.ebrains.kg.editor.models.commons.Permissions;
 import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InstanceSummary {
+public class InstanceSummary implements HasId {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public InstanceSummary(
@@ -18,7 +19,7 @@ public class InstanceSummary {
             @JsonProperty(EditorConstants.VOCAB_SPACE) String kgWorkspace,
             @JsonProperty(EditorConstants.VOCAB_PERMISSIONS) List<String> kgPermissions
     ) {
-        this.id = getLastPathItem(kgId);
+        this.id = kgId;
         this.types = handleTypes(kgType);
         this.workspace = kgWorkspace;
         this.permissions = Permissions.fromPermissionList(kgPermissions);
@@ -36,10 +37,12 @@ public class InstanceSummary {
     private String name;
     private List<StructureOfField> fields;
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getId() {
         return id;
     }

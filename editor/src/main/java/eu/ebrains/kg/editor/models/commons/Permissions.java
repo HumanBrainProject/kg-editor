@@ -16,7 +16,7 @@ public class Permissions {
     }
 
     public static Permissions fromPermissionList(List<String> permissions){
-        return new Permissions(
+        return permissions == null ? null : new Permissions(
                 permissions.contains("CREATE"),
                 permissions.contains("INVITE_FOR_REVIEW"),
                 permissions.contains("DELETE"),

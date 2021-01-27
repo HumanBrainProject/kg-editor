@@ -51,7 +51,7 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
 
-    public List<ResultWithOriginalMap<InstanceSummary>> searchInstanceSummaries(String space,
+    public KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>> searchInstanceSummaries(String space,
                                                                                        String type,
                                                                                        Integer from,
                                                                                        Integer size,
@@ -68,7 +68,8 @@ public class InstanceClient extends AbstractServiceClient {
         }
         KGCoreResult.List response = get(uri).retrieve().bodyToMono(KGCoreResult.List.class).block();
         if(response!=null){
-            return response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).collect(Collectors.toList());
+            List<ResultWithOriginalMap<InstanceSummary>> resultList = response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).collect(Collectors.toList());
+            return new KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>>().setData(resultList).setTotalResults(response.getTotal()).setFrom(response.getFrom()).setSize(response.getSize());
         }
         return null;
     }
@@ -85,19 +86,18 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
     private static class NeighborFromKG extends KGCoreResult<Neighbor>{}
-    public Neighbor getNeighbors(String id) {
+    public KGCoreResult<Neighbor> getNeighbors(String id) {
         String uri = String.format("instances/%s/neighbors?stage=IN_PROGRESS", id);
-        NeighborFromKG response = get(uri)
+        return get(uri)
                 .retrieve()
                 .bodyToMono(NeighborFromKG.class)
                 .block();
-        return response != null ? response.getData() : null;
     }
 
     private static class SuggestionFromKG extends KGCoreResult<SuggestionStructure> {
     }
 
-    public SuggestionStructure postSuggestions(String id,
+    public KGCoreResult<SuggestionStructure> postSuggestions(String id,
                                                String field,
                                                String type,
                                                Integer start,
@@ -111,12 +111,11 @@ public class InstanceClient extends AbstractServiceClient {
         if (StringUtils.isNotBlank(type)) {
             uri += String.format("&type=%s", type);
         }
-        SuggestionFromKG response = post(uri)
+        return post(uri)
                 .body(BodyInserters.fromValue(payload))
                 .retrieve()
                 .bodyToMono(SuggestionFromKG.class)
                 .block();
-        return response!=null ? response.getData() : null;
     }
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {

@@ -111,23 +111,27 @@ public class Instances {
                                                             @RequestParam(value = "size", required = false, defaultValue = "50") int size,
                                                             @RequestParam(value = "search", required = false) String search,
                                                             @RequestBody Map<String, Object> payload) {
-        SuggestionStructure suggestionStructure = instanceClient.postSuggestions(id, field, type, start, size, search, payload);
-        suggestionStructure.getSuggestions().getData().forEach(s -> {
-            if(s!=null && s.getType()!=null){
-                SimpleTypeWithSpaces fullType = suggestionStructure.getTypes().get(s.getType().getName());
-                if(fullType!=null){
-                    s.setType(fullType);
+        KGCoreResult<SuggestionStructure> suggestionStructure = instanceClient.postSuggestions(id, field, type, start, size, search, payload);
+        if(suggestionStructure!= null && suggestionStructure.getData()!=null){
+            suggestionStructure.getData().getSuggestions().getData().forEach(s -> {
+                if(s!=null && s.getType()!=null){
+                    SimpleTypeWithSpaces fullType = suggestionStructure.getData().getTypes().get(s.getType().getName());
+                    if(fullType!=null){
+                        s.setType(fullType);
+                    }
                 }
-            }
-        });
-        return new KGCoreResult<SuggestionStructure>().setData(suggestionStructure);
+            });
+        }
+        return suggestionStructure;
     }
 
     @GetMapping("/{id}/neighbors")
     public KGCoreResult<Neighbor> getInstanceNeighbors(@PathVariable("id") String id) {
-        Neighbor neighbor = instanceClient.getNeighbors(id);
-        instanceController.enrichNeighborRecursivelyWithTypeInformation(neighbor);
-        return new KGCoreResult<Neighbor>().setData(neighbor);
+        KGCoreResult<Neighbor> neighbor = instanceClient.getNeighbors(id);
+        if(neighbor!=null && neighbor.getData()!=null) {
+            instanceController.enrichNeighborRecursivelyWithTypeInformation(neighbor.getData());
+        }
+        return neighbor;
     }
 
 

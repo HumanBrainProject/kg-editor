@@ -1,5 +1,6 @@
 package eu.ebrains.kg.editor.api;
 
+import eu.ebrains.kg.editor.controllers.IdController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceSummary;
@@ -23,10 +24,12 @@ import java.util.stream.Collectors;
 // TODO check if this could be moved to another place
 public class Summary {
 
+    private final IdController idController;
     private final InstanceClient instanceClient;
     private final WorkspaceClient workspaceClient;
 
-    public Summary(InstanceClient instanceClient, WorkspaceClient workspaceClient) {
+    public Summary(IdController idController, InstanceClient instanceClient, WorkspaceClient workspaceClient) {
+        this.idController = idController;
         this.instanceClient = instanceClient;
         this.workspaceClient = workspaceClient;
     }
@@ -66,6 +69,7 @@ public class Summary {
                     t.setColor(byName.getData().getColor());
                 }
             });
+            idController.simplifyId(r.getResult());
             return r.getResult();
         }).collect(Collectors.toList());
         return new KGCoreResult<List<InstanceSummary>>().setData(instanceSummary);

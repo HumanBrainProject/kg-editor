@@ -45,7 +45,9 @@ public class InstanceClient extends AbstractServiceClient {
             originalMap.getData().keySet().forEach(f -> {
                 Object o = originalMap.getData().get(f);
                 KGCoreResult.Single r = objectMapper.convertValue(o, KGCoreResult.Single.class);
-                result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+                if(f != null && r.getData() != null) {
+                    result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+                }
             });
         }
         return result;

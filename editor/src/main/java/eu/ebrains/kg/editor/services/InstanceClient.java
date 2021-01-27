@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class InstanceClient extends AbstractServiceClient {
@@ -50,23 +51,27 @@ public class InstanceClient extends AbstractServiceClient {
         return result;
     }
 
-    private static class InstanceSummaryFromKG extends KGCoreResult<List<InstanceSummary>> {
-    }
 
-    public List<InstanceSummary> searchInstances(String space,
-                                                 String type,
-                                                 Integer from,
-                                                 Integer size,
-                                                 String searchByLabel) {
-        String uri = String.format("instances?stage=IN_PROGRESS&returnPermissions=true&type=%s&space=%s&searchByLabel=%s", type, space, searchByLabel);
+    public List<ResultWithOriginalMap<InstanceSummary>> searchInstanceSummaries(String space,
+                                                         String type,
+                                                         Integer from,
+                                                         Integer size,
+                                                         String searchByLabel) {
+        String uri = String.format("instances?stage=IN_PROGRESS&returnPermissions=true&type=%s&space=%s", type, space);
+        if(searchByLabel!=null){
+            uri = String.format("%s&searchByLabel=%s", uri, searchByLabel);
+        }
         if (from != null) {
-            uri += String.format("&from=%s", from);
+            uri = String.format("%s&from=%s", uri, from);
         }
         if (size != null) {
-            uri += String.format("&size=%s", size);
+            uri = String.format("%s&size=%s", uri, size);
         }
-        InstanceSummaryFromKG response = get(uri).retrieve().bodyToMono(InstanceSummaryFromKG.class).block();
-        return response != null ? response.getData() : null;
+        KGCoreResult.List response = get(uri).retrieve().bodyToMono(KGCoreResult.List.class).block();
+        if(response!=null){
+            return response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).collect(Collectors.toList());
+        }
+        return null;
     }
 
     public Map getInstanceScope(String id) {

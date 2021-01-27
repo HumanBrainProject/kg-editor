@@ -19,23 +19,23 @@ public class StructureOfType {
             @JsonProperty(EditorConstants.VOCAB_COLOR) String kgColor,
             @JsonProperty(EditorConstants.VOCAB_LABEL_PROPERTY) String kgLabelField,
             @JsonProperty(EditorConstants.VOCAB_PROPERTIES) List<StructureOfField> kgFields
-            ){
+    ) {
         this.label = kgLabel;
         this.name = kgName;
         this.color = kgColor;
         this.labelField = kgLabelField;
-        this.promotedFields = kgFields.stream().filter(StructureOfType::filterField).filter(f -> f.getSearchable() != null && f.getSearchable()).map(StructureOfField::getFullyQualifiedName).sorted().collect(Collectors.toList());
-        if(this.labelField != null){
+        this.promotedFields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).filter(f -> f.getSearchable() != null && f.getSearchable()).map(StructureOfField::getFullyQualifiedName).sorted().collect(Collectors.toList()) : null;
+        if (this.labelField != null && this.promotedFields != null) {
             //Ensure the label field is at the first position
             this.promotedFields.remove(this.labelField);
             this.promotedFields.add(0, this.labelField);
         }
-        this.fields = kgFields.stream().filter(StructureOfType::filterField).collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, f -> f));
+        this.fields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, f -> f)) : null;
     }
 
     private static final List<String> FIELDS_BLACKLIST = Arrays.asList("@id", "@type", SchemaFieldsConstants.IDENTIFIER, EditorConstants.VOCAB_ALTERNATIVE, EditorConstants.VOCAB_USER, EditorConstants.VOCAB_SPACES, EditorConstants.VOCAB_PROPERTY_UPDATES);
 
-    private static boolean filterField(StructureOfField f){
+    private static boolean filterField(StructureOfField f) {
         return f.getLabel() != null && !FIELDS_BLACKLIST.contains(f.getFullyQualifiedName());
     }
 

@@ -25,4 +25,9 @@ public class RestControllerAdvice {
     protected ResponseEntity<?> internalServerError(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    protected ResponseEntity<?> illegalArgument(RuntimeException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

@@ -5,6 +5,7 @@ import eu.ebrains.kg.editor.controllers.InstanceController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
+import eu.ebrains.kg.editor.models.instance.Neighbor;
 import eu.ebrains.kg.editor.models.instance.SimpleTypeWithSpaces;
 import eu.ebrains.kg.editor.models.instance.SuggestionStructure;
 import eu.ebrains.kg.editor.services.InstanceClient;
@@ -22,7 +23,6 @@ public class Instances {
     private final InstanceClient instanceClient;
     private final InstanceController instanceController;
     private final IdController idController;
-
 
     public Instances(InstanceClient instanceClient, InstanceController instanceController, IdController idController) {
         this.instanceClient = instanceClient;
@@ -112,8 +112,14 @@ public class Instances {
     }
 
     @GetMapping("/{id}/neighbors")
-    public void getInstanceNeighbors(@PathVariable("id") String id) {
+    public KGCoreResult<Neighbor> getInstanceNeighbors(@PathVariable("id") String id) {
+        Neighbor neighbor = instanceClient.getNeighbors(id);
+        instanceController.enrichNeighborRecursivelyWithTypeInformation(neighbor);
+        return new KGCoreResult<Neighbor>().setData(neighbor);
     }
+
+
+
 
 
 }

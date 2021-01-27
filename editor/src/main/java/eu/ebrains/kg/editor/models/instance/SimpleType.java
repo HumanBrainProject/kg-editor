@@ -9,6 +9,7 @@ public class SimpleType {
     private final String name;
     private String label;
     private String color;
+    private String labelField;
 
     public String getName() {
         return name;
@@ -28,5 +29,13 @@ public class SimpleType {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getLabelField() {
+        return labelField;
+    }
+
+    public void setLabelField(String labelField) {
+        this.labelField = labelField;
     }
 }

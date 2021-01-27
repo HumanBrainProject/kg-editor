@@ -5,6 +5,7 @@ import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.InstanceFull;
 import eu.ebrains.kg.editor.models.instance.InstanceSummary;
+import eu.ebrains.kg.editor.models.instance.Neighbor;
 import eu.ebrains.kg.editor.models.instance.SuggestionStructure;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -76,12 +77,14 @@ public class InstanceClient extends AbstractServiceClient {
                 .block();
     }
 
-    public Map getNeighbors(String id) {
+    private static class NeighborFromKG extends KGCoreResult<Neighbor>{}
+    public Neighbor getNeighbors(String id) {
         String uri = String.format("instances/%s/neighbors?stage=IN_PROGRESS", id);
-        return get(uri)
+        NeighborFromKG response = get(uri)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(NeighborFromKG.class)
                 .block();
+        return response != null ? response.getData() : null;
     }
 
     private static class SuggestionFromKG extends KGCoreResult<SuggestionStructure> {

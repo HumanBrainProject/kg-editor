@@ -57,11 +57,12 @@ public class InstanceController {
       return result;
     }
 
-    private void enrichSimpleType(SimpleType t, Map<String, KGCoreResult<StructureOfType>> typesByName){
+    public void enrichSimpleType(SimpleType t, Map<String, KGCoreResult<StructureOfType>> typesByName){
         KGCoreResult<StructureOfType> structureOfTypeKGCoreResult = typesByName.get(t.getName());
         if (structureOfTypeKGCoreResult != null && structureOfTypeKGCoreResult.getData() != null) {
             t.setColor(structureOfTypeKGCoreResult.getData().getColor());
             t.setLabel(structureOfTypeKGCoreResult.getData().getLabel());
+            t.setLabelField(structureOfTypeKGCoreResult.getData().getLabelField());
         }
     }
 
@@ -120,7 +121,7 @@ public class InstanceController {
             return userSummary.getId();
         }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
-        instance.getAlternatives().values().stream().forEach(value -> value.forEach(v -> idController.simplifyIdIfObjectIsAMap(v.getValue())));
+        instance.getAlternatives().values().forEach(value -> value.forEach(v -> idController.simplifyIdIfObjectIsAMap(v.getValue())));
 
         /* TODO there's a lot of replication of big payloads here since we're keeping the picture in every sub element.
          *  Can't we just provide an additional map at the root level which is then looked up by the UI?
@@ -130,6 +131,25 @@ public class InstanceController {
                 .map(Alternative::getUsers).flatMap(Collection::stream).forEach(u ->
                 u.setPicture(userPictures.get(u.getId()))
         );
+    }
+
+    public void enrichNeighborRecursivelyWithTypeInformation(Neighbor neighbor){
+        Set<String> typesInNeighbor = findTypesInNeighbor(neighbor, new HashSet<>());
+        Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(new ArrayList<>(typesInNeighbor), true);
+        enrichTypesInNeighbor(neighbor, typesByName);
+    }
+
+    private  void enrichTypesInNeighbor(Neighbor neighbor, Map<String, KGCoreResult<StructureOfType>> types){
+        neighbor.getTypes().forEach(t -> enrichSimpleType(t, types));
+        neighbor.getInbound().forEach(i -> enrichTypesInNeighbor(i, types));
+        neighbor.getOutbound().forEach(o -> enrichTypesInNeighbor(o, types));
+    }
+
+    private static Set<String> findTypesInNeighbor(Neighbor neighbor, Set<String> acc){
+        acc.addAll(neighbor.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
+        neighbor.getInbound().forEach(inboundNeighbor -> findTypesInNeighbor(inboundNeighbor, acc));
+        neighbor.getOutbound().forEach(outboundNeighbor -> findTypesInNeighbor(outboundNeighbor, acc));
+        return acc;
     }
 
 

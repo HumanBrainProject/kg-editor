@@ -4,10 +4,7 @@ import eu.ebrains.kg.editor.controllers.IdController;
 import eu.ebrains.kg.editor.controllers.InstanceController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
-import eu.ebrains.kg.editor.models.instance.InstanceFull;
-import eu.ebrains.kg.editor.models.instance.Neighbor;
-import eu.ebrains.kg.editor.models.instance.SimpleTypeWithSpaces;
-import eu.ebrains.kg.editor.models.instance.SuggestionStructure;
+import eu.ebrains.kg.editor.models.instance.*;
 import eu.ebrains.kg.editor.services.InstanceClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,18 +74,22 @@ public class Instances {
     }
 
     @PostMapping("/summary")
-    public void getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+    public KGCoreResult<Map<String, InstanceFull>> getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                     @RequestBody List<String> ids) {
-//        InstanceSummary instances = instanceClient.getInstances(ids, stage, metadata, false, true, false, InstancesSummaryFromKG.class);
-//        instances.
-
+//        Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
+//        Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result);
+//        return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
+        return null;
     }
 
     @PostMapping("/label")
-    public void getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+    public KGCoreResult<Map<String, InstanceLabel>> getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                   @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                   @RequestBody List<String> ids) {
+        Map<String, ResultWithOriginalMap<InstanceLabel>> result = instanceClient.getInstances(ids, stage, metadata, false, false, false, InstanceLabel.class);
+        Map<String, InstanceLabel> enrichedInstances = instanceController.enrichInstancesLabel(result);
+        return new KGCoreResult<Map<String, InstanceLabel>>().setData(enrichedInstances);
     }
 
     @PostMapping("/{id}/suggestions")

@@ -173,4 +173,14 @@ public class InstanceClient extends AbstractServiceClient {
         return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
+    public ResultWithOriginalMap<InstanceFull> postInstance(String workspace, Map<?, ?> body) {
+        String uri = String.format("instances?returnPermissions=true&space=%s&returnAlternatives=true", workspace);
+        KGCoreResult.Single response = post(uri)
+                .body(BodyInserters.fromValue(body))
+                .retrieve()
+                .bodyToMono(KGCoreResult.Single.class)
+                .block();
+        return buildResultWithOriginalMap(response, InstanceFull.class);
+    }
+
 }

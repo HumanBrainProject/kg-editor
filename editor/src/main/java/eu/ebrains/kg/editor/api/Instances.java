@@ -44,6 +44,16 @@ public class Instances {
         return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
+
+    @PostMapping
+    public KGCoreResult<InstanceFull> createInstanceWithoutId(@RequestParam("workspace") String workspace,
+                                                     @RequestBody Map<String, Object> payload) {
+        Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(workspace, normalizedPayload);
+        InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);
+        return new KGCoreResult<InstanceFull>().setData(instanceFull);
+    }
+
     @PatchMapping("/{id}")
     public KGCoreResult<InstanceFull> updateInstance(@PathVariable("id") String id,
                                                      @RequestBody Map<String, Object> payload) {

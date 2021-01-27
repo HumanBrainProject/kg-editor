@@ -15,10 +15,11 @@
 */
 
 import React from "react";
+import { observer } from "mobx-react-lite";
 
 import ListItem from "./ListItem";
 
-const List = ({
+const List = observer(({
   list,
   readOnly,
   disabled,
@@ -44,6 +45,6 @@ const List = ({
       />
     ))}
   </span>
-);
+));
 
 export default List;

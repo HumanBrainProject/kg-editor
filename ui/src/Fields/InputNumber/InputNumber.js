@@ -38,38 +38,10 @@ const useStyles = createUseStyles({
   }
 });
 
-const Lines = ({lines}) => {
-  return (
-    <div>
-      {lines.map((line, index) => {
-        return(
-          <p key={line+(""+index)}>{line}</p>
-        );
-      })}
-    </div>
-  );
-};
-
-const FieldValue = ({field, splitLines}) => {
-  const { value } = field;
-  const val = !value || typeof value === "string"? value:value.toString();
-
-  if (splitLines) {
-    const lines = typeof value === "string"?value.split("\n"):[];
-    return (
-      <Lines lines={lines} />
-    );
-  }
-
-  return (
-    <span>&nbsp;{val}</span>
-  );
-};
-
-const AlternativeValue = observer(({alternative}) => alternative.value);
+const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
 AlternativeValue.displayName = "AlternativeValue";
 
-const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
+const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
 
   const classes = useStyles();
 
@@ -78,7 +50,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const {
     value,
     inputType,
-    rows,
     returnAsNull,
     alternatives,
     label,
@@ -97,16 +68,18 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     if(!value && !showIfNoValue) {
       return null;
     }
+
+    const val = !value || typeof value === "string"? value:value.toString();
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip}labelTooltipIcon={labelTooltipIcon} />
-        <FieldValue field={fieldStore} splitLines={as === "textarea"} />
+        <span>&nbsp;{val}</span>
       </Form.Group>
     );
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.minMaxValueWarning);
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
@@ -123,10 +96,8 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
       <Form.Control
         value={value}
         type={inputType}
-        as={as}
         onChange={handleChange}
         disabled={isDisabled}
-        rows={rows}
         className={hasWarning && hasWarningMessages?classes.warning:""}
       />
       {hasWarning && hasWarningMessages &&
@@ -135,6 +106,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     </Form.Group>
   );
 });
-InputText.displayName = "InputText";
+InputNumber.displayName = "InputNumber";
 
-export default InputText;
+export default InputNumber;

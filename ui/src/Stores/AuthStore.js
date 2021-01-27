@@ -15,6 +15,7 @@
 */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
+import * as Sentry from "@sentry/browser";
 
 const rootPath = window.rootPath || "";
 
@@ -189,6 +190,13 @@ export class AuthStore {
       const { data } = await this.transportLayer.getAuthEndpoint();
       runInAction(() => {
         this.endpoint =  data && data.data? data.data.endpoint :null;
+        const sentryUrl = data && data.data? data.data.sentryUrl :null;
+        if (sentryUrl) {
+          Sentry.init({
+            dsn: sentryUrl,
+            environment: window.location.host
+          });
+        }
       });
       if(this.endpoint) {
         try {

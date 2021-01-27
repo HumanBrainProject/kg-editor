@@ -80,14 +80,15 @@ const theme = {
     }
   },
   warn: {
+    color: "#e67e22",
     quiet: {
-      color: "#473600"
+      backgroundColor: "#473600"
     },
     normal: {
-      color: "#8f6b00"
+      backgroundColor: "#8f6b00"
     },
     loud: {
-      color: "#b88a00"
+      backgroundColor: "#b88a00"
     }
   },
   info: {

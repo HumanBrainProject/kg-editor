@@ -15,35 +15,24 @@
 */
 
 import React from "react";
+import { createUseStyles } from "react-jss";
 
-import { useStores } from "../Hooks/UseStores";
-
-class ErrorBoundaryComponent extends React.Component {
-
-  static getDerivedStateFromError() {
-    return null;
+const useStyles = createUseStyles({
+  invalid: {
+    display: "block",
+    width: "100%",
+    marginTop: ".25rem",
+    fontSize: "80%",
+    color: "var(--ft-color-warn)",
+    fontWeight: "bold"
   }
+});
 
-  componentDidCatch(error, info) {
-    const { stores:{ appStore } } = this.props;
-    appStore.setGlobalError(error, info);
-  }
-
-  render() {
-    const { children } = this.props;
-    return children;
-  }
-}
-
-const ErrorBoundary = ({ children }) => {
-
-  const stores = useStores();
-
+const Invalid = ({ messages }) => {
+  const classes = useStyles();
   return (
-    <ErrorBoundaryComponent stores={stores} >
-      {children}
-    </ErrorBoundaryComponent>
+    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message}</div>)
   );
 };
 
-export default ErrorBoundary;
+export default Invalid;

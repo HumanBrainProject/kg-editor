@@ -22,7 +22,6 @@ import { useStores } from "../Hooks/UseStores";
 
 import BGMessage from "../Components/BGMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as Sentry from "@sentry/browser";
 
 const useStyles = createUseStyles({
   container: {
@@ -49,9 +48,6 @@ const GlobalError = () => {
           If the problem persists, please contact the support.<br /><br />
         <Button variant={"primary"} onClick={handleDismiss}>
           <FontAwesomeIcon icon={"check"} /> &nbsp; Dismiss
-        </Button>&nbsp;&nbsp;
-        <Button variant={"warning"} onClick={() => Sentry.showReportDialog({ title: "An unexpected error has occured.", subtitle2: "We recommend you to save all your changes and reload the application in your browser. The KG team has been notified. If you'd like to help, tell us what happened below.", labelEmail: "Email(optional)", labelName: "Name(optional)", user: { email: "error@kgeditor.com", name: "Error Reporter" }, labelComments: "Please fill in a description of your error use case" })}>
-          <FontAwesomeIcon icon={"envelope"} /> &nbsp; Send an error report
         </Button>
       </BGMessage>
     </div >

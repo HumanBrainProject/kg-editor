@@ -13,17 +13,17 @@
 *   See the License for the specific language governing permissions and
 *   limitations under the License.
 */
-
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, toJS, makeObservable, action, computed } from "mobx";
 
 import FieldStore from "./FieldStore";
 
-class InputTextStore extends FieldStore {
+class InputNumberStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
-  maxLength = null;
-  regex = null;
+  inputType = "number";
+  minValue = null;
+  maxValue = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
@@ -31,29 +31,56 @@ class InputTextStore extends FieldStore {
       value: observable,
       returnAsNull: observable,
       initialValue: observable,
-      maxLength: observable,
-      regex: observable,
-      returnValue: computed,
-      requiredValidationWarning: computed,
-      maxLengthWarning: computed,
-      cloneWithInitialValue: computed,
-      warningMessages: computed,
-      hasWarningMessages: computed,
+      minValue: observable,
+      maxValue: observable,
       updateValue: action,
       reset: action,
       hasChanged: computed,
-      setValue: action
+      setValue: action,
+      returnValue: computed,
+      minMaxValueWarning: computed,
+      warningMessages: computed,
+      requiredValidationWarning: computed,
+      hasWarningMessages: computed
     });
-    this.maxLength = definition.maxLength;
-    this.regex = definition.regex;
+    this.minValue = 2; //definition.minValue;
+    this.maxValue = definition.maxValue;
+  }
+
+  get minMaxValueWarning() {
+    if(!this.minValue && !this.maxValue) {
+      return false;
+    }
+    if(this.minValue || this.maxValue) {
+      return true;
+    }
+    return false;
+  }
+
+  get warningMessages() {
+    const messages = {};
+    if (this.hasChanged) {
+      if(this.minMaxValueWarning) {
+        if(this.minValue && this.maxValue) {
+          if(this.value < this.minValue || this.value > this.maxValue) {
+            messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
+          }
+        } else if(this.value < this.minValue) {
+          messages.minMaxValue = `Value should be bigger than ${this.minValue}`;
+        } else if(this.value.length > this.maxValue) {
+          messages.minMaxValue = `Value should be smaller than ${this.maxValue}`;
+        }
+      }
+    }
+    return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   get returnValue() {
-    return this.doReturnValue();
-  }
-
-  doReturnValue() {
-    if (this.value === "" && this.returnAsNull) {
+    if (this.value === null && this.returnAsNull) {
       return null;
     }
     return toJS(this.value);
@@ -63,50 +90,10 @@ class InputTextStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value === "") {
+    if(this.value === null) {
       return true;
     }
     return false;
-  }
-
-  get maxLengthWarning() {
-    if(!this.maxLength) {
-      return false;
-    }
-    if(this.value.length > this.maxLength) {
-      return true;
-    }
-    return false;
-  }
-
-  get regexWarning() {
-    if(!this.regex) {
-      return false;
-    }
-    if(!this.regex.test(this.value)) {
-      return true;
-    }
-    return false;
-  }
-
-  get warningMessages() {
-    const messages = {};
-    if (this.hasChanged) {
-      if(this.requiredValidationWarning) {
-        messages.required = "This field is marked as required.";
-      }
-      if(this.maxLengthWarning) {
-        messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
-      }
-      if(this.regexWarning) {
-        messages.regex = `${this.value} is not a valid value`;
-      }
-    }
-    return messages;
-  }
-
-  get hasWarningMessages() {
-    return Object.keys(this.warningMessages).length > 0;
   }
 
   get cloneWithInitialValue() {
@@ -147,4 +134,4 @@ class InputTextStore extends FieldStore {
   }
 }
 
-export default InputTextStore;
+export default InputNumberStore;

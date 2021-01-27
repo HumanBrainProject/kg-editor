@@ -17,7 +17,7 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 
-class InputTextMultipleStore extends FieldStore {
+class InputNumberMultipleStore extends FieldStore {
   value = [];
   options = [];
   returnAsNull = false;
@@ -26,13 +26,15 @@ class InputTextMultipleStore extends FieldStore {
   regex = null;
   minItems = null;
   maxItems = null;
+  minValue = null;
+  maxValue = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
-    this.maxLength = definition.maxLength;
-    this.regex = definition.regex;
+    this.minValue = definition.minValue;
+    this.maxValue = definition.maxValue;
 
     makeObservable(this, {
       value: observable,
@@ -42,6 +44,8 @@ class InputTextMultipleStore extends FieldStore {
       maxLength: observable,
       minItems: observable,
       maxItems: observable,
+      minValue: observable,
+      maxValue: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       requiredValidationWarning: computed,
@@ -86,32 +90,33 @@ class InputTextMultipleStore extends FieldStore {
     return false;
   }
 
-  get maxLengthWarning() {
-    if(!this.maxLength) {
-      return false;
-    }
-    if(this.maxLength) {
-      return true;
-    }
-    return false;
+  updateValue(value) {
+    this.returnAsNull = false;
+    const values = Array.isArray(value)?value:(value !== null && value !== undefined?[value]:[]);
+    this.initialValue = [...values];
+    this.value = values;
   }
 
-  get regexWarning() {
-    if(!this.regex) {
-      return false;
-    }
-    if(this.regex) {
-      return true;
-    }
-    return false;
+  reset() {
+    this.returnAsNull = false;
+    this.value = [...this.initialValue];
   }
-
 
   get numberOfItemsWarning() {
     if(!this.minItems && !this.maxItems) {
       return false;
     }
     if(this.minItems || this.maxItems) {
+      return true;
+    }
+    return false;
+  }
+
+  get minMaxValueWarning() {
+    if(!this.minValue && !this.maxValue) {
+      return false;
+    }
+    if(this.minValue || this.maxValue) {
       return true;
     }
     return false;
@@ -128,17 +133,18 @@ class InputTextMultipleStore extends FieldStore {
         } else if(this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
         } else if(this.value.length > this.maxItems) {
-          messages.numberOfItems = `Number of values should be smaller than ${this.maxItems}`;
+          messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
         }
       }
-      if(this.maxLengthWarning) {
-        if (this.value.some(val => val.length > this.maxLength)) {
-          messages.maxValues = `Maximum characters allowed per value: ${this.maxLength}`;
-        }
-      }
-      if(this.regexWarning) {
-        if (this.value.some(val => !this.regex.test(val))) {
-          messages.regex = "Invalid value";
+      if(this.minMaxValueWarning) {
+        if(this.minValue && this.maxValue) {
+          if (this.value.some(val => val < this.minValue || val > this.maxValue)) {
+            messages.minMaxValues = `Values should be between ${this.minValue} and ${this.maxValue}`;
+          }
+        } else if (this.value.some(val => val < this.minValue)) {
+          messages.minMaxValues = `Values should be bigger than ${this.minValue}`;
+        } else if (this.value.some(val => val > this.maxValue)) {
+          messages.minMaxValues = `Values should be smaller than ${this.maxValue}`;
         }
       }
     }
@@ -152,19 +158,6 @@ class InputTextMultipleStore extends FieldStore {
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
   }
-
-  updateValue(value) {
-    this.returnAsNull = false;
-    const values = Array.isArray(value)?value:(value !== null && value !== undefined?[value]:[]);
-    this.initialValue = [...values];
-    this.value = values;
-  }
-
-  reset() {
-    this.returnAsNull = false;
-    this.value = [...this.initialValue];
-  }
-
 
   insertValue(value, index) {
     if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
@@ -220,4 +213,4 @@ class InputTextMultipleStore extends FieldStore {
   }
 }
 
-export default InputTextMultipleStore;
+export default InputNumberMultipleStore;

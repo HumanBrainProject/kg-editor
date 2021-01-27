@@ -14,36 +14,14 @@
 *   limitations under the License.
 */
 
-import React from "react";
+import InputTextStore from "./InputTextStore";
 
-import { useStores } from "../Hooks/UseStores";
+class InputDateStore extends InputTextStore {
+  inputType = "date";
 
-class ErrorBoundaryComponent extends React.Component {
-
-  static getDerivedStateFromError() {
-    return null;
-  }
-
-  componentDidCatch(error, info) {
-    const { stores:{ appStore } } = this.props;
-    appStore.setGlobalError(error, info);
-  }
-
-  render() {
-    const { children } = this.props;
-    return children;
+  constructor(definition, options, instance, transportLayer) {
+    super(definition, options, instance, transportLayer);
   }
 }
 
-const ErrorBoundary = ({ children }) => {
-
-  const stores = useStores();
-
-  return (
-    <ErrorBoundaryComponent stores={stores} >
-      {children}
-    </ErrorBoundaryComponent>
-  );
-};
-
-export default ErrorBoundary;
+export default InputDateStore;

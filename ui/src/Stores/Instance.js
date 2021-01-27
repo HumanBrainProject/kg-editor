@@ -28,7 +28,7 @@ const compareField = (a, b, ignoreName=false) => {
   if (!b) {
     return -1;
   }
-  if ((!a.order || typeof a !== Number) && (!b.order || typeof b !== Number)) {
+  if (!a.order && !b.order) {
     if (ignoreName) {
       return 0;
     }
@@ -43,13 +43,13 @@ const compareField = (a, b, ignoreName=false) => {
     }
     return a.label.localeCompare(b.label);
   }
-  if (!a.order || typeof a !== Number) {
+  if (!a.order) {
     return 1;
   }
-  if (!b.order || typeof b !== Number) {
+  if (!b.order) {
     return -1;
   }
-  return a - b;
+  return a.order - b.order;
 };
 
 export const normalizeLabelInstanceData = data => {
@@ -538,6 +538,10 @@ export class Instance {
     this.permissions = normalizedData.permissions;
     Object.entries(normalizedData.fields).forEach(([name, field]) => {
       let warning = null;
+      if(name === this.labelField) {
+        field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+        field.labelTooltipIcon = "globe";
+      }
       if (!this.fields[name]) {
         if (!field.widget) {
           warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;

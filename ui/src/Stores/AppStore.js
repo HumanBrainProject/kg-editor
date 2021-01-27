@@ -371,12 +371,15 @@ export class AppStore{
       workspace = this.rootStore.authStore.workspaces[0];
     }
     if(this.currentWorkspace !== workspace) {
-      if(this.rootStore.viewStore.views.size > 0) {
-        if (window.confirm("You are about to change workspace. All opened instances will be closed. Continue ?")) {
+      if(this.rootStore.instanceStore.hasUnsavedChanges) {
+        if (window.confirm("You are about to change workspace. All unsaved changes will be lost. Continue ?")) {
+          this.rootStore.instanceStore.clearUnsavedChanges();
           this.clearViews();
         } else {
           return;
         }
+      } else if(this.rootStore.viewStore.views.size > 0) {
+        this.clearViews();
       }
       this.currentWorkspace = workspace;
       if (this.currentWorkspace) {

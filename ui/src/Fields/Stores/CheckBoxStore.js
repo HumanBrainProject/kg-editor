@@ -29,6 +29,7 @@ class CheckBoxStore extends FieldStore {
       value: observable,
       initialValue: observable,
       returnValue: computed,
+      requiredValidationWarning: computed,
       cloneWithInitialValue: computed,
       updateValue: action,
       reset: action,
@@ -39,6 +40,10 @@ class CheckBoxStore extends FieldStore {
 
   get returnValue() {
     return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    return false;
   }
 
   get cloneWithInitialValue() {

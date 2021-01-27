@@ -43,6 +43,7 @@ import {faChartBar} from "@fortawesome/free-solid-svg-icons/faChartBar";
 import {faCodeBranch} from "@fortawesome/free-solid-svg-icons/faCodeBranch";
 import {faPencilAlt} from "@fortawesome/free-solid-svg-icons/faPencilAlt";
 import {faEye} from "@fortawesome/free-solid-svg-icons/faEye";
+import {faGlobe} from "@fortawesome/free-solid-svg-icons/faGlobe";
 import {faExclamationTriangle} from "@fortawesome/free-solid-svg-icons/faExclamationTriangle";
 import {faUnlink} from "@fortawesome/free-solid-svg-icons/faUnlink";
 import {faBan} from "@fortawesome/free-solid-svg-icons/faBan";
@@ -147,5 +148,6 @@ library.add(
   faTable,
   faAsterisk,
   faLevelDownAlt,
-  faSitemap
+  faSitemap,
+  faGlobe
 );

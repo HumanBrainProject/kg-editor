@@ -25,6 +25,7 @@ import { useStores } from "../../Hooks/UseStores";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
+import Invalid from "../Invalid";
 
 import List from "./List";
 
@@ -47,6 +48,9 @@ const useStyles = createUseStyles({
   },
   alternatives: {
     marginLeft: "3px"
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -65,6 +69,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     links,
     label,
     labelTooltip,
+    labelTooltipIcon,
     mappingValue,
     allowCustomValues,
     optionsSearchTerm,
@@ -74,7 +79,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     hasMoreOptions,
     fetchingOptions,
     alternatives,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -213,7 +219,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} />
         {(view && view.currentInstanceId === instance.id)?
           <List
             list={links}
@@ -238,9 +244,12 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <LinksAlternatives
         className={classes.alternatives}
         list={alternatives}
@@ -249,7 +258,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         mappingValue={mappingValue}
         parentContainerRef={formGroupRef}
       />
-      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={links}
           readOnly={false}
@@ -285,6 +294,9 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           />
         )}
       </div>
+      {hasWarning && hasWarningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

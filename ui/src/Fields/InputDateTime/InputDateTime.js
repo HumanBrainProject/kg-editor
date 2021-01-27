@@ -18,12 +18,21 @@ import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
+import DatePicker from "react-datepicker";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";
-import Invalid from "../Invalid";
+import "react-datepicker/dist/react-datepicker.css";
 
 const useStyles = createUseStyles({
+  containerDatepicker: {
+    "& > .react-datepicker-wrapper": {
+      display: "block"
+    },
+    "& .react-datepicker__triangle": {
+      left: "50px !important"
+    }
+  },
   alternatives: {
     marginLeft: "3px"
   },
@@ -33,43 +42,34 @@ const useStyles = createUseStyles({
       content: "':\\00a0'"
     }
   },
+  datePicker: {
+    display: "block",
+    width: "100%",
+    padding: ".375rem .75rem",
+    fontSize: "1rem",
+    fontWeight: "400",
+    lineHeight: "1.5",
+    color: "#495057",
+    backgroundColor: "#fff",
+    backgroundClip: "padding-box",
+    border: "1px solid #ced4da",
+    borderRadius: ".25rem",
+    transition: "border-color .15s ease-in-out,box-shadow .15s ease-in-out",
+    height: "auto",
+    position: "relative",
+    minHeight: "34px",
+    paddingBottom: "3px"
+  },
   warning: {
     borderColor: "var(--ft-color-warn)"
   }
 });
 
-const Lines = ({lines}) => {
-  return (
-    <div>
-      {lines.map((line, index) => {
-        return(
-          <p key={line+(""+index)}>{line}</p>
-        );
-      })}
-    </div>
-  );
-};
-
-const FieldValue = ({field, splitLines}) => {
-  const { value } = field;
-  const val = !value || typeof value === "string"? value:value.toString();
-
-  if (splitLines) {
-    const lines = typeof value === "string"?value.split("\n"):[];
-    return (
-      <Lines lines={lines} />
-    );
-  }
-
-  return (
-    <span>&nbsp;{val}</span>
-  );
-};
 
 const AlternativeValue = observer(({alternative}) => alternative.value);
 AlternativeValue.displayName = "AlternativeValue";
 
-const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
+const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
 
   const classes = useStyles();
 
@@ -77,8 +77,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   const {
     value,
-    inputType,
-    rows,
     returnAsNull,
     alternatives,
     label,
@@ -87,7 +85,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     isRequired
   } = fieldStore;
 
-  const handleChange = e => fieldStore.setValue(e.target.value);
+  const handleChange = value => fieldStore.setValue(value);
 
   const handleSelectAlternative = value => fieldStore.setValue(value);
 
@@ -97,20 +95,19 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     if(!value && !showIfNoValue) {
       return null;
     }
+    const val = !value || typeof value === "string"? value:value.toString();
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip}labelTooltipIcon={labelTooltipIcon} />
-        <FieldValue field={fieldStore} splitLines={as === "textarea"} />
+        <span>&nbsp;{val}</span>
       </Form.Group>
     );
   }
-
+  const dateValue = value === "" ? null:new Date(value);
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
+  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
-    <Form.Group className={className} ref={formGroupRef} >
+    <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <Alternatives
         className={classes.alternatives}
@@ -120,21 +117,19 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         parentContainerRef={formGroupRef}
         ValueRenderer={AlternativeValue}
       />
-      <Form.Control
-        value={value}
-        type={inputType}
-        as={as}
-        onChange={handleChange}
+      <DatePicker
+        className={`${classes.datePicker} ${hasWarning?classes.warning:""}`}
+        selected={dateValue}
         disabled={isDisabled}
-        rows={rows}
-        className={hasWarning && hasWarningMessages?classes.warning:""}
+        onChange={handleChange}
+        showTimeSelect
+        timeFormat="p"
+        timeIntervals={15}
+        dateFormat="Pp"
       />
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
     </Form.Group>
   );
 });
-InputText.displayName = "InputText";
+InputDateTime.displayName = "InputDateTime";
 
-export default InputText;
+export default InputDateTime;

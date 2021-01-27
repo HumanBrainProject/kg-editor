@@ -70,8 +70,7 @@ export class RootStore  {
     //this.bookmarkStore = new BookmarkStore(transportLayer, this);
     //this.bookmarkStatusStore = new BookmarkStatusStore(transportLayer, this);
     this.featuresStore = new FeaturesStore(transportLayer, this);
-
-    this.authStore = new AuthStore(transportLayer);
+    this.authStore = new AuthStore(transportLayer, this);
     transportLayer.setAuthStore(this.authStore);
 
     // UI stores

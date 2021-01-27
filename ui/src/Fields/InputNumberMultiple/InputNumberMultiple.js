@@ -35,7 +35,7 @@ const useStyles = createUseStyles({
       marginRight:"3px",
       marginBottom:"3px"
     },
-    "&:disabled":{
+    "&[disabled]": {
       pointerEvents:"none",
       display: "none !important"
     }
@@ -66,14 +66,13 @@ const useStyles = createUseStyles({
   }
 });
 
-
-const getAlternativeValue = mappingValue => {
-  const AlternativeValue = observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+const getAlternativeValue = () => {
+  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };
 
-const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -81,8 +80,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   const formGroupRef = useRef();
 
   const {
-    value: values,
-    resources,
+    value: list,
     label,
     labelTooltip,
     labelTooltipIcon,
@@ -96,9 +94,11 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     draggedValue.current = null;
   };
 
-  const handleOnAddValue = resource => {
-    const value = {[fieldStore.mappingValue]: resource};
-    fieldStore.addValue(value);
+  const handleOnAddValue = value => {
+    const val = parseFloat(value);
+    if(val) {
+      fieldStore.addValue(value);
+    }
   };
 
   const handleSelectAlternative = values => fieldStore.setValues([...values]);
@@ -108,7 +108,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   const handleDeleteLastValue = () => fieldStore.removeLastValue();
 
   const handleDelete = index => {
-    const value = values[index];
+    const value = list[index];
     fieldStore.removeValue(value);
   };
 
@@ -151,25 +151,24 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         handleOnAddValue(value);
       }
       e.target.value = "";
-    } else if(!e.target.value && fieldStore.resources.length > 0 && e.keyCode === 8){
+    } else if(!e.target.value && fieldStore.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
-      e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
+      e.target.value = list[list.length-1];
       handleDeleteLastValue();
     }
   };
 
   if(readMode){
-    if (!resources.length && !showIfNoValue) {
+    if(!list.length && !showIfNoValue) {
       return null;
     }
 
-
     return (
-      <Form.Group className={`${classes.readMode}} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
+      <Form.Group className={classes.readMode}>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
         <List
-          list={resources}
+          list={list}
           readOnly={true}
           disabled={false}
         />
@@ -178,28 +177,23 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.minMaxValueWarning || fieldStore.numberOfItemsWarning);
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
-    <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label}
-        label={label}
-        labelTooltip={labelTooltip}
-        labelTooltipIcon={labelTooltipIcon}
-        isRequired={isRequired}
-      />
+    <Form.Group className={className} ref={formGroupRef}>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
+        ValueRenderer={getAlternativeValue()}
       />
       <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
-          list={resources}
+          list={list}
           readOnly={false}
           disabled={isDisabled}
           onDelete={handleDelete}
@@ -208,8 +202,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
         />
-        <input type="text"
-          className={classes.userInput}
+        <input type="number" className={classes.userInput}
           disabled={isDisabled}
           onDrop={handleDrop}
           onDragOver={e => e.preventDefault()}
@@ -225,6 +218,6 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     </Form.Group>
   );
 });
-AnnotatedInputText.displayName = "AnnotatedInputText";
+InputNumberMultiple.displayName = "InputNumberMultiple";
 
-export default AnnotatedInputText;
+export default InputNumberMultiple;

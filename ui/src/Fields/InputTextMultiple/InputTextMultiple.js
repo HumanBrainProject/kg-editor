@@ -23,6 +23,7 @@ import List from "./List";
 import Label from "../Label";
 
 import Alternatives from "../Alternatives";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   values:{
@@ -60,12 +61,15 @@ const useStyles = createUseStyles({
       cursor: "not-allowed"
     }
   },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
+  }
 });
 
-const getAlternativeValue = mappingValue => {
-  const AlternativeValue = observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+const getAlternativeValue = () => {
+  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
   AlternativeValue.displayName = "AlternativeValue";
-  return;
+  return AlternativeValue;
 };
 
 const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
@@ -79,8 +83,10 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     value: list,
     label,
     labelTooltip,
+    labelTooltipIcon,
     alternatives,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -143,19 +149,19 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     } else if(!e.target.value && fieldStore.value.length > 0 && e.keyCode === 8){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
-      e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
+      e.target.value = list[list.length-1];
       handleDeleteLastValue();
     }
   };
 
   if(readMode){
-    if(!list.length || !showIfNoValue) {
+    if(!list.length && !showIfNoValue) {
       return null;
     }
 
     return (
       <Form.Group className={classes.readMode}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
         <List
           list={list}
           readOnly={true}
@@ -166,18 +172,21 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   }
 
   const isDisabled = returnAsNull;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.numberOfItemsWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
+        ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={list}
           readOnly={false}
@@ -198,6 +207,9 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
           onPaste={handleNativePaste}
         />
       </div>
+      {hasWarning && hasWarningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

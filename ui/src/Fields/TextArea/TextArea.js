@@ -38,7 +38,7 @@ const useStyles = createUseStyles({
 const TextArea = (props) => {
   const classes = useStyles();
   const { readMode, fieldStore, className, showIfNoValue } = props;
-  const { label, labelTooltip, value } = fieldStore;
+  const { label, labelTooltip, value, labelTooltipIcon } = fieldStore;
   if (readMode) {
 
     if(!value && !showIfNoValue) {
@@ -49,7 +49,7 @@ const TextArea = (props) => {
       return (
         <Form.Group className={`${classes.container} ${className} ${classes.readMode}`} >
           {label && (
-            <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+            <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
           )}
           <RenderMarkdownField value={value}/>
         </Form.Group>
@@ -58,7 +58,7 @@ const TextArea = (props) => {
     return (
       <Form.Group className={`${classes.container} ${className} ${classes.readMode}`} >
         {label && (
-          <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+          <Label className={classes.label} label={label} labelTooltip={labelTooltip}  labelTooltipIcon={labelTooltipIcon}/>
         )}
         <p>{fieldStore.value}</p>
       </Form.Group>

@@ -169,7 +169,8 @@ export class InstanceStore {
       removeInstances: action,
       cancelInstanceChanges: action,
       confirmCancelInstanceChanges: action,
-      abortCancelInstanceChange: action
+      abortCancelInstanceChange: action,
+      clearUnsavedChanges: action
     });
 
     this.stage = stage?stage:null;
@@ -264,6 +265,16 @@ export class InstanceStore {
 
   get hasUnsavedChanges() {
     return this.getUnsavedInstances.length > 0;
+  }
+
+  clearUnsavedChanges() {
+    this.getUnsavedInstances.forEach(i => {
+      const instance = this.instances.get(i.id);
+      instance.cancelChanges();
+      if(instance.isNew) {
+        instance.isNew = false;
+      }
+    });
   }
 
   processQueue() {

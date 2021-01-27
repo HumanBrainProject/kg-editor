@@ -39,11 +39,15 @@ class LinksStore extends FieldStore {
   initialValue = [];
   isLink = true;
   mappingValue = "@id";
+  minItems = null;
+  maxItems = null;
 
   appStore = null;
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
+    this.minItems = definition.minItems;
+    this.maxItems = definition.maxItems;
 
     makeObservable(this, {
       value: observable,
@@ -60,13 +64,19 @@ class LinksStore extends FieldStore {
       lazyShowLinks: observable,
       visibleLinks: observable,
       initialValue: observable,
+      minItems: observable,
+      maxItems: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      requiredValidationWarning: computed,
+      warningMessages: computed,
+      numberOfItemsWarning: computed,
       numberOfValues: computed,
       hasMoreOptions: computed,
+      hasWarningMessages: computed,
       insertValue: action,
       deleteValue: action,
       addValue: action,
@@ -114,6 +124,48 @@ class LinksStore extends FieldStore {
       return null;
     }
     return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    if(!this.isRequired) {
+      return false;
+    }
+    if(this.value.length === 0) {
+      return true;
+    }
+    return false;
+  }
+
+  get numberOfItemsWarning() {
+    if(!this.minItems && !this.maxItems) {
+      return false;
+    }
+    if(this.minItems || this.maxItems) {
+      return true;
+    }
+    return false;
+  }
+
+  get warningMessages() {
+    const messages = {};
+    if (this.hasChanged) {
+      if(this.numberOfItemsWarning) {
+        if(this.minItems && this.maxItems) {
+          if(this.value.length < this.minItems || this.value.length > this.maxItems) {
+            messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
+          }
+        } else if(this.value.length < this.minItems) {
+          messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
+        } else if(this.value.length > this.maxItems) {
+          messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
+        }
+      }
+    }
+    return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   updateValue(value) {

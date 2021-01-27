@@ -19,6 +19,7 @@ import { observable, action, computed, makeObservable } from "mobx";
 class FieldStore {
   label = null;
   labelTooltip = null;
+  labelTooltipIcon = null;
   fullyQualifiedName = null;
   alternatives = [];
   warning = null;
@@ -26,7 +27,9 @@ class FieldStore {
   errorInfo = null;
   instance = null;
   type = null;
-
+  order = null;
+  widget = null;
+  isRequired = false;
   instance = null;
   transportLayer = null;
 
@@ -34,11 +37,13 @@ class FieldStore {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,
+      labelTooltipIcon: observable,
       fullyQualifiedName: observable,
       alternatives: observable,
       warning: observable,
       errorMessage: observable,
       errorInfo: observable,
+      isRequired: observable,
       setError: action,
       clearError: action,
       hasError: computed,
@@ -48,9 +53,11 @@ class FieldStore {
     this.widget = definition.widget;
     this.label = definition.label;
     this.labelTooltip = definition.labelTooltip;
+    this.labelTooltipIcon = definition.labelTooltipIcon;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
-
+    this.order = definition.order;
+    this.isRequired = definition.isRequired;
     this.transportLayer = transportLayer;
   }
 
@@ -77,11 +84,16 @@ class FieldStore {
     throw `cloneWithInitialValue getter is not implemented for ${this.widget} store`;
   }
 
+  get requiredValidationWarning() {
+    throw `requiredValidationWarning getter is not implemented for ${this.widget} store`;
+  }
+
   get definition() {
     return {
       widget: this.widget,
       label: this.label,
-      fullyQualifiedName: this.fullyQualifiedName
+      fullyQualifiedName: this.fullyQualifiedName,
+      isRequired: this.isRequired
     };
   }
 

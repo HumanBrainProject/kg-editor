@@ -27,6 +27,7 @@ import { useStores } from "../../Hooks/UseStores";
 import Dropdown from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 import Label from "../Label";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   container: {
@@ -83,6 +84,9 @@ const useStyles = createUseStyles({
     "& $label:after": {
       content: "':\\00a0'"
     }
+  },
+  warning: {
+    borderColor: "var(--ft-color-warn)"
   }
 });
 
@@ -97,6 +101,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     links,
     label,
     labelTooltip,
+    labelTooltipIcon,
     allowCustomValues,
     optionsSearchTerm,
     options,
@@ -104,7 +109,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     optionsExternalTypes,
     hasMoreOptions,
     fetchingOptions,
-    returnAsNull
+    returnAsNull,
+    isRequired
   } = fieldStore;
 
   const handleDropdownReset = () => {
@@ -199,14 +205,16 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || returnAsNull;
-
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
   if (readMode && !links.length && !showIfNoValue) {
     return null;
   }
 
   return (
     <Form.Group className={`${classes.container} ${readMode?classes.readMode:""} ${className}`}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
       {!isDisabled && (view && view.currentInstanceId === instance.id) && (
         <div className={classes.deleteBtn}>
           <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
@@ -214,7 +222,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           </Button>
         </div>
       )}
-      <div className={`${classes.table} ${returnAsNull?"disabled":""}`}>
+      <div className={`${classes.table} ${hasWarning && hasWarningMessages?classes.warning:""} ${returnAsNull?"disabled":""}`}>
         {(view && view.currentInstanceId === instance.id)?
           <Table
             list={links}
@@ -261,6 +269,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           </span>
         </div>
       )}
+      {hasWarning && hasWarningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </Form.Group>
   );
 });

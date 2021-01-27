@@ -15,6 +15,7 @@
 */
 
 import InputText from "./InputText/InputText";
+import InputNumber from "./InputNumber/InputNumber";
 import TextArea from "./TextArea/TextArea";
 import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
 import DynamicTable from "./DynamicTable/DynamicTable";
@@ -28,15 +29,37 @@ import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
 import InputTextMultiple from "./InputTextMultiple/InputTextMultiple";
 import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 
+import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
+import InputNumberMultipleStore from "./Stores/InputNumberMultipleStore";
+
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
 import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
+import InputNumberStore from "./Stores/InputNumberStore";
+import InputDateStore from "./Stores/InputDateStore";
+import InputDateTime from "./InputDateTime/InputDateTime";
 
 export const fieldsMapping = {
   "InputText":  {
     Component: InputText,
     Store: InputTextStore
+  },
+  "InputNumber":  {
+    Component: InputNumber,
+    Store: InputNumberStore
+  },
+  "InputDate": {
+    Component: InputText,
+    Store: InputDateStore
+  },
+  "InputDateTime": {
+    Component: InputDateTime,
+    Store: InputTextStore
+  },
+  "InputNumberMultiple":  {
+    Component: InputNumberMultiple,
+    Store: InputNumberMultipleStore
   },
   "TextArea": {
     Component: TextArea,

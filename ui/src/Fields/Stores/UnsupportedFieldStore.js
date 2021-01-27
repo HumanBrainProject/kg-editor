@@ -28,6 +28,7 @@ class UnsupportedFieldStore extends FieldStore {
       value: observable,
       returnValue: computed,
       cloneWithInitialValue: computed,
+      requiredValidationWarning: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed
@@ -36,6 +37,10 @@ class UnsupportedFieldStore extends FieldStore {
 
   get returnValue() {
     return toJS(this.value);
+  }
+
+  get requiredValidationWarning() {
+    return false;
   }
 
   get cloneWithInitialValue() {

@@ -3,10 +3,7 @@ package eu.ebrains.kg.editor.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
-import eu.ebrains.kg.editor.models.instance.InstanceFull;
-import eu.ebrains.kg.editor.models.instance.InstanceSummary;
-import eu.ebrains.kg.editor.models.instance.Neighbor;
-import eu.ebrains.kg.editor.models.instance.SuggestionStructure;
+import eu.ebrains.kg.editor.models.instance.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -76,12 +73,15 @@ public class InstanceClient extends AbstractServiceClient {
         return null;
     }
 
-    public Map getInstanceScope(String id) {
+    private static class ScopeFromKG extends KGCoreResult<Scope>{}
+
+    public Scope getInstanceScope(String id) {
         String uri = String.format("instances/%s/scope?stage=IN_PROGRESS&returnPermissions=true", id);
-        return get(uri)
+        ScopeFromKG response = get(uri)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(ScopeFromKG.class)
                 .block();
+        return response!=null ? response.getData() : null;
     }
 
     private static class NeighborFromKG extends KGCoreResult<Neighbor>{}

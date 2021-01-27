@@ -218,17 +218,45 @@ public class InstanceController {
 
     private void enrichTypesInNeighbor(Neighbor neighbor, Map<String, KGCoreResult<StructureOfType>> types) {
         neighbor.getTypes().forEach(t -> enrichSimpleType(t, types));
-        neighbor.getInbound().forEach(i -> enrichTypesInNeighbor(i, types));
-        neighbor.getOutbound().forEach(o -> enrichTypesInNeighbor(o, types));
+        if(neighbor.getInbound()!=null) {
+            neighbor.getInbound().forEach(i -> enrichTypesInNeighbor(i, types));
+        }
+        if(neighbor.getOutbound()!=null) {
+            neighbor.getOutbound().forEach(o -> enrichTypesInNeighbor(o, types));
+        }
     }
 
     private static Set<String> findTypesInNeighbor(Neighbor neighbor, Set<String> acc) {
         acc.addAll(neighbor.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
-        neighbor.getInbound().forEach(inboundNeighbor -> findTypesInNeighbor(inboundNeighbor, acc));
-        neighbor.getOutbound().forEach(outboundNeighbor -> findTypesInNeighbor(outboundNeighbor, acc));
+        if(neighbor.getInbound()!=null) {
+            neighbor.getInbound().forEach(inboundNeighbor -> findTypesInNeighbor(inboundNeighbor, acc));
+        }
+        if(neighbor.getOutbound()!=null) {
+            neighbor.getOutbound().forEach(outboundNeighbor -> findTypesInNeighbor(outboundNeighbor, acc));
+        }
         return acc;
     }
 
+    public void enrichScopeRecursivelyWithTypeInformation(Scope scope) {
+        Set<String> types= findTypesInScope(scope, new HashSet<>());
+        Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(new ArrayList<>(types), true);
+        enrichTypesInScope(scope, typesByName);
+    }
+
+    private static Set<String> findTypesInScope(Scope scope, Set<String> acc){
+        acc.addAll(scope.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
+        if(scope.getChildren()!=null){
+            scope.getChildren().forEach(s -> findTypesInScope(s, acc));
+        }
+        return acc;
+    }
+
+    private void enrichTypesInScope(Scope scope, Map<String, KGCoreResult<StructureOfType>> types) {
+        scope.getTypes().forEach(t -> enrichSimpleType(t, types));
+        if(scope.getChildren()!=null) {
+            scope.getChildren().forEach(i -> enrichTypesInScope(i, types));
+        }
+    }
 
     public KGCoreResult.Single normalizeInstance(String id, KGCoreResult.Single instance) {
         List<String> typesToRetrieve = (List<String>) instance.getData().get("@type");

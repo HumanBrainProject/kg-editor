@@ -16,7 +16,6 @@ import java.util.Map;
 // TODO Add proper error handling
 public class Instances {
 
-
     private final InstanceClient instanceClient;
     private final InstanceController instanceController;
     private final IdController idController;
@@ -60,7 +59,12 @@ public class Instances {
     }
 
     @GetMapping("/{id}/scope")
-    public void getInstanceScope(@PathVariable("id") String id) {
+    public KGCoreResult<Scope> getInstanceScope(@PathVariable("id") String id) {
+        Scope instanceScope = instanceClient.getInstanceScope(id);
+        instanceController.enrichScopeRecursivelyWithTypeInformation(instanceScope);
+
+        // update release status
+        return new KGCoreResult<Scope>().setData(instanceScope);
     }
 
 

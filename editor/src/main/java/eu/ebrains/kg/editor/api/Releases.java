@@ -5,6 +5,7 @@ import eu.ebrains.kg.editor.services.ReleaseClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/releases")
 @RestController
@@ -27,7 +28,8 @@ public class Releases {
     }
 
     @PostMapping("/status")
-    public KGCoreResult.Single getReleaseStatus(@RequestParam(value = "releaseTreeScope", required = false) String releaseTreeScope, @RequestBody List<String> ids) {
-        return releaseClient.getReleaseStatus(ids, releaseTreeScope);
+    public KGCoreResult<Map<String, KGCoreResult<String>>> getReleaseStatus(@RequestParam(value = "releaseTreeScope", required = false) String releaseTreeScope, @RequestBody List<String> ids) {
+        Map<String, KGCoreResult<String>> releaseStatus = releaseClient.getReleaseStatus(ids, releaseTreeScope);
+        return new KGCoreResult<Map<String, KGCoreResult<String>>>().setData(releaseStatus);
     }
 }

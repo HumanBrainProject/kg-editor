@@ -7,13 +7,11 @@ import eu.ebrains.kg.editor.models.commons.UserSummary;
 import eu.ebrains.kg.editor.models.instance.*;
 import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 import eu.ebrains.kg.editor.models.workspace.StructureOfType;
+import eu.ebrains.kg.editor.services.ReleaseClient;
 import eu.ebrains.kg.editor.services.UserClient;
 import eu.ebrains.kg.editor.services.WorkspaceClient;
 import org.apache.commons.lang3.SerializationUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,11 +20,13 @@ import java.util.stream.Stream;
 @Component
 public class InstanceController {
     private final WorkspaceClient workspaceClient;
+    private final ReleaseClient releaseClient;
     private final IdController idController;
     private final UserClient userClient;
 
-    public InstanceController(WorkspaceClient workspaceClient, IdController idController, UserClient userClient) {
+    public InstanceController(WorkspaceClient workspaceClient, ReleaseClient releaseClient, IdController idController, UserClient userClient) {
         this.workspaceClient = workspaceClient;
+        this.releaseClient = releaseClient;
         this.idController = idController;
         this.userClient = userClient;
     }
@@ -237,18 +237,33 @@ public class InstanceController {
         return acc;
     }
 
-    public void enrichScopeRecursivelyWithTypeInformation(Scope scope) {
-        Set<String> types= findTypesInScope(scope, new HashSet<>());
+
+    public void enrichScopeRecursivelyWithTypeAndReleaseStatusInformation(Scope scope) {
+        Set<String> types = new HashSet<>();
+        Set<String> ids = new HashSet<>();
+        findTypesAndIdsInScope(scope, types, ids);
+
         Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(new ArrayList<>(types), true);
         enrichTypesInScope(scope, typesByName);
+
+        Map<String, KGCoreResult<String>> releaseStatus = releaseClient.getReleaseStatus(new ArrayList<>(ids), "TOP_INSTANCE_ONLY");
+        enrichReleaseStatusInScope(scope, releaseStatus);
     }
 
-    private static Set<String> findTypesInScope(Scope scope, Set<String> acc){
-        acc.addAll(scope.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
+    private static void findTypesAndIdsInScope(Scope scope, Set<String> types, Set<String> ids){
+        types.addAll(scope.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
+        ids.add(scope.getId());
         if(scope.getChildren()!=null){
-            scope.getChildren().forEach(s -> findTypesInScope(s, acc));
+            scope.getChildren().forEach(s -> findTypesAndIdsInScope(s, types, ids));
         }
-        return acc;
+    }
+
+    private void enrichReleaseStatusInScope(Scope scope, Map<String, KGCoreResult<String>> releaseStatus){
+        KGCoreResult<String> status = releaseStatus.get(scope.getId());
+        scope.setStatus(status!=null ? status.getData() : null);
+        if(scope.getChildren()!=null){
+            scope.getChildren().forEach(s -> enrichReleaseStatusInScope(s, releaseStatus));
+        }
     }
 
     private void enrichTypesInScope(Scope scope, Map<String, KGCoreResult<StructureOfType>> types) {
@@ -258,16 +273,4 @@ public class InstanceController {
         }
     }
 
-    public KGCoreResult.Single normalizeInstance(String id, KGCoreResult.Single instance) {
-        List<String> typesToRetrieve = (List<String>) instance.getData().get("@type");
-        if (CollectionUtils.isEmpty(typesToRetrieve)) {
-            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong while extracting the types! Please try again!");
-        }
-        Map<String, KGCoreResult<StructureOfType>> typesByName = workspaceClient.getTypesByName(typesToRetrieve, true);
-        if (CollectionUtils.isEmpty(typesByName)) {
-            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong while processing the types! Please try again!");
-        }
-        return null;
-
-    }
 }

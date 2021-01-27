@@ -31,13 +31,16 @@ public class ReleaseClient extends AbstractServiceClient{
                 .block();
     }
 
-    public KGCoreResult.Single getReleaseStatus(List<String> ids, String releaseTreeScope) {
+    private static class ReleaseStatusFromKG extends KGCoreResult<Map<String, KGCoreResult<String>>>{}
+
+    public Map<String, KGCoreResult<String>> getReleaseStatus(List<String> ids, String releaseTreeScope) {
         String uri = String.format("instancesByIds/release/status?releaseTreeScope=%s", releaseTreeScope);
-        return post(uri)
+        ReleaseStatusFromKG response = post(uri)
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()
-                .bodyToMono(KGCoreResult.Single.class)
+                .bodyToMono(ReleaseStatusFromKG.class)
                 .block();
+        return response != null ? response.getData() : null;
     }
 
 }

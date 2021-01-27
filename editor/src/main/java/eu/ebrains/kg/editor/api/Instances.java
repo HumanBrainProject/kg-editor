@@ -61,9 +61,7 @@ public class Instances {
     @GetMapping("/{id}/scope")
     public KGCoreResult<Scope> getInstanceScope(@PathVariable("id") String id) {
         Scope instanceScope = instanceClient.getInstanceScope(id);
-        instanceController.enrichScopeRecursivelyWithTypeInformation(instanceScope);
-
-        // update release status
+        instanceController.enrichScopeRecursivelyWithTypeAndReleaseStatusInformation(instanceScope);
         return new KGCoreResult<Scope>().setData(instanceScope);
     }
 

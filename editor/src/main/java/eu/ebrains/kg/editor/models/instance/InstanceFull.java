@@ -3,12 +3,11 @@ package eu.ebrains.kg.editor.models.instance;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
-import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 
 import java.util.List;
 import java.util.Map;
 
-public class InstanceFull extends InstanceSummary<List<StructureOfField>> {
+public class InstanceFull extends InstanceSummary {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public InstanceFull(

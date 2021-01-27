@@ -52,7 +52,7 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
 
-    public List<ResultWithOriginalMap<InstanceSummary.Simple>> searchInstanceSummaries(String space,
+    public List<ResultWithOriginalMap<InstanceSummary>> searchInstanceSummaries(String space,
                                                                                        String type,
                                                                                        Integer from,
                                                                                        Integer size,
@@ -69,7 +69,7 @@ public class InstanceClient extends AbstractServiceClient {
         }
         KGCoreResult.List response = get(uri).retrieve().bodyToMono(KGCoreResult.List.class).block();
         if(response!=null){
-            return response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.Simple.class))).collect(Collectors.toList());
+            return response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).collect(Collectors.toList());
         }
         return null;
     }

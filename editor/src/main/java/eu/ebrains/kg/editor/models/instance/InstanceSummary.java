@@ -9,31 +9,38 @@ import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 import java.util.List;
 import java.util.Map;
 
-public class InstanceSummary extends InstanceLabel {
+public abstract class InstanceSummary<FieldsType> extends InstanceLabel {
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public InstanceSummary(
-            @JsonProperty("@id") String kgId,
-            @JsonProperty("@type") List<String> kgType,
-            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgWorkspace,
-            @JsonProperty(EditorConstants.VOCAB_PERMISSIONS) List<String> kgPermissions
-    ) {
+    public static class Simple extends InstanceSummary<Map<String,StructureOfField>> {
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public Simple(
+                @JsonProperty("@id") String kgId,
+                @JsonProperty("@type") List<String> kgType,
+                @JsonProperty(EditorConstants.VOCAB_SPACE) String kgWorkspace,
+                @JsonProperty(EditorConstants.VOCAB_PERMISSIONS) List<String> kgPermissions
+        ) {
+            super(kgId, kgType, kgWorkspace, kgPermissions);
+        }
+    }
+
+    public InstanceSummary(String kgId, List<String> kgType, String kgWorkspace, List<String> kgPermissions) {
         super(kgId, kgType, kgWorkspace);
         this.permissions = Permissions.fromPermissionList(kgPermissions);
     }
 
     private final Permissions permissions;
-    private Map<String, StructureOfField> fields;
+    private FieldsType fields;
 
-    public Map<String, StructureOfField> getFields() {
+    public FieldsType getFields() {
         return fields;
+    }
+
+    public void setFields(FieldsType fields) {
+        this.fields = fields;
     }
 
     public Permissions getPermissions() {
         return permissions;
     }
 
-    public void setFields(Map<String, StructureOfField> fields) {
-        this.fields = fields;
-    }
 }

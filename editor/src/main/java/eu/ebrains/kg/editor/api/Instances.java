@@ -74,13 +74,12 @@ public class Instances {
     }
 
     @PostMapping("/summary")
-    public KGCoreResult<Map<String, InstanceFull>> getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
+    public KGCoreResult<Map<String, InstanceSummary>> getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                     @RequestBody List<String> ids) {
-//        Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
-//        Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result);
-//        return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
-        return null;
+        Map<String, ResultWithOriginalMap<InstanceSummary>> result = instanceClient.getInstances(ids, stage, metadata, false, true, false, InstanceSummary.class);
+        Map<String, InstanceSummary> enrichedInstances = instanceController.enrichInstancesSummary(result);
+        return new KGCoreResult<Map<String, InstanceSummary>>().setData(enrichedInstances);
     }
 
     @PostMapping("/label")

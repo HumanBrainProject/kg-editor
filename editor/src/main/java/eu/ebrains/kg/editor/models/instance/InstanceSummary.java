@@ -7,6 +7,7 @@ import eu.ebrains.kg.editor.models.commons.Permissions;
 import eu.ebrains.kg.editor.models.workspace.StructureOfField;
 
 import java.util.List;
+import java.util.Map;
 
 public class InstanceSummary extends InstanceLabel {
 
@@ -22,9 +23,9 @@ public class InstanceSummary extends InstanceLabel {
     }
 
     private final Permissions permissions;
-    private List<StructureOfField> fields;
+    private Map<String, StructureOfField> fields;
 
-    public List<StructureOfField> getFields() {
+    public Map<String, StructureOfField> getFields() {
         return fields;
     }
 
@@ -32,7 +33,7 @@ public class InstanceSummary extends InstanceLabel {
         return permissions;
     }
 
-    public void setFields(List<StructureOfField> fields) {
+    public void setFields(Map<String, StructureOfField> fields) {
         this.fields = fields;
     }
 }

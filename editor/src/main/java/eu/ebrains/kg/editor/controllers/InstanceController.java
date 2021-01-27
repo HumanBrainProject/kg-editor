@@ -60,6 +60,17 @@ public class InstanceController {
         return instancesWithResult.stream().collect(Collectors.toMap(k -> k.getResult().getId(), ResultWithOriginalMap::getResult));
     }
 
+
+    public Map<String, InstanceSummary> enrichInstancesSummary(Map<String, ResultWithOriginalMap<InstanceSummary>> instancesWithMap) {
+        Collection<ResultWithOriginalMap<InstanceSummary>> instancesWithResult = getInstancesWithSimplifiedId(instancesWithMap);
+        Map<String, KGCoreResult<StructureOfType>> typesByName = getTypesByName(instancesWithResult);
+        instancesWithResult.forEach(instanceWithResult -> {
+            Map<String, KGCoreResult<StructureOfType>> filteredTypes = getFilteredTypes(typesByName, instanceWithResult.getResult());
+            enrichTypesAndSearchableFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), filteredTypes);
+        });
+        return instancesWithResult.stream().collect(Collectors.toMap(k -> k.getResult().getId(), ResultWithOriginalMap::getResult));
+    }
+
     private <T extends HasId> Collection<ResultWithOriginalMap<T>> getInstancesWithSimplifiedId(Map<String, ResultWithOriginalMap<T>> instancesWithMap) {
         Collection<ResultWithOriginalMap<T>> instancesWithResult = instancesWithMap.values();
         instancesWithResult.forEach(i -> idController.simplifyId(i.getResult()));
@@ -103,7 +114,7 @@ public class InstanceController {
                     filter(Objects::nonNull).map(t -> t.getFields().values()).
                     flatMap(Collection::stream).distinct().map(SerializationUtils::clone).collect(Collectors.toList());
             fields.forEach(f -> simplifyIdsOfLinks(f, originalMap));
-            instance.setFields(fields);
+            instance.setFields(convertFieldsToMap(fields));
 
             //Define special fields such as promoted and label
             instance.setPromotedFields(typesByName.values().stream().map(KGCoreResult::getData)
@@ -113,6 +124,37 @@ public class InstanceController {
                     .filter(Objects::nonNull).map(StructureOfType::getLabelField).findFirst().orElse(null));
         }
     }
+
+    private void enrichTypesAndSearchableFields(InstanceSummary instance, Map<?, ?> originalMap, Map<String, KGCoreResult<StructureOfType>> typesByName) {
+        if (typesByName != null) {
+            // Fill the type information
+            instance.getTypes().forEach(t -> enrichSimpleType(t, typesByName));
+
+            // Define the fields with the structure of the type and the values of the instance
+            List<StructureOfField> fields = typesByName.values().stream().map(KGCoreResult::getData).
+                    filter(Objects::nonNull).map(t -> t.getFields().values()).
+                    flatMap(Collection::stream).distinct().map(SerializationUtils::clone).collect(Collectors.toList());
+
+            List<String> promotedFields = typesByName.values().stream().map(KGCoreResult::getData)
+                    .filter(Objects::nonNull).map(StructureOfType::getPromotedFields).
+                            flatMap(Collection::stream).distinct().collect(Collectors.toList());
+            List<StructureOfField> filteredFields = fields.stream().filter(f -> promotedFields.contains(f.getFullyQualifiedName())).collect(Collectors.toList());
+            filteredFields.forEach(f -> simplifyIdsOfLinks(f, originalMap));
+            instance.setFields(convertFieldsToMap(filteredFields));
+
+            String labelField = typesByName.values().stream().map(KGCoreResult::getData)
+                    .filter(Objects::nonNull).map(StructureOfType::getLabelField).findFirst().orElse(null);
+            if (labelField != null) {
+                String name = (String) originalMap.get(labelField);
+                instance.setName(name);
+            }
+        }
+    }
+
+    private Map<String, StructureOfField> convertFieldsToMap(List<StructureOfField> fields) {
+        return fields.stream().collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, v -> v));
+    }
+
 
     private void enrichName(InstanceLabel instance, Map<?, ?> originalMap, Map<String, KGCoreResult<StructureOfType>> typesByName) {
         if (typesByName != null) {

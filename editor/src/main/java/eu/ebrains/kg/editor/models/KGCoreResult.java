@@ -16,6 +16,8 @@
 
 package eu.ebrains.kg.editor.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,6 +30,9 @@ public class KGCoreResult<T> {
     private T data;
     private String message;
     private Error error;
+    private Integer total;
+    private Integer size;
+    private Integer from;
 
     public KGCoreResult<T> setData(T data) {
         this.data = data;
@@ -41,6 +46,34 @@ public class KGCoreResult<T> {
 
     public KGCoreResult<T>  setError(Error error) {
         this.error = error;
+        return this;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    @JsonProperty("totalResults")
+    public KGCoreResult<T> setTotalResults(Integer total) {
+        this.total = total;
+        return this;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public KGCoreResult<T> setSize(Integer size) {
+        this.size = size;
+        return this;
+    }
+
+    public Integer getFrom() {
+        return from;
+    }
+
+    public KGCoreResult<T> setFrom(Integer from) {
+        this.from = from;
         return this;
     }
 

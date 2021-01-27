@@ -20,15 +20,12 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Modal from "react-bootstrap/Modal";
-import uniqueId from "lodash/uniqueId";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../Hooks/UseStores";
 
 import CompareChanges from "./CompareChanges";
-
-const animationId = uniqueId("animationId");
 
 const useStyles = createUseStyles({
   container:{
@@ -81,9 +78,9 @@ const useStyles = createUseStyles({
   },
   saveIcon: {
     color: "red",
-    animation: `${animationId} 1.4s infinite linear`
+    animation: "$animationIdBar 1.4s infinite linear"
   },
-  [`@keyframes ${animationId}`]: {
+  "@keyframes animationIdBar": {
     "0%": {
       transform: "scale(1)"
     },

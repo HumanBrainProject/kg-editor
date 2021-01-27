@@ -16,10 +16,7 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-const animationId = uniqueId("animationId");
 
 const useStyles = createUseStyles({
   container: {
@@ -72,9 +69,9 @@ const useStyles = createUseStyles({
   },
   icon: {
     color: "red",
-    animation: `${animationId} 1.4s infinite linear`
+    animation: "$animationId 1.4s infinite linear"
   },
-  [`@keyframes ${animationId}`]: {
+  "@keyframes animationId": {
     "0%": {
       transform: "scale(1)"
     },
@@ -87,7 +84,7 @@ const useStyles = createUseStyles({
   },
   label: {
     paddingLeft: "6px"
-  },
+  }
 });
 
 const SavingPanel = ({ id, show, inline }) => {

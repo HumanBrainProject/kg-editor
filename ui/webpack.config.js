@@ -55,9 +55,12 @@ module.exports = {
     open: true,
     proxy: {
       "/editor/api/**": {
-        target:"http://localhost:9000",
+        target:"http://localhost:8080",
         secure:false,
-        changeOrigin: true
+        changeOrigin: true,
+        pathRewrite: function(path) {
+          return path.replace("/editor/api/", "/");
+         }
       }
     },
     historyApiFallback: {

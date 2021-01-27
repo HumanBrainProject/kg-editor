@@ -217,21 +217,25 @@ public class InstanceController {
     }
 
     private void enrichTypesInNeighbor(Neighbor neighbor, Map<String, KGCoreResult<StructureOfType>> types) {
-        neighbor.getTypes().forEach(t -> enrichSimpleType(t, types));
-        if(neighbor.getInbound()!=null) {
+        if (neighbor.getTypes() != null) {
+            neighbor.getTypes().forEach(t -> enrichSimpleType(t, types));
+        }
+        if (neighbor.getInbound() != null) {
             neighbor.getInbound().forEach(i -> enrichTypesInNeighbor(i, types));
         }
-        if(neighbor.getOutbound()!=null) {
+        if (neighbor.getOutbound() != null) {
             neighbor.getOutbound().forEach(o -> enrichTypesInNeighbor(o, types));
         }
     }
 
     private static Set<String> findTypesInNeighbor(Neighbor neighbor, Set<String> acc) {
-        acc.addAll(neighbor.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
-        if(neighbor.getInbound()!=null) {
+        if (neighbor.getTypes() != null) {
+            acc.addAll(neighbor.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
+        }
+        if (neighbor.getInbound() != null) {
             neighbor.getInbound().forEach(inboundNeighbor -> findTypesInNeighbor(inboundNeighbor, acc));
         }
-        if(neighbor.getOutbound()!=null) {
+        if (neighbor.getOutbound() != null) {
             neighbor.getOutbound().forEach(outboundNeighbor -> findTypesInNeighbor(outboundNeighbor, acc));
         }
         return acc;
@@ -250,25 +254,25 @@ public class InstanceController {
         enrichReleaseStatusInScope(scope, releaseStatus);
     }
 
-    private static void findTypesAndIdsInScope(Scope scope, Set<String> types, Set<String> ids){
+    private static void findTypesAndIdsInScope(Scope scope, Set<String> types, Set<String> ids) {
         types.addAll(scope.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));
         ids.add(scope.getId());
-        if(scope.getChildren()!=null){
+        if (scope.getChildren() != null) {
             scope.getChildren().forEach(s -> findTypesAndIdsInScope(s, types, ids));
         }
     }
 
-    private void enrichReleaseStatusInScope(Scope scope, Map<String, KGCoreResult<String>> releaseStatus){
+    private void enrichReleaseStatusInScope(Scope scope, Map<String, KGCoreResult<String>> releaseStatus) {
         KGCoreResult<String> status = releaseStatus.get(scope.getId());
-        scope.setStatus(status!=null ? status.getData() : null);
-        if(scope.getChildren()!=null){
+        scope.setStatus(status != null ? status.getData() : null);
+        if (scope.getChildren() != null) {
             scope.getChildren().forEach(s -> enrichReleaseStatusInScope(s, releaseStatus));
         }
     }
 
     private void enrichTypesInScope(Scope scope, Map<String, KGCoreResult<StructureOfType>> types) {
         scope.getTypes().forEach(t -> enrichSimpleType(t, types));
-        if(scope.getChildren()!=null) {
+        if (scope.getChildren() != null) {
             scope.getChildren().forEach(i -> enrichTypesInScope(i, types));
         }
     }

@@ -34,7 +34,7 @@ public class Summary {
     @GetMapping
     //FIXME The pagination parameters differ from the one in instances -> they should be homogenized.
     //TODO check if it would make sense to introduce a default pagination
-    public List<InstanceSummary> searchInstancesSummary(@RequestParam("workspace") String workspace, @RequestParam("type") String type, @RequestParam(required = false, value = "from") Integer from, @RequestParam(required = false, value = "size") Integer size, @RequestParam(value = "searchByLabel", required = false) String searchByLabel) {
+    public KGCoreResult<List<InstanceSummary>> searchInstancesSummary(@RequestParam("workspace") String workspace, @RequestParam("type") String type, @RequestParam(required = false, value = "from") Integer from, @RequestParam(required = false, value = "size") Integer size, @RequestParam(value = "searchByLabel", required = false) String searchByLabel) {
         List<ResultWithOriginalMap<InstanceSummary>> result = instanceClient.searchInstanceSummaries(workspace, type, from, size, searchByLabel);
 
         // We're fetching the root type with properties to receive the information about the label field only.
@@ -51,16 +51,16 @@ public class Summary {
                 typesByName.putAll(otherTypesByName);
             }
         }
-        return result.stream().map(r -> {
-            if(rootLabelField!=null) {
+        List<InstanceSummary> instanceSummary = result.stream().map(r -> {
+            if (rootLabelField != null) {
                 Object labelValue = r.getOriginalMap().get(rootLabelField);
-                if(labelValue!=null) {
+                if (labelValue != null) {
                     r.getResult().setName(labelValue.toString());
                 }
             }
             r.getResult().getTypes().forEach(t -> {
                 KGCoreResult<StructureOfType> byName = typesByName.get(t.getName());
-                if(byName!=null && byName.getData()!=null){
+                if (byName != null && byName.getData() != null) {
                     //Enrich the simple type information from the structure of type...
                     t.setLabel(byName.getData().getLabel());
                     t.setColor(byName.getData().getColor());
@@ -68,6 +68,7 @@ public class Summary {
             });
             return r.getResult();
         }).collect(Collectors.toList());
+        return new KGCoreResult<List<InstanceSummary>>().setData(instanceSummary);
     }
 
 

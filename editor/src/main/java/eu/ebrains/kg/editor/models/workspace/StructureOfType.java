@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,7 @@ public class StructureOfType {
         this.color = kgColor;
         this.labelField = kgLabelField;
         this.promotedFields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).filter(f -> f.getSearchable() != null && f.getSearchable()).map(StructureOfField::getFullyQualifiedName).sorted().collect(Collectors.toList()) : null;
-        if (this.labelField != null && this.promotedFields != null) {
+        if (this.labelField != null && !CollectionUtils.isEmpty(this.promotedFields)) {
             //Ensure the label field is at the first position
             this.promotedFields.remove(this.labelField);
             this.promotedFields.add(0, this.labelField);

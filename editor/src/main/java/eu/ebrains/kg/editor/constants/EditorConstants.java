@@ -6,6 +6,7 @@ public class EditorConstants {
     public static final String CORE_META = CORE_NAMESPACE + "vocab/meta/";
     public static final String EDITOR_META = EDITOR_NAMESPACE + "vocab/meta/";
 
+    public static final String VOCAB_TYPE = CORE_META + "type";
     public static final String VOCAB_EMBEDDED_PROPERTIES = CORE_META + "embeddedProperties";
     public static final String VOCAB_OCCURRENCES = CORE_META + "occurrences";
     public static final String VOCAB_ORDER = CORE_META + "orderNumber";

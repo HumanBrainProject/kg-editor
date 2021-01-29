@@ -88,78 +88,6 @@ export const normalizeLabelInstanceData = data => {
 
 export const normalizeInstanceData = data => {
 
-  // TODO: Remove the mockup, this is just a test for embedded
-  // data.fields["http://schema.org/address"] = {
-  //   widget: "Nested",
-  //   fullyQualifiedName: "http://schema.org/address",
-  //   name: "address",
-  //   label: "Address",
-  //   min:0,
-  //   max: Number.POSITIVE_INFINITY,
-  //   value: [
-  //     {
-  //       "http://schema.org/addressLocality": "Springfield",
-  //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
-  //       "http://schema.org/country" : [
-  //         {"@id": "8cc3b71f-a77a-4976-bd46-7df303236501"},
-  //         {"@id": "2c4540af-7e82-4fb6-8b00-4e3b9a7fc31b"}
-  //       ],
-  //       "http://schema.org/zipCode": [
-  //         { "http://schema.org/test": "Testing...",
-  //           "http://schema.org/region":  [
-  //             {"@id": "8cc3b71f-a77a-4976-bd46-7df303236501"}
-  //           ]
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   fields: {
-  //     "http://schema.org/addressLocality": {
-  //       fullyQualifiedName: "http://schema.org/addressLocality",
-  //       name: "addressLocality",
-  //       label: "Address Locality",
-  //       widget: "InputText"
-  //     },
-  //     "http://schema.org/streetAddress": {
-  //       fullyQualifiedName: "http://schema.org/streetAddress",
-  //       name: "streetAddress",
-  //       label: "Street Address",
-  //       widget: "InputText"
-  //     },
-  //     "http://schema.org/country" : {
-  //       fullyQualifiedName: "http://schema.org/country",
-  //       name: "country",
-  //       label: "Country",
-  //       widget: "DynamicDropdown",
-  //       isLink: true
-  //     },
-  //     "http://schema.org/zipCode": {
-  //       widget: "Nested",
-  //       fullyQualifiedName: "http://schema.org/zipCode",
-  //       name: "zipCode",
-  //       label: "Zip Code",
-  //       min:0,
-  //       max: Number.POSITIVE_INFINITY,
-  //       fields: {
-  //         "http://schema.org/test": {
-  //           fullyQualifiedName: "http://schema.org/test",
-  //           name: "test",
-  //           label: "Test",
-  //           widget: "InputText"
-  //         },
-  //         "http://schema.org/region" :{
-  //           fullyQualifiedName: "http://schema.org/region",
-  //           name: "region",
-  //           label: "Region",
-  //           widget: "DynamicDropdown",
-  //           isLink: true
-  //         }
-  //       }
-  //     }
-  //   }
-  // };
-  // END of TODO
-
   const normalizeAlternative = (name, field, alternatives) => {
     field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
       .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
@@ -293,7 +221,7 @@ const getChildrenIdsGroupedByField = fields => {
 
   function getGroups(field, values) {
     const groups = [];
-    if (field.widget === "Nested") {
+    if (field.widget === "Nested" && values) {
       groups.push(...getNestedFields(field.fields, values));
     } else if (field.isLink) {
       const group = getGroup(field, values);
@@ -528,9 +456,6 @@ export class Instance {
           field.labelTooltipIcon = "globe";
         }
         if (!this.fields[name]) {
-          if(field.widget === "Nested") {
-            _initializeFields(field.fields);
-          }
           if (!field.widget) {
             warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
             field.widget = "UnsupportedField";

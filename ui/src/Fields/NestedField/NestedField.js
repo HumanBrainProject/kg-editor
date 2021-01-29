@@ -17,79 +17,57 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 import { createUseStyles } from "react-jss";
 
 import Label from "../Label";
+import Field from "../Field";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  values:{
-    height:"auto",
-    paddingBottom:"3px",
-    position:"relative",
-    minHeight: "34px",
-    "& .btn":{
-      marginRight:"3px",
-      marginBottom:"3px"
-    },
-    "&[disabled]": {
-      pointerEvents:"none",
-      display: "none !important"
-    }
-  },
   label: {},
   readMode:{
     "& $label:after": {
       content: "':\\00a0'"
     }
   },
-  alternatives: {
-    marginLeft: "3px"
-  },
-  userInput:{
-    background:"transparent",
-    border:"none",
-    color:"currentColor",
-    outline:"none",
-    width:"200px",
-    maxWidth:"33%",
-    marginBottom:"3px",
-    "&:disabled":{
-      cursor: "not-allowed"
-    }
-  },
+  container: {
+    border: "1px solid #ced4da",
+    borderRadius: ".25rem",
+    padding: "10px"
+  }
 });
 
-const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+const NestedField = observer(({className, fieldStore, readMode}) => {
 
   const classes = useStyles();
 
   const formGroupRef = useRef();
 
   const {
-    value: list,
     label,
     labelTooltip,
-    labelTooltipIcon, 
-    returnAsNull
+    labelTooltipIcon,
+    nestedFieldsStores
   } = fieldStore;
 
-  if(readMode){
-    if(!list.length && !showIfNoValue) {
-      return null;
-    }
+  const addValue = () => fieldStore.addValue();
 
-    return (
-      <Form.Group className={classes.readMode}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
-      </Form.Group>
-    );
-  }
-
-  const isDisabled = returnAsNull;
   return (
-    <Form.Group className={className} ref={formGroupRef}>
+    <Form.Group className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
-      <div className={`form-control ${classes.values}`} disabled={isDisabled} ></div>
+      <Form>
+        {nestedFieldsStores.map((rowFieldStore, idx) => (
+          <div key={idx} className={classes.container}>
+            {Object.values(rowFieldStore).map(store => (
+              <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
+            ))}
+          </div>
+        ))}
+        <Button className={classes.actionBtn} size="small" variant={"primary"} onClick={addValue} >
+          <FontAwesomeIcon icon="times"/>
+        </Button>
+      </Form>
     </Form.Group>
   );
 });

@@ -14,23 +14,20 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, makeObservable, toJS } from "mobx";
 import FieldStore from "./FieldStore";
+import { fieldsMapping } from "../../Fields";
 
 class NestedFieldStore extends FieldStore {
-  value = [];
-  options = [];
-  returnAsNull = false;
-  initialValue = [];
+  fieldsTemplate = {};
+  nestedFieldsStores = [];
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
+    this.fieldsTemplate = definition.fields;
 
     makeObservable(this, {
-      value: observable,
-      options: observable,
-      returnAsNull: observable,
-      initialValue: observable,
+      nestedFieldsStores: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
@@ -40,33 +37,66 @@ class NestedFieldStore extends FieldStore {
   }
 
   get cloneWithInitialValue() {
-    return {
-      ...this.definition,
-      value: [...toJS(this.initialValue)]
-    };
+    // get cloneWithInitialValue from fields
+    return {};
   }
 
   get returnValue() {
-    if (!this.value.length && this.returnAsNull) {
-      return null;
-    }
-    return toJS(this.value);
+    return this.nestedFieldsStores.map(row => {
+      return Object.values(row).reduce((acc, store) => {
+        acc[store.fullyQualifiedName] = store.returnValue;
+        return acc;
+      }, {});
+    });
   }
 
-  updateValue(value) {
-    this.returnAsNull = false;
-    const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
-    this.initialValue = [...values];
-    this.value = values;
+  updateValue(values) {
+    this.nestedFieldsStores = [];
+    if(values) {
+      values.forEach(value => {
+        const rowFieldStores = {};
+        Object.entries(this.fieldsTemplate).forEach(([name, fieldTemplate]) => {
+          const field = JSON.parse(JSON.stringify(toJS(fieldTemplate)));
+          let warning = null;
+          if(name === this.labelField) {
+            field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+            field.labelTooltipIcon = "globe";
+          }
+          if (!rowFieldStores[name]) {
+            if (!field.widget) {
+              warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
+              field.widget = "UnsupportedField";
+            } else if (!fieldsMapping[field.widget]) {
+              warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+              field.widget = "UnsupportedField";
+            }
+            const fieldMapping = fieldsMapping[field.widget];
+            rowFieldStores[name] = new fieldMapping.Store(field, fieldMapping.options, this.instance, this.transportLayer);
+          }
+          const store = rowFieldStores[name];
+          store.updateValue(value[name]);
+          if (warning) {
+            store.setWarning(warning);
+          }
+        });
+        this.nestedFieldsStores.push(rowFieldStores);
+      });
+    }
+  }
+
+  addValue() {
+    const values = this.returnValue;
+    values.push({});
+    this.updateValue(values);
   }
 
   reset() {
-    this.returnAsNull = false;
-    this.value = [...this.initialValue];
+    // call fields reset
   }
 
   get hasChanged() {
-    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
+    // call fields hasChanged
+    return false;
   }
 
 }

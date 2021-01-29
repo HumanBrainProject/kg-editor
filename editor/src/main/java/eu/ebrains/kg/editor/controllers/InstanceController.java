@@ -1,5 +1,6 @@
 package eu.ebrains.kg.editor.controllers;
 
+import eu.ebrains.kg.editor.helpers.Helpers;
 import eu.ebrains.kg.editor.models.HasId;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
@@ -83,7 +84,7 @@ public class InstanceController {
     private void simplifyIdsOfLinks(StructureOfField field, Map<?, ?> originalMap) {
         Object fromMap = originalMap.get(field.getFullyQualifiedName());
         if (fromMap != null) {
-            if (isNestedField(field)) {
+            if (Helpers.isNestedField(field)) {
                 Object value = getNestedFieldValue(fromMap, field.getFields());
                 field.setValue(value);
             } else {
@@ -98,7 +99,7 @@ public class InstanceController {
         fields.forEach((k, v) -> {
             Object fieldOriginalValue = originalValue.get(v.getFullyQualifiedName());
             if (fieldOriginalValue != null) {
-                if (isNestedField(v)) {
+                if (Helpers.isNestedField(v)) {
                     Object fieldValue = getNestedFieldValue(fieldOriginalValue, v.getFields());
                     value.put(k, fieldValue);
                 } else {
@@ -107,11 +108,7 @@ public class InstanceController {
                 }
             }
         });
-        return (Object) value;
-    }
-
-    private boolean isNestedField(StructureOfField field) {
-        return field.getWidget() != null && field.getWidget().equals("Nested");
+        return value;
     }
 
     private Object getNestedFieldValue(Object fromMap, Map<String, StructureOfField> fields) {
@@ -224,7 +221,7 @@ public class InstanceController {
 
             Map<String, StructureOfField> filteredFields = fields.entrySet().stream()
                     .filter(f -> promotedFields.contains(f.getValue().getFullyQualifiedName()) && !f.getValue().getFullyQualifiedName().equals(labelField))
-                    .collect(Collectors.toMap(k->k.getKey(), v -> v.getValue()));
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                     
             filteredFields.values().stream().forEach(f -> simplifyIdsOfLinks(f, originalMap));
             instance.setFields(filteredFields);
@@ -247,10 +244,6 @@ public class InstanceController {
                     .map(StructureOfType::getLabelField)
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .findFirst()
-                    .findFirst()
-                    .findFirst()
-                    .findFirst()
                     .orElse(null);
             if (labelField != null) {
                 String name = (String) originalMap.get(labelField);
@@ -267,7 +260,7 @@ public class InstanceController {
     private Map<String, StructureOfType> getTypesByName(InstanceLabel instance) {
         List<String> involvedTypes = instance.getTypes().stream().map(SimpleType::getName).collect(Collectors.toList());
         Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, true);
-        Map<String, StructureOfType> typesByName = getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
         retrieveNestedTypes(typesByName);
         return typesByName;
     }
@@ -283,7 +276,7 @@ public class InstanceController {
                 .distinct()
                 .collect(Collectors.toList());
         Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, true);
-        Map<String, StructureOfType> typesByName = getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
         retrieveNestedTypes(typesByName);
         return typesByName;
     }
@@ -300,7 +293,7 @@ public class InstanceController {
                         })));
         if (!CollectionUtils.isEmpty(nestedTypes)) {
             Map<String, KGCoreResult<StructureOfType>> nestedTypesResultByName = workspaceClient.getTypesByName(nestedTypes, true);
-            Map<String, StructureOfType> nestedTypesByName = getTypesByName(nestedTypesResultByName);
+            Map<String, StructureOfType> nestedTypesByName = Helpers.getTypesByName(nestedTypesResultByName);
             typesByName.putAll(nestedTypesByName);
             retrieveNestedTypes(nestedTypesByName);
         }
@@ -332,7 +325,7 @@ public class InstanceController {
     public void enrichNeighborRecursivelyWithTypeInformation(Neighbor neighbor) {
         Set<String> typesInNeighbor = findTypesInNeighbor(neighbor, new HashSet<>());
         Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(new ArrayList<>(typesInNeighbor), true);
-        Map<String, StructureOfType> typesByName = getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
         enrichTypesInNeighbor(neighbor, typesByName);
     }
 
@@ -368,18 +361,12 @@ public class InstanceController {
         findTypesAndIdsInScope(scope, types, ids);
 
         Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(new ArrayList<>(types), true);
-        Map<String, StructureOfType> typesByName = getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
         enrichTypesInScope(scope, typesByName);
         Map<String, KGCoreResult<String>> releaseStatus = releaseClient.getReleaseStatus(new ArrayList<>(ids), "TOP_INSTANCE_ONLY");
         enrichReleaseStatusInScope(scope, releaseStatus);
     }
 
-    private Map<String, StructureOfType> getTypesByName(Map<String, KGCoreResult<StructureOfType>> typesResultByName) {
-        return typesResultByName.values().stream()
-                .map(KGCoreResult::getData)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(StructureOfType::getName, v -> v));
-    }
 
     private static void findTypesAndIdsInScope(Scope scope, Set<String> types, Set<String> ids) {
         types.addAll(scope.getTypes().stream().map(SimpleType::getName).collect(Collectors.toSet()));

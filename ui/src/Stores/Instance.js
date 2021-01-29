@@ -90,7 +90,7 @@ export const normalizeInstanceData = data => {
 
   // TODO: Remove the mockup, this is just a test for embedded
   // data.fields["http://schema.org/address"] = {
-  //   type: "Nested",
+  //   widget: "Nested",
   //   fullyQualifiedName: "http://schema.org/address",
   //   name: "address",
   //   label: "Address",
@@ -101,16 +101,13 @@ export const normalizeInstanceData = data => {
   //       "http://schema.org/addressLocality": "Springfield",
   //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
   //       "http://schema.org/country" : [
-  //         {id: "e583e6a5-d621-4724-90aa-8706326ede44"},
-  //         {id: "933048fa-f314-4a70-8839-0ce346ac0c36"},
-  //         {id: "ced19d52-78e7-4e3f-a68b-6e42ba77d83b"}
+  //         {"@id": "8cc3b71f-a77a-4976-bd46-7df303236501"},
+  //         {"@id": "2c4540af-7e82-4fb6-8b00-4e3b9a7fc31b"}
   //       ],
   //       "http://schema.org/zipCode": [
   //         { "http://schema.org/test": "Testing...",
   //           "http://schema.org/region":  [
-  //             {id: "f9590f64-b8f9-4d70-a966-7af3b60ea2ae"},
-  //             {id: "3b10cce0-c452-4217-94b4-631fff56d854"},
-  //             {id: "8f3a518b-8224-447c-bf41-0da18797d969"}
+  //             {"@id": "8cc3b71f-a77a-4976-bd46-7df303236501"}
   //           ]
   //         }
   //       ]
@@ -121,24 +118,23 @@ export const normalizeInstanceData = data => {
   //       fullyQualifiedName: "http://schema.org/addressLocality",
   //       name: "addressLocality",
   //       label: "Address Locality",
-  //       type: "InputText"
+  //       widget: "InputText"
   //     },
   //     "http://schema.org/streetAddress": {
   //       fullyQualifiedName: "http://schema.org/streetAddress",
   //       name: "streetAddress",
   //       label: "Street Address",
-  //       type: "InputText"
+  //       widget: "InputText"
   //     },
   //     "http://schema.org/country" : {
   //       fullyQualifiedName: "http://schema.org/country",
   //       name: "country",
   //       label: "Country",
-  //       type: "DropdownSelect",
-  //       isLink: true,
-  //       allowCustomValues: true
+  //       widget: "DynamicDropdown",
+  //       isLink: true
   //     },
   //     "http://schema.org/zipCode": {
-  //       type: "Nested",
+  //       widget: "Nested",
   //       fullyQualifiedName: "http://schema.org/zipCode",
   //       name: "zipCode",
   //       label: "Zip Code",
@@ -149,15 +145,14 @@ export const normalizeInstanceData = data => {
   //           fullyQualifiedName: "http://schema.org/test",
   //           name: "test",
   //           label: "Test",
-  //           type: "InputText"
+  //           widget: "InputText"
   //         },
   //         "http://schema.org/region" :{
   //           fullyQualifiedName: "http://schema.org/region",
   //           name: "region",
   //           label: "Region",
-  //           type: "DropdownSelect",
-  //           isLink: true,
-  //           allowCustomValues: true
+  //           widget: "DynamicDropdown",
+  //           isLink: true
   //         }
   //       }
   //     }
@@ -525,6 +520,36 @@ export class Instance {
   }
 
   initializeData(transportLayer, data, isNew = false) {
+    const _initializeFields = _fields => {
+      Object.entries(_fields).forEach(([name, field]) => {
+        let warning = null;
+        if(name === this.labelField) {
+          field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+          field.labelTooltipIcon = "globe";
+        }
+        if (!this.fields[name]) {
+          if(field.widget === "Nested") {
+            _initializeFields(field.fields);
+          }
+          if (!field.widget) {
+            warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
+            field.widget = "UnsupportedField";
+          } else if (!fieldsMapping[field.widget]) {
+            warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+            field.widget = "UnsupportedField";
+          }
+          const fieldMapping = fieldsMapping[field.widget];
+          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
+        }
+        const store = this.fields[name];
+        store.updateValue(field.value);
+        store.setAlternatives(field.alternatives);
+        if (warning) {
+          store.setWarning(warning);
+        }
+      });
+    };
+
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name,
     this.workspace = normalizedData.workspace;
@@ -536,30 +561,7 @@ export class Instance {
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
-    Object.entries(normalizedData.fields).forEach(([name, field]) => {
-      let warning = null;
-      if(name === this.labelField) {
-        field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-        field.labelTooltipIcon = "globe";
-      }
-      if (!this.fields[name]) {
-        if (!field.widget) {
-          warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
-          field.widget = "UnsupportedField";
-        } else if (!fieldsMapping[field.widget]) {
-          warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
-          field.widget = "UnsupportedField";
-        }
-        const fieldMapping = fieldsMapping[field.widget];
-        this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
-      }
-      const store = this.fields[name];
-      store.updateValue(field.value);
-      store.setAlternatives(field.alternatives);
-      if (warning) {
-        store.setWarning(warning);
-      }
-    });
+    _initializeFields(normalizedData.fields);
     this.fetchError = null;
     this.isNotFound = false;
     this.hasFetchError = false;

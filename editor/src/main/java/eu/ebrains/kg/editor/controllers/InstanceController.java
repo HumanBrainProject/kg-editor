@@ -82,20 +82,55 @@ public class InstanceController {
 
     private void simplifyIdsOfLinks(StructureOfField field, Map<?, ?> originalMap) {
         Object fromMap = originalMap.get(field.getFullyQualifiedName());
-        if (fromMap instanceof Collection) {
-            field.setValue(((Collection<?>) fromMap).stream().map(idController::simplifyIdIfObjectIsAMap));
-        } else if (field.getWidget() != null && field.getWidget().equals("Nested")) {
-            if (fromMap != null) {
-                Map<String, Object> value = new HashMap<>();
-                Map<String, Object> originalValue = (Map<String, Object>) fromMap;
-                field.getFields().forEach((k, v) -> {
-                    Object fieldValue = originalValue.get(v.getFullyQualifiedName());
-                    value.put(k, idController.simplifyIdIfObjectIsAMap(fieldValue));
-                });
+        if (fromMap != null) {
+            if (isNestedField(field)) {
+                Object value = getNestedFieldValue(fromMap, field.getFields());
+                field.setValue(value);
+            } else {
+                Object value = getFieldValue(fromMap);
                 field.setValue(value);
             }
-        } else if (fromMap != null) {
-            field.setValue(idController.simplifyIdIfObjectIsAMap(fromMap));
+        }
+    }
+
+    private Object simplifyIdsOfLinksInNested(Map<String, Object> originalValue, Map<String, StructureOfField> fields) {
+        Map<String, Object> value = new HashMap<>();
+        fields.forEach((k, v) -> {
+            Object fieldOriginalValue = originalValue.get(v.getFullyQualifiedName());
+            if (fieldOriginalValue != null) {
+                if (isNestedField(v)) {
+                    Object fieldValue = getNestedFieldValue(fieldOriginalValue, v.getFields());
+                    value.put(k, fieldValue);
+                } else {
+                    Object fieldValue = getFieldValue(fieldOriginalValue);
+                    value.put(k, fieldValue);
+                }
+            }
+        });
+        return (Object) value;
+    }
+
+    private boolean isNestedField(StructureOfField field) {
+        return field.getWidget() != null && field.getWidget().equals("Nested");
+    }
+
+    private Object getNestedFieldValue(Object fromMap, Map<String, StructureOfField> fields) {
+        if (fromMap instanceof Collection) {
+            List<Object> value = ((Collection<?>) fromMap).stream()
+                            .map(v -> simplifyIdsOfLinksInNested((Map<String, Object>) v, fields))
+                            .collect(Collectors.toList());
+            return value;
+        } else {
+            Object value = simplifyIdsOfLinksInNested((Map<String, Object>) fromMap, fields);
+            return value;
+        }
+    }
+
+    private Object getFieldValue(Object fieldOriginalValue) {
+        if (fieldOriginalValue instanceof Collection) {
+            return  ((Collection<?>) fieldOriginalValue).stream().map(idController::simplifyIdIfObjectIsAMap);
+        } else {
+            return idController.simplifyIdIfObjectIsAMap(fieldOriginalValue);
         }
     }
 
@@ -176,6 +211,7 @@ public class InstanceController {
             String labelField = typesByName.values().stream()
                     .filter(Objects::nonNull)
                     .map(StructureOfType::getLabelField)
+                    .filter(Objects::nonNull)
                     .findFirst()
                     .orElse(null);
 
@@ -207,7 +243,15 @@ public class InstanceController {
 
             //Set the name from the label field
             String labelField = typesByName.values().stream()
-                    .filter(Objects::nonNull).map(StructureOfType::getLabelField).findFirst().orElse(null);
+                    .filter(Objects::nonNull)
+                    .map(StructureOfType::getLabelField)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .findFirst()
+                    .findFirst()
+                    .findFirst()
+                    .findFirst()
+                    .orElse(null);
             if (labelField != null) {
                 String name = (String) originalMap.get(labelField);
                 instance.setName(name);

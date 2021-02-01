@@ -25,6 +25,16 @@ const theme = {
     image: `${window.rootPath}/assets/background-bright.png`,
     position: "50% 50%"
   },
+  button: {
+    primary: {
+      backgroundColor: "#007bff",
+      borderColor: "#007bff",
+      active: {
+        backgroundColor: "#0069d9",
+        borderColor: "#0062cc"
+      }
+    }
+  },
   contrast1: {
     backgroundColor: "#ffffff",
     borderColor: "#ffffff"

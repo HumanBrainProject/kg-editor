@@ -55,6 +55,8 @@ import {faFile} from "@fortawesome/free-solid-svg-icons/faFile";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faDotCircle} from "@fortawesome/free-solid-svg-icons/faDotCircle";
 import {faArrowRight} from "@fortawesome/free-solid-svg-icons/faArrowRight";
+import {faArrowUp} from "@fortawesome/free-solid-svg-icons/faArrowUp";
+import {faArrowDown} from "@fortawesome/free-solid-svg-icons/faArrowDown";
 import {faExpandArrowsAlt} from "@fortawesome/free-solid-svg-icons/faExpandArrowsAlt";
 import {faCompress} from "@fortawesome/free-solid-svg-icons/faCompress";
 import {faEyeSlash} from "@fortawesome/free-solid-svg-icons/faEyeSlash";
@@ -123,6 +125,8 @@ library.add(
   faPlus,
   faDotCircle,
   faArrowRight,
+  faArrowUp,
+  faArrowDown,
   faExpandArrowsAlt,
   faCompress,
   faExclamationCircle,

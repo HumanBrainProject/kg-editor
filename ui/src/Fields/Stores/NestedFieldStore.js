@@ -20,6 +20,8 @@ import { fieldsMapping } from "../../Fields";
 
 class NestedFieldStore extends FieldStore {
   fieldsTemplate = {};
+  initialValue = [];
+  returnAsNull = false;
   nestedFieldsStores = [];
 
   constructor(definition, options, instance, transportLayer) {
@@ -27,18 +29,33 @@ class NestedFieldStore extends FieldStore {
     this.fieldsTemplate = definition.fields;
 
     makeObservable(this, {
+      initialValue: observable,
+      returnAsNull: observable,
       nestedFieldsStores: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      addValue: action,
+      deleteItemByIndex: action,
+      moveItemUpByIndex: action,
+      moveItemDownByIndex: action
     });
   }
 
+  get definition() {
+    return {
+      ...super.definition,
+      field: this.fieldsTemplate
+    };
+  }
+
   get cloneWithInitialValue() {
-    // get cloneWithInitialValue from fields
-    return {};
+    return {
+      ...this.definition,
+      value: [...toJS(this.initialValue)]
+    };
   }
 
   get returnValue() {
@@ -50,7 +67,7 @@ class NestedFieldStore extends FieldStore {
     });
   }
 
-  updateValue(values) {
+  _setValue(values) {
     this.nestedFieldsStores = [];
     if(values) {
       values.forEach(value => {
@@ -84,19 +101,53 @@ class NestedFieldStore extends FieldStore {
     }
   }
 
+  updateValue(values) {
+    this.returnAsNull = false;
+    this.initialValue = JSON.parse(JSON.stringify(values));
+    this._setValue(values);
+  };
+
   addValue() {
     const values = this.returnValue;
     values.push({});
-    this.updateValue(values);
+    this._setValue(values);
+  }
+
+  deleteItemByIndex(index) {
+    if (index >= 0 && index < this.nestedFieldsStores.length) {
+      const values = this.returnValue;
+      values.splice(index, 1);
+      this._setValue(values);
+    }
+  }
+
+  moveItemUpByIndex(index) {
+    if (index > 0 && index < this.nestedFieldsStores.length) {
+      const values = this.returnValue;
+      const item = values[index];
+      values.splice(index, 1);
+      values.splice(index-1, 0, item);
+      this._setValue(values);
+    }
+  }
+
+  moveItemDownByIndex(index) {
+    if (index >= 0 && index < this.nestedFieldsStores.length -1) {
+      const values = this.returnValue;
+      const item = values[index];
+      values.splice(index, 1);
+      values.splice(index+1, 0, item);
+      this._setValue(values);
+    }
   }
 
   reset() {
-    // call fields reset
+    this.returnAsNull = false;
+    this.updateValue(toJS(this.initialValue));
   }
 
   get hasChanged() {
-    // call fields hasChanged
-    return false;
+    return JSON.stringify(toJS(this.returnValue)) !== JSON.stringify(toJS(this.initialValue));
   }
 
 }

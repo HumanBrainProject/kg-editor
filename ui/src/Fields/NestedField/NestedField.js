@@ -31,12 +31,113 @@ const useStyles = createUseStyles({
       content: "':\\00a0'"
     }
   },
-  container: {
+  form: {
+    position: "relative",
     border: "1px solid #ced4da",
     borderRadius: ".25rem",
-    padding: "10px"
-  }
+    padding: "10px",
+  },
+  item: {
+    position: "relative",
+    border: "1px solid #ced4da",
+    borderRadius: ".25rem",
+    padding: "10px",
+    "&:hover": {
+      "& $actions": {
+        opacity: 0.75
+      }
+    },
+    "& + $item": {
+      marginTop: "10px"
+    }
+  },
+  actions: {
+    position: "absolute",
+    top: "5px",
+    right: "10px",
+    display: "flex",
+    alignItems: "flex-end",
+    opacity: 0,
+    "&:hover": {
+      opacity: "1 !important"
+    }
+  },
+  action: {
+    fontSize: "0.9em",
+    lineHeight: "27px",
+    textAlign: "center",
+    backgroundColor: "var(--button-primary-bg-color)",
+    color: "var(--ft-color-loud)",
+    cursor: "pointer",
+    width: "25px",
+    "&:hover": {
+      backgroundColor: "var(--button-primary-active-bg-color)",
+    },
+    "&:first-child": {
+      borderRadius: "4px 0 0 4px"
+    },
+    "&:last-child": {
+      borderRadius: "0 4px 4px 0"
+    },
+    "&$single": {
+      borderRadius: "4px"
+    }
+  },
+  single: {},
+  actionBtn: {
+    fontSize: "x-small",
+    marginTop: "10px",
+    "&$noItems": {
+      marginTop: "0"
+    }
+  },
+  noItems: {}
 });
+
+const Action = ({ icon, single, onClick }) => {
+
+  const classes = useStyles();
+
+  const handleClick = e => {
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.target)) {
+      return;
+    }
+    typeof onClick === "function" && onClick();
+  };
+
+  return (
+    <div className={`${classes.action} ${single?classes.single:""}`} onClick={handleClick}>
+      <FontAwesomeIcon icon={icon} />
+    </div>
+  );
+};
+
+const Item = ({ itemFieldStores, readMode, index, total, onDelete, onMoveUp, onMoveDown }) => {
+
+  const classes = useStyles();
+
+  const handleDelete = () => onDelete(index);
+  const handleMoveUp = () => onMoveUp(index);
+  const handleMoveDown = () => onMoveDown(index);
+
+  return (
+    <div className={classes.item}>
+      {Object.values(itemFieldStores).map(store => (
+        <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
+      ))}
+      <div className={classes.actions} >
+        <Action icon="times" onClick={handleDelete} single={total === 1} />
+        {index !== 0 && (
+          <Action icon="arrow-up" onClick={handleMoveUp} />
+        )}
+        {index < total - 1 && (
+          <Action icon="arrow-down" onClick={handleMoveDown} />
+        )}
+      </div>
+    </div>
+  );
+};
 
 const NestedField = observer(({className, fieldStore, readMode}) => {
 
@@ -53,19 +154,19 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
 
   const addValue = () => fieldStore.addValue();
 
+  const handleDeleteItem = index => fieldStore.deleteItemByIndex(index);
+  const handleMoveItemUp = index => fieldStore.moveItemUpByIndex(index);
+  const handleMoveItemDown = index => fieldStore.moveItemDownByIndex(index);
+
   return (
     <Form.Group className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
-      <Form>
-        {nestedFieldsStores.map((rowFieldStore, idx) => (
-          <div key={idx} className={classes.container}>
-            {Object.values(rowFieldStore).map(store => (
-              <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
-            ))}
-          </div>
+      <Form className={classes.form} >
+        {nestedFieldsStores.map((itemFieldStores, idx) => (
+          <Item key={idx} itemFieldStores={itemFieldStores} readMode={readMode} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
-        <Button className={classes.actionBtn} size="small" variant={"primary"} onClick={addValue} >
-          <FontAwesomeIcon icon="times"/>
+        <Button className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} size="small" variant={"primary"} onClick={addValue} >
+          <FontAwesomeIcon icon="plus"/>
         </Button>
       </Form>
     </Form.Group>

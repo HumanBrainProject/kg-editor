@@ -83,7 +83,7 @@ class InputNumberStore extends FieldStore {
     if (this.value === null && this.returnAsNull) {
       return null;
     }
-    return toJS(this.value);
+    return toJS(parseFloat(this.value));
   }
 
   get requiredValidationWarning() {

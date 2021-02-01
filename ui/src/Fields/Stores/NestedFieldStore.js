@@ -47,7 +47,7 @@ class NestedFieldStore extends FieldStore {
   get definition() {
     return {
       ...super.definition,
-      field: this.fieldsTemplate
+      fields: this.fieldsTemplate
     };
   }
 
@@ -105,7 +105,7 @@ class NestedFieldStore extends FieldStore {
     this.returnAsNull = false;
     this.initialValue = JSON.parse(JSON.stringify(values));
     this._setValue(values);
-  };
+  }
 
   addValue() {
     const values = this.returnValue;

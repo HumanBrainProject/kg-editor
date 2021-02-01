@@ -77,7 +77,8 @@ class InputNumberMultipleStore extends FieldStore {
     if (!this.value.length && this.returnAsNull) {
       return null;
     }
-    return toJS(this.value);
+    const val = this.value.map(v => parseFloat(v));
+    return val;
   }
 
   get requiredValidationWarning() {

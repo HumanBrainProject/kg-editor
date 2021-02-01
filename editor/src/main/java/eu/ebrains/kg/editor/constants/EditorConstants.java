@@ -13,6 +13,12 @@ public class EditorConstants {
     public static final String VOCAB_SPACES = CORE_META + "spaces";
     public static final String VOCAB_SPACE = CORE_META + "space";
     public static final String VOCAB_ALTERNATIVE = CORE_META + "alternative";
+    public static final String VOCAB_REGEX = CORE_META + "regex";
+    public static final String VOCAB_MAX_LENGTH = CORE_META + "maxLength";
+    public static final String VOCAB_MIN_ITEMS = CORE_META + "minItems";
+    public static final String VOCAB_MAX_ITEMS = CORE_META + "maxItems";
+    public static final String VOCAB_MIN_VALUE = CORE_META + "minValue";
+    public static final String VOCAB_MAX_VALUE = CORE_META + "maxValue";
     public static final String VOCAB_SELECTED = CORE_META + "selected";
     public static final String VOCAB_USER = CORE_META + "user";
     public static final String VOCAB_VALUE = CORE_META + "value";

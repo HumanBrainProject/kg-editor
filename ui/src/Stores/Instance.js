@@ -202,7 +202,8 @@ const getChildrenIdsGroupedByField = fields => {
     return Array.isArray(values) ? values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
   }
 
-  function getGroup(field, values) {
+  function getGroup(field) {
+    const values = field.returnValue;
     const ids = getIds(field, values, field.mappingValue);
     if (ids.length) {
       const group = {
@@ -219,12 +220,13 @@ const getChildrenIdsGroupedByField = fields => {
     return null;
   }
 
-  function getGroups(field, values) {
+  function getGroups(field) {
     const groups = [];
-    if (field.widget === "Nested" && values) {
-      groups.push(...getNestedFields(field.fields, values));
+    if (field.widget === "Nested") {
+      const nestedGroups = getNestedFields(field.nestedFieldsStores);
+      groups.push(...nestedGroups);
     } else if (field.isLink) {
-      const group = getGroup(field, values);
+      const group = getGroup(field);
       if (group) {
         groups.push(group);
       }
@@ -232,23 +234,37 @@ const getChildrenIdsGroupedByField = fields => {
     return groups;
   }
 
-  function getNestedFields(fields, vals) {
-    return Object.entries(fields).reduce((acc, [fieldKey, field]) => {
-      const values = vals.flatMap(v => v[fieldKey].value);
-      const groups = getGroups(field, values);
-      acc.push(...groups);
+  function getNestedFields(fields) {
+    return fields.reduce((acc, rowFields) => {
+      acc.push(...Object.values(rowFields).reduce((acc2, field) => {
+        const groups = getGroups(field);
+        acc2.push(...groups);
+        return acc2;
+      }, []));
       return acc;
     }, []);
   }
 
-  return fields.reduce((acc, field) => {
-    const values = toJS(field.value);
-    const groups = getGroups(field, values);
-    acc.push(...groups);
-    return acc;
-  }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
-};
+  function getUniqueGroups(fields) {
+    const list = fields.reduce((acc, field) => {
+      const groups = getGroups(field);
+      acc.push(...groups);
+      return acc;
+    }, []);
+    return Object.entries(list.reduce((acc, group) => {
+      if (!acc[group.label]) {
+        acc[group.label] = [];
+      }
+      acc[group.label].push(...group.ids);
+      return acc;
+    }, {}))
+      .map(([label, ids]) => ({label: label, ids: ids}))
+      .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+  }
 
+  const groups = getUniqueGroups(fields);
+  return groups;
+};
 export class Instance {
   id = null;
   _name = null;

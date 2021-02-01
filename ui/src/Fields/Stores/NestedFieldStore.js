@@ -103,7 +103,7 @@ class NestedFieldStore extends FieldStore {
 
   updateValue(values) {
     this.returnAsNull = false;
-    this.initialValue = JSON.parse(JSON.stringify(values));
+    this.initialValue = values?JSON.parse(JSON.stringify(values)):null;
     this._setValue(values);
   }
 

@@ -16,13 +16,13 @@
 
 import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
-import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { createUseStyles } from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Label from "../Label";
 import Field from "../Field";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 
 const useStyles = createUseStyles({
   label: {},
@@ -117,6 +117,9 @@ const Item = ({ itemFieldStores, readMode, index, total, onDelete, onMoveUp, onM
 
   const classes = useStyles();
 
+  const view = React.useContext(ViewContext);
+  const pane = React.useContext(PaneContext);
+
   const handleDelete = () => onDelete(index);
   const handleMoveUp = () => onMoveUp(index);
   const handleMoveDown = () => onMoveDown(index);
@@ -124,7 +127,7 @@ const Item = ({ itemFieldStores, readMode, index, total, onDelete, onMoveUp, onM
   return (
     <div className={classes.item}>
       {Object.values(itemFieldStores).map(store => (
-        <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
+        <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
       ))}
       <div className={classes.actions} >
         <Action icon="times" onClick={handleDelete} single={total === 1} />
@@ -159,17 +162,17 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
   const handleMoveItemDown = index => fieldStore.moveItemDownByIndex(index);
 
   return (
-    <Form.Group className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
+    <div className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
-      <Form className={classes.form} >
+      <div className={classes.form} >
         {nestedFieldsStores.map((itemFieldStores, idx) => (
           <Item key={idx} itemFieldStores={itemFieldStores} readMode={readMode} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
         <Button className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} size="small" variant={"primary"} onClick={addValue} >
           <FontAwesomeIcon icon="plus"/>
         </Button>
-      </Form>
-    </Form.Group>
+      </div>
+    </div>
   );
 });
 NestedField.displayName = "NestedField";

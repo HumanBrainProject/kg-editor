@@ -50,7 +50,7 @@ const getLabel = (instanceStore, field, value) => {
 };
 
 const getNestedFieldValue = (instanceStore, fields, level) => {
-  const tabs = Array.from({ length: level }, () => "\t").join("")
+  const tabs = Array.from({ length: level }, () => "\t").join("");
   let result = `${tabs}[`;
   fields.forEach(row => {
     result += `\n\t${tabs}{`;
@@ -59,7 +59,7 @@ const getNestedFieldValue = (instanceStore, fields, level) => {
   });
   result += "]";
   return result;
-}
+};
 
 const getFieldValue = (instanceStore, field, level) => {
   if (field.widget === "Nested") {
@@ -86,7 +86,7 @@ const getFieldValue = (instanceStore, field, level) => {
     return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
   }
   return "";
-}
+};
 
 const getValue = (instanceStore, instance, name) => {
   if (!instance) {

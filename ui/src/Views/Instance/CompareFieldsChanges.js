@@ -49,11 +49,22 @@ const getLabel = (instanceStore, field, value) => {
   return id;
 };
 
-const getValue = (instanceStore, instance, name) => {
-  if (!instance) {
-    return "";
+const getNestedFieldValue = (instanceStore, fields, level) => {
+  const tabs = Array.from({ length: level }, () => "\t").join("")
+  let result = `${tabs}[`;
+  fields.forEach(row => {
+    result += `\n\t${tabs}{`;
+    Object.values(row).forEach(store => result += `\n\t\t${tabs}${store.label}:${getFieldValue(instanceStore, store, level + 1)}`);
+    result += `\n\t${tabs}}\n`;
+  });
+  result += "]";
+  return result;
+}
+
+const getFieldValue = (instanceStore, field, level) => {
+  if (field.widget === "Nested") {
+    return getNestedFieldValue(instanceStore, field.nestedFieldsStores, level);
   }
-  const field = instance.fields[name];
   const value = field.returnValue;
   if (!value) {
     return "";
@@ -75,6 +86,14 @@ const getValue = (instanceStore, instance, name) => {
     return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
   }
   return "";
+}
+
+const getValue = (instanceStore, instance, name) => {
+  if (!instance) {
+    return "";
+  }
+  const field = instance.fields[name];
+  return getFieldValue(instanceStore, field, 0);
 };
 
 const getStatus = (store, ids) => ids.reduce((acc, id) => {

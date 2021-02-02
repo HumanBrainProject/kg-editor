@@ -51,6 +51,12 @@ const useStyles = createUseStyles({
       marginTop: "10px"
     }
   },
+  field: {
+    marginBottom: 0,
+    "& + $field": {
+      marginTop: "1rem"
+    }
+  },
   actions: {
     position: "absolute",
     top: "5px",
@@ -94,7 +100,7 @@ const useStyles = createUseStyles({
   noItems: {}
 });
 
-const Action = ({ icon, single, onClick }) => {
+const Action = ({ icon, title, single, onClick }) => {
 
   const classes = useStyles();
 
@@ -107,13 +113,13 @@ const Action = ({ icon, single, onClick }) => {
   };
 
   return (
-    <div className={`${classes.action} ${single?classes.single:""}`} onClick={handleClick}>
+    <div className={`${classes.action} ${single?classes.single:""}`} onClick={handleClick} title={title}>
       <FontAwesomeIcon icon={icon} />
     </div>
   );
 };
 
-const Item = ({ itemFieldStores, readMode, index, total, onDelete, onMoveUp, onMoveDown }) => {
+const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMoveUp, onMoveDown }) => {
 
   const classes = useStyles();
 
@@ -129,15 +135,17 @@ const Item = ({ itemFieldStores, readMode, index, total, onDelete, onMoveUp, onM
       {Object.values(itemFieldStores).map(store => (
         <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
       ))}
-      <div className={classes.actions} >
-        <Action icon="times" onClick={handleDelete} single={total === 1} />
-        {index !== 0 && (
-          <Action icon="arrow-up" onClick={handleMoveUp} />
-        )}
-        {index < total - 1 && (
-          <Action icon="arrow-down" onClick={handleMoveDown} />
-        )}
-      </div>
+      {!readMode && active && (
+        <div className={classes.actions} >
+          <Action icon="times" onClick={handleDelete} single={total === 1} title="Delete" />
+          {index !== 0 && (
+            <Action icon="arrow-up" onClick={handleMoveUp} title="Move up" />
+          )}
+          {index < total - 1 && (
+            <Action icon="arrow-down" onClick={handleMoveDown} title="Move down" />
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -148,7 +156,10 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
 
   const formGroupRef = useRef();
 
+  const view = React.useContext(ViewContext);
+
   const {
+    instance,
     label,
     labelTooltip,
     labelTooltipIcon,
@@ -161,16 +172,20 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
   const handleMoveItemUp = index => fieldStore.moveItemUpByIndex(index);
   const handleMoveItemDown = index => fieldStore.moveItemDownByIndex(index);
 
+  const active = view && view.currentInstanceId === instance.id;
+
   return (
     <div className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       <div className={classes.form} >
         {nestedFieldsStores.map((itemFieldStores, idx) => (
-          <Item key={idx} itemFieldStores={itemFieldStores} readMode={readMode} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
+          <Item key={idx} itemFieldStores={itemFieldStores} readMode={readMode} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
-        <Button className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} size="small" variant={"primary"} onClick={addValue} >
-          <FontAwesomeIcon icon="plus"/>
-        </Button>
+        {!readMode && active && (
+          <Button className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} size="small" variant={"primary"} onClick={addValue} title="Add" >
+            <FontAwesomeIcon icon="plus"/>
+          </Button>
+        )}
       </div>
     </div>
   );

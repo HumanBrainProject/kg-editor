@@ -160,7 +160,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     }
 
     return (
-      <Form.Group className={classes.readMode}>
+      <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
         <List
           list={list}

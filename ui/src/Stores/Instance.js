@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, makeObservable } from "mobx";
 
 import { fieldsMapping } from "../Fields";
 
@@ -198,13 +198,14 @@ const getChildrenIdsGroupedByField = fields => {
     return false;
   }
 
-  function getIds(field, values, mappingValue) {
+  function getIds(field) {
+    const values = field.returnValue;
+    const mappingValue = field.mappingValue;
     return Array.isArray(values) ? values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
   }
 
   function getGroup(field) {
-    const values = field.returnValue;
-    const ids = getIds(field, values, field.mappingValue);
+    const ids = getIds(field);
     if (ids.length) {
       const group = {
         //name: field.name,
@@ -422,14 +423,20 @@ export class Instance {
   }
 
   get childrenIds() {
-    if (this.isFetched && !this.fetchError && this.fields) {
-      const ids = Object.values(this.fields)
+
+    function getChildrenIds(fields) {
+      const ids = Object.values(fields)
         .reduce((acc, field) => {
           if (field.widget === "Nested") {
-            //TODO
+            const idsOfNestedFields = getChildrenIdsOfNestedFields(field.nestedFieldsStores);
+            idsOfNestedFields.forEach(id => {
+              if (!acc.has(id)) {
+                acc.add(id);
+              }
+            });
           } else if (field.isLink) {
-            const values = toJS(field.value);
-            Array.isArray(values) && values.map(obj => {
+            const values = field.returnValue;
+            Array.isArray(values) && values.forEach(obj => {
               const id = obj && obj[field.mappingValue];
               if (id && !acc.has(id)) {
                 acc.add(id);
@@ -439,6 +446,23 @@ export class Instance {
           return acc;
         }, new Set());
       return Array.from(ids);
+    }
+
+    function getChildrenIdsOfNestedFields(fields) {
+      const ids = fields.reduce((acc, rowFields) => {
+        const ids = getChildrenIds(rowFields);
+        ids.forEach(id => {
+          if (!acc.has(id)) {
+            acc.add(id);
+          }
+        });
+        return acc;
+      }, new Set());
+      return Array.from(ids);
+    }
+
+    if (this.isFetched && !this.fetchError && this.fields) {
+      return getChildrenIds(this.fields);
     }
     return [];
   }

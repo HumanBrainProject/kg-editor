@@ -165,7 +165,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     }
 
     return (
-      <Form.Group className={classes.readMode}>
+      <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
         <List
           list={list}

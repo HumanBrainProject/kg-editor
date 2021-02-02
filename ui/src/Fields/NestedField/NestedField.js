@@ -44,7 +44,7 @@ const useStyles = createUseStyles({
     padding: "10px",
     "&:hover": {
       "& $actions": {
-        opacity: 0.75
+        opacity: 1
       }
     },
     "& + $item": {
@@ -65,7 +65,7 @@ const useStyles = createUseStyles({
     alignItems: "flex-end",
     opacity: 0,
     "&:hover": {
-      opacity: "1 !important"
+      opacity: 1
     }
   },
   action: {

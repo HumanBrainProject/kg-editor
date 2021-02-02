@@ -34,42 +34,65 @@ public class InstanceController {
     }
 
     public InstanceFull enrichInstance(ResultWithOriginalMap<InstanceFull> instanceWithMap) {
-        InstanceFull instance = idController.simplifyId(instanceWithMap.getResult());
-        Map<String, StructureOfType> typesByName = getTypesByName(instance);
-        enrichTypesAndFields(instance, instanceWithMap.getOriginalMap(), typesByName);
-        enrichAlternatives(instance);
-        return instance;
+        if(instanceWithMap.getResult() != null) {
+            InstanceFull instance = idController.simplifyId(instanceWithMap.getResult());
+            Map<String, StructureOfType> typesByName = getTypesByName(instance);
+            enrichTypesAndFields(instance, instanceWithMap.getOriginalMap(), typesByName);
+            enrichAlternatives(instance);
+            return  instance;
+        }
+        return null;
     }
 
-    public Map<String, InstanceFull> enrichInstances(Map<String, ResultWithOriginalMap<InstanceFull>> instancesWithMap) {
-        Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = getInstancesWithSimplifiedId(instancesWithMap);
+    public Map<String, InstanceFull> enrichInstances(Map<String, ResultWithOriginalMap<InstanceFull>> instancesWithMap, String stage) {
+        simplifyIdsOfInstances(instancesWithMap);
+        Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
         instancesWithResult.forEach(instanceWithResult -> {
-            enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
-            enrichAlternatives(instanceWithResult.getResult());
+            if(instanceWithResult.getResult() != null ) {
+                enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
+                if(stage.equals("IN_PROGRESS")) {
+                    enrichAlternatives(instanceWithResult.getResult());
+                }
+            }
         });
-        return instancesWithResult.stream().collect(Collectors.toMap(k -> k.getResult().getId(), ResultWithOriginalMap::getResult));
+        Map<String, InstanceFull> result = new HashMap<>();
+        instancesWithMap.forEach((k, v) -> result.put(k, v.getResult()));
+        return result;
     }
 
     public Map<String, InstanceLabel> enrichInstancesLabel(Map<String, ResultWithOriginalMap<InstanceLabel>> instancesWithMap) {
-        Collection<ResultWithOriginalMap<InstanceLabel>> instancesWithResult = getInstancesWithSimplifiedId(instancesWithMap);
+        simplifyIdsOfInstances(instancesWithMap);
+        Collection<ResultWithOriginalMap<InstanceLabel>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
-        instancesWithResult.forEach(instanceWithResult -> enrichName(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName));
-        return instancesWithResult.stream().collect(Collectors.toMap(k -> k.getResult().getId(), ResultWithOriginalMap::getResult));
+        instancesWithResult.forEach(instanceWithResult -> {
+            if(instanceWithResult.getResult() != null ) {
+                enrichName(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
+            }
+        });
+        Map<String, InstanceLabel> result = new HashMap<>();
+        instancesWithMap.forEach((k, v) -> result.put(k, v.getResult()));
+        return result;
     }
 
 
     public Map<String, InstanceSummary> enrichInstancesSummary(Map<String, ResultWithOriginalMap<InstanceSummary>> instancesWithMap) {
-        Collection<ResultWithOriginalMap<InstanceSummary>> instancesWithResult = getInstancesWithSimplifiedId(instancesWithMap);
+        simplifyIdsOfInstances(instancesWithMap);
+        Collection<ResultWithOriginalMap<InstanceSummary>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
-        instancesWithResult.forEach(instanceWithResult -> enrichTypesAndSearchableFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName));
-        return instancesWithResult.stream().collect(Collectors.toMap(k -> k.getResult().getId(), ResultWithOriginalMap::getResult));
+        instancesWithResult.forEach(instanceWithResult -> {
+            if(instanceWithResult.getResult() != null ) {
+                enrichTypesAndSearchableFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
+            }
+        });
+        Map<String, InstanceSummary> result = new HashMap<>();
+        instancesWithMap.forEach((k, v) -> result.put(k, v.getResult()));
+        return result;
     }
 
-    private <T extends HasId> Collection<ResultWithOriginalMap<T>> getInstancesWithSimplifiedId(Map<String, ResultWithOriginalMap<T>> instancesWithMap) {
+    private <T extends HasId> void simplifyIdsOfInstances(Map<String, ResultWithOriginalMap<T>> instancesWithMap) {
         Collection<ResultWithOriginalMap<T>> instancesWithResult = instancesWithMap.values();
         instancesWithResult.forEach(i -> idController.simplifyId(i.getResult()));
-        return instancesWithResult;
     }
 
     public void enrichSimpleType(SimpleType t, Map<String, StructureOfType> typesByName) {
@@ -234,9 +257,12 @@ public class InstanceController {
     }
 
     private void enrichName(InstanceLabel instance, Map<?, ?> originalMap, Map<String, StructureOfType> typesByName) {
-        if (typesByName != null) {
+        if (typesByName != null && instance != null) {
             // Fill the type information
-            instance.getTypes().forEach(t -> enrichSimpleType(t, typesByName));
+            if(instance.getTypes() != null) {
+                instance.getTypes().stream().filter(Objects::nonNull).forEach(t -> enrichSimpleType(t, typesByName));
+            }
+
 
             //Set the name from the label field
             String labelField = typesByName.values().stream()
@@ -245,7 +271,7 @@ public class InstanceController {
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElse(null);
-            if (labelField != null) {
+            if (originalMap != null && labelField != null) {
                 String name = (String) originalMap.get(labelField);
                 instance.setName(name);
             }
@@ -253,7 +279,7 @@ public class InstanceController {
     }
 
     private <T extends InstanceLabel> Map<String, StructureOfType> getTypesByName(Collection<ResultWithOriginalMap<T>> instancesWithResult) {
-        List<InstanceLabel> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).collect(Collectors.toList());
+        List<InstanceLabel> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).filter(Objects::nonNull).collect(Collectors.toList());
         return getTypesByName(instanceLabelList);
     }
 
@@ -268,9 +294,11 @@ public class InstanceController {
     private Map<String, StructureOfType> getTypesByName(List<InstanceLabel> instances) {
         Stream<SimpleType> simpleTypeStream = instances.stream()
                 .map(InstanceLabel::getTypes)
+                .filter(Objects::nonNull)
                 .flatMap(Collection::stream);
         List<String> involvedTypes = simpleTypeStream
                 .map(SimpleType::getName)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList())
                 .stream()
                 .distinct()

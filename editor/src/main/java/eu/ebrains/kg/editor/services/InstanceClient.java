@@ -1,6 +1,7 @@
 package eu.ebrains.kg.editor.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.ebrains.kg.editor.models.HasError;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.*;
@@ -17,20 +18,20 @@ import java.util.stream.Collectors;
 @Component
 public class InstanceClient extends AbstractServiceClient {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public InstanceClient(HttpServletRequest request, ObjectMapper jacksonObjectMapper) {
         super(request);
         this.objectMapper = jacksonObjectMapper;
     }
 
-    public <T> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
-                                                                  String stage,
-                                                                  boolean metadata,
-                                                                  boolean returnAlternatives,
-                                                                  boolean returnPermissions,
-                                                                  boolean returnEmbedded,
-                                                                  Class<T> clazz) {
+    public <T extends HasError> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
+                                                                                   String stage,
+                                                                                   boolean metadata,
+                                                                                   boolean returnAlternatives,
+                                                                                   boolean returnPermissions,
+                                                                                   boolean returnEmbedded,
+                                                                                   Class<T> clazz) {
         String uri = String.format("instancesByIds?stage=%s&metadata=%s&returnAlternatives=%s&returnPermissions=%s&returnEmbedded=%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded);
         KGCoreResult.Single originalMap = post(uri)
                 .body(BodyInserters.fromValue(ids))
@@ -42,22 +43,27 @@ public class InstanceClient extends AbstractServiceClient {
             originalMap.getData().keySet().forEach(f -> {
                 Object o = originalMap.getData().get(f);
                 KGCoreResult.Single r = objectMapper.convertValue(o, KGCoreResult.Single.class);
-                if(f != null && r.getData() != null) {
-                    result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+                if (f != null) {
+                    if (r.getData() != null) {
+                        result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+                    } else if (r.getError() != null) {
+                        T t = objectMapper.convertValue(new HashMap<>(), clazz);
+                        t.setError(r.getError());
+                        result.put(f,  new ResultWithOriginalMap<T>(null, t));
+                    }
                 }
             });
         }
         return result;
     }
 
-
     public KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>> searchInstanceSummaries(String space,
-                                                                                       String type,
-                                                                                       Integer from,
-                                                                                       Integer size,
-                                                                                       String searchByLabel) {
+                                                                                              String type,
+                                                                                              Integer from,
+                                                                                              Integer size,
+                                                                                              String searchByLabel) {
         String uri = String.format("instances?stage=IN_PROGRESS&returnPermissions=true&type=%s&space=%s", type, space);
-        if(searchByLabel!=null){
+        if (searchByLabel != null) {
             uri = String.format("%s&searchByLabel=%s", uri, searchByLabel);
         }
         if (from != null) {
@@ -67,14 +73,15 @@ public class InstanceClient extends AbstractServiceClient {
             uri = String.format("%s&size=%s", uri, size);
         }
         KGCoreResult.List response = get(uri).retrieve().bodyToMono(KGCoreResult.List.class).block();
-        if(response!=null){
+        if (response != null) {
             List<ResultWithOriginalMap<InstanceSummary>> resultList = response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).collect(Collectors.toList());
             return new KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>>().setData(resultList).setTotalResults(response.getTotal()).setFrom(response.getFrom()).setSize(response.getSize());
         }
         return null;
     }
 
-    private static class ScopeFromKG extends KGCoreResult<Scope>{}
+    private static class ScopeFromKG extends KGCoreResult<Scope> {
+    }
 
     public Scope getInstanceScope(String id) {
         String uri = String.format("instances/%s/scope?stage=IN_PROGRESS&returnPermissions=true", id);
@@ -82,10 +89,12 @@ public class InstanceClient extends AbstractServiceClient {
                 .retrieve()
                 .bodyToMono(ScopeFromKG.class)
                 .block();
-        return response!=null ? response.getData() : null;
+        return response != null ? response.getData() : null;
     }
 
-    private static class NeighborFromKG extends KGCoreResult<Neighbor>{}
+    private static class NeighborFromKG extends KGCoreResult<Neighbor> {
+    }
+
     public KGCoreResult<Neighbor> getNeighbors(String id) {
         String uri = String.format("instances/%s/neighbors?stage=IN_PROGRESS", id);
         return get(uri)
@@ -98,14 +107,14 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
     public KGCoreResult<SuggestionStructure> postSuggestions(String id,
-                                               String field,
-                                               String type,
-                                               Integer start,
-                                               Integer size,
-                                               String search,
-                                               Map<String, Object> payload) {
+                                                             String field,
+                                                             String type,
+                                                             Integer start,
+                                                             Integer size,
+                                                             String search,
+                                                             Map<String, Object> payload) {
         String uri = String.format("instances/%s/suggestedLinksForProperty?stage=IN_PROGRESS&property=%s&from=%d&size=%d", id, field, start, size);
-        if(StringUtils.isNotBlank(search)){
+        if (StringUtils.isNotBlank(search)) {
             uri += String.format("&search=%s", search);
         }
         if (StringUtils.isNotBlank(type)) {
@@ -160,7 +169,6 @@ public class InstanceClient extends AbstractServiceClient {
         }
         return null;
     }
-
 
     public ResultWithOriginalMap<InstanceFull> postInstance(String id, String workspace, Map<?, ?> body) {
         String uri = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, workspace);

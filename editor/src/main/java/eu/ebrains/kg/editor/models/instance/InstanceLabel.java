@@ -3,12 +3,14 @@ package eu.ebrains.kg.editor.models.instance;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
+import eu.ebrains.kg.editor.models.Error;
+import eu.ebrains.kg.editor.models.HasError;
 import eu.ebrains.kg.editor.models.HasId;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InstanceLabel implements HasId {
+public class InstanceLabel implements HasId, HasError {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public InstanceLabel(
             @JsonProperty("@id") String kgId,
@@ -29,6 +31,13 @@ public class InstanceLabel implements HasId {
 
     private String id;
     private String name;
+    private Error error;
+
+    @Override
+    public void setError(Error error) { this.error=error; }
+
+    @Override
+    public Error getError() { return error; }
 
     @Override
     public void setId(String id) {

@@ -19,7 +19,8 @@ public class StructureOfType {
             @JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgName,
             @JsonProperty(EditorConstants.VOCAB_COLOR) String kgColor,
             @JsonProperty(EditorConstants.VOCAB_LABEL_PROPERTY) String kgLabelField,
-            @JsonProperty(EditorConstants.VOCAB_PROPERTIES) List<StructureOfField> kgFields
+            @JsonProperty(EditorConstants.VOCAB_PROPERTIES) List<StructureOfField> kgFields,
+            @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) List<StructureOfIncomingLink> kgIncomingLinks
     ) {
         this.label = kgLabel;
         this.name = kgName;
@@ -32,6 +33,12 @@ public class StructureOfType {
             this.promotedFields.add(0, this.labelField);
         }
         this.fields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, f -> f)) : null;
+        this.incomingLinks = !CollectionUtils.isEmpty(kgIncomingLinks) ?
+                kgIncomingLinks.stream()
+                        .collect(Collectors.toMap(
+                                StructureOfIncomingLink::getFullyQualifiedName,
+                                v -> v)
+                        ) : null;
     }
 
     private static final List<String> FIELDS_BLACKLIST = Arrays.asList("@id", "@type", SchemaFieldsConstants.IDENTIFIER, EditorConstants.VOCAB_ALTERNATIVE, EditorConstants.VOCAB_USER, EditorConstants.VOCAB_SPACES, EditorConstants.VOCAB_PROPERTY_UPDATES);
@@ -46,6 +53,7 @@ public class StructureOfType {
     private final String labelField;
     private final Map<String, StructureOfField> fields;
     private final List<String> promotedFields;
+    private final Map<String, StructureOfIncomingLink> incomingLinks;
 
     public static List<String> getFieldsBlacklist() {
         return FIELDS_BLACKLIST;
@@ -73,5 +81,9 @@ public class StructureOfType {
 
     public List<String> getPromotedFields() {
         return promotedFields;
+    }
+
+    public Map<String, StructureOfIncomingLink> getIncomingLinks() {
+        return incomingLinks;
     }
 }

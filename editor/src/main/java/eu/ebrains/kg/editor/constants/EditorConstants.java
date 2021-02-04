@@ -26,6 +26,9 @@ public class EditorConstants {
     public static final String VOCAB_COLOR = CORE_META + "color";
     public static final String VOCAB_PROPERTY_UPDATES = CORE_META + "propertyUpdates";
     public static final String VOCAB_PROPERTIES = CORE_META + "properties";
+    public static final String VOCAB_INCOMING_LINKS = CORE_META + "incomingLinks";
+    public static final String VOCAB_INSTANCE_LINKS = CORE_META + "links";
+    public static final String VOCAB_SOURCE_TYPES = CORE_META + "sourceTypes";
     public static final String VOCAB_LABEL_PROPERTY = CORE_META + "type/labelProperty";
     public static final String VOCAB_PICTURE = CORE_META + "picture";
     public static final String VOCAB_WORKSPACES = CORE_META + "workspaces";

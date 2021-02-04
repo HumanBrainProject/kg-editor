@@ -24,6 +24,7 @@ public class InstanceFull extends InstanceSummary {
     private final Map<String, List<Alternative>> alternatives;
     private String labelField;
     private List<String> promotedFields;
+    //    private Map<String, IncomingLink> incomingLinks;
 
     public Map<String, List<Alternative>> getAlternatives() {
         return alternatives;

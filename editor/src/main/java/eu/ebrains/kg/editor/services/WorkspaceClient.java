@@ -31,7 +31,7 @@ public class WorkspaceClient extends AbstractServiceClient{
     private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType>>{}
 
     public List<StructureOfType> getWorkspaceTypes(String workspace) {
-        String uri = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true", workspace);
+        String uri = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true&withIncomingLinks=true", workspace);
         StructureTypeResultFromKG response = get(uri)
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)

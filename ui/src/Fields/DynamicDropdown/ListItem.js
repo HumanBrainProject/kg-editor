@@ -77,35 +77,47 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
   }, [instanceId]);
 
   const handleClick = e => {
-    e.stopPropagation();
-    onClick && onClick(index);
+    if(enablePointerEvents) {
+      e.stopPropagation();
+      onClick && onClick(index);
+    }
   };
 
   const handleDelete = e => {
-    e.stopPropagation();
-    onDelete && onDelete(index);
+    if(enablePointerEvents) {
+      e.stopPropagation();
+      onDelete && onDelete(index);
+    }
   };
 
   const handleDragEnd = e => {
-    e.stopPropagation();
-    onDragEnd && onDragEnd();
+    if(enablePointerEvents) {
+      e.stopPropagation();
+      onDragEnd && onDragEnd();
+    }
   };
 
   const handleDragOver = e => e.preventDefault();
 
   const handleDragStart = e => {
-    e.stopPropagation();
-    onDragStart && onDragStart(index);
+    if(enablePointerEvents) {
+      e.stopPropagation();
+      onDragStart && onDragStart(index);
+    }
   };
 
   const handleDrop = e => {
-    e.stopPropagation();
-    onDrop && onDrop(index);
+    if(enablePointerEvents) {
+      e.stopPropagation();
+      onDrop && onDrop(index);
+    }
   };
 
   const handleKeyDown = e => {
-    e.stopPropagation();
-    onKeyDown && onKeyDown(index, e);
+    if(enablePointerEvents) {
+      e.stopPropagation();
+      onKeyDown && onKeyDown(index, e);
+    }
   };
 
   const handleFocus = e => {

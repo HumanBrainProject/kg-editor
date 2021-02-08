@@ -4,12 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class StructureOfIncomingLink {
@@ -19,7 +16,7 @@ public class StructureOfIncomingLink {
             @JsonProperty(EditorConstants.VOCAB_SOURCE_TYPES) List<SourceType> kgSourceTypes
     ) {
         this.fullyQualifiedName = kgFullyQualifiedName;
-        this.sourceTypes = kgSourceTypes.stream().filter(st -> Objects.nonNull(st.getSpace())).collect(Collectors.toList());
+        this.sourceTypes = kgSourceTypes;
     }
 
     private final String fullyQualifiedName;
@@ -38,17 +35,17 @@ public class StructureOfIncomingLink {
         public SourceType( @JsonProperty(EditorConstants.VOCAB_TYPE) String kgType,
                            @JsonProperty(EditorConstants.VOCAB_SPACES) List<Map<String, String>> kgSpaces) {
             this.type = kgType;
-            this.space = !CollectionUtils.isEmpty(kgSpaces) ? kgSpaces.get(0).get(EditorConstants.VOCAB_SPACE): null;
+            this.spaces = kgSpaces.stream().map(s -> s.get(EditorConstants.VOCAB_SPACE)).collect(Collectors.toList());
         }
         private final String type;
-        private final String space;
+        private final List<String> spaces;
 
         public String getType() {
             return type;
         }
 
-        public String getSpace() {
-            return space;
+        public List<String> getSpaces() {
+            return spaces;
         }
     }
 }

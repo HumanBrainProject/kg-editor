@@ -128,7 +128,7 @@ public class InstanceClient extends AbstractServiceClient {
     }
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {
-        String uri = String.format("instances/%s?stage=IN_PROGRESS&metadata=true&returnPermissions=true&returnAlternatives=true", id);
+        String uri = String.format("instances/%s?stage=IN_PROGRESS&metadata=true&returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true", id);
         KGCoreResult.Single response = get(uri)
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)

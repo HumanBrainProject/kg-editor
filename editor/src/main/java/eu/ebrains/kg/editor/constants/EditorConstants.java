@@ -2,10 +2,12 @@ package eu.ebrains.kg.editor.constants;
 
 public class EditorConstants {
     public static final String CORE_NAMESPACE = "https://core.kg.ebrains.eu/";
+    public static final String LABEL = CORE_NAMESPACE + "vocab/label";
     public static final String EDITOR_NAMESPACE = "https://editor.kg.ebrains.eu/";
     public static final String CORE_META = CORE_NAMESPACE + "vocab/meta/";
     public static final String EDITOR_META = EDITOR_NAMESPACE + "vocab/meta/";
 
+    public static final String VOCAB_TYPES = CORE_META + "types";
     public static final String VOCAB_TYPE = CORE_META + "type";
     public static final String VOCAB_EMBEDDED_PROPERTIES = CORE_META + "embeddedProperties";
     public static final String VOCAB_OCCURRENCES = CORE_META + "occurrences";

@@ -10,62 +10,52 @@ import java.util.List;
 public class IncomingLink {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public IncomingLink(
-            @JsonProperty(SchemaFieldsConstants.NAME) String kgLabel,
-            @JsonProperty(EditorConstants.VOCAB_INSTANCE_LINKS) List<InstanceLink> kgInstanceLinks
+            @JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgIdentifier,
+            @JsonProperty(SchemaFieldsConstants.NAME) String kgName,
+            @JsonProperty("@id") String kgId,
+            @JsonProperty(EditorConstants.LABEL) String kgLabel,
+            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgSpace,
+            @JsonProperty(EditorConstants.VOCAB_TYPES) List<Type> kgTypes
+
     ) {
-        this.label = kgLabel;
-        this.instanceLinks = kgInstanceLinks;
+        this.identifier = kgIdentifier;
+        this.label = kgName;
+        this.id = kgId;
+        this.instanceLabel = kgLabel;
+        this.space = kgSpace;
+        this.types = kgTypes;
+
     }
 
+    private final String identifier;
+    private final String instanceLabel;
+    private final String id;
     private final String label;
-    private final List<InstanceLink> instanceLinks;
+    private final String space;
+    private final List<Type> types;
 
+    public String getIdentifier() { return identifier; }
 
-    public String getLabel() {
-        return label;
-    }
+    public String getInstanceLabel() { return instanceLabel; }
 
-    public List<InstanceLink> getInstanceLinks() {
-        return instanceLinks;
-    }
+    public String getId() { return id; }
 
-    private static class InstanceLink {
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        public InstanceLink(@JsonProperty("@id") String kgId,
-                            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgSpace,
-                            @JsonProperty(EditorConstants.VOCAB_TYPE) String kgType
-        ) {
-            this.id = kgId;
-            this.space = kgSpace;
-            this.type = kgType;
-        }
+    public String getLabel() { return label; }
 
-        private String id;
-        private String space;
-        private String type;
+    public String getSpace() { return space; }
 
-        public String getId() {
-            return id;
-        }
+    public List<Type> getTypes() { return types; }
 
-        public void setId(String id) {
-            this.id = id;
-        }
+    private static class  Type {
+        private  String name;
+        private  String labelProperty;
 
-        public String getSpace() {
-            return space;
-        }
+        public String getName() { return name; }
 
-        public void setSpace(String space) {
-            this.space = space;
-        }
+        public String getLabelProperty() { return labelProperty; }
 
-        public String getType() {
-            return type;
-        }
+        public void setName(String name) { this.name = name; }
 
-        public void setType(String type) {
-            this.type = type;
-        }
+        public void setLabelProperty(String labelProperty) { this.labelProperty = labelProperty; }
     }
 }

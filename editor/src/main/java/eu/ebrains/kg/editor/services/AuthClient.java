@@ -3,17 +3,17 @@ package eu.ebrains.kg.editor.services;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-
 @Component
-public class AuthClient extends AbstractServiceClient {
+public class AuthClient {
 
-    public AuthClient(HttpServletRequest request) {
-        super(request);
+    private final ServiceCall kg;
+
+    public AuthClient(ServiceCall kg) {
+        this.kg = kg;
     }
 
     public KGCoreResult.Single getEndpoint() {
-        return get("users/authorization")
+        return kg.client().get().uri(kg.url("users/authorization"))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
                 .block();

@@ -6,45 +6,49 @@ import eu.ebrains.kg.editor.models.workspace.StructureOfType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class WorkspaceClient extends AbstractServiceClient{
+public class WorkspaceClient {
 
-    public WorkspaceClient(HttpServletRequest request) {
-        super(request);
+    private final ServiceCall kg;
+
+    public WorkspaceClient(ServiceCall kg) {
+        this.kg = kg;
     }
 
-    private static class WorkspacesResultFromKG extends KGCoreResult<List<Workspace>>{}
+    private static class WorkspacesResultFromKG extends KGCoreResult<List<Workspace>> {
+    }
 
     public List<Workspace> getWorkspaces() {
-        String uri = "spaces?stage=IN_PROGRESS&permissions=true";
-        KGCoreResult<List<Workspace>> response = get(uri)
+        String relativeUrl = "spaces?stage=IN_PROGRESS&permissions=true";
+        KGCoreResult<List<Workspace>> response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(WorkspacesResultFromKG.class)
                 .block();
-        return response!=null ? response.getData() : null;
+        return response != null ? response.getData() : null;
     }
 
-    private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType>>{}
+    private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType>> {
+    }
 
     public List<StructureOfType> getWorkspaceTypes(String workspace) {
-        String uri = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true", workspace);
-        StructureTypeResultFromKG response = get(uri)
+        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true", workspace);
+        StructureTypeResultFromKG response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)
                 .block();
-        return response!=null ? response.getData() : null;
+        return response != null ? response.getData() : null;
     }
 
 
-    private static class StructureOfTypeByNameFromKG extends KGCoreResult<Map<String, KGCoreResult<StructureOfType>>>{}
+    private static class StructureOfTypeByNameFromKG extends KGCoreResult<Map<String, KGCoreResult<StructureOfType>>> {
+    }
 
     public Map<String, KGCoreResult<StructureOfType>> getTypesByName(List<String> types, boolean withProperties) {
-        String uri = String.format("typesByName?stage=IN_PROGRESS&withProperties=%s", withProperties);
-        StructureOfTypeByNameFromKG response = post(uri)
+        String relativeUrl = String.format("typesByName?stage=IN_PROGRESS&withProperties=%s", withProperties);
+        StructureOfTypeByNameFromKG response = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(types))
                 .retrieve()
                 .bodyToMono(StructureOfTypeByNameFromKG.class)

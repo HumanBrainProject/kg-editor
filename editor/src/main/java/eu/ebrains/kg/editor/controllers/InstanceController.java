@@ -194,6 +194,24 @@ public class InstanceController {
                 possibleIncomingLinks.putAll(structureOfType.getIncomingLinks());
             });
             instance.setPossibleIncomingLinks(possibleIncomingLinks);
+
+            if (instance.getIncomingLinks() != null) {
+                instance.getIncomingLinks()
+                        .values()
+                        .forEach(v -> v
+                                .forEach(link -> {
+                                    link.setId(idController.simplifyFullyQualifiedId(link.getId()).toString());
+                                    link.getTypes()
+                                            .forEach(t -> {
+                                                StructureOfType structureOfType = typesByName.get(t.getName());
+                                                t.setLabel(structureOfType.getLabel());
+                                                t.setColor(structureOfType.getColor());
+                                            });
+                                        }
+                                )
+                        );
+            }
+
         }
     }
 

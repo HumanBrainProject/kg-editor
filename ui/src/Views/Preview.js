@@ -31,6 +31,7 @@ import Status from "./Instance/Status";
 // import BookmarkStatus from "./Instance/BookmarkStatus";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
+import IncomingLinks from "./Instance/IncomingLinks/IncomingLinks";
 
 const useStyles = createUseStyles({
   container: {
@@ -237,6 +238,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
                   <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} showIfNoValue={showEmptyFields} />
                 );
               })}
+              <IncomingLinks links={instance.incomingLinks} readMode={true} />
               {showMetaData && instance.metadata && instance.metadata.length > 0 && (
                 <div>
                   <hr />

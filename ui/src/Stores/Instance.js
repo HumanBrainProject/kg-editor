@@ -127,7 +127,8 @@ export const normalizeInstanceData = data => {
     promotedFields: [],
     alternatives: {},
     metadata: {},
-    permissions: {}
+    permissions: {},
+    incomingLinks: []
   };
 
   if (!data) {
@@ -150,6 +151,31 @@ export const normalizeInstanceData = data => {
   }
   if (data.labelField) {
     instance.labelField = data.labelField;
+  }
+  if(data.incomingLinks) {
+    const incomingLinks = Object.values(data.incomingLinks).map(links => {
+      const groupedLinks = links.reduce((acc,link) => {
+        const types = link.types.map(t => t.name).join("/");
+        if (!acc[types]) {
+          acc[types] = {
+            space: link.space,
+            types: link.types,
+            instances: []
+          };
+        }
+        acc[types].instances.push({
+          id: link.id,
+          label: link.instanceLabel
+        });
+        return acc;
+      }, {});
+      return {
+        label: links[0].label,
+        links: Object.values(groupedLinks)
+      };
+    });
+    console.log(incomingLinks);
+    instance.incomingLinks = incomingLinks;
   }
   if (data.promotedFields instanceof Array) {
     instance.promotedFields = data.promotedFields;
@@ -278,6 +304,7 @@ export class Instance {
   metadata = {};
   permissions = {};
   fields = {};
+  incomingLinks=[];
 
   isLabelFetching = false;
   isLabelFetched = false;
@@ -304,6 +331,7 @@ export class Instance {
       metadata: observable,
       permissions: observable,
       fields: observable,
+      incomingLinks: observable,
       isLabelFetching: observable,
       isLabelFetched: observable,
       fetchLabelError: observable,
@@ -526,6 +554,7 @@ export class Instance {
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
+    this.incomingLinks = normalizedData.incomingLinks;
     _initializeFields(normalizedData.fields);
     this.fetchError = null;
     this.isNotFound = false;

@@ -23,6 +23,7 @@ import { observer } from "mobx-react-lite";
 import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";
 import Label from "../../../Fields/Label";
+import IncomingLinks from "../IncomingLinks/IncomingLinks";
 
 const useStyles = createUseStyles({
   container: {
@@ -105,6 +106,7 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
           <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
         );
       })}
+      <IncomingLinks links={instance.incomingLinks} readMode={readMode} />
     </Form>
   );
 });

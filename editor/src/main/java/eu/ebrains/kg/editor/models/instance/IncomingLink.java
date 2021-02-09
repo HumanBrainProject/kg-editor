@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
 import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
+import eu.ebrains.kg.editor.controllers.IdController;
 
+import java.awt.*;
 import java.util.List;
+import java.util.UUID;
 
 public class IncomingLink {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -20,7 +23,7 @@ public class IncomingLink {
     ) {
         this.identifier = kgIdentifier;
         this.label = kgName;
-        this.id = kgId;
+        this.id =  kgId;
         this.instanceLabel = kgLabel;
         this.space = kgSpace;
         this.types = kgTypes;
@@ -29,7 +32,7 @@ public class IncomingLink {
 
     private final String identifier;
     private final String instanceLabel;
-    private final String id;
+    private String id;
     private final String label;
     private final String space;
     private final List<Type> types;
@@ -40,22 +43,32 @@ public class IncomingLink {
 
     public String getId() { return id; }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getLabel() { return label; }
 
     public String getSpace() { return space; }
 
     public List<Type> getTypes() { return types; }
 
-    private static class  Type {
+    public static class  Type {
         private  String name;
-        private  String labelProperty;
+        private  String label;
+        private  String color;
 
         public String getName() { return name; }
 
-        public String getLabelProperty() { return labelProperty; }
-
         public void setName(String name) { this.name = name; }
 
-        public void setLabelProperty(String labelProperty) { this.labelProperty = labelProperty; }
+        public String getLabel() { return label; }
+
+        public void setLabel(String label) { this.label = label; }
+
+        public String getColor() { return color; }
+
+        public void setColor(String color) { this.color = color; }
+
     }
 }

@@ -16,13 +16,14 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
+//import { createUseStyles } from "react-jss";
 import Label from "../../../Fields/Label";
 
-const useStyles = createUseStyles({
-});
+// const useStyles = createUseStyles({
+// });
 
-const IncomingLinkInstance = observer(({instance, types, space, readMode }) => {
+const IncomingLinkInstance = observer(({instance, readMode }) => {
+// const IncomingLinkInstance = observer(({instance, types, space, readMode }) => {
 
   // const classes = useStyles();
 

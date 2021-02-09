@@ -4,28 +4,29 @@ import eu.ebrains.kg.editor.models.KGCoreResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class ReleaseClient extends AbstractServiceClient{
+public class ReleaseClient {
 
-    public ReleaseClient(HttpServletRequest request) {
-        super(request);
+    private final ServiceCall kg;
+
+    public ReleaseClient(ServiceCall kg) {
+        this.kg = kg;
     }
 
     public void putRelease(String id) {
-        String uri = String.format("instances/%s/release",  id);
-        put(uri)
+        String relativeUrl = String.format("instances/%s/release",  id);
+        kg.client().put().uri(kg.url(relativeUrl))
             .retrieve()
             .bodyToMono(Map.class)
             .block();
     }
 
     public void deleteRelease(String id) {
-        String uri = String.format("instances/%s/release", id);
-        delete(uri)
+        String relativeUrl = String.format("instances/%s/release", id);
+        kg.client().delete().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
@@ -34,8 +35,8 @@ public class ReleaseClient extends AbstractServiceClient{
     private static class ReleaseStatusFromKG extends KGCoreResult<Map<String, KGCoreResult<String>>>{}
 
     public Map<String, KGCoreResult<String>> getReleaseStatus(List<String> ids, String releaseTreeScope) {
-        String uri = String.format("instancesByIds/release/status?releaseTreeScope=%s", releaseTreeScope);
-        ReleaseStatusFromKG response = post(uri)
+        String relativeUrl = String.format("instancesByIds/release/status?releaseTreeScope=%s", releaseTreeScope);
+        ReleaseStatusFromKG response = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()
                 .bodyToMono(ReleaseStatusFromKG.class)

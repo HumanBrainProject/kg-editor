@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/instances")
 @RestController
 // TODO Add proper error handling
 public class Instances {
@@ -26,7 +25,7 @@ public class Instances {
         this.idController = idController;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/instances/{id}")
     public KGCoreResult<InstanceFull> getInstance(@PathVariable("id") String id) {
         ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.getInstance(id);
         InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);
@@ -34,7 +33,7 @@ public class Instances {
     }
 
 
-    @PostMapping("/{id}")
+    @PostMapping("/instances/{id}")
     public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id,
                                                      @RequestParam("workspace") String workspace,
                                                      @RequestBody Map<String, Object> payload) {
@@ -45,7 +44,7 @@ public class Instances {
     }
 
 
-    @PostMapping
+    @PostMapping("/instances")
     public KGCoreResult<InstanceFull> createInstanceWithoutId(@RequestParam("workspace") String workspace,
                                                      @RequestBody Map<String, Object> payload) {
         Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
@@ -54,7 +53,7 @@ public class Instances {
         return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/instances/{id}")
     public KGCoreResult<InstanceFull> updateInstance(@PathVariable("id") String id,
                                                      @RequestBody Map<String, Object> payload) {
         Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
@@ -63,12 +62,12 @@ public class Instances {
         return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/instances/{id}")
     public void deleteInstance(@PathVariable("id") String id) {
         instanceClient.deleteInstance(id);
     }
 
-    @GetMapping("/{id}/scope")
+    @GetMapping("/instances/{id}/scope")
     public KGCoreResult<Scope> getInstanceScope(@PathVariable("id") String id) {
         Scope instanceScope = instanceClient.getInstanceScope(id);
         instanceController.enrichScopeRecursivelyWithTypeAndReleaseStatusInformation(instanceScope);
@@ -76,7 +75,7 @@ public class Instances {
     }
 
 
-    @PostMapping("/list")
+    @PostMapping("/instancesBulk/list")
     public KGCoreResult<Map<String, InstanceFull>> getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                                                     @RequestBody List<String> ids) {
@@ -85,7 +84,7 @@ public class Instances {
         return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
     }
 
-    @PostMapping("/summary")
+    @PostMapping("/instancesBulk/summary")
     public KGCoreResult<Map<String, InstanceSummary>> getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                     @RequestBody List<String> ids) {
@@ -94,7 +93,7 @@ public class Instances {
         return new KGCoreResult<Map<String, InstanceSummary>>().setData(enrichedInstances);
     }
 
-    @PostMapping("/label")
+    @PostMapping("/instancesBulk/label")
     public KGCoreResult<Map<String, InstanceLabel>> getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
                                   @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                   @RequestBody List<String> ids) {
@@ -103,7 +102,7 @@ public class Instances {
         return new KGCoreResult<Map<String, InstanceLabel>>().setData(enrichedInstances);
     }
 
-    @PostMapping("/{id}/suggestions")
+    @PostMapping("/instances/{id}/suggestions")
     public KGCoreResult<SuggestionStructure> getSuggestions(@PathVariable("id") String id,
                                                             @RequestParam("field") String field,
                                                             @RequestParam(value = "type", required = false) String type,
@@ -125,7 +124,7 @@ public class Instances {
         return suggestionStructure;
     }
 
-    @GetMapping("/{id}/neighbors")
+    @GetMapping("/instances/{id}/neighbors")
     public KGCoreResult<Neighbor> getInstanceNeighbors(@PathVariable("id") String id) {
         KGCoreResult<Neighbor> neighbor = instanceClient.getNeighbors(id);
         if(neighbor!=null && neighbor.getData()!=null) {

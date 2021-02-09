@@ -22,6 +22,8 @@ public class EditorApplication extends WebSecurityConfigurerAdapter {
          *  ( {@link eu.ebrains.kg.editor.configuration.OauthClient ) to KG core and
          *  let this one manage the access permissions....
          */
+        //FIXME We want to enable CSRF -> https://kanban.ebrains.eu/kg/planning/-/issues/635
+        http.csrf().disable();
         http.authorizeRequests(a -> a.anyRequest().permitAll());
     }
 

@@ -24,7 +24,7 @@ public class InstanceClient {
         this.objectMapper = jacksonObjectMapper;
     }
 
-    public <T> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
+    public <T extends HasError> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
                                                                   String stage,
                                                                   boolean metadata,
                                                                   boolean returnAlternatives,
@@ -43,7 +43,13 @@ public class InstanceClient {
                 Object o = originalMap.getData().get(f);
                 KGCoreResult.Single r = objectMapper.convertValue(o, KGCoreResult.Single.class);
                 if(f != null && r.getData() != null) {
-                    result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+                    if (r.getData() != null) {
+                        result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
+                    } else if (r.getError() != null) {
+                        T t = objectMapper.convertValue(new HashMap<>(), clazz);
+                        t.setError(r.getError());
+                        result.put(f,  new ResultWithOriginalMap<T>(null, t));
+                    }
                 }
             });
         }
@@ -119,7 +125,7 @@ public class InstanceClient {
     }
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {
-        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&metadata=true&returnPermissions=true&returnAlternatives=true", id);
+        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&metadata=true&returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true", id);
         KGCoreResult.Single response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)

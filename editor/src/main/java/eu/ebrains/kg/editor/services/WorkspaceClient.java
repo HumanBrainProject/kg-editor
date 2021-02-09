@@ -34,7 +34,7 @@ public class WorkspaceClient {
     }
 
     public List<StructureOfType> getWorkspaceTypes(String workspace) {
-        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true", workspace);
+        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true&withIncomingLinks=true", workspace);
         StructureTypeResultFromKG response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)

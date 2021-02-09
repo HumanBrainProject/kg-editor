@@ -81,7 +81,7 @@ public class Instances {
                                                                     @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                                                     @RequestBody List<String> ids) {
         Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, metadata, true, true, true, InstanceFull.class);
-        Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result);
+        Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result, stage);
         return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
     }
 

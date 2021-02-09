@@ -49,10 +49,6 @@ class InputTextStore extends FieldStore {
   }
 
   get returnValue() {
-    return this.doReturnValue();
-  }
-
-  doReturnValue() {
     if (this.value === "" && this.returnAsNull) {
       return null;
     }
@@ -83,7 +79,8 @@ class InputTextStore extends FieldStore {
     if(!this.regex) {
       return false;
     }
-    if(!this.regex.test(this.value)) {
+    const pattern = new RegExp(this.regex);
+    if(!pattern.test(this.value)) {
       return true;
     }
     return false;

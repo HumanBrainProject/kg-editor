@@ -19,7 +19,6 @@ package eu.ebrains.kg.editor.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class KGCoreResult<T> {
 
@@ -77,35 +76,6 @@ public class KGCoreResult<T> {
         return this;
     }
 
-    public static class Error{
-        private int code;
-        private String message;
-        private UUID instanceId;
-
-        public int getCode() {
-            return code;
-        }
-
-        public void setCode(int code) {
-            this.code = code;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public UUID getInstanceId() {
-            return instanceId;
-        }
-
-        public void setInstanceId(UUID instanceId) {
-            this.instanceId = instanceId;
-        }
-    }
 
     public T getData() {
         return data;

@@ -263,7 +263,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           list={links}
           readOnly={false}
           disabled={isDisabled}
-          enablePointerEvents={true}
+          enablePointerEvents={(view && view.currentInstanceId === instance.id)}
           onClick={handleClick}
           onDelete={handleDelete}
           onDragEnd={handleDragEnd}

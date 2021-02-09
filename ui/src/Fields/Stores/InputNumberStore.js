@@ -43,7 +43,7 @@ class InputNumberStore extends FieldStore {
       requiredValidationWarning: computed,
       hasWarningMessages: computed
     });
-    this.minValue = 2; //definition.minValue;
+    this.minValue = definition.minValue;
     this.maxValue = definition.maxValue;
   }
 
@@ -60,7 +60,7 @@ class InputNumberStore extends FieldStore {
   get warningMessages() {
     const messages = {};
     if (this.hasChanged) {
-      if(this.minMaxValueWarning) {
+      if(this.minMaxValueWarning && this.value !== "") {
         if(this.minValue && this.maxValue) {
           if(this.value < this.minValue || this.value > this.maxValue) {
             messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
@@ -83,7 +83,10 @@ class InputNumberStore extends FieldStore {
     if (this.value === null && this.returnAsNull) {
       return null;
     }
-    return toJS(this.value);
+    if (this.value === "") {
+      return null;
+    }
+    return parseFloat(toJS(this.value));
   }
 
   get requiredValidationWarning() {

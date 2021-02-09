@@ -21,7 +21,7 @@ import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
 import DynamicTable from "./DynamicTable/DynamicTable";
 import CheckBox from "./CheckBox/CheckBox";
 import UnsupportedField from "./UnsupportedField/UnsupportedField";
-
+import NestedField from "./NestedField/NestedField";
 
 import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
 import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
@@ -39,6 +39,7 @@ import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
 import InputNumberStore from "./Stores/InputNumberStore";
 import InputDateStore from "./Stores/InputDateStore";
 import InputDateTime from "./InputDateTime/InputDateTime";
+import NestedFieldStore from "./Stores/NestedFieldStore";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -91,5 +92,9 @@ export const fieldsMapping = {
   "UnsupportedField": {
     Component: UnsupportedField,
     Store: UnsupportedFieldStore
+  },
+  "Nested": {
+    Component: NestedField,
+    Store: NestedFieldStore
   }
 };

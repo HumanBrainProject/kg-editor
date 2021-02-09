@@ -2,16 +2,25 @@ package eu.ebrains.kg.editor.constants;
 
 public class EditorConstants {
     public static final String CORE_NAMESPACE = "https://core.kg.ebrains.eu/";
+    public static final String LABEL = CORE_NAMESPACE + "vocab/label";
     public static final String EDITOR_NAMESPACE = "https://editor.kg.ebrains.eu/";
     public static final String CORE_META = CORE_NAMESPACE + "vocab/meta/";
     public static final String EDITOR_META = EDITOR_NAMESPACE + "vocab/meta/";
 
+    public static final String VOCAB_TYPES = CORE_META + "types";
+    public static final String VOCAB_TYPE = CORE_META + "type";
     public static final String VOCAB_EMBEDDED_PROPERTIES = CORE_META + "embeddedProperties";
     public static final String VOCAB_OCCURRENCES = CORE_META + "occurrences";
     public static final String VOCAB_ORDER = CORE_META + "orderNumber";
     public static final String VOCAB_SPACES = CORE_META + "spaces";
     public static final String VOCAB_SPACE = CORE_META + "space";
     public static final String VOCAB_ALTERNATIVE = CORE_META + "alternative";
+    public static final String VOCAB_REGEX = CORE_META + "regex";
+    public static final String VOCAB_MAX_LENGTH = CORE_META + "maxLength";
+    public static final String VOCAB_MIN_ITEMS = CORE_META + "minItems";
+    public static final String VOCAB_MAX_ITEMS = CORE_META + "maxItems";
+    public static final String VOCAB_MIN_VALUE = CORE_META + "minValue";
+    public static final String VOCAB_MAX_VALUE = CORE_META + "maxValue";
     public static final String VOCAB_SELECTED = CORE_META + "selected";
     public static final String VOCAB_USER = CORE_META + "user";
     public static final String VOCAB_VALUE = CORE_META + "value";
@@ -19,6 +28,9 @@ public class EditorConstants {
     public static final String VOCAB_COLOR = CORE_META + "color";
     public static final String VOCAB_PROPERTY_UPDATES = CORE_META + "propertyUpdates";
     public static final String VOCAB_PROPERTIES = CORE_META + "properties";
+    public static final String VOCAB_INCOMING_LINKS = CORE_META + "incomingLinks";
+    public static final String VOCAB_INSTANCE_LINKS = CORE_META + "links";
+    public static final String VOCAB_SOURCE_TYPES = CORE_META + "sourceTypes";
     public static final String VOCAB_LABEL_PROPERTY = CORE_META + "type/labelProperty";
     public static final String VOCAB_PICTURE = CORE_META + "picture";
     public static final String VOCAB_WORKSPACES = CORE_META + "workspaces";

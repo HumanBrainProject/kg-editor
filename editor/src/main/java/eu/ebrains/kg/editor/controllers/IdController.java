@@ -31,11 +31,19 @@ public class IdController {
             if (v instanceof List) {
                 ((List<?>) v).forEach(value -> {
                     if (value instanceof Map) {
+                        Map<String, Object> valToMap = (Map<String, Object>) value;
+                        if(!valToMap.containsKey("@id")) {
+                            fullyQualifyAtId(valToMap);
+                        }
                         checkId((Map<String, Object>) value);
                     }
                 });
             } else if (v instanceof Map) {
-                body.put(k, checkId((Map<String, Object>) v));
+                Map<String, Object> vToMap = (Map<String, Object>) v;
+                if(!vToMap.containsKey("@id")) {
+                    fullyQualifyAtId(vToMap);
+                }
+                body.put(k, checkId(vToMap));
             }
         });
         return body;

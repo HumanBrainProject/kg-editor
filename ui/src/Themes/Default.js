@@ -25,6 +25,16 @@ const theme = {
     image: `${window.rootPath}/assets/background-default.jpg`,
     size: "cover"
   },
+  button: {
+    primary: {
+      backgroundColor: "#007bff",
+      borderColor: "#007bff",
+      active: {
+        backgroundColor: "#0069d9",
+        borderColor: "#0062cc"
+      }
+    }
+  },
   contrast1: {
     backgroundColor: "#141618",
     borderColor: "#111314"

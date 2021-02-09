@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, makeObservable } from "mobx";
 
 import { fieldsMapping } from "../Fields";
 
@@ -87,83 +87,6 @@ export const normalizeLabelInstanceData = data => {
 };
 
 export const normalizeInstanceData = data => {
-
-  // TODO: Remove the mockup, this is just a test for embedded
-  // data.fields["http://schema.org/address"] = {
-  //   type: "Nested",
-  //   fullyQualifiedName: "http://schema.org/address",
-  //   name: "address",
-  //   label: "Address",
-  //   min:0,
-  //   max: Number.POSITIVE_INFINITY,
-  //   value: [
-  //     {
-  //       "http://schema.org/addressLocality": "Springfield",
-  //       "http://schema.org/streetAddress": "742 Evergreen Terrace",
-  //       "http://schema.org/country" : [
-  //         {id: "e583e6a5-d621-4724-90aa-8706326ede44"},
-  //         {id: "933048fa-f314-4a70-8839-0ce346ac0c36"},
-  //         {id: "ced19d52-78e7-4e3f-a68b-6e42ba77d83b"}
-  //       ],
-  //       "http://schema.org/zipCode": [
-  //         { "http://schema.org/test": "Testing...",
-  //           "http://schema.org/region":  [
-  //             {id: "f9590f64-b8f9-4d70-a966-7af3b60ea2ae"},
-  //             {id: "3b10cce0-c452-4217-94b4-631fff56d854"},
-  //             {id: "8f3a518b-8224-447c-bf41-0da18797d969"}
-  //           ]
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   fields: {
-  //     "http://schema.org/addressLocality": {
-  //       fullyQualifiedName: "http://schema.org/addressLocality",
-  //       name: "addressLocality",
-  //       label: "Address Locality",
-  //       type: "InputText"
-  //     },
-  //     "http://schema.org/streetAddress": {
-  //       fullyQualifiedName: "http://schema.org/streetAddress",
-  //       name: "streetAddress",
-  //       label: "Street Address",
-  //       type: "InputText"
-  //     },
-  //     "http://schema.org/country" : {
-  //       fullyQualifiedName: "http://schema.org/country",
-  //       name: "country",
-  //       label: "Country",
-  //       type: "DropdownSelect",
-  //       isLink: true,
-  //       allowCustomValues: true
-  //     },
-  //     "http://schema.org/zipCode": {
-  //       type: "Nested",
-  //       fullyQualifiedName: "http://schema.org/zipCode",
-  //       name: "zipCode",
-  //       label: "Zip Code",
-  //       min:0,
-  //       max: Number.POSITIVE_INFINITY,
-  //       fields: {
-  //         "http://schema.org/test": {
-  //           fullyQualifiedName: "http://schema.org/test",
-  //           name: "test",
-  //           label: "Test",
-  //           type: "InputText"
-  //         },
-  //         "http://schema.org/region" :{
-  //           fullyQualifiedName: "http://schema.org/region",
-  //           name: "region",
-  //           label: "Region",
-  //           type: "DropdownSelect",
-  //           isLink: true,
-  //           allowCustomValues: true
-  //         }
-  //       }
-  //     }
-  //   }
-  // };
-  // END of TODO
 
   const normalizeAlternative = (name, field, alternatives) => {
     field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
@@ -275,12 +198,14 @@ const getChildrenIdsGroupedByField = fields => {
     return false;
   }
 
-  function getIds(field, values, mappingValue) {
+  function getIds(field) {
+    const values = field.returnValue;
+    const mappingValue = field.mappingValue;
     return Array.isArray(values) ? values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
   }
 
-  function getGroup(field, values) {
-    const ids = getIds(field, values, field.mappingValue);
+  function getGroup(field) {
+    const ids = getIds(field);
     if (ids.length) {
       const group = {
         //name: field.name,
@@ -296,12 +221,13 @@ const getChildrenIdsGroupedByField = fields => {
     return null;
   }
 
-  function getGroups(field, values) {
+  function getGroups(field) {
     const groups = [];
     if (field.widget === "Nested") {
-      groups.push(...getNestedFields(field.fields, values));
+      const nestedGroups = getNestedFields(field.nestedFieldsStores);
+      groups.push(...nestedGroups);
     } else if (field.isLink) {
-      const group = getGroup(field, values);
+      const group = getGroup(field);
       if (group) {
         groups.push(group);
       }
@@ -309,23 +235,37 @@ const getChildrenIdsGroupedByField = fields => {
     return groups;
   }
 
-  function getNestedFields(fields, vals) {
-    return Object.entries(fields).reduce((acc, [fieldKey, field]) => {
-      const values = vals.flatMap(v => v[fieldKey].value);
-      const groups = getGroups(field, values);
-      acc.push(...groups);
+  function getNestedFields(fields) {
+    return fields.reduce((acc, rowFields) => {
+      acc.push(...Object.values(rowFields).reduce((acc2, field) => {
+        const groups = getGroups(field);
+        acc2.push(...groups);
+        return acc2;
+      }, []));
       return acc;
     }, []);
   }
 
-  return fields.reduce((acc, field) => {
-    const values = toJS(field.value);
-    const groups = getGroups(field, values);
-    acc.push(...groups);
-    return acc;
-  }, []).sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
-};
+  function getUniqueGroups(fields) {
+    const list = fields.reduce((acc, field) => {
+      const groups = getGroups(field);
+      acc.push(...groups);
+      return acc;
+    }, []);
+    return Object.entries(list.reduce((acc, group) => {
+      if (!acc[group.label]) {
+        acc[group.label] = [];
+      }
+      acc[group.label].push(...group.ids);
+      return acc;
+    }, {}))
+      .map(([label, ids]) => ({label: label, ids: ids}))
+      .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+  }
 
+  const groups = getUniqueGroups(fields);
+  return groups;
+};
 export class Instance {
   id = null;
   _name = null;
@@ -483,14 +423,20 @@ export class Instance {
   }
 
   get childrenIds() {
-    if (this.isFetched && !this.fetchError && this.fields) {
-      const ids = Object.values(this.fields)
+
+    function getChildrenIds(fields) {
+      const ids = Object.values(fields)
         .reduce((acc, field) => {
           if (field.widget === "Nested") {
-            //TODO
+            const idsOfNestedFields = getChildrenIdsOfNestedFields(field.nestedFieldsStores);
+            idsOfNestedFields.forEach(id => {
+              if (!acc.has(id)) {
+                acc.add(id);
+              }
+            });
           } else if (field.isLink) {
-            const values = toJS(field.value);
-            Array.isArray(values) && values.map(obj => {
+            const values = field.returnValue;
+            Array.isArray(values) && values.forEach(obj => {
               const id = obj && obj[field.mappingValue];
               if (id && !acc.has(id)) {
                 acc.add(id);
@@ -500,6 +446,23 @@ export class Instance {
           return acc;
         }, new Set());
       return Array.from(ids);
+    }
+
+    function getChildrenIdsOfNestedFields(fields) {
+      const ids = fields.reduce((acc, rowFields) => {
+        const ids = getChildrenIds(rowFields);
+        ids.forEach(id => {
+          if (!acc.has(id)) {
+            acc.add(id);
+          }
+        });
+        return acc;
+      }, new Set());
+      return Array.from(ids);
+    }
+
+    if (this.isFetched && !this.fetchError && this.fields) {
+      return getChildrenIds(this.fields);
     }
     return [];
   }
@@ -525,6 +488,33 @@ export class Instance {
   }
 
   initializeData(transportLayer, data, isNew = false) {
+    const _initializeFields = _fields => {
+      Object.entries(_fields).forEach(([name, field]) => {
+        let warning = null;
+        if(name === this.labelField) {
+          field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+          field.labelTooltipIcon = "globe";
+        }
+        if (!this.fields[name]) {
+          if (!field.widget) {
+            warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
+            field.widget = "UnsupportedField";
+          } else if (!fieldsMapping[field.widget]) {
+            warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+            field.widget = "UnsupportedField";
+          }
+          const fieldMapping = fieldsMapping[field.widget];
+          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
+        }
+        const store = this.fields[name];
+        store.updateValue(field.value);
+        store.setAlternatives(field.alternatives);
+        if (warning) {
+          store.setWarning(warning);
+        }
+      });
+    };
+
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name,
     this.workspace = normalizedData.workspace;
@@ -536,30 +526,7 @@ export class Instance {
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
-    Object.entries(normalizedData.fields).forEach(([name, field]) => {
-      let warning = null;
-      if(name === this.labelField) {
-        field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-        field.labelTooltipIcon = "globe";
-      }
-      if (!this.fields[name]) {
-        if (!field.widget) {
-          warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
-          field.widget = "UnsupportedField";
-        } else if (!fieldsMapping[field.widget]) {
-          warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
-          field.widget = "UnsupportedField";
-        }
-        const fieldMapping = fieldsMapping[field.widget];
-        this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer);
-      }
-      const store = this.fields[name];
-      store.updateValue(field.value);
-      store.setAlternatives(field.alternatives);
-      if (warning) {
-        store.setWarning(warning);
-      }
-    });
+    _initializeFields(normalizedData.fields);
     this.fetchError = null;
     this.isNotFound = false;
     this.hasFetchError = false;

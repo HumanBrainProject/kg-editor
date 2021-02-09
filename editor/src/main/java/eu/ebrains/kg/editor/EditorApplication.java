@@ -17,8 +17,11 @@ public class EditorApplication extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(HttpSecurity http) throws Exception {
-        // The http security is quite simple here because we're just fast-forwarding the token to KG core and
-        // let this one manage the access permissions...
+        /**
+         *  The http security is quite simple here because we're just fast-forwarding the token
+         *  ( {@link eu.ebrains.kg.editor.configuration.OauthClient ) to KG core and
+         *  let this one manage the access permissions....
+         */
         http.authorizeRequests(a -> a.anyRequest().permitAll());
     }
 

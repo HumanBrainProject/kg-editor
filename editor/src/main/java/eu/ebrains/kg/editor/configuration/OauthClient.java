@@ -31,9 +31,11 @@ public class OauthClient {
             }).build();
             return nextFilter.exchange(updatedHeaders);
         }).defaultRequest(r -> {
-            //We have to add the user access token to the request here, because this consumer is executed in the original
-            // thread and we therefore have access to the original request. We store it in a temporary header since otherwise
-            //it would be overwritten by the above exchange filter.
+            /**
+             *  We have to add the user access token to the request here, because this consumer is executed in the original
+             *  thread and we therefore have access to the original request. We store it in a temporary header since otherwise
+             *  it would be overwritten by the above exchange filter.
+             */
             r.header("User-Authorization", request.getHeader("Authorization"));
         }).build();
     }

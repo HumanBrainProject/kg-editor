@@ -1,6 +1,7 @@
 package eu.ebrains.kg.editor.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.ebrains.kg.editor.models.HasError;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.instance.*;
@@ -25,12 +26,12 @@ public class InstanceClient {
     }
 
     public <T extends HasError> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
-                                                                  String stage,
-                                                                  boolean metadata,
-                                                                  boolean returnAlternatives,
-                                                                  boolean returnPermissions,
-                                                                  boolean returnEmbedded,
-                                                                  Class<T> clazz) {
+                                                                                   String stage,
+                                                                                   boolean metadata,
+                                                                                   boolean returnAlternatives,
+                                                                                   boolean returnPermissions,
+                                                                                   boolean returnEmbedded,
+                                                                                   Class<T> clazz) {
         String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%s&returnAlternatives=%s&returnPermissions=%s&returnEmbedded=%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded);
         KGCoreResult.Single originalMap = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))

@@ -43,7 +43,7 @@ public class OpenAPIv3 {
 
         OpenAPI openapi = new OpenAPI().openapi("3.0.3");
         String description = "This is the API of the EBRAINS Knowledge Graph Editor";
-
+  
         return openapi.info(new Info().version("v3.0.0").title(String.format("This is the EBRAINS KG Editor API")).description(description).license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html")).termsOfService("https://kg.ebrains.eu/search-terms-of-use.html"))
                 .components(new Components()).schemaRequirement("Authorization", userToken)
                 .security(Collections.singletonList(userWithoutClientReq));

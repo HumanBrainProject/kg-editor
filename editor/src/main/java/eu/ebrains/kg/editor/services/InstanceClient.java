@@ -31,8 +31,9 @@ public class InstanceClient {
                                                                                    boolean returnAlternatives,
                                                                                    boolean returnPermissions,
                                                                                    boolean returnEmbedded,
+                                                                                   boolean returnIncomingLinks,
                                                                                    Class<T> clazz) {
-        String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%s&returnAlternatives=%s&returnPermissions=%s&returnEmbedded=%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded);
+        String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%b&returnAlternatives=%b&returnPermissions=%b&returnEmbedded=%b&returnIncomingLinks=%b", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded, returnIncomingLinks);
         KGCoreResult.Single originalMap = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()

@@ -49,6 +49,7 @@ public class InstanceController {
         simplifyIdsOfInstances(instancesWithMap);
         Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
+        enrichTypesWithIncomingLinksTypes(instancesWithResult, typesByName);
         instancesWithResult.forEach(instanceWithResult -> {
             if (instanceWithResult.getResult() != null) {
                 enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
@@ -60,6 +61,15 @@ public class InstanceController {
         Map<String, InstanceFull> result = new HashMap<>();
         instancesWithMap.forEach((k, v) -> result.put(k, v.getResult()));
         return result;
+    }
+
+    private void enrichTypesWithIncomingLinksTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
+        List<String> incomingLinksTypes = new ArrayList<>();
+        instancesWithResult.forEach(instance -> incomingLinksTypes.addAll(Objects.requireNonNull(retrieveIncomingLinksTypesFromInstance(instance.getResult(), typesByName))));
+        List<String> filteredIncomingLinksTypes = incomingLinksTypes.stream().distinct().collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
+            typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes));
+        }
     }
 
     public Map<String, InstanceLabel> enrichInstancesLabel(Map<String, ResultWithOriginalMap<InstanceLabel>> instancesWithMap) {
@@ -305,19 +315,18 @@ public class InstanceController {
     }
 
     private <T extends InstanceLabel> Map<String, StructureOfType> getTypesByName(Collection<ResultWithOriginalMap<T>> instancesWithResult) {
-        List<InstanceLabel> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).filter(Objects::nonNull).collect(Collectors.toList());
+        List<T> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).filter(Objects::nonNull).collect(Collectors.toList());
         return getTypesByName(instanceLabelList);
     }
 
     private Map<String, StructureOfType> getTypesByName(InstanceLabel instance) {
         List<String> involvedTypes = instance.getTypes().stream().map(SimpleType::getName).collect(Collectors.toList());
-        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, true);
-        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes);
         retrieveNestedTypes(typesByName);
         return typesByName;
     }
 
-    private Map<String, StructureOfType> getTypesByName(List<InstanceLabel> instances) {
+    private Map<String, StructureOfType> getTypesByName(List<? extends InstanceLabel> instances) {
         Stream<SimpleType> simpleTypeStream = instances.stream()
                 .map(InstanceLabel::getTypes)
                 .filter(Objects::nonNull)
@@ -329,10 +338,14 @@ public class InstanceController {
                 .stream()
                 .distinct()
                 .collect(Collectors.toList());
-        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, true);
-        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes);
         retrieveNestedTypes(typesByName);
         return typesByName;
+    }
+
+    private Map<String, StructureOfType> getTypesByNameResult(List<String> involvedTypes) {
+        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, true);
+        return Helpers.getTypesByName(typesResultByName);
     }
 
     private void retrieveNestedTypes(Map<String, StructureOfType> typesByName) {
@@ -346,11 +359,32 @@ public class InstanceController {
                             }
                         })));
         if (!CollectionUtils.isEmpty(nestedTypes)) {
-            Map<String, KGCoreResult<StructureOfType>> nestedTypesResultByName = workspaceClient.getTypesByName(nestedTypes, true);
-            Map<String, StructureOfType> nestedTypesByName = Helpers.getTypesByName(nestedTypesResultByName);
+            Map<String, StructureOfType> nestedTypesByName = getTypesByNameResult(nestedTypes);
             typesByName.putAll(nestedTypesByName);
             retrieveNestedTypes(nestedTypesByName);
         }
+    }
+
+    private List<String> retrieveIncomingLinksTypesFromInstance(InstanceFull instance, Map<String, StructureOfType> typesByName) {
+        if(!CollectionUtils.isEmpty(instance.getIncomingLinks())) {
+            Stream<IncomingLink> incomingLinkStream = instance
+                    .getIncomingLinks()
+                    .values().stream()
+                    .filter(Objects::nonNull)
+                    .flatMap(Collection::stream);
+            return incomingLinkStream
+                    .flatMap(v -> v
+                            .getTypes()
+                            .stream()
+                            .map(IncomingLink.Type::getName)
+                            .filter(t-> !typesByName.containsKey(t))
+                    )
+                    .collect(Collectors.toList())
+                    .stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 
     /**
@@ -378,8 +412,7 @@ public class InstanceController {
 
     public void enrichNeighborRecursivelyWithTypeInformation(Neighbor neighbor) {
         Set<String> typesInNeighbor = findTypesInNeighbor(neighbor, new HashSet<>());
-        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(new ArrayList<>(typesInNeighbor), true);
-        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(new ArrayList<>(typesInNeighbor));
         enrichTypesInNeighbor(neighbor, typesByName);
     }
 
@@ -414,8 +447,7 @@ public class InstanceController {
         Set<String> ids = new HashSet<>();
         findTypesAndIdsInScope(scope, types, ids);
 
-        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(new ArrayList<>(types), true);
-        Map<String, StructureOfType> typesByName = Helpers.getTypesByName(typesResultByName);
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(new ArrayList<>(types));
         enrichTypesInScope(scope, typesByName);
         Map<String, KGCoreResult<String>> releaseStatus = releaseClient.getReleaseStatus(new ArrayList<>(ids), "TOP_INSTANCE_ONLY");
         enrichReleaseStatusInScope(scope, releaseStatus);

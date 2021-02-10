@@ -1,4 +1,4 @@
-FROM node:11.12.0-alpine as build-stage
+FROM node:12.19.0-stretch as build-stage
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 ENV PATH /usr/src/app/node_modules/.bin:$PATH

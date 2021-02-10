@@ -48,7 +48,7 @@ public class InstanceController {
     public Map<String, InstanceFull> enrichInstances(Map<String, ResultWithOriginalMap<InstanceFull>> instancesWithMap, String stage) {
         simplifyIdsOfInstances(instancesWithMap);
         Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
-        Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
+        Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult, true);
         enrichTypesWithIncomingLinksTypes(instancesWithResult, typesByName);
         instancesWithResult.forEach(instanceWithResult -> {
             if (instanceWithResult.getResult() != null) {
@@ -65,17 +65,22 @@ public class InstanceController {
 
     private void enrichTypesWithIncomingLinksTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
         List<String> incomingLinksTypes = new ArrayList<>();
-        instancesWithResult.forEach(instance -> incomingLinksTypes.addAll(Objects.requireNonNull(retrieveIncomingLinksTypesFromInstance(instance.getResult(), typesByName))));
-        List<String> filteredIncomingLinksTypes = incomingLinksTypes.stream().distinct().collect(Collectors.toList());
+        instancesWithResult.forEach(instance -> {
+            List<String> types = retrieveIncomingLinksTypesFromInstance(instance.getResult(), typesByName);
+            if(types != null) {
+                incomingLinksTypes.addAll(types);
+            }
+        });
+        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty()?incomingLinksTypes.stream().distinct().collect(Collectors.toList()):null;
         if(!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
-            typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes));
+            typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes, true));
         }
     }
 
     public Map<String, InstanceLabel> enrichInstancesLabel(Map<String, ResultWithOriginalMap<InstanceLabel>> instancesWithMap) {
         simplifyIdsOfInstances(instancesWithMap);
         Collection<ResultWithOriginalMap<InstanceLabel>> instancesWithResult = instancesWithMap.values();
-        Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
+        Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult, false);
         instancesWithResult.forEach(instanceWithResult -> {
             if (instanceWithResult.getResult() != null) {
                 enrichName(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
@@ -90,7 +95,7 @@ public class InstanceController {
     public Map<String, InstanceSummary> enrichInstancesSummary(Map<String, ResultWithOriginalMap<InstanceSummary>> instancesWithMap) {
         simplifyIdsOfInstances(instancesWithMap);
         Collection<ResultWithOriginalMap<InstanceSummary>> instancesWithResult = instancesWithMap.values();
-        Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult);
+        Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult, true);
         instancesWithResult.forEach(instanceWithResult -> {
             if (instanceWithResult.getResult() != null) {
                 enrichTypesAndSearchableFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
@@ -314,19 +319,19 @@ public class InstanceController {
         }
     }
 
-    private <T extends InstanceLabel> Map<String, StructureOfType> getTypesByName(Collection<ResultWithOriginalMap<T>> instancesWithResult) {
+    private <T extends InstanceLabel> Map<String, StructureOfType> getTypesByName(Collection<ResultWithOriginalMap<T>> instancesWithResult, boolean withProperties) {
         List<T> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).filter(Objects::nonNull).collect(Collectors.toList());
-        return getTypesByName(instanceLabelList);
+        return getTypesByName(instanceLabelList, withProperties);
     }
 
     private Map<String, StructureOfType> getTypesByName(InstanceLabel instance) {
         List<String> involvedTypes = instance.getTypes().stream().map(SimpleType::getName).collect(Collectors.toList());
-        Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes);
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes, true);
         retrieveNestedTypes(typesByName);
         return typesByName;
     }
 
-    private Map<String, StructureOfType> getTypesByName(List<? extends InstanceLabel> instances) {
+    private Map<String, StructureOfType> getTypesByName(List<? extends InstanceLabel> instances, boolean withProperties) {
         Stream<SimpleType> simpleTypeStream = instances.stream()
                 .map(InstanceLabel::getTypes)
                 .filter(Objects::nonNull)
@@ -338,28 +343,32 @@ public class InstanceController {
                 .stream()
                 .distinct()
                 .collect(Collectors.toList());
-        Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes);
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes, withProperties);
         retrieveNestedTypes(typesByName);
         return typesByName;
     }
 
-    private Map<String, StructureOfType> getTypesByNameResult(List<String> involvedTypes) {
-        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, true);
+    private Map<String, StructureOfType> getTypesByNameResult(List<String> involvedTypes, boolean withProperties) {
+        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, withProperties);
         return Helpers.getTypesByName(typesResultByName);
     }
 
     private void retrieveNestedTypes(Map<String, StructureOfType> typesByName) {
         List<String> nestedTypes = new ArrayList<>();
         typesByName.values()
-                .forEach(v -> v.getFields().values().stream()
-                        .filter(fv -> Objects.nonNull(fv) && fv.getWidget() != null && fv.getWidget().equals("Nested"))
-                        .forEach(t -> t.getTargetTypes().forEach(tg -> {
-                            if (!nestedTypes.contains(tg) && !typesByName.containsKey(tg)) {
-                                nestedTypes.add(tg);
-                            }
-                        })));
+                .forEach(v -> {
+                    if(v.getFields() != null) {
+                        v.getFields().values().stream()
+                                .filter(fv -> Objects.nonNull(fv) && fv.getWidget() != null && fv.getWidget().equals("Nested"))
+                                .forEach(t -> t.getTargetTypes().forEach(tg -> {
+                                    if (!nestedTypes.contains(tg) && !typesByName.containsKey(tg)) {
+                                        nestedTypes.add(tg);
+                                    }
+                                }));
+                    }
+                });
         if (!CollectionUtils.isEmpty(nestedTypes)) {
-            Map<String, StructureOfType> nestedTypesByName = getTypesByNameResult(nestedTypes);
+            Map<String, StructureOfType> nestedTypesByName = getTypesByNameResult(nestedTypes, true);
             typesByName.putAll(nestedTypesByName);
             retrieveNestedTypes(nestedTypesByName);
         }
@@ -412,7 +421,7 @@ public class InstanceController {
 
     public void enrichNeighborRecursivelyWithTypeInformation(Neighbor neighbor) {
         Set<String> typesInNeighbor = findTypesInNeighbor(neighbor, new HashSet<>());
-        Map<String, StructureOfType> typesByName = getTypesByNameResult(new ArrayList<>(typesInNeighbor));
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(new ArrayList<>(typesInNeighbor), false);
         enrichTypesInNeighbor(neighbor, typesByName);
     }
 
@@ -447,7 +456,7 @@ public class InstanceController {
         Set<String> ids = new HashSet<>();
         findTypesAndIdsInScope(scope, types, ids);
 
-        Map<String, StructureOfType> typesByName = getTypesByNameResult(new ArrayList<>(types));
+        Map<String, StructureOfType> typesByName = getTypesByNameResult(new ArrayList<>(types), false);
         enrichTypesInScope(scope, typesByName);
         Map<String, KGCoreResult<String>> releaseStatus = releaseClient.getReleaseStatus(new ArrayList<>(ids), "TOP_INSTANCE_ONLY");
         enrichReleaseStatusInScope(scope, releaseStatus);

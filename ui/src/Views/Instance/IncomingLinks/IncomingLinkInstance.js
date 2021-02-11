@@ -16,26 +16,48 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
-//import { createUseStyles } from "react-jss";
-import Label from "../../../Fields/Label";
+import { createUseStyles } from "react-jss";
+import Badge from "react-bootstrap/Badge";
+import { useStores } from "../../../Hooks/UseStores";
 
-// const useStyles = createUseStyles({
-// });
 
-const IncomingLinkInstance = observer(({instance, readMode }) => {
-// const IncomingLinkInstance = observer(({instance, types, space, readMode }) => {
 
-  // const classes = useStyles();
+const useStyles = createUseStyles({
+  pill: {
+    cursor: "pointer"
+  }
+});
+
+
+const IncomingLinkInstance = observer(({instance, space, readMode }) => {
+//const IncomingLinkInstance = observer(({instance, types, space, readMode }) => {
+
+  const classes = useStyles();
+
+  const { appStore, history } = useStores();
 
   if (readMode) {
     return (
-      <Label label={instance.label} />
+      <span>
+        <Badge pill variant="secondary" >
+          {instance.label}
+        </Badge>
+      </span>
     );
   }
 
+  const handleOpenInstance = () => {
+    if(appStore.currentWorkspace.id !== space) {
+      appStore.setCurrentWorkspace(space);
+    }
+    history.push(`/instances/${instance.id}`);
+  };
+
   return (
-    <span>
-      <a href={instance.id}>{instance.label}</a>
+    <span className={classes.pill} title={space}>
+      <Badge pill variant="secondary" onClick={handleOpenInstance} >
+        {instance.label}
+      </Badge>
     </span>
   );
 

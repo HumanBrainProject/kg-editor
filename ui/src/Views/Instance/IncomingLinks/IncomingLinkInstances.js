@@ -29,14 +29,14 @@ const useStyles = createUseStyles({
       "& > li": {
         display: "inline",
         "& + li:before": {
-          content: "', '"
+          content: "' '"
         }
       }
     }
   },
   type: {
     paddingRight: "10px"
-  },
+  }
 });
 
 const IncomingLinkInstances = observer(({ link, readMode }) => {

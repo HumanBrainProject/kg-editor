@@ -38,6 +38,8 @@ public class InstanceController {
         if (instanceWithMap.getResult() != null) {
             InstanceFull instance = idController.simplifyId(instanceWithMap.getResult());
             Map<String, StructureOfType> typesByName = getTypesByName(instance);
+            enrichTypesByNameWithIncomingLinksTypes(instance, typesByName);
+            enrichInstanceWithPossibleIncomingLinks(instance, typesByName);
             enrichTypesAndFields(instance, instanceWithMap.getOriginalMap(), typesByName);
             enrichAlternatives(instance);
             return instance;
@@ -49,9 +51,10 @@ public class InstanceController {
         simplifyIdsOfInstances(instancesWithMap);
         Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult, true);
-        enrichTypesWithIncomingLinksTypes(instancesWithResult, typesByName);
+        enrichTypesByNameWithIncomingLinksTypes(instancesWithResult, typesByName);
         instancesWithResult.forEach(instanceWithResult -> {
             if (instanceWithResult.getResult() != null) {
+                enrichInstanceWithPossibleIncomingLinks(instanceWithResult.getResult(), typesByName);
                 enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
                 if (stage.equals("IN_PROGRESS")) {
                     enrichAlternatives(instanceWithResult.getResult());
@@ -63,18 +66,61 @@ public class InstanceController {
         return result;
     }
 
-    private void enrichTypesWithIncomingLinksTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
+    private void enrichTypesByNameWithIncomingLinksTypes(InstanceFull instance, Map<String, StructureOfType> typesByName) {
+        List<String> types = getTypesNamesFromInstance(instance);
         List<String> incomingLinksTypes = new ArrayList<>();
-        instancesWithResult.forEach(instance -> {
-            List<String> types = retrieveIncomingLinksTypesFromInstance(instance.getResult(), typesByName);
-            if(types != null) {
-                incomingLinksTypes.addAll(types);
-            }
-        });
-        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty()?incomingLinksTypes.stream().distinct().collect(Collectors.toList()):null;
-        if(!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
+        retrieveIncomingLinksTypes(typesByName, incomingLinksTypes, types);
+        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty() ? incomingLinksTypes.stream().distinct().collect(Collectors.toList()) : null;
+        if (!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
             typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes, true));
         }
+    }
+
+    private void enrichTypesByNameWithIncomingLinksTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
+        List<String> incomingLinksTypes = new ArrayList<>();
+        instancesWithResult.forEach(instance -> {
+            List<String> types = getTypesNamesFromInstance(instance.getResult());
+            retrieveIncomingLinksTypes(typesByName, incomingLinksTypes, types);
+        });
+        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty() ? incomingLinksTypes.stream().distinct().collect(Collectors.toList()) : null;
+        if (!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
+            typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes, true));
+        }
+    }
+
+    private void retrieveIncomingLinksTypes(Map<String, StructureOfType> typesByName, List<String> incomingLinksTypes, List<String> types) {
+        types.forEach(type -> {
+            StructureOfType structureOfType = typesByName.get(type);
+            structureOfType
+                    .getIncomingLinks()
+                    .values()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .forEach(v -> v.getSourceTypes()
+                            .forEach(t -> {
+                                if (!typesByName.containsKey(t.getType().getName())) {
+                                    incomingLinksTypes.add(t.getType().getName());
+                                }
+                            }));
+        });
+    }
+
+    private void enrichInstanceWithPossibleIncomingLinks(InstanceFull instance, Map<String, StructureOfType> typesByName) {
+        List<String> types = getTypesNamesFromInstance(instance);
+        Map<String, StructureOfIncomingLink> possibleIncomingLinks = new HashMap<>();
+        types.forEach(type -> {
+            StructureOfType structureOfType = typesByName.get(type);
+            possibleIncomingLinks.putAll(structureOfType.getIncomingLinks());
+        });
+        enrichPossibleIncomingLinksTypes(typesByName, possibleIncomingLinks);
+        instance.setPossibleIncomingLinks(possibleIncomingLinks);
+    }
+
+    private void enrichPossibleIncomingLinksTypes(Map<String, StructureOfType> typesByName, Map<String, StructureOfIncomingLink> possibleIncomingLinks) {
+        possibleIncomingLinks.values().forEach(v -> v.getSourceTypes().forEach(s -> {
+            s.getType().setColor(typesByName.get(s.getType().getName()).getColor());
+            s.getType().setLabel(typesByName.get(s.getType().getName()).getLabel());
+        }));
     }
 
     public Map<String, InstanceLabel> enrichInstancesLabel(Map<String, ResultWithOriginalMap<InstanceLabel>> instancesWithMap) {
@@ -203,25 +249,18 @@ public class InstanceController {
                     .findFirst()
                     .orElse(null));
 
-            Map<String, StructureOfIncomingLink> possibleIncomingLinks = new HashMap<>();
-            types.forEach(type -> {
-                StructureOfType structureOfType = typesByName.get(type);
-                possibleIncomingLinks.putAll(structureOfType.getIncomingLinks());
-            });
-            instance.setPossibleIncomingLinks(possibleIncomingLinks);
-
             if (instance.getIncomingLinks() != null) {
                 instance.getIncomingLinks()
                         .values()
                         .forEach(v -> v
                                 .forEach(link -> {
-                                    link.setId(idController.simplifyFullyQualifiedId(link.getId()).toString());
-                                    link.getTypes()
-                                            .forEach(t -> {
-                                                StructureOfType structureOfType = typesByName.get(t.getName());
-                                                t.setLabel(structureOfType.getLabel());
-                                                t.setColor(structureOfType.getColor());
-                                            });
+                                            link.setId(idController.simplifyFullyQualifiedId(link.getId()).toString());
+                                            link.getTypes()
+                                                    .forEach(t -> {
+                                                        StructureOfType structureOfType = typesByName.get(t.getName());
+                                                        t.setLabel(structureOfType.getLabel());
+                                                        t.setColor(structureOfType.getColor());
+                                                    });
                                         }
                                 )
                         );
@@ -357,7 +396,7 @@ public class InstanceController {
         List<String> nestedTypes = new ArrayList<>();
         typesByName.values()
                 .forEach(v -> {
-                    if(v.getFields() != null) {
+                    if (v.getFields() != null) {
                         v.getFields().values().stream()
                                 .filter(fv -> Objects.nonNull(fv) && fv.getWidget() != null && fv.getWidget().equals("Nested"))
                                 .forEach(t -> t.getTargetTypes().forEach(tg -> {
@@ -372,28 +411,6 @@ public class InstanceController {
             typesByName.putAll(nestedTypesByName);
             retrieveNestedTypes(nestedTypesByName);
         }
-    }
-
-    private List<String> retrieveIncomingLinksTypesFromInstance(InstanceFull instance, Map<String, StructureOfType> typesByName) {
-        if(!CollectionUtils.isEmpty(instance.getIncomingLinks())) {
-            Stream<IncomingLink> incomingLinkStream = instance
-                    .getIncomingLinks()
-                    .values().stream()
-                    .filter(Objects::nonNull)
-                    .flatMap(Collection::stream);
-            return incomingLinkStream
-                    .flatMap(v -> v
-                            .getTypes()
-                            .stream()
-                            .map(IncomingLink.Type::getName)
-                            .filter(t-> !typesByName.containsKey(t))
-                    )
-                    .collect(Collectors.toList())
-                    .stream()
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
-        return null;
     }
 
     /**

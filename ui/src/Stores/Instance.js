@@ -174,8 +174,18 @@ export const normalizeInstanceData = data => {
         links: Object.values(groupedLinks)
       };
     });
-    console.log(incomingLinks);
     instance.incomingLinks = incomingLinks;
+  }
+  if(data.possibleIncomingLinks) {
+    instance.possibleIncomingLinks = Object.values(data.possibleIncomingLinks)
+      .flatMap(link => link.sourceTypes)
+      .reduce((acc, current) => {
+        if(!acc.some(obj => obj.type.name === current.type.name && JSON.stringify(obj.spaces) === JSON.stringify(current.spaces))) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      console.log(instance.possibleIncomingLinks);
   }
   if (data.promotedFields instanceof Array) {
     instance.promotedFields = data.promotedFields;
@@ -305,6 +315,7 @@ export class Instance {
   permissions = {};
   fields = {};
   incomingLinks=[];
+  possibleIncomingLinks=[];
 
   isLabelFetching = false;
   isLabelFetched = false;
@@ -332,6 +343,7 @@ export class Instance {
       permissions: observable,
       fields: observable,
       incomingLinks: observable,
+      possibleIncomingLinks: observable,
       isLabelFetching: observable,
       isLabelFetched: observable,
       fetchLabelError: observable,
@@ -555,6 +567,7 @@ export class Instance {
     this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
     this.incomingLinks = normalizedData.incomingLinks;
+    this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;
     _initializeFields(normalizedData.fields);
     this.fetchError = null;
     this.isNotFound = false;

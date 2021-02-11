@@ -24,6 +24,7 @@ import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
 import Field from "../../../Fields/Field";
 import Label from "../../../Fields/Label";
 import IncomingLinks from "../IncomingLinks/IncomingLinks";
+import PossibleIncomingLinks from "../IncomingLinks/PossibleIncomingLinks";
 
 const useStyles = createUseStyles({
   container: {
@@ -107,6 +108,7 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
         );
       })}
       <IncomingLinks links={instance.incomingLinks} readMode={readMode} />
+      {!readMode && <PossibleIncomingLinks links={instance.possibleIncomingLinks} type={instance.primaryType.label} />}
     </Form>
   );
 });

@@ -19,34 +19,36 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 //import Badge from "react-bootstrap/Badge";
 import Label from "../../../Fields/Label";
+import PossibleIncomingLink from "./PossibleIncomingLink";
 
 const useStyles = createUseStyles({
   container: {
     "& > ul": {
       listStyle: "none",
-      paddingLeft: "20px"
+      paddingLeft: "20px",
+      "& > li": {
+        display: "inline",
+        "& + li:before": {
+          content: "' '"
+        }
+      }
     }
   }
 });
 
-const PossibleIncomingLinks = observer(({ type }) => {
-//const PossibleIncomingLinks = observer(({ links, type }) => {
+const PossibleIncomingLinks = observer(({ links, type }) => {
 
   const classes = useStyles();
 
   return(
     <div className={classes.container}>
-      <Label label={`Link ${type} to`}/>
+      <Label label={`${type} can be linked from`}/>
       <ul>
-        {/* {links.map((l, index) => (
+        {links.map((l, index) => (
           <li key={index}>
-            <span className={classes.pill}>
-              <Badge pill variant="secondary" onClick={handleOpenInstance} >
-                {instance.label}
-              </Badge>
-            </span>
+            <PossibleIncomingLink type={l.type} spaces={l.spaces} />
           </li>
-        ))} */}
+        ))}
       </ul>
     </div>
   );

@@ -459,7 +459,8 @@ export class InstanceStore {
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},
-      permissions: { canRead: true, canCreate: true, canWrite: true }
+      permissions: { canRead: true, canCreate: true, canWrite: true },
+      possibleIncomingLinks: []
     };
     if (type.labelField) {
       data.labelField = type.labelField;

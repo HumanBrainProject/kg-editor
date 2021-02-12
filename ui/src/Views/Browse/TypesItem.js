@@ -141,7 +141,7 @@ const TypesItem = observer(({ type }) => {
 
   const handleCreateInstance = () => instanceStore.createNewInstanceOfType(type);
 
-  const selected = browseStore.selectedItem === type;
+  const selected = (browseStore.selectedItem && type)? (browseStore.selectedItem.name === type.name):false;
   const color = type.color;
 
   return (

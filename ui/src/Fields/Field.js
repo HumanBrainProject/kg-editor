@@ -22,7 +22,9 @@ import FieldError from "./FieldError";
 import { fieldsMapping } from "../Fields";
 
 const Field = props => {
-
+  if(!props || !props.fieldStore) {
+    return null;
+  }
   const fieldMapping = fieldsMapping[props.fieldStore.widget];
   if (!fieldMapping) {
     throw `${props.name} widget is not supported!`;

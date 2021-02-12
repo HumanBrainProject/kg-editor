@@ -107,7 +107,7 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
           <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
         );
       })}
-      <IncomingLinks links={instance.incomingLinks} readMode={readMode} />
+      <IncomingLinks links={instance.incomingLinks} readMode={false} />
       {!readMode && <PossibleIncomingLinks links={instance.possibleIncomingLinks} type={instance.primaryType.label} />}
     </Form>
   );

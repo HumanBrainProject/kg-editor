@@ -18,6 +18,7 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Badge from "react-bootstrap/Badge";
+
 import { useStores } from "../../../Hooks/UseStores";
 
 
@@ -30,7 +31,6 @@ const useStyles = createUseStyles({
 
 
 const IncomingLinkInstance = observer(({instance, space, readMode }) => {
-//const IncomingLinkInstance = observer(({instance, types, space, readMode }) => {
 
   const classes = useStyles();
 

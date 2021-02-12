@@ -1,21 +1,20 @@
 package eu.ebrains.kg.editor.controllers;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import eu.ebrains.kg.editor.helpers.Helpers;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.workspace.StructureOfField;
+import eu.ebrains.kg.editor.models.workspace.StructureOfType;
+import eu.ebrains.kg.editor.services.WorkspaceClient;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import eu.ebrains.kg.editor.models.workspace.StructureOfType;
-import eu.ebrains.kg.editor.services.WorkspaceClient;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class WorkspaceController {
-    
+
     private final WorkspaceClient workspaceClient;
 
     public WorkspaceController(WorkspaceClient workspaceClient) {
@@ -26,23 +25,53 @@ public class WorkspaceController {
         List<StructureOfType> workspaceTypes = workspaceClient.getWorkspaceTypes(workspace);
         Map<String, StructureOfType> typesMap = workspaceTypes.stream().collect(Collectors.toMap(StructureOfType::getName, v -> v));
         getNestedTypes(typesMap, workspaceTypes);
+        getIncomingLinksTypes(workspaceTypes, typesMap);
         workspaceTypes.sort(Comparator.comparing(StructureOfType::getLabel));
         return workspaceTypes;
+    }
+
+    private void getIncomingLinksTypes(List<StructureOfType> workspaceTypes, Map<String, StructureOfType> typesMap) {
+        List<String> typesFromIncomingLinks = new ArrayList<>();
+        workspaceTypes.stream().filter(wt -> Objects.nonNull(wt.getIncomingLinks()))
+                .collect(Collectors.toList())
+                .forEach(v -> v.getIncomingLinks().values()
+                        .forEach(i -> i.getSourceTypes().forEach(s -> {
+                            if (!typesMap.containsKey(s.getType().getName())) {
+                                typesFromIncomingLinks.add(s.getType().getName());
+                            }
+                        }))
+                );
+        if (!CollectionUtils.isEmpty(typesFromIncomingLinks)) {
+            List<String> uniqueTypes = typesFromIncomingLinks.stream().distinct().collect(Collectors.toList());
+            Map<String, KGCoreResult<StructureOfType>> incomingLinksTypesByNameResult = workspaceClient.getTypesByName(uniqueTypes, false);
+            Map<String, StructureOfType> incomingLinksTypes = Helpers.getTypesByName(incomingLinksTypesByNameResult);
+            typesMap.putAll(incomingLinksTypes);
+            workspaceTypes.stream().filter(wt -> Objects.nonNull(wt.getIncomingLinks()))
+                    .collect(Collectors.toList())
+                    .forEach(v -> v.getIncomingLinks().values()
+                            .forEach(i -> i.getSourceTypes().forEach(s -> {
+                                StructureOfType structureOfType = typesMap.get(s.getType().getName());
+                                s.getType().setLabel(structureOfType.getLabel());
+                                s.getType().setColor(structureOfType.getColor());
+                                s.getType().setLabelField(structureOfType.getLabelField());
+                            }))
+                    );
+        }
     }
 
     private void getNestedTypes(Map<String, StructureOfType> typesMap, List<StructureOfType> types) {
         List<String> typesToRetrieve = new ArrayList<>();
         types.forEach(type -> type.getFields().values().forEach(f -> {
-            if(Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypes())) {
+            if (Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypes())) {
                 f.getTargetTypes().forEach(targetType -> {
-                    if(!typesMap.containsKey(targetType)) {
+                    if (!typesMap.containsKey(targetType)) {
                         typesToRetrieve.add(targetType);
                     }
                 });
             }
         }));
         List<String> uniqueTypes = typesToRetrieve.stream().distinct().collect(Collectors.toList());
-        if(!CollectionUtils.isEmpty(uniqueTypes)) {
+        if (!CollectionUtils.isEmpty(uniqueTypes)) {
             Map<String, KGCoreResult<StructureOfType>> nestedTypesByNameResult = workspaceClient.getTypesByName(uniqueTypes, true);
             Map<String, StructureOfType> nestedTypesByName = Helpers.getTypesByName(nestedTypesByNameResult);
             typesMap.putAll(nestedTypesByName);
@@ -50,7 +79,7 @@ public class WorkspaceController {
             getNestedTypes(typesMap, nestedTypes);
         }
         types.forEach(t -> t.getFields().values().forEach(f -> {
-            if(Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypes())) {
+            if (Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypes())) {
                 Map<String, StructureOfField> fields = new HashMap<>();
                 f.getTargetTypes().forEach(targetType -> {
                     StructureOfType structureOfType = typesMap.get(targetType);
@@ -61,6 +90,6 @@ public class WorkspaceController {
                 f.setFields(fields);
             }
         }));
-    } 
-    
+    }
+
 }

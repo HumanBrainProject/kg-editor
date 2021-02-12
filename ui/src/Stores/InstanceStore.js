@@ -460,7 +460,7 @@ export class InstanceStore {
       alternatives: {},
       metadata: {},
       permissions: { canRead: true, canCreate: true, canWrite: true },
-      possibleIncomingLinks: []
+      possibleIncomingLinks: type.incomingLinks
     };
     if (type.labelField) {
       data.labelField = type.labelField;

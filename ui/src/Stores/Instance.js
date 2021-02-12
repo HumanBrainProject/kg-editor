@@ -185,7 +185,6 @@ export const normalizeInstanceData = data => {
         }
         return acc;
       }, []);
-    // console.log(instance.possibleIncomingLinks);
   }
   if (data.promotedFields instanceof Array) {
     instance.promotedFields = data.promotedFields;

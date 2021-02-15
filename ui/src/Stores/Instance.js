@@ -99,17 +99,8 @@ export const normalizeInstanceData = data => {
   };
 
   const normalizeField = (field, instanceId) => {
-    if (field.widget === "Nested") {
-      field.topAddButton = false;
-      if (!field.min) {
-        field.min = 0;
-      }
-      if (!field.max) {
-        field.max = Number.POSITIVE_INFINITY;
-      }
-      if (typeof field.fields === "object") {
-        normalizeFields(field.fields, instanceId);
-      }
+    if (field.widget === "Nested" && typeof field.fields === "object") {
+      normalizeFields(field.fields, instanceId);
     }
   };
 

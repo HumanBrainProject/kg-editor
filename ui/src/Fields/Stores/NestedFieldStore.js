@@ -23,11 +23,12 @@ class NestedFieldStore extends FieldStore {
   initialValue = [];
   returnAsNull = false;
   nestedFieldsStores = [];
+  targetTypes = [];
 
   constructor(definition, options, instance, transportLayer) {
     super(definition, options, instance, transportLayer);
     this.fieldsTemplate = definition.fields;
-
+    this.targetTypes = definition.targetTypes;
     makeObservable(this, {
       initialValue: observable,
       returnAsNull: observable,
@@ -60,10 +61,10 @@ class NestedFieldStore extends FieldStore {
 
   get returnValue() {
     return this.nestedFieldsStores.map(row => {
-      return Object.values(row).reduce((acc, store) => {
+      return Object.values(row.stores).reduce((acc, store) => {
         acc[store.fullyQualifiedName] = store.returnValue;
         return acc;
-      }, {});
+      }, {"@type": row["@type"]});
     });
   }
 
@@ -71,7 +72,7 @@ class NestedFieldStore extends FieldStore {
     this.nestedFieldsStores = [];
     if(values) {
       values.forEach(value => {
-        const rowFieldStores = {};
+        const rowFieldStores = {stores: {}, "@type": value["@type"]};
         Object.entries(this.fieldsTemplate).forEach(([name, fieldTemplate]) => {
           const field = JSON.parse(JSON.stringify(toJS(fieldTemplate)));
           let warning = null;
@@ -88,9 +89,10 @@ class NestedFieldStore extends FieldStore {
               field.widget = "UnsupportedField";
             }
             const fieldMapping = fieldsMapping[field.widget];
-            rowFieldStores[name] = new fieldMapping.Store(field, fieldMapping.options, this.instance, this.transportLayer);
+            const options = {...fieldMapping.options, targetTypes: value["@type"]};
+            rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer);
           }
-          const store = rowFieldStores[name];
+          const store = rowFieldStores.stores[name];
           store.updateValue(value[name]);
           if (warning) {
             store.setWarning(warning);
@@ -103,13 +105,15 @@ class NestedFieldStore extends FieldStore {
 
   updateValue(values) {
     this.returnAsNull = false;
-    this.initialValue = values?JSON.parse(JSON.stringify(values)):null;
     this._setValue(values);
+    this.initialValue = this.returnValue;
   }
 
   addValue() {
     const values = this.returnValue;
-    values.push({});
+    values.push({
+      "@type": [this.targetTypes[0]] // By  default we choose the first possible type. This will change in the future
+    });
     this._setValue(values);
   }
 

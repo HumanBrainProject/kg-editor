@@ -38,6 +38,7 @@ class LinksStore extends FieldStore {
   visibleLinks = new Set();
   initialValue = [];
   isLink = true;
+  targetTypes = [];
   mappingValue = "@id";
   minItems = null;
   maxItems = null;
@@ -48,6 +49,15 @@ class LinksStore extends FieldStore {
     super(definition, options, instance, transportLayer);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
+    this.targetTypes = options && options.targetTypes;
+    if (definition.allowCustomValues !== undefined) {
+      this.allowCustomValues = !!definition.allowCustomValues;
+    }
+    if (definition.lazyShowLinks !== undefined) {
+      this.lazyShowLinks = !!definition.lazyShowLinks;
+    } else if (options && options.lazyShowLinks !== undefined) {
+      this.lazyShowLinks = !!options.lazyShowLinks;
+    }
 
     makeObservable(this, {
       value: observable,
@@ -94,14 +104,6 @@ class LinksStore extends FieldStore {
       loadMoreOptions: action
     });
 
-    if (definition.allowCustomValues !== undefined) {
-      this.allowCustomValues = !!definition.allowCustomValues;
-    }
-    if (definition.lazyShowLinks !== undefined) {
-      this.lazyShowLinks = !!definition.lazyShowLinks;
-    } else if (options && options.lazyShowLinks !== undefined) {
-      this.lazyShowLinks = !!options.lazyShowLinks;
-    }
   }
 
   get definition() {
@@ -297,7 +299,7 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.optionsSelectedType, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.targetTypes?this.targetTypes:[], this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
       const options = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (append) {

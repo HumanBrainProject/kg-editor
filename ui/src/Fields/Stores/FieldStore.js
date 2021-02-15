@@ -25,7 +25,6 @@ class FieldStore {
   warning = null;
   errorMessage = null;
   errorInfo = null;
-  instance = null;
   type = null;
   order = null;
   widget = null;
@@ -58,6 +57,7 @@ class FieldStore {
     this.instance = instance;
     this.order = definition.order;
     this.isRequired = definition.isRequired;
+    this.type = definition.type;
     this.transportLayer = transportLayer;
   }
 

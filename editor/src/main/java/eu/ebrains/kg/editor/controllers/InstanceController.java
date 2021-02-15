@@ -193,6 +193,8 @@ public class InstanceController {
                 }
             }
         });
+        List t = (List<String>)originalValue.get("@type");
+        value.put("@type", t);
         return value;
     }
 

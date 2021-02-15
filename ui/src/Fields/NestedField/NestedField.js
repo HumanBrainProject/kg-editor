@@ -178,8 +178,8 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
     <div className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
       <div className={classes.form} >
-        {nestedFieldsStores.map((itemFieldStores, idx) => (
-          <Item key={idx} itemFieldStores={itemFieldStores} readMode={readMode} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
+        {nestedFieldsStores.map((row, idx) => (
+          <Item key={idx} itemFieldStores={row.stores} readMode={readMode} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
         {!readMode && active && (
           <Button className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} size="small" variant={"primary"} onClick={addValue} title="Add" >

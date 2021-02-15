@@ -29,7 +29,7 @@ const API = {
     "instancesLabel": (stage=null) => `/editor/api/instancesBulk/label${stage?`?stage=${stage}`:"" }`,
     "searchInstancesByBookmark": (workspace, bookmarkId, from, size, search) => `/editor/api/instances/filter?bookmarkId=${bookmarkId}&from=${from}&size=${size}&search=${search}`,
     "searchInstancesByType": (workspace, type, from, size, search) => `/editor/api/summary?workspace=${workspace}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${search}`,
-    "suggestions": (instanceId, field, type=null, start, size, search) => `/editor/api/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${type?"&type=" + encodeURIComponent(type):""}&start=${start}&size=${size}&search=${search}`,
+    "suggestions": (instanceId, field, type, start, size, search) => `/editor/api/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${type?"&type=" + encodeURIComponent(type):""}&start=${start}&size=${size}&search=${search}`,
     "instance": instanceId => `/editor/api/instances/${instanceId}`,
     "instanceScope": instanceId => `/editor/api/instances/${instanceId}/scope`,
     "createInstance": (workspace, instanceId=null) => `/editor/api/instances${instanceId?("/" + instanceId):""}?workspace=${workspace}`,

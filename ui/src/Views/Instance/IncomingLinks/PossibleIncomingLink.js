@@ -17,16 +17,24 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import uniqueId from "lodash/uniqueId";
 
 import { useStores } from "../../../Hooks/UseStores";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  pill: {
-    cursor: "pointer"
+  btn: {
+    padding: ".175rem .75rem",
+    marginRight: "5px",
+    color: "#212529",
+    "&:hover": {
+      backgroundColor: "transparent",
+      borderColor: "#337ab7",
+      color: "#212529"
+    }
   }
 });
 
@@ -45,14 +53,12 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
 
   return(
     <React.Fragment>
-      {spaces.map((space, index) => (
-        <span key={`${space}-${index}`} className={classes.pill}>
-          <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{`In space ${space}`}</Tooltip>}>
-            <Badge pill variant="secondary" style={{backgroundColor: type.color}} onClick={() => handleLinkFrom(space)}>
-              {type.label}
-            </Badge>
-          </OverlayTrigger>
-        </span>
+      {spaces.map(space => (
+        <OverlayTrigger key={`${space}-${type.label}`} placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{`In space ${space}`}</Tooltip>}>
+          <Button className={classes.btn}  onClick={() => handleLinkFrom(space)} variant="outline-secondary">
+            <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;<span>{type.label}</span>
+          </Button>
+        </OverlayTrigger>
       ))}
     </React.Fragment>
   );

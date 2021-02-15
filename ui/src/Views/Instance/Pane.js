@@ -42,15 +42,6 @@ const useStyles = createUseStyles({
     "&.main, &.main.active": {
       background: "white"
     },
-    "&:hover": {
-      zIndex: 2
-    },
-    "&.after:hover": {
-      transform: "scale(0.95) translateX(-50%)"
-    },
-    "&.before:hover": {
-      transform: "scale(0.95) translateX(50%)"
-    },
     "& > div": {
       opacity: "0.75",
       transition: "opacity 0.25s ease"

@@ -41,6 +41,29 @@ const useStyles = createUseStyles({
   }
 });
 
+
+const getElementToScroll = elem => {
+  while(elem !== null && !elem.className.startsWith("scrolledView")) {
+    elem = elem.parentElement;
+  }
+  if(elem !== null) {
+    elem  = elem.parentElement;
+  }
+  return elem;
+};
+
+const getScrollTop = elem => {
+  let distance = 0;
+  while(elem !== null && !elem.attributes["data-id"]) {
+    elem = elem.parentElement;
+    if(elem !== null) {
+      distance += elem.offsetTop;
+    }
+  }
+  return distance;
+};
+
+
 const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
 
   const classes = useStyles();
@@ -49,7 +72,14 @@ const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
 
   useEffect(() => {
     if (highlight) {
-      scrollIntoViewRef.current.scrollIntoView({behavior:"smooth", block:"center"});
+      const distance = getScrollTop(scrollIntoViewRef.current);
+      const elem = getElementToScroll(scrollIntoViewRef.current);
+      if(elem) {
+        elem.scrollTo({
+          top: distance - 20, // -20 because scrolledView contains padding-top:20px;
+          behavior: "smooth"
+        });
+      }
     }
   }, [highlight]);
 

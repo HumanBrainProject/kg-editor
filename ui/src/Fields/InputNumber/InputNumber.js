@@ -55,6 +55,8 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
     label,
     labelTooltip,
     labelTooltipIcon,
+    globalLabelTooltip,
+    globalLabelTooltipIcon,
     isRequired
   } = fieldStore;
 
@@ -84,7 +86,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

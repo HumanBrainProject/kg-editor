@@ -522,8 +522,8 @@ export class Instance {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
         if(name === this.labelField) {
-          field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-          field.labelTooltipIcon = "globe";
+          field.globalLabelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+          field.globalLabelTooltipIcon = "globe";
         }
         if (!this.fields[name]) {
           if (!field.widget) {

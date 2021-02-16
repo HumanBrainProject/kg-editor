@@ -20,6 +20,8 @@ class FieldStore {
   label = null;
   labelTooltip = null;
   labelTooltipIcon = null;
+  globalLabelTooltip = null;
+  globalLabelTooltipIcon = null;
   fullyQualifiedName = null;
   alternatives = [];
   warning = null;
@@ -37,6 +39,8 @@ class FieldStore {
       label: observable,
       labelTooltip: observable,
       labelTooltipIcon: observable,
+      globalLabelTooltip:observable,
+      globalLabelTooltipIcon: observable,
       fullyQualifiedName: observable,
       alternatives: observable,
       warning: observable,
@@ -53,6 +57,8 @@ class FieldStore {
     this.label = definition.label;
     this.labelTooltip = definition.labelTooltip;
     this.labelTooltipIcon = definition.labelTooltipIcon;
+    this.globalLabelTooltip = definition.globalLabelTooltip;
+    this.globalLabelTooltipIcon = definition.globalLabelTooltipIcon;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
     this.order = definition.order;

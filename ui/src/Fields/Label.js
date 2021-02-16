@@ -29,19 +29,22 @@ const useStyles = createUseStyles({
   }
 });
 
-const Label = ({ className, label, labelTooltip, labelTooltipIcon, isRequired }) => {
+const LabelTooltip = ({tooltip, icon}) => (
+  <React.Fragment>
+  &nbsp;
+    <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{tooltip}</Tooltip>}>
+      <FontAwesomeIcon icon={icon?icon:"question-circle"}/>
+    </OverlayTrigger>
+  </React.Fragment>
+);
+
+const Label = ({ className, label, labelTooltip, labelTooltipIcon, isRequired, globalLabelTooltip, globalLabelTooltipIcon }) => {
   const classes = useStyles();
   return (
     <Form.Label className={`${classes.label} ${className?className:""}`}>
       {label}{isRequired && " *"}
-      {labelTooltip && (
-        <React.Fragment>
-        &nbsp;
-          <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{labelTooltip}</Tooltip>}>
-            <FontAwesomeIcon icon={labelTooltipIcon?labelTooltipIcon:"question-circle"}/>
-          </OverlayTrigger>
-        </React.Fragment>
-      )}
+      {globalLabelTooltip && <LabelTooltip tooltip={globalLabelTooltip} icon={globalLabelTooltipIcon} />}
+      {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
     </Form.Label>
   );
 };

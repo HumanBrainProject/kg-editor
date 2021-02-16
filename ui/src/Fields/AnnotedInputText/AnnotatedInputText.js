@@ -86,6 +86,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     label,
     labelTooltip,
     labelTooltipIcon,
+    globalLabelTooltip,
+    globalLabelTooltipIcon,
     alternatives,
     returnAsNull,
     isRequired
@@ -188,6 +190,8 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         labelTooltip={labelTooltip}
         labelTooltipIcon={labelTooltipIcon}
         isRequired={isRequired}
+        globalLabelTooltip={globalLabelTooltip}
+        globalLabelTooltipIcon={globalLabelTooltipIcon}
       />
       <Alternatives
         className={classes.alternatives}

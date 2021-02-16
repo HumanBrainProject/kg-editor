@@ -70,6 +70,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     label,
     labelTooltip,
     labelTooltipIcon,
+    globalLabelTooltip,
+    globalLabelTooltipIcon,
     mappingValue,
     allowCustomValues,
     optionsSearchTerm,
@@ -249,7 +251,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
       <LinksAlternatives
         className={classes.alternatives}
         list={alternatives}

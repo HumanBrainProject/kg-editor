@@ -84,6 +84,8 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     label,
     labelTooltip,
     labelTooltipIcon,
+    globalLabelTooltip,
+    globalLabelTooltipIcon,
     alternatives,
     returnAsNull,
     isRequired
@@ -182,7 +184,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

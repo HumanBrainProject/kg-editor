@@ -82,6 +82,8 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     label,
     labelTooltip,
     labelTooltipIcon,
+    globalLabelTooltip,
+    globalLabelTooltipIcon,
     isRequired
   } = fieldStore;
 
@@ -108,7 +110,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
   const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

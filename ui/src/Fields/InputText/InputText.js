@@ -84,6 +84,8 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     label,
     labelTooltip,
     labelTooltipIcon,
+    globalLabelTooltip,
+    globalLabelTooltipIcon,
     isRequired
   } = fieldStore;
 
@@ -99,7 +101,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     }
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip}labelTooltipIcon={labelTooltipIcon} />
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
         <FieldValue field={fieldStore} splitLines={as === "textarea"} />
       </Form.Group>
     );
@@ -111,7 +113,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

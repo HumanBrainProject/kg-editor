@@ -16,7 +16,7 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Router } from "react-router-dom";
+import { Router, useHistory } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
 import _  from "lodash-uuid";
 
@@ -26,6 +26,31 @@ import ErrorBoundary from "./ErrorBoundary";
 import Layout from "./Layout";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
+
+
+const BrowserEventHandler = observer(() => {
+  const routerHistory = useHistory();
+
+  const { appStore, instanceStore } = useStores();
+
+  useEffect(() => {
+    return routerHistory.listen(location => {
+      if (routerHistory.action === "POP") {
+        const path = location.pathname;
+        if(path.startsWith("/instance")) {
+          const id = path.split("/")[2];
+          const instance = instanceStore.instances.get(id);
+          if (!instance || instance.workspace !== appStore.currentWorkspace.id) {
+            appStore.closeInstance(id);
+            window.location.replace(location.pathname);
+          }
+        }
+      }
+    });
+  }, []);
+
+  return null;
+});
 
 const App = observer(() => {
 
@@ -81,6 +106,7 @@ const App = observer(() => {
   return (
     <ErrorBoundary>
       <Router history={history}>
+        <BrowserEventHandler />
         <ThemeProvider theme={theme}>
           <Layout />
         </ThemeProvider>

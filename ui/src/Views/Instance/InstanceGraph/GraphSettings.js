@@ -129,6 +129,9 @@ const Node = ({ node, isGrouped }) => {
   const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
+      if(node.workspace !== appStore.currentWorkspace.id) {
+        appStore.setCurrentWorkspace(node.workspace);
+      }
       history.push(`/instances/${node.id}/graph`);
     }
   };

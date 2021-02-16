@@ -84,7 +84,7 @@ public class IdController {
     }
 
     public UUID simplifyFullyQualifiedId(String id) {
-        if (id.startsWith(this.kgCoreInstancesPrefix)) {
+        if (id!=null && id.startsWith(this.kgCoreInstancesPrefix)) {
             String uuid = id.substring(this.kgCoreInstancesPrefix.length());
             try {
                 return UUID.fromString(uuid);

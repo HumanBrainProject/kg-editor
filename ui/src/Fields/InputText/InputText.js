@@ -101,7 +101,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     }
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} />
+        <Label className={classes.label} label={label} />
         <FieldValue field={fieldStore} splitLines={as === "textarea"} />
       </Form.Group>
     );

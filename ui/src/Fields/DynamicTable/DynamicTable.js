@@ -216,7 +216,10 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   return (
     <Form.Group className={`${classes.container} ${readMode?classes.readMode:""} ${className}`}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+      {readMode ?
+        <Label className={classes.label} label={label} isRequired={isRequired}/>:
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+      }
       {!isDisabled && (view && view.currentInstanceId === instance.id) && (
         <div className={classes.deleteBtn}>
           <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>

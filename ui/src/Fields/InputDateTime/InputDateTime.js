@@ -100,7 +100,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     const val = !value || typeof value === "string"? value:value.toString();
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip}labelTooltipIcon={labelTooltipIcon} />
+        <Label className={classes.label} label={label} />
         <span>&nbsp;{val}</span>
       </Form.Group>
     );

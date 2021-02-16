@@ -45,14 +45,22 @@ const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) =
     }
   };
 
-  if(readMode && value === null && !showIfNoValue) {
-    return null;
+  if(readMode) {
+    if(value ===null && !showIfNoValue){
+      return null;
+    }
+
+    <Form.Group className={`${classes.container} ${className}`} >
+      <Label className={classes.label} label={label} />
+      <Form.Check disabled={true} checked={value} />
+    </Form.Group>;
+
   }
 
   return (
     <Form.Group className={`${classes.container} ${className}`} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
-      <Form.Check disabled={readMode} onChange={handleChange} checked={value} />
+      <Form.Check onChange={handleChange} checked={value} />
     </Form.Group>
   );
 });

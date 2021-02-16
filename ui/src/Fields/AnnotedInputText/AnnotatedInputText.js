@@ -169,7 +169,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
 
     return (
       <Form.Group className={`${classes.readMode}} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon}/>
+        <Label className={classes.label} label={label} />
         <List
           list={resources}
           readOnly={true}

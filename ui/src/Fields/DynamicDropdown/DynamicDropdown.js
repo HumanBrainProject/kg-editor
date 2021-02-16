@@ -221,7 +221,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} />
+        <Label className={classes.label} label={label} isRequired={isRequired} />
         {(view && view.currentInstanceId === instance.id)?
           <List
             list={links}

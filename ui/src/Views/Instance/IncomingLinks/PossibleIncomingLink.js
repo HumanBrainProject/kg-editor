@@ -29,6 +29,7 @@ const useStyles = createUseStyles({
   btn: {
     padding: ".175rem .75rem",
     marginRight: "5px",
+    marginTop: "5px",
     color: "#212529",
     "&:hover": {
       backgroundColor: "transparent",

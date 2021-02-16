@@ -193,7 +193,7 @@ public class InstanceController {
                 }
             }
         });
-        List t = (List<String>)originalValue.get("@type");
+        List t = (List<String>) originalValue.get("@type");
         value.put("@type", t);
         return value;
     }
@@ -254,15 +254,23 @@ public class InstanceController {
             if (instance.getIncomingLinks() != null) {
                 instance.getIncomingLinks()
                         .values()
-                        .forEach(v -> v
+                        .stream().filter(Objects::nonNull)
+                        .forEach(v -> v.stream().filter(Objects::nonNull)
                                 .forEach(link -> {
-                                            link.setId(idController.simplifyFullyQualifiedId(link.getId()).toString());
-                                            link.getTypes()
-                                                    .forEach(t -> {
-                                                        StructureOfType structureOfType = typesByName.get(t.getName());
-                                                        t.setLabel(structureOfType.getLabel());
-                                                        t.setColor(structureOfType.getColor());
-                                                    });
+                                            UUID uuid = idController.simplifyFullyQualifiedId(link.getId());
+                                            if (uuid != null) {
+                                                link.setId(uuid.toString());
+                                            }
+                                            if (link.getTypes() != null) {
+                                                link.getTypes()
+                                                        .forEach(t -> {
+                                                            StructureOfType structureOfType = typesByName.get(t.getName());
+                                                            if (structureOfType != null) {
+                                                                t.setLabel(structureOfType.getLabel());
+                                                                t.setColor(structureOfType.getColor());
+                                                            }
+                                                        });
+                                            }
                                         }
                                 )
                         );

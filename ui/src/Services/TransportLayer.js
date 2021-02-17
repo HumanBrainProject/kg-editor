@@ -15,7 +15,6 @@
 */
 
 import axios from "axios";
-import * as Sentry from "@sentry/browser";
 
 import API from "./API";
 
@@ -24,18 +23,6 @@ export class TransportLayer {
 
   constructor() {
     this._axios = axios.create({});
-  }
-
-  captureException = e => {
-    if (e && e.response && e.response.status && e.response.status) {
-      switch (e.response.status) {
-      case 500:
-      {
-        Sentry.captureException(e);
-        break;
-      }
-      }
-    }
   }
 
   setAuthStore = authStore => {

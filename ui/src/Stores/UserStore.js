@@ -143,7 +143,6 @@ export class UserStore {
           user.isFetched = true;
           user.isFetching = false;
         });
-        this.transportLayer.captureException(e);
       }
     }
     return user;
@@ -221,7 +220,6 @@ export class UserStore {
             this.isFetchingSearch = false;
           }
         });
-        this.transportLayer.captureException(e);
       }
     }
   }

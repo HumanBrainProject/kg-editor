@@ -149,7 +149,6 @@ export class GraphStore {
         this.fetchError = e.message ? e.message : e;
         this.isFetching = false;
       });
-      this.transportLayer.captureException(e);
     }
   }
 

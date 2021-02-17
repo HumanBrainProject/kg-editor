@@ -222,22 +222,22 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     setTokenCopied(timer);
   };
 
-  const handlePictureClick = e => {
-    e && e.stopPropagation();
-    imageFileRef.current.click();
-  };
+  // const handlePictureClick = e => {
+  //   e && e.stopPropagation();
+  //   imageFileRef.current.click();
+  // };
 
-  const handleImageFileChange = () => {
-    if (imageFileRef.current.files.length) {
-      const reader = new FileReader();
-      const sendPictureToBackend = () => {
-        authStore.saveProfilePicture(reader.result);
-        reader.removeEventListener("load", sendPictureToBackend);
-      };
-      reader.addEventListener("load", sendPictureToBackend, false);
-      reader.readAsDataURL(imageFileRef.current.files[0]);
-    }
-  };
+  // const handleImageFileChange = () => {
+  //   if (imageFileRef.current.files.length) {
+  //     const reader = new FileReader();
+  //     const sendPictureToBackend = () => {
+  //       authStore.saveProfilePicture(reader.result);
+  //       reader.removeEventListener("load", sendPictureToBackend);
+  //     };
+  //     reader.addEventListener("load", sendPictureToBackend, false);
+  //     reader.readAsDataURL(imageFileRef.current.files[0]);
+  //   }
+  // };
 
   const handleLogout = () => appStore.logout();
 
@@ -262,12 +262,14 @@ const UserProfileTab = observer(({ className, size=30 }) => {
         <Popover id={uniqueId("popover")} className={classes.popOver}>
           <PopOverContent onSizeChange={handlePopOverPosition}>
             <div className={classes.popOverContent}>
-              <button className={classes.profilePictureButton} onClick={handlePictureClick} title="Click to change your profile picture." >
+              {/* <button className={classes.profilePictureButton} onClick={handlePictureClick} title="Click to change your profile picture." > */}
+              <button className={classes.profilePictureButton} >
                 <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={100}  title={authStore.user.name} />
                 <FontAwesomeIcon icon={"camera"} size="5x" className={classes.profilePictureCamera} />
                 <FontAwesomeIcon icon={"plus"} size="2x" className={classes.profilePicturePlus} />
               </button>
-              <input type="file" accept="image/*" ref={imageFileRef} style={{display: "none"}} onChange={handleImageFileChange} />
+              {/* <input type="file" accept="image/*" ref={imageFileRef} style={{display: "none"}} onChange={handleImageFileChange} /> */}
+              <input type="file" accept="image/*" ref={imageFileRef} style={{display: "none"}} />
               <div>
                 <div className={classes.name}>{authStore.user.name}</div>
                 <div className={classes.email}>{authStore.user.email}</div>

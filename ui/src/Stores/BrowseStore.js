@@ -180,7 +180,6 @@ export class BrowseStore {
           this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
           this.isFetching.instances = false;
         });
-        this.transportLayer.captureException(e);
       }
     }
   }

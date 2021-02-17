@@ -141,7 +141,6 @@ export class AuthStore {
             this.isRetrievingUserProfile = false;
           }
         });
-        this.transportLayer.captureException(e);
       }
     }
     return this.hasUserProfile;
@@ -244,16 +243,16 @@ export class AuthStore {
     return this.authSuccess;
   }
 
-  async saveProfilePicture(picture) {
-    try {
-      await this.transportLayer.updateUserPicture(picture);
-      runInAction(() => {
-        this.user.picture = picture;
-      });
-    } catch (e) {
-      this.transportLayer.captureException(e);
-    }
-  }
+  // async saveProfilePicture(picture) {
+  //   try {
+  //     await this.transportLayer.updateUserPicture(picture);
+  //     runInAction(() => {
+  //       this.user.picture = picture;
+  //     });
+  //   } catch (e) {
+  //     // Catch Error
+  //   }
+  // }
 
 }
 

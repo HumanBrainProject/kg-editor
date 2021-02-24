@@ -7,6 +7,7 @@ import eu.ebrains.kg.editor.constants.SchemaFieldsConstants;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,13 +33,13 @@ public class StructureOfType {
             this.promotedFields.remove(this.labelField);
             this.promotedFields.add(0, this.labelField);
         }
-        this.fields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, f -> f)) : null;
+        this.fields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, f -> f)) : Collections.emptyMap();
         this.incomingLinks = !CollectionUtils.isEmpty(kgIncomingLinks) ?
                 kgIncomingLinks.stream()
                         .collect(Collectors.toMap(
                                 StructureOfIncomingLink::getFullyQualifiedName,
                                 v -> v)
-                        ) : null;
+                        ) : Collections.emptyMap();
     }
 
     private static final List<String> FIELDS_BLACKLIST = Arrays.asList("@id", "@type", SchemaFieldsConstants.IDENTIFIER, EditorConstants.VOCAB_ALTERNATIVE, EditorConstants.VOCAB_USER, EditorConstants.VOCAB_SPACES, EditorConstants.VOCAB_PROPERTY_UPDATES);

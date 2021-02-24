@@ -91,17 +91,20 @@ public class InstanceController {
     private void retrieveIncomingLinksTypes(Map<String, StructureOfType> typesByName, List<String> incomingLinksTypes, List<String> types) {
         types.forEach(type -> {
             StructureOfType structureOfType = typesByName.get(type);
-            structureOfType
-                    .getIncomingLinks()
-                    .values()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .forEach(v -> v.getSourceTypes()
-                            .forEach(t -> {
-                                if (!typesByName.containsKey(t.getType().getName())) {
-                                    incomingLinksTypes.add(t.getType().getName());
-                                }
-                            }));
+            Map<String, StructureOfIncomingLink> incomingLinks = structureOfType
+                    .getIncomingLinks();
+            if(incomingLinks!=null) {
+                incomingLinks
+                        .values()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .forEach(v -> v.getSourceTypes()
+                                .forEach(t -> {
+                                    if (!typesByName.containsKey(t.getType().getName())) {
+                                        incomingLinksTypes.add(t.getType().getName());
+                                    }
+                                }));
+            }
         });
     }
 

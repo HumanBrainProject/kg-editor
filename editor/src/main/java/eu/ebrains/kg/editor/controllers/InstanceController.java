@@ -351,19 +351,10 @@ public class InstanceController {
             // Fill the type information
             if (instance.getTypes() != null) {
                 instance.getTypes().stream().filter(Objects::nonNull).forEach(t -> enrichSimpleType(t, typesByName));
-            }
-
-
-            //Set the name from the label field
-            String labelField = typesByName.values().stream()
-                    .filter(Objects::nonNull)
-                    .map(StructureOfType::getLabelField)
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElse(null);
-            if (originalMap != null && labelField != null) {
-                String name = (String) originalMap.get(labelField);
-                instance.setName(name);
+                if(originalMap!=null){
+                    String label = instance.getTypes().stream().map(SimpleType::getLabelField).filter(Objects::nonNull).map(originalMap::get).filter(Objects::nonNull).map(Object::toString).findFirst().orElse(null);
+                    instance.setName(label);
+                }
             }
         }
     }

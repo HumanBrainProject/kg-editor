@@ -506,7 +506,7 @@ export class Instance {
 
   initializeLabelData(data) {
     const normalizedData = normalizeLabelInstanceData(data);
-    this._name = normalizedData.name,
+    this._name = normalizedData.name;
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;
     this.primaryType = normalizedData.primaryType;
@@ -546,7 +546,7 @@ export class Instance {
     };
 
     const normalizedData = normalizeInstanceData(data);
-    this._name = normalizedData.name,
+    this._name = normalizedData.name;
     this.workspace = normalizedData.workspace;
     this.types = normalizedData.types;
     this.isNew = isNew;

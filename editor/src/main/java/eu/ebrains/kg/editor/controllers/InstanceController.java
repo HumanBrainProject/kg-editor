@@ -244,12 +244,15 @@ public class InstanceController {
                     .distinct()
                     .collect(Collectors.toList()));
 
-            instance.setLabelField(typesByName.values().stream()
-                    .filter(Objects::nonNull)
-                    .map(StructureOfType::getLabelField)
+
+            String labelField = instance.getTypes().stream()
+                    .map(SimpleType::getLabelField)
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .orElse(null));
+                    .orElse(null);
+
+
+            instance.setLabelField(labelField);
 
             if (instance.getIncomingLinks() != null) {
                 instance.getIncomingLinks()

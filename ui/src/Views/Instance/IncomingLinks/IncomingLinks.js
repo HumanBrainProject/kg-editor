@@ -30,11 +30,11 @@ const useStyles = createUseStyles({
 });
 
 const IncomingLinks = observer(({ links, readMode }) => {
+  const classes = useStyles();
+
   if(!links || !links.length) {
     return null;
   }
-
-  const classes = useStyles();
 
   return(
     <div className={classes.container} >

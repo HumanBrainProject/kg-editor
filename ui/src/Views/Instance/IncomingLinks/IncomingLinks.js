@@ -19,13 +19,12 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 
 import IncomingLink from "./IncomingLink";
-import Label from "../../../Fields/Label";
 
 const useStyles = createUseStyles({
   container: {
     "& > ul": {
       listStyle: "none",
-      paddingLeft: "20px"
+      padding: "0"
     }
   }
 });
@@ -39,7 +38,6 @@ const IncomingLinks = observer(({ links, readMode }) => {
 
   return(
     <div className={classes.container} >
-      <Label label="Incoming links"/>
       <ul>
         {links.map(link => (
           <li key={link.label}>

@@ -221,12 +221,14 @@ class LinksStore extends FieldStore {
   }
 
   addValue(value) {
-    this.insertValue(value);
-    if (this.lazyShowLinks) {
-      const values = Array.isArray(value)?value:[value];
-      values.forEach(v => this.visibleLinks.add(v[this.mappingValue]));
+    if(!this.value.some(v => v[this.mappingValue] === value[this.mappingValue])) {
+      this.insertValue(value);
+      if (this.lazyShowLinks) {
+        const values = Array.isArray(value)?value:[value];
+        values.forEach(v => this.visibleLinks.add(v[this.mappingValue]));
+      }
+      this.resetOptionsSearch();
     }
-    this.resetOptionsSearch();
   }
 
   setValues(values) {

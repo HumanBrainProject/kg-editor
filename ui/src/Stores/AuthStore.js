@@ -167,19 +167,14 @@ export class AuthStore {
       reject(error.error_description);
     };
     keycloak.onTokenExpired = () => {
-      runInAction(() => {
-        this.authSuccess = false;
-        this.isTokenExpired = true;
-      });
-      // keycloak
-      //   .updateToken(30)
-      //   .catch(() => runInAction(() => {
-      //     this.authSuccess = false;
-      //     this.isTokenExpired = true;
-      //   }));
+      keycloak
+        .updateToken(30)
+        .catch(() => runInAction(() => {
+          this.authSuccess = false;
+          this.isTokenExpired = true;
+        }));
     };
-    //keycloak.init({ onLoad: "login-required", pkceMethod: "S256" });
-    keycloak.init({ onLoad: "login-required", flow: "implicit" });
+    keycloak.init({ onLoad: "login-required", pkceMethod: "S256" });
   }
 
   login() {

@@ -42,6 +42,7 @@ const useStyles = createUseStyles({
     border: "1px solid #ced4da",
     borderRadius: ".25rem",
     padding: "10px",
+    minHeight: "40px",
     "&:hover": {
       "& $actions": {
         opacity: 1

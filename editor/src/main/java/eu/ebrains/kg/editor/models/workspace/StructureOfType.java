@@ -20,6 +20,7 @@ public class StructureOfType {
             @JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgName,
             @JsonProperty(EditorConstants.VOCAB_COLOR) String kgColor,
             @JsonProperty(EditorConstants.VOCAB_LABEL_PROPERTY) String kgLabelField,
+            @JsonProperty(EditorConstants.VOCAB_EMBEDDED_ONLY) Boolean kgEmbeddedOnly,
             @JsonProperty(EditorConstants.VOCAB_PROPERTIES) List<StructureOfField> kgFields,
             @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) List<StructureOfIncomingLink> kgIncomingLinks
     ) {
@@ -27,6 +28,7 @@ public class StructureOfType {
         this.name = kgName;
         this.color = kgColor;
         this.labelField = kgLabelField;
+        this.embeddedOnly = kgEmbeddedOnly;
         this.promotedFields = kgFields != null ? kgFields.stream().filter(StructureOfType::filterField).filter(f -> f.getSearchable() != null && f.getSearchable()).map(StructureOfField::getFullyQualifiedName).sorted().collect(Collectors.toList()) : null;
         if (this.labelField != null && !CollectionUtils.isEmpty(this.promotedFields)) {
             //Ensure the label field is at the first position
@@ -52,6 +54,7 @@ public class StructureOfType {
     private final String name;
     private final String color;
     private final String labelField;
+    private final Boolean embeddedOnly;
     private final Map<String, StructureOfField> fields;
     private final List<String> promotedFields;
     private final Map<String, StructureOfIncomingLink> incomingLinks;
@@ -72,9 +75,9 @@ public class StructureOfType {
         return color;
     }
 
-    public String getLabelField() {
-        return labelField;
-    }
+    public String getLabelField() { return labelField; }
+
+    public Boolean getEmbeddedOnly() { return embeddedOnly; }
 
     public Map<String, StructureOfField> getFields() {
         return fields;

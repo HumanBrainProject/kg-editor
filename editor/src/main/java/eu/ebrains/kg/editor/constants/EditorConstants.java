@@ -9,7 +9,6 @@ public class EditorConstants {
 
     public static final String VOCAB_TYPES = CORE_META + "types";
     public static final String VOCAB_TYPE = CORE_META + "type";
-    public static final String VOCAB_EMBEDDED_PROPERTIES = CORE_META + "embeddedProperties";
     public static final String VOCAB_OCCURRENCES = CORE_META + "occurrences";
     public static final String VOCAB_ORDER = CORE_META + "orderNumber";
     public static final String VOCAB_SPACES = CORE_META + "spaces";
@@ -29,11 +28,9 @@ public class EditorConstants {
     public static final String VOCAB_PROPERTY_UPDATES = CORE_META + "propertyUpdates";
     public static final String VOCAB_PROPERTIES = CORE_META + "properties";
     public static final String VOCAB_INCOMING_LINKS = CORE_META + "incomingLinks";
-    public static final String VOCAB_INSTANCE_LINKS = CORE_META + "links";
     public static final String VOCAB_SOURCE_TYPES = CORE_META + "sourceTypes";
+    public static final String VOCAB_EMBEDDED_ONLY = CORE_META + "embeddedOnly";
     public static final String VOCAB_LABEL_PROPERTY = CORE_META + "type/labelProperty";
-    public static final String VOCAB_PICTURE = CORE_META + "picture";
-    public static final String VOCAB_WORKSPACES = CORE_META + "workspaces";
     public static final String VOCAB_SEARCHABLE = CORE_META + "property/searchable";
     public static final String VOCAB_TARGET_TYPES = CORE_META + "targetTypes";
     public static final String VOCAB_AUTO_RELEASE = CORE_META + "space/autorelease";

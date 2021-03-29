@@ -32,6 +32,7 @@ export class TypeStore {
       fetchError: observable,
       isFetching: observable,
       isFetched: computed,
+      filteredTypes: computed,
       fetch: action
     });
 
@@ -42,13 +43,17 @@ export class TypeStore {
   filteredList(term) {
     term = typeof term === "string" && term.trim().toLowerCase();
     if(term) {
-      return this.types.filter(type => type && typeof type.label === "string" && type.label.toLowerCase().includes(term));
+      return this.filteredTypes.filter(type => type && typeof type.label === "string" && type.label.toLowerCase().includes(term));
     }
-    return this.types;
+    return this.filteredTypes;
   }
 
   get isFetched() {
     return !this.fetchError && this.types.length;
+  }
+
+  get filteredTypes() {
+    return this.types.filter(t => !t.embeddedOnly);
   }
 
   async fetch(forceFetch=false) {

@@ -289,13 +289,15 @@ public class InstanceController {
     private Map<String, StructureOfField> getFieldsFromTypes(List<String> types, Map<String, StructureOfType> typesByName) {
         Map<String, StructureOfField> result = new HashMap<>();
         types.forEach(t -> {
-            StructureOfType structureOfType = typesByName.get(t);
             if (t != null) {
-                structureOfType.getFields().values().forEach(f -> {
-                    if (!result.containsKey(f.getFullyQualifiedName())) {
-                        result.put(f.getFullyQualifiedName(), SerializationUtils.clone(f));
-                    }
-                });
+                StructureOfType structureOfType = typesByName.get(t);
+                if (structureOfType != null) {
+                    structureOfType.getFields().values().forEach(f -> {
+                        if (!result.containsKey(f.getFullyQualifiedName())) {
+                            result.put(f.getFullyQualifiedName(), SerializationUtils.clone(f));
+                        }
+                    });
+                }
             }
         });
         return result;
@@ -354,7 +356,7 @@ public class InstanceController {
             // Fill the type information
             if (instance.getTypes() != null) {
                 instance.getTypes().stream().filter(Objects::nonNull).forEach(t -> enrichSimpleType(t, typesByName));
-                if(originalMap!=null){
+                if (originalMap != null) {
                     String label = instance.getTypes().stream().map(SimpleType::getLabelField).filter(Objects::nonNull).map(originalMap::get).filter(Objects::nonNull).map(Object::toString).findFirst().orElse(null);
                     instance.setName(label);
                 }
@@ -370,7 +372,7 @@ public class InstanceController {
     private Map<String, StructureOfType> getTypesByName(InstanceLabel instance) {
         List<String> involvedTypes = instance.getTypes().stream().map(SimpleType::getName).collect(Collectors.toList());
         Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes, true);
-        retrieveNestedTypes(typesByName);
+        retrieveTargetTypesFromNestedTypes(typesByName, typesByName);
         return typesByName;
     }
 
@@ -387,7 +389,7 @@ public class InstanceController {
                 .distinct()
                 .collect(Collectors.toList());
         Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes, withProperties);
-        retrieveNestedTypes(typesByName);
+        retrieveTargetTypesFromNestedTypes(typesByName, typesByName);
         return typesByName;
     }
 
@@ -396,24 +398,24 @@ public class InstanceController {
         return Helpers.getTypesByName(typesResultByName);
     }
 
-    private void retrieveNestedTypes(Map<String, StructureOfType> typesByName) {
-        List<String> nestedTypes = new ArrayList<>();
+    private void retrieveTargetTypesFromNestedTypes(Map<String, StructureOfType> fullTypesByName, Map<String, StructureOfType> typesByName) {
+        List<String> targetTypes = new ArrayList<>();
         typesByName.values()
                 .forEach(v -> {
                     if (v.getFields() != null) {
                         v.getFields().values().stream()
-                                .filter(fv -> Objects.nonNull(fv) && fv.getWidget() != null && fv.getWidget().equals("Nested"))
+                                .filter(f -> f != null && f.getTargetTypes() != null && f.getWidget() != null && f.getWidget().equals("Nested"))
                                 .forEach(t -> t.getTargetTypes().forEach(tg -> {
-                                    if (!nestedTypes.contains(tg) && !typesByName.containsKey(tg)) {
-                                        nestedTypes.add(tg);
+                                    if (!targetTypes.contains(tg) && !fullTypesByName.containsKey(tg)) {
+                                        targetTypes.add(tg);
                                     }
                                 }));
                     }
                 });
-        if (!CollectionUtils.isEmpty(nestedTypes)) {
-            Map<String, StructureOfType> nestedTypesByName = getTypesByNameResult(nestedTypes, true);
-            typesByName.putAll(nestedTypesByName);
-            retrieveNestedTypes(nestedTypesByName);
+        if (!CollectionUtils.isEmpty(targetTypes)) {
+            Map<String, StructureOfType> targetTypesByName = getTypesByNameResult(targetTypes, true);
+            fullTypesByName.putAll(targetTypesByName);
+            retrieveTargetTypesFromNestedTypes(fullTypesByName, targetTypesByName);
         }
     }
 

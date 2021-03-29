@@ -29,8 +29,8 @@ class InputNumberMultipleStore extends FieldStore {
   minValue = null;
   maxValue = null;
 
-  constructor(definition, options, instance, transportLayer) {
-    super(definition, options, instance, transportLayer);
+  constructor(definition, options, instance, transportLayer, rootStore) {
+    super(definition, options, instance, transportLayer, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
     this.minValue = definition.minValue;

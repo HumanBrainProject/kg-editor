@@ -138,7 +138,7 @@ export class HistoryStore {
                   }
                 });
                 const instance = new Instance(identifier);
-                instance.initializeData(this.transportLayer, data);
+                instance.initializeData(this.transportLayer, this.rootStore, data);
                 this.instances.push(instance);
               }
             }

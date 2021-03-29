@@ -25,8 +25,8 @@ class InputTextStore extends FieldStore {
   maxLength = null;
   regex = null;
 
-  constructor(definition, options, instance, transportLayer) {
-    super(definition, options, instance, transportLayer);
+  constructor(definition, options, instance, transportLayer, rootStore) {
+    super(definition, options, instance, transportLayer, rootStore);
     makeObservable(this, {
       value: observable,
       returnAsNull: observable,

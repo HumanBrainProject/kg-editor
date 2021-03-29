@@ -49,7 +49,7 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
       const savedInstance = savedInstanceStore.createInstanceOrGet(instanceId);
       const instance = instanceStore.instances.get(instanceId);
       const data = instance.cloneInitialData;
-      savedInstance.initializeData(savedInstanceStore.transportLayer, data);
+      savedInstance.initializeData(savedInstanceStore.transportLayer, savedInstance.store.rootStore, data);
     }
     return () => {
       savedInstanceStore && savedInstanceStore.flush();

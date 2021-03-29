@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Label from "../Label";
 import Field from "../Field";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
+import { compareField } from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   label: {},
@@ -131,9 +132,11 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
   const handleMoveUp = () => onMoveUp(index);
   const handleMoveDown = () => onMoveDown(index);
 
+  const sortedStores = Object.values(itemFieldStores).sort((a, b) => compareField(a, b, true));
+
   return (
     <div className={classes.item}>
-      {Object.values(itemFieldStores).map(store => (
+      {sortedStores.map(store => (
         <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
       ))}
       {!readMode && active && (

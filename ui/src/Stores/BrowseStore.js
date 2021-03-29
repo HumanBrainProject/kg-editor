@@ -19,7 +19,7 @@ import debounce from "lodash/debounce";
 
 import Instance from "./Instance";
 
-const normalizeInstancesData = (transportLayer, data) => {
+const normalizeInstancesData = (transportLayer, rootStore, data) => {
   return (data && Array.isArray(data.data))?data.data.map(rowData => {
     Object.values(rowData.fields).forEach(d => {
       if(d.widget === "TextArea") {
@@ -28,7 +28,7 @@ const normalizeInstancesData = (transportLayer, data) => {
       }
     });
     const instance = new Instance(rowData.id);
-    instance.initializeData(transportLayer, rowData);
+    instance.initializeData(transportLayer, rootStore, rowData);
     return instance;
   }):[];
 };
@@ -143,7 +143,7 @@ export class BrowseStore {
           const { data } = await this.transportLayer.searchInstancesByBookmark(this.rootStore.appStore.currentWorkspace.id, this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
           runInAction(() => {
             this.isFetching.instances = false;
-            const instances = normalizeInstancesData(this.transportLayer, data);
+            const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
             if(loadMore){
               this.instances = [...this.instances, ...instances];
             } else {
@@ -165,7 +165,7 @@ export class BrowseStore {
         const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentWorkspace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
         runInAction(() => {
           this.isFetching.instances = false;
-          const instances = normalizeInstancesData(this.transportLayer, data);
+          const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
           if(loadMore){
             this.instances = [...this.instances, ...instances];
           } else {

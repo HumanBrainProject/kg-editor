@@ -239,7 +239,7 @@ export class AppStore{
       if(data){
 
         const instance = this.rootStore.instanceStore.createInstanceOrGet(instanceId);
-        instance.initializeData(this.transportLayer, data);
+        instance.initializeData(this.transportLayer, this.rootStore, data);
 
         if(data.workspace){
           return data.workspace;
@@ -529,7 +529,7 @@ export class AppStore{
       });
       const newId = data.data.id;
       const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
-      newInstance.initializeData(this.transportLayer, data.data);
+      newInstance.initializeData(this.transportLayer, this.rootStore, data.data);
       this.rootStore.history.push(`/instances/${newId}/edit`);
     } catch(e){
       runInAction(() => {

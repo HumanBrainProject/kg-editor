@@ -17,7 +17,6 @@
 import { observable, action, computed, makeObservable, toJS } from "mobx";
 import FieldStore from "./FieldStore";
 import { fieldsMapping } from "../../Fields";
-
 class NestedFieldStore extends FieldStore {
   fieldsTemplate = {};
   initialValue = [];
@@ -25,8 +24,8 @@ class NestedFieldStore extends FieldStore {
   nestedFieldsStores = [];
   targetTypes = [];
 
-  constructor(definition, options, instance, transportLayer) {
-    super(definition, options, instance, transportLayer);
+  constructor(definition, options, instance, transportLayer, rootStore) {
+    super(definition, options, instance, transportLayer, rootStore);
     this.fieldsTemplate = definition.fields;
     this.targetTypes = definition.targetTypes;
     makeObservable(this, {
@@ -82,15 +81,23 @@ class NestedFieldStore extends FieldStore {
           }
           if (!rowFieldStores[name]) {
             if (!field.widget) {
-              warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
+              warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
               field.widget = "UnsupportedField";
             } else if (!fieldsMapping[field.widget]) {
-              warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
+              warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
               field.widget = "UnsupportedField";
             }
             const fieldMapping = fieldsMapping[field.widget];
             const options = {...fieldMapping.options, targetTypes: value["@type"]};
-            rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer);
+            if(field.widget === "Nested") {
+              const typeName = field.targetTypes && field.targetTypes[0];
+              const type = typeName && this.rootStore.typeStore.typesMap.get(typeName);
+              if(type) {
+                const fields = JSON.parse(JSON.stringify(toJS(type.fields)));
+                field.fields = fields;
+              }
+            }
+            rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
           }
           const store = rowFieldStores.stores[name];
           store.updateValue(value[name]);

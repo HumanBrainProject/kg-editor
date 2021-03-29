@@ -33,8 +33,9 @@ class FieldStore {
   isRequired = false;
   instance = null;
   transportLayer = null;
+  rootStore = null;
 
-  constructor(definition, options, instance, transportLayer) {
+  constructor(definition, options, instance, transportLayer, rootStore) {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,
@@ -65,6 +66,7 @@ class FieldStore {
     this.isRequired = definition.isRequired;
     this.type = definition.type;
     this.transportLayer = transportLayer;
+    this.rootStore = rootStore;
   }
 
   get returnValue() {

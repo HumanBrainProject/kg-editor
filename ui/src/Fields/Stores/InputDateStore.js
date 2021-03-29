@@ -19,8 +19,8 @@ import InputTextStore from "./InputTextStore";
 class InputDateStore extends InputTextStore {
   inputType = "date";
 
-  constructor(definition, options, instance, transportLayer) {
-    super(definition, options, instance, transportLayer);
+  constructor(definition, options, instance, transportLayer, rootStore) {
+    super(definition, options, instance, transportLayer, rootStore);
   }
 }
 

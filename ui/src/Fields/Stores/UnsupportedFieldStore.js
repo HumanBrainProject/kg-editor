@@ -21,8 +21,8 @@ import FieldStore from "./FieldStore";
 class UnsupportedFieldStore extends FieldStore {
   value = null;
 
-  constructor(definition, options, instance, transportLayer) {
-    super(definition, options, instance, transportLayer);
+  constructor(definition, options, instance, transportLayer, rootStore) {
+    super(definition, options, instance, transportLayer, rootStore);
 
     makeObservable(this, {
       value: observable,

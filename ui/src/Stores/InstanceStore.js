@@ -95,7 +95,7 @@ class Instance extends BaseInstance {
             this.store.instance.delete(this.id);
             this.id = newId;
           }
-          this.initializeData(this.store.transportLayer, data.data);
+          this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
         });
       } else {
         const { data } = await this.store.transportLayer.patchInstance(this.id, payload);
@@ -103,7 +103,7 @@ class Instance extends BaseInstance {
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
-          this.initializeData(this.store.transportLayer, data.data);
+          this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
         });
       }
     } catch (e) {
@@ -226,7 +226,7 @@ export class InstanceStore {
         }
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(this.transportLayer, data && data.data);
+        instance.initializeData(this.transportLayer, this.rootStore, data && data.data);
         const view = this.rootStore.viewStore.views.get(resolvedId);
         if(view) {
           view.setNameAndColor(instance.name, instance.primaryType.color);
@@ -336,7 +336,7 @@ export class InstanceStore {
                 instance.isFetching = false;
                 instance.isFetched = false;
               } else {
-                instance.initializeData(this.transportLayer, data, false);
+                instance.initializeData(this.transportLayer, this.rootStore, data, false);
                 this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
               }
             } else {
@@ -463,7 +463,7 @@ export class InstanceStore {
       data.labelField = type.labelField;
     }
     const instance  = new Instance(id, this);
-    instance.initializeData(this.transportLayer, data, true);
+    instance.initializeData(this.transportLayer, this.rootStore, data, true);
     if (instance.labelField) {
       instance.fields[instance.labelField].setValue(name);
     }

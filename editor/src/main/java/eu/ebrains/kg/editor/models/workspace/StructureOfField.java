@@ -30,6 +30,7 @@ public class StructureOfField implements Serializable {
             @JsonProperty(EditorConstants.VOCAB_MAX_VALUE) Integer kgMaxValue,
             @JsonProperty(EditorConstants.VOCAB_LABEL_TOOLTIP) String kgLabelTooltip,
             @JsonProperty(EditorConstants.VOCAB_SEARCHABLE) Boolean kgSearchable,
+            @JsonProperty(EditorConstants.VOCAB_REQUIRED) Boolean isRequired,
             @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes
     ) {
         this.fullyQualifiedName = kgFullyQualifiedName;
@@ -46,6 +47,7 @@ public class StructureOfField implements Serializable {
         this.maxValue = kgMaxValue;
         this.labelTooltip = kgLabelTooltip;
         this.searchable = kgSearchable;
+        this.isRequired = isRequired;
         this.targetTypes = !CollectionUtils.isEmpty(kgTargetTypes) ? kgTargetTypes.stream()
                 .map(t -> (String) t.get(EditorConstants.VOCAB_TYPE)).filter(Objects::nonNull).collect(Collectors.toList()) : null;
     }
@@ -65,6 +67,7 @@ public class StructureOfField implements Serializable {
 
     private final String labelTooltip;
     private final Boolean searchable;
+    private final Boolean isRequired;
     private Map<String, StructureOfField> fields;
     private Object value;
     private List<String> targetTypes;
@@ -132,4 +135,8 @@ public class StructureOfField implements Serializable {
     public Map<String, StructureOfField> getFields() { return fields; }
 
     public void setFields(Map<String, StructureOfField> fields) { this.fields = fields; }
+
+    public Boolean getIsRequired() {
+        return isRequired;
+    }
 }

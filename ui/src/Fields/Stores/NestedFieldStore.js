@@ -40,7 +40,8 @@ class NestedFieldStore extends FieldStore {
       addValue: action,
       deleteItemByIndex: action,
       moveItemUpByIndex: action,
-      moveItemDownByIndex: action
+      moveItemDownByIndex: action,
+      resolvedTargetTypes: computed
     });
   }
 
@@ -67,45 +68,57 @@ class NestedFieldStore extends FieldStore {
     });
   }
 
+  get resolvedTargetTypes() {
+    return this.targetTypes.map(typeName => this.rootStore.typeStore.typesMap.get(typeName)).filter(type => !!type);
+  }
+
+  getType(types) {
+    const typeName = (Array.isArray(types) && types.length)?types[0]:null; // for embeded: value should only belong to a single type.
+    return typeName && this.rootStore.typeStore.typesMap.get(typeName);
+  }
+
   _setValue(values) {
     this.nestedFieldsStores = [];
     if(values) {
       values.forEach(value => {
         const rowFieldStores = {stores: {}, "@type": value["@type"]};
-        Object.entries(this.fieldsTemplate).forEach(([name, fieldTemplate]) => {
-          const field = JSON.parse(JSON.stringify(toJS(fieldTemplate)));
-          let warning = null;
-          if(name === this.labelField) {
-            field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-            field.labelTooltipIcon = "globe";
-          }
-          if (!rowFieldStores[name]) {
-            if (!field.widget) {
-              warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
-              field.widget = "UnsupportedField";
-            } else if (!fieldsMapping[field.widget]) {
-              warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
-              field.widget = "UnsupportedField";
+        const type = this.getType(value["@type"]);
+        if (type) {
+          const fieldsTemplate = type.fields;
+          Object.entries(fieldsTemplate).forEach(([name, fieldTemplate]) => {
+            const field = JSON.parse(JSON.stringify(toJS(fieldTemplate)));
+            let warning = null;
+            if(name === this.labelField) {
+              field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+              field.labelTooltipIcon = "globe";
             }
-            const fieldMapping = fieldsMapping[field.widget];
-            const options = {...fieldMapping.options, targetTypes: value["@type"]};
-            if(field.widget === "Nested") {
-              const typeName = field.targetTypes && field.targetTypes[0];
-              const type = typeName && this.rootStore.typeStore.typesMap.get(typeName);
-              if(type) {
-                const fields = JSON.parse(JSON.stringify(toJS(type.fields)));
-                field.fields = fields;
+            if (!rowFieldStores[name]) {
+              if (!field.widget) {
+                warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
+                field.widget = "UnsupportedField";
+              } else if (!fieldsMapping[field.widget]) {
+                warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
+                field.widget = "UnsupportedField";
               }
+              const fieldMapping = fieldsMapping[field.widget];
+              if(field.widget === "Nested") {
+                const type = this.getType(value["@type"]);
+                if(type) {
+                  const fields = JSON.parse(JSON.stringify(toJS(type.fields)));
+                  field.fields = fields;
+                }
+              }
+              const options = {...fieldMapping.options, targetType: value["@type"]};
+              rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
             }
-            rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
-          }
-          const store = rowFieldStores.stores[name];
-          store.updateValue(value[name]);
-          if (warning) {
-            store.setWarning(warning);
-          }
-        });
-        this.nestedFieldsStores.push(rowFieldStores);
+            const store = rowFieldStores.stores[name];
+            store.updateValue(value[name]);
+            if (warning) {
+              store.setWarning(warning);
+            }
+          });
+          this.nestedFieldsStores.push(rowFieldStores);
+        }
       });
     }
   }
@@ -116,10 +129,10 @@ class NestedFieldStore extends FieldStore {
     this.initialValue = this.returnValue;
   }
 
-  addValue() {
+  addValue(type) {
     const values = this.returnValue;
     values.push({
-      "@type": [this.targetTypes[0]] // By  default we choose the first possible type. This will change in the future
+      "@type": [type] // for embeded: value should only belong to a single type.
     });
     this._setValue(values);
   }

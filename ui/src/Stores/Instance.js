@@ -294,6 +294,7 @@ const getChildrenIdsGroupedByField = fields => {
 };
 export class Instance {
   id = null;
+  _rawData = null;
   _name = null;
   types = [];
   isNew = false;
@@ -322,6 +323,7 @@ export class Instance {
   constructor(id, transportLayer) {
     makeObservable(this, {
       id: observable,
+      _rawData: observable,
       _name: observable,
       types: observable,
       isNew: observable,
@@ -517,6 +519,11 @@ export class Instance {
     this.hasLabelFetchError = false;
   }
 
+  initializeRawData(data) {
+    this._rawData = data;
+    this.isFetching = false;
+  }
+
   initializeData(transportLayer, rootStore, data, isNew = false) {
     const _initializeFields = _fields => {
       Object.entries(_fields).forEach(([name, field]) => {
@@ -545,6 +552,7 @@ export class Instance {
       });
     };
 
+    this._rawData = null;
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name;
     this.workspace = normalizedData.workspace;

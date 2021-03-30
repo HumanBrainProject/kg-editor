@@ -42,6 +42,7 @@ class LinksStore extends FieldStore {
   mappingValue = "@id";
   minItems = null;
   maxItems = null;
+  targetType = null;
 
   appStore = null;
 
@@ -49,7 +50,8 @@ class LinksStore extends FieldStore {
     super(definition, options, instance, transportLayer, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
-    this.targetTypes = options && options.targetTypes;
+    this.targetTypes = definition.targetTypes;
+    this.targetType = options && options.targetType;
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;
     }
@@ -76,6 +78,7 @@ class LinksStore extends FieldStore {
       initialValue: observable,
       minItems: observable,
       maxItems: observable,
+      targetType: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
@@ -301,7 +304,7 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.targetTypes?this.targetTypes:[], this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.targetType?this.targetType:null, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
       const options = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (append) {

@@ -237,10 +237,12 @@ export class AppStore{
       const response = await this.transportLayer.getInstance(instanceId);
       const data = response.data && response.data.data;
       if(data){
-
         const instance = this.rootStore.instanceStore.createInstanceOrGet(instanceId);
-        instance.initializeData(this.transportLayer, this.rootStore, data);
-
+        if (!this.rootStore.typeStore.isFetched) {
+          instance.initializeRawData(data);
+        } else {
+          instance.initializeData(this.transportLayer, this.rootStore, data);
+        }
         if(data.workspace){
           return data.workspace;
         }

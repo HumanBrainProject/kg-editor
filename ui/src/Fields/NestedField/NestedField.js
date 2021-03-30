@@ -16,12 +16,12 @@
 
 import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Label from "../Label";
 import Field from "../Field";
+import Add from "./Add";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 import { compareField } from "../../Stores/Instance";
 
@@ -93,7 +93,6 @@ const useStyles = createUseStyles({
   },
   single: {},
   actionBtn: {
-    fontSize: "x-small",
     marginTop: "10px",
     "&$noItems": {
       marginTop: "0"
@@ -172,7 +171,7 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
     nestedFieldsStores
   } = fieldStore;
 
-  const addValue = () => fieldStore.addValue();
+  const addValue = type => fieldStore.addValue(type);
 
   const handleDeleteItem = index => fieldStore.deleteItemByIndex(index);
   const handleMoveItemUp = index => fieldStore.moveItemUpByIndex(index);
@@ -191,9 +190,7 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
           <Item key={idx} itemFieldStores={row.stores} readMode={readMode} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
         {!readMode && active && (
-          <Button className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} size="small" variant={"primary"} onClick={addValue} title="Add" >
-            <FontAwesomeIcon icon="plus"/>
-          </Button>
+          <Add className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} onClick={addValue} types={fieldStore.resolvedTargetTypes} />
         )}
       </div>
     </div>

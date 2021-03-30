@@ -56,7 +56,7 @@ const Instance = observer(({ match, mode }) => {
 
   const id = match.params.id;
 
-  const { appStore, history, instanceStore, viewStore } = useStores();
+  const { appStore, history, instanceStore, viewStore, typeStore } = useStores();
 
   useEffect(() => {
     appStore.openInstance(id, id, {}, mode);
@@ -73,6 +73,16 @@ const Instance = observer(({ match, mode }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode]);
 
+  useEffect(() => {
+    if (typeStore.isFetched) {
+      const instance = instanceStore.instances.get(id);
+      if (instance && instance._rawData) {
+        instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._rawData);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeStore.isFetched]);
+
   const handleRetry = () => instanceStore.checkInstanceIdAvailability(id, mode === "create");
 
   const handleContinue = () => {
@@ -85,8 +95,35 @@ const Instance = observer(({ match, mode }) => {
     instanceStore.resetInstanceIdAvailability();
   };
 
+  const handleLoadTypes = typeStore.fetch();
+
+  if (typeStore.fetchError) {
+    return (
+      <div className={classes.error}>
+        <BGMessage icon={"ban"}>
+          There was a network problem fetching the types.<br />
+          If the problem persists, please contact the support.<br />
+          <small>{typeStore.fetchError}</small><br /><br />
+          <Button variant={"primary"} onClick={handleLoadTypes}>
+            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+          </Button>
+        </BGMessage>
+      </div>
+    );
+  }
+
+  if (!typeStore.isFetched) {
+    return (
+      <div className={classes.loader}>
+        <FetchingLoader>
+          <span>Fetching types...</span>
+        </FetchingLoader>
+      </div>
+    );
+  }
+
   const instance = instanceStore.instances.get(id);
-  if (instance && instance.isFetched) {
+  if (instance && instance.isFetched && typeStore.isFetched) {
     return (
       <View instance={instance} mode={mode} />
     );
@@ -96,7 +133,7 @@ const Instance = observer(({ match, mode }) => {
 
   if (!status || status.isChecking) {
     return (
-      <div className={classes.error}>
+      <div className={classes.loader}>
         <FetchingLoader>
           <span>Fetching instance &quot;<i>{id}&quot;</i> information...</span>
         </FetchingLoader>
@@ -117,6 +154,7 @@ const Instance = observer(({ match, mode }) => {
       </BGMessage>
     );
   }
+
 
   if (status.isAvailable && mode === "create") {
     return (

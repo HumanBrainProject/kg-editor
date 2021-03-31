@@ -377,11 +377,13 @@ export class AppStore{
         if (window.confirm("You are about to change workspace. All unsaved changes will be lost. Continue ?")) {
           this.rootStore.instanceStore.clearUnsavedChanges();
           this.clearViews();
+          this.rootStore.browseStore.clearInstancesFilter();
         } else {
           return;
         }
       } else if(this.rootStore.viewStore.views.size > 0) {
         this.clearViews();
+        this.rootStore.browseStore.clearInstancesFilter();
       }
       this.currentWorkspace = workspace;
       if (this.currentWorkspace) {

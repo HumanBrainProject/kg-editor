@@ -59,9 +59,6 @@ const Filter = ({ value, placeholder="filter...", icon="search", onChange }) => 
     if (ref.current) {
       ref.current.focus();
     }
-    return () => {
-      onChange("");
-    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

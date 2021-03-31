@@ -83,7 +83,8 @@ export class BrowseStore {
       clearSelectedInstance: action,
       setInstancesFilter: action,
       fetchInstances: action,
-      refreshFilter: action
+      refreshFilter: action,
+      clearInstancesFilter: action
     });
 
     this.transportLayer = transportLayer;
@@ -91,7 +92,6 @@ export class BrowseStore {
   }
 
   selectItem(item) {
-    this.instancesFilter = "";
     this.selectedItem = item;
     this.fetchInstances();
   }
@@ -118,6 +118,10 @@ export class BrowseStore {
     this.instancesFilter = filter;
     this.isFetching.instances = true;
     this.applyInstancesFilter();
+  }
+
+  clearInstancesFilter() {
+    this.instancesFilter = "";
   }
 
   applyInstancesFilter = debounce(() => {

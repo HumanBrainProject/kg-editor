@@ -52,7 +52,7 @@ class Instance extends BaseInstance {
     const ids = this.childrenIds.reduce((acc, id) => {
       if (id !== this.id) {
         const instance = this.store.instances.get(id);
-        if (instance) {
+        if (instance && instance.linkedIds) {
           instance.linkedIds.forEach(child => acc.add(child));
         }
       }

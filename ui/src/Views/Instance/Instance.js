@@ -141,7 +141,7 @@ const View = observer(({instance, mode}) => {
     }
     break;
   case "graph":
-    if(instance.permissions.canCreate) {
+    if(instance.permissions.canRead) {
       return (
         <InstanceGraph instance={instance} />
       );

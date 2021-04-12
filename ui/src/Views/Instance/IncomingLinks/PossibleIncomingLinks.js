@@ -40,6 +40,10 @@ const PossibleIncomingLinks = observer(({ links, type }) => {
 
   const classes = useStyles();
 
+  if(!links || !links.length) {
+    return null;
+  }
+
   return(
     <div className={classes.container}>
       <Label label={`${type} can be linked from`}/>

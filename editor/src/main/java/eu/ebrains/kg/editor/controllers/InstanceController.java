@@ -423,23 +423,25 @@ public class InstanceController {
      * Normalize users of alternatives and add pictures
      */
     private void enrichAlternatives(InstanceFull instance) {
-        Stream<UserSummary> allUsers = instance.getAlternatives().values().stream().flatMap(Collection::stream)
-                .map(Alternative::getUsers).flatMap(Collection::stream);
-        List<String> userIds = allUsers.map(u -> {
-            UserSummary userSummary = idController.simplifyId(u);
-            return userSummary.getId();
-        }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        if(instance.getAlternatives()!=null) {
+            Stream<UserSummary> allUsers = instance.getAlternatives().values().stream().flatMap(Collection::stream)
+                    .map(Alternative::getUsers).flatMap(Collection::stream);
+            List<String> userIds = allUsers.map(u -> {
+                UserSummary userSummary = idController.simplifyId(u);
+                return userSummary.getId();
+            }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
-        instance.getAlternatives().values().forEach(value -> value.forEach(v -> idController.simplifyIdIfObjectIsAMap(v.getValue())));
+            instance.getAlternatives().values().forEach(value -> value.forEach(v -> idController.simplifyIdIfObjectIsAMap(v.getValue())));
 
-        /* TODO there's a lot of replication of big payloads here since we're keeping the picture in every sub element.
-         *  Can't we just provide an additional map at the root level which is then looked up by the UI?
-         */
-        Map<String, String> userPictures = userClient.getUserPictures(userIds);
-        instance.getAlternatives().values().stream().flatMap(Collection::stream)
-                .map(Alternative::getUsers).flatMap(Collection::stream).forEach(u ->
-                u.setPicture(userPictures.get(u.getId()))
-        );
+            /* TODO there's a lot of replication of big payloads here since we're keeping the picture in every sub element.
+             *  Can't we just provide an additional map at the root level which is then looked up by the UI?
+             */
+            Map<String, String> userPictures = userClient.getUserPictures(userIds);
+            instance.getAlternatives().values().stream().flatMap(Collection::stream)
+                    .map(Alternative::getUsers).flatMap(Collection::stream).forEach(u ->
+                    u.setPicture(userPictures.get(u.getId()))
+            );
+        }
     }
 
     public void enrichNeighborRecursivelyWithTypeInformation(Neighbor neighbor) {

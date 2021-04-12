@@ -79,16 +79,15 @@ const TipsOfTheDay = () => {
   const classes = useStyles();
 
   const tips = [
-    <span key="1">to create a new bookmark list click on the <FontAwesomeIcon icon="star" className={classes.bookmarkIcon} /> button of an instance and type the name of the new desired bookmark list.</span>,
-    <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
-    <span key="3">press <span className="kbd">Alt</span> + <span className="kbd">b</span> to browse the instances.</span>,
-    <span key="4">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,
-    <span key="5">press <span className="kbd">Alt</span> + <span className="kbd">n</span> to create a new instance.</span>,
-    <span key="6">press <span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</span>,
-    <span key="7">press <span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</span>,
-    <span key="8">press <span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</span>,
-    <span key="9">press <span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</span>,
-    <span key="10">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
+    <span key="1">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
+    <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">f</span> to browse the instances.</span>,
+    <span key="3">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,
+    <span key="4">press <span className="kbd">Alt</span> + <span className="kbd">n</span> to create a new instance.</span>,
+    <span key="5">press <span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</span>,
+    <span key="6">press <span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">w</span> to close all tabs.</span>,
+    <span key="7">press <span className="kbd">Alt</span> + <span className="kbd">&#8592;</span> to active previous tab.</span>,
+    <span key="8">press <span className="kbd">Alt</span> + <span className="kbd">&#8594;</span> to active next tab.</span>,
+    <span key="9">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
   ];
 
   const [currentIndex, seCurrentIndex] = useState(Math.floor(Math.random() * 10) % tips.length);

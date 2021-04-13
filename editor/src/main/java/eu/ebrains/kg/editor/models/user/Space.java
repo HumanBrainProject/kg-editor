@@ -8,10 +8,10 @@ import eu.ebrains.kg.editor.models.commons.Permissions;
 
 import java.util.List;
 
-public class Workspace {
+public class Space {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public Workspace(
+    public Space(
             @JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgId,
             @JsonProperty(SchemaFieldsConstants.NAME) String kgName,
             @JsonProperty(EditorConstants.VOCAB_AUTO_RELEASE) Boolean kgAutoRelease,

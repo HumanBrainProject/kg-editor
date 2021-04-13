@@ -50,8 +50,8 @@ export class AuthStore {
       accessToken: computed,
       isAuthenticated: computed,
       hasUserProfile: computed,
-      hasWorkspaces: computed,
-      workspaces: computed,
+      hasSpaces: computed,
+      spaces: computed,
       logout: action,
       retrieveUserProfile: action,
       initializeKeycloak: action,
@@ -79,12 +79,12 @@ export class AuthStore {
     return !!this.user;
   }
 
-  get hasWorkspaces() {
-    return this.user && this.user.workspaces instanceof Array && !!this.user.workspaces.length;
+  get hasSpaces() {
+    return this.user && this.user.spaces instanceof Array && !!this.user.spaces.length;
   }
 
-  get workspaces() {
-    return this.hasWorkspaces ? this.user.workspaces: [];
+  get spaces() {
+    return this.hasSpaces ? this.user.spaces: [];
   }
 
   get firstName() {
@@ -124,9 +124,9 @@ export class AuthStore {
         //throw {response: { status: 403}};
         runInAction(() => {
           this.isUserAuthorized = true;
-          const user = (data && data.data)?data.data:{ workspaces: []};
-          user.workspaces = Array.isArray(user.workspaces)?user.workspaces.sort((a, b) => a.name.localeCompare(b.name)):[];
-          //user.workspaces = []; // uncomment to simulate a user without any workspace
+          const user = (data && data.data)?data.data:{ spaces: []};
+          user.spaces = Array.isArray(user.spaces)?user.spaces.sort((a, b) => a.name.localeCompare(b.name)):[];
+          //user.spaces = []; // uncomment to simulate a user without any space
           this.user = user;
           this.isRetrievingUserProfile = false;
         });

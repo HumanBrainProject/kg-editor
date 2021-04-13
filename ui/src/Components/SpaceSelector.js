@@ -42,35 +42,35 @@ const useStyles = createUseStyles({
   }
 });
 
-const WorkspaceSelector = observer(() => {
+const SpaceSelector = observer(() => {
   const classes = useStyles();
 
   const { appStore, authStore } = useStores();
 
-  const handleSelectWorkspace = eventKey => appStore.setCurrentWorkspace(eventKey);
+  const handleSelectSpace = eventKey => appStore.setCurrentSpace(eventKey);
 
   return (
-    <div className={classes.container} title={`${appStore.currentWorkspaceName} workspace`}>
-      {authStore.workspaces.length > 1 ?
+    <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
+      {authStore.spaces.length > 1 ?
         <Dropdown>
           <Dropdown.Toggle as={CustomDropdownToggle}>
-            {appStore.currentWorkspaceName}
+            {appStore.currentSpaceName}
           </Dropdown.Toggle>
           <Dropdown.Menu as={CustomDropdownMenu}>
-            {authStore.workspaces.map(workspace =>
+            {authStore.spaces.map(space =>
               <Dropdown.Item
-                key={workspace.id}
-                eventKey={workspace.id}
-                onSelect={handleSelectWorkspace}>
-                {workspace.name||workspace.id}
+                key={space.id}
+                eventKey={space.id}
+                onSelect={handleSelectSpace}>
+                {space.name||space.id}
               </Dropdown.Item>
             )}
           </Dropdown.Menu>
         </Dropdown>
-        : appStore.currentWorkspaceName}
+        : appStore.currentSpaceName}
     </div>
   );
 });
-WorkspaceSelector.displayName = "WorkspaceSelector";
+SpaceSelector.displayName = "SpaceSelector";
 
-export default WorkspaceSelector;
+export default SpaceSelector;

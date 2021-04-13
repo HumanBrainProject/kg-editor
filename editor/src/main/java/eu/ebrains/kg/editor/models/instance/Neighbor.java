@@ -10,11 +10,16 @@ import java.util.stream.Collectors;
 public class Neighbor {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public Neighbor(@JsonProperty("id") String kgId, @JsonProperty("name") String kgName, @JsonProperty("types") List<String> kgTypes, @JsonProperty("space") String kgWorkspace, @JsonProperty("inbound") List<Neighbor> kgInbound, @JsonProperty("outbound") List<Neighbor> kgOutbound) {
+    public Neighbor(@JsonProperty("id") String kgId,
+                    @JsonProperty("name") String kgName,
+                    @JsonProperty("types") List<String> kgTypes,
+                    @JsonProperty("space") String kgSpace,
+                    @JsonProperty("inbound") List<Neighbor> kgInbound,
+                    @JsonProperty("outbound") List<Neighbor> kgOutbound) {
         this.id = kgId;
         this.name = kgName;
         this.types = kgTypes!=null ? kgTypes.stream().map(SimpleType::new).collect(Collectors.toList()) : null;
-        this.workspace = kgWorkspace;
+        this.space = kgSpace;
         this.inbound = kgInbound == null ? Collections.emptyList() : kgInbound;
         this.outbound = kgOutbound == null ? Collections.emptyList() : kgOutbound;
     }
@@ -22,7 +27,7 @@ public class Neighbor {
     private final String id;
     private final String name;
     private List<SimpleType> types;
-    private final String workspace;
+    private final String space;
     private final List<Neighbor> inbound;
     private final List<Neighbor> outbound;
 
@@ -38,8 +43,8 @@ public class Neighbor {
         return types;
     }
 
-    public String getWorkspace() {
-        return workspace;
+    public String getSpace() {
+        return space;
     }
 
     public List<Neighbor> getInbound() {

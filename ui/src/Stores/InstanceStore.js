@@ -83,7 +83,7 @@ class Instance extends BaseInstance {
     const payload = this.returnValue;
     try {
       if (this.isNew) {
-        const { data } = await this.store.transportLayer.createInstance(this.workspace, this.id, payload);
+        const { data } = await this.store.transportLayer.createInstance(this.space, this.id, payload);
         runInAction(() => {
           const newId = data.data.id;
           this.isNew = false;
@@ -451,7 +451,7 @@ export class InstanceStore {
       _name: type.labelField?name:id,
       types: [instanceType],
       primaryType: instanceType,
-      workspace: this.rootStore.appStore.currentWorkspace.id,
+      space: this.rootStore.appStore.currentSpace.id,
       fields: toJS(fields),
       promotedFields: toJS(type.promotedFields),
       alternatives: {},

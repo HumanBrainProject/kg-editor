@@ -56,12 +56,12 @@ export class HistoryStore {
   }
 
   updateInstanceHistory(id, mode, remove) {
-    if (!this.rootStore.appStore.currentWorkspace) {
+    if (!this.rootStore.appStore.currentSpace) {
       return;
     }
     let index = -1;
     this.instancesHistory.some((instance, idx) => {
-      if (instance.id === id && this.rootStore.appStore.currentWorkspace && instance.workspace === this.rootStore.appStore.currentWorkspace.id && instance.mode === mode) {
+      if (instance.id === id && this.rootStore.appStore.currentSpace && instance.space === this.rootStore.appStore.currentSpace.id && instance.mode === mode) {
         index = idx;
         return true;
       }
@@ -72,15 +72,15 @@ export class HistoryStore {
     } else if (this.instancesHistory.length >= maxItems) {
       this.instancesHistory.pop();
     }
-    if (!remove && this.rootStore.appStore.currentWorkspace) {
-      this.instancesHistory.unshift({id: id, workspace: this.rootStore.appStore.currentWorkspace.id, mode: mode});
+    if (!remove && this.rootStore.appStore.currentSpace) {
+      this.instancesHistory.unshift({id: id, space: this.rootStore.appStore.currentSpace.id, mode: mode});
     }
     localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
   }
 
-  getFileredInstancesHistory(workspace, modes, max=10) {
-    if (!workspace) {
+  getFileredInstancesHistory(space, modes, max=10) {
+    if (!space) {
       return [];
     }
     if (!modes) {
@@ -91,7 +91,7 @@ export class HistoryStore {
     max = Number(max);
     return this.instancesHistory
       .filter(instance => {
-        if (instance.workspace !== workspace) {
+        if (instance.space !== space) {
           return false;
         }
         if (!modes.length) {

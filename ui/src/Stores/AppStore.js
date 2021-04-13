@@ -42,11 +42,11 @@ const getLinkedInstanceIds = (instanceStore, instanceIds) => {
 
 export class AppStore{
   globalError = null;
-  currentWorkspace = null;
+  currentSpace = null;
   initializingMessage = null;
   initializationError = null;
   initialInstanceError = null;
-  initialInstanceWorkspaceError = null;
+  initialInstanceSpaceError = null;
   isInitialized = false;
   canLogin = true;
   _currentThemeName = DefaultTheme.name;
@@ -65,12 +65,12 @@ export class AppStore{
   constructor(transportLayer, rootStore) {
     makeObservable(this, {
       globalError: observable,
-      currentWorkspace: observable,
-      setCurrentWorkspace: action,
+      currentSpace: observable,
+      setCurrentSpace: action,
       initializingMessage: observable,
       initializationError: observable,
       initialInstanceError: observable,
-      initialInstanceWorkspaceError: observable,
+      initialInstanceSpaceError: observable,
       isInitialized: observable,
       canLogin: observable,
       _currentThemeName: observable,
@@ -83,13 +83,13 @@ export class AppStore{
       isCreatingNewInstance: observable,
       instanceCreationError: observable,
       pathsToResolve: observable,
-      currentWorkspaceName: computed,
-      currentWorkspacePermissions: computed,
+      currentSpaceName: computed,
+      currentSpacePermissions: computed,
       delete: action,
       initialize: action,
       flush: action,
-      initializeWorkspace: action,
-      getInitialInstanceWorkspace: action,
+      initializeSpace: action,
+      getInitialInstanceSpace: action,
       cancelInitialInstance: action,
       setGlobalError: action,
       dismissGlobalError: action,
@@ -146,7 +146,7 @@ export class AppStore{
       this.initializingMessage = "Initializing the application...";
       this.initializationError = null;
       this.initialInstanceError = null;
-      this.initialInstanceWorkspaceError = null;
+      this.initialInstanceSpaceError = null;
       if(!this.rootStore.authStore.isAuthenticated) {
         this.initializingMessage = "User authenticating...";
         await this.rootStore.authStore.authenticate();
@@ -173,10 +173,10 @@ export class AppStore{
         });
       }
       if(this.rootStore.authStore.isAuthenticated && this.rootStore.authStore.isUserAuthorized) {
-        await this.initializeWorkspace();
+        await this.initializeSpace();
         runInAction(() => {
           this.initializingMessage = null;
-          this.isInitialized = !!this.currentWorkspace || (!this.initialInstanceError && !this.initialInstanceWorkspaceError) ;
+          this.isInitialized = !!this.currentSpace || (!this.initialInstanceError && !this.initialInstanceSpaceError) ;
         });
       }
     }
@@ -211,27 +211,27 @@ export class AppStore{
     };
   }
 
-  async initializeWorkspace() {
-    let workspace = null;
-    this.initializingMessage = "Setting workspace...";
+  async initializeSpace() {
+    let space = null;
+    this.initializingMessage = "Setting space...";
     const path = this.matchInstancePath();
     if (path && path.params.mode !== "create") {
-      workspace = await this.getInitialInstanceWorkspace(path.params.id);
-      if (workspace) {
-        this.setCurrentWorkspace(workspace);
-        if (!this.currentWorkspace || this.currentWorkspace.id !== workspace) {
-          this.initialInstanceWorkspaceError = `Could not load instance "${path.params.id}" because you're not granted access to workspace "${workspace}".`;
+      space = await this.getInitialInstanceSpace(path.params.id);
+      if (space) {
+        this.setCurrentSpace(space);
+        if (!this.currentSpace || this.currentSpace.id !== space) {
+          this.initialInstanceSpaceError = `Could not load instance "${path.params.id}" because you're not granted access to space "${space}".`;
         }
       }
-      return this.currentWorkspace;
+      return this.currentSpace;
     } else {
-      workspace = localStorage.getItem("workspace");
-      this.setCurrentWorkspace(workspace);
-      return this.currentWorkspace;
+      space = localStorage.getItem("space");
+      this.setCurrentSpace(space);
+      return this.currentSpace;
     }
   }
 
-  async getInitialInstanceWorkspace(instanceId) {
+  async getInitialInstanceSpace(instanceId) {
     this.initializingMessage = `Retrieving instance "${instanceId}"...`;
     try{
       const response = await this.transportLayer.getInstance(instanceId);
@@ -243,11 +243,11 @@ export class AppStore{
         } else {
           instance.initializeData(this.transportLayer, this.rootStore, data);
         }
-        if(data.workspace){
-          return data.workspace;
+        if(data.space){
+          return data.space;
         }
         runInAction(() => {
-          this.initialInstanceError = `Instance "${instanceId}" does not have a workspace.`;
+          this.initialInstanceError = `Instance "${instanceId}" does not have a space.`;
           this.initializingMessage = null;
         });
         return null;
@@ -278,10 +278,10 @@ export class AppStore{
     this.rootStore.history.replace("/browse");
     this.initializationError = null;
     this.initialInstanceError = null;
-    this.initialInstanceWorkspaceError = null;
+    this.initialInstanceSpaceError = null;
     this.initializingMessage = null;
-    const workspace = localStorage.getItem("workspace");
-    this.setCurrentWorkspace(workspace);
+    const space = localStorage.getItem("space");
+    this.setCurrentSpace(space);
     this.isInitialized = true;
   }
 
@@ -330,15 +330,15 @@ export class AppStore{
     }
   }
 
-  get currentWorkspaceName() {
-    if (this.currentWorkspace) {
-      return this.currentWorkspace.name || this.currentWorkspace.id;
+  get currentSpaceName() {
+    if (this.currentSpace) {
+      return this.currentSpace.name || this.currentSpace.id;
     }
     return "";
   }
 
-  get currentWorkspacePermissions() {
-    return this.currentWorkspace?this.currentWorkspace.permissions:{};
+  get currentSpacePermissions() {
+    return this.currentSpace?this.currentSpace.permissions:{};
   }
 
   setSizeHistorySetting(size){
@@ -367,14 +367,14 @@ export class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  setCurrentWorkspace = space => {
-    let workspace = space?this.rootStore.authStore.workspaces.find( w => w.id === space):null;
-    if (!workspace && this.rootStore.authStore.hasWorkspaces && this.rootStore.authStore.workspaces.length === 1) {
-      workspace = this.rootStore.authStore.workspaces[0];
+  setCurrentSpace = selectedSpace => {
+    let space = selectedSpace?this.rootStore.authStore.spaces.find( w => w.id === selectedSpace):null;
+    if (!space && this.rootStore.authStore.hasSpaces && this.rootStore.authStore.spaces.length === 1) {
+      space = this.rootStore.authStore.spaces[0];
     }
-    if(this.currentWorkspace !== workspace) {
+    if(this.currentSpace !== space) {
       if(this.rootStore.instanceStore.hasUnsavedChanges) {
-        if (window.confirm("You are about to change workspace. All unsaved changes will be lost. Continue ?")) {
+        if (window.confirm("You are about to change space. All unsaved changes will be lost. Continue ?")) {
           this.rootStore.instanceStore.clearUnsavedChanges();
           this.clearViews();
           this.rootStore.browseStore.clearInstancesFilter();
@@ -385,14 +385,14 @@ export class AppStore{
         this.clearViews();
         this.rootStore.browseStore.clearInstancesFilter();
       }
-      this.currentWorkspace = workspace;
-      if (this.currentWorkspace) {
-        localStorage.setItem("workspace", workspace.id);
+      this.currentSpace = space;
+      if (this.currentSpace) {
+        localStorage.setItem("space", space.id);
         this.rootStore.viewStore.restoreViews();
         this.rootStore.typeStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       } else {
-        localStorage.removeItem("workspace");
+        localStorage.removeItem("space");
       }
     }
   };
@@ -527,7 +527,7 @@ export class AppStore{
     }
     this.isCreatingNewInstance = true;
     try{
-      const { data } = await this.transportLayer.createInstance(this.currentWorkspace.id, null, payload);
+      const { data } = await this.transportLayer.createInstance(this.currentSpace.id, null, payload);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });

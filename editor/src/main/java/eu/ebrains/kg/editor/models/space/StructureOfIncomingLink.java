@@ -1,4 +1,4 @@
-package eu.ebrains.kg.editor.models.workspace;
+package eu.ebrains.kg.editor.models.space;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

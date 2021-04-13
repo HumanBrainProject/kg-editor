@@ -123,32 +123,32 @@ const InstancesHistory = observer(() => {
   const { appStore, history, historyStore, instanceStore } = useStores();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstances(appStore.currentWorkspace.id), [appStore.currentWorkspace.id]);
+  useEffect(() => fetchInstances(appStore.currentSpace.id), [appStore.currentSpace.id]);
 
-  const fetchInstances = workspace => {
+  const fetchInstances = space => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
       if (eventValue) {
         acc.push(eventType);
       }
       return acc;
     }, []);
-    const history = historyStore.getFileredInstancesHistory(workspace, eventTypes, appStore.historySettings.size);
+    const history = historyStore.getFileredInstancesHistory(space, eventTypes, appStore.historySettings.size);
     historyStore.fetchInstances(history);
   };
 
   const handleHistorySizeChange = e => {
     appStore.setSizeHistorySetting(e.target.value);
-    fetchInstances(appStore.currentWorkspace.id);
+    fetchInstances(appStore.currentSpace.id);
   };
 
   const handleHistoryViewedFlagChange = e => {
     appStore.toggleViewedFlagHistorySetting(e.target.checked);
-    fetchInstances(appStore.currentWorkspace.id);
+    fetchInstances(appStore.currentSpace.id);
   };
 
   const handleHistoryEditedFlagChange = e => {
     appStore.toggleEditedFlagHistorySetting(e.target.checked);
-    fetchInstances(appStore.currentWorkspace.id);
+    fetchInstances(appStore.currentSpace.id);
   };
 
   // const handleHistoryBookmarkedFlagChange = e => {
@@ -203,7 +203,7 @@ const InstancesHistory = observer(() => {
               <option value={50}>50</option>
             </select>
           </div>
-            instances in {appStore.currentWorkspaceName}
+            instances in {appStore.currentSpaceName}
         </h3>
         <ul className="config">
           <li><input type="checkbox" checked={appStore.historySettings.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>

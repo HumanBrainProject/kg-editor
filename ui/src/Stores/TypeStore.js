@@ -61,7 +61,7 @@ export class TypeStore {
       this.isFetching = true;
       this.fetchError = null;
       try {
-        const response = await this.transportLayer.getWorkspaceTypes(this.rootStore.appStore.currentWorkspace.id);
+        const response = await this.transportLayer.getSpaceTypes(this.rootStore.appStore.currentSpace.id);
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
           this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());

@@ -3,9 +3,9 @@ package eu.ebrains.kg.editor.api;
 import eu.ebrains.kg.editor.controllers.IdController;
 import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.user.UserProfile;
-import eu.ebrains.kg.editor.models.user.Workspace;
+import eu.ebrains.kg.editor.models.user.Space;
 import eu.ebrains.kg.editor.services.UserClient;
-import eu.ebrains.kg.editor.services.WorkspaceClient;
+import eu.ebrains.kg.editor.services.SpaceClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,15 +22,15 @@ public class User {
 
     private final IdController idController;
     private final UserClient userClient;
-    private final WorkspaceClient workspaceClient;
+    private final SpaceClient spaceClient;
 
-    public User(IdController idController, UserClient userClient, WorkspaceClient workspaceClient) {
+    public User(IdController idController, UserClient userClient, SpaceClient spaceClient) {
         this.idController = idController;
         this.userClient = userClient;
-        this.workspaceClient = workspaceClient;
+        this.spaceClient = spaceClient;
     }
 
-    private static boolean isUserRelevantWorkspace(Workspace w){
+    private static boolean isUserRelevantSpace(Space w){
         return (w.getClientSpace() == null || !w.getClientSpace()) && (w.getInternalSpace() == null || !w.getInternalSpace());
     }
 
@@ -42,9 +42,9 @@ public class User {
             if(uuid!=null) {
                 userProfile.setId(uuid.toString());
             }
-            List<Workspace> workspaces = workspaceClient.getWorkspaces();
-            if (workspaces != null) {
-                userProfile.setWorkspaces(workspaces.stream().filter(User::isUserRelevantWorkspace).collect(Collectors.toList()));
+            List<Space> spaces = spaceClient.getSpaces();
+            if (spaces != null) {
+                userProfile.setSpaces(spaces.stream().filter(User::isUserRelevantSpace).collect(Collectors.toList()));
             }
             Map<?, ?> userPictures = userClient.getUserPictures(Collections.singletonList(userProfile.getId()));
             if (userPictures != null && userPictures.get(userProfile.getId()) != null) {

@@ -136,7 +136,7 @@ export class BookmarkStore {
     try {
       this.isFetching = true;
       this.fetchError = null;
-      const { data } = await this.transportLayer.getBookmarks(this.rootStore.appStore.currentWorkspace.id);
+      const { data } = await this.transportLayer.getBookmarks(this.rootStore.appStore.currentSpace.id);
       runInAction(() => {
         this.list = data.data;
         this.isFetching = false;
@@ -155,7 +155,7 @@ export class BookmarkStore {
     this.isCreatingBookmark = true;
     const id = _.uuid();
     try {
-      const { data } = await this.transportLayer.createBookmark(id, this.rootStore.appStore.currentWorkspace.id, name, instanceIds || []);
+      const { data } = await this.transportLayer.createBookmark(id, this.rootStore.appStore.currentSpace.id, name, instanceIds || []);
       runInAction(() => {
         const bookmarkData = data && data.data;
         this.list.push({

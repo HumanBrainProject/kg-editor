@@ -153,7 +153,7 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
   );
 };
 
-const NestedField = observer(({className, fieldStore, readMode}) => {
+const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -163,6 +163,7 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
 
   const {
     instance,
+    initialValue,
     label,
     labelTooltip,
     labelTooltipIcon,
@@ -178,6 +179,10 @@ const NestedField = observer(({className, fieldStore, readMode}) => {
   const handleMoveItemDown = index => fieldStore.moveItemDownByIndex(index);
 
   const active = view && view.currentInstanceId === instance.id;
+
+  if(readMode && !showIfNoValue && (!initialValue || !initialValue.length )) {
+    return null;
+  }
 
   return (
     <div className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>

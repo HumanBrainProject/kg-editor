@@ -6,12 +6,12 @@ import eu.ebrains.kg.editor.models.KGCoreResult;
 import eu.ebrains.kg.editor.models.ResultWithOriginalMap;
 import eu.ebrains.kg.editor.models.commons.UserSummary;
 import eu.ebrains.kg.editor.models.instance.*;
-import eu.ebrains.kg.editor.models.workspace.StructureOfField;
-import eu.ebrains.kg.editor.models.workspace.StructureOfIncomingLink;
-import eu.ebrains.kg.editor.models.workspace.StructureOfType;
+import eu.ebrains.kg.editor.models.space.StructureOfField;
+import eu.ebrains.kg.editor.models.space.StructureOfIncomingLink;
+import eu.ebrains.kg.editor.models.space.StructureOfType;
 import eu.ebrains.kg.editor.services.ReleaseClient;
 import eu.ebrains.kg.editor.services.UserClient;
-import eu.ebrains.kg.editor.services.WorkspaceClient;
+import eu.ebrains.kg.editor.services.SpaceClient;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -22,13 +22,13 @@ import java.util.stream.Stream;
 
 @Component
 public class InstanceController {
-    private final WorkspaceClient workspaceClient;
+    private final SpaceClient spaceClient;
     private final ReleaseClient releaseClient;
     private final IdController idController;
     private final UserClient userClient;
 
-    public InstanceController(WorkspaceClient workspaceClient, ReleaseClient releaseClient, IdController idController, UserClient userClient) {
-        this.workspaceClient = workspaceClient;
+    public InstanceController(SpaceClient spaceClient, ReleaseClient releaseClient, IdController idController, UserClient userClient) {
+        this.spaceClient = spaceClient;
         this.releaseClient = releaseClient;
         this.idController = idController;
         this.userClient = userClient;
@@ -394,7 +394,7 @@ public class InstanceController {
     }
 
     private Map<String, StructureOfType> getTypesByNameResult(List<String> involvedTypes, boolean withProperties) {
-        Map<String, KGCoreResult<StructureOfType>> typesResultByName = workspaceClient.getTypesByName(involvedTypes, withProperties);
+        Map<String, KGCoreResult<StructureOfType>> typesResultByName = spaceClient.getTypesByName(involvedTypes, withProperties);
         return Helpers.getTypesByName(typesResultByName);
     }
 

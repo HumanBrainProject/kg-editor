@@ -178,7 +178,7 @@ const useStyles = createUseStyles({
       fontWeight: "300"
     }
   },
-  workspaces: {
+  spaces: {
     display: "grid",
     padding: "0 30px",
     gridGap: "15px",
@@ -190,7 +190,7 @@ const useStyles = createUseStyles({
       gridTemplateColumns: "repeat(3, 1fr)"
     },
   },
-  workspace: {
+  space: {
     position: "relative",
     padding: "20px",
     fontWeight: "300",
@@ -223,7 +223,7 @@ const useStyles = createUseStyles({
       }
     }
   },
-  noWorkspacesModal: {
+  noSpacesModal: {
     "&.modal-dialog": {
       marginTop: "40vh",
       "& .modal-body": {

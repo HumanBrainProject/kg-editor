@@ -56,8 +56,8 @@ export class TransportLayer {
     return this._axios.put(API.endpoints.userPicture(), picture);
   }
 
-  async getWorkspaceTypes(workspace) {
-    return this._axios.get(API.endpoints.workspaceTypes(workspace));
+  async getSpaceTypes(space) {
+    return this._axios.get(API.endpoints.workspaceTypes(space));
   }
 
   async getInstance(instanceId) {
@@ -68,20 +68,20 @@ export class TransportLayer {
     return this._axios.delete(API.endpoints.instance(instanceId));
   }
 
-  async createInstance(workspace, instanceId, payload) {
-    return this._axios.post(API.endpoints.createInstance(workspace, instanceId), payload);
+  async createInstance(space, instanceId, payload) {
+    return this._axios.post(API.endpoints.createInstance(space, instanceId), payload);
   }
 
   async patchInstance(instanceId, payload) {
     return this._axios.patch(API.endpoints.instance(instanceId), payload);
   }
 
-  async searchInstancesByType(workspace, type, from, size, search) {
-    return this._axios.get(API.endpoints.searchInstancesByType(workspace, type, from, size, search));
+  async searchInstancesByType(space, type, from, size, search) {
+    return this._axios.get(API.endpoints.searchInstancesByType(space, type, from, size, search));
   }
 
-  async searchInstancesByBookmark(workspace, bookmarkId, from, size, search) {
-    return this._axios.get(API.endpoints.searchInstancesByBookmark(workspace, bookmarkId, from, size, search));
+  async searchInstancesByBookmark(space, bookmarkId, from, size, search) {
+    return this._axios.get(API.endpoints.searchInstancesByBookmark(space, bookmarkId, from, size, search));
   }
 
   async getSuggestions(instanceId, field, type, from, size, search, payload) {
@@ -152,12 +152,12 @@ export class TransportLayer {
     return this._axios.get(API.endpoints.features());
   }
 
-  async getBookmarks(workspace) {
-    return this._axios.get(API.endpoints.bookmarks(workspace));
+  async getBookmarks(space) {
+    return this._axios.get(API.endpoints.bookmarks(space));
   }
 
-  async createBookmark(bookmarkId, workspace, name, instanceIds) {
-    return this._axios.post(API.endpoints.bookmarks(bookmarkId, workspace), { name: name, list: instanceIds});
+  async createBookmark(bookmarkId, space, name, instanceIds) {
+    return this._axios.post(API.endpoints.bookmarks(bookmarkId, space), { name: name, list: instanceIds});
   }
 
   async renameBookmark(bookmarkId, name) {

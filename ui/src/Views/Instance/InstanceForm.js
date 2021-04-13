@@ -186,9 +186,9 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
     instance.cancelSave();
   };
 
-  const belongsToCurrentWorkspace = appStore.currentWorkspace && instance.workspace === appStore.currentWorkspace.id;
+  const belongsToCurrentSpace = appStore.currentSpace && instance.space === appStore.currentSpace.id;
 
-  const isReadMode = view.mode === "view" || !belongsToCurrentWorkspace;
+  const isReadMode = view.mode === "view" || !belongsToCurrentSpace;
 
   const mainInstanceId = view.instanceId;
   const isMainInstance = id === mainInstanceId;
@@ -219,7 +219,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
         <div
           onFocus={handleFocus}
           onClick={handleFocus}
-          onDoubleClick={isReadMode && !isMainInstance && (appStore.currentWorkspace.id === instance.workspace)? handleOpenInstance : undefined}
+          onDoubleClick={isReadMode && !isMainInstance && (appStore.currentSpace.id === instance.space)? handleOpenInstance : undefined}
         >
           <HeaderPanel
             className={classes.panelHeader}

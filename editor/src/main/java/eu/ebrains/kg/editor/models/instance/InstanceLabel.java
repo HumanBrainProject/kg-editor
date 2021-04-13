@@ -15,18 +15,18 @@ public class InstanceLabel implements HasId, HasError {
     public InstanceLabel(
             @JsonProperty("@id") String kgId,
             @JsonProperty("@type") List<String> kgType,
-            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgWorkspace
+            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgSpace
     ) {
         this.id = kgId;
         this.types = handleTypes(kgType);
-        this.workspace = kgWorkspace;
+        this.space = kgSpace;
     }
 
     private List<SimpleType> handleTypes(List<String> types) {
         return types != null ? types.stream().map(SimpleType::new).collect(Collectors.toList()) : null;
     }
 
-    private final String workspace;
+    private final String space;
     private final List<SimpleType> types;
 
     private String id;
@@ -49,8 +49,8 @@ public class InstanceLabel implements HasId, HasError {
         return id;
     }
 
-    public String getWorkspace() {
-        return workspace;
+    public String getSpace() {
+        return space;
     }
 
     public List<SimpleType> getTypes() {

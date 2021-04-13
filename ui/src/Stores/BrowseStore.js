@@ -144,7 +144,7 @@ export class BrowseStore {
     if(this.selectedItem.list) {
       if(this.selectedItem.list.length > 0) {
         try {
-          const { data } = await this.transportLayer.searchInstancesByBookmark(this.rootStore.appStore.currentWorkspace.id, this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+          const { data } = await this.transportLayer.searchInstancesByBookmark(this.rootStore.appStore.currentSpace.id, this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
           runInAction(() => {
             this.isFetching.instances = false;
             const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
@@ -166,7 +166,7 @@ export class BrowseStore {
       }
     } else {
       try {
-        const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentWorkspace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+        const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
         runInAction(() => {
           this.isFetching.instances = false;
           const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);

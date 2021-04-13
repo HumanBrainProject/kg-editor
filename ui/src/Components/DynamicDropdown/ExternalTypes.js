@@ -28,7 +28,7 @@ const ExternalType = ({ type }) => {
       <em>New instance of type <span style={style}>
         <FontAwesomeIcon fixedWidth icon="circle" />
       </span>
-      {type.label} could only be created in workspace <strong>{types}</strong></em>
+      {type.label} could only be created in space <strong>{types}</strong></em>
     </div>
   );
 };

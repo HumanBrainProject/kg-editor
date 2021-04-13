@@ -101,11 +101,11 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
       <Row>
         <Col xs={10}>
           <div className={classes.info}>ID: {instance.id?instance.id:"<New>"}</div>
-          <div className={classes.info}>Workspace: {instance.workspace}</div>
+          <div className={classes.info}>Space: {instance.space}</div>
         </Col>
         <Col xs={2}>
           <div className={classes.actions}>
-            {appStore.currentWorkspace.id === instance.workspace && instance.permissions.canRead && (
+            {appStore.currentSpace.id === instance.space && instance.permissions.canRead && (
               <div className={classes.action} onClick={handleOpenInstance}>
                 <FontAwesomeIcon icon="folder-open"/>
               </div>

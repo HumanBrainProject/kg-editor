@@ -32,7 +32,7 @@ import Help from "./Help";
 import Browse from "./Browse";
 import Instance from "./Instance";
 import GlobalError from "./GlobalError";
-import WorkspaceModal from "./WorkspaceModal";
+import SpaceModal from "./SpaceModal";
 
 const getGlobalUseStyles = () => createUseStyles(theme => {
   const styles = {
@@ -216,8 +216,8 @@ const Layout = observer(() => {
             <Route component={Login} />
             :
             authStore.isUserAuthorized?
-              authStore.hasWorkspaces?
-                appStore.currentWorkspace?
+              authStore.hasSpaces?
+                appStore.currentSpace?
                   <Switch>
                     <Route path="/instances/:id" exact={true} render={props=><Instance {...props} mode="view" />} />
                     <Route path="/instances/:id/create" exact={true} render={props=><Instance {...props} mode="create" />} />
@@ -234,12 +234,12 @@ const Layout = observer(() => {
                     <Route component={NotFound} />
                   </Switch>
                   :
-                  <Route component={WorkspaceModal} />
+                  <Route component={SpaceModal} />
                 :
                 <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
                   <Modal.Body>
                     <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
-                    <p>You are currently not granted permission to acccess any workspaces.</p>
+                    <p>You are currently not granted permission to acccess any spaces.</p>
                     <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
                     <div className={classes.actionPanel}>
                       <Button onClick={handleLogout}>Logout</Button>

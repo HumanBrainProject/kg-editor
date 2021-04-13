@@ -40,7 +40,7 @@ const BrowserEventHandler = observer(() => {
         if(path.startsWith("/instance")) {
           const id = path.split("/")[2];
           const instance = instanceStore.instances.get(id);
-          if (!instance || instance.workspace !== appStore.currentWorkspace.id) {
+          if (!instance || instance.space !== appStore.currentSpace.id) {
             appStore.closeInstance(id);
             window.location.replace(location.pathname);
           }

@@ -42,9 +42,9 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
   const { appStore, history, browseStore } = useStores();
 
   const handleLinkFrom = space => {
-    if(appStore.currentWorkspace.id !== space) {
-      const changeWorkspace = appStore.setCurrentWorkspace(space);
-      if(!changeWorkspace) {
+    if(appStore.currentSpace.id !== space) {
+      const changeSpace = appStore.setCurrentSpace(space);
+      if(!changeSpace) {
         return;
       }
     }
@@ -56,7 +56,7 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
     <React.Fragment>
       {spaces.map(space => (
         <Button key={`${space}-${type.label}`} className={classes.btn}  onClick={() => handleLinkFrom(space)} variant="outline-secondary">
-          <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="workspace"><i>({space})</i></strong></span>
+          <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="space"><i>({space})</i></strong></span>
         </Button>
       ))}
     </React.Fragment>

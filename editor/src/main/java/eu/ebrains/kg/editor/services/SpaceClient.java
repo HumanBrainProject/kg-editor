@@ -1,8 +1,8 @@
 package eu.ebrains.kg.editor.services;
 
 import eu.ebrains.kg.editor.models.KGCoreResult;
-import eu.ebrains.kg.editor.models.user.Workspace;
-import eu.ebrains.kg.editor.models.workspace.StructureOfType;
+import eu.ebrains.kg.editor.models.user.Space;
+import eu.ebrains.kg.editor.models.space.StructureOfType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
@@ -10,22 +10,22 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class WorkspaceClient {
+public class SpaceClient {
 
     private final ServiceCall kg;
 
-    public WorkspaceClient(ServiceCall kg) {
+    public SpaceClient(ServiceCall kg) {
         this.kg = kg;
     }
 
-    private static class WorkspacesResultFromKG extends KGCoreResult<List<Workspace>> {
+    private static class SpacesResultFromKG extends KGCoreResult<List<Space>> {
     }
 
-    public List<Workspace> getWorkspaces() {
+    public List<Space> getSpaces() {
         String relativeUrl = "spaces?stage=IN_PROGRESS&permissions=true";
-        KGCoreResult<List<Workspace>> response = kg.client().get().uri(kg.url(relativeUrl))
+        KGCoreResult<List<Space>> response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
-                .bodyToMono(WorkspacesResultFromKG.class)
+                .bodyToMono(SpacesResultFromKG.class)
                 .block();
         return response != null ? response.getData() : null;
     }
@@ -33,8 +33,8 @@ public class WorkspaceClient {
     private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType>> {
     }
 
-    public List<StructureOfType> getWorkspaceTypes(String workspace) {
-        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true&withIncomingLinks=true", workspace);
+    public List<StructureOfType> getSpaceTypes(String space) {
+        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true&withIncomingLinks=true", space);
         StructureTypeResultFromKG response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)

@@ -24,7 +24,7 @@ import { useStores } from "../Hooks/UseStores";
 
 import InstanceTabs from "./InstanceTabs";
 import UserProfileTab from "./UserProfileTab";
-import WorkspaceSelector from "../Components/WorkspaceSelector";
+import SpaceSelector from "../Components/SpaceSelector";
 import Tab from "../Components/Tab";
 
 const useStyles = createUseStyles({
@@ -101,12 +101,12 @@ const Tabs = observer(() => {
       {!appStore.globalError &&
         <React.Fragment>
           <div className={classes.fixedTabsLeft}>
-            {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasWorkspaces && appStore.currentWorkspace?
+            {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasSpaces && appStore.currentSpace?
               <React.Fragment>
-                <WorkspaceSelector />
+                <SpaceSelector />
                 <Tab icon={"home"} current={matchPath(currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                 <Tab icon={"search"} current={matchPath(currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
-                {appStore.currentWorkspacePermissions.canCreate && (
+                {appStore.currentSpacePermissions.canCreate && (
                   <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
                 )}
               </React.Fragment>

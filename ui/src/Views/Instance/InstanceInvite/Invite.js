@@ -110,7 +110,7 @@ const InstanceInvite = observer(({ instance }) => {
                 <Col xs={12}>
                   <div className={classes.info}>
                     <div>ID: {instance.id}</div>
-                    <div>Workspace: {instance.workspace}</div>
+                    <div>Space: {instance.space}</div>
                   </div>
                 </Col>
               </Row>

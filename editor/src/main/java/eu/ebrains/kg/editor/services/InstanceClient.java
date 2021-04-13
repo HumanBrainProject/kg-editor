@@ -170,8 +170,8 @@ public class InstanceClient {
     }
 
 
-    public ResultWithOriginalMap<InstanceFull> postInstance(String id, String workspace, Map<?, ?> body) {
-        String relativeUrl = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, workspace);
+    public ResultWithOriginalMap<InstanceFull> postInstance(String id, String space, Map<?, ?> body) {
+        String relativeUrl = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, space);
         KGCoreResult.Single response = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
@@ -180,8 +180,8 @@ public class InstanceClient {
         return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
-    public ResultWithOriginalMap<InstanceFull> postInstance(String workspace, Map<?, ?> body) {
-        String relativeUrl = String.format("instances?returnPermissions=true&space=%s&returnAlternatives=true", workspace);
+    public ResultWithOriginalMap<InstanceFull> postInstance(String space, Map<?, ?> body) {
+        String relativeUrl = String.format("instances?returnPermissions=true&space=%s&returnAlternatives=true", space);
         KGCoreResult.Single response = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(body))
                 .retrieve()

@@ -129,8 +129,8 @@ const Node = ({ node, isGrouped }) => {
   const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
-      if(node.workspace !== appStore.currentWorkspace.id) {
-        appStore.setCurrentWorkspace(node.workspace);
+      if(node.space !== appStore.currentSpace.id) {
+        appStore.setCurrentSpace(node.space);
       }
       history.push(`/instances/${node.id}/graph`);
     }
@@ -146,7 +146,7 @@ const Node = ({ node, isGrouped }) => {
   }
 
   return (
-    <div className={classes.node} {...actions}>{node.name} {node.workspace !== appStore.currentWorkspace.id? <em style={{color:"var(--ft-color-error)"}}>(Workspace: {node.workspace})</em> : null}</div>
+    <div className={classes.node} {...actions}>{node.name} {node.space !== appStore.currentSpace.id? <em style={{color:"var(--ft-color-error)"}}>(Space: {node.space})</em> : null}</div>
   );
 };
 

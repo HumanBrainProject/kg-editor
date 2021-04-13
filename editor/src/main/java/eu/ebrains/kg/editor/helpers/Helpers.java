@@ -1,8 +1,8 @@
 package eu.ebrains.kg.editor.helpers;
 
 import eu.ebrains.kg.editor.models.KGCoreResult;
-import eu.ebrains.kg.editor.models.workspace.StructureOfField;
-import eu.ebrains.kg.editor.models.workspace.StructureOfType;
+import eu.ebrains.kg.editor.models.space.StructureOfField;
+import eu.ebrains.kg.editor.models.space.StructureOfType;
 
 import java.util.Map;
 import java.util.Objects;

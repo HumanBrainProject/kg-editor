@@ -35,20 +35,20 @@ public class Instances {
 
     @PostMapping("/instances/{id}")
     public KGCoreResult<InstanceFull> createInstance(@PathVariable("id") String id,
-                                                     @RequestParam("workspace") String workspace,
+                                                     @RequestParam("space") String space,
                                                      @RequestBody Map<String, Object> payload) {
         Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
-        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, workspace, normalizedPayload);
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(id, space, normalizedPayload);
         InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);
         return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }
 
 
     @PostMapping("/instances")
-    public KGCoreResult<InstanceFull> createInstanceWithoutId(@RequestParam("workspace") String workspace,
+    public KGCoreResult<InstanceFull> createInstanceWithoutId(@RequestParam("space") String space,
                                                      @RequestBody Map<String, Object> payload) {
         Map<?, ?> normalizedPayload = idController.fullyQualifyAtId(payload);
-        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(workspace, normalizedPayload);
+        ResultWithOriginalMap<InstanceFull> instanceWithMap = instanceClient.postInstance(space, normalizedPayload);
         InstanceFull instanceFull = instanceController.enrichInstance(instanceWithMap);
         return new KGCoreResult<InstanceFull>().setData(instanceFull);
     }

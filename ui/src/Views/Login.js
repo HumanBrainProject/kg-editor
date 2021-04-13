@@ -129,12 +129,12 @@ const Login = observer(() => {
       );
     }
 
-    if (appStore.initialInstanceWorkspaceError) {
+    if (appStore.initialInstanceSpaceError) {
       return (
         <div className={classes.container}>
           <div className={classes.error}>
             <BGMessage icon={"ban"}>
-              {appStore.initialInstanceWorkspaceError}<br /><br />
+              {appStore.initialInstanceSpaceError}<br /><br />
               <Button variant={"primary"} onClick={handleCancelInitialInstance}>Continue</Button>
             </BGMessage>
           </div>

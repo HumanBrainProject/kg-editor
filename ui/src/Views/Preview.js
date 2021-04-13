@@ -181,7 +181,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
         <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
           <div className={classes.info}>
             <div>ID: {instanceId}</div>
-            <div>Workspace: {instance.workspace}</div>
+            <div>Space: {instance.space}</div>
           </div>
           <div className={classes.errorMessage}>
             <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
@@ -223,7 +223,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
           </div>
           <div className={classes.info}>
             <div>ID: {instanceId}</div>
-            <div>Workspace: {instance.workspace}</div>
+            <div>Space: {instance.space}</div>
           </div>
         </div>
         <Scrollbars autoHide>

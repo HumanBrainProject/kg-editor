@@ -85,7 +85,7 @@ const Graph = observer(() => {
     if (node.isGroup) {
       graphStore.setGrouping(node, false);
     } else if (node.id !== graphStore.mainId) {
-      if(node.workspace === appStore.currentWorkspace.id){
+      if(node.space === appStore.currentSpace.id){
         graphStore.reset();
         history.push(`/instances/${node.id}/graph`);
       }
@@ -101,7 +101,7 @@ const Graph = observer(() => {
     return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
   };
 
-  const getNodeLabel = node => `${getNodeName(node)} ${node.workspace !== appStore.currentWorkspace.id?`(Workspace: ${node.workspace})`:""}`;
+  const getNodeLabel = node => `${getNodeName(node)} ${node.space !== appStore.currentSpace.id?`(Space: ${node.space})`:""}`;
 
   const getNodeAutoColorBy = node => node.color;
 

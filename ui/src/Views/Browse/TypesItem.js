@@ -155,7 +155,7 @@ const TypesItem = observer(({ type }) => {
         <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
       }
       <span>{type.label}</span>
-      {appStore.currentWorkspacePermissions.canCreate && (
+      {appStore.currentSpacePermissions.canCreate && (
         appStore.isCreatingNewInstance ?
           <div className={classes.createInstance}>
             <FontAwesomeIcon icon={"circle-notch"} spin />

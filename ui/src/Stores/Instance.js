@@ -58,7 +58,7 @@ export const normalizeLabelInstanceData = data => {
     name: null,
     types: [],
     primaryType: { name: "", color: "", label: "" },
-    workspace: "",
+    space: "",
     error: null
   };
 
@@ -74,8 +74,8 @@ export const normalizeLabelInstanceData = data => {
       instance.primaryType = instance.types[0];
     }
   }
-  if (data.workspace) {
-    instance.workspace = data.workspace;
+  if (data.space) {
+    instance.space = data.space;
   }
   if (data.name) {
     instance.name = data.name;
@@ -134,8 +134,8 @@ export const normalizeInstanceData = data => {
       instance.primaryType = instance.types[0];
     }
   }
-  if (data.workspace) {
-    instance.workspace = data.workspace;
+  if (data.space) {
+    instance.space = data.space;
   }
   if (data.name) {
     instance.name = data.name;
@@ -303,7 +303,7 @@ export class Instance {
   labelField = null;
   _promotedFields = [];
   primaryType = { name: "", color: "", label: "" };
-  workspace = "";
+  space = "";
   metadata = {};
   permissions = {};
   fields = {};
@@ -332,7 +332,7 @@ export class Instance {
       labelField: observable,
       _promotedFields: observable,
       primaryType: observable,
-      workspace: observable,
+      space: observable,
       metadata: observable,
       permissions: observable,
       fields: observable,
@@ -376,7 +376,7 @@ export class Instance {
       name: this.name,
       types: this.types.map(t => ({...t})),
       primaryType: {...this.primaryType},
-      workspace: this.workspace,
+      space: this.space,
       fields: Object.entries(this.fields).reduce((acc, [name, field]) => {
         acc[name] = field.cloneWithInitialValue;
         return acc;
@@ -511,7 +511,7 @@ export class Instance {
   initializeLabelData(data) {
     const normalizedData = normalizeLabelInstanceData(data);
     this._name = normalizedData.name;
-    this.workspace = normalizedData.workspace;
+    this.space = normalizedData.space;
     this.types = normalizedData.types;
     this.primaryType = normalizedData.primaryType;
     this.isLabelFetching = false;
@@ -557,7 +557,7 @@ export class Instance {
     this._rawData = null;
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name;
-    this.workspace = normalizedData.workspace;
+    this.space = normalizedData.space;
     this.types = normalizedData.types;
     this.isNew = isNew;
     this.labelField = normalizedData.labelField;

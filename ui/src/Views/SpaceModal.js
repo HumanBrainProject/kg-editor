@@ -39,7 +39,7 @@ const useStyles = createUseStyles({
       fontWeight: "300"
     }
   },
-  workspaces: {
+  spaces: {
     display: "grid",
     padding: "0 30px",
     gridGap: "15px",
@@ -51,7 +51,7 @@ const useStyles = createUseStyles({
       gridTemplateColumns: "repeat(3, 1fr)"
     }
   },
-  workspace: {
+  space: {
     position: "relative",
     padding: "20px",
     background: "var(--bg-color-ui-contrast3)",
@@ -93,13 +93,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const WorkspaceModal = observer(() => {
+const SpaceModal = observer(() => {
 
   const classes = useStyles();
 
   const { appStore, authStore } = useStores();
 
-  const handleClick = workspace => appStore.setCurrentWorkspace(workspace);
+  const handleClick = space => appStore.setCurrentSpace(space);
 
   return (
     <div className={classes.container}>
@@ -107,12 +107,12 @@ const WorkspaceModal = observer(() => {
         <Modal.Body>
           <div className={classes.workspacesSelection}>
             <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
-            <p>Please select a workspace:</p>
-            <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(authStore.workspaces.length / 3) * 90))}px`}}>
+            <p>Please select a space:</p>
+            <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(authStore.spaces.length / 3) * 90))}px`}}>
               <Scrollbars>
-                <div className={classes.workspaces}>
-                  {authStore.workspaces.map(workspace =>
-                    <div className={classes.workspace} key={workspace.id} onClick={() => handleClick(workspace.id)}>{workspace.name||workspace.id}</div>
+                <div className={classes.spaces}>
+                  {authStore.spaces.map(space =>
+                    <div className={classes.space} key={space.id} onClick={() => handleClick(space.id)}>{space.name||space.id}</div>
                   )}
                 </div>
               </Scrollbars>
@@ -123,6 +123,6 @@ const WorkspaceModal = observer(() => {
     </div>
   );
 });
-WorkspaceModal.displayName = "WorkspaceModal";
+SpaceModal.displayName = "SpaceModal";
 
-export default WorkspaceModal;
+export default SpaceModal;

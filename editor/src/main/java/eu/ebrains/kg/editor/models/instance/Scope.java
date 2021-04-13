@@ -10,7 +10,11 @@ import java.util.stream.Collectors;
 public class Scope {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public Scope(@JsonProperty("id") String kgId, @JsonProperty("label") String kgLabel, @JsonProperty("types") List<String> kgTypes, @JsonProperty("space") String kgWorkspace, @JsonProperty("children") List<Scope> kgChildren, @JsonProperty("permissions") List<String> permissions) {
+    public Scope(@JsonProperty("id") String kgId,
+                 @JsonProperty("label") String kgLabel,
+                 @JsonProperty("types") List<String> kgTypes,
+                 @JsonProperty("children") List<Scope> kgChildren,
+                 @JsonProperty("permissions") List<String> permissions) {
         this.id = kgId;
         this.label = kgLabel;
         this.types = kgTypes!=null ? kgTypes.stream().map(SimpleType::new).collect(Collectors.toList()) : null;

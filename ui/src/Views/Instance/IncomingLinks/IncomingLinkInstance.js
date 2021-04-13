@@ -47,8 +47,8 @@ const IncomingLinkInstance = observer(({instance, space, readMode }) => {
   }
 
   const handleOpenInstance = () => {
-    if(appStore.currentWorkspace.id !== space) {
-      appStore.setCurrentWorkspace(space);
+    if(appStore.currentSpace.id !== space) {
+      appStore.setCurrentSpace(space);
     }
     history.push(`/instances/${instance.id}`);
   };

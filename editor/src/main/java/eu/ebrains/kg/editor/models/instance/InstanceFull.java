@@ -3,7 +3,7 @@ package eu.ebrains.kg.editor.models.instance;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.editor.constants.EditorConstants;
-import eu.ebrains.kg.editor.models.workspace.StructureOfIncomingLink;
+import eu.ebrains.kg.editor.models.space.StructureOfIncomingLink;
 
 import java.util.List;
 import java.util.Map;
@@ -14,12 +14,12 @@ public class InstanceFull extends InstanceSummary {
     public InstanceFull(
             @JsonProperty("@id") String kgId,
             @JsonProperty("@type") List<String> kgType,
-            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgWorkspace,
+            @JsonProperty(EditorConstants.VOCAB_SPACE) String kgSpace,
             @JsonProperty(EditorConstants.VOCAB_PERMISSIONS) List<String> kgPermissions,
             @JsonProperty(EditorConstants.VOCAB_ALTERNATIVE) Map<String, List<Alternative>> kgAlternatives,
             @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) Map<String,  List<IncomingLink>> kgIncomingLinks
     ){
-        super(kgId, kgType, kgWorkspace, kgPermissions);
+        super(kgId, kgType, kgSpace, kgPermissions);
         this.alternatives = kgAlternatives;
         this.incomingLinks = kgIncomingLinks;
     }

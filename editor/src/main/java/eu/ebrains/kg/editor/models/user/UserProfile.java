@@ -28,7 +28,7 @@ public class UserProfile extends UserSummary {
     private final String familyName;
     private final String email;
     private Boolean isCurator;
-    private List<Workspace> workspaces;
+    private List<Space> spaces;
 
     public String getGivenName() {
         return givenName;
@@ -50,11 +50,11 @@ public class UserProfile extends UserSummary {
         isCurator = curator;
     }
 
-    public List<Workspace> getWorkspaces() {
-        return workspaces;
+    public List<Space> getSpaces() {
+        return spaces;
     }
 
-    public void setWorkspaces(List<Workspace> workspaces) {
-        this.workspaces = workspaces;
+    public void setSpaces(List<Space> spaces) {
+        this.spaces = spaces;
     }
 }

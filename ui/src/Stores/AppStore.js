@@ -27,13 +27,13 @@ themes[BrightTheme.name] = BrightTheme;
 themes[CupcakeTheme.name] = CupcakeTheme;
 
 const getLinkedInstanceIds = (instanceStore, instanceIds) => {
-  //window.console.log("list: ", instanceIds);
   const result = instanceIds.reduce((acc, id) => {
     const instance = instanceStore.instances.get(id);
     if (instance) {
       const linkedIds = instance.linkedIds;
-      //window.console.log(id, linkedIds);
-      acc.push(...linkedIds);
+      if(linkedIds) {
+        acc.push(...linkedIds);
+      }
     }
     return acc;
   }, []);

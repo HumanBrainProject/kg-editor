@@ -264,8 +264,10 @@ const getChildrenIdsGroupedByField = fields => {
   function getNestedFields(fields) {
     return fields.reduce((acc, rowFields) => {
       acc.push(...Object.values(rowFields).reduce((acc2, field) => {
-        const groups = getGroups(field);
-        acc2.push(...groups);
+        Object.values(field).forEach(f => {
+          const groups = getGroups(f);
+          acc2.push(...groups);
+        });
         return acc2;
       }, []));
       return acc;

@@ -54,7 +54,7 @@ public class StructureOfType {
     private final String name;
     private final String color;
     private final String labelField;
-    private final Boolean embeddedOnly;
+    private Boolean embeddedOnly;
     private final Map<String, StructureOfField> fields;
     private final List<String> promotedFields;
     private final Map<String, StructureOfIncomingLink> incomingLinks;
@@ -78,6 +78,10 @@ public class StructureOfType {
     public String getLabelField() { return labelField; }
 
     public Boolean getEmbeddedOnly() { return embeddedOnly; }
+
+    public void setEmbeddedOnly(Boolean embeddedOnly) {
+        this.embeddedOnly = embeddedOnly;
+    }
 
     public Map<String, StructureOfField> getFields() {
         return fields;

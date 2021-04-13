@@ -25,6 +25,16 @@ public class WorkspaceController {
         List<StructureOfType> workspaceTypes = workspaceClient.getWorkspaceTypes(workspace);
         Map<String, StructureOfType> typesMap = workspaceTypes.stream().collect(Collectors.toMap(StructureOfType::getName, v -> v));
         getNestedTypes(typesMap, workspaceTypes);
+        HashSet<String> workspaceTypesName = new HashSet<>();
+        workspaceTypes.forEach(w -> workspaceTypesName.add(w.getName()));
+        typesMap.values().forEach(v -> {
+            if (!workspaceTypesName.contains(v.getName())) {
+                if(!v.getEmbeddedOnly()) {
+                    v.setEmbeddedOnly(true);
+                }
+                workspaceTypes.add(v);
+            }
+        });
         getIncomingLinksTypes(workspaceTypes, typesMap);
         workspaceTypes.sort(Comparator.comparing(StructureOfType::getLabel));
         return workspaceTypes;

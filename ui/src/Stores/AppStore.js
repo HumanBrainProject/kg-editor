@@ -379,7 +379,7 @@ export class AppStore{
           this.clearViews();
           this.rootStore.browseStore.clearInstancesFilter();
         } else {
-          return;
+          return false;
         }
       } else if(this.rootStore.viewStore.views.size > 0) {
         this.clearViews();

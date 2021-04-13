@@ -18,9 +18,6 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
-import uniqueId from "lodash/uniqueId";
 
 import { useStores } from "../../../Hooks/UseStores";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -46,7 +43,10 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
 
   const handleLinkFrom = space => {
     if(appStore.currentWorkspace.id !== space) {
-      appStore.setCurrentWorkspace(space);
+      const changeWorkspace = appStore.setCurrentWorkspace(space);
+      if(!changeWorkspace) {
+        return;
+      }
     }
     history.push("/browse");
     browseStore.selectItem(type);
@@ -55,11 +55,9 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
   return(
     <React.Fragment>
       {spaces.map(space => (
-        <OverlayTrigger key={`${space}-${type.label}`} placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{`In space ${space}`}</Tooltip>}>
-          <Button className={classes.btn}  onClick={() => handleLinkFrom(space)} variant="outline-secondary">
-            <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;<span>{type.label}</span>
-          </Button>
-        </OverlayTrigger>
+        <Button key={`${space}-${type.label}`} className={classes.btn}  onClick={() => handleLinkFrom(space)} variant="outline-secondary">
+          <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="workspace"><i>({space})</i></strong></span>
+        </Button>
       ))}
     </React.Fragment>
   );

@@ -71,7 +71,7 @@ const App = observer(() => {
   const handleKeyDown = e => {
     if ((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84) {
       appStore.toggleTheme();
-    } else if (e.altKey && e.keyCode === 70) { // alt+f, browse
+    } else if (e.altKey && e.shiftKey && e.keyCode === 70) { // alt+shift+f, browse
       history.push("/browse");
     } else if (e.altKey && e.keyCode === 78) { // alt+n, new
       const uuid = _.uuid();

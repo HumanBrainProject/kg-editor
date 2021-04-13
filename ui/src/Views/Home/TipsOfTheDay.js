@@ -80,7 +80,7 @@ const TipsOfTheDay = () => {
 
   const tips = [
     <span key="1">press <span className="kbd">Alt</span> + <span className="kbd">d</span> to show the dashboard.</span>,
-    <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">f</span> to browse the instances.</span>,
+    <span key="2">press <span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">f</span> to browse the instances.</span>,
     <span key="3">press <span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</span>,
     <span key="4">press <span className="kbd">Alt</span> + <span className="kbd">n</span> to create a new instance.</span>,
     <span key="5">press <span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</span>,

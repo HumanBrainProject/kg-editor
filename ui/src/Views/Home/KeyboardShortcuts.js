@@ -61,7 +61,7 @@ const KeyboardShortcuts = () => {
       <h3>Keyboard shortcuts</h3>
       <ul>
         <li><span className="kbd">Alt</span> + <span className="kbd">d</span> show dashboard.</li>
-        <li><span className="kbd">Alt</span> + <span className="kbd">f</span> browse the instances.</li>
+        <li><span className="kbd">Alt</span> + <span className="kbd">Shift</span> + <span className="kbd">f</span> browse the instances.</li>
         <li><span className="kbd">Ctrl</span> + click to open an instance in a new background tab.</li>
         <li><span className="kbd">Alt</span> + <span className="kbd">n</span> create a new instance.</li>
         <li><span className="kbd">Alt</span> + <span className="kbd">w</span> to close current tab.</li>

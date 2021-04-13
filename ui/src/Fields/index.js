@@ -17,6 +17,7 @@
 import InputText from "./InputText/InputText";
 import InputNumber from "./InputNumber/InputNumber";
 import TextArea from "./TextArea/TextArea";
+import InputColor from "./InputColor/InputColor";
 import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
 import DynamicTable from "./DynamicTable/DynamicTable";
 import CheckBox from "./CheckBox/CheckBox";
@@ -61,6 +62,10 @@ export const fieldsMapping = {
   "InputNumberMultiple":  {
     Component: InputNumberMultiple,
     Store: InputNumberMultipleStore
+  },
+  "InputColor": {
+    Component: InputColor,
+    Store: InputTextStore
   },
   "TextArea": {
     Component: TextArea,

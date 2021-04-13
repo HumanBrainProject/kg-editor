@@ -97,9 +97,11 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
   };
 
   const handleOnAddValue = value => {
-    const val = parseFloat(value);
-    if(val) {
-      fieldStore.addValue(value);
+    if(value !== undefined && value !== null) {
+      const val = parseFloat(value);
+      if(!isNaN(val)) {
+        fieldStore.addValue(value);
+      }
     }
   };
 

@@ -161,7 +161,7 @@ class InputNumberMultipleStore extends FieldStore {
   }
 
   insertValue(value, index) {
-    if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
+    if(value !== undefined && value !== null && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
         this.value.splice(index, 0, value);
       } else {

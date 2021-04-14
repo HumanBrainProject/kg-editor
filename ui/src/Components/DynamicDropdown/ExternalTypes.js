@@ -1,34 +1,72 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Button from "react-bootstrap/Button";
 
 const useStyles = createUseStyles({
   container: {
-    margin: "6px",
-    backgroundColor: "rgba(255, 226, 20, 0.6)",
+    marginLeft: "5px",
     borderRadius: "5px",
-    padding: "3px 12px"
+    paddingRight: "12px",
+    paddingLeft: "12px"
+  },
+  info: {
+    backgroundColor: "rgba(255, 226, 20, 0.6)",
+    padding: "5px",
+    marginTop: "2px",
+    cursor: "pointer"
+  },
+  create: {
+    paddingBottom: "5px"
   }
 });
 
-const ExternalTypes = ({types}) => (
+const ExternalTypes = ({types, onExternalCreate}) => (
   <React.Fragment>
-    {types.map(type => <ExternalType key={type.name} type={type} />)}
+    {types.map(type => <ExternalType key={type.name} type={type} onExternalCreate={onExternalCreate}/>)}
   </React.Fragment>
 );
 
-const ExternalType = ({ type }) => {
+const ExternalType = ({ type, onExternalCreate }) => {
 
   const classes = useStyles();
-  const types = type.space.join(", or ");
+
+  return (
+    <div className={classes.container}>
+      {type.spaces.map(space => (
+        <Space key={space.id} space={space} type={type} onExternalCreate={onExternalCreate} />
+      ))}
+    </div>
+  );
+};
+
+const Space = ({space, type, onExternalCreate}) => {
+
+  const classes = useStyles();
+
   const style = type.color ? { color: type.color } : {};
 
-  return(
-    <div className={classes.container}>
-      <em>New instance of type <span style={style}>
+  const handleOnCreate = () => onExternalCreate(space.name, type.name);
+
+  if (space.permissions.canCreate) {
+    return (
+      <div className={classes.create}>
+        <Button variant="primary" size="sm" onClick={handleOnCreate}>
+          <em>Create an instance of type <span style={style}>
+            <FontAwesomeIcon fixedWidth icon="circle" />
+          </span>
+          {type.label} in space <strong>{space.name}</strong></em>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.info}>
+      <em>You are not allowed to create an instance of type <span style={style}>
         <FontAwesomeIcon fixedWidth icon="circle" />
       </span>
-      {type.label} could only be created in space <strong>{types}</strong></em>
+      {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>
     </div>
   );
 };

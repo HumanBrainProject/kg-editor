@@ -28,6 +28,7 @@ import InstanceInvite from "./InstanceInvite";
 import InstanceGraph from "./InstanceGraph";
 import InstanceRelease from "./InstanceRelease";
 import InstanceManage from "./InstanceManage";
+import ExternalCreateModal from "../ExternalCreateModal";
 import SaveBar from "./SaveBar";
 import Tabs from "./Tabs";
 import BGMessage from "../../Components/BGMessage";
@@ -227,6 +228,7 @@ const Instance = observer(({ instance, mode }) =>  {
           </React.Fragment>
         )}
       </div>
+      <ExternalCreateModal />
     </React.Fragment>
   );
 });

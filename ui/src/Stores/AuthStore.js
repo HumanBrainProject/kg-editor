@@ -14,7 +14,7 @@
 *   limitations under the License.
 */
 
-import { observable, computed, action, runInAction, makeObservable } from "mobx";
+import { observable, computed, action, runInAction, makeObservable, toJS } from "mobx";
 import * as Sentry from "@sentry/browser";
 
 const rootPath = window.rootPath || "";
@@ -85,6 +85,14 @@ export class AuthStore {
 
   get spaces() {
     return this.hasSpaces ? this.user.spaces: [];
+  }
+
+  getSpaceInfo(id) {
+    const space = this.spaces.find(us => us.id === id);
+    if (space) {
+      return toJS(space);
+    }
+    return {id: id, name: id, permissions: {}};
   }
 
   get firstName() {

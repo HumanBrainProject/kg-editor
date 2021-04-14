@@ -58,6 +58,7 @@ export class TypeStore {
 
   async fetch(forceFetch=false) {
     if (!this.isFetching && (!this.types.length || !!forceFetch)) {
+      this.types = [];
       this.isFetching = true;
       this.fetchError = null;
       try {
@@ -72,6 +73,7 @@ export class TypeStore {
           const message = e.message ? e.message : e;
           this.fetchError = `Error while fetching types (${message})`;
           this.isFetching = false;
+          this.types = [];
         });
       }
     }

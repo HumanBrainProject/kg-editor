@@ -16,6 +16,7 @@
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import { matchPath } from "react-router-dom";
+import _ from "lodash-uuid";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -43,6 +44,7 @@ const getLinkedInstanceIds = (instanceStore, instanceIds) => {
 export class AppStore{
   globalError = null;
   currentSpace = null;
+  savePercentage = null;
   initializingMessage = null;
   initializationError = null;
   initialInstanceError = null;
@@ -52,6 +54,7 @@ export class AppStore{
   _currentThemeName = DefaultTheme.name;
   historySettings = null;
   showSaveBar = false;
+  externalCreateModal = false;
   instanceToDelete = null;
   isDeletingInstance = false;
   deleteInstanceError = null;
@@ -64,8 +67,10 @@ export class AppStore{
 
   constructor(transportLayer, rootStore) {
     makeObservable(this, {
+      externalCreateModal: observable,
       globalError: observable,
       currentSpace: observable,
+      savePercentage: observable,
       setCurrentSpace: action,
       initializingMessage: observable,
       initializationError: observable,
@@ -112,6 +117,9 @@ export class AppStore{
       toggleReleasedFlagHistorySetting: action,
       setTheme: action,
       toggleTheme: action,
+      createExternalInstance: action,
+      updateExternalInstanceModal: action,
+      clearExternalCreateModal: action
     });
 
     this.transportLayer = transportLayer;
@@ -139,6 +147,33 @@ export class AppStore{
       };
     }
     this.historySettings = savedHistorySettings;
+  }
+
+  async createExternalInstance(space, typeName, value) {
+    if (this.rootStore.instanceStore.hasUnsavedChanges) {
+      this.externalCreateModal = {space: space, type: typeName, value: value};
+    } else {
+      this.externalCreateModal = null;
+      await this.setCurrentSpace(space);
+      const type = this.rootStore.typeStore.typesMap.get(typeName);
+      const uuid = _.uuid();
+      this.rootStore.instanceStore.createNewInstance(type, uuid, value);
+      this.rootStore.history.push(`/instances/${uuid}/create`);
+    }
+  }
+
+  updateExternalInstanceModal(toSave=null) {
+    if (toSave) {
+      this.externalCreateModal.toSave = toSave;
+      this.externalCreateModal.saved = 0;
+    } else {
+      this.externalCreateModal.saved += 1;
+    }
+    this.savePercentage = Math.round(this.externalCreateModal.saved/this.externalCreateModal.toSave*100);
+  }
+
+  clearExternalCreateModal() {
+    this.externalCreateModal = null;
   }
 
   async initialize() {
@@ -367,7 +402,7 @@ export class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  setCurrentSpace = selectedSpace => {
+  async setCurrentSpace(selectedSpace) {
     let space = selectedSpace?this.rootStore.authStore.spaces.find( w => w.id === selectedSpace):null;
     if (!space && this.rootStore.authStore.hasSpaces && this.rootStore.authStore.spaces.length === 1) {
       space = this.rootStore.authStore.spaces[0];
@@ -389,13 +424,13 @@ export class AppStore{
       if (this.currentSpace) {
         localStorage.setItem("space", space.id);
         this.rootStore.viewStore.restoreViews();
-        this.rootStore.typeStore.fetch(true);
+        await this.rootStore.typeStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       } else {
         localStorage.removeItem("space");
       }
     }
-  };
+  }
 
   toggleSavebarDisplay = state => {
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;

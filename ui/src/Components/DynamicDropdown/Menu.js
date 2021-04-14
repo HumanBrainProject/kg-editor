@@ -73,6 +73,7 @@ const Menu = ({ types,
   onAddNewValue,
   onAddValue,
   onCancel,
+  onExternalCreate,
   onLoadMore,
   onPreview,
   onSelectNextType,
@@ -97,7 +98,7 @@ const Menu = ({ types,
               <em>No results found for: </em> <strong>{searchTerm}</strong>
             </Dropdown.Item>)
         }
-        <ExternalTypes types={externalTypes} />
+        <ExternalTypes types={externalTypes} onExternalCreate={onExternalCreate}/>
         <NewValues value={searchTerm} types={types} currentType={currentType} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onCancel}/>
         <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
         {loading?

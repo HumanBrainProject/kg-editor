@@ -98,7 +98,6 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
   }
 
   const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
-
   return (
     <Form className={`${classes.container} ${className}`} >
       {fields.map(name => {

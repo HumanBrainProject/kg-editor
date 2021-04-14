@@ -58,7 +58,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const classes = useStyles();
 
-  const { typeStore, instanceStore } = useStores();
+  const { typeStore, instanceStore, appStore } = useStores();
 
   const draggedValue = useRef();
   const formGroupRef = useRef();
@@ -120,6 +120,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     setTimeout(() => view.setInstanceHighlight(id, fieldStore.label), 1000);
     instanceStore.togglePreviewInstance();
   };
+
+  const handleOnExternalCreate = (space, type) => appStore.createExternalInstance(space, type, optionsSearchTerm);
 
   const handleSelectAlternative = value => {
     const values = value.map(v => ({[fieldStore.mappingValue]: v.id}));
@@ -289,6 +291,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             onLoadMore={handleLoadMoreOptions}
             onReset={handleDropdownReset}
             onAddValue={handleOnAddValue}
+            onExternalCreate={handleOnExternalCreate}
             onAddNewValue={handleOnAddNewValue}
             onDeleteLastValue={handleDeleteLastValue}
             onDrop={dropValue}

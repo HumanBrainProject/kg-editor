@@ -318,17 +318,22 @@ class LinksStore extends FieldStore {
           if(type.space.includes(this.instance.space)) {
             this.optionsTypes.push(type);
           } else {
-            this.optionsExternalTypes.push(type);
+            this.optionsExternalTypes.push({
+              ...type,
+              spaces: type.space.map(id => this.rootStore.authStore.getSpaceInfo(id))
+            });
           }
         });
         this.optionsCurrentTotal = total;
         this.fetchingOptions = false;
       });
     } catch(e) {
-      this.options = [];
-      this.optionsCurrentTotal = 0;
-      this.optionsTypes = [];
-      this.optionsExternalTypes = [];
+      runInAction(()=>{
+        this.options = [];
+        this.optionsCurrentTotal = 0;
+        this.optionsTypes = [];
+        this.optionsExternalTypes = [];
+      });
     }
   }
 

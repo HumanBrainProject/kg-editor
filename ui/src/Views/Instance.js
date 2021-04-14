@@ -64,7 +64,7 @@ const Instance = observer(({ match, mode }) => {
     viewStore.selectViewByInstanceId(id);
     const instance = instanceStore.instances.get(id);
     if (instance && instance.isFetched) {
-      if (mode === "create") {
+      if (mode === "create" && !instance.isNew) {
         history.replace(`/instances/${id}/edit`);
       }
     } else {

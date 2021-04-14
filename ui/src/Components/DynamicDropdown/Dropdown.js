@@ -33,7 +33,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onAddValue, onAddNewValue, onDeleteLastValue, onLoadMore, onDrop, onPreview }) => {
+const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onAddValue, onExternalCreate, onAddNewValue, onDeleteLastValue, onLoadMore, onDrop, onPreview }) => {
 
   const classes = useStyles();
 
@@ -219,6 +219,7 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
           onLoadMore={onLoadMore}
           onAddNewValue={handleOnAddNewValue}
           onAddValue={handleOnAddValue}
+          onExternalCreate={onExternalCreate}
           onSelectNextType={handleOnSelectNextType}
           onSelectPreviousType={handleOnSelectPreviousType}
           onSelectNextValue={handleOnSelectNextValue}

@@ -94,7 +94,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const classes = useStyles();
 
-  const { typeStore, instanceStore } = useStores();
+  const { typeStore, instanceStore, authStore, appStore } = useStores();
 
   const {
     instance,
@@ -150,6 +150,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     }, 1000);
     instanceStore.togglePreviewInstance();
   };
+
+  const handleOnExternalCreate = (space, type) => appStore.createExternalInstance(space, type, optionsSearchTerm);
 
   const handleDeleteAll = () => {
     fieldStore.setValues([]);
@@ -253,6 +255,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
               searchTerm={optionsSearchTerm}
               options={options}
               types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
+              spaces={authStore.spaces}
               externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
               loading={fetchingOptions}
               hasMore={hasMoreOptions}
@@ -263,6 +266,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
               onAddValue={handleOnAddValue}
               onAddNewValue={handleOnAddNewValue}
               onPreview={handleOptionPreview}
+              onExternalCreate={handleOnExternalCreate}
             />
           </div>
         )}

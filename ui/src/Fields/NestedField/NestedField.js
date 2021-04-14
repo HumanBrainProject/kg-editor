@@ -74,12 +74,12 @@ const useStyles = createUseStyles({
     fontSize: "0.9em",
     lineHeight: "27px",
     textAlign: "center",
-    backgroundColor: "var(--button-primary-bg-color)",
+    backgroundColor: "var(--button-secondary-bg-color)",
     color: "var(--ft-color-loud)",
     cursor: "pointer",
     width: "25px",
     "&:hover": {
-      backgroundColor: "var(--button-primary-active-bg-color)",
+      backgroundColor: "var(--button-secondary-active-bg-color)",
     },
     "&:first-child": {
       borderRadius: "4px 0 0 4px"

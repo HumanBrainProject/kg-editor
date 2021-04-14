@@ -35,6 +35,14 @@ const theme = {
         backgroundColor: "#0069d9",
         borderColor: "#0062cc"
       }
+    },
+    secondary: {
+      backgroundColor: "#6c757d",
+      borderColor: "#6c757d",
+      active: {
+        backgroundColor: "#545b62",
+        borderColor: "#4e555b"
+      }
     }
   },
   contrast1: {

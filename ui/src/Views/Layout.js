@@ -52,6 +52,11 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
         "--button-primary-active-bg-color": theme.button.primary.active.backgroundColor,
         "--button-primary-active-border-color": theme.button.primary.active.borderColor,
 
+        "--button-secondary-bg-color": theme.button.secondary.backgroundColor,
+        "--button-secondary-border-color": theme.button.secondary.borderColor,
+        "--button-secondary-active-bg-color": theme.button.secondary.active.backgroundColor,
+        "--button-secondary-active-border-color": theme.button.secondary.active.borderColor,
+
         "--border-color-ui-contrast1": theme.contrast1.borderColor,
         "--border-color-ui-contrast2": theme.contrast2.borderColor,
         "--border-color-ui-contrast5": theme.contrast5.borderColor,

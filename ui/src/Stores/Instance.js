@@ -534,6 +534,9 @@ export class Instance {
           field.globalLabelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
           field.globalLabelTooltipIcon = "globe";
         }
+        if(field.fullyQualifiedName === "https://openminds.ebrains.eu/vocab/displayColor") {
+          field.widget = "InputColor";
+        }
         if (!this.fields[name]) {
           if (!field.widget) {
             warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;

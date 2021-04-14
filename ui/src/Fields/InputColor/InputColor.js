@@ -19,6 +19,8 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Color from "color";
 import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Label from "../Label";
 import Invalid from "../Invalid";
@@ -26,8 +28,11 @@ import Invalid from "../Invalid";
 const useStyles = createUseStyles({
   label: {},
   inputColor: {
+    display: "inline-block",
     width: "revert",
-    padding: "0"
+    padding: "0",
+    minWidth: "70px",
+    paddingRight: "25px"
   },
   blockColor: {
     display: "inline-block",
@@ -41,6 +46,18 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: "var(--ft-color-warn)"
+  },
+  addColorBtn: {
+    fontSize: "x-small",
+    marginLeft: "4px"
+  },
+  removeColorBtn: {
+    display: "inline-block",
+    borderRadius: "50px",
+    padding: "2px 5px",
+    fontSize: "xx-small",
+    marginTop: "-15px",
+    marginLeft: "-23px"
   }
 });
 
@@ -65,8 +82,19 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
 
   const handleChange = e => fieldStore.setValue(e.target.value);
 
+  const handleAddColor = () => fieldStore.setValue("#000");
+
+  const handleRemoveColor = () => fieldStore.setValue(null);
+
   if(readMode){
-    if(!value && !showIfNoValue) {
+    if(!value) {
+      if (showIfNoValue) {
+        return (
+          <Form.Group className={`${classes.readMode} ${className}`}>
+            <Label className={classes.label} label={label} />
+          </Form.Group>
+        );
+      }
       return null;
     }
 
@@ -81,6 +109,17 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
     );
   }
 
+  if (!value) {
+    return (
+      <Form.Group className={className}>
+        <Label className={classes.label} label={label} />
+        <Button className={classes.addColorBtn} size="small" variant="primary" onClick={handleAddColor} title="Set color" >
+          <FontAwesomeIcon icon="plus"/>
+        </Button>
+      </Form.Group>
+    );
+  }
+
   const isDisabled = returnAsNull;
   const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
   const warningMessages = fieldStore.warningMessages;
@@ -88,15 +127,20 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
-      <Form.Control
-        value={value}
-        type="color"
-        as="input"
-        onChange={handleChange}
-        disabled={isDisabled}
-        rows={rows}
-        className={`${classes.inputColor} ${hasWarning && hasWarningMessages?classes.warning:""}`}
-      />
+      <div>
+        <Form.Control
+          value={value}
+          type="color"
+          as="input"
+          onChange={handleChange}
+          disabled={isDisabled}
+          rows={rows}
+          className={`${classes.inputColor} ${hasWarning && hasWarningMessages?classes.warning:""}`}
+        />
+        <Button className={classes.removeColorBtn} size="small" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
+          <FontAwesomeIcon icon="times"/>
+        </Button>
+      </div>
       {hasWarning && hasWarningMessages &&
         <Invalid  messages={warningMessages}/>
       }

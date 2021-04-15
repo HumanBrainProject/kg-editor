@@ -29,9 +29,9 @@ const useStyles = createUseStyles({
 
 
 const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, onSelect, onCancel}) => (
-  <React.Fragment>
+  <>
     {types.map(type => <NewValue type={type} key={type.name} value={value} onSelectNext={onSelectNext} onSelectPrevious={onSelectPrevious} onSelect={onSelect} onCancel={onCancel} hasFocus={currentType === type.name} />)}
-  </React.Fragment>
+  </>
 );
 
 const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel }) => {

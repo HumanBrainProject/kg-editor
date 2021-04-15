@@ -99,30 +99,30 @@ const Tabs = observer(() => {
         <span>Knowledge Graph Editor</span>
       </div>
       {!appStore.globalError &&
-        <React.Fragment>
+        <>
           <div className={classes.fixedTabsLeft}>
             {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasSpaces && appStore.currentSpace?
-              <React.Fragment>
+              <>
                 <SpaceSelector />
                 <Tab icon={"home"} current={matchPath(currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                 <Tab icon={"search"} current={matchPath(currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
                 {appStore.currentSpacePermissions.canCreate && (
                   <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
                 )}
-              </React.Fragment>
+              </>
               : null
             }
           </div>
           <InstanceTabs pathname={currentLocationPathname} />
           <div className={classes.fixedTabsRight}>
             {authStore.isAuthenticated && authStore.isUserAuthorized && (
-              <React.Fragment>
+              <>
                 <Tab icon={"question-circle"} current={matchPath(currentLocationPathname, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
                 <UserProfileTab className={classes.userProfileTab} size={32} />
-              </React.Fragment>
+              </>
             )}
           </div>
-        </React.Fragment>
+        </>
       }
     </div>
   );

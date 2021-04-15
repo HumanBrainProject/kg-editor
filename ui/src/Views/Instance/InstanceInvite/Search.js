@@ -261,16 +261,16 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
               <div className={classes.footerPanel} >
                 <div>
                   { userStore.isFetchingSearch && (
-                    <React.Fragment>
+                    <>
                       <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; fetching...
-                    </React.Fragment>
+                    </>
                   )}
                 </div>
                 <div className={classes.searchCount}>
                   { showTotalSearchCount && (
-                    <React.Fragment>
+                    <>
                       {userStore.totalSearchCount} user{`${userStore.totalSearchCount !== 0?"s":""} found`}
-                    </React.Fragment>
+                    </>
                   )}
                 </div>
               </div>

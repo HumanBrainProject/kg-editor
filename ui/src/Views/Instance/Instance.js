@@ -201,7 +201,7 @@ const Instance = observer(({ instance, mode }) =>  {
   const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
 
   return (
-    <React.Fragment>
+    <>
       <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
         <Tabs mode={mode} instance={instance} />
         <div className={classes.body}>
@@ -213,7 +213,7 @@ const Instance = observer(({ instance, mode }) =>  {
       </div>
       <div className={`${classes.previewPanel} ${previewInstance?"show":""}`}>
         {previewInstance && (
-          <React.Fragment>
+          <>
             <h3>Preview</h3>
             <Preview instanceId={previewInstance.id}
               instanceName={previewInstance.name}
@@ -225,11 +225,11 @@ const Instance = observer(({ instance, mode }) =>  {
             <div className={classes.closePreviewBtn} title="close preview" onClick={handleHidePreview}>
               <FontAwesomeIcon icon={"times"} />
             </div>
-          </React.Fragment>
+          </>
         )}
       </div>
       <ExternalCreateModal />
-    </React.Fragment>
+    </>
   );
 });
 Instance.displayName = "Instance";

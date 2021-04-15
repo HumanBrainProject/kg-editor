@@ -197,11 +197,11 @@ const InstanceManage = observer(({instance}) => {
                   <Button variant="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
                 </div>
                 : !status || !status.isFetched ?
-                  <React.Fragment>
+                  <>
                     <FontAwesomeIcon icon={"circle-notch"} spin />&nbsp;&nbsp;Fetching instance release status
-                  </React.Fragment>
+                  </>
                   :
-                  <React.Fragment>
+                  <>
                     {status.data !== "UNRELEASED" ?
                       <ul>
                         <li>This instance has been released and therefore cannot be deleted.</li>
@@ -215,7 +215,7 @@ const InstanceManage = observer(({instance}) => {
                     <Button variant={"danger"} onClick={handleDeleteInstance} disabled={status.data !== "UNRELEASED"} >
                       <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
                     </Button>
-                  </React.Fragment>
+                  </>
               }
             </div>
           )}

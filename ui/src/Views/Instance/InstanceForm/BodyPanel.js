@@ -62,12 +62,12 @@ const NoPermissionForView = observer(({ instance, mode }) => {
   const classes = useStyles();
 
   return (
-    <React.Fragment>
+    <>
       <Label className={classes.label} label="Name" />{instance.name}
       <div className={classes.errorMessage}>
         <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
       </div>
-    </React.Fragment>
+    </>
   );
 });
 NoPermissionForView.displayName = "NoPermissionForView";

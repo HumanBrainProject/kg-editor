@@ -61,7 +61,7 @@ const Links = observer(({ instanceId }) => {
   const index = path.findIndex(id => id === instanceId);
   const childInstanceId = (index >=0 && path.length>index+1)?path[index+1]:null;
   return (
-    <React.Fragment>
+    <>
       <Pane className={classes.pane} paneId={paneId}>
         {groups.map(group => (
           <div key={group.label} data-provenance={group.label}>
@@ -76,7 +76,7 @@ const Links = observer(({ instanceId }) => {
         ))}
       </Pane>
       {childInstanceId && <DecoratedLinks instanceId={childInstanceId} />}
-    </React.Fragment>
+    </>
   );
 });
 Links.displayName = "Links";

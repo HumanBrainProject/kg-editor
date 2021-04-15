@@ -133,9 +133,9 @@ const BookmarkStatus = observer(class BookmarkStatus extends React.Component {
             iconComponent={FontAwesomeIcon}
             iconProps={{icon: "question-circle"}}
             okComponent={() => (
-              <React.Fragment>
+              <>
                 <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
-              </React.Fragment>
+              </>
             )}
             onOk={this.handleFetchRetry}
           >
@@ -154,15 +154,15 @@ const BookmarkStatus = observer(class BookmarkStatus extends React.Component {
             iconComponent={FontAwesomeIcon}
             iconProps={{icon: "exclamation-triangle"}}
             okComponent={() => (
-              <React.Fragment>
+              <>
                 <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
-              </React.Fragment>
+              </>
             )}
             onOk={this.handleSaveRetry}
             cancelComponent={() => (
-              <React.Fragment>
+              <>
                 <FontAwesomeIcon icon="undo-alt"/>&nbsp;Revert
-              </React.Fragment>
+              </>
             )}
             onCancel={this.handleSaveCancel}
           >

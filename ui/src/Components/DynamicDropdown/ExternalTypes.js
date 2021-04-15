@@ -22,9 +22,9 @@ const useStyles = createUseStyles({
 });
 
 const ExternalTypes = ({types, onExternalCreate}) => (
-  <React.Fragment>
+  <>
     {types.map(type => <ExternalType key={type.name} type={type} onExternalCreate={onExternalCreate}/>)}
-  </React.Fragment>
+  </>
 );
 
 const ExternalType = ({ type, onExternalCreate }) => {

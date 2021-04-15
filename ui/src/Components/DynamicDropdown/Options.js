@@ -46,7 +46,7 @@ const useStyles = createUseStyles({
 });
 
 const Options = ({values, current, onSelectNext, onSelectPrevious, onSelect, onCancel, onPreview}) => (
-  <React.Fragment>
+  <>
     {values.map(value =>
       <Option value={value}
         key={value.id}
@@ -57,7 +57,7 @@ const Options = ({values, current, onSelectNext, onSelectPrevious, onSelect, onC
         onPreview={onPreview}
         hasFocus={current === value.id}/>
     )}
-  </React.Fragment>
+  </>
 );
 
 const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel, onPreview }) => {

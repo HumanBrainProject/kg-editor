@@ -81,14 +81,14 @@ const SavingModal = observer(() => {
           label={`${releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}%`} />
         <div className={classes.absoluteProgress}>{releaseStore.savingProgress} / {releaseStore.savingTotal}</div>
         {releaseStore.savingProgress !== releaseStore.savingTotal?
-          <React.Fragment>
+          <>
             <div className={classes.lastEndedInstance}>
               {releaseStore.savingLastEndedNode && releaseStore.savingLastEndedNode.label}
             </div>
             <div className={classes.lastEndedOperation}>
               {releaseStore.savingLastEndedRequest}
             </div>
-          </React.Fragment>
+          </>
           :releaseStore.savingErrors.length === 0?
             <div className={classes.reloadRelease}>
               <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Reloading current instance release status

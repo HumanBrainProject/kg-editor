@@ -30,12 +30,12 @@ const useStyles = createUseStyles({
 });
 
 const LabelTooltip = ({tooltip, icon}) => (
-  <React.Fragment>
+  <>
   &nbsp;
     <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{tooltip}</Tooltip>}>
       <FontAwesomeIcon icon={icon?icon:"question-circle"}/>
     </OverlayTrigger>
-  </React.Fragment>
+  </>
 );
 
 const Label = ({ className, label, labelTooltip, labelTooltipIcon, isRequired, globalLabelTooltip, globalLabelTooltipIcon }) => {

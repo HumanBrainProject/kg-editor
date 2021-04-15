@@ -58,10 +58,10 @@ const InstanceInvite = observer(({ instance: { id, permissions} }) => {
     <div className={classes.container}>
       <div className={classes.panel}>
         {permissions.canInviteForSuggestion?
-          <React.Fragment>
+          <>
             <Preview className={classes.preview} instanceId={id} showEmptyFields={false} showAction={false} showBookmarkStatus={false} showType={true} showStatus={false} showMetaData={false} />
             {/* <Reviewers id={this.props.id} /> */}
-          </React.Fragment>
+          </>
           :
           <BGMessage icon={"ban"} className={classes.error}>
               You are note entitled to invite people for suggestions.

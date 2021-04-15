@@ -264,7 +264,7 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
         className={`${classes.container} ${selected ? "selected" : ""} ${edited ? "edited" : ""} ${bookmarkStore.isFetching ? "disabled" : ""}`}
         onClick={this.handleSelect}
         onMouseLeave={this.handelCancelActions} >
-        <React.Fragment>
+        <>
           <FontAwesomeIcon icon={"star"} className={`${classes.icon} ${classes.bookmarkIcon}`} />
           {edited && !bookmark.updateError && !bookmark.deleteError ?
             <div className={classes.editBookmark}>
@@ -288,15 +288,15 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
               iconComponent={FontAwesomeIcon}
               iconProps={{ icon: "exclamation-triangle" }}
               okComponent={() => (
-                <React.Fragment>
+                <>
                   <FontAwesomeIcon icon="redo-alt" />&nbsp;Retry
-                </React.Fragment>
+                </>
               )}
               onOk={this.handleEditBookmark}
               cancelComponent={() => (
-                <React.Fragment>
+                <>
                   <FontAwesomeIcon icon="undo-alt" />&nbsp;Cancel
-                </React.Fragment>
+                </>
               )}
               onCancel={this.handleRevertEditBookmark}
             >
@@ -311,15 +311,15 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
                 iconComponent={FontAwesomeIcon}
                 iconProps={{ icon: "exclamation-triangle" }}
                 okComponent={() => (
-                  <React.Fragment>
+                  <>
                     <FontAwesomeIcon icon="redo-alt" />&nbsp;Retry
-                  </React.Fragment>
+                  </>
                 )}
                 onOk={this.handleDeleteBookmark}
                 cancelComponent={() => (
-                  <React.Fragment>
+                  <>
                     <FontAwesomeIcon icon="undo-alt" />&nbsp;Cancel
-                  </React.Fragment>
+                  </>
                 )}
                 onCancel={this.handleCancelDeleteBookmark}
               >
@@ -332,7 +332,7 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
                 </div>
                 :
                 !edited && !bookmark.updateError && !bookmark.deleteError && (
-                  <React.Fragment>
+                  <>
                     <div className={classes.actions}>
                       <div className={classes.action} onClick={this.handleEditBookmark} title="rename">
                         <FontAwesomeIcon icon="pencil-alt" />
@@ -344,10 +344,10 @@ const BookmarksItem = observer(class BookmarksItem extends React.Component {
                     <div className={`${classes.deleteBookmarkDialog} ${this.state.showDeleteBookmarkDialog ? "show" : ""}`}>
                       <Button variant="danger" size="sm" onClick={this.handleDeleteBookmark}><FontAwesomeIcon icon="trash-alt" />&nbsp;Delete</Button>
                     </div>
-                  </React.Fragment>
+                  </>
                 )
           }
-        </React.Fragment>
+        </>
       </div>
     );
 

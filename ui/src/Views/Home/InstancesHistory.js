@@ -223,9 +223,9 @@ const InstancesHistory = observer(() => {
               iconComponent={FontAwesomeIcon}
               iconProps={{icon: "exclamation-triangle", className:classes.fetchErrorIcon}}
               okComponent={() => (
-                <React.Fragment>
+                <>
                   <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
-                </React.Fragment>
+                </>
               )}
               onOk={fetchInstances}
             >

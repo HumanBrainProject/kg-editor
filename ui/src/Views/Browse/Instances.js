@@ -116,12 +116,12 @@ const Instances = observer(() => {
     <div className={classes.container}>
       <div className={classes.header}>
         {browseStore.selectedItem !== null && (
-          <React.Fragment>
+          <>
             <Filter value={browseStore.instancesFilter} placeholder={`Filter instances of ${browseStore.selectedItem.label}`} onChange={handleFilterChange} />
             <div className={classes.instanceCount}>
               {browseStore.totalInstances} Result{`${browseStore.totalInstances !== 0?"s":""}`}
             </div>
-          </React.Fragment>
+          </>
         )}
       </div>
       <Scrollbars autoHide>

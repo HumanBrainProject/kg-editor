@@ -296,9 +296,6 @@ class LinksStore extends FieldStore {
   isLinkVisible = id => this.visibleLinks.has(id);
 
   async performSearchOptions(append) {
-    if(this.fetchingOptions){
-      return;
-    }
     this.fetchingOptions = true;
     this.optionsPageStart = append?this.options.length:0;
     const payload = this.instance.payload;

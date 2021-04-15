@@ -676,7 +676,7 @@ export class AppStore{
   };
 
   logout = () => {
-    if (!this.rootStore.instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
+    if (!this.rootStore.instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       this.rootStore.viewStore.flushStoredViews();
       this.rootStore.authStore.logout();
     }

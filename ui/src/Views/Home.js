@@ -245,7 +245,7 @@ const Home = () => {
       <Scrollbars autoHide>
         <div className={classes.panel}>
           <div className={classes.welcome}>
-            <h1>Welcome <span title={name}><DisplayName /></span></h1>
+            <h1>Welcome <span><DisplayName /></span></h1>
           </div>
           <div className={classes.nav}>
             <ThemeSwitcher/>

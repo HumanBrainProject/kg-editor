@@ -20,6 +20,7 @@ import { render } from "react-dom";
 
 import "react-virtualized/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+//import reportWebVitals from './reportWebVitals';
 
 import "./Services/IconsImport";
 
@@ -32,6 +33,8 @@ import App from "./Views/App";
 //   observableRequiresReaction: false,
 //   disableErrorBoundaries: false // help to debug only
 // });
+
+//reportWebVitals();
 
 render(
   <React.StrictMode>

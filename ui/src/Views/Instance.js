@@ -46,7 +46,15 @@ const useStyles = createUseStyles({
     }
   },
   error: {
-    color: "var(--ft-color-loud)"
+    padding: "20px",
+    color: "var(--ft-color-loud)",
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
+    "& button": {
+      marginTop: "20px",
+      "& + button": {
+        marginLeft: "20px"
+      }
+    }
   }
 });
 
@@ -99,16 +107,14 @@ const Instance = observer(({ match, mode }) => {
 
   if (typeStore.fetchError) {
     return (
-      <div className={classes.error}>
-        <BGMessage icon={"ban"}>
-          There was a network problem fetching the types.<br />
-          If the problem persists, please contact the support.<br />
-          <small>{typeStore.fetchError}</small><br /><br />
-          <Button variant={"primary"} onClick={handleLoadTypes}>
-            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-          </Button>
-        </BGMessage>
-      </div>
+      <BGMessage icon={"ban"} className={classes.error}>
+        There was a network problem fetching the types.<br />
+        If the problem persists, please contact the support.<br />
+        <small>{typeStore.fetchError}</small><br /><br />
+        <Button variant={"primary"} onClick={handleLoadTypes}>
+          <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+        </Button>
+      </BGMessage>
     );
   }
 
@@ -143,7 +149,7 @@ const Instance = observer(({ match, mode }) => {
 
   if (status.error || (status.isAvailable && mode !== "create")) {
     return (
-      <BGMessage icon={"ban"}>
+      <BGMessage icon={"ban"} className={classes.error}>
           There was a network problem fetching the instance.<br />
           If the problem persists, please contact the support.<br />
         <small>{status.error}</small><br /><br />

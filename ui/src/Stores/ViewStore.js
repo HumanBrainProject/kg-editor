@@ -158,7 +158,7 @@ export class ViewStore{
   syncStoredViews(){
     if (this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
-      views[this.rootStore.appStore.currentSpace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, mode: view.mode}));
+      views[this.rootStore.appStore.currentSpace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, mode: view.mode, selected:this.selectedView ? this.selectedView.instanceId === id:false}));
       localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
     }
   }
@@ -172,8 +172,18 @@ export class ViewStore{
     if(this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
       const workspaceViews = views[this.rootStore.appStore.currentSpace.id];
+      let selectedView = null;
       if (Array.isArray(workspaceViews)) {
-        workspaceViews.forEach(({id, name, color, mode}) => this.views.set(id, new View(id, name, color, mode)));
+        workspaceViews.forEach(view => {
+          if (view.selected) {
+            selectedView = view;
+          }
+          const {id, name, color, mode} = view;
+          this.views.set(id, new View(id, name, color, mode));
+        });
+      }
+      if (selectedView) {
+        selectedView.mode === "view" ? this.rootStore.history.push(`/instances/${selectedView.id}`):this.rootStore.history.push(`/instances/${selectedView.id}/${selectedView.mode}`);
       }
     }
   }

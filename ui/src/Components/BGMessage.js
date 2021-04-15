@@ -40,10 +40,10 @@ const useStyles = createUseStyles({
   }
 });
 
-const BGMessage = ({ icon, transform, children }) => {
+const BGMessage = ({ icon, transform, children, className }) => {
   const classes = useStyles();
   return(
-    <div className={classes.container}>
+    <div className={`${classes.container} ${className?className:""}`}>
       <div className={classes.icon}>
         <FontAwesomeIcon icon={icon} transform={transform}/>
       </div>

@@ -64,7 +64,7 @@ const Graph = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, graphStore } = useStores();
+  const { appStore, history, graphStore, authStore } = useStores();
 
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
 
@@ -81,12 +81,19 @@ const Graph = observer(() => {
       window.removeEventListener("resize", updateDimensions);
     };
   }, []);
+
   const handleNodeClick = node => {
     if (node.isGroup) {
       graphStore.setGrouping(node, false);
     } else if (node.id !== graphStore.mainId) {
-      if(node.space === appStore.currentSpace.id){
-        graphStore.reset();
+      graphStore.reset();
+      if(node.space !== appStore.currentSpace.id) {
+        const space = authStore.getSpaceInfo(node.space);
+        if(space.permissions.canRead) {
+          appStore.setCurrentSpace(node.space);
+          history.push(`/instances/${node.id}/graph`);
+        }
+      } else {
         history.push(`/instances/${node.id}/graph`);
       }
     }

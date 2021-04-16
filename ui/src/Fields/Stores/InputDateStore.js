@@ -18,10 +18,6 @@ import InputTextStore from "./InputTextStore";
 
 class InputDateStore extends InputTextStore {
   inputType = "date";
-
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
-  }
 }
 
 export default InputDateStore;

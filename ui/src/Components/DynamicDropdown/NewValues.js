@@ -75,6 +75,8 @@ const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSel
         onCancel();
         break;
       }
+      default:
+        break;
       }
     }
   };

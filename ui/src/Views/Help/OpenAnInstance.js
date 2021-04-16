@@ -21,18 +21,18 @@ const HelpView = () => (
     <h1>Open an instance</h1>
     <p>In the KG Editor, you can open one or multiple instances that you want to view or edit. Each opened instance will show a new tab at the top of the application.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/tabs.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/tabs.png`} alt="open instance"/>
     </p>
 
     <h2>Opening modes</h2>
     <p>From the “Browse” feature, you can chose to open an instance in different modes.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/browse-modes.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/browse-modes.png`} alt="browse modes"/>
     </p>
 
     <p>Once an instance is opened, you can switch between the different modes using the left tool bar.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/modes.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/modes.png`} alt="switch modes"/>
     </p>
 
     <h3>View mode</h3>

@@ -72,6 +72,7 @@ const getIconStatus = status => {
   case "UNRELEASED": return "unlink";
   case "HAS_CHANGED": return "pencil-alt";
   case "RELEASED": return "check";
+  default: break;
   }
   return "question";
 };
@@ -81,6 +82,7 @@ const MessageStatus = ({status}) => {
   case "UNRELEASED": return <span>This instance is <strong>not released</strong>.</span>;
   case "HAS_CHANGED": return <span>This instance is <strong>different</strong> than its released version</span>;
   case "RELEASED": return <span>This instance is <strong>released</strong></span>;
+  default: break;
   }
   return <strong>Unknown entity</strong>;
 };

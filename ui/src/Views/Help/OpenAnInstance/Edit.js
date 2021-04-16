@@ -24,23 +24,23 @@ const HelpView = () => (
     <h2>Edit a text value</h2>
     <p>You can edit text values by simply using the standards input boxes.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/text-values.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/text-values.png`} alt="text values"/>
     </p>
 
     <h2>Edit a link value</h2>
     <p>If an instance value is a link, the input box will offer you the possibility to link an instance, from the dropdown of existing instances. You can use the input area to search among those results.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/linked-values.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/linked-values.png`} alt="linked values"/>
     </p>
 
     <p>You can also remove a value by clicking on the cross near an already selected value.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/remove-value.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/remove-value.png`} alt="remove value"/>
     </p>
 
     <p>If you have to create a new instance you can do it as well, by entering the name in the input area and use the “Add a value” option in the dropdown list. KG Editor will then create a new graph instance, link it and let you complete the informations of this new instance.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/add-value.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/add-value.png`} alt="add value"/>
     </p>
 
     <h2>Saving the changes</h2>

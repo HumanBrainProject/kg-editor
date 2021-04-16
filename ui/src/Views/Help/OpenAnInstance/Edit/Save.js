@@ -22,13 +22,13 @@ const HelpView = () => (
     <p>When you have made modifications on instances, these will be listed in the “Unsaved instances” panel on the right of the screen, visible on any of the view mode of an instance, or accessible through the corresponding button in the bottom right corner of the application on any other feature.</p>
     <p>If unsaved modifications exist, the application will try to prevent any unwanted loss of your current work by showing a confirmation box if you or your browser try to leave or reload the application.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/unsaved-instances.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/unsaved-instances.png`} alt="unsaved instances"/>
     </p>
 
     <h2>Save all modifications</h2>
     <p>Use the “Save All” button to quickly save all the modifications made on instances. All successfully saved instances will disappear from that list.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/save-all.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/save-all.png`} alt="save all"/>
     </p>
 
     <h2>Instance specific actions</h2>
@@ -37,22 +37,22 @@ const HelpView = () => (
     <h3>Save an instance</h3>
     <p>Use this button to save only this specific instance.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/save.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/save.png`} alt="save"/>
     </p>
 
     <h3>Revert changes</h3>
     <p>Use this button to revert the changes made to this specific instance. Please be aware that all the changes made on the corresponding instance will be lost.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/revert.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/revert.png`} alt="revert"/>
     </p>
 
     <h3>Review changes</h3>
     <p>Use this button to review the changes you made on this instance. The application will show you a window with a visual diff of those changes.</p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/review.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/review.png`} alt="review"/>
     </p>
     <p>
-      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/changes.png`}/>
+      <img className="screenshot" src={`${window.rootPath}/assets/Help/OpenAnInstance/Edit/Save/changes.png`} alt="changes"/>
     </p>
 
     <h2>Releasing the changes</h2>

@@ -187,7 +187,7 @@ export const normalizeInstanceData = data => {
   if (typeof data.metadata === "object") {
     const metadata = data.metadata;
     instance.metadata = Object.keys(metadata).map(key => {
-      if (key == "lastUpdateAt" || key == "createdAt") {
+      if (key === "lastUpdateAt" || key === "createdAt") {
         const d = new Date(metadata[key].value);
         metadata[key].value = d.toLocaleString();
       }

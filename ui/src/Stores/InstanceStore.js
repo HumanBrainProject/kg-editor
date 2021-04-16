@@ -222,7 +222,7 @@ export class InstanceStore {
       runInAction(() => {
         const resolvedId = data && data.data && data.data.id;
         if (!resolvedId) {
-          throw `Failed to fetch instance "${instanceId}" (Invalid response) (${data})`;
+          throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
         }
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);

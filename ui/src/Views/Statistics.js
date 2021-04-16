@@ -17,7 +17,7 @@
 import React from "react";
 
 const Statistics = () => (
-  <iframe src="/statistics/" style={{width:"100%", height:"calc(100% + 80px)", marginTop:"-80px"}} frameBorder={0}/>
+  <iframe src="/statistics/" style={{width:"100%", height:"calc(100% + 80px)", marginTop:"-80px"}} frameBorder={0} title="statistics"/>
 );
 
 export default Statistics;

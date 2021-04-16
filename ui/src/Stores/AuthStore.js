@@ -61,7 +61,7 @@ export class AuthStore {
     });
 
     if (Storage === undefined) {
-      throw "The browser must support WebStorage API";
+      throw new Error("The browser must support WebStorage API");
     }
 
     this.transportLayer = transportLayer;

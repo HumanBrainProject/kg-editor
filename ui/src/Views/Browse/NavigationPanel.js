@@ -21,7 +21,6 @@ import { Scrollbars } from "react-custom-scrollbars";
 
 import { useStores } from "../../Hooks/UseStores";
 
-// import Bookmarks from "./Bookmarks";
 import Types from "./Types";
 import Filter from "../../Components/Filter";
 
@@ -46,12 +45,10 @@ const NavigationPanel = observer(() => {
 
   const classes = useStyles();
 
-  //const { typeStore, browseStore, bookmarkStore } = useStores();
   const { typeStore, browseStore } = useStores();
 
   const handleFilterChange = value => browseStore.setNavigationFilterTerm(value);
 
-  // const bookmarkList = bookmarkStore.filteredList(browseStore.navigationFilter);
   const typeList = typeStore.filteredList(browseStore.navigationFilter);
 
   return (
@@ -61,10 +58,8 @@ const NavigationPanel = observer(() => {
       </div>
       <Scrollbars autoHide>
         {browseStore.navigationFilter.trim() &&
-              // bookmarkList.length === 0 && typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
               typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
         }
-        {/* <Bookmarks /> */}
         <Types />
       </Scrollbars>
     </div>

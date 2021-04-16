@@ -223,6 +223,8 @@ const Actions = observer(({ className, group }) => {
     case "ungroup":
       graphStore.setGrouping(group, false);
       break;
+    default:
+      break;
     }
   };
 

@@ -89,6 +89,8 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
         onCancel();
         break;
       }
+      default: 
+        break;
       }
     }
   };

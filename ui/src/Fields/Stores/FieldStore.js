@@ -70,30 +70,30 @@ class FieldStore {
   }
 
   get returnValue() {
-    throw `returnValue getter is not implemented for ${this.widget} store`;
+    throw new Error(`returnValue getter is not implemented for ${this.widget} store`);
   }
 
   /**
    * @param {any} value field value
    */
   updateValue() {
-    throw `update method is not implemented for ${this.widget} store`;
+    throw new Error(`update method is not implemented for ${this.widget} store`);
   }
 
   reset() {
-    throw `reset method is not implemented for ${this.widget} store`;
+    throw new Error(`reset method is not implemented for ${this.widget} store`);
   }
 
   get hasChanged() {
-    throw `hasChanged getter is not implemented for ${this.widget} store`;
+    throw new Error(`hasChanged getter is not implemented for ${this.widget} store`);
   }
 
   get cloneWithInitialValue() {
-    throw `cloneWithInitialValue getter is not implemented for ${this.widget} store`;
+    throw new Error(`cloneWithInitialValue getter is not implemented for ${this.widget} store`);
   }
 
   get requiredValidationWarning() {
-    throw `requiredValidationWarning getter is not implemented for ${this.widget} store`;
+    throw new Error(`requiredValidationWarning getter is not implemented for ${this.widget} store`);
   }
 
   get definition() {

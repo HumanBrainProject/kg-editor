@@ -27,7 +27,7 @@ const Field = props => {
   }
   const fieldMapping = fieldsMapping[props.fieldStore.widget];
   if (!fieldMapping) {
-    throw `${props.name} widget is not supported!`;
+    throw new Error(`${props.name} widget is not supported!`);
   }
   const Component = fieldMapping.Component;
   return (

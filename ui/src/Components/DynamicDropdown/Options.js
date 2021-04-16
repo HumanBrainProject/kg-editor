@@ -99,6 +99,8 @@ const Option = ({ value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onC
         onCancel();
         break;
       }
+      default:
+        break;
       }
     }
   };

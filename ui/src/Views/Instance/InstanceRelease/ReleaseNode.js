@@ -153,7 +153,7 @@ const ReleaseNode = observer(({ node, level = 0 }) => {
   }
 
   return (
-    <div className={`${classes.container}`} status={node["pending_" + "status"]} style={{marginLeft: 32*level}}>
+    <div className={`${classes.container}`} status={node["pending_status"]} style={{marginLeft: 32*level}}>
       <div
         className="node-content">
         <div className={"status-indicator"}>

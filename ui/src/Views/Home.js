@@ -261,7 +261,7 @@ const Home = () => {
         </div>
         <TipsOfTheDay />
       </Scrollbars>
-      <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} />
+      <img className={classes.cat} src={`${window.location.protocol}//${window.location.host}${rootPath}/assets/cat.gif`} alt="cat" />
     </div>
   );
 };

@@ -24,7 +24,6 @@ import Introduction from "./Help/Introduction";
 
 import Browse from "./Help/Browse";
 import BrowseNodetypes from "./Help/Browse/Nodetypes";
-import BrowseBookmarks from "./Help/Browse/Bookmarks";
 
 import CreateAnInstance from "./Help/CreateAnInstance";
 
@@ -107,7 +106,6 @@ const Instances = ({match}) => {
             <NavLink to={`${path}/browse`}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
             <ul>
               <li><NavLink to={`${path}/browse/nodetypes`}><FontAwesomeIcon fixedWidth icon="code-branch" transform={"flip-h rotate--90"}/>Nodetypes</NavLink></li>
-              <li><NavLink to={`${path}/browse/bookmarks`}><FontAwesomeIcon fixedWidth icon="star"/>Bookmarks</NavLink></li>
             </ul>
           </li>
           <li><NavLink to={`${path}/create`}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
@@ -140,7 +138,6 @@ const Instances = ({match}) => {
 
               <Route path={`${path}/browse`} exact={true} component={Browse}/>
               <Route path={`${path}/browse/nodetypes`} exact={true} component={BrowseNodetypes}/>
-              <Route path={`${path}/browse/bookmarks`} exact={true} component={BrowseBookmarks}/>
 
               <Route path={`${path}/create`} exact={true} component={CreateAnInstance}/>
 

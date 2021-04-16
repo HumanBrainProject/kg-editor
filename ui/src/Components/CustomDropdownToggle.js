@@ -23,6 +23,8 @@ const useStyles = createUseStyles({
     color: "var(--ft-color-normal)",
     fontSize: "0.9em",
     textDecoration: "none",
+    backgroundColor: "transparent",
+    border: "none",
     "&:hover": {
       color: "var(--ft-color-loud)",
       textDecoration: "none"
@@ -39,9 +41,9 @@ const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => {
   };
 
   return (
-    <a onClick={handleClick} className={classes.dropdownLink} ref={ref}>
+    <button onClick={handleClick} className={classes.dropdownLink} ref={ref}>
       {children} <FontAwesomeIcon icon={"caret-down"} />
-    </a>
+    </button>
   );
 });
 

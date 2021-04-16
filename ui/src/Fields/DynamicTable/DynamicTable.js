@@ -129,7 +129,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       fieldStore.addValue(value);
       setTimeout(() => {
         if (fieldStore.isLinkVisible(id)) {
-          view.setInstanceHighlight(id, fieldStore.label);
+          const index = view.panes.findIndex(p => p === pane);
+          if (index !== -1 && index < view.panes.length -1) {
+            const targetPane = view.panes[index+1];
+            view.setInstanceHighlight(targetPane, id, fieldStore.label);
+          }
         }
         view.setCurrentInstanceId(pane, id);
         view.selectPane(view.currentInstanceIdPane);
@@ -145,7 +149,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     fieldStore.addValue(value);
     setTimeout(() => {
       if (fieldStore.isLinkVisible(id)) {
-        view.setInstanceHighlight(id, fieldStore.label);
+        const index = view.panes.findIndex(p => p === pane);
+        if (index !== -1 && index < view.panes.length -1) {
+          const targetPane = view.panes[index+1];
+          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+        }
       }
     }, 1000);
     instanceStore.togglePreviewInstance();
@@ -196,7 +204,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id && fieldStore.isLinkVisible(id)) {
-        view.setInstanceHighlight(id, fieldStore.label);
+        const index = view.panes.findIndex(p => p === pane);
+        if (index !== -1 && index < view.panes.length -1) {
+          const targetPane = view.panes[index+1];
+          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+        }
       }
     }
   };

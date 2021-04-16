@@ -87,13 +87,14 @@ class View {
     this.instancePath.splice(start, this.instancePath.length-start, instanceId);
   }
 
-  setInstanceHighlight(instanceId, provenance) {
+  setInstanceHighlight(pane, instanceId, provenance) {
+    this.instanceHighlight.pane = pane;
     this.instanceHighlight.instanceId = instanceId;
     this.instanceHighlight.provenance = provenance;
   }
 
   resetInstanceHighlight() {
-    this.setInstanceHighlight(null, null);
+    this.setInstanceHighlight(null, null, null);
   }
 
   setNameAndColor(name, color) {

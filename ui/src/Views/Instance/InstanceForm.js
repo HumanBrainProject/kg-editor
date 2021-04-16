@@ -193,7 +193,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
   const mainInstanceId = view.instanceId;
   const isMainInstance = id === mainInstanceId;
   const isCurrentInstance = id === view.currentInstanceId;
-  const highlight = view.instanceHighlight && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
+  const highlight = view.instanceHighlight && view.instanceHighlight.pane === pane && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
 
   const className = `${classes.container} ${isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
 

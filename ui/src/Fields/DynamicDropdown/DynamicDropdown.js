@@ -104,7 +104,11 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {
-        view.setInstanceHighlight(id, fieldStore.label);
+        const index = view.panes.findIndex(p => p === pane);
+        if (index !== -1 && index < view.panes.length -1) {
+          const targetPane = view.panes[index+1];
+          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+        }
         view.setCurrentInstanceId(pane, id);
         view.selectPane(view.currentInstanceIdPane);
         view.resetInstanceHighlight();
@@ -117,7 +121,11 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
-    setTimeout(() => view.setInstanceHighlight(id, fieldStore.label), 1000);
+    const index = view.panes.findIndex(p => p === pane);
+    if (index !== -1 && index < view.panes.length -1) {
+      const targetPane = view.panes[index+1];
+      setTimeout(() => view.setInstanceHighlight(targetPane, id, fieldStore.label), 1000);
+    }
     instanceStore.togglePreviewInstance();
   };
 
@@ -177,7 +185,11 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id) {
-        view.setInstanceHighlight(id, fieldStore.label);
+        const index = view.panes.findIndex(p => p === pane);
+        if (index !== -1 && index < view.panes.length -1) {
+          const targetPane = view.panes[index+1];
+          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+        }
       }
       instanceStore.togglePreviewInstance();
     }
@@ -195,7 +207,11 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id) {
-        view.setInstanceHighlight(id, fieldStore.label);
+        const index = view.panes.findIndex(p => p === pane);
+        if (index !== -1 && index < view.panes.length -1) {
+          const targetPane = view.panes[index+1];
+          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+        }
       }
     }
   };

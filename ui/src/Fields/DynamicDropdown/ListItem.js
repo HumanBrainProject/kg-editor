@@ -65,16 +65,18 @@ const useStyles = createUseStyles({
   }
 });
 
-const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut }) => {
+const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut, fetchLabel }) => {
 
   const classes = useStyles();
 
   const { instanceStore } = useStores();
 
   useEffect(() => {
-    instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+    if (fetchLabel) {
+      instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instanceId]);
+  }, [instanceId, fetchLabel]);
 
   const handleClick = e => {
     if(enablePointerEvents) {

@@ -249,6 +249,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             onClick={handleClick}
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
+            fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
           />
           :
           <List
@@ -256,6 +257,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             readOnly={true}
             disabled={false}
             enablePointerEvents={false}
+            fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
           />
         }
       </Form.Group>
@@ -294,6 +296,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           onBlur={handleBlur}
           onMouseOver={handleMouseOver}
           onMouseOut={handleMouseOut}
+          fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
         />
         {canAddValues && (
           <Dropdown

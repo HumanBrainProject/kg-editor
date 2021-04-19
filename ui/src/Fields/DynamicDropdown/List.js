@@ -32,7 +32,8 @@ const List = ({
   onFocus,
   onBlur,
   onMouseOver,
-  onMouseOut
+  onMouseOut,
+  fetchLabel
 }) => (
   <span>
     {list.map((id, index) => (
@@ -53,6 +54,7 @@ const List = ({
         onBlur={onBlur}
         onMouseOver={onMouseOver}
         onMouseOut={onMouseOut}
+        fetchLabel={fetchLabel}
       />
     ))}
   </span>

@@ -168,7 +168,7 @@ export class ViewStore{
     localStorage.removeItem(STORED_INSTANCE_VIEWS_KEY);
   }
 
-  restoreViews(){
+  restoreViews(preventSelectView=false){
     this.clearViews();
     if(this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
@@ -176,7 +176,7 @@ export class ViewStore{
       let selectedView = null;
       if (Array.isArray(workspaceViews)) {
         workspaceViews.forEach(view => {
-          if (view.selected) {
+          if (!preventSelectView && view.selected) {
             selectedView = view;
           }
           const {id, name, color, mode} = view;
@@ -191,6 +191,7 @@ export class ViewStore{
 
   selectViewByInstanceId(instanceId) {
     this.selectedView = this.views.get(instanceId);
+    this.syncStoredViews();
   }
 
   unregisterViewByInstanceId(instanceId) {

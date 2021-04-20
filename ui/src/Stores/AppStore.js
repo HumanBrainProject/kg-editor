@@ -253,7 +253,7 @@ export class AppStore{
     if (path && path.params.mode !== "create") {
       space = await this.getInitialInstanceSpace(path.params.id);
       if (space) {
-        this.setCurrentSpace(space);
+        this.setCurrentSpace(space, !!path && !!path.params.id);
         if (!this.currentSpace || this.currentSpace.id !== space) {
           this.initialInstanceSpaceError = `Could not load instance "${path.params.id}" because you're not granted access to space "${space}".`;
         }
@@ -261,7 +261,7 @@ export class AppStore{
       return this.currentSpace;
     } else {
       space = localStorage.getItem("space");
-      this.setCurrentSpace(space);
+      this.setCurrentSpace(space, !!path && !!path.params.id);
       return this.currentSpace;
     }
   }
@@ -402,7 +402,7 @@ export class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  async setCurrentSpace(selectedSpace) {
+  async setCurrentSpace(selectedSpace, preventSelectView=false) {
     let space = selectedSpace?this.rootStore.authStore.spaces.find( w => w.id === selectedSpace):null;
     if (!space && this.rootStore.authStore.hasSpaces && this.rootStore.authStore.spaces.length === 1) {
       space = this.rootStore.authStore.spaces[0];
@@ -423,7 +423,7 @@ export class AppStore{
       this.currentSpace = space;
       if (this.currentSpace) {
         localStorage.setItem("space", space.id);
-        this.rootStore.viewStore.restoreViews();
+        this.rootStore.viewStore.restoreViews(preventSelectView);
         await this.rootStore.typeStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       } else {

@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @Component
 public class InstanceClient {
 
+    private final int INCOMING_LINKS_PAGE_SIZE = 10;
+
     private final ObjectMapper objectMapper;
     private final ServiceCall kg;
 
@@ -33,7 +35,8 @@ public class InstanceClient {
                                                                                    boolean returnEmbedded,
                                                                                    boolean returnIncomingLinks,
                                                                                    Class<T> clazz) {
-        String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%b&returnAlternatives=%b&returnPermissions=%b&returnEmbedded=%b&returnIncomingLinks=%b", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded, returnIncomingLinks);
+        String incomingLinksPageSizeParam = returnIncomingLinks?String.format("&incomingLinksPageSize=%d", INCOMING_LINKS_PAGE_SIZE):"";
+        String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%b&returnAlternatives=%b&returnPermissions=%b&returnEmbedded=%b&returnIncomingLinks=%b%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded, returnIncomingLinks, incomingLinksPageSizeParam);
         KGCoreResult.Single originalMap = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()
@@ -127,7 +130,7 @@ public class InstanceClient {
     }
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {
-        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true", id);
+        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true&incomingLinksPageSize=%d", id, INCOMING_LINKS_PAGE_SIZE);
         KGCoreResult.Single response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
@@ -144,7 +147,7 @@ public class InstanceClient {
     }
 
     public ResultWithOriginalMap<InstanceFull> patchInstance(String id, Map<?, ?> body) {
-        String relativeUrl = String.format("instances/%s?returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true", id);
+        String relativeUrl = String.format("instances/%s?returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true&incomingLinksPageSize=%d", id, INCOMING_LINKS_PAGE_SIZE);
         KGCoreResult.Single response = kg.client().patch().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(body))
                 .retrieve()

@@ -17,7 +17,7 @@ public class InstanceFull extends InstanceSummary {
             @JsonProperty(EditorConstants.VOCAB_SPACE) String kgSpace,
             @JsonProperty(EditorConstants.VOCAB_PERMISSIONS) List<String> kgPermissions,
             @JsonProperty(EditorConstants.VOCAB_ALTERNATIVE) Map<String, List<Alternative>> kgAlternatives,
-            @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) Map<String,  List<IncomingLink>> kgIncomingLinks
+            @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) Map<String,  Map<String, IncomingLinksByType>> kgIncomingLinks
     ){
         super(kgId, kgType, kgSpace, kgPermissions);
         this.alternatives = kgAlternatives;
@@ -28,7 +28,7 @@ public class InstanceFull extends InstanceSummary {
     private final Map<String, List<Alternative>> alternatives;
     private String labelField;
     private List<String> promotedFields;
-    private Map<String, List<IncomingLink>> incomingLinks;
+    private Map<String,  Map<String, IncomingLinksByType>> incomingLinks;
     private Map<String, StructureOfIncomingLink> possibleIncomingLinks;
 
     public Map<String, List<Alternative>> getAlternatives() {
@@ -57,11 +57,11 @@ public class InstanceFull extends InstanceSummary {
         this.possibleIncomingLinks = possibleIncomingLinks;
     }
 
-    public Map<String, List<IncomingLink>> getIncomingLinks() {
+    public Map<String,  Map<String, IncomingLinksByType>> getIncomingLinks() {
         return incomingLinks;
     }
 
-    public void setIncomingLinks(Map<String, List<IncomingLink>> incomingLinks) {
+    public void setIncomingLinks(Map<String,  Map<String, IncomingLinksByType>> incomingLinks) {
         this.incomingLinks = incomingLinks;
     }
 }

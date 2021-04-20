@@ -144,25 +144,23 @@ export const normalizeInstanceData = data => {
     instance.labelField = data.labelField;
   }
   if(data.incomingLinks) {
-    const incomingLinks = Object.values(data.incomingLinks).map(links => {
-      const groupedLinks = links.reduce((acc,link) => {
-        const types = link.types.map(t => t.name).join("/");
-        if (!acc[types]) {
-          acc[types] = {
-            space: link.space,
-            types: link.types,
-            instances: []
-          };
-        }
-        acc[types].instances.push({
-          id: link.id,
-          label: link.instanceLabel
-        });
-        return acc;
-      }, {});
+    const incomingLinks = Object.entries(data.incomingLinks).map(([id, field])=> {
+      let label = "";
+      let links = Object.entries(field).map(([typeName, type]) => {
+        label = type.nameForReverseLink;
+        return {
+          type: {
+            name: typeName,
+            label: type.label,
+            color: type.color
+          },
+          instances: type.data
+        };
+      });
       return {
-        label: links[0].label,
-        links: Object.values(groupedLinks)
+        id: id,
+        label: label,
+        links: links
       };
     });
     instance.incomingLinks = incomingLinks;

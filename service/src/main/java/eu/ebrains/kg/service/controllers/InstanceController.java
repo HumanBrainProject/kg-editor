@@ -118,8 +118,17 @@ public class InstanceController {
 
     private void enrichPossibleIncomingLinksTypes(Map<String, StructureOfType> typesByName, Map<String, StructureOfIncomingLink> possibleIncomingLinks) {
         possibleIncomingLinks.values().forEach(v -> v.getSourceTypes().forEach(s -> {
-            s.getType().setColor(typesByName.get(s.getType().getName()).getColor());
-            s.getType().setLabel(typesByName.get(s.getType().getName()).getLabel());
+            StructureOfType type = typesByName.get(s.getType().getName());
+            if (type != null) {
+                String color = type.getColor();
+                String label = type.getLabel();
+                if (color != null) {
+                    s.getType().setColor(color);
+                }
+                if (label != null) {
+                    s.getType().setLabel(label);
+                }
+            }
         }));
     }
 
@@ -258,24 +267,16 @@ public class InstanceController {
                 instance.getIncomingLinks()
                         .values()
                         .stream().filter(Objects::nonNull)
-                        .forEach(v -> v.stream().filter(Objects::nonNull)
-                                .forEach(link -> {
-                                            UUID uuid = idController.simplifyFullyQualifiedId(link.getId());
-                                            if (uuid != null) {
-                                                link.setId(uuid.toString());
-                                            }
-                                            if (link.getTypes() != null) {
-                                                link.getTypes()
-                                                        .forEach(t -> {
-                                                            StructureOfType structureOfType = typesByName.get(t.getName());
-                                                            if (structureOfType != null) {
-                                                                t.setLabel(structureOfType.getLabel());
-                                                                t.setColor(structureOfType.getColor());
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                )
+                        .forEach(v -> v
+                                .values()
+                                .stream()
+                                .filter(Objects::nonNull)
+                                .forEach(links -> links.getData().forEach(link -> {
+                                    UUID uuid = idController.simplifyFullyQualifiedId(link.getId());
+                                    if (uuid != null) {
+                                        link.setId(uuid.toString());
+                                    }
+                                }))
                         );
             }
 
@@ -423,7 +424,7 @@ public class InstanceController {
      * Normalize users of alternatives and add pictures
      */
     private void enrichAlternatives(InstanceFull instance) {
-        if(instance.getAlternatives()!=null) {
+        if (instance.getAlternatives() != null) {
             Stream<UserSummary> allUsers = instance.getAlternatives().values().stream().flatMap(Collection::stream)
                     .map(Alternative::getUsers).flatMap(Collection::stream);
             List<String> userIds = allUsers.map(u -> {

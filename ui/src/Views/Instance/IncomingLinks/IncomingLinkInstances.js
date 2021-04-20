@@ -46,14 +46,12 @@ const IncomingLinkInstances = observer(({ link, readMode }) => {
   return (
     <div className={classes.container}>
       <div>
-        {link.types.map(({name, label, color}) => (
-          <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
-        ))}
+        <span className={classes.type} title={link.type.name}><FontAwesomeIcon icon={"circle"} color={link.type.color}/>&nbsp;&nbsp;<span>{link.type.label?link.type.label:link.type.name}</span></span>
       </div>
       <ul>
-        {link.instances.map((instance, index) => (
-          <li key={index}>
-            <IncomingLinkInstance instance={instance} types={link.types} space={link.space} readMode={readMode} />
+        {link.instances.map(instance => (
+          <li key={instance.id}>
+            <IncomingLinkInstance instance={instance} readMode={readMode} />
           </li>
         ))}
       </ul>

@@ -30,33 +30,39 @@ const useStyles = createUseStyles({
 });
 
 
-const IncomingLinkInstance = observer(({instance, space, readMode }) => {
+const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   const classes = useStyles();
 
-  const { appStore, history } = useStores();
+  const { appStore, history, instanceStore } = useStores();
 
+  let label = instance.label?instance.label:instance.id;
+
+  if (instance.space === appStore.currentSpace.id && instanceStore.instances.has(instance.id)) {
+    label = instanceStore.instances.get(instance.id).name;
+  }
+  
   if (readMode) {
     return (
       <span>
         <Badge pill variant="secondary" >
-          {instance.label}
+          {label}
         </Badge>
       </span>
     );
   }
 
   const handleOpenInstance = () => {
-    if(appStore.currentSpace.id !== space) {
-      appStore.setCurrentSpace(space);
+    if(appStore.currentSpace.id !== instance.space) {
+      appStore.setCurrentSpace(instance.space);
     }
     history.push(`/instances/${instance.id}`);
   };
 
   return (
-    <span className={classes.pill} title={space}>
+    <span className={classes.pill} title={instance.space}>
       <Badge pill variant="secondary" onClick={handleOpenInstance} >
-        {instance.label}
+        {label}
       </Badge>
     </span>
   );

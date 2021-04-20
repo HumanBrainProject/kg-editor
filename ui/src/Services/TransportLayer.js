@@ -44,135 +44,139 @@ export class TransportLayer {
     });
   }
 
-  async getAuthEndpoint() {
+   getAuthEndpoint() {
     return this._axios.get(API.endpoints.auth());
   }
 
-  async getUserProfile() {
+   getUserProfile() {
     return this._axios.get(API.endpoints.user());
   }
 
-  async updateUserPicture(picture) {
+   updateUserPicture(picture) {
     return this._axios.put(API.endpoints.userPicture(), picture);
   }
 
-  async getSpaceTypes(space) {
+   getSpaceTypes(space) {
     return this._axios.get(API.endpoints.workspaceTypes(space));
   }
 
-  async getInstance(instanceId) {
+   getInstance(instanceId) {
     return this._axios.get(API.endpoints.instance(instanceId));
   }
 
-  async deleteInstance(instanceId) {
+   deleteInstance(instanceId) {
     return this._axios.delete(API.endpoints.instance(instanceId));
   }
 
-  async createInstance(space, instanceId, payload) {
+   createInstance(space, instanceId, payload) {
     return this._axios.post(API.endpoints.createInstance(space, instanceId), payload);
   }
 
-  async patchInstance(instanceId, payload) {
+   patchInstance(instanceId, payload) {
     return this._axios.patch(API.endpoints.instance(instanceId), payload);
   }
 
-  async searchInstancesByType(space, type, from, size, search) {
+   searchInstancesByType(space, type, from, size, search) {
     return this._axios.get(API.endpoints.searchInstancesByType(space, type, from, size, search));
   }
 
-  async searchInstancesByBookmark(space, bookmarkId, from, size, search) {
+   searchInstancesByBookmark(space, bookmarkId, from, size, search) {
     return this._axios.get(API.endpoints.searchInstancesByBookmark(space, bookmarkId, from, size, search));
   }
 
-  async getSuggestions(instanceId, field, type, from, size, search, payload) {
+   getSuggestions(instanceId, field, type, from, size, search, payload) {
     return this._axios.post(API.endpoints.suggestions(instanceId, field, type, from, size, search), payload);
   }
 
-  async getInstanceNeighbors(instanceId) {
+   getInstanceNeighbors(instanceId) {
     return this._axios.get(API.endpoints.neighbors(instanceId));
   }
 
-  async getInstanceScope(instanceId) {
+   getInstanceScope(instanceId) {
     return this._axios.get(API.endpoints.instanceScope(instanceId));
   }
 
-  async getInstancesLabel(stage, instanceIds) {
+   getInstancesLabel(stage, instanceIds) {
     return this._axios.post(API.endpoints.instancesLabel(stage), instanceIds);
   }
 
-  async getInstancesSummary(stage, instanceIds) {
+   getInstancesSummary(stage, instanceIds) {
     return this._axios.post(API.endpoints.instancesSummary(stage), instanceIds);
   }
 
-  async getInstancesList(stage, instanceIds) {
+   getInstancesList(stage, instanceIds) {
     return this._axios.post(API.endpoints.instancesList(stage), instanceIds);
   }
 
-  async getUserInfo(userId) {
+   getUserInfo(userId) {
     return this._axios.get(API.endpoints.userInfo(userId));
   }
 
-  async getInstanceReviews(instanceId) {
+   getInstanceReviews(instanceId) {
     return this._axios.get(API.endpoints.instanceReviews(instanceId));
   }
 
-  async getUsersForReview(from, size, search) {
+   getUsersForReview(from, size, search) {
     return this._axios.get(API.endpoints.usersForReview(from, size, search));
   }
 
-  async inviteUserToReviewInstance(userId, instanceId) {
+   inviteUserToReviewInstance(userId, instanceId) {
     return this._axios.put(API.endpoints.inviteUserToReviewInstance(userId, instanceId));
   }
 
-  async deleteInstanceReviewsByUser(instanceId, userId) {
+   deleteInstanceReviewsByUser(instanceId, userId) {
     return this._axios.delete(API.endpoints.instanceReviewsByUser(instanceId, userId));
   }
 
-  async getMessages() {
+   getMessages() {
     return this._axios.get(API.endpoints.messages());
   }
 
-  async releaseInstance(instanceId) {
+   releaseInstance(instanceId) {
     return this._axios.put(API.endpoints.release(instanceId));
   }
 
-  async unreleaseInstance(instanceId) {
+  unreleaseInstance(instanceId) {
     return this._axios.delete(API.endpoints.release(instanceId));
   }
 
-  async getReleaseStatusTopInstance(instanceIds) {
+  getReleaseStatusTopInstance(instanceIds) {
     return this._axios.post(API.endpoints.releaseStatusTopInstance(), instanceIds);
   }
 
-  async getReleaseStatusChildren(instanceIds) {
+  getReleaseStatusChildren(instanceIds) {
     return this._axios.post(API.endpoints.releaseStatusChildren(), instanceIds);
   }
 
-  async getFeatures() {
+  getFeatures() {
     return this._axios.get(API.endpoints.features());
   }
 
-  async getBookmarks(space) {
+  getBookmarks(space) {
     return this._axios.get(API.endpoints.bookmarks(space));
   }
 
-  async createBookmark(bookmarkId, space, name, instanceIds) {
+  createBookmark(bookmarkId, space, name, instanceIds) {
     return this._axios.post(API.endpoints.bookmarks(bookmarkId, space), { name: name, list: instanceIds});
   }
 
-  async renameBookmark(bookmarkId, name) {
+  renameBookmark(bookmarkId, name) {
     return this._axios.post(API.endpoints.bookmarks(bookmarkId), { name: name });
   }
 
-  async deleteBookmark(bookmarkId) {
+  deleteBookmark(bookmarkId) {
     return this._axios.delete(API.endpoints.bookmark(bookmarkId));
   }
 
-  async getBookmarksByInstances(instanceIds) {
+  getBookmarksByInstances(instanceIds) {
     return this._axios.post(API.endpoints.bookmarksByInstances(), instanceIds);
   }
 
-  async updateInstanceBookmarks(instanceId, bookmarks) {
+  updateInstanceBookmarks(instanceId, bookmarks) {
     return this._axios.put(API.endpoints.instanceBookmarks(instanceId), bookmarks);
+  }
+
+  getMoreIncomingLinks(instanceId, property, type, from, size) {
+    return this._axios.get(API.endpoints.incomingLinks(instanceId, property, type, from, size));
   }
 }

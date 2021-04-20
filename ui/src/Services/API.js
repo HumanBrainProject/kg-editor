@@ -42,7 +42,8 @@ const API = {
     "bookmark": (bookmarkId, space=null) => `/editor/api/bookmarks/${bookmarkId}${space?("?space=" + space):""}`,
     "bookmarks": space => `/editor/api/spaces/${space}/bookmarks`,
     "instanceBookmarks": instanceId => `/editor/api/instances/${instanceId}/bookmarks`,
-    "bookmarksByInstances": () => "/editor/api/instances/bookmarks"
+    "bookmarksByInstances": () => "/editor/api/instances/bookmarks",
+    "incomingLinks": (instanceId, property, type, from, size) => `/editor/api/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`,
   }
 };
 

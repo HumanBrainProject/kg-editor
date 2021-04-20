@@ -144,21 +144,28 @@ export const normalizeInstanceData = data => {
     instance.labelField = data.labelField;
   }
   if(data.incomingLinks) {
-    const incomingLinks = Object.entries(data.incomingLinks).map(([id, field])=> {
+    const incomingLinks = Object.entries(data.incomingLinks).map(([property, field])=> {
       let label = "";
       let links = Object.entries(field).map(([typeName, type]) => {
         label = type.nameForReverseLink;
         return {
+          instanceId: instance.id,
+          property: property,
           type: {
             name: typeName,
             label: type.label,
             color: type.color
           },
-          instances: type.data
+          instances: type.data,
+          from: type.from,
+          size: type.size,
+          total: type.total,
+          isFetching: false,
+          fetchError: null,
         };
       });
       return {
-        id: id,
+        property: property,
         label: label,
         links: links
       };

@@ -18,6 +18,9 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Button from "react-bootstrap/Button";
+
+import { useStores } from "../../../Hooks/UseStores";
 
 import IncomingLinkInstance from "./IncomingLinkInstance";
 
@@ -36,12 +39,28 @@ const useStyles = createUseStyles({
   },
   type: {
     paddingRight: "10px"
+  },
+  showMore: {
+    paddingLeft: 0,
+    paddingTop: 0,
+    transform: "translateY(1px)"
+  },
+  showMoreLoading: {
+    display: "block"
+  },
+  showMoreError: {
+    display: "block",
+    color: "var(--ft-color-error)"
   }
 });
 
 const IncomingLinkInstances = observer(({ link, readMode }) => {
 
   const classes = useStyles();
+
+  const { instanceStore } = useStores();
+
+  const handleShowMore = () => instanceStore.fetchMoreIncomingLinks(link.instanceId, link.property, link.type.name);
 
   return (
     <div className={classes.container}>
@@ -54,6 +73,22 @@ const IncomingLinkInstances = observer(({ link, readMode }) => {
             <IncomingLinkInstance instance={instance} readMode={readMode} />
           </li>
         ))}
+        {link.fetchError?
+          <li className={classes.showMoreError}>
+            <FontAwesomeIcon icon="exclamation-triangle" /> {link.fetchError}. <Button variant="primary" onClick={handleShowMore}>Retry</Button>
+          </li>
+          :
+          link.isFetching?
+            <li className={classes.showMoreLoading}>
+              <FontAwesomeIcon icon="circle-notch" spin/> Loading more incoming links...
+            </li>
+            :
+            link.total > (link.from + link.size) && (
+              <li>
+                <Button className={classes.showMore} variant="link" onClick={handleShowMore}>show more...</Button>
+              </li>
+            )
+        }
       </ul>
     </div>
   );

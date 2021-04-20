@@ -40,7 +40,7 @@ const IncomingLinks = observer(({ links, readMode }) => {
     <div className={classes.container} >
       <ul>
         {links.map(link => (
-          <li key={link.label}>
+          <li key={link.property}>
             <IncomingLink link={link} readMode={readMode} />
           </li>
         ))}

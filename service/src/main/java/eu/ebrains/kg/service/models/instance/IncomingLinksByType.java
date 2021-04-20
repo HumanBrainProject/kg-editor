@@ -13,7 +13,7 @@ public class IncomingLinksByType {
             @JsonProperty(SchemaFieldsConstants.NAME) String kgLabel,
             @JsonProperty(EditorConstants.VOCAB_COLOR) String kgColor,
             @JsonProperty("data") List<IncomingLink> kgData,
-            @JsonProperty("totalResults") int kgTotalResults,
+            @JsonProperty("totalResults") int kgTotal,
             @JsonProperty("from") int kgFrom,
             @JsonProperty("size") int kgSize,
             @JsonProperty(EditorConstants.VOCAB_NAME_FOR_REVERSE_LINK) String kgNameForReverseLink
@@ -21,7 +21,7 @@ public class IncomingLinksByType {
         this.label = kgLabel;
         this.color = kgColor;
         this.data = kgData;
-        this.totalResults = kgTotalResults;
+        this.total = kgTotal;
         this.from = kgFrom;
         this.size = kgSize;
         this.nameForReverseLink = kgNameForReverseLink;
@@ -30,7 +30,7 @@ public class IncomingLinksByType {
     private final String label;
     private final String color;
     private final List<IncomingLink> data;
-    private final int totalResults;
+    private final int total;
     private final int from;
     private final int size;
     private final String nameForReverseLink;
@@ -48,8 +48,8 @@ public class IncomingLinksByType {
         return data;
     }
 
-    public int getTotalResults() {
-        return totalResults;
+    public int getTotal() {
+        return total;
     }
 
     public int getFrom() {

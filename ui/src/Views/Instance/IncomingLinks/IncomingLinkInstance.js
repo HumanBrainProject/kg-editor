@@ -21,8 +21,6 @@ import Badge from "react-bootstrap/Badge";
 
 import { useStores } from "../../../Hooks/UseStores";
 
-
-
 const useStyles = createUseStyles({
   pill: {
     cursor: "pointer"

@@ -169,7 +169,8 @@ export class InstanceStore {
       cancelInstanceChanges: action,
       confirmCancelInstanceChanges: action,
       abortCancelInstanceChange: action,
-      clearUnsavedChanges: action
+      clearUnsavedChanges: action,
+      fetchMoreIncomingLinks: action,
     });
 
     this.stage = stage?stage:null;
@@ -197,6 +198,43 @@ export class InstanceStore {
       this.previewInstance = null;
     } else {
       this.previewInstance = {id: instanceId, name: instanceName, options: options};
+    }
+  }
+
+
+  getIncomingLinksOfType(instanceId, property, type) {
+    const instance = this.instances.get(instanceId);
+    if (!instance) {
+      return null;
+    }
+    const prop = instance.incomingLinks.find(p => p.property === property);
+    if (!prop) {
+      return null;
+    }
+    return prop.links.find(lk => lk.type.name === type);
+  }
+
+  async fetchMoreIncomingLinks(instanceId, property, type) {
+    const links = this.getIncomingLinksOfType(instanceId, property, type);
+    if (links) {
+      links.isFetching = true;
+      links.fetchError = null;
+      try {
+        const { data } = await this.transportLayer.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
+        runInAction(() => {
+          links.isFetching = false;
+          links.size += data.size;
+          links.total = data.total;
+          links.instances = [...links.instances, ...data.data];
+        });
+      } catch(e){
+        runInAction(() => {
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          links.fetchError = `Failed to retrieve more incoming links "(${message}) ${errorMessage}"`;
+          links.isFetching = false;
+        });
+      }
     }
   }
 

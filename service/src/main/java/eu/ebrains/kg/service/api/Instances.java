@@ -74,6 +74,15 @@ public class Instances {
         return new KGCoreResult<Scope>().setData(instanceScope);
     }
 
+    @GetMapping("/instances/{id}/incomingLinks")
+    public KGCoreResult<List<IncomingLink>> getIncomingLinks(@PathVariable("id") String id,
+                                                       @RequestParam("property") String property,
+                                                       @RequestParam("type") String type,
+                                                       @RequestParam("from") int from,
+                                                       @RequestParam("size") int size) {
+        return instanceClient.getIncomingLinks(id, property, type, from, size);
+    }
+
 
     @PostMapping("/instancesBulk/list")
     public KGCoreResult<Map<String, InstanceFull>> getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,

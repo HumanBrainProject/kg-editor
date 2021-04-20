@@ -1,6 +1,7 @@
 package eu.ebrains.kg.service.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.ebrains.kg.service.controllers.IdController;
 import eu.ebrains.kg.service.models.HasError;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,10 +21,12 @@ public class InstanceClient {
 
     private final int INCOMING_LINKS_PAGE_SIZE = 10;
 
+    private final IdController idController;
     private final ObjectMapper objectMapper;
     private final ServiceCall kg;
 
-    public InstanceClient(ServiceCall kg, ObjectMapper jacksonObjectMapper) {
+    public InstanceClient(IdController idController, ServiceCall kg, ObjectMapper jacksonObjectMapper) {
+        this.idController = idController;
         this.kg = kg;
         this.objectMapper = jacksonObjectMapper;
     }
@@ -61,6 +65,28 @@ public class InstanceClient {
         return result;
     }
 
+    private static class IncomingLinksResult extends KGCoreResult<List<IncomingLink>> {};
+
+    public KGCoreResult<List<IncomingLink>> getIncomingLinks(String id,
+                                                        String property,
+                                                        String type,
+                                                        Integer from,
+                                                        Integer size) {
+
+        String relativeUrl = String.format("instances/%s/incomingLinks?stage=IN_PROGRESS&property=%s&type=%s&from=%d&size=%d", id, property, type, from, size);
+        IncomingLinksResult response = kg.client().get().uri(kg.url(relativeUrl)).retrieve().bodyToMono(IncomingLinksResult.class).block();
+        if(response!=null){
+            response.getData().forEach(lk -> {
+                        UUID uuid = idController.simplifyFullyQualifiedId(lk.getId());
+                        if(uuid!=null){
+                            lk.setId(uuid.toString());
+                        }
+
+            });
+            return response;
+        }
+        return null;
+    }
 
     public KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>> searchInstanceSummaries(String space,
                                                                                        String type,

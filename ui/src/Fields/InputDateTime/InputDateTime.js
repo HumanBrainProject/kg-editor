@@ -66,7 +66,18 @@ const useStyles = createUseStyles({
 });
 
 
-const AlternativeValue = observer(({alternative}) => alternative.value);
+const getDateTimeValue = value => {
+  if (value && typeof value === "string") {
+    const d = new Date(value);
+    if (d instanceof Date && !isNaN(d)) {
+      return d.toLocaleString();
+    }
+    return value
+  }
+  return JSON.stringify(value);
+};
+
+const AlternativeValue = observer(({alternative}) => getDateTimeValue(alternative.value));
 AlternativeValue.displayName = "AlternativeValue";
 
 const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
@@ -97,7 +108,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     if(!value && !showIfNoValue) {
       return null;
     }
-    const val = !value || typeof value === "string"? value:value.toString();
+    const val = getDateTimeValue(value);
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} />

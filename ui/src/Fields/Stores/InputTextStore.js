@@ -50,7 +50,7 @@ class InputTextStore extends FieldStore {
 
   get returnValue() {
     if (this.value === "" && this.returnAsNull) {
-      return null;
+      return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
     return toJS(this.value);
   }

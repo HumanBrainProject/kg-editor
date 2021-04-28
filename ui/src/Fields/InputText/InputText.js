@@ -38,6 +38,19 @@ const useStyles = createUseStyles({
   }
 });
 
+const getStringValue = value => !value || typeof value === "string"? value:JSON.stringify(value);
+
+const getDateValue = value => {
+  if (value && typeof value === "string") {
+    const d = new Date(value);
+    if (d instanceof Date && !isNaN(d)) {
+      return d.toLocaleDateString();
+    }
+    return value
+  }
+  return JSON.stringify(value);
+}
+
 const Lines = ({lines}) => {
   return (
     <div>
@@ -52,7 +65,6 @@ const Lines = ({lines}) => {
 
 const FieldValue = ({field, splitLines}) => {
   const { value } = field;
-  const val = !value || typeof value === "string"? value:value.toString();
 
   if (splitLines) {
     const lines = typeof value === "string"?value.split("\n"):[];
@@ -61,13 +73,18 @@ const FieldValue = ({field, splitLines}) => {
     );
   }
 
+  const val = (field.inputType === "date")?getDateValue(value):getStringValue(value);
+
   return (
     <span>&nbsp;{val}</span>
   );
 };
 
-const AlternativeValue = observer(({alternative}) => alternative.value);
+const AlternativeValue = observer(({alternative}) => typeof alternative.value === "string"?alternative.value:JSON.stringify(alternative.value));
 AlternativeValue.displayName = "AlternativeValue";
+
+const AlternativeDateValue = observer(({alternative}) => getDateValue(alternative.value));
+AlternativeDateValue.displayName = "AlternativeDateValue";
 
 const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
 
@@ -107,6 +124,8 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     );
   }
 
+  const AlternativeValueComponent = inputType === "date"?AlternativeDateValue:AlternativeValue;
+
   const isDisabled = returnAsNull;
   const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
   const warningMessages = fieldStore.warningMessages;
@@ -120,7 +139,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValue}
+        ValueRenderer={AlternativeValueComponent}
       />
       <Form.Control
         value={value}

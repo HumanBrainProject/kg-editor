@@ -81,7 +81,7 @@ class InputNumberStore extends FieldStore {
 
   get returnValue() {
     if (this.value === null && this.returnAsNull) {
-      return null;
+      return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
     if (this.value === "") {
       return null;

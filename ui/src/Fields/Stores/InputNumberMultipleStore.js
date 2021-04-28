@@ -75,7 +75,7 @@ class InputNumberMultipleStore extends FieldStore {
 
   get returnValue() {
     if (!this.value.length && this.returnAsNull) {
-      return null;
+      return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
     const val = this.value.map(v => parseFloat(v));
     return val;

@@ -43,6 +43,10 @@ const useStyles = createUseStyles({
       transform: "translateY(-50%)"
     }
   },
+  nullValue:{
+    color: "grey",
+    fontStyle: "italic"
+  },
   removeIcon: {
     marginLeft: "3%"
   }
@@ -105,9 +109,9 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   return (
     <Dropdown.Item className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
-        <strong>
+        {alternative.value != null ? <strong>
           <ValueRenderer alternative={alternative} />
-        </strong><em><div className="parenthesis">(</div>{
+        </strong> : <span className={classes.nullValue}>no value</span>} <em><div className="parenthesis">(</div>{
           users.map(user => (
             <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
           ))

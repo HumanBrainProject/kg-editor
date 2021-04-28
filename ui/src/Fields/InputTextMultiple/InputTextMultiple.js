@@ -67,7 +67,7 @@ const useStyles = createUseStyles({
 });
 
 const getAlternativeValue = () => {
-  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.join("; "):alternative.value);
+  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.map(v => typeof v === "string"?v:JSON.stringify(v)).join("; "):JSON.stringify(alternative.value));
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };

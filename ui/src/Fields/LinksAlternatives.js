@@ -32,7 +32,7 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
 
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
-      const instances = value.map(v => {
+      const instances = Array.isArray(value)?value.map(v => {
         if (v[mappingValue]) {
           const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
           instance.fetchLabel();
@@ -42,7 +42,12 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
           name: "Unknown instance",
           value: value
         };
-      });
+      }):[
+        {
+          name: JSON.stringify(value),
+          value: value
+        }
+      ];
       return {
         users: users,
         selected: selected,

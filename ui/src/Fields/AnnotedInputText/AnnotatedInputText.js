@@ -68,7 +68,7 @@ const useStyles = createUseStyles({
 
 
 const getAlternativeValue = mappingValue => {
-  const AlternativeValue = observer(({alternative}) => alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "));
+  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value)?alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "):JSON.stringify(alternative.value));
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };

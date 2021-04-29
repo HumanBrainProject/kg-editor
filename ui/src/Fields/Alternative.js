@@ -109,7 +109,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   return (
     <Dropdown.Item className={classes.container} onSelect={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
-        {alternative.value != null ? <strong>
+        {alternative.value !== null ? <strong>
           <ValueRenderer alternative={alternative} />
         </strong> : <span className={classes.nullValue}>no value</span>} <em><div className="parenthesis">(</div>{
           users.map(user => (

@@ -92,7 +92,7 @@ export const normalizeInstanceData = data => {
     field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
       .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
       .map(alternative => ({
-        value: alternative.value,
+        value: alternative.value === undefined ? null : alternative.value,
         users: alternative.users,
         selected: !!alternative.selected
       }));

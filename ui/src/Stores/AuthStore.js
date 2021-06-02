@@ -176,10 +176,11 @@ export class AuthStore {
       resolve(true);
     };
     keycloak.onAuthError = error => {
+      const message = (error && error.error_description)?error.error_description:"Failed to authenticate";
       runInAction(() => {
-        this.authError = error.error_description;
+        this.authError = message;
       });
-      reject(error.error_description);
+      reject(message);
     };
     keycloak.onTokenExpired = () => {
       keycloak

@@ -72,6 +72,9 @@ export class TypeStore {
         const response = await this.transportLayer.getSpaceTypes(this.rootStore.appStore.currentSpace.id);
         runInAction(() => {
           this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
+          if(!this.types.length) {
+            this.fetchError = "No types available";
+          }
           this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
           this.isFetching = false;
         });

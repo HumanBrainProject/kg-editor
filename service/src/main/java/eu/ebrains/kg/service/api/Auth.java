@@ -32,12 +32,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RequestMapping("/auth")
 @RestController
 public class Auth {
 
     @Value("${eu.ebrains.kg.editor.sentry}")
-    private String sentryUrl;
+    String sentryUrl;
+
+    @Value("${eu.ebrains.kg.commit}")
+    String commit;
 
     private final AuthClient authClient;
 
@@ -49,8 +54,12 @@ public class Auth {
     @GetMapping("/endpoint")
     public KGCoreResult.Single getAuthEndpoint() {
         KGCoreResult.Single response = authClient.getEndpoint();
+        Map<String, Object> data = response.getData();
         if(StringUtils.isNotBlank(sentryUrl)) {
-            response.getData().put("sentryUrl", sentryUrl);
+            data.put("sentryUrl", sentryUrl);
+        }
+        if(StringUtils.isNotBlank(commit)) {
+            data.put("commit", commit);
         }
         return response;
     }

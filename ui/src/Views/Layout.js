@@ -202,6 +202,15 @@ const useStyles = createUseStyles(theme => ({
       paddingLeft: "30px",
       paddingRight: "30px"
     }
+  },
+  footer: {
+    position: "relative"
+  },
+  build: {
+    color: "var(--ft-color-loud)",
+    position: "absolute",
+    top: "0px",
+    right: "10px"
   }
 }));
 
@@ -209,6 +218,7 @@ const Layout = observer(() => {
 
   const { appStore, authStore } = useStores();
 
+  const commit = authStore.commit;
   const theme = useTheme();
   const useGlobalStyles = getGlobalUseStyles();
   useGlobalStyles({ theme });
@@ -271,8 +281,13 @@ const Layout = observer(() => {
               </Modal>
         }
       </div>
-      <div className={`${classes.status} layout-status`}>
-        Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
+      <div className={classes.footer}>
+        <div className={`${classes.status} layout-status`}>
+                Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
+        </div>
+        <div className={classes.build}>
+          {commit && <span >build: <i>{commit}</i></span>}
+        </div>
       </div>
     </div>
   );

@@ -39,6 +39,7 @@ export class AuthStore {
   isLogout = false;
   keycloak = null;
   endpoint = null;
+  commit = null;
 
   transportLayer = null;
 
@@ -46,6 +47,7 @@ export class AuthStore {
     makeObservable(this, {
       isUserAuthorized: observable,
       user: observable,
+      commit: observable,
       isRetrievingUserProfile: observable,
       userProfileError: observable,
       authError: observable,
@@ -207,6 +209,7 @@ export class AuthStore {
       const { data } = await this.transportLayer.getAuthEndpoint();
       runInAction(() => {
         this.endpoint =  data && data.data? data.data.endpoint :null;
+        this.commit =  data && data.data? data.data.commit :null;
         const sentryUrl = data && data.data? data.data.sentryUrl :null;
         if (sentryUrl) {
           Sentry.init({

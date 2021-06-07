@@ -27,6 +27,7 @@ import Form from "react-bootstrap/Form";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -197,7 +198,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const handleSelectTargetType = (eventKey, e) => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
-    debugger;
     if (type) {
       fieldStore.setTargetType(type);
     }
@@ -323,10 +323,14 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         </div>
         {hasMultipleTypes && (
           <Dropdown className={classes.targetTypes} onSelect={handleSelectTargetType}>
-            <Dropdown.Toggle id={`targetType-${fullyQualifiedName}`}>{targetType.label}</Dropdown.Toggle>
+            <Dropdown.Toggle id={`targetType-${fullyQualifiedName}`}>
+              <FontAwesomeIcon icon={"circle"} color={targetType.color}/>&nbsp;&nbsp;{targetType.label?targetType.label:targetType.name}
+            </Dropdown.Toggle>
             <Dropdown.Menu>
               {targetTypes.map(type =>
-                  <Dropdown.Item key={type.name} eventKey={type.name}>{type.label}</Dropdown.Item>
+                  <Dropdown.Item key={type.name} eventKey={type.name}>
+                    <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;{type.label?type.label:type.name}
+                  </Dropdown.Item>
               )}
             </Dropdown.Menu>
           </Dropdown>

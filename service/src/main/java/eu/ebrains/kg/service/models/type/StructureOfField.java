@@ -24,9 +24,11 @@
 package eu.ebrains.kg.service.models.space;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
+import eu.ebrains.kg.service.models.instance.SimpleType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -72,7 +74,10 @@ public class StructureOfField implements Serializable {
         this.searchable = kgSearchable;
         this.required = required;
         this.targetTypes = !CollectionUtils.isEmpty(kgTargetTypes) ? kgTargetTypes.stream()
-                .map(t -> (String) t.get(EditorConstants.VOCAB_TYPE)).filter(Objects::nonNull).collect(Collectors.toList()) : null;
+                .map(t -> (String) t.get(EditorConstants.VOCAB_TYPE))
+                .filter(Objects::nonNull)
+                .map(SimpleType::new)
+                .collect(Collectors.toList()) : null;
     }
 
     private final String fullyQualifiedName;
@@ -93,7 +98,7 @@ public class StructureOfField implements Serializable {
     private final Boolean required;
     private Map<String, StructureOfField> fields;
     private Object value;
-    private List<String> targetTypes;
+    private List<SimpleType> targetTypes;
 
     public String getRegex() { return regex; }
 
@@ -107,11 +112,16 @@ public class StructureOfField implements Serializable {
 
     public Integer getMaxValue() { return maxValue; }
 
-    public List<String> getTargetTypes() {
+    public List<SimpleType> getTargetTypes() {
         return targetTypes;
     }
 
-    public void setTargetTypes(List<String> targetTypes) {
+    @JsonIgnore
+    public List<String> getTargetTypesNames() {
+        return targetTypes.stream().map(SimpleType::getName).collect(Collectors.toList());
+    }
+
+    public void setTargetTypes(List<SimpleType> targetTypes) {
         this.targetTypes = targetTypes;
     }
 

@@ -23,7 +23,9 @@
 
 package eu.ebrains.kg.service.models.instance;
 
-public class SimpleType {
+import java.io.Serializable;
+
+public class SimpleType implements Serializable {
 
     public SimpleType(String name) {
         this.name = name;

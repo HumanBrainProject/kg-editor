@@ -40,13 +40,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onAddValue, onExternalCreate, onAddNewValue, onDeleteLastValue, onLoadMore, onDrop, onPreview }) => {
+const Dropdown = ({ className, options, newOptions, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onAddValue, onExternalCreate, onAddNewValue, onDeleteLastValue, onLoadMore, onDrop, onPreview, onSelectTargetType }) => {
 
   const classes = useStyles();
 
   const wrapperRef = useRef();
 
-  const [current, setCurrent] = useState({ type: null, option: null});
+  const [current, setCurrent] = useState({ newOption: null, option: null});
 
   useEffect(() => {
     return () => { // Unmount
@@ -59,27 +59,24 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
     if(e.keyCode === 8 && !e.target.value){
       e.preventDefault();
       onDeleteLastValue && onDeleteLastValue();
-    } else if(e.keyCode === 40){
+    } else if(e.keyCode === 40){ //down
       e.preventDefault();
-      if(types.length){
-        const type = types[0];
-        setCurrent({type: type.name, option: null});
+      if(newOptions.length){
+        const newOption = newOptions[0];
+        setCurrent({newOption: newOption.id, option: null});
       } else if(options.length){
         const value = options[0];
-        setCurrent({type: null, option: value.id});
+        setCurrent({newOption: null, option: value.id});
       } else {
-        setCurrent({type: null, option: null});
+        setCurrent({newOption: null, option: null});
       }
-    } else if(e.keyCode === 38){
+    } else if(e.keyCode === 38){ //up
       e.preventDefault();
       if(options.length){
         const value = options[options.length - 1];
-        setCurrent({type: null, option: value.id});
-      } else if(types.length){
-        const type = types[options.length-1];
-        setCurrent({type: type.name, option: null});
+        setCurrent({newOption: null, option: value.id});
       } else {
-        setCurrent({type: null, option: null});
+        setCurrent({newOption: null, option: null});
       }
     } else if(e.keyCode === 27) {
       //escape key -> we want to reset the search
@@ -96,46 +93,46 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
     const name = searchTerm.trim();
     if(name) {
       onAddNewValue(name, type);
-      setCurrent({type: null, option: null});
+      setCurrent({newOption: null, option: null});
       handleFocus();
     }
   };
 
   const handleOnAddValue = id => {
     onAddValue(id);
-    setCurrent({type: null, option: null});
+    setCurrent({newOption: null, option: null});
     handleFocus();
   };
 
-  const handleOnSelectNextType = name => {
-    const index = types.findIndex(o => o.name === name);
-    if(index < types.length - 1){
-      const type = types[index + 1] ;
-      setCurrent({type: type.name, option: null});
+  const handleOnSelectNextNewOption = name => {
+    const index = newOptions.findIndex(o => o.name === name);
+    if(index < newOptions.length - 1){
+      const newOption = newOptions[index + 1] ;
+      setCurrent({newOption: newOption.id, option: null});
     } else if(options.length){
       const value = options[0];
-      setCurrent({type: null, option: value.id});
-    } else if(types.length) {
-      const type = types[0];
-      setCurrent({type: type.name, option: null});
+      setCurrent({newOption: null, option: value.id});
+    } else if(newOptions.length) {
+      const newOption = newOptions[0];
+      setCurrent({newOption: newOption.id, option: null});
     } else {
-      setCurrent({type: null, option: null});
+      setCurrent({newOption: null, option: null});
     }
   };
 
-  const handleOnSelectPreviousType = name => {
-    const index = types.findIndex(o => o.name === name);
+  const handleOnSelectPreviousNewOption = name => {
+    const index = newOptions.findIndex(o => o.name === name);
     if(index > 0){
-      const type = types[index - 1] ;
-      setCurrent({type: type.name, option: null});
+      const newOption = newOptions[index - 1] ;
+      setCurrent({newOption: newOption.id, option: null});
     } else if(options.length){
       const value = options[options.length-1];
-      setCurrent({type: null, option: value.id});
-    } else if(types.length) {
-      const type = types[0];
-      setCurrent({type: type.name, option:null});
+      setCurrent({newOption: null, option: value.id});
+    } else if(newOptions.length) {
+      const newOption = newOptions[0];
+      setCurrent({newOption: newOption.id, option:null});
     } else {
-      setCurrent({type: null, option: null});
+      setCurrent({newOption: null, option: null});
     }
   };
 
@@ -143,15 +140,15 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
     const index = options.findIndex(o => o.id === id);
     if(index < options.length - 1){
       const value = options[index + 1] ;
-      setCurrent({type:null, option: value.id});
-    } else if(types.length) {
-      const type = types[0];
-      setCurrent({type: type.name, option: null});
+      setCurrent({newOption:null, option: value.id});
+    } else if(newOptions.length) {
+      const newOption = newOptions[0];
+      setCurrent({newOption: newOption.id, option: null});
     } else if(options.length) {
       const value = options[0];
-      setCurrent({type: null, option: value.id});
+      setCurrent({newOption: null, option: value.id});
     } else {
-      setCurrent({type: null, option: null});
+      setCurrent({newOption: null, option: null});
     }
   };
 
@@ -159,26 +156,26 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
     const index = options.findIndex(o => o.id === id);
     if(index > 0){
       const value = options[index- 1] ;
-      setCurrent({type: null, option: value.id});
-    } else if(types.length){
-      const type = types[types.length-1];
-      setCurrent({type: type.name, option: null});
+      setCurrent({newOption: null, option: value.id});
+    } else if(newOptions.length){
+      const newOption = newOptions[newOptions.length-1];
+      setCurrent({newOption: newOption.id, option: null});
     } else if(options.length){
       const value = options[0];
-      setCurrent({type: null, option: value.id});
+      setCurrent({newOption: null, option: value.id});
     } else {
-      setCurrent({type: null, option: null});
+      setCurrent({newOption: null, option: null});
     }
   };
 
   const handleReset = () => {
-    setCurrent({type: null, option: null});
+    setCurrent({newOption: null, option: null});
     onReset();
   };
 
   const handleFocus = () => {
     onSearch("");
-    setCurrent({type: null, option: null});
+    setCurrent({newOption: null, option: null});
     listenClickOutHandler();
   };
 
@@ -203,8 +200,9 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
 
   //const showMenu = wrapperRef.current && wrapperRef.current.contains(document.activeElement) && (options.length || searchTerm);
   const showMenu = options.length || searchTerm;
+
   return (
-    <div className={classes.container} ref={wrapperRef}>
+    <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
       <input className={classes.userInput}
         onDrop={e => e.preventDefault() && onDrop && onDrop()}
         onDragOver={e => e.preventDefault()}
@@ -215,20 +213,20 @@ const Dropdown = ({ options, types, externalTypes, inputPlaceholder, loading, ha
         value={searchTerm}
         placeholder={inputPlaceholder} />
       {showMenu && (
-        <Menu currentType={current.type}
+        <Menu 
+          currentNewOption={current.newOption}
           currentOption={current.option}
           searchTerm={searchTerm}
           values={options}
-          types={types}
-          externalTypes={externalTypes}
+          newValues={newOptions}
           loading={loading}
           hasMore={hasMore}
           onLoadMore={onLoadMore}
           onAddNewValue={handleOnAddNewValue}
           onAddValue={handleOnAddValue}
           onExternalCreate={onExternalCreate}
-          onSelectNextType={handleOnSelectNextType}
-          onSelectPreviousType={handleOnSelectPreviousType}
+          onSelectNextType={handleOnSelectNextNewOption}
+          onSelectPreviousType={handleOnSelectPreviousNewOption}
           onSelectNextValue={handleOnSelectNextValue}
           onSelectPreviousValue={handleOnSelectPreviousValue}
           onCancel={handleReset}

@@ -25,27 +25,80 @@ import React, { useEffect, useRef } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
+import Button from "react-bootstrap/Button";
 
 import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   option: {
     position: "relative"
+  },
+  info: {
+    backgroundColor: "rgba(255, 226, 20, 0.6)",
+    padding: "5px",
+    marginTop: "2px",
+    cursor: "pointer"
+  },
+  create: {
+    paddingBottom: "5px"
   }
 });
 
 
-const NewValues = ({types, currentType, value, onSelectNext, onSelectPrevious, onSelect, onCancel}) => (
-  <>
-    {types.map(type => <NewValue type={type} key={type.name} value={value} onSelectNext={onSelectNext} onSelectPrevious={onSelectPrevious} onSelect={onSelect} onCancel={onCancel} hasFocus={currentType === type.name} />)}
-  </>
-);
+const NewValueInCurentSpace = ({ type, value }) => {
 
-const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel }) => {
+  const  { typeStore } = useStores();
+
+  const style = type.color ? { color: type.color } : {};
+
+  const typeDefinition = typeStore.typesMap.get(type.name);
+
+  return (
+    <>
+      <em>Add a new <span style={style}>
+        <FontAwesomeIcon fixedWidth icon="circle" />
+      </span>
+      {type.label} </em>{!!typeDefinition && !!typeDefinition.labelField && (
+        <strong>{value}</strong>
+      )}
+    </>
+  );
+};
+
+
+const NewValueInExternalSpace = ({space, type}) => {
 
   const classes = useStyles();
 
-  const  { typeStore } = useStores();
+  const style = type.color ? { color: type.color } : {};
+
+  if (space.permissions.canCreate) {
+    return (
+      <div className={classes.create}>
+        <Button variant="primary" size="sm">
+          <em>Create an instance of type <span style={style}>
+            <FontAwesomeIcon fixedWidth icon="circle" />
+          </span>
+          {type.label} in space <strong>{space.name}</strong></em>
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.info}>
+      <em>You are not allowed to create an instance of type <span style={style}>
+        <FontAwesomeIcon fixedWidth icon="circle" />
+      </span>
+      {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>
+    </div>
+  );
+};
+
+
+const NewValue = ({ newValue, value, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel, onExternalCreate }) => {
+
+  const classes = useStyles();
 
   const ref = useRef();
 
@@ -56,7 +109,13 @@ const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSel
   });
 
   const handleOnSelect = () => {
-    onSelect(type.name);
+    if (newValue.isExternal) {
+      if (newValue.space.permissions.canCreate) {
+        onExternalCreate(newValue.space.name, newValue.type.name);
+      }
+    } else {
+      onSelect(newValue.type.name);
+    }
   };
 
   const handleKeyDown = e => {
@@ -64,17 +123,17 @@ const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSel
       switch(e.keyCode) {
       case 38: {
         e.preventDefault();
-        onSelectPrevious(type.name);
+        onSelectPrevious(newValue.type.name);
         break;
       }
       case 40: {
         e.preventDefault();
-        onSelectNext(type.name);
+        onSelectNext(newValue.type.name);
         break;
       }
       case 13: {
         e.preventDefault();
-        onSelect(type.name);
+        handleOnSelect();
         break;
       }
       case 27: {
@@ -88,22 +147,25 @@ const NewValue = ({ type, value, hasFocus, onSelectNext, onSelectPrevious, onSel
     }
   };
 
-  const style = type.color ? { color: type.color } : {};
-
-  const typeDefinition = typeStore.typesMap.get(type.name);
-
   return (
     <Dropdown.Item onSelect={handleOnSelect}>
       <div tabIndex={-1} className={classes.option} onKeyDown={handleKeyDown} ref={ref}>
-        <em>Add a new <span style={style}>
-          <FontAwesomeIcon fixedWidth icon="circle" />
-        </span>
-        {type.label} </em>{!!typeDefinition && !!typeDefinition.labelField && (
-          <strong>{value}</strong>
-        )}
+        {newValue.isExternal?
+          <NewValueInExternalSpace space={newValue.space} type={newValue.type} /> 
+          :
+          <NewValueInCurentSpace type={newValue.type} value={value} />
+        }
       </div>
     </Dropdown.Item>
   );
 };
+
+
+const NewValues = ({newValues, current, value, onSelectNext, onSelectPrevious, onSelect, onCancel, onExternalCreate}) => (
+  <>
+    {newValues.map(newValue => <NewValue key={newValue.id} newValue={newValue} value={value} onSelectNext={onSelectNext} onSelectPrevious={onSelectPrevious} onSelect={onSelect} onExternalCreate={onExternalCreate} onCancel={onCancel} hasFocus={current === newValue.id} />)}
+  </>
+);
+
 
 export default NewValues;

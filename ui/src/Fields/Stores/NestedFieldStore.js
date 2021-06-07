@@ -115,7 +115,7 @@ class NestedFieldStore extends FieldStore {
                   field.fields = fields;
                 }
               }
-              const options = {...fieldMapping.options, targetType: value["@type"]};
+              const options = {...fieldMapping.options, sourceType: value["@type"]};
               rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
             }
             const store = rowFieldStores.stores[name];

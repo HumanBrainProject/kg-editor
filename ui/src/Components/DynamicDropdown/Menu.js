@@ -29,7 +29,6 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Options from "./Options";
 import NewValues from "./NewValues";
-import ExternalTypes from "./ExternalTypes";
 
 const useStyles = createUseStyles({
   container:{
@@ -69,13 +68,15 @@ const useStyles = createUseStyles({
   }
 });
 
-const Menu = ({ types,
-  externalTypes,
-  currentType,
+const Menu = ({ 
+  types,
+  currentNewOption,
   currentOption,
+  currentNewValue,
   hasMore,
   searchTerm,
   values,
+  newValues,
   loading,
   onAddNewValue,
   onAddValue,
@@ -100,13 +101,12 @@ const Menu = ({ types,
         hasMore={hasMore}
         loadMore={onLoadMore}
         useWindow={false}>
-        {!values.length && !types.length &&
+        {!values.length && !newValues.length &&
             (<Dropdown.Item>
               <em>No results found for: </em> <strong>{searchTerm}</strong>
             </Dropdown.Item>)
         }
-        <ExternalTypes types={externalTypes} onExternalCreate={onExternalCreate}/>
-        <NewValues value={searchTerm} types={types} currentType={currentType} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onCancel={onCancel}/>
+        <NewValues newValues={newValues} current={currentNewValue} value={searchTerm} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onExternalCreate={onExternalCreate} onCancel={onCancel}/>
         <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
         {loading?
           <Dropdown.Item>

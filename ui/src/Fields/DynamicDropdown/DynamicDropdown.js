@@ -24,12 +24,13 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
+import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import Dropdown from "../../Components/DynamicDropdown/Dropdown";
+import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
 import Invalid from "../Invalid";
@@ -37,7 +38,17 @@ import Invalid from "../Invalid";
 import List from "./List";
 
 const useStyles = createUseStyles({
+  labelContainer: {
+    display: "flex"
+  },
+  labelPanel: {
+    flex: "1",
+    "&.verticalSpace": {
+      paddingTop: "5px"
+    }
+  },
   values:{
+    flex: 1,
     height:"auto",
     paddingBottom:"3px",
     position:"relative",
@@ -45,6 +56,15 @@ const useStyles = createUseStyles({
     "&[disabled]": {
       backgroundColor: "#e9ecef",
       pointerEvents:"none"
+    }
+  },
+  targetTypes: {
+    minWidth: "30%",
+    marginBottom: "5px",
+    "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active": {
+      border: "1px solid #ced4da",
+      background: "transparent",
+      color: "#212529"
     }
   },
   label: {},
@@ -72,6 +92,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const {
     instance,
+    fullyQualifiedName,
     value: values,
     links,
     label,
@@ -80,11 +101,11 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     globalLabelTooltip,
     globalLabelTooltipIcon,
     mappingValue,
-    allowCustomValues,
     optionsSearchTerm,
     options,
-    optionsTypes,
-    optionsExternalTypes,
+    newOptions,
+    targetTypes,
+    targetType,
     hasMoreOptions,
     fetchingOptions,
     alternatives,
@@ -171,6 +192,15 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     const value = values[index];
     fieldStore.removeValue(value);
     instanceStore.togglePreviewInstance();
+  };
+
+  const handleSelectTargetType = (eventKey, e) => {
+    e.preventDefault();
+    const type = targetTypes.find(t => t.name === eventKey);
+    debugger;
+    if (type) {
+      fieldStore.setTargetType(type);
+    }
   };
 
   const handleDragEnd = () => draggedValue.current = null;
@@ -276,18 +306,33 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
+  const hasMultipleTypes = canAddValues && targetTypes.length > 1;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
-      <LinksAlternatives
-        className={classes.alternatives}
-        list={alternatives}
-        onSelect={handleSelectAlternative}
-        onRemove={handleRemoveMySuggestion}
-        mappingValue={mappingValue}
-        parentContainerRef={formGroupRef}
-      />
-      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
+      <div className={classes.labelContainer}>
+        <div className={`${classes.labelPanel} ${hasMultipleTypes?"verticalSpace":""}`}>
+          <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+          <LinksAlternatives
+            className={classes.alternatives}
+            list={alternatives}
+            onSelect={handleSelectAlternative}
+            onRemove={handleRemoveMySuggestion}
+            mappingValue={mappingValue}
+            parentContainerRef={formGroupRef}
+          />
+        </div>
+        {hasMultipleTypes && (
+          <Dropdown className={classes.targetTypes} onSelect={handleSelectTargetType}>
+            <Dropdown.Toggle id={`targetType-${fullyQualifiedName}`}>{targetType.label}</Dropdown.Toggle>
+            <Dropdown.Menu>
+              {targetTypes.map(type =>
+                  <Dropdown.Item key={type.name} eventKey={type.name}>{type.label}</Dropdown.Item>
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
+      </div>
+      <div className={`form-control ${classes.values} ${(hasWarning && hasWarningMessages)?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={links}
           readOnly={false}
@@ -306,11 +351,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
         />
         {canAddValues && (
-          <Dropdown
+          <DropdownComponent
             searchTerm={optionsSearchTerm}
             options={options}
-            types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-            externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
+            newOptions={newOptions}
             loading={fetchingOptions}
             hasMore={hasMoreOptions}
             onSearch={handleSearchOptions}

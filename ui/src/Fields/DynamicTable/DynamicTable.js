@@ -28,10 +28,11 @@ import _  from "lodash-uuid";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import Dropdown from "../../Components/DynamicDropdown/Dropdown";
+import DropdownComponent from "../../Components/DynamicDropdown/Dropdown";
 import Table from "./Table";
 import Label from "../Label";
 import Invalid from "../Invalid";
@@ -55,6 +56,22 @@ const useStyles = createUseStyles({
       paddingLeft: "9px"
     }
   },
+  addValueContainer: {
+    position: "relative",
+    "&.hasMultipleTypes": {
+      "& $dropdownContainer": {
+        paddingRight: "30%"
+      },
+      "& $dropdown": {
+        display: "block",
+        marginRight: "10px",
+        "& > input": {
+          maxWidth: "unset !important",
+          width: "100% !important"
+        }
+      }
+    }
+  },
   dropdownContainer:{
     height:"auto",
     borderRadius: "0",
@@ -64,6 +81,22 @@ const useStyles = createUseStyles({
     paddingTop: "4px",
     paddingBottom: "1px",
     position:"relative"
+  },
+  dropdown: {},
+  targetTypes: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active": {
+      border: "1px solid #ced4da",
+      background: "transparent",
+      color: "#212529",
+      borderTop: 0,
+      borderBottom: 0,
+      borderRight: 0,
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0
+    }
   },
   emptyMessage: {
     position: "absolute !important",
@@ -105,17 +138,18 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const {
     instance,
+    fullyQualifiedName,
     links,
     label,
     labelTooltip,
     labelTooltipIcon,
     globalLabelTooltip,
     globalLabelTooltipIcon,
-    allowCustomValues,
     optionsSearchTerm,
     options,
-    optionsTypes,
-    optionsExternalTypes,
+    newOptions,
+    targetTypes,
+    targetType,
     hasMoreOptions,
     fetchingOptions,
     returnAsNull,
@@ -167,6 +201,15 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   };
 
   const handleOnExternalCreate = (space, type) => appStore.createExternalInstance(space, type, optionsSearchTerm);
+
+  const handleSelectTargetType = (eventKey, e) => {
+    e.preventDefault();
+    const type = targetTypes.find(t => t.name === eventKey);
+    debugger;
+    if (type) {
+      fieldStore.setTargetType(type);
+    }
+  };
 
   const handleDeleteAll = () => {
     fieldStore.setValues([]);
@@ -228,9 +271,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || returnAsNull;
+  const canAddValues = !isDisabled;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
+  const hasMultipleTypes = canAddValues && targetTypes.length > 1;
   if (readMode && !links.length && !showIfNoValue) {
     return null;
   }
@@ -269,24 +314,36 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           />
         }
         {!isDisabled && (
-          <div className={`form-control ${classes.dropdownContainer}`}>
-            <Dropdown
-              searchTerm={optionsSearchTerm}
-              options={options}
-              types={(allowCustomValues && optionsTypes.length && optionsSearchTerm)?optionsTypes:[]}
-              spaces={authStore.spaces}
-              externalTypes={(allowCustomValues && optionsExternalTypes.length && optionsSearchTerm)?optionsExternalTypes:[]}
-              loading={fetchingOptions}
-              hasMore={hasMoreOptions}
-              inputPlaceholder={`type to add a ${fieldStoreLabel}`}
-              onSearch={handleSearchOptions}
-              onLoadMore={handleLoadMoreOptions}
-              onReset={handleDropdownReset}
-              onAddValue={handleOnAddValue}
-              onAddNewValue={handleOnAddNewValue}
-              onPreview={handleOptionPreview}
-              onExternalCreate={handleOnExternalCreate}
-            />
+          <div className={`${classes.addValueContainer} ${hasMultipleTypes?"hasMultipleTypes":""}`}>
+            <div className={`form-control ${classes.dropdownContainer}`}>
+              <DropdownComponent
+                className={classes.dropdown}
+                searchTerm={optionsSearchTerm}
+                options={options}
+                newOptions={newOptions}
+                spaces={authStore.spaces}
+                loading={fetchingOptions}
+                hasMore={hasMoreOptions}
+                inputPlaceholder={`type to add a ${fieldStoreLabel}`}
+                onSearch={handleSearchOptions}
+                onLoadMore={handleLoadMoreOptions}
+                onReset={handleDropdownReset}
+                onAddValue={handleOnAddValue}
+                onAddNewValue={handleOnAddNewValue}
+                onPreview={handleOptionPreview}
+                onExternalCreate={handleOnExternalCreate}
+              />
+            </div>
+            {hasMultipleTypes && (
+              <Dropdown className={classes.targetTypes} onSelect={handleSelectTargetType}>
+              <Dropdown.Toggle id={`targetType-${fullyQualifiedName}`}>{targetType.label}</Dropdown.Toggle>
+              <Dropdown.Menu>
+                {targetTypes.map(type =>
+                    <Dropdown.Item key={type.name} eventKey={type.name}>{type.label}</Dropdown.Item>
+                )}
+              </Dropdown.Menu>
+            </Dropdown>
+            )}
           </div>
         )}
       </div>

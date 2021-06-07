@@ -34,12 +34,11 @@ class LinksStore extends FieldStore {
   options = [];
   allowCustomValues = true;
   returnAsNull = false;
-  optionsTypes = [];
-  optionsExternalTypes = [];
   optionsSearchTerm = "";
   optionsPageStart = 0;
   optionsPageSize = 50;
   optionsCurrentTotal = Infinity;
+  newOptions = [];
   fetchingOptions = false;
   lazyShowLinks = false;
   visibleLinks = new Set();
@@ -50,6 +49,7 @@ class LinksStore extends FieldStore {
   minItems = null;
   maxItems = null;
   targetType = null;
+  sourceType = null;
 
   appStore = null;
 
@@ -57,8 +57,9 @@ class LinksStore extends FieldStore {
     super(definition, options, instance, transportLayer, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
-    this.targetTypes = definition.targetTypes;
-    this.targetType = options && options.targetType;
+    this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes.map(t => ({name: t, label: t.split("/")[4], color: "black", space: ["actors"]})):[];
+    this.targetType = this.targetTypes.length?this.targetTypes[0]:null;
+    this.sourceType = options && options.sourceType;
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;
     }
@@ -73,8 +74,6 @@ class LinksStore extends FieldStore {
       options: observable,
       allowCustomValues: observable,
       returnAsNull: observable,
-      optionsTypes: observable,
-      optionsExternalTypes: observable,
       optionsSearchTerm: observable,
       optionsPageStart: observable,
       optionsPageSize: observable,
@@ -86,6 +85,7 @@ class LinksStore extends FieldStore {
       minItems: observable,
       maxItems: observable,
       targetType: observable,
+      newOptions: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
@@ -111,7 +111,8 @@ class LinksStore extends FieldStore {
       performSearchOptions: action,
       searchOptions: action,
       resetOptionsSearch: action,
-      loadMoreOptions: action
+      loadMoreOptions: action,
+      setTargetType: action
     });
 
   }
@@ -308,7 +309,7 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.targetType?this.targetType:null, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
       const options = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (append) {
@@ -316,17 +317,16 @@ class LinksStore extends FieldStore {
         } else {
           this.options = options;
         }
-        this.optionsTypes = [];
-        this.optionsExternalTypes = [];
-        Object.values(types).forEach(type => {
-          if(type.space.includes(this.instance.space)) {
-            this.optionsTypes.push(type);
-          } else {
-            this.optionsExternalTypes.push({
-              ...type,
-              spaces: type.space.map(id => this.rootStore.authStore.getSpaceInfo(id))
+        this.newOptions = [];
+        this.allowCustomValues && Object.values(types).forEach(type => {
+          type.space.forEach(space => {
+            this.newOptions.push({
+              id: `${space}-${type.name}`,
+              type: type,
+              space: this.rootStore.authStore.getSpaceInfo(space),
+              isExternal: space !== this.rootStore.appStore.currentSpace.id
             });
-          }
+          })
         });
         this.optionsCurrentTotal = total;
         this.fetchingOptions = false;
@@ -335,8 +335,6 @@ class LinksStore extends FieldStore {
       runInAction(()=>{
         this.options = [];
         this.optionsCurrentTotal = 0;
-        this.optionsTypes = [];
-        this.optionsExternalTypes = [];
       });
     }
   }
@@ -346,8 +344,6 @@ class LinksStore extends FieldStore {
   searchOptions(search, force=true) {
     this.optionsSearchTerm = search;
     this.options = [];
-    this.optionsTypes = [];
-    this.optionsExternalTypes = [];
     if (force || search) {
       this._debouncedSearchOptions(false);
     }
@@ -361,6 +357,10 @@ class LinksStore extends FieldStore {
     if(this.hasMoreOptions){
       this.performSearchOptions(true);
     }
+  }
+
+  setTargetType(type) {
+    this.targetType = type;
   }
 }
 

@@ -137,12 +137,13 @@ public class Instances {
     @PostMapping("/instances/{id}/suggestions")
     public KGCoreResult<SuggestionStructure> getSuggestions(@PathVariable("id") String id,
                                                             @RequestParam("field") String field,
-                                                            @RequestParam(value = "type", required = false) String type,
+                                                            @RequestParam(value = "sourceType", required = false) String sourceType,
+                                                            @RequestParam(value = "targetType", required = false) String targetType,
                                                             @RequestParam(value = "start", required = false, defaultValue = "0") int start,
                                                             @RequestParam(value = "size", required = false, defaultValue = "50") int size,
                                                             @RequestParam(value = "search", required = false) String search,
                                                             @RequestBody Map<String, Object> payload) {
-        KGCoreResult<SuggestionStructure> suggestionStructure = instanceClient.postSuggestions(id, field, type, start, size, search, payload);
+        KGCoreResult<SuggestionStructure> suggestionStructure = instanceClient.postSuggestions(id, field, sourceType, targetType, start, size, search, payload);
         if(suggestionStructure!= null && suggestionStructure.getData()!=null){
             suggestionStructure.getData().getSuggestions().getData().forEach(s -> {
                 if(s!=null && s.getType()!=null){

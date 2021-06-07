@@ -159,7 +159,8 @@ public class InstanceClient {
 
     public KGCoreResult<SuggestionStructure> postSuggestions(String id,
                                                String field,
-                                               String type,
+                                               String sourceType,
+                                               String targetType,
                                                Integer start,
                                                Integer size,
                                                String search,
@@ -168,8 +169,11 @@ public class InstanceClient {
         if(StringUtils.isNotBlank(search)){
             relativeUrl = String.format("%s&search=%s", relativeUrl, search);
         }
-        if (StringUtils.isNotBlank(type)) {
-            relativeUrl = String.format("%s&type=%s", relativeUrl, type);
+        if (StringUtils.isNotBlank(sourceType)) {
+            relativeUrl = String.format("%s&sourceType=%s", relativeUrl, sourceType);
+        }
+        if (StringUtils.isNotBlank(targetType)) {
+            relativeUrl = String.format("%s&targetType=%s", relativeUrl, targetType);
         }
         return kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(payload))

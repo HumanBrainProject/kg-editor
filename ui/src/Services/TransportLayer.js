@@ -91,8 +91,8 @@ export class TransportLayer {
     return this._axios.get(API.endpoints.searchInstancesByBookmark(space, bookmarkId, from, size, search));
   }
 
-   getSuggestions(instanceId, field, type, from, size, search, payload) {
-    return this._axios.post(API.endpoints.suggestions(instanceId, field, type, from, size, search), payload);
+   getSuggestions(instanceId, field, sourceType, targetType, from, size, search, payload) {
+    return this._axios.post(API.endpoints.suggestions(instanceId, field, sourceType, targetType, from, size, search), payload);
   }
 
    getInstanceNeighbors(instanceId) {

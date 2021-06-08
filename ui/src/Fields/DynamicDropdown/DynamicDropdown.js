@@ -43,10 +43,7 @@ const useStyles = createUseStyles({
     display: "flex"
   },
   labelPanel: {
-    flex: "1",
-    "&.verticalSpace": {
-      paddingTop: "5px"
-    }
+    flex: "1"
   },
   values:{
     flex: 1,
@@ -61,11 +58,14 @@ const useStyles = createUseStyles({
   },
   targetTypes: {
     minWidth: "30%",
-    marginBottom: "5px",
     "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active": {
-      border: "1px solid #ced4da",
+      border: 0, //"1px solid #ced4da",
       background: "transparent",
-      color: "#212529"
+      color: "#212529",
+      width: "100%",
+      paddingRight: "2px",
+      textOverflow: "ellipsis",
+      textAlign: "right"
     }
   },
   label: {},
@@ -310,7 +310,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <div className={classes.labelContainer}>
-        <div className={`${classes.labelPanel} ${hasMultipleTypes?"verticalSpace":""}`}>
+        <div className={classes.labelPanel}>
           <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
           <LinksAlternatives
             className={classes.alternatives}

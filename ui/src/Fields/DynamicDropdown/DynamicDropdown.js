@@ -65,7 +65,8 @@ const useStyles = createUseStyles({
       width: "100%",
       paddingRight: "2px",
       textOverflow: "ellipsis",
-      textAlign: "right"
+      textAlign: "right",
+      outline: 0
     }
   },
   label: {},

@@ -24,8 +24,9 @@
 package eu.ebrains.kg.service.helpers;
 
 import eu.ebrains.kg.service.models.KGCoreResult;
-import eu.ebrains.kg.service.models.space.StructureOfField;
-import eu.ebrains.kg.service.models.space.StructureOfType;
+import eu.ebrains.kg.service.models.type.StructureOfField;
+import eu.ebrains.kg.service.models.type.StructureOfType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -43,4 +44,23 @@ public class Helpers {
     public static boolean isNestedField(StructureOfField field) {
         return field.getWidget() != null && field.getWidget().equals("Nested");
     }
+
+    public static void enrichFieldsTargetTypes(Map<String, StructureOfType> typesMap, Map<String, StructureOfField> fields) {
+        if (fields != null) {
+            fields.forEach((name, field) -> {
+                if (field.getTargetTypes() != null) {
+                    field.getTargetTypes().forEach(targetType -> {
+                        if (StringUtils.isNotBlank(targetType.getName())) {
+                            StructureOfType t = typesMap.get(targetType.getName());
+                            if (t != null) {
+                                targetType.setLabel(t.getLabel());
+                                targetType.setColor(t.getColor());
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
 }
+

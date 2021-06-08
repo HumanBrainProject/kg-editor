@@ -25,8 +25,8 @@ package eu.ebrains.kg.service.controllers;
 
 import eu.ebrains.kg.service.helpers.Helpers;
 import eu.ebrains.kg.service.models.KGCoreResult;
-import eu.ebrains.kg.service.models.space.StructureOfField;
-import eu.ebrains.kg.service.models.space.StructureOfType;
+import eu.ebrains.kg.service.models.type.StructureOfField;
+import eu.ebrains.kg.service.models.type.StructureOfType;
 import eu.ebrains.kg.service.services.SpaceClient;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
@@ -60,7 +60,12 @@ public class SpaceController {
         });
         getIncomingLinksTypes(spaceTypes, typesMap);
         spaceTypes.sort(Comparator.comparing(StructureOfType::getLabel));
+        enrichSpaceTypes(spaceTypes, typesMap);
         return spaceTypes;
+    }
+
+    private void enrichSpaceTypes(List<StructureOfType> spaceTypes, Map<String, StructureOfType> typesMap) {
+        spaceTypes.forEach(st -> Helpers.enrichFieldsTargetTypes(typesMap, st.getFields()));
     }
 
     private void getIncomingLinksTypes(List<StructureOfType> spaceTypes, Map<String, StructureOfType> typesMap) {
@@ -95,8 +100,8 @@ public class SpaceController {
     private void getNestedTypes(Map<String, StructureOfType> typesMap, List<StructureOfType> types) {
         List<String> typesToRetrieve = new ArrayList<>();
         types.forEach(type -> type.getFields().values().forEach(f -> {
-            if (Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypes())) {
-                f.getTargetTypes().forEach(targetType -> {
+            if (Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypesNames())) {
+                f.getTargetTypesNames().forEach(targetType -> {
                     if (!typesMap.containsKey(targetType)) {
                         typesToRetrieve.add(targetType);
                     }
@@ -112,9 +117,9 @@ public class SpaceController {
             getNestedTypes(typesMap, nestedTypes);
         }
         types.forEach(t -> t.getFields().values().forEach(f -> {
-            if (Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypes())) {
+            if (Helpers.isNestedField(f) && !CollectionUtils.isEmpty(f.getTargetTypesNames())) {
                 Map<String, StructureOfField> fields = new HashMap<>();
-                f.getTargetTypes().forEach(targetType -> {
+                f.getTargetTypesNames().forEach(targetType -> {
                     StructureOfType structureOfType = typesMap.get(targetType);
                     Map<String, StructureOfField> nestedFields = structureOfType.getFields().entrySet().stream()
                             .collect(Collectors.toMap(Map.Entry::getKey, v -> SerializationUtils.clone(v.getValue())));

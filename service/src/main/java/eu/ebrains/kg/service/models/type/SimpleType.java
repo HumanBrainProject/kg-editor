@@ -21,7 +21,7 @@
  *
  */
 
-package eu.ebrains.kg.service.models.instance;
+package eu.ebrains.kg.service.models.type;
 
 import java.io.Serializable;
 

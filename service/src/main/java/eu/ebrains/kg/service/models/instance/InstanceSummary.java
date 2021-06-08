@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.models.commons.Permissions;
-import eu.ebrains.kg.service.models.space.StructureOfField;
+import eu.ebrains.kg.service.models.type.StructureOfField;
 
 import java.util.List;
 import java.util.Map;

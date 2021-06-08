@@ -21,7 +21,7 @@
  *
  */
 
-package eu.ebrains.kg.service.models.space;
+package eu.ebrains.kg.service.models.type;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

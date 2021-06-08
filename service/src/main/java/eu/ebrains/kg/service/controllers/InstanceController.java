@@ -29,13 +29,15 @@ import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
 import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.instance.*;
-import eu.ebrains.kg.service.models.space.StructureOfField;
-import eu.ebrains.kg.service.models.space.StructureOfIncomingLink;
-import eu.ebrains.kg.service.models.space.StructureOfType;
+import eu.ebrains.kg.service.models.type.SimpleType;
+import eu.ebrains.kg.service.models.type.StructureOfField;
+import eu.ebrains.kg.service.models.type.StructureOfIncomingLink;
+import eu.ebrains.kg.service.models.type.StructureOfType;
 import eu.ebrains.kg.service.services.ReleaseClient;
 import eu.ebrains.kg.service.services.UserClient;
 import eu.ebrains.kg.service.services.SpaceClient;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -64,6 +66,7 @@ public class InstanceController {
             enrichTypesByNameWithIncomingLinksTypes(instance, typesByName);
             enrichInstanceWithPossibleIncomingLinks(instance, typesByName);
             enrichTypesAndFields(instance, instanceWithMap.getOriginalMap(), typesByName);
+            Helpers.enrichFieldsTargetTypes(getTargetTypes(instance, typesByName), instance.getFields());
             enrichAlternatives(instance);
             return instance;
         }
@@ -75,12 +78,15 @@ public class InstanceController {
         Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult, true);
         enrichTypesByNameWithIncomingLinksTypes(instancesWithResult, typesByName);
+        Map<String, StructureOfType> targetTypes = getTargetTypes(instancesWithResult, typesByName);
         instancesWithResult.forEach(instanceWithResult -> {
-            if (instanceWithResult.getResult() != null) {
-                enrichInstanceWithPossibleIncomingLinks(instanceWithResult.getResult(), typesByName);
-                enrichTypesAndFields(instanceWithResult.getResult(), instanceWithResult.getOriginalMap(), typesByName);
+            InstanceFull instance = instanceWithResult.getResult();
+            if (instance != null) {
+                enrichInstanceWithPossibleIncomingLinks(instance, typesByName);
+                enrichTypesAndFields(instance, instanceWithResult.getOriginalMap(), typesByName);
+                Helpers.enrichFieldsTargetTypes(targetTypes, instance.getFields());
                 if (stage.equals("IN_PROGRESS")) {
-                    enrichAlternatives(instanceWithResult.getResult());
+                    enrichAlternatives(instance);
                 }
             }
         });
@@ -97,6 +103,41 @@ public class InstanceController {
         if (!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
             typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes, true));
         }
+    }
+
+    private Map<String, StructureOfType> getTargetTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
+        Set<String> types = new HashSet<>();
+        Map<String, StructureOfType> result = new HashMap<>();
+        List<String> typeToRetrieve = new ArrayList<>();
+        instancesWithResult.forEach(instance -> types.addAll(getTargetTypesNamesFromInstance(instance.getResult())));
+        types.forEach(t -> {
+            if (typesByName.containsKey(t)) {
+                result.put(t, typesByName.get(t));
+            } else {
+                typeToRetrieve.add(t);
+            }
+        });
+        if (!CollectionUtils.isEmpty(typeToRetrieve)) {
+            result.putAll(getTypesByNameResult(typeToRetrieve, false));
+        }
+        return result;
+    }
+
+    private Map<String, StructureOfType> getTargetTypes(InstanceSummary instance, Map<String, StructureOfType> typesByName) {
+        Set<String> types = new HashSet<>(getTargetTypesNamesFromInstance(instance));
+        Map<String, StructureOfType> result = new HashMap<>();
+        List<String> typeToRetrieve = new ArrayList<>();
+        types.forEach(t -> {
+            if (typesByName.containsKey(t)) {
+                result.put(t, typesByName.get(t));
+            } else {
+                typeToRetrieve.add(t);
+            }
+        });
+        if (!CollectionUtils.isEmpty(typeToRetrieve)) {
+            result.putAll(getTypesByNameResult(typeToRetrieve, false));
+        }
+        return result;
     }
 
     private void enrichTypesByNameWithIncomingLinksTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
@@ -265,6 +306,7 @@ public class InstanceController {
             Map<String, StructureOfField> fields = getFieldsFromTypes(types, typesByName);
 
             enrichNestedTypesToInstanceRecursively(fields, typesByName);
+            Helpers.enrichFieldsTargetTypes(typesByName, fields);
             fields.values().forEach(f -> simplifyIdsOfLinks(f, originalMap));
             instance.setFields(fields);
 
@@ -310,6 +352,22 @@ public class InstanceController {
         return instance.getTypes().stream().map(SimpleType::getName).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    private Set<String> getTargetTypesNamesFromInstance(InstanceSummary instance) {
+        Set<String> result = new HashSet<>();
+        if (instance.getFields() != null) {
+            instance.getFields().forEach((name, field) -> {
+                if (field.getTargetTypes() != null) {
+                    field.getTargetTypes().forEach(targetType -> {
+                        if (StringUtils.isNotBlank(targetType.getName())) {
+                            result.add(targetType.getName());
+                        }
+                    });
+                }
+            });
+        }
+        return result;
+    }
+
     private Map<String, StructureOfField> getFieldsFromTypes(List<String> types, Map<String, StructureOfType> typesByName) {
         Map<String, StructureOfField> result = new HashMap<>();
         types.forEach(t -> {
@@ -330,7 +388,7 @@ public class InstanceController {
     private void enrichNestedTypesToInstanceRecursively(Map<String, StructureOfField> fields, Map<String, StructureOfType> typesByName) {
         fields.values().forEach(f -> {
             if (f.getWidget() != null && f.getWidget().equals("Nested")) {
-                Map<String, StructureOfField> nestedFields = getFieldsFromTypes(f.getTargetTypes(), typesByName);
+                Map<String, StructureOfField> nestedFields = getFieldsFromTypes(f.getTargetTypesNames(), typesByName);
                 f.setFields(nestedFields);
                 enrichNestedTypesToInstanceRecursively(nestedFields, typesByName);
             }
@@ -429,7 +487,7 @@ public class InstanceController {
                     if (v.getFields() != null) {
                         v.getFields().values().stream()
                                 .filter(f -> f != null && f.getTargetTypes() != null && f.getWidget() != null && f.getWidget().equals("Nested"))
-                                .forEach(t -> t.getTargetTypes().forEach(tg -> {
+                                .forEach(t -> t.getTargetTypesNames().forEach(tg -> {
                                     if (!targetTypes.contains(tg) && !fullTypesByName.containsKey(tg)) {
                                         targetTypes.add(tg);
                                     }

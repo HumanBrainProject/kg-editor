@@ -76,7 +76,7 @@ class NestedFieldStore extends FieldStore {
   }
 
   get resolvedTargetTypes() {
-    return this.targetTypes.map(typeName => this.rootStore.typeStore.typesMap.get(typeName)).filter(type => !!type);
+    return this.targetTypes.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type);
   }
 
   getType(types) {

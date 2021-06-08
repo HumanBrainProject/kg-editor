@@ -26,7 +26,7 @@ package eu.ebrains.kg.service.models.instance;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.EditorConstants;
-import eu.ebrains.kg.service.models.space.StructureOfIncomingLink;
+import eu.ebrains.kg.service.models.type.StructureOfIncomingLink;
 
 import java.util.List;
 import java.util.Map;

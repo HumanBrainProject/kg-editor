@@ -25,6 +25,7 @@ package eu.ebrains.kg.service.models.instance;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.ebrains.kg.service.models.type.SimpleType;
 
 import java.util.Collections;
 import java.util.List;

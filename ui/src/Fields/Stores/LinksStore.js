@@ -57,7 +57,7 @@ class LinksStore extends FieldStore {
     super(definition, options, instance, transportLayer, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
-    this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes.map(t => ({name: t, label: t.split("/")[4], color: "black", space: ["actors"]})):[];
+    this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];
     this.targetType = this.targetTypes.length?this.targetTypes[0]:null;
     this.sourceType = options && options.sourceType;
     if (definition.allowCustomValues !== undefined) {

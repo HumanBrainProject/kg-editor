@@ -21,13 +21,12 @@
  *
  */
 
-package eu.ebrains.kg.service.models.space;
+package eu.ebrains.kg.service.models.type;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
-import eu.ebrains.kg.service.models.instance.SimpleType;
 
 import java.util.List;
 import java.util.Map;

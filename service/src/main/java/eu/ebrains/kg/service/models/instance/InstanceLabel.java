@@ -29,6 +29,7 @@ import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.models.Error;
 import eu.ebrains.kg.service.models.HasError;
 import eu.ebrains.kg.service.models.HasId;
+import eu.ebrains.kg.service.models.type.SimpleType;
 
 import java.util.List;
 import java.util.stream.Collectors;

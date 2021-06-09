@@ -32,6 +32,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStores } from "../../Hooks/UseStores";
 
 import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
+import DynamicOption  from "../DynamicOption/DynamicOption";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
 import Invalid from "../Invalid";
@@ -105,7 +106,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     mappingValue,
     optionsSearchTerm,
     options,
-    newOptions,
     targetTypes,
     targetType,
     hasMoreOptions,
@@ -126,7 +126,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleOnAddNewValue = (name, typeName) => {
+  const addNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
       const id = _.uuid();
       const type = typeStore.typesMap.get(typeName);
@@ -147,7 +147,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleOnAddValue = id => {
+  const addValue = id => {
     instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
@@ -158,8 +158,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
     instanceStore.togglePreviewInstance();
   };
-
-  const handleOnExternalCreate = (space, type) => appStore.createExternalInstance(space, type, optionsSearchTerm);
 
   const handleSelectAlternative = value => {
     const values = value.map(v => ({[fieldStore.mappingValue]: v.id}));
@@ -201,6 +199,19 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     const type = targetTypes.find(t => t.name === eventKey);
     if (type) {
       fieldStore.setTargetType(type);
+    }
+  };
+
+  const handleOnSelectOption = option => {
+    if (option.isNew) {
+      const name = optionsSearchTerm.trim();
+      if (option.isExternal) {
+        appStore.createExternalInstance(option.space.id, option.type.name, name);
+      } else {
+        addNewValue(name, option.type.name);
+      }
+    } else {
+      addValue(option.id);
     }
   };
 
@@ -258,11 +269,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (view) {
       view.resetInstanceHighlight();
     }
-  };
-
-  const handleOptionPreview = (instanceId, instanceName) => {
-    const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(instanceId, instanceName, options);
   };
 
   const handleSearchOptions = term => fieldStore.searchOptions(term);
@@ -359,18 +365,15 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           <DropdownComponent
             searchTerm={optionsSearchTerm}
             options={options}
-            newOptions={newOptions}
             loading={fetchingOptions}
             hasMore={hasMoreOptions}
             onSearch={handleSearchOptions}
             onLoadMore={handleLoadMoreOptions}
             onReset={handleDropdownReset}
-            onAddValue={handleOnAddValue}
-            onExternalCreate={handleOnExternalCreate}
-            onAddNewValue={handleOnAddNewValue}
+            onSelect={handleOnSelectOption}
             onDeleteLastValue={handleDeleteLastValue}
             onDrop={dropValue}
-            onPreview={handleOptionPreview}
+            optionComponent={DynamicOption}
           />
         )}
       </div>

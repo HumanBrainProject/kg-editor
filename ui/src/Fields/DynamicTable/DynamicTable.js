@@ -33,6 +33,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { useStores } from "../../Hooks/UseStores";
 
 import DropdownComponent from "../../Components/DynamicDropdown/Dropdown";
+import DynamicOption  from "../DynamicOption/DynamicOption";
 import Table from "./Table";
 import Label from "../Label";
 import Invalid from "../Invalid";
@@ -147,7 +148,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     globalLabelTooltipIcon,
     optionsSearchTerm,
     options,
-    newOptions,
     targetTypes,
     targetType,
     hasMoreOptions,
@@ -161,7 +161,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const handleOnAddNewValue = (name, typeName) => {
+  const addNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
       const id = _.uuid();
       const type = typeStore.typesMap.get(typeName);
@@ -184,7 +184,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const handleOnAddValue = id => {
+  const addValue = id => {
     instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
@@ -200,8 +200,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const handleOnExternalCreate = (space, type) => appStore.createExternalInstance(space, type, optionsSearchTerm);
-
   const handleSelectTargetType = (eventKey, e) => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
@@ -210,14 +208,22 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     }
   };
 
+  const handleOnSelectOption = option => {
+    if (option.isNew) {
+      const name = optionsSearchTerm.trim();
+      if (option.isExternal) {
+        appStore.createExternalInstance(option.space.id, option.type.name, name);
+      } else {
+        addNewValue(name, option.type.name);
+      }
+    } else {
+      addValue(option.id);
+    }
+  };
+
   const handleDeleteAll = () => {
     fieldStore.setValues([]);
     instanceStore.togglePreviewInstance();
-  };
-
-  const handleOptionPreview = (id, name) => {
-    const options = { showEmptyfieldStores:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(id, name, options);
   };
 
   const handleSearchOptions = term => fieldStore.searchOptions(term);
@@ -319,7 +325,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 className={classes.dropdown}
                 searchTerm={optionsSearchTerm}
                 options={options}
-                newOptions={newOptions}
                 spaces={authStore.spaces}
                 loading={fetchingOptions}
                 hasMore={hasMoreOptions}
@@ -327,10 +332,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 onSearch={handleSearchOptions}
                 onLoadMore={handleLoadMoreOptions}
                 onReset={handleDropdownReset}
-                onAddValue={handleOnAddValue}
-                onAddNewValue={handleOnAddNewValue}
-                onPreview={handleOptionPreview}
-                onExternalCreate={handleOnExternalCreate}
+                onSelect={handleOnSelectOption}
+                optionComponent={DynamicOption}
               />
             </div>
             {hasMultipleTypes && (

@@ -32,6 +32,7 @@ const defaultNumberOfVisibleLinks = 10;
 class LinksStore extends FieldStore {
   value = [];
   options = [];
+  optionsResult = [];
   allowCustomValues = true;
   returnAsNull = false;
   optionsSearchActive = false;
@@ -39,8 +40,8 @@ class LinksStore extends FieldStore {
   optionsPreviousSearchTerm = null;
   optionsFrom = 0;
   optionsPageSize = 50;
+  optionsSize = 0;
   optionsTotal = Infinity;
-  newOptions = [];
   fetchingCounter = 0;
   lazyShowLinks = false;
   visibleLinks = new Set();
@@ -82,6 +83,7 @@ class LinksStore extends FieldStore {
       optionsFrom: observable,
       optionsPageSize: observable,
       optionsTotal: observable,
+      optionsSize: observable,
       fetchingOptions: computed,
       fetchingCounter: observable,
       lazyShowLinks: observable,
@@ -90,7 +92,6 @@ class LinksStore extends FieldStore {
       minItems: observable,
       maxItems: observable,
       targetType: observable,
-      newOptions: observable,
       cloneWithInitialValue: computed,
       returnValue: computed,
       updateValue: action,
@@ -319,7 +320,7 @@ class LinksStore extends FieldStore {
     if (this.optionsSearchTerm !== this.optionsPreviousSearchTerm) {
       append = false;
     }
-    const from = append?this.options.length:0;
+    const from = append?this.optionsSize:0;
     if (this.optionsSearchTerm === this.optionsPreviousSearchTerm && from === this.optionsFrom) {
       return;
     }
@@ -330,6 +331,7 @@ class LinksStore extends FieldStore {
     this.fetchingCounter++;
     if (from === 0) {
       this.options = [];
+      this.optionsSize = 0;
     }
     this.optionsFrom = from;
     this.optionsPreviousSearchTerm = this.optionsSearchTerm;
@@ -337,32 +339,34 @@ class LinksStore extends FieldStore {
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
       const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
-      const options = Array.isArray(values)?values:[];
+      const newOptions = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (this.optionsSearchActive) {
-          if (from === 0) {
-            this.options = options;
-          } else {
-            this.options = this.options.concat(options);
-          }
-          this.newOptions = [];
+          const optionsResult = from === 0?newOptions:this.optionsResult.concat(newOptions);
+          const newValues = [];
           this.allowCustomValues && Object.values(types).forEach(type => {
             type.space.forEach(space => {
-              this.newOptions.push({
+              newValues.push({
                 id: `${space}-${type.name}`,
                 type: type,
                 space: this.rootStore.authStore.getSpaceInfo(space),
-                isExternal: space !== this.rootStore.appStore.currentSpace.id
+                isExternal: space !== this.rootStore.appStore.currentSpace.id,
+                isNew: true
               });
             })
           });
+          this.optionsResult = optionsResult;
+          this.options = [...newValues, ...optionsResult];
+          this.optionsSize = optionsResult.length;
           this.optionsTotal = total;
         }
         this.fetchingCounter--;
       });
     } catch(e) {
       runInAction(()=>{
+        this.optionsResult = [];
         this.options = [];
+        this.optionsSize = 0;
         this.optionsTotal = 0;
         this.fetchingCounter--;
       });
@@ -380,7 +384,7 @@ class LinksStore extends FieldStore {
   resetOptionsSearch() {
     this.optionsSearchActive = false;
     this.optionsSearchTerm = "";
-    this.optionsPreviousSearchTerm = false;
+    this.optionsPreviousSearchTerm = null;
     this.optionsFrom = 0;
     this.optionsTotal = Infinity;
     this.options = [];
@@ -394,6 +398,7 @@ class LinksStore extends FieldStore {
 
   setTargetType(type) {
     this.targetType = type;
+    this.resetOptionsSearch();
   }
 }
 

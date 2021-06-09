@@ -40,13 +40,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const Dropdown = ({ className, options, newOptions, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onAddValue, onExternalCreate, onAddNewValue, onDeleteLastValue, onLoadMore, onDrop, onPreview, onSelectTargetType }) => {
+const Dropdown = ({ className, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop, optionComponent }) => {
 
   const classes = useStyles();
 
   const wrapperRef = useRef();
 
-  const [current, setCurrent] = useState({ newOption: null, option: null});
+  const [current, setCurrent] = useState(null);
 
   useEffect(() => {
     return () => { // Unmount
@@ -61,22 +61,19 @@ const Dropdown = ({ className, options, newOptions, inputPlaceholder, loading, h
       onDeleteLastValue && onDeleteLastValue();
     } else if(e.keyCode === 40){ //down
       e.preventDefault();
-      if(newOptions.length){
-        const newOption = newOptions[0];
-        setCurrent({newOption: newOption.id, option: null});
-      } else if(options.length){
-        const value = options[0];
-        setCurrent({newOption: null, option: value.id});
+      if(options.length){
+        const option = options[0];
+        setCurrent(option);
       } else {
-        setCurrent({newOption: null, option: null});
+        setCurrent(null);
       }
     } else if(e.keyCode === 38){ //up
       e.preventDefault();
       if(options.length){
-        const value = options[options.length - 1];
-        setCurrent({newOption: null, option: value.id});
+        const option = options[options.length - 1];
+        setCurrent(option);
       } else {
-        setCurrent({newOption: null, option: null});
+        setCurrent(null);
       }
     } else if(e.keyCode === 27) {
       //escape key -> we want to reset the search
@@ -89,93 +86,46 @@ const Dropdown = ({ className, options, newOptions, inputPlaceholder, loading, h
     onSearch(e.target.value);
   };
 
-  const handleOnAddNewValue = type => {
-    const name = searchTerm.trim();
-    if(name) {
-      onAddNewValue(name, type);
-      setCurrent({newOption: null, option: null});
-      handleFocus();
-    }
-  };
-
-  const handleOnAddValue = id => {
-    onAddValue(id);
-    setCurrent({newOption: null, option: null});
+  const handleOnSelect = item => {
+    setCurrent(null);
     handleFocus();
-  };
+    onSelect(item);
+  }
 
-  const handleOnSelectNextNewOption = name => {
-    const index = newOptions.findIndex(o => o.name === name);
-    if(index < newOptions.length - 1){
-      const newOption = newOptions[index + 1] ;
-      setCurrent({newOption: newOption.id, option: null});
-    } else if(options.length){
-      const value = options[0];
-      setCurrent({newOption: null, option: value.id});
-    } else if(newOptions.length) {
-      const newOption = newOptions[0];
-      setCurrent({newOption: newOption.id, option: null});
-    } else {
-      setCurrent({newOption: null, option: null});
-    }
-  };
-
-  const handleOnSelectPreviousNewOption = name => {
-    const index = newOptions.findIndex(o => o.name === name);
-    if(index > 0){
-      const newOption = newOptions[index - 1] ;
-      setCurrent({newOption: newOption.id, option: null});
-    } else if(options.length){
-      const value = options[options.length-1];
-      setCurrent({newOption: null, option: value.id});
-    } else if(newOptions.length) {
-      const newOption = newOptions[0];
-      setCurrent({newOption: newOption.id, option:null});
-    } else {
-      setCurrent({newOption: null, option: null});
-    }
-  };
-
-  const handleOnSelectNextValue = id => {
-    const index = options.findIndex(o => o.id === id);
+  const handleOnSelectNext = item => {
+    const index = options.findIndex(o => o === item);
     if(index < options.length - 1){
-      const value = options[index + 1] ;
-      setCurrent({newOption:null, option: value.id});
-    } else if(newOptions.length) {
-      const newOption = newOptions[0];
-      setCurrent({newOption: newOption.id, option: null});
+      const option = options[index + 1] ;
+      setCurrent(option);
     } else if(options.length) {
-      const value = options[0];
-      setCurrent({newOption: null, option: value.id});
+      const option = options[0];
+      setCurrent(option);
     } else {
-      setCurrent({newOption: null, option: null});
+      setCurrent(null);
     }
   };
 
-  const handleOnSelectPreviousValue = id => {
-    const index = options.findIndex(o => o.id === id);
+  const handleOnSelectPrevious = item => {
+    const index = options.findIndex(o => o === item);
     if(index > 0){
-      const value = options[index- 1] ;
-      setCurrent({newOption: null, option: value.id});
-    } else if(newOptions.length){
-      const newOption = newOptions[newOptions.length-1];
-      setCurrent({newOption: newOption.id, option: null});
+      const option = options[index- 1] ;
+      setCurrent(option);
     } else if(options.length){
-      const value = options[0];
-      setCurrent({newOption: null, option: value.id});
+      const option = options[options.length-1];
+      setCurrent(option);
     } else {
-      setCurrent({newOption: null, option: null});
+      setCurrent(null);
     }
   };
 
   const handleReset = () => {
-    setCurrent({newOption: null, option: null});
+    setCurrent(null);
     onReset();
   };
 
   const handleFocus = () => {
     onSearch("");
-    setCurrent({newOption: null, option: null});
+    setCurrent(null);
     listenClickOutHandler();
   };
 
@@ -214,23 +164,17 @@ const Dropdown = ({ className, options, newOptions, inputPlaceholder, loading, h
         placeholder={inputPlaceholder} />
       {showMenu && (
         <Menu 
-          currentNewOption={current.newOption}
-          currentOption={current.option}
+          current={current}
           searchTerm={searchTerm}
-          values={options}
-          newValues={newOptions}
+          items={options}
           loading={loading}
           hasMore={hasMore}
           onLoadMore={onLoadMore}
-          onAddNewValue={handleOnAddNewValue}
-          onAddValue={handleOnAddValue}
-          onExternalCreate={onExternalCreate}
-          onSelectNextType={handleOnSelectNextNewOption}
-          onSelectPreviousType={handleOnSelectPreviousNewOption}
-          onSelectNextValue={handleOnSelectNextValue}
-          onSelectPreviousValue={handleOnSelectPreviousValue}
+          onSelect={handleOnSelect}
+          onSelectNext={handleOnSelectNext}
+          onSelectPrevious={handleOnSelectPrevious}
           onCancel={handleReset}
-          onPreview={onPreview}
+          menuItemComponent={optionComponent}
         />
       )}
     </div>

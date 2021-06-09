@@ -24,11 +24,9 @@
 
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Options from "./Options";
-import NewValues from "./NewValues";
+
+import MenuItems from "./MenuItems";
 
 const useStyles = createUseStyles({
   container:{
@@ -60,34 +58,23 @@ const useStyles = createUseStyles({
     background:"none",
     border:"none",
     boxShadow:"none",
-    padding:0,
+    padding: 0,
     margin:0
-  },
-  option: {
-    position: "relative"
   }
 });
 
 const Menu = ({ 
-  types,
-  currentNewOption,
-  currentOption,
-  currentNewValue,
+  current,
   hasMore,
-  searchTerm,
-  values,
-  newValues,
-  loading,
-  onAddNewValue,
-  onAddValue,
-  onCancel,
-  onExternalCreate,
   onLoadMore,
-  onPreview,
-  onSelectNextType,
-  onSelectPreviousType,
-  onSelectNextValue,
-  onSelectPreviousValue,
+  searchTerm,
+  items,
+  loading,
+  onSelect,
+  onSelectNext,
+  onSelectPrevious,
+  onCancel,
+  menuItemComponent
 }) => {
 
   const classes = useStyles();
@@ -95,26 +82,23 @@ const Menu = ({
   return(
     <div className={classes.container}>
       <InfiniteScroll
-        element={"ul"}
         className={classes.menu}
         threshold={100}
         hasMore={hasMore}
         loadMore={onLoadMore}
         useWindow={false}>
-        {!values.length && !newValues.length &&
-            (<Dropdown.Item>
-              <em>No results found for: </em> <strong>{searchTerm}</strong>
-            </Dropdown.Item>)
-        }
-        <NewValues newValues={newValues} current={currentNewValue} value={searchTerm} onSelectNext={onSelectNextType} onSelectPrevious={onSelectPreviousType} onSelect={onAddNewValue} onExternalCreate={onExternalCreate} onCancel={onCancel}/>
-        <Options values={values} current={currentOption} onSelectNext={onSelectNextValue} onSelectPrevious={onSelectPreviousValue} onSelect={onAddValue} onCancel={onCancel} onPreview={onPreview} />
-        {loading?
-          <Dropdown.Item>
-            <div tabIndex={-1} className={classes.option}>
-              <FontAwesomeIcon spin icon="circle-notch"/>
-            </div>
-          </Dropdown.Item>
-          :null}
+          <MenuItems
+            current={current}
+            searchTerm={searchTerm}
+            items={items}
+            loading={loading}
+            hasMore={hasMore}
+            onSelect={onSelect}
+            onSelectNext={onSelectNext}
+            onSelectPrevious={onSelectPrevious}
+            onCancel={onCancel}
+            menuItemComponent={menuItemComponent}
+        />
       </InfiniteScroll>
     </div>
 

@@ -34,12 +34,14 @@ class LinksStore extends FieldStore {
   options = [];
   allowCustomValues = true;
   returnAsNull = false;
+  optionsSearchActive = false;
   optionsSearchTerm = "";
-  optionsPageStart = 0;
+  optionsPreviousSearchTerm = null;
+  optionsFrom = 0;
   optionsPageSize = 50;
-  optionsCurrentTotal = Infinity;
+  optionsTotal = Infinity;
   newOptions = [];
-  fetchingOptions = false;
+  fetchingCounter = 0;
   lazyShowLinks = false;
   visibleLinks = new Set();
   initialValue = [];
@@ -74,11 +76,14 @@ class LinksStore extends FieldStore {
       options: observable,
       allowCustomValues: observable,
       returnAsNull: observable,
+      optionsSearchActive: observable,
       optionsSearchTerm: observable,
-      optionsPageStart: observable,
+      optionsPreviousSearchTerm: observable,
+      optionsFrom: observable,
       optionsPageSize: observable,
-      optionsCurrentTotal: observable,
-      fetchingOptions: observable,
+      optionsTotal: observable,
+      fetchingOptions: computed,
+      fetchingCounter: observable,
       lazyShowLinks: observable,
       visibleLinks: observable,
       initialValue: observable,
@@ -212,7 +217,7 @@ class LinksStore extends FieldStore {
   }
 
   get hasMoreOptions() {
-    return !this.fetchingOptions && this.options.length < this.optionsCurrentTotal;
+    return !this.fetchingOptions && this.options.length < this.optionsTotal;
   }
 
   insertValue(value, index) {
@@ -301,61 +306,89 @@ class LinksStore extends FieldStore {
     return this.visibleLinks.size;
   }
 
+  get fetchingOptions() {
+    return this.fetchingCounter > 0;
+  }
+
   isLinkVisible = id => this.visibleLinks.has(id);
 
-  async performSearchOptions(append) {
-    this.fetchingOptions = true;
-    this.optionsPageStart = append?this.options.length:0;
+  triggerSearchOption(append) {
+    if (!this.optionsSearchActive) {
+      return;
+    }
+    if (this.optionsSearchTerm !== this.optionsPreviousSearchTerm) {
+      append = false;
+    }
+    const from = append?this.options.length:0;
+    if (this.optionsSearchTerm === this.optionsPreviousSearchTerm && from === this.optionsFrom) {
+      return;
+    }
+    this.performSearchOptions(from);
+  }
+
+  async performSearchOptions(from) {
+    this.fetchingCounter++;
+    if (from === 0) {
+      this.options = [];
+    }
+    this.optionsFrom = from;
+    this.optionsPreviousSearchTerm = this.optionsSearchTerm;
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsPageStart, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const options = Array.isArray(values)?values:[];
       runInAction(()=>{
-        if (append) {
-          this.options = this.options.concat(options);
-        } else {
-          this.options = options;
+        if (this.optionsSearchActive) {
+          if (from === 0) {
+            this.options = options;
+          } else {
+            this.options = this.options.concat(options);
+          }
+          this.newOptions = [];
+          this.allowCustomValues && Object.values(types).forEach(type => {
+            type.space.forEach(space => {
+              this.newOptions.push({
+                id: `${space}-${type.name}`,
+                type: type,
+                space: this.rootStore.authStore.getSpaceInfo(space),
+                isExternal: space !== this.rootStore.appStore.currentSpace.id
+              });
+            })
+          });
+          this.optionsTotal = total;
         }
-        this.newOptions = [];
-        this.allowCustomValues && Object.values(types).forEach(type => {
-          type.space.forEach(space => {
-            this.newOptions.push({
-              id: `${space}-${type.name}`,
-              type: type,
-              space: this.rootStore.authStore.getSpaceInfo(space),
-              isExternal: space !== this.rootStore.appStore.currentSpace.id
-            });
-          })
-        });
-        this.optionsCurrentTotal = total;
-        this.fetchingOptions = false;
+        this.fetchingCounter--;
       });
     } catch(e) {
       runInAction(()=>{
         this.options = [];
-        this.optionsCurrentTotal = 0;
+        this.optionsTotal = 0;
+        this.fetchingCounter--;
       });
     }
   }
 
-  _debouncedSearchOptions = debounce(append=>{this.performSearchOptions(append);}, 250);
+  _debouncedSearchOptions = debounce(append=>{this.triggerSearchOption(append);}, 250);
 
-  searchOptions(search, force=true) {
-    this.optionsSearchTerm = search;
-    this.options = [];
-    if (force || search) {
-      this._debouncedSearchOptions(false);
-    }
+  searchOptions(searchTerm) {
+    this.optionsSearchActive = true;
+    this.optionsSearchTerm = searchTerm;
+    this._debouncedSearchOptions(false);
   }
 
   resetOptionsSearch() {
-    this.searchOptions("", false);
+    this.optionsSearchActive = false;
+    this.optionsSearchTerm = "";
+    this.optionsPreviousSearchTerm = false;
+    this.optionsFrom = 0;
+    this.optionsTotal = Infinity;
+    this.options = [];
   }
 
   loadMoreOptions() {
     if(this.hasMoreOptions){
-      this.performSearchOptions(true);
+      this._debouncedSearchOptions(true);
     }
   }
 

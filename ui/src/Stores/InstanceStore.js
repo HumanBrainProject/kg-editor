@@ -390,8 +390,8 @@ export class InstanceStore {
               instance.isFetching = false;
               instance.isFetched = false;
             }
-            this.instancesQueue.delete(identifier);
           }
+          this.instancesQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
         this.processQueue();
@@ -404,8 +404,8 @@ export class InstanceStore {
             instance.errorInstance(e);
             instance.isFetching = false;
             instance.isFetched = false;
-            this.instancesQueue.delete(identifier);
           }
+          this.instancesQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
         this.processQueue();
@@ -452,8 +452,8 @@ export class InstanceStore {
               instance.isLabelFetching = false;
               instance.isLabelFetched = false;
             }
-            this.instanceLabelsQueue.delete(identifier);
           }
+          this.instanceLabelsQueue.delete(identifier);
         });
         this.isFetchingLabelsQueue = false;
         this.processLabelsQueue();
@@ -466,8 +466,8 @@ export class InstanceStore {
             instance.errorLabelInstance(e);
             instance.isLabelFetching = false;
             instance.isLabelFetched = false;
-            this.instanceLabelsQueue.delete(identifier);
           }
+          this.instanceLabelsQueue.delete(identifier);
         });
         this.isFetchingQueue = false;
         this.processQueue();

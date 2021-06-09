@@ -116,7 +116,7 @@ public class InstanceClient {
                                                                                        Integer from,
                                                                                        Integer size,
                                                                                        String searchByLabel) {
-        String relativeUrl = String.format("instances?stage=IN_PROGRESS&returnPermissions=true&type=%s&space=%s", type, space);
+        String relativeUrl = String.format("instances?stage=IN_PROGRESS&sortByLabel=true&returnPermissions=true&type=%s&space=%s", type, space);
         if(searchByLabel!=null){
             relativeUrl = String.format("%s&searchByLabel=%s", relativeUrl, searchByLabel);
         }

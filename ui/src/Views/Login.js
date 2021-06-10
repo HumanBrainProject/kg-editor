@@ -26,6 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -90,7 +91,10 @@ const Login = observer(() => {
 
   const { appStore, authStore } = useStores();
 
-  const handleLogin = () => appStore.login();
+  const handleLogin = () =>  {
+    ReactPiwik.push(["trackEvent", "User", "Login"]);
+    appStore.login();
+  }
 
   const handleRetryToInitialize = () => {
     appStore.initialize();

@@ -25,6 +25,7 @@ import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { matchPath } from "react-router-dom";
 import { createUseStyles } from "react-jss";
+import ReactPiwik from "react-piwik";
 import _  from "lodash-uuid";
 
 import { useStores } from "../Hooks/UseStores";
@@ -96,6 +97,7 @@ const Tabs = observer(() => {
 
   const handleCreateInstance = () => {
     const uuid = _.uuid();
+    ReactPiwik.push(["trackEvent", "Tab", "CreateInstance", uuid]);
     history.push(`/instances/${uuid}/create`);
   };
 

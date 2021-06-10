@@ -30,6 +30,7 @@ import Button from "react-bootstrap/Button";
 import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -144,6 +145,7 @@ const useStyles = createUseStyles({
   profilePictureButton: {
     margin: 0,
     padding: 0,
+    overflow: "hidden",
     border: 0,
     background: "none",
     "&:hover $profilePictureCamera": {
@@ -197,6 +199,9 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   const { appStore, authStore } = useStores();
 
   useEffect(() => {
+    if(showPopOver) {
+      ReactPiwik.push(["trackEvent", "Tab", "UserProfile", "Open"]);
+    }
     return () => {
       if (showPopOver) {
         handlePopOverClose();
@@ -224,6 +229,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   };
 
   const handleCopyToken = () => {
+    ReactPiwik.push(["trackEvent", "Token", "Copy"]);
     clearTimeout(tokenCopied);
     const timer = setTimeout(() => setTokenCopied(null), 2000);
     setTokenCopied(timer);
@@ -246,7 +252,10 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   //   }
   // };
 
-  const handleLogout = () => appStore.logout();
+  const handleLogout = () => {
+    ReactPiwik.push(["trackEvent", "User", "Logout"]);
+    appStore.logout();
+  }
 
   if (!authStore.isAuthenticated || !authStore.isUserAuthorized || !authStore.user) {
     return null;

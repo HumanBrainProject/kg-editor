@@ -23,6 +23,7 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
+import ReactPiwik from "react-piwik";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 
@@ -54,7 +55,10 @@ const SpaceSelector = observer(() => {
 
   const { appStore, authStore } = useStores();
 
-  const handleSelectSpace = eventKey => appStore.setCurrentSpace(eventKey);
+  const handleSelectSpace = eventKey => {
+    ReactPiwik.push(["trackEvent", "Space", "Select", eventKey]);
+    appStore.setCurrentSpace(eventKey);
+  }
 
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>

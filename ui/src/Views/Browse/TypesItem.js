@@ -25,6 +25,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -143,10 +144,14 @@ const TypesItem = observer(({ type }) => {
 
   const handleSelect = e => {
     e && e.stopPropagation();
+    ReactPiwik.push(["trackEvent", "Browse", "SelectType", type.name]);
     browseStore.selectItem(type);
   };
 
-  const handleCreateInstance = () => instanceStore.createNewInstanceOfType(type);
+  const handleCreateInstance = () => {
+    ReactPiwik.push(["trackEvent", "Browse", "CreateInstance", type.name]);
+    instanceStore.createNewInstanceOfType(type);
+  }
 
   const selected = (browseStore.selectedItem && type)? (browseStore.selectedItem.name === type.name):false;
   const color = type.color;

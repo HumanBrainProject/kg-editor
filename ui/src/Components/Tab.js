@@ -22,6 +22,7 @@
  */
 
 import React from "react";
+import ReactPiwik from "react-piwik";
 import { createUseStyles } from "react-jss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -107,6 +108,7 @@ const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, pa
   const handleClick = e => {
     e.preventDefault();
     if(path){
+      ReactPiwik.push(["trackEvent", "Tab", "Select", path.label]);
       history.push(path);
     }
     typeof onClick === "function" && onClick(e);

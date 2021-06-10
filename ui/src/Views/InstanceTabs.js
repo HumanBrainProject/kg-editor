@@ -25,6 +25,7 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { matchPath } from "react-router-dom";
 import { createUseStyles } from "react-jss";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -59,7 +60,14 @@ const InstanceTab = observer(({view, pathname}) => {
   };
 
 
-  const handleClose = () => appStore.closeInstance(view.instanceId);
+  const handleClose = () => {
+    if(isCurrent(view.instanceId, view.mode)) {
+      ReactPiwik.push(["trackEvent", "Tab", "CloseCurrentInstance", view.instanceId]);
+    } else {
+      ReactPiwik.push(["trackEvent", "Tab", "CloseOtherInstance", view.instanceId]);
+    }
+    appStore.closeInstance(view.instanceId);
+  }
 
   const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);
   const color = (instance && (instance.isFetched || instance.isLabelFetched))?instance.primaryType.color:(view.color?view.color:"");

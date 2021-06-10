@@ -119,18 +119,22 @@ export class StatusStore {
     let toProcess = this.fetchQueue.splice(0, this.processSize);
     toProcess.forEach(id => {
       const status = this.statuses.get(id);
-      status.isFetching = true;
-      status.hasFetchError = false;
-      status.fetchError = null;
+      if (status) {
+        status.isFetching = true;
+        status.hasFetchError = false;
+        status.fetchError = null;
+      }
     });
     try {
       let { data } = await this.transportLayer.getReleaseStatusTopInstance(toProcess);
       runInAction(() => {
         Object.entries(data.data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
-          status.data = responseStatus.data;
-          status.isFetching = false;
-          status.isFetched = true;
+          if (status) {
+            status.data = responseStatus.data;
+            status.isFetching = false;
+            status.isFetched = true;
+          }
           this.isFetching = false;
           this.smartProcessQueue();
         });
@@ -140,9 +144,11 @@ export class StatusStore {
         const message = e.message ? e.message : e;
         toProcess.forEach(id => {
           const status = this.statuses.get(id);
-          status.isFetching = false;
-          status.hasFetchError = true;
-          status.fetchError = `Error while fetching instance status (${message})`;
+          if (status) {
+            status.isFetching = false;
+            status.hasFetchError = true;
+            status.fetchError = `Error while fetching instance status (${message})`;
+          }
         });
         this.isFetching = false;
         this.smartProcessQueue();
@@ -159,18 +165,22 @@ export class StatusStore {
     let toProcessChildren = this.fetchQueueChildren.splice(0, this.processSize);
     toProcessChildren.forEach(id => {
       const status = this.statuses.get(id);
-      status.isFetchingChildren = true;
-      status.hasFetchErrorChildren = false;
-      status.fetchErrorChildren = null;
+      if (status) {
+        status.isFetchingChildren = true;
+        status.hasFetchErrorChildren = false;
+        status.fetchErrorChildren = null;
+      }
     });
     try {
       let { data } = await this.transportLayer.getReleaseStatusChildren(toProcessChildren);
       runInAction(() => {
         Object.entries(data.data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
-          status.childrenData = responseStatus.data;
-          status.isFetchingChildren = false;
-          status.isFetchedChildren = true;
+          if (status) {
+            status.childrenData = responseStatus.data;
+            status.isFetchingChildren = false;
+            status.isFetchedChildren = true;
+          }
           this.isFetchingChildren = false;
           this.smartProcessQueueChildren();
         });
@@ -180,9 +190,11 @@ export class StatusStore {
         const message = e.message ? e.message : e;
         toProcessChildren.forEach(id => {
           const status = this.statuses.get(id);
-          status.isFetchingChildren = false;
-          status.hasFetchErrorChildren = true;
-          status.fetchErrorChildren = `Error while fetching instance child status (${message})`;
+          if (status) {
+            status.isFetchingChildren = false;
+            status.hasFetchErrorChildren = true;
+            status.fetchErrorChildren = `Error while fetching instance child status (${message})`;
+          }
         });
         this.isFetchingChildren = false;
         this.smartProcessQueueChildren();

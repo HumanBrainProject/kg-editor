@@ -225,7 +225,7 @@ const Graph = observer(() => {
         nodeRelSize={7}
         linkDirectionalArrowLength={3}
       />
-      <buttoo className={`${classes.capture} btn btn-primary`} onClick={handleCapture} alt="capture"><FontAwesomeIcon icon="camera" /></buttoo>
+      <button className={`${classes.capture} btn btn-primary`} onClick={handleCapture} alt="capture"><FontAwesomeIcon icon="camera" /></button>
     </div>
   );
 });

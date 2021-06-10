@@ -78,21 +78,30 @@ public class InstanceController {
         Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult = instancesWithMap.values();
         Map<String, StructureOfType> typesByName = getTypesByName(instancesWithResult, true);
         enrichTypesByNameWithIncomingLinksTypes(instancesWithResult, typesByName);
-        Map<String, StructureOfType> targetTypes = getTargetTypes(instancesWithResult, typesByName);
         instancesWithResult.forEach(instanceWithResult -> {
             InstanceFull instance = instanceWithResult.getResult();
             if (instance != null) {
                 enrichInstanceWithPossibleIncomingLinks(instance, typesByName);
                 enrichTypesAndFields(instance, instanceWithResult.getOriginalMap(), typesByName);
-                Helpers.enrichFieldsTargetTypes(targetTypes, instance.getFields());
                 if (stage.equals("IN_PROGRESS")) {
                     enrichAlternatives(instance);
                 }
             }
         });
+        enrichFieldsTargetTypes(instancesWithResult, typesByName);
         Map<String, InstanceFull> result = new HashMap<>();
         instancesWithMap.forEach((k, v) -> result.put(k, v.getResult()));
         return result;
+    }
+
+    private void enrichFieldsTargetTypes(Collection<ResultWithOriginalMap<InstanceFull>> instancesWithResult, Map<String, StructureOfType> typesByName) {
+        Map<String, StructureOfType> targetTypes = getTargetTypes(instancesWithResult, typesByName);
+        instancesWithResult.forEach(instanceWithResult -> {
+            InstanceFull instance = instanceWithResult.getResult();
+            if (instance != null) {
+                Helpers.enrichFieldsTargetTypes(targetTypes, instance.getFields());
+            }
+        });
     }
 
     private void enrichTypesByNameWithIncomingLinksTypes(InstanceFull instance, Map<String, StructureOfType> typesByName) {

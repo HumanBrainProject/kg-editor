@@ -30,7 +30,10 @@ import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   pill: {
-    cursor: "pointer"
+    cursor: "pointer",
+    "& > .badge-pill": {
+      whiteSpace: "break-spaces"
+    }
   }
 });
 

@@ -25,6 +25,7 @@ import React from "react";
 import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -74,6 +75,7 @@ const Tab = ({ className, show, disabled, active, icon, mode, onClick }) => {
     }:
     {
       className: className,
+      title: mode[0].toUpperCase() + mode.substr(1),
       onClick: () => typeof onClick === "function" && onClick(mode)
     };
 
@@ -91,6 +93,7 @@ const Tabs = observer(({ instance, mode }) => {
   const { history } = useStores();
 
   const handleClick = mode => {
+    ReactPiwik.push(["trackEvent", "Instance", `Select${mode[0].toUpperCase() + mode.substr(1)}Mode`, instance.id]);
     if(mode === "view") {
       history.push(`/instances/${instance.id}`);
     } else {

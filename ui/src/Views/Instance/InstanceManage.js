@@ -28,6 +28,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -157,9 +158,15 @@ const InstanceManage = observer(({instance}) => {
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
-  const handleDuplicateInstance = () => appStore.duplicateInstance(instance.id);
+  const handleDuplicateInstance = () => {
+    ReactPiwik.push(["trackEvent", "Instance", "Duplicate", instance.id]);
+    appStore.duplicateInstance(instance.id);
+  };
 
-  const handleDeleteInstance = async () => appStore.deleteInstance(instance.id);
+  const handleDeleteInstance = async () => {
+    ReactPiwik.push(["trackEvent", "Instance", "Delete", instance.id]);
+    appStore.deleteInstance(instance.id);
+  };
 
   const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
 

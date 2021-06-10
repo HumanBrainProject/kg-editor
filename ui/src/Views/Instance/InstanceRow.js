@@ -174,8 +174,10 @@ const Action = ({ className, show, icon, mode, onClick, onCtrlClick }) => {
     }
   };
 
+  const modeLabel = mode[0].toUpperCase() + mode.substr(1);
+
   return (
-    <div className={className} onClick={handleClick}>
+    <div className={className} onClick={handleClick} title={modeLabel}>
       <FontAwesomeIcon icon={icon} />
     </div>
   );

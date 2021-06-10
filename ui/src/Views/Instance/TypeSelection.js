@@ -27,6 +27,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -113,7 +114,10 @@ const TypeSelection = observer(({ onSelect }) => {
 
   const [ filter, setFilter ] = useState();
 
-  const handleChange = value => setFilter(value);
+  const handleChange = value => {
+    ReactPiwik.push(["trackEvent", "Browser", "FilterType", value]);
+    setFilter(value);
+  };
 
   const handleRetry = () => typeStore.fetch();
 

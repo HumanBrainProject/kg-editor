@@ -29,6 +29,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Modal from "react-bootstrap/Modal";
 import { Scrollbars } from "react-custom-scrollbars";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -225,22 +226,28 @@ const SavePanel = observer(() => {
   }, []);
 
   const handleSaveAll = () => {
+    ReactPiwik.push(["trackEvent", "Instance", "SaveAll"]);
     instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
   };
 
   const handleSave = instance => {
+    ReactPiwik.push(["trackEvent", "Instance", "InstanceSave", instance.id]);
     appStore.saveInstance(instance);
     setComparedInstance(null);
   };
 
   const handleReset = instance => {
+    ReactPiwik.push(["trackEvent", "Instance", "InstanceReset", instance.id]);
     instanceStore.confirmCancelInstanceChanges(instance.id);
     setComparedInstance(null);
   };
 
   const handleDismissSaveError = instance => instance.cancelSave();
 
-  const handleCompare = instance => setComparedInstance(instance);
+  const handleCompare = instance => {
+    ReactPiwik.push(["trackEvent", "Instance", "InstanceCompare", instance.id]);
+    setComparedInstance(instance);
+  };
 
   const handleCloseCompararison = () => setComparedInstance(null);
 

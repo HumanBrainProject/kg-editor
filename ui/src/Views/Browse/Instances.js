@@ -29,6 +29,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -90,12 +91,19 @@ const Instances = observer(() => {
 
   const { appStore, history, browseStore, instanceStore } = useStores();
 
-  const handleFilterChange = value => browseStore.setInstancesFilter(value);
+  const handleFilterChange = value => {
+    ReactPiwik.push(["trackEvent", "Browse", "FilterInstance", value]);
+    browseStore.setInstancesFilter(value);
+  };
 
-  const handleInstanceClick = instance => browseStore.selectInstance(instance);
+  const handleInstanceClick = instance => {
+    ReactPiwik.push(["trackEvent", "Browse", "InstancePreview", instance.id]);
+    browseStore.selectInstance(instance);
+  }
 
   const handleInstanceCtrlClick = instance => {
     if (instance && instance.id) {
+      ReactPiwik.push(["trackEvent", "Browse", "InstanceOpenTabInBackground", instance.id]);
       appStore.openInstance(instance.id, instance.name, instance.primaryType);
     }
   };
@@ -107,6 +115,7 @@ const Instances = observer(() => {
         const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
+      ReactPiwik.push(["trackEvent", "Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id]);
       if(mode === "view") {
         history.push(`/instances/${id}`);
       } else {

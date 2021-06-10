@@ -27,7 +27,7 @@ import FieldStore from "./FieldStore";
 class InputNumberStore extends FieldStore {
   value = "";
   returnAsNull = false;
-  initialValue = "";
+  initialValue = null;
   inputType = "number";
   minValue = null;
   maxValue = null;
@@ -90,10 +90,14 @@ class InputNumberStore extends FieldStore {
     if (this.value === null && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
-    if (this.value === "") {
+    if (this.value === "" || this.value === null) {
       return null;
     }
-    return parseFloat(toJS(this.value));
+    const value = parseFloat(toJS(this.value));
+    if (isNaN(value)) {
+      return null;
+    }
+    return value;
   }
 
   get requiredValidationWarning() {
@@ -115,7 +119,7 @@ class InputNumberStore extends FieldStore {
 
   updateValue(value) {
     this.returnAsNull = false;
-    this.initialValue = (value !== null && value !== undefined)?value:"";
+    this.initialValue = (value !== null && value !== undefined)?value:null;
     this.value = this.initialValue;
   }
 
@@ -125,7 +129,7 @@ class InputNumberStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (typeof this.initialValue  === "object") {
+    if (this.initialValue !== null && typeof this.initialValue  === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
     }
     return this.returnValue !== this.initialValue;

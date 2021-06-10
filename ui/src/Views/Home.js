@@ -21,10 +21,11 @@
  *
  */
 
-import React from "react";
+import React, {useEffect} from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -246,6 +247,12 @@ const useStyles = createUseStyles({
 
 const Home = () => {
   const classes = useStyles();
+
+  useEffect(() => {
+    ReactPiwik.push(["setCustomUrl", window.location.href]);
+    ReactPiwik.push(["trackPageView"]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={classes.container}>

@@ -76,6 +76,7 @@ const Instance = observer(({ match, mode }) => {
   const { appStore, history, instanceStore, viewStore, typeStore } = useStores();
 
   useEffect(() => {
+    ReactPiwik.push(["setCustomUrl", window.location.href]);
     ReactPiwik.push(["trackPageView"]);
     appStore.openInstance(id, id, {}, mode);
     instanceStore.togglePreviewInstance();

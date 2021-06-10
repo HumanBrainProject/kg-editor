@@ -50,8 +50,6 @@ new ReactPiwik({
   trackErrors: true
 });
 
-ReactPiwik.push(["trackPageView"]);
-
 render(
   <React.StrictMode>
     <App/>

@@ -21,17 +21,12 @@
  *
  */
 
-import React from "react";
+import React, {useEffect} from "react";
 import { createUseStyles } from "react-jss";
-//import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react-lite";
-//import Modal from "react-bootstrap/Modal";
-//import Button from "react-bootstrap/Button";
-
-//import { useStores } from "../Hooks/UseStores";
+import ReactPiwik from "react-piwik";
 
 import Instances from "./Browse/Instances";
-//import FetchingLoader from "../Components/FetchingLoader";
 import NavigationPanel from "./Browse/NavigationPanel";
 
 const useStyles = createUseStyles({
@@ -98,46 +93,13 @@ const useStyles = createUseStyles({
 
 const Browse = observer(() => {
 
+  useEffect(() => {
+    ReactPiwik.push(["setCustomUrl", window.location.href]);
+    ReactPiwik.push(["trackPageView"]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const classes = useStyles();
-
-  // const { browseStore, bookmarkStore } = useStores();
-
-  // const handleDismissBookmarkCreationError = () => {
-  //   bookmarkStore.dismissBookmarkCreationError();
-  // };
-
-  // const handleRetryCreateNewBookmark = () => {
-  //   bookmarkStore.createBookmark(bookmarkStore.newBookmarkName);
-  // };
-
-  // return (
-  //   <div className={classes.container}>
-  //     <NavigationPanel />
-  //     <Instances/>
-  //     <Modal
-  //       dialogClassName={classes.modal}
-  //       show={!!browseStore.bookmarkListCreationError}
-  //       keyboard={true}
-  //       autoFocus={true}
-  //       onHide={handleDismissBookmarkCreationError}
-  //       backdrop={false}
-  //     >
-  //       <Modal.Header
-  //         closeButton={true}
-  //       />
-  //       <Modal.Body>{`Creation of bookmark list "${bookmarkStore.newBookmarkName}" failed (${bookmarkStore.bookmarkCreationError}).`} </Modal.Body>
-  //       <Modal.Footer>
-  //         <Button onClick={handleDismissBookmarkCreationError}><FontAwesomeIcon icon="undo-alt"/>&nbsp;Cancel</Button>
-  //         <Button variant="primary" onClick={handleRetryCreateNewBookmark}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
-  //       </Modal.Footer>
-  //     </Modal>
-  //     {bookmarkStore.isCreatingBookmark && (
-  //       <div className={classes.loader}>
-  //         <FetchingLoader>{`Creating a bookmark list "${bookmarkStore.newBookmarkName}"...`}</FetchingLoader>
-  //       </div>
-  //     )}
-  //   </div>
-  // );
 
   return(
     <div className={classes.container}>

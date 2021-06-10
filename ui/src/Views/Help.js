@@ -21,10 +21,11 @@
  *
  */
 
-import React from "react";
+import React, {useEffect} from "react";
 import { Route, Switch, NavLink, Redirect } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import Introduction from "./Help/Introduction";
@@ -103,6 +104,13 @@ const useStyles = createUseStyles({
 
 const Instances = ({match}) => {
   const classes = useStyles();
+
+  useEffect(() => {
+    ReactPiwik.push(["setCustomUrl", window.location.href]);
+    ReactPiwik.push(["trackPageView"]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const {path} = match;
   return (
     <div className={classes.container}>

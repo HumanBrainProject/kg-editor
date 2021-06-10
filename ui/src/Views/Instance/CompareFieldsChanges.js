@@ -83,7 +83,7 @@ const getFieldValue = (instanceStore, field, level) => {
     if (typeof value === "object") {
       return "Unknown value";
     }
-    if (typeof value === "boolean") {
+    if (typeof value === "boolean" || typeof value === "number") {
       return value.toString();
     }
     return value;

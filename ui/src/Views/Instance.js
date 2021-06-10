@@ -25,6 +25,8 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
+
 import Button from "react-bootstrap/Button";
 
 import { useStores } from "../Hooks/UseStores";
@@ -74,6 +76,7 @@ const Instance = observer(({ match, mode }) => {
   const { appStore, history, instanceStore, viewStore, typeStore } = useStores();
 
   useEffect(() => {
+    ReactPiwik.push(["trackPageView"]);
     appStore.openInstance(id, id, {}, mode);
     instanceStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);

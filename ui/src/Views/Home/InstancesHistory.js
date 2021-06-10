@@ -26,6 +26,7 @@ import { toJS } from "mobx";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
@@ -171,6 +172,7 @@ const InstancesHistory = observer(() => {
   const handleInstanceClick = instance => {
     let id = instance && instance.id;
     if (id) {
+      ReactPiwik.push(["trackEvent", "Home", "InstanceOpenTab", instance.id]);
       history.push(`/instances/${id}`);
     }
   };
@@ -178,6 +180,7 @@ const InstancesHistory = observer(() => {
   const handleInstanceCtrlClick = instance => {
     const id = instance && instance.id;
     if (id) {
+      ReactPiwik.push(["trackEvent", "Home", "InstanceOpenTabInBackground", instance.id]);
       appStore.openInstance(id, instance.name, instance.primaryType);
     }
   };
@@ -189,6 +192,7 @@ const InstancesHistory = observer(() => {
         const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
+      ReactPiwik.push(["trackEvent", "Home", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id]);
       if(mode === "view") {
         history.push(`/instances/${id}`);
       } else {

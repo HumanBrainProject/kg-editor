@@ -99,6 +99,7 @@ export class BrowseStore {
   }
 
   selectItem(item) {
+    this.clearInstancesFilter();
     this.selectedItem = item;
     this.fetchInstances();
   }

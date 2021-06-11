@@ -149,7 +149,7 @@ const Dropdown = ({ className, options, inputPlaceholder, loading, hasMore, sear
   };
 
   //const showMenu = wrapperRef.current && wrapperRef.current.contains(document.activeElement) && (options.length || searchTerm);
-  const showMenu = options.length || searchTerm;
+  const showMenu = options.length || searchTerm || loading;
 
   return (
     <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>

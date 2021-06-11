@@ -28,6 +28,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -206,8 +207,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
+         ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInExternalSpace", option.type.name]);
         appStore.createExternalInstance(option.space.id, option.type.name, name);
       } else {
+        ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInCurrentSpace", option.type.name]);
         addNewValue(name, option.type.name);
       }
     } else {

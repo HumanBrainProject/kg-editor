@@ -29,6 +29,7 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
+import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -212,8 +213,10 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
+        ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInExternalSpace", option.type.name]);
         appStore.createExternalInstance(option.space.id, option.type.name, name);
       } else {
+        ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInCurrentSpace", option.type.name]);
         addNewValue(name, option.type.name);
       }
     } else {

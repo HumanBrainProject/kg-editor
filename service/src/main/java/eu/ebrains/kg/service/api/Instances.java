@@ -90,6 +90,11 @@ public class Instances {
         instanceClient.deleteInstance(id);
     }
 
+    @GetMapping("/instances/{id}/raw")
+    public KGCoreResult.Single getRawInstance(@PathVariable("id") String id) {
+        return instanceClient.getRawInstance(id);
+    }
+
     @GetMapping("/instances/{id}/scope")
     public KGCoreResult<Scope> getInstanceScope(@PathVariable("id") String id) {
         Scope instanceScope = instanceClient.getInstanceScope(id);

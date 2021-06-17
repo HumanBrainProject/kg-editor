@@ -191,6 +191,14 @@ public class InstanceClient {
         return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
+    public KGCoreResult.Single getRawInstance(String id) {
+        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnEmbedded=true", id);
+        return kg.client().get().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(KGCoreResult.Single.class)
+                .block();
+    }
+
     public void deleteInstance(String id) {
         String relativeUrl = String.format("instances/%s", id);
         kg.client().delete().uri(kg.url(relativeUrl))

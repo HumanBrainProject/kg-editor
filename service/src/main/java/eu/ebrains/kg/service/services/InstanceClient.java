@@ -24,19 +24,19 @@
 package eu.ebrains.kg.service.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.controllers.IdController;
 import eu.ebrains.kg.service.models.HasError;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
+import eu.ebrains.kg.service.models.commons.Permissions;
 import eu.ebrains.kg.service.models.instance.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -191,12 +191,28 @@ public class InstanceClient {
         return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
-    public KGCoreResult.Single getRawInstance(String id) {
-        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnEmbedded=true", id);
-        return kg.client().get().uri(kg.url(relativeUrl))
+    public Map getRawInstance(String id) {
+        String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnEmbedded=true", id);
+        Map result = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
-                .bodyToMono(KGCoreResult.Single.class)
+                .bodyToMono(Map.class)
                 .block();
+        if (result != null && result.containsKey("data")) {
+            try {
+                Map data = (HashMap<String, Object>) result.get("data");
+                if (data.containsKey(EditorConstants.VOCAB_PERMISSIONS)) {
+                        List<String> permissionList = (List<String>) data.get(EditorConstants.VOCAB_PERMISSIONS);
+                        Permissions permissions = Permissions.fromPermissionList(permissionList);
+                        data.remove(EditorConstants.VOCAB_PERMISSIONS);
+                        result.put("permissions", permissions);
+                } else {
+                    result.put("permissions", Collections.emptyList());
+                }
+            } catch (Exception e) {
+                result.put("permissions", Collections.emptyList());
+            }
+        }
+        return result;
     }
 
     public void deleteInstance(String id) {

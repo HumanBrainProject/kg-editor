@@ -38,6 +38,7 @@ const API = {
     "searchInstancesByType": (space, type, from, size, search) => `/editor/api/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${search}`,
     "suggestions": (instanceId, field, sourceType, targetType, start, size, search) => `/editor/api/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?"&sourceType=" + encodeURIComponent(sourceType):""}${targetType?"&targetType=" + encodeURIComponent(targetType):""}&start=${start}&size=${size}&search=${search}`,
     "instance": instanceId => `/editor/api/instances/${instanceId}`,
+    "rawInstance": instanceId => `/editor/api/instances/${instanceId}/raw`,
     "instanceScope": instanceId => `/editor/api/instances/${instanceId}/scope`,
     "createInstance": (space, instanceId=null) => `/editor/api/instances${instanceId?("/" + instanceId):""}?space=${space}`,
     "release": instanceId => `/editor/api/releases/${instanceId}/release`,

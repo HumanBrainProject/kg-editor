@@ -248,6 +248,7 @@ const Layout = observer(() => {
                     <Route path="/instances/:id/graph" exact={true} render={props=><Instance {...props} mode="graph" />} />
                     <Route path="/instances/:id/release" exact={true} render={props=><Instance {...props} mode="release" />} />
                     <Route path="/instances/:id/manage" exact={true}  render={props=><Instance {...props} mode="manage" />} />
+                    <Route path="/instances/:id/raw" exact={true}  render={props=><Instance {...props} mode="raw" />} />
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />

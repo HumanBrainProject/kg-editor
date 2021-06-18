@@ -71,6 +71,10 @@ export class TransportLayer {
     return this._axios.get(API.endpoints.instance(instanceId));
   }
 
+  getRawInstance(instanceId) {
+    return this._axios.get(API.endpoints.rawInstance(instanceId));
+  }
+
    deleteInstance(instanceId) {
     return this._axios.delete(API.endpoints.instance(instanceId));
   }

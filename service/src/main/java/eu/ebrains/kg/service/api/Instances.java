@@ -91,7 +91,7 @@ public class Instances {
     }
 
     @GetMapping("/instances/{id}/raw")
-    public KGCoreResult.Single getRawInstance(@PathVariable("id") String id) {
+    public Map getRawInstance(@PathVariable("id") String id) {
         return instanceClient.getRawInstance(id);
     }
 

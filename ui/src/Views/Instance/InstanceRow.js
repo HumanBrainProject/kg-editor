@@ -156,7 +156,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Action = ({ className, show, icon, mode, onClick, onCtrlClick }) => {
+const Action = ({ className, show, icon, mode, label, onClick, onCtrlClick }) => {
 
   if(!show) {
     return null;
@@ -174,10 +174,8 @@ const Action = ({ className, show, icon, mode, onClick, onCtrlClick }) => {
     }
   };
 
-  const modeLabel = mode[0].toUpperCase() + mode.substr(1);
-
   return (
-    <div className={className} onClick={handleClick} title={modeLabel}>
+    <div className={className} onClick={handleClick} title={label}>
       <FontAwesomeIcon icon={icon} />
     </div>
   );
@@ -247,12 +245,13 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         ))}
       </Form>
       <div className={classes.actions}>
-        <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    label="Open"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    label="Edit"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        mode="invite"  label="Invite"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
       </div>
       {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
       {/* <div className={classes.separator}></div> */}

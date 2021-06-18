@@ -47,6 +47,7 @@ import {faEdit} from "@fortawesome/free-solid-svg-icons/faEdit";
 import {faProjectDiagram} from "@fortawesome/free-solid-svg-icons/faProjectDiagram";
 import {faCloudUploadAlt} from "@fortawesome/free-solid-svg-icons/faCloudUploadAlt";
 import {faChartBar} from "@fortawesome/free-solid-svg-icons/faChartBar";
+import {faCode} from "@fortawesome/free-solid-svg-icons/faCode";
 import {faCodeBranch} from "@fortawesome/free-solid-svg-icons/faCodeBranch";
 import {faPencilAlt} from "@fortawesome/free-solid-svg-icons/faPencilAlt";
 import {faEye} from "@fortawesome/free-solid-svg-icons/faEye";
@@ -117,6 +118,7 @@ library.add(
   faProjectDiagram,
   faCloudUploadAlt,
   faChartBar,
+  faCode,
   faCodeBranch,
   faPencilAlt,
   faEye,

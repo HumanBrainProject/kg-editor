@@ -76,33 +76,25 @@ const Instance = observer(({ match, mode }) => {
   const { appStore, history, instanceStore, viewStore, typeStore } = useStores();
 
   useEffect(() => {
-    ReactPiwik.push(["setCustomUrl", window.location.href]);
-    ReactPiwik.push(["trackPageView"]);
-    appStore.openInstance(id, id, {}, mode);
-    instanceStore.togglePreviewInstance();
-    viewStore.selectViewByInstanceId(id);
-    const instance = instanceStore.instances.get(id);
-    if (instance && instance.isFetched) {
-      if (mode === "create" && !instance.isNew) {
-        history.replace(`/instances/${id}/edit`);
-      }
-    } else {
-      instanceStore.checkInstanceIdAvailability(id, mode);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, mode]);
-
-  useEffect(() => {
     if (typeStore.isFetched) {
+      ReactPiwik.push(["setCustomUrl", window.location.href]);
+      ReactPiwik.push(["trackPageView"]);
+      appStore.openInstance(id, id, {}, mode);
+      instanceStore.togglePreviewInstance();
+      viewStore.selectViewByInstanceId(id);
       const instance = instanceStore.instances.get(id);
-      if (instance && instance._rawData) {
-        instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._rawData);
+      if (instance && ((mode === "raw" && instance.isRawFetched) || (mode !== "raw" && instance.isFetched))) {
+        if (mode === "create" && !instance.isNew) {
+          history.replace(`/instances/${id}/edit`);
+        }
+      } else {
+        instanceStore.checkInstanceIdAvailability(id, mode);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [typeStore.isFetched]);
+  }, [id, mode, typeStore.isFetched]);
 
-  const handleRetry = () => instanceStore.checkInstanceIdAvailability(id, mode === "create");
+  const handleRetry = () => instanceStore.checkInstanceIdAvailability(id, mode);
 
   const handleContinue = () => {
     instanceStore.instanceIdAvailability.delete(id);
@@ -140,7 +132,7 @@ const Instance = observer(({ match, mode }) => {
   }
 
   const instance = instanceStore.instances.get(id);
-  if (instance && instance.isFetched && typeStore.isFetched) {
+  if (instance && ((mode === "raw" && instance.isRawFetched) || (mode !== "raw" && instance.isFetched))) {
     return (
       <View instance={instance} mode={mode} />
     );

@@ -47,6 +47,7 @@ class Instance extends BaseInstance {
       linkedIds: computed,
       fetch: action,
       fetchLabel: action,
+      fetchRaw: action,
       save: action,
       cancelSave: action,
       cancelChanges: action
@@ -82,6 +83,26 @@ class Instance extends BaseInstance {
     }
   }
 
+  async fetchRaw(forceFetch = false) {
+    if (!this.isRawFetching && (!this.isRawFetched || this.rawFetchError || forceFetch)) {
+      this.isRawFetching = true;
+      this.hasRawFetchError = false;
+      this.rawFetchError = null;
+      try {
+        const { data } = await this.store.transportLayer.getRawInstance(this.id);
+        this.initializeRawData(data && data.data, data && data.permissions);
+      } catch (e) {
+        runInAction(() => {
+          if(e.response && e.response.status === 404){
+            this.errorRawInstance(e, true);
+          } else {
+            this.errorRawInstance(e);
+          }
+        });
+      }
+    }
+  }
+
   async save() {
     this.cancelChangesPending = false;
     this.hasSaveError = false;
@@ -97,6 +118,12 @@ class Instance extends BaseInstance {
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
+          this._initialJsonData = null;
+          this.rawData = null;
+          this.rawFetchError = null;
+          this.hasRawFetchError = false;
+          this.isRawFetched = false;
+          this.isRawFetching = false;
           if (newId !== this.id) {
             this.store.instances.set(newId, this);
             this.store.instance.delete(this.id);
@@ -110,6 +137,12 @@ class Instance extends BaseInstance {
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
+          this._initialJsonData = null;
+          this.rawData = null;
+          this.rawFetchError = null;
+          this.hasRawFetchError = false;
+          this.isRawFetched = false;
+          this.isRawFetching = false;
           this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
         });
       }
@@ -163,6 +196,8 @@ export class InstanceStore {
       togglePreviewInstance: action,
       resetInstanceIdAvailability: action,
       checkInstanceIdAvailability: action,
+      checkRawInstanceIdAvailability: action,
+      checkNonRawInstanceIdAvailability: action,
       getUnsavedInstances: computed,
       hasUnsavedChanges: computed,
       processQueue: action,
@@ -249,19 +284,48 @@ export class InstanceStore {
     this.instanceIdAvailability.clear();
   }
 
-  async checkInstanceIdAvailability(instanceId, mode) {
-    const status = this.instanceIdAvailability.get(instanceId);
-    if(status) {
-      status.isAvailable = false;
-      status.isChecking = true;
-      status.error = null;
-    } else {
-      this.instanceIdAvailability.set(instanceId, {
-        isAvailable: false,
-        isChecking: true,
-        error: null
+  async checkRawInstanceIdAvailability(instanceId) {
+    try{
+      const { data } = await this.transportLayer.getRawInstance(instanceId);
+      runInAction(() => {
+        const resolvedfullId = data && data.data && data.data["@id"];
+        const path = typeof resolvedfullId === "string" && resolvedfullId.split("/");
+        const resolvedId = (path && path.length)?path[path.length -1]:null;
+        if (!resolvedId) {
+          throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
+        }
+        this.instanceIdAvailability.delete(instanceId);
+        const instance = this.createInstanceOrGet(resolvedId);
+        instance.initializeRawData(data && data.data, data && data.permissions);
+        const view = this.rootStore.viewStore.views.get(resolvedId);
+        if(view) {
+          view.setNameAndColor(instance.name, instance.primaryType.color);
+          this.rootStore.viewStore.syncStoredViews();
+        }
+      });
+    } catch(e){
+      runInAction(() => {
+        const status =  this.instanceIdAvailability.get(instanceId);
+        if (e.response && e.response.status === 404) {
+          if(status.type) {
+            this.createNewInstance(status.type, instanceId);
+            this.resetInstanceIdAvailability();
+          } else {
+            status.isAvailable = true;
+            status.isChecking = false;
+          }
+        } else {
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
+          status.isAvailable = false;
+          status.isChecking = false;
+        }
       });
     }
+  };
+
+  async checkNonRawInstanceIdAvailability(instanceId, mode) {
     try{
       const { data } = await this.transportLayer.getInstance(instanceId);
       runInAction(() => {
@@ -300,6 +364,39 @@ export class InstanceStore {
           status.isChecking = false;
         }
       });
+    }
+  };
+
+  checkInstanceIdAvailability(instanceId, mode) {
+    const rawMode = mode === "raw";
+    const instance = this.instances.get(instanceId);
+    if (instance && ((rawMode && instance.isRawFetched) || (!rawMode && instance.isFetched))) {
+      this.instanceIdAvailability.delete(instanceId);
+    } else {
+      const status = this.instanceIdAvailability.get(instanceId);
+      if(status) {
+        status.isAvailable = false;
+        status.isChecking = true;
+        status.error = null;
+      } else {
+        this.instanceIdAvailability.set(instanceId, {
+          isAvailable: false,
+          isChecking: true,
+          error: null
+        });
+      }
+      if (rawMode) {
+        if (instance && instance.store.rootStore.typeStore.isFetched && instance._initialJsonData) {
+          instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._initialJsonData);
+        }
+        this.checkRawInstanceIdAvailability(instanceId);
+      } else {
+        if (instance && instance.store.rootStore.typeStore.isFetched && instance._initialJsonData) {
+          instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._initialJsonData);
+        } else {
+          this.checkNonRawInstanceIdAvailability(instanceId, mode);
+        }
+      }
     }
   }
 

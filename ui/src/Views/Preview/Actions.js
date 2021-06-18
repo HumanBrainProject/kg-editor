@@ -51,7 +51,7 @@ const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}) => {
 const useStyles = createUseStyles({
   actions: {
     display: "grid",
-    gridTemplateColumns: "repeat(5, 1fr)",
+    gridTemplateColumns: "repeat(7, 1fr)",
     gridGap: "10px",
     marginBottom: "20px"
   },
@@ -92,12 +92,13 @@ const Actions = observer(({ instance }) => {
 
   return (
     <div className={classes.actions}>
-      <Action className={classes.action} show={permissions.canRead}                            icon="eye"              label="Open"    mode="view"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       label="Edit"    mode="edit"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        label="Invite"  mode="invite"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  label="Explore" mode="graph"   onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" label="Release" mode="release" onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              label="Manage"  mode="manage"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canRead}                            icon="eye"              label="Open"     mode="view"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       label="Edit"     mode="edit"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canInviteForSuggestion}             icon="user-edit"        label="Invite"   mode="invite"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  label="Explore"  mode="graph"   onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" label="Release"  mode="release" onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              label="Manage"   mode="manage"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions.canRead}                            icon="code"             label="Raw view" mode="raw"     onClick={handleClick} onCtrlClick={handleCtrlClick} />
     </div>
   );
 });

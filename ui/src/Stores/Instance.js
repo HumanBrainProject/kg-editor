@@ -308,7 +308,7 @@ const getChildrenIdsGroupedByField = fields => {
 };
 export class Instance {
   id = null;
-  _rawData = null;
+  _initialJsonData = null;
   _name = null;
   types = [];
   isNew = false;
@@ -334,10 +334,15 @@ export class Instance {
   isNotFound = false
   hasFetchError = false;
 
+  rawData = null;
+  rawFetchError = null;
+  hasRawFetchError = false;
+  isRawFetched = false;
+  isRawFetching = false;
+
   constructor(id, transportLayer) {
     makeObservable(this, {
       id: observable,
-      _rawData: observable,
       _name: observable,
       types: observable,
       isNew: observable,
@@ -374,8 +379,14 @@ export class Instance {
       childrenIdsGroupedByField: computed,
       initializeLabelData: action,
       initializeData: action,
+      initializeRawData: action,
       errorLabelInstance: action,
-      errorInstance: action
+      errorInstance: action,
+      errorRawInstance: action,
+      rawFetchError: observable,
+      hasRawFetchError: observable,
+      isRawFetched: observable,
+      isRawFetching: observable
     });
 
     this.id = id;
@@ -520,6 +531,11 @@ export class Instance {
     return [];
   }
 
+  initializeJsonData(data) {
+    this._initialJsonData = data;
+    this.isFetching = false;
+  }
+
   initializeLabelData(data) {
     const normalizedData = normalizeLabelInstanceData(data);
     this._name = normalizedData.name;
@@ -533,9 +549,16 @@ export class Instance {
     this.hasLabelFetchError = false;
   }
 
-  initializeRawData(data) {
-    this._rawData = data;
-    this.isFetching = false;
+
+  initializeRawData(data, permissions) {
+    this.rawData = data;
+    this.rawFetchError = null;
+    this.hasRawFetchError = false;
+    this.isRawFetched = true;
+    this.isRawFetching = false;
+    if (typeof permissions === "object") {
+      this.permissions = permissions;
+    }
   }
 
   initializeData(transportLayer, rootStore, data, isNew = false) {
@@ -569,7 +592,7 @@ export class Instance {
       });
     };
 
-    this._rawData = null;
+    this._initialJsonData = null;
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name;
     this.space = normalizedData.space;
@@ -614,6 +637,15 @@ export class Instance {
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;
+  }
+
+  errorRawInstance(e, isNotFound=false) {
+    this.rawData = null;
+    this.isNotFound = isNotFound;
+    this.rawFetchError = this.buildErrorMessage(e);
+    this.hasRawFetchError = true;
+    this.isRawFetched = false;
+    this.isRawFetching = false;
   }
 }
 

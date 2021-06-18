@@ -35,6 +35,7 @@ import InstanceInvite from "./InstanceInvite";
 import InstanceGraph from "./InstanceGraph";
 import InstanceRelease from "./InstanceRelease";
 import InstanceManage from "./InstanceManage";
+import InstanceRaw from "./InstanceRaw";
 import ExternalCreateModal from "../ExternalCreateModal";
 import SaveBar from "./SaveBar";
 import Tabs from "./Tabs";
@@ -169,6 +170,13 @@ const View = observer(({instance, mode}) => {
       );
     }
     break;
+  case "raw":
+    if(instance.permissions.canRead) {
+      return (
+        <InstanceRaw instance={instance} />
+      );
+    }
+    break;
   default:
     break;
   }
@@ -182,10 +190,12 @@ const NoPermissionForView = observer(({instance, mode}) => {
 
   const classes = useStyles();
 
+  const actionMode = mode === "raw"?"view":mode;
+
   return (
     <div className={classes.errorMessage} >
       <BGMessage icon={"ban"}>
-      You do not have permission to {mode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
+      You do not have permission to {actionMode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
         {instance.permissions.canRead?
           <Link className="btn btn-primary" to={`/instances/${instance.id}`}>Go to view</Link>:
           <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}

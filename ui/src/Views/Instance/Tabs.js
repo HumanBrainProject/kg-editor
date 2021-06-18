@@ -63,7 +63,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Tab = ({ className, show, disabled, active, icon, mode, onClick }) => {
+const Tab = ({ className, show, disabled, active, icon, mode, label, onClick }) => {
 
   if(!show) {
     return null;
@@ -75,7 +75,7 @@ const Tab = ({ className, show, disabled, active, icon, mode, onClick }) => {
     }:
     {
       className: className,
-      title: mode[0].toUpperCase() + mode.substr(1),
+      title: label,
       onClick: () => typeof onClick === "function" && onClick(mode)
     };
 
@@ -105,12 +105,13 @@ const Tabs = observer(({ instance, mode }) => {
 
   return (
     <div className={classes.tabs}>
-      <Tab className={classes.tab} icon="eye"              mode="view"    disabled={mode === "create"} active={mode === "view"}                      onClick={handleClick} show={permissions.canRead} />
-      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    disabled={false}             active={mode === "edit" || mode === "create"} onClick={handleClick} show={permissions.canWrite || permissions.canCreate } />
-      <Tab className={classes.tab} icon="user-edit"        mode="invite"  disabled={mode === "create"} active={mode === "invite"}                    onClick={handleClick} show={!instance.isNew && permissions.canInviteForSuggestion} />
-      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   disabled={mode === "create"} active={mode === "graph"}                     onClick={handleClick} show={!instance.isNew && permissions.canRead} />
-      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" disabled={mode === "create"} active={mode === "release"}                   onClick={handleClick} show={!instance.isNew && permissions.canRelease} />
-      <Tab className={classes.tab} icon="cog"              mode="manage"  disabled={mode === "create"} active={mode === "manage"}                    onClick={handleClick} show={!instance.isNew && (permissions.canDelete || permissions.canCreate)} />
+      <Tab className={classes.tab} icon="eye"              mode="view"    label="View"     disabled={mode === "create"} active={mode === "view"}                      onClick={handleClick} show={permissions.canRead} />
+      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    label="Edit"     disabled={false}             active={mode === "edit" || mode === "create"} onClick={handleClick} show={permissions.canWrite || permissions.canCreate } />
+      <Tab className={classes.tab} icon="user-edit"        mode="invite"  label="Invite"   disabled={mode === "create"} active={mode === "invite"}                    onClick={handleClick} show={!instance.isNew && permissions.canInviteForSuggestion} />
+      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   label="Explore"  disabled={mode === "create"} active={mode === "graph"}                     onClick={handleClick} show={!instance.isNew && permissions.canRead} />
+      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" label="Release"  disabled={mode === "create"} active={mode === "release"}                   onClick={handleClick} show={!instance.isNew && permissions.canRelease} />
+      <Tab className={classes.tab} icon="cog"              mode="manage"  label="Manage"   disabled={mode === "create"} active={mode === "manage"}                    onClick={handleClick} show={!instance.isNew && (permissions.canDelete || permissions.canCreate)} />
+      <Tab className={classes.tab} icon="code"             mode="raw"     label="Raw view" disabled={mode === "create"} active={mode === "raw"}                       onClick={handleClick} show={!instance.isNew && permissions.canRead} />
     </div>
   );
 });

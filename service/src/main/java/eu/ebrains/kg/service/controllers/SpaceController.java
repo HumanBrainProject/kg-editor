@@ -58,6 +58,7 @@ public class SpaceController {
                 spaceTypes.add(v);
             }
         });
+        getTargetTypes(typesMap, spaceTypes);
         getIncomingLinksTypes(spaceTypes, typesMap);
         spaceTypes.sort(Comparator.comparing(StructureOfType::getLabel));
         enrichSpaceTypes(spaceTypes, typesMap);
@@ -95,6 +96,37 @@ public class SpaceController {
                             }))
                     );
         }
+    }
+
+    private void getTargetTypes(Map<String, StructureOfType> typesMap, List<StructureOfType> types) {
+        List<String> typesToRetrieve = new ArrayList<>();
+        types.forEach(type -> type.getFields().values().forEach(f -> {
+            if (!CollectionUtils.isEmpty(f.getTargetTypesNames())) {
+                f.getTargetTypesNames().forEach(targetType -> {
+                    if (!typesMap.containsKey(targetType)) {
+                        typesToRetrieve.add(targetType);
+                    }
+                });
+            }
+        }));
+        Map<String, StructureOfType> targetTypesByName = new HashMap<>();
+        List<String> uniqueTypes = typesToRetrieve.stream().distinct().collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(uniqueTypes)) {
+            Map<String, KGCoreResult<StructureOfType>> targetTypesByNameResult = spaceClient.getTypesByName(uniqueTypes, false);
+            targetTypesByName.putAll(Helpers.getTypesByName(targetTypesByNameResult));
+        }
+        types.forEach(t -> t.getFields().values().forEach(f -> {
+            if (!CollectionUtils.isEmpty(f.getTargetTypes())) {
+                f.getTargetTypes().forEach(targetType -> {
+                    StructureOfType structureOfType = typesMap.get(targetType.getName());
+                    if (structureOfType == null) {
+                        structureOfType = targetTypesByName.get(targetType.getName());
+                    }
+                    targetType.setLabel(structureOfType.getLabel());
+                    targetType.setColor(structureOfType.getColor());
+                });
+            }
+        }));
     }
 
     private void getNestedTypes(Map<String, StructureOfType> typesMap, List<StructureOfType> types) {

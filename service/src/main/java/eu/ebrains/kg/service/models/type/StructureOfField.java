@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -117,7 +118,7 @@ public class StructureOfField implements Serializable {
 
     @JsonIgnore
     public List<String> getTargetTypesNames() {
-        return targetTypes.stream().map(SimpleType::getName).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(targetTypes)? Collections.emptyList():targetTypes.stream().map(SimpleType::getName).collect(Collectors.toList());
     }
 
     public void setTargetTypes(List<SimpleType> targetTypes) {

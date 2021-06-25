@@ -135,14 +135,14 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {
-        const index = view.panes.findIndex(p => p === pane);
+        const index = view.panes.findIndex(p => p === pane); 
         if (index !== -1 && index < view.panes.length -1) {
           const targetPane = view.panes[index+1];
           view.setInstanceHighlight(targetPane, id, fieldStore.label);
+          view.setCurrentInstanceId(targetPane, id);
+          view.selectPane(targetPane);
+          view.resetInstanceHighlight();
         }
-        view.setCurrentInstanceId(pane, id);
-        view.selectPane(view.currentInstanceIdPane);
-        view.resetInstanceHighlight();
       }, 1000);
     }
     instanceStore.togglePreviewInstance();

@@ -175,11 +175,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           if (index !== -1 && index < view.panes.length -1) {
             const targetPane = view.panes[index+1];
             view.setInstanceHighlight(targetPane, id, fieldStore.label);
+            view.setCurrentInstanceId(targetPane, id);
+            view.selectPane(targetPane);
+            view.resetInstanceHighlight();
           }
         }
-        view.setCurrentInstanceId(pane, id);
-        view.selectPane(view.currentInstanceIdPane);
-        view.resetInstanceHighlight();
       }, 1000);
     }
     instanceStore.togglePreviewInstance();

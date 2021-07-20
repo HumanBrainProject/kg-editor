@@ -46,7 +46,6 @@ class CredentialsService @Inject()(configuration: ConfigurationService) extends 
         val json = Json.parse(stream)
         clientCredentials = Some(
           ClientCredentials(
-            (json \ "refresh_token").as[String],
             (json \ "client_id").as[String],
             (json \ "client_secret").as[String],
             (json \ "openid_host").as[String]

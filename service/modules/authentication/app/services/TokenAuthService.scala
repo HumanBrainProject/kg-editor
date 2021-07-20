@@ -64,8 +64,7 @@ class TokenAuthService @Inject()(
           .withQueryStringParameters(
             "client_id"     -> clientCredentials.clientId,
             "client_secret" -> clientCredentials.clientSecret,
-            "refresh_token" -> clientCredentials.refreshToken,
-            "grant_type"    -> "refresh_token"
+            "grant_type"    -> "client_credentials"
           )
           .get()
       }

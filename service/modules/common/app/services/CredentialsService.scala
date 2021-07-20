@@ -32,7 +32,7 @@ trait Credentials {
   def getClientCredentials(): ClientCredentials
 }
 
-case class ClientCredentials(refreshToken: String, clientId: String, clientSecret: String, openidHost: String)
+case class ClientCredentials(clientId: String, clientSecret: String, openidHost: String)
 
 @Singleton
 class CredentialsService @Inject()(configuration: ConfigurationService) extends Credentials {

@@ -23,8 +23,13 @@
 
 import React from "react";
 import injectStyles from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import authStore from "../Stores/AuthStore";
-import { Button } from "react-bootstrap";
+import appStore from "../Stores/AppStore";
+
+import FetchingLoader from "../Components/FetchingLoader";
+import BGMessage from "../Components/BGMessage";
 
 const styles = {
   container: {
@@ -33,7 +38,7 @@ const styles = {
   panel: {
     backgroundColor: "var(--bg-color-ui-contrast2)",
     color:"var(--ft-color-loud)",
-    padding: "0px 20px 20px 20px",
+    padding: "20px",
     borderRadius: "4px",
     textAlign: "center",
     width: "auto",
@@ -46,56 +51,148 @@ const styles = {
       margin: "20px 0"
     }
   },
-  oidFrame: {
-    position: "absolute",
+  loader: {
+    position: "fixed",
     top: 0,
     left: 0,
-    width: "100vw",
-    height: "100vh",
-    background: "var(--bg-color-ui-contrast2)"
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    background: "var(--bg-color-blend-contrast1)",
+    "& .fetchingPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
+    }
+  },
+  error: {
+    color: "var(--ft-color-loud)",
+    "& button + button": {
+      marginLeft: "60px"
+    }
+  },
+  actionPanel: {
+    textAlign: "center",
+    "& button": {
+      paddingLeft: "30px",
+      paddingRight: "30px"
+    }
   }
 };
 
 @injectStyles(styles)
 export default class Login extends React.Component {
-  constructor(props) {
-    super(props);
 
-    this.state = { showFrame: false };
+
+  handleLogin() {
+    appStore.login();
+  }
+
+  handleRetryToInitialize() {
+    appStore.initialize();
+  }
+
+   handleCancelInitialInstance() {
+    appStore.cancelInitialInstance();
   }
 
   render() {
     const { classes } = this.props;
-    return (
-      <div className={classes.container}>
-        {authStore.expiredToken?
+    if (!appStore.isInitialized) {
+
+      if (appStore.initializationError) {
+        return (
+          <div className={classes.container}>
+            <div className={classes.error}>
+              <BGMessage icon={"ban"}>
+                {`There was a problem initializing (${appStore.initializationError}).
+                  If the problem persists, please contact the support.`}<br /><br />
+                <Button variant={"primary"} onClick={this.handleRetryToInitialize}>
+                  <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+                </Button>
+              </BGMessage>
+            </div>
+          </div>
+        );
+      }
+  
+      if (appStore.initialInstanceError) {
+        return (
+          <div className={classes.container}>
+            <div className={classes.error}>
+              <BGMessage icon={"ban"}>
+                {appStore.initialInstanceError}<br /><br />
+                <div>
+                  <button onClick={this.handleRetryToInitialize}>
+                    <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+                  </button>
+                </div>
+                  <Button variant={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
+              </BGMessage>
+            </div>
+          </div>
+        );
+      }
+  
+      if (appStore.initialInstanceSpaceError) {
+        return (
+          <div className={classes.container}>
+            <div className={classes.error}>
+              <BGMessage icon={"ban"}>
+                {appStore.initialInstanceSpaceError}<br /><br />
+                <Button variant={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
+              </BGMessage>
+            </div>
+          </div>
+        );
+      }
+  
+      if (appStore.initializingMessage) {
+        return (
+          <div className={classes.container}>
+            <div className={classes.loader}>
+              <FetchingLoader>{appStore.initializingMessage}</FetchingLoader>
+            </div>
+          </div>
+        );
+      }
+  
+      return (
+        <div className={classes.container}>
+          <div className={classes.panel}>
+            <h3>You are logged out of the application</h3>
+            <p></p>
+            <div className={classes.actionPanel}>
+              <button variant={"primary"} onClick={this.handleLogin}>Login</button>
+            </div>
+          </div>
+        </div>
+      );
+  
+    }
+  
+    if (authStore.isTokenExpired && !authStore.isLogout) {
+      return (
+        <div className={classes.container}>
           <div className={classes.panel}>
             <h3>Your session has expired</h3>
             <p>
-              Your session token has expired or has become invalid.<br/>
-              Click on the following button to ask a new one and continue with your session.
+                Your session token has expired or has become invalid.<br/>
+                Click on the following button to ask a new one and continue with your session.
             </p>
-            <div>
-              <Button bsStyle={"primary"} onClick={this.showFrame.bind(this)}>Re-Login</Button>
+            <div className={classes.actionPanel}>
+              <Button variant={"primary"} onClick={this.handleLogin}>Re-Login</Button>
             </div>
           </div>
-          :
-          <div className={classes.panel}>
-            <h3>Welcome to Knowledge Graph Editor</h3>
-            <p>Please login to continue.</p>
-            <div>
-              <Button bsStyle={"primary"} onClick={this.showFrame.bind(this)}>Login</Button>
-            </div>
-          </div>
-        }
-        {this.state.showFrame &&
-          <iframe className={classes.oidFrame} frameBorder="0" src={authStore.loginUrl} />
-        }
-      </div>
+        </div>
+      );
+    }
+  
+    return (
+      <div className={classes.container}></div>
     );
-  }
-
-  showFrame() {
-    this.setState({ showFrame: true });
   }
 }

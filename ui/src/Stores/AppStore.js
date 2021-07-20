@@ -21,17 +21,23 @@
  *
  */
 
-import { observable, action } from "mobx";
+import { observable, action, runInAction } from "mobx";
 import * as Sentry from "@sentry/browser";
+
+import authStore from "./AuthStore";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 
 class AppStore{
+  @observable canLogin = true;
+  @observable isInitialized = false;
   @observable globalError = null;
   @observable currentTheme;
   @observable historySettings;
+  @observable initializingMessage = null;
+  @observable initializationError = null;
 
   availableThemes = {
     "default": DefaultTheme,
@@ -130,6 +136,40 @@ class AppStore{
     this.historySettings.eventTypes.released = on?true:false;
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
+
+  @action
+  async initialize() {
+    if (this.canLogin && !this.isInitialized) {
+      this.initializingMessage = "Initializing the application...";
+      this.initializationError = null;
+      if(!authStore.isAuthenticated) {
+        this.initializingMessage = "User authenticating...";
+        await authStore.authenticate();
+        if (authStore.authError) {
+          runInAction(() => {
+            this.initializationError = authStore.authError;
+            this.initializingMessage = null;
+          });
+        }
+      }
+      if(authStore.isAuthenticated && !authStore.hasUserProfile) {
+        runInAction(() => {
+          this.initializingMessage = "Retrieving user profile...";
+        });
+        await authStore.retrieveUserProfile();
+        runInAction(() => {
+          if (authStore.userProfileError) {
+            this.initializationError = authStore.userProfileError;
+            this.initializingMessage = null;
+          } else if (!authStore.isUserAuthorized && !authStore.isRetrievingUserProfile) {
+            this.isInitialized = true;
+            this.initializingMessage = null;
+          }
+        });
+      }
+    }
+  }
+
 }
 
 export default new AppStore();

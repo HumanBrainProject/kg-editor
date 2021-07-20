@@ -290,7 +290,6 @@ const styles = {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    authStore.tryAuthenticate();
     this.state = {
       currentLocation: routerStore.history.location.pathname
     };
@@ -303,6 +302,7 @@ class App extends React.Component {
 
 
   componentDidMount() {
+    appStore.initialize();
     document.addEventListener("keydown", this.handleGlobalShortcuts);
     // Init of sentry (logs) bucket
     const cookies = new Cookies();
@@ -468,11 +468,13 @@ class App extends React.Component {
   handleLogout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       instanceStore.flushOpenedTabs();
+      debugger;
       authStore.logout();
       document.querySelector("#root").style.display = "none";
       window.location.href = window.rootPath + "/";
     }
   }
+
   render() {
     const { classes } = this.props;
     const { currentLocation } = this.state;
@@ -491,7 +493,7 @@ class App extends React.Component {
             {!appStore.globalError &&
               <React.Fragment>
                 <div className={classes.fixedTabsLeft}>
-                  {authStore.isFullyAuthenticated ?
+                  {appStore.isInitialized && authStore.isAuthenticated ?
                     <React.Fragment>
                       <Tab icon={"home"} current={matchPath(currentLocation, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                       <Tab icon={"search"} current={matchPath(currentLocation, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
@@ -502,7 +504,7 @@ class App extends React.Component {
                   }
                 </div>
                 <div className={classes.dynamicTabs}>
-                  {authStore.isFullyAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
+                  {appStore.isInitialized && authStore.isAuthenticated && Array.from(instanceStore.openedInstances.keys()).map(instanceId => {
                     const instance = instanceStore.instances.get(instanceId);
                     const mode = instanceStore.openedInstances.get(instanceId).viewMode;
                     let label;
@@ -530,7 +532,7 @@ class App extends React.Component {
                   })}
                 </div>
                 <div className={classes.fixedTabsRight}>
-                  {authStore.isFullyAuthenticated &&
+                  {appStore.isInitialized && authStore.isAuthenticated &&
                     <React.Fragment>
                       <Tab icon={"question-circle"} current={matchPath(currentLocation, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
                       <UserProfileTab className={classes.userProfileTab} size={32} />
@@ -554,10 +556,10 @@ class App extends React.Component {
             {appStore.globalError ?
               <Route component={GlobalError} />
               :
-              !authStore.isOIDCAuthenticated ?
+              !appStore.isInitialized || !authStore.isAuthenticated ?
                 <Route component={Login} />
                 :
-                authStore.isFullyAuthenticated ?
+                authStore.isUserAuthorized ?
                   <Switch>
                     <Route path="/instance/view/:org/:domain/:schema/:version/:id" exact={true} render={(props) => (<Instance {...props} mode="view" />)} />
                     <Route path="/instance/edit/:org/:domain/:schema/:version/:id" exact={true} render={(props) => (<Instance {...props} mode="edit" />)} />
@@ -569,36 +571,16 @@ class App extends React.Component {
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />
-                    {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
-                    <Route path="/loginSuccess" exact={true} component={() => null} />
                     <Route path="/" exact={true} component={Home} />
                     <Route component={NotFound} />
                   </Switch>
                   : null
             }
-            {authStore.isOIDCAuthenticated && !authStore.hasUserProfile && (
-              authStore.isRetrievingUserProfile ?
-                <div className={classes.userProfileLoader}>
-                  <FetchingLoader>Retrieving user profile...</FetchingLoader>
-                </div>
-                :
-                authStore.userProfileError ?
-                  <div className={classes.userProfileError}>
-                    <BGMessage icon={"ban"}>
-                      {`There was a network problem retrieving user profile (${authStore.userProfileError}).
-                      If the problem persists, please contact the support.`}<br /><br />
-                      <Button bsStyle={"primary"} onClick={this.handleRetryRetriveUserProfile}>
-                        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-                      </Button>
-                    </BGMessage>
-                  </div>
-                  : null
-            )}
           </div>
           <div className={`${classes.status} layout-status`}>
 
           </div>
-          {authStore.isFullyAuthenticated && (
+          {appStore.isInitialized && authStore.isAuthenticated && (
             <React.Fragment>
               {instanceStore.showCreateModal &&
                 <Modal dialogClassName={classes.newInstanceModal} show={true} onHide={this.handleHideCreateModal}>

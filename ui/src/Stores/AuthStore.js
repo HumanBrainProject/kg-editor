@@ -1,107 +1,52 @@
 /*
- * Copyright 2018 - 2021 Swiss Federal Institute of Technology Lausanne (EPFL)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0.
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * This open source software code was developed in part or in whole in the
- * Human Brain Project, funded from the European Union's Horizon 2020
- * Framework Programme for Research and Innovation under
- * Specific Grant Agreements No. 720270, No. 785907, and No. 945539
- * (Human Brain Project SGA1, SGA2 and SGA3).
- *
- */
+*   Copyright (c) 2020, EPFL/Human Brain Project PCO
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+*/
 
 import { observable, computed, action, runInAction } from "mobx";
 import API from "../Services/API";
 
-import appStore from "./AppStore";
+const rootPath = window.rootPath || "";
 
-const oidConnectServerUri = "https://services.humanbrainproject.eu/oidc/authorize";
-const oidClientId = "nexus-kg-search";
-const oidLocalStorageKey = "hbp.kg-editor.oid";
-
-const generateRandomKey = () => {
-  let key = "";
-  const chars = "ABCDEF0123456789";
-  for (let i=0; i<4; i++) {
-    if (key !== "") {
-      key += "-";
-    }
-    for (let j=0; j<5; j++) {
-      key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-  }
-  return key;
-};
-
-const getKey = (hash, key) => {
-  if (typeof hash !== "string" || typeof key !== "string") {
-    return null;
-  }
-  const patterns = [
-    `^#${key}=([^&]+)&.+$`,
-    `^.+&${key}=([^&]+)&.+$`,
-    `^#${key}=([^&]+)$`,
-    `^.+&${key}=([^&]+)$`
-  ];
-  let value = null;
-  patterns.some(pattern => {
-    const reg = new RegExp(pattern);
-    const m = hash.match(reg);
-    if (m && m.length === 2) {
-      value = m[1];
-      return true;
-    }
-    return false;
-  });
-  return value;
-};
-
-let rootPath = window.rootPath || "";
-let redirectUri = `${window.location.protocol}//${window.location.host}${rootPath}/loginSuccess`;
-let stateKey = btoa(redirectUri);
-let sessionTimer = null;
-
+const endpoint = window.location.origin === "https://kg-editor.humanbrainproject.eu" ?"https://iam.ebrains.eu/auth":"https://iam-dev.ebrains.eu/auth";
 class AuthStore {
-  @observable session = null;
+  @observable isUserAuthorized = false;
   @observable user = null;
   @observable isRetrievingUserProfile = false;
   @observable userProfileError = false;
-  reloginResolve = null;
-  reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
-  expiredToken = false;
+  @observable authError = null;
+  @observable authSuccess = false;
+  @observable isTokenExpired = false;
+  @observable isInitializing = true;
+  @observable initializationError = null;
+  @observable isLogout = false;
+  @observable keycloak = null;
 
-  constructor(){
-    if(Storage === undefined){
+  constructor() {
+    if (Storage === undefined) {
       throw "The browser must support WebStorage API";
     }
-
-    window.addEventListener("storage", (e) => {
-      if(e.key !== oidLocalStorageKey){
-        return;
-      }
-      this.tryAuthenticate();
-    });
   }
 
   @computed
   get accessToken() {
-    return this.hasExpired? null: this.session.accessToken;
+    return this.isAuthenticated ? this.keycloak.token: "";
   }
 
   @computed
-  get isOIDCAuthenticated() {
-    return !this.hasExpired;
+  get isAuthenticated() {
+    return this.authSuccess;
   }
 
   @computed
@@ -109,120 +54,136 @@ class AuthStore {
     return !!this.user;
   }
 
-  @computed
-  get isFullyAuthenticated() {
-    return this.isOIDCAuthenticated && this.hasUserProfile;
-  }
-
-  get hasExpired() {
-    return this.session === null || (new Date() - this.session.expiryTimestamp) > 0;
-  }
-
-  get loginUrl() {
-    const nonceKey = generateRandomKey();
-    const url = `${oidConnectServerUri}?response_type=id_token%20token&client_id=${oidClientId}&redirect_uri=${escape(redirectUri)}&scope=openid%20profile&state=${stateKey}&nonce=${nonceKey}`;
-    return url;
-  }
-
-  startSessionTimer() {
-    if (this.hasExpired) {
-      return;
+  get firstName() {
+    const firstNameReg = /^([^ ]+) .*$/;
+    if (this.hasUserProfile && this.user) {
+      if (this.user.givenName) {
+        return this.user.givenName;
+      }
+      if (this.user.name) {
+        if (firstNameReg.test(this.user.name)) {
+          return this.user.name.match(firstNameReg)[1];
+        }
+        return this.user.name;
+      }
+      if (this.user.username) {
+        return this.user.username;
+      }
     }
-    clearTimeout(sessionTimer);
-    sessionTimer = setTimeout(() => {
-      // console.log("session is expiring...");
-      this.logout();
-    }, this.session.expiryTimestamp -(new Date()).getTime());
+    return "";
   }
 
   @action
   logout() {
-    // console.log("logout");
-    clearTimeout(sessionTimer);
-    this.session = null;
-    this.expiredToken = true;
+    this.authSuccess = false;
+    this.isTokenExpired = true;
+    this.isUserAuthorized = false;
     this.user = null;
-    if (typeof Storage !== "undefined" ) {
-      localStorage.removeItem(oidLocalStorageKey);
-    }
-    return this.reloginPromise;
+    this.keycloak.logout({redirectUri: `${window.location.protocol}//${window.location.host}${rootPath}/logout`});
+    this.isLogout = true;
   }
 
-  listenForLogin(){
-    window.addEventListener("message", this.loginSuccessHandler);
-  }
 
   @action
-  loginSuccessHandler(e){
-    if(e.data === "LOGIN_SUCCESS"){
-      this.tryAuthenticate();
-    }
-    window.removeEventListener("message", this.loginSuccessHandler);
-  }
-
-  @action
-  async retriveUserProfile() {
-    if (!this.hasExpired && !this.user) {
+  async retrieveUserProfile() {
+    if (this.isAuthenticated && !this.user) {
       this.userProfileError = false;
       this.isRetrievingUserProfile = true;
       try {
-        /* Uncomment to test error handling
-        if ((Math.floor(Math.random() * 10) % 2) === 0) {
-          throw "Error 501";
-        }
-        */
         const { data } = await API.axios.get(API.endpoints.user());
+        debugger;
+        //throw {response: { status: 403}};
         runInAction(() => {
-          this.user = data && data.data;
+          this.isUserAuthorized = true;
+          const user = (data && data.data)?data.data:null;
+          this.user = user;
           this.isRetrievingUserProfile = false;
-          this.reloginResolve();
-          this.reloginPromise = new Promise((resolve)=>{this.reloginResolve = resolve;});
         });
       } catch (e) {
         runInAction(() => {
-          this.userProfileError = e.message?e.message:e;
-          this.isRetrievingUserProfile = false;
+          if (e.response && e.response.status === 403) {
+            this.isUserAuthorized = false;
+            this.isRetrievingUserProfile = false;
+          } else {
+            this.isUserAuthorized = false;
+            this.userProfileError = e.message ? e.message : e;
+            this.isRetrievingUserProfile = false;
+          }
         });
-        appStore.captureSentryException(e);
       }
+    }
+    return this.hasUserProfile;
+  }
+
+
+  initializeKeycloak(resolve, reject) {
+    const keycloak = window.Keycloak({
+      "realm": "hbp",
+      "url":  endpoint,
+      "clientId": "kg"
+    });
+    runInAction(() => this.keycloak = keycloak);
+    keycloak.onAuthSuccess = () => {
+      runInAction(() => {
+        this.authSuccess = true;
+        this.isInitializing = false;
+      });
+      resolve(true);
+    };
+    keycloak.onAuthError = error => {
+      runInAction(() => {
+        this.authError = error.error_description;
+      });
+      reject(error.error_description);
+    };
+    keycloak.onTokenExpired = () => {
+      keycloak
+        .updateToken(30)
+        .catch(() => runInAction(() => {
+          this.authSuccess = false;
+          this.isTokenExpired = true;
+        }));
+    };
+    keycloak.init({ onLoad: "login-required", pkceMethod: "S256" });
+  }
+
+  login() {
+    if(!this.isAuthenticated && this.keycloak) {
+      this.keycloak.login();
     }
   }
 
   @action
-  async tryAuthenticate() {
-    const hash = window.location.hash;
-    const accessToken = getKey(hash, "access_token");
-    const state = getKey(hash, "state");
-    const expiresIn = getKey(hash, "expires_in");
+  async authenticate() {
+    this.isLogout = false;
+    this.isInitializing = true;
+    this.authError = null;
+    try {
+      await new Promise((resolve, reject) => {
+        const keycloakScript = document.createElement("script");
+        keycloakScript.src = endpoint + "/js/keycloak.js";
+        keycloakScript.async = true;
 
-    if (accessToken && state && expiresIn) {
-      this.session = {
-        accessToken: accessToken,
-        expiryTimestamp: new Date().getTime() + 1000 * (Number(expiresIn) - 60)
-      };
-      this.startSessionTimer();
-
-      // console.log ("retrieved oid from url: ", this.session);
-      localStorage.setItem(oidLocalStorageKey, JSON.stringify(this.session));
-
-      // const uri = atob(state);
-      // console.log ("retrieved stateKey: ", uri);
-    } else {
-      const oidStoredState = JSON.parse(localStorage.getItem(oidLocalStorageKey));
-      // console.log ("retrieved oid from localStorage: ", oidStoredState);
-
-      if (oidStoredState && oidStoredState.expiryTimestamp && new Date() < oidStoredState.expiryTimestamp) {
-        this.session = oidStoredState;
-        this.startSessionTimer();
-      } else if(this.session){
-        this.logout();
-      }
-
+        document.head.appendChild(keycloakScript);
+        keycloakScript.onload = () => {
+          this.initializeKeycloak(resolve, reject);
+        };
+        keycloakScript.onerror = () => {
+          document.head.removeChild(keycloakScript);
+          runInAction(() => {
+            this.isInitializing = false;
+            this.authError = `Failed to load resource! (${keycloakScript.src})`;
+          });
+          reject(this.authError);
+        };
+      });
+    } catch (e) {
+      // error are already set in the store so no need to do anything here
+      // window.console.log(e);
     }
-
-    this.retriveUserProfile();
-
-    return this.session? this.session.accessToken: null;
+    return this.authSuccess;
   }
+
 }
+
 export default new AuthStore();

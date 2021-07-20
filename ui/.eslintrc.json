@@ -10,6 +10,7 @@
         "ecmaFeatures": {
             "experimentalObjectRestSpread": true,
             "experimentalDecorators": true,
+            "legacyDecorators": true,
             "jsx": true
         },
         "sourceType": "module"

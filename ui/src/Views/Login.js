@@ -24,6 +24,7 @@
 import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
 
 import authStore from "../Stores/AuthStore";
 import appStore from "../Stores/AppStore";
@@ -95,7 +96,7 @@ export default class Login extends React.Component {
     appStore.initialize();
   }
 
-   handleCancelInitialInstance() {
+  handleCancelInitialInstance() {
     appStore.cancelInitialInstance();
   }
 
@@ -118,7 +119,7 @@ export default class Login extends React.Component {
           </div>
         );
       }
-  
+
       if (appStore.initialInstanceError) {
         return (
           <div className={classes.container}>
@@ -130,13 +131,13 @@ export default class Login extends React.Component {
                     <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
                   </button>
                 </div>
-                  <Button variant={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
+                <Button variant={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
               </BGMessage>
             </div>
           </div>
         );
       }
-  
+
       if (appStore.initialInstanceSpaceError) {
         return (
           <div className={classes.container}>
@@ -149,7 +150,7 @@ export default class Login extends React.Component {
           </div>
         );
       }
-  
+
       if (appStore.initializingMessage) {
         return (
           <div className={classes.container}>
@@ -159,7 +160,7 @@ export default class Login extends React.Component {
           </div>
         );
       }
-  
+
       return (
         <div className={classes.container}>
           <div className={classes.panel}>
@@ -171,9 +172,9 @@ export default class Login extends React.Component {
           </div>
         </div>
       );
-  
+
     }
-  
+
     if (authStore.isTokenExpired && !authStore.isLogout) {
       return (
         <div className={classes.container}>
@@ -190,7 +191,7 @@ export default class Login extends React.Component {
         </div>
       );
     }
-  
+
     return (
       <div className={classes.container}></div>
     );

@@ -58,7 +58,6 @@ import Instance from "./Views/Instance";
 import NewInstance from "./Views/NewInstance";
 import QueryBuilder from "./Views/QueryBuilder";
 import FetchingLoader from "./Components/FetchingLoader";
-import BGMessage from "./Components/BGMessage";
 import GlobalError from "./Views/GlobalError";
 import * as Sentry from "@sentry/browser";
 
@@ -468,7 +467,6 @@ class App extends React.Component {
   handleLogout = () => {
     if (!instanceStore.hasUnsavedChanges || confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       instanceStore.flushOpenedTabs();
-      debugger;
       authStore.logout();
       document.querySelector("#root").style.display = "none";
       window.location.href = window.rootPath + "/";

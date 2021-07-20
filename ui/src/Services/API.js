@@ -65,14 +65,12 @@ class API {
   constructor() {
     this._axios = axios.create({});
     this._axios.interceptors.request.use(config => {
-      debugger;
       if(authStore.keycloak) {
         config.headers.Authorization = "Bearer " + authStore.keycloak.token;
       }
       return Promise.resolve(config);
     });
     this._axios.interceptors.response.use(null, (error) => {
-      debugger;
       if (error.response && error.response.status === 401 && !error.config._isRetry) {
         authStore.logout();
         return this.axios.request(error.config);

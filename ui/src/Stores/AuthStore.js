@@ -91,7 +91,6 @@ class AuthStore {
       this.isRetrievingUserProfile = true;
       try {
         const { data } = await API.axios.get(API.endpoints.user());
-        debugger;
         //throw {response: { status: 403}};
         runInAction(() => {
           this.isUserAuthorized = true;

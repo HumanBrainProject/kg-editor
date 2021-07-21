@@ -150,7 +150,7 @@ class AppStore{
       this.canLogin = true;
       this.initialize();
     }
-  };
+  }
 
   @action
   async initialize() {

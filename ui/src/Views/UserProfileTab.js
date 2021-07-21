@@ -170,6 +170,12 @@ export default class UserProfileTab extends React.Component{
     this.buttonRef = React.createRef();
   }
 
+  componentWillUnmount() {
+    if (this.state.showPopOver) {
+      this.handlePopOverClose();
+    }
+  }
+
   handlePopOverPosition = popOverRect => {
     if (!popOverRect) { return null; }
     const buttonRect = this.buttonRef.current.getBoundingClientRect();
@@ -200,13 +206,6 @@ export default class UserProfileTab extends React.Component{
       instanceStore.flushOpenedTabs();
       authStore.logout();
       document.querySelector("#root").style.display = "none";
-      window.location.href = window.rootPath + "/";
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.state.showPopOver) {
-      this.handlePopOverClose();
     }
   }
 

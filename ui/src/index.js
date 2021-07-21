@@ -298,8 +298,6 @@ class App extends React.Component {
     this.kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
   }
 
-
-
   componentDidMount() {
     appStore.initialize();
     document.addEventListener("keydown", this.handleGlobalShortcuts);
@@ -312,7 +310,6 @@ class App extends React.Component {
       });
     }
   }
-
 
   componentDidCatch(error, info) {
     appStore.setGlobalError(error, info);
@@ -469,7 +466,6 @@ class App extends React.Component {
       instanceStore.flushOpenedTabs();
       authStore.logout();
       document.querySelector("#root").style.display = "none";
-      window.location.href = window.rootPath + "/";
     }
   }
 
@@ -477,7 +473,6 @@ class App extends React.Component {
     const { classes } = this.props;
     const { currentLocation } = this.state;
     const Theme = appStore.availableThemes[appStore.currentTheme];
-    console.log(appStore.isInitialized && authStore.isAuthenticated );
     return (
       <Router history={routerStore.history}>
         <div className={classes.layout}>

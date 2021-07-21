@@ -89,22 +89,12 @@ const styles = {
 @observer
 export default class Login extends React.Component {
 
+  handleLogin = () => appStore.login();
 
-  handleLogin() {
-    appStore.login();
-  }
-
-  handleRetryToInitialize() {
-    appStore.initialize();
-  }
-
-  handleCancelInitialInstance() {
-    appStore.cancelInitialInstance();
-  }
+  handleRetryToInitialize = () => appStore.initialize();
 
   render() {
     const { classes } = this.props;
-    console.log(appStore.isInitialized);
     if (!appStore.isInitialized) {
       if (appStore.initializationError) {
         return (

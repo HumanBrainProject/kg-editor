@@ -22,9 +22,11 @@
  */
 
 import { observable, action, runInAction } from "mobx";
+import { matchPath } from "react-router-dom";
 import * as Sentry from "@sentry/browser";
 
 import authStore from "./AuthStore";
+import routerStore from "../Stores/RouterStore";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -69,7 +71,9 @@ class AppStore{
       };
     }
     this.historySettings = savedHistorySettings;
+    this.canLogin = !matchPath(routerStore.history.location.pathname, { path: "/logout", exact: "true" });
   }
+
 
   @action
   setGlobalError(error, info){
@@ -136,6 +140,17 @@ class AppStore{
     this.historySettings.eventTypes.released = on?true:false;
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
+
+  @action
+  login(){
+    if (this.canLogin) {
+      authStore.login();
+    } else {
+      routerStore.history.replace("/");
+      this.canLogin = true;
+      this.initialize();
+    }
+  };
 
   @action
   async initialize() {

@@ -25,6 +25,7 @@ import React from "react";
 import injectStyles from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
+import { observer } from "mobx-react";
 
 import authStore from "../Stores/AuthStore";
 import appStore from "../Stores/AppStore";
@@ -85,6 +86,7 @@ const styles = {
 };
 
 @injectStyles(styles)
+@observer
 export default class Login extends React.Component {
 
 
@@ -102,8 +104,8 @@ export default class Login extends React.Component {
 
   render() {
     const { classes } = this.props;
+    console.log(appStore.isInitialized);
     if (!appStore.isInitialized) {
-
       if (appStore.initializationError) {
         return (
           <div className={classes.container}>
@@ -114,37 +116,6 @@ export default class Login extends React.Component {
                 <Button variant={"primary"} onClick={this.handleRetryToInitialize}>
                   <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
                 </Button>
-              </BGMessage>
-            </div>
-          </div>
-        );
-      }
-
-      if (appStore.initialInstanceError) {
-        return (
-          <div className={classes.container}>
-            <div className={classes.error}>
-              <BGMessage icon={"ban"}>
-                {appStore.initialInstanceError}<br /><br />
-                <div>
-                  <button onClick={this.handleRetryToInitialize}>
-                    <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-                  </button>
-                </div>
-                <Button variant={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
-              </BGMessage>
-            </div>
-          </div>
-        );
-      }
-
-      if (appStore.initialInstanceSpaceError) {
-        return (
-          <div className={classes.container}>
-            <div className={classes.error}>
-              <BGMessage icon={"ban"}>
-                {appStore.initialInstanceSpaceError}<br /><br />
-                <Button variant={"primary"} onClick={this.handleCancelInitialInstance}>Continue</Button>
               </BGMessage>
             </div>
           </div>
@@ -167,7 +138,7 @@ export default class Login extends React.Component {
             <h3>You are logged out of the application</h3>
             <p></p>
             <div className={classes.actionPanel}>
-              <button variant={"primary"} onClick={this.handleLogin}>Login</button>
+              <Button variant={"primary"} onClick={this.handleLogin}>Login</Button>
             </div>
           </div>
         </div>

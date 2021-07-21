@@ -179,7 +179,7 @@ class AuthStore {
       });
     } catch (e) {
       // error are already set in the store so no need to do anything here
-      console.log(e);
+      // console.log(e);
     }
     return this.authSuccess;
   }

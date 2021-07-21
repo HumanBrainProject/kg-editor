@@ -211,7 +211,7 @@ export default class UserProfileTab extends React.Component{
   }
 
   render(){
-    if (!authStore.isFullyAuthenticated || !authStore.hasUserProfile || !authStore.user) {
+    if (!authStore.isAuthenticated || !authStore.hasUserProfile || !authStore.user) {
       return null;
     }
     const { classes, className, size=30 } = this.props;
@@ -237,7 +237,7 @@ export default class UserProfileTab extends React.Component{
                 <div>
                   <div className={classes.name}>{authStore.user.name}</div>
                   <div className={classes.email}>{authStore.user.email}</div>
-                  <Button bsStyle="primary" className={classes.accountBtn} href="https://collab.humanbrainproject.eu/#/me" title="https://collab.humanbrainproject.eu/#/me" rel="noopener noreferrer" target="_blank">Account</Button>
+                  <Button bsStyle="primary" className={classes.accountBtn} href="https://iam.ebrains.eu/auth/realms/hbp/account/" title="https://iam.ebrains.eu/auth/realms/hbp/account/" rel="noopener noreferrer" target="_blank">Account</Button>
                 </div>
               </div>
               <div className={classes.popOverFooterBar}>

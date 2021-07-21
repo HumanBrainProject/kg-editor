@@ -477,6 +477,7 @@ class App extends React.Component {
     const { classes } = this.props;
     const { currentLocation } = this.state;
     const Theme = appStore.availableThemes[appStore.currentTheme];
+    console.log(appStore.isInitialized && authStore.isAuthenticated );
     return (
       <Router history={routerStore.history}>
         <div className={classes.layout}>

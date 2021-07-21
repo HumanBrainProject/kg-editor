@@ -161,7 +161,7 @@ class AppStore{
           if (authStore.userProfileError) {
             this.initializationError = authStore.userProfileError;
             this.initializingMessage = null;
-          } else if (!authStore.isUserAuthorized && !authStore.isRetrievingUserProfile) {
+          } else if (authStore.isUserAuthorized && !authStore.isRetrievingUserProfile) {
             this.isInitialized = true;
             this.initializingMessage = null;
           }

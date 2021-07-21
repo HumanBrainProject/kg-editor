@@ -30,8 +30,7 @@ import scala.concurrent.duration.FiniteDuration
 @Singleton
 class ConfigurationService @Inject()(configuration: Configuration) {
   val refreshTokenFile: String = configuration.get[String]("auth.refreshTokenFile")
-  val oidcEndpoint = s"${configuration.get[String]("auth.endpoint")}/oidc"
-  val oidcTokenEndpoint = s"$oidcEndpoint/token"
+  val oidcTokenEndpoint = s"${configuration.get[String]("auth.endpoint")}/token"
   val cacheExpiration: FiniteDuration = configuration.get[FiniteDuration]("cache.expiration")
 
   val nexusEndpoint: String =
@@ -40,8 +39,7 @@ class ConfigurationService @Inject()(configuration: Configuration) {
 
   val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
   val iamEndpoint = configuration.get[String]("nexus.iam")
-  val authEndpoint = configuration.get[String]("auth.endpoint")
-  val idmApiEndpoint = s"$authEndpoint/idm/v1/api"
+  val idmApiEndpoint = "https://foobar/idm/v1/api"
   val editorSubSpace = configuration.getOptional[String]("editor.subspace").getOrElse("editor")
 
 }

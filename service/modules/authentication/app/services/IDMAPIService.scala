@@ -82,17 +82,11 @@ class IDMAPIService @Inject()(
   }
 
   private def getUserInfoFromToken(token: BasicAccessToken): Task[Option[IDMUser]] = {
-    val userRequest = WSClient.url(s"${config.idmApiEndpoint}/user/me").addHttpHeaders(AUTHORIZATION -> token.token)
+    val userRequest = WSClient.url(s"${config.iamEndpoint}/v0/oauth2/userinfo").addHttpHeaders(AUTHORIZATION -> token.token)
     Task.deferFuture(userRequest.get()).flatMap { res =>
       res.status match {
         case OK =>
-          res.json.asOpt[IDMUser] match {
-            case Some(u) =>
-              getUserGroups(u.id, token).map { groups =>
-                Some(u.copy(groups = groups))
-              }
-            case None => Task.pure(None)
-          }
+          Task.pure(res.json.asOpt[IDMUser])
         case _ =>
           log.error(s"Could not fetch user - ${res.body}")
           Task.pure(None)

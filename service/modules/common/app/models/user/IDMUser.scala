@@ -41,15 +41,15 @@ final case class IDMUser(
 object IDMUser {
   type ID = String
   implicit val idmUserReads: Reads[IDMUser] = (
-    (JsPath \ "id").read[String] and
-    (JsPath \ "username").read[String] and
-    (JsPath \ "givenName").read[String] and
-    (JsPath \ "familyName").read[String] and
-    (JsPath \ "displayName").read[String] and
-    (JsPath \ "emails").read[List[Email]].map(l => l.collectFirst { case e if e.primary => e.value }) and
+    (JsPath \ "sub").read[String] and
+    (JsPath \ "preferred_username").read[String] and
+    (JsPath \ "given_name").read[String] and
+    (JsPath \ "family_name").read[String] and
+    (JsPath \ "name").read[String] and
+    (JsPath \ "email").readNullable[String] and
     (JsPath \ "picture").readNullable[String] and
-    (JsPath \ "isCurator").readNullable[Boolean].map(opt => opt.fold(false)(identity)) and
-    (JsPath \ "groups").readNullable[List[Group]].map(opt => opt.fold(List[Group]())(identity))
+    (JsPath \ "groups").readNullable[List[String]].map(l => l.getOrElse(List()).contains("group-kg-curators")) and
+    (JsPath \ "groups").read[List[String]].map(l => l.map(i => Group(i)))
   )(IDMUser.apply _)
 
   implicit val idmUserWrites: Writes[IDMUser] = (

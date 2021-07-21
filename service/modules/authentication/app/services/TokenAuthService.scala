@@ -60,13 +60,11 @@ class TokenAuthService @Inject()(
   private def refreshAccessToken(clientCredentials: ClientCredentials): Task[RefreshAccessToken] = {
     Task
       .deferFuture {
-        ws.url(config.oidcTokenEndpoint)
-          .withQueryStringParameters(
+        ws.url(config.oidcTokenEndpoint).post(Map(
             "client_id"     -> clientCredentials.clientId,
             "client_secret" -> clientCredentials.clientSecret,
             "grant_type"    -> "client_credentials"
-          )
-          .get()
+          ))
       }
       .flatMap { result =>
         result.status match {

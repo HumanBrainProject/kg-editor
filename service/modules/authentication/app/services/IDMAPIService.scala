@@ -23,14 +23,14 @@
 package services
 
 import com.google.inject.Inject
-import models.user.{Group, IDMUser}
+import models.user.{Group, IDMUser, WikiUser}
 import models.{AccessToken, BasicAccessToken, Pagination, RefreshAccessToken}
 import monix.eval.Task
 import org.slf4j.LoggerFactory
 import play.api.cache.{AsyncCacheApi, NamedCache}
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsArray, JsValue}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 class IDMAPIService @Inject()(
@@ -47,21 +47,20 @@ class IDMAPIService @Inject()(
     if (userId.isEmpty) {
       Task.pure(None)
     } else {
-      val url = s"${config.idmApiEndpoint}/user/$userId"
+      val url = s"${config.wikiEndpoint}/user/$userId"
       val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token)
 
       val queryResult = token match {
         case BasicAccessToken(_)   => Task.deferFuture(q.get())
         case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
       }
-      for {
-        userRes    <- queryResult
-        userGroups <- getUserGroups(userId, token)
-        user = userRes.json.asOpt[IDMUser] match {
-          case Some(u) => Some(u.copy(groups = userGroups, isCurator = isUserPartOfGroups(u, List("nexus-curators"))))
-          case None    => None
+
+      queryResult.map { res =>
+        res.status match {
+          case OK => res.json.asOpt[IDMUser]
+          case _ => None
         }
-      } yield user
+      }
     }
   }
 
@@ -95,102 +94,31 @@ class IDMAPIService @Inject()(
   }
 
   def getUsers(
-    size: Int,
     searchTerm: String,
     token: AccessToken
-  ): Task[Either[WSResponse, (List[IDMUser], Pagination)]] = {
-    val url = s"${config.idmApiEndpoint}/user/searchByText"
-    if (!searchTerm.isEmpty) {
+  ): Task[Either[WSResponse, (List[WikiUser], Pagination)]] = {
+    val url = s"${config.wikiEndpoint}/users"
+    if (searchTerm.nonEmpty) {
       Task
         .deferFuture {
           WSClient
             .url(url)
             .addHttpHeaders(AUTHORIZATION -> token.token)
             .addQueryStringParameters(
-              "pageSize" -> size.toString,
-              "str"      -> searchTerm,
-              "sort"     -> "displayName,asc"
+              "search"      -> searchTerm
             )
             .get()
         }
         .flatMap { res =>
           res.status match {
             case OK =>
-              Task
-                .gather(
-                  (res.json \ "_embedded" \ "users")
-                    .as[List[IDMUser]]
-                    .map { u =>
-                      hasUserGroups(u, List("nexus-curators"), token).map {
-                        case Right(bool) => u.copy(isCurator = bool)
-                        case Left(res) =>
-                          log.error(s"Could not verify if user is curator - ${res.body}")
-                          u
-                      }
-                    }
-                )
-                .map { users =>
-                  val pagination = (res.json \ "page").as[Pagination]
-                  Right((users, pagination))
-                }
+              val users = res.json.as[List[WikiUser]]
+              Task.pure(Right((users, Pagination(users.size, users.size, 1, 0))))
             case _ => Task.pure(Left(res))
           }
         }
     } else {
       Task.pure(Right((List(), Pagination.empty)))
-    }
-  }
-
-  private def isUserPartOfGroups(user: IDMUser, groups: List[String]): Boolean = {
-    groups.forall(s => user.groups.exists(g => g.name.equals(s)))
-  }
-
-  def hasUserGroups(
-    user: IDMUser,
-    groups: List[String],
-    token: AccessToken
-  ): Task[Either[WSResponse, Boolean]] = {
-    val url = s"${config.idmApiEndpoint}/user/${user.id}/member-groups"
-    val queryGroups: List[(String, String)] = groups.map("name" -> _)
-    val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token).addQueryStringParameters(queryGroups: _*)
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-    }
-    r.map { res =>
-      res.status match {
-        case OK => Right((res.json \ "_embedded" \ "groups").as[List[JsValue]].nonEmpty)
-        case _  => Left(res)
-      }
-    }
-
-  }
-
-  def getUserGroups(
-    userId: String,
-    token: AccessToken,
-  ): Task[List[Group]] = {
-    for {
-      userGroups <- getGroups(userId, token)
-    } yield userGroups
-  }
-
-  private def getGroups(userId: String, token: AccessToken): Task[List[Group]] = {
-    val url = s"${config.idmApiEndpoint}/user/$userId/member-groups"
-    val q =
-      WSClient.url(url).withHttpHeaders(AUTHORIZATION -> token.token).addQueryStringParameters("pageSize" -> "1000")
-    val r = token match {
-      case BasicAccessToken(_)   => Task.deferFuture(q.get())
-      case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
-    }
-    r.map { res =>
-      res.status match {
-        case OK =>
-          (res.json \ "_embedded" \ "groups").as[List[Group]]
-        case _ =>
-          log.error(s"Could not fetch user groups - Status:${res.status} - Content:${res.body}")
-          List()
-      }
     }
   }
 

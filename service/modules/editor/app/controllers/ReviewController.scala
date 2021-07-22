@@ -43,9 +43,9 @@ class ReviewController @Inject()(
   implicit val scheduler = monix.execution.Scheduler.Implicits.global
   object instanceApiService extends InstanceApiService
 
-  def getUsers(size: Int, search: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+  def getUsers(search: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     IDMAPIService
-      .getUsers(size, search, request.userToken)
+      .getUsers(search, request.userToken)
       .map {
         case Right((users, pagination)) =>
           Ok(

@@ -21,34 +21,31 @@
  *
  */
 
-package helpers
+package models.user
 
-import models.user.IDMUser
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-object EditorSpaceHelper {
-  private val editorSuffix = "editor"
 
-  def nexusEditorContext(org: String): String = {
-    if (org != "manual") {
-      s""""${org}":"http://hbp.eu/${org}#",
-         |"manual":"http://hbp.eu/manual#",
-       """.stripMargin
-    } else {
-      s""""${org}":"http://hbp.eu/${org}#","""
-    }
-  }
+case class WikiUser(
+                     userName: String,
+                     givenName: String,
+                     familyName: String,
+                     picture: String
+                   )
 
-  /**
-    * Check if the group is an editor group
-    * @param userInfo UserInfo with all the groups
-    * @param hintedGroup The group the user wants to use
-    * @return true if the group is an editor group
-    */
-  def isEditorGroup(userInfo: IDMUser, hintedGroup: String): Boolean = {
-    userInfo.groups.exists(g => g.name.equals(s"group-nexus-${hintedGroup}"))
-  }
+object WikiUser {
+  implicit val wikiUserReads: Reads[WikiUser] = (
+    (JsPath \ "username").read[String] and
+      (JsPath \ "firstName").read[String] and
+      (JsPath \ "lastName").read[String] and
+      (JsPath \ "avatar").read[String]
+    ) (WikiUser.apply _)
 
-  def getGroupName(group: String, suffix: String): String = {
-    s"$group$suffix"
-  }
+  implicit val wikiUserWrites: Writes[WikiUser] = (
+    (JsPath \ "username").write[String] and
+      (JsPath \ "firstName").write[String] and
+      (JsPath \ "lastName").write[String] and
+      (JsPath \ "avatar").write[String]
+    ) (unlift(WikiUser.unapply))
 }

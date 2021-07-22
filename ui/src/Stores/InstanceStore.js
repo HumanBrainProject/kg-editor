@@ -30,7 +30,6 @@ import API from "../Services/API";
 import historyStore from "./HistoryStore";
 import PaneStore from "./PaneStore";
 import browseStore from "./BrowseStore";
-import authStore from "./AuthStore";
 import statusStore from "./StatusStore";
 import routerStore from "./RouterStore";
 import appStore from "./AppStore";

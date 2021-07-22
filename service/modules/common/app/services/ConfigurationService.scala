@@ -39,7 +39,7 @@ class ConfigurationService @Inject()(configuration: Configuration) {
 
   val kgQueryEndpoint: String = configuration.getOptional[String]("kgquery.endpoint").getOrElse("http://localhost:8600")
   val iamEndpoint = configuration.get[String]("nexus.iam")
-  val idmApiEndpoint = "https://foobar/idm/v1/api"
+  val wikiEndpoint = configuration.get[String]("wiki.endpoint")
   val editorSubSpace = configuration.getOptional[String]("editor.subspace").getOrElse("editor")
 
 }

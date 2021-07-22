@@ -31,6 +31,7 @@ import routerStore from "../Stores/RouterStore";
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
+import instanceStore from "./InstanceStore";
 
 class AppStore{
   @observable canLogin = true;
@@ -181,6 +182,10 @@ class AppStore{
             this.initializingMessage = null;
           }
         });
+      }
+      if(localStorage.getItem("openedTabs")) {
+        const storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
+        instanceStore.restoreOpenedTabs(storedOpenedTabs);
       }
     }
   }

@@ -333,12 +333,6 @@ class InstanceStore {
 
   constructor(databaseScope=null) {
     this.databaseScope = databaseScope?databaseScope:null;
-    if(localStorage.getItem("openedTabs")){
-      let storedOpenedTabs = JSON.parse(localStorage.getItem("openedTabs"));
-      authStore.reloginPromise.then(()=>{
-        this.restoreOpenedTabs(storedOpenedTabs);
-      });
-    }
   }
 
   fetchInstance(instance){

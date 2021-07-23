@@ -349,7 +349,7 @@ class QueryBuilderStore {
 
   @computed
   get isOneOfMySavedQueries() {
-    return this.sourceQuery !== null && this.sourceQuery.user === authStore.user.id;
+    return this.sourceQuery !== null && this.sourceQuery.user === authStore.user.username;
   }
 
   @computed
@@ -421,7 +421,7 @@ class QueryBuilderStore {
   @computed
   get myQueries() {
     if (authStore.hasUserProfile) {
-      return this.specifications.filter(spec => spec.user === authStore.user.id).sort((a, b) => a.label - b.label);
+      return this.specifications.filter(spec => spec.user === authStore.user.username).sort((a, b) => a.label - b.label);
     }
     return [];
   }
@@ -429,7 +429,7 @@ class QueryBuilderStore {
   @computed
   get othersQueries() {
     if (authStore.hasUserProfile) {
-      return this.specifications.filter(spec => spec.user !== authStore.user.id).sort((a, b) => a.label - b.label);
+      return this.specifications.filter(spec => spec.user !== authStore.user.username).sort((a, b) => a.label - b.label);
     }
     return this.specifications.sort((a, b) => a.label - b.label);
   }
@@ -1135,7 +1135,7 @@ class QueryBuilderStore {
       try {
         await API.axios.put(API.endpoints.query(this.rootField.schema.id, queryId), payload);
         runInAction(() => {
-          if (!this.saveAsMode && this.sourceQuery && this.sourceQuery.user === authStore.user.id) {
+          if (!this.saveAsMode && this.sourceQuery && this.sourceQuery.user === authStore.user.username) {
             this.sourceQuery.label = payload.label;
             this.sourceQuery.description = payload.description;
             this.sourceQuery.context = payload["@context"];
@@ -1150,7 +1150,7 @@ class QueryBuilderStore {
           } else {
             this.sourceQuery = {
               id: queryId,
-              user: authStore.user.id,
+              user: authStore.user.username,
               context: payload["@context"],
               merge: payload.merge,
               fields: payload.fields,

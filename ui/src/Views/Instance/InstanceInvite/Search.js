@@ -185,7 +185,7 @@ export default class Search extends React.Component{
       event && event.preventDefault();
       usersStore.addUser(org, toJS(user), true);
       this.inputRef && this.inputRef.focus();
-      typeof onSelect === "function" && onSelect(user.id);
+      typeof onSelect === "function" && onSelect(user.username);
     }
   }
 
@@ -273,7 +273,7 @@ export default class Search extends React.Component{
                   loadMore={this.handleLoadMoreSearchResults}
                   useWindow={false}>
                   {usersStore.searchResult.map(user => (
-                    <User key={user.id} user={user} onSelect={this.handleSelect} />
+                    <User key={user.username} user={user} onSelect={this.handleSelect} />
                   ))}
                 </InfiniteScroll>
               </div>

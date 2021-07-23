@@ -86,6 +86,8 @@ export default class User extends React.Component{
   render() {
     const { classes, user} = this.props;
 
+    const displayName = user && `${user.firstName} ${user.lastName}`;
+
     const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
       if (item && item.value && item.verified) {
         if (item.primary || !email) {
@@ -96,11 +98,11 @@ export default class User extends React.Component{
     }, null):null;
 
     return (
-      <MenuItem  key={user.id} className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect.bind(this, user)}>
+      <MenuItem  key={user.username} className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect.bind(this, user)}>
         <div tabIndex={-1} className="option" onKeyDown={this.handleSelect.bind(this, user)}>
           <UserComponent
-            userId={user && user.id}
-            name={user && user.displayName}
+            userId={user && user.username}
+            name={displayName}
             picture={user && user.picture}
             isCurator={!!user && !!user.isCurator}
             title={email} />

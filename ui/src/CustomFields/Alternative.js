@@ -108,7 +108,7 @@ export default class Alternative extends React.Component {
     const { classes, alternative, field, className } = this.props;
 
     const userIds = (!alternative || !alternative.userIds)?[]:(typeof alternative.userIds === "string")?[alternative.userIds]:alternative.userIds;
-    const isOwnAlternative = userIds.includes(authStore.user.id);
+    const isOwnAlternative = userIds.includes(authStore.user.username);
 
     return (
       <MenuItem className={`quickfire-dropdown-item ${classes.container}`} onSelect={this.handleSelect(alternative)}>

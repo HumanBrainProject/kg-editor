@@ -67,8 +67,8 @@ class UsersStore {
 
   @action
   addUser(user, clearSearch = false) {
-    if (user && user.id && !this.users.has(user.id)) {
-      this.users.set(user.id, Object.assign({}, user, {
+    if (user && user.username && !this.users.has(user.username)) {
+      this.users.set(user.username, Object.assign({}, user, {
         isFetching: false,
         isFetched: true,
         hasFetchError: false,
@@ -81,11 +81,11 @@ class UsersStore {
   }
 
   @action
-  async fetchUser(userId) {
-    let user = this.users.get(userId);
+  async fetchUser(userName) {
+    let user = this.users.get(userName);
     if (!user) {
-      this.users.set(userId, {
-        id: userId,
+      this.users.set(userName, {
+        id: userName,
         username: null,
         displayName: null,
         givenName: null,
@@ -98,20 +98,20 @@ class UsersStore {
         hasFetchError: false,
         fetchError: null
       });
-      user = this.users.get(userId);
+      user = this.users.get(userName);
     }
     if (!user.isFetching && (!user.isFetched || user.hasFetchError)) {
       try {
         user.isFetching = true;
         user.hasFetchError = false;
         user.fetchError = null;
-        const { data } = await API.axios.get(API.endpoints.userInfo(userId));
+        const { data } = await API.axios.get(API.endpoints.userInfo(userName));
         runInAction(() => {
           const userData = data && data.data;
           user.username = userData && userData.username;
-          user.displayName = userData && userData.displayName;
-          user.givenName = userData && userData.givenName;
-          user.familyName = userData && userData.familyName;
+          user.displayName = userData && `${userData.firstName}  ${userData.lastName}`;
+          user.givenName = userData && userData.firstName;
+          user.familyName = userData && userData.lastName;
           user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
           user.picture = userData && userData.picture;
           user.isCurator = !!userData && !!userData.isCurator;
@@ -128,7 +128,7 @@ class UsersStore {
           user.picture = null;
           user.isCurator = false;
           const error = e.message ? e.message : e;
-          user.fetchError = `Error while retrieving user "${userId}" (${error})`;
+          user.fetchError = `Error while retrieving user "${userName}" (${error})`;
           user.hasFetchError = true;
           user.isFetched = true;
           user.isFetching = false;
@@ -196,7 +196,7 @@ class UsersStore {
             }
             if (this.searchFilter.excludedUsers && this.searchFilter.excludedUsers.length) {
 
-              this.searchResult = result.filter(user => !this.searchFilter.excludedUsers.includes(user.id));
+              this.searchResult = result.filter(user => !this.searchFilter.excludedUsers.includes(user.username));
             } else {
               this.searchResult = result;
             }

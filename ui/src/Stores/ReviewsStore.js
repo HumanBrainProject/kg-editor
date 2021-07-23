@@ -117,22 +117,22 @@ class ReviewsStore {
   }
 
   @action
-  async addInstanceReviewRequest(instanceId, org, userId) {
-    if (userId && this.instancesReviews.has(instanceId)) {
+  async addInstanceReviewRequest(instanceId, org, username) {
+    if (username && this.instancesReviews.has(instanceId)) {
       const instanceReviews = this.instancesReviews.get(instanceId);
       if (!instanceReviews.isFetching) {
-        let instanceReview = instanceReviews.reviews.find(review => review.userId === userId);
+        let instanceReview = instanceReviews.reviews.find(review => review.userName === username);
         if (!instanceReview) {
           instanceReview = {
-            userId: userId,
+            username: username,
             org: org
           };
           instanceReviews.reviews.push(instanceReview);
-          instanceReview = instanceReviews.reviews.find(review => review.userId === userId);
+          instanceReview = instanceReviews.reviews.find(review => review.userName === username);
         }
         delete instanceReview.error;
         try {
-          const {data} = await API.axios.put(API.endpoints.instanceReviewsByUser(instanceId, userId));
+          const {data} = await API.axios.put(API.endpoints.instanceReviewsByUser(instanceId, username));
 
           runInAction(async () => {
             instanceReview.status = data && data.status ? data.status : "PENDING";
@@ -141,7 +141,7 @@ class ReviewsStore {
           runInAction(() => {
             const message = e.message ? e.message : e;
             instanceReview.status = "ADD_ERROR";
-            instanceReview.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
+            instanceReview.error = `Error while inviting user "${username}" to review instance "${instanceId}" (${message})`;
           });
           appStore.captureSentryException(e);
         }
@@ -150,15 +150,15 @@ class ReviewsStore {
   }
 
   @action
-  async removeInstanceReviewRequest(instanceId, userId) {
-    if (userId && this.instancesReviews.has(instanceId)) {
+  async removeInstanceReviewRequest(instanceId, username) {
+    if (username && this.instancesReviews.has(instanceId)) {
       const instanceReviews = this.instancesReviews.get(instanceId);
       if (!instanceReviews.isFetching) {
-        let instanceReview = instanceReviews.reviews.find(review => review.userId === userId);
+        let instanceReview = instanceReviews.reviews.find(review => review.userName === username);
         instanceReviews.reviews.remove(instanceReview);
         delete instanceReview.error;
         try {
-          await API.axios.delete(API.endpoints.instanceReviewsByUser(instanceId, userId));
+          await API.axios.delete(API.endpoints.instanceReviewsByUser(instanceId, username));
           runInAction(async () => {
             instanceReviews.reviews.remove(instanceReview);
           });
@@ -166,7 +166,7 @@ class ReviewsStore {
           runInAction(() => {
             const message = e.message ? e.message : e;
             instanceReview.status = "REMOVE_ERROR";
-            instanceReview.error = `Error while trying to cancel invite to user "${userId}" to review instance "${instanceId}" (${message})`;
+            instanceReview.error = `Error while trying to cancel invite to user "${username}" to review instance "${instanceId}" (${message})`;
           });
           appStore.captureSentryException(e);
         }

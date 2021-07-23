@@ -90,14 +90,14 @@ const styles = {
 @observer
 export default class Reviewer extends React.Component{
 
-  handleInvite = userId => {
+  handleInvite = userName => {
     const { onInvite } = this.props;
-    typeof onInvite === "function" && onInvite(userId);
+    typeof onInvite === "function" && onInvite(userName);
   }
 
-  handleCancelInvitation = userId => {
+  handleCancelInvitation = userName => {
     const { onCancelInvitation } = this.props;
-    typeof onCancelInvitation === "function" && onCancelInvitation(userId);
+    typeof onCancelInvitation === "function" && onCancelInvitation(userName);
   }
 
   render() {
@@ -109,8 +109,8 @@ export default class Reviewer extends React.Component{
 
     return (
       <div className={classes.container}>
-        <User key={review.userId}  userId={review.userId} />
-        <button title="cancel invitation" onClick={this.handleCancelInvitation.bind(this, review.userId)}><FontAwesomeIcon icon="times"/></button>
+        <User key={review.userName}  userId={review.userName} />
+        <button title="cancel invitation" onClick={this.handleCancelInvitation.bind(this, review.userName)}><FontAwesomeIcon icon="times"/></button>
       </div>
     );
   }

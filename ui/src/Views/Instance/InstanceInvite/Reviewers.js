@@ -89,14 +89,14 @@ export default class Reviewers extends React.Component{
     reviewsStore.getInstanceReviews(this.props.id);
   }
 
-  handleCancelUserInvitation = userId => {
+  handleCancelUserInvitation = userName => {
     //window.console.log(`cancel invitation to user "${userId}" to review instance "${this.props.id}"`);
-    reviewsStore.removeInstanceReviewRequest(this.props.id, userId);
+    reviewsStore.removeInstanceReviewRequest(this.props.id, userName);
   }
 
-  handleInviteUser = userId => {
+  handleInviteUser = userName => {
     //window.console.log(`invite user "${userId}" to review instance "${this.props.id}"`);
-    reviewsStore.addInstanceReviewRequest(this.props.id, this.org, userId);
+    reviewsStore.addInstanceReviewRequest(this.props.id, this.org, userName);
   }
 
   render(){
@@ -104,9 +104,9 @@ export default class Reviewers extends React.Component{
 
     const instanceReviews = reviewsStore.getInstanceReviews(this.props.id);
 
-    const excludedUsers = instanceReviews.reviews.map(review => review.userId);
-    if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
-      excludedUsers.push(authStore.user.id);
+    const excludedUsers = instanceReviews.reviews.map(review => review.userName);
+    if (authStore.hasUserProfile && authStore.user && authStore.user.username && !excludedUsers.includes(authStore.user.username)) {
+      excludedUsers.push(authStore.user.username);
     }
 
     return (
@@ -121,7 +121,7 @@ export default class Reviewers extends React.Component{
                 <h4>{instanceReviews.reviews.length?"Users invited to review the instance:":(this.org?"Invite users to review":"")}</h4>
                 <ul>
                   {instanceReviews.reviews.map(review => (
-                    <li key={review.userId}>
+                    <li key={review.userName}>
                       <Reviewer review={review} onCancelInvitation={this.handleCancelUserInvitation} onInvite={this.handleInviteUser} />
                     </li>
                   ))}

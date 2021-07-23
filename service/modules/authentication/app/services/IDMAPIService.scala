@@ -43,11 +43,11 @@ class IDMAPIService @Inject()(
   private val log = LoggerFactory.getLogger(this.getClass)
   object cacheService extends CacheService
 
-  def getUserInfoFromID(userId: String, token: AccessToken): Task[Option[IDMUser]] = {
+  def getUserInfoFromID(userId: String, token: AccessToken): Task[Option[WikiUser]] = {
     if (userId.isEmpty) {
       Task.pure(None)
     } else {
-      val url = s"${config.wikiEndpoint}/user/$userId"
+      val url = s"${config.wikiEndpoint}/users/$userId"
       val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token)
 
       val queryResult = token match {
@@ -57,7 +57,7 @@ class IDMAPIService @Inject()(
 
       queryResult.map { res =>
         res.status match {
-          case OK => res.json.asOpt[IDMUser]
+          case OK => res.json.asOpt[WikiUser]
           case _ => None
         }
       }

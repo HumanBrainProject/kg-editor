@@ -26,7 +26,7 @@ import com.google.inject.Inject
 import constants.{InternalSchemaFieldsConstants, SchemaFieldsConstants}
 import models.errors.APIEditorError
 import models.instance.{EditorMetadata, NexusInstance}
-import models.user.IDMUser
+import models.user.{IDMUser, WikiUser}
 import monix.eval.Task
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -53,8 +53,8 @@ class MetadataService @Inject()(
     } yield {
       Right(
         partialMetadata.copy(
-          lastUpdateBy = updater.map(_.displayName).getOrElse(MetadataService.UNKNOWN_USER),
-          createdBy = createdBy.map(_.displayName).getOrElse(MetadataService.UNKNOWN_USER)
+          lastUpdateBy = updater.map(_.userName).getOrElse(MetadataService.UNKNOWN_USER),
+          createdBy = createdBy.map(_.userName).getOrElse(MetadataService.UNKNOWN_USER)
         )
       )
     }
@@ -79,7 +79,7 @@ object MetadataService {
     authService: TokenAuthService,
     IDMAPIService: IDMAPIService,
     cacheApi: AsyncCacheApi
-  ): Task[Option[IDMUser]] = {
+  ): Task[Option[WikiUser]] = {
     userIdOpt match {
       case Some(userIdO) =>
         val id = if (userIdO.startsWith("https://")) {
@@ -89,14 +89,14 @@ object MetadataService {
         }
         logger.debug(s"Fetching metadata for user ${id}")
         cacheService
-          .getOrElse[IDMUser](cacheApi, id) {
+          .getOrElse[WikiUser](cacheApi, id) {
             val u = for {
               token <- authService.getTechAccessToken()
               user  <- IDMAPIService.getUserInfoFromID(id, token)
             } yield user
             u.flatMap {
               case Some(idmUser) =>
-                cacheService.set[IDMUser](cacheApi, id, idmUser, 2.hours).map { _ =>
+                cacheService.set[WikiUser](cacheApi, id, idmUser, 2.hours).map { _ =>
                   Some(idmUser)
                 }
               case None => Task.pure(None)

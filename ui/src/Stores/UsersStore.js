@@ -140,6 +140,65 @@ class UsersStore {
   }
 
   @action
+  async fetchUserById(userId) {
+    let user = this.users.get(userId);
+    if (!user) {
+      this.users.set(userId, {
+        id: userId,
+        username: null,
+        displayName: null,
+        givenName: null,
+        familyName: null,
+        emails: [],
+        picture: null,
+        isCurator: false,
+        isFetching: false,
+        isFetched: false,
+        hasFetchError: false,
+        fetchError: null
+      });
+      user = this.users.get(userId);
+    }
+    if (!user.isFetching && (!user.isFetched || user.hasFetchError)) {
+      try {
+        user.isFetching = true;
+        user.hasFetchError = false;
+        user.fetchError = null;
+        const { data } = await API.axios.get(API.endpoints.userInfoById(userId));
+        runInAction(() => {
+          const userData = data && data.data;
+          user.username = userData && userData.username;
+          user.displayName = userData && `${userData.firstName}  ${userData.lastName}`;
+          user.givenName = userData && userData.firstName;
+          user.familyName = userData && userData.lastName;
+          user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
+          user.picture = userData && userData.picture;
+          user.isCurator = !!userData && !!userData.isCurator;
+          user.isFetching = false;
+          user.isFetched = true;
+        });
+      } catch (e) {
+        runInAction(() => {
+          user.username = null;
+          user.displayName = null;
+          user.givenName = null;
+          user.familyName = null;
+          user.emails = [];
+          user.picture = null;
+          user.isCurator = false;
+          const error = e.message ? e.message : e;
+          user.fetchError = `Error while retrieving user "${userId}" (${error})`;
+          user.hasFetchError = true;
+          user.isFetched = true;
+          user.isFetching = false;
+        });
+        appStore.captureSentryException(e);
+      }
+    }
+    return user;
+  }
+
+  @action
   setSearchFilter(queryString, excludedUsers = []) {
     if (!queryString) {
       queryString = "";

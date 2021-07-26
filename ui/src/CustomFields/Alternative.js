@@ -26,8 +26,8 @@ import injectStyles from "react-jss";
 import { MenuItem } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import User from "../Views/User";
 import authStore from "../Stores/AuthStore";
+import UserByID from "../Views/UserByID";
 
 const Value = ({value, field}) => {
 
@@ -116,7 +116,7 @@ export default class Alternative extends React.Component {
           <strong>
             <Values value={alternative.value} field={field} /></strong> <em><div className="parenthesis">(</div>{
             userIds.map(userId => (
-              <User key={userId} userId={userId} />
+              <UserByID key={userId} userId={userId} />
             ))
           }<div className="parenthesis">)</div></em>
           {alternative.selected?

@@ -58,9 +58,9 @@ class ReviewController @Inject()(
       .runToFuture
   }
 
-  def getUserById(id: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+  def getUserByUsername(userName: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
     IDMAPIService
-      .getUserInfoFromID(id, request.userToken)
+      .getUserInfoFromUsername(userName, request.userToken)
       .map {
         case Some(user) => Ok(Json.toJson(EditorResponseObject(Json.toJson(user))))
         case None       => NotFound("User not found")

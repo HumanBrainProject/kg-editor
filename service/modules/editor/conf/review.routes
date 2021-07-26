@@ -56,4 +56,4 @@ GET /users          controllers.ReviewController.getUsers(search:String?="")
 #      schema:
 #        type: object
 ###
-GET /user/:id          controllers.ReviewController.getUserById(id:String)
+GET /user/:userName          controllers.ReviewController.getUserByUsername(userName:String)

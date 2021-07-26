@@ -27,6 +27,7 @@ import authStore from "../Stores/AuthStore";
 const endpoints = {
   "user": () => "/editor/api/user",
   "userInfo": user => `/editor/api/review/user/${user}`,
+  "userInfoById": user => `/editor/api/user/${user}`,
   "reviewUsers": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
   "instanceReviews": instance => `/editor/api/scopes/${instance}`,
   "instanceReviewsByUser": (instance, user) => `/editor/api/scopes/${instance}/${user}`,

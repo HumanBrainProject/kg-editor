@@ -64,6 +64,28 @@ class IDMAPIService @Inject()(
     }
   }
 
+  def getUserInfoFromUsername(userName: String, token: AccessToken): Task[Option[WikiUser]] = {
+    if (userName.isEmpty) {
+      Task.pure(None)
+    } else {
+      val url = s"${config.wikiEndpoint}/users/$userName"
+      val q = WSClient.url(url).addHttpHeaders(AUTHORIZATION -> token.token)
+
+      val queryResult = token match {
+        case BasicAccessToken(_)   => Task.deferFuture(q.get())
+        case RefreshAccessToken(_) => AuthHttpClient.getWithRetry(q)
+      }
+
+      queryResult.map { res =>
+        res.status match {
+          case OK => res.json.asOpt[WikiUser]
+          case _ => None
+        }
+      }
+    }
+  }
+
+
   def getUserInfo(token: BasicAccessToken): Task[Option[IDMUser]] = {
     getUserInfoWithCache(token)
   }

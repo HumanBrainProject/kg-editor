@@ -1094,3 +1094,29 @@ POST /bookmarks                                                 controllers.Edit
 
 #Specifications Routes
 -> /specifications specification.Routes
+
+###
+#  tags:
+#    - Editor
+#  summary: Returns info about a user
+#  description: Returns info about a user
+#  operationId: getReviewUser
+#  produces:
+#    - application/json
+#  parameters:
+#  - name: id
+#    in: query
+#    description: The id of the user to return
+#    type: string
+#  - in: header
+#    name: Authorization
+#    description: Authorization token
+#    required: true
+#    type: string
+#  responses:
+#    200:
+#      description: successful operation
+#      schema:
+#        type: object
+###
+GET /user/:id          controllers.EditorController.getUserById(id:String)

@@ -32,8 +32,8 @@ const jsdiff = require("diff");
 
 import queryBuilderStore from "../../Stores/QueryBuilderStore";
 import FetchingLoader from "../../Components/FetchingLoader";
-import User from "../User";
 import Field from "./Field";
+import UserByID from "../UserByID";
 
 const styles = {
   container:{
@@ -423,7 +423,7 @@ export default class Query extends React.Component{
               </div>
               {queryBuilderStore.isQuerySaved && !queryBuilderStore.saveAsMode && !queryBuilderStore.isOneOfMySavedQueries && queryBuilderStore.sourceQuery.org && queryBuilderStore.sourceQuery.user && (
                 <div className={classes.author} >
-                  <span>by user<User userId={queryBuilderStore.sourceQuery.user} /></span>
+                  <span>by user<UserByID userId={queryBuilderStore.sourceQuery.user} /></span>
                 </div>
               )}
             </React.Fragment>

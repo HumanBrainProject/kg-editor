@@ -46,6 +46,7 @@ class EditorController @Inject()(
   TokenAuthService: TokenAuthService,
   config: ConfigurationService,
   iAMAuthService: IAMAuthService,
+  IDMAPIService: IDMAPIService,
   formService: FormService,
   metadataService: MetadataService,
   reverseLinkService: ReverseLinkService
@@ -55,6 +56,16 @@ class EditorController @Inject()(
   val logger = Logger(this.getClass)
 
   implicit val s = monix.execution.Scheduler.Implicits.global
+
+  def getUserById(id: String): Action[AnyContent] = authenticatedUserAction.async { implicit request =>
+    IDMAPIService
+      .getUserInfoFromID(id, request.userToken)
+      .map {
+        case Some(user) => Ok(Json.toJson(EditorResponseObject(Json.toJson(user))))
+        case None       => NotFound("User not found")
+      }
+      .runToFuture
+  }
 
   def deleteInstance(org: String, domain: String, schema: String, version: String, id: String): Action[AnyContent] =
     authenticatedUserAction.async { implicit request =>

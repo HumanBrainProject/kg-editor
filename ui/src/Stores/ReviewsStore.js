@@ -67,7 +67,10 @@ class ReviewsStore {
       runInAction(() => {
         const reviews = data.length ? data : [];
         const [org, , , ,] = instanceId.split("/");
-        reviews.forEach(review => review.org = org);
+        reviews.forEach(review => {
+          review.username = review.userName;
+          review.org = org;
+        });
         instanceReviews.reviews = reviews;
         instanceReviews.isFetching = false;
         instanceReviews.isFetched = true;
@@ -121,14 +124,14 @@ class ReviewsStore {
     if (username && this.instancesReviews.has(instanceId)) {
       const instanceReviews = this.instancesReviews.get(instanceId);
       if (!instanceReviews.isFetching) {
-        let instanceReview = instanceReviews.reviews.find(review => review.userName === username);
+        let instanceReview = instanceReviews.reviews.find(review => review.username === username);
         if (!instanceReview) {
           instanceReview = {
             username: username,
             org: org
           };
           instanceReviews.reviews.push(instanceReview);
-          instanceReview = instanceReviews.reviews.find(review => review.userName === username);
+          instanceReview = instanceReviews.reviews.find(review => review.username === username);
         }
         delete instanceReview.error;
         try {
@@ -154,7 +157,7 @@ class ReviewsStore {
     if (username && this.instancesReviews.has(instanceId)) {
       const instanceReviews = this.instancesReviews.get(instanceId);
       if (!instanceReviews.isFetching) {
-        let instanceReview = instanceReviews.reviews.find(review => review.userName === username);
+        let instanceReview = instanceReviews.reviews.find(review => review.username === username);
         instanceReviews.reviews.remove(instanceReview);
         delete instanceReview.error;
         try {

@@ -104,7 +104,7 @@ export default class Reviewers extends React.Component{
 
     const instanceReviews = reviewsStore.getInstanceReviews(this.props.id);
 
-    const excludedUsers = instanceReviews.reviews.map(review => review.userName);
+    const excludedUsers = instanceReviews.reviews.map(review => review.username);
     if (authStore.hasUserProfile && authStore.user && authStore.user.username && !excludedUsers.includes(authStore.user.username)) {
       excludedUsers.push(authStore.user.username);
     }
@@ -121,7 +121,7 @@ export default class Reviewers extends React.Component{
                 <h4>{instanceReviews.reviews.length?"Users invited to review the instance:":(this.org?"Invite users to review":"")}</h4>
                 <ul>
                   {instanceReviews.reviews.map(review => (
-                    <li key={review.userName}>
+                    <li key={review.username}>
                       <Reviewer review={review} onCancelInvitation={this.handleCancelUserInvitation} onInvite={this.handleInviteUser} />
                     </li>
                   ))}

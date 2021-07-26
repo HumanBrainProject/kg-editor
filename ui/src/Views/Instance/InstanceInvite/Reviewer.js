@@ -109,8 +109,8 @@ export default class Reviewer extends React.Component{
 
     return (
       <div className={classes.container}>
-        <User key={review.userName}  userId={review.userName} />
-        <button title="cancel invitation" onClick={this.handleCancelInvitation.bind(this, review.userName)}><FontAwesomeIcon icon="times"/></button>
+        <User key={review.username}  userId={review.username} />
+        <button title="cancel invitation" onClick={this.handleCancelInvitation.bind(this, review.username)}><FontAwesomeIcon icon="times"/></button>
       </div>
     );
   }

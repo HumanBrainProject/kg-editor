@@ -34,6 +34,7 @@ import { ViewStore } from "./ViewStore";
 import { GraphStore } from "./GraphStore";
 import { ReleaseStore } from "./ReleaseStore";
 import { UserStore } from "./UserStore";
+import { ReviewsStore } from "./ReviewsStore";
 //import { BookmarkStore } from "./BookmarkStore";
 //import { BookmarkStatusStore } from "./BookmarkStatusStore";
 import { FeaturesStore } from "./FeaturesStore";
@@ -55,6 +56,7 @@ export class RootStore  {
   //bookmarkStore= null
   //bookmarkStatusStore= null
   featuresStore= null
+  reviewsStore = null
 
   constructor(transportLayer) {
 
@@ -78,6 +80,7 @@ export class RootStore  {
     //this.bookmarkStatusStore = new BookmarkStatusStore(transportLayer, this);
     this.featuresStore = new FeaturesStore(transportLayer, this);
     this.authStore = new AuthStore(transportLayer, this);
+    this.reviewsStore = new ReviewsStore(transportLayer, this)
     transportLayer.setAuthStore(this.authStore);
 
     // UI stores

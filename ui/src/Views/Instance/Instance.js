@@ -31,7 +31,6 @@ import { useStores } from "../../Hooks/UseStores";
 
 import Preview from "../Preview";
 import InstanceView from "./InstanceView";
-import InstanceInvite from "./InstanceInvite";
 import InstanceGraph from "./InstanceGraph";
 import InstanceRelease from "./InstanceRelease";
 import InstanceManage from "./InstanceManage";
@@ -139,13 +138,6 @@ const View = observer(({instance, mode}) => {
     if(instance.permissions.canRead) {
       return (
         <InstanceView instance={instance} />
-      );
-    }
-    break;
-  case "invite":
-    if(instance.permissions.canInvite) {
-      return (
-        <InstanceInvite instance={instance} />
       );
     }
     break;

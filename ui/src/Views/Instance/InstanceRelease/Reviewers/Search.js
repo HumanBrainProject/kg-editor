@@ -30,7 +30,7 @@ import InfiniteScroll from "react-infinite-scroller";
 
 import User from "./User";
 
-import { userStore } from "../../../Hooks/UseStores";
+import { useStores } from "../../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -152,6 +152,8 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
 
   const classes = useStyles();
 
+  const { userStore } = useStores();
+
   const handleLoadMoreSearchResults = () => {
     userStore.searchUsers(true);
   };
@@ -248,7 +250,7 @@ const Search = observer(({ org, excludedUsers, onSelect }) => {
     <div className={classes.container} ref={wrapperRef} >
       <FontAwesomeIcon icon="user-plus" className={classes.addIcon} />
       <div className={classes.search}>
-        <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Add a user" type="text" value={userStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
+        <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Invite a user for review" type="text" value={userStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
         <FontAwesomeIcon icon="search" className={classes.searchIcon} />
         <div className={`${classes.searchDropdown} ${userStore.hasSearchFilter?"open":""}`} ref={usersRef}>
           <div className="dropdown-menu">

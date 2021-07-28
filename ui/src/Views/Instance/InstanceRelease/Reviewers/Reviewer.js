@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import User from "../../User";
+import User from "../../../User";
 
 const useStyles = createUseStyles({
   container: {

@@ -33,11 +33,12 @@ import { useStores } from "../../../Hooks/UseStores";
 import ClientPreviewModal from "./ClientPreviewModal";
 import ReleaseStats from "./ReleaseStats";
 import ReleaseMessages from "./ReleaseMessages";
+import Reviewers from "./Reviewers";
 
 const useStyles = createUseStyles({
   container: {
     display: "grid",
-    gridTemplateRows: "auto auto 1fr auto",
+    gridTemplateRows: "auto auto auto 1fr auto",
     gridTemplateColumns: "1fr",
     gridRowGap: "15px",
     width: "100%",
@@ -86,6 +87,12 @@ const useStyles = createUseStyles({
     fontSize: "large",
     background: "var(--bg-color-ui-contrast3)"
   },
+  invite: {
+    width: "100%",
+    border: "1px solid var(--border-color-ui-contrast1)",
+    padding: "10px",
+    background: "var(--bg-color-ui-contrast3)"
+  },
   section: {
     paddingBottom: "10px",
     "& h5": {
@@ -122,7 +129,7 @@ const ReleaseAction = observer(() => {
 
   const classes = useStyles();
 
-  const { releaseStore } = useStores();
+  const { releaseStore, instanceStore } = useStores();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -145,6 +152,8 @@ const ReleaseAction = observer(() => {
     return null;
   }
 
+  const permissions = instanceStore.instances.get(releaseStore.topInstanceId).permissions;
+
   return (
     <div className={classes.container}>
       <ReleaseStats />
@@ -162,6 +171,11 @@ const ReleaseAction = observer(() => {
             </div>
           </div>
         </div>
+      </div>
+      <div className={classes.invite}>
+        {permissions.canInviteForSuggestion && (
+          <Reviewers id={releaseStore.topInstanceId} />
+        )}
       </div>
       <ReleaseMessages />
       <div className={classes.releasePnl} >

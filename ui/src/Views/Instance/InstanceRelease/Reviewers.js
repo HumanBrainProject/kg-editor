@@ -30,30 +30,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../../Hooks/UseStores";
 
-import Reviewer from "./Reviewer";
-import Search from "./Search";
+import Reviewer from "./Reviewers/Reviewer";
+import Search from "./Reviewers/Search";
 import FetchingLoader from "../../../Components/FetchingLoader";
-import BGMessage from "../../../Components/BGMessage";
 
 const useStyles = createUseStyles({
   container: {
     position: "relative",
-    width: "100%",
-    color: "var(--ft-color-normal)",
-    "& .errorPanel, & .fetchingPanel": {
-      color: "var(--ft-color-loud)",
-      "& svg path": {
-        stroke: "var(--ft-color-loud)",
-        fill: "var(--ft-color-quiet)"
-      }
-    }
+    width: "100%"
   },
   panel: {
     position: "relative",
-    width: "100%",
-    padding: "15px 3px 15px 13px",
-    border: "1px solid var(--bg-color-blend-contrast1)",
-    backgroundColor: "var(--bg-color-ui-contrast2)"
+    width: "100%"
+  },
+  title: {
+    fontSize: "1.0285em",
+    fontWeight: "bold"
   },
   reviewers: {
     "& h4": {
@@ -86,9 +78,7 @@ const Reviewers = observer(({ id }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]); // check if id is needed
 
-  const fetchInstanceReviews = () => {
-    reviewsStore.getInstanceReviews(id);
-  };
+  const fetchInstanceReviews = () => reviewsStore.getInstanceReviews(id);
 
   const handleCancelUserInvitation = userId => {
     //window.console.log(`cancel invitation to user "${userId}" to review instance "${id}"`);
@@ -100,15 +90,16 @@ const Reviewers = observer(({ id }) => {
     reviewsStore.addInstanceReviewRequest(id, org, userId);
   };
 
-  const instanceReviews = reviewsStore.getInstanceReviews(id);
+  const instanceReviews = reviewsStore.reviews;
 
-  const excludedUsers = instanceReviews.reviews.map(review => review.userId);
+  const excludedUsers = instanceReviews.map(review => review.userId);
   if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
     excludedUsers.push(authStore.user.id);
   }
 
   return (
     <div className={classes.container}>
+      <h5 className={classes.title}>Reviewers:</h5>
       {instanceReviews.isFetching?
         <FetchingLoader>
           <span>Fetching reviewers...</span>
@@ -116,9 +107,8 @@ const Reviewers = observer(({ id }) => {
         :!instanceReviews.hasFetchError?
           <div className={classes.panel}>
             <div className={classes.reviewers} >
-              <h4>{instanceReviews.reviews.length?"Users invited to review the instance:":(org?"Invite users to review":"")}</h4>
               <ul>
-                {instanceReviews.reviews.map(review => (
+                {instanceReviews.map(review => (
                   <li key={review.userId}>
                     <Reviewer review={review} onCancelInvitation={handleCancelUserInvitation} onInvite={handleInviteUser} />
                   </li>
@@ -128,14 +118,10 @@ const Reviewers = observer(({ id }) => {
             <Search onSelect={handleInviteUser} excludedUsers={excludedUsers} />
           </div>
           :
-          <BGMessage icon={"ban"} className={classes.error}>
-              There was a network problem fetching the reviewers for instance &quot;<i>{id}&quot;</i>.<br/>
-              If the problem persists, please contact the support.<br/>
-            <small>{instanceReviews.fetchError}</small><br/><br/>
-            <Button variant="primary" onClick={fetchInstanceReviews}>
-              <FontAwesomeIcon icon="redo-alt"/>&nbsp;&nbsp; Retry
-            </Button>
-          </BGMessage>
+          <div>
+            <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{instanceReviews.fetchError}</small>
+            &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} onClick={fetchInstanceReviews}/>
+          </div>
       }
     </div>
   );

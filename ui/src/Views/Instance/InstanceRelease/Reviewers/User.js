@@ -24,6 +24,7 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
+import Dropdown from "react-bootstrap/Dropdown";
 
 import UserComponent from "../../../../Components/User";
 
@@ -91,7 +92,7 @@ const User = observer(({ user, onSelect }) => {
   }, null):null;
 
   return (
-    // <MenuItem  key={user.id} className={classes.container} onSelect={handleSelect}>
+    <Dropdown.Item key={user.id} className={classes.container} onSelect={handleSelect} >
       <div tabIndex={-1} className="option" onKeyDown={handleSelect}>
         <UserComponent
           userId={user && user.id}
@@ -100,7 +101,7 @@ const User = observer(({ user, onSelect }) => {
           isCurator={!!user && !!user.isCurator}
           title={email} />
       </div>
-    // </MenuItem>
+    </Dropdown.Item>
   );
 });
 User.displayName = "User";

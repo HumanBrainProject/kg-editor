@@ -91,7 +91,7 @@ const Reviewer = observer(({ review, onCancelInvitation }) => {
   const classes = useStyles();
 
   const handleCancelInvitation = () => {
-    typeof onCancelInvitation === "function" && onCancelInvitation(review.userId);
+    typeof onCancelInvitation === "function" && onCancelInvitation(review.id);
   };
 
   if (!review) {
@@ -100,7 +100,7 @@ const Reviewer = observer(({ review, onCancelInvitation }) => {
 
   return (
     <div className={classes.container}>
-      <User key={review.userId}  userId={review.userId} />
+      <User key={review.id}  userId={review.id} />
       <button title="cancel invitation" onClick={handleCancelInvitation}><FontAwesomeIcon icon="times"/></button>
     </div>
   );

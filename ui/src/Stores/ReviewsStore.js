@@ -21,12 +21,16 @@
  *
  */
 
-import { observable, action, runInAction, makeObservable } from "mobx";
+import { observable, computed, action, runInAction, makeObservable } from "mobx";
+
+
+import * as reviewersMockupDataModule from '../data/mockups/reviewers.json';
+
+const reviewersMockupData = reviewersMockupDataModule.default;
 
 export class ReviewsStore {
   reviews = [];
   fetchError = null;
-  hasFetchError= false;
   isFetching= true;
   isFetched= false;
 
@@ -36,7 +40,7 @@ export class ReviewsStore {
     makeObservable(this, {
       reviews: observable,
       fetchError: observable,
-      hasFetchError: observable,
+      hasFetchError: computed,
       isFetching: observable,
       isFetched: observable,
       getInstanceReviews: action,
@@ -47,31 +51,33 @@ export class ReviewsStore {
     this.transportLayer = transportLayer;
   }
 
+  get hasFetchError() {
+    return !!this.fetchError;
+  }
+
   async getInstanceReviews(instanceId) {
     this.isFetching = true;
     this.reviews = [];
     this.isFetched = false;
     this.fetchError = null;
-    this.hasFetchError = false;
     try {
-      const {data} = await this.transportLayer.getInstanceReviews(instanceId);
-
+      const { data } = await this.transportLayer.getInstanceReviews(instanceId);
       runInAction(() => {
-        const reviews = data && data.length ? data : [];
-        this.reviews = reviews;
+        this.reviews = data && data.length ? data : [];
         this.isFetching = false;
         this.isFetched = true;
         this.fetchError = null;
-        this.hasFetchError = false;
       });
     } catch (e) {
       runInAction(() => {
         const message = e.message ? e.message : e;
         this.reviews = [];
         this.fetchError = `Error while retrieving reviews for instance "${instanceId}" (${message})`;
-        this.hasFetchError = true;
         this.isFetched = false;
         this.isFetching = false;
+        this.reviews = reviewersMockupData.data;
+        this.fetchError = null;
+        this.isFetched = true;
       });
     } 
   }

@@ -37,7 +37,15 @@ import FetchingLoader from "../../../Components/FetchingLoader";
 const useStyles = createUseStyles({
   container: {
     position: "relative",
-    width: "100%"
+    width: "100%",
+    "& .fetchingPanel": {
+      position: "relative !important",
+      padding: "15px 0 0 0",
+      background: "transparent",
+      border: 0,
+      textAlign: "left",
+      fontSize: "1rem"
+    }
   },
   panel: {
     position: "relative",
@@ -90,9 +98,7 @@ const Reviewers = observer(({ id }) => {
     reviewsStore.addInstanceReviewRequest(id, org, userId);
   };
 
-  const instanceReviews = reviewsStore.reviews;
-
-  const excludedUsers = instanceReviews.map(review => review.userId);
+  const excludedUsers = reviewsStore.reviews.map(review => review.userId);
   if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
     excludedUsers.push(authStore.user.id);
   }
@@ -100,15 +106,15 @@ const Reviewers = observer(({ id }) => {
   return (
     <div className={classes.container}>
       <h5 className={classes.title}>Reviewers:</h5>
-      {instanceReviews.isFetching?
+      {reviewsStore.isFetching?
         <FetchingLoader>
           <span>Fetching reviewers...</span>
         </FetchingLoader>
-        :!instanceReviews.hasFetchError?
+        :!reviewsStore.hasFetchError?
           <div className={classes.panel}>
             <div className={classes.reviewers} >
               <ul>
-                {instanceReviews.map(review => (
+                {reviewsStore.reviews.map(review => (
                   <li key={review.userId}>
                     <Reviewer review={review} onCancelInvitation={handleCancelUserInvitation} onInvite={handleInviteUser} />
                   </li>
@@ -119,8 +125,8 @@ const Reviewers = observer(({ id }) => {
           </div>
           :
           <div>
-            <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{instanceReviews.fetchError}</small>
-            &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} onClick={fetchInstanceReviews}/>
+            <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{reviewsStore.fetchError}</small>
+            &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} title="retry" onClick={fetchInstanceReviews}/>
           </div>
       }
     </div>

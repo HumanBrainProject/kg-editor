@@ -50,7 +50,6 @@ export class UserStore {
       hasSearchFilter: computed,
       getUser: action,
       addUser: action,
-      fetchUser: action,
       setSearchFilter: action,
       clearSearch: action,
       searchUsers: action
@@ -83,61 +82,6 @@ export class UserStore {
         this.clearSearch();
       }
     }
-  }
-
-  async fetchUser(userId) {
-    let user = this.users.get(userId);
-    if (!user) {
-      this.users.set(userId, {
-        id: userId,
-        username: null,
-        name: null,
-        givenName: null,
-        familyName: null,
-        emails: [],
-        picture: null,
-        profileUrl: null,
-        isFetching: false,
-        isFetched: false,
-        hasFetchError: false,
-        fetchError: null
-      });
-      user = this.users.get(userId);
-    }
-    if (!user.isFetching && (!user.isFetched || user.hasFetchError)) {
-      try {
-        user.isFetching = true;
-        user.hasFetchError = false;
-        user.fetchError = null;
-        const { data } = await this.transportLayer.getUserInfo(userId);
-        runInAction(() => {
-          const userData = data && data.data;
-          user.username = userData && userData.username;
-          user.name = userData && userData.name;
-          user.givenName = userData && userData.givenName;
-          user.familyName = userData && userData.familyName;
-          user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
-          user.picture = userData && userData.picture;
-          user.isFetching = false;
-          user.isFetched = true;
-        });
-      } catch (e) {
-        runInAction(() => {
-          user.username = null;
-          user.name = null;
-          user.givenName = null;
-          user.familyName = null;
-          user.emails = [];
-          user.picture = null;
-          const error = e.message ? e.message : e;
-          user.fetchError = `Error while retrieving user "${userId}" (${error})`;
-          user.hasFetchError = true;
-          user.isFetched = true;
-          user.isFetching = false;
-        });
-      }
-    }
-    return user;
   }
 
   setSearchFilter(queryString, excludedUsers = []) {

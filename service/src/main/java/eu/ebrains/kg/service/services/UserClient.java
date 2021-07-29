@@ -24,7 +24,10 @@
 package eu.ebrains.kg.service.services;
 
 import eu.ebrains.kg.service.models.KGCoreResult;
+import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.user.UserProfile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
@@ -52,8 +55,17 @@ public class UserClient{
         return response != null ? response.getData() : null;
     }
 
-    private static class UserPictureMap extends HashMap<String, String> {}
+    private static class UserSummaryFromIAM extends KGCoreResult<List<UserSummary>> {}
+    public KGCoreResult<List<UserSummary>> getUsers(String search) {
+        String relativeUrl = String.format("users/fromIAM?search=%s", search);
+        return kg.client().get()
+                .uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(UserSummaryFromIAM.class)
+                .block();
+    }
 
+    private static class UserPictureMap extends HashMap<String, String> {}
     public Map<String, String> getUserPictures(List<String> userIds){
         String relativeUrl = "users/pictures";
         return kg.client().post().uri(kg.url(relativeUrl))

@@ -30,10 +30,10 @@ import eu.ebrains.kg.service.models.HasError;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
 import eu.ebrains.kg.service.models.commons.Permissions;
+import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.instance.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.*;
@@ -268,6 +268,31 @@ public class InstanceClient {
                 .bodyToMono(KGCoreResult.Single.class)
                 .block();
         return buildResultWithOriginalMap(response, InstanceFull.class);
+    }
+
+    private static class UserSummaryKG extends KGCoreResult<List<UserSummary>>{}
+    public KGCoreResult<List<UserSummary>> getInvitedUsers(String id) {
+        String relativeUrl = String.format("instances/%s/invitedUsers", id);
+        return kg.client().get().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(UserSummaryKG.class)
+                .block();
+    }
+
+    public void deleteInvitedUser(String id, String userId) {
+        String relativeUrl = String.format("instances/%s/invitedUsers/%s", id, userId);
+        kg.client().delete().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    public void addInvitation(String id, String userId) {
+        String relativeUrl = String.format("instances/%s/invitedUsers/%s", id, userId);
+        kg.client().put().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
 }

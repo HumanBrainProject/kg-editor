@@ -27,6 +27,7 @@ import eu.ebrains.kg.service.controllers.IdController;
 import eu.ebrains.kg.service.controllers.InstanceController;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
+import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.instance.*;
 import eu.ebrains.kg.service.services.InstanceClient;
 import org.springframework.web.bind.annotation.*;
@@ -171,8 +172,18 @@ public class Instances {
         return neighbor;
     }
 
+    @GetMapping("/instances/{id}/invitedUsers")
+    public KGCoreResult<List<UserSummary>> getInvitedUsers(@PathVariable("id") String id) {
+        return instanceClient.getInvitedUsers(id);
+    }
 
+    @DeleteMapping("/instances/{id}/invitedUsers/{userId}")
+    public void deleteUserinvitation(@PathVariable("id") String id, @PathVariable("userId") String userId) {
+        instanceClient.deleteInvitedUser(id, userId);
+    }
 
-
-
+    @PutMapping("/instances/{id}/invitedUsers/{userId}")
+    public void putUserinvitation(@PathVariable("id") String id, @PathVariable("userId") String userId) {
+        instanceClient.addInvitation(id, userId);
+    }
 }

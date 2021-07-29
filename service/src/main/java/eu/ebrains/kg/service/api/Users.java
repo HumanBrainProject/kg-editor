@@ -25,12 +25,14 @@ package eu.ebrains.kg.service.api;
 
 import eu.ebrains.kg.service.controllers.IdController;
 import eu.ebrains.kg.service.models.KGCoreResult;
+import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.user.UserProfile;
 import eu.ebrains.kg.service.models.user.Space;
 import eu.ebrains.kg.service.services.UserClient;
 import eu.ebrains.kg.service.services.SpaceClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
@@ -39,15 +41,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RestController
-public class User {
+public class Users {
 
     private final IdController idController;
     private final UserClient userClient;
     private final SpaceClient spaceClient;
 
-    public User(IdController idController, UserClient userClient, SpaceClient spaceClient) {
+    public Users(IdController idController, UserClient userClient, SpaceClient spaceClient) {
         this.idController = idController;
         this.userClient = userClient;
         this.spaceClient = spaceClient;
@@ -57,9 +59,9 @@ public class User {
         return (w.getClientSpace() == null || !w.getClientSpace()) && (w.getInternalSpace() == null || !w.getInternalSpace());
     }
 
-    @GetMapping
+    @GetMapping("/me")
     public KGCoreResult<UserProfile> getUserProfile() {
-        UserProfile userProfile = this.userClient.getUserProfile();
+        UserProfile userProfile = userClient.getUserProfile();
         if(userProfile!=null) {
             UUID uuid = idController.simplifyFullyQualifiedId(userProfile.getId());
             if(uuid!=null) {
@@ -67,7 +69,7 @@ public class User {
             }
             List<Space> spaces = spaceClient.getSpaces();
             if (spaces != null) {
-                userProfile.setSpaces(spaces.stream().filter(User::isUserRelevantSpace).collect(Collectors.toList()));
+                userProfile.setSpaces(spaces.stream().filter(Users::isUserRelevantSpace).collect(Collectors.toList()));
             }
             Map<?, ?> userPictures = userClient.getUserPictures(Collections.singletonList(userProfile.getId()));
             if (userPictures != null && userPictures.get(userProfile.getId()) != null) {
@@ -76,6 +78,11 @@ public class User {
             return new KGCoreResult<UserProfile>().setData(userProfile);
         }
         return null;
+    }
+
+    @GetMapping("/search")
+    public KGCoreResult<List<UserSummary>> getUsers(@RequestParam(value = "search", required = false) String search) {
+        return userClient.getUsers(search);
     }
 
     //FIXME this endpoint does not work properly yet (already with the old service).

@@ -24,8 +24,8 @@
 const API = {
   endpoints: {
     "auth": () => "/editor/api/auth/endpoint",
-    "user": () => "/editor/api/user",
-    "userPicture": () => "/editor/api/user/picture",
+    "user": () => "/editor/api/users/me",
+    "userPicture": () => "/editor/api/users/picture",
     "userInfo": user => `/editor/api/review/user/${user}`,
     "usersForReview": (from, size, search) => `/editor/api/review/users?from=${from}&size=${size}&search=${search}`,
     "instanceReviews": instanceId => `/editor/api/scopes/${instanceId}`,

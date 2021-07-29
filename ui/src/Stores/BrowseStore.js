@@ -149,50 +149,25 @@ export class BrowseStore {
       this.instances = [];
     }
     this.fetchError.instances = null;
-    if(this.selectedItem.list) {
-      if(this.selectedItem.list.length > 0) {
-        try {
-          const { data } = await this.transportLayer.searchInstancesByBookmark(this.rootStore.appStore.currentSpace.id, this.selectedItem.id, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
-          runInAction(() => {
-            this.isFetching.instances = false;
-            const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
-            if(loadMore){
-              this.instances = [...this.instances, ...instances];
-            } else {
-              this.instances = instances;
-            }
-            this.canLoadMoreInstances = this.instances.length < data.total;
-            this.totalInstances = data.total;
-          });
-        } catch (e) {
-          runInAction(() => {
-            const message = e.message?e.message:e;
-            this.fetchError.instances = `Error while retrieving instances of bookmark "${this.selectedItem.id}" (${message})`;
-            this.isFetching.instances = false;
-          });
+    try {
+      const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      runInAction(() => {
+        this.isFetching.instances = false;
+        const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
+        if(loadMore){
+          this.instances = [...this.instances, ...instances];
+        } else {
+          this.instances = instances;
         }
-      }
-    } else {
-      try {
-        const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
-        runInAction(() => {
-          this.isFetching.instances = false;
-          const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
-          if(loadMore){
-            this.instances = [...this.instances, ...instances];
-          } else {
-            this.instances = instances;
-          }
-          this.canLoadMoreInstances = this.instances.length < data.total;
-          this.totalInstances = data.total;
-        });
-      } catch (e) {
-        runInAction(() => {
-          const message = e.message?e.message:e;
-          this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
-          this.isFetching.instances = false;
-        });
-      }
+        this.canLoadMoreInstances = this.instances.length < data.total;
+        this.totalInstances = data.total;
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
+        this.isFetching.instances = false;
+      });
     }
   }
 

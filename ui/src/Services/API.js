@@ -34,7 +34,6 @@ const API = {
     "instancesList": (stage=null) => `/editor/api/instancesBulk/list${stage?`?stage=${stage}`:"" }`,
     "instancesSummary": (stage=null) => `/editor/api/instancesBulk/summary${stage?`?stage=${stage}`:"" }`,
     "instancesLabel": (stage=null) => `/editor/api/instancesBulk/label${stage?`?stage=${stage}`:"" }`,
-    "searchInstancesByBookmark": (space, bookmarkId, from, size, search) => `/editor/api/instances/filter?bookmarkId=${bookmarkId}&from=${from}&size=${size}&search=${search}`,
     "searchInstancesByType": (space, type, from, size, search) => `/editor/api/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${search}`,
     "suggestions": (instanceId, field, sourceType, targetType, start, size, search) => `/editor/api/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?"&sourceType=" + encodeURIComponent(sourceType):""}${targetType?"&targetType=" + encodeURIComponent(targetType):""}&start=${start}&size=${size}&search=${search}`,
     "instance": instanceId => `/editor/api/instances/${instanceId}`,
@@ -47,10 +46,6 @@ const API = {
     "releaseStatusChildren": () => "/editor/api/releases/status?releaseTreeScope=CHILDREN_ONLY",
     "neighbors": instanceId => `/editor/api/instances/${instanceId}/neighbors`,
     "workspaceTypes": space => `/editor/api/spaces/${space}/types`,
-    "bookmark": (bookmarkId, space=null) => `/editor/api/bookmarks/${bookmarkId}${space?("?space=" + space):""}`,
-    "bookmarks": space => `/editor/api/spaces/${space}/bookmarks`,
-    "instanceBookmarks": instanceId => `/editor/api/instances/${instanceId}/bookmarks`,
-    "bookmarksByInstances": () => "/editor/api/instances/bookmarks",
     "incomingLinks": (instanceId, property, type, from, size) => `/editor/api/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`,
   }
 };

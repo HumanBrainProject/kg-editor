@@ -91,10 +91,6 @@ export class TransportLayer {
     return this._axios.get(API.endpoints.searchInstancesByType(space, type, from, size, search));
   }
 
-   searchInstancesByBookmark(space, bookmarkId, from, size, search) {
-    return this._axios.get(API.endpoints.searchInstancesByBookmark(space, bookmarkId, from, size, search));
-  }
-
    getSuggestions(instanceId, field, sourceType, targetType, from, size, search, payload) {
     return this._axios.post(API.endpoints.suggestions(instanceId, field, sourceType, targetType, from, size, search), payload);
   }
@@ -161,30 +157,6 @@ export class TransportLayer {
 
   getFeatures() {
     return this._axios.get(API.endpoints.features());
-  }
-
-  getBookmarks(space) {
-    return this._axios.get(API.endpoints.bookmarks(space));
-  }
-
-  createBookmark(bookmarkId, space, name, instanceIds) {
-    return this._axios.post(API.endpoints.bookmarks(bookmarkId, space), { name: name, list: instanceIds});
-  }
-
-  renameBookmark(bookmarkId, name) {
-    return this._axios.post(API.endpoints.bookmarks(bookmarkId), { name: name });
-  }
-
-  deleteBookmark(bookmarkId) {
-    return this._axios.delete(API.endpoints.bookmark(bookmarkId));
-  }
-
-  getBookmarksByInstances(instanceIds) {
-    return this._axios.post(API.endpoints.bookmarksByInstances(), instanceIds);
-  }
-
-  updateInstanceBookmarks(instanceId, bookmarks) {
-    return this._axios.put(API.endpoints.instanceBookmarks(instanceId), bookmarks);
   }
 
   getMoreIncomingLinks(instanceId, property, type, from, size) {

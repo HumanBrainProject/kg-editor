@@ -50,7 +50,6 @@ public class UserProfile extends UserSummary {
     private final String givenName;
     private final String familyName;
     private final String email;
-    private Boolean isCurator;
     private List<Space> spaces;
 
     public String getGivenName() {
@@ -63,14 +62,6 @@ public class UserProfile extends UserSummary {
 
     public String getEmail() {
         return email;
-    }
-
-    public Boolean getCurator() {
-        return isCurator;
-    }
-
-    public void setCurator(Boolean curator) {
-        isCurator = curator;
     }
 
     public List<Space> getSpaces() {

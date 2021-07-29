@@ -25,7 +25,6 @@
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../../Hooks/UseStores";
@@ -79,56 +78,71 @@ const Reviewers = observer(({ id }) => {
 
   const { authStore, reviewsStore } = useStores();
 
-  const [org] = id?id.split("/"):[""];
-
   useEffect(() => {
     reviewsStore.getInstanceReviews(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]); // check if id is needed
+  }, []);
 
   const fetchInstanceReviews = () => reviewsStore.getInstanceReviews(id);
 
-  const handleCancelUserInvitation = userId => {
-    //window.console.log(`cancel invitation to user "${userId}" to review instance "${id}"`);
-    reviewsStore.removeInstanceReviewRequest(id, userId);
-  };
+  const handleRemoveUserInvitation = userId => reviewsStore.removeInstanceReviewRequest(id, userId);
 
-  const handleInviteUser = userId => {
-    //window.console.log(`invite user "${userId}" to review instance "${id}"`);
-    reviewsStore.addInstanceReviewRequest(id, org, userId);
-  };
+  const handleInviteUser = userId => reviewsStore.addInstanceReviewRequest(id, userId);
 
-  const excludedUsers = reviewsStore.reviews.map(review => review.userId);
+  const excludedUsers = reviewsStore.reviews.map(review => review.id);
   if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
     excludedUsers.push(authStore.user.id);
+  }
+
+  if(reviewsStore.isFetching) {
+    return(
+      <div className={classes.container}>
+        <h5 className={classes.title}>Reviewers:</h5>
+        <FetchingLoader>
+            <span>Fetching reviewers...</span>
+          </FetchingLoader>
+      </div>
+    );
+  }
+
+  if(reviewsStore.hasFetchError) {
+    return(
+      <div className={classes.container}>
+        <h5 className={classes.title}>Reviewers:</h5>
+        <div>
+          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{reviewsStore.fetchError}</small>
+          &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} title="retry" onClick={fetchInstanceReviews}/>
+        </div>
+      </div>
+    );
+  }
+
+  if(reviewsStore.error) {
+    return(
+      <div className={classes.container}>
+        <h5 className={classes.title}>Reviewers:</h5>
+        <div>
+          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{reviewsStore.error}</small>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className={classes.container}>
       <h5 className={classes.title}>Reviewers:</h5>
-      {reviewsStore.isFetching?
-        <FetchingLoader>
-          <span>Fetching reviewers...</span>
-        </FetchingLoader>
-        :!reviewsStore.hasFetchError?
-          <div className={classes.panel}>
-            <div className={classes.reviewers} >
-              <ul>
-                {reviewsStore.reviews.map(review => (
-                  <li key={review.userId}>
-                    <Reviewer review={review} onCancelInvitation={handleCancelUserInvitation} onInvite={handleInviteUser} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Search onSelect={handleInviteUser} excludedUsers={excludedUsers} />
-          </div>
-          :
-          <div>
-            <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{reviewsStore.fetchError}</small>
-            &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} title="retry" onClick={fetchInstanceReviews}/>
-          </div>
-      }
+      <div className={classes.panel}>
+        <div className={classes.reviewers} >
+          <ul>
+            {reviewsStore.reviews.map(review => (
+              <li key={review.userId}>
+                <Reviewer review={review} onRemoveInvitation={handleRemoveUserInvitation} onInvite={handleInviteUser} />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Search onSelect={handleInviteUser} excludedUsers={excludedUsers} />
+      </div>
     </div>
   );
 });

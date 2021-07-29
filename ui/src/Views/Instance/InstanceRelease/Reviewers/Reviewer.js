@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import User from "../../../User";
+import User from "../../../../Components/User";
 
 const useStyles = createUseStyles({
   container: {
@@ -86,13 +86,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const Reviewer = observer(({ review, onCancelInvitation }) => {
+const Reviewer = observer(({ review, onRemoveInvitation }) => {
 
   const classes = useStyles();
 
-  const handleCancelInvitation = () => {
-    typeof onCancelInvitation === "function" && onCancelInvitation(review.id);
-  };
+  const handleRemoveInvitation = () => onRemoveInvitation(review.id);
 
   if (!review) {
     return null;
@@ -100,8 +98,8 @@ const Reviewer = observer(({ review, onCancelInvitation }) => {
 
   return (
     <div className={classes.container}>
-      <User key={review.id}  userId={review.id} />
-      <button title="cancel invitation" onClick={handleCancelInvitation}><FontAwesomeIcon icon="times"/></button>
+      <User userId={review.id} name={review.name} title={review.name} />
+      <button title="remove invitation" onClick={handleRemoveInvitation}><FontAwesomeIcon icon="times"/></button>
     </div>
   );
 });

@@ -177,13 +177,15 @@ public class Instances {
         return instanceClient.getInvitedUsers(id);
     }
 
-    @DeleteMapping("/instances/{id}/invitedUsers/{userId}")
-    public void deleteUserinvitation(@PathVariable("id") String id, @PathVariable("userId") String userId) {
+    @DeleteMapping("/instances/{id}/users/{userId}/invite")
+    public KGCoreResult<List<UserSummary>> deleteUserinvitation(@PathVariable("id") String id, @PathVariable("userId") String userId) {
         instanceClient.deleteInvitedUser(id, userId);
+        return instanceClient.getInvitedUsers(id);
     }
 
-    @PutMapping("/instances/{id}/invitedUsers/{userId}")
-    public void putUserinvitation(@PathVariable("id") String id, @PathVariable("userId") String userId) {
+    @PutMapping("/instances/{id}/users/{userId}/invite")
+    public KGCoreResult<List<UserSummary>> putUserinvitation(@PathVariable("id") String id, @PathVariable("userId") String userId) {
         instanceClient.addInvitation(id, userId);
+        return instanceClient.getInvitedUsers(id);
     }
 }

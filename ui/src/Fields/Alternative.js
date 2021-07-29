@@ -120,7 +120,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
           <ValueRenderer alternative={alternative} />
         </strong> : <span className={classes.nullValue}>no value</span>} <em><div className="parenthesis">(</div>{
           users.map(user => (
-            <User userId={user.id} name={user.name} key={user.id} picture={user.picture} />
+            <User key={user.id} userId={user.id} name={user.name} picture={user.picture} />
           ))
         }<div className="parenthesis">)</div></em>
         {alternative.selected?

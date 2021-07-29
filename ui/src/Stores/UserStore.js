@@ -36,9 +36,6 @@ export class UserStore {
   };
   totalSearchCount = 0;
 
-  searchPageStart = 0;
-  searchPageSize = 20;
-
   transportLayer = null;
 
   constructor(transportLayer) {
@@ -51,7 +48,6 @@ export class UserStore {
       searchFilter: observable,
       totalSearchCount: observable,
       hasSearchFilter: computed,
-      canLoadMoreResults: computed,
       getUser: action,
       addUser: action,
       fetchUser: action,
@@ -65,14 +61,6 @@ export class UserStore {
 
   get hasSearchFilter() {
     return this.searchFilter.queryString !== "";
-  }
-
-  get canLoadMoreResults() {
-    if (!this.hasSearchFilter || this.isFetchingSearch || this.searchFetchError || !this.searchResult.length) {
-      return false;
-    }
-
-    return this.searchResult.length < this.totalSearchCount;
   }
 
   applySearchFilter = debounce(() => {
@@ -109,7 +97,6 @@ export class UserStore {
         emails: [],
         picture: null,
         profileUrl: null,
-        isCurator: false,
         isFetching: false,
         isFetched: false,
         hasFetchError: false,
@@ -131,7 +118,6 @@ export class UserStore {
           user.familyName = userData && userData.familyName;
           user.emails = userData && userData.emails instanceof Array ? userData.emails : [];
           user.picture = userData && userData.picture;
-          user.isCurator = !!userData && !!userData.isCurator;
           user.isFetching = false;
           user.isFetched = true;
         });
@@ -143,7 +129,6 @@ export class UserStore {
           user.familyName = null;
           user.emails = [];
           user.picture = null;
-          user.isCurator = false;
           const error = e.message ? e.message : e;
           user.fetchError = `Error while retrieving user "${userId}" (${error})`;
           user.hasFetchError = true;
@@ -178,42 +163,28 @@ export class UserStore {
     this.totalSearchCount = 0;
   }
 
-  async searchUsers(loadMore = false) {
+  async searchUsers() {
     if (!this.hasSearchFilter) {
       this.clearSearch();
     } else {
       try {
-        if (loadMore) {
-          if (!this.searchFetchError) {
-            this.searchPageStart++;
-          }
-        } else {
-          this.searchPageStart = 0;
-          this.searchResult = [];
-        }
+        this.searchResult = [];
         this.isFetchingSearch = true;
         this.searchFetchError = null;
-
-        const { data } = await this.transportLayer.getUsersForReview(this.searchPageStart * this.searchPageSize, this.searchPageSize, this.searchFilter.queryString);
+        const { data } = await this.transportLayer.getUsersForReview(this.searchFilter.queryString);
         runInAction(() => {
           if (!this.hasSearchFilter) {
             this.clearSearch();
           } else {
             this.isSearchFetched = true;
             this.isFetchingSearch = false;
-            let result = [];
-            if (loadMore) {
-              result = [...this.searchResult, ...((data && data.data && data.data.users) ? data.data.users : [])];
-            } else {
-              result = (data && data.data && data.data.users) ? data.data.users : [];
-            }
+            let result = data && data.data ? data.data : [];
             if (this.searchFilter.excludedUsers && this.searchFilter.excludedUsers.length) {
-
               this.searchResult = result.filter(user => !this.searchFilter.excludedUsers.includes(user.id));
             } else {
               this.searchResult = result;
             }
-            this.totalSearchCount = data.total !== undefined ? (data.total - (result.length - this.searchResult.length)) : 0;
+            this.totalSearchCount = this.searchResult.length;
           }
         });
       } catch (e) {

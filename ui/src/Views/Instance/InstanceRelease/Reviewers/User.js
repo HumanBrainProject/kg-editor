@@ -78,28 +78,16 @@ const User = observer(({ user, onSelect }) => {
 
   const classes = useStyles();
 
-  const handleSelect = e => {
-    typeof onSelect === "function" && onSelect(user, e);
-  };
+  if(!user) {
+    return null;
+  }
 
-  const email = (user && user.emails instanceof Array)?user.emails.reduce((email, item) => {
-    if (item && item.value && item.verified) {
-      if (item.primary || !email) {
-        return item;
-      }
-    }
-    return email;
-  }, null):null;
+  const handleSelect = e => onSelect(user, e);
 
   return (
-    <Dropdown.Item key={user.id} className={classes.container} onSelect={handleSelect} >
+    <Dropdown.Item className={classes.container} onSelect={handleSelect} >
       <div tabIndex={-1} className="option" onKeyDown={handleSelect}>
-        <UserComponent
-          userId={user && user.id}
-          name={user && user.name}
-          picture={user && user.picture}
-          isCurator={!!user && !!user.isCurator}
-          title={email} />
+        <UserComponent userId={user.id} name={user.name} picture={user.picture} />
       </div>
     </Dropdown.Item>
   );

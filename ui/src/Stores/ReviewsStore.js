@@ -22,17 +22,12 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-
-
-import * as reviewersMockupDataModule from '../data/mockups/reviewers.json';
-
-const reviewersMockupData = reviewersMockupDataModule.default;
-
 export class ReviewsStore {
   reviews = [];
   fetchError = null;
-  isFetching= true;
-  isFetched= false;
+  isFetching = true;
+  isFetched = false;
+  error = null;
 
   transportLayer = null;
 
@@ -40,9 +35,10 @@ export class ReviewsStore {
     makeObservable(this, {
       reviews: observable,
       fetchError: observable,
-      hasFetchError: computed,
       isFetching: observable,
       isFetched: observable,
+      error: observable,
+      hasFetchError: computed,
       getInstanceReviews: action,
       addInstanceReviewRequest: action,
       removeInstanceReviewRequest: action
@@ -63,7 +59,7 @@ export class ReviewsStore {
     try {
       const { data } = await this.transportLayer.getInstanceReviews(instanceId);
       runInAction(() => {
-        this.reviews = data && data.length ? data : [];
+        this.reviews = data && data.data ? data.data : [];
         this.isFetching = false;
         this.isFetched = true;
         this.fetchError = null;
@@ -75,65 +71,36 @@ export class ReviewsStore {
         this.fetchError = `Error while retrieving reviews for instance "${instanceId}" (${message})`;
         this.isFetched = false;
         this.isFetching = false;
-        this.reviews = reviewersMockupData.data;
-        this.fetchError = null;
-        this.isFetched = true;
       });
     } 
   }
 
-  async addInstanceReviewRequest(instanceId, org, userId) {
-    // if (userId && this.instancesReviews.has(instanceId)) {
-    //   const instanceReviews = this.instancesReviews.get(instanceId);
-    //   if (!instanceReviews.isFetching) {
-    //     let instanceReview = instanceReviews.reviews.find(review => review.userId === userId);
-    //     if (!instanceReview) {
-    //       instanceReview = {
-    //         userId: userId,
-    //         org: org
-    //       };
-    //       instanceReviews.reviews.push(instanceReview);
-    //       instanceReview = instanceReviews.reviews.find(review => review.userId === userId);
-    //     }
-    //     delete instanceReview.error;
-    //     try {
-    //       const {data} = await this.transportLayer.inviteUserToReviewInstance(userId, instanceId);
-
-    //       runInAction(async () => {
-    //         instanceReview.status = data && data.status ? data.status : "PENDING";
-    //       });
-    //     } catch (e) {
-    //       runInAction(() => {
-    //         const message = e.message ? e.message : e;
-    //         instanceReview.status = "ADD_ERROR";
-    //         instanceReview.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
-    //       });
-    //     }
-    //   }
-    // }
+  async addInstanceReviewRequest(instanceId, userId) {
+    try {
+      const { data } = await this.transportLayer.inviteUserToReviewInstance(instanceId, userId);
+      runInAction(() => {
+        this.reviews = data && data.data ? data.data : [];
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message ? e.message : e;
+        this.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
+      });
+    }
   }
 
   async removeInstanceReviewRequest(instanceId, userId) {
-    // if (userId && this.instancesReviews.has(instanceId)) {
-    //   const instanceReviews = this.instancesReviews.get(instanceId);
-    //   if (!instanceReviews.isFetching) {
-    //     let instanceReview = instanceReviews.reviews.find(review => review.userId === userId);
-    //     instanceReviews.reviews.remove(instanceReview);
-    //     delete instanceReview.error;
-    //     try {
-    //       await this.transportLayer.deleteInstanceReviewsByUser(instanceId, userId);
-    //       runInAction(async () => {
-    //         instanceReviews.reviews.remove(instanceReview);
-    //       });
-    //     } catch (e) {
-    //       runInAction(() => {
-    //         const message = e.message ? e.message : e;
-    //         instanceReview.status = "REMOVE_ERROR";
-    //         instanceReview.error = `Error while trying to cancel invite to user "${userId}" to review instance "${instanceId}" (${message})`;
-    //       });
-    //     }
-    //   }
-    // }
+    try {
+      const { data } = await this.transportLayer.deleteInstanceReviewsByUser(instanceId, userId);
+      runInAction(() => {
+        this.reviews = data && data.data ? data.data : [];
+      });
+    } catch (e) {
+      runInAction(() => {
+        const message = e.message ? e.message : e;
+        this.error = `Error while removing user "${userId}" to review instance "${instanceId}" (${message})`;
+      });
+    }
   }
 }
 

@@ -33,27 +33,19 @@ const useStyles = createUseStyles({
     },
     "& .avatar.picture": {
       margin: "0 2px 0 5px"
-    },
-    "& .name:not(.is-curator)":  {
-      color: "#337ab7"
     }
   }
 });
 
-const User = ({userId, name, picture, isCurator, title})  => {
+const User = ({userId, name, picture, title})  => {
 
   const classes = useStyles();
 
-  if (!userId) {
-    return null;
-  }
-
   return (
-    <span className={`${classes.user} user`}><Avatar userId={userId} name={name} picture={picture} />{title?
-      <span className={`name ${isCurator?"is-curator":""} `} title={title}>{name?name:userId}</span>
-      :
-      <span className={`name" ${isCurator?"is-curator":""} `} >{name?name:userId}</span>
-    }</span>
+    <span className={`${classes.user} user`}>
+      <Avatar userId={userId} name={name} picture={picture} />
+      <span title={title?title:""}>{name?name:userId}</span>
+    </span>
   );
 };
 

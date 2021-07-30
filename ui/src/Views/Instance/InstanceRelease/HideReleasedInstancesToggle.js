@@ -51,9 +51,7 @@ const HideReleasedInstancesToggle = observer(() => {
 
   const { releaseStore } = useStores();
 
-  const handleClick = showAll => {
-    releaseStore.toggleHideReleasedInstances(!!showAll);
-  };
+  const handleClick = showAll => releaseStore.toggleHideReleasedInstances(!!showAll);
 
   return (
     <div className={classes.container}>

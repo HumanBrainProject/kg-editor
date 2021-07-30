@@ -60,7 +60,7 @@ const Option = ({ item }) => {
 
   const handlePreview = e => {
     e.stopPropagation();
-    const options = { showEmptyFields:false, showAction:false, showBookmarkStatus:false, showType:true, showStatus:false };
+    const options = { showEmptyFields:false, showAction:false, showType:true, showStatus:false };
     instanceStore.togglePreviewInstance(item.id, item.name, options);
   };
 

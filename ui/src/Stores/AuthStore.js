@@ -138,7 +138,6 @@ export class AuthStore {
       this.isRetrievingUserProfile = true;
       try {
         const { data } = await this.transportLayer.getUserProfile();
-        //throw {response: { status: 403}};
         runInAction(() => {
           this.isUserAuthorized = true;
           const user = (data && data.data)?data.data:{ spaces: []};
@@ -219,29 +218,24 @@ export class AuthStore {
         }
       });
       if(this.endpoint) {
-        try {
-          await new Promise((resolve, reject) => {
-            const keycloakScript = document.createElement("script");
-            keycloakScript.src = this.endpoint + "/js/keycloak.js";
-            keycloakScript.async = true;
+        await new Promise((resolve, reject) => {
+          const keycloakScript = document.createElement("script");
+          keycloakScript.src = this.endpoint + "/js/keycloak.js";
+          keycloakScript.async = true;
 
-            document.head.appendChild(keycloakScript);
-            keycloakScript.onload = () => {
-              this.initializeKeycloak(resolve, reject);
-            };
-            keycloakScript.onerror = () => {
-              document.head.removeChild(keycloakScript);
-              runInAction(() => {
-                this.isInitializing = false;
-                this.authError = `Failed to load resource! (${keycloakScript.src})`;
-              });
-              reject(this.authError);
-            };
-          });
-        } catch (e) {
-          // error are already set in the store so no need to do anything here
-          // window.console.log(e);
-        }
+          document.head.appendChild(keycloakScript);
+          keycloakScript.onload = () => {
+            this.initializeKeycloak(resolve, reject);
+          };
+          keycloakScript.onerror = () => {
+            document.head.removeChild(keycloakScript);
+            runInAction(() => {
+              this.isInitializing = false;
+              this.authError = `Failed to load resource! (${keycloakScript.src})`;
+            });
+            reject(this.authError);
+          };
+        });
       } else {
         runInAction(() => {
           this.isInitializing = false;

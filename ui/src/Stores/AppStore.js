@@ -120,7 +120,6 @@ export class AppStore{
       setSizeHistorySetting: action,
       toggleViewedFlagHistorySetting: action,
       toggleEditedFlagHistorySetting: action,
-      toggleBookmarkedFlagHistorySetting: action,
       toggleReleasedFlagHistorySetting: action,
       setTheme: action,
       toggleTheme: action,
@@ -148,7 +147,6 @@ export class AppStore{
         eventTypes: {
           viewed: false,
           edited: true,
-          bookmarked: true,
           released: false
         }
       };
@@ -396,11 +394,6 @@ export class AppStore{
 
   toggleEditedFlagHistorySetting(on){
     this.historySettings.eventTypes.edited = on?true:false;
-    localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
-  }
-
-  toggleBookmarkedFlagHistorySetting(on){
-    this.historySettings.eventTypes.bookmarked = on?true:false;
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 

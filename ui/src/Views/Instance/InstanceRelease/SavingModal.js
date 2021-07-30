@@ -71,13 +71,9 @@ const SavingModal = observer(() => {
 
   const { releaseStore } = useStores();
 
-  const handleDismissSavingReport = () => {
-    releaseStore.dismissSaveError();
-  };
+  const handleDismissSavingReport = () =>releaseStore.dismissSaveError();
 
-  const handleStop = () => {
-    releaseStore.stopRelease();
-  };
+  const handleStop = () => releaseStore.stopRelease();
 
   return (
     <Modal show={releaseStore.isSaving} onHide={() => {}}>

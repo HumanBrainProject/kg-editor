@@ -35,7 +35,6 @@ import Field from "../Fields/Field";
 import FetchingLoader from "../Components/FetchingLoader";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
-// import BookmarkStatus from "./Instance/BookmarkStatus";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 import IncomingLinks from "./Instance/IncomingLinks/IncomingLinks";
@@ -68,10 +67,6 @@ const useStyles = createUseStyles({
     top: "6px",
     right: "-54px",
     fontSize: "25px"
-  },
-  bookmarkStatus: {
-    marginRight: "5px",
-    fontSize: "1em"
   },
   type: {
     display: "inline-block",
@@ -208,9 +203,6 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
             <Actions instance={instance} />
           )}
           <div className={classes.titlePanel}>
-            {/* {showBookmarkStatus && (
-                  <BookmarkStatus className={classes.bookmarkStatus} id={instanceId} />
-                )} */}
             {showTypes && (
               <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
                 <FontAwesomeIcon fixedWidth icon="circle" />

@@ -27,7 +27,6 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Field from "../../Fields/Field";
 import Status from "./Status";
-// import BookmarkStatus from "./BookmarkStatus";
 import { observer } from "mobx-react-lite";
 
 const useStyles = createUseStyles({
@@ -35,9 +34,7 @@ const useStyles = createUseStyles({
     position: "relative",
     minHeight: "47px",
     cursor: "pointer",
-    // padding: "10px 10px 10px 75px",
     padding: "10px",
-    //background:"var(--bg-color-ui-contrast3)",
     background: "var(--bg-color-ui-contrast2)",
     borderLeft: "4px solid transparent",
     color: "var(--ft-color-normal)",
@@ -56,9 +53,6 @@ const useStyles = createUseStyles({
       },
       "& $type": {
         opacity: "1"
-      },
-      "& .bookmarkStatus": {
-        opacity: "1"
       }
     },
     "& .status": {
@@ -76,20 +70,6 @@ const useStyles = createUseStyles({
       },
       "& $type": {
         opacity: "1"
-      },
-      "& .bookmarkStatus": {
-        opacity: "1"
-      }
-    },
-    "& .bookmarkStatus": {
-      position: "absolute",
-      top: "50%",
-      left: "15px",
-      transform: "translateY(-50%)",
-      fontSize: "1.5em",
-      opacity: "0.5",
-      "& svg": {
-        strokeWidth: "1.5em"
       }
     }
   },
@@ -252,8 +232,6 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canRead}                            icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
       </div>
-      {/* <BookmarkStatus id={instance.id} className="bookmarkStatus" /> */}
-      {/* <div className={classes.separator}></div> */}
     </div>
   );
 });

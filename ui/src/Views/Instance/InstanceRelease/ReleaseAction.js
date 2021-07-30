@@ -140,13 +140,9 @@ const ReleaseAction = observer(() => {
     }
   };
 
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
+  const handleOpenModal = () => setShowModal(true);
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  const handleCloseModal = () => setShowModal(false);
 
   if (!releaseStore.treeStats) {
     return null;

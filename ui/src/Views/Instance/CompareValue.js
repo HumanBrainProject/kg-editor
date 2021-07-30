@@ -36,8 +36,6 @@ const useStyles = createUseStyles({
     overflowWrap: "anywhere",
     fontFamily: "unset",
     fontSize: "unset"
-    //,
-    //textAlign: "justify"
   },
   label: {
     marginBottom: 0,
@@ -71,8 +69,6 @@ const useStyles = createUseStyles({
 const CompareValue = ({ label, leftValue, rightValue, separator }) => {
 
   const classes = useStyles();
-
-  //window.console.log(label, leftValue, rightValue);
 
   const diff = jsdiff.diffWordsWithSpace(leftValue, rightValue);
 

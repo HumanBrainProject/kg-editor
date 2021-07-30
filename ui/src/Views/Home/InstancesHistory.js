@@ -159,11 +159,6 @@ const InstancesHistory = observer(() => {
     fetchInstances(appStore.currentSpace.id);
   };
 
-  // const handleHistoryBookmarkedFlagChange = e => {
-  //   appStore.toggleBookmarkedFlagHistorySetting(e.target.checked);
-  //   fetchInstances();
-  // };
-
   const handleHistoryReleasedFlagChange = e => {
     appStore.toggleReleasedFlagHistorySetting(e.target.checked);
     fetchInstances();
@@ -219,7 +214,6 @@ const InstancesHistory = observer(() => {
         <ul className="config">
           <li><input type="checkbox" checked={appStore.historySettings.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>
           <li><input type="checkbox" checked={appStore.historySettings.eventTypes.edited} onChange={handleHistoryEditedFlagChange} />Edited</li>
-          {/* <li><input type="checkbox" checked={appStore.historySettings.eventTypes.bookmarked} onChange={handleHistoryBookmarkedFlagChange} />Bookmarked</li> */}
           <li><input type="checkbox" checked={appStore.historySettings.eventTypes.released} onChange={handleHistoryReleasedFlagChange} />Released</li>
         </ul>
       </div>

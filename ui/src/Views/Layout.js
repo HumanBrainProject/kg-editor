@@ -35,7 +35,6 @@ import NotFound from "./NotFound";
 import Home from "./Home";
 import Login from "./Login";
 import Help from "./Help";
-// import Statistics from "./Statistics";
 import Browse from "./Browse";
 import Instance from "./Instance";
 import GlobalError from "./GlobalError";
@@ -251,7 +250,6 @@ const Layout = observer(() => {
 
                     <Route path="/browse" exact={true} component={Browse} />
                     <Route path="/help" component={Help} />
-                    {/* <Route path="/kg-stats" exact={true} component={Statistics} /> */}
                     <Route path="/" exact={true} component={Home} />
                     <Route component={NotFound} />
                   </Switch>

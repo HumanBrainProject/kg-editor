@@ -48,9 +48,7 @@ const ThemeSwitcher = observer(() => {
 
   const { appStore } = useStores();
 
-  const handleChange = theme => {
-    appStore.setTheme(theme);
-  };
+  const handleChange = theme => appStore.setTheme(theme);
 
   return (
     <div className={classes.container}>

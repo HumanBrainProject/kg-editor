@@ -228,7 +228,6 @@ const Instance = observer(({ instance, mode }) =>  {
               instanceName={previewInstance.name}
               showEmptyFields={previewOptions.showEmptyFields}
               showAction={previewOptions.showAction}
-              showBookmarkStatus={previewOptions.showBookmarkStatus}
               showType={previewOptions.showType}
               showStatus={previewOptions.showStatus} />
             <div className={classes.closePreviewBtn} title="close preview" onClick={handleHidePreview}>

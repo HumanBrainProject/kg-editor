@@ -152,7 +152,8 @@ const ReleaseAction = observer(() => {
     return null;
   }
 
-  const permissions = instanceStore.instances.get(releaseStore.topInstanceId).permissions;
+  const instance = instanceStore.instances.get(releaseStore.topInstanceId);
+  const permissions = instance && instance.permissions;
 
   return (
     <div className={classes.container}>
@@ -173,7 +174,7 @@ const ReleaseAction = observer(() => {
         </div>
       </div>
       <div className={classes.invite}>
-        {permissions.canInviteForSuggestion && (
+        {(permissions && permissions.canInviteForSuggestion) && (
           <Reviewers id={releaseStore.topInstanceId} />
         )}
       </div>

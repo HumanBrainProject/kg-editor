@@ -25,7 +25,6 @@ import { observable, action, runInAction, computed, makeObservable } from "mobx"
 import debounce from "lodash/debounce";
 
 export class UserStore {
-  users = new Map();
   isFetchingSearch = false;
   isSearchFetched = false;
   searchFetchError = null;
@@ -40,7 +39,6 @@ export class UserStore {
 
   constructor(transportLayer) {
     makeObservable(this, {
-      users: observable,
       isFetchingSearch: observable,
       isSearchFetched: observable,
       searchFetchError: observable,
@@ -48,8 +46,6 @@ export class UserStore {
       searchFilter: observable,
       totalSearchCount: observable,
       hasSearchFilter: computed,
-      getUser: action,
-      addUser: action,
       setSearchFilter: action,
       clearSearch: action,
       searchUsers: action
@@ -65,24 +61,6 @@ export class UserStore {
   applySearchFilter = debounce(() => {
     this.searchUsers();
   }, 750);
-
-  getUser(userId) {
-    return this.users.get(userId);
-  }
-
-  addUser(user, clearSearch = false) {
-    if (user && user.id && !this.users.has(user.id)) {
-      this.users.set(user.id, Object.assign({}, user, {
-        isFetching: false,
-        isFetched: true,
-        hasFetchError: false,
-        fetchError: null
-      }));
-      if (clearSearch) {
-        this.clearSearch();
-      }
-    }
-  }
 
   setSearchFilter(queryString, excludedUsers = []) {
     if (!queryString) {

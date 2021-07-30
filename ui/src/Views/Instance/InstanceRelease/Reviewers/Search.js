@@ -22,7 +22,6 @@
  */
 
 import React, { useEffect, useRef } from "react";
-import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -202,7 +201,6 @@ const Search = observer(({ excludedUsers, onSelect }) => {
       userStore.clearSearch();
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
       event && event.preventDefault();
-      userStore.addUser(toJS(user), true);
       inputRef.current.focus();
       typeof onSelect === "function" && onSelect(user.id);
     }
@@ -271,7 +269,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
                 <div className={classes.searchCount}>
                   { showTotalSearchCount && (
                     <>
-                      {userStore.totalSearchCount} user{`${userStore.totalSearchCount !== 0?"s":""} found`}
+                      {userStore.totalSearchCount} user{`${userStore.totalSearchCount > 1?"s":""} found`}
                     </>
                   )}
                 </div>

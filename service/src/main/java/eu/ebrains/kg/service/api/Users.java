@@ -56,7 +56,7 @@ public class Users {
     }
 
     private static boolean isUserRelevantSpace(Space w){
-        return (w.getClientSpace() == null || !w.getClientSpace()) && (w.getInternalSpace() == null || !w.getInternalSpace());
+        return (w.getClientSpace() == null || !w.getClientSpace()) && (w.getInternalSpace() == null || !w.getInternalSpace()) && (w.getPermissions() != null && w.getPermissions().isCanRead());
     }
 
     @GetMapping("/me")

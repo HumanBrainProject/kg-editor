@@ -52,10 +52,7 @@ public class SpaceController {
         spaceTypes.forEach(w -> spaceTypesName.add(w.getName()));
         typesMap.values().forEach(v -> {
             if (!spaceTypesName.contains(v.getName())) {
-                if(v.getEmbeddedOnly() == null || !v.getEmbeddedOnly()) {
-                    v.setEmbeddedOnly(true);
-                }
-                spaceTypes.add(v);
+                throw new RuntimeException(String.format("The type %s is referenced as a nested target but does not exist for the space %s.", v.getName(), space));
             }
         });
         getTargetTypes(typesMap, spaceTypes);

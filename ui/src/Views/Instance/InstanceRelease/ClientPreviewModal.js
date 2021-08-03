@@ -54,11 +54,26 @@ const useStyles = createUseStyles({
   }
 });
 
+const getUrl = instanceId => {
+  switch(window.location.hostname) {
+    case "localhost":
+    case "editor.kg-dev.ebrains.eu":
+      return `https://search.kg-dev.ebrains.eu/live/${instanceId}`;
+    case "editor.kg-int.ebrains.eu":
+      return `https://search.kg-int.ebrains.eu/live/${instanceId}`;
+    case "editor.kg-ppd.ebrains.eu":
+      return `https://search.kg-ppd.ebrains.eu/live/${instanceId}`;
+    case "editor.kg.ebrains.eu":
+    default:
+      return `https://kg.ebrains.eu/search/live/${instanceId}`;
+  }
+}
+
 const ClientPreviewModal = observer(({ store, show, handleClose }) => {
 
   const classes = useStyles();
 
-  const url = `https://kg.ebrains.eu/search/live/${store.topInstanceId}`;
+  const url = getUrl(store.topInstanceId); 
 
   return (
     <Modal show={show} className={classes.greatModal} onHide={() => {}}>

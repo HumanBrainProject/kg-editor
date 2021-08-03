@@ -52,7 +52,7 @@ public class SpaceController {
         spaceTypes.forEach(w -> spaceTypesName.add(w.getName()));
         typesMap.values().forEach(v -> {
             if (!spaceTypesName.contains(v.getName())) {
-                if(!v.getEmbeddedOnly()) {
+                if(v.getEmbeddedOnly() == null || !v.getEmbeddedOnly()) {
                     v.setEmbeddedOnly(true);
                 }
                 spaceTypes.add(v);

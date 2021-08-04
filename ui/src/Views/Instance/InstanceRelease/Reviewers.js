@@ -98,9 +98,12 @@ const Reviewers = observer(({ id }) => {
     return(
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
-        <FetchingLoader>
-            <span>Fetching reviewers...</span>
-          </FetchingLoader>
+        <div>
+        <FontAwesomeIcon icon="circle-notch" spin/>
+        <span className={`${classes.fetchingLabel} fetchingLabel`}>&nbsp;&nbsp;
+          Fetching reviewers...
+        </span>
+        </div>
       </div>
     );
   }

@@ -32,6 +32,8 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -98,6 +100,24 @@ public class SpaceController {
         }
     }
 
+    private static String labelFromTypeName(String fullyQualifiedName) {
+        if (fullyQualifiedName != null) {
+            if (fullyQualifiedName.startsWith("@")) {
+                return fullyQualifiedName.replace("@", "");
+            }
+            if (fullyQualifiedName.lastIndexOf("#") > -1) {
+                return fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf("#") + 1);
+            }
+            try {
+                URI uri = new URI(fullyQualifiedName);
+                return uri.getPath() != null ? uri.getPath().substring(uri.getPath().lastIndexOf('/') + 1) : null;
+            } catch (URISyntaxException e) {
+                return fullyQualifiedName;
+            }
+        }
+        return null;
+    }
+
     private void getTargetTypes(Map<String, StructureOfType> typesMap, List<StructureOfType> types) {
         List<String> typesToRetrieve = new ArrayList<>();
         types.forEach(type -> type.getFields().values().forEach(f -> {
@@ -122,8 +142,14 @@ public class SpaceController {
                     if (structureOfType == null) {
                         structureOfType = targetTypesByName.get(targetType.getName());
                     }
-                    targetType.setLabel(structureOfType.getLabel());
-                    targetType.setColor(structureOfType.getColor());
+                    if(structureOfType!=null) {
+                        targetType.setLabel(structureOfType.getLabel());
+                        targetType.setColor(structureOfType.getColor());
+                    }
+                    else{
+                        //If the type doesn't exist, the best thing we can do is to extract the label from the type name
+                        targetType.setLabel(labelFromTypeName(targetType.getName()));
+                    }
                 });
             }
         }));

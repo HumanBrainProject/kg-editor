@@ -31,12 +31,20 @@ import Field from "../Field";
 import Add from "./Add";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 import { compareField } from "../../Stores/Instance";
+import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   label: {},
   readMode:{
-    "& $label:after": {
+    "&:.readOnly $label:after": {
       content: "':\\00a0'"
+    },
+    "& $item:first-child:last-child": {
+      border: 0,
+      padding: 0
+    },
+    "& $field + $field": {
+      marginTop: "0.5rem"
     }
   },
   form: {
@@ -105,7 +113,10 @@ const useStyles = createUseStyles({
       marginTop: "0"
     }
   },
-  noItems: {}
+  noItems: {},
+  warning: {
+    borderColor: "var(--ft-color-warn)"
+  }
 });
 
 const Action = ({ icon, title, single, onClick }) => {
@@ -174,6 +185,7 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     label,
     labelTooltip,
     labelTooltipIcon,
+    isReadOnly,
     isPublic,
     nestedFieldsStores
   } = fieldStore;
@@ -190,20 +202,27 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     return null;
   }
 
+  const hasWarning = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const warningMessages = fieldStore.warningMessages;
+  const hasWarningMessages = fieldStore.hasWarningMessages;
+  
   return (
-    <div className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
+    <div className={`${className} ${(readMode || isReadOnly)?classes.readMode:""} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic}/>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} isReadOnly={isReadOnly} />
       }
-      <div className={classes.form} >
+      <div className={`${classes.form} ${hasWarning && hasWarningMessages?classes.warning:""}`} >
         {nestedFieldsStores.map((row, idx) => (
-          <Item key={idx} itemFieldStores={row.stores} readMode={readMode} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
+          <Item key={idx} itemFieldStores={row.stores} readMode={readMode || isReadOnly} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
-        {!readMode && active && (
+        {!readMode && !isReadOnly && active && (
           <Add className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} onClick={addValue} types={fieldStore.resolvedTargetTypes} />
         )}
       </div>
+      {hasWarning && hasWarningMessages &&
+        <Invalid  messages={warningMessages}/>
+      }
     </div>
   );
 });

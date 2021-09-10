@@ -30,11 +30,15 @@ class NestedFieldStore extends FieldStore {
   returnAsNull = false;
   nestedFieldsStores = [];
   targetTypes = [];
+  minItems = null;
+  maxItems = null;
 
   constructor(definition, options, instance, transportLayer, rootStore) {
     super(definition, options, instance, transportLayer, rootStore);
     this.fieldsTemplate = definition.fields;
     this.targetTypes = definition.targetTypes;
+    this.minItems = definition.minItems;
+    this.maxItems = definition.maxItems;
     makeObservable(this, {
       initialValue: observable,
       returnAsNull: observable,
@@ -48,7 +52,13 @@ class NestedFieldStore extends FieldStore {
       deleteItemByIndex: action,
       moveItemUpByIndex: action,
       moveItemDownByIndex: action,
-      resolvedTargetTypes: computed
+      resolvedTargetTypes: computed,
+      requiredValidationWarning: computed,
+      minItems: observable,
+      maxItems: observable,
+      warningMessages: computed,
+      numberOfItemsWarning: computed,
+      hasWarningMessages: computed
     });
   }
 
@@ -73,6 +83,38 @@ class NestedFieldStore extends FieldStore {
         return acc;
       }, {"@type": row["@type"]});
     });
+  }
+
+  get numberOfItemsWarning() {
+    if(!this.minItems && !this.maxItems) {
+      return false;
+    }
+    if(this.minItems || this.maxItems) {
+      return true;
+    }
+    return false;
+  }
+
+  get warningMessages() {
+    const messages = {};
+    if (this.hasChanged) {
+      if(this.numberOfItemsWarning) {
+        if(this.minItems && this.maxItems) {
+          if(this.nestedFieldsStores.length < this.minItems || this.nestedFieldsStores.length > this.maxItems) {
+            messages.numberOfItems = `Number of items should be between ${this.minItems} and ${this.maxItems}`;
+          }
+        } else if(this.nestedFieldsStores.length < this.minItems) {
+          messages.numberOfItems = `Number of items should be bigger than ${this.minItems}`;
+        } else if(this.nestedFieldsStores.length > this.maxItems) {
+          messages.numberOfItems = `Number of items should be smaller than ${this.maxItems}`;
+        }
+      }
+    }
+    return messages;
+  }
+
+  get hasWarningMessages() {
+    return Object.keys(this.warningMessages).length > 0;
   }
 
   get resolvedTargetTypes() {

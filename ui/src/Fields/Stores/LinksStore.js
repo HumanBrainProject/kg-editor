@@ -176,7 +176,7 @@ class LinksStore extends FieldStore {
         } else if(this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
         } else if(this.value.length > this.maxItems) {
-          messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
+          messages.numberOfItems = `Number of values should be smaller than ${this.maxItems}`;
         }
       }
     }

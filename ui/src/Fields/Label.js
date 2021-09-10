@@ -49,10 +49,10 @@ const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, i
   const classes = useStyles();
   return (
     <Form.Label className={`${classes.label} ${className?className:""}`}>
-      {label}{isRequired && !isReadOnly && " *"}
-      {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" />}
-      {isPublic && !isReadOnly && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon="globe" />}
-      {labelTooltip && !isReadOnly && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
+      {label}{isRequired && " *"}
+      {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" icon="cogs" />}
+      {isPublic && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon="globe" />}
+      {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
     </Form.Label>
   );
 };

@@ -31,7 +31,6 @@ import { useStores } from "../../../Hooks/UseStores";
 
 import Reviewer from "./Reviewers/Reviewer";
 import Search from "./Reviewers/Search";
-import FetchingLoader from "../../../Components/FetchingLoader";
 
 const useStyles = createUseStyles({
   container: {

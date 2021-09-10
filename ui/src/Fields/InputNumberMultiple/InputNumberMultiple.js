@@ -91,11 +91,11 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
+    isPublic,
     alternatives,
     returnAsNull,
-    isRequired
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -170,14 +170,14 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     }
   };
 
-  if(readMode){
-    if(!list.length && !showIfNoValue) {
-      return null;
-    }
+  if(readMode && !list.length && !showIfNoValue) {
+    return null;
+  }
 
+  if(readMode || isReadOnly){
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} isRequired={isRequired}/>
+        <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
         <List
           list={list}
           readOnly={true}
@@ -193,7 +193,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon} />
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

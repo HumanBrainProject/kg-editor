@@ -565,10 +565,7 @@ export class Instance {
     const _initializeFields = _fields => {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
-        if(name === this.labelField) {
-          field.globalLabelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-          field.globalLabelTooltipIcon = "globe";
-        }
+        field.isPublic = name === this.labelField;
         if(field.fullyQualifiedName === "https://openminds.ebrains.eu/vocab/displayColor") {
           field.widget = "InputColor";
         }

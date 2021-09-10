@@ -102,8 +102,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
+    isPublic,
     mappingValue,
     optionsSearchTerm,
     options,
@@ -113,7 +112,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     fetchingOptions,
     alternatives,
     returnAsNull,
-    isRequired
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -278,15 +278,14 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
-  if(readMode){
+  if (readMode && !links.length && !showIfNoValue) {
+    return null;
+  }
 
-    if (!links.length && !showIfNoValue) {
-      return null;
-    }
-
+  if(readMode || isReadOnly){
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} isRequired={isRequired} />
+        <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
         {(view && view.currentInstanceId === instance.id)?
           <List
             list={links}
@@ -321,7 +320,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     <Form.Group className={className} ref={formGroupRef}>
       <div className={classes.labelContainer}>
         <div className={classes.labelPanel}>
-          <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+          <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
           <LinksAlternatives
             className={classes.alternatives}
             list={alternatives}

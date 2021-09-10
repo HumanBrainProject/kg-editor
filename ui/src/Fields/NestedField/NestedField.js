@@ -174,8 +174,7 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
+    isPublic,
     nestedFieldsStores
   } = fieldStore;
 
@@ -195,7 +194,7 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     <div className={`${className} ${readMode?classes.readMode:""}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic}/>
       }
       <div className={classes.form} >
         {nestedFieldsStores.map((row, idx) => (

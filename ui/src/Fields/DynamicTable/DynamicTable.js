@@ -145,8 +145,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
+    isPublic,
     optionsSearchTerm,
     options,
     targetTypes,
@@ -154,7 +153,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     hasMoreOptions,
     fetchingOptions,
     returnAsNull,
-    isRequired
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const handleDropdownReset = () => {
@@ -278,7 +278,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   };
 
   const fieldStoreLabel = label.toLowerCase();
-  const isDisabled =  readMode || returnAsNull;
+  const isDisabled =  readMode || isReadOnly || returnAsNull;
   const canAddValues = !isDisabled;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
   const warningMessages = fieldStore.warningMessages;
@@ -291,8 +291,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   return (
     <Form.Group className={`${classes.container} ${readMode?classes.readMode:""} ${className}`}>
       {readMode ?
-        <Label className={classes.label} label={label} isRequired={isRequired}/>:
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+        <Label className={classes.label} label={label} isRequired={isRequired} />:
+        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}/>
       }
       {!isDisabled && (view && view.currentInstanceId === instance.id) && (
         <div className={classes.deleteBtn}>

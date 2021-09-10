@@ -56,6 +56,7 @@ public class StructureOfField implements Serializable {
             @JsonProperty(EditorConstants.VOCAB_LABEL_TOOLTIP) String kgLabelTooltip,
             @JsonProperty(EditorConstants.VOCAB_SEARCHABLE) Boolean kgSearchable,
             @JsonProperty(EditorConstants.VOCAB_REQUIRED) Boolean required,
+            @JsonProperty(EditorConstants.VOCAB_READONLY) Boolean readOnly,
             @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes
     ) {
         this.fullyQualifiedName = kgFullyQualifiedName;
@@ -73,6 +74,7 @@ public class StructureOfField implements Serializable {
         this.labelTooltip = kgLabelTooltip;
         this.searchable = kgSearchable;
         this.required = required;
+        this.readOnly = readOnly;
         this.targetTypes = !CollectionUtils.isEmpty(kgTargetTypes) ? kgTargetTypes.stream()
                 .map(t -> (String) t.get(EditorConstants.VOCAB_TYPE))
                 .filter(Objects::nonNull)
@@ -96,6 +98,7 @@ public class StructureOfField implements Serializable {
     private final String labelTooltip;
     private final Boolean searchable;
     private final Boolean required;
+    private final Boolean readOnly;
     private Map<String, StructureOfField> fields;
     private Object value;
     private List<SimpleType> targetTypes;
@@ -173,4 +176,7 @@ public class StructureOfField implements Serializable {
     public Boolean getRequired() {
         return required;
     }
+
+    @JsonProperty("isReadOnly")
+    public Boolean getReadonly() { return readOnly; }
 }

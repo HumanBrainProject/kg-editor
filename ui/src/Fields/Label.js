@@ -45,13 +45,14 @@ const LabelTooltip = ({tooltip, icon}) => (
   </>
 );
 
-const Label = ({ className, label, labelTooltip, labelTooltipIcon, isRequired, globalLabelTooltip, globalLabelTooltipIcon }) => {
+const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic }) => {
   const classes = useStyles();
   return (
     <Form.Label className={`${classes.label} ${className?className:""}`}>
-      {label}{isRequired && " *"}
-      {globalLabelTooltip && <LabelTooltip tooltip={globalLabelTooltip} icon={globalLabelTooltipIcon} />}
-      {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
+      {label}{isRequired && !isReadOnly && " *"}
+      {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" />}
+      {isPublic && !isReadOnly && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon="globe" />}
+      {labelTooltip && !isReadOnly && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
     </Form.Label>
   );
 };

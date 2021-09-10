@@ -82,9 +82,9 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
-    isRequired
+    isPublic,
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const handleChange = e => fieldStore.setValue(e.target.value);
@@ -93,24 +93,25 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
 
   const handleRemoveColor = () => fieldStore.setValue(null);
 
-  if(readMode){
-    if(!value) {
-      if (showIfNoValue) {
-        return (
-          <Form.Group className={`${classes.readMode} ${className}`}>
-            <Label className={classes.label} label={label} />
-          </Form.Group>
-        );
-      }
-      return null;
+  if(readMode && !value) {
+    if (showIfNoValue) {
+      return (
+        <Form.Group className={`${classes.readMode} ${className}`}>
+          <Label className={classes.label} label={label} />
+        </Form.Group>
+      );
     }
+    return null;
+  }
+
+  if(readMode || isReadOnly){
 
     const color = new Color(value);
     const textColor = color.isLight()?"black":"white";
 
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} />
+        <Label className={classes.label} label={label} isReadOnly={readMode?false:isReadOnly} />
         <div className={classes.blockColor} style={{backgroundColor: value, color: textColor}} title={value}>{value}</div>
       </Form.Group>
     );
@@ -133,7 +134,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}/>
       <div>
         <Form.Control
           value={value}

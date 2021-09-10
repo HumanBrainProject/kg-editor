@@ -62,9 +62,9 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
-    isRequired
+    isPublic,
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const handleChange = e => fieldStore.setValue(e.target.value);
@@ -73,15 +73,16 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
-  if(readMode){
-    if(!value && !showIfNoValue) {
-      return null;
-    }
+  if(readMode && !value && !showIfNoValue) {
+    return null;
+  }
+
+  if(readMode || isReadOnly){
 
     const val = !value || typeof value === "string"? value:value.toString();
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} />
+        <Label className={classes.label} label={label} isReadOnly={readMode?false:isReadOnly} />
         <span>&nbsp;{val}</span>
       </Form.Group>
     );
@@ -93,7 +94,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

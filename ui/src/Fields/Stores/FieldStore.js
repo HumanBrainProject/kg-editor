@@ -27,8 +27,7 @@ class FieldStore {
   label = null;
   labelTooltip = null;
   labelTooltipIcon = null;
-  globalLabelTooltip = null;
-  globalLabelTooltipIcon = null;
+  isPublic = false;
   fullyQualifiedName = null;
   alternatives = [];
   warning = null;
@@ -38,6 +37,7 @@ class FieldStore {
   order = null;
   widget = null;
   isRequired = false;
+  isReadOnly = false;
   instance = null;
   transportLayer = null;
   rootStore = null;
@@ -47,14 +47,14 @@ class FieldStore {
       label: observable,
       labelTooltip: observable,
       labelTooltipIcon: observable,
-      globalLabelTooltip:observable,
-      globalLabelTooltipIcon: observable,
+      isPublic:observable,
       fullyQualifiedName: observable,
       alternatives: observable,
       warning: observable,
       errorMessage: observable,
       errorInfo: observable,
       isRequired: observable,
+      isReadOnly: observable,
       setError: action,
       clearError: action,
       hasError: computed,
@@ -65,12 +65,12 @@ class FieldStore {
     this.label = definition.label;
     this.labelTooltip = definition.labelTooltip;
     this.labelTooltipIcon = definition.labelTooltipIcon;
-    this.globalLabelTooltip = definition.globalLabelTooltip;
-    this.globalLabelTooltipIcon = definition.globalLabelTooltipIcon;
+    this.isPublic = !!definition.isPublic;
     this.fullyQualifiedName = definition.fullyQualifiedName;
     this.instance = instance;
     this.order = definition.order;
     this.isRequired = definition.isRequired;
+    this.isReadOnly = definition.isReadOnly;
     this.type = definition.type;
     this.transportLayer = transportLayer;
     this.rootStore = rootStore;
@@ -108,7 +108,8 @@ class FieldStore {
       widget: this.widget,
       label: this.label,
       fullyQualifiedName: this.fullyQualifiedName,
-      isRequired: this.isRequired
+      isRequired: this.isRequired,
+      isReadOnly: this.isReadOnly
     };
   }
 

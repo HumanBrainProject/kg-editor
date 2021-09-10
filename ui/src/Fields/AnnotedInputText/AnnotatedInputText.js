@@ -93,11 +93,11 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
+    isPublic,
     alternatives,
     returnAsNull,
-    isRequired
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const dropValue = droppedValue => {
@@ -168,15 +168,15 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     }
   };
 
-  if(readMode){
-    if (!resources.length && !showIfNoValue) {
-      return null;
-    }
+  
+  if (readMode && !resources.length && !showIfNoValue) {
+    return null;
+  }
 
-
+  if(readMode || isReadOnly){
     return (
       <Form.Group className={`${classes.readMode}} ${className}`}>
-        <Label className={classes.label} label={label} />
+        <Label className={classes.label} label={label} isReadOnly={readMode?false:isReadOnly} />
         <List
           list={resources}
           readOnly={true}
@@ -197,8 +197,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         labelTooltip={labelTooltip}
         labelTooltipIcon={labelTooltipIcon}
         isRequired={isRequired}
-        globalLabelTooltip={globalLabelTooltip}
-        globalLabelTooltipIcon={globalLabelTooltipIcon}
+        isPublic={isPublic}
       />
       <Alternatives
         className={classes.alternatives}

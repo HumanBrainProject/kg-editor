@@ -43,7 +43,7 @@ const useStyles = createUseStyles({
 
 const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) => {
 
-  const { value, label, labelTooltip, labelTooltipIcon, globalLabelTooltip, globalLabelTooltipIcon } = fieldStore;
+  const { value, label, labelTooltip, labelTooltipIcon, isPublic } = fieldStore;
   const classes = useStyles();
 
   const handleChange = () => {
@@ -66,7 +66,7 @@ const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) =
 
   return (
     <Form.Group className={`${classes.container} ${className}`} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic}/>
       <Form.Check onChange={handleChange} checked={value} />
     </Form.Group>
   );

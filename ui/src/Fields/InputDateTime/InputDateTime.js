@@ -100,9 +100,9 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     label,
     labelTooltip,
     labelTooltipIcon,
-    globalLabelTooltip,
-    globalLabelTooltipIcon,
-    isRequired
+    isPublic,
+    isRequired,
+    isReadOnly
   } = fieldStore;
 
   const handleChange = value => fieldStore.setValue(value);
@@ -111,14 +111,15 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
-  if(readMode){
-    if(!value && !showIfNoValue) {
-      return null;
-    }
+  if(readMode && !value && !showIfNoValue) {
+    return null;
+  }
+
+  if (readMode || isReadOnly) {
     const val = getDateTimeValue(value);
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
-        <Label className={classes.label} label={label} />
+        <Label className={classes.label} label={label} isReadOnly={readMode?false:isReadOnly} />
         <span>&nbsp;{val}</span>
       </Form.Group>
     );
@@ -128,7 +129,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
   const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} globalLabelTooltip={globalLabelTooltip} globalLabelTooltipIcon={globalLabelTooltipIcon}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
       <Alternatives
         className={classes.alternatives}
         list={alternatives}

@@ -26,6 +26,9 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import uniqueId from "lodash/uniqueId";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -40,6 +43,9 @@ const useStyles = createUseStyles({
       background: "var(--list-bg-hover)",
       borderColor: "var(--list-border-hover)",
       color: "var(--ft-color-loud)",
+      "& $cannotCreateTooltip": {
+        opacity: 0.75
+      },
       "& $actions": {
         opacity: 0.75
       },
@@ -75,6 +81,15 @@ const useStyles = createUseStyles({
     "& + span": {
       display: "inline-block",
       marginLeft: "22px"
+    }
+  },
+  cannotCreateTooltip: {
+    position: "absolute",
+    top: "5px",
+    right: "15px",
+    opacity: 0,
+    "&:hover": {
+      opacity: "1 !important"
     }
   },
   actions: {
@@ -155,6 +170,9 @@ const TypesItem = observer(({ type }) => {
 
   const selected = (browseStore.selectedItem && type)? (browseStore.selectedItem.name === type.name):false;
   const color = type.color;
+  const canCreate = type.canCreate !== false;
+
+  const cannotCreateTooltip = appStore.currentSpacePermissions.canCreate?(canCreate?null:`You are not allowed to create a new ${type.label} in the editor.`):`You are not allowed to create a new ${type.label}.`;
 
   return (
     <div
@@ -167,7 +185,7 @@ const TypesItem = observer(({ type }) => {
         <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
       }
       <span>{type.label}</span>
-      {appStore.currentSpacePermissions.canCreate && (
+      {appStore.currentSpacePermissions.canCreate && canCreate?
         appStore.isCreatingNewInstance ?
           <div className={classes.createInstance}>
             <FontAwesomeIcon icon={"circle-notch"} spin />
@@ -178,7 +196,13 @@ const TypesItem = observer(({ type }) => {
               <FontAwesomeIcon icon={"plus"} />
             </div>
           </div>
-      )}
+        :
+        <div className={classes.cannotCreateTooltip}>
+          <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("cannotCreate-tooltip")}>{cannotCreateTooltip}</Tooltip>}>
+            <FontAwesomeIcon icon="question-circle" />
+          </OverlayTrigger>
+        </div>
+      }
     </div>
   );
 });

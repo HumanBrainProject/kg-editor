@@ -45,7 +45,8 @@ public class StructureOfType {
             @JsonProperty(EditorConstants.VOCAB_LABEL_PROPERTY) String kgLabelField,
             @JsonProperty(EditorConstants.VOCAB_EMBEDDED_ONLY) Boolean kgEmbeddedOnly,
             @JsonProperty(EditorConstants.VOCAB_PROPERTIES) List<StructureOfField> kgFields,
-            @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) List<StructureOfIncomingLink> kgIncomingLinks
+            @JsonProperty(EditorConstants.VOCAB_INCOMING_LINKS) List<StructureOfIncomingLink> kgIncomingLinks,
+            @JsonProperty(EditorConstants.VOCAB_CAN_CREATE) Boolean kgCanCreate
     ) {
         this.label = kgLabel;
         this.name = kgName;
@@ -65,6 +66,7 @@ public class StructureOfType {
                                 StructureOfIncomingLink::getFullyQualifiedName,
                                 v -> v)
                         ) : Collections.emptyMap();
+        this.canCreate = kgCanCreate;
     }
 
     private static final List<String> FIELDS_BLACKLIST = Arrays.asList("@id", "@type", SchemaFieldsConstants.IDENTIFIER, EditorConstants.VOCAB_ALTERNATIVE, EditorConstants.VOCAB_USER, EditorConstants.VOCAB_SPACES, EditorConstants.VOCAB_PROPERTY_UPDATES);
@@ -81,6 +83,7 @@ public class StructureOfType {
     private final Map<String, StructureOfField> fields;
     private final List<String> promotedFields;
     private final Map<String, StructureOfIncomingLink> incomingLinks;
+    private final Boolean canCreate;
 
     public static List<String> getFieldsBlacklist() {
         return FIELDS_BLACKLIST;
@@ -116,5 +119,9 @@ public class StructureOfType {
 
     public Map<String, StructureOfIncomingLink> getIncomingLinks() {
         return incomingLinks;
+    }
+
+    public Boolean getCanCreate() {
+        return canCreate;
     }
 }

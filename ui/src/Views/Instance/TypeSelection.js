@@ -123,7 +123,7 @@ const TypeSelection = observer(({ onSelect }) => {
 
   const handleClick = type => onSelect(type);
 
-  const types = typeStore.filteredList(filter);
+  const types = typeStore.filteredList(filter).filter(t => t.canCreate !== false);
 
   if (typeStore.isFetching) {
     return (

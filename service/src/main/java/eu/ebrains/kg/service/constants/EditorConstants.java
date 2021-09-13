@@ -65,4 +65,5 @@ public class EditorConstants {
     public static final String VOCAB_LABEL_TOOLTIP = EDITOR_META + "property/labelTooltip";
     public static final String VOCAB_WIDGET = EDITOR_META + "property/widget";
     public static final String VOCAB_READONLY = EDITOR_META + "property/readOnly";
+    public static final String VOCAB_CAN_CREATE = EDITOR_META + "type/canCreate";
 }

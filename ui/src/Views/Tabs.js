@@ -81,7 +81,7 @@ const Tabs = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, authStore } = useStores();
+  const { appStore, history, authStore, typeStore } = useStores();
 
   const [currentLocationPathname, setCurrentLocationPathname] = useState(history.location.pathname);
 
@@ -101,6 +101,8 @@ const Tabs = observer(() => {
     history.push(`/instances/${uuid}/create`);
   };
 
+  const canCreate = appStore.currentSpacePermissions.canCreate && !typeStore.isFetching && typeStore.isFetched && !!typeStore.filteredTypes.filter(t => t.canCreate !== false).length;
+
   return (
     <div className={classes.container}>
       <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
@@ -115,7 +117,7 @@ const Tabs = observer(() => {
                 <SpaceSelector />
                 <Tab icon={"home"} current={matchPath(currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
                 <Tab icon={"search"} current={matchPath(currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
-                {appStore.currentSpacePermissions.canCreate && (
+                {canCreate && (
                   <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
                 )}
               </>

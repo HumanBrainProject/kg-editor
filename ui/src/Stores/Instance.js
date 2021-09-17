@@ -239,7 +239,12 @@ const getChildrenIdsGroupedByField = fields => {
   function getIds(field) {
     const values = field.returnValue;
     const mappingValue = field.mappingValue;
-    return Array.isArray(values) ? values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id)) : [];
+    if(Array.isArray(values)) {
+      return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id));
+    } else if (typeof values === "object" && values[mappingValue] && showId(field, values[mappingValue])) {
+      return [values[mappingValue]];
+    }
+    return [];
   }
 
   function getGroup(field) {

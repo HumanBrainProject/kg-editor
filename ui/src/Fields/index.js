@@ -40,6 +40,9 @@ import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
 import InputNumberMultipleStore from "./Stores/InputNumberMultipleStore";
 
+import SimpleDropdown from "./SimpleDropdown/SimpleDropdown";
+import LinkStore from "./Stores/LinkStore";
+
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
@@ -77,6 +80,10 @@ export const fieldsMapping = {
   "TextArea": {
     Component: TextArea,
     Store: InputTextStore
+  },
+  "SimpleDropdown": {
+    Component: SimpleDropdown,
+    Store: LinkStore
   },
   "DynamicDropdown": {
     Component: DynamicDropdown,

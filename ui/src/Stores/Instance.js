@@ -241,7 +241,7 @@ const getChildrenIdsGroupedByField = fields => {
     const mappingValue = field.mappingValue;
     if(Array.isArray(values)) {
       return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id));
-    } else if (typeof values === "object" && values[mappingValue] && showId(field, values[mappingValue])) {
+    } else if (typeof values === "object" && values && values[mappingValue] && showId(field, values[mappingValue])) { 
       return [values[mappingValue]];
     }
     return [];

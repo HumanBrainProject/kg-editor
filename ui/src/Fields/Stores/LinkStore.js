@@ -162,7 +162,7 @@ class LinkStore extends FieldStore {
   }
 
   deleteValue() {
-    this.value = undefined;
+    this.value = null;
     this.resetOptionsSearch();
   }
 

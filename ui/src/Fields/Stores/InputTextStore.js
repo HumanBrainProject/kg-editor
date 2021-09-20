@@ -25,12 +25,16 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
 
+const DEFAULT_REGEX = "^(?! ).*(?<! )$";
+const DEFAULT_REGEX_MESSAGE = "leading/trailling spaces are not allowed";
+
 class InputTextStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
   maxLength = null;
   regex = null;
+  isDefaultRegex = true;
 
   constructor(definition, options, instance, transportLayer, rootStore) {
     super(definition, options, instance, transportLayer, rootStore);
@@ -40,6 +44,7 @@ class InputTextStore extends FieldStore {
       initialValue: observable,
       maxLength: observable,
       regex: observable,
+      isDefaultRegex: observable,
       returnValue: computed,
       requiredValidationWarning: computed,
       maxLengthWarning: computed,
@@ -52,7 +57,8 @@ class InputTextStore extends FieldStore {
       setValue: action
     });
     this.maxLength = definition.maxLength;
-    this.regex = definition.regex;
+    this.regex = definition.regex?definition.regex:DEFAULT_REGEX;
+    this.isDefaultRegex = !definition.regex;
   }
 
   get returnValue() {
@@ -103,7 +109,7 @@ class InputTextStore extends FieldStore {
         messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
       }
       if(this.regexWarning) {
-        messages.regex = `${this.value} is not a valid value`;
+        messages.regex = this.isDefaultRegex?DEFAULT_REGEX_MESSAGE:`${this.value} is not a valid value`;
       }
     }
     return messages;

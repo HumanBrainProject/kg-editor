@@ -282,13 +282,13 @@ public class InstanceController {
 
     private Object getNestedFieldValue(Object fromMap, Map<String, StructureOfField> fields) {
         if (fromMap instanceof Collection) {
-            List<Object> value = ((Collection<?>) fromMap).stream()
+            return ((Collection<?>) fromMap).stream()
                     .map(v -> simplifyIdsOfLinksInNested((Map<String, Object>) v, fields))
                     .collect(Collectors.toList());
-            return value;
+        } else if (fromMap instanceof  String || fromMap instanceof Integer){
+            return fromMap;
         } else {
-            Object value = simplifyIdsOfLinksInNested((Map<String, Object>) fromMap, fields);
-            return value;
+            return simplifyIdsOfLinksInNested((Map<String, Object>) fromMap, fields);
         }
     }
 

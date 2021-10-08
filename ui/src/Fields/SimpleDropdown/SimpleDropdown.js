@@ -261,7 +261,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         {(view && view.currentInstanceId === instance.id)?
           <ListItem
             instanceId={id}
-            readOnly={false}
+            readOnly={true}
             disabled={false}
             enablePointerEvents={true}
             onClick={handleClick}
@@ -272,7 +272,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
           :
           <ListItem
             instanceId={id}
-            readOnly={false}
+            readOnly={true}
             disabled={false}
             enablePointerEvents={false}
             fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}

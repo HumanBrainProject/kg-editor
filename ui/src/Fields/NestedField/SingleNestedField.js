@@ -31,22 +31,15 @@ import Field from "../Field";
 import Add from "./Add";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 import { compareField } from "../../Stores/Instance";
-import Invalid from "../Invalid";
 
 const useStyles = createUseStyles({
   label: {},
   readMode:{
-    "&:.readOnly $label:after": {
-      content: "':\\00a0'"
-    },
     "& $item": {
-      padding: "10px"
-    },
-    "& $item$single": {
       padding: 0
     },
-    "& $item:first-child:last-child": {
-      border: 0
+    "&:.readOnly $label:after": {
+      content: "':\\00a0'"
     },
     "& $field + $field": {
       marginTop: "0.5rem"
@@ -60,13 +53,10 @@ const useStyles = createUseStyles({
   },
   item: {
     position: "relative",
-    border: "1px solid #ced4da",
+    border: 0,
     borderRadius: ".25rem",
-    padding: "40px 10px 10px 10px",
-    minHeight: "40px",
-    "& + $item": {
-      marginTop: "10px"
-    }
+    padding: "30px 0 0 0 ",
+    minHeight: "40px"
   },
   field: {
     marginBottom: 0,
@@ -76,8 +66,8 @@ const useStyles = createUseStyles({
   },
   actions: {
     position: "absolute",
-    top: "10px",
-    right: "10px",
+    top: 0,
+    right: 0,
     display: "flex",
     alignItems: "flex-end"
   },
@@ -89,20 +79,11 @@ const useStyles = createUseStyles({
     color: "var(--ft-color-loud)",
     cursor: "pointer",
     width: "25px",
+    borderRadius: "4px",
     "&:hover": {
       backgroundColor: "var(--button-secondary-active-bg-color)",
-    },
-    "&:first-child": {
-      borderRadius: "4px 0 0 4px"
-    },
-    "&:last-child": {
-      borderRadius: "0 4px 4px 0"
-    },
-    "&$single": {
-      borderRadius: "4px"
     }
   },
-  single: {},
   actionBtn: {
     marginTop: "10px",
     "&$noItems": {
@@ -115,7 +96,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Action = ({ icon, title, single, onClick }) => {
+const Action = ({ icon, title, onClick }) => {
 
   const classes = useStyles();
 
@@ -128,13 +109,13 @@ const Action = ({ icon, title, single, onClick }) => {
   };
 
   return (
-    <div className={`${classes.action} ${single?classes.single:""}`} onClick={handleClick} title={title}>
+    <div className={classes.action} onClick={handleClick} title={title}>
       <FontAwesomeIcon icon={icon} />
     </div>
   );
 };
 
-const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMoveUp, onMoveDown }) => {
+const Item = ({ itemFieldsStores, readMode, active, index, onDelete }) => {
 
   const classes = useStyles();
 
@@ -142,32 +123,24 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
   const pane = React.useContext(PaneContext);
 
   const handleDelete = () => onDelete(index);
-  const handleMoveUp = () => onMoveUp(index);
-  const handleMoveDown = () => onMoveDown(index);
 
-  const sortedStores = Object.values(itemFieldStores).sort((a, b) => compareField(a, b, true));
+  const sortedStores = Object.values(itemFieldsStores).sort((a, b) => compareField(a, b, true));
 
   return (
-    <div className={`${classes.item} ${total === 1?classes.single:""}`} >
+    <div className={classes.item}>
       {sortedStores.map(store => (
         <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
       ))}
       {!readMode && active && (
         <div className={classes.actions} >
-          <Action icon="times" onClick={handleDelete} single={total === 1} title="Delete" />
-          {index !== 0 && (
-            <Action icon="arrow-up" onClick={handleMoveUp} title="Move up" />
-          )}
-          {index < total - 1 && (
-            <Action icon="arrow-down" onClick={handleMoveDown} title="Move down" />
-          )}
+          <Action icon="times" onClick={handleDelete} title="Delete" />
         </div>
       )}
     </div>
   );
 };
 
-const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoValue}) => {
 
   const classes = useStyles();
 
@@ -186,42 +159,33 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     nestedFieldsStores
   } = fieldStore;
 
-  const addValue = type => fieldStore.addValue(type);
+  const handleAdd = type => fieldStore.add(type);
 
-  const handleDeleteItem = index => fieldStore.deleteItemByIndex(index);
-  const handleMoveItemUp = index => fieldStore.moveItemUpByIndex(index);
-  const handleMoveItemDown = index => fieldStore.moveItemDownByIndex(index);
+  const handleDelete = () => fieldStore.delete();
 
   const active = view && view.currentInstanceId === instance.id;
 
-  if(readMode && !showIfNoValue && (!initialValue || !initialValue.length )) {
+  if(readMode && !showIfNoValue && (!initialValue || !nestedFieldsStores )) {
     return null;
   }
 
-  const hasWarning = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
-  
   return (
     <div className={`${className} ${(readMode || isReadOnly)?classes.readMode:""} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} isReadOnly={isReadOnly} />
       }
-      <div className={`${classes.form} ${hasWarning && hasWarningMessages?classes.warning:""}`} >
-        {nestedFieldsStores.map((row, idx) => (
-          <Item key={idx} itemFieldStores={row.stores} readMode={readMode || isReadOnly} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
-        ))}
-        {!readMode && !isReadOnly && active && (
-          <Add className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} onClick={addValue} types={fieldStore.resolvedTargetTypes} />
+      <div className={classes.form} >
+        {nestedFieldsStores && (
+          <Item itemFieldsStores={nestedFieldsStores.stores} readMode={readMode || isReadOnly} active={active}  onDelete={handleDelete} />
+        )}
+        {!readMode && !isReadOnly && active && !nestedFieldsStores && (
+          <Add className={`${classes.actionBtn} ${nestedFieldsStores?"":classes.noItems}`} onClick={handleAdd} types={fieldStore.resolvedTargetTypes} />
         )}
       </div>
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
     </div>
   );
 });
-NestedField.displayName = "NestedField";
+SingleNestedField.displayName = "SingleNestedField";
 
-export default NestedField;
+export default SingleNestedField;

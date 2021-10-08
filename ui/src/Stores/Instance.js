@@ -106,7 +106,7 @@ export const normalizeInstanceData = data => {
   };
 
   const normalizeField = (field, instanceId) => {
-    if (field.widget === "Nested" && typeof field.fields === "object") {
+    if ((field.widget === "Nested" || field.widget === "SingleNested") && typeof field.fields === "object") {
       normalizeFields(field.fields, instanceId);
     }
   };
@@ -269,6 +269,9 @@ const getChildrenIdsGroupedByField = fields => {
     if (field.widget === "Nested") {
       const nestedGroups = getNestedFields(field.nestedFieldsStores);
       groups.push(...nestedGroups);
+    } else if (field.widget === "SingleNested") {
+      const nestedGroups = getSingleNestedFields(field.nestedFieldsStores);
+      groups.push(...nestedGroups);
     } else if (field.isLink) {
       const group = getGroup(field);
       if (group) {
@@ -278,13 +281,22 @@ const getChildrenIdsGroupedByField = fields => {
     return groups;
   }
 
+  function getSingleNestedFields(fields) {
+    if (!fields) {
+      return [];
+    }
+    return Object.values(fields.stores).reduce((acc, field) => {
+      const groups = getGroups(field);
+      acc.push(...groups);
+      return acc;
+    }, [])
+  }
+
   function getNestedFields(fields) {
     return fields.reduce((acc, rowFields) => {
-      acc.push(...Object.values(rowFields).reduce((acc2, field) => {
-        Object.values(field).forEach(f => {
-          const groups = getGroups(f);
-          acc2.push(...groups);
-        });
+      acc.push(...Object.values(rowFields.stores).reduce((acc2, field) => {
+        const groups = getGroups(field);
+        acc2.push(...groups);
         return acc2;
       }, []));
       return acc;
@@ -489,7 +501,14 @@ export class Instance {
     function getChildrenIds(fields) {
       const ids = Object.values(fields)
         .reduce((acc, field) => {
-          if (field.widget === "Nested") {
+          if (field.widget === "SingleNested") {
+            const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(field.nestedFieldsStores);
+            idsOfNestedFields.forEach(id => {
+              if (!acc.has(id)) {
+                acc.add(id);
+              }
+            });
+          } else if (field.widget === "Nested") {
             const idsOfNestedFields = getChildrenIdsOfNestedFields(field.nestedFieldsStores);
             idsOfNestedFields.forEach(id => {
               if (!acc.has(id)) {
@@ -498,12 +517,19 @@ export class Instance {
             });
           } else if (field.isLink) {
             const values = field.returnValue;
-            Array.isArray(values) && values.forEach(obj => {
-              const id = obj && obj[field.mappingValue];
+            if (Array.isArray(values)) {
+              values.forEach(obj => {
+                const id = obj && obj[field.mappingValue];
+                if (id && !acc.has(id)) {
+                  acc.add(id);
+                }
+              });
+            } else if (typeof values === "object" && values) { // field.widget === "SimpleDropdown"
+              const id = values && values[field.mappingValue];
               if (id && !acc.has(id)) {
                 acc.add(id);
               }
-            });
+            }
           }
           return acc;
         }, new Set());
@@ -512,7 +538,7 @@ export class Instance {
 
     function getChildrenIdsOfNestedFields(fields) {
       const ids = fields.reduce((acc, rowFields) => {
-        const ids = getChildrenIds(rowFields);
+        const ids = getChildrenIds(rowFields.stores);
         ids.forEach(id => {
           if (!acc.has(id)) {
             acc.add(id);
@@ -520,6 +546,20 @@ export class Instance {
         });
         return acc;
       }, new Set());
+      return Array.from(ids);
+    }
+
+    function getChildrenIdsOfSingleNestedFields(fields) {
+      if (!fields) {
+        return [];
+      }
+      const ids = new Set();
+      const childrenIds = getChildrenIds(fields.stores);
+      childrenIds.forEach(id => {
+        if (!ids.has(id)) {
+          ids.add(id);
+        }
+      });
       return Array.from(ids);
     }
 
@@ -571,8 +611,19 @@ export class Instance {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
         field.isPublic = name === this.labelField;
-        if(field.fullyQualifiedName === "https://openminds.ebrains.eu/vocab/displayColor") {
-          field.widget = "InputColor";
+        //TODO: temporary fix to support invalid array value
+        if ((field.widget === "SimpleDropdown" || field.widget === "SingleNested") && Array.isArray(field.value)) {
+          if (field.value.length >= 1) {
+            field.value = field.value[0];
+          } else {
+            delete field.value;
+          }
+          window.console.warn(`the field ${field.name} of instance ${this.id}  is a ${field.widget} which require an object as value but received an array.`, field.value);
+        }
+        //TODO: temporary fix to support invalid object value
+        if ((field.widget === "DynamicDropdown" || field.widget === "DynamicTable" || field.widget === "Nested") && !Array.isArray(field.value) && field.value !== undefined && field.value !== null ) {
+            window.console.warn(`The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`, field.value);
+            field.value = [field.value];
         }
         if (!this.fields[name]) {
           if (!field.widget) {

@@ -134,7 +134,7 @@ class LinksStore extends FieldStore {
   get cloneWithInitialValue() {
     return {
       ...this.definition,
-      value: [...toJS(this.initialValue)]
+      value: toJS(this.initialValue)
     };
   }
 

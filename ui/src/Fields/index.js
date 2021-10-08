@@ -30,6 +30,7 @@ import DynamicTable from "./DynamicTable/DynamicTable";
 import CheckBox from "./CheckBox/CheckBox";
 import UnsupportedField from "./UnsupportedField/UnsupportedField";
 import NestedField from "./NestedField/NestedField";
+import SingleNestedField from "./NestedField/SingleNestedField";
 
 import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
 import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
@@ -51,6 +52,7 @@ import InputNumberStore from "./Stores/InputNumberStore";
 import InputDateStore from "./Stores/InputDateStore";
 import InputDateTime from "./InputDateTime/InputDateTime";
 import NestedFieldStore from "./Stores/NestedFieldStore";
+import SingleNestedFieldStore from "./Stores/SingleNestedFieldStore";
 
 export const fieldsMapping = {
   "InputText":  {
@@ -115,5 +117,9 @@ export const fieldsMapping = {
   "Nested": {
     Component: NestedField,
     Store: NestedFieldStore
+  },
+  "SingleNested": {
+    Component: SingleNestedField,
+    Store: SingleNestedFieldStore
   }
 };

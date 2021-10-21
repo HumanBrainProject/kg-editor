@@ -42,7 +42,7 @@ public class Helpers {
     }
 
     public static boolean isNestedField(StructureOfField field) {
-        return field.getWidget() != null && field.getWidget().equals("Nested");
+        return field.getWidget() != null && (field.getWidget().equals("Nested") ||  field.getWidget().equals("SingleNested"));
     }
 
     public static void enrichFieldsTargetTypes(Map<String, StructureOfType> typesMap, Map<String, StructureOfField> fields) {

@@ -396,7 +396,7 @@ public class InstanceController {
 
     private void enrichNestedTypesToInstanceRecursively(Map<String, StructureOfField> fields, Map<String, StructureOfType> typesByName) {
         fields.values().forEach(f -> {
-            if (f.getWidget() != null && f.getWidget().equals("Nested")) {
+            if (f.getWidget() != null && (f.getWidget().equals("Nested") || f.getWidget().equals("SingleNested"))) {
                 Map<String, StructureOfField> nestedFields = getFieldsFromTypes(f.getTargetTypesNames(), typesByName);
                 f.setFields(nestedFields);
                 enrichNestedTypesToInstanceRecursively(nestedFields, typesByName);
@@ -495,7 +495,7 @@ public class InstanceController {
                 .forEach(v -> {
                     if (v.getFields() != null) {
                         v.getFields().values().stream()
-                                .filter(f -> f != null && f.getTargetTypes() != null && f.getWidget() != null && f.getWidget().equals("Nested"))
+                                .filter(f -> f != null && f.getTargetTypes() != null && f.getWidget() != null && (f.getWidget().equals("Nested") || f.getWidget().equals("SingleNested")))
                                 .forEach(t -> t.getTargetTypesNames().forEach(tg -> {
                                     if (!targetTypes.contains(tg) && !fullTypesByName.containsKey(tg)) {
                                         targetTypes.add(tg);

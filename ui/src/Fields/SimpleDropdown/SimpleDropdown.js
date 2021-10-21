@@ -258,25 +258,28 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
-        {(view && view.currentInstanceId === instance.id)?
-          <ListItem
-            instanceId={id}
-            readOnly={true}
-            disabled={false}
-            enablePointerEvents={true}
-            onClick={handleClick}
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
-            fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
-          />
+        {id?
+          (view && view.currentInstanceId === instance.id)?
+            <ListItem
+              instanceId={id}
+              readOnly={true}
+              disabled={false}
+              enablePointerEvents={true}
+              onClick={handleClick}
+              onMouseOver={handleMouseOver}
+              onMouseOut={handleMouseOut}
+              fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+            />
+            :
+            <ListItem
+              instanceId={id}
+              readOnly={true}
+              disabled={false}
+              enablePointerEvents={false}
+              fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+            />
           :
-          <ListItem
-            instanceId={id}
-            readOnly={true}
-            disabled={false}
-            enablePointerEvents={false}
-            fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
-          />
+          null
         }
       </Form.Group>
     );

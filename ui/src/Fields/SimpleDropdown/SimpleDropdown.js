@@ -250,7 +250,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const id = value && value[mappingValue];
 
-  if (readMode && !showIfNoValue) {
+  if (readMode && !id && !showIfNoValue) {
     return null;
   }
 

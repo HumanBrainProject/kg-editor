@@ -26,6 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
+import Color from "color";
 
 import { useStores } from "../../../Hooks/UseStores";
 
@@ -69,10 +70,25 @@ const IncomingLinkInstances = observer(({ link, readMode }) => {
 
   const handleShowMore = () => instanceStore.fetchMoreIncomingLinks(link.instanceId, link.property, link.type.name);
 
+  const badgeColor = link.type.color?link.type.color:"black";
+  const badgeTextColor = (new Color(badgeColor)).isLight()?"black":"white";
+  const badgeStyle = {
+    "background-color": badgeColor, 
+    "color":  badgeTextColor
+  };
+
   return (
     <div className={classes.container}>
       <div>
-        <span className={classes.type} title={link.type.name}><FontAwesomeIcon icon={"circle"} color={link.type.color}/>&nbsp;&nbsp;<span>{link.type.label?link.type.label:link.type.name}</span></span>
+        <span className={classes.type} title={link.type.name}>
+          {Array.isArray(link.instances)?
+            <span className="badge badge-pill" style={badgeStyle}>{link.instances.length}</span>
+            :
+            <FontAwesomeIcon icon={"circle"} color={badgeColor}/>
+          }
+          &nbsp;&nbsp;
+          <span>{link.type.label?link.type.label:link.type.name}</span>
+          </span>
       </div>
       <ul>
         {link.instances.map(instance => (

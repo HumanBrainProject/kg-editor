@@ -82,7 +82,7 @@ const IncomingLinkInstances = observer(({ link, readMode }) => {
       <div>
         <span className={classes.type} title={link.type.name}>
           {Array.isArray(link.instances)?
-            <span className="badge badge-pill" style={badgeStyle}>{link.instances.length}</span>
+            <span className="badge badge-pill" style={badgeStyle}>{link.total}</span>
             :
             <FontAwesomeIcon icon={"circle"} color={badgeColor}/>
           }

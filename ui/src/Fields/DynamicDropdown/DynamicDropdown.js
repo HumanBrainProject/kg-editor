@@ -24,10 +24,8 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
-import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
@@ -39,6 +37,7 @@ import Label from "../Label";
 import Invalid from "../Invalid";
 
 import List from "./List";
+import TargetTypeSelection from "../TargetTypeSelection";
 
 const useStyles = createUseStyles({
   labelContainer: {
@@ -56,19 +55,6 @@ const useStyles = createUseStyles({
     "&[disabled]": {
       backgroundColor: "#e9ecef",
       pointerEvents:"none"
-    }
-  },
-  targetTypes: {
-    minWidth: "30%",
-    "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active": {
-      border: 0, //"1px solid #ced4da",
-      background: "transparent",
-      color: "#212529",
-      width: "100%",
-      paddingRight: "2px",
-      textOverflow: "ellipsis",
-      textAlign: "right",
-      outline: 0
     }
   },
   label: {},
@@ -330,20 +316,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             parentContainerRef={formGroupRef}
           />
         </div>
-        {hasMultipleTypes && (
-          <Dropdown className={classes.targetTypes} onSelect={handleSelectTargetType}>
-            <Dropdown.Toggle id={`targetType-${fullyQualifiedName}`}>
-              <FontAwesomeIcon icon={"circle"} color={targetType.color}/>&nbsp;&nbsp;{targetType.label?targetType.label:targetType.name}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {targetTypes.map(type =>
-                  <Dropdown.Item key={type.name} eventKey={type.name}>
-                    <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;{type.label?type.label:type.name}
-                  </Dropdown.Item>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
+        {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
       <div className={`form-control ${classes.values} ${(hasWarning && hasWarningMessages)?classes.warning:""}`} disabled={isDisabled} >
         <List

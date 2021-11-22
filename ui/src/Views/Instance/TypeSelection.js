@@ -88,6 +88,10 @@ const useStyles = createUseStyles({
   },
   icon: {
     alignSelf: "center"
+  },
+  infoCircle: {
+    marginLeft: "5px",
+    transform: "translateY(2px)"
   }
 });
 
@@ -98,10 +102,11 @@ const Type = ({ type, onClick }) => {
   const handleClick = () => onClick(type);
 
   return (
-    <div className={classes.type} onClick={handleClick}>
+    <div className={classes.type} onClick={handleClick} title={type.description?type.description:type.name}>
       <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
         <FontAwesomeIcon fixedWidth icon="circle" />
-      </div>{type.label}
+      </div>
+      <span>{type.label}{type.description && <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />}</span>
     </div>
   );
 };

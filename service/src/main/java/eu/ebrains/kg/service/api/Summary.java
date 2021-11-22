@@ -98,6 +98,7 @@ public class Summary {
                     //Enrich the simple type information from the structure of type...
                     t.setLabel(byName.getData().getLabel());
                     t.setColor(byName.getData().getColor());
+                    t.setDescription(byName.getData().getDescription());
                 }
             });
             idController.simplifyId(r.getResult());

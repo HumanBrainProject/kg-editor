@@ -36,7 +36,7 @@ public class Suggestion {
     public Suggestion(@JsonProperty("id") String kgId, @JsonProperty("label") String kgName, @JsonProperty("type") String kgType, @JsonProperty("space") String kgSpace) {
         this.id = kgId;
         this.name = kgName;
-        this.type = kgType != null ? new SimpleTypeWithSpaces(kgType, null, null, null) : null;
+        this.type = kgType != null ? new SimpleTypeWithSpaces(kgType, null, null, null, null) : null;
         this.space = kgSpace;
     }
 

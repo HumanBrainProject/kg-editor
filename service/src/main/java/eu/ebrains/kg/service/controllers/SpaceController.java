@@ -95,6 +95,7 @@ public class SpaceController {
                                 s.getType().setLabel(structureOfType.getLabel());
                                 s.getType().setColor(structureOfType.getColor());
                                 s.getType().setLabelField(structureOfType.getLabelField());
+                                s.getType().setDescription(structureOfType.getDescription());
                             }))
                     );
         }
@@ -145,6 +146,7 @@ public class SpaceController {
                     if(structureOfType!=null) {
                         targetType.setLabel(structureOfType.getLabel());
                         targetType.setColor(structureOfType.getColor());
+                        targetType.setDescription(structureOfType.getDescription());
                     }
                     else{
                         //If the type doesn't exist, the best thing we can do is to extract the label from the type name

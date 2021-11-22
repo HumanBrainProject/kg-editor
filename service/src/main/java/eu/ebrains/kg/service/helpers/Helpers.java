@@ -55,6 +55,7 @@ public class Helpers {
                             if (t != null) {
                                 targetType.setLabel(t.getLabel());
                                 targetType.setColor(t.getColor());
+                                targetType.setDescription(t.getDescription());
                             }
                         }
                     });

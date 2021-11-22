@@ -147,6 +147,10 @@ const useStyles = createUseStyles({
   createInstance: {
     display: "none",
     cursor: "pointer"
+  },
+  infoCircle: {
+    marginLeft: "5px",
+    transform: "translateY(2px)"
   }
 });
 
@@ -178,13 +182,14 @@ const TypesItem = observer(({ type }) => {
     <div
       key={type.id}
       className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`}
-      onClick={handleSelect} title={type.label}>
+      onClick={handleSelect} 
+      title={type.description ? type.description:type.name}>
       {color ?
         <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.typeIcon}`} style={{ color: color }} />
         :
         <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
       }
-      <span>{type.label}</span>
+      <span>{type.label}{type.description && <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />}</span>
       {appStore.currentSpacePermissions.canCreate && canCreate?
         appStore.isCreatingNewInstance ?
           <div className={classes.createInstance}>

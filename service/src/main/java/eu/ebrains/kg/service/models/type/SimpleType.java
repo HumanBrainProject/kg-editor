@@ -32,6 +32,7 @@ public class SimpleType implements Serializable {
     }
 
     private final String name;
+    private String description;
     private String label;
     private String color;
     private String labelField;
@@ -39,6 +40,10 @@ public class SimpleType implements Serializable {
     public String getName() {
         return name;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 
     public String getLabel() {
         return label;

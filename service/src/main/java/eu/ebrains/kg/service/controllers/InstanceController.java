@@ -195,11 +195,15 @@ public class InstanceController {
             if (type != null) {
                 String color = type.getColor();
                 String label = type.getLabel();
+                String description = type.getDescription();
                 if (color != null) {
                     s.getType().setColor(color);
                 }
                 if (label != null) {
                     s.getType().setLabel(label);
+                }
+                if (description != null) {
+                    s.getType().setDescription(description);
                 }
             }
         }));
@@ -245,6 +249,7 @@ public class InstanceController {
             t.setColor(structureOfTypeKGCoreResult.getColor());
             t.setLabel(structureOfTypeKGCoreResult.getLabel());
             t.setLabelField(structureOfTypeKGCoreResult.getLabelField());
+            t.setDescription(structureOfTypeKGCoreResult.getDescription());
         }
     }
 

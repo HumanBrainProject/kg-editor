@@ -28,7 +28,6 @@ import _  from "lodash-uuid";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
@@ -38,6 +37,7 @@ import DynamicOption  from "../DynamicOption/DynamicOption";
 import Table from "./Table";
 import Label from "../Label";
 import Invalid from "../Invalid";
+import TargetTypeSelection from "../TargetTypeSelection";
 
 const useStyles = createUseStyles({
   container: {
@@ -85,21 +85,6 @@ const useStyles = createUseStyles({
     position:"relative"
   },
   dropdown: {},
-  targetTypes: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active": {
-      border: "1px solid #ced4da",
-      background: "transparent",
-      color: "#212529",
-      borderTop: 0,
-      borderBottom: 0,
-      borderRight: 0,
-      borderTopLeftRadius: 0,
-      borderBottomLeftRadius: 0
-    }
-  },
   emptyMessage: {
     position: "absolute !important",
     top: "50%",
@@ -339,20 +324,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 optionComponent={DynamicOption}
               />
             </div>
-            {hasMultipleTypes && (
-              <Dropdown className={classes.targetTypes} onSelect={handleSelectTargetType}>
-                <Dropdown.Toggle id={`targetType-${fullyQualifiedName}`}>
-                  <FontAwesomeIcon icon={"circle"} color={targetType.color}/>&nbsp;&nbsp;{targetType.label?targetType.label:targetType.name}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  {targetTypes.map(type =>
-                      <Dropdown.Item key={type.name} eventKey={type.name}>
-                        <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;{type.label?type.label:type.name}
-                      </Dropdown.Item>
-                  )}
-                </Dropdown.Menu>
-              </Dropdown>
-            )}
+            {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
           </div>
         )}
       </div>

@@ -30,6 +30,7 @@ public class SchemaFieldsConstants {
     public static final String IDENTIFIER = SCHEMA_ORG + "identifier";
     public static final String ALTERNATENAME = SCHEMA_ORG + "alternateName";
     public static final String NAME = SCHEMA_ORG + "name";
+    public static final String DESCRIPTION = SCHEMA_ORG + "description";
     public static final String GIVEN_NAME = SCHEMA_ORG + "givenName";
     public static final String FAMILY_NAME = SCHEMA_ORG + "familyName";
     public static final String EMAIL = SCHEMA_ORG + "email";

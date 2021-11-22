@@ -93,6 +93,7 @@ import {faTable} from "@fortawesome/free-solid-svg-icons/faTable";
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons/faAsterisk";
 import {faLevelDownAlt} from "@fortawesome/free-solid-svg-icons/faLevelDownAlt";
 import {faSitemap} from "@fortawesome/free-solid-svg-icons/faSitemap";
+import {faInfoCircle} from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 
 library.add(
   faUser,
@@ -164,5 +165,6 @@ library.add(
   faAsterisk,
   faLevelDownAlt,
   faSitemap,
-  faGlobe
+  faGlobe,
+  faInfoCircle
 );

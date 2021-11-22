@@ -40,11 +40,13 @@ public class SimpleTypeWithSpaces extends SimpleType {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public SimpleTypeWithSpaces(@JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgName,
                                 @JsonProperty(SchemaFieldsConstants.NAME) String kgLabel,
+                                @JsonProperty(SchemaFieldsConstants.DESCRIPTION) String kgDescription,
                                 @JsonProperty(EditorConstants.VOCAB_COLOR) String kgColor,
                                 @JsonProperty(EditorConstants.VOCAB_SPACES) List<Map<String, String>> kgSpaces) {
         super(kgName);
         this.setLabel(kgLabel);
         this.setColor(kgColor);
+        this.setDescription(kgDescription);
         this.space = kgSpaces!=null ? kgSpaces.stream().map(s ->
                 s.get(EditorConstants.VOCAB_SPACE)).filter(Objects::nonNull).collect(Collectors.toList()) : null;
     }

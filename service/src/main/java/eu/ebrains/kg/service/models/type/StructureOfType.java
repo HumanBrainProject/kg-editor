@@ -40,6 +40,7 @@ public class StructureOfType {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public StructureOfType(
             @JsonProperty(SchemaFieldsConstants.NAME) String kgLabel,
+            @JsonProperty(SchemaFieldsConstants.DESCRIPTION) String kgDescription,
             @JsonProperty(SchemaFieldsConstants.IDENTIFIER) String kgName,
             @JsonProperty(EditorConstants.VOCAB_COLOR) String kgColor,
             @JsonProperty(EditorConstants.VOCAB_LABEL_PROPERTY) String kgLabelField,
@@ -50,6 +51,7 @@ public class StructureOfType {
     ) {
         this.label = kgLabel;
         this.name = kgName;
+        this.description = kgDescription;
         this.color = kgColor;
         this.labelField = kgLabelField;
         this.embeddedOnly = kgEmbeddedOnly;
@@ -77,6 +79,7 @@ public class StructureOfType {
 
     private final String label;
     private final String name;
+    private final String description;
     private final String color;
     private final String labelField;
     private Boolean embeddedOnly;
@@ -124,4 +127,6 @@ public class StructureOfType {
     public Boolean getCanCreate() {
         return canCreate;
     }
+
+    public String getDescription() { return description; }
 }

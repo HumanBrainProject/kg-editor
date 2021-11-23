@@ -96,6 +96,10 @@ export class AuthStore {
     return this.hasSpaces ? this.user.spaces: [];
   }
 
+  hasSpace(id) {
+    return !!this.spaces.find(s => s.id === id);
+  }
+
   getSpaceInfo(id) {
     const space = this.spaces.find(us => us.id === id);
     if (space) {

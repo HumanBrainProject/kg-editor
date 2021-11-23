@@ -34,6 +34,9 @@ const useStyles = createUseStyles({
     "& > .badge-pill": {
       whiteSpace: "break-spaces"
     }
+  },
+  isForbidden: {
+    cursor: "not-allowed"
   }
 });
 
@@ -42,17 +45,19 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   const classes = useStyles();
 
-  const { appStore, history, instanceStore } = useStores();
+  const { authStore, appStore, history, instanceStore } = useStores();
 
   let label = instance.label?instance.label:instance.id;
 
   if (instance.space === appStore.currentSpace.id && instanceStore.instances.has(instance.id)) {
     label = instanceStore.instances.get(instance.id).name;
   }
-  
-  if (readMode) {
+
+  const isForbidden = !authStore.hasSpace(instance.space);
+
+  if (readMode || isForbidden) {
     return (
-      <span>
+      <span className={isForbidden?classes.isForbidden:""} title={isForbidden?"You don't have the permission to access this instance!": null}>
         <Badge pill variant="secondary" >
           {label}
         </Badge>

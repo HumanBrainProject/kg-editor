@@ -164,17 +164,19 @@ public class InstanceController {
     private void retrieveIncomingLinksTypes(Map<String, StructureOfType> typesByName, List<String> incomingLinksTypes, List<String> types) {
         types.forEach(type -> {
             StructureOfType structureOfType = typesByName.get(type);
-            structureOfType
-                    .getIncomingLinks()
-                    .values()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .forEach(v -> v.getSourceTypes()
-                            .forEach(t -> {
-                                if (!typesByName.containsKey(t.getType().getName())) {
-                                    incomingLinksTypes.add(t.getType().getName());
-                                }
-                            }));
+            if (structureOfType != null) {
+                structureOfType
+                        .getIncomingLinks()
+                        .values()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .forEach(v -> v.getSourceTypes()
+                                .forEach(t -> {
+                                    if (!typesByName.containsKey(t.getType().getName())) {
+                                        incomingLinksTypes.add(t.getType().getName());
+                                    }
+                                }));
+            }
         });
     }
 
@@ -183,7 +185,9 @@ public class InstanceController {
         Map<String, StructureOfIncomingLink> possibleIncomingLinks = new HashMap<>();
         types.forEach(type -> {
             StructureOfType structureOfType = typesByName.get(type);
-            possibleIncomingLinks.putAll(structureOfType.getIncomingLinks());
+            if(structureOfType != null) {
+                possibleIncomingLinks.putAll(structureOfType.getIncomingLinks());
+            }
         });
         enrichPossibleIncomingLinksTypes(typesByName, possibleIncomingLinks);
         instance.setPossibleIncomingLinks(possibleIncomingLinks);
@@ -290,7 +294,7 @@ public class InstanceController {
             return ((Collection<?>) fromMap).stream()
                     .map(v -> simplifyIdsOfLinksInNested((Map<String, Object>) v, fields))
                     .collect(Collectors.toList());
-        } else if (fromMap instanceof  String || fromMap instanceof Integer){
+        } else if (fromMap instanceof String || fromMap instanceof Integer) {
             return fromMap;
         } else {
             return simplifyIdsOfLinksInNested((Map<String, Object>) fromMap, fields);
@@ -535,8 +539,8 @@ public class InstanceController {
             Map<String, String> userPictures = userClient.getUserPictures(userIds);
             instance.getAlternatives().values().stream().flatMap(Collection::stream)
                     .map(Alternative::getUsers).flatMap(Collection::stream).forEach(u ->
-                    u.setPicture(userPictures.get(u.getId()))
-            );
+                            u.setPicture(userPictures.get(u.getId()))
+                    );
         }
     }
 

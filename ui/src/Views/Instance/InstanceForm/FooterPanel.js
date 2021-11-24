@@ -94,8 +94,11 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
 
   const { appStore, history } = useStores();
 
-  const handleOpenInstance = e => {
+  const handleOpenInstance = async e => {
     e.stopPropagation();
+    if(appStore.currentSpace.id !== instance.space) {
+      await appStore.setCurrentSpace(instance.space);
+    }
     if(e.metaKey || e.ctrlKey){
       appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
@@ -112,7 +115,7 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
         </Col>
         <Col xs={2}>
           <div className={classes.actions}>
-            {appStore.currentSpace.id === instance.space && instance.permissions.canRead && (
+            {instance.permissions.canRead && (
               <div className={classes.action} onClick={handleOpenInstance}>
                 <FontAwesomeIcon icon="folder-open"/>
               </div>

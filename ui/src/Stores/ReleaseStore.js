@@ -227,14 +227,15 @@ export class ReleaseStore {
     };
 
     const rseek = node => {
-      if(node.status !== node.pending_status){
-        nodesByStatus[node.pending_status].push(node);
-      }
-      if(node.children && node.children.length > 0){
-        node.children.forEach(child => rseek(child));
+      if(node.permissions && node.permissions.canRelease) {
+        if(node.status !== node.pending_status){
+          nodesByStatus[node.pending_status].push(node);
+        }
+        if(node.children && node.children.length > 0){
+          node.children.forEach(child => rseek(child));
+        }
       }
     };
-
     rseek(this.instancesTree);
     nodesByStatus.RELEASED = Array.from(new Set(nodesByStatus.RELEASED));
     nodesByStatus.UNRELEASED = Array.from(new Set(nodesByStatus.UNRELEASED));

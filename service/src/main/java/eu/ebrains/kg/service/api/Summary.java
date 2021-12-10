@@ -88,6 +88,12 @@ public class Summary {
                 //We're assigning the value of the instance to the StructureOfField -> we therefore need to clone it
                 StructureOfField clone = SerializationUtils.clone(f);
                 Object valueOfSearchField = r.getOriginalMap().get(f.getFullyQualifiedName());
+                if(valueOfSearchField instanceof Map<?, ?> && ((Map<?, ?>) valueOfSearchField).containsKey("@id")) {
+                    String id = (String) ((Map<?, ?>) valueOfSearchField).get("@id");
+                    UUID uuid = idController.simplifyFullyQualifiedId(id);
+                    ((Map)valueOfSearchField).put("@id", uuid.toString());
+
+                }
                 clone.setValue(valueOfSearchField);
                 return clone;
             }).collect(Collectors.toMap(StructureOfField::getFullyQualifiedName, v->v)));

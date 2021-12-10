@@ -73,7 +73,7 @@ const IncomingLinkInstances = observer(({ link, readMode }) => {
   const badgeColor = link.type.color?link.type.color:"black";
   const badgeTextColor = (new Color(badgeColor)).isLight()?"black":"white";
   const badgeStyle = {
-    "background-color": badgeColor, 
+    "backgroundColor": badgeColor, 
     "color":  badgeTextColor
   };
 

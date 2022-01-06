@@ -30,9 +30,18 @@ import { useStores } from "../../Hooks/UseStores";
 const useStyles = createUseStyles({
   option: {
     position: "relative",
+    display: "grid",
+    gridTemplateColumns: "min-content min-content 1fr",
     "&:hover $preview": {
       display: "block"
     }
+  },
+  additionalInformation: {
+    overflow: "hidden",
+    padding: "0 6px",
+    fontStyle: "italic",
+    textOverflow: "ellipsis",
+    color: "grey"
   },
   preview: {
     display: "none",
@@ -69,7 +78,10 @@ const Option = ({ item }) => {
       <span className={classes.icon} style={style}>
         <FontAwesomeIcon fixedWidth icon="circle" />
       </span>
-      {item.name}
+      <span>{item.name}</span>
+      {item.additionalInformation && (
+        <span className={classes.additionalInformation}>{item.additionalInformation}</span>
+      )}
       <div className={classes.preview} title="preview" onClick={handlePreview}>
         <FontAwesomeIcon icon="eye" />
       </div>

@@ -29,13 +29,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Suggestion {
     private final String id;
     private final String name;
+    private final String additionalInformation;
     private SimpleTypeWithSpaces type;
     private final String space;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public Suggestion(@JsonProperty("id") String kgId, @JsonProperty("label") String kgName, @JsonProperty("type") String kgType, @JsonProperty("space") String kgSpace) {
+    public Suggestion(@JsonProperty("id") String kgId, @JsonProperty("label") String kgName, @JsonProperty("additionalInformation") String kgAdditionalInformation, @JsonProperty("type") String kgType, @JsonProperty("space") String kgSpace) {
         this.id = kgId;
         this.name = kgName;
+        this.additionalInformation = kgAdditionalInformation;
         this.type = kgType != null ? new SimpleTypeWithSpaces(kgType, null, null, null, null) : null;
         this.space = kgSpace;
     }
@@ -46,6 +48,10 @@ public class Suggestion {
 
     public String getName() {
         return name;
+    }
+
+    public String getAdditionalInformation() {
+        return additionalInformation;
     }
 
     public SimpleTypeWithSpaces getType() {

@@ -35,15 +35,15 @@ import Search from "./Reviewers/Search";
 const useStyles = createUseStyles({
   container: {
     position: "relative",
-    width: "100%",
-    "& .fetchingPanel": {
-      position: "relative !important",
-      padding: "15px 0 0 0",
-      background: "transparent",
-      border: 0,
-      textAlign: "left",
-      fontSize: "1rem"
-    }
+    width: "100%"
+  },
+  fetchingLabel: {
+    position: "relative !important",
+    padding: "15px 0 0 0",
+    background: "transparent",
+    border: 0,
+    textAlign: "left",
+    fontSize: "1rem"
   },
   panel: {
     position: "relative",
@@ -99,7 +99,7 @@ const Reviewers = observer(({ id }) => {
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
         <FontAwesomeIcon icon="circle-notch" spin/>
-        <span className={`${classes.fetchingLabel} fetchingLabel`}>&nbsp;&nbsp;
+        <span className={classes.fetchingLabel}>&nbsp;&nbsp;
           Fetching reviewers...
         </span>
         </div>

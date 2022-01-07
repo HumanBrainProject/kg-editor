@@ -26,7 +26,7 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -34,7 +34,7 @@ import TypesItem from "./TypesItem";
 
 const useStyles = createUseStyles({
   folder: {
-    "& .fetchingPanel": {
+    "& .spinnerPanel": {
       position: "unset !important",
       top: "unset",
       left: "unset",
@@ -107,7 +107,7 @@ const Types = observer(() => {
             <TypesItem key={type.name} type={type}/>
           )
           :
-          <FetchingLoader>fetching...</FetchingLoader>
+          <Spinner>fetching...</Spinner>
         :
         <div className={classes.fetchErrorPanel}>
           <div>{typeStore.fetchError}</div>

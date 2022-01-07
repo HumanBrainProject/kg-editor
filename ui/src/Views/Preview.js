@@ -32,7 +32,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { useStores } from "../Hooks/UseStores";
 
 import Field from "../Fields/Field";
-import FetchingLoader from "../Components/FetchingLoader";
+import Spinner from "../Components/Spinner";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
 import Actions from "./Preview/Actions";
@@ -160,9 +160,9 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(!instance.isFetched || instance.isFetching) {
     return(
       <div className={`${classes.container} ${className?className:""}`}>
-        <FetchingLoader>
+        <Spinner>
           <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
-        </FetchingLoader>
+        </Spinner>
       </div>
     );
   }

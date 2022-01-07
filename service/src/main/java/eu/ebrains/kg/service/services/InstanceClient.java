@@ -279,6 +279,14 @@ public class InstanceClient {
                 .block();
     }
 
+    public void moveInstance(String id, String space) {
+        String relativeUrl = String.format("instances/%s/spaces/%s", id, space);
+        kg.client().put().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
     public void deleteInvitedUser(String id, String userId) {
         String relativeUrl = String.format("instances/%s/invitedUsers/%s", id, userId);
         kg.client().delete().uri(kg.url(relativeUrl))

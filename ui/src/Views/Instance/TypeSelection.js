@@ -31,7 +31,7 @@ import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import Filter from "../../Components/Filter";
 
@@ -133,7 +133,7 @@ const TypeSelection = observer(({ onSelect }) => {
   if (typeStore.isFetching) {
     return (
       <div className={classes.container}>
-        <FetchingLoader>Fetching data types...</FetchingLoader>
+        <Spinner>Fetching data types...</Spinner>
       </div>
     );
   }

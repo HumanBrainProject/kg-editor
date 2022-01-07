@@ -79,6 +79,7 @@ import {faFolderOpen} from "@fortawesome/free-solid-svg-icons/faFolderOpen";
 import {faGlasses} from "@fortawesome/free-solid-svg-icons/faGlasses";
 import {faTimesCircle} from "@fortawesome/free-solid-svg-icons/faTimesCircle";
 import {faAngleDown} from "@fortawesome/free-solid-svg-icons/faAngleDown";
+import {faAngleDoubleRight} from "@fortawesome/free-solid-svg-icons/faAngleDoubleRight";
 import {faCog} from "@fortawesome/free-solid-svg-icons/faCog";
 import {faCogs} from "@fortawesome/free-solid-svg-icons/faCogs";
 import {faAngleRight} from "@fortawesome/free-solid-svg-icons/faAngleRight";
@@ -151,6 +152,7 @@ library.add(
   faGlasses,
   faTimesCircle,
   faAngleDown,
+  faAngleDoubleRight,
   faCog,
   faCogs,
   faAngleRight,

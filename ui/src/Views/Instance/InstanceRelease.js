@@ -29,7 +29,7 @@ import Button from "react-bootstrap/Button";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import SavingModal from "./InstanceRelease/SavingModal";
 import CompareInstancesModal from "./InstanceRelease/CompareInstancesModal";
@@ -47,7 +47,7 @@ const useStyles = createUseStyles({
     height: "calc(100% - 30px)",
     color: "var(--ft-color-normal)",
     margin: "15px",
-    "& .fetchingPanel": {
+    "& .spinnerPanel": {
       width: "auto",
       padding: "30px",
       border: "1px solid var(--border-color-ui-contrast1)",
@@ -161,9 +161,9 @@ const InstanceRelease = observer(({ instance }) => {
   if (releaseStore.isFetching) {
     return (
       <div className={classes.container}>
-        <FetchingLoader>
+        <Spinner>
           <span>Fetching release data of instance &quot;<i>{instance.id}&quot;</i>...</span>
-        </FetchingLoader>
+        </Spinner>
       </div>
     );
   }

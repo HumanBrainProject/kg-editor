@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import CompareValue from "./CompareValue";
 
@@ -135,7 +135,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   if (leftStatus.isFetching || rightStatus.isFetching) {
     return (
       <div className={classes.container}>
-        <FetchingLoader>Fetching children of instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
+        <Spinner>Fetching children of instance &quot;<i>{instanceId}</i>&quot; data...</Spinner>
       </div>
     );
   }

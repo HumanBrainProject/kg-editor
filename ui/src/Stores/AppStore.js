@@ -67,6 +67,9 @@ export class AppStore{
   deleteInstanceError = null;
   isCreatingNewInstance = false;
   instanceCreationError = null;
+  isMovingInstance = false;
+  instanceMovingError = null;
+  instanceToMove = null;
   pathsToResolve = new Map();
 
   transportLayer = null;
@@ -94,6 +97,9 @@ export class AppStore{
       deleteInstanceError: observable,
       isCreatingNewInstance: observable,
       instanceCreationError: observable,
+      isMovingInstance: observable,
+      instanceMovingError: observable,
+      instanceToMove: observable,
       pathsToResolve: observable,
       currentSpaceName: computed,
       currentSpacePermissions: computed,
@@ -228,6 +234,9 @@ export class AppStore{
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
+    this.instanceToMove = null;
+    this.isMovingInstance = false;
+    this.instanceMovingError = null;
     this.instanceToDelete = null;
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
@@ -576,6 +585,43 @@ export class AppStore{
         this.instanceCreationError = e.message;
       });
     }
+  }
+
+  async moveInstance(instanceId, space) {
+    this.instanceToMove = {
+      id: instanceId,
+      space: space
+    };
+    this.instanceMovingError = null;
+    this.isMovingInstance = true;
+    try{
+      await this.transportLayer.moveInstance(instanceId, space);
+      runInAction(() => {
+        this.isMovingInstance = false;
+        this.instanceToMove = null;
+      });
+      this.rootStore.browseStore.refreshFilter();
+      this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
+      this.flush();
+      await this.setCurrentSpace(space);
+      this.rootStore.history.push(`/instances/${instanceId}`);
+    } catch(e){
+      runInAction(() => {
+        const message = e.message?e.message:e;
+        const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+        this.instanceMovingError = `Failed to move instance "${instanceId}" to space "${space}" (${message}) ${errorMessage}`;
+        this.isMovingInstance = false;
+      });
+    }
+  }
+
+  async retryMoveInstance() {
+    return await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space);
+  }
+
+  cancelMoveInstance() {
+    this.instanceToMove = null;
+    this.instanceMovingError = null;
   }
 
   async retryDeleteInstance() {

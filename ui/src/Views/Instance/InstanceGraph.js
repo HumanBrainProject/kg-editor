@@ -30,7 +30,7 @@ import { useStores } from "../../Hooks/UseStores";
 
 import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 
 const useStyles = createUseStyles({
   container: {
@@ -64,7 +64,7 @@ const useStyles = createUseStyles({
     height: "100%",
     zIndex: 10000,
     background: "var(--bg-color-blend-contrast1)",
-    "& .fetchingPanel": {
+    "& .spinnerPanel": {
       width: "auto",
       padding: "30px",
       border: "1px solid var(--border-color-ui-contrast1)",
@@ -119,7 +119,7 @@ const GraphInstance = observer(({ instance }) => {
 
     return (
       <div className={classes.loader}>
-        <FetchingLoader>Fetching visualization data for instance &quot;{instance.id}&quot; ...</FetchingLoader>
+        <Spinner>Fetching visualization data for instance &quot;{instance.id}&quot; ...</Spinner>
       </div>
     );
   }

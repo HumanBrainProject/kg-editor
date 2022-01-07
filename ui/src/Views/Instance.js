@@ -32,7 +32,7 @@ import Button from "react-bootstrap/Button";
 import { useStores } from "../Hooks/UseStores";
 
 import View from "./Instance/Instance";
-import FetchingLoader from "../Components/FetchingLoader";
+import Spinner from "../Components/Spinner";
 import BGMessage from "../Components/BGMessage";
 import TypeSelection from "./Instance/TypeSelection";
 
@@ -45,7 +45,7 @@ const useStyles = createUseStyles({
     height: "100%",
     zIndex: 10000,
     background: "var(--bg-color-blend-contrast1)",
-    "& .fetchingPanel": {
+    "& .spinnerPanel": {
       width: "auto",
       padding: "30px",
       border: "1px solid var(--border-color-ui-contrast1)",
@@ -124,9 +124,9 @@ const Instance = observer(({ match, mode }) => {
   if (!typeStore.isFetched) {
     return (
       <div className={classes.loader}>
-        <FetchingLoader>
+        <Spinner>
           <span>Fetching types...</span>
-        </FetchingLoader>
+        </Spinner>
       </div>
     );
   }
@@ -143,9 +143,9 @@ const Instance = observer(({ match, mode }) => {
   if (!status || status.isChecking) {
     return (
       <div className={classes.loader}>
-        <FetchingLoader>
+        <Spinner>
           <span>Fetching instance &quot;<i>{id}&quot;</i> information...</span>
-        </FetchingLoader>
+        </Spinner>
       </div>
     );
   }

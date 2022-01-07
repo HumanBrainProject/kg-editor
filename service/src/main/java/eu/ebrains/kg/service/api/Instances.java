@@ -163,6 +163,12 @@ public class Instances {
         return suggestionStructure;
     }
 
+    @PutMapping("/instances/{id}/spaces/{space}")
+    public void moveInstance(@PathVariable("id") String id,
+                             @PathVariable("space") String space) {
+        instanceClient.moveInstance(id, space);
+    }
+
     @GetMapping("/instances/{id}/neighbors")
     public KGCoreResult<Neighbor> getInstanceNeighbors(@PathVariable("id") String id) {
         KGCoreResult<Neighbor> neighbor = instanceClient.getNeighbors(id);

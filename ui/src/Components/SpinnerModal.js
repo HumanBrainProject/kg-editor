@@ -23,33 +23,56 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import Spinner from "../../../Components/Spinner";
+import Modal from "react-bootstrap/Modal";
+import Spinner from "./Spinner";
 
 const useStyles = createUseStyles({
-  container:{
-    background:"rgba(255,255,255,0.75)",
-    position:"absolute",
-    top:0,
-    left:0,
-    width:"100%",
-    height:"100%",
-    zIndex:1001
+  modal: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    background: "rgba(0, 0, 0, 0.3)",
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "30px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--list-bg-hover)",
+        "& .spinnerPanel": {
+          position: "unset !important",
+          top: "unset",
+          left: "unset",
+          width: "unset",
+          transform: "none",
+          wordBreak: "break-word",
+          "& .spinnerLabel": {
+            display: "inline"
+          }
+        }
+      }
+    }
   }
 });
 
-const CreatingChildInstancePanel = ({show}) => {
+const SpinnerModal = ({text}) => {
 
   const classes = useStyles();
 
-  if (!show) {
-    return null;
-  }
-
   return (
-    <div className={classes.container}>
-      <Spinner>Creating a new instance...</Spinner>
+    <div className={classes.modal}>
+      <Modal.Dialog>
+        <Modal.Body>
+          <Spinner>{text}</Spinner>
+        </Modal.Body>
+      </Modal.Dialog>
     </div>
   );
 };
 
-export default CreatingChildInstancePanel;
+export default SpinnerModal;

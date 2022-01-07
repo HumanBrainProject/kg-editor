@@ -152,7 +152,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
   const instance = instanceStore.instances.get(instanceId);
 
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
-  const isFetching = instance && (instance.isFetching || instance.isfFetchingLabel);
+  const isFetching = instance && (instance.isFetching || instance.isFetchingLabel);
   const label = instance ? (hasError ? "Not found" : (isFetching ? instance.id : instance.name)) : "Unknown instance";
 
   if (readOnly) {

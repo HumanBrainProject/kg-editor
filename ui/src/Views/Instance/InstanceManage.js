@@ -21,19 +21,15 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { Scrollbars } from "react-custom-scrollbars";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
-
-import { useStores } from "../../Hooks/UseStores";
-
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
-import FetchingLoader from "../../Components/FetchingLoader";
+
+import DuplicateInstance from "./InstanceManage/DuplicateInstance";
+import MoveInstance from "./InstanceManage/MoveInstance";
+import DeleteInstance from "./InstanceManage/DeleteInstance";
 
 const useStyles = createUseStyles({
   container: {
@@ -76,104 +72,12 @@ const useStyles = createUseStyles({
   field: {
     marginBottom: "10px",
     wordBreak: "break-word"
-  },
-  error: {
-    color: "var(--ft-color-error)"
-  },
-  deleteInstanceErrorModal: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    top: 0,
-    left: 0,
-    background: "rgba(0, 0, 0, 0.3)",
-    "& .modal-dialog": {
-      top: "35%",
-      width: "max-content",
-      maxWidth: "800px",
-      "& .modal-body": {
-        padding: "15px 25px",
-        border: "1px solid var(--ft-color-loud)",
-        borderRadius: "4px",
-        color: "var(--ft-color-loud)",
-        background: "var(--list-bg-hover)"
-      }
-    }
-  },
-  deleteInstanceError: {
-    margin: "20px 0",
-    color: "var(--ft-color-error)"
-  },
-  deleteInstanceErrorFooterBar: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
-    }
-  },
-  deletingInstanceModal: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    top: 0,
-    left: 0,
-    background: "rgba(0, 0, 0, 0.3)",
-    "& .modal-dialog": {
-      top: "35%",
-      width: "max-content",
-      maxWidth: "800px",
-      "& .modal-body": {
-        padding: "30px",
-        border: "1px solid var(--ft-color-loud)",
-        borderRadius: "4px",
-        color: "var(--ft-color-loud)",
-        background: "var(--list-bg-hover)",
-        "& .fetchingPanel": {
-          position: "unset !important",
-          top: "unset",
-          left: "unset",
-          width: "unset",
-          transform: "none",
-          wordBreak: "break-word",
-          "& .fetchingLabel": {
-            display: "inline"
-          }
-        }
-      }
-    }
   }
 });
 
 const InstanceManage = observer(({instance}) => {
 
   const classes = useStyles();
-
-  const { appStore, statusStore } = useStores();
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchStatus(), [instance]);
-
-  const fetchStatus = () => statusStore.fetchStatus(instance.id);
-
-  const handleDuplicateInstance = () => {
-    ReactPiwik.push(["trackEvent", "Instance", "Duplicate", instance.id]);
-    appStore.duplicateInstance(instance.id);
-  };
-
-  const handleDeleteInstance = async () => {
-    ReactPiwik.push(["trackEvent", "Instance", "Delete", instance.id]);
-    appStore.deleteInstance(instance.id);
-  };
-
-  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
-
-  const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
-
-  const permissions = instance.permissions;
-  const status = statusStore.getInstance(instance.id);
 
   return (
     <div className={classes.container}>
@@ -190,73 +94,11 @@ const InstanceManage = observer(({instance}) => {
               </div>
             }
           </div>
-          {permissions.canCreate && (
-            <div className={classes.content}>
-              <h4>Duplicate this instance</h4>
-              <ul>
-                <li>Be careful. After duplication both instances will look the same.</li>
-                <li>After duplication you should update the name &amp; description fields.</li>
-              </ul>
-              <Button variant={"warning"} onClick={handleDuplicateInstance}>
-                <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance
-              </Button>
-            </div>
-          )}
-          {permissions.canDelete && (
-            <div className={classes.content}>
-              <h4>Delete this instance</h4>
-              {status && status.hasFetchError ?
-                <div className={classes.error}>
-                  <FontAwesomeIcon icon={"exclamation-triangle"} />&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
-                  <Button variant="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-                </div>
-                : !status || !status.isFetched ?
-                  <>
-                    <FontAwesomeIcon icon={"circle-notch"} spin />&nbsp;&nbsp;Fetching instance release status
-                  </>
-                  :
-                  <>
-                    {status.data !== "UNRELEASED" ?
-                      <ul>
-                        <li>This instance has been released and therefore cannot be deleted.</li>
-                        <li>If you still want to delete it you first have to unrelease it.</li>
-                      </ul>
-                      :
-                      <p>
-                        <strong>Be careful. Removed instances cannot be restored!</strong>
-                      </p>
-                    }
-                    <Button variant={"danger"} onClick={handleDeleteInstance} disabled={status.data !== "UNRELEASED"} >
-                      <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
-                    </Button>
-                  </>
-              }
-            </div>
-          )}
+          <DuplicateInstance instance={instance} className={classes.content} />
+          <MoveInstance instance={instance} className={classes.content} />
+          <DeleteInstance instance={instance} className={classes.content} />
         </div>
       </Scrollbars>
-      {appStore.deleteInstanceError && (
-        <div className={classes.deleteInstanceErrorModal}>
-          <Modal.Dialog>
-            <Modal.Body>
-              <div className={classes.deleteInstanceError}>Il y a une erreur {appStore.deleteInstanceError}</div>
-              <div className={classes.deleteInstanceErrorFooterBar}>
-                <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
-                <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-              </div>
-            </Modal.Body>
-          </Modal.Dialog>
-        </div>
-      )}
-      {!appStore.deleteInstanceError && appStore.isDeletingInstance && !!appStore.instanceToDelete && (
-        <div className={classes.deletingInstanceModal}>
-          <Modal.Dialog>
-            <Modal.Body>
-              <FetchingLoader>{`Deleting instance "${appStore.instanceToDelete}" ...`}</FetchingLoader>
-            </Modal.Body>
-          </Modal.Dialog>
-        </div>
-      )}
     </div>
   );
 });

@@ -53,23 +53,6 @@ const useStyles = createUseStyles({
       }
     }
   },
-  loader: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    zIndex: 10000,
-    background: "var(--bg-color-blend-contrast1)",
-    "& .fetchingPanel": {
-      width: "auto",
-      padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast1)",
-      borderRadius: "4px",
-      color: "var(--ft-color-loud)",
-      background: "var(--list-bg-hover)"
-    }
-  },
   body: {
     position: "relative",
     overflow: "hidden"

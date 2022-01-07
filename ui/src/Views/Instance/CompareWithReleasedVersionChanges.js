@@ -30,7 +30,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStores } from "../../Hooks/UseStores";
 import { createInstanceStore } from "../../Stores/InstanceStore";
 
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import CompareFieldsChanges from "./CompareFieldsChanges";
 
@@ -101,7 +101,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
   if ((releasedInstance && releasedInstance.isFetching) || instance.isFetching) {
     return(
       <div className={classes.container}>
-        <FetchingLoader>Fetching instance &quot;<i>{instanceId}</i>&quot; data...</FetchingLoader>
+        <Spinner>Fetching instance &quot;<i>{instanceId}</i>&quot; data...</Spinner>
       </div>
     );
   }

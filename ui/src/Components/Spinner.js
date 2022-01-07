@@ -26,7 +26,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  fetchingPanel: {
+  spinnerPanel: {
     position: "absolute !important",
     top: "50%",
     left: "50%",
@@ -36,22 +36,22 @@ const useStyles = createUseStyles({
     width:"100%",
     textAlign:"center"
   },
-  fetchingLabel: {
+  spinnerLabel: {
     paddingLeft: "6px",
     display:"inline-block"
   }
 });
 
-const FetchingLoader = ({children}) => {
+const Spinner = ({children}) => {
   const classes = useStyles();
   return (
-    <div className={`${classes.fetchingPanel} fetchingPanel`}>
+    <div className={`${classes.spinnerPanel} spinnerPanel`}>
       <FontAwesomeIcon icon="circle-notch" spin/>
-      <span className={`${classes.fetchingLabel} fetchingLabel`}>
+      <span className={`${classes.spinnerLabel} spinnerLabel`}>
         {children}
       </span>
     </div>
   );
 };
 
-export default FetchingLoader;
+export default Spinner;

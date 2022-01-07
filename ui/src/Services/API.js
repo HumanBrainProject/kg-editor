@@ -40,6 +40,7 @@ const API = {
     "rawInstance": instanceId => `/editor/api/instances/${instanceId}/raw`,
     "instanceScope": instanceId => `/editor/api/instances/${instanceId}/scope`,
     "createInstance": (space, instanceId=null) => `/editor/api/instances${instanceId?("/" + instanceId):""}?space=${space}`,
+    "moveInstance": (instanceId, space) => `/editor/api/instances/${instanceId}/spaces/${space}`,
     "release": instanceId => `/editor/api/releases/${instanceId}/release`,
     "messages": () => "/editor/api/directives/messages",
     "releaseStatusTopInstance": () => "/editor/api/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY",

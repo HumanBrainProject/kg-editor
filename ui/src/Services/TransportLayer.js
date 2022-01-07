@@ -83,6 +83,10 @@ export class TransportLayer {
     return this._axios.post(API.endpoints.createInstance(space, instanceId), payload);
   }
 
+  moveInstance(instanceId, space) {
+    return this._axios.put(API.endpoints.moveInstance(instanceId, space));
+  }
+
    patchInstance(instanceId, payload) {
     return this._axios.patch(API.endpoints.instance(instanceId), payload);
   }

@@ -33,7 +33,7 @@ import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import FetchingLoader from "../../Components/FetchingLoader";
+import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import Filter from "../../Components/Filter";
 import Preview from "../Preview";
@@ -166,9 +166,9 @@ const Instances = observer(() => {
                   {browseStore.instancesFilter && <div>with the search term {`"${browseStore.instancesFilter}"`}</div>}
                 </BGMessage>
               :
-              <FetchingLoader>
+              <Spinner>
                 <span>Fetching instances...</span>
-              </FetchingLoader>
+              </Spinner>
             :
             <BGMessage icon={"ban"}>
                 There was a network problem retrieving the list of instances.<br/>

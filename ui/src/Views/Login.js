@@ -30,7 +30,7 @@ import ReactPiwik from "react-piwik";
 
 import { useStores } from "../Hooks/UseStores";
 
-import FetchingLoader from "../Components/FetchingLoader";
+import Spinner from "../Components/Spinner";
 import BGMessage from "../Components/BGMessage";
 
 const useStyles = createUseStyles({
@@ -61,7 +61,7 @@ const useStyles = createUseStyles({
     height: "100%",
     zIndex: 10000,
     background: "var(--bg-color-blend-contrast1)",
-    "& .fetchingPanel": {
+    "& .spinnerPanel": {
       width: "auto",
       padding: "30px",
       border: "1px solid var(--border-color-ui-contrast1)",
@@ -157,7 +157,7 @@ const Login = observer(() => {
       return (
         <div className={classes.container}>
           <div className={classes.loader}>
-            <FetchingLoader>{appStore.initializingMessage}</FetchingLoader>
+            <Spinner>{appStore.initializingMessage}</Spinner>
           </div>
         </div>
       );

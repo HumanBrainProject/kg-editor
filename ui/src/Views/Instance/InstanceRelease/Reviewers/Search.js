@@ -35,7 +35,7 @@ const useStyles = createUseStyles({
     position: "relative",
     width: "100%",
     color: "var(--ft-color-normal)",
-    "& .errorPanel, & .fetchingPanel": {
+    "& .errorPanel, & .spinnerPanel": {
       color: "var(--ft-color-loud)",
       "& svg path": {
         stroke: "var(--ft-color-loud)",

@@ -36,6 +36,11 @@ import SpinnerModal from "../../../Components/SpinnerModal";
 const useStyles = createUseStyles({
   error: {
     color: "var(--ft-color-error)"
+  },
+  btn: {
+    "&[disabled]": {
+      cursor: "not-allowed"
+    }
   }
 });
 
@@ -50,7 +55,7 @@ const DeleteInstance = observer(({instance, className}) => {
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
-  const handleDeleteInstance = async () => {
+  const handleDeleteInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Delete", instance.id]);
     appStore.deleteInstance(instance.id);
   };
@@ -88,7 +93,7 @@ const DeleteInstance = observer(({instance, className}) => {
                     <strong>Be careful. Removed instances cannot be restored!</strong>
                   </p>
                 }
-                <Button variant={"danger"} onClick={handleDeleteInstance} disabled={status.data !== "UNRELEASED"} >
+                <Button variant={status.data !== "UNRELEASED"?"secondary":"danger"} onClick={handleDeleteInstance} className={classes.btn} disabled={status.data !== "UNRELEASED"} >
                   <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
                 </Button>
               </>

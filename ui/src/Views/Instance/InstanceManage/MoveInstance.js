@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import ReactPiwik from "react-piwik";
@@ -51,7 +51,10 @@ const useStyles = createUseStyles({
       fontSize: "1.5rem",
       "-webkit-appearance": "none",
       cursor: "pointer",
-      color: "inherit"
+      color: "inherit",
+      "&[disabled]": {
+        cursor: "not-allowed"
+      }
     },
     "&:before": {
       content: "\" \"",
@@ -69,17 +72,31 @@ const useStyles = createUseStyles({
       pointerEvents: "none"
     }
   },
+  error: {
+    color: "var(--ft-color-error)"
+  },
+  btn: {
+    "&[disabled]": {
+      cursor: "not-allowed"
+    }
+  }
 });
 
 const MoveInstance = observer(({instance, className}) => {
 
   const classes = useStyles();
 
-  const { appStore, authStore } = useStores();
+  const { appStore, statusStore, authStore } = useStores();
   
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => fetchStatus(), [instance]);
+
+  const fetchStatus = () => statusStore.fetchStatus(instance.id);
+
   const [spaceId, setSpaceId] = useState(appStore.currentSpace.id);
 
   const permissions = instance.permissions;
+  const status = statusStore.getInstance(instance.id);
 
   const spaces = authStore.spaces.filter(s => {
     if (s.id === appStore.currentSpace.id) {
@@ -111,16 +128,35 @@ const MoveInstance = observer(({instance, className}) => {
           <div>
             <h4 className={classes.title}>Move this instance to space</h4>
             <div className={classes.selector}>
-              <select value={spaceId} onChange={handleSetSpaceId} >
+              <select value={spaceId} onChange={handleSetSpaceId} disabled={!status || status.data !== "UNRELEASED"}>
                 {spaces.map(s => 
                   <option key={s.id} value={s.id}>{s.name||s.id}</option>
                 )}
               </select>
             </div>
           </div>
-          <Button variant={spaceId === appStore.currentSpace.id?"secondary":"warning"} disabled={spaceId === appStore.currentSpace.id} onClick={handleMoveInstance}>
-            <FontAwesomeIcon icon={"angle-double-right"} /> &nbsp; Move this instance
-          </Button>
+          {status && status.hasFetchError ?
+            <div className={classes.error}>
+              <FontAwesomeIcon icon={"exclamation-triangle"} />&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
+              <Button variant="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+            </div>
+            : !status || !status.isFetched ?
+              <>
+                <FontAwesomeIcon icon={"circle-notch"} spin />&nbsp;&nbsp;Fetching instance release status
+              </>
+              :
+              <>
+                {status.data !== "UNRELEASED" && (
+                  <ul>
+                    <li>This instance has been released and therefore cannot be moved.</li>
+                    <li>If you still want to move it you first have to unrelease it.</li>
+                  </ul>
+                )}
+                <Button variant={spaceId === appStore.currentSpace.id?"secondary":"warning"} disabled={status.data !== "UNRELEASED" || spaceId === appStore.currentSpace.id} className={classes.btn} onClick={handleMoveInstance}>
+                  <FontAwesomeIcon icon={"angle-double-right"} /> &nbsp; Move this instance
+                </Button>
+              </>
+          }
         </div>
       )}
       {appStore.instanceMovingError && (

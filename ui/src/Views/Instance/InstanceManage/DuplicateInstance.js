@@ -51,7 +51,7 @@ const DuplicateInstance = observer(({instance, className}) => {
         <li>Be careful. After duplication both instances will look the same.</li>
         <li>After duplication you should update the name &amp; description fields.</li>
       </ul>
-      <Button variant={"warning"} onClick={handleDuplicateInstance}>
+      <Button variant={"primary"} onClick={handleDuplicateInstance}>
         <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance
       </Button>
     </div>

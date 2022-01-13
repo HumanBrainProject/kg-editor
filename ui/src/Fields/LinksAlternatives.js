@@ -40,7 +40,7 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
       const instances = Array.isArray(value)?value.map(v => {
-        if (v[mappingValue]) {
+        if (v[mappingValue] && typeof v[mappingValue] === "string") {
           const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
           instance.fetchLabel();
           return instance;

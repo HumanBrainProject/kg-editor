@@ -137,7 +137,7 @@ public class InstanceClient {
     private static class ScopeFromKG extends KGCoreResult<Scope>{}
 
     public Scope getInstanceScope(String id) {
-        String relativeUrl = String.format("instances/%s/scope?stage=IN_PROGRESS&returnPermissions=true", id);
+        String relativeUrl = String.format("instances/%s/scope?stage=IN_PROGRESS&returnPermissions=true&applyRestrictions=true", id);
         ScopeFromKG response = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(ScopeFromKG.class)

@@ -21,65 +21,12 @@
  *
  */
 
+// eslint-disable-next-line no-unused-vars
 import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import Label from "../Label";
-
-const useStyles = createUseStyles({
-  label: {},
-  readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
-    }
-  },
-  value: {
-    marginBttom: "10px",
-    fontStyle: "italic"
-  },
-  warning: {
-    marginBttom: "15px",
-    color: "var(--ft-color-error)"
-  }
-});
-
-
-const UnsupportedField = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
-
-  const classes = useStyles();
-
-  const {
-    value,
-    warning,
-    label,
-    labelTooltip,
-    labelTooltipIcon,
-    isPublic
-  } = fieldStore;
-
-
-  if(readMode && !value && !showIfNoValue) {
-    return null;
-  }
-  return (
-    <Form.Group className={`${classes.readMode} ${className}`}>
-      {readMode ?
-        <Label className={classes.label} label={label} />:
-        <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} />
-      }
-      {value && (
-        <div className={classes.value}>{JSON.stringify(value)}</div>
-      )}
-      {warning && (
-        <div className={classes.warning}><FontAwesomeIcon icon="exclamation-triangle" title="Error"/> {warning}</div>
-      )}
-    </Form.Group>
-  );
-
-});
-UnsupportedField.displayName = "UnsupportedField";
+const UnsupportedField = ({fieldStore}) => {
+  console.warn(fieldStore.warning);
+  return null;
+};
 
 export default UnsupportedField;

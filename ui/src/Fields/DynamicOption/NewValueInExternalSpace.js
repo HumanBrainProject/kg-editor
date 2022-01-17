@@ -50,7 +50,7 @@ const NewValueInExternalSpace = ({item:{space, type}}) => {
     if (space.permissions.canCreate) {
       return (
         <em className={classes.create}>
-          Create an instance of type <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
+          Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
           {type.label} in space <strong>{space.name}</strong>
         </em>
       );
@@ -58,7 +58,7 @@ const NewValueInExternalSpace = ({item:{space, type}}) => {
   
     return (
       <div className={classes.info}>
-        <em>You are not allowed to create an instance of type <span style={style}>
+        <em>You are not allowed to create a new <span style={style}>
           <FontAwesomeIcon fixedWidth icon="circle" />
         </span>
         {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>

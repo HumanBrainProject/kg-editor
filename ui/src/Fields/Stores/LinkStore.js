@@ -213,7 +213,7 @@ class LinkStore extends FieldStore {
       runInAction(()=>{
         if (this.optionsSearchActive) {
           const optionsResult = from === 0?newOptions:this.optionsResult.concat(newOptions);
-          const newValues = [];
+          let newValues = [];
           this.allowCustomValues && Object.values(types).forEach(type => {
             type.space.forEach(space => {
               newValues.push({
@@ -224,6 +224,16 @@ class LinkStore extends FieldStore {
                 isNew: true
               });
             })
+          });
+          newValues = newValues.filter(value => !value.isExternal || value.space.permissions.canCreate);
+          newValues.sort((a, b) => {
+            if (!a.isExternal && b.isExternal) {
+              return -1;
+            }
+            if (a.isExternal && !b.isExternal) {
+              return 1;
+            }
+            return a.type.name.localeCompare(b.type.name);
           });
           this.optionsResult = optionsResult;
           this.options = [...newValues, ...optionsResult];

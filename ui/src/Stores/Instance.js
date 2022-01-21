@@ -626,17 +626,17 @@ export class Instance {
             field.value = [field.value];
         }
         // TO TEST regexRules RULES
-        if ([
-          "https://openminds.ebrains.eu/vocab/IRI",
-          "https://openminds.ebrains.eu/vocab/keyword"
-        ].includes(field.fullyQualifiedName)) {
-          field.validation = [
-            {
-              regex: "(https?|ftp|file):\\/\\/[\\-A-Za-z0-9+&@#\\/%?=~_|!:,.;]*[\\-A-Za-z0-9+&@#\\/%=~_|]",
-              errorMessage: "This is not a valid IRI"
-            }
-          ]
-        }
+        // if ([
+        //   "https://openminds.ebrains.eu/vocab/IRI",
+        //   "https://openminds.ebrains.eu/vocab/keyword"
+        // ].includes(field.fullyQualifiedName)) {
+        //   field.validation = [
+        //     {
+        //       regex: "(https?|ftp|file):\\/\\/[\\-A-Za-z0-9+&@#\\/%?=~_|!:,.;]*[\\-A-Za-z0-9+&@#\\/%=~_|]",
+        //       errorMessage: "This is not a valid IRI"
+        //     }
+        //   ]
+        // }
         if (!this.fields[name]) {
           if (!field.widget) {
             warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;

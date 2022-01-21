@@ -181,7 +181,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.numberOfItemsWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.numberOfItemsWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (

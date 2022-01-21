@@ -129,7 +129,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (

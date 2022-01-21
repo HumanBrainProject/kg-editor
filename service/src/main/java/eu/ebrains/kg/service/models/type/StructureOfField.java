@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.digester.Rule;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
@@ -57,7 +58,8 @@ public class StructureOfField implements Serializable {
             @JsonProperty(EditorConstants.VOCAB_SEARCHABLE) Boolean kgSearchable,
             @JsonProperty(EditorConstants.VOCAB_REQUIRED) Boolean required,
             @JsonProperty(EditorConstants.VOCAB_READONLY) Boolean readOnly,
-            @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes
+            @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes,
+            @JsonProperty(EditorConstants.VOCAB_VALIDATION) List<ValidationRule> kgValidation
     ) {
         this.fullyQualifiedName = kgFullyQualifiedName;
         this.numOfOccurrences = kgNumOfOccurrences;
@@ -80,6 +82,7 @@ public class StructureOfField implements Serializable {
                 .filter(Objects::nonNull)
                 .map(SimpleType::new)
                 .collect(Collectors.toList()) : null;
+        this.validation = kgValidation;
     }
 
     private final String fullyQualifiedName;
@@ -102,6 +105,8 @@ public class StructureOfField implements Serializable {
     private Map<String, StructureOfField> fields;
     private Object value;
     private List<SimpleType> targetTypes;
+
+    private final List<ValidationRule> validation;
 
     public String getRegex() { return regex; }
 
@@ -179,4 +184,8 @@ public class StructureOfField implements Serializable {
 
     @JsonProperty("isReadOnly")
     public Boolean getReadonly() { return readOnly; }
+
+    public List<ValidationRule> getValidation() {
+        return validation;
+    }
 }

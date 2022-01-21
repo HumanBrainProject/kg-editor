@@ -25,26 +25,50 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
 
-const DEFAULT_REGEX = "^(?! ).*(?<! )$";
-const DEFAULT_REGEX_MESSAGE = "leading/trailling spaces are not allowed";
+const DEFAULT_REGEX = {
+  regex: new RegExp("^(?! ).*(?<! )$"),
+  errorMessage: "leading/trailling spaces are not allowed"
+};
 
+const getRegexRules = validation => {
+  const rules = Array.isArray(validation)?
+  validation.map(rule => ({
+      regex: new RegExp(rule.regex),
+      errorMessage: rule.errorMessage
+    })):[];
+  rules.push(DEFAULT_REGEX);
+  return rules;
+};
 class InputTextStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
   maxLength = null;
-  regex = null;
-  isDefaultRegex = true;
+  regexRules = [DEFAULT_REGEX];
 
   constructor(definition, options, instance, transportLayer, rootStore) {
     super(definition, options, instance, transportLayer, rootStore);
+    this.maxLength = definition.maxLength;
+    this.regexRules = getRegexRules(definition.validation);
+    //TODO: remove backward compatibility for deprecated regex property
+    if (definition.regex && !(Array.isArray(definition.validation) && definition.validation.length)) {
+      this.regexRules = [
+        {
+          regex: new RegExp(definition.regex),
+          errorMessage: "this is not a valid value"
+        },
+        DEFAULT_REGEX
+      ];
+    }
+
     makeObservable(this, {
       value: observable,
       returnAsNull: observable,
       initialValue: observable,
       maxLength: observable,
-      regex: observable,
-      isDefaultRegex: observable,
+      regexRules: observable,
+      regexWarning: computed,
+      hasRegexWarning: computed,
       returnValue: computed,
       requiredValidationWarning: computed,
       maxLengthWarning: computed,
@@ -56,9 +80,6 @@ class InputTextStore extends FieldStore {
       hasChanged: computed,
       setValue: action
     });
-    this.maxLength = definition.maxLength;
-    this.regex = definition.regex?definition.regex:DEFAULT_REGEX;
-    this.isDefaultRegex = !definition.regex;
   }
 
   get returnValue() {
@@ -89,14 +110,11 @@ class InputTextStore extends FieldStore {
   }
 
   get regexWarning() {
-    if(!this.regex) {
-      return false;
-    }
-    const pattern = new RegExp(this.regex);
-    if(!pattern.test(this.value)) {
-      return true;
-    }
-    return false;
+    return this.regexRules.reduce((message, rule) => (message || rule.regex.test(this.value))?message:rule.errorMessage, null);
+  }
+
+  get hasRegexWarning() {
+    return !!this.regexWarning;
   }
 
   get warningMessages() {
@@ -108,8 +126,8 @@ class InputTextStore extends FieldStore {
       if(this.maxLengthWarning) {
         messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
       }
-      if(this.regexWarning) {
-        messages.regex = this.isDefaultRegex?DEFAULT_REGEX_MESSAGE:`${this.value} is not a valid value`;
+      if(this.hasRegexWarning) {
+        messages.regex = this.regexWarning;
       }
     }
     return messages;

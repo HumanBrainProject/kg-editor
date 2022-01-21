@@ -135,7 +135,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const AlternativeValueComponent = inputType === "date"?AlternativeDateValue:AlternativeValue;
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.regexWarning);
+  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
   const warningMessages = fieldStore.warningMessages;
   const hasWarningMessages = fieldStore.hasWarningMessages;
   return (

@@ -22,24 +22,42 @@
  */
 
 import { observable, action, computed, toJS, makeObservable } from "mobx";
+
 import FieldStore from "./FieldStore";
 
+const getRegexRules = validation => {
+  const rules = Array.isArray(validation)?
+  validation.map(rule => ({
+      regex: new RegExp(rule.regex),
+      errorMessage: rule.errorMessage
+    })):[];
+  return rules;
+};
 class InputTextMultipleStore extends FieldStore {
   value = [];
   options = [];
   returnAsNull = false;
   initialValue = [];
   maxLength = null;
-  regex = null;
   minItems = null;
   maxItems = null;
+  regexRules = [];
 
   constructor(definition, options, instance, transportLayer, rootStore) {
     super(definition, options, instance, transportLayer, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
     this.maxLength = definition.maxLength;
-    this.regex = definition.regex;
+    this.regexRules = getRegexRules(definition.validation);
+    //TODO: remove backward compatibility for deprecated regex property
+    if (definition.regex && !(Array.isArray(definition.validation) && definition.validation.length)) {
+      this.regexRules = [
+        {
+          regex: definition.regex,
+          errorMessage: "this is not a valid value"
+        }
+      ];
+    }
 
     makeObservable(this, {
       value: observable,
@@ -49,6 +67,9 @@ class InputTextMultipleStore extends FieldStore {
       maxLength: observable,
       minItems: observable,
       maxItems: observable,
+      regexRules: observable,
+      regexWarning: computed,
+      hasRegexWarning: computed,
       cloneWithInitialValue: computed,
       returnValue: computed,
       requiredValidationWarning: computed,
@@ -104,13 +125,21 @@ class InputTextMultipleStore extends FieldStore {
   }
 
   get regexWarning() {
-    if(!this.regex) {
-      return false;
-    }
-    if(this.regex) {
-      return true;
-    }
-    return false;
+    const test = this.regexRules.reduce((message, rule) => {
+      !message && Array.isArray(this.value) && this.value.some(val => {
+        if (!rule.regex.test(val)) {
+          message = rule.errorMessage;
+          return true;
+        }
+        return false;
+      });
+      return message;
+    }, null);
+    return test;
+  }
+
+  get hasRegexWarning() {
+    return !!this.regexWarning;
   }
 
 
@@ -143,10 +172,8 @@ class InputTextMultipleStore extends FieldStore {
           messages.maxValues = `Maximum characters allowed per value: ${this.maxLength}`;
         }
       }
-      if(this.regexWarning) {
-        if (this.value.some(val => !this.regex.test(val))) {
-          messages.regex = "Invalid value";
-        }
+      if(this.hasRegexWarning) {
+        messages.regex = this.regexWarning;
       }
     }
     return messages;

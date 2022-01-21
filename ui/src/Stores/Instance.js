@@ -625,6 +625,18 @@ export class Instance {
             window.console.warn(`The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`, field.value);
             field.value = [field.value];
         }
+        // TO TEST regexRules RULES
+        if ([
+          "https://openminds.ebrains.eu/vocab/IRI",
+          "https://openminds.ebrains.eu/vocab/keyword"
+        ].includes(field.fullyQualifiedName)) {
+          field.validation = [
+            {
+              regex: "(https?|ftp|file):\\/\\/[\\-A-Za-z0-9+&@#\\/%?=~_|!:,.;]*[\\-A-Za-z0-9+&@#\\/%=~_|]",
+              errorMessage: "This is not a valid IRI"
+            }
+          ]
+        }
         if (!this.fields[name]) {
           if (!field.widget) {
             warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;

@@ -23,26 +23,26 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  invalid: {
-    display: "block",
-    width: "100%",
-    marginTop: ".25rem",
-    fontSize: "80%",
-    color: "var(--ft-color-warn)",
-    fontWeight: "bold"
+  warning: {
+    marginBottom: "15px",
+    color: "var(--ft-color-error)"
   }
 });
 
-const Invalid = ({ show, messages }) => {
+const Warning = ({ show, message }) => {
+  
   const classes = useStyles();
-  if (!show || typeof messages !== "object") {
+
+  if (!show || !message) {
     return null;
   }
+
   return (
-    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message}</div>)
+    <div className={classes.warning}><FontAwesomeIcon icon="exclamation-triangle" title="Error"/> {message}</div>
   );
 };
 
-export default Invalid;
+export default Warning;

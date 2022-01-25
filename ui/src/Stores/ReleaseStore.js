@@ -69,7 +69,7 @@ export class ReleaseStore {
   hasWarning = false;
   fetchError = null;
   saveError = null;
-  warningMessages = new Map();
+  validationWarnings = new Map();
   fetchWarningMessagesError = null;
   isWarningMessagesFetched = false;
   isFetchingWarningMessages = false;
@@ -98,7 +98,7 @@ export class ReleaseStore {
       hasWarning: observable,
       fetchError: observable,
       saveError: observable,
-      warningMessages: observable,
+      validationWarnings: observable,
       fetchWarningMessagesError: observable,
       isWarningMessagesFetched: observable,
       isFetchingWarningMessages: observable,
@@ -136,7 +136,7 @@ export class ReleaseStore {
 
   get visibleWarningMessages() {
     let results = [];
-    this.warningMessages.forEach(message =>{
+    this.validationWarnings.forEach(message =>{
       let release = 0;
       let unrelease = 0;
       message.releaseFlags.forEach(flag => {
@@ -286,7 +286,7 @@ export class ReleaseStore {
     }
     this.isFetchingWarningMessages = true;
     this.fetchWarningMessagesError = null;
-    this.warningMessages.clear();
+    this.validationWarnings.clear();
     try {
       const { data } = await this.transportLayer.getMessages();
       // const data = {
@@ -303,7 +303,7 @@ export class ReleaseStore {
       // };
       runInAction(() => {
         Object.entries(data.data).forEach(([typePath, messages]) => {
-          this.warningMessages.set(typePath, {releaseFlags:new Map(), messages: messages});
+          this.validationWarnings.set(typePath, {releaseFlags:new Map(), messages: messages});
         });
         this.isWarningMessagesFetched = true;
         this.isFetchingWarningMessages = false;
@@ -432,13 +432,13 @@ export class ReleaseStore {
   }
 
   clearWarningMessages() {
-    this.warningMessages.forEach(message => message.releaseFlags.clear());
+    this.validationWarnings.forEach(message => message.releaseFlags.clear());
   }
 
   //TODO: Check if this logic is still valid
   handleWarning(node, newStatus) {
-    if(this.warningMessages.has(node.typePath)) {
-      const messages = this.warningMessages.get(node.typePath);
+    if(this.validationWarnings.has(node.typePath)) {
+      const messages = this.validationWarnings.get(node.typePath);
       if(newStatus === "RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "UNRELEASED")))  {
         messages.releaseFlags.set(node.relativeUrl, true);
       } else if(newStatus === "UNRELEASED" && ((node.status === "HAS_CHANGED" || node.status === "RELEASED"))) {

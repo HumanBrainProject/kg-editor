@@ -32,6 +32,7 @@ import Add from "./Add";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 import { compareField } from "../../Stores/Instance";
 import Invalid from "../Invalid";
+import Warning from "../Warning";
 
 const useStyles = createUseStyles({
   label: {},
@@ -198,17 +199,16 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     return null;
   }
 
-  const hasWarning = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
-  
+  const checkValidationWarnings = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasWarning = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <div className={`${className} ${(readMode || isReadOnly)?classes.readMode:""} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} isReadOnly={isReadOnly} />
       }
-      <div className={`${classes.form} ${hasWarning && hasWarningMessages?classes.warning:""}`} >
+      <div className={`${classes.form} ${hasValidationWarnings?classes.warning:""}`} >
         {nestedFieldsStores.map((row, idx) => (
           <Item key={idx} itemFieldStores={row.stores} readMode={readMode || isReadOnly} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
@@ -216,9 +216,8 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
           <Add className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} onClick={addValue} types={fieldStore.resolvedTargetTypes} />
         )}
       </div>
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
+      <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
+      <Warning show={hasWarning} message={fieldStore.warning} />
     </div>
   );
 });

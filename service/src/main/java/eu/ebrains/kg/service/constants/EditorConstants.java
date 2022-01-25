@@ -39,6 +39,7 @@ public class EditorConstants {
     public static final String VOCAB_ALTERNATIVE = CORE_META + "alternative";
     public static final String VOCAB_REGEX = CORE_META + "regex";
     public static final String VOCAB_VALIDATION = CORE_META + "validation";
+    public static final String VOCAB_WARNING = CORE_META + "warning";
     public static final String VOCAB_ERROR_MESSAGE = CORE_META + "errorMessage";
     public static final String VOCAB_MAX_LENGTH = CORE_META + "maxLength";
     public static final String VOCAB_MIN_ITEMS = CORE_META + "minItems";

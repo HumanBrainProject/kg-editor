@@ -29,6 +29,7 @@ import Form from "react-bootstrap/Form";
 import Alternatives from "../Alternatives";
 import Label from "../Label";
 import Invalid from "../Invalid";
+import Warning from "../Warning";
 
 const useStyles = createUseStyles({
   alternatives: {
@@ -135,9 +136,9 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const AlternativeValueComponent = inputType === "date"?AlternativeDateValue:AlternativeValue;
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
+  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
+  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
@@ -156,11 +157,10 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         onChange={handleChange}
         disabled={isDisabled}
         rows={rows}
-        className={hasWarning && hasWarningMessages?classes.warning:""}
+        className={hasValidationWarnings?classes.warning:""}
       />
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
+      <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
+      <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>
   );
 });

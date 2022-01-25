@@ -98,11 +98,11 @@ class LinksStore extends FieldStore {
       reset: action,
       hasChanged: computed,
       requiredValidationWarning: computed,
-      warningMessages: computed,
+      validationWarnings: computed,
       numberOfItemsWarning: computed,
       numberOfValues: computed,
       hasMoreOptions: computed,
-      hasWarningMessages: computed,
+      hasValidationWarnings: computed,
       insertValue: action,
       deleteValue: action,
       addValue: action,
@@ -165,7 +165,7 @@ class LinksStore extends FieldStore {
     return false;
   }
 
-  get warningMessages() {
+  get validationWarnings() {
     const messages = {};
     if (this.hasChanged) {
       if(this.numberOfItemsWarning) {
@@ -183,8 +183,8 @@ class LinksStore extends FieldStore {
     return messages;
   }
 
-  get hasWarningMessages() {
-    return Object.keys(this.warningMessages).length > 0;
+  get hasValidationWarnings() {
+    return Object.keys(this.validationWarnings).length > 0;
   }
 
   updateValue(value) {

@@ -126,7 +126,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
   }
   const dateValue = value === "" ? null:new Date(value);
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
+  const checkValidationWarnings = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
@@ -139,7 +139,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
         ValueRenderer={AlternativeValue}
       />
       <DatePicker
-        className={`${classes.datePicker} ${hasWarning?classes.warning:""}`}
+        className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:""}`}
         selected={dateValue}
         disabled={isDisabled}
         onChange={handleChange}

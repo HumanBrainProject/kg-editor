@@ -72,8 +72,8 @@ class LinkStore extends FieldStore {
       reset: action,
       hasChanged: computed,
       requiredValidationWarning: computed,
-      hasWarningMessages: computed,
-      warningMessages: computed,
+      hasValidationWarnings: computed,
+      validationWarnings: computed,
       deleteValue: action,
       removeValue: action,
       addValue: action,
@@ -127,7 +127,7 @@ class LinkStore extends FieldStore {
     return false;
   }
 
-  get warningMessages() {
+  get validationWarnings() {
     const messages = {};
     if (this.hasChanged) {
       if(this.requiredValidationWarning) {
@@ -137,8 +137,8 @@ class LinkStore extends FieldStore {
     return messages;
   }
 
-  get hasWarningMessages() {
-    return Object.keys(this.warningMessages).length > 0;
+  get hasValidationWarnings() {
+    return Object.keys(this.validationWarnings).length > 0;
   }
 
   updateValue(value) {

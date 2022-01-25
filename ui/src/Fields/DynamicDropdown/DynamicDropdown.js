@@ -35,6 +35,7 @@ import DynamicOption  from "../DynamicOption/DynamicOption";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
 import Invalid from "../Invalid";
+import Warning from "../Warning";
 
 import List from "./List";
 import TargetTypeSelection from "../TargetTypeSelection";
@@ -298,9 +299,9 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
+  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
+  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
   return (
     <Form.Group className={className} ref={formGroupRef}>
@@ -318,7 +319,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div className={`form-control ${classes.values} ${(hasWarning && hasWarningMessages)?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={links}
           readOnly={false}
@@ -352,9 +353,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           />
         )}
       </div>
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
+      <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
+      <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>
   );
 });

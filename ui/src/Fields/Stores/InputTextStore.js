@@ -73,8 +73,8 @@ class InputTextStore extends FieldStore {
       requiredValidationWarning: computed,
       maxLengthWarning: computed,
       cloneWithInitialValue: computed,
-      warningMessages: computed,
-      hasWarningMessages: computed,
+      validationWarnings: computed,
+      hasValidationWarnings: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
@@ -117,24 +117,24 @@ class InputTextStore extends FieldStore {
     return !!this.regexWarning;
   }
 
-  get warningMessages() {
+  get validationWarnings() {
     const messages = {};
     if (this.hasChanged) {
       if(this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
       }
-      if(this.maxLengthWarning) {
-        messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
-      }
-      if(this.hasRegexWarning) {
+      if(this.hasRegexWarning && !this.requiredValidationWarning) {
         messages.regex = this.regexWarning;
+      }
+      if(this.maxLengthWarning && !this.requiredValidationWarning && !this.hasRegexWarning) {
+        messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
       }
     }
     return messages;
   }
 
-  get hasWarningMessages() {
-    return Object.keys(this.warningMessages).length > 0;
+  get hasValidationWarnings() {
+    return Object.keys(this.validationWarnings).length > 0;
   }
 
   get cloneWithInitialValue() {

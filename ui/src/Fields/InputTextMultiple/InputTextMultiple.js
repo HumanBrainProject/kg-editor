@@ -31,6 +31,7 @@ import Label from "../Label";
 
 import Alternatives from "../Alternatives";
 import Invalid from "../Invalid";
+import Warning from "../Warning";
 
 const useStyles = createUseStyles({
   values:{
@@ -181,9 +182,9 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.numberOfItemsWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
+  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.numberOfItemsWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
+  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
@@ -195,7 +196,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasWarning && hasWarningMessages?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} >
         <List
           list={list}
           readOnly={false}
@@ -216,9 +217,8 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
           onPaste={handleNativePaste}
         />
       </div>
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
+      <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
+      <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>
   );
 });

@@ -59,7 +59,8 @@ public class StructureOfField implements Serializable {
             @JsonProperty(EditorConstants.VOCAB_REQUIRED) Boolean required,
             @JsonProperty(EditorConstants.VOCAB_READONLY) Boolean readOnly,
             @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes,
-            @JsonProperty(EditorConstants.VOCAB_VALIDATION) List<ValidationRule> kgValidation
+            @JsonProperty(EditorConstants.VOCAB_VALIDATION) List<ValidationRule> kgValidation,
+            @JsonProperty(EditorConstants.VOCAB_WARNING) String kgWarning
     ) {
         this.fullyQualifiedName = kgFullyQualifiedName;
         this.numOfOccurrences = kgNumOfOccurrences;
@@ -83,6 +84,7 @@ public class StructureOfField implements Serializable {
                 .map(SimpleType::new)
                 .collect(Collectors.toList()) : null;
         this.validation = kgValidation;
+        this.warning = kgWarning;
     }
 
     private final String fullyQualifiedName;
@@ -105,8 +107,9 @@ public class StructureOfField implements Serializable {
     private Map<String, StructureOfField> fields;
     private Object value;
     private List<SimpleType> targetTypes;
-
     private final List<ValidationRule> validation;
+
+    private final String warning;
 
     public String getRegex() { return regex; }
 
@@ -188,4 +191,6 @@ public class StructureOfField implements Serializable {
     public List<ValidationRule> getValidation() {
         return validation;
     }
+
+    public String getWarning() { return warning;}
 }

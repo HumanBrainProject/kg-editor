@@ -58,7 +58,10 @@ class FieldStore {
       setError: action,
       clearError: action,
       hasError: computed,
-      setAlternatives: action
+      setAlternatives: action,
+      setWarning: action,
+      clearWarning: action,
+      hasWarning: computed
     });
 
     this.widget = definition.widget;
@@ -71,6 +74,7 @@ class FieldStore {
     this.order = definition.order;
     this.isRequired = definition.isRequired;
     this.isReadOnly = definition.isReadOnly;
+    this.warning = definition.warning;
     this.type = definition.type;
     this.transportLayer = transportLayer;
     this.rootStore = rootStore;
@@ -122,7 +126,7 @@ class FieldStore {
   }
 
   get hasWarning() {
-    return this.warning;
+    return !!this.warning;
   }
 
   setError(message, info) {

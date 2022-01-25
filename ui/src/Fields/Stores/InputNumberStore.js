@@ -46,9 +46,9 @@ class InputNumberStore extends FieldStore {
       setValue: action,
       returnValue: computed,
       minMaxValueWarning: computed,
-      warningMessages: computed,
+      validationWarnings: computed,
       requiredValidationWarning: computed,
-      hasWarningMessages: computed
+      hasValidationWarnings: computed
     });
     this.minValue = definition.minValue;
     this.maxValue = definition.maxValue;
@@ -64,7 +64,7 @@ class InputNumberStore extends FieldStore {
     return false;
   }
 
-  get warningMessages() {
+  get validationWarnings() {
     const messages = {};
     if (this.hasChanged) {
       if(this.minMaxValueWarning && this.value !== "") {
@@ -82,8 +82,8 @@ class InputNumberStore extends FieldStore {
     return messages;
   }
 
-  get hasWarningMessages() {
-    return Object.keys(this.warningMessages).length > 0;
+  get hasValidationWarnings() {
+    return Object.keys(this.validationWarnings).length > 0;
   }
 
   get returnValue() {

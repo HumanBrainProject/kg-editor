@@ -31,6 +31,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Label from "../Label";
 import Invalid from "../Invalid";
+import Warning from "../Warning";
 
 const useStyles = createUseStyles({
   label: {},
@@ -129,9 +130,9 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
   }
 
   const isDisabled = returnAsNull;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
-  const warningMessages = fieldStore.warningMessages;
-  const hasWarningMessages = fieldStore.hasWarningMessages;
+  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
+  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}/>
@@ -143,15 +144,14 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
           onChange={handleChange}
           disabled={isDisabled}
           rows={rows}
-          className={`${classes.inputColor} ${hasWarning && hasWarningMessages?classes.warning:""}`}
+          className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:""}`}
         />
         <Button className={classes.removeColorBtn} size="small" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
           <FontAwesomeIcon icon="times"/>
         </Button>
       </div>
-      {hasWarning && hasWarningMessages &&
-        <Invalid  messages={warningMessages}/>
-      }
+      <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
+      <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>
   );
 });

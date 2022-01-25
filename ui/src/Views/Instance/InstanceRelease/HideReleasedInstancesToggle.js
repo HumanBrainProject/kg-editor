@@ -57,8 +57,8 @@ const HideReleasedInstancesToggle = observer(() => {
     <div className={classes.container}>
       <div className={classes.toggle}>
         <MultiToggle selectedValue={releaseStore.hideReleasedInstances} onChange={handleClick}>
-          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"times"} value={false} />
-          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"check"} value={true} />
+          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?"var(--ft-color-normal)":"var(--ft-color-loud)"} icon={"times"} value={false} />
+          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?"#40a9f3":"var(--ft-color-normal)"} icon={"check"} value={true} />
         </MultiToggle>
       </div>
       <span className={classes.text}>Hide released instances</span>

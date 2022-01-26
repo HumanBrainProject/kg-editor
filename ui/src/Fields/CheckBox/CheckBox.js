@@ -57,11 +57,12 @@ const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) =
       return null;
     }
 
-    <Form.Group className={`${classes.container} ${className}`} >
-      <Label className={classes.label} label={label} />
-      <Form.Check disabled={true} checked={value} />
-    </Form.Group>;
-
+    return(
+      <Form.Group className={`${classes.container} ${className}`} >
+        <Label className={classes.label} label={label} />
+        <Form.Check disabled={true} checked={value} />
+      </Form.Group>
+    );
   }
 
   return (

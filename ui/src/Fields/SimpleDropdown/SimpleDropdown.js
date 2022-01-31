@@ -274,8 +274,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
-  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && fieldStore.requiredValidationWarning;
-  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
   return (

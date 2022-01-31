@@ -41,6 +41,7 @@ class CheckBoxStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       toggleValue: action
     });
   }
@@ -70,10 +71,14 @@ class CheckBoxStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (typeof this.initialValue  === "object") {
+    if (typeof this.initialValue === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
+  }
+
+  get shouldCheckValidation() {
+    return this.hasChanged;
   }
 
   toggleValue() {

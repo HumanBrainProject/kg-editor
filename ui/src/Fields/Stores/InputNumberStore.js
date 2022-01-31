@@ -43,6 +43,7 @@ class InputNumberStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       setValue: action,
       returnValue: computed,
       minMaxValueWarning: computed,
@@ -66,7 +67,7 @@ class InputNumberStore extends FieldStore {
 
   get validationWarnings() {
     const messages = {};
-    if (this.hasChanged) {
+    if (this.shouldCheckValidation) {
       if(this.minMaxValueWarning && this.value !== "") {
         if(this.minValue && this.maxValue) {
           if(this.value < this.minValue || this.value > this.maxValue) {
@@ -129,10 +130,14 @@ class InputNumberStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (this.initialValue !== null && typeof this.initialValue  === "object") {
+    if (this.initialValue !== null && typeof this.initialValue === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
+  }
+
+  get shouldCheckValidation() {
+    return this.initialValue !== null || this.hasChanged;
   }
 
   setValue(value) {

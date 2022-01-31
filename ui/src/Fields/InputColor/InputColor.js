@@ -130,8 +130,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
   }
 
   const isDisabled = returnAsNull;
-  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && (fieldStore.requiredValidationWarning || fieldStore.maxLengthWarning || fieldStore.hasRegexWarning);
-  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef} >

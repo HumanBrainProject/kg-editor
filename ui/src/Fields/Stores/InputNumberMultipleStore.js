@@ -62,6 +62,7 @@ class InputNumberMultipleStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       insertValue: action,
       deleteValue: action,
       addValue: action,
@@ -132,7 +133,10 @@ class InputNumberMultipleStore extends FieldStore {
 
   get validationWarnings() {
     const messages = {};
-    if (this.hasChanged) {
+    if (this.shouldCheckValidation) {
+      if(this.requiredValidationWarning) {
+        messages.required = "This field is marked as required.";
+      }
       if(this.numberOfItemsWarning) {
         if(this.minItems && this.maxItems) {
           if(this.value.length < this.minItems || this.value.length > this.maxItems) {
@@ -165,6 +169,10 @@ class InputNumberMultipleStore extends FieldStore {
 
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
+  }
+
+  get shouldCheckValidation() {
+    return !!this.initialValue.length || this.hasChanged;
   }
 
   insertValue(value, index) {

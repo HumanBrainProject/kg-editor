@@ -99,6 +99,10 @@ class FieldStore {
     throw new Error(`hasChanged getter is not implemented for ${this.widget} store`);
   }
 
+  get shouldCheckValidation() {
+    throw new Error(`shouldCheckValidation getter is not implemented for ${this.widget} store`);
+  }
+
   get cloneWithInitialValue() {
     throw new Error(`cloneWithInitialValue getter is not implemented for ${this.widget} store`);
   }

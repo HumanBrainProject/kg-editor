@@ -199,8 +199,9 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     return null;
   }
 
-  const checkValidationWarnings = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
-  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+
+  const isDisabled = readMode || isReadOnly;
+  const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <div className={`${className} ${(readMode || isReadOnly)?classes.readMode:""} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>

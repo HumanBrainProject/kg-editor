@@ -78,6 +78,7 @@ class InputTextStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       setValue: action
     });
   }
@@ -119,7 +120,7 @@ class InputTextStore extends FieldStore {
 
   get validationWarnings() {
     const messages = {};
-    if (this.hasChanged) {
+    if (this.shouldCheckValidation) {
       if(this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
       }
@@ -160,6 +161,10 @@ class InputTextStore extends FieldStore {
       return typeof this.returnValue !== "object"; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
+  }
+
+  get shouldCheckValidation() {
+    return this.initialValue !== "" || this.hasChanged;
   }
 
   setValue(value) {

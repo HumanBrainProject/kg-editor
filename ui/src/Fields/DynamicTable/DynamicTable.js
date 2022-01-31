@@ -266,8 +266,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || isReadOnly || returnAsNull;
   const canAddValues = !isDisabled;
-  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
-  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
   if (readMode && !links.length && !showIfNoValue) {

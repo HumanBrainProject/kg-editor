@@ -38,7 +38,8 @@ class UnsupportedFieldStore extends FieldStore {
       requiredValidationWarning: computed,
       updateValue: action,
       reset: action,
-      hasChanged: computed
+      hasChanged: computed,
+      shouldCheckValidation: computed
     });
   }
 
@@ -67,6 +68,9 @@ class UnsupportedFieldStore extends FieldStore {
     return false;
   }
 
+  get shouldCheckValidation() {
+    return false;
+  }
 }
 
 export default UnsupportedFieldStore;

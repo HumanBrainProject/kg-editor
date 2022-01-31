@@ -44,6 +44,7 @@ class NestedFieldStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       add: action,
       delete: action,
       resolvedTargetTypes: computed,
@@ -149,6 +150,10 @@ class NestedFieldStore extends FieldStore {
 
   get hasChanged() {
     return JSON.stringify(toJS(this.returnValue)) !== JSON.stringify(toJS(this.initialValue));
+  }
+
+  get shouldCheckValidation() {
+    return this.initialValue !== null || this.hasChanged;
   }
 
 }

@@ -71,6 +71,7 @@ class LinkStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       requiredValidationWarning: computed,
       hasValidationWarnings: computed,
       validationWarnings: computed,
@@ -129,7 +130,7 @@ class LinkStore extends FieldStore {
 
   get validationWarnings() {
     const messages = {};
-    if (this.hasChanged) {
+    if (this.shouldCheckValidation) {
       if(this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
       }
@@ -155,6 +156,10 @@ class LinkStore extends FieldStore {
 
   get hasChanged() {
     return JSON.stringify(this.value) !== JSON.stringify(this.initialValue);
+  }
+
+  get shouldCheckValidation() {
+    return this.initialValue !== undefined || this.hasChanged;
   }
 
   get hasMoreOptions() {

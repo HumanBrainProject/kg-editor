@@ -48,6 +48,7 @@ class NestedFieldStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       addValue: action,
       deleteItemByIndex: action,
       moveItemUpByIndex: action,
@@ -97,7 +98,7 @@ class NestedFieldStore extends FieldStore {
 
   get validationWarnings() {
     const messages = {};
-    if (this.hasChanged) {
+    if (this.shouldCheckValidation) {
       if(this.numberOfItemsWarning) {
         if(this.minItems && this.maxItems) {
           if(this.nestedFieldsStores.length < this.minItems || this.nestedFieldsStores.length > this.maxItems) {
@@ -221,6 +222,10 @@ class NestedFieldStore extends FieldStore {
 
   get hasChanged() {
     return JSON.stringify(toJS(this.returnValue)) !== JSON.stringify(toJS(this.initialValue));
+  }
+
+  get shouldCheckValidation() {
+    return !!this.initialValue.length || this.hasChanged;
   }
 
 }

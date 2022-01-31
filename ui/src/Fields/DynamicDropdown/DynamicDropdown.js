@@ -299,8 +299,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const isDisabled = returnAsNull;
   const canAddValues = !isDisabled;
-  const checkValidationWarnings = !isDisabled && fieldStore.hasChanged && fieldStore.numberOfItemsWarning;
-  const hasValidationWarnings = checkValidationWarnings && fieldStore.hasValidationWarnings;
+  const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
   return (

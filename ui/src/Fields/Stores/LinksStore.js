@@ -97,6 +97,7 @@ class LinksStore extends FieldStore {
       updateValue: action,
       reset: action,
       hasChanged: computed,
+      shouldCheckValidation: computed,
       requiredValidationWarning: computed,
       validationWarnings: computed,
       numberOfItemsWarning: computed,
@@ -167,7 +168,10 @@ class LinksStore extends FieldStore {
 
   get validationWarnings() {
     const messages = {};
-    if (this.hasChanged) {
+    if (this.shouldCheckValidation) {
+      if(this.requiredValidationWarning) {
+        messages.required = "This field is marked as required.";
+      }
       if(this.numberOfItemsWarning) {
         if(this.minItems && this.maxItems) {
           if(this.value.length < this.minItems || this.value.length > this.maxItems) {
@@ -211,6 +215,10 @@ class LinksStore extends FieldStore {
 
   get hasChanged() {
     return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
+  }
+
+  get shouldCheckValidation() {
+    return !!this.initialValue.length || this.hasChanged;
   }
 
   get numberOfValues() {

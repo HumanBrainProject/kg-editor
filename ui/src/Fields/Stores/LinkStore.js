@@ -155,11 +155,12 @@ class LinkStore extends FieldStore {
   }
 
   get hasChanged() {
-    return JSON.stringify(this.value) !== JSON.stringify(this.initialValue);
+    return JSON.stringify(toJS(this.value)) !== JSON.stringify(toJS(this.initialValue));
   }
 
   get shouldCheckValidation() {
-    return this.initialValue !== undefined || this.hasChanged;
+    const check = this.initialValue !== undefined || this.hasChanged;
+    return check;
   }
 
   get hasMoreOptions() {
@@ -167,7 +168,7 @@ class LinkStore extends FieldStore {
   }
 
   deleteValue() {
-    this.value = null;
+    this.value = undefined;
     this.resetOptionsSearch();
   }
 

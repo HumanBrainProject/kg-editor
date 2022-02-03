@@ -23,14 +23,21 @@
 
 package eu.ebrains.kg.service.services;
 
+import eu.ebrains.kg.service.controllers.UserPictureRepository;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.user.UserProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +46,11 @@ import java.util.Map;
 public class UserClient{
 
     private final ServiceCall kg;
+    private final UserPictureRepository userPictureRepository;
 
-    public UserClient(ServiceCall kg) {
+    public UserClient(ServiceCall kg, UserPictureRepository userPictureRepository) {
         this.kg = kg;
+        this.userPictureRepository  = userPictureRepository;
     }
 
     private static class UserFromKG extends KGCoreResult<UserProfile>{}
@@ -65,11 +74,15 @@ public class UserClient{
                 .block();
     }
 
-    private static class UserPictureMap extends HashMap<String, String> {}
     public Map<String, String> getUserPictures(List<String> userIds){
-        String relativeUrl = "users/pictures";
-        return kg.client().post().uri(kg.url(relativeUrl))
-                .body(BodyInserters.fromValue(userIds)).retrieve().bodyToMono(UserPictureMap.class).block();
+        Map<String, String> result = new HashMap<>();
+        userIds.forEach(userId -> {
+            String picture = userPictureRepository.fetchUserPicture(userId);
+            if (picture != null) {
+                result.put(userId, picture);
+            }
+        });
+        return result;
     }
 
 }

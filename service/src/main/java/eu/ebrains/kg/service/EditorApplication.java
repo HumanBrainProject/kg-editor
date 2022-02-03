@@ -25,14 +25,18 @@ package eu.ebrains.kg.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
+@EnableCaching
+@EnableScheduling
 public class EditorApplication extends WebSecurityConfigurerAdapter {
 
     public static void main(String[] args) {

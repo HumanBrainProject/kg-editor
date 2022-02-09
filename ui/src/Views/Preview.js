@@ -27,7 +27,7 @@ import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 
 import { useStores } from "../Hooks/UseStores";
 

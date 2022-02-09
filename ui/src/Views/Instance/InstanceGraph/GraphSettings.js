@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import MultiToggle from "../../../Components/MultiToggle";
 import Color from "color";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../../Hooks/UseStores";

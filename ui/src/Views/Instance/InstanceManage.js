@@ -24,7 +24,7 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 
 import DuplicateInstance from "./InstanceManage/DuplicateInstance";

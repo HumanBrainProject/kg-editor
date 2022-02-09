@@ -24,7 +24,7 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import Modal from "react-bootstrap/Modal";
 
 import { useStores } from "../Hooks/UseStores";

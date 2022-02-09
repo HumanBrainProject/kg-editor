@@ -24,7 +24,7 @@
 import React, { useEffect, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import debounce from "lodash/debounce";
 
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";

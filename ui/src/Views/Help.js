@@ -26,7 +26,7 @@ import { Route, Switch, NavLink, Redirect } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 
 import Introduction from "./Help/Introduction";
 

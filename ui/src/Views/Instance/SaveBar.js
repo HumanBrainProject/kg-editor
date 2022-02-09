@@ -27,7 +27,7 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Modal from "react-bootstrap/Modal";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
 

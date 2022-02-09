@@ -28,7 +28,7 @@ import { observer } from "mobx-react-lite";
 import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";

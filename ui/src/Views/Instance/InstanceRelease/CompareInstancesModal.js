@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../../Hooks/UseStores";

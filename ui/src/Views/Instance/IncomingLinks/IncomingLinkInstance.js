@@ -31,7 +31,7 @@ import { useStores } from "../../../Hooks/UseStores";
 const useStyles = createUseStyles({
   pill: {
     cursor: "pointer",
-    "& > .badge-pill": {
+    "& > .rounded-pill": {
       whiteSpace: "break-spaces"
     }
   },
@@ -58,7 +58,7 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
   if (readMode || isForbidden) {
     return (
       <span className={isForbidden?classes.isForbidden:""} title={isForbidden?"You don't have the permission to access this instance!": null}>
-        <Badge pill variant="secondary" >
+        <Badge pill bg="secondary" >
           {label}
         </Badge>
       </span>
@@ -74,7 +74,7 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   return (
     <span className={classes.pill} title={instance.space}>
-      <Badge pill variant="secondary" onClick={handleOpenInstance} >
+      <Badge pill bg="secondary" onClick={handleOpenInstance} >
         {label}
       </Badge>
     </span>

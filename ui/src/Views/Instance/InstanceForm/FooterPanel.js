@@ -57,7 +57,6 @@ const useStyles = createUseStyles({
   actions:{
     display:"none",
     position:"absolute",
-    top:"0",
     right:"15px",
     width:"25px",
     gridTemplateColumns:"repeat(1, 1fr)",

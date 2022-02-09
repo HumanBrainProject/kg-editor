@@ -38,9 +38,12 @@ const useStyles = createUseStyles({
       listStyle: "none",
       paddingLeft: "20px",
       "& > li": {
-        display: "inline",
+        display: "inline-block",
         "& + li:before": {
           content: "' '"
+        },
+        "& + li": {
+          marginTop: "2px"
         }
       }
     }

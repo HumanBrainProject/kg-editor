@@ -55,9 +55,9 @@ const SpaceSelector = observer(() => {
 
   const { appStore, authStore } = useStores();
 
-  const handleSelectSpace = eventKey => {
-    ReactPiwik.push(["trackEvent", "Space", "Select", eventKey]);
-    appStore.setCurrentSpace(eventKey);
+  const handleSelectSpace = space => {
+    ReactPiwik.push(["trackEvent", "Space", "Select", space]);
+    appStore.setCurrentSpace(space);
   }
 
   return (
@@ -72,7 +72,7 @@ const SpaceSelector = observer(() => {
               <Dropdown.Item
                 key={space.id}
                 eventKey={space.id}
-                onSelect={handleSelectSpace}>
+                onClick={() => handleSelectSpace(space.id)}>
                 {space.name||space.id}
               </Dropdown.Item>
             )}

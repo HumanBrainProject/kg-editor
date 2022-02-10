@@ -63,16 +63,16 @@ const SpaceSelector = observer(() => {
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
       {authStore.spaces.length > 1 ?
-        <Dropdown>
+        <Dropdown onSelect={handleSelectSpace}>
           <Dropdown.Toggle as={CustomDropdownToggle}>
             {appStore.currentSpaceName}
           </Dropdown.Toggle>
-          <Dropdown.Menu as={CustomDropdownMenu}>
+          <Dropdown.Menu as={CustomDropdownMenu} >
             {authStore.spaces.map(space =>
               <Dropdown.Item
                 key={space.id}
                 eventKey={space.id}
-                onClick={() => handleSelectSpace(space.id)}>
+              >
                 {space.name||space.id}
               </Dropdown.Item>
             )}

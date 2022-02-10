@@ -25,6 +25,8 @@ import React from "react";
 import { render } from "react-dom";
 // import { configure } from "mobx";
 import ReactPiwik from "react-piwik";
+import {JssProvider} from "react-jss";
+
 
 import "react-virtualized/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -52,5 +54,7 @@ new ReactPiwik({
 
 render(
   <React.StrictMode>
-    <App/>
+    <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>
+      <App />
+    </JssProvider>
   </React.StrictMode>, document.getElementById("root"));

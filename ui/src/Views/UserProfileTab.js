@@ -76,8 +76,8 @@ const useStyles = createUseStyles({
     background: "var(--list-bg-hover)",
     border: "1px solid var(--border-color-ui-contrast1)",
     borderRadius: 0,
-    "& .arrow": {
-      display: "none !important"
+    "& .popover-arrow:after": {
+      borderBottomColor: "var(--list-bg-hover)"
     },
     "& .popover-content": {
       padding: "0 !important"

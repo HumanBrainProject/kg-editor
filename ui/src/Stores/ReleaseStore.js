@@ -23,13 +23,40 @@
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 
-const setNodeTypes = node => {
+const setNodeTypesAndSortChildren = node => {
   node.typesName = node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
   if (Array.isArray(node.children) && node.children.length) {
-    node.children.forEach(child => setNodeTypes(child)); // Change child permissions here in case you want to test permissions.
-    node.children = node.children.sort((a, b) =>  a.typesName.toUpperCase().localeCompare(b.typesName.toUpperCase()));
+    node.children.forEach(child => setNodeTypesAndSortChildren(child)); // Change child permissions here in case you want to test permissions.
+    node.children = node.children.sort((a, b) =>  {
+      const ta = a.typesName.toUpperCase();
+      const tb = b.typesName.toUpperCase();
+      if (ta === tb) {
+        return a.label.toUpperCase().localeCompare(b.label.toUpperCase());
+      }
+      return ta.localeCompare(tb);
+    });
   }
 };
+
+const removeDupplicates = (node, ids) => {
+  if (typeof node === "object" && Array.isArray(node.children)) {
+    if (!(ids instanceof Set)) {
+      ids = new Set();
+      ids.add(node.id);
+    }
+    node.children = node.children.filter(n => {
+      if (ids.has(n.id)) {
+        return false;
+      }
+      ids.add(n.id);
+      return true;
+    });
+    node.children.forEach(c => removeDupplicates(c, ids));
+    if (!node.children.length) {
+      delete node.children;
+    }
+  }
+}
 
 const populateStatuses = (node, prefix = "") => {
   if(node.permissions.canRelease) {
@@ -266,7 +293,8 @@ export class ReleaseStore {
         // Default release state
         this.recursiveMarkNodeForChange(data.data, null); // "RELEASED"
         populateStatuses(data.data, "pending_");
-        setNodeTypes(data.data);
+        setNodeTypesAndSortChildren(data.data);
+        removeDupplicates(data.data); // after sorting!
         this.instancesTree = data.data;
         this.isFetched = true;
         this.isFetching = false;

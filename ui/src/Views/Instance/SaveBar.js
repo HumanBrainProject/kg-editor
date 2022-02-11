@@ -126,6 +126,9 @@ const useStyles = createUseStyles({
       height: "calc(95vh - 112px)",
       padding: "3px 0"
     }
+  },
+  autoreleaseWarning: {
+    margin: "10px 10px 0 10px"
   }
 });
 
@@ -256,6 +259,9 @@ const SavePanel = observer(() => {
   return(
     <div className={classes.container}>
       <Scrollbars autoHide>
+        {appStore.currentSpace.autorelease && (
+          <div className={`alert alert-warning ${classes.autoreleaseWarning}`} role="alert"><FontAwesomeIcon icon="exclamation-triangle"  /> Saved changes will be released automatically.</div>
+        )}
         <h4>Unsaved instances &nbsp;<Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
         <div className={classes.instances} >
           <CompareModal instance={comparedInstance} onSave={handleSave} onReset={handleReset} onClose={handleCloseCompararison} />

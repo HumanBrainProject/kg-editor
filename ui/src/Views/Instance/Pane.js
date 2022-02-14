@@ -108,7 +108,7 @@ const Pane = observer(({ paneId, children }) => {
     <PaneContext.Provider value={paneId} >
       <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>
         <Scrollbars autoHide>
-          <div className={classes.scrolledView}>
+          <div className={`${classes.scrolledView} scrolledView`} >
             {children}
           </div>
         </Scrollbars>

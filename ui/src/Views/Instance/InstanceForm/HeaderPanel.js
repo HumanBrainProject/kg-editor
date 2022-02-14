@@ -50,7 +50,7 @@ const useStyles = createUseStyles({
 
 
 const getElementToScroll = elem => {
-  while(elem !== null && !elem.className.startsWith("scrolledView")) {
+  while(elem !== null && !elem.className.includes("scrolledView")) {
     elem = elem.parentElement;
   }
   if(elem !== null) {

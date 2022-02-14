@@ -78,9 +78,11 @@ const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
   const scrollIntoViewRef = useRef();
 
   useEffect(() => {
+    console.log("highligh", highlight);
     if (highlight) {
       const distance = getScrollTop(scrollIntoViewRef.current);
       const elem = getElementToScroll(scrollIntoViewRef.current);
+      console.log(distance, elem);
       if(elem) {
         elem.scrollTo({
           top: distance - 20, // -20 because scrolledView contains padding-top:20px;

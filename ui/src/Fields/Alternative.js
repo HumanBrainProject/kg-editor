@@ -114,7 +114,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   const users = (!alternative || !alternative.users)?[]:alternative.users;
   const isOwnAlternative = users.find(user => authStore.user.id === user.id);
   return (
-    <Dropdown.Item className={classes.container} onSelect={handleSelect}>
+    <Dropdown.Item className={classes.container} onClick={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
         {alternative.value !== null ? <strong>
           <ValueRenderer alternative={alternative} />

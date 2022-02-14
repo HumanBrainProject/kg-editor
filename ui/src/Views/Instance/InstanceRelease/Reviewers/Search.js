@@ -70,8 +70,9 @@ const useStyles = createUseStyles({
     "& .dropdown-menu": {
       display: "block",
       width: "calc(100% - 58px)",
-      margin: "-6px 0 0 26px",
+      margin: "50px 0 0 27px",
       padding: 0,
+      left: 0,
       borderTopLeftRadius: 0,
       borderTopRightRadius: 0,
       "& .dropdown-list": {
@@ -98,13 +99,13 @@ const useStyles = createUseStyles({
   },
   addIcon: {
     position: "absolute",
-    top: "10px",
+    top: "15px",
     left: "2px",
     color: "var(--ft-color-normal)",
   },
   searchIcon:{
     position: "absolute",
-    top: "10px",
+    top: "15px",
     left: "40px",
     color: "var(--ft-color-normal)",
   },

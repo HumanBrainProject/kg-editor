@@ -85,7 +85,7 @@ const User = observer(({ user, onSelect }) => {
   const handleSelect = e => onSelect(user, e);
 
   return (
-    <Dropdown.Item className={classes.container} onSelect={handleSelect} >
+    <Dropdown.Item className={classes.container} onClick={handleSelect} >
       <div tabIndex={-1} className="option" onKeyDown={handleSelect}>
         <UserComponent userId={user.id} name={user.name} picture={user.picture} />
       </div>

@@ -45,7 +45,7 @@ const useStyles = createUseStyles({
     "& .user": {
       display: "flex",
       alignItems: "center",
-      margin: "0 3px 0 6px",
+      margin: "0 3px 0 20px",
       padding: "6px",
       background: "var(--bg-color-ui-contrast3)",
       "& .avatar": {

@@ -159,6 +159,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
   const handleFocus = () => {
     if (view.currentInstanceId !== id) {
       view.setCurrentInstanceId(pane, id);
+      view.resetInstanceHighlight();
     }
   };
 

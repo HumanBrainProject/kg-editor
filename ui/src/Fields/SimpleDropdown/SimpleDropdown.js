@@ -158,6 +158,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         const _pane = view.currentInstanceIdPane;
         view.selectPane(_pane);
         view.setCurrentInstanceId(_pane, id);
+        view.setInstanceHighlight(_pane, id, fieldStore.label);
       }
     }
   };
@@ -212,25 +213,6 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     }
   };
 
-  const handleMouseOver = () => {
-    if (view) {
-      const id = value && value[mappingValue];
-      if (id) {
-        const index = view.panes.findIndex(p => p === pane);
-        if (index !== -1 && index < view.panes.length -1) {
-          const targetPane = view.panes[index+1];
-          view.setInstanceHighlight(targetPane, id, fieldStore.label);
-        }
-      }
-    }
-  };
-
-  const handleMouseOut = () => {
-    if (view) {
-      view.resetInstanceHighlight();
-    }
-  };
-
   const handleSearchOptions = term => fieldStore.searchOptions(term);
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
@@ -253,8 +235,6 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
               disabled={false}
               enablePointerEvents={true}
               onClick={handleClick}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
               fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
             />
             :
@@ -304,8 +284,6 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
           onDelete={handleDelete}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
           fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
         />
         }

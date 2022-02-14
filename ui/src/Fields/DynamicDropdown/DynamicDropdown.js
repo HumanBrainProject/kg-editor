@@ -165,13 +165,14 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const handleClick = index => {
     if (view && pane) {
+      view.resetInstanceHighlight();
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id) {
-        view.resetInstanceHighlight();
         const _pane = view.currentInstanceIdPane;
         view.selectPane(_pane);
         view.setCurrentInstanceId(_pane, id);
+        view.setInstanceHighlight(_pane, id, fieldStore.label);
       }
     }
   };
@@ -241,26 +242,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleMouseOver = index => {
-    if (view) {
-      const value = values[index];
-      const id = value && value[fieldStore.mappingValue];
-      if (id) {
-        const index = view.panes.findIndex(p => p === pane);
-        if (index !== -1 && index < view.panes.length -1) {
-          const targetPane = view.panes[index+1];
-          view.setInstanceHighlight(targetPane, id, fieldStore.label);
-        }
-      }
-    }
-  };
-
-  const handleMouseOut = () => {
-    if (view) {
-      view.resetInstanceHighlight();
-    }
-  };
-
   const handleSearchOptions = term => fieldStore.searchOptions(term);
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
@@ -280,8 +261,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             disabled={false}
             enablePointerEvents={true}
             onClick={handleClick}
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
             fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
           />
           :
@@ -332,8 +311,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
           fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
         />
         {canAddValues && (

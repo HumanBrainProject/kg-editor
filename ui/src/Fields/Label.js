@@ -40,7 +40,7 @@ const LabelTooltip = ({tooltip, icon}) => (
   <>
   &nbsp;
     <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{tooltip}</Tooltip>}>
-      <FontAwesomeIcon icon={icon?icon:"info-circle"}/>
+      <span><FontAwesomeIcon icon={icon?icon:"info-circle"}/></span>
     </OverlayTrigger>
   </>
 );

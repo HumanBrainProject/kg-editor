@@ -204,7 +204,7 @@ const TypesItem = observer(({ type }) => {
         :
         <div className={classes.cannotCreateTooltip}>
           <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("cannotCreate-tooltip")}>{cannotCreateTooltip}</Tooltip>}>
-            <FontAwesomeIcon icon="question-circle" />
+            <span><FontAwesomeIcon icon="question-circle" /></span>
           </OverlayTrigger>
         </div>
       }

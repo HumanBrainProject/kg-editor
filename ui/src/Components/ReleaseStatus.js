@@ -94,19 +94,16 @@ const MessageStatus = ({status}) => {
   return <strong>Unknown entity</strong>;
 };
 
-const renderOverlayTooltip = instanceStatus => (
-  <Tooltip id={uniqueId("release-tooltip")}>
-    <div>
-      <MessageStatus status={instanceStatus} />
-    </div>
-  </Tooltip>
-);
-
-
 const ReleaseStatus = ({instanceStatus, darkmode}) => {
   const classes = useStyles();
   return (
-    <OverlayTrigger placement="top" overlay={renderOverlayTooltip(instanceStatus)}>
+    <OverlayTrigger placement="top" overlay={
+      <Tooltip id={uniqueId("release-tooltip")}>
+      <div>
+        <MessageStatus status={instanceStatus} />
+      </div>
+    </Tooltip>
+    }>
       <div className={`${classes.status} ${darkmode? "darkmode" : ""} `} status={instanceStatus}>
         <div className={`${classes.instanceStatus}  `}>
           <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />

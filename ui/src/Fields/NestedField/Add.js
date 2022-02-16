@@ -74,7 +74,7 @@ const Add = observer(({className, types, onClick}) => {
       title={<FontAwesomeIcon icon="plus" />}
       className={`${classes.dropdownBtn} ${className?className:""}`}
     >
-      {types.map(type=> <Dropdown.Item key={type.name} eventKey={type.name} onClick={handleOnSelect}>{type.label}</Dropdown.Item>)}
+      {types.map(type=> <Dropdown.Item key={type.name} eventKey={type.name} onClick={() => handleOnSelect(type.name)}>{type.label}</Dropdown.Item>)}
     </DropdownButton>
   );
 });

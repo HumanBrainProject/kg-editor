@@ -445,7 +445,17 @@ export class Instance {
       "@type": this.types.map(t => t.name)
     };
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
-      acc[name] = field.returnValue;
+      if (Array.isArray(field.returnValue)) {
+        if (field.returnValue.length) {
+          acc[name] = field.returnValue;
+        } 
+      } else if (typeof field.returnValue === "string") {
+          if (field.returnValue !== "") {
+            acc[name] = field.returnValue;
+          }
+      } else if (field.returnValue !== null && field.returnValue !== undefined) {
+        acc[name] = field.returnValue;
+      }
       return acc;
     }, payload);
   }

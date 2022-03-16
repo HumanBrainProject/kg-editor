@@ -38,7 +38,7 @@ const setNodeTypesAndSortChildren = node => {
   }
 };
 
-const removeDupplicates = (node, ids) => {
+const removeDuplicates = (node, ids) => {
   if (typeof node === "object" && Array.isArray(node.children)) {
     if (!(ids instanceof Set)) {
       ids = new Set();
@@ -51,7 +51,7 @@ const removeDupplicates = (node, ids) => {
       ids.add(n.id);
       return true;
     });
-    node.children.forEach(c => removeDupplicates(c, ids));
+    node.children.forEach(c => removeDuplicates(c, ids));
     if (!node.children.length) {
       delete node.children;
     }
@@ -294,7 +294,7 @@ export class ReleaseStore {
         this.recursiveMarkNodeForChange(data.data, null); // "RELEASED"
         populateStatuses(data.data, "pending_");
         setNodeTypesAndSortChildren(data.data);
-        removeDupplicates(data.data); // after sorting!
+        removeDuplicates(data.data); // after sorting!
         this.instancesTree = data.data;
         this.isFetched = true;
         this.isFetching = false;

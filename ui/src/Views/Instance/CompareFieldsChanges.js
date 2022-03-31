@@ -45,7 +45,7 @@ const separator = "; ";
 const getLabel = (instanceStore, field, value) => {
   const id = value[field.mappingValue];
   if (!id) {
-    return "Unkown instance";
+    return "Unknown instance";
   }
 
   const instance = instanceStore.instances.get(id);
@@ -73,26 +73,32 @@ const getFieldValue = (instanceStore, field, level) => {
     return getNestedFieldValue(instanceStore, field.nestedFieldsStores, level);
   }
   const value = field.returnValue;
+  if (value === "https://core.kg.ebrains.eu/vocab/resetValue") {
+    return "";
+  }
+  if (field.isLink) {
+    if (!value) {
+      return "null";
+    }
+    const vals = Array.isArray(value)?value:[value];
+    if (vals.length) {
+      return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
+    }
+    return "";
+  }
   if (!value) {
     return "";
   }
-  if (!field.isLink) {
-    if (Array.isArray(value)) {
-      return value.join(separator);
-    }
-    if (typeof value === "object") {
-      return "Unknown value";
-    }
-    if (typeof value === "boolean" || typeof value === "number") {
-      return value.toString();
-    }
-    return value;
+  if (Array.isArray(value)) {
+    return value.join(separator);
   }
-  const vals = Array.isArray(value)?value:[value];
-  if (vals.length) {
-    return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
+  if (typeof value === "object") {
+    return "Unknown value";
   }
-  return "";
+  if (typeof value === "boolean" || typeof value === "number") {
+    return value.toString();
+  }
+  return value;
 };
 
 const getValue = (instanceStore, instance, name) => {

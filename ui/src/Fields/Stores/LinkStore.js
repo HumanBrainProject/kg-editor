@@ -28,8 +28,8 @@ import debounce from "lodash/debounce";
 import FieldStore from "./FieldStore";
 
 class LinkStore extends FieldStore {
-  value = undefined;
-  initialValue = undefined;
+  value = null;
+  initialValue = null;
   options = [];
   optionsResult = [];
   allowCustomValues = true;
@@ -122,7 +122,7 @@ class LinkStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value === undefined) {
+    if(this.value === null) {
       return true;
     }
     return false;
@@ -144,7 +144,7 @@ class LinkStore extends FieldStore {
 
   updateValue(value) {
     this.returnAsNull = false;
-    const v = (value !== null && value !== undefined && typeof value === "object")?value:undefined;
+    const v = (value !== null && value !== undefined && typeof value === "object")?value:null;
     this.initialValue = v;
     this.value = v;
   }
@@ -155,11 +155,11 @@ class LinkStore extends FieldStore {
   }
 
   get hasChanged() {
-    return JSON.stringify(toJS(this.value)) !== JSON.stringify(toJS(this.initialValue));
+    return JSON.stringify(toJS(this.value)) !== JSON.stringify(toJS(this.initialValue)) || this.returnAsNull;
   }
 
   get shouldCheckValidation() {
-    const check = this.initialValue !== undefined || this.hasChanged;
+    const check = this.initialValue !== null || this.hasChanged;
     return check;
   }
 
@@ -168,13 +168,13 @@ class LinkStore extends FieldStore {
   }
 
   deleteValue() {
-    this.value = undefined;
+    this.value = null;
     this.resetOptionsSearch();
   }
 
   removeValue() {
     this.returnAsNull = true;
-    this.value = undefined;
+    this.value = null;
     this.resetOptionsSearch();
   }
 

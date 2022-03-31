@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import _  from "lodash-uuid";
@@ -123,6 +123,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const classes = useStyles();
 
   const { typeStore, instanceStore, authStore, appStore } = useStores();
+
+  const formControlRef = useRef();
+  const dropdownInputRef = useRef();
 
   const {
     instance,
@@ -263,6 +266,12 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     }
   };
 
+  const handleDropDownFocus = e => {
+    if (formControlRef && formControlRef.current === e.target && dropdownInputRef) {
+      dropdownInputRef.current.focus();
+    }
+  };
+
   const fieldStoreLabel = label.toLowerCase();
   const isDisabled =  readMode || isReadOnly || returnAsNull;
   const canAddValues = !isDisabled;
@@ -308,8 +317,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         }
         {!isDisabled && (
           <div className={`${classes.addValueContainer} ${hasMultipleTypes?"hasMultipleTypes":""}`}>
-            <div className={`form-control ${classes.dropdownContainer}`}>
+            <div ref={formControlRef} className={`form-control ${classes.dropdownContainer}`} onClick={handleDropDownFocus} >
               <DropdownComponent
+                inputRef={dropdownInputRef}
                 className={classes.dropdown}
                 searchTerm={optionsSearchTerm}
                 options={options}

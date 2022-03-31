@@ -79,6 +79,8 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
   const { typeStore, instanceStore, appStore } = useStores();
 
   const formGroupRef = useRef();
+  const formControlRef = useRef();
+  const dropdownInputRef = useRef();
 
   const {
     instance,
@@ -217,6 +219,12 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
+  const handleDropDownFocus = e => {
+    if (formControlRef && formControlRef.current === e.target && dropdownInputRef) {
+      dropdownInputRef.current.focus();
+    }
+  };
+
   const id = value && value[mappingValue];
 
   if (readMode && !id && !showIfNoValue) {
@@ -273,7 +281,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         {value &&
         <ListItem
           instanceId={id}
@@ -289,6 +297,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         }
         {canAddValues && (
           <DropdownComponent
+            inputRef={dropdownInputRef}
             searchTerm={optionsSearchTerm}
             options={options}
             loading={fetchingOptions}

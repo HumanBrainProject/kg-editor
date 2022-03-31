@@ -80,6 +80,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const draggedValue = useRef();
   const formGroupRef = useRef();
+  const formControlRef = useRef();
+  const dropdownInputRef = useRef();
 
   const {
     instance,
@@ -246,6 +248,12 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
+  const handleDropDownFocus = e => {
+    if (formControlRef && formControlRef.current === e.target && dropdownInputRef) {
+      dropdownInputRef.current.focus();
+    }
+  };
+
   if (readMode && !links.length && !showIfNoValue) {
     return null;
   }
@@ -297,7 +305,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         <List
           list={links}
           readOnly={false}
@@ -315,6 +323,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         />
         {canAddValues && (
           <DropdownComponent
+            inputRef={dropdownInputRef}
             searchTerm={optionsSearchTerm}
             options={options}
             loading={fetchingOptions}

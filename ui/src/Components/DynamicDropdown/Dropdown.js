@@ -40,7 +40,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Dropdown = ({ className, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop, optionComponent }) => {
+const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop, optionComponent }) => {
 
   const classes = useStyles();
 
@@ -154,6 +154,7 @@ const Dropdown = ({ className, options, inputPlaceholder, loading, hasMore, sear
   return (
     <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
       <input className={classes.userInput}
+        ref={inputRef}
         onDrop={e => e.preventDefault() && onDrop && onDrop()}
         onDragOver={e => e.preventDefault()}
         type="text"

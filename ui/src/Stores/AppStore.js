@@ -269,7 +269,14 @@ export class AppStore{
       if (space) {
         this.setCurrentSpace(space, !!path && !!path.params.id);
         if (!this.currentSpace || this.currentSpace.id !== space) {
-          this.initialInstanceSpaceError = `Could not load instance "${path.params.id}" because you're not granted access to space "${space}".`;
+          const instance = this.rootStore.instanceStore.instances.get(path.params.id);
+          if (instance?.permissions?.canRead) {
+            // try to set the "review" space if the user is allowed
+            this.setCurrentSpace("review", !!path && !!path.params.id);
+          }
+          if (!this.currentSpace || this.currentSpace.id !== space) {
+            this.initialInstanceSpaceError = `Could not load instance "${path.params.id}" because you're not granted access to space "${space}".`;
+          }
         }
       }
       return this.currentSpace;

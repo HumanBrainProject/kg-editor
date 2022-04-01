@@ -588,6 +588,7 @@ export class Instance {
 
   initializeJsonData(data) {
     this._initialJsonData = data;
+    this.permissions = data.permissions;
     this.isFetching = false;
   }
 

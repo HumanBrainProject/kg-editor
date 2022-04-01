@@ -106,7 +106,7 @@ const Instance = observer(({ match, mode }) => {
     instanceStore.resetInstanceIdAvailability();
   };
 
-  const handleLoadTypes = typeStore.fetch();
+  const handleLoadTypes = () => typeStore.fetch();
 
   if (typeStore.fetchError) {
     return (

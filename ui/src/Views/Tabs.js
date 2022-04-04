@@ -106,7 +106,7 @@ const Tabs = observer(() => {
   return (
     <div className={classes.container}>
       <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
-        <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" width="30" height="30" />
+        <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" height="40" />
         <span>Knowledge Graph Editor</span>
       </div>
       {!appStore.globalError &&

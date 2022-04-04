@@ -59,6 +59,7 @@ public class StructureOfField implements Serializable {
             @JsonProperty(EditorConstants.VOCAB_REQUIRED) Boolean required,
             @JsonProperty(EditorConstants.VOCAB_READONLY) Boolean readOnly,
             @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes,
+            @JsonProperty(EditorConstants.VOCAB_DEFAULT_TARGET_TYPE) String kgDefaultTargetType,
             @JsonProperty(EditorConstants.VOCAB_VALIDATION) List<ValidationRule> kgValidation,
             @JsonProperty(EditorConstants.VOCAB_WARNING) String kgWarning
     ) {
@@ -83,6 +84,7 @@ public class StructureOfField implements Serializable {
                 .filter(Objects::nonNull)
                 .map(SimpleType::new)
                 .collect(Collectors.toList()) : null;
+        this.defaultTargetType = kgDefaultTargetType;
         this.validation = kgValidation;
         this.warning = kgWarning;
     }
@@ -106,6 +108,7 @@ public class StructureOfField implements Serializable {
     private final Boolean readOnly;
     private Map<String, StructureOfField> fields;
     private Object value;
+    private String defaultTargetType;
     private List<SimpleType> targetTypes;
     private final List<ValidationRule> validation;
 
@@ -125,6 +128,10 @@ public class StructureOfField implements Serializable {
 
     public List<SimpleType> getTargetTypes() {
         return targetTypes;
+    }
+
+    public String getDefaultTargetType() {
+        return defaultTargetType;
     }
 
     @JsonIgnore

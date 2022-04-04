@@ -62,6 +62,12 @@ class LinksStore extends FieldStore {
     this.maxItems = definition.maxItems;
     this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];
     this.targetType = this.targetTypes.length?this.targetTypes[0]:null;
+    if (definition.defaultTargetType) {
+      const defaultTargetType = this.targetTypes.find(type => type.name === definition.defaultTargetType);
+      if (defaultTargetType) {
+        this.targetType = defaultTargetType;
+      }
+    }
     this.sourceType = options && options.sourceType;
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;

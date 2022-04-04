@@ -61,6 +61,7 @@ public class EditorConstants {
     public static final String VOCAB_LABEL_PROPERTY = CORE_META + "type/labelProperty";
     public static final String VOCAB_SEARCHABLE = CORE_META + "property/searchable";
     public static final String VOCAB_TARGET_TYPES = CORE_META + "targetTypes";
+    public static final String VOCAB_DEFAULT_TARGET_TYPE = CORE_META + "defaultTargetType";
     public static final String VOCAB_AUTO_RELEASE = CORE_META + "space/autorelease";
     public static final String VOCAB_CLIENT_SPACE = CORE_META + "space/clientSpace";
     public static final String VOCAB_INTERNAL_SPACE = CORE_META + "space/internalSpace";

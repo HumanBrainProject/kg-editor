@@ -26,7 +26,7 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 
 const DEFAULT_REGEX = {
-  regex: /^(?! )(.|\n)*(?<! )$/,
+  regex: /^(?!\s)(.|\n)*(?<!\s)$/,
   errorMessage: "leading/trailling spaces are not allowed"
 };
 

@@ -27,6 +27,6 @@ public class UserPictureRepository {
         String relativeUrl = "users/pictures";
         Map<String, String> usersPictures = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(Collections.singletonList(userId))).retrieve().bodyToMono(Map.class).block();
-        return usersPictures.get(userId);
+        return usersPictures!=null ? usersPictures.get(userId) : null;
     }
 }

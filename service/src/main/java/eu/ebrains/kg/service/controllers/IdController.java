@@ -49,7 +49,7 @@ public class IdController {
     /**
      * This method takes a payload and translates it @id from simplified (UUID only) to fully qualified (incl. KG namespace)
      */
-    public Map<?, ?> fullyQualifyAtId(Map<String, Object> body) {
+    public Map<String, Object> fullyQualifyAtId(Map<String, Object> body) {
         body.forEach((k, v) -> {
             if (v instanceof List) {
                 ((List<?>) v).forEach(value -> {

@@ -35,27 +35,27 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class RestControllerAdvice {
 
     @ExceptionHandler({WebClientResponseException.Unauthorized.class})
-    protected ResponseEntity<?> unauthorized(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> unauthorized(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @ExceptionHandler({WebClientResponseException.Forbidden.class})
-    protected ResponseEntity<?> forbidden(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> forbidden(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @ExceptionHandler({WebClientResponseException.InternalServerError.class})
-    protected ResponseEntity<?> internalServerError(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> internalServerError(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
     @ExceptionHandler({WebClientResponseException.NotFound.class})
-    protected ResponseEntity<?> notFound(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> notFound(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @ExceptionHandler({IllegalArgumentException.class})
-    protected ResponseEntity<?> illegalArgument(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<Object> illegalArgument(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

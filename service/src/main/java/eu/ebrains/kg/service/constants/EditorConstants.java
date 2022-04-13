@@ -24,6 +24,11 @@
 package eu.ebrains.kg.service.constants;
 
 public class EditorConstants {
+
+    private EditorConstants() {
+        //Don't instantiate
+    }
+
     public static final String CORE_NAMESPACE = "https://core.kg.ebrains.eu/";
     public static final String LABEL = CORE_NAMESPACE + "vocab/label";
     public static final String EDITOR_NAMESPACE = "https://editor.kg.ebrains.eu/";

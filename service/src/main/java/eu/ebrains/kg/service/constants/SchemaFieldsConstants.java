@@ -24,6 +24,11 @@
 package eu.ebrains.kg.service.constants;
 
 public class SchemaFieldsConstants {
+
+    private SchemaFieldsConstants() {
+        //Don't instantiate
+    }
+
     public static final String SCHEMA_ORG = "http://schema.org/";
     public static final String SCHEMA_HBP = "https://schema.hbp.eu/";
 

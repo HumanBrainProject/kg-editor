@@ -185,7 +185,7 @@ public class InstanceController {
         Map<String, StructureOfIncomingLink> possibleIncomingLinks = new HashMap<>();
         types.forEach(type -> {
             StructureOfType structureOfType = typesByName.get(type);
-            if(structureOfType != null) {
+            if (structureOfType != null) {
                 possibleIncomingLinks.putAll(structureOfType.getIncomingLinks());
             }
         });
@@ -284,7 +284,7 @@ public class InstanceController {
                 }
             }
         });
-        List t = (List<String>) originalValue.get("@type");
+        List<String> t = (List<String>) originalValue.get("@type");
         value.put("@type", t);
         return value;
     }
@@ -452,14 +452,12 @@ public class InstanceController {
     }
 
     private void enrichName(InstanceLabel instance, Map<?, ?> originalMap, Map<String, StructureOfType> typesByName) {
-        if (typesByName != null && instance != null) {
+        if (typesByName != null && instance != null && instance.getTypes() != null) {
             // Fill the type information
-            if (instance.getTypes() != null) {
-                instance.getTypes().stream().filter(Objects::nonNull).forEach(t -> enrichSimpleType(t, typesByName));
-                if (originalMap != null) {
-                    String label = instance.getTypes().stream().map(SimpleType::getLabelField).filter(Objects::nonNull).map(originalMap::get).filter(Objects::nonNull).map(Object::toString).findFirst().orElse(null);
-                    instance.setName(label);
-                }
+            instance.getTypes().stream().filter(Objects::nonNull).forEach(t -> enrichSimpleType(t, typesByName));
+            if (originalMap != null) {
+                String label = instance.getTypes().stream().map(SimpleType::getLabelField).filter(Objects::nonNull).map(originalMap::get).filter(Objects::nonNull).map(Object::toString).findFirst().orElse(null);
+                instance.setName(label);
             }
         }
     }
@@ -539,8 +537,8 @@ public class InstanceController {
             Map<String, String> userPictures = userClient.getUserPictures(userIds);
             instance.getAlternatives().values().stream().flatMap(Collection::stream)
                     .map(Alternative::getUsers).flatMap(Collection::stream).forEach(u ->
-                            u.setPicture(userPictures.get(u.getId()))
-                    );
+                    u.setPicture(userPictures.get(u.getId()))
+            );
         }
     }
 

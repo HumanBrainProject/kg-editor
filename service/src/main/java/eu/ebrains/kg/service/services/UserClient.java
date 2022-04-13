@@ -77,7 +77,7 @@ public class UserClient{
     public Map<String, String> getUserPictures(List<String> userIds){
         Map<String, String> result = new HashMap<>();
         userIds.forEach(userId -> {
-            String picture = userPictureRepository.fetchUserPicture(userId);
+            String picture = userId!=null ? userPictureRepository.fetchUserPicture(userId) : null;
             if (picture != null) {
                 result.put(userId, picture);
             }

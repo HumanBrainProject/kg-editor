@@ -191,7 +191,7 @@ public class InstanceClient {
         return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
-    public Map getRawInstance(String id) {
+    public Map<String, Object> getRawInstance(String id) {
         String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnEmbedded=true", id);
         Map result = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
@@ -200,7 +200,7 @@ public class InstanceClient {
         if (result != null && result.containsKey("data")) {
             final String permissionsKey = "permissions";
             try {
-                Map data = (HashMap<String, Object>) result.get("data");
+                Map<String, Object> data = (HashMap<String, Object>) result.get("data");
                 if (data.containsKey(EditorConstants.VOCAB_PERMISSIONS)) {
                         List<String> permissionList = (List<String>) data.get(EditorConstants.VOCAB_PERMISSIONS);
                         Permissions permissions = Permissions.fromPermissionList(permissionList);

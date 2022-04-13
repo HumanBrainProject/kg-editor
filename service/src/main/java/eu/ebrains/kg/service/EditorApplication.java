@@ -44,6 +44,7 @@ public class EditorApplication extends WebSecurityConfigurerAdapter {
         SpringApplication.run(EditorApplication.class, args);
     }
 
+    @Override
     @SuppressWarnings("java:S4502") //We suppress the csrf disable warning because we have a stateless, token-base API (also see https://www.baeldung.com/spring-security-csrf#stateless-spring-api ).
     protected void configure(HttpSecurity http) throws Exception {
         /**

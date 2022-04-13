@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class UserPictureRepository {
     }
 
     @Cacheable(value="userPicture")
-    public String fetchUserPicture(String userId){
+    public String fetchUserPicture(@NotNull String userId){
         logger.info(String.format("Fetching user %s picture from endpoint - no cache available", userId));
         String relativeUrl = "users/pictures";
         Map<String, String> usersPictures = kg.client().post().uri(kg.url(relativeUrl))

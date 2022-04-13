@@ -93,7 +93,7 @@ public class IdController {
         if(e instanceof Collection) {
             ((Collection<?>) e).forEach(col -> simplifyIdIfObjectIsAMap(col));
         } else if (e instanceof Map) {
-            Map map = (Map) e;
+            Map<String, Object> map = (Map<String, Object>) e;
             Object atId = map.get("@id");
             if (atId != null) {
                 UUID uuid = simplifyFullyQualifiedId(atId.toString());

@@ -85,10 +85,4 @@ public class Users {
         return userClient.getUsers(search);
     }
 
-    //FIXME this endpoint does not work properly yet (already with the old service).
-//    @PutMapping(value = "/picture", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-//    public void saveUserPicture(@RequestBody String payload) {
-//        System.out.println(payload);
-//    }
-
 }

@@ -92,7 +92,7 @@ public class Instances {
     }
 
     @GetMapping("/instances/{id}/raw")
-    public Map getRawInstance(@PathVariable("id") String id) {
+    public Map<String, Object> getRawInstance(@PathVariable("id") String id) {
         return instanceClient.getRawInstance(id);
     }
 

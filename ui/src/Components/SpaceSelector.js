@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import ReactPiwik from "react-piwik";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -31,6 +31,7 @@ import { useStores } from "../Hooks/UseStores";
 
 import CustomDropdownToggle from "./CustomDropdownToggle";
 import CustomDropdownMenu from "./CustomDropdownMenu";
+import Filter from "./Filter";
 
 const useStyles = createUseStyles({
   container: {
@@ -46,19 +47,33 @@ const useStyles = createUseStyles({
     gridTemplateColumns: "auto 1fr auto",
     "& .btn-group": {
       margin: "-2px"
+    },
+    "& .inputFilter": {
+      minWidth: "286px"
+    }
+  },
+  dropdownItem: {
+    color: "var(--ft-color-loud)",
+    "&:hover": {
+      backgroundColor: "var(--list-bg-hover)",
+      color: "var(--ft-color-loud)"
     }
   }
 });
 
 const SpaceSelector = observer(() => {
   const classes = useStyles();
-
+  const [ filter, setFilter ] = useState();
   const { appStore, authStore } = useStores();
 
   const handleSelectSpace = space => {
     ReactPiwik.push(["trackEvent", "Space", "Select", space]);
     appStore.setCurrentSpace(space);
   }
+
+  const handleChange = value => setFilter(value);
+
+  const spaces = authStore.filteredList(filter);
 
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
@@ -68,10 +83,12 @@ const SpaceSelector = observer(() => {
             {appStore.currentSpaceName}
           </Dropdown.Toggle>
           <Dropdown.Menu as={CustomDropdownMenu} >
-            {authStore.spaces.map(space =>
+            <Filter value={filter} placeholder="Filter spaces" onChange={handleChange} />
+            {spaces.map(space =>
               <Dropdown.Item
                 key={space.id}
                 eventKey={space.id}
+                className={classes.dropdownItem}
               >
                 {space.name||space.id}
               </Dropdown.Item>

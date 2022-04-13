@@ -26,8 +26,9 @@ import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
   dropdownMenu: {
-    background: "var(--ft-color-loud)",
-    fontSize: "0.9em"
+    background: "var(--bg-color-ui-contrast2)",
+    fontSize: "0.9em",
+    border: "1px solid var(--border-color-ui-contrast2)"
   },
   list: {
     paddingLeft: "0",

@@ -76,6 +76,15 @@ export class AuthStore {
     this.transportLayer = transportLayer;
   }
 
+  filteredList(term) {
+    term = term && term.trim().toLowerCase();
+    if(term) {
+      return this.spaces.filter(t => t.id.toLowerCase().includes(term));
+    }
+    return this.spaces;
+  }
+
+
   get accessToken() {
     return this.isAuthenticated ? this.keycloak.token: "";
   }

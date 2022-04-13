@@ -48,9 +48,9 @@ export class TypeStore {
   }
 
   filteredList(term) {
-    term = typeof term === "string" && term.trim().toLowerCase();
+    term = term && term.trim().toLowerCase();
     if(term) {
-      return this.filteredTypes.filter(type => type && typeof type.label === "string" && type.label.toLowerCase().includes(term));
+      return this.filteredTypes.filter(type => type.label.toLowerCase().includes(term));
     }
     return this.filteredTypes;
   }

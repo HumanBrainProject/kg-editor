@@ -75,7 +75,7 @@ const Filter = ({ value, placeholder="filter...", icon="search", onChange }) => 
     <div className={classes.container}>
       <Form.Control
         ref={ref}
-        className={classes.input}
+        className={`${classes.input} inputFilter`}
         type="text"
         onChange={handleChange}
         value={value}

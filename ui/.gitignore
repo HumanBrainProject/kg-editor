@@ -1,4 +1,6 @@
 node_modules
+coverage
+test-report.xml
 .tmp
 .DS_Store
 .vscode

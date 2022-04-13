@@ -26,15 +26,15 @@ package eu.ebrains.kg.service.models;
 import java.util.Map;
 
 public class ResultWithOriginalMap<T> {
-    private final Map<?, ? > originalMap;
+    private final Map<String,Object> originalMap;
     private final T result;
 
-    public ResultWithOriginalMap(Map<?, ?> originalMap, T result) {
+    public ResultWithOriginalMap(Map<String, Object> originalMap, T result) {
         this.originalMap = originalMap;
         this.result = result;
     }
 
-    public Map<?, ?> getOriginalMap() {
+    public Map<String, Object> getOriginalMap() {
         return originalMap;
     }
 

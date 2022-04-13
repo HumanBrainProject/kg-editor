@@ -198,18 +198,19 @@ public class InstanceClient {
                 .bodyToMono(Map.class)
                 .block();
         if (result != null && result.containsKey("data")) {
+            final String permissionsKey = "permissions";
             try {
                 Map data = (HashMap<String, Object>) result.get("data");
                 if (data.containsKey(EditorConstants.VOCAB_PERMISSIONS)) {
                         List<String> permissionList = (List<String>) data.get(EditorConstants.VOCAB_PERMISSIONS);
                         Permissions permissions = Permissions.fromPermissionList(permissionList);
                         data.remove(EditorConstants.VOCAB_PERMISSIONS);
-                        result.put("permissions", permissions);
+                        result.put(permissionsKey, permissions);
                 } else {
-                    result.put("permissions", Collections.emptyList());
+                    result.put(permissionsKey, Collections.emptyList());
                 }
             } catch (Exception e) {
-                result.put("permissions", Collections.emptyList());
+                result.put(permissionsKey, Collections.emptyList());
             }
         }
         return result;
@@ -241,7 +242,7 @@ public class InstanceClient {
         return null;
     }
 
-    private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(Map<?,?> data, Class<T> target) {
+    private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(Map<String, Object> data, Class<T> target) {
         if (data != null) {
             T mapped = objectMapper.convertValue(data, target);
             return new ResultWithOriginalMap<T>(data, mapped);

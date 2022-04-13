@@ -44,6 +44,11 @@ public class OauthClient {
     private final ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1000000)).build();
 
+
+    public final static String AUTHORIZATION_KEY = "Authorization";
+    private final static String USER_AUTHORIZATION_KEY = "User-Authorization";
+    private final static java.lang.String CLIENT_AUTHORIZATION_KEY = "Client-Authorization";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Bean
     WebClient webClient(ClientRegistrationRepository clientRegistrations, OAuth2AuthorizedClientService authorizedClientService, HttpServletRequest request) {
@@ -60,10 +65,10 @@ public class OauthClient {
             ClientRequest updatedHeaders = ClientRequest.from(clientRequest).headers(h -> {
                 //Spring adds the oauth2 bearer token to the standard "Authorization" header -> we want it to be sent as
                 // "Client-Authorization" though to let the user token be handed in properly.
-                h.put("Client-Authorization", h.get("Authorization"));
-                List<String> userAuth = h.get("User-Authorization");
-                h.put("Authorization", userAuth);
-                h.remove("User-Authorization");
+                h.put(CLIENT_AUTHORIZATION_KEY, h.get(AUTHORIZATION_KEY));
+                List<String> userAuth = h.get(USER_AUTHORIZATION_KEY);
+                h.put(AUTHORIZATION_KEY, userAuth);
+                h.remove(USER_AUTHORIZATION_KEY);
             }).build();
             return nextFilter.exchange(updatedHeaders);
         }).defaultRequest(r -> {
@@ -72,7 +77,7 @@ public class OauthClient {
              *  thread and we therefore have access to the original request. We store it in a temporary header since otherwise
              *  it would be overwritten by the above exchange filter.
              */
-            r.header("User-Authorization", request.getHeader("Authorization"));
+            r.header(USER_AUTHORIZATION_KEY, request.getHeader(AUTHORIZATION_KEY));
         }).build();
     }
 

@@ -107,7 +107,7 @@ public class StructureOfField implements Serializable {
     private final Boolean required;
     private final Boolean readOnly;
     private Map<String, StructureOfField> fields;
-    private Object value;
+    private transient Object value;
     private String defaultTargetType;
     private List<SimpleType> targetTypes;
     private final List<ValidationRule> validation;

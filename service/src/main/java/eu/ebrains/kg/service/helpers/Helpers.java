@@ -34,6 +34,10 @@ import java.util.stream.Collectors;
 
 public class Helpers {
 
+    private Helpers() {
+        //Don't instantiate
+    }
+
     public static Map<String, StructureOfType> getTypesByName(Map<String, KGCoreResult<StructureOfType>> typesResultByName) {
         return typesResultByName.values().stream()
                 .map(KGCoreResult::getData)

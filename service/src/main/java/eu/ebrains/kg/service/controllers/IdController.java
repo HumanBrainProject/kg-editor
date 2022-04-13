@@ -91,7 +91,7 @@ public class IdController {
 
     public Object simplifyIdIfObjectIsAMap(Object e) {
         if(e instanceof Collection) {
-            ((Collection<?>) e).forEach(col -> simplifyIdIfObjectIsAMap(col));
+            ((Collection<?>) e).forEach(this::simplifyIdIfObjectIsAMap);
         } else if (e instanceof Map) {
             Map<String, Object> map = (Map<String, Object>) e;
             Object atId = map.get("@id");

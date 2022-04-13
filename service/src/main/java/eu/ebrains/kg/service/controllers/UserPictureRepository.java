@@ -24,7 +24,7 @@ public class UserPictureRepository {
 
     @Cacheable(value="userPicture")
     public String fetchUserPicture(@NotNull String userId){
-        logger.info(String.format("Fetching user %s picture from endpoint - no cache available", userId));
+        logger.info("Fetching user {} picture from endpoint - no cache available", userId);
         String relativeUrl = "users/pictures";
         Map<String, String> usersPictures = kg.client().post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(Collections.singletonList(userId))).retrieve().bodyToMono(Map.class).block();

@@ -71,7 +71,7 @@ public class Summary {
         String rootLabelField =  rootType.getLabelField();
         Set<StructureOfField> searchableFields = rootType.getFields().values().stream().filter(f -> f.getSearchable()!=null && f.getSearchable() && !f.getFullyQualifiedName().equals(rootLabelField)).collect(Collectors.toSet());
         List<String> otherTypes = result.getData().stream().map(r -> r.getResult().getTypes()).flatMap(Collection::stream).map(SimpleType::getName).filter(t -> !t.equals(type)).distinct().collect(Collectors.toList());
-        if(otherTypes.size()>0) {
+        if(!otherTypes.isEmpty()) {
             Map<String, KGCoreResult<StructureOfType>> otherTypesByName = spaceClient.getTypesByName(otherTypes, false);
             if(otherTypesByName!=null) {
                 typesByName.putAll(otherTypesByName);

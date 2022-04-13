@@ -45,9 +45,9 @@ public class OauthClient {
             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1000000)).build();
 
 
-    public final static String AUTHORIZATION_KEY = "Authorization";
-    private final static String USER_AUTHORIZATION_KEY = "User-Authorization";
-    private final static java.lang.String CLIENT_AUTHORIZATION_KEY = "Client-Authorization";
+    public static final String AUTHORIZATION_KEY = "Authorization";
+    private static final String USER_AUTHORIZATION_KEY = "User-Authorization";
+    private static final java.lang.String CLIENT_AUTHORIZATION_KEY = "Client-Authorization";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     @Bean
@@ -71,14 +71,14 @@ public class OauthClient {
                 h.remove(USER_AUTHORIZATION_KEY);
             }).build();
             return nextFilter.exchange(updatedHeaders);
-        }).defaultRequest(r -> {
+        }).defaultRequest(r ->
             /**
              *  We have to add the user access token to the request here, because this consumer is executed in the original
              *  thread and we therefore have access to the original request. We store it in a temporary header since otherwise
              *  it would be overwritten by the above exchange filter.
              */
-            r.header(USER_AUTHORIZATION_KEY, request.getHeader(AUTHORIZATION_KEY));
-        }).build();
+            r.header(USER_AUTHORIZATION_KEY, request.getHeader(AUTHORIZATION_KEY))
+        ).build();
     }
 
 }

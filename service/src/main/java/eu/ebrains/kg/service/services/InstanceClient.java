@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @Component
 public class InstanceClient {
 
-    private final int INCOMING_LINKS_PAGE_SIZE = 10;
+    private static final int INCOMING_LINKS_PAGE_SIZE = 10;
 
     private final IdController idController;
     private final ObjectMapper objectMapper;
@@ -80,7 +80,7 @@ public class InstanceClient {
                     } else if (r.getError() != null) {
                         T t = objectMapper.convertValue(new HashMap<>(), clazz);
                         t.setError(r.getError());
-                        result.put(f,  new ResultWithOriginalMap<T>(null, t));
+                        result.put(f,  new ResultWithOriginalMap<>(null, t));
                     }
                 }
             });
@@ -88,7 +88,7 @@ public class InstanceClient {
         return result;
     }
 
-    private static class IncomingLinksResult extends KGCoreResult<List<IncomingLink>> {};
+    private static class IncomingLinksResult extends KGCoreResult<List<IncomingLink>> {}
 
     public KGCoreResult<List<IncomingLink>> getIncomingLinks(String id,
                                                         String property,
@@ -193,7 +193,7 @@ public class InstanceClient {
 
     public Map<String, Object> getRawInstance(String id) {
         String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnEmbedded=true", id);
-        Map result = kg.client().get().uri(kg.url(relativeUrl))
+        Map<String, Object> result = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
@@ -245,7 +245,7 @@ public class InstanceClient {
     private <T> ResultWithOriginalMap<T> buildResultWithOriginalMap(Map<String, Object> data, Class<T> target) {
         if (data != null) {
             T mapped = objectMapper.convertValue(data, target);
-            return new ResultWithOriginalMap<T>(data, mapped);
+            return new ResultWithOriginalMap<>(data, mapped);
         }
         return null;
     }

@@ -29,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.digester.Rule;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;

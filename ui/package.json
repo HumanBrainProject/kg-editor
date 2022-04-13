@@ -50,7 +50,7 @@
     "start": "env-cmd -f .env.development react-scripts start",
     "build": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test",
-    "testCI": "react-scripts test --coverage",
+    "testCI": "react-scripts test --coverage --passWithNoTests",
     "eject": "react-scripts eject",
     "lint": "eslint src/",
     "fix_lint": "eslint --fix src/"

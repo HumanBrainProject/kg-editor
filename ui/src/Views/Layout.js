@@ -23,7 +23,7 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { Route, Routes, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { createUseStyles, useTheme } from "react-jss";

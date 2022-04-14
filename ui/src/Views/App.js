@@ -41,23 +41,20 @@ const BrowserEventHandler = observer(() => {
 
   const { appStore, instanceStore } = useStores();
 
-  // useEffect(() => {
-  //   //TODO: Check if this is working. 
-  //   return window.location.listen(location => {
-  //     if (location.action === "POP") {
-  //       const path = location.pathname;
-  //       if(path.startsWith("/instance")) {
-  //         const id = path.split("/")[2];
-  //         const instance = instanceStore.instances.get(id);
-  //         if (!instance || instance.space !== appStore.currentSpace.id) {
-  //           appStore.closeInstance(location, navigate, id);
-  //           window.location.replace(location.pathname);
-  //         }
-  //       }
-  //     }
-  //   });
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    window.onpopstate = () => {
+      const path = location.pathname;
+      if(path.startsWith("/instance")) {
+        const id = path.split("/")[2];
+        const instance = instanceStore.instances.get(id);
+        if (!instance || instance.space !== appStore.currentSpace.id) {
+          appStore.closeInstance(location, navigate, id);
+          window.location.replace(location.pathname);
+        }
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 });

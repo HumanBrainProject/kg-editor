@@ -32,6 +32,7 @@ import { useStores } from "../../../Hooks/UseStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   title: {
@@ -87,6 +88,7 @@ const MoveInstance = observer(({instance, className}) => {
   const classes = useStyles();
 
   const { appStore, statusStore, authStore } = useStores();
+  const navigate = useNavigate();
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchStatus(), [instance]);
@@ -114,10 +116,10 @@ const MoveInstance = observer(({instance, className}) => {
 
   const handleMoveInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Move", instance.id]);
-    appStore.moveInstance(instance.id, spaceId);
+    appStore.moveInstance(instance.id, spaceId, navigate);
   };
 
-  const handleCancelMoveInstance = () => appStore.retryMoveInstance();
+  const handleCancelMoveInstance = () => appStore.retryMoveInstance(navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
 

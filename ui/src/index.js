@@ -35,6 +35,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Services/IconsImport";
 
 import App from "./Views/App";
+import { BrowserRouter } from "react-router-dom";
+import ErrorBoundary from "./Views/ErrorBoundary";
 
 // configure({
 //   enforceActions: "always",
@@ -55,6 +57,10 @@ new ReactPiwik({
 render(
   <React.StrictMode>
     <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>
-      <App />
+      <ErrorBoundary>
+        <BrowserRouter>
+          <App />
+          </BrowserRouter>
+        </ErrorBoundary>
     </JssProvider>
   </React.StrictMode>, document.getElementById("root"));

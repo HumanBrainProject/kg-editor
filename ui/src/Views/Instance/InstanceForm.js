@@ -39,6 +39,7 @@ import SavingPanel from "./InstanceForm/SavingPanel";
 import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   container: {
@@ -139,7 +140,8 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const classes = useStyles();
 
-  const { appStore, history, instanceStore } = useStores();
+  const { appStore, instanceStore } = useStores();
+  const navigate = useNavigate();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstance(), [id]);
@@ -168,7 +170,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
       const instance = instanceStore.instances.get(id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
-      history.push(`/instances/${this.props.id}`);
+      navigate(`/instances/${this.props.id}`);
     }
   };
 
@@ -186,7 +188,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const handleSave = e => {
     e && e.stopPropagation();
-    instance && appStore.saveInstance(instance);
+    instance && appStore.saveInstance(instance, navigate);
   };
 
   const handleCancelSave = e => {

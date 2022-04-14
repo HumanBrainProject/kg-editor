@@ -28,14 +28,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../../Hooks/UseStores";
+import { useNavigate } from "react-router-dom";
 
 const DuplicateInstance = observer(({instance, className}) => {
 
   const { appStore } = useStores();
+  const navigate = useNavigate();
 
   const handleDuplicateInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Duplicate", instance.id]);
-    appStore.duplicateInstance(instance.id);
+    appStore.duplicateInstance(instance.id, navigate);
   };
 
   const permissions = instance.permissions;

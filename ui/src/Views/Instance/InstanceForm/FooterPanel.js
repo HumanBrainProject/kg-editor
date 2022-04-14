@@ -27,6 +27,7 @@ import { createUseStyles } from "react-jss";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../../../Hooks/UseStores";
 
@@ -91,17 +92,20 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
 
   const classes = useStyles();
 
-  const { appStore, history } = useStores();
+  const { appStore } = useStores();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleOpenInstance = async e => {
     e.stopPropagation();
     if(appStore.currentSpace.id !== instance.space) {
-      await appStore.setCurrentSpace(instance.space);
+      await appStore.setCurrentSpace(location, navigate, instance.space);
     }
     if(e.metaKey || e.ctrlKey){
       appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
     } else {
-      history.push(`/instances/${instance.id}`);
+      navigate(`/instances/${instance.id}`);
     }
   };
 

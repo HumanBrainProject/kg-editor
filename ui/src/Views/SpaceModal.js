@@ -26,6 +26,7 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import Modal from "react-bootstrap/Modal";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -104,9 +105,12 @@ const SpaceModal = observer(() => {
 
   const classes = useStyles();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { appStore, authStore } = useStores();
 
-  const handleClick = space => appStore.setCurrentSpace(space);
+  const handleClick = space => appStore.setCurrentSpace(location, navigate, space);
 
   return (
     <div className={classes.container}>

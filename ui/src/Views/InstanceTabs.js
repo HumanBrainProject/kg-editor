@@ -23,7 +23,7 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { matchPath } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import ReactPiwik from "react-piwik";
 
@@ -40,6 +40,9 @@ const useStyles = createUseStyles({
 
 const InstanceTab = observer(({view, pathname}) => {
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { appStore, instanceStore, viewStore } = useStores();
 
   const instance = instanceStore.instances.get(view.instanceId);
@@ -54,9 +57,9 @@ const InstanceTab = observer(({view, pathname}) => {
 
   const isCurrent = (instanceId, mode) => {
     if(mode !== "view") {
-      return matchPath(pathname, { path: `/instances/${instanceId}/${mode}`, exact: "true" });
+      return matchPath({ path: `/instances/${instanceId}/${mode}` }, pathname);
     }
-    return matchPath(pathname, { path: `/instances/${instanceId}`, exact: "true" });
+    return matchPath({ path: `/instances/${instanceId}` }, pathname);
   };
 
 
@@ -66,7 +69,7 @@ const InstanceTab = observer(({view, pathname}) => {
     } else {
       ReactPiwik.push(["trackEvent", "Tab", "CloseOtherInstance", view.instanceId]);
     }
-    appStore.closeInstance(view.instanceId);
+    appStore.closeInstance(location, navigate, view.instanceId);
   }
 
   const label = (instance && (instance.isFetched || instance.isLabelFetched))?instance.name:(view.name?view.name:view.instanceId);

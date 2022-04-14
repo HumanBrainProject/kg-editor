@@ -137,7 +137,7 @@ export class AppStore{
     this.transportLayer = transportLayer;
     this.rootStore = rootStore;
 
-    this.canLogin = !matchPath(this.rootStore.history.location.pathname, { path: "/logout", exact: "true" });
+    this.canLogin = !matchPath({ path: "/logout" }, window.location.pathname);
     this.setTheme(localStorage.getItem("theme"));
     let savedHistorySettings = null;
     if (localStorage.getItem("historySettings")) {
@@ -160,16 +160,16 @@ export class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
-  async createExternalInstance(space, typeName, value) {
+  async createExternalInstance(space, typeName, value, location, navigate) {
     if (this.rootStore.instanceStore.hasUnsavedChanges) {
       this.externalCreateModal = {space: space, type: typeName, value: value};
     } else {
       this.externalCreateModal = null;
-      await this.setCurrentSpace(space);
+      await this.setCurrentSpace(location, navigate, space);
       const type = this.rootStore.typeStore.typesMap.get(typeName);
       const uuid = _.uuid();
       this.rootStore.instanceStore.createNewInstance(type, uuid, value);
-      this.rootStore.history.push(`/instances/${uuid}/create`);
+      navigate(`/instances/${uuid}/create`);
     }
   }
 
@@ -187,7 +187,7 @@ export class AppStore{
     this.externalCreateModal = null;
   }
 
-  async initialize() {
+  async initialize(location, navigate) {
     if (this.canLogin && !this.isInitialized) {
       this.initializingMessage = "Initializing the application...";
       this.initializationError = null;
@@ -219,7 +219,7 @@ export class AppStore{
         });
       }
       if(this.rootStore.authStore.isAuthenticated && this.rootStore.authStore.isUserAuthorized) {
-        await this.initializeSpace();
+        await this.initializeSpace(location, navigate);
         runInAction(() => {
           this.initializingMessage = null;
           this.isInitialized = !!this.currentSpace || (!this.initialInstanceError && !this.initialInstanceSpaceError) ;
@@ -243,12 +243,12 @@ export class AppStore{
     this.pathsToResolve.clear();
   }
 
-  matchInstancePath = (id=":id") => {
-    let path =  matchPath(this.rootStore.history.location.pathname, { path: `/instances/${id}/:mode`, exact: "true" });
+  matchInstancePath = (pathname, id=":id") => {
+    let path =  matchPath({ path: `/instances/${id}/:mode` }, pathname);
     if(path) {
       return path;
     }
-    path = matchPath(this.rootStore.history.location.pathname, { path: `/instances/${id}`, exact: "true" });
+    path = matchPath({ path: `/instances/${id}` }, pathname);
     if(!path) {
       return null;
     }
@@ -260,14 +260,14 @@ export class AppStore{
     };
   }
 
-  async initializeSpace() {
+  async initializeSpace(location, navigate) {
     let space = null;
     this.initializingMessage = "Setting space...";
-    const path = this.matchInstancePath();
+    const path = this.matchInstancePath(location.pathname);
     if (path && path.params.mode !== "create") {
       space = await this.getInitialInstanceSpace(path.params.id);
       if (space) {
-        this.setCurrentSpace(space, !!path && !!path.params.id);
+        this.setCurrentSpace(location, navigate, space, !!path && !!path.params.id);
         if (!this.currentSpace || this.currentSpace.id !== space) {
           const instance = this.rootStore.instanceStore.instances.get(path.params.id);
           if (instance?.permissions?.canRead) {
@@ -330,8 +330,8 @@ export class AppStore{
     return null;
   }
 
-  cancelInitialInstance() {
-    this.rootStore.history.replace("/browse");
+  cancelInitialInstance(navigate) {
+    navigate("/browse", {replace: true});
     this.initializationError = null;
     this.initialInstanceError = null;
     this.initialInstanceSpaceError = null;
@@ -341,22 +341,22 @@ export class AppStore{
     this.isInitialized = true;
   }
 
-  closeAllInstances() {
+  closeAllInstances(location, navigate) {
     this.rootStore.instanceStore.resetInstanceIdAvailability();
-    if (!(matchPath(this.rootStore.history.location.pathname, { path: "/", exact: "true" })
-      || matchPath(this.rootStore.history.location.pathname, { path: "/browse", exact: "true" })
-      || matchPath(this.rootStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
-      this.rootStore.history.push("/browse");
+    if (!(matchPath({ path: "/" }, location.pathname)
+      || matchPath({ path: "/browse" }, location.pathname)
+      || matchPath({ path: "/help/*" }, location.pathname))) {
+      navigate("/browse");
     }
     this.rootStore.viewStore.unregisterAllViews();
   }
 
-  clearViews() {
+  clearViews(location, navigate) {
     this.rootStore.instanceStore.resetInstanceIdAvailability();
-    if (!(matchPath(this.rootStore.history.location.pathname, { path: "/", exact: "true" })
-      || matchPath(this.rootStore.history.location.pathname, { path: "/browse", exact: "true" })
-      || matchPath(this.rootStore.history.location.pathname, { path: "/help/*", exact: "true" }))) {
-      this.rootStore.history.push("/browse");
+    if (!(matchPath({ path: "/" }, location.pathname)
+      || matchPath({ path: "/browse" }, location.pathname)
+      || matchPath({ path: "/help/*" }, location.pathname))) {
+        navigate("/browse");
     }
     this.rootStore.viewStore.clearViews();
   }
@@ -418,7 +418,7 @@ export class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  async setCurrentSpace(selectedSpace, preventSelectView=false) {
+  async setCurrentSpace(location, navigate, selectedSpace, preventSelectView=false) {
     let space = selectedSpace?this.rootStore.authStore.spaces.find( w => w.id === selectedSpace):null;
     if (!space && this.rootStore.authStore.hasSpaces && this.rootStore.authStore.spaces.length === 1) {
       space = this.rootStore.authStore.spaces[0];
@@ -427,19 +427,19 @@ export class AppStore{
       if(this.rootStore.instanceStore.hasUnsavedChanges) {
         if (window.confirm("You are about to change space. All unsaved changes will be lost. Continue ?")) {
           this.rootStore.instanceStore.clearUnsavedChanges();
-          this.clearViews();
+          this.clearViews(location, navigate);
           this.rootStore.browseStore.clearInstancesFilter();
         } else {
           return false;
         }
       } else if(this.rootStore.viewStore.views.size > 0) {
-        this.clearViews();
+        this.clearViews(location, navigate);
         this.rootStore.browseStore.clearInstancesFilter();
       }
       this.currentSpace = space;
       if (this.currentSpace) {
         localStorage.setItem("space", space.id);
-        this.rootStore.viewStore.restoreViews(preventSelectView);
+        this.rootStore.viewStore.restoreViews(navigate, preventSelectView);
         await this.rootStore.typeStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       } else {
@@ -464,13 +464,8 @@ export class AppStore{
     this.rootStore.viewStore.syncStoredViews();
   }
 
-  getReadMode() {
-    const path = this.matchInstancePath();
-    return !(path && (path.params.mode === "edit" || path.params.mode === "create"));
-  }
-
-  closeInstance(instanceId) {
-    if (this.matchInstancePath(instanceId)) {
+  closeInstance(location, navigate, instanceId) {
+    if (this.matchInstancePath(location.pathname, instanceId)) {
       if (this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
@@ -478,12 +473,12 @@ export class AppStore{
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
+          navigate(`/instances/${newCurrentInstanceId}`);
         } else {
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        this.rootStore.history.push("/browse");
+        navigate("/browse");
         this.rootStore.browseStore.clearSelectedInstance();
       }
     }
@@ -497,7 +492,7 @@ export class AppStore{
     }
   }
 
-  async saveInstance(instance) {
+  async saveInstance(instance, navigate) {
     const isNew = instance.isNew;
     const id = instance.id;
     await instance.save();
@@ -513,7 +508,7 @@ export class AppStore{
               view.mode = "edit";
             }
             this.pathsToResolve.set(`/instances/${id}/create`, `/instances/${newId}/edit`);
-            this.replaceInstanceResolvedIdPath(`/instances/${id}/create`);
+            this.replaceInstanceResolvedIdPath(`/instances/${id}/create`, navigate);
           }
         });
         this.rootStore.viewStore.syncStoredViews();
@@ -529,7 +524,7 @@ export class AppStore{
     }
   }
 
-  async delete(instanceId) {
+  async delete(instanceId, location, navigate) {
     if (instanceId) {
       this.instanceToDelete = instanceId;
       this.isDeletingInstance = true;
@@ -540,7 +535,7 @@ export class AppStore{
           this.instanceToDelete = null;
           this.isDeletingInstance = false;
           let nextLocation = null;
-          if(this.matchInstancePath(instanceId)){
+          if(this.matchInstancePath(location.pathname, instanceId)){
             const ids = this.rootStore.viewStore.instancesIds;
             if(ids.length > 1){
               const currentInstanceIndex = ids.indexOf(instanceId);
@@ -555,7 +550,7 @@ export class AppStore{
           this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
           this.flush();
           if (nextLocation) {
-            this.rootStore.history.push(nextLocation);
+            navigate(nextLocation);
           }
         });
       } catch(e){
@@ -569,7 +564,7 @@ export class AppStore{
     }
   }
 
-  async duplicateInstance(fromInstanceId) {
+  async duplicateInstance(fromInstanceId, navigate) {
     const instanceToCopy = this.rootStore.instanceStore.instances.get(fromInstanceId);
     const payload = instanceToCopy.payload;
     const labelField = instanceToCopy.labelField;
@@ -585,7 +580,7 @@ export class AppStore{
       const newId = data.data.id;
       const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
       newInstance.initializeData(this.transportLayer, this.rootStore, data.data);
-      this.rootStore.history.push(`/instances/${newId}/edit`);
+      navigate(`/instances/${newId}/edit`);
     } catch(e){
       runInAction(() => {
         this.isCreatingNewInstance = false;
@@ -594,7 +589,7 @@ export class AppStore{
     }
   }
 
-  async moveInstance(instanceId, space) {
+  async moveInstance(instanceId, space, navigate) {
     this.instanceToMove = {
       id: instanceId,
       space: space
@@ -611,7 +606,7 @@ export class AppStore{
       this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
       this.flush();
       await this.setCurrentSpace(space);
-      this.rootStore.history.push(`/instances/${instanceId}`);
+      navigate(`/instances/${instanceId}`);
     } catch(e){
       runInAction(() => {
         const message = e.message?e.message:e;
@@ -622,8 +617,8 @@ export class AppStore{
     }
   }
 
-  async retryMoveInstance() {
-    return await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space);
+  async retryMoveInstance(navigate) {
+    return await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, navigate);
   }
 
   cancelMoveInstance() {
@@ -644,16 +639,16 @@ export class AppStore{
     this.deleteInstanceError = null;
   }
 
-  replaceInstanceResolvedIdPath(path) {
+  replaceInstanceResolvedIdPath(path, navigate) {
     if (this.pathsToResolve.has(path)) {
       const newPath = this.pathsToResolve.get(path);
       this.pathsToResolve.delete(path);
-      this.rootStore.history.replace(newPath);
+      navigate(newPath, {replace:true});
     }
   }
 
-  focusPreviousInstance(instanceId) {
-    if (this.matchInstancePath(instanceId)) {
+  focusPreviousInstance(instanceId, location, navigate) {
+    if (this.matchInstancePath(location.pathname, instanceId)) {
       if (this.rootStore.viewStore.views.size > 1) {
         let openedInstances = this.rootStore.viewStore.instancesIds;
         let currentInstanceIndex = openedInstances.indexOf(instanceId);
@@ -661,12 +656,12 @@ export class AppStore{
 
         let openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
+          navigate(`/instances/${newCurrentInstanceId}`);
         } else {
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        this.rootStore.history.push("/browse");
+        navigate("/browse");
       }
     } else {
       if (this.rootStore.viewStore.views.size > 1) {
@@ -674,18 +669,18 @@ export class AppStore{
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
+          navigate(`/instances/${newCurrentInstanceId}`);
         } else {
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        this.rootStore.history.push("/browse");
+        navigate("/browse");
       }
     }
   }
 
-  focusNextInstance(instanceId) {
-    if (this.matchInstancePath(instanceId)) {
+  focusNextInstance(instanceId, location, navigate) {
+    if (this.matchInstancePath(location.pathname, instanceId)) {
       if (this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
@@ -693,12 +688,12 @@ export class AppStore{
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
+          navigate(`/instances/${newCurrentInstanceId}`);
         } else {
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        this.rootStore.history.push("/browse");
+        navigate("/browse");
       }
     } else {
       if (this.rootStore.viewStore.views.size > 1) {
@@ -706,23 +701,23 @@ export class AppStore{
         const newCurrentInstanceId = openedInstances[0];
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         if(openedInstance.mode === "view"){
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}`);
+          navigate(`/instances/${newCurrentInstanceId}`);
         } else {
-          this.rootStore.history.push(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
+          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
         }
       } else {
-        this.rootStore.history.push("/browse");
+        navigate("/browse");
       }
     }
   }
 
-  goToDashboard = () => this.rootStore.history.push("/");
+  goToDashboard = navigate => navigate("/");
 
-  login = () => {
+  login = navigate => {
     if (this.canLogin) {
       this.rootStore.authStore.login();
     } else {
-      this.rootStore.history.replace("/");
+      navigate("/", { replace: true });
       this.canLogin = true;
       this.initialize(true);
     }

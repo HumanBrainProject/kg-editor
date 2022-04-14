@@ -32,6 +32,7 @@ import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
 
 import { useStores } from "../../Hooks/UseStores";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   container: {
@@ -128,7 +129,8 @@ const InstancesHistory = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, historyStore, instanceStore } = useStores();
+  const { appStore, historyStore, instanceStore } = useStores();
+  const navigate = useNavigate();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchInstances(appStore.currentSpace.id), [appStore.currentSpace.id]);
@@ -168,7 +170,7 @@ const InstancesHistory = observer(() => {
     let id = instance && instance.id;
     if (id) {
       ReactPiwik.push(["trackEvent", "Home", "InstanceOpenTab", instance.id]);
-      history.push(`/instances/${id}`);
+      navigate(`/instances/${id}`);
     }
   };
 
@@ -189,9 +191,9 @@ const InstancesHistory = observer(() => {
       }
       ReactPiwik.push(["trackEvent", "Home", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id]);
       if(mode === "view") {
-        history.push(`/instances/${id}`);
+        navigate(`/instances/${id}`);
       } else {
-        history.push(`/instances/${id}/${mode}`);
+        navigate(`/instances/${id}/${mode}`);
       }
     }
   };

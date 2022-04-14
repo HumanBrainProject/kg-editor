@@ -23,52 +23,56 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Router, useHistory } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
 import _  from "lodash-uuid";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../Hooks/UseStores";
 
-import ErrorBoundary from "./ErrorBoundary";
 import Layout from "./Layout";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
 
 const BrowserEventHandler = observer(() => {
-  const routerHistory = useHistory();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { appStore, instanceStore } = useStores();
 
-  useEffect(() => {
-    return routerHistory.listen(location => {
-      if (routerHistory.action === "POP") {
-        const path = location.pathname;
-        if(path.startsWith("/instance")) {
-          const id = path.split("/")[2];
-          const instance = instanceStore.instances.get(id);
-          if (!instance || instance.space !== appStore.currentSpace.id) {
-            appStore.closeInstance(id);
-            window.location.replace(location.pathname);
-          }
-        }
-      }
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   //TODO: Check if this is working. 
+  //   return window.location.listen(location => {
+  //     if (location.action === "POP") {
+  //       const path = location.pathname;
+  //       if(path.startsWith("/instance")) {
+  //         const id = path.split("/")[2];
+  //         const instance = instanceStore.instances.get(id);
+  //         if (!instance || instance.space !== appStore.currentSpace.id) {
+  //           appStore.closeInstance(location, navigate, id);
+  //           window.location.replace(location.pathname);
+  //         }
+  //       }
+  //     }
+  //   });
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return null;
 });
 
 const App = observer(() => {
 
-  const { appStore, history } = useStores();
+  const { appStore } = useStores();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const theme = appStore.currentTheme;
 
   useEffect(() => {
-    appStore.initialize();
+    appStore.initialize(location, navigate);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -82,34 +86,34 @@ const App = observer(() => {
       appStore.toggleTheme();
     } else if (e.altKey && e.shiftKey && e.keyCode === 70) { // alt+shift+f, browse
       ReactPiwik.push(["trackEvent", "Shortcut", "Browse"]);
-      history.push("/browse");
+      navigate("/browse");
     } else if (e.altKey && e.keyCode === 78) { // alt+n, new
       ReactPiwik.push(["trackEvent", "Shortcut", "Create"]);
       const uuid = _.uuid();
-      history.push(`/instances/${uuid}/create`);
+      navigate(`/instances/${uuid}/create`);
     } else if (e.altKey && e.keyCode === 68) { // alt+d, dashboard
       ReactPiwik.push(["trackEvent", "Shortcut", "Home"]);
-      history.push("/");
+      navigate("/");
     } else if (e.keyCode === 112) { // F1, help
       ReactPiwik.push(["trackEvent", "Shortcut", "Help"]);
-      history.push("/help");
+      navigate("/help");
     } else if (e.altKey && e.keyCode === 87) { // alt+w, close
       if (e.shiftKey) { // alt+shift+w, close all
         ReactPiwik.push(["trackEvent", "Shortcut", "CloseAllInstances"]);
-        appStore.closeAllInstances();
+        appStore.closeAllInstances(location, navigate);
       } else {
-        const matchInstanceTab = appStore.matchInstancePath();
+        const matchInstanceTab = appStore.matchInstancePath(location.pathname);
         if (matchInstanceTab) {
           ReactPiwik.push(["trackEvent", "Shortcut", "InstanceClose", matchInstanceTab.params.id]);
-          appStore.closeInstance(matchInstanceTab.params.id);
+          appStore.closeInstance(location, navigate, matchInstanceTab.params.id);
         }
       }
     } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
-      const matchInstanceTab = appStore.matchInstancePath();
-      appStore.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id);
+      const matchInstanceTab = appStore.matchInstancePath(location.pathname);
+      appStore.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
     } else if (e.altKey && e.keyCode === 39) { // right arrow, next
-      const matchInstanceTab = appStore.matchInstancePath();
-      appStore.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id);
+      const matchInstanceTab = appStore.matchInstancePath(location.pathname);
+      appStore.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
     } else {
       kCode.step = kCode.ref[kCode.step] === e.keyCode ? kCode.step + 1 : 0;
       if (kCode.step === kCode.ref.length) {
@@ -121,14 +125,12 @@ const App = observer(() => {
   };
 
   return (
-    <ErrorBoundary>
-      <Router history={history}>
-        <BrowserEventHandler />
-        <ThemeProvider theme={theme}>
-          <Layout />
-        </ThemeProvider>
-      </Router>
-    </ErrorBoundary>
+    <>
+      <BrowserEventHandler />
+      <ThemeProvider theme={theme}>
+        <Layout />
+      </ThemeProvider>
+    </>
   );
 });
 App.displayName = "App";

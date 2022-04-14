@@ -31,6 +31,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import uniqueId from "lodash/uniqueId";
 
 import { useStores } from "../../Hooks/UseStores";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   container: {
@@ -160,6 +161,7 @@ const TypesItem = observer(({ type }) => {
   const classes = useStyles();
 
   const { appStore, browseStore, instanceStore } = useStores();
+  const navigate = useNavigate();
 
   const handleSelect = e => {
     e && e.stopPropagation();
@@ -169,7 +171,7 @@ const TypesItem = observer(({ type }) => {
 
   const handleCreateInstance = () => {
     ReactPiwik.push(["trackEvent", "Browse", "CreateInstance", type.name]);
-    instanceStore.createNewInstanceOfType(type);
+    instanceStore.createNewInstanceOfType(type, navigate);
   }
 
   const selected = (browseStore.selectedItem && type)? (browseStore.selectedItem.name === type.name):false;

@@ -325,7 +325,7 @@ export class InstanceStore {
     }
   };
 
-  async checkNonRawInstanceIdAvailability(instanceId, mode) {
+  async checkNonRawInstanceIdAvailability(instanceId, mode, navigate) {
     try{
       const { data } = await this.transportLayer.getInstance(instanceId);
       runInAction(() => {
@@ -342,7 +342,7 @@ export class InstanceStore {
           this.rootStore.viewStore.syncStoredViews();
         }
         if (mode === "create") {
-          this.rootStore.history.replace(`/instances/${resolvedId}/edit`);
+          navigate(`/instances/${resolvedId}/edit`, {replace:true});
         }
       });
     } catch(e){
@@ -367,7 +367,7 @@ export class InstanceStore {
     }
   };
 
-  checkInstanceIdAvailability(instanceId, mode) {
+  checkInstanceIdAvailability(instanceId, mode, navigate) {
     const rawMode = mode === "raw";
     const instance = this.instances.get(instanceId);
     if (instance && ((rawMode && instance.isRawFetched) || (!rawMode && instance.isFetched))) {
@@ -394,7 +394,7 @@ export class InstanceStore {
         if (instance && instance.store.rootStore.typeStore.isFetched && instance._initialJsonData) {
           instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._initialJsonData);
         } else {
-          this.checkNonRawInstanceIdAvailability(instanceId, mode);
+          this.checkNonRawInstanceIdAvailability(instanceId, mode, navigate);
         }
       }
     }
@@ -612,7 +612,7 @@ export class InstanceStore {
     this.instances.set(id, instance);
   }
 
-  createNewInstanceOfType = type => {
+  createNewInstanceOfType = (type, navigate) => {
     const uuid = _.uuid();
     this.instanceIdAvailability.set(uuid, {
       isAvailable: false,
@@ -620,7 +620,7 @@ export class InstanceStore {
       error: null,
       type: type
     });
-    this.rootStore.history.push(`/instances/${uuid}/create`);
+    navigate(`/instances/${uuid}/create`);
   }
 
   removeInstances(instanceIds) {

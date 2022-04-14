@@ -27,6 +27,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../../Hooks/UseStores";
+import { useNavigate } from "react-router-dom";
 
 const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}) => {
   const handleClick = event => {
@@ -75,7 +76,8 @@ const Actions = observer(({ instance }) => {
   const { id, name, primaryType, permissions } = instance;
   const classes = useStyles();
 
-  const { appStore, history } = useStores();
+  const { appStore } = useStores();
+  const navigate = useNavigate();
 
   const handleCtrlClick = mode => {
     appStore.openInstance(id, name, primaryType, mode);
@@ -84,9 +86,9 @@ const Actions = observer(({ instance }) => {
   const handleClick = mode => {
     const { id } = instance;
     if(mode === "view") {
-      history.push(`/instances/${id}`);
+      navigate(`/instances/${id}`);
     } else {
-      history.push(`/instances/${id}/${mode}`);
+      navigate(`/instances/${id}/${mode}`);
     }
   };
 

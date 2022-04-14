@@ -175,7 +175,7 @@ export class ViewStore{
     localStorage.removeItem(STORED_INSTANCE_VIEWS_KEY);
   }
 
-  restoreViews(preventSelectView=false){
+  restoreViews(navigate, preventSelectView=false){
     this.clearViews();
     if(this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
@@ -191,7 +191,7 @@ export class ViewStore{
         });
       }
       if (selectedView) {
-        selectedView.mode === "view" ? this.rootStore.history.push(`/instances/${selectedView.id}`):this.rootStore.history.push(`/instances/${selectedView.id}/${selectedView.mode}`);
+        selectedView.mode === "view" ? navigate(`/instances/${selectedView.id}`):navigate(`/instances/${selectedView.id}/${selectedView.mode}`);
       }
     }
   }

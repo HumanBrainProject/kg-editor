@@ -22,7 +22,7 @@
  */
 
 import React, {useEffect} from "react";
-import { Route, Switch, NavLink, Redirect } from "react-router-dom";
+import { Route, Routes, NavLink, Navigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
@@ -147,28 +147,28 @@ const Instances = ({match}) => {
       <div className={classes.content}>
         <Scrollbars autoHide>
           <div className={classes.contentInner}>
-            <Switch>
-              <Route exact path={`${path}`} render={()=><Redirect to={`${path}/introduction`}/>}/>
-              <Route path={`${path}/introduction`} exact={true} component={Introduction}/>
+            <Routes>
+              <Route path={`${path}`} render={()=> <Navigate to={`${path}/introduction`} replace={true} />}/>
+              <Route path={`${path}/introduction`} element={<Introduction />}/>
 
-              <Route path={`${path}/browse`} exact={true} component={Browse}/>
-              <Route path={`${path}/browse/nodetypes`} exact={true} component={BrowseNodetypes}/>
+              <Route path={`${path}/browse`} element={<Browse />}/>
+              <Route path={`${path}/browse/nodetypes`} element={<BrowseNodetypes />}/>
 
-              <Route path={`${path}/create`} exact={true} component={CreateAnInstance}/>
+              <Route path={`${path}/create`} element={<CreateAnInstance />}/>
 
-              <Route path={`${path}/instance`} exact={true} component={OpenAnInstance}/>
-              <Route path={`${path}/instance/view`} exact={true} component={OAIView}/>
-              <Route path={`${path}/instance/edit`} exact={true} component={OAIEdit}/>
-              <Route path={`${path}/instance/edit/save`} exact={true} component={OAIEditSave}/>
-              <Route path={`${path}/instance/graph`} exact={true} component={OAIExplore}/>
-              <Route path={`${path}/instance/release`} exact={true} component={OAIRelease}/>
+              <Route path={`${path}/instance`} element={<OpenAnInstance />}/>
+              <Route path={`${path}/instance/view`} element={<OAIView />}/>
+              <Route path={`${path}/instance/edit`} element={<OAIEdit />}/>
+              <Route path={`${path}/instance/edit/save`} element={<OAIEditSave />}/>
+              <Route path={`${path}/instance/graph`} element={<OAIExplore />}/>
+              <Route path={`${path}/instance/release`} element={<OAIRelease />}/>
 
-              <Route path={`${path}/statistics`} exact={true} component={Statistics}/>
-              <Route path={`${path}/settings`} exact={true} component={Settings}/>
-              <Route path={`${path}/faq`} exact={true} component={FAQ}/>
-              <Route path={`${path}/contact`} exact={true} component={ContactTheSupport}/>
+              <Route path={`${path}/statistics`} element={<Statistics />}/>
+              <Route path={`${path}/settings`} element={<Settings />}/>
+              <Route path={`${path}/faq`} element={<FAQ />}/>
+              <Route path={`${path}/contact`} element={<ContactTheSupport />}/>
 
-            </Switch>
+            </Routes>
           </div>
         </Scrollbars>
       </div>

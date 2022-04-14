@@ -35,6 +35,7 @@ import View from "./Instance/Instance";
 import Spinner from "../Components/Spinner";
 import BGMessage from "../Components/BGMessage";
 import TypeSelection from "./Instance/TypeSelection";
+import { useNavigate, useParams } from "react-router-dom";
 
 const useStyles = createUseStyles({
   loader: {
@@ -67,13 +68,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const Instance = observer(({ match, mode }) => {
+const Instance = observer(({ mode }) => {
 
   const classes = useStyles();
+  const { appStore, instanceStore, viewStore, typeStore } = useStores();
+  const navigate = useNavigate();
+  const params = useParams();
 
-  const id = match.params.id;
-
-  const { appStore, history, instanceStore, viewStore, typeStore } = useStores();
+  const id = params.id;
 
   useEffect(() => {
     if (typeStore.isFetched) {
@@ -85,20 +87,20 @@ const Instance = observer(({ match, mode }) => {
       const instance = instanceStore.instances.get(id);
       if (instance && ((mode === "raw" && instance.isRawFetched) || (mode !== "raw" && instance.isFetched))) {
         if (mode === "create" && !instance.isNew) {
-          history.replace(`/instances/${id}/edit`);
+          navigate(`/instances/${id}/edit`, {replace: true});
         }
       } else {
-        instanceStore.checkInstanceIdAvailability(id, mode);
+        instanceStore.checkInstanceIdAvailability(id, mode, navigate);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode, typeStore.isFetched]);
 
-  const handleRetry = () => instanceStore.checkInstanceIdAvailability(id, mode);
+  const handleRetry = () => instanceStore.checkInstanceIdAvailability(id, mode, navigate);
 
   const handleContinue = () => {
     instanceStore.instanceIdAvailability.delete(id);
-    history.replace("/browse");
+    navigate(`/browse`, {replace: true});
   };
 
   const handleCreateNewInstanceOfType = type => {

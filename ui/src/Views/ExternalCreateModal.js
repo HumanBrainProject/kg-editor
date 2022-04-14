@@ -28,6 +28,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -57,6 +58,9 @@ const ExternalCreateModal = observer(() => {
 
   const classes = useStyles();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { appStore, instanceStore } = useStores();
 
   if (!appStore.externalCreateModal) {
@@ -68,11 +72,11 @@ const ExternalCreateModal = observer(() => {
     appStore.updateExternalInstanceModal(instancesToSave.length);
     await Promise.all(instancesToSave.map(async instance => {
       if(!instance.isSaving) {
-        await appStore.saveInstance(instance);
+        await appStore.saveInstance(instance, navigate);
         appStore.updateExternalInstanceModal();
       }
     }));
-    appStore.createExternalInstance(appStore.externalCreateModal.space, appStore.externalCreateModal.type, appStore.externalCreateModal.value);
+    appStore.createExternalInstance(appStore.externalCreateModal.space, appStore.externalCreateModal.type, appStore.externalCreateModal.value, location, navigate);
   };
 
   const handleCancel = () => appStore.clearExternalCreateModal();

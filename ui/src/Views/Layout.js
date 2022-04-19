@@ -272,7 +272,7 @@ const Main = observer(({classes}) => {
       <Route path="/instances/:id/raw"  element={<Instance mode="raw" />} />
 
       <Route path="/browse" element={<Browse/>} />
-      <Route path="/help" element={<Help/>} />
+      <Route path="/help/*" element={<Help/>} />
       <Route path="/" element={<Home/>} />
       <Route element={<NotFound/>} />
     </Routes>

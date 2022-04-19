@@ -105,7 +105,7 @@ const Login = observer(() => {
   };
 
   const handleCancelInitialInstance = () => {
-    appStore.cancelInitialInstance(navigate);
+    appStore.cancelInitialInstance(location, navigate);
   };
 
   if (!appStore.isInitialized) {

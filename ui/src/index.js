@@ -25,7 +25,7 @@ import React from "react";
 import { render } from "react-dom";
 // import { configure } from "mobx";
 import ReactPiwik from "react-piwik";
-import {JssProvider} from "react-jss";
+import { JssProvider } from "react-jss";
 
 
 import "react-virtualized/styles.css";
@@ -56,11 +56,11 @@ new ReactPiwik({
 
 render(
   <React.StrictMode>
-    <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>
+    <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
       <ErrorBoundary>
         <BrowserRouter>
           <App />
-          </BrowserRouter>
-        </ErrorBoundary>
+        </BrowserRouter>
+      </ErrorBoundary>
     </JssProvider>
   </React.StrictMode>, document.getElementById("root"));

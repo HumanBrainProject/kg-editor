@@ -272,7 +272,7 @@ export class AppStore{
           const instance = this.rootStore.instanceStore.instances.get(path.params.id);
           if (instance?.permissions?.canRead) {
             // try to set the "review" space if the user is allowed
-            this.setCurrentSpace("review", !!path && !!path.params.id);
+            this.setCurrentSpace(location, navigate, "review", !!path && !!path.params.id);
           }
           if (!this.currentSpace || this.currentSpace.id !== space) {
             this.initialInstanceSpaceError = `Could not load instance "${path.params.id}" because you're not granted access to space "${space}".`;
@@ -282,7 +282,7 @@ export class AppStore{
       return this.currentSpace;
     } else {
       space = localStorage.getItem("space");
-      this.setCurrentSpace(space, !!path && !!path.params.id);
+      this.setCurrentSpace(location, navigate, space, !!path && !!path.params.id);
       return this.currentSpace;
     }
   }
@@ -330,14 +330,14 @@ export class AppStore{
     return null;
   }
 
-  cancelInitialInstance(navigate) {
+  cancelInitialInstance(location, navigate) {
     navigate("/browse", {replace: true});
     this.initializationError = null;
     this.initialInstanceError = null;
     this.initialInstanceSpaceError = null;
     this.initializingMessage = null;
     const space = localStorage.getItem("space");
-    this.setCurrentSpace(space);
+    this.setCurrentSpace(location, navigate, space);
     this.isInitialized = true;
   }
 
@@ -589,7 +589,7 @@ export class AppStore{
     }
   }
 
-  async moveInstance(instanceId, space, navigate) {
+  async moveInstance(instanceId, space, location, navigate) {
     this.instanceToMove = {
       id: instanceId,
       space: space
@@ -605,7 +605,7 @@ export class AppStore{
       this.rootStore.browseStore.refreshFilter();
       this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
       this.flush();
-      await this.setCurrentSpace(space);
+      await this.setCurrentSpace(location, navigate, space);
       navigate(`/instances/${instanceId}`);
     } catch(e){
       runInAction(() => {
@@ -617,8 +617,8 @@ export class AppStore{
     }
   }
 
-  async retryMoveInstance(navigate) {
-    return await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, navigate);
+  async retryMoveInstance(location, navigate) {
+    return await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, location, navigate);
   }
 
   cancelMoveInstance() {

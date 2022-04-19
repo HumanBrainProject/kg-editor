@@ -162,7 +162,7 @@ const Instances = () => {
               <Route path={"settings"} element={<Settings />}/>
               <Route path={"faq"} element={<FAQ />}/>
               <Route path={"contact"} element={<ContactTheSupport />}/>
-              <Route path={"*"} render={()=> <Navigate to={"introduction"} replace={true} />}/>
+              <Route path={"*"} element={<Navigate to={"introduction"} replace={true} />}/>
             </Routes>
           </div>
         </Scrollbars>

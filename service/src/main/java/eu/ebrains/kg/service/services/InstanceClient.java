@@ -74,7 +74,7 @@ public class InstanceClient {
             originalMap.getData().keySet().forEach(f -> {
                 Object o = originalMap.getData().get(f);
                 KGCoreResult.Single r = objectMapper.convertValue(o, KGCoreResult.Single.class);
-                if(f != null && r.getData() != null) {
+                if(f != null) {
                     if (r.getData() != null) {
                         result.put(f, buildResultWithOriginalMap(r.getData(), clazz));
                     } else if (r.getError() != null) {

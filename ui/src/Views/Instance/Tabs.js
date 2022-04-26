@@ -27,7 +27,6 @@ import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
 
-import { useStores } from "../../Hooks/UseStores";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({

@@ -20,9 +20,6 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-
-import { createBrowserHistory } from "history";
-
 import { AppStore } from "./AppStore";
 import { AuthStore } from "./AuthStore";
 import { HistoryStore } from "./HistoryStore";
@@ -38,8 +35,6 @@ import { ReviewsStore } from "./ReviewsStore";
 import { FeaturesStore } from "./FeaturesStore";
 
 export class RootStore  {
-
-  history= null
 
   authStore= null
   historyStore= null
@@ -59,8 +54,6 @@ export class RootStore  {
     if (!transportLayer) {
       throw new Error("no transport layer provided!");
     }
-
-    this.history = createBrowserHistory({basename:window.rootPath});
 
     // Domain stores
     this.historyStore = new HistoryStore(transportLayer, this);

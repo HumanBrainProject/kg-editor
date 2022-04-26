@@ -24,6 +24,7 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
+import { useLocation, useNavigate } from "react-router-dom";
 import MultiToggle from "../../../Components/MultiToggle";
 import Color from "color";
 import { Scrollbars } from "react-custom-scrollbars-2";
@@ -127,7 +128,10 @@ const Node = ({ node, isGrouped }) => {
 
   const classes = useStyles();
 
-  const { appStore, history, graphStore, authStore } = useStores();
+  const { appStore, graphStore, authStore } = useStores();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handelMouseOver = () => graphStore.setHighlightNodeConnections(node, true);
 
@@ -139,11 +143,11 @@ const Node = ({ node, isGrouped }) => {
       if(node.space !== appStore.currentSpace.id) {
         const space = authStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
-          appStore.setCurrentSpace(node.space);
-          history.push(`/instances/${node.id}/graph`);
+          appStore.setCurrentSpace(location, navigate, node.space);
+          navigate(`/instances/${node.id}/graph`);
         }
       } else {
-        history.push(`/instances/${node.id}/graph`);
+        navigate(`/instances/${node.id}/graph`);
       }
     }
   };

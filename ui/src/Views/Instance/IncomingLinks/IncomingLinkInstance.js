@@ -25,6 +25,7 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Badge from "react-bootstrap/Badge";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../../../Hooks/UseStores";
 
@@ -45,7 +46,10 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   const classes = useStyles();
 
-  const { authStore, appStore, history, instanceStore } = useStores();
+  const { authStore, appStore, instanceStore } = useStores();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   let label = instance.label?instance.label:instance.id;
 
@@ -67,9 +71,9 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   const handleOpenInstance = () => {
     if(appStore.currentSpace.id !== instance.space) {
-      appStore.setCurrentSpace(instance.space);
+      appStore.setCurrentSpace(location, navigate, instance.space);
     }
-    history.push(`/instances/${instance.id}`);
+    navigate(`/instances/${instance.id}`);
   };
 
   return (

@@ -32,6 +32,7 @@ import { useStores } from "../../../Hooks/UseStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   error: {
@@ -50,6 +51,10 @@ const DeleteInstance = observer(({instance, className}) => {
 
   const { appStore, statusStore } = useStores();
 
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchStatus(), [instance]);
 
@@ -57,7 +62,7 @@ const DeleteInstance = observer(({instance, className}) => {
 
   const handleDeleteInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Delete", instance.id]);
-    appStore.deleteInstance(instance.id);
+    appStore.deleteInstance(instance.id, location, navigate);
   };
 
   const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();

@@ -622,6 +622,9 @@ export class Instance {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
         field.isPublic = name === this.labelField;
+        if (field.widget === "DynamicDropdown" && Array.isArray(field.value) && field.value.length > 30) {
+          field.widget = "DynamicTable";
+        }
         //TODO: temporary fix to support invalid array value
         if ((field.widget === "SimpleDropdown" || field.widget === "SingleNested") && Array.isArray(field.value)) {
           if (field.value.length >= 1) {

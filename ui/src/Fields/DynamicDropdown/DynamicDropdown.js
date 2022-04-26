@@ -27,6 +27,7 @@ import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
 import ReactPiwik from "react-piwik";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -75,6 +76,9 @@ const useStyles = createUseStyles({
 const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}) => {
 
   const classes = useStyles();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { typeStore, instanceStore, appStore } = useStores();
 
@@ -198,7 +202,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
          ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInExternalSpace", option.type.name]);
-        appStore.createExternalInstance(option.space.id, option.type.name, name);
+        appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
         ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInCurrentSpace", option.type.name]);
         addNewValue(name, option.type.name);

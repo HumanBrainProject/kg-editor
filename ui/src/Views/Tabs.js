@@ -21,9 +21,9 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { observer } from "mobx-react-lite";
-import { matchPath } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import ReactPiwik from "react-piwik";
 import _  from "lodash-uuid";
@@ -81,24 +81,16 @@ const Tabs = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, authStore, typeStore } = useStores();
+  const { appStore, authStore, typeStore } = useStores();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [currentLocationPathname, setCurrentLocationPathname] = useState(history.location.pathname);
-
-  useEffect(() => {
-    const unlisten = history.listen(location => {
-      setCurrentLocationPathname(location.pathname);
-    });
-    return unlisten;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleGoToDashboard = () => appStore.goToDashboard();
+  const handleGoToDashboard = () => appStore.goToDashboard(navigate);
 
   const handleCreateInstance = () => {
     const uuid = _.uuid();
     ReactPiwik.push(["trackEvent", "Tab", "CreateInstance", uuid]);
-    history.push(`/instances/${uuid}/create`);
+    navigate(`/instances/${uuid}/create`);
   };
 
   const canCreate = appStore.currentSpacePermissions.canCreate && !typeStore.isFetching && typeStore.isFetched && !!typeStore.filteredTypes.filter(t => t.canCreate !== false).length;
@@ -115,8 +107,8 @@ const Tabs = observer(() => {
             {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasSpaces && appStore.currentSpace?
               <>
                 <SpaceSelector />
-                <Tab icon={"home"} current={matchPath(currentLocationPathname, { path: "/", exact: "true" })} path={"/"} label={"Home"} hideLabel />
-                <Tab icon={"search"} current={matchPath(currentLocationPathname, { path: "/browse", exact: "true" })} path={"/browse"} hideLabel label={"Browse"} />
+                <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
+                <Tab icon={"search"} current={matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
                 {canCreate && (
                   <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
                 )}
@@ -124,11 +116,11 @@ const Tabs = observer(() => {
               : null
             }
           </div>
-          <InstanceTabs pathname={currentLocationPathname} />
+          <InstanceTabs pathname={location.pathname} />
           <div className={classes.fixedTabsRight}>
             {authStore.isAuthenticated && authStore.isUserAuthorized && (
               <>
-                <Tab icon={"question-circle"} current={matchPath(currentLocationPathname, { path: "/help", exact: "true" })} path={"/help"} hideLabel label={"Help"} />
+                <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
                 <UserProfileTab className={classes.userProfileTab} size={32} />
               </>
             )}

@@ -38,6 +38,7 @@ import BGMessage from "../../Components/BGMessage";
 import Filter from "../../Components/Filter";
 import Preview from "../Preview";
 import InstanceRow from "../Instance/InstanceRow";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   container:{
@@ -89,7 +90,8 @@ const Instances = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, browseStore, instanceStore } = useStores();
+  const { appStore, browseStore, instanceStore } = useStores();
+  const navigate = useNavigate();
 
   const handleFilterChange = value => {
     ReactPiwik.push(["trackEvent", "Browse", "FilterInstance", value]);
@@ -117,9 +119,9 @@ const Instances = observer(() => {
       }
       ReactPiwik.push(["trackEvent", "Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id]);
       if(mode === "view") {
-        history.push(`/instances/${id}`);
+        navigate(`/instances/${id}`);
       } else {
-        history.push(`/instances/${id}/${mode}`);
+        navigate(`/instances/${id}/${mode}`);
       }
     }
   };

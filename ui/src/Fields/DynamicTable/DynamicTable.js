@@ -29,6 +29,7 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import ReactPiwik from "react-piwik";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -122,6 +123,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const classes = useStyles();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { typeStore, instanceStore, authStore, appStore } = useStores();
 
   const formControlRef = useRef();
@@ -203,7 +207,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
         ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInExternalSpace", option.type.name]);
-        appStore.createExternalInstance(option.space.id, option.type.name, name);
+        appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
         ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInCurrentSpace", option.type.name]);
         addNewValue(name, option.type.name);

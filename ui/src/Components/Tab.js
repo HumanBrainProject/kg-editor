@@ -28,6 +28,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useStores } from "../Hooks/UseStores";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   container:{
@@ -100,7 +101,7 @@ const useStyles = createUseStyles({
 
 const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
 
-  const  { history } = useStores();
+  const  navigate = useNavigate();
 
   const classes = useStyles();
   const closeable = typeof onClose === "function";
@@ -109,7 +110,7 @@ const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, pa
     e.preventDefault();
     if(path){
       ReactPiwik.push(["trackEvent", "Tab", "Select", path.label]);
-      history.push(path);
+      navigate(path);
     }
     typeof onClick === "function" && onClick(e);
   };

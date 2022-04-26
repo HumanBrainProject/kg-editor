@@ -27,6 +27,7 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -89,19 +90,22 @@ const Login = observer(() => {
 
   const classes = useStyles();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { appStore, authStore } = useStores();
 
   const handleLogin = () =>  {
     ReactPiwik.push(["trackEvent", "User", "Login"]);
-    appStore.login();
+    appStore.login(navigate);
   }
 
   const handleRetryToInitialize = () => {
-    appStore.initialize();
+    appStore.initialize(location, navigate);
   };
 
   const handleCancelInitialInstance = () => {
-    appStore.cancelInitialInstance();
+    appStore.cancelInitialInstance(location, navigate);
   };
 
   if (!appStore.isInitialized) {

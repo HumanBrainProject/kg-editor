@@ -30,6 +30,7 @@ import Modal from "react-bootstrap/Modal";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
+import { useNavigate } from "react-router-dom";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -209,6 +210,7 @@ const SavePanel = observer(() => {
   const { appStore, instanceStore } = useStores();
 
   const [comparedInstance, setComparedInstance] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -235,7 +237,7 @@ const SavePanel = observer(() => {
 
   const handleSave = instance => {
     ReactPiwik.push(["trackEvent", "Instance", "InstanceSave", instance.id]);
-    appStore.saveInstance(instance);
+    appStore.saveInstance(instance, navigate);
     setComparedInstance(null);
   };
 

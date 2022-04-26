@@ -23,7 +23,7 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { createUseStyles, useTheme } from "react-jss";
@@ -213,80 +213,103 @@ const useStyles = createUseStyles(theme => ({
   }
 }));
 
-const Layout = observer(() => {
+const Main = observer(({classes}) => {
 
   const { appStore, authStore } = useStores();
 
+  const handleLogout = () => appStore.logout();
+
+  if (!appStore.isInitialized || !authStore.isAuthenticated) {
+    return (
+      <Login />
+    );
+  }
+
+  if (!authStore.isUserAuthorized) {
+    return (
+      <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
+        <Modal.Body>
+          <h1>Welcome</h1>
+          <p>You are currently not granted permission to acccess the application.</p>
+          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+          <div className={classes.actionPanel}>
+            <Button onClick={handleLogout}>Logout</Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+    );
+  }
+
+  if (!authStore.hasSpaces) {
+    return (
+      <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
+        <Modal.Body>
+          <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
+          <p>You are currently not granted permission to acccess any spaces.</p>
+          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+          <div className={classes.actionPanel}>
+            <Button onClick={handleLogout}>Logout</Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+    );
+  }
+
+  if (!appStore.currentSpace) {
+    return (
+      <SpaceModal/>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/instances/:id" element={<Instance mode="view" />} />
+      <Route path="/instances/:id/create" element={<Instance mode="create" />} />
+      <Route path="/instances/:id/edit" element={<Instance mode="edit" />} />
+      <Route path="/instances/:id/graph" element={<Instance mode="graph" />} />
+      <Route path="/instances/:id/release" element={<Instance mode="release" />} />
+      <Route path="/instances/:id/manage"  element={<Instance mode="manage" />} />
+      <Route path="/instances/:id/raw"  element={<Instance mode="raw" />} />
+
+      <Route path="/browse" element={<Browse/>} />
+      <Route path="/help/*" element={<Help/>} />
+      <Route path="/" element={<Home/>} />
+      <Route element={<NotFound/>} />
+    </Routes>
+  );
+});
+
+const Footer = observer(({classes}) => {
+  const { authStore } = useStores();
   const commit = authStore.commit;
+  return(
+    <div className={classes.footer}>
+      <div className={`${classes.status} layout-status`}>
+              Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
+      </div>
+      <div className={classes.build}>
+        {commit && <span >build: <i>{commit}</i></span>}
+      </div>
+    </div>
+  );
+});
+
+const Layout = observer(() => {
+
+  const { appStore } = useStores();
   const theme = useTheme();
+  const classes = useStyles({ theme });
+  
   const useGlobalStyles = getGlobalUseStyles();
   useGlobalStyles({ theme });
-
-  const classes = useStyles({ theme });
-
-  const handleLogout = () => appStore.logout();
 
   return (
     <div className={classes.layout}>
       <Tabs />
       <div className={classes.body}>
-        {appStore.globalError ?
-          <Route component={GlobalError} />
-          :
-          !appStore.isInitialized || !authStore.isAuthenticated ?
-            <Route component={Login} />
-            :
-            authStore.isUserAuthorized?
-              authStore.hasSpaces?
-                appStore.currentSpace?
-                  <Switch>
-                    <Route path="/instances/:id" exact={true} render={props=><Instance {...props} mode="view" />} />
-                    <Route path="/instances/:id/create" exact={true} render={props=><Instance {...props} mode="create" />} />
-                    <Route path="/instances/:id/edit" exact={true} render={props=><Instance {...props} mode="edit" />} />
-                    <Route path="/instances/:id/graph" exact={true} render={props=><Instance {...props} mode="graph" />} />
-                    <Route path="/instances/:id/release" exact={true} render={props=><Instance {...props} mode="release" />} />
-                    <Route path="/instances/:id/manage" exact={true}  render={props=><Instance {...props} mode="manage" />} />
-                    <Route path="/instances/:id/raw" exact={true}  render={props=><Instance {...props} mode="raw" />} />
-
-                    <Route path="/browse" exact={true} component={Browse} />
-                    <Route path="/help" component={Help} />
-                    <Route path="/" exact={true} component={Home} />
-                    <Route component={NotFound} />
-                  </Switch>
-                  :
-                  <Route component={SpaceModal} />
-                :
-                <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
-                  <Modal.Body>
-                    <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
-                    <p>You are currently not granted permission to acccess any spaces.</p>
-                    <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-                    <div className={classes.actionPanel}>
-                      <Button onClick={handleLogout}>Logout</Button>
-                    </div>
-                  </Modal.Body>
-                </Modal>
-              :
-              <Modal dialogClassName={classes.noAccessModal} show={true} onHide={() => {}}>
-                <Modal.Body>
-                  <h1>Welcome</h1>
-                  <p>You are currently not granted permission to acccess the application.</p>
-                  <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-                  <div className={classes.actionPanel}>
-                    <Button onClick={handleLogout}>Logout</Button>
-                  </div>
-                </Modal.Body>
-              </Modal>
-        }
+        {appStore.globalError?<GlobalError />:<Main classes={classes}/>}
       </div>
-      <div className={classes.footer}>
-        <div className={`${classes.status} layout-status`}>
-                Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
-        </div>
-        <div className={classes.build}>
-          {commit && <span >build: <i>{commit}</i></span>}
-        </div>
-      </div>
+      <Footer classes={classes}/>
     </div>
   );
 });

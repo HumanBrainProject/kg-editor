@@ -25,7 +25,7 @@ import React from "react";
 import { render } from "react-dom";
 // import { configure } from "mobx";
 import ReactPiwik from "react-piwik";
-import {JssProvider} from "react-jss";
+import { JssProvider } from "react-jss";
 
 
 import "react-virtualized/styles.css";
@@ -35,6 +35,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Services/IconsImport";
 
 import App from "./Views/App";
+import { BrowserRouter } from "react-router-dom";
+import ErrorBoundary from "./Views/ErrorBoundary";
 
 // configure({
 //   enforceActions: "always",
@@ -54,7 +56,11 @@ new ReactPiwik({
 
 render(
   <React.StrictMode>
-    <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>
-      <App />
+    <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ErrorBoundary>
     </JssProvider>
   </React.StrictMode>, document.getElementById("root"));

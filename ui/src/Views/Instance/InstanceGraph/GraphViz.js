@@ -28,6 +28,7 @@ import { ForceGraph2D } from "react-force-graph";
 import debounce from "lodash/debounce";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../../../Hooks/UseStores";
 
@@ -71,7 +72,10 @@ const Graph = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, history, graphStore, authStore } = useStores();
+  const { appStore, graphStore, authStore } = useStores();
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [dimensions, setDimensions] = useState({width: 0, height: 0});
 
@@ -97,11 +101,11 @@ const Graph = observer(() => {
       if(node.space !== appStore.currentSpace.id) {
         const space = authStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
-          appStore.setCurrentSpace(node.space);
-          history.push(`/instances/${node.id}/graph`);
+          appStore.setCurrentSpace(location, navigate, node.space);
+          navigate(`/instances/${node.id}/graph`);
         }
       } else {
-        history.push(`/instances/${node.id}/graph`);
+        navigate(`/instances/${node.id}/graph`);
       }
     }
   };

@@ -26,6 +26,7 @@ import { observer } from "mobx-react-lite";
 import ReactPiwik from "react-piwik";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -63,12 +64,16 @@ const useStyles = createUseStyles({
 
 const SpaceSelector = observer(() => {
   const classes = useStyles();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [ filter, setFilter ] = useState();
   const { appStore, authStore } = useStores();
 
   const handleSelectSpace = space => {
     ReactPiwik.push(["trackEvent", "Space", "Select", space]);
-    appStore.setCurrentSpace(space);
+    appStore.setCurrentSpace(location, navigate, space);
   }
 
   const handleChange = value => setFilter(value);

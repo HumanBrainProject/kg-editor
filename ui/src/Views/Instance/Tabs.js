@@ -28,6 +28,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   tabs: {
@@ -90,14 +91,14 @@ const Tabs = observer(({ instance, mode }) => {
 
   const classes = useStyles();
 
-  const { history } = useStores();
+  const navigate = useNavigate();
 
   const handleClick = mode => {
     ReactPiwik.push(["trackEvent", "Instance", `Select${mode[0].toUpperCase() + mode.substr(1)}Mode`, instance.id]);
     if(mode === "view") {
-      history.push(`/instances/${instance.id}`);
+      navigate(`/instances/${instance.id}`);
     } else {
-      history.push(`/instances/${instance.id}/${mode}`);
+      navigate(`/instances/${instance.id}/${mode}`);
     }
   };
 

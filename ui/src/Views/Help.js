@@ -22,7 +22,7 @@
  */
 
 import React, {useEffect} from "react";
-import { Route, Switch, NavLink, Redirect } from "react-router-dom";
+import { Route, Routes, NavLink, Navigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
@@ -102,7 +102,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Instances = ({match}) => {
+const Instances = () => {
   const classes = useStyles();
 
   useEffect(() => {
@@ -111,64 +111,59 @@ const Instances = ({match}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const {path} = match;
   return (
     <div className={classes.container}>
       <div className={classes.navigation}>
         <ul>
-          <li><NavLink to={`${path}/introduction`}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</NavLink></li>
+          <li><NavLink to={"introduction"}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</NavLink></li>
           <li>
-            <NavLink to={`${path}/browse`}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
+            <NavLink to={"browse"}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
             <ul>
-              <li><NavLink to={`${path}/browse/nodetypes`}><FontAwesomeIcon fixedWidth icon="code-branch" transform={"flip-h rotate--90"}/>Nodetypes</NavLink></li>
+              <li><NavLink to={"browse/nodetypes"}><FontAwesomeIcon fixedWidth icon="code-branch" transform={"flip-h rotate--90"}/>Nodetypes</NavLink></li>
             </ul>
           </li>
-          <li><NavLink to={`${path}/create`}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
+          <li><NavLink to={"create"}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
           <li>
-            <NavLink to={`${path}/instance`}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</NavLink>
+            <NavLink to={"instance"}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</NavLink>
             <ul>
-              <li><NavLink to={`${path}/instance/view`}><FontAwesomeIcon fixedWidth icon="eye"/>View</NavLink></li>
+              <li><NavLink to={"instance/view"}><FontAwesomeIcon fixedWidth icon="eye"/>View</NavLink></li>
               <li>
-                <NavLink to={`${path}/instance/edit`}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</NavLink>
+                <NavLink to={"instance/edit"}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</NavLink>
                 <ul>
-                  <li><NavLink to={`${path}/instance/edit/save`}><FontAwesomeIcon fixedWidth icon="save"/>Save</NavLink></li>
+                  <li><NavLink to={"instance/edit/save"}><FontAwesomeIcon fixedWidth icon="save"/>Save</NavLink></li>
                 </ul>
               </li>
-              <li><NavLink to={`${path}/instance/graph`}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</NavLink></li>
-              <li><NavLink to={`${path}/instance/release`}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</NavLink></li>
+              <li><NavLink to={"instance/graph"}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</NavLink></li>
+              <li><NavLink to={"instance/release"}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</NavLink></li>
             </ul>
           </li>
-          {/*<li><NavLink to={`${path}/statistics`}><FontAwesomeIcon fixedWidth icon="chart-bar"/>Statistics</NavLink></li>*/}
-          {/*<li><NavLink to={`${path}/settings`}><FontAwesomeIcon fixedWidth icon="cog"/>Settings</NavLink></li>*/}
-          <li><NavLink to={`${path}/faq`}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</NavLink></li>
-          <li><NavLink to={`${path}/contact`}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</NavLink></li>
+          {/*<li><NavLink to={"statistics"}><FontAwesomeIcon fixedWidth icon="chart-bar"/>Statistics</NavLink></li>*/}
+          {/*<li><NavLink to={"settings"}><FontAwesomeIcon fixedWidth icon="cog"/>Settings</NavLink></li>*/}
+          <li><NavLink to={"faq"}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</NavLink></li>
+          <li><NavLink to={"contact"}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</NavLink></li>
         </ul>
       </div>
       <div className={classes.content}>
         <Scrollbars autoHide>
           <div className={classes.contentInner}>
-            <Switch>
-              <Route exact path={`${path}`} render={()=><Redirect to={`${path}/introduction`}/>}/>
-              <Route path={`${path}/introduction`} exact={true} component={Introduction}/>
+            <Routes>
+              <Route path={"introduction"} element={<Introduction />}/>
+              <Route path={"browse"} element={<Browse />} />
+              <Route path={"browse/nodetypes"} element={<BrowseNodetypes />}/>
+              <Route path={"create"} element={<CreateAnInstance />}/>
+              <Route path={"instance"} element={<OpenAnInstance />}/>
+              <Route path={"instance/view"} element={<OAIView />}/>
+              <Route path={"instance/edit"} element={<OAIEdit />}/>
+              <Route path={"instance/edit/save"} element={<OAIEditSave />}/>
+              <Route path={"instance/graph"} element={<OAIExplore />}/>
+              <Route path={"instance/release"} element={<OAIRelease />}/>
 
-              <Route path={`${path}/browse`} exact={true} component={Browse}/>
-              <Route path={`${path}/browse/nodetypes`} exact={true} component={BrowseNodetypes}/>
-
-              <Route path={`${path}/create`} exact={true} component={CreateAnInstance}/>
-
-              <Route path={`${path}/instance`} exact={true} component={OpenAnInstance}/>
-              <Route path={`${path}/instance/view`} exact={true} component={OAIView}/>
-              <Route path={`${path}/instance/edit`} exact={true} component={OAIEdit}/>
-              <Route path={`${path}/instance/edit/save`} exact={true} component={OAIEditSave}/>
-              <Route path={`${path}/instance/graph`} exact={true} component={OAIExplore}/>
-              <Route path={`${path}/instance/release`} exact={true} component={OAIRelease}/>
-
-              <Route path={`${path}/statistics`} exact={true} component={Statistics}/>
-              <Route path={`${path}/settings`} exact={true} component={Settings}/>
-              <Route path={`${path}/faq`} exact={true} component={FAQ}/>
-              <Route path={`${path}/contact`} exact={true} component={ContactTheSupport}/>
-
-            </Switch>
+              <Route path={"statistics"} element={<Statistics />}/>
+              <Route path={"settings"} element={<Settings />}/>
+              <Route path={"faq"} element={<FAQ />}/>
+              <Route path={"contact"} element={<ContactTheSupport />}/>
+              <Route path={"*"} element={<Navigate to={"introduction"} replace={true} />}/>
+            </Routes>
           </div>
         </Scrollbars>
       </div>

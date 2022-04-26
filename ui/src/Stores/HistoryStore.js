@@ -131,13 +131,7 @@ export class HistoryStore {
           list.forEach(identifier => {
             const data = response && response.data && response.data.data && response.data.data[identifier];
             if(data) {
-              if (data.error) {
-                if(data.error.code && [401, 403, 404, 410].includes(data.error.code)) {
-                  //TODO: ignore those errors because instance id in localstorage may have been deleted or permissions may have changed
-                } else {
-                  //TODO: set error message to the instance
-                }
-              } else {
+              if (!data.error) {
                 Object.values(data.fields).forEach(d => {
                   if(d.widget === "TextArea") {
                     d.value = d.value && d.value.substr(0, 197) + "...";
@@ -148,6 +142,13 @@ export class HistoryStore {
                 instance.initializeData(this.transportLayer, this.rootStore, data);
                 this.instances.push(instance);
               }
+              // else {
+              //   if(data.error.code && [401, 403, 404, 410].includes(data.error.code)) {
+              //     //TO DO: ignore those errors because instance id in localstorage may have been deleted or permissions may have changed
+              //   } else {
+              //     //TO DO: set error message to the instance
+              //   }
+              // }
             }
           });
           this.isFetching = false;

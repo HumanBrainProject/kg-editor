@@ -180,8 +180,9 @@ class AnnotatedInputTextStore extends FieldStore {
 
   moveValueAfter(value, afterValue) {
     if(value) {
+      const index = this.value.indexOf(afterValue);
       this.deleteValue(value);
-      this.insertValue(value, this.value.indexOf(afterValue));
+      this.insertValue(value, index);
     }
   }
 

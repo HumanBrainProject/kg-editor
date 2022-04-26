@@ -82,7 +82,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const { typeStore, instanceStore, appStore } = useStores();
 
-  const draggedValue = useRef();
+  const draggedIndex = useRef();
   const formGroupRef = useRef();
   const formControlRef = useRef();
   const dropdownInputRef = useRef();
@@ -108,12 +108,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     isRequired,
     isReadOnly
   } = fieldStore;
-
-  const dropValue = droppedValue => {
-    fieldStore.moveValueAfter(draggedValue.current, droppedValue);
-    draggedValue.current = null;
-    instanceStore.togglePreviewInstance();
-  };
 
   const handleDropdownReset = () => {
     fieldStore.resetOptionsSearch();
@@ -212,11 +206,19 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleDragEnd = () => draggedValue.current = null;
+  const handleDragEnd = () => draggedIndex.current = null;
 
-  const handleDragStart = value => draggedValue.current = value;
+  const handleDragStart = index => draggedIndex.current = index;
 
-  const handleDrop = value => dropValue(value);
+  const handleDrop = droppedIndex => {
+    if (Array.isArray(values) && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
+      const value = values[draggedIndex.current];
+      const afterValue = values[droppedIndex];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = null;
+    instanceStore.togglePreviewInstance();
+  };
 
   const handleKeyDown = (value, e) => {
     if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
@@ -337,7 +339,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             onReset={handleDropdownReset}
             onSelect={handleOnSelectOption}
             onDeleteLastValue={handleDeleteLastValue}
-            onDrop={dropValue}
+            onDrop={handleDrop}
             optionComponent={DynamicOption}
           />
         )}

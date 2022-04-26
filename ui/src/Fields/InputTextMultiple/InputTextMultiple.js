@@ -84,7 +84,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
   const classes = useStyles();
 
-  const draggedValue = useRef();
+  const draggedIndex = useRef();
   const formGroupRef = useRef();
 
   const {
@@ -99,11 +99,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     isReadOnly
   } = fieldStore;
 
-  const dropValue = droppedValue => {
-    fieldStore.moveValueAfter(draggedValue.current, droppedValue);
-    draggedValue.current = null;
-  };
-
   const handleOnAddValue = value => fieldStore.addValue(value);
 
   const handleSelectAlternative = values => fieldStore.setValues([...values]);
@@ -117,11 +112,18 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     fieldStore.removeValue(value);
   };
 
-  const handleDragEnd = () => draggedValue.current = null;
+  const handleDragEnd = () => draggedIndex.current = null;
 
-  const handleDragStart = value => draggedValue.current = value;
+  const handleDragStart = index => draggedIndex.current = index;
 
-  const handleDrop = value => dropValue(value);
+  const handleDrop = droppedIndex => {
+    if (Array.isArray(list) && draggedIndex.current >= 0 && draggedIndex.current < list.length && droppedIndex >= 0 && droppedIndex < list.length) {
+      const value = list[draggedIndex.current];
+      const afterValue = list[droppedIndex];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = null;
+  };
 
   const handleBlur = e => {
     const value = e.target.value.trim();

@@ -85,7 +85,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
 
   const classes = useStyles();
 
-  const draggedValue = useRef();
+  const draggedIndex = useRef();
   const formGroupRef = useRef();
 
   const {
@@ -100,11 +100,6 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     isRequired,
     isReadOnly
   } = fieldStore;
-
-  const dropValue = droppedValue => {
-    fieldStore.moveValueAfter(draggedValue.current, droppedValue);
-    draggedValue.current = null;
-  };
 
   const handleOnAddValue = resource => {
     const value = {[fieldStore.mappingValue]: resource};
@@ -122,11 +117,18 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     fieldStore.removeValue(value);
   };
 
-  const handleDragEnd = () => draggedValue.current = null;
+  const handleDragEnd = () => draggedIndex.current = null;
 
-  const handleDragStart = value => draggedValue.current = value;
+  const handleDragStart = index => draggedIndex.current = index;
 
-  const handleDrop = value => dropValue(value);
+  const handleDrop = droppedIndex => {
+    if (Array.isArray(values) && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
+      const value = values[draggedIndex.current];
+      const afterValue = values[droppedIndex];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = null;
+  };
 
   const handleBlur = e => {
     const value = e.target.value.trim();

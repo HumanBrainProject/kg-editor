@@ -483,7 +483,7 @@ export class InstanceStore {
               }
             } else {
               const message = "Unexpected error: no response returned.";
-              instance.errorInstance(message);
+              instance.errorInstance(message, true);
               instance.isFetching = false;
               instance.isFetched = false;
             }
@@ -545,7 +545,7 @@ export class InstanceStore {
               }
             } else {
               const message = "Unexpected error: no response returned.";
-              instance.errorLabelInstance(message);
+              instance.errorLabelInstance(message, true);
               instance.isLabelFetching = false;
               instance.isLabelFetched = false;
             }

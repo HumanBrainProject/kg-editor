@@ -80,7 +80,7 @@ public class InstanceController {
         enrichTypesByNameWithIncomingLinksTypes(instancesWithResult, typesByName);
         instancesWithResult.forEach(instanceWithResult -> {
             InstanceFull instance = instanceWithResult.getResult();
-            if (instance != null) {
+            if (instance != null && instance.getId()!=null) {
                 enrichInstanceWithPossibleIncomingLinks(instance, typesByName);
                 enrichTypesAndFields(instance, instanceWithResult.getOriginalMap(), typesByName);
                 if (stage.equals("IN_PROGRESS")) {
@@ -367,7 +367,7 @@ public class InstanceController {
     }
 
     private List<String> getTypesNamesFromInstance(InstanceLabel instance) {
-        return instance.getTypes().stream().map(SimpleType::getName).filter(Objects::nonNull).collect(Collectors.toList());
+        return instance.getTypes() != null ? instance.getTypes().stream().map(SimpleType::getName).filter(Objects::nonNull).collect(Collectors.toList()) : Collections.emptyList();
     }
 
     private Set<String> getTargetTypesNamesFromInstance(InstanceSummary instance) {

@@ -44,7 +44,12 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "http-proxy-middleware": "^2.0.6"
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "http-proxy-middleware": "^2.0.6",
+    "prettier": "^2.6.2"
   },
   "scripts": {
     "start": "env-cmd -f .env.development react-scripts start",

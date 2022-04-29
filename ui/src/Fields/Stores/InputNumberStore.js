@@ -87,7 +87,7 @@ class InputNumberStore extends FieldStore {
     return Object.keys(this.validationWarnings).length > 0;
   }
 
-  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a list of value
+  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
     if (this.value === null && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }

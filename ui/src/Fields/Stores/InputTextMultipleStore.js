@@ -98,7 +98,7 @@ class InputTextMultipleStore extends FieldStore {
     };
   }
 
-  get returnValue() {
+  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a list of value
     if (!this.value.length && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }

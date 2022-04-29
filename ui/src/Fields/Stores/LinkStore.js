@@ -117,7 +117,7 @@ class LinkStore extends FieldStore {
     };
   }
 
-  get returnValue() {
+  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
     if (!this.value && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }

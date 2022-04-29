@@ -84,7 +84,7 @@ const Instance = observer(({ mode }) => {
       appStore.openInstance(id, id, {}, mode);
       instanceStore.togglePreviewInstance();
       viewStore.selectViewByInstanceId(id);
-      const instance = instanceStore.instances.get(id);
+      const instance = instanceStore.instances.get(id); //NOSONAR
       if (instance && ((mode === "raw" && instance.isRawFetched) || (mode !== "raw" && instance.isFetched))) {
         if (mode === "create" && !instance.isNew) {
           navigate(`/instances/${id}/edit`, {replace: true});

@@ -46,8 +46,8 @@ const useStyles = createUseStyles({
       background: "rgba(255,255,255, 0.05)",
       color: "var(--ft-color-quiet)",
       fontSize: "1em",
-      textAlign: "left"
-    }
+      textAlign: "left",
+    },
   },
   folderName: {
     color: "var(--ft-color-quiet)",
@@ -55,7 +55,7 @@ const useStyles = createUseStyles({
     fontWeight: "bold",
     fontSize: "0.9em",
     padding: "10px 10px 5px 10px",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   fetchErrorPanel: {
     margin: "0 34px",
@@ -67,14 +67,40 @@ const useStyles = createUseStyles({
     wordBreak: "break-all",
     "& .btn": {
       width: "100px",
-      margin: "10px 6px 6px 6px"
+      margin: "10px 6px 6px 6px",
     },
-    color: "var(--ft-color-error)"
+    color: "var(--ft-color-error)",
+  },
+});
+
+const ResultTypes = observer(({
+  fetchError,
+  isFetching,
+  onClick,
+  classes,
+  showTypes,
+  list,
+}) => {
+  if (fetchError) {
+    return (
+      <div className={classes.fetchErrorPanel}>
+        <div>{fetchError}</div>
+        <Button variant="primary" onClick={onClick}>
+          Retry
+        </Button>
+      </div>
+    );
   }
+  if (isFetching) {
+    return <Spinner>fetching...</Spinner>;
+  }
+  if (!showTypes) {
+    return null;
+  }
+  return list.map((type) => <TypesItem key={type.name} type={type} />);
 });
 
 const Types = observer(() => {
-
   const classes = useStyles();
 
   const { typeStore, browseStore } = useStores();
@@ -83,7 +109,7 @@ const Types = observer(() => {
 
   useEffect(() => {
     typeStore.fetch();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLoadRetry = () => typeStore.fetch();
@@ -99,21 +125,20 @@ const Types = observer(() => {
   return (
     <div className={classes.folder}>
       <div className={classes.folderName} onClick={handleToggleType}>
-        <FontAwesomeIcon fixedWidth icon={showTypes ? "caret-down" : "caret-right"} /> &nbsp;Types
+        <FontAwesomeIcon
+          fixedWidth
+          icon={showTypes ? "caret-down" : "caret-right"}
+        />{" "}
+        &nbsp;Types
       </div>
-      {!typeStore.fetchError ?
-        !typeStore.isFetching ?
-          showTypes && list.map(type =>
-            <TypesItem key={type.name} type={type}/>
-          )
-          :
-          <Spinner>fetching...</Spinner>
-        :
-        <div className={classes.fetchErrorPanel}>
-          <div>{typeStore.fetchError}</div>
-          <Button variant="primary" onClick={handleLoadRetry}>Retry</Button>
-        </div>
-      }
+      <ResultTypes
+        fetchError={typeStore.fetchError}
+        isFetching={typeStore.isFetching}
+        onClick={handleLoadRetry}
+        classes={classes}
+        showTypes={showTypes}
+        list={list}
+      />
     </div>
   );
 });

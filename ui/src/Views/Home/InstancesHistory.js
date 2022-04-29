@@ -175,7 +175,7 @@ const InstancesHistory = observer(() => {
   };
 
   const handleInstanceCtrlClick = instance => {
-    const id = instance && instance.id;
+    const id = instance?.id;
     if (id) {
       ReactPiwik.push(["trackEvent", "Home", "InstanceOpenTabInBackground", instance.id]);
       appStore.openInstance(id, instance.name, instance.primaryType);
@@ -183,7 +183,7 @@ const InstancesHistory = observer(() => {
   };
 
   const handleInstanceActionClick = (historyInstance, mode) => {
-    const id = historyInstance && historyInstance.id;
+    const id = historyInstance?.id;
     if (id) {
       if (!instanceStore.instances.has(id)) {
         const instance = instanceStore.createInstanceOrGet(id);

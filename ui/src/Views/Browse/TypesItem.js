@@ -45,10 +45,10 @@ const useStyles = createUseStyles({
       borderColor: "var(--list-border-hover)",
       color: "var(--ft-color-loud)",
       "& $cannotCreateTooltip": {
-        opacity: 0.75
+        opacity: 0.75,
       },
       "& $actions": {
-        opacity: 0.75
+        opacity: 0.75,
       },
       "& $createInstance": {
         position: "absolute",
@@ -60,29 +60,29 @@ const useStyles = createUseStyles({
         color: "var(--ft-color-normal)",
         "&:hover": {
           color: "var(--ft-color-loud)",
-        }
-      }
+        },
+      },
     },
     "&.selected": {
       background: "var(--list-bg-selected)",
       borderColor: "var(--list-border-selected)",
-      color: "var(--ft-color-loud)"
+      color: "var(--ft-color-loud)",
     },
     "&.edited": {
-      padding: "0 5px 0 30px"
+      padding: "0 5px 0 30px",
     },
     "&.disabled": {
       pointerEvents: "none",
-      opacity: "0.8"
-    }
+      opacity: "0.8",
+    },
   },
   icon: {
     position: "absolute",
     top: "8px",
     "& + span": {
       display: "inline-block",
-      marginLeft: "22px"
-    }
+      marginLeft: "22px",
+    },
   },
   cannotCreateTooltip: {
     position: "absolute",
@@ -90,8 +90,8 @@ const useStyles = createUseStyles({
     right: "15px",
     opacity: 0,
     "&:hover": {
-      opacity: "1 !important"
-    }
+      opacity: "1 !important",
+    },
   },
   actions: {
     position: "absolute",
@@ -102,8 +102,8 @@ const useStyles = createUseStyles({
     width: "25px",
     gridTemplateColumns: "repeat(1, 1fr)",
     "&:hover": {
-      opacity: "1 !important"
-    }
+      opacity: "1 !important",
+    },
   },
   action: {
     fontSize: "0.9em",
@@ -112,17 +112,17 @@ const useStyles = createUseStyles({
     backgroundColor: "var(--bg-color-ui-contrast2)",
     color: "var(--ft-color-normal)",
     "&:hover": {
-      color: "var(--ft-color-loud)"
+      color: "var(--ft-color-loud)",
     },
     "&:first-child": {
-      borderRadius: "4px 0 0 4px"
+      borderRadius: "4px 0 0 4px",
     },
     "&:last-child": {
-      borderRadius: "0 4px 4px 0"
+      borderRadius: "0 4px 4px 0",
     },
     "&:first-child:last-child": {
-      borderRadius: "4px"
-    }
+      borderRadius: "4px",
+    },
   },
   deleteBookmarkDialog: {
     position: "absolute",
@@ -130,8 +130,8 @@ const useStyles = createUseStyles({
     right: "-200px",
     transition: "right .2s ease",
     "&.show": {
-      right: "5px"
-    }
+      right: "5px",
+    },
   },
   error: {
     position: "absolute",
@@ -139,31 +139,75 @@ const useStyles = createUseStyles({
     right: "10px",
   },
   errorButton: {
-    color: "var(--ft-color-error)"
+    color: "var(--ft-color-error)",
   },
   textError: {
     margin: 0,
-    wordBreak: "keep-all"
+    wordBreak: "keep-all",
   },
   createInstance: {
     display: "none",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   infoCircle: {
     marginLeft: "5px",
-    transform: "translateY(2px)"
-  }
+    transform: "translateY(2px)",
+  },
 });
 
+const CreateInstance = observer(({
+  canCreate,
+  isCreatingNewInstance,
+  classes,
+  onClick,
+  cannotCreateTooltip,
+  label,
+}) => {
+  if (canCreate) {
+    if (isCreatingNewInstance) {
+      return (
+        <div className={classes.createInstance}>
+          <FontAwesomeIcon icon={"circle-notch"} spin />
+        </div>
+      );
+    }
+    return (
+      <div className={classes.actions}>
+        <div
+          className={classes.action}
+          onClick={onClick}
+          title={`create a new ${label}`}
+        >
+          <FontAwesomeIcon icon={"plus"} />
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={classes.cannotCreateTooltip}>
+      <OverlayTrigger
+        placement="top"
+        overlay={
+          <Tooltip id={uniqueId("cannotCreate-tooltip")}>
+            {cannotCreateTooltip}
+          </Tooltip>
+        }
+      >
+        <span>
+          <FontAwesomeIcon icon="question-circle" />
+        </span>
+      </OverlayTrigger>
+    </div>
+  );
+});
 
 const TypesItem = observer(({ type }) => {
-
   const classes = useStyles();
 
   const { appStore, browseStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
-  const handleSelect = e => {
+  const handleSelect = (e) => {
     e && e.stopPropagation();
     ReactPiwik.push(["trackEvent", "Browse", "SelectType", type.name]);
     browseStore.selectItem(type);
@@ -172,44 +216,57 @@ const TypesItem = observer(({ type }) => {
   const handleCreateInstance = () => {
     ReactPiwik.push(["trackEvent", "Browse", "CreateInstance", type.name]);
     instanceStore.createNewInstanceOfType(type, navigate);
-  }
+  };
 
-  const selected = (browseStore.selectedItem && type)? (browseStore.selectedItem.name === type.name):false;
+  const selected =
+    browseStore.selectedItem && type
+      ? browseStore.selectedItem.name === type.name
+      : false;
   const color = type.color;
   const canCreate = type.canCreate !== false;
 
-  const cannotCreateTooltip = appStore.currentSpacePermissions.canCreate?(canCreate?null:`You are not allowed to create a new ${type.label} in the editor.`):`You are not allowed to create a new ${type.label}.`;
+  const cannotCreateTooltip = appStore.currentSpacePermissions.canCreate
+    ? canCreate
+      ? null
+      : `You are not allowed to create a new ${type.label} in the editor.`
+    : `You are not allowed to create a new ${type.label}.`;
 
   return (
     <div
       key={type.id}
-      className={`${classes.container} ${selected ? "selected" : ""} ${browseStore.isFetching.instances?"disabled":""}`}
-      onClick={handleSelect} 
-      title={type.description ? type.description:type.name}>
-      {color ?
-        <FontAwesomeIcon fixedWidth icon="circle" className={`${classes.icon} ${classes.typeIcon}`} style={{ color: color }} />
-        :
-        <FontAwesomeIcon icon={"code-branch"} className={`${classes.icon} ${classes.typeIcon}`} />
-      }
-      <span>{type.label}{type.description && <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />}</span>
-      {appStore.currentSpacePermissions.canCreate && canCreate?
-        appStore.isCreatingNewInstance ?
-          <div className={classes.createInstance}>
-            <FontAwesomeIcon icon={"circle-notch"} spin />
-          </div>
-          :
-          <div className={classes.actions}>
-            <div className={classes.action} onClick={handleCreateInstance} title={`create a new ${type.label}`}>
-              <FontAwesomeIcon icon={"plus"} />
-            </div>
-          </div>
-        :
-        <div className={classes.cannotCreateTooltip}>
-          <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("cannotCreate-tooltip")}>{cannotCreateTooltip}</Tooltip>}>
-            <span><FontAwesomeIcon icon="question-circle" /></span>
-          </OverlayTrigger>
-        </div>
-      }
+      className={`${classes.container} ${selected ? "selected" : ""} ${
+        browseStore.isFetching.instances ? "disabled" : ""
+      }`}
+      onClick={handleSelect}
+      title={type.description ? type.description : type.name}
+    >
+      {color ? (
+        <FontAwesomeIcon
+          fixedWidth
+          icon="circle"
+          className={`${classes.icon} ${classes.typeIcon}`}
+          style={{ color: color }}
+        />
+      ) : (
+        <FontAwesomeIcon
+          icon={"code-branch"}
+          className={`${classes.icon} ${classes.typeIcon}`}
+        />
+      )}
+      <span>
+        {type.label}
+        {type.description && (
+          <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />
+        )}
+      </span>
+      <CreateInstance
+        canCreate={appStore.currentSpacePermissions.canCreate && canCreate}
+        isCreatingNewInstance={appStore.isCreatingNewInstance}
+        classes={classes}
+        onClick={handleCreateInstance}
+        cannotCreateTooltip={cannotCreateTooltip}
+        label={type.label}
+      />
     </div>
   );
 });

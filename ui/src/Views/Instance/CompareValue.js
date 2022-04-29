@@ -72,6 +72,16 @@ const CompareValue = ({ label, leftValue, rightValue, separator }) => {
 
   const diff = jsdiff.diffWordsWithSpace(leftValue, rightValue);
 
+  const getClassname = part => {
+    if(part.added) {
+      return classes.added;
+    }
+    if(part.removed) {
+      return classes.removed;
+    }
+    return classes.unchanged;
+  }
+
   return (
     <pre className={classes.container}>
       <label className={classes.label}>{label}</label>
@@ -80,13 +90,7 @@ const CompareValue = ({ label, leftValue, rightValue, separator }) => {
           if (!part.value) {
             return null;
           }
-          const className = part.added?
-            classes.added
-            :
-            part.removed?
-              classes.removed
-              :
-              classes.unchanged;
+          const className = getClassname(part);
           let [, , first, value, , last] = [null, null, null, part.value, null, null];
           const match = part.value.match(new RegExp("^((" + separator + "){0,1})(.*[^" + separator[separator.length-1] + "])((" + separator + "){0,1})$"));
           if (match && match.length >= 6) {

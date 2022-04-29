@@ -41,85 +41,106 @@ const useStyles = createUseStyles({
         marginRight: "2px",
         display: "inline-block",
         "& + li:before": {
-          content: "' '"
+          content: "' '",
         },
         "& + li": {
-          marginTop: "2px"
-        }
-      }
-    }
+          marginTop: "2px",
+        },
+      },
+    },
   },
   type: {
-    paddingRight: "10px"
+    paddingRight: "10px",
   },
   showMore: {
     paddingLeft: 0,
     paddingTop: 0,
-    transform: "translateY(1px)"
+    transform: "translateY(1px)",
   },
   showMoreLoading: {
-    display: "block"
+    display: "block",
   },
   showMoreError: {
     display: "block",
-    color: "var(--ft-color-error)"
+    color: "var(--ft-color-error)",
+  },
+});
+
+const ShowMore = observer(({ link, classes, onClick }) => {
+  if (link.fetchError) {
+    return (
+      <li className={classes.showMoreError}>
+        <FontAwesomeIcon icon="exclamation-triangle" /> {link.fetchError}.{" "}
+        <Button variant="primary" onClick={onClick}>
+          Retry
+        </Button>
+      </li>
+    );
   }
+  if (link.isFetching) {
+    return (
+      <li className={classes.showMoreLoading}>
+        <FontAwesomeIcon icon="circle-notch" spin /> Loading more incoming
+        links...
+      </li>
+    );
+  }
+  if (link.total > link.from + link.size) {
+    return (
+      <li>
+        <Button className={classes.showMore} variant="link" onClick={onClick}>
+          show more...
+        </Button>
+      </li>
+    );
+  }
+  return null;
 });
 
 const IncomingLinkInstances = observer(({ link, readMode }) => {
-
   const classes = useStyles();
 
   const { instanceStore } = useStores();
 
-  const handleShowMore = () => instanceStore.fetchMoreIncomingLinks(link.instanceId, link.property, link.type.name);
+  const handleShowMore = () =>
+    instanceStore.fetchMoreIncomingLinks(
+      link.instanceId,
+      link.property,
+      link.type.name
+    );
 
-  const badgeColor = link.type.color?link.type.color:"black";
-  const badgeTextColor = (new Color(badgeColor)).isLight()?"black":"white";
+  const badgeColor = link.type.color ? link.type.color : "black";
+  const badgeTextColor = new Color(badgeColor).isLight() ? "black" : "white";
   const badgeStyle = {
-    "backgroundColor": badgeColor, 
-    "color":  badgeTextColor
+    backgroundColor: badgeColor,
+    color: badgeTextColor,
   };
 
   return (
     <div className={classes.container}>
       <div>
         <span className={classes.type} title={link.type.name}>
-          {Array.isArray(link.instances)?
-            <span className="badge badge-pill" style={badgeStyle}>{link.total}</span>
-            :
-            <FontAwesomeIcon icon={"circle"} color={badgeColor}/>
-          }
+          {Array.isArray(link.instances) ? (
+            <span className="badge badge-pill" style={badgeStyle}>
+              {link.total}
+            </span>
+          ) : (
+            <FontAwesomeIcon icon={"circle"} color={badgeColor} />
+          )}
           &nbsp;&nbsp;
-          <span>{link.type.label?link.type.label:link.type.name}</span>
-          </span>
+          <span>{link.type.label ? link.type.label : link.type.name}</span>
+        </span>
       </div>
       <ul>
-        {link.instances.map(instance => (
+        {link.instances.map((instance) => (
           <li key={instance.id}>
             <IncomingLinkInstance instance={instance} readMode={readMode} />
           </li>
         ))}
-        {link.fetchError?
-          <li className={classes.showMoreError}>
-            <FontAwesomeIcon icon="exclamation-triangle" /> {link.fetchError}. <Button variant="primary" onClick={handleShowMore}>Retry</Button>
-          </li>
-          :
-          link.isFetching?
-            <li className={classes.showMoreLoading}>
-              <FontAwesomeIcon icon="circle-notch" spin/> Loading more incoming links...
-            </li>
-            :
-            link.total > (link.from + link.size) && (
-              <li>
-                <Button className={classes.showMore} variant="link" onClick={handleShowMore}>show more...</Button>
-              </li>
-            )
-        }
+        <ShowMore link={link} classes={classes} onClick={handleShowMore} />
       </ul>
     </div>
   );
-
 });
 IncomingLinkInstances.displayName = "IncomingLinkInstances";
 

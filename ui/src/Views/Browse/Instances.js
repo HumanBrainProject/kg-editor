@@ -41,71 +41,155 @@ import InstanceRow from "../Instance/InstanceRow";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
-  container:{
+  container: {
     color: "var(--ft-color-loud)",
-    overflow:"hidden",
-    position:"relative",
-    display:"grid",
-    gridTemplateColumns:"1fr 33%",
-    gridTemplateRows:"auto 1fr"
+    overflow: "hidden",
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: "1fr 33%",
+    gridTemplateRows: "auto 1fr",
   },
-  preview:{
-    position:"relative",
-    gridRow:"1 / span 2",
-    gridColumn:"2",
-    background:"var(--bg-color-ui-contrast2)",
-    borderLeft:"1px solid var(--border-color-ui-contrast1)",
-    overflow:"auto",
-    color:"var(--ft-color-loud)"
+  preview: {
+    position: "relative",
+    gridRow: "1 / span 2",
+    gridColumn: "2",
+    background: "var(--bg-color-ui-contrast2)",
+    borderLeft: "1px solid var(--border-color-ui-contrast1)",
+    overflow: "auto",
+    color: "var(--ft-color-loud)",
   },
-  loader:{
-    textAlign:"center",
-    margin:"20px 0 30px",
-    fontSize:"1.25em",
-    fontWeight:"300"
+  loader: {
+    textAlign: "center",
+    margin: "20px 0 30px",
+    fontSize: "1.25em",
+    fontWeight: "300",
   },
-  list:{
+  list: {
     "& ul": {
       listStyleType: "none",
-      padding:"1px 11px 1px 11px"
-    }
+      padding: "1px 11px 1px 11px",
+    },
   },
-  header:{
-    display:"grid",
-    gridTemplateColumns:"1fr auto",
-    gridGap:"10px",
-    padding:"5px 10px 0 0",
-    position:"relative"
+  header: {
+    display: "grid",
+    gridTemplateColumns: "1fr auto",
+    gridGap: "10px",
+    padding: "5px 10px 0 0",
+    position: "relative",
   },
-  instanceCount:{
+  instanceCount: {
     color: "var(--ft-color-normal)",
-    lineHeight:"34px",
-    background:"var(--bg-color-ui-contrast2)",
-    padding:"0 10px",
-    margin: "10px 0 10px -10px"
+    lineHeight: "34px",
+    background: "var(--bg-color-ui-contrast2)",
+    padding: "0 10px",
+    margin: "10px 0 10px -10px",
+  },
+});
+
+const InstancesResult = observer(({
+  browseStore,
+  onRetry,
+  onClick,
+  onActionClick,
+  onCtrlClick,
+  loadMore,
+  classes,
+}) => {
+  if (!browseStore.selectedItem) {
+    return (
+      <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
+        Select a list of instances in the left panel
+      </BGMessage>
+    );
   }
+  if (browseStore.fetchError.instances) {
+    return (
+      <BGMessage icon={"ban"}>
+        There was a network problem retrieving the list of instances.
+        <br />
+        If the problem persists, please contact the support.
+        <br />
+        <br />
+        <Button variant={"primary"} onClick={onRetry}>
+          <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+        </Button>
+      </BGMessage>
+    );
+  }
+  if (browseStore.isFetching.instances) {
+    return (
+      <Spinner>
+        <span>Fetching instances...</span>
+      </Spinner>
+    );
+  }
+  if (!browseStore.instances.length) {
+    return (
+      <BGMessage icon={"unlink"}>
+        No instances could be found in this list
+        {browseStore.instancesFilter && (
+          <div>with the search term {`"${browseStore.instancesFilter}"`}</div>
+        )}
+      </BGMessage>
+    );
+  }
+  return (
+    <InfiniteScroll
+      threshold={400}
+      pageStart={0}
+      loadMore={loadMore}
+      hasMore={browseStore.canLoadMoreInstances}
+      loader={
+        <div className={classes.loader} key={0}>
+          <FontAwesomeIcon icon={"circle-notch"} spin />
+          &nbsp;&nbsp;<span>Loading more instances...</span>
+        </div>
+      }
+      useWindow={false}
+    >
+      <div className={classes.list}>
+        <ul>
+          {browseStore.instances.map((instance) => (
+            <li key={instance.id}>
+              <InstanceRow
+                instance={instance}
+                selected={instance === browseStore.selectedInstance}
+                onClick={onClick}
+                onCtrlClick={onCtrlClick}
+                onActionClick={onActionClick}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </InfiniteScroll>
+  );
 });
 
 const Instances = observer(() => {
-
   const classes = useStyles();
 
   const { appStore, browseStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
-  const handleFilterChange = value => {
+  const handleFilterChange = (value) => {
     ReactPiwik.push(["trackEvent", "Browse", "FilterInstance", value]);
     browseStore.setInstancesFilter(value);
   };
 
-  const handleInstanceClick = instance => {
+  const handleInstanceClick = (instance) => {
     ReactPiwik.push(["trackEvent", "Browse", "InstancePreview", instance.id]);
     browseStore.selectInstance(instance);
-  }
+  };
 
-  const handleInstanceCtrlClick = instance => {
+  const handleInstanceCtrlClick = (instance) => {
     if (instance && instance.id) {
-      ReactPiwik.push(["trackEvent", "Browse", "InstanceOpenTabInBackground", instance.id]);
+      ReactPiwik.push([
+        "trackEvent",
+        "Browse",
+        "InstanceOpenTabInBackground",
+        instance.id,
+      ]);
       appStore.openInstance(instance.id, instance.name, instance.primaryType);
     }
   };
@@ -117,8 +201,13 @@ const Instances = observer(() => {
         const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
-      ReactPiwik.push(["trackEvent", "Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id]);
-      if(mode === "view") {
+      ReactPiwik.push([
+        "trackEvent",
+        "Browse",
+        `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`,
+        id,
+      ]);
+      if (mode === "view") {
         navigate(`/instances/${id}`);
       } else {
         navigate(`/instances/${id}/${mode}`);
@@ -135,64 +224,40 @@ const Instances = observer(() => {
       <div className={classes.header}>
         {browseStore.selectedItem !== null && (
           <>
-            <Filter value={browseStore.instancesFilter} placeholder={`Filter instances of ${browseStore.selectedItem.label}`} onChange={handleFilterChange} />
+            <Filter
+              value={browseStore.instancesFilter}
+              placeholder={`Filter instances of ${browseStore.selectedItem.label}`}
+              onChange={handleFilterChange}
+            />
             <div className={classes.instanceCount}>
-              {browseStore.totalInstances} Result{`${browseStore.totalInstances !== 0?"s":""}`}
+              {browseStore.totalInstances} Result
+              {`${browseStore.totalInstances !== 0 ? "s" : ""}`}
             </div>
           </>
         )}
       </div>
       <Scrollbars autoHide>
-        {browseStore.selectedItem ?
-          !browseStore.fetchError.instances ?
-            !browseStore.isFetching.instances ?
-              browseStore.instances.length ?
-                <InfiniteScroll
-                  threshold={400}
-                  pageStart={0}
-                  loadMore={handleLoadMore}
-                  hasMore={browseStore.canLoadMoreInstances}
-                  loader={<div className={classes.loader} key={0}><FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;<span>Loading more instances...</span></div>}
-                  useWindow={false}>
-                  <div className={classes.list}>
-                    <ul>
-                      {browseStore.instances.map(instance => (
-                        <li key={instance.id}><InstanceRow instance={instance} selected={instance === browseStore.selectedInstance} onClick={handleInstanceClick}  onCtrlClick={handleInstanceCtrlClick}  onActionClick={handleInstanceActionClick} /></li>
-                      ))}
-                    </ul>
-                  </div>
-                </InfiniteScroll>
-                :
-                <BGMessage icon={"unlink"}>
-                    No instances could be found in this list
-                  {browseStore.instancesFilter && <div>with the search term {`"${browseStore.instancesFilter}"`}</div>}
-                </BGMessage>
-              :
-              <Spinner>
-                <span>Fetching instances...</span>
-              </Spinner>
-            :
-            <BGMessage icon={"ban"}>
-                There was a network problem retrieving the list of instances.<br/>
-                If the problem persists, please contact the support.<br/><br/>
-              <Button variant={"primary"} onClick={handleRetry}>
-                <FontAwesomeIcon icon={"redo-alt"}/> &nbsp; Retry
-              </Button>
-            </BGMessage>
-          :
-          <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
-              Select a list of instances in the left panel
-          </BGMessage>
-        }
+        <InstancesResult
+          browseStore={browseStore}
+          onRetry={handleRetry}
+          onClick={handleInstanceClick}
+          onCtrlClick={handleInstanceCtrlClick}
+          onActionClick={handleInstanceActionClick}
+          loadMore={handleLoadMore}
+          classes={classes}
+        />
       </Scrollbars>
       <div className={classes.preview}>
-        {browseStore.selectedInstance?
-          <Preview instanceId={browseStore.selectedInstance.id} instanceName={browseStore.selectedInstance.name}/>
-          :
+        {browseStore.selectedInstance ? (
+          <Preview
+            instanceId={browseStore.selectedInstance.id}
+            instanceName={browseStore.selectedInstance.name}
+          />
+        ) : (
           <BGMessage icon={"money-check"}>
-              Select an instance to display its preview here.
+            Select an instance to display its preview here.
           </BGMessage>
-        }
+        )}
       </div>
     </div>
   );

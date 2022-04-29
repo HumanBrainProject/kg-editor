@@ -65,7 +65,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const AfterSave = ({ savingErrors, className }) => {
+const AfterSave = observer(({ savingErrors, className }) => {
   if (savingErrors.length !== 0) {
     return null;
   }
@@ -75,7 +75,7 @@ const AfterSave = ({ savingErrors, className }) => {
       &nbsp;&nbsp;Reloading current instance release status
     </div>
   );
-};
+});
 
 const SavingModal = observer(() => {
   const classes = useStyles();

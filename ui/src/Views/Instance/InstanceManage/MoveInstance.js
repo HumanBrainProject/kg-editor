@@ -83,7 +83,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const Status = ({
+const Status = observer(({
   status,
   fetchStatus,
   onClick,
@@ -132,7 +132,7 @@ const Status = ({
       </Button>
     </>
   );
-};
+});
 
 const MoveInstance = observer(({ instance, className }) => {
   const classes = useStyles();

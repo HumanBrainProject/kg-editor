@@ -67,7 +67,7 @@ const useStyles = createUseStyles({
   },
 });
 
-const InstanceStatus = ({ instanceStatus, classes, darkmode }) => {
+const InstanceStatus = observer(({ instanceStatus, classes, darkmode }) => {
   if (instanceStatus.hasFetchError) {
     return (
       <div className={classes.loader}>
@@ -85,9 +85,9 @@ const InstanceStatus = ({ instanceStatus, classes, darkmode }) => {
   return (
     <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.data} />
   );
-};
+});
 
-const InstanceChildrenStatus = ({ instanceStatus, classes, darkmode }) => {
+const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }) => {
   if (instanceStatus.hasFetchErrorChildren) {
     return (
       <div className={classes.loader}>
@@ -109,7 +109,7 @@ const InstanceChildrenStatus = ({ instanceStatus, classes, darkmode }) => {
       instanceStatus={instanceStatus.childrenData}
     />
   );
-};
+});
 
 const Status = observer(({ id, darkmode }) => {
   const classes = useStyles();

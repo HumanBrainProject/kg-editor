@@ -43,9 +43,9 @@ const useStyles = createUseStyles({
       cursor: "not-allowed",
     },
   },
+  
 });
-
-const Delete = ({ status, onClick, classes, fetchStatus }) => {
+const Delete = observer(({ status, onClick, classes, fetchStatus }) => {
   if (status && status.hasFetchError) {
     return (
       <div className={classes.error}>
@@ -94,7 +94,7 @@ const Delete = ({ status, onClick, classes, fetchStatus }) => {
       </Button>
     </>
   );
-};
+});
 
 const DeleteInstance = observer(({ instance, className }) => {
   const classes = useStyles();

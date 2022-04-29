@@ -167,7 +167,6 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
 
   const handleOpenInstance = e => {
     if ((e.metaKey || e.ctrlKey)) {
-      const instance = instanceStore.instances.get(id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
       navigate(`/instances/${this.props.id}`);

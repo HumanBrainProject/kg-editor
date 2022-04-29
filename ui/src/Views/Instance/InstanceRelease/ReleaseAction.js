@@ -148,9 +148,19 @@ const ReleaseAction = observer(() => {
     return null;
   }
 
+  const getTitle = () => {
+    if(releaseStore.isSaving) {
+      return "Saving...";
+    }
+    if (releaseStore.treeStats.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0) {
+      return "No pending changes to release";
+    }
+    return "Proceed";
+  };
+
   const instance = instanceStore.instances.get(releaseStore.topInstanceId);
   const permissions = instance && instance.permissions;
-
+  const title = getTitle();
   return (
     <div className={classes.container}>
       <ReleaseStats />
@@ -185,14 +195,7 @@ const ReleaseAction = observer(() => {
           }
           bsPrefix={`${classes.releaseButton} btn btn-primary`}
           variant={"primary"}
-          title={
-            releaseStore.isSaving
-              ? "Saving..."
-              : releaseStore.treeStats.proceed_release === 0 &&
-                  releaseStore.treeStats.proceed_unrelease === 0
-                ? "No pending changes to release"
-                : "Proceed"
-          }
+          title={title}
         >
           <FontAwesomeIcon
             icon={releaseStore.isSaving ? "circle-notch" : "cloud-upload-alt"}

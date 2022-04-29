@@ -24,7 +24,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-//import Badge from "react-bootstrap/Badge";
 import Label from "../../../Fields/Label";
 import PossibleIncomingLink from "./PossibleIncomingLink";
 

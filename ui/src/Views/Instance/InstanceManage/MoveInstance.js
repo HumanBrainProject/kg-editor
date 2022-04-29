@@ -36,7 +36,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const useStyles = createUseStyles({
   title: {
-    display: "inline"
+    display: "inline",
   },
   selector: {
     display: "inline-block",
@@ -54,11 +54,11 @@ const useStyles = createUseStyles({
       cursor: "pointer",
       color: "inherit",
       "&[disabled]": {
-        cursor: "not-allowed"
-      }
+        cursor: "not-allowed",
+      },
     },
     "&:before": {
-      content: "\" \"",
+      content: '" "',
       display: "block",
       position: "absolute",
       top: "50%",
@@ -70,27 +70,77 @@ const useStyles = createUseStyles({
       borderRight: "6px solid transparent",
       borderTop: "6px solid var(--ft-color-normal)",
       cursor: "pointer",
-      pointerEvents: "none"
-    }
+      pointerEvents: "none",
+    },
   },
   error: {
-    color: "var(--ft-color-error)"
+    color: "var(--ft-color-error)",
   },
   btn: {
     "&[disabled]": {
-      cursor: "not-allowed"
-    }
-  }
+      cursor: "not-allowed",
+    },
+  },
 });
 
-const MoveInstance = observer(({instance, className}) => {
+const Status = ({
+  status,
+  fetchStatus,
+  onClick,
+  classes,
+  variant,
+  isDisabled,
+}) => {
+  if (status && status.hasFetchError) {
+    return (
+      <div className={classes.error}>
+        <FontAwesomeIcon icon={"exclamation-triangle"} />
+        &nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
+        <Button variant="primary" onClick={fetchStatus}>
+          <FontAwesomeIcon icon="redo-alt" />
+          &nbsp;Retry
+        </Button>
+      </div>
+    );
+  }
+  if (!status || !status.isFetched) {
+    return (
+      <>
+        <FontAwesomeIcon icon={"circle-notch"} spin />
+        &nbsp;&nbsp;Fetching instance release status
+      </>
+    );
+  }
+  return (
+    <>
+      {status.data !== "UNRELEASED" && (
+        <ul>
+          <li>
+            This instance has been released and therefore cannot be moved.
+          </li>
+          <li>If you still want to move it you first have to unrelease it.</li>
+        </ul>
+      )}
+      <Button
+        variant={variant}
+        disabled={isDisabled}
+        className={classes.btn}
+        onClick={onClick}
+      >
+        <FontAwesomeIcon icon={"angle-double-right"} /> &nbsp; Move this
+        instance
+      </Button>
+    </>
+  );
+};
 
+const MoveInstance = observer(({ instance, className }) => {
   const classes = useStyles();
 
   const { appStore, statusStore, authStore } = useStores();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => fetchStatus(), [instance]);
 
@@ -101,29 +151,37 @@ const MoveInstance = observer(({instance, className}) => {
   const permissions = instance.permissions;
   const status = statusStore.getInstance(instance.id);
 
-  const spaces = authStore.spaces.filter(s => {
+  const spaces = authStore.spaces.filter((s) => {
     if (s.id === appStore.currentSpace.id) {
       return true;
     }
-    if (!s.id.startsWith("private-") || appStore.currentSpace.id.startsWith("private-")) { // only instance in a private space can be moved to another private space
+    if (
+      !s.id.startsWith("private-") ||
+      appStore.currentSpace.id.startsWith("private-")
+    ) {
+      // only instance in a private space can be moved to another private space
       return s.permissions.canCreate;
     }
     return false;
   });
 
-  const handleSetSpaceId = e => {
+  const handleSetSpaceId = (e) => {
     setSpaceId(e.target.value);
-  }
+  };
 
   const handleMoveInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Move", instance.id]);
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 
-  const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
+  const handleCancelMoveInstance = () =>
+    appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
-
+  const variant =
+    spaceId === appStore.currentSpace.id ? "secondary" : "warning";
+  const isDisabled =
+    status.data !== "UNRELEASED" || spaceId === appStore.currentSpace.id;
   return (
     <>
       {permissions.canDelete && spaces.length > 1 && (
@@ -131,46 +189,43 @@ const MoveInstance = observer(({instance, className}) => {
           <div>
             <h4 className={classes.title}>Move this instance to space</h4>
             <div className={classes.selector}>
-              <select value={spaceId} onChange={handleSetSpaceId} disabled={!status || status.data !== "UNRELEASED"}>
-                {spaces.map(s => 
-                  <option key={s.id} value={s.id}>{s.name||s.id}</option>
-                )}
+              <select
+                value={spaceId}
+                onChange={handleSetSpaceId}
+                disabled={!status || status.data !== "UNRELEASED"}
+              >
+                {spaces.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name || s.id}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
-          {status && status.hasFetchError ?
-            <div className={classes.error}>
-              <FontAwesomeIcon icon={"exclamation-triangle"} />&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
-              <Button variant="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-            </div>
-            : !status || !status.isFetched ?
-              <>
-                <FontAwesomeIcon icon={"circle-notch"} spin />&nbsp;&nbsp;Fetching instance release status
-              </>
-              :
-              <>
-                {status.data !== "UNRELEASED" && (
-                  <ul>
-                    <li>This instance has been released and therefore cannot be moved.</li>
-                    <li>If you still want to move it you first have to unrelease it.</li>
-                  </ul>
-                )}
-                <Button variant={spaceId === appStore.currentSpace.id?"secondary":"warning"} disabled={status.data !== "UNRELEASED" || spaceId === appStore.currentSpace.id} className={classes.btn} onClick={handleMoveInstance}>
-                  <FontAwesomeIcon icon={"angle-double-right"} /> &nbsp; Move this instance
-                </Button>
-              </>
-          }
+          <Status
+            status={status}
+            fetchStatus={fetchStatus}
+            onClick={handleMoveInstance}
+            classes={classes}
+            variant={variant}
+            isDisabled={isDisabled}
+          />
         </div>
       )}
       {appStore.instanceMovingError && (
-        <ErrorModal message={appStore.instanceMovingError} onCancel={handleCancelMoveInstance} onRetry={handleRetryMoveInstance} />
+        <ErrorModal
+          message={appStore.instanceMovingError}
+          onCancel={handleCancelMoveInstance}
+          onRetry={handleRetryMoveInstance}
+        />
       )}
       {!appStore.instanceMovingError && appStore.isMovingInstance && (
-        <SpinnerModal text={`Moving instance "${appStore.instanceToMove.id}" to space "${appStore.instanceToMove.space}" ...`} />
+        <SpinnerModal
+          text={`Moving instance "${appStore.instanceToMove.id}" to space "${appStore.instanceToMove.space}" ...`}
+        />
       )}
     </>
   );
 });
-MoveInstance.displayName = "MoveInstance";
 
 export default MoveInstance;

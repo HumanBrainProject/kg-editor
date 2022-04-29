@@ -119,13 +119,20 @@ const Graph = observer(() => {
     return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
   };
 
-  const getNodeLabel = node => `${getNodeName(node)} ${node.space !== appStore.currentSpace.id?`(Space: ${node.space})`:""}`;
+  const getNodeLabel = node =>  {
+    const nodeName = getNodeName(node);
+    let space = "";
+    if(node.space !== appStore.currentSpace.id) {
+      space = `(Space: ${node.space})`;
+    }
+    return `${nodeName} ${space}`;
+  };
 
   const getNodeAutoColorBy = node => node.color;
 
   const wrapText = (context, text, x, y, maxWidth, lineHeight, node) => {
     if (node.labelLines === undefined) {
-      let words = text.split(/( |_|-|\.)/gi);
+      let words = text.split(/( |_|-|\.)/gi); //NOSONAR
       let line = "";
       let lines = [];
 

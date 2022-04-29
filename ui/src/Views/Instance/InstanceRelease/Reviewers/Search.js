@@ -178,7 +178,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
 
   const handleSelect = (user, event) => {
     if(event && event.keyCode === 40){ // Down
-      event && event.preventDefault();
+      event.preventDefault();
       const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
@@ -188,7 +188,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
         users[index].focus();
       }
     } else if(event && event.keyCode === 38){ // Up
-      event && event.preventDefault();
+      event.preventDefault();
       const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
@@ -198,10 +198,10 @@ const Search = observer(({ excludedUsers, onSelect }) => {
         users[index].focus();
       }
     } else if(event && event.keyCode === 27) { //escape
-      event && event.preventDefault();
+      event.preventDefault();
       userStore.clearSearch();
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
-      event && event.preventDefault();
+      event.preventDefault();
       inputRef.current.focus();
       typeof onSelect === "function" && onSelect(user.id);
     }
@@ -209,7 +209,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
 
   const handleInputKeyStrokes = event => {
     if(event && event.keyCode === 40 ){ // Down
-      event && event.preventDefault();
+      event.preventDefault();
       const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
@@ -219,7 +219,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
         users[index].focus();
       }
     } else if(event && event.keyCode === 38){ // Up
-      event && event.preventDefault();
+      event.preventDefault();
       const users = usersRef.current.querySelectorAll(".option");
       if (users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
@@ -229,7 +229,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
         users[index].focus();
       }
     } else if(event && event.keyCode === 27) { //escape
-      event && event.preventDefault();
+      event.preventDefault();
       userStore.clearSearch();
     }
   };

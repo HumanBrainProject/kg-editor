@@ -178,7 +178,6 @@ const NoPermissionForView = observer(({instance, mode}) => {
     </div>
   );
 });
-NoPermissionForView.displayName = "NoPermissionForView";
 
 const Instance = observer(({ instance, mode }) =>  {
 
@@ -190,7 +189,7 @@ const Instance = observer(({ instance, mode }) =>  {
 
   const previewInstance = instanceStore.previewInstance;
 
-  const previewOptions = previewInstance?(previewInstance.options?previewInstance.options:{}):{};
+  const previewOptions = previewInstance?.options ?? {};
 
   return (
     <>

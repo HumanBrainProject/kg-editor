@@ -101,9 +101,19 @@ const Pane = observer(({ paneId, children }) => {
     }
   };
 
+  const geActiveClass = () => {
+    if(paneId === view.selectedPane) {
+      return "active";
+    }
+    if(index > view.selectedPaneIndex) {
+      return "after";
+    }
+    return "before";
+  }
+
   const index = view.getPaneIndex(paneId);
   const mainClass = index === 0?"main":"";
-  const activeClass = paneId === view.selectedPane?"active":(index > view.selectedPaneIndex?"after":"before");
+  const activeClass = geActiveClass();
   return (
     <PaneContext.Provider value={paneId} >
       <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>

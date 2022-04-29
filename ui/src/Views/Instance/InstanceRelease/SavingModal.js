@@ -32,46 +32,57 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStores } from "../../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
-  lastEndedOperation:{
-    fontWeight:"bold",
-    fontSize:"0.8em",
-    whiteSpace:"nowrap",
-    textOverflow:"ellipsis",
-    overflow:"hidden"
+  lastEndedOperation: {
+    fontWeight: "bold",
+    fontSize: "0.8em",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
   },
-  reloadRelease:{
-    extend:"lastEndedOperation"
+  reloadRelease: {
+    extend: "lastEndedOperation",
   },
-  error:{
-    background:"rgba(255,0,0,0.1)",
-    borderTop:"1px solid #f5f5f5",
+  error: {
+    background: "rgba(255,0,0,0.1)",
+    borderTop: "1px solid #f5f5f5",
     padding: "10px 5px",
-    fontWeight:"bold",
-    fontSize:"0.8em",
-    "&:last-child":{
-      borderBottom:"1px solid #f5f5f5"
+    fontWeight: "bold",
+    fontSize: "0.8em",
+    "&:last-child": {
+      borderBottom: "1px solid #f5f5f5",
     },
-    "&:nth-child(odd)":{
-      background:"rgba(255,0,0,0.15)"
-    }
+    "&:nth-child(odd)": {
+      background: "rgba(255,0,0,0.15)",
+    },
   },
-  errors:{
-    marginTop:"10px"
+  errors: {
+    marginTop: "10px",
   },
   absoluteProgress: {
     fontSize: "12px",
     transform: "translateY(-10px)",
-    marginTop: "-10px"
-  }
+    marginTop: "-10px",
+  },
 });
 
-const SavingModal = observer(() => {
+const AfterSave = ({ savingErrors, className }) => {
+  if (savingErrors.length !== 0) {
+    return null;
+  }
+  return (
+    <div className={className}>
+      <FontAwesomeIcon icon={"circle-notch"} spin />
+      &nbsp;&nbsp;Reloading current instance release status
+    </div>
+  );
+};
 
+const SavingModal = observer(() => {
   const classes = useStyles();
 
   const { releaseStore } = useStores();
 
-  const handleDismissSavingReport = () =>releaseStore.dismissSaveError();
+  const handleDismissSavingReport = () => releaseStore.dismissSaveError();
 
   const handleStop = () => releaseStore.stopRelease();
 
@@ -80,48 +91,72 @@ const SavingModal = observer(() => {
       <Modal.Body>
         <ProgressBar
           active={releaseStore.savingProgress !== releaseStore.savingTotal}
-          now={releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}
-          label={`${releaseStore.savingTotal <= 0? 100: Math.round(releaseStore.savingProgress/releaseStore.savingTotal*100)}%`} />
-        <div className={classes.absoluteProgress}>{releaseStore.savingProgress} / {releaseStore.savingTotal}</div>
-        {releaseStore.savingProgress !== releaseStore.savingTotal?
+          now={
+            releaseStore.savingTotal <= 0
+              ? 100
+              : Math.round(
+                  (releaseStore.savingProgress / releaseStore.savingTotal) * 100
+                )
+          }
+          label={`${
+            releaseStore.savingTotal <= 0
+              ? 100
+              : Math.round(
+                  (releaseStore.savingProgress / releaseStore.savingTotal) * 100
+                )
+          }%`}
+        />
+        <div className={classes.absoluteProgress}>
+          {releaseStore.savingProgress} / {releaseStore.savingTotal}
+        </div>
+        {releaseStore.savingProgress !== releaseStore.savingTotal ? (
           <>
             <div className={classes.lastEndedInstance}>
-              {releaseStore.savingLastEndedNode && releaseStore.savingLastEndedNode.label}
+              {releaseStore.savingLastEndedNode &&
+                releaseStore.savingLastEndedNode.label}
             </div>
             <div className={classes.lastEndedOperation}>
               {releaseStore.savingLastEndedRequest}
             </div>
           </>
-          :releaseStore.savingErrors.length === 0?
-            <div className={classes.reloadRelease}>
-              <FontAwesomeIcon icon={"circle-notch"} spin/>&nbsp;&nbsp;Reloading current instance release status
-            </div>
-            :null
-        }
-        {releaseStore.savingErrors.length > 0 &&
-            <div className={classes.errors}>
-              {releaseStore.savingErrors.map(error => {
-                return(
-                  <div key={error.id} className={classes.error}>
-                    <FontAwesomeIcon icon={"times-circle"}/>&nbsp;
-                    ({error.node.type}) {error.node.label}<br/><br/>
-                    {error.message}
-                  </div>
-                );
-              })}
-            </div>
-        }
+        ) : (
+          <AfterSave
+            savingErrors={releaseStore.savingErrors}
+            className={classes.reloadRelease}
+          />
+        )}
+        {releaseStore.savingErrors.length > 0 && (
+          <div className={classes.errors}>
+            {releaseStore.savingErrors.map((error) => {
+              return (
+                <div key={error.id} className={classes.error}>
+                  <FontAwesomeIcon icon={"times-circle"} />
+                  &nbsp; ({error.node.type}) {error.node.label}
+                  <br />
+                  <br />
+                  {error.message}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Modal.Body>
-      {releaseStore.savingErrors.length > 0 && releaseStore.savingProgress === releaseStore.savingTotal ?
+      {releaseStore.savingErrors.length > 0 &&
+      releaseStore.savingProgress === releaseStore.savingTotal ? (
         <Modal.Footer>
-          <Button variant="primary" onClick={handleDismissSavingReport}>Dismiss</Button>
-        </Modal.Footer> : <Modal.Footer>
-          <Button variant="danger" onClick={handleStop}>Stop</Button>
+          <Button variant="primary" onClick={handleDismissSavingReport}>
+            Dismiss
+          </Button>
         </Modal.Footer>
-      }
+      ) : (
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleStop}>
+            Stop
+          </Button>
+        </Modal.Footer>
+      )}
     </Modal>
   );
 });
-SavingModal.displayName = "SavingModal";
 
 export default SavingModal;

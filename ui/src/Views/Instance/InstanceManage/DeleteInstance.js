@@ -36,17 +36,67 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   error: {
-    color: "var(--ft-color-error)"
+    color: "var(--ft-color-error)",
   },
   btn: {
     "&[disabled]": {
-      cursor: "not-allowed"
-    }
-  }
+      cursor: "not-allowed",
+    },
+  },
 });
 
-const DeleteInstance = observer(({instance, className}) => {
+const Delete = ({ status, onClick, classes, fetchStatus }) => {
+  if (status && status.hasFetchError) {
+    return (
+      <div className={classes.error}>
+        <FontAwesomeIcon icon={"exclamation-triangle"} />
+        &nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
+        <Button variant="primary" onClick={fetchStatus}>
+          <FontAwesomeIcon icon="redo-alt" />
+          &nbsp;Retry
+        </Button>
+      </div>
+    );
+  }
+  if (!status || !status.isFetched) {
+    return (
+      <>
+        <FontAwesomeIcon icon={"circle-notch"} spin />
+        &nbsp;&nbsp;Fetching instance release status
+      </>
+    );
+  }
 
+  return (
+    <>
+      {status.data !== "UNRELEASED" ? (
+        <ul>
+          <li>
+            This instance has been released and therefore cannot be deleted.
+          </li>
+          <li>
+            If you still want to delete it you first have to unrelease it.
+          </li>
+        </ul>
+      ) : (
+        <p>
+          <strong>Be careful. Removed instances cannot be restored!</strong>
+        </p>
+      )}
+      <Button
+        variant={status.data !== "UNRELEASED" ? "secondary" : "danger"}
+        onClick={onClick}
+        className={classes.btn}
+        disabled={status.data !== "UNRELEASED"}
+      >
+        <FontAwesomeIcon icon={"trash-alt"} />
+        &nbsp;&nbsp; Delete this instance
+      </Button>
+    </>
+  );
+};
+
+const DeleteInstance = observer(({ instance, className }) => {
   const classes = useStyles();
 
   const { appStore, statusStore } = useStores();
@@ -77,40 +127,28 @@ const DeleteInstance = observer(({instance, className}) => {
       {permissions.canDelete && (
         <div className={className}>
           <h4>Delete this instance</h4>
-          {status && status.hasFetchError ?
-            <div className={classes.error}>
-              <FontAwesomeIcon icon={"exclamation-triangle"} />&nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
-              <Button variant="primary" onClick={fetchStatus}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-            </div>
-            : !status || !status.isFetched ?
-              <>
-                <FontAwesomeIcon icon={"circle-notch"} spin />&nbsp;&nbsp;Fetching instance release status
-              </>
-              :
-              <>
-                {status.data !== "UNRELEASED" ?
-                  <ul>
-                    <li>This instance has been released and therefore cannot be deleted.</li>
-                    <li>If you still want to delete it you first have to unrelease it.</li>
-                  </ul>
-                  :
-                  <p>
-                    <strong>Be careful. Removed instances cannot be restored!</strong>
-                  </p>
-                }
-                <Button variant={status.data !== "UNRELEASED"?"secondary":"danger"} onClick={handleDeleteInstance} className={classes.btn} disabled={status.data !== "UNRELEASED"} >
-                  <FontAwesomeIcon icon={"trash-alt"} />&nbsp;&nbsp; Delete this instance
-                </Button>
-              </>
-          }
+          <Delete
+            status={status}
+            onClick={handleDeleteInstance}
+            classes={classes}
+            fetchStatus={fetchStatus}
+          />
         </div>
       )}
       {appStore.deleteInstanceError && (
-        <ErrorModal message={appStore.deleteInstanceError} onCancel={handleCancelDeleteInstance} onRetry={handleRetryDeleteInstance} />
+        <ErrorModal
+          message={appStore.deleteInstanceError}
+          onCancel={handleCancelDeleteInstance}
+          onRetry={handleRetryDeleteInstance}
+        />
       )}
-      {!appStore.deleteInstanceError && appStore.isDeletingInstance && !!appStore.instanceToDelete && (
-        <SpinnerModal text={`Deleting instance "${appStore.instanceToDelete}" ...`} />
-      )}
+      {!appStore.deleteInstanceError &&
+        appStore.isDeletingInstance &&
+        !!appStore.instanceToDelete && (
+          <SpinnerModal
+            text={`Deleting instance "${appStore.instanceToDelete}" ...`}
+          />
+        )}
     </>
   );
 });

@@ -99,9 +99,19 @@ class InputNumberMultipleStore extends FieldStore {
     return false;
   }
 
+  getValues(value) {
+    if(Array.isArray(value)) {
+      return value;
+    }
+    if(value !== null && value !== undefined) {
+      return [value];
+    }
+    return [];
+  }
+
   updateValue(value) {
     this.returnAsNull = false;
-    const values = Array.isArray(value)?value:(value !== null && value !== undefined?[value]:[]);
+    const values = this.getValues(value);
     this.initialValue = [...values];
     this.value = values;
   }

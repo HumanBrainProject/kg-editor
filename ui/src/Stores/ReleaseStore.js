@@ -21,13 +21,22 @@
  *
  */
 
-import { observable, action, runInAction, computed, makeObservable } from "mobx";
+import {
+  observable,
+  action,
+  runInAction,
+  computed,
+  makeObservable,
+} from "mobx";
 
-const setNodeTypesAndSortChildren = node => {
-  node.typesName = node.types.reduce((acc, current)  => `${acc}${acc.length ? ", " : ""}${current.label}`, "");
+const setNodeTypesAndSortChildren = (node) => {
+  node.typesName = node.types.reduce(
+    (acc, current) => `${acc}${acc.length ? ", " : ""}${current.label}`,
+    ""
+  );
   if (Array.isArray(node.children) && node.children.length) {
-    node.children.forEach(child => setNodeTypesAndSortChildren(child)); // Change child permissions here in case you want to test permissions.
-    node.children = node.children.sort((a, b) =>  {
+    node.children.forEach((child) => setNodeTypesAndSortChildren(child)); // Change child permissions here in case you want to test permissions.
+    node.children = node.children.sort((a, b) => {
       const ta = a.typesName.toUpperCase();
       const tb = b.typesName.toUpperCase();
       if (ta === tb) {
@@ -44,43 +53,47 @@ const removeDuplicates = (node, ids) => {
       ids = new Set();
       ids.add(node.id);
     }
-    node.children = node.children.filter(n => {
+    node.children = node.children.filter((n) => {
       if (ids.has(n.id)) {
         return false;
       }
       ids.add(n.id);
       return true;
     });
-    node.children.forEach(c => removeDuplicates(c, ids));
+    node.children.forEach((c) => removeDuplicates(c, ids));
     if (!node.children.length) {
       delete node.children;
     }
   }
-}
-
-const populateStatuses = (node, prefix = "") => {
-  if(node.permissions.canRelease) {
-    node[prefix+"childrenStatus"] = null;
-    if(node.children && node.children.length > 0){
-      let childrenStatuses = node.children.map(child => populateStatuses(child, prefix));
-      if(childrenStatuses.some(status => status === "UNRELEASED")){
-        node[prefix+"childrenStatus"] = "UNRELEASED";
-        node[prefix+"globalStatus"] = "UNRELEASED";
-      } else if(childrenStatuses.some(status => status === "HAS_CHANGED")){
-        node[prefix+"childrenStatus"] = "HAS_CHANGED";
-        node[prefix+"globalStatus"] = node[prefix+"status"] === "UNRELEASED"? "UNRELEASED": "HAS_CHANGED";
-      } else {
-        node[prefix+"childrenStatus"] = "RELEASED";
-        node[prefix+"globalStatus"] = node[prefix+"status"];
-      }
-    } else {
-      node[prefix+"childrenStatus"] = null;
-      node[prefix+"globalStatus"] = node[prefix+"status"];
-    }
-    return node[prefix+"globalStatus"];
-  }
 };
 
+const populateStatuses = (node, prefix = "") => {
+  if (node.permissions.canRelease) {
+    node[prefix + "childrenStatus"] = null;
+    if (node.children && node.children.length > 0) {
+      let childrenStatuses = node.children.map((child) =>
+        populateStatuses(child, prefix)
+      );
+      if (childrenStatuses.some((status) => status === "UNRELEASED")) {
+        node[prefix + "childrenStatus"] = "UNRELEASED";
+        node[prefix + "globalStatus"] = "UNRELEASED";
+      } else if (childrenStatuses.some((status) => status === "HAS_CHANGED")) {
+        node[prefix + "childrenStatus"] = "HAS_CHANGED";
+        node[prefix + "globalStatus"] =
+          node[prefix + "status"] === "UNRELEASED"
+            ? "UNRELEASED"
+            : "HAS_CHANGED";
+      } else {
+        node[prefix + "childrenStatus"] = "RELEASED";
+        node[prefix + "globalStatus"] = node[prefix + "status"];
+      }
+    } else {
+      node[prefix + "childrenStatus"] = null;
+      node[prefix + "globalStatus"] = node[prefix + "status"];
+    }
+    return node[prefix + "globalStatus"];
+  }
+};
 
 export class ReleaseStore {
   topInstanceId = null;
@@ -150,7 +163,7 @@ export class ReleaseStore {
       markAllNodeForChange: action,
       recursiveMarkNodeForChange: action,
       clearWarningMessages: action,
-      handleWarning: action
+      handleWarning: action,
     });
 
     this.transportLayer = transportLayer;
@@ -163,16 +176,16 @@ export class ReleaseStore {
 
   get visibleWarningMessages() {
     let results = [];
-    this.validationWarnings.forEach(message =>{
+    this.validationWarnings.forEach((message) => {
       let release = 0;
       let unrelease = 0;
-      message.releaseFlags.forEach(flag => {
+      message.releaseFlags.forEach((flag) => {
         flag ? release++ : unrelease++;
       });
-      if(release && message.messages.release) {
+      if (release && message.messages.release) {
         results.push(message.messages.release);
       }
-      if(unrelease && message.messages.unrelease) {
+      if (unrelease && message.messages.unrelease) {
         results.push(message.messages.unrelease);
       }
     });
@@ -185,40 +198,52 @@ export class ReleaseStore {
     }
 
     const count = {
-      total:0,
-      released:0,
-      not_released:0,
-      has_changed:0,
-      pending_released:0,
-      pending_not_released:0,
-      pending_has_changed:0,
-      proceed_release:0,
-      proceed_unrelease:0,
-      proceed_do_nothing:0
+      total: 0,
+      released: 0,
+      not_released: 0,
+      has_changed: 0,
+      pending_released: 0,
+      pending_not_released: 0,
+      pending_has_changed: 0,
+      proceed_release: 0,
+      proceed_unrelease: 0,
+      proceed_do_nothing: 0,
     };
 
-    const getStatsFromNode = node => {
+    const getStatsFromNode = (node) => {
       count.total++;
-      if(node.status === "RELEASED"){count.released++;}
-      if(node.status === "UNRELEASED"){count.not_released++;}
-      if(node.status === "HAS_CHANGED"){count.has_changed++;}
+      if (node.status === "RELEASED") {
+        count.released++;
+      }
+      if (node.status === "UNRELEASED") {
+        count.not_released++;
+      }
+      if (node.status === "HAS_CHANGED") {
+        count.has_changed++;
+      }
 
-      if(node.pending_status === "RELEASED"){count.pending_released++;}
-      if(node.pending_status === "UNRELEASED"){count.pending_not_released++;}
-      if(node.pending_status === "HAS_CHANGED"){count.pending_has_changed++;}
+      if (node.pending_status === "RELEASED") {
+        count.pending_released++;
+      }
+      if (node.pending_status === "UNRELEASED") {
+        count.pending_not_released++;
+      }
+      if (node.pending_status === "HAS_CHANGED") {
+        count.pending_has_changed++;
+      }
 
-      if(node.status === node.pending_status){
+      if (node.status === node.pending_status) {
         count.proceed_do_nothing++;
       } else {
-        if(node.pending_status === "RELEASED"){
+        if (node.pending_status === "RELEASED") {
           count.proceed_release++;
         } else {
           count.proceed_unrelease++;
         }
       }
 
-      if(node.children && node.children.length > 0){
-        node.children.forEach(child => getStatsFromNode(child));
+      if (node.children && node.children.length > 0) {
+        node.children.forEach((child) => getStatsFromNode(child));
       }
     };
 
@@ -228,38 +253,60 @@ export class ReleaseStore {
   }
 
   get instanceList() {
-
-    const processChildrenInstanceList = (node, result, level, hideReleasedInstances)  => {
-      if (!hideReleasedInstances
-          || node.status === "UNRELEASED" || node.status === "HAS_CHANGED"
-          || node.childrenStatus === "UNRELEASED" || node.childrenStatus === "HAS_CHANGED"
-          || node.pending_status !== node.status
-          || node.pending_childrenStatus !== node.childrenStatus) {
-        const obj = { node: node, level:level };
+    const processChildrenInstanceList = (
+      node,
+      result,
+      level,
+      hideReleasedInstances
+    ) => {
+      if (
+        !hideReleasedInstances ||
+        node.status === "UNRELEASED" ||
+        node.status === "HAS_CHANGED" ||
+        node.childrenStatus === "UNRELEASED" ||
+        node.childrenStatus === "HAS_CHANGED" ||
+        node.pending_status !== node.status ||
+        node.pending_childrenStatus !== node.childrenStatus
+      ) {
+        const obj = { node: node, level: level };
         result.push(obj);
-        node.children && node.children.forEach(child => processChildrenInstanceList(child, result, level+1, hideReleasedInstances));
+        node.children &&
+          node.children.forEach((child) =>
+            processChildrenInstanceList(
+              child,
+              result,
+              level + 1,
+              hideReleasedInstances
+            )
+          );
       }
       return result;
     };
 
     const result = [];
-    this.instancesTree && processChildrenInstanceList(this.instancesTree, result, 0, this.hideReleasedInstances);
+    this.instancesTree &&
+      processChildrenInstanceList(
+        this.instancesTree,
+        result,
+        0,
+        this.hideReleasedInstances
+      );
     return result;
   }
 
-  getNodesToProceed(){
+  getNodesToProceed() {
     const nodesByStatus = {
-      "RELEASED": [],
-      "UNRELEASED": []
+      RELEASED: [],
+      UNRELEASED: [],
     };
 
-    const rseek = node => {
-      if(node.permissions && node.permissions.canRelease) {
-        if(node.status !== node.pending_status){
+    const rseek = (node) => {
+      if (node.permissions && node.permissions.canRelease) {
+        if (node.status !== node.pending_status) {
           nodesByStatus[node.pending_status].push(node);
         }
-        if(node.children && node.children.length > 0){
-          node.children.forEach(child => rseek(child));
+        if (node.children && node.children.length > 0) {
+          node.children.forEach((child) => rseek(child));
         }
       }
     };
@@ -270,7 +317,10 @@ export class ReleaseStore {
   }
 
   toggleHideReleasedInstances(hideReleasedInstances) {
-    this.hideReleasedInstances = hideReleasedInstances === undefined?!this.hideReleasedInstances:!!hideReleasedInstances;
+    this.hideReleasedInstances =
+      hideReleasedInstances === undefined
+        ? !this.hideReleasedInstances
+        : !!hideReleasedInstances;
   }
 
   stopRelease() {
@@ -285,9 +335,11 @@ export class ReleaseStore {
     this.isFetched = false;
     this.isFetching = true;
     this.fetchError = null;
-    try{
-      const { data } = await this.transportLayer.getInstanceScope(this.topInstanceId);
-      runInAction(()=>{
+    try {
+      const { data } = await this.transportLayer.getInstanceScope(
+        this.topInstanceId
+      );
+      runInAction(() => {
         this.hideReleasedInstances = false;
         populateStatuses(data.data);
         // Default release state
@@ -299,17 +351,16 @@ export class ReleaseStore {
         this.isFetched = true;
         this.isFetching = false;
       });
-    } catch(e){
+    } catch (e) {
       runInAction(() => {
-        const message = e.message?e.message:e;
+        const message = e.message ? e.message : e;
         this.fetchError = message;
       });
     }
   }
 
-
   async fetchWarningMessages() {
-    if(this.isFetchingWarningMessages || this.isWarningMessagesFetched) {
+    if (this.isFetchingWarningMessages || this.isWarningMessagesFetched) {
       return;
     }
     this.isFetchingWarningMessages = true;
@@ -317,28 +368,19 @@ export class ReleaseStore {
     this.validationWarnings.clear();
     try {
       const { data } = await this.transportLayer.getMessages();
-      // const data = {
-      //   data: {
-      //       "datacite/core/doi/v1.0.0": {
-      //         release: "By releasing a DOI, you trigger the official registration of a DOI in an external system including specific meta-data",
-      //         unrelease: "Attention! Unreleasing a DOI does not remove it from the external registry - your DOI is still findable by external systems!"
-      //       },
-      //       "minds/core/activity/v1.0.0": {
-      //         release: "Test",
-      //         unrelease: "Test unrelease"
-      //       }
-      //     }
-      // };
       runInAction(() => {
         Object.entries(data.data).forEach(([typePath, messages]) => {
-          this.validationWarnings.set(typePath, {releaseFlags:new Map(), messages: messages});
+          this.validationWarnings.set(typePath, {
+            releaseFlags: new Map(),
+            messages: messages,
+          });
         });
         this.isWarningMessagesFetched = true;
         this.isFetchingWarningMessages = false;
       });
-    } catch(e) {
+    } catch (e) {
       runInAction(() => {
-        const message = e.message?e.message:e;
+        const message = e.message ? e.message : e;
         this.fetchWarningMessagesError = message;
         this.isWarningMessagesFetched = false;
         this.isFetchingWarningMessages = false;
@@ -349,21 +391,30 @@ export class ReleaseStore {
   async commitStatusChanges() {
     let nodesToProceed = this.getNodesToProceed();
     this.savingProgress = 0;
-    this.savingTotal = nodesToProceed["UNRELEASED"].length + nodesToProceed["RELEASED"].length;
+    this.savingTotal =
+      nodesToProceed["UNRELEASED"].length + nodesToProceed["RELEASED"].length;
     this.savingErrors = [];
     this.isStopped = false;
-    if(!this.savingTotal){
+    if (!this.savingTotal) {
       return;
     }
     this.savingLastEndedRequest = "Initializing actions...";
     this.isSaving = true;
 
-    for(let i=0; i<nodesToProceed["RELEASED"].length && !this.isStopped; i++) {
+    for (
+      let i = 0;
+      i < nodesToProceed["RELEASED"].length && !this.isStopped;
+      i++
+    ) {
       const node = nodesToProceed["RELEASED"][i];
       await this.releaseNode(node);
     }
 
-    for(let i=0; i<nodesToProceed["UNRELEASED"].length && !this.isStopped; i++) {
+    for (
+      let i = 0;
+      i < nodesToProceed["UNRELEASED"].length && !this.isStopped;
+      i++
+    ) {
       const node = nodesToProceed["UNRELEASED"][i];
       await this.unreleaseNode(node);
     }
@@ -374,19 +425,23 @@ export class ReleaseStore {
   async releaseNode(node) {
     try {
       await this.transportLayer.releaseInstance(node.id);
-      runInAction(()=>{
+      runInAction(() => {
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} released successfully`;
         this.savingLastEndedNode = node;
-        this.rootStore.historyStore.updateInstanceHistory(node.id, "released", false);
+        this.rootStore.historyStore.updateInstanceHistory(
+          node.id,
+          "released",
+          false
+        );
       });
-    } catch(e){
-      runInAction(()=>{
-        this.savingErrors.push({node: node, message: e.message});
+    } catch (e) {
+      runInAction(() => {
+        this.savingErrors.push({ node: node, message: e.message });
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
     } finally {
-      runInAction(()=>{
+      runInAction(() => {
         this.savingProgress++;
       });
     }
@@ -395,28 +450,36 @@ export class ReleaseStore {
   async unreleaseNode(node) {
     try {
       await this.transportLayer.unreleaseInstance(node.id);
-      runInAction(()=>{
+      runInAction(() => {
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} unreleased successfully`;
         this.savingLastEndedNode = node;
-        this.rootStore.historyStore.updateInstanceHistory(node.id, "released", true);
+        this.rootStore.historyStore.updateInstanceHistory(
+          node.id,
+          "released",
+          true
+        );
       });
-    } catch(e){
-      runInAction(()=>{
-        this.savingErrors.push({node: node, message: e.message});
+    } catch (e) {
+      runInAction(() => {
+        this.savingErrors.push({ node: node, message: e.message });
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
     } finally {
-      runInAction(()=>{
+      runInAction(() => {
         this.savingProgress++;
       });
     }
   }
 
   afterSave() {
-    if((this.savingErrors.length === 0 && this.savingProgress === this.savingTotal) || this.isStopped){
-      setTimeout(()=>{
-        runInAction(()=>{
+    if (
+      (this.savingErrors.length === 0 &&
+        this.savingProgress === this.savingTotal) ||
+      this.isStopped
+    ) {
+      setTimeout(() => {
+        runInAction(() => {
           this.isSaving = false;
           this.rootStore.statusStore.flush();
           this.savingErrors = [];
@@ -450,26 +513,34 @@ export class ReleaseStore {
   }
 
   recursiveMarkNodeForChange(node, newStatus) {
-    if(node.permissions.canRelease) {
-      node.pending_status = newStatus? newStatus: node.status;
+    if (node.permissions.canRelease) {
+      node.pending_status = newStatus ? newStatus : node.status;
       this.handleWarning(node, node.pending_status);
-      if(node.children && node.children.length > 0){
-        node.children.forEach(child => this.recursiveMarkNodeForChange(child, newStatus));
+      if (node.children && node.children.length > 0) {
+        node.children.forEach((child) =>
+          this.recursiveMarkNodeForChange(child, newStatus)
+        );
       }
     }
   }
 
   clearWarningMessages() {
-    this.validationWarnings.forEach(message => message.releaseFlags.clear());
+    this.validationWarnings.forEach((message) => message.releaseFlags.clear());
   }
 
   //TODO: Check if this logic is still valid
   handleWarning(node, newStatus) {
-    if(this.validationWarnings.has(node.typePath)) {
+    if (this.validationWarnings.has(node.typePath)) {
       const messages = this.validationWarnings.get(node.typePath);
-      if(newStatus === "RELEASED" && ((node.status === "HAS_CHANGED" || node.status === "UNRELEASED")))  {
+      if (
+        newStatus === "RELEASED" &&
+        (node.status === "HAS_CHANGED" || node.status === "UNRELEASED")
+      ) {
         messages.releaseFlags.set(node.relativeUrl, true);
-      } else if(newStatus === "UNRELEASED" && ((node.status === "HAS_CHANGED" || node.status === "RELEASED"))) {
+      } else if (
+        newStatus === "UNRELEASED" &&
+        (node.status === "HAS_CHANGED" || node.status === "RELEASED")
+      ) {
         messages.releaseFlags.set(node.relativeUrl, false);
       } else {
         messages.releaseFlags.delete(node.relativeUrl);

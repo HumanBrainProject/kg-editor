@@ -131,16 +131,16 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
       return;
     }
     if(e && e.keyCode === 40){ // Down
-      e && e.preventDefault();
+      e.preventDefault();
       handleSelectNext(current);
     } else if(e && e.keyCode === 38){ // Up
-      e && e.preventDefault();
+      e.preventDefault();
       handleSelectPrevious(current);
     } else if(e && e.keyCode === 27) { //escape
-      e && e.preventDefault();
+      e.preventDefault();
       close();
     } else if (e.keyCode === 13) { // enter
-      e && e.preventDefault();
+      e.preventDefault();
       if (open) {
         if (current) {
           typeof onSelect === "function" && onSelect(current);

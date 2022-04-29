@@ -197,9 +197,19 @@ class LinksStore extends FieldStore {
     return Object.keys(this.validationWarnings).length > 0;
   }
 
+  getValues(value) {
+    if(Array.isArray(value)) {
+      return value;
+    }
+    if(value !== null && value !== undefined && typeof value === "object") {
+      return [value];
+    }
+    return [];
+  }
+
   updateValue(value) {
     this.returnAsNull = false;
-    const values = Array.isArray(value)?value:(value !== null && value !== undefined && typeof value === "object"?[value]:[]);
+    const values = this.getValues(value);
     this.initialValue = [...values];
     this.value = values;
     if (this.lazyShowLinks) {

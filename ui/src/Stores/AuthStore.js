@@ -155,7 +155,6 @@ export class AuthStore {
           this.isUserAuthorized = true;
           const user = (data && data.data)?data.data:{ spaces: []};
           user.spaces = Array.isArray(user.spaces)?user.spaces.sort((a, b) => a.name.localeCompare(b.name)):[];
-          //user.spaces = []; // uncomment to simulate a user without any space
           this.user = user;
           this.isRetrievingUserProfile = false;
         });

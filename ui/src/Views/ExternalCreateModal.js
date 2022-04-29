@@ -83,7 +83,7 @@ const ExternalCreateModal = observer(() => {
 
   return(
     <div className={classes.container}>
-      <Modal  dialogClassName={classes.modal} show={true} onHide={() => {}}>
+      <Modal  dialogClassName={classes.modal} show={true}>
         <Modal.Body>
           {appStore.externalCreateModal.toSave ?
             <div>

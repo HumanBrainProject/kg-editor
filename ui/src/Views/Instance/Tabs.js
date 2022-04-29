@@ -92,12 +92,12 @@ const Tabs = observer(({ instance, mode }) => {
 
   const navigate = useNavigate();
 
-  const handleClick = mode => {
-    ReactPiwik.push(["trackEvent", "Instance", `Select${mode[0].toUpperCase() + mode.substr(1)}Mode`, instance.id]);
-    if(mode === "view") {
+  const handleClick = instanceMode => {
+    ReactPiwik.push(["trackEvent", "Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id]);
+    if(instanceMode === "view") {
       navigate(`/instances/${instance.id}`);
     } else {
-      navigate(`/instances/${instance.id}/${mode}`);
+      navigate(`/instances/${instance.id}/${instanceMode}`);
     }
   };
 

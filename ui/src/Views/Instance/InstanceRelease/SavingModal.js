@@ -76,7 +76,7 @@ const SavingModal = observer(() => {
   const handleStop = () => releaseStore.stopRelease();
 
   return (
-    <Modal show={releaseStore.isSaving} onHide={() => {}}>
+    <Modal show={releaseStore.isSaving}>
       <Modal.Body>
         <ProgressBar
           active={releaseStore.savingProgress !== releaseStore.savingTotal}

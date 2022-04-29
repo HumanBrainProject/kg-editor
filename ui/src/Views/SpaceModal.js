@@ -114,7 +114,7 @@ const SpaceModal = observer(() => {
 
   return (
     <div className={classes.container}>
-      <Modal dialogClassName={classes.workspaceSelectionModal} show={true} onHide={() => {}} >
+      <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
         <Modal.Body>
           <div className={classes.workspacesSelection}>
             <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>

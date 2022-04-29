@@ -76,7 +76,7 @@ const ClientPreviewModal = observer(({ store, show, handleClose }) => {
   const url = getUrl(store.topInstanceId); 
 
   return (
-    <Modal show={show} className={classes.greatModal} onHide={() => {}}>
+    <Modal show={show} className={classes.greatModal}>
       <Modal.Body>
         <div className={classes.frameContainer}>
           <Iframe url={url}

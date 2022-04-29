@@ -84,7 +84,6 @@ const Actions = observer(({ instance }) => {
   };
 
   const handleClick = mode => {
-    const { id } = instance;
     if(mode === "view") {
       navigate(`/instances/${id}`);
     } else {

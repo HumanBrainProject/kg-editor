@@ -43,14 +43,14 @@ const useStyles = createUseStyles({
       display: "block",
       position: "relative",
       zIndex: "5",
-      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)"
+      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)",
     },
     "& > div:not(:first-child)": {
       position: "relative",
       top: "-0.3em",
       left: "0.6em",
       display: "block",
-      zIndex: "3"
+      zIndex: "3",
     },
   },
   loader: {
@@ -62,55 +62,85 @@ const useStyles = createUseStyles({
     border: "1px solid var(--ft-color-loud)",
     "& .svg-inline--fa": {
       fontSize: "0.8em",
-      verticalAlign: "baseline"
-    }
-  }
+      verticalAlign: "baseline",
+    },
+  },
 });
 
-const Status = observer(({ id, darkmode }) => {
+const InstanceStatus = ({ instanceStatus, classes, darkmode }) => {
+  if (instanceStatus.hasFetchError) {
+    return (
+      <div className={classes.loader}>
+        <FontAwesomeIcon icon={"question-circle"} />
+      </div>
+    );
+  }
+  if (!instanceStatus.isFetched) {
+    return (
+      <div className={classes.loader}>
+        <FontAwesomeIcon icon={"circle-notch"} spin />
+      </div>
+    );
+  }
+  return (
+    <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.data} />
+  );
+};
 
+const InstanceChildrenStatus = ({ instanceStatus, classes, darkmode }) => {
+  if (instanceStatus.hasFetchErrorChildren) {
+    return (
+      <div className={classes.loader}>
+        <FontAwesomeIcon icon={"question-circle"} />
+      </div>
+    );
+  }
+
+  if (!instanceStatus.isFetchedChildren) {
+    return (
+      <div className={classes.loader}>
+        <FontAwesomeIcon icon={"circle-notch"} spin />
+      </div>
+    );
+  }
+  return (
+    <ReleaseStatus
+      darkmode={darkmode}
+      instanceStatus={instanceStatus.childrenData}
+    />
+  );
+};
+
+const Status = observer(({ id, darkmode }) => {
   const classes = useStyles();
 
   const { statusStore } = useStores();
 
   useEffect(() => {
     statusStore.fetchStatus(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const instanceStatus = statusStore.getInstance(id);
 
-  if(!instanceStatus) {
+  if (!instanceStatus) {
     return null;
   }
 
   return (
     <div className={`${classes.container} status`}>
-      {instanceStatus.hasFetchError ?
-        <div className={classes.loader}>
-          <FontAwesomeIcon icon={"question-circle"} />
-        </div>
-        : !instanceStatus.isFetched ?
-          <div className={classes.loader}>
-            <FontAwesomeIcon icon={"circle-notch"} spin />
-          </div>
-          :
-          <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.data} isChildren={false} />
-      }
-      {instanceStatus.hasFetchErrorChildren ?
-        <div className={classes.loader}>
-          <FontAwesomeIcon icon={"question-circle"} />
-        </div>
-        : (!instanceStatus.isFetchedChildren?
-          <div className={classes.loader}>
-            <FontAwesomeIcon icon={"circle-notch"} spin />
-          </div>
-          :
-          <ReleaseStatus darkmode={darkmode} instanceStatus={instanceStatus.childrenData ? instanceStatus.childrenData : null} highContrastChildren={true} isChildren={true} />)
-      }
+      <InstanceStatus
+        instanceStatus={instanceStatus}
+        classes={classes}
+        darkmode={darkmode}
+      />
+      <InstanceChildrenStatus
+        instanceStatus={instanceStatus}
+        classes={classes}
+        darkmode={darkmode}
+      />
     </div>
   );
 });
-Status.displayName = "Status";
 
 export default Status;

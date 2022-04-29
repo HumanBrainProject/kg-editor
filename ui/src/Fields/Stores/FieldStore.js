@@ -42,7 +42,7 @@ class FieldStore {
   transportLayer = null;
   rootStore = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
+  constructor(definition, _options, instance, transportLayer, rootStore) {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,

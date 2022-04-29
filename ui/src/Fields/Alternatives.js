@@ -104,10 +104,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
       return;
     }
     const index = list.findIndex(alternative => alternative.value === value);
-    if (index === -1) {
-      const alternative = list[0] ;
-      setCurrent(alternative.value);
-    } else if (index < list.length -1){
+    if (index !== -1 && index < list.length -1){
       const alternative = list[index + 1] ;
       setCurrent(alternative.value);
     } else {
@@ -127,16 +124,16 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
   };
 
   const handleInputKeyStrokes = e => {
-    if (disabled) {
+    if (disabled || !e) {
       return;
     }
-    if(e && e.keyCode === 40){ // Down
+    if(e.keyCode === 40){ // Down
       e.preventDefault();
       handleSelectNext(current);
-    } else if(e && e.keyCode === 38){ // Up
+    } else if(e.keyCode === 38){ // Up
       e.preventDefault();
       handleSelectPrevious(current);
-    } else if(e && e.keyCode === 27) { //escape
+    } else if(e.keyCode === 27) { //escape
       e.preventDefault();
       close();
     } else if (e.keyCode === 13) { // enter

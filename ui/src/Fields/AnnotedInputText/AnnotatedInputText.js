@@ -106,7 +106,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     fieldStore.addValue(value);
   };
 
-  const handleSelectAlternative = values => fieldStore.setValues([...values]);
+  const handleSelectAlternative = vals => fieldStore.setValues([...vals]);
 
   const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 

@@ -72,6 +72,19 @@ const useStyles = createUseStyles({
   }
 });
 
+const getLabel = (instance, hasError, isFetching) => {
+  if (!instance) {
+    return  "Unknown instance"
+  }
+  if (hasError) {
+    return "Not found";
+  }
+  if (isFetching) {
+    return instance.id;
+  }
+  return instance.name;
+};
+
 const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut, fetchLabel }) => {
 
   const classes = useStyles();
@@ -153,7 +166,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
 
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
   const isFetching = instance && (instance.isFetching || instance.isFetchingLabel);
-  const label = instance ? (hasError ? "Not found" : (isFetching ? instance.id : instance.name)) : "Unknown instance";
+  const label = getLabel(instance, hasError, isFetching);
 
   if (readOnly) {
     if (!enablePointerEvents) {

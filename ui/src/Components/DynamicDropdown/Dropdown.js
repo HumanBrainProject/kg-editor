@@ -148,7 +148,6 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
     window.removeEventListener("keyup", clickOutHandler, false);
   };
 
-  //const showMenu = wrapperRef.current && wrapperRef.current.contains(document.activeElement) && (options.length || searchTerm);
   const showMenu = options.length || searchTerm || loading;
 
   return (

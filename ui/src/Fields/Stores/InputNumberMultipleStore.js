@@ -24,6 +24,16 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 
+const normalizeValues = values => {
+  if (Array.isArray(values)) {
+    return values;
+  }
+  if (values !== null && values !== undefined) {
+    return [values];
+  }
+  return [];
+};
+
 class InputNumberMultipleStore extends FieldStore {
   value = [];
   options = [];
@@ -81,7 +91,7 @@ class InputNumberMultipleStore extends FieldStore {
     };
   }
 
-  get returnValue() {
+  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a list of value
     if (!this.value.length && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
@@ -99,19 +109,9 @@ class InputNumberMultipleStore extends FieldStore {
     return false;
   }
 
-  getValues(value) {
-    if(Array.isArray(value)) {
-      return value;
-    }
-    if(value !== null && value !== undefined) {
-      return [value];
-    }
-    return [];
-  }
-
   updateValue(value) {
     this.returnAsNull = false;
-    const values = this.getValues(value);
+    const values = normalizeValues(value);
     this.initialValue = [...values];
     this.value = values;
   }

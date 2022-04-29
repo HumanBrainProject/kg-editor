@@ -73,6 +73,34 @@ const useStyles = createUseStyles({
   }
 });
 
+const ReadOnlyValue = observer(({ id, fetchLabel, onClick }) => {
+  if (!id) {
+    return null;
+  }
+  const isClickable = typeof onClick === "function";
+  if (isClickable) {
+    return (
+      <ListItem
+        instanceId={id}
+        readOnly={true}
+        disabled={false}
+        enablePointerEvents={true}
+        onClick={onClick}
+        fetchLabel={fetchLabel}
+      />
+    );
+  }
+  return (
+    <ListItem
+      instanceId={id}
+      readOnly={true}
+      disabled={false}
+      enablePointerEvents={false}
+      fetchLabel={fetchLabel}
+    />
+  );
+});
+
 const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}) => {
 
   const classes = useStyles();
@@ -115,17 +143,17 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const addNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
-      const id = _.uuid();
+      const newId = _.uuid();
       const type = typeStore.typesMap.get(typeName);
-      instanceStore.createNewInstance(type, id, name);
-      const value = {[mappingValue]: id};
-      fieldStore.addValue(value);
+      instanceStore.createNewInstance(type, newId, name);
+      const newValue = {[mappingValue]: newId};
+      fieldStore.addValue(newValue);
       setTimeout(() => {
         const index = view.panes.findIndex(p => p === pane); 
         if (index !== -1 && index < view.panes.length -1) {
           const targetPane = view.panes[index+1];
-          view.setInstanceHighlight(targetPane, id, fieldStore.label);
-          view.setCurrentInstanceId(targetPane, id);
+          view.setInstanceHighlight(targetPane, newId, fieldStore.label);
+          view.setCurrentInstanceId(targetPane, newId);
           view.selectPane(targetPane);
           view.resetInstanceHighlight();
         }
@@ -134,10 +162,10 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const addValue = id => {
-    instanceStore.createInstanceOrGet(id);
-    const value = {[mappingValue]: id};
-    fieldStore.addValue(value);
+  const addValue = idToAdd => {
+    instanceStore.createInstanceOrGet(idToAdd);
+    const val = {[mappingValue]: idToAdd};
+    fieldStore.addValue(val);
     const index = view.panes.findIndex(p => p === pane);
     if (index !== -1 && index < view.panes.length -1) {
       const targetPane = view.panes[index+1];
@@ -146,8 +174,8 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectAlternative = value => {
-    fieldStore.addValue({[mappingValue]: value.id});
+  const handleSelectAlternative = val => {
+    fieldStore.addValue({[mappingValue]: val.id});
     instanceStore.togglePreviewInstance();
   };
 
@@ -158,13 +186,13 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const handleClick = () => {
     if (view && pane) {
-      const id = value && value[mappingValue];
-      if (id) {
+      const selectedId = value && value[mappingValue];
+      if (selectedId) {
         view.resetInstanceHighlight();
         const _pane = view.currentInstanceIdPane;
         view.selectPane(_pane);
-        view.setCurrentInstanceId(_pane, id);
-        view.setInstanceHighlight(_pane, id, fieldStore.label);
+        view.setCurrentInstanceId(_pane, selectedId);
+        view.setInstanceHighlight(_pane, selectedId, fieldStore.label);
       }
     }
   };
@@ -200,12 +228,12 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const handleFocus = () => {
     if (view) {
-      const id = value && value[mappingValue];
-      if (id) {
+      const focusedId = value && value[mappingValue];
+      if (focusedId) {
         const index = view.panes.findIndex(p => p === pane);
         if (index !== -1 && index < view.panes.length -1) {
           const targetPane = view.panes[index+1];
-          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+          view.setInstanceHighlight(targetPane, focusedId, fieldStore.label);
         }
       }
       instanceStore.togglePreviewInstance();
@@ -236,30 +264,15 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
   }
 
   if(readMode || isReadOnly){
+    const isClickable = view && view.currentInstanceId === instance.id;
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
-        {id?
-          (view && view.currentInstanceId === instance.id)?
-            <ListItem
-              instanceId={id}
-              readOnly={true}
-              disabled={false}
-              enablePointerEvents={true}
-              onClick={handleClick}
-              fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
-            />
-            :
-            <ListItem
-              instanceId={id}
-              readOnly={true}
-              disabled={false}
-              enablePointerEvents={false}
-              fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
-            />
-          :
-          null
-        }
+        <ReadOnlyValue
+          id={id}
+          fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+          onClick={isClickable?handleClick:null}
+        />
       </Form.Group>
     );
   }

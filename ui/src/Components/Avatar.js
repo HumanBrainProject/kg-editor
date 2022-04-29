@@ -47,8 +47,9 @@ const Avatar = ({userId, name, picture, title, size=20}) => {
   }
 
   if (picture) {
+    const imgTitle = title?title:(name?name:userId);
     return (
-      <img alt={name?name:userId} width={size} height={size} src={picture} title={title?title:(name?name:userId)} className={`${classes.avatar} avatar picture`} />
+      <img alt={name?name:userId} width={size} height={size} src={picture} title={imgTitle} className={`${classes.avatar} avatar picture`} />
     );
   }
 

@@ -105,9 +105,9 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     isReadOnly
   } = fieldStore;
 
-  const handleChange = value => fieldStore.setValue(value);
+  const handleChange = val => fieldStore.setValue(val);
 
-  const handleSelectAlternative = value => fieldStore.setValue(value);
+  const handleSelectAlternative = val => fieldStore.setValue(val);
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 

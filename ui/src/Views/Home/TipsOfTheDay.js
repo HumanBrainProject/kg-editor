@@ -97,7 +97,7 @@ const TipsOfTheDay = () => {
     <span key="9">press <span className="kbd">Ctrl</span> + <span className="kbd">Alt</span> + <span className="kbd">t</span> to toggle theme.</span>
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(Math.floor(Math.random() * 10) % tips.length);
+  const [currentIndex, setCurrentIndex] = useState(Math.floor(Math.random() * 10) % tips.length); //NOSONAR
 
   const handleShowNextTip = () => setCurrentIndex((currentIndex + 1 === tips.length)?0:(currentIndex + 1));
 

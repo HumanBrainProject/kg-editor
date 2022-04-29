@@ -148,8 +148,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   };
 
   const handleSelectAlternative = value => {
-    const values = value.map(v => ({[fieldStore.mappingValue]: v.id}));
-    fieldStore.setValues(values);
+    const vals = value.map(v => ({[fieldStore.mappingValue]: v.id}));
+    fieldStore.setValues(vals);
     instanceStore.togglePreviewInstance();
   };
 
@@ -233,9 +233,9 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id) {
-        const index = view.panes.findIndex(p => p === pane);
-        if (index !== -1 && index < view.panes.length -1) {
-          const targetPane = view.panes[index+1];
+        const idx = view.panes.findIndex(p => p === pane);
+        if (idx !== -1 && idx < view.panes.length -1) {
+          const targetPane = view.panes[idx+1];
           view.setInstanceHighlight(targetPane, id, fieldStore.label);
         }
       }

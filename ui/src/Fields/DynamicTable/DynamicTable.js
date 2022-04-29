@@ -255,9 +255,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id && fieldStore.isLinkVisible(id)) {
-        const index = view.panes.findIndex(p => p === pane);
-        if (index !== -1 && index < view.panes.length -1) {
-          const targetPane = view.panes[index+1];
+        const idx = view.panes.findIndex(p => p === pane);
+        if (idx !== -1 && idx < view.panes.length -1) {
+          const targetPane = view.panes[idx+1];
           view.setInstanceHighlight(targetPane, id, fieldStore.label);
         }
       }

@@ -46,16 +46,62 @@ const normalizeAlternative = (name, field, alternatives) => {
 };
 
 const normalizeField = (field, instanceId) => {
-  if ((field.widget === "Nested" || field.widget === "SingleNested") && typeof field.fields === "object") {
+  if (field instanceof Object && !Array.isArray(field) && (field.widget === "Nested" || field.widget === "SingleNested")) {
     normalizeFields(field.fields, instanceId);
   }
 };
 
 const normalizeFields = (fields, instanceId, alternatives) => {
-  Object.entries(fields).forEach(([name, field]) => {
-    normalizeField(field, instanceId);
-    normalizeAlternative(name, field, alternatives);
-  });
+  if (fields instanceof Object && !Array.isArray(fields)) {
+    Object.entries(fields).forEach(([name, field]) => {
+      normalizeField(field, instanceId);
+      normalizeAlternative(name, field, alternatives);
+    });
+  }
+};
+
+const getChildrenIds = fields => {
+  if (!(fields instanceof Object) || Array.isArray(fields)) {
+    return new Set();
+  }
+  return Object.values(fields).reduce((acc, field) => {
+    if (field.widget === "SingleNested") {
+      const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(field.nestedFieldsStores);
+      idsOfNestedFields.forEach(id => acc.add(id));
+    } else if (field.widget === "Nested") {
+      const idsOfNestedFields = getChildrenIdsOfNestedFields(field.nestedFieldsStores);
+      idsOfNestedFields.forEach(id => acc.add(id));
+    } else if (field.isLink) {
+      const values = field.returnValue;
+      if (Array.isArray(values)) {
+        values.map(obj => obj && obj[field.mappingValue]).filter(id => !!id).forEach(id => acc.add(id));
+      } else if (values instanceof Object && !Array.isArray(values)) { // field.widget === "SimpleDropdown"
+        const id = values[field.mappingValue];
+        if (id) {
+          acc.add(id);
+        }
+      }
+    }
+    return acc;
+  }, new Set());
+};
+
+const getChildrenIdsOfNestedFields = fields => {
+  if (!Array.isArray(fields)) {
+    return Set();
+  }
+  return fields.reduce((acc, rowFields) => {
+    const ids = getChildrenIds(rowFields.stores);
+    ids.forEach(id => acc.add(id));
+    return acc;
+  }, new Set());
+};
+
+const getChildrenIdsOfSingleNestedFields = fields => {
+  if (!(fields instanceof Object) || Array.isArray(fields)) {
+    return new Set();
+  }
+  return getChildrenIds(fields.stores);
 };
 
 export const compareField = (a, b, ignoreName=false) => {
@@ -520,74 +566,8 @@ export class Instance {
   }
 
   get childrenIds() {
-
-    function getChildrenIds(fields) {
-      const ids = Object.values(fields)
-        .reduce((acc, field) => {
-          if (field.widget === "SingleNested") {
-            const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(field.nestedFieldsStores);
-            idsOfNestedFields.forEach(id => {
-              if (!acc.has(id)) {
-                acc.add(id);
-              }
-            });
-          } else if (field.widget === "Nested") {
-            const idsOfNestedFields = getChildrenIdsOfNestedFields(field.nestedFieldsStores);
-            idsOfNestedFields.forEach(id => {
-              if (!acc.has(id)) {
-                acc.add(id);
-              }
-            });
-          } else if (field.isLink) {
-            const values = field.returnValue;
-            if (Array.isArray(values)) {
-              values.forEach(obj => {
-                const id = obj && obj[field.mappingValue];
-                if (id && !acc.has(id)) {
-                  acc.add(id);
-                }
-              });
-            } else if (typeof values === "object" && values) { // field.widget === "SimpleDropdown"
-              const id = values && values[field.mappingValue];
-              if (id && !acc.has(id)) {
-                acc.add(id);
-              }
-            }
-          }
-          return acc;
-        }, new Set());
-      return Array.from(ids);
-    }
-
-    function getChildrenIdsOfNestedFields(fields) {
-      const ids = fields.reduce((acc, rowFields) => {
-        const ids = getChildrenIds(rowFields.stores);
-        ids.forEach(id => {
-          if (!acc.has(id)) {
-            acc.add(id);
-          }
-        });
-        return acc;
-      }, new Set());
-      return Array.from(ids);
-    }
-
-    function getChildrenIdsOfSingleNestedFields(fields) {
-      if (!fields) {
-        return [];
-      }
-      const ids = new Set();
-      const childrenIds = getChildrenIds(fields.stores);
-      childrenIds.forEach(id => {
-        if (!ids.has(id)) {
-          ids.add(id);
-        }
-      });
-      return Array.from(ids);
-    }
-
     if (this.isFetched && !this.fetchError && this.fields) {
-      return getChildrenIds(this.fields);
+      return Array.from(getChildrenIds(this.fields));
     }
     return [];
   }

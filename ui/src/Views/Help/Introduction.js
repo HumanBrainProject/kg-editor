@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Introduction = () => (
   <div>
     <h1>Introduction</h1>
     <p>Welcome to the Knowledge Graph Editor, the tool of choice for browsing, editing, reviewing, exploring and releasing the Knowledge Graph data.</p>
@@ -31,4 +31,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Introduction;

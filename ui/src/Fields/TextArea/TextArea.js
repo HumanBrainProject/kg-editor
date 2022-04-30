@@ -23,7 +23,7 @@
 
 import React from "react";
 import InputText from "../InputText/InputText";
-import RenderMarkdownField from "../../Components/Markdown";
+import Markdown from "../../Components/Markdown";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import Label from "../Label";
@@ -58,7 +58,7 @@ const TextArea = props => {
           {label && (
             <Label className={classes.label} label={label} />
           )}
-          <RenderMarkdownField value={value}/>
+          <Markdown value={value}/>
         </Form.Group>
       );
     }

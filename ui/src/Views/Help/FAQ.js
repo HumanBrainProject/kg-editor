@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const FAQ = () => (
   <div>
     <h1>Frequently asked questions</h1>
     <p>This section needs you.</p>
@@ -31,4 +31,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default FAQ;

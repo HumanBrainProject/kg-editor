@@ -24,7 +24,7 @@
 import React from "react";
 import ReleaseStatus from "../../../Components/ReleaseStatus";
 
-const HelpView = () => (
+const Release = () => (
   <div>
     <h1>Release an instance</h1>
     <p>The “Release” view of an opened instance will show you the tree of instances linked to the opened instance with their status of release (meaning how they are accessible in the public API). The view is divided in two parts: on the left you can see the current state of the instances tree release status, and some toggles to select the action to perform on each instance, and on the right side you have a preview of the future state, once you will have pressed the proceed button.</p>
@@ -89,4 +89,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Release;

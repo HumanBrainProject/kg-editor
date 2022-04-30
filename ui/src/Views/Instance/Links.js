@@ -52,8 +52,8 @@ const Links = observer(({ instanceId }) => {
 
   const fetchInstance = (forceFetch = false) => {
     if (instanceId) {
-      const instance = instanceStore.createInstanceOrGet(instanceId);
-      instance.fetch(forceFetch);
+      const inst = instanceStore.createInstanceOrGet(instanceId);
+      inst.fetch(forceFetch);
     }
   };
 
@@ -89,4 +89,4 @@ const Links = observer(({ instanceId }) => {
 Links.displayName = "Links";
 
 const DecoratedLinks = Links;
-export default DecoratedLinks;
+export default Links;

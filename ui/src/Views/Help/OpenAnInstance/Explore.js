@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Explore = () => (
   <div>
     <h1>Explore the graph from an instance</h1>
     <p>The “Explore” view of an opened instance allows you to visualise in a graphical way all the instances linked to the opened instance. For the moment, the view shows 2 levels of depth of outgoing links, and 1 level below of incoming links to the opened instance.</p>
@@ -59,4 +59,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Explore;

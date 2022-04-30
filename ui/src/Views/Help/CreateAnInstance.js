@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const CreateAnInstance = () => (
   <div>
     <h1>Create an instance</h1>
     <p>You have three different ways of creating a new instance.</p>
@@ -45,4 +45,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default CreateAnInstance;

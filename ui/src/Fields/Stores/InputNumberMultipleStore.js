@@ -95,18 +95,14 @@ class InputNumberMultipleStore extends FieldStore {
     if (!this.value.length && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
-    const val = this.value.map(v => parseFloat(v));
-    return val;
+    return this.value.map(v => parseFloat(v));
   }
 
   get requiredValidationWarning() {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value.length === 0) {
-      return true;
-    }
-    return false;
+    return this.value.length === 0;
   }
 
   updateValue(value) {
@@ -125,20 +121,14 @@ class InputNumberMultipleStore extends FieldStore {
     if(!this.minItems && !this.maxItems) {
       return false;
     }
-    if(this.minItems || this.maxItems) {
-      return true;
-    }
-    return false;
+    return this.minItems || this.maxItems;
   }
 
   get minMaxValueWarning() {
     if(!this.minValue && !this.maxValue) {
       return false;
     }
-    if(this.minValue || this.maxValue) {
-      return true;
-    }
-    return false;
+    return this.minValue || this.maxValue;
   }
 
   get validationWarnings() {

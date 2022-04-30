@@ -156,20 +156,14 @@ class LinksStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value.length === 0) {
-      return true;
-    }
-    return false;
+    return this.value.length === 0;
   }
 
   get numberOfItemsWarning() {
     if(!this.minItems && !this.maxItems) {
       return false;
     }
-    if(this.minItems || this.maxItems) {
-      return true;
-    }
-    return false;
+    return this.minItems || this.maxItems;
   }
 
   get validationWarnings() {

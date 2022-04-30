@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Browse = () => (
   <div>
     <h1>Browse the Knowledge Graph</h1>
     <p>One of the key features of the KG Editor is to allow its users to find any instance they need.</p>
@@ -35,4 +35,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Browse;

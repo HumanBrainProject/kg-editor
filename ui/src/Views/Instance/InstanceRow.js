@@ -180,9 +180,9 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         action = typeof onCtrlClick === "function"?onCtrlClick:null;
       }
       if (action) {
-        timeout.current = setTimeout((i, action) => {
+        timeout.current = setTimeout((i, act) => {
           timeout.current = null;
-          action(i);
+          act(i);
         }, 300, instance, action);
       }
     }

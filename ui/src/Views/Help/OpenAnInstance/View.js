@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const View = () => (
   <div>
     <h1>View an instance</h1>
     <p>That feature is made of scrolling panels, flowing form left to right. Each panel represents a level of depth in the graph relations of the opened instance, this one being the first panel. </p>
@@ -48,4 +48,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default View;

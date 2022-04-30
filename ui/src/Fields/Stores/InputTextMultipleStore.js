@@ -25,14 +25,13 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
 
-const getRegexRules = validation => {
-  const rules = Array.isArray(validation)?
+const getRegexRules = validation => Array.isArray(validation)?
   validation.map(rule => ({
       regex: new RegExp(rule.regex),
       errorMessage: rule.errorMessage
-    })):[];
-  return rules;
-};
+  }))
+  :[];
+    
 class InputTextMultipleStore extends FieldStore {
   value = [];
   options = [];
@@ -109,24 +108,15 @@ class InputTextMultipleStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value.length === 0) {
-      return true;
-    }
-    return false;
+    return this.value.length === 0;
   }
 
   get maxLengthWarning() {
-    if(!this.maxLength) {
-      return false;
-    }
-    if(this.maxLength) {
-      return true;
-    }
-    return false;
+    return !!this.maxLength;
   }
 
   get regexWarning() {
-    const test = this.regexRules.reduce((message, rule) => {
+    return this.regexRules.reduce((message, rule) => {
       !message && Array.isArray(this.value) && this.value.some(val => {
         if (!rule.regex.test(val)) {
           message = rule.errorMessage;
@@ -136,22 +126,17 @@ class InputTextMultipleStore extends FieldStore {
       });
       return message;
     }, null);
-    return test;
   }
 
   get hasRegexWarning() {
     return !!this.regexWarning;
   }
 
-
   get numberOfItemsWarning() {
     if(!this.minItems && !this.maxItems) {
       return false;
     }
-    if(this.minItems || this.maxItems) {
-      return true;
-    }
-    return false;
+    return this.minItems || this.maxItems;
   }
 
   get validationWarnings() {

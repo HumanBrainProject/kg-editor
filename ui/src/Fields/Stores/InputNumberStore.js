@@ -59,10 +59,7 @@ class InputNumberStore extends FieldStore {
     if(!this.minValue && !this.maxValue) {
       return false;
     }
-    if(this.minValue || this.maxValue) {
-      return true;
-    }
-    return false;
+    return (this.minValue || this.maxValue);
   }
 
   get validationWarnings() {
@@ -105,10 +102,7 @@ class InputNumberStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value === null) {
-      return true;
-    }
-    return false;
+    return this.value === null;
   }
 
   get cloneWithInitialValue() {

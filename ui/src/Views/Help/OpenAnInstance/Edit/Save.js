@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Save = () => (
   <div>
     <h1>Saving instances</h1>
     <p>When you have made modifications on instances, these will be listed in the “Unsaved instances” panel on the right of the screen, visible on any of the view mode of an instance, or accessible through the corresponding button in the bottom right corner of the application on any other feature.</p>
@@ -67,4 +67,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Save;

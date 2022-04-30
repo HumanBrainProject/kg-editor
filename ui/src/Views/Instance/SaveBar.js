@@ -203,7 +203,7 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
 });
 Instance.displayName = "Instance";
 
-const SavePanel = observer(() => {
+const SaveBar = observer(() => {
 
   const classes = useStyles();
 
@@ -281,6 +281,6 @@ const SavePanel = observer(() => {
     </div>
   );
 });
-SavePanel.displayName = "SavePanel";
+SaveBar.displayName = "SaveBar";
 
-export default SavePanel;
+export default SaveBar;

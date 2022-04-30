@@ -95,6 +95,21 @@ const populateStatuses = (node, prefix = "") => {
   }
 };
 
+const processChildrenInstanceList = (node, list, level, hideReleasedInstances) => {
+  if (
+    !hideReleasedInstances ||
+    node.status === "UNRELEASED" ||
+    node.status === "HAS_CHANGED" ||
+    node.childrenStatus === "UNRELEASED" ||
+    node.childrenStatus === "HAS_CHANGED" ||
+    node.pending_status !== node.status ||
+    node.pending_childrenStatus !== node.childrenStatus
+  ) {
+    const obj = { node: node, level: level };
+    list.push(obj);
+    node.children && node.children.forEach((child) => processChildrenInstanceList(child, list, level + 1, hideReleasedInstances));
+  }
+};
 export class ReleaseStore {
   topInstanceId = null;
   instancesTree = null;
@@ -253,44 +268,10 @@ export class ReleaseStore {
   }
 
   get instanceList() {
-    const processChildrenInstanceList = (
-      node,
-      result,
-      level,
-      hideReleasedInstances
-    ) => {
-      if (
-        !hideReleasedInstances ||
-        node.status === "UNRELEASED" ||
-        node.status === "HAS_CHANGED" ||
-        node.childrenStatus === "UNRELEASED" ||
-        node.childrenStatus === "HAS_CHANGED" ||
-        node.pending_status !== node.status ||
-        node.pending_childrenStatus !== node.childrenStatus
-      ) {
-        const obj = { node: node, level: level };
-        result.push(obj);
-        node.children &&
-          node.children.forEach((child) =>
-            processChildrenInstanceList(
-              child,
-              result,
-              level + 1,
-              hideReleasedInstances
-            )
-          );
-      }
-      return result;
-    };
-
     const result = [];
-    this.instancesTree &&
-      processChildrenInstanceList(
-        this.instancesTree,
-        result,
-        0,
-        this.hideReleasedInstances
-      );
+    if (this.instancesTree) {
+      processChildrenInstanceList(this.instancesTree, result, 0, this.hideReleasedInstances);
+    }
     return result;
   }
 

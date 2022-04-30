@@ -302,7 +302,7 @@ export class InstanceStore {
       status.isAvailable = false;
       status.isChecking = false;
     }
-  };
+  }
 
   async checkRawInstanceIdAvailability(instanceId) {
     try{
@@ -326,7 +326,7 @@ export class InstanceStore {
     } catch(e){
       this.instanceIdCheckAvailabilityError(instanceId, e);
     }
-  };
+  }
 
   async checkNonRawInstanceIdAvailability(instanceId, mode, navigate) {
     try{
@@ -351,7 +351,7 @@ export class InstanceStore {
     } catch(e){
       this.instanceIdCheckAvailabilityError(instanceId, e);
     }
-  };
+  }
 
   checkInstanceIdAvailability(instanceId, mode, navigate) {
     const rawMode = mode === "raw";

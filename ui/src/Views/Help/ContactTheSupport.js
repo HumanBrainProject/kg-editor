@@ -27,7 +27,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStores } from "../../Hooks/UseStores";
 import * as Sentry from "@sentry/browser";
 
-const HelpView = () => {
+const ContactTheSupport = () => {
   const { authStore } = useStores();
   
   const handleErrorReport = () => {
@@ -57,4 +57,4 @@ const HelpView = () => {
   );
 };
 
-export default HelpView;
+export default ContactTheSupport;

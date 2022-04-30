@@ -223,13 +223,14 @@ const TypesItem = observer(({ type }) => {
       ? browseStore.selectedItem.name === type.name
       : false;
   const color = type.color;
-  const canCreate = type.canCreate !== false;
+  const canCreate = appStore.currentSpacePermissions.canCreate && !!type.canCreate;
 
-  const cannotCreateTooltip = appStore.currentSpacePermissions.canCreate
-    ? canCreate
-      ? null
-      : `You are not allowed to create a new ${type.label} in the editor.`
-    : `You are not allowed to create a new ${type.label}.`;
+  let cannotCreateTooltip = null;
+  if (!appStore.currentSpacePermissions.canCreate) {
+    cannotCreateTooltip = `You are not allowed to create a new ${type.label}.`;
+  } else if (!type.canCreate) {
+    cannotCreateTooltip = `You are not allowed to create a new ${type.label} in the editor.`;
+  }
 
   return (
     <div
@@ -260,7 +261,7 @@ const TypesItem = observer(({ type }) => {
         )}
       </span>
       <CreateInstance
-        canCreate={appStore.currentSpacePermissions.canCreate && canCreate}
+        canCreate={canCreate}
         isCreatingNewInstance={appStore.isCreatingNewInstance}
         classes={classes}
         onClick={handleCreateInstance}

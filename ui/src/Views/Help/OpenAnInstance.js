@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const OpenAnInstance = () => (
   <div>
     <h1>Open an instance</h1>
     <p>In the KG Editor, you can open one or multiple instances that you want to view or edit. Each opened instance will show a new tab at the top of the application.</p>
@@ -56,4 +56,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default OpenAnInstance;

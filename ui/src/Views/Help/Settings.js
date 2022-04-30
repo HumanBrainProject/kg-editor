@@ -23,10 +23,10 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Settings = () => (
   <div>
 
   </div>
 );
 
-export default HelpView;
+export default Settings;

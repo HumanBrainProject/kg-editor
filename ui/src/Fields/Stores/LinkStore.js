@@ -128,10 +128,7 @@ class LinkStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value === null) {
-      return true;
-    }
-    return false;
+    return this.value === null;
   }
 
   get validationWarnings() {
@@ -165,8 +162,7 @@ class LinkStore extends FieldStore {
   }
 
   get shouldCheckValidation() {
-    const check = this.initialValue !== null || this.hasChanged;
-    return check;
+    return this.initialValue !== null || this.hasChanged;
   }
 
   get hasMoreOptions() {

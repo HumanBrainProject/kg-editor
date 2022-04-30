@@ -110,8 +110,7 @@ class View {
   }
 
   get selectedPaneIndex() {
-    const index = this.getPaneIndex(this.selectedPane);
-    return index;
+    return this.getPaneIndex(this.selectedPane);
   }
 
   getPaneIndex(paneId) {

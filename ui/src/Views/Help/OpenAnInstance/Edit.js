@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Edit = () => (
   <div>
     <h1>Edit an instance</h1>
     <p>The edit mode of an opened instance has the same navigation than the view mode, please refer to the “View” section if you haven’t yet. On top of that, you are able to edit the values of the instances, and create link between instances and even create new instances directly from here.</p>
@@ -55,4 +55,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Edit;

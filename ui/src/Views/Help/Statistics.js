@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Statistics = () => (
   <div>
     <h1>Statistics</h1>
 
@@ -32,4 +32,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Statistics;

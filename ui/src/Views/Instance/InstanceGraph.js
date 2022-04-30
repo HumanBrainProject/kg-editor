@@ -95,7 +95,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const GraphInstance = observer(({ instance }) => {
+const InstanceGraph = observer(({ instance }) => {
 
   const classes = useStyles();
 
@@ -135,6 +135,6 @@ const GraphInstance = observer(({ instance }) => {
     </div>
   );
 });
-GraphInstance.displayName = "GraphInstance";
+InstanceGraph.displayName = "InstanceGraph";
 
-export default GraphInstance;
+export default InstanceGraph;

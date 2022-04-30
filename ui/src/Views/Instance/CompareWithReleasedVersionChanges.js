@@ -72,14 +72,14 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
 
   const fetchReleasedInstance = (forceFetch=false) => {
     if (status !== "UNRELEASED") {
-      const instance = releasedInstanceStore.createInstanceOrGet(instanceId);
-      instance.fetch(forceFetch);
+      const inst = releasedInstanceStore.createInstanceOrGet(instanceId);
+      inst.fetch(forceFetch);
     }
   };
 
   const fetchInstance = (forceFetch=false) => {
-    const instance = instanceStore.createInstanceOrGet(instanceId);
-    instance.fetch(forceFetch);
+    const inst = instanceStore.createInstanceOrGet(instanceId);
+    inst.fetch(forceFetch);
   };
 
   const handleCloseComparison = () => releaseStore.setComparedInstance(null);

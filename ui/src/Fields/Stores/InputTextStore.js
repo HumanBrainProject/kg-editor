@@ -94,20 +94,14 @@ class InputTextStore extends FieldStore {
     if(!this.isRequired) {
       return false;
     }
-    if(this.value === "") {
-      return true;
-    }
-    return false;
+    return this.value === "";
   }
 
   get maxLengthWarning() {
     if(!this.maxLength) {
       return false;
     }
-    if(this.value.length > this.maxLength) {
-      return true;
-    }
-    return false;
+    return this.value.length > this.maxLength;
   }
 
   get regexWarning() { //NOSONAR by design return null when no warning

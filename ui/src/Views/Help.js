@@ -102,7 +102,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Instances = () => {
+const Help = () => {
   const classes = useStyles();
 
   useEffect(() => {
@@ -171,4 +171,4 @@ const Instances = () => {
   );
 };
 
-export default Instances;
+export default Help;

@@ -23,7 +23,7 @@
 
 import React from "react";
 
-const HelpView = () => (
+const Nodetypes = () => (
   <div>
     <h1>Browse by node type</h1>
 
@@ -65,4 +65,4 @@ const HelpView = () => (
   </div>
 );
 
-export default HelpView;
+export default Nodetypes;

@@ -65,7 +65,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Graph = observer(() => {
+const GraphViz = observer(() => {
 
   const wrapperRef = useRef();
   const graphRef = useRef();
@@ -240,6 +240,6 @@ const Graph = observer(() => {
     </div>
   );
 });
-Graph.displayName = "Graph";
+GraphViz.displayName = "GraphViz";
 
-export default Graph;
+export default GraphViz;

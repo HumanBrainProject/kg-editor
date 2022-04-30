@@ -618,7 +618,7 @@ export class AppStore{
   }
 
   async retryMoveInstance(location, navigate) {
-    return await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, location, navigate);
+    return this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, location, navigate);
   }
 
   cancelMoveInstance() {
@@ -627,11 +627,11 @@ export class AppStore{
   }
 
   async retryDeleteInstance() {
-    return await this.deleteInstance(this.instanceToDelete);
+    return this.deleteInstance(this.instanceToDelete);
   }
 
   async deleteInstance(instanceId) {
-    return await this.delete(instanceId);
+    return this.delete(instanceId);
   }
 
   cancelDeleteInstance() {

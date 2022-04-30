@@ -48,7 +48,7 @@ const useStyles = createUseStyles({
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast1)",
     overflow: "hidden",
-    position: "relative",
+    position: "relative"
   },
   settings: {
     background: "var(--bg-color-ui-contrast2)",

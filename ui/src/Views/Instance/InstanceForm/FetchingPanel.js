@@ -41,7 +41,7 @@ const useStyles = createUseStyles({
       position: "absolute !important",
       top: "50%",
       left: "50%",
-      transform: "translate(-50%, -50%)",
+      transform: "translate(-50%, -50%)"
     },
     "& small": {
       display: "block",

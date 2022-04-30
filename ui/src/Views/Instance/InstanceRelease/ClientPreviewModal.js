@@ -36,7 +36,7 @@ const useStyles = createUseStyles({
     "& .modal-dialog": {
       maxWidth: "unset",
       width: "60%",
-      height: "95%",
+      height: "95%"
     },
     "& .modal-content": {
       height: "100%",
@@ -50,7 +50,7 @@ const useStyles = createUseStyles({
   frame: {
     border: "0",
     minHeight: "100%",
-    minWidth: "100%",
+    minWidth: "100%"
   }
 });
 

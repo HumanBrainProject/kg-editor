@@ -47,7 +47,7 @@ const useStyles = createUseStyles({
     position: "relative",
     display: "grid",
     gridTemplateColumns: "1fr 33%",
-    gridTemplateRows: "auto 1fr",
+    gridTemplateRows: "auto 1fr"
   },
   preview: {
     position: "relative",
@@ -56,34 +56,34 @@ const useStyles = createUseStyles({
     background: "var(--bg-color-ui-contrast2)",
     borderLeft: "1px solid var(--border-color-ui-contrast1)",
     overflow: "auto",
-    color: "var(--ft-color-loud)",
+    color: "var(--ft-color-loud)"
   },
   loader: {
     textAlign: "center",
     margin: "20px 0 30px",
     fontSize: "1.25em",
-    fontWeight: "300",
+    fontWeight: "300"
   },
   list: {
     "& ul": {
       listStyleType: "none",
-      padding: "1px 11px 1px 11px",
-    },
+      padding: "1px 11px 1px 11px"
+    }
   },
   header: {
     display: "grid",
     gridTemplateColumns: "1fr auto",
     gridGap: "10px",
     padding: "5px 10px 0 0",
-    position: "relative",
+    position: "relative"
   },
   instanceCount: {
     color: "var(--ft-color-normal)",
     lineHeight: "34px",
     background: "var(--bg-color-ui-contrast2)",
     padding: "0 10px",
-    margin: "10px 0 10px -10px",
-  },
+    margin: "10px 0 10px -10px"
+  }
 });
 
 const InstancesResult = observer(({
@@ -93,7 +93,7 @@ const InstancesResult = observer(({
   onActionClick,
   onCtrlClick,
   loadMore,
-  classes,
+  classes
 }) => {
   if (!browseStore.selectedItem) {
     return (
@@ -172,17 +172,17 @@ const Instances = observer(() => {
   const { appStore, browseStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
-  const handleFilterChange = (value) => {
+  const handleFilterChange = value => {
     ReactPiwik.push(["trackEvent", "Browse", "FilterInstance", value]);
     browseStore.setInstancesFilter(value);
   };
 
-  const handleInstanceClick = (instance) => {
+  const handleInstanceClick = instance => {
     ReactPiwik.push(["trackEvent", "Browse", "InstancePreview", instance.id]);
     browseStore.selectInstance(instance);
   };
 
-  const handleInstanceCtrlClick = (instance) => {
+  const handleInstanceCtrlClick = instance => {
     if (instance && instance.id) {
       ReactPiwik.push([
         "trackEvent",

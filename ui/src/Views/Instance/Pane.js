@@ -58,7 +58,7 @@ const useStyles = createUseStyles({
     }
   },
   scrolledView:{
-    padding:"20px",
+    padding:"20px"
   }
 });
 

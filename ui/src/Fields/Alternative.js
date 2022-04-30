@@ -37,7 +37,7 @@ const useStyles = createUseStyles({
     },
     "& .option": {
       position: "relative",
-      paddingLeft: "3px",
+      paddingLeft: "3px"
     },
     "& .option .parenthesis": {
       display: "inline-block",

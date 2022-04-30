@@ -42,7 +42,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const TextArea = (props) => {
+const TextArea = props => {
   const classes = useStyles();
   const { readMode, fieldStore, className, showIfNoValue } = props;
   const { label, value } = fieldStore;

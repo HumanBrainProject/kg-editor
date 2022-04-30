@@ -63,7 +63,7 @@ const useStyles = createUseStyles({
       "@media screen and (max-width:576px)": {
         wordBreak: "break-all",
         wordWrap: "break-word",
-        whiteSpace: "normal",
+        whiteSpace: "normal"
       }
     },
     "& button span + span": {
@@ -82,7 +82,7 @@ const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
 
   const classes = useStyles();
 
-  const handleRetry = (e) => {
+  const handleRetry = e => {
     e.stopPropagation();
     onRetry(e);
   };

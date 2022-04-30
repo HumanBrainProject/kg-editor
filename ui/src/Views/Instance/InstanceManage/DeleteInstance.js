@@ -36,13 +36,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   error: {
-    color: "var(--ft-color-error)",
+    color: "var(--ft-color-error)"
   },
   btn: {
     "&[disabled]": {
-      cursor: "not-allowed",
-    },
-  },
+      cursor: "not-allowed"
+    }
+  }
   
 });
 const Delete = observer(({ status, onClick, classes, fetchStatus }) => {

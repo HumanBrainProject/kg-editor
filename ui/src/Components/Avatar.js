@@ -38,6 +38,16 @@ const useStyles = createUseStyles({
   }
 });
 
+const getImageTitle = (title, name, userId) => {
+  if (title) {
+    return title;
+  }
+  if (name) {
+    return name;
+  }
+  return userId;
+};
+
 const Avatar = ({userId, name, picture, title, size=20}) => {
 
   const classes = useStyles();
@@ -47,7 +57,7 @@ const Avatar = ({userId, name, picture, title, size=20}) => {
   }
 
   if (picture) {
-    const imgTitle = title?title:(name?name:userId);
+    const imgTitle = getImageTitle(title, name, userId);
     return (
       <img alt={name?name:userId} width={size} height={size} src={picture} title={imgTitle} className={`${classes.avatar} avatar picture`} />
     );

@@ -65,7 +65,7 @@ const useStyles = createUseStyles({
     "& button + button, & a + button, & a + a": {
       marginLeft: "20px"
     }
-  },
+  }
 });
 
 const ConfirmCancelEditPanel = ({ show, text, inline, onConfirm, onCancel }) => {

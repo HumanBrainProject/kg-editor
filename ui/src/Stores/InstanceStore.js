@@ -196,6 +196,7 @@ export class InstanceStore {
       togglePreviewInstance: action,
       resetInstanceIdAvailability: action,
       checkInstanceIdAvailability: action,
+      instanceIdCheckAvailabilityError: action,
       checkRawInstanceIdAvailability: action,
       checkNonRawInstanceIdAvailability: action,
       getUnsavedInstances: computed,
@@ -212,7 +213,7 @@ export class InstanceStore {
       confirmCancelInstanceChanges: action,
       abortCancelInstanceChange: action,
       clearUnsavedChanges: action,
-      fetchMoreIncomingLinks: action,
+      fetchMoreIncomingLinks: action
     });
 
     this.stage = stage?stage:null;
@@ -284,6 +285,25 @@ export class InstanceStore {
     this.instanceIdAvailability.clear();
   }
 
+  instanceIdCheckAvailabilityError(instanceId, e) {
+    const status =  this.instanceIdAvailability.get(instanceId);
+    if (e.response && e.response.status === 404) {
+      if(status.type) {
+        this.createNewInstance(status.type, instanceId);
+        this.resetInstanceIdAvailability();
+      } else {
+        status.isAvailable = true;
+        status.isChecking = false;
+      }
+    } else {
+      const message = e.message?e.message:e;
+      const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+      status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
+      status.isAvailable = false;
+      status.isChecking = false;
+    }
+  };
+
   async checkRawInstanceIdAvailability(instanceId) {
     try{
       const { data } = await this.transportLayer.getRawInstance(instanceId);
@@ -304,24 +324,7 @@ export class InstanceStore {
         }
       });
     } catch(e){
-      runInAction(() => {
-        const status =  this.instanceIdAvailability.get(instanceId);
-        if (e.response && e.response.status === 404) {
-          if(status.type) {
-            this.createNewInstance(status.type, instanceId);
-            this.resetInstanceIdAvailability();
-          } else {
-            status.isAvailable = true;
-            status.isChecking = false;
-          }
-        } else {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
-          status.isAvailable = false;
-          status.isChecking = false;
-        }
-      });
+      this.instanceIdCheckAvailabilityError(instanceId, e);
     }
   };
 
@@ -346,24 +349,7 @@ export class InstanceStore {
         }
       });
     } catch(e){
-      runInAction(() => {
-        const status =  this.instanceIdAvailability.get(instanceId);
-        if (e.response && e.response.status === 404) {
-          if(status.type) {
-            this.createNewInstance(status.type, instanceId);
-            this.resetInstanceIdAvailability();
-          } else {
-            status.isAvailable = true;
-            status.isChecking = false;
-          }
-        } else {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
-          status.isAvailable = false;
-          status.isChecking = false;
-        }
-      });
+      this.instanceIdCheckAvailabilityError(instanceId, e);
     }
   };
 

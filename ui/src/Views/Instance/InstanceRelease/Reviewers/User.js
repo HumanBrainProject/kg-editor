@@ -44,7 +44,7 @@ const useStyles = createUseStyles({
           "& .avatar": {
             margin: "0 5px",
             "&.default": {
-              margin: "0 9px",
+              margin: "0 9px"
             }
           }
         }
@@ -54,7 +54,7 @@ const useStyles = createUseStyles({
         outline: 0
       },
       "&:visited": {
-        color: "#333",
+        color: "#333"
       },
       "&:hover, &:active, &:focus": {
         color: "black"

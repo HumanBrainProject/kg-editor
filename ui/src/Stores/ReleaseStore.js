@@ -26,10 +26,10 @@ import {
   action,
   runInAction,
   computed,
-  makeObservable,
+  makeObservable
 } from "mobx";
 
-const setNodeTypesAndSortChildren = (node) => {
+const setNodeTypesAndSortChildren = node => {
   node.typesName = node.types.reduce(
     (acc, current) => `${acc}${acc.length ? ", " : ""}${current.label}`,
     ""
@@ -163,7 +163,7 @@ export class ReleaseStore {
       markAllNodeForChange: action,
       recursiveMarkNodeForChange: action,
       clearWarningMessages: action,
-      handleWarning: action,
+      handleWarning: action
     });
 
     this.transportLayer = transportLayer;
@@ -207,10 +207,10 @@ export class ReleaseStore {
       pending_has_changed: 0,
       proceed_release: 0,
       proceed_unrelease: 0,
-      proceed_do_nothing: 0,
+      proceed_do_nothing: 0
     };
 
-    const getStatsFromNode = (node) => {
+    const getStatsFromNode = node => {
       count.total++;
       if (node.status === "RELEASED") {
         count.released++;
@@ -297,10 +297,10 @@ export class ReleaseStore {
   getNodesToProceed() {
     const nodesByStatus = {
       RELEASED: [],
-      UNRELEASED: [],
+      UNRELEASED: []
     };
 
-    const rseek = (node) => {
+    const rseek = node => {
       if (node.permissions && node.permissions.canRelease) {
         if (node.status !== node.pending_status) {
           nodesByStatus[node.pending_status].push(node);
@@ -372,7 +372,7 @@ export class ReleaseStore {
         Object.entries(data.data).forEach(([typePath, messages]) => {
           this.validationWarnings.set(typePath, {
             releaseFlags: new Map(),
-            messages: messages,
+            messages: messages
           });
         });
         this.isWarningMessagesFetched = true;

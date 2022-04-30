@@ -60,7 +60,7 @@ const useStyles = createUseStyles({
     "&:nth-child(even)":{
       background:"var(--bg-color-ui-contrast2)"
     },
-    gridTemplateColumns:"1fr 50px",
+    gridTemplateColumns:"1fr 50px"
   },
   actions:{
     gridRow:"span 4",
@@ -121,7 +121,7 @@ const useStyles = createUseStyles({
   compareModal:{
     width:"90%",
     "@media screen and (min-width:1024px)": {
-      width:"900px",
+      width:"900px"
     },
     "& .modal-body": {
       height: "calc(95vh - 112px)",

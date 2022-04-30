@@ -77,7 +77,7 @@ const useStyles = createUseStyles({
     display: "inline-block",
     opacity: "0.5",
     paddingRight: "8px",
-    verticalAlign: "text-bottom",
+    verticalAlign: "text-bottom"
   },
   name: {
     display: "inline",

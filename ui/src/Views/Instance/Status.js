@@ -37,21 +37,21 @@ const useStyles = createUseStyles({
     "& > div:only-child": {
       display: "block",
       position: "relative",
-      zIndex: "5",
+      zIndex: "5"
     },
     "& > div:first-child:not(:only-of-type)": {
       display: "block",
       position: "relative",
       zIndex: "5",
-      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)",
+      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)"
     },
     "& > div:not(:first-child)": {
       position: "relative",
       top: "-0.3em",
       left: "0.6em",
       display: "block",
-      zIndex: "3",
-    },
+      zIndex: "3"
+    }
   },
   loader: {
     borderRadius: "0.14em",
@@ -62,9 +62,9 @@ const useStyles = createUseStyles({
     border: "1px solid var(--ft-color-loud)",
     "& .svg-inline--fa": {
       fontSize: "0.8em",
-      verticalAlign: "baseline",
-    },
-  },
+      verticalAlign: "baseline"
+    }
+  }
 });
 
 const InstanceStatus = observer(({ instanceStatus, classes, darkmode }) => {

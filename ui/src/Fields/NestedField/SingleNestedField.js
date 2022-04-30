@@ -49,7 +49,7 @@ const useStyles = createUseStyles({
     position: "relative",
     border: "1px solid #ced4da",
     borderRadius: ".25rem",
-    padding: "10px",
+    padding: "10px"
   },
   item: {
     position: "relative",
@@ -81,7 +81,7 @@ const useStyles = createUseStyles({
     width: "25px",
     borderRadius: "4px",
     "&:hover": {
-      backgroundColor: "var(--button-secondary-active-bg-color)",
+      backgroundColor: "var(--button-secondary-active-bg-color)"
     }
   },
   actionBtn: {

@@ -131,7 +131,7 @@ const useStyles = createUseStyles({
     "&.show": {
       height: "48px",
       "& $tokenCopied": {
-        transform: "translateY(0)",
+        transform: "translateY(0)"
       }
     }
   },

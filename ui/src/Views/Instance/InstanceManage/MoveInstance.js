@@ -36,7 +36,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const useStyles = createUseStyles({
   title: {
-    display: "inline",
+    display: "inline"
   },
   selector: {
     display: "inline-block",
@@ -54,8 +54,8 @@ const useStyles = createUseStyles({
       cursor: "pointer",
       color: "inherit",
       "&[disabled]": {
-        cursor: "not-allowed",
-      },
+        cursor: "not-allowed"
+      }
     },
     "&:before": {
       content: '" "',
@@ -70,17 +70,17 @@ const useStyles = createUseStyles({
       borderRight: "6px solid transparent",
       borderTop: "6px solid var(--ft-color-normal)",
       cursor: "pointer",
-      pointerEvents: "none",
-    },
+      pointerEvents: "none"
+    }
   },
   error: {
-    color: "var(--ft-color-error)",
+    color: "var(--ft-color-error)"
   },
   btn: {
     "&[disabled]": {
-      cursor: "not-allowed",
-    },
-  },
+      cursor: "not-allowed"
+    }
+  }
 });
 
 const Status = observer(({
@@ -89,7 +89,7 @@ const Status = observer(({
   onClick,
   classes,
   variant,
-  isDisabled,
+  isDisabled
 }) => {
   if (status && status.hasFetchError) {
     return (
@@ -165,7 +165,7 @@ const MoveInstance = observer(({ instance, className }) => {
     return false;
   });
 
-  const handleSetSpaceId = (e) => {
+  const handleSetSpaceId = e => {
     setSpaceId(e.target.value);
   };
 

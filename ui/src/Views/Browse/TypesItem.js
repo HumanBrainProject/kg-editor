@@ -45,10 +45,10 @@ const useStyles = createUseStyles({
       borderColor: "var(--list-border-hover)",
       color: "var(--ft-color-loud)",
       "& $cannotCreateTooltip": {
-        opacity: 0.75,
+        opacity: 0.75
       },
       "& $actions": {
-        opacity: 0.75,
+        opacity: 0.75
       },
       "& $createInstance": {
         position: "absolute",
@@ -59,30 +59,30 @@ const useStyles = createUseStyles({
         display: "block",
         color: "var(--ft-color-normal)",
         "&:hover": {
-          color: "var(--ft-color-loud)",
-        },
-      },
+          color: "var(--ft-color-loud)"
+        }
+      }
     },
     "&.selected": {
       background: "var(--list-bg-selected)",
       borderColor: "var(--list-border-selected)",
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-loud)"
     },
     "&.edited": {
-      padding: "0 5px 0 30px",
+      padding: "0 5px 0 30px"
     },
     "&.disabled": {
       pointerEvents: "none",
-      opacity: "0.8",
-    },
+      opacity: "0.8"
+    }
   },
   icon: {
     position: "absolute",
     top: "8px",
     "& + span": {
       display: "inline-block",
-      marginLeft: "22px",
-    },
+      marginLeft: "22px"
+    }
   },
   cannotCreateTooltip: {
     position: "absolute",
@@ -90,8 +90,8 @@ const useStyles = createUseStyles({
     right: "15px",
     opacity: 0,
     "&:hover": {
-      opacity: "1 !important",
-    },
+      opacity: "1 !important"
+    }
   },
   actions: {
     position: "absolute",
@@ -102,8 +102,8 @@ const useStyles = createUseStyles({
     width: "25px",
     gridTemplateColumns: "repeat(1, 1fr)",
     "&:hover": {
-      opacity: "1 !important",
-    },
+      opacity: "1 !important"
+    }
   },
   action: {
     fontSize: "0.9em",
@@ -112,17 +112,17 @@ const useStyles = createUseStyles({
     backgroundColor: "var(--bg-color-ui-contrast2)",
     color: "var(--ft-color-normal)",
     "&:hover": {
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-loud)"
     },
     "&:first-child": {
-      borderRadius: "4px 0 0 4px",
+      borderRadius: "4px 0 0 4px"
     },
     "&:last-child": {
-      borderRadius: "0 4px 4px 0",
+      borderRadius: "0 4px 4px 0"
     },
     "&:first-child:last-child": {
-      borderRadius: "4px",
-    },
+      borderRadius: "4px"
+    }
   },
   deleteBookmarkDialog: {
     position: "absolute",
@@ -130,29 +130,29 @@ const useStyles = createUseStyles({
     right: "-200px",
     transition: "right .2s ease",
     "&.show": {
-      right: "5px",
-    },
+      right: "5px"
+    }
   },
   error: {
     position: "absolute",
     top: "5px",
-    right: "10px",
+    right: "10px"
   },
   errorButton: {
-    color: "var(--ft-color-error)",
+    color: "var(--ft-color-error)"
   },
   textError: {
     margin: 0,
-    wordBreak: "keep-all",
+    wordBreak: "keep-all"
   },
   createInstance: {
     display: "none",
-    cursor: "pointer",
+    cursor: "pointer"
   },
   infoCircle: {
     marginLeft: "5px",
-    transform: "translateY(2px)",
-  },
+    transform: "translateY(2px)"
+  }
 });
 
 const CreateInstance = observer(({
@@ -161,7 +161,7 @@ const CreateInstance = observer(({
   classes,
   onClick,
   cannotCreateTooltip,
-  label,
+  label
 }) => {
   if (canCreate) {
     if (isCreatingNewInstance) {
@@ -207,7 +207,7 @@ const TypesItem = observer(({ type }) => {
   const { appStore, browseStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
-  const handleSelect = (e) => {
+  const handleSelect = e => {
     e && e.stopPropagation();
     ReactPiwik.push(["trackEvent", "Browse", "SelectType", type.name]);
     browseStore.selectItem(type);

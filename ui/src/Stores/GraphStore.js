@@ -194,7 +194,7 @@ export class GraphStore {
     set(group, "grouped", grouped);
   }
 
-  extractGroupsAndLinks = data => {
+  extractGroupsAndLinks = rootData => {
     const links = {};
 
     const getOrCreateNode = (id, name, space, group) => {
@@ -229,7 +229,7 @@ export class GraphStore {
 
     const addLink = (source, target, isReverse) => {
       if (isReverse) {
-        addDirectionalLink(target, source);
+        addDirectionalLink(target, source); //NOSONAR swap of target & source order are intended, it is reverse
       } else {
         addDirectionalLink(source, target);
       }
@@ -257,7 +257,7 @@ export class GraphStore {
       Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, true));
     };
 
-    extractData(data, null, null, false);
+    extractData(rootData, null, null, false);
 
     values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
 

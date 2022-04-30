@@ -23,6 +23,7 @@
 
 import React from "react";
 import { render } from "react-dom";
+// import { configure } from "mobx"; //NOSONAR
 import ReactPiwik from "react-piwik";
 import { JssProvider } from "react-jss";
 
@@ -35,6 +36,18 @@ import "./Services/IconsImport";
 import App from "./Views/App";
 import { BrowserRouter } from "react-router-dom";
 import ErrorBoundary from "./Views/ErrorBoundary";
+
+/* //NOSONAR React debug flags
+configure({
+  enforceActions: "always",
+  computedRequiresReaction: true,
+  reactionRequiresObservable: true,
+  observableRequiresReaction: false,
+  disableErrorBoundaries: false // help to debug only
+});
+*/
+
+//reportWebVitals(); //NOSONAR
 
 new ReactPiwik({ //NOSONAR
   url: process.env.REACT_APP_MATOMO_URL,

@@ -167,7 +167,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
         name: name,
         label: rightInstance.fields[name].label,
         leftValue: getValue(leftInstanceStore, leftInstance, name),
-        rightValue: getValue(rightInstanceStore, rightInstance, name),
+        rightValue: getValue(rightInstanceStore, rightInstance, name)
       })
     );
     return (

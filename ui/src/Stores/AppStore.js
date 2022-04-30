@@ -243,7 +243,7 @@ export class AppStore{
     this.pathsToResolve.clear();
   }
 
-  matchInstancePath = (pathname, id=":id") => {
+  matchInstancePath = (pathname, id=":id") => { //NOSONAR
     let path =  matchPath({ path: `/instances/${id}/:mode` }, pathname);
     if(path) {
       return path;

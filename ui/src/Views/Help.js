@@ -85,7 +85,7 @@ const useStyles = createUseStyles({
     background:"var(--bg-color-ui-contrast2)",
     border:"1px solid var(--border-color-ui-contrast1)",
     color:"var(--ft-color-loud)",
-    fontSize:"1.05em",
+    fontSize:"1.05em"
   },
   contentInner:{
     padding:"10px 20px",

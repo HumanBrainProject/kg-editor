@@ -70,7 +70,7 @@ const useStyles = createUseStyles({
     color: "var(--ft-color-normal)",
     cursor: "pointer",
     "&:hover": {
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-loud)"
     }
   },
   typeIcon: {
@@ -94,7 +94,7 @@ const useStyles = createUseStyles({
     cursor: "pointer",
     color: "var(--ft-color-normal)",
     "&:hover": {
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-loud)"
     },
     "&::before": {
       content: "''",

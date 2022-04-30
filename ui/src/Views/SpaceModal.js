@@ -74,7 +74,7 @@ const useStyles = createUseStyles({
     transition: "background .3s ease-in-out, color .3s ease-in-out",
     "&:hover": {
       background: "var(--bg-color-blend-contrast1)",
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-loud)"
     }
   },
   workspaceSelectionModal: {

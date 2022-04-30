@@ -24,6 +24,7 @@
 import { observable, action, computed, makeObservable, toJS } from "mobx";
 import FieldStore from "./FieldStore";
 import { fieldsMapping } from "../../Fields";
+
 class NestedFieldStore extends FieldStore {
   fieldsTemplate = {};
   initialValue = [];
@@ -127,6 +128,39 @@ class NestedFieldStore extends FieldStore {
     return typeName && this.rootStore.typeStore.typesMap.get(typeName);
   }
 
+  _addNestedStore = (stores, name, template, value) => {
+    const field = JSON.parse(JSON.stringify(toJS(template)));
+    let warning = null;
+    if(name === this.labelField) {
+      field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
+      field.labelTooltipIcon = "globe";
+    }
+    if (!stores[name]) {
+      if (!field.widget) {
+        warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
+        field.widget = "UnsupportedField";
+      } else if (!fieldsMapping[field.widget]) {
+        warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
+        field.widget = "UnsupportedField";
+      }
+      const fieldMapping = fieldsMapping[field.widget];
+      if(field.widget === "Nested") {
+        const type = this.getType(value["@type"]);
+        if(type) {
+          const fields = JSON.parse(JSON.stringify(toJS(type.fields)));
+          field.fields = fields;
+        }
+      }
+      const options = {...fieldMapping.options, sourceType: value["@type"]};
+      stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
+    }
+    const store = [name];
+    store.updateValue(value[name]);
+    if (warning) {
+      store.setWarning(warning);
+    }
+  }
+  
   _setValue(values) {
     this.nestedFieldsStores = [];
     if(values) {
@@ -135,38 +169,7 @@ class NestedFieldStore extends FieldStore {
         const type = this.getType(value["@type"]);
         if (type) {
           const fieldsTemplate = type.fields;
-          Object.entries(fieldsTemplate).forEach(([name, fieldTemplate]) => {
-            const field = JSON.parse(JSON.stringify(toJS(fieldTemplate)));
-            let warning = null;
-            if(name === this.labelField) {
-              field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-              field.labelTooltipIcon = "globe";
-            }
-            if (!rowFieldStores[name]) {
-              if (!field.widget) {
-                warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
-                field.widget = "UnsupportedField";
-              } else if (!fieldsMapping[field.widget]) {
-                warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
-                field.widget = "UnsupportedField";
-              }
-              const fieldMapping = fieldsMapping[field.widget];
-              if(field.widget === "Nested") {
-                const type = this.getType(value["@type"]);
-                if(type) {
-                  const fields = JSON.parse(JSON.stringify(toJS(type.fields)));
-                  field.fields = fields;
-                }
-              }
-              const options = {...fieldMapping.options, sourceType: value["@type"]};
-              rowFieldStores.stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
-            }
-            const store = rowFieldStores.stores[name];
-            store.updateValue(value[name]);
-            if (warning) {
-              store.setWarning(warning);
-            }
-          });
+          Object.entries(fieldsTemplate).forEach(([name, template]) => this._addNestedStore(rowFieldStores.stores, name, template, value));
           this.nestedFieldsStores.push(rowFieldStores);
         }
       });

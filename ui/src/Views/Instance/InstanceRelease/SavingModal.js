@@ -37,10 +37,10 @@ const useStyles = createUseStyles({
     fontSize: "0.8em",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
-    overflow: "hidden",
+    overflow: "hidden"
   },
   reloadRelease: {
-    extend: "lastEndedOperation",
+    extend: "lastEndedOperation"
   },
   error: {
     background: "rgba(255,0,0,0.1)",
@@ -49,20 +49,20 @@ const useStyles = createUseStyles({
     fontWeight: "bold",
     fontSize: "0.8em",
     "&:last-child": {
-      borderBottom: "1px solid #f5f5f5",
+      borderBottom: "1px solid #f5f5f5"
     },
     "&:nth-child(odd)": {
-      background: "rgba(255,0,0,0.15)",
-    },
+      background: "rgba(255,0,0,0.15)"
+    }
   },
   errors: {
-    marginTop: "10px",
+    marginTop: "10px"
   },
   absoluteProgress: {
     fontSize: "12px",
     transform: "translateY(-10px)",
-    marginTop: "-10px",
-  },
+    marginTop: "-10px"
+  }
 });
 
 const AfterSave = observer(({ savingErrors, className }) => {

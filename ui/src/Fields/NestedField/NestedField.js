@@ -57,7 +57,7 @@ const useStyles = createUseStyles({
     position: "relative",
     border: "1px solid #ced4da",
     borderRadius: ".25rem",
-    padding: "10px",
+    padding: "10px"
   },
   item: {
     position: "relative",
@@ -91,7 +91,7 @@ const useStyles = createUseStyles({
     cursor: "pointer",
     width: "25px",
     "&:hover": {
-      backgroundColor: "var(--button-secondary-active-bg-color)",
+      backgroundColor: "var(--button-secondary-active-bg-color)"
     },
     "&:first-child": {
       borderRadius: "4px 0 0 4px"

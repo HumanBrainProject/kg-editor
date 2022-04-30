@@ -24,6 +24,16 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 
+const normalizeValues = values => {
+  if (Array.isArray(values)) {
+    return values;
+  }
+  if(values !== null && values !== undefined && typeof values === "object") {
+    return [values];
+  }
+  return [];
+};
+
 class AnnotatedInputTextStore extends FieldStore {
   value = [];
   options = [];
@@ -126,19 +136,9 @@ class AnnotatedInputTextStore extends FieldStore {
     return Object.keys(this.validationWarnings).length > 0;
   }
 
-  getValues(value) {
-    if(Array.isArray(value)) {
-      return value;
-    }
-    if(value !== null && value !== undefined && typeof value === "object") {
-      return [value];
-    }
-    return [];
-  }
-
   updateValue(value) {
     this.returnAsNull = false;
-    const values = this.getValues(value);
+    const values = normalizeValues(value);
     this.initialValue = [...values];
     this.value = values;
   }

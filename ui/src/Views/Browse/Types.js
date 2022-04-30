@@ -46,8 +46,8 @@ const useStyles = createUseStyles({
       background: "rgba(255,255,255, 0.05)",
       color: "var(--ft-color-quiet)",
       fontSize: "1em",
-      textAlign: "left",
-    },
+      textAlign: "left"
+    }
   },
   folderName: {
     color: "var(--ft-color-quiet)",
@@ -55,7 +55,7 @@ const useStyles = createUseStyles({
     fontWeight: "bold",
     fontSize: "0.9em",
     padding: "10px 10px 5px 10px",
-    cursor: "pointer",
+    cursor: "pointer"
   },
   fetchErrorPanel: {
     margin: "0 34px",
@@ -67,10 +67,10 @@ const useStyles = createUseStyles({
     wordBreak: "break-all",
     "& .btn": {
       width: "100px",
-      margin: "10px 6px 6px 6px",
+      margin: "10px 6px 6px 6px"
     },
-    color: "var(--ft-color-error)",
-  },
+    color: "var(--ft-color-error)"
+  }
 });
 
 const ResultTypes = observer(({
@@ -79,7 +79,7 @@ const ResultTypes = observer(({
   onClick,
   classes,
   showTypes,
-  list,
+  list
 }) => {
   if (fetchError) {
     return (

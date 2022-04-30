@@ -47,7 +47,7 @@ const useStyles = createUseStyles({
         "& .modal-body": {
           color: "var(--ft-color-loud)",
           padding: "0 20px 5px 20px",
-          textAlign: "center",
+          textAlign: "center"
         },
         "& .modal-header": {
           padding: "10px 10px 0 0",

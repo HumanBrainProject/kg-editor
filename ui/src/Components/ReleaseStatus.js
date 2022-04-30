@@ -68,10 +68,10 @@ const useStyles = createUseStyles({
     "&:only-child": {
       "& .svg-inline--fa": {
         fontSize: "0.8em"
-      },
-    },
+      }
+    }
 
-  },
+  }
 });
 
 const getIconStatus = status => {

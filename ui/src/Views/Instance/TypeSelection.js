@@ -83,7 +83,7 @@ const useStyles = createUseStyles({
     wordBreak: "break-word",
     "&:hover": {
       background: "var(--bg-color-blend-contrast1)",
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-loud)"
     }
   },
   icon: {

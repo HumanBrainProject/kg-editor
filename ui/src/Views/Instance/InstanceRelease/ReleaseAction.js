@@ -76,7 +76,7 @@ const useStyles = createUseStyles({
         display: "block",
         marginLeft: 0
       }
-    },
+    }
   },
   preview: {
     width: "100%",

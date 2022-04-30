@@ -49,7 +49,7 @@ const useStyles = createUseStyles({
       height: "calc(95vh - 112px)",
       padding: "3px 0"
     }
-  },
+  }
 });
 
 const CompareInstancesModal = observer(() => {

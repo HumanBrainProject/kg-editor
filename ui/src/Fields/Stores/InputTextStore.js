@@ -110,7 +110,7 @@ class InputTextStore extends FieldStore {
     return false;
   }
 
-  get regexWarning() {
+  get regexWarning() { //NOSONAR by design return null when no warning
     return this.regexRules.reduce((message, rule) => (message || rule.regex.test(this.value))?message:rule.errorMessage, null);
   }
 

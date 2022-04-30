@@ -215,10 +215,10 @@ class LinksStore extends FieldStore {
     if (this.lazyShowLinks) {
       this.visibleLinks.clear();
     }
-    values.forEach((value, index) => {
+    values.forEach((val, index) => {
       if (this.lazyShowLinks && index < defaultNumberOfVisibleLinks) {
-        if (value[this.mappingValue]) {
-          this.visibleLinks.add(value[this.mappingValue]);
+        if (val[this.mappingValue]) {
+          this.visibleLinks.add(val[this.mappingValue]);
         }
       }
     });

@@ -38,6 +38,26 @@ const useStyles = createUseStyles({
   }
 });
 
+const getLabel = (instance, view) => {
+  if(instance && (instance.isFetched || instance.isLabelFetched)) {
+    return instance.name;
+  }
+  if(view.name) {
+    return view.name;
+  }
+  return view.instanceId;
+};
+
+const getColor = (instance, view) => {
+  if(instance && (instance.isFetched || instance.isLabelFetched)) {
+    return instance.primaryType.color;
+  }
+  if(view.color) {
+    return view.color;
+  }
+  return "";
+};
+
 const InstanceTab = observer(({view, pathname}) => {
 
   const location = useLocation();
@@ -72,28 +92,8 @@ const InstanceTab = observer(({view, pathname}) => {
     appStore.closeInstance(location, navigate, view.instanceId);
   }
 
-  const getLabel = () => {
-    if(instance && (instance.isFetched || instance.isLabelFetched)) {
-      return instance.name;
-    }
-    if(view.name) {
-      return view.name;
-    }
-    return view.instanceId;
-  }
-
-  const getColor = () => {
-    if(instance && (instance.isFetched || instance.isLabelFetched)) {
-      return instance.primaryType.color;
-    }
-    if(view.color) {
-      return view.color;
-    }
-    return "";
-  }
-
-  const label = getLabel();
-  const color = getColor();
+  const label = getLabel(instance, view);
+  const color = getColor(instance, view);
   return (
     <Tab
       icon={instance && instance.isFetching ? "circle-notch" : "circle"}

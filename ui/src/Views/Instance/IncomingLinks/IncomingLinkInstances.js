@@ -41,29 +41,29 @@ const useStyles = createUseStyles({
         marginRight: "2px",
         display: "inline-block",
         "& + li:before": {
-          content: "' '",
+          content: "' '"
         },
         "& + li": {
-          marginTop: "2px",
-        },
-      },
-    },
+          marginTop: "2px"
+        }
+      }
+    }
   },
   type: {
-    paddingRight: "10px",
+    paddingRight: "10px"
   },
   showMore: {
     paddingLeft: 0,
     paddingTop: 0,
-    transform: "translateY(1px)",
+    transform: "translateY(1px)"
   },
   showMoreLoading: {
-    display: "block",
+    display: "block"
   },
   showMoreError: {
     display: "block",
-    color: "var(--ft-color-error)",
-  },
+    color: "var(--ft-color-error)"
+  }
 });
 
 const ShowMore = observer(({ link, classes, onClick }) => {
@@ -113,7 +113,7 @@ const IncomingLinkInstances = observer(({ link, readMode }) => {
   const badgeTextColor = new Color(badgeColor).isLight() ? "black" : "white";
   const badgeStyle = {
     backgroundColor: badgeColor,
-    color: badgeTextColor,
+    color: badgeTextColor
   };
 
   return (

@@ -95,7 +95,7 @@ export class TransportLayer {
     return this._axios.get(API.endpoints.searchInstancesByType(space, type, from, size, search));
   }
 
-   getSuggestions(instanceId, field, sourceType, targetType, from, size, search, payload) {
+   getSuggestions(instanceId, field, sourceType, targetType, from, size, search, payload) { //NOSONAR
     return this._axios.post(API.endpoints.suggestions(instanceId, field, sourceType, targetType, from, size, search), payload);
   }
 

@@ -97,7 +97,7 @@ const useStyles = createUseStyles({
     gridArea: "main",
     position: "relative",
     "& > * + *": {
-      marginTop: "10px",
+      marginTop: "10px"
     },
     "& .widget-list": {
       "& > * + *": {
@@ -131,7 +131,7 @@ const useStyles = createUseStyles({
       transform: "scale(0.3)",
       animation: "walk 180s linear infinite",
       zIndex: 10000
-    },
+    }
   },
   "@keyframes walk": {
     "0%":{
@@ -196,7 +196,7 @@ const useStyles = createUseStyles({
     },
     "@media screen and (min-width:1024px)": {
       gridTemplateColumns: "repeat(3, 1fr)"
-    },
+    }
   },
   space: {
     position: "relative",

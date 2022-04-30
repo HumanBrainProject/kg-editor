@@ -72,7 +72,7 @@ const useToggleStyles = createUseStyles({
         color:"white"
       },*/
       "&.noscale":{
-        transform:"scale(1)",
+        transform:"scale(1)"
       }
     }
   }

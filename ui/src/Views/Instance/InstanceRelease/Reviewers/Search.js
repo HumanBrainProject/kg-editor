@@ -60,10 +60,10 @@ const useStyles = createUseStyles({
     "&:focus": {
       borderColor: "rgba(64, 169, 243, 0.5)",
       backgroundColor: "var(--bg-color-blend-contrast1)",
-      color: "var(--ft-color-normal)",
+      color: "var(--ft-color-normal)"
     },
     "&.disabled,&:disabled": {
-      backgroundColor: "var(--bg-color-blend-contrast1)",
+      backgroundColor: "var(--bg-color-blend-contrast1)"
     }
   },
   searchDropdown: {
@@ -88,7 +88,7 @@ const useStyles = createUseStyles({
       }
     },
     "&.open":{
-      display:"block",
+      display:"block"
     },
     "&:not(.open)":{
       "& .dropdown-menu": {
@@ -101,13 +101,13 @@ const useStyles = createUseStyles({
     position: "absolute",
     top: "15px",
     left: "2px",
-    color: "var(--ft-color-normal)",
+    color: "var(--ft-color-normal)"
   },
   searchIcon:{
     position: "absolute",
     top: "15px",
     left: "40px",
-    color: "var(--ft-color-normal)",
+    color: "var(--ft-color-normal)"
   },
   footerPanel: {
     display: "flex",

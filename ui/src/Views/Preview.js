@@ -71,7 +71,7 @@ const useStyles = createUseStyles({
   type: {
     display: "inline-block",
     paddingRight: "8px",
-    verticalAlign: "text-bottom",
+    verticalAlign: "text-bottom"
   },
   titlePanel: {
     position: "relative",

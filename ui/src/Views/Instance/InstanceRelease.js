@@ -61,7 +61,7 @@ const useStyles = createUseStyles({
     gridTemplateRows: "auto 1fr",
     gridTemplateColumns: "1fr 580px",
     gridColumnGap: "15px",
-    height: "100%",
+    height: "100%"
   },
   header: {
     gridColumn: "span 2",

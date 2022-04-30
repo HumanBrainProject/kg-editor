@@ -36,7 +36,7 @@ const useStyles = createUseStyles({
     background: "none",
     borderRadius: "20px",
     "&:not(:hover), &:disabled, &:hover:disabled": {
-      borderColor: "transparent",
+      borderColor: "transparent"
     },
     "& .avatar + .avatar": {
       marginLeft: "5px"

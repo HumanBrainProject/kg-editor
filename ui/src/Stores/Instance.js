@@ -25,6 +25,39 @@ import { observable, action, computed, makeObservable } from "mobx";
 
 import { fieldsMapping } from "../Fields";
 
+const compareAlternatives = (a, b) => {
+  if (a.selected === b.selected) {
+    return 0;
+  }
+  if (a.selected) {
+    return -1;
+  }
+  return 1;
+};
+
+const normalizeAlternative = (name, field, alternatives) => {
+  field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
+    .sort(compareAlternatives)
+    .map(alternative => ({
+      value: alternative.value === undefined ? null : alternative.value,
+      users: alternative.users,
+      selected: !!alternative.selected
+    }));
+};
+
+const normalizeField = (field, instanceId) => {
+  if ((field.widget === "Nested" || field.widget === "SingleNested") && typeof field.fields === "object") {
+    normalizeFields(field.fields, instanceId);
+  }
+};
+
+const normalizeFields = (fields, instanceId, alternatives) => {
+  Object.entries(fields).forEach(([name, field]) => {
+    normalizeField(field, instanceId);
+    normalizeAlternative(name, field, alternatives);
+  });
+};
+
 export const compareField = (a, b, ignoreName=false) => {
   if (!a && !b) {
     return 0;
@@ -95,29 +128,6 @@ export const normalizeLabelInstanceData = data => {
 
 export const normalizeInstanceData = data => {
 
-  const normalizeAlternative = (name, field, alternatives) => {
-    field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
-      .sort((a, b) => a.selected === b.selected?0:(a.selected?-1:1))
-      .map(alternative => ({
-        value: alternative.value === undefined ? null : alternative.value,
-        users: alternative.users,
-        selected: !!alternative.selected
-      }));
-  };
-
-  const normalizeField = (field, instanceId) => {
-    if ((field.widget === "Nested" || field.widget === "SingleNested") && typeof field.fields === "object") {
-      normalizeFields(field.fields, instanceId);
-    }
-  };
-
-  const normalizeFields = (fields, instanceId, alternatives) => {
-    Object.entries(fields).forEach(([name, field]) => {
-      normalizeField(field, instanceId);
-      normalizeAlternative(name, field, alternatives);
-    });
-  };
-
   const instance = {
     ...normalizeLabelInstanceData(data),
     fields: {},
@@ -168,7 +178,7 @@ export const normalizeInstanceData = data => {
           size: type.size,
           total: type.total,
           isFetching: false,
-          fetchError: null,
+          fetchError: null
         };
       });
       return {
@@ -212,117 +222,120 @@ export const normalizeInstanceData = data => {
   return instance;
 };
 
-const getChildrenIdsGroupedByField = fields => {
-  function getPagination(field) {
+const getPagination = field => {
+  if (field.lazyShowLinks) {
+    const total = field.numberOfValues;
+    if (total) {
+      return {
+        count: field.numberOfVisibleLinks,
+        total: total
+      };
+    }
+  }
+  return null;
+};
+
+const showId = (field, id) => {
+  if (id) {
     if (field.lazyShowLinks) {
-      const total = field.numberOfValues;
-      if (total) {
-        return {
-          count: field.numberOfVisibleLinks,
-          total: total
-        };
-      }
+      return field.isLinkVisible(id);
     }
-    return null;
+    return true;
   }
+  return false;
+};
 
-  function showId(field, id) {
-    if (id) {
-      if (field.lazyShowLinks) {
-        return field.isLinkVisible(id);
-      }
-      return true;
-    }
-    return false;
+const getIds = field => {
+  const values = field.returnValue;
+  const mappingValue = field.mappingValue;
+  if(Array.isArray(values)) {
+    return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id));
+  } else if (typeof values === "object" && values && values[mappingValue] && showId(field, values[mappingValue])) { 
+    return [values[mappingValue]];
   }
+  return [];
+};
 
-  function getIds(field) {
-    const values = field.returnValue;
-    const mappingValue = field.mappingValue;
-    if(Array.isArray(values)) {
-      return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => showId(field, id));
-    } else if (typeof values === "object" && values && values[mappingValue] && showId(field, values[mappingValue])) { 
-      return [values[mappingValue]];
+const getGroup = field => {
+  const ids = getIds(field);
+  if (ids.length) {
+    const group = {
+      //name: field.name,
+      label: field.label,
+      ids: ids
+    };
+    const pagination = getPagination(field);
+    if (pagination) {
+      group.pagination = pagination;
     }
+    return group;
+  }
+  return null;
+};
+
+const getGroupsForFields = fields => {
+  if (!Array.isArray(fields)) {
     return [];
   }
+  return fields.reduce((acc, field) => {
+    const groups = getGroupsForField(field);
+    acc.push(...groups);
+    return acc;
+  }, [])
+};
 
-  function getGroup(field) {
-    const ids = getIds(field);
-    if (ids.length) {
-      const group = {
-        //name: field.name,
-        label: field.label,
-        ids: ids
-      };
-      const pagination = getPagination(field);
-      if (pagination) {
-        group.pagination = pagination;
-      }
-      return group;
+const getGroupsForField = field => {
+  const groups = [];
+  if (field.widget === "Nested") {
+    const nestedGroups = getNestedFields(field.nestedFieldsStores);
+    groups.push(...nestedGroups);
+  } else if (field.widget === "SingleNested") {
+    const nestedGroups = getSingleNestedFields(field.nestedFieldsStores);
+    groups.push(...nestedGroups);
+  } else if (field.isLink) {
+    const group = getGroup(field);
+    if (group) {
+      groups.push(group);
     }
-    return null;
   }
-
-  function getGroups(field) {
-    const groups = [];
-    if (field.widget === "Nested") {
-      const nestedGroups = getNestedFields(field.nestedFieldsStores);
-      groups.push(...nestedGroups);
-    } else if (field.widget === "SingleNested") {
-      const nestedGroups = getSingleNestedFields(field.nestedFieldsStores);
-      groups.push(...nestedGroups);
-    } else if (field.isLink) {
-      const group = getGroup(field);
-      if (group) {
-        groups.push(group);
-      }
-    }
-    return groups;
-  }
-
-  function getSingleNestedFields(fields) {
-    if (!fields) {
-      return [];
-    }
-    return Object.values(fields.stores).reduce((acc, field) => {
-      const groups = getGroups(field);
-      acc.push(...groups);
-      return acc;
-    }, [])
-  }
-
-  function getNestedFields(fields) {
-    return fields.reduce((acc, rowFields) => {
-      acc.push(...Object.values(rowFields.stores).reduce((acc2, field) => {
-        const groups = getGroups(field);
-        acc2.push(...groups);
-        return acc2;
-      }, []));
-      return acc;
-    }, []);
-  }
-
-  function getUniqueGroups(fields) {
-    const list = fields.reduce((acc, field) => {
-      const groups = getGroups(field);
-      acc.push(...groups);
-      return acc;
-    }, []);
-    return Object.entries(list.reduce((acc, group) => {
-      if (!acc[group.label]) {
-        acc[group.label] = [];
-      }
-      acc[group.label].push(...group.ids);
-      return acc;
-    }, {}))
-      .map(([label, ids]) => ({label: label, ids: ids}))
-      .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
-  }
-
-  const groups = getUniqueGroups(fields);
   return groups;
 };
+
+const getSingleNestedFields = fields => {
+  if (!fields) {
+    return [];
+  }
+  const nestedFields = Object.values(fields.stores);
+  return getGroupsForFields(nestedFields);
+};
+
+const getNestedFields = fields => {
+  if (!Array.isArray(fields)) {
+    return [];
+  }
+  return fields.reduce((acc, rowFields) => {
+    const nestedFields = Object.values(rowFields.stores);
+    const groups = getGroupsForFields(nestedFields);
+    acc.push(...groups);
+    return acc;
+  }, []);
+};
+
+const getUniqueGroups = fields => {
+  const list = getGroupsForFields(fields);
+  return Object.entries(list.reduce((acc, group) => {
+    if (!acc[group.label]) {
+      acc[group.label] = [];
+    }
+    acc[group.label].push(...group.ids);
+    return acc;
+  }, {}))
+    .map(([label, ids]) => ({label: label, ids: ids}))
+    .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+};
+
+const getChildrenIdsGroupedByField = fields => getUniqueGroups(fields);
+
 export class Instance {
   id = null;
   _initialJsonData = null;

@@ -126,7 +126,7 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
     "@global button, @global input[type=button], @global a": {
       "-webkit-touch-callout": "none",
       userSelect: "none"
-    },
+    }
   };
 
   if (theme.name === "cupcake") {

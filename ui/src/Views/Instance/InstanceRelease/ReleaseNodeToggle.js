@@ -46,7 +46,7 @@ const useStyles = createUseStyles({
     "&:not([status]) .ban svg": {
       color: "gray"
     }
-  },
+  }
 });
 
 const ReleaseNodeToggle = observer(({ node }) => {

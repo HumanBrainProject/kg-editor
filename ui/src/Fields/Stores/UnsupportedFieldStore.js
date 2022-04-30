@@ -62,7 +62,7 @@ class UnsupportedFieldStore extends FieldStore {
     this.value = value;
   }
 
-  reset() {}
+  reset() {} //NOSONAR this class extends FieldStore which require that the reset methode should be implemented
 
   get hasChanged() {
     return false;

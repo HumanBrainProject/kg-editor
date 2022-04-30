@@ -54,7 +54,7 @@ const API = {
     "releaseStatusChildren": () => "/editor/api/releases/status?releaseTreeScope=CHILDREN_ONLY",
     "neighbors": instanceId => `/editor/api/instances/${instanceId}/neighbors`,
     "workspaceTypes": space => `/editor/api/spaces/${space}/types`,
-    "incomingLinks": (instanceId, property, type, from, size) => `/editor/api/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`,
+    "incomingLinks": (instanceId, property, type, from, size) => `/editor/api/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`
   }
 };
 

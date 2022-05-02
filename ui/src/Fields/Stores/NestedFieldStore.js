@@ -91,10 +91,7 @@ class NestedFieldStore extends FieldStore {
     if(!this.minItems && !this.maxItems) {
       return false;
     }
-    if(this.minItems || this.maxItems) {
-      return true;
-    }
-    return false;
+    return this.minItems || this.maxItems;
   }
 
   get validationWarnings() {

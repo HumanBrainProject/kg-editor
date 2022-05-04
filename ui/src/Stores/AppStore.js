@@ -626,12 +626,12 @@ export class AppStore{
     this.instanceMovingError = null;
   }
 
-  async retryDeleteInstance() {
-    return this.deleteInstance(this.instanceToDelete);
+  async retryDeleteInstance(location, navigate) {
+    return this.deleteInstance(this.instanceToDelete, location, navigate);
   }
 
-  async deleteInstance(instanceId) {
-    return this.delete(instanceId);
+  async deleteInstance(instanceId, location, navigate) {
+    return this.delete(instanceId, location, navigate);
   }
 
   cancelDeleteInstance() {

@@ -115,7 +115,7 @@ const DeleteInstance = observer(({ instance, className }) => {
     appStore.deleteInstance(instance.id, location, navigate);
   };
 
-  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance();
+  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance(location, navigate);
 
   const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
 

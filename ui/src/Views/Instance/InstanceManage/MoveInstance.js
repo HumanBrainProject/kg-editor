@@ -142,7 +142,7 @@ const MoveInstance = observer(({ instance, className }) => {
   const location = useLocation();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchStatus(), [instance]);
+  useEffect(() => fetchStatus(), [instance.id]);
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
@@ -150,6 +150,10 @@ const MoveInstance = observer(({ instance, className }) => {
 
   const permissions = instance.permissions;
   const status = statusStore.getInstance(instance.id);
+
+  if (!status) {
+    return null;
+  }
 
   const spaces = authStore.spaces.filter((s) => {
     if (s.id === appStore.currentSpace.id) {

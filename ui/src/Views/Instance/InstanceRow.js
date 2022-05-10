@@ -198,7 +198,8 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === "function") {
       onCtrlClick(instance);
     } else {
-      typeof onActionClick === "function" && onActionClick(instance, "view");
+      const mode = instance.permissions.canRawRead?"raw":"view";
+      typeof onActionClick === "function" && onActionClick(instance, mode);
     }
   };
 
@@ -230,7 +231,7 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead || permissions.canRawRead}  icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
       </div>
     </div>
   );

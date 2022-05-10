@@ -139,14 +139,14 @@ const View = observer(({instance, mode}) => {
     }
     break;
   case "manage":
-    if(instance.permissions.canRead) {
+    if(instance.permissions.canRawRead || instance.permissions.canRead) {
       return (
         <InstanceManage instance={instance} />
       );
     }
     break;
   case "raw":
-    if(instance.permissions.canRead) {
+    if(instance.permissions.canRawRead || instance.permissions.canRead) {
       return (
         <InstanceRaw instance={instance} />
       );
@@ -161,16 +161,24 @@ const View = observer(({instance, mode}) => {
 });
 View.displayName = "View";
 
+const getActionLabel = mode => {
+  if (mode === "raw") {
+    return "view";
+  }
+  if (mode === "graph") {
+    return "visualize";
+  }
+  return mode;
+};
+
 const NoPermissionForView = observer(({instance, mode}) => {
 
   const classes = useStyles();
 
-  const actionMode = mode === "raw"?"view":mode;
-
   return (
     <div className={classes.errorMessage} >
       <BGMessage icon={"ban"}>
-      You do not have permission to {actionMode} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
+      You do not have permission to {getActionLabel(mode)} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
         {instance.permissions.canRead?
           <Link className="btn btn-primary" to={`/instances/${instance.id}`}>Go to view</Link>:
           <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}

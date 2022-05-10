@@ -90,7 +90,7 @@ class Instance extends BaseInstance {
       this.rawFetchError = null;
       try {
         const { data } = await this.store.transportLayer.getRawInstance(this.id);
-        this.initializeRawData(data && data.data, data && data.permissions);
+        this.initializeRawData(data && data.data, data && data.permissions, this.rootStore.typeStore.typesMap);
       } catch (e) {
         runInAction(() => {
           if(e.response && e.response.status === 404){
@@ -316,7 +316,7 @@ export class InstanceStore {
         }
         this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeRawData(data && data.data, data && data.permissions);
+        instance.initializeRawData(data && data.data, data && data.permissions, this.rootStore.typeStore.typesMap);
         const view = this.rootStore.viewStore.views.get(resolvedId);
         if(view) {
           view.setNameAndColor(instance.name, instance.primaryType.color);
@@ -341,8 +341,12 @@ export class InstanceStore {
         instance.initializeData(this.transportLayer, this.rootStore, data && data.data);
         const view = this.rootStore.viewStore.views.get(resolvedId);
         if(view) {
-          view.setNameAndColor(instance.name, instance.primaryType.color);
-          this.rootStore.viewStore.syncStoredViews();
+          if (instance.permissions.canRawRead && ["view", "edit", "graph"].includes(view.mode)) {
+            navigate(`/instances/${resolvedId}/raw`, {replace:true});
+          } else {
+            view.setNameAndColor(instance.name, instance.primaryType.color);
+            this.rootStore.viewStore.syncStoredViews();
+          }
         }
         if (mode === "create") {
           navigate(`/instances/${resolvedId}/edit`, {replace:true});

@@ -248,11 +248,11 @@ export const normalizeInstanceData = data => {
   if (data.promotedFields instanceof Array) {
     instance.promotedFields = data.promotedFields;
   }
-  if (typeof data.fields === "object") {
+  if (data.fields instanceof Object) {
     normalizeFields(data.fields, instance.id, data.alternatives);
     instance.fields = data.fields;
   }
-  if (typeof data.metadata === "object") {
+  if (data.metadata instanceof Object) {
     const metadata = data.metadata;
     instance.metadata = Object.keys(metadata).map(key => {
       if (key === "lastUpdateAt" || key === "createdAt") {
@@ -262,7 +262,7 @@ export const normalizeInstanceData = data => {
       return metadata[key];
     });
   }
-  if (typeof data.permissions === "object") {
+  if (data.permissions instanceof Object) {
     instance.permissions = data.permissions;
   }
   return instance;
@@ -579,9 +579,9 @@ export class Instance {
     return [];
   }
 
-  initializeJsonData(data) {
+  initializeJsonData(data, types) {
     this._initialJsonData = data;
-    this.permissions = data.permissions;
+    this.permissions = this.getPermissions(data, types);
     this.isFetching = false;
   }
 
@@ -599,16 +599,40 @@ export class Instance {
   }
 
 
-  initializeRawData(data, permissions) {
+  initializeRawData(data, permissions, types) {
     this.rawData = data;
     this.rawFetchError = null;
     this.hasRawFetchError = false;
     this.isRawFetched = true;
     this.isRawFetching = false;
-    if (typeof permissions === "object") {
-      this.permissions = permissions;
-    }
+    this.permissions = this.getPermissions({...data, permissions: permissions}, types);
   }
+
+  getTypeName(data) {
+    const type = data.types?.[0];
+    if (type) {
+      if (type instanceof Object) {
+        return type.name;
+      } 
+      return type;
+    }
+    return null;
+  }
+
+  getPermissions(data, types) {
+    if (data) {
+      const typeName = this.getTypeName(data);
+      const type = typeName?types.get(typeName):null;
+      if (!type?.fields || !Object.keys(type.fields).length) {
+        return {
+         canDelete: !!data.permissions?.canDelete,
+         canRawRead: true
+        };
+      }
+      return (data.permissions instanceof Object)?data.permissions:{}
+    }
+    return {};
+  };
 
   initializeData(transportLayer, rootStore, data, isNew = false) {
     const _initializeFields = _fields => {
@@ -675,7 +699,7 @@ export class Instance {
     this._promotedFields = normalizedData.promotedFields;
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
-    this.permissions = normalizedData.permissions;
+    this.permissions = this.getPermissions(normalizedData, rootStore.typeStore.typesMap);
     this.incomingLinks = normalizedData.incomingLinks;
     this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;
     _initializeFields(normalizedData.fields);
@@ -685,6 +709,8 @@ export class Instance {
     this.isFetching = false;
     this.isFetched = true;
   }
+
+  
 
   buildErrorMessage(e) {
     const message = e.message ? e.message : e;

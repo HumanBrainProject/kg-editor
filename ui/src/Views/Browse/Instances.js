@@ -190,7 +190,7 @@ const Instances = observer(() => {
         "InstanceOpenTabInBackground",
         instance.id,
       ]);
-      appStore.openInstance(instance.id, instance.name, instance.primaryType);
+      appStore.openInstance(instance.id, instance.name, instance.primaryType, instance.permissions.canRawRead?"raw":"view");
     }
   };
 
@@ -248,16 +248,21 @@ const Instances = observer(() => {
         />
       </Scrollbars>
       <div className={classes.preview}>
-        {browseStore.selectedInstance ? (
-          <Preview
-            instanceId={browseStore.selectedInstance.id}
-            instanceName={browseStore.selectedInstance.name}
-          />
-        ) : (
+        {browseStore.selectedInstance ?
+          browseStore.selectedInstance.permissions.canRawRead?
+            <BGMessage icon={"code"}>
+              This instance doesn&apos;t support preview.
+            </BGMessage>
+            :
+            <Preview
+              instanceId={browseStore.selectedInstance.id}
+              instanceName={browseStore.selectedInstance.name}
+            />
+          :
           <BGMessage icon={"money-check"}>
             Select an instance to display its preview here.
           </BGMessage>
-        )}
+        }
       </div>
     </div>
   );

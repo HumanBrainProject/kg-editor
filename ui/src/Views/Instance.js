@@ -85,7 +85,14 @@ const Instance = observer(({ mode }) => {
       instanceStore.togglePreviewInstance();
       viewStore.selectViewByInstanceId(id);
       const instance = instanceStore.instances.get(id); //NOSONAR
-      if (instance && ((mode === "raw" && instance.isRawFetched) || (mode !== "raw" && instance.isFetched))) {
+      let isForbidden = false;
+      if (instance?._initialJsonData) {
+        const permissions = instance.getPermissions(instance._initialJsonData, typeStore.typesMap);
+        isForbidden = permissions.canRawRead;
+      }
+      if (mode !== "raw" && isForbidden) { 
+        navigate(`/instances/${id}/raw`, {replace: true});
+      } else if (instance && ((mode === "raw" && instance.isRawFetched) || (mode !== "raw" && instance.isFetched))) {
         if (mode === "create" && !instance.isNew) {
           navigate(`/instances/${id}/edit`, {replace: true});
         }

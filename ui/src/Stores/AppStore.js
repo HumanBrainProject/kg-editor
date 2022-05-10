@@ -295,7 +295,7 @@ export class AppStore{
       if(data){
         const instance = this.rootStore.instanceStore.createInstanceOrGet(instanceId);
         if (!this.rootStore.typeStore.isFetched) {
-          instance.initializeJsonData(data);
+          instance.initializeJsonData(data, this.rootStore.typeStore.typesMap);
         } else {
           instance.initializeData(this.transportLayer, this.rootStore, data);
         }

@@ -151,7 +151,7 @@ class NestedFieldStore extends FieldStore {
       const options = {...fieldMapping.options, sourceType: value["@type"]};
       stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
     }
-    const store = [name];
+    const store = stores[name];
     store.updateValue(value[name]);
     if (warning) {
       store.setWarning(warning);

@@ -223,7 +223,7 @@ const TypesItem = observer(({ type }) => {
       ? browseStore.selectedItem.name === type.name
       : false;
   const color = type.color;
-  const canCreate = appStore.currentSpacePermissions.canCreate && !!type.canCreate;
+  const canCreate = appStore.currentSpacePermissions.canCreate && type.canCreate !== false; // We are allowed to create unless canCreate is explicitly set to false
 
   let cannotCreateTooltip = null;
   if (!appStore.currentSpacePermissions.canCreate) {

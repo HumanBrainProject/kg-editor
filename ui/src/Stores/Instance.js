@@ -618,11 +618,11 @@ export class Instance {
     return null;
   }
 
-  getPermissions(data, types) {
+  getPermissions(data, types, checkTypes=true) {
     if (data) {
       const typeName = this.getTypeName(data);
       const type = typeName?types.get(typeName):null;
-      if (!type?.fields || !Object.keys(type.fields).length) {
+      if (checkTypes && (!type?.fields || !Object.keys(type.fields).length)) {
         return {
          canDelete: !!data.permissions?.canDelete,
          canRawRead: true
@@ -698,7 +698,7 @@ export class Instance {
     this._promotedFields = normalizedData.promotedFields;
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
-    this.permissions = this.getPermissions(normalizedData, rootStore.typeStore.typesMap);
+    this.permissions = this.getPermissions(normalizedData, rootStore.typeStore.typesMap, rootStore.appStore.currentSpace.id === normalizedData.space);
     this.incomingLinks = normalizedData.incomingLinks;
     this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;
     _initializeFields(normalizedData.fields);

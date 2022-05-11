@@ -264,7 +264,7 @@ const SaveBar = observer(() => {
         {appStore.currentSpace.autorelease && (
           <div className={`alert alert-warning ${classes.autoreleaseWarning}`} role="alert"><FontAwesomeIcon icon="exclamation-triangle"  /> Saved changes will be released automatically.</div>
         )}
-        <h4>Unsaved instances &nbsp;<Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button></h4>
+        <h4>Unsaved instances &nbsp;{instanceStore.hasUnsavedChanges && <Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button>}</h4>
         <div className={classes.instances} >
           <CompareModal instance={comparedInstance} onSave={handleSave} onReset={handleReset} onClose={handleCloseCompararison} />
           {!instanceStore.hasUnsavedChanges &&

@@ -193,8 +193,6 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
     }
   }
 
-  const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
-
   return (
     <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
       <div className={classes.content}>
@@ -231,7 +229,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
               <GlobalFieldErrors instance={instance} />
             </div>:
             <Form className={`${classes.form}`}>
-              {fields.map(name => {
+              {instance.sortedFieldNames.map(name => {
                 const fieldStore = instance.fields[name];
                 return (
                   <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} readMode={true} showIfNoValue={showEmptyFields} />

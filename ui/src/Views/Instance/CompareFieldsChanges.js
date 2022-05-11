@@ -162,7 +162,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   }
 
   if (leftStatus.isFetched && rightStatus.isFetched) {
-    const fields = [...rightInstance.promotedFields, ...rightInstance.nonPromotedFields].map(name => (
+    const fields = rightInstance.sortedFieldNames.map(name => (
       {
         name: name,
         label: rightInstance.fields[name].label,

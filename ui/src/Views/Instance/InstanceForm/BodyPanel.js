@@ -104,10 +104,9 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
     }
   }
 
-  const fields = [...instance.promotedFields, ...instance.nonPromotedFields];
   return (
     <Form className={`${classes.container} ${className}`} >
-      {fields.map(name => {
+      {instance.sortedFieldNames.map(name => {
         const fieldStore = instance.fields[name];
         return (
           <Field key={name} name={name} className={classes.field} fieldStore={fieldStore} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />

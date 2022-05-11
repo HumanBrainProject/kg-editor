@@ -450,7 +450,7 @@ export class Instance {
       clearFieldsErrors: action,
       name: computed,
       promotedFields: computed,
-      nonPromotedFields: computed,
+      sortedFieldNames: computed,
       childrenIds: computed,
       childrenIdsGroupedByField: computed,
       initializeLabelData: action,
@@ -555,10 +555,9 @@ export class Instance {
     return this._promotedFields;
   }
 
-  get nonPromotedFields() {
+  get sortedFieldNames() {
     if (this.isFetched && !this.fetchError) {
       return Object.entries(this.fields)
-        .filter(([key]) => !this.promotedFields.includes(key))
         .sort(([, a], [, b]) => compareField(a, b))
         .map(([key]) => key);
     }

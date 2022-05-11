@@ -180,7 +180,7 @@ const ReleaseStats = observer(() => {
       </div>
 
       <div className={"section"}>
-        <h5>State after precessing:</h5>
+        <h5>State after processing:</h5>
         <div className={"stat"}>
           <div className={"name"}>Released</div>
           <div className={"bar released"}>

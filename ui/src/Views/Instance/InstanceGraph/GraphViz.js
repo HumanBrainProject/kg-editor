@@ -98,7 +98,7 @@ const GraphViz = observer(() => {
       graphStore.setGrouping(node, false);
     } else if (node.id !== graphStore.mainId) {
       graphStore.reset();
-      if(node.space !== appStore.currentSpace.id) {
+      if(node.space && node.space !== appStore.currentSpace.id) {
         const space = authStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
           appStore.setCurrentSpace(location, navigate, node.space);
@@ -122,7 +122,7 @@ const GraphViz = observer(() => {
   const getNodeLabel = node =>  {
     const nodeName = getNodeName(node);
     let space = "";
-    if(node.space !== appStore.currentSpace.id) {
+    if(node.space && node.space !== appStore.currentSpace.id) {
       space = `(Space: ${node.space})`;
     }
     return `${nodeName} ${space}`;

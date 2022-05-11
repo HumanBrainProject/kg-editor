@@ -125,7 +125,7 @@ const View = observer(({instance, mode}) => {
     }
     break;
   case "graph":
-    if(instance.permissions.canRead) {
+    if(instance.permissions.canRawRead || instance.permissions.canRead) {
       return (
         <InstanceGraph instance={instance} />
       );

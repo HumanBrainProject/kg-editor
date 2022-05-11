@@ -228,7 +228,7 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
       <div className={classes.actions}>
         <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    label="Open"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    label="Edit"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead || permissions.canRawRead}  icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
         <Action className={classes.action} show={permissions.canRead || permissions.canRawRead}  icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />

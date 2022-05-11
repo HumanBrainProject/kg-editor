@@ -341,7 +341,7 @@ export class InstanceStore {
         instance.initializeData(this.transportLayer, this.rootStore, data && data.data);
         const view = this.rootStore.viewStore.views.get(resolvedId);
         if(view) {
-          if (instance.permissions.canRawRead && ["view", "edit", "graph"].includes(view.mode)) {
+          if (instance.permissions.canRawRead && ["view", "edit"].includes(view.mode)) {
             navigate(`/instances/${resolvedId}/raw`, {replace:true});
           } else {
             view.setNameAndColor(instance.name, instance.primaryType.color);

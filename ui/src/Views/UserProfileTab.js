@@ -195,7 +195,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   const [popOverPosition, setPopOverPosition] = useState("bottom");
   const [tokenCopied, setTokenCopied] = useState(null);
 
-  const { appStore, authStore } = useStores();
+  const { viewStore, authStore, instanceStore } = useStores();
 
   useEffect(() => {
     if(showPopOver) {
@@ -236,7 +236,10 @@ const UserProfileTab = observer(({ className, size=30 }) => {
 
   const handleLogout = () => {
     ReactPiwik.push(["trackEvent", "User", "Logout"]);
-    appStore.logout();
+    if (!instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
+      viewStore.flushStoredViews();
+      authStore.logout();
+    }
   }
 
   if (!authStore.isAuthenticated || !authStore.isUserAuthorized || !authStore.user) {

@@ -100,7 +100,7 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
   const handleOpenInstance = async e => {
     e.stopPropagation();
     if(appStore.currentSpace.id !== instance.space) {
-      await appStore.setCurrentSpace(location, navigate, instance.space);
+      await appStore.switchSpace(location, navigate, instance.space);
     }
     if(e.metaKey || e.ctrlKey){
       appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");

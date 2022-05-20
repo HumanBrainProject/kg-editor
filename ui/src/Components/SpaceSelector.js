@@ -73,7 +73,7 @@ const SpaceSelector = observer(() => {
 
   const handleSelectSpace = space => {
     ReactPiwik.push(["trackEvent", "Space", "Select", space]);
-    appStore.setCurrentSpace(location, navigate, space);
+    appStore.switchSpace(location, navigate, space);
   }
 
   const handleChange = value => setFilter(value);

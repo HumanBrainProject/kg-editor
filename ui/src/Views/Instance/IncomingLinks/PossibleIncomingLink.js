@@ -54,7 +54,7 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
 
   const handleLinkFrom = space => {
     if(appStore.currentSpace.id !== space) {
-      const changeSpace = appStore.setCurrentSpace(location, navigate, space);
+      const changeSpace = appStore.switchSpace(location, navigate, space);
       if(!changeSpace) {
         return;
       }

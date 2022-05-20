@@ -25,8 +25,6 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
-import ReactPiwik from "react-piwik";
-import _  from "lodash-uuid";
 
 import { useStores } from "../Hooks/UseStores";
 
@@ -34,6 +32,7 @@ import InstanceTabs from "./InstanceTabs";
 import UserProfileTab from "./UserProfileTab";
 import SpaceSelector from "../Components/SpaceSelector";
 import Tab from "../Components/Tab";
+import NewInstanceTab from "./NewInstanceTab";
 
 const useStyles = createUseStyles({
   container: {
@@ -78,56 +77,45 @@ const useStyles = createUseStyles({
 
 
 const Tabs = observer(() => {
-
   const classes = useStyles();
 
-  const { appStore, authStore, typeStore } = useStores();
+  const { appStore, authStore } = useStores();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleGoToDashboard = () => appStore.goToDashboard(navigate);
-
-  const handleCreateInstance = () => {
-    const uuid = _.uuid();
-    ReactPiwik.push(["trackEvent", "Tab", "CreateInstance", uuid]);
-    navigate(`/instances/${uuid}/create`);
-  };
-
-  const canCreate = appStore.currentSpacePermissions.canCreate && !typeStore.isFetching && typeStore.isFetched && !!typeStore.filteredTypes.filter(t => t.canCreate !== false).length;
+  const handleGoToDashboard = () => navigate("/")
 
   return (
-    <div className={classes.container}>
-      <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
-        <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" height="30" />
-        <span>Knowledge Graph Editor</span>
+      <div className={classes.container}>
+        <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
+          <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" height="30" />
+          <span>Knowledge Graph Editor</span>
+        </div>
+        {!appStore.globalError &&
+          <>
+            <div className={classes.fixedTabsLeft}>
+              {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasSpaces && appStore.currentSpace?
+                <>
+                  <SpaceSelector />
+                  <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
+                  <Tab icon={"search"} current={matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
+                  <NewInstanceTab />
+                </>
+                : null
+              }
+            </div>
+            <InstanceTabs pathname={location.pathname} />
+            <div className={classes.fixedTabsRight}>
+              {authStore.isAuthenticated && authStore.isUserAuthorized && (
+                <>
+                  <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
+                  <UserProfileTab className={classes.userProfileTab} size={32} />
+                </>
+              )}
+            </div>
+          </>
+        }
       </div>
-      {!appStore.globalError &&
-        <>
-          <div className={classes.fixedTabsLeft}>
-            {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasSpaces && appStore.currentSpace?
-              <>
-                <SpaceSelector />
-                <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
-                <Tab icon={"search"} current={matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
-                {canCreate && (
-                  <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
-                )}
-              </>
-              : null
-            }
-          </div>
-          <InstanceTabs pathname={location.pathname} />
-          <div className={classes.fixedTabsRight}>
-            {authStore.isAuthenticated && authStore.isUserAuthorized && (
-              <>
-                <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
-                <UserProfileTab className={classes.userProfileTab} size={32} />
-              </>
-            )}
-          </div>
-        </>
-      }
-    </div>
   );
 });
 Tabs.displayName = "Tabs";

@@ -102,51 +102,56 @@ const useStyles = createUseStyles({
 });
 
 const View = observer(({instance, mode}) => {
+
+  const { typeStore } = useStores();
+
+  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+
   switch (mode) {
   case "create":
-    if(instance.permissions.canCreate) {
+    if(instance.permissions.canCreate && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
   case "edit":
-    if(instance.permissions.canWrite) {
+    if(instance.permissions.canWrite && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
   case "view":
-    if(instance.permissions.canRead) {
+    if(instance.permissions.canRead && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
   case "graph":
-    if(instance.permissions.canRawRead || instance.permissions.canRead) {
+    if(instance.permissions.canRead) {
       return (
         <InstanceGraph instance={instance} />
       );
     }
     break;
   case "release":
-    if(instance.permissions.canRelease) {
+    if(instance.permissions.canRelease && isTypesSupported) {
       return (
         <InstanceRelease instance={instance} />
       );
     }
     break;
   case "manage":
-    if(instance.permissions.canRawRead || instance.permissions.canRead) {
+    if(instance.permissions.canRead) {
       return (
         <InstanceManage instance={instance} />
       );
     }
     break;
   case "raw":
-    if(instance.permissions.canRawRead || instance.permissions.canRead) {
+    if(instance.permissions.canRead) {
       return (
         <InstanceRaw instance={instance} />
       );

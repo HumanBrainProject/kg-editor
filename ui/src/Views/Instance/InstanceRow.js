@@ -29,6 +29,8 @@ import Field from "../../Fields/Field";
 import Status from "./Status";
 import { observer } from "mobx-react-lite";
 
+import { useStores } from "../../Hooks/UseStores";
+
 const useStyles = createUseStyles({
   container: {
     position: "relative",
@@ -165,6 +167,10 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
 
   const classes = useStyles();
 
+  const { typeStore } = useStores();
+
+  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+
   const { permissions } = instance;
 
   const timeout = useRef(null);
@@ -198,7 +204,8 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === "function") {
       onCtrlClick(instance);
     } else {
-      const mode = instance.permissions.canRawRead?"raw":"view";
+      const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+      const mode = isTypesSupported?"view":"raw";
       typeof onActionClick === "function" && onActionClick(instance, mode);
     }
   };
@@ -226,12 +233,12 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         ))}
       </Form>
       <div className={classes.actions}>
-        <Action className={classes.action} show={permissions.canRead}                            icon="eye"              mode="view"    label="Open"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       mode="edit"    label="Edit"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead || permissions.canRawRead}  icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead || permissions.canRawRead}  icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead && isTypesSupported}        icon="eye"              mode="view"    label="Open"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canWrite && isTypesSupported}       icon="pencil-alt"       mode="edit"    label="Edit"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRelease && isTypesSupported}     icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions.canRead}                            icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
       </div>
     </div>
   );

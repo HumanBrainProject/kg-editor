@@ -219,9 +219,9 @@ export class AuthStore {
     try {
       const { data } = await this.transportLayer.getAuthEndpoint();
       runInAction(() => {
-        this.endpoint =  data && data.data? data.data.endpoint :null;
-        this.commit =  data && data.data? data.data.commit :null;
-        const sentryUrl = data && data.data? data.data.sentryUrl :null;
+        this.endpoint =  data?.data?.endpoint;
+        this.commit =  data?.data?.commit;
+        const sentryUrl = data?.data?.sentryUrl;
         if (sentryUrl) {
           Sentry.init({
             dsn: sentryUrl,

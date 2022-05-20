@@ -26,26 +26,20 @@ import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
 import ReactPiwik from "react-piwik";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import Spinner from "../../Components/Spinner";
-import BGMessage from "../../Components/BGMessage";
 import Filter from "../../Components/Filter";
 
 const useStyles = createUseStyles({
   container: {
-    position: "absolute",
     display: "flex",
     flexDirection: "column",
-    width:"50%",
-    height:"calc(100% - 160px)",
-    top:"80px",
-    left:"25%",
+    width: "100%",   
+    height: "100%",
     background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
+    color: "var(--ft-color-normal)",  
     border: "1px solid var(--border-color-ui-contrast1)",
     boxShadow: "0 2px 10px var(--pane-box-shadow)",
     "& button": {
@@ -124,36 +118,9 @@ const TypeSelection = observer(({ onSelect }) => {
     setFilter(value);
   };
 
-  const handleRetry = () => typeStore.fetch();
-
   const handleClick = type => onSelect(type);
 
   const types = typeStore.filteredList(filter).filter(t => t.canCreate !== false);
-
-  if (typeStore.isFetching) {
-    return (
-      <div className={classes.container}>
-        <Spinner>Fetching data types...</Spinner>
-      </div>
-    );
-  }
-
-  if (typeStore.fetchError) {
-    return (
-      <div className={classes.container}>
-        <BGMessage icon={"ban"}>
-              There was a network problem fetching data types.<br />
-              If the problem persists, please contact the support.<br />
-          <small>{typeStore.fetchError}</small><br /><br />
-          <div>
-            <Button variant={"primary"} onClick={handleRetry}>
-              <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-            </Button>
-          </div>
-        </BGMessage>
-      </div>
-    );
-  }
 
   return (
     <div className={classes.container}>

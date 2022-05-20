@@ -71,7 +71,7 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   const handleOpenInstance = () => {
     if(appStore.currentSpace.id !== instance.space) {
-      appStore.setCurrentSpace(location, navigate, instance.space);
+      appStore.switchSpace(location, navigate, instance.space);
     }
     navigate(`/instances/${instance.id}`);
   };

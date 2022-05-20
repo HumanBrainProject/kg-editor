@@ -23,22 +23,14 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { Route, Routes } from "react-router-dom";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import { createUseStyles, useTheme } from "react-jss";
 
 import { useStores } from "../Hooks/UseStores";
 
-import Tabs from "./Tabs";
-import NotFound from "./NotFound";
-import Home from "./Home";
-import Login from "./Login";
-import Help from "./Help";
-import Browse from "./Browse";
-import Instance from "./Instance";
 import GlobalError from "./GlobalError";
-import SpaceModal from "./SpaceModal";
+import Tabs from "./Tabs";
+import Authenticate from "./Authenticate";
+import Footer from "./Footer";
 
 const getGlobalUseStyles = () => createUseStyles(theme => {
   const styles = {
@@ -132,7 +124,7 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
   if (theme.name === "cupcake") {
     return {
       ...styles,
-      ".layout-status": {
+      ".copyright": {
         "background": "linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3) !important",
         "background-size": "180% 180% !important",
         animation: "rainbow 3s linear infinite !important",
@@ -186,123 +178,7 @@ const useStyles = createUseStyles(theme => ({
     backgroundImage: theme.background.image?`url('${theme.background.image}')`:"unset",
     backgroundPosition: theme.background.position?theme.background.position:"unset"
   },
-  status: {
-    background: "var(--bg-color-ui-contrast1)",
-    color: "var(--ft-color-loud)",
-    paddingLeft: "10px"
-  },
-  noAccessModal: {
-    maxWidth: "min(max(500px, 50%),750px)",
-    "&.modal-dialog": {
-      marginTop: "40vh",
-      "& .modal-content":{
-        backgroundColor: "var(--bg-color-ui-contrast2)",
-        color: "var(--ft-color-loud)",
-        "& .modal-body": {
-          padding: "15px 30px",
-          fontSize: "1.6rem"
-        }
-      }
-    }
-  },
-  actionPanel: {
-    textAlign: "center",
-    "& button": {
-      paddingLeft: "30px",
-      paddingRight: "30px"
-    }
-  },
-  footer: {
-    position: "relative"
-  },
-  build: {
-    color: "var(--ft-color-loud)",
-    position: "absolute",
-    top: "0px",
-    right: "10px"
-  }
 }));
-
-const Main = observer(({classes}) => {
-
-  const { appStore, authStore } = useStores();
-
-  const handleLogout = () => appStore.logout();
-
-  if (!appStore.isInitialized || !authStore.isAuthenticated) {
-    return (
-      <Login />
-    );
-  }
-
-  if (!authStore.isUserAuthorized) {
-    return (
-      <Modal dialogClassName={classes.noAccessModal} show={true}>
-        <Modal.Body>
-          <h1>Welcome</h1>
-          <p>You are currently not granted permission to acccess the application.</p>
-          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-          <div className={classes.actionPanel}>
-            <Button onClick={handleLogout}>Logout</Button>
-          </div>
-        </Modal.Body>
-      </Modal>
-    );
-  }
-
-  if (!authStore.hasSpaces) {
-    return (
-      <Modal dialogClassName={classes.noAccessModal} show={true}>
-        <Modal.Body>
-          <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
-          <p>You are currently not granted permission to acccess any spaces.</p>
-          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-          <div className={classes.actionPanel}>
-            <Button onClick={handleLogout}>Logout</Button>
-          </div>
-        </Modal.Body>
-      </Modal>
-    );
-  }
-
-  if (!appStore.currentSpace) {
-    return (
-      <SpaceModal/>
-    );
-  }
-
-  return (
-    <Routes>
-      <Route path="/instances/:id" element={<Instance mode="view" />} />
-      <Route path="/instances/:id/create" element={<Instance mode="create" />} />
-      <Route path="/instances/:id/edit" element={<Instance mode="edit" />} />
-      <Route path="/instances/:id/graph" element={<Instance mode="graph" />} />
-      <Route path="/instances/:id/release" element={<Instance mode="release" />} />
-      <Route path="/instances/:id/manage"  element={<Instance mode="manage" />} />
-      <Route path="/instances/:id/raw"  element={<Instance mode="raw" />} />
-
-      <Route path="/browse" element={<Browse/>} />
-      <Route path="/help/*" element={<Help/>} />
-      <Route path="/" element={<Home/>} />
-      <Route element={<NotFound/>} />
-    </Routes>
-  );
-});
-
-const Footer = observer(({classes}) => {
-  const { authStore } = useStores();
-  const commit = authStore.commit;
-  return(
-    <div className={classes.footer}>
-      <div className={`${classes.status} layout-status`}>
-              Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
-      </div>
-      <div className={classes.build}>
-        {commit && <span >build: <i>{commit}</i></span>}
-      </div>
-    </div>
-  );
-});
 
 const Layout = observer(() => {
 
@@ -317,9 +193,9 @@ const Layout = observer(() => {
     <div className={classes.layout}>
       <Tabs />
       <div className={classes.body}>
-        {appStore.globalError?<GlobalError />:<Main classes={classes}/>}
+        {appStore.globalError?<GlobalError />:<Authenticate/>}
       </div>
-      <Footer classes={classes}/>
+      <Footer />
     </div>
   );
 });

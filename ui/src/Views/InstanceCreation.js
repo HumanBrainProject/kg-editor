@@ -22,63 +22,55 @@
  */
 
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
+import { Navigate, Link } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
 
+import Instance from "./Instance";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
-import Space from "./Space";
 
-const Instance = observer(({instanceId}) => {
-  const navigate = useNavigate();
+const InstanceCreation = observer(({instanceId}) => {
   const {instanceStore} = useStores();
-
-  const instance = instanceStore.createInstanceOrGet(instanceId);
-
-  const handleRetry = () => instance.fetch();
-
-  const handleContinue = () => navigate("/browse");
-
   useEffect(() => {
-    if (!instance.isNew) {
-      instance.fetch();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    instanceStore.checkInstanceIdAvailability(instanceId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
-  if (!instance.isNew) {
+  const status = instanceStore.instanceIdAvailability.get(instanceId);
 
-    if (instance.fetchError) {
+  if (status) {
+    if (status.error) {
       return (
         <ErrorPanel>
-          There was a network problem fetching the instance.<br />
-          If the problem persists, please contact the support.<br />
-          <small>{instance.fetchError}</small><br /><br />
-          <Button variant={"primary"} onClick={handleRetry}>
-            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-          </Button>
-          <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
-        </ErrorPanel>
+           {status.error}<br /><br />
+          <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
       );
     }
 
-
-    if (!instance.isFetched || instance.isFetching) {
-      return (
-        <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
-      );
+    if (status.isChecking) {
+      return <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />;
     }
 
+    if (status.isChecked) {
+
+      if (status.isAvailable) {
+        return (
+          <Instance instanceId={instanceId} />
+        );
+      }
+
+      if (status.resolvedId) {
+        return (
+          <Navigate to={`/instances/${status.resolvedId}`} />
+        );
+      }
+    }
   }
-
-  return (
-    <Space space={instance.space} />
-  );
+  return null;
 });
-Instance.displayName = "Instance";
+InstanceCreation.displayName = "InstanceCreation";
 
-export default Instance;
+export default InstanceCreation;

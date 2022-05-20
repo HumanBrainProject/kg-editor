@@ -28,6 +28,7 @@ export class TypeStore {
   typesMap = new Map();
   fetchError = null;
   isFetching = false;
+  isFetched = false;
 
   transportLayer = null;
   rootStore = null;
@@ -38,7 +39,7 @@ export class TypeStore {
       typesMap: observable,
       fetchError: observable,
       isFetching: observable,
-      isFetched: computed,
+      isFetched: observable,
       filteredTypes: computed,
       fetch: action
     });
@@ -55,28 +56,41 @@ export class TypeStore {
     return this.filteredTypes;
   }
 
-  get isFetched() {
-    return !this.fetchError && this.types.length;
-  }
-
   get filteredTypes() {
     return this.types.filter(t => !t.embeddedOnly);
   }
+
+  isTypesSupported(typeNames) {
+    return typeNames.some(name => {
+      const type = this.typesMap.get(name);
+      return type && type.isSupported;
+    });
+  };
 
   async fetch(forceFetch=false) {
     if (!this.isFetching && (!this.types.length || !!forceFetch)) {
       this.types = [];
       this.isFetching = true;
       this.fetchError = null;
+      this.isFetched = false;
       try {
         const response = await this.transportLayer.getSpaceTypes(this.rootStore.appStore.currentSpace.id);
         runInAction(() => {
-          this.types = (response.data && response.data.data && response.data.data.length)?response.data.data:[];
+          this.types = (response.data && response.data.data && response.data.data.length)?
+            response.data.data.map(type => ({
+              ...type,
+              isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
+            }))
+            :[];
           if(!this.types.length) {
             this.fetchError = "No types available";
+            this.isFetching = false;
+            this.isFetched = false;
+          } else {
+            this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
+            this.isFetching = false;
+            this.isFetched = true;
           }
-          this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
-          this.isFetching = false;
         });
       } catch (e) {
         runInAction(() => {
@@ -84,6 +98,7 @@ export class TypeStore {
           this.fetchError = `Error while fetching types (${message})`;
           this.isFetching = false;
           this.types = [];
+          this.isFetched = false;
         });
       }
     }

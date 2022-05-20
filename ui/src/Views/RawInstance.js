@@ -22,7 +22,7 @@
  */
 
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
@@ -33,52 +33,45 @@ import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 import Space from "./Space";
 
-const Instance = observer(({instanceId}) => {
+const RawInstance = observer(({instanceId}) => {
   const navigate = useNavigate();
   const {instanceStore} = useStores();
 
   const instance = instanceStore.createInstanceOrGet(instanceId);
 
-  const handleRetry = () => instance.fetch();
+  const handleRetry = () => instance.fetchRaw();
 
   const handleContinue = () => navigate("/browse");
 
   useEffect(() => {
-    if (!instance.isNew) {
-      instance.fetch();
-    }
+    instance.fetchRaw();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
-  if (!instance.isNew) {
+  if (instance.isRawFetching) {
+    return (
+      <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
+    );
+  }
 
-    if (instance.fetchError) {
-      return (
-        <ErrorPanel>
-          There was a network problem fetching the instance.<br />
-          If the problem persists, please contact the support.<br />
-          <small>{instance.fetchError}</small><br /><br />
-          <Button variant={"primary"} onClick={handleRetry}>
-            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
-          </Button>
-          <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
-        </ErrorPanel>
-      );
-    }
-
-
-    if (!instance.isFetched || instance.isFetching) {
-      return (
-        <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
-      );
-    }
-
+  if (instance.rawFetchError) {
+    return (
+      <ErrorPanel>
+        There was a network problem fetching the instance.<br />
+        If the problem persists, please contact the support.<br />
+        <small>{instance.rawFetchError}</small><br /><br />
+        <Button variant={"primary"} onClick={handleRetry}>
+          <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+        </Button>
+        <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+      </ErrorPanel>
+    );
   }
 
   return (
-    <Space space={instance.space} />
+    <Space />
   );
 });
-Instance.displayName = "Instance";
+RawInstance.displayName = "RawInstance";
 
-export default Instance;
+export default RawInstance;

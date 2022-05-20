@@ -29,6 +29,7 @@ import ReactPiwik from "react-piwik";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import uniqueId from "lodash/uniqueId";
+import _  from "lodash-uuid";
 
 import { useStores } from "../../Hooks/UseStores";
 import { useNavigate } from "react-router-dom";
@@ -215,7 +216,9 @@ const TypesItem = observer(({ type }) => {
 
   const handleCreateInstance = () => {
     ReactPiwik.push(["trackEvent", "Browse", "CreateInstance", type.name]);
-    instanceStore.createNewInstanceOfType(type, navigate);
+    const uuid = _.uuid();
+    instanceStore.setInstanceIdAvailability(type, uuid);
+    navigate(`/instances/${uuid}/create`);
   };
 
   const selected =

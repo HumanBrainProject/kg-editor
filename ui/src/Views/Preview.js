@@ -160,9 +160,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(!instance.isFetched || instance.isFetching) {
     return(
       <div className={`${classes.container} ${className?className:""}`}>
-        <Spinner>
-          <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
-        </Spinner>
+        <Spinner text={`Fetching instance ${instanceId}...`} />
       </div>
     );
   }

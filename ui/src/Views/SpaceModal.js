@@ -93,7 +93,7 @@ const useStyles = createUseStyles({
         border: "1px solid var(--border-color-ui-contrast1)",
         "& .modal-body": {
           padding: "0",
-          maxHeight: "calc(100vh - 30vh -80px)",
+          maxHeight: "calc(100vh - 30vh - 80px)",
           overflowY: "hidden"
         }
       }
@@ -110,7 +110,7 @@ const SpaceModal = observer(() => {
 
   const { appStore, authStore } = useStores();
 
-  const handleClick = space => appStore.setCurrentSpace(location, navigate, space);
+  const handleClick = space => appStore.switchSpace(location, navigate, space);
 
   return (
     <div className={classes.container}>

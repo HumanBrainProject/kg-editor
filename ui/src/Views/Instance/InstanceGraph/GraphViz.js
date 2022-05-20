@@ -101,7 +101,7 @@ const GraphViz = observer(() => {
       if(node.space && node.space !== appStore.currentSpace.id) {
         const space = authStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
-          appStore.setCurrentSpace(location, navigate, node.space);
+          appStore.switchSpace(location, navigate, node.space);
           navigate(`/instances/${node.id}/graph`);
         }
       } else {

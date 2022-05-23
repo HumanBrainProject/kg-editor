@@ -35,7 +35,7 @@ import Space from "./Space";
 
 const Instance = observer(({instanceId}) => {
   const navigate = useNavigate();
-  const {instanceStore} = useStores();
+  const {instanceStore, authStore} = useStores();
 
   const handleRetry = () => instance.fetch();
 
@@ -71,10 +71,18 @@ const Instance = observer(({instanceId}) => {
       );
     }
 
-
     if (!instance.isFetched || instance.isFetching) {
       return (
         <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
+      );
+    }
+
+    if (!authStore.spaces.find(s => s.id === instance.space)) {
+      return (
+        <ErrorPanel>
+          You do not have permission to access the space &quot;<i>{instance.space}&quot;</i>.<br /><br />
+          <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+        </ErrorPanel>
       );
     }
 

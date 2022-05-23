@@ -35,7 +35,7 @@ import Space from "./Space";
 
 const RawInstance = observer(({instanceId}) => {
   const navigate = useNavigate();
-  const {instanceStore} = useStores();
+  const {instanceStore, authStore} = useStores();
 
   useEffect(() => {
     const instance = instanceStore.createInstanceOrGet(instanceId);
@@ -53,12 +53,6 @@ const RawInstance = observer(({instanceId}) => {
     return null;
   }
 
-  if (instance.isRawFetching) {
-    return (
-      <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
-    );
-  }
-
   if (instance.rawFetchError) {
     return (
       <ErrorPanel>
@@ -68,6 +62,21 @@ const RawInstance = observer(({instanceId}) => {
         <Button variant={"primary"} onClick={handleRetry}>
           <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
         </Button>
+        <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+      </ErrorPanel>
+    );
+  }
+
+  if (!instance.isRawFetched || instance.isRawFetching) {
+    return (
+      <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
+    );
+  }
+
+  if (!authStore.spaces.find(s => s.id === instance.space)) {
+    return (
+      <ErrorPanel>
+        You do not have permission to access the space &quot;<i>{instance.space}&quot;</i>.<br /><br />
         <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
       </ErrorPanel>
     );

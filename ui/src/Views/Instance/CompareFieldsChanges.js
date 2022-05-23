@@ -141,7 +141,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   if (leftStatus.isFetching || rightStatus.isFetching) {
     return (
       <div className={classes.container}>
-        <Spinner text={`Fetching children of instance ${instanceId}...`} />
+        <Spinner>Fetching children of instance {instanceId}...</Spinner>
       </div>
     );
   }

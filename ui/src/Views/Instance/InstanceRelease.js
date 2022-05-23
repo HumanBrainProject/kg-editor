@@ -161,7 +161,7 @@ const InstanceRelease = observer(({ instance }) => {
   if (releaseStore.isFetching) {
     return (
       <div className={classes.container}>
-        <Spinner text={`Fetching release data of instance ${instance.id}...`} />
+        <Spinner>Fetching release data of instance {instance.id}...</Spinner>
       </div>
     );
   }

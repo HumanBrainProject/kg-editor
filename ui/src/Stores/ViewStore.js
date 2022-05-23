@@ -174,23 +174,16 @@ export class ViewStore{
     localStorage.removeItem(STORED_INSTANCE_VIEWS_KEY);
   }
 
-  restoreViews(navigate, preventSelectView=false){
+  restoreViews(){
     this.clearViews();
     if(this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
       const workspaceViews = views[this.rootStore.appStore.currentSpace.id];
-      let selectedView = null;
       if (Array.isArray(workspaceViews)) {
         workspaceViews.forEach(view => {
-          if (!preventSelectView && view.selected) {
-            selectedView = view;
-          }
           const {id, name, color, mode} = view;
           this.views.set(id, new View(id, name, color, mode));
         });
-      }
-      if (selectedView) {
-        selectedView.mode === "view" ? navigate(`/instances/${selectedView.id}`):navigate(`/instances/${selectedView.id}/${selectedView.mode}`);
       }
     }
   }

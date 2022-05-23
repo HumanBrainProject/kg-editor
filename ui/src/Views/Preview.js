@@ -32,12 +32,12 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { useStores } from "../Hooks/UseStores";
 
 import Field from "../Fields/Field";
-import Spinner from "../Components/Spinner";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 import IncomingLinks from "./Instance/IncomingLinks/IncomingLinks";
+import Spinner from "../Components/Spinner";
 
 const useStyles = createUseStyles({
   container: {
@@ -160,7 +160,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(!instance.isFetched || instance.isFetching) {
     return(
       <div className={`${classes.container} ${className?className:""}`}>
-        <Spinner text={`Fetching instance ${instanceId}...`} />
+        <Spinner>Fetching instance {instanceId}...</Spinner>
       </div>
     );
   }

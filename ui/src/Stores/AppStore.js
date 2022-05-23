@@ -283,13 +283,17 @@ export class AppStore{
     if (spaceName) {
       this.currentSpace = this.rootStore.authStore.spaces.find( w => w.id === spaceName);
       localStorage.setItem("space", spaceName);
+      if (this.currentSpace) {
+        this.rootStore.viewStore.restoreViews();
+        this.rootStore.browseStore.clearInstances();
+      }
     } else {
       this.currentSpace = null;
       localStorage.removeItem("space");
     }
   }
 
-  async switchSpace(location, navigate, selectedSpace, preventSelectView=false) {
+  async switchSpace(location, navigate, selectedSpace) {
     let space = selectedSpace?this.rootStore.authStore.spaces.find( w => w.id === selectedSpace):null;
     if (!space && this.rootStore.authStore.hasSpaces && this.rootStore.authStore.spaces.length === 1) {
       space = this.rootStore.authStore.spaces[0];
@@ -309,7 +313,7 @@ export class AppStore{
       }
       this.setSpace(space.id);
       if (this.currentSpace) {
-        this.rootStore.viewStore.restoreViews(navigate, preventSelectView);
+        this.rootStore.viewStore.restoreViews();
         await this.rootStore.typeStore.fetch(true);
         this.rootStore.browseStore.clearInstances();
       }
@@ -350,7 +354,6 @@ export class AppStore{
         this.rootStore.browseStore.clearSelectedInstance();
       }
     }
-    this.rootStore.instanceStore.deleteInstanceIdAvailability(instanceId);
     this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
     const instance = this.rootStore.instanceStore.instances.get(instanceId);
     if (instance) {

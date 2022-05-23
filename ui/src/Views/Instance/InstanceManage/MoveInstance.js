@@ -183,9 +183,7 @@ const MoveInstance = observer(({ instance, className }) => {
     return false;
   });
 
-  const handleSetSpaceId = e => {
-    setSpaceId(e.target.value);
-  };
+  const handleSetSpaceId = e => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Move", instance.id]);

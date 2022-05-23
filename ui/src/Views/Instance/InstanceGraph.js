@@ -119,7 +119,7 @@ const InstanceGraph = observer(({ instance }) => {
 
     return (
       <div className={classes.loader}>
-        <Spinner text={`Fetching visualization data for instance ${instance.id}...`} />
+        <Spinner>Fetching visualization data for instance {instance.id}...</Spinner>
       </div>
     );
   }

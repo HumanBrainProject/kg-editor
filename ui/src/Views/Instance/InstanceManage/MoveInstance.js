@@ -155,8 +155,11 @@ const MoveInstance = observer(({ instance, className }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchStatus(), [instance.id]);
+  
+  useEffect(() => {
+    fetchStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance.id]);
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
@@ -190,8 +193,7 @@ const MoveInstance = observer(({ instance, className }) => {
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 
-  const handleCancelMoveInstance = () =>
-    appStore.retryMoveInstance(location, navigate);
+  const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
   const variant =

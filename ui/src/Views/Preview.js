@@ -133,7 +133,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   const handleRetry = () => fetchInstance(true);
 
-  const instance = instanceId?instanceStore.instances.get(instanceId):null;
+  const instance = instanceStore.instances.get(instanceId);
   if (!instance) {
     return null;
   }

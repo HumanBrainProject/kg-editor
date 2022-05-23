@@ -37,16 +37,21 @@ const RawInstance = observer(({instanceId}) => {
   const navigate = useNavigate();
   const {instanceStore} = useStores();
 
-  const instance = instanceStore.createInstanceOrGet(instanceId);
+  useEffect(() => {
+    const instance = instanceStore.createInstanceOrGet(instanceId);
+    instance.fetchRaw();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instanceId]);
 
   const handleRetry = () => instance.fetchRaw();
 
   const handleContinue = () => navigate("/browse");
 
-  useEffect(() => {
-    instance.fetchRaw();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instanceId]);
+  const instance = instanceStore.instances.get(instanceId);
+
+  if(!instance) {
+    return null;
+  }
 
   if (instance.isRawFetching) {
     return (
@@ -69,7 +74,7 @@ const RawInstance = observer(({instanceId}) => {
   }
 
   return (
-    <Space />
+    <Space space={instance.space} />
   );
 });
 RawInstance.displayName = "RawInstance";

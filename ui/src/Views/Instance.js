@@ -37,18 +37,23 @@ const Instance = observer(({instanceId}) => {
   const navigate = useNavigate();
   const {instanceStore} = useStores();
 
-  const instance = instanceStore.createInstanceOrGet(instanceId);
-
   const handleRetry = () => instance.fetch();
 
   const handleContinue = () => navigate("/browse");
 
   useEffect(() => {
+    const instance = instanceStore.createInstanceOrGet(instanceId);
     if (!instance.isNew) {
       instance.fetch();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
+
+  const instance = instanceStore.instances.get(instanceId);
+
+  if (!instance) {
+    return null;
+  }
 
   if (!instance.isNew) {
 
@@ -74,7 +79,6 @@ const Instance = observer(({instanceId}) => {
     }
 
   }
-
   return (
     <Space space={instance.space} />
   );

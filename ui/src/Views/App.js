@@ -58,6 +58,7 @@ const BrowserEventHandler = observer(() => {
 
   return null;
 });
+BrowserEventHandler.displayName = "BrowserEventHandler";
 
 const App = observer(() => {
 

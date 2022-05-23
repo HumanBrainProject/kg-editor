@@ -24,6 +24,7 @@
 import { observable, action, computed, runInAction, makeObservable } from "mobx";
 
 export class TypeStore {
+  space = null;
   types = [];
   typesMap = new Map();
   fetchError = null;
@@ -35,6 +36,7 @@ export class TypeStore {
 
   constructor(transportLayer, rootStore) {
     makeObservable(this, {
+      space: observable,
       types: observable,
       typesMap: observable,
       fetchError: observable,
@@ -67,39 +69,46 @@ export class TypeStore {
     });
   };
 
-  async fetch(forceFetch=false) {
-    if (!this.isFetching && (!this.types.length || !!forceFetch)) {
-      this.types = [];
-      this.isFetching = true;
-      this.fetchError = null;
-      this.isFetched = false;
-      try {
-        const response = await this.transportLayer.getSpaceTypes(this.rootStore.appStore.currentSpace.id);
-        runInAction(() => {
-          this.types = (response.data && response.data.data && response.data.data.length)?
-            response.data.data.map(type => ({
-              ...type,
-              isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
-            }))
-            :[];
-          if(!this.types.length) {
-            this.fetchError = "No types available";
+  async fetch(space) {
+    if (!this.isFetching && space !== this.space) {
+      if (space) {
+        this.space = space;
+        this.types = [];
+        this.isFetching = true;
+        this.fetchError = null;
+        this.isFetched = false;
+        try {
+          const response = await this.transportLayer.getSpaceTypes(space);
+          runInAction(() => {
+            this.types = (response.data && response.data.data && response.data.data.length)?
+              response.data.data.map(type => ({
+                ...type,
+                isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
+              }))
+              :[];
+            if(!this.types.length) {
+              this.fetchError = "No types available";
+              this.isFetching = false;
+              this.isFetched = false;
+            } else {
+              this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
+              this.isFetching = false;
+              this.isFetched = true;
+            }
+          });
+        } catch (e) {
+          runInAction(() => {
+            const message = e.message ? e.message : e;
+            this.fetchError = `Error while fetching types (${message})`;
             this.isFetching = false;
+            this.types = [];
             this.isFetched = false;
-          } else {
-            this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
-            this.isFetching = false;
-            this.isFetched = true;
-          }
-        });
-      } catch (e) {
-        runInAction(() => {
-          const message = e.message ? e.message : e;
-          this.fetchError = `Error while fetching types (${message})`;
-          this.isFetching = false;
-          this.types = [];
-          this.isFetched = false;
-        });
+          });
+        }
+      } else {
+        this.types = [];
+        this.fetchError = null;
+        this.isFetched = false;
       }
     }
   }

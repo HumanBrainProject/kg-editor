@@ -599,6 +599,7 @@ export class Instance {
     this.isRawFetched = true;
     this.isRawFetching = false;
     this.permissions = (permissions instanceof Object)?permissions:{};
+    this.space = data["https://core.kg.ebrains.eu/vocab/meta/space"];
   }
 
   get typeNames() {

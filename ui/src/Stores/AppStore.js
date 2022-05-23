@@ -115,7 +115,9 @@ export class AppStore{
       toggleTheme: action,
       createExternalInstance: action,
       updateExternalInstanceModal: action,
-      clearExternalCreateModal: action
+      clearExternalCreateModal: action,
+      moveInstance: action,
+      cancelMoveInstance: action
     });
 
     this.transportLayer = transportLayer;
@@ -283,10 +285,8 @@ export class AppStore{
     if (spaceName) {
       this.currentSpace = this.rootStore.authStore.spaces.find( w => w.id === spaceName);
       localStorage.setItem("space", spaceName);
-      if (this.currentSpace) {
-        this.rootStore.viewStore.restoreViews();
-        this.rootStore.browseStore.clearInstances();
-      }
+      this.rootStore.viewStore.restoreViews();
+      this.rootStore.browseStore.clearInstances();
     } else {
       this.currentSpace = null;
       localStorage.removeItem("space");
@@ -307,16 +307,11 @@ export class AppStore{
         } else {
           return false;
         }
-      } else if(this.rootStore.viewStore.views.size > 0) {
+      } else {
         this.clearViews(location, navigate);
         this.rootStore.browseStore.clearInstancesFilter();
       }
       this.setSpace(space.id);
-      if (this.currentSpace) {
-        this.rootStore.viewStore.restoreViews();
-        await this.rootStore.typeStore.fetch(true);
-        this.rootStore.browseStore.clearInstances();
-      }
     }
   }
 

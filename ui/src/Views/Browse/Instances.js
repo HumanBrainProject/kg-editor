@@ -102,7 +102,7 @@ const InstancesResult = observer(({
       </BGMessage>
     );
   }
-  if (browseStore.fetchError.instances) {
+  if (browseStore.fetchError) {
     return (
       <BGMessage icon={"ban"}>
         There was a network problem retrieving the list of instances.
@@ -116,7 +116,7 @@ const InstancesResult = observer(({
       </BGMessage>
     );
   }
-  if (browseStore.isFetching.instances) {
+  if (browseStore.isFetching) {
     return (
       <Spinner>Fetching instances...</Spinner>
     );

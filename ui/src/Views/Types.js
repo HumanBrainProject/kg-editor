@@ -36,14 +36,12 @@ const Types = observer(() => {
 
   const { appStore, typeStore } = useStores();
 
-  const handeRetry = () => typeStore.fetch();
+  const handeRetry = () => typeStore.fetch(appStore.currentSpace.id);
 
   useEffect(() => {
-    if (appStore.currentSpace) {
-      typeStore.fetch();
-    }
+    typeStore.fetch(appStore.currentSpace.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appStore.currentSpace]);
+  }, [appStore.currentSpace.id]);
 
   if (!appStore.currentSpace) {
     return null;

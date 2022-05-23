@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import ReactPiwik from "react-piwik";
 import { useStores } from "../Hooks/UseStores";
 
-import View from "./Instance/Instance";
+import Instance from "./Instance/Instance";
 import { useNavigate, useParams } from "react-router-dom";
 
 
@@ -50,18 +50,21 @@ const InstanceView = observer(({ mode }) => {
       if (!instance.isNew) {
         navigate(`/instances/${id}/edit`, {replace: true});
       }
-    } else {
+    } else if (instance.space ===  typeStore.space) {
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
       if (!isTypesSupported && !["raw", "graph", "manage"].includes(mode)) {
         navigate(`/instances/${id}/raw`, {replace: true});
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, mode]);
+  }, [id, mode, typeStore.space]);
 
   const instance = instanceStore.instances.get(id);
+  if (instance.space !==  typeStore.space) {
+    return null;
+  }
   return (
-    <View instance={instance} mode={mode} />
+    <Instance instance={instance} mode={mode} />
   );
 });
 InstanceView.displayName = "InstanceView";

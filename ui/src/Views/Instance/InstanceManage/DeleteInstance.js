@@ -118,8 +118,10 @@ const DeleteInstance = observer(({ instance, className }) => {
 
   const location = useLocation();
 
+  useEffect(() => {
+    fetchStatus();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchStatus(), [instance]);
+  }, [instance]);
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 

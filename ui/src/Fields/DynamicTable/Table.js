@@ -64,8 +64,10 @@ const LabelCellRenderer = observer(({ instanceId }) => {
 
   const { instanceStore } = useStores();
 
+  useEffect(() => {
+    instanceStore.createInstanceOrGet(instanceId).fetchLabel();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => instanceStore.createInstanceOrGet(instanceId).fetchLabel(), [instanceId]);
+  }, [instanceId]);
 
   const instance = instanceId && instanceStore.instances.get(instanceId);
 

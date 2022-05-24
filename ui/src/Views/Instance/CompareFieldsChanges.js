@@ -125,8 +125,10 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
 
   const classes = useStyles();
 
+  useEffect(() => {
+    fetchInstances();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstances(), [leftChildrenIds, rightChildrenIds]);
+  }, [leftChildrenIds, rightChildrenIds]);
 
   const fetchInstances = (forceFetch=false) => {
     leftChildrenIds.forEach(id => leftInstanceStore.createInstanceOrGet(id).fetchLabel(forceFetch));

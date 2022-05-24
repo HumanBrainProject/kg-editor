@@ -264,8 +264,10 @@ const InstancesHistory = observer(() => {
 
   const { appStore, historyStore } = useStores();
 
+  useEffect(() => {
+    fetchInstances(appStore.currentSpace.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstances(appStore.currentSpace.id), [appStore.currentSpace.id]);
+  }, [appStore.currentSpace.id]);
 
   const fetchInstances = space => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {

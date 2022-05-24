@@ -101,8 +101,10 @@ const InstanceGraph = observer(({ instance }) => {
 
   const { graphStore } = useStores();
 
+  useEffect(() => {
+    fetch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetch(), [instance]);
+  }, [instance.id]);
 
   const fetch = () => graphStore.fetch(instance.id);
 

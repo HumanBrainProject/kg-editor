@@ -28,13 +28,14 @@ const rootPath = window.rootPath || "";
 
 export class AuthStore {
   isUserAuthorized = false;
+  isUserAuthorizationInitialized = false;
   user = null;
   isRetrievingUserProfile = false;
   userProfileError = false;
   authError = null;
   authSuccess = false;
   isTokenExpired = false;
-  isInitializing = true;
+  isInitializing = false;
   initializationError = null;
   isLogout = false;
   keycloak = null;
@@ -46,6 +47,7 @@ export class AuthStore {
   constructor(transportLayer) {
     makeObservable(this, {
       isUserAuthorized: observable,
+      isUserAuthorizationInitialized: observable,
       user: observable,
       commit: observable,
       isRetrievingUserProfile: observable,
@@ -146,9 +148,10 @@ export class AuthStore {
   }
 
   async retrieveUserProfile() {
-    if (this.isAuthenticated && !this.user) {
+    if (this.isAuthenticated && !this.isRetrievingUserProfile && !this.user) {
       this.userProfileError = false;
       this.isRetrievingUserProfile = true;
+      this.isUserAuthorizationInitialized = true;
       try {
         const { data } = await this.transportLayer.getUserProfile();
         runInAction(() => {
@@ -163,10 +166,12 @@ export class AuthStore {
           if (e.response && e.response.status === 403) {
             this.isUserAuthorized = false;
             this.isRetrievingUserProfile = false;
+            this.isUserAuthorizationInitialized = false;
           } else {
             this.isUserAuthorized = false;
             this.userProfileError = e.message ? e.message : e;
             this.isRetrievingUserProfile = false;
+            this.isUserAuthorizationInitialized = false;
           }
         });
       }
@@ -213,6 +218,9 @@ export class AuthStore {
   }
 
   async authenticate() {
+    if (this.isInitializing || this.authSuccess) {
+      return;
+    }
     this.isLogout = false;
     this.isInitializing = true;
     this.authError = null;

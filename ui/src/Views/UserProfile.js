@@ -67,7 +67,7 @@ const Authenticate = observer(() => {
       );
     }
 
-    if (authStore.isRetrievingUserProfile) {
+    if (!authStore.isUserAuthorizationInitialized || authStore.isRetrievingUserProfile) {
       return (
         <SpinnerPanel text="Retrieving user profile..." />
       );

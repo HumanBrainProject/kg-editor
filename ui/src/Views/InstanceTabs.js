@@ -69,8 +69,10 @@ const InstanceTab = observer(({view, pathname}) => {
 
   useEffect(() => {
     if (instance && instance.name !== view.name && instance.primaryType.color !== view.color) {
-      view.setNameAndColor(instance.name, instance.primaryType.color);
-      viewStore.syncStoredViews();
+      if (instance.name !== instance.id) { 
+        view.setNameAndColor(instance.name, instance.primaryType.color);
+        viewStore.syncStoredViews();
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance, view]);

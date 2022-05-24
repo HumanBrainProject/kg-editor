@@ -123,8 +123,10 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   const { instanceStore } = useStores();
 
+  useEffect(() => {
+    fetchInstance();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstance(), [instanceId]);
+  }, [instanceId]);
 
   const fetchInstance = (forceFetch=false) =>  {
     const inst = instanceStore.createInstanceOrGet(instanceId);

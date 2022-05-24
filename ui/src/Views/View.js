@@ -56,7 +56,6 @@ const View = observer(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   if (!isInitialized) {
     return null;
   }

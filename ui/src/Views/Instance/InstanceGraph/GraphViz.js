@@ -217,14 +217,14 @@ const GraphViz = observer(() => {
     e.target.href = wrapperRef.current && wrapperRef.current.querySelector("canvas").toDataURL("image/png");
     e.target.download = "test.png";
   };
-
+  
   return (
     <div className={classes.graph} ref={wrapperRef}>
       <ForceGraph2D
         ref={graphRef}
         width={dimensions.width}
         height={dimensions.height}
-        graphData={graphStore.graphData}
+        graphData={{nodes: graphStore.graphDataNodes, links: graphStore.graphDataLinks}}
         nodeAutoColorBy={getNodeAutoColorBy}
         nodeLabel={getNodeLabel}
         nodeCanvasObject={getNodeCanvasObject}

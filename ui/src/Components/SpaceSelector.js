@@ -68,7 +68,7 @@ const SpaceSelector = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [ filter, setFilter ] = useState();
+  const [ filter, setFilter ] = useState("");
   const { appStore, authStore } = useStores();
 
   const handleSelectSpace = space => {

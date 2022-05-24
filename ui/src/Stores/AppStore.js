@@ -285,8 +285,6 @@ export class AppStore{
     if (spaceName) {
       this.currentSpace = this.rootStore.authStore.spaces.find( w => w.id === spaceName);
       localStorage.setItem("space", spaceName);
-      this.rootStore.viewStore.restoreViews();
-      this.rootStore.browseStore.clearInstances();
     } else {
       this.currentSpace = null;
       localStorage.removeItem("space");
@@ -312,6 +310,11 @@ export class AppStore{
         this.rootStore.browseStore.clearInstancesFilter();
       }
       this.setSpace(space.id);
+      this.rootStore.browseStore.clearInstances();
+      const path = this.rootStore.viewStore.restoreViews();
+      if (path) {
+        navigate(path);
+      }
     }
   }
 

@@ -21,9 +21,11 @@
  *
  */
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, matchPath, useNavigate } from "react-router-dom";
+
+import { useStores } from "../Hooks/UseStores";
 
 import NotFound from "./NotFound";
 import Home from "./Home";
@@ -32,6 +34,32 @@ import Browse from "./Browse";
 import InstanceView from "./InstanceView";
 
 const View = observer(() => {
+
+  const [isInitialized, setInitialized] = useState(false);
+
+  const navigate = useNavigate();
+
+  const { viewStore } = useStores();
+
+  useEffect(() => {
+    if (!viewStore.views.size) {
+      const path = viewStore.restoreViews();
+      const noRoute = !!matchPath({path:"/"}, location.pathname);
+      if (noRoute && path) {
+        navigate(path);
+      } else {
+        setInitialized(true);
+      }
+    } else {
+      setInitialized(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
+  if (!isInitialized) {
+    return null;
+  }
 
   return (
     <Routes>

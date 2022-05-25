@@ -163,7 +163,7 @@ const getBackgroundSize = theme => {
 }
 
 const useStyles = createUseStyles(theme => ({
-  layout: {
+  container: {
     height: "100vh",
     display: "grid",
     overflow: "hidden",
@@ -190,7 +190,7 @@ const Layout = observer(() => {
   useGlobalStyles({ theme });
 
   return (
-    <div className={classes.layout}>
+    <div className={classes.container}>
       <Tabs />
       <div className={classes.body}>
         {appStore.globalError?<GlobalError />:<Authenticate/>}

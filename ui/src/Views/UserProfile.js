@@ -38,7 +38,7 @@ import Space from "./Space";
 
 const matchInstance = pathname => matchPath({path:"/instances/:instanceId/:mode"}, pathname) || matchPath({path:"/instances/:instanceId"}, pathname);
 
-const Authenticate = observer(() => {
+const UserProfile = observer(() => {
 
   const { authStore, typeStore } = useStores();
   const location = useLocation();
@@ -121,6 +121,6 @@ const Authenticate = observer(() => {
   )
 
 });
-Authenticate.displayName = "Authenticate";
+UserProfile.displayName = "UserProfile";
 
-export default Authenticate;
+export default UserProfile;

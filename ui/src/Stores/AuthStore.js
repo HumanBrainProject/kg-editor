@@ -31,7 +31,7 @@ export class AuthStore {
   isUserAuthorizationInitialized = false;
   user = null;
   isRetrievingUserProfile = false;
-  userProfileError = false;
+  userProfileError = null;
   authError = null;
   authSuccess = false;
   isTokenExpired = false;
@@ -70,10 +70,6 @@ export class AuthStore {
       authenticate: action,
       firstName: computed
     });
-
-    if (Storage === undefined) {
-      throw new Error("The browser must support WebStorage API");
-    }
 
     this.transportLayer = transportLayer;
   }
@@ -143,13 +139,14 @@ export class AuthStore {
     this.isTokenExpired = true;
     this.isUserAuthorized = false;
     this.user = null;
+    this.isUserAuthorizationInitialized = false;
     this.keycloak.logout({redirectUri: `${window.location.protocol}//${window.location.host}${rootPath}/logout`});
     this.isLogout = true;
   }
 
   async retrieveUserProfile() {
     if (this.isAuthenticated && !this.isRetrievingUserProfile && !this.user) {
-      this.userProfileError = false;
+      this.userProfileError = null;
       this.isRetrievingUserProfile = true;
       this.isUserAuthorizationInitialized = true;
       try {
@@ -176,7 +173,6 @@ export class AuthStore {
         });
       }
     }
-    return this.hasUserProfile;
   }
 
   initializeKeycloak(resolve, reject) {

@@ -26,8 +26,9 @@ import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import ReactPiwik from "react-piwik";
-
 import { useNavigate } from "react-router-dom";
+
+import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
   tabs: {
@@ -92,6 +93,10 @@ const Tabs = observer(({ instance, mode }) => {
 
   const navigate = useNavigate();
 
+  const { typeStore } = useStores();
+
+  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+
   const handleClick = instanceMode => {
     ReactPiwik.push(["trackEvent", "Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id]);
     if(instanceMode === "view") {
@@ -105,12 +110,12 @@ const Tabs = observer(({ instance, mode }) => {
 
   return (
     <div className={classes.tabs}>
-      <Tab className={classes.tab} icon="eye"              mode="view"    label="View"     disabled={mode === "create"} active={mode === "view"}                      onClick={handleClick} show={permissions.canRead} />
-      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    label="Edit"     disabled={false}             active={mode === "edit" || mode === "create"} onClick={handleClick} show={permissions.canWrite || (permissions.canCreate && !permissions.canRawRead) } />
-      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   label="Explore"  disabled={mode === "create"} active={mode === "graph"}                     onClick={handleClick} show={!instance.isNew && (permissions.canRead || permissions.canRawRead)} />
-      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" label="Release"  disabled={mode === "create"} active={mode === "release"}                   onClick={handleClick} show={!instance.isNew && permissions.canRelease} />
-      <Tab className={classes.tab} icon="cog"              mode="manage"  label="Manage"   disabled={mode === "create"} active={mode === "manage"}                    onClick={handleClick} show={!instance.isNew && (permissions.canDelete || permissions.canCreate)} />
-      <Tab className={classes.tab} icon="code"             mode="raw"     label="Raw view" disabled={mode === "create"} active={mode === "raw"}                       onClick={handleClick} show={!instance.isNew && (permissions.canRead || permissions.canRawRead)} />
+      <Tab className={classes.tab} icon="eye"              mode="view"    label="View"     disabled={mode === "create"} active={mode === "view"}                      onClick={handleClick} show={permissions.canRead && isTypesSupported} />
+      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    label="Edit"     disabled={false}             active={mode === "edit" || mode === "create"} onClick={handleClick} show={(permissions.canWrite || permissions.canCreate) && isTypesSupported } />
+      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   label="Explore"  disabled={mode === "create"} active={mode === "graph"}                     onClick={handleClick} show={!instance.isNew && permissions.canRead} />
+      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" label="Release"  disabled={mode === "create"} active={mode === "release"}                   onClick={handleClick} show={!instance.isNew && permissions.canRelease && isTypesSupported} />
+      <Tab className={classes.tab} icon="cog"              mode="manage"  label="Manage"   disabled={mode === "create"} active={mode === "manage"}                    onClick={handleClick} show={!instance.isNew && permissions.canRead} />
+      <Tab className={classes.tab} icon="code"             mode="raw"     label="Raw view" disabled={mode === "create"} active={mode === "raw"}                       onClick={handleClick} show={!instance.isNew && permissions.canRead} />
     </div>
   );
 });

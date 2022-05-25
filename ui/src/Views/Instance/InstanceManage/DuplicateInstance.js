@@ -32,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 
 const DuplicateInstance = observer(({instance, className}) => {
 
-  const { appStore } = useStores();
+  const { appStore, typeStore } = useStores();
   const navigate = useNavigate();
 
   const handleDuplicateInstance = () => {
@@ -42,7 +42,10 @@ const DuplicateInstance = observer(({instance, className}) => {
 
   const permissions = instance.permissions;
 
-  if (!permissions.canCreate) {
+
+  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+
+  if (!permissions.canCreate || !isTypesSupported) {
     return null;
   }
 

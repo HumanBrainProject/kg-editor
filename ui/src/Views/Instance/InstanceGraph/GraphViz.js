@@ -101,7 +101,7 @@ const GraphViz = observer(() => {
       if(node.space && node.space !== appStore.currentSpace.id) {
         const space = authStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
-          appStore.setCurrentSpace(location, navigate, node.space);
+          appStore.switchSpace(location, navigate, node.space);
           navigate(`/instances/${node.id}/graph`);
         }
       } else {
@@ -217,14 +217,14 @@ const GraphViz = observer(() => {
     e.target.href = wrapperRef.current && wrapperRef.current.querySelector("canvas").toDataURL("image/png");
     e.target.download = "test.png";
   };
-
+  
   return (
     <div className={classes.graph} ref={wrapperRef}>
       <ForceGraph2D
         ref={graphRef}
         width={dimensions.width}
         height={dimensions.height}
-        graphData={graphStore.graphData}
+        graphData={{nodes: graphStore.graphDataNodes, links: graphStore.graphDataLinks}}
         nodeAutoColorBy={getNodeAutoColorBy}
         nodeLabel={getNodeLabel}
         nodeCanvasObject={getNodeCanvasObject}

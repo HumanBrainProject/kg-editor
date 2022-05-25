@@ -32,12 +32,12 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { useStores } from "../Hooks/UseStores";
 
 import Field from "../Fields/Field";
-import Spinner from "../Components/Spinner";
 import BGMessage from "../Components/BGMessage";
 import Status from "./Instance/Status";
 import Actions from "./Preview/Actions";
 import GlobalFieldErrors from "../Components/GlobalFieldErrors";
 import IncomingLinks from "./Instance/IncomingLinks/IncomingLinks";
+import Spinner from "../Components/Spinner";
 
 const useStyles = createUseStyles({
   container: {
@@ -123,8 +123,10 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   const { instanceStore } = useStores();
 
+  useEffect(() => {
+    fetchInstance();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstance(), [instanceId]);
+  }, [instanceId]);
 
   const fetchInstance = (forceFetch=false) =>  {
     const inst = instanceStore.createInstanceOrGet(instanceId);
@@ -133,7 +135,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   const handleRetry = () => fetchInstance(true);
 
-  const instance = instanceId?instanceStore.instances.get(instanceId):null;
+  const instance = instanceStore.instances.get(instanceId);
   if (!instance) {
     return null;
   }
@@ -160,9 +162,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(!instance.isFetched || instance.isFetching) {
     return(
       <div className={`${classes.container} ${className?className:""}`}>
-        <Spinner>
-          <span>Fetching instance &quot;<i>{instanceId}&quot;</i>information...</span>
-        </Spinner>
+        <Spinner>Fetching instance {instanceId}...</Spinner>
       </div>
     );
   }

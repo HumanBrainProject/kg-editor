@@ -111,24 +111,26 @@ export class GraphStore {
       nodes: observable,
       links: observable,
       highlightedNode: observable,
-      graphData: computed,
       groupsList: computed,
       fetch: action,
       reset: action,
       setHighlightNodeConnections: action,
       setGroupVisibility: action,
       setGrouping: action,
-      extractGroupsAndLinks: action
+      extractGroupsAndLinks: action,
+      graphDataNodes: computed,
+      graphDataLinks: computed
     });
 
     this.transportLayer = transportLayer;
   }
+  
+  get graphDataNodes() {
+    return getGraphNodes(this.groups);
+  }
 
-  get graphData() {
-    return {
-      nodes: getGraphNodes(this.groups),
-      links: getGraphLinks(this.groups, this.links)
-    };
+  get graphDataLinks() {
+    return getGraphLinks(this.groups, this.links);
   }
 
   get groupsList() {
@@ -136,6 +138,9 @@ export class GraphStore {
   }
 
   async fetch(id) {
+    if (this.isFetching) {
+      return;
+    }
     this.fetchError = null;
     this.isFetched = false;
     this.isFetching = true;
@@ -177,7 +182,7 @@ export class GraphStore {
       set(link.target, "highlighted", false);
     });
     if (node && highlighted) {
-      this.graphData.links.forEach(link => {
+      this.graphDataLinks.forEach(link => {
         if (link.source.id === node.id || link.target.id === node.id) {
           set(link.source, "highlighted", true);
           set(link.target, "highlighted", true);

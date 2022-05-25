@@ -24,24 +24,8 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  message: {
-    margin: "20px 0",
-    color: "var(--ft-color-error)"
-  },
-  footerBar: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
-    }
-  },
   modal: {
     position: "absolute",
     width: "100%",
@@ -64,7 +48,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const ErrorModal = ({message, onCancel, onRetry}) => {
+const ErrorModal = ({children}) => {
 
   const classes = useStyles();
 
@@ -72,11 +56,7 @@ const ErrorModal = ({message, onCancel, onRetry}) => {
     <div className={classes.modal}>
       <Modal.Dialog>
         <Modal.Body>
-          <div className={classes.message}>{message}</div>
-          <div className={classes.footerBar}>
-            <Button onClick={onCancel}>Cancel</Button>
-            <Button variant="primary" onClick={onRetry}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
-          </div>
+        {children}
         </Modal.Body>
       </Modal.Dialog>
     </div>

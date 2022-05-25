@@ -47,8 +47,10 @@ const Links = observer(({ instanceId }) => {
     return null;
   }
 
+  useEffect(() => {
+    fetchInstance();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstance(), [instanceId]);
+  }, [instanceId]);
 
   const fetchInstance = (forceFetch = false) => {
     if (instanceId) {

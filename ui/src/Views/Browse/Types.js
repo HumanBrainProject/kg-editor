@@ -21,12 +21,9 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Spinner from "../../Components/Spinner";
 
 import { useStores } from "../../Hooks/UseStores";
 
@@ -73,48 +70,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const ResultTypes = observer(({
-  fetchError,
-  isFetching,
-  onClick,
-  classes,
-  showTypes,
-  list
-}) => {
-  if (fetchError) {
-    return (
-      <div className={classes.fetchErrorPanel}>
-        <div>{fetchError}</div>
-        <Button variant="primary" onClick={onClick}>
-          Retry
-        </Button>
-      </div>
-    );
-  }
-  if (isFetching) {
-    return <Spinner>fetching...</Spinner>;
-  }
-  if (!showTypes) {
-    return null;
-  }
-  return list.map((type) => <TypesItem key={type.name} type={type} />);
-});
 
 const Types = observer(() => {
   const classes = useStyles();
 
   const { typeStore, browseStore } = useStores();
-
-  const [showTypes, setShowTypes] = useState(true);
-
-  useEffect(() => {
-    typeStore.fetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleLoadRetry = () => typeStore.fetch();
-
-  const handleToggleType = () => setShowTypes(!showTypes);
 
   const list = typeStore.filteredList(browseStore.navigationFilter);
 
@@ -124,21 +84,10 @@ const Types = observer(() => {
 
   return (
     <div className={classes.folder}>
-      <div className={classes.folderName} onClick={handleToggleType}>
-        <FontAwesomeIcon
-          fixedWidth
-          icon={showTypes ? "caret-down" : "caret-right"}
-        />{" "}
-        &nbsp;Types
+      <div className={classes.folderName}>
+        Types
       </div>
-      <ResultTypes
-        fetchError={typeStore.fetchError}
-        isFetching={typeStore.isFetching}
-        onClick={handleLoadRetry}
-        classes={classes}
-        showTypes={showTypes}
-        list={list}
-      />
+      {list.map((type) => <TypesItem key={type.name} type={type} />)}
     </div>
   );
 });

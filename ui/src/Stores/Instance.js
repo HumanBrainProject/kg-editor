@@ -384,7 +384,6 @@ const getChildrenIdsGroupedByField = fields => getUniqueGroups(fields);
 
 export class Instance {
   id = null;
-  _initialJsonData = null;
   _name = null;
   types = [];
   isNew = false;
@@ -462,7 +461,8 @@ export class Instance {
       rawFetchError: observable,
       hasRawFetchError: observable,
       isRawFetched: observable,
-      isRawFetching: observable
+      isRawFetching: observable,
+      typeNames: computed
     });
 
     this.id = id;
@@ -578,12 +578,6 @@ export class Instance {
     return [];
   }
 
-  initializeJsonData(data, types) {
-    this._initialJsonData = data;
-    this.permissions = this.getPermissions(data, types);
-    this.isFetching = false;
-  }
-
   initializeLabelData(data) {
     const normalizedData = normalizeLabelInstanceData(data);
     this._name = normalizedData.name;
@@ -598,40 +592,27 @@ export class Instance {
   }
 
 
-  initializeRawData(data, permissions, types) {
+  initializeRawData(data, permissions) {
     this.rawData = data;
     this.rawFetchError = null;
     this.hasRawFetchError = false;
     this.isRawFetched = true;
     this.isRawFetching = false;
-    this.permissions = this.getPermissions({...data, permissions: permissions}, types);
+    this.permissions = (permissions instanceof Object)?permissions:{};
+    this.space = data["https://core.kg.ebrains.eu/vocab/meta/space"];
   }
 
-  getTypeName(data) {
-    const type = data.types?.[0];
-    if (type) {
-      if (type instanceof Object) {
-        return type.name;
-      } 
-      return type;
+  get typeNames() {
+    if (this.isFetched || this.isLabelFetched) {
+      return this.types
+        .map(t => t.name)
+        .filter(t => t !== null);
+    };
+    if (this.isRawFetched && Array.isArray(this.rawData?.["@type"])) {
+      return this.rawData["@type"];
     }
-    return null;
+    return [];
   }
-
-  getPermissions(data, types, checkTypes=true) {
-    if (data) {
-      const typeName = this.getTypeName(data);
-      const type = typeName?types.get(typeName):null;
-      if (checkTypes && (!type?.fields || !Object.keys(type.fields).length)) {
-        return {
-         canDelete: !!data.permissions?.canDelete,
-         canRawRead: true
-        };
-      }
-      return (data.permissions instanceof Object)?data.permissions:{}
-    }
-    return {};
-  };
 
   initializeData(transportLayer, rootStore, data, isNew = false) {
     const _initializeFields = _fields => {
@@ -687,7 +668,6 @@ export class Instance {
       });
     };
 
-    this._initialJsonData = null;
     const normalizedData = normalizeInstanceData(data);
     this._name = normalizedData.name;
     this.space = normalizedData.space;
@@ -698,7 +678,7 @@ export class Instance {
     this._promotedFields = normalizedData.promotedFields;
     this.alternatives = normalizedData.alternatives;
     this.metadata = normalizedData.metadata;
-    this.permissions = this.getPermissions(normalizedData, rootStore.typeStore.typesMap, rootStore.appStore.currentSpace.id === normalizedData.space);
+    this.permissions = normalizedData.permissions;
     this.incomingLinks = normalizedData.incomingLinks;
     this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;
     _initializeFields(normalizedData.fields);

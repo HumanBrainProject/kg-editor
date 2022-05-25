@@ -23,44 +23,43 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import Spinner from "./Spinner";
 
 const useStyles = createUseStyles({
-  container:{
-    position:"absolute !important",
-    top:"50%",
-    left:"50%",
-    transform:"translate(-50%,-200px)",
-    textAlign:"center"
+  container: {
+    height: "100%"
   },
-  icon:{
-    fontSize:"10em",
-    "& path":{
-      fill:"var(--bg-color-blend-contrast1)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px"
+  panel: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    background: "var(--bg-color-blend-contrast1)",
+    "& .spinnerPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast1)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--list-bg-hover)"
     }
-  },
-  text:{
-    fontWeight:"300",
-    fontSize:"1.2em"
   }
 });
 
-const BGMessage = ({ icon, transform, children, className }) => {
+const SpinnerPanel = ({text}) => {
+
   const classes = useStyles();
-  return(
-    <div className={`${classes.container} ${className?className:""}`}>
-      {icon && (
-        <div className={classes.icon}>
-          <FontAwesomeIcon icon={icon} transform={transform}/>
-        </div>
-      )}
-      <div className={classes.text}>
-        {children}
+
+  return (
+    <div className={classes.container}>
+      <div className={classes.panel}>
+        <Spinner>{text}</Spinner>
       </div>
     </div>
   );
 };
 
-export default BGMessage;
+export default SpinnerPanel;

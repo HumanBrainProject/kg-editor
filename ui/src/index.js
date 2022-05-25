@@ -22,7 +22,7 @@
  */
 
 import React from "react";
-import { render } from "react-dom";
+import { createRoot } from 'react-dom/client';
 // import { configure } from "mobx"; //NOSONAR
 import ReactPiwik from "react-piwik";
 import { JssProvider } from "react-jss";
@@ -55,7 +55,9 @@ new ReactPiwik({ //NOSONAR
   trackErrors: true
 });
 
-render(
+const container = document.getElementById('root');
+const root = createRoot(container); // createRoot(container!) if you use TypeScript
+root.render(
   <React.StrictMode>
     <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
       <ErrorBoundary>
@@ -64,4 +66,5 @@ render(
         </BrowserRouter>
       </ErrorBoundary>
     </JssProvider>
-  </React.StrictMode>, document.getElementById("root"));
+  </React.StrictMode>
+);

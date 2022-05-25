@@ -149,13 +149,15 @@ export class ViewStore{
     makeObservable(this, {
       views: observable,
       selectedView: observable,
+      restoreViews: action,
       selectViewByInstanceId: action,
       unregisterViewByInstanceId: action,
       unregisterAllViews: action,
       clearViews: action,
       registerViewByInstanceId: action,
       replaceViewByNewInstanceId: action,
-      instancesIds: computed
+      instancesIds: computed,
+      syncStoredViews: action
     });
 
     this.transportLayer = transportLayer;
@@ -174,7 +176,7 @@ export class ViewStore{
     localStorage.removeItem(STORED_INSTANCE_VIEWS_KEY);
   }
 
-  restoreViews(navigate, preventSelectView=false){
+  restoreViews(){
     this.clearViews();
     if(this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
@@ -182,16 +184,20 @@ export class ViewStore{
       let selectedView = null;
       if (Array.isArray(workspaceViews)) {
         workspaceViews.forEach(view => {
-          if (!preventSelectView && view.selected) {
+          if (view.selected) {
             selectedView = view;
           }
           const {id, name, color, mode} = view;
           this.views.set(id, new View(id, name, color, mode));
         });
       }
-      if (selectedView) {
-        selectedView.mode === "view" ? navigate(`/instances/${selectedView.id}`):navigate(`/instances/${selectedView.id}/${selectedView.mode}`);
+      if (!selectedView) {
+        return null;
       }
+      if (selectedView.mode === "view") {
+        return `/instances/${selectedView.id}`;
+      } 
+      return `/instances/${selectedView.id}/${selectedView.mode}`;
     }
   }
 

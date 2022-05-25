@@ -41,18 +41,9 @@ const normalizeInstancesData = (transportLayer, rootStore, data) => {
 };
 
 export class BrowseStore {
-  lists = [];
-  isFetching = {
-    lists: false,
-    instances: false
-  };
-  isFetched = {
-    lists: false
-  };
-  fetchError = {
-    lists: null,
-    instances: null
-  };
+  isFetching = false;
+  isFetched = false;
+  fetchError = null;
   selectedItem = null;
   selectedInstance = null;
 
@@ -72,7 +63,6 @@ export class BrowseStore {
 
   constructor(transportLayer, rootStore) {
     makeObservable(this, {
-      lists: observable,
       isFetching: observable,
       isFetched: observable,
       fetchError: observable,
@@ -108,6 +98,8 @@ export class BrowseStore {
     this.instances.length = 0;
     this.totalInstances = 0;
     this.clearSelectedInstance();
+    this.selectedItem = null;
+    this.clearInstancesFilter();
   }
 
   setNavigationFilterTerm(filter) {
@@ -124,7 +116,7 @@ export class BrowseStore {
 
   setInstancesFilter(filter) {
     this.instancesFilter = filter;
-    this.isFetching.instances = true;
+    this.isFetching = true;
     this.applyInstancesFilter();
   }
 
@@ -144,15 +136,15 @@ export class BrowseStore {
       this.pageStart++;
     } else {
       this.pageStart = 0;
-      this.isFetching.instances = true;
+      this.isFetching = true;
       this.selectedInstance = null;
       this.instances = [];
     }
-    this.fetchError.instances = null;
+    this.fetchError = null;
     try {
       const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
-        this.isFetching.instances = false;
+        this.isFetching = false;
         const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
         if(loadMore){
           this.instances = [...this.instances, ...instances];
@@ -165,8 +157,8 @@ export class BrowseStore {
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;
-        this.fetchError.instances = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
-        this.isFetching.instances = false;
+        this.fetchError = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
+        this.isFetching = false;
       });
     }
   }

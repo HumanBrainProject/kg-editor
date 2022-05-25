@@ -101,8 +101,10 @@ const InstanceGraph = observer(({ instance }) => {
 
   const { graphStore } = useStores();
 
+  useEffect(() => {
+    fetch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetch(), [instance]);
+  }, [instance.id]);
 
   const fetch = () => graphStore.fetch(instance.id);
 
@@ -119,7 +121,7 @@ const InstanceGraph = observer(({ instance }) => {
 
     return (
       <div className={classes.loader}>
-        <Spinner>Fetching visualization data for instance &quot;{instance.id}&quot; ...</Spinner>
+        <Spinner>Fetching visualization data for instance {instance.id}...</Spinner>
       </div>
     );
   }

@@ -23,7 +23,6 @@
 
 import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
-import _  from "lodash-uuid";
 
 import { Instance as BaseInstance } from "./Instance";
 
@@ -90,7 +89,7 @@ class Instance extends BaseInstance {
       this.rawFetchError = null;
       try {
         const { data } = await this.store.transportLayer.getRawInstance(this.id);
-        this.initializeRawData(data && data.data, data && data.permissions, this.rootStore.typeStore.typesMap);
+        this.initializeRawData(data && data.data, data && data.permissions);
       } catch (e) {
         runInAction(() => {
           if(e.response && e.response.status === 404){
@@ -118,7 +117,6 @@ class Instance extends BaseInstance {
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
-          this._initialJsonData = null;
           this.rawData = null;
           this.rawFetchError = null;
           this.hasRawFetchError = false;
@@ -137,7 +135,6 @@ class Instance extends BaseInstance {
           this.saveError = null;
           this.hasSaveError = false;
           this.isSaving = false;
-          this._initialJsonData = null;
           this.rawData = null;
           this.rawFetchError = null;
           this.hasRawFetchError = false;
@@ -194,11 +191,9 @@ export class InstanceStore {
       previewInstance: observable,
       instanceIdAvailability: observable,
       togglePreviewInstance: action,
+      setInstanceIdAvailability: action,
       resetInstanceIdAvailability: action,
       checkInstanceIdAvailability: action,
-      instanceIdCheckAvailabilityError: action,
-      checkRawInstanceIdAvailability: action,
-      checkNonRawInstanceIdAvailability: action,
       getUnsavedInstances: computed,
       hasUnsavedChanges: computed,
       processQueue: action,
@@ -281,54 +276,37 @@ export class InstanceStore {
     }
   }
 
+  setInstanceIdAvailability = (type, uuid) => {
+    this.instanceIdAvailability.set(uuid, {
+      isChecked: false,
+      isAvailable: false,
+      isChecking: false,
+      error: null,
+      type: type,
+      resolvedId: null
+    });
+  }
+
   resetInstanceIdAvailability() {
     this.instanceIdAvailability.clear();
   }
 
-  instanceIdCheckAvailabilityError(instanceId, e) {
-    const status =  this.instanceIdAvailability.get(instanceId);
-    if (e.response && e.response.status === 404) {
-      if(status.type) {
-        this.createNewInstance(status.type, instanceId);
-        this.resetInstanceIdAvailability();
-      } else {
-        status.isAvailable = true;
-        status.isChecking = false;
-      }
-    } else {
-      const message = e.message?e.message:e;
-      const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-      status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
-      status.isAvailable = false;
-      status.isChecking = false;
-    }
-  }
-
-  async checkRawInstanceIdAvailability(instanceId) {
-    try{
-      const { data } = await this.transportLayer.getRawInstance(instanceId);
-      runInAction(() => {
-        const resolvedfullId = data && data.data && data.data["@id"];
-        const path = typeof resolvedfullId === "string" && resolvedfullId.split("/");
-        const resolvedId = (path && path.length)?path[path.length -1]:null;
-        if (!resolvedId) {
-          throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
-        }
-        this.instanceIdAvailability.delete(instanceId);
-        const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeRawData(data && data.data, data && data.permissions, this.rootStore.typeStore.typesMap);
-        const view = this.rootStore.viewStore.views.get(resolvedId);
-        if(view) {
-          view.setNameAndColor(instance.name, instance.primaryType.color);
-          this.rootStore.viewStore.syncStoredViews();
-        }
+  async checkInstanceIdAvailability(instanceId) {
+    if (!this.instanceIdAvailability.has(instanceId)) {
+      this.instanceIdAvailability.set(instanceId, {
+        isChecked: false,
+        isAvailable: false,
+        isChecking: false,
+        error: null,
+        resolvedId: null
       });
-    } catch(e){
-      this.instanceIdCheckAvailabilityError(instanceId, e);
     }
-  }
-
-  async checkNonRawInstanceIdAvailability(instanceId, mode, navigate) {
+    const status = this.instanceIdAvailability.get(instanceId);
+    if (status.isChecked || status.isChecking) {
+      return;
+    }
+    status.isChecking = true;
+    status.error = null;
     try{
       const { data } = await this.transportLayer.getInstance(instanceId);
       runInAction(() => {
@@ -336,57 +314,27 @@ export class InstanceStore {
         if (!resolvedId) {
           throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
         }
-        this.instanceIdAvailability.delete(instanceId);
         const instance = this.createInstanceOrGet(resolvedId);
         instance.initializeData(this.transportLayer, this.rootStore, data && data.data);
-        const view = this.rootStore.viewStore.views.get(resolvedId);
-        if(view) {
-          if (instance.permissions.canRawRead && ["view", "edit"].includes(view.mode)) {
-            navigate(`/instances/${resolvedId}/raw`, {replace:true});
-          } else {
-            view.setNameAndColor(instance.name, instance.primaryType.color);
-            this.rootStore.viewStore.syncStoredViews();
-          }
-        }
-        if (mode === "create") {
-          navigate(`/instances/${resolvedId}/edit`, {replace:true});
-        }
+        status.resolvedId = resolvedId;
+        status.isChecked = true;
+        status.isChecking = false;
       });
     } catch(e){
-      this.instanceIdCheckAvailabilityError(instanceId, e);
-    }
-  }
-
-  checkInstanceIdAvailability(instanceId, mode, navigate) {
-    const rawMode = mode === "raw";
-    const instance = this.instances.get(instanceId);
-    if (instance && ((rawMode && instance.isRawFetched) || (!rawMode && instance.isFetched))) {
-      this.instanceIdAvailability.delete(instanceId);
-    } else {
-      const status = this.instanceIdAvailability.get(instanceId);
-      if(status) {
-        status.isAvailable = false;
-        status.isChecking = true;
-        status.error = null;
-      } else {
-        this.instanceIdAvailability.set(instanceId, {
-          isAvailable: false,
-          isChecking: true,
-          error: null
-        });
-      }
-      if (rawMode) {
-        if (instance && instance.store.rootStore.typeStore.isFetched && instance._initialJsonData) {
-          instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._initialJsonData);
-        }
-        this.checkRawInstanceIdAvailability(instanceId);
-      } else {
-        if (instance && instance.store.rootStore.typeStore.isFetched && instance._initialJsonData) {
-          instance.initializeData(instance.store.transportLayer, instance.store.rootStore, instance._initialJsonData);
+      runInAction(() => {
+        if (e.response && e.response.status === 404) {
+          this.createNewInstance(status.type, instanceId);
+          status.isAvailable = true;
+          status.isChecked = true;
+          status.isChecking = false;
         } else {
-          this.checkNonRawInstanceIdAvailability(instanceId, mode, navigate);
+          const message = e.message?e.message:e;
+          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
+          status.isChecked = true;
+          status.isChecking = false;
         }
-      }
+      });
     }
   }
 
@@ -588,7 +536,7 @@ export class InstanceStore {
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
       metadata: {},
-      permissions: { canRead: true, canCreate: true, canWrite: true },
+      permissions: toJS(this.rootStore.appStore.currentSpacePermissions),
       possibleIncomingLinks: type.incomingLinks
     };
     if (type.labelField) {
@@ -601,18 +549,7 @@ export class InstanceStore {
     }
     this.instances.set(id, instance);
   }
-
-  createNewInstanceOfType = (type, navigate) => {
-    const uuid = _.uuid();
-    this.instanceIdAvailability.set(uuid, {
-      isAvailable: false,
-      isChecking: true,
-      error: null,
-      type: type
-    });
-    navigate(`/instances/${uuid}/create`);
-  }
-
+  
   removeInstances(instanceIds) {
     instanceIds.forEach(id => this.instances.delete(id));
   }

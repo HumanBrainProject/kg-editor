@@ -47,7 +47,7 @@ const CreatingChildInstancePanel = ({show}) => {
 
   return (
     <div className={classes.container}>
-      <Spinner>Creating a new instance...</Spinner>
+      <Spinner text="Creating a new instance..." />
     </div>
   );
 };

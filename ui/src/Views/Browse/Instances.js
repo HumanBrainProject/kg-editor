@@ -102,7 +102,7 @@ const InstancesResult = observer(({
       </BGMessage>
     );
   }
-  if (browseStore.fetchError.instances) {
+  if (browseStore.fetchError) {
     return (
       <BGMessage icon={"ban"}>
         There was a network problem retrieving the list of instances.
@@ -116,11 +116,9 @@ const InstancesResult = observer(({
       </BGMessage>
     );
   }
-  if (browseStore.isFetching.instances) {
+  if (browseStore.isFetching) {
     return (
-      <Spinner>
-        <span>Fetching instances...</span>
-      </Spinner>
+      <Spinner>Fetching instances...</Spinner>
     );
   }
   if (!browseStore.instances.length) {
@@ -169,7 +167,8 @@ const InstancesResult = observer(({
 const Instances = observer(() => {
   const classes = useStyles();
 
-  const { appStore, browseStore, instanceStore } = useStores();
+  const { appStore, browseStore, typeStore, instanceStore } = useStores();
+
   const navigate = useNavigate();
 
   const handleFilterChange = value => {
@@ -190,7 +189,8 @@ const Instances = observer(() => {
         "InstanceOpenTabInBackground",
         instance.id,
       ]);
-      appStore.openInstance(instance.id, instance.name, instance.primaryType, instance.permissions.canRawRead?"raw":"view");
+      const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+      appStore.openInstance(instance.id, instance.name, instance.primaryType, isTypesSupported?"view":"raw");
     }
   };
 
@@ -218,6 +218,8 @@ const Instances = observer(() => {
   const handleLoadMore = () => browseStore.fetchInstances(true);
 
   const handleRetry = () => browseStore.fetchInstances();
+
+  const isTypeOfSelectedInstanceSupported = browseStore.selectedInstance?typeStore.isTypesSupported(browseStore.selectedInstance.typeNames):false;
 
   return (
     <div className={classes.container}>
@@ -249,15 +251,15 @@ const Instances = observer(() => {
       </Scrollbars>
       <div className={classes.preview}>
         {browseStore.selectedInstance ?
-          browseStore.selectedInstance.permissions.canRawRead?
-            <BGMessage icon={"code"}>
-              This instance doesn&apos;t support preview.
-            </BGMessage>
-            :
+          isTypeOfSelectedInstanceSupported?
             <Preview
               instanceId={browseStore.selectedInstance.id}
               instanceName={browseStore.selectedInstance.name}
             />
+            :
+            <BGMessage icon={"code"}>
+              This instance doesn&apos;t support preview.
+            </BGMessage>
           :
           <BGMessage icon={"money-check"}>
             Select an instance to display its preview here.

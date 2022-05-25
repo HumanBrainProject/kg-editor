@@ -80,6 +80,20 @@ const useStyles = createUseStyles({
     "&[disabled]": {
       cursor: "not-allowed"
     }
+  },
+  moveErrorMessage: {
+    margin: "20px 0",
+    color: "var(--ft-color-error)"
+  },
+  moveErrorActions: {
+    marginBottom: "10px",
+    width: "100%",
+    textAlign: "center",
+    wordBreak: "keep-all",
+    whiteSpace: "nowrap",
+    "& button + button": {
+      marginLeft: "20px"
+    }
   }
 });
 
@@ -141,8 +155,11 @@ const MoveInstance = observer(({ instance, className }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchStatus(), [instance.id]);
+  
+  useEffect(() => {
+    fetchStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance.id]);
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
@@ -169,17 +186,14 @@ const MoveInstance = observer(({ instance, className }) => {
     return false;
   });
 
-  const handleSetSpaceId = e => {
-    setSpaceId(e.target.value);
-  };
+  const handleSetSpaceId = e => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
     ReactPiwik.push(["trackEvent", "Instance", "Move", instance.id]);
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 
-  const handleCancelMoveInstance = () =>
-    appStore.retryMoveInstance(location, navigate);
+  const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
   const variant =
@@ -217,11 +231,13 @@ const MoveInstance = observer(({ instance, className }) => {
         </div>
       )}
       {appStore.instanceMovingError && (
-        <ErrorModal
-          message={appStore.instanceMovingError}
-          onCancel={handleCancelMoveInstance}
-          onRetry={handleRetryMoveInstance}
-        />
+        <ErrorModal>
+          <div className={classes.moveErrorMessage}>{appStore.instanceMovingError}</div>
+          <div className={classes.moveErrorActions}>
+            <Button onClick={handleCancelMoveInstance}>Cancel</Button>
+            <Button variant="primary" onClick={handleRetryMoveInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+          </div>
+       </ErrorModal>
       )}
       {!appStore.instanceMovingError && appStore.isMovingInstance && (
         <SpinnerModal

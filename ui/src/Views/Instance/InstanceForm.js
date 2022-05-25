@@ -143,8 +143,10 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
   const { appStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchInstance();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchInstance(), [id]);
+  }, [id]);
 
   const fetchInstance = (forceFetch = false) => {
     const inst = instanceStore.createInstanceOrGet(id);

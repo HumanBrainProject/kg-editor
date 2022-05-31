@@ -26,7 +26,8 @@ import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
 
 const DEFAULT_REGEX = {
-  regex: /^(?!\s)(.|\n)*(?<!\s)$/,
+  // regex: /^(?!\s)(.|\n)*(?<!\s)$/, -> Negative lookout is not supported by safari
+  regex: /^[^\s]([^]*[^\s])?$/,
   errorMessage: "leading/trailling spaces are not allowed"
 };
 

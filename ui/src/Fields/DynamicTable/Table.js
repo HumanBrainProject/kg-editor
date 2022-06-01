@@ -52,7 +52,7 @@ const useStyles = createUseStyles({
     cursor: "pointer",
     "&:hover":{
       color: "#143048",
-      backgroundColor: "#a5c7e9"
+      backgroundColor: "var(--link-bg-color-hover)"
     }
   },
   actionBtn: {

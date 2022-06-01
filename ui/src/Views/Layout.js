@@ -44,6 +44,7 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
         "--bg-color-ui-contrast2": theme.contrast2.backgroundColor,
         "--bg-color-ui-contrast3": theme.contrast3.backgroundColor,
         "--bg-color-ui-contrast4": theme.contrast4.backgroundColor,
+        "--bg-color-ui-contrast6": theme.contrast6.backgroundColor,
 
         "--button-primary-bg-color": theme.button.primary.backgroundColor,
         "--button-primary-border-color": theme.button.primary.borderColor,
@@ -58,6 +59,7 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
         "--border-color-ui-contrast1": theme.contrast1.borderColor,
         "--border-color-ui-contrast2": theme.contrast2.borderColor,
         "--border-color-ui-contrast5": theme.contrast5.borderColor,
+        "--border-color-ui-contrast6": theme.contrast6.borderColor,
 
         "--bg-color-blend-contrast1": theme.blendContrast1.backgroundColor,
 
@@ -83,6 +85,14 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
 
         "--ft-color-info": theme.info.color,
         "--bg-color-info-normal": theme.info.normal.color,
+
+        "--ft-color-selected": theme.selected.color,
+        "--ft-color-selected-hover": theme.selected.hover.color,
+
+        "--link-ft-color-hover": theme.link.hover.color,
+        "--link-bg-color-hover": theme.link.hover.backgroundColor,
+        "--link-border-color-hover": theme.link.hover.borderColor,
+        "--link-bg-color-hover-quiet": theme.link.quiet.hover.backgroundColor,
 
         "--pane-box-shadow": theme.pane.boxShadow.color,
 
@@ -162,13 +172,41 @@ const getBackgroundSize = theme => {
   return "200%";
 }
 
+const getBtnLinkStyle = theme => {
+  if (theme.name === "bright") {
+    return {
+      color: "var(--ft-color-selected)",
+      "&:hover": {
+        color: "var(--ft-color-selected-hover)"
+      }
+    };
+  }
+  return {};
+}
+
+const getPrimaryBtnStyle = theme => {
+  if (theme.name === "bright") {
+    return {
+      backgroundColor: "#45b07c",
+      borderColor: "#3e9e6f",
+      "&:hover": {
+        backgroundColor: "#378b62",
+        borderColor: "#3e9e6f"
+      }
+    };
+  }
+  return {};
+}
+
 const useStyles = createUseStyles(theme => ({
   container: {
     height: "100vh",
     display: "grid",
     overflow: "hidden",
     gridTemplateColumns: "1fr",
-    gridTemplateRows: "auto 1fr 20px"
+    gridTemplateRows: "auto 1fr 20px",
+    "& .btn-link": getBtnLinkStyle(theme),
+    "& .btn-primary": getPrimaryBtnStyle(theme),
   },
   body: {
     position: "relative",
@@ -176,7 +214,8 @@ const useStyles = createUseStyles(theme => ({
     background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
     backgroundSize: getBackgroundSize(theme),
     backgroundImage: theme.background.image?`url('${theme.background.image}')`:"unset",
-    backgroundPosition: theme.background.position?theme.background.position:"unset"
+    backgroundPosition: theme.background.position?theme.background.position:"unset",
+    backgroundColor: theme.backgroundColor?theme.backgroundColor:"unset",
   },
 }));
 

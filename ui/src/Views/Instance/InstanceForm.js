@@ -68,18 +68,18 @@ const useStyles = createUseStyles({
       background: new Color("#f39c12").lighten(0.66).hex()
     },
     "&:hover:not(.current)": {
-      backgroundColor: "#eff5fb",
-      borderColor: "#337ab7"
+      backgroundColor: "var(--link-bg-color-hover-quiet)",
+      borderColor: "var(--link-border-color-hover)"
     },
     "&:hover:not(.current).readMode": {
-      color: "#337ab7"
+      color: "var(--link-ft-color-hover)"
     },
     "& > div:first-Child": {
       position: "relative"
     },
     "&:not(.current).highlight": {
-      backgroundColor: "#a5c7e9",
-      borderColor: "#337ab7",
+      backgroundColor: "var(--link-bg-color-hover)",
+      borderColor: "var(--link-border-color-hover)",
       color: "#143048"
     },
     "& .highlightArrow": {
@@ -102,7 +102,7 @@ const useStyles = createUseStyles({
       transition: "color 0.25s ease-in-out"
     },
     "&:not(.current).highlight .highlightArrow": {
-      color: "#337ab7"
+      color: "var(--link-ft-color-hover)"
     },
     "&:not(.main) $panelHeader": {
       padding: "10px 10px 0 10px"

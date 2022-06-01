@@ -43,7 +43,7 @@ const useStyles = createUseStyles({
         border: "1px solid var(--ft-color-loud)",
         borderRadius: "4px",
         color: "var(--ft-color-loud)",
-        background: "var(--list-bg-hover)",
+        background: "var(--bg-color-ui-contrast6)",
         "& .spinnerPanel": {
           position: "unset !important",
           top: "unset",
@@ -68,7 +68,7 @@ const SpinnerModal = ({text}) => {
     <div className={classes.modal}>
       <Modal.Dialog>
         <Modal.Body>
-          <Spinner>{text}</Spinner>
+          <Spinner text={text} />
         </Modal.Body>
       </Modal.Dialog>
     </div>

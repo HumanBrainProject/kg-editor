@@ -38,7 +38,7 @@ const useStyles = createUseStyles({
     color: "#212529",
     "&:hover": {
       backgroundColor: "transparent",
-      borderColor: "#337ab7",
+      borderColor: "var(--link-border-color-hover)",
       color: "#212529"
     }
   }

@@ -32,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 const useStyles = createUseStyles({
   container:{
     height:"50px",
-    lineHeight:"50px",
+    lineHeight:"45px",
     color:"var(--ft-color-normal)",
     background:"var(--bg-color-ui-contrast2)",
     padding:"0 20px 0 20px",
@@ -45,7 +45,7 @@ const useStyles = createUseStyles({
       paddingRight:"10px"
     },
     "& $icon": {
-      opacity:0.5
+      opacity:0.7
     },
     "&:hover":{
       color:"var(--ft-color-loud)",
@@ -68,7 +68,7 @@ const useStyles = createUseStyles({
   current:{
     backgroundColor:"var(--bg-color-ui-contrast3)",
     color:"var(--ft-color-loud)",
-    borderBottom:"1px solid #40a9f3",
+    borderBottom:"1px solid var(--list-border-selected)",
     "& $icon": {
       opacity:1
     }

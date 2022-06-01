@@ -69,6 +69,10 @@ const theme = {
   contrast5: {
     borderColor: new Color("#94789a").lighten(0.5).rgb().string()
   },
+  contrast6: {
+    backgroundColor: new Color("#94789a").darken(0.5).rgb().string(),
+    borderColor: new Color("#94789a").darken(0.2).rgb().string()
+  },
   blendContrast1: {
     backgroundColor: "rgba(0, 0, 0, 0.2)"
   },
@@ -122,6 +126,24 @@ const theme = {
     color: "#24282a",
     normal: {
       color: "#ffc107"
+    }
+  },
+  selected: {
+    color: "#45b07c",
+    hover: {
+      color: "#2f7955"
+    }
+  },
+  link: {
+    hover: {
+      color: "#337ab7",
+      borderColor: "#337ab7",
+      backgroundColor: "#a5c7e9"
+    },
+    quiet: {
+      hover: {
+        backgroundColor: "#eff5fb"
+      }
     }
   },
   pane: {

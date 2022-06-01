@@ -117,7 +117,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Preview  = observer(({ className, instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}) => {
+const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}) => {
 
   const classes = useStyles();
 
@@ -142,7 +142,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   if(instance.hasFetchError) {
     return(
-      <div className={`${classes.container} ${className?className:""}`}>
+      <div className={classes.container}>
         <BGMessage icon={"ban"}>
                 There was a network problem retrieving the instance &quot;<i>{instanceId}&quot;</i>.
           <br />
@@ -161,8 +161,8 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
 
   if(!instance.isFetched || instance.isFetching) {
     return(
-      <div className={`${classes.container} ${className?className:""}`}>
-        <Spinner>Retrieving instance {instanceId}...</Spinner>
+      <div className={classes.container}>
+        <Spinner text={`Retrieving instance ${instanceId}...`} />
       </div>
     );
   }
@@ -171,7 +171,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
     if (instance.labelField) {
       const fieldStore = instance.fields[instance.labelField];
       return (
-        <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
+        <Form className={`${classes.container} ${classes.noPermission}`} >
           <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
           <div className={classes.errorMessage}>
             <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
@@ -180,7 +180,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
       );
     } else {
       return (
-        <Form className={`${classes.container} ${className?className:""} ${classes.noPermission}`} >
+        <Form className={`${classes.container} ${classes.noPermission}`} >
           <div className={classes.info}>
             <div>ID: {instanceId}</div>
             <div>Space: {instance.space}</div>
@@ -194,7 +194,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   }
 
   return (
-    <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}  ${className?className:""}`}>
+    <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}`}>
       <div className={classes.content}>
         <div className="header">
           {showAction && (

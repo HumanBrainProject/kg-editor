@@ -38,7 +38,7 @@ const useStyles = createUseStyles({
   tab: {
     color: "var(--ft-color-normal)",
     borderLeft: "2px solid transparent",
-    opacity: "0.5",
+    opacity: "0.7",
     cursor: "pointer",
     height: "50px",
     lineHeight: "50px",

@@ -36,42 +36,6 @@ const useStyles = createUseStyles({
     gridTemplateRows:"1fr",
     overflow:"hidden",
     height:"100%"
-  },
-  modal: {
-    "&.modal-dialog": {
-      marginTop: "25%",
-      "& .modal-content": {
-        background: "var(--list-bg-hover)",
-        border: "1px solid var(--list-border-hover)",
-        boxShadow: "none",
-        "& .modal-body": {
-          color: "var(--ft-color-loud)",
-          padding: "0 20px 5px 20px",
-          textAlign: "center"
-        },
-        "& .modal-header": {
-          padding: "10px 10px 0 0",
-          border: 0,
-          "& button.close": {
-            color: "var(--ft-color-loud)",
-            opacity: 0.5,
-            "&:hover": {
-              opacity: 1
-            }
-          }
-        },
-        "& .modal-footer": {
-          border: 0,
-          textAlign: "center",
-          "& .btn": {
-            padding: "6px 18px"
-          },
-          "& .btn + .btn": {
-            marginLeft: "30px"
-          }
-        }
-      }
-    }
   }
 });
 

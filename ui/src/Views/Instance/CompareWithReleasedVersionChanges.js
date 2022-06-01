@@ -101,7 +101,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
   if ((releasedInstance && releasedInstance.isFetching) || instance.isFetching) {
     return(
       <div className={classes.container}>
-        <Spinner>Retrieving instance {instanceId}...</Spinner>
+        <Spinner text={`Retrieving instance ${instanceId}...`} />
       </div>
     );
   }

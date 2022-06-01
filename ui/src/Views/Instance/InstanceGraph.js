@@ -30,7 +30,8 @@ import { useStores } from "../../Hooks/UseStores";
 
 import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
-import Spinner from "../../Components/Spinner";
+import SpinnerPanel from "../../Components/SpinnerPanel";
+import ErrorPanel from "../../Components/ErrorPanel";
 
 const useStyles = createUseStyles({
   container: {
@@ -55,43 +56,6 @@ const useStyles = createUseStyles({
     border: "1px solid var(--border-color-ui-contrast1)",
     overflow: "auto",
     position: "relative"
-  },
-  loader: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    zIndex: 10000,
-    background: "var(--bg-color-blend-contrast1)",
-    "& .spinnerPanel": {
-      width: "auto",
-      padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast1)",
-      borderRadius: "4px",
-      color: "var(--ft-color-loud)",
-      background: "var(--list-bg-hover)"
-    }
-  },
-  fetchErrorPanel: {
-    position: "absolute !important",
-    top: "50%",
-    left: "50%",
-    padding: "30px",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    borderRadius: "4px",
-    color: "var(--ft-color-loud)",
-    background: "var(--list-bg-hover)",
-    transform: "translate(-50%, -50%)",
-    textAlign: "center",
-    minWidth: "220px",
-    "& h4": {
-      paddingBottom: "10px",
-      color: "var(--ft-color-error)"
-    },
-    "& button + button, & a + button, & a + a": {
-      marginLeft: "20px"
-    }
   }
 });
 
@@ -107,22 +71,19 @@ const InstanceGraph = observer(({ instance }) => {
   }, [instance.id]);
 
   const fetch = () => graphStore.fetch(instance.id);
-
   if (graphStore.fetchError) {
     return (
-      <div className={classes.fetchErrorPanel}>
-        <h4>Error while retrieving graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})</h4>
+      <ErrorPanel>
+        Error while retrieving graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})<br /><br />
         <Button variant="primary" onClick={fetch}>Retry</Button>
-      </div>
+      </ErrorPanel>
     );
   }
 
   if (graphStore.isFetching) {
 
     return (
-      <div className={classes.loader}>
-        <Spinner>Retrieving visualization data for instance {instance.id}...</Spinner>
-      </div>
+      <SpinnerPanel text={`Retrieving visualization data for instance ${instance.id}...`} />
     );
   }
 

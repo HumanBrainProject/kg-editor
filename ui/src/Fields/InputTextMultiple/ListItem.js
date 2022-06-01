@@ -37,8 +37,8 @@ const useStyles = createUseStyles({
     padding: "1px 5px",
     border: "1px solid #ced4da",
     "&:hover": {
-      backgroundColor: "#a5c7e9",
-      borderColor: "#337ab7",
+      backgroundColor: "var(--link-bg-color-hover)",
+      borderColor: "var(--link-border-color-hover)",
       color: "#143048"
     },
     "& + $valueTag": {

@@ -32,6 +32,7 @@ const theme = {
     image: `${window.rootPath}/assets/background-bright.png`,
     position: "50% 50%"
   },
+  backgroundColor: "#f4fbf7",
   button: {
     primary: {
       backgroundColor: "#007bff",
@@ -67,24 +68,28 @@ const theme = {
   contrast5: {
     borderColor: "rgba(0, 0, 0, 0.3)"
   },
+  contrast6: {
+    backgroundColor: "#ffffff",
+    borderColor: "#ffffff"
+  },
   blendContrast1: {
     backgroundColor: "rgba(0, 0, 0, 0.1)"
   },
   list: {
     hover: {
-      backgroundColor: "#def0fd",
-      borderColor: "#68b6f5"
+      backgroundColor: "#aee0c8",
+      borderColor: "#368c62"
     },
     selected: {
-      backgroundColor: "#c6e2f5",
-      borderColor: "#259dff"
+      backgroundColor: "#68c498",
+      borderColor: "#2f7955"
     }
   },
   quiet: {
     color: "rgba(0, 0, 0, 0.4)"
   },
   normal: {
-    color: "rgba(0, 0, 0, 0.5)"
+    color: "#1a202c"
   },
   loud: {
     color: "#444444"
@@ -120,6 +125,24 @@ const theme = {
     color: "#24282a",
     normal: {
       color: "#ffc107"
+    }
+  },
+  selected: {
+    color: "#45b07c",
+    hover: {
+      color: "#2f7955"
+    }
+  },
+  link: {
+    hover: {
+      color: "#143048",
+      borderColor: "#368c62",
+      backgroundColor: "#aee0c8"
+    },
+    quiet: {
+      hover: {
+        backgroundColor: "#effbf5"
+      }
     }
   },
   pane: {

@@ -29,8 +29,8 @@ import Button from "react-bootstrap/Button";
 
 import { useStores } from "../../Hooks/UseStores";
 
-import Spinner from "../../Components/Spinner";
-import BGMessage from "../../Components/BGMessage";
+import SpinnerPanel from "../../Components/SpinnerPanel";
+import ErrorPanel from "../../Components/ErrorPanel";
 import SavingModal from "./InstanceRelease/SavingModal";
 import CompareInstancesModal from "./InstanceRelease/CompareInstancesModal";
 
@@ -46,15 +46,7 @@ const useStyles = createUseStyles({
     width: "calc(100% - 30px)",
     height: "calc(100% - 30px)",
     color: "var(--ft-color-normal)",
-    margin: "15px",
-    "& .spinnerPanel": {
-      width: "auto",
-      padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast1)",
-      borderRadius: "4px",
-      color: "var(--ft-color-loud)",
-      background: "var(--list-bg-hover)"
-    }
+    margin: "15px"
   },
   panel: {
     display: "grid",
@@ -119,50 +111,44 @@ const InstanceRelease = observer(({ instance }) => {
 
   if (releaseStore.saveError) {
     return (
-      <div className={classes.container}>
-        <BGMessage icon="ban">
-          There has been an error while releasing one or more instances.
-          <br />
-          Please try again or contact our support if the problem persists.
-          <br />
-          <br />
-          <small>{releaseStore.saveError}</small>
-          <br />
-          <br />
-          <Button variant="primary" onClick={handleDismissSaveError}>
-            OK
-          </Button>
-        </BGMessage>
-      </div>
+    <ErrorPanel>
+        There has been an error while releasing one or more instances.
+        <br />
+        Please try again or contact our support if the problem persists.
+        <br />
+        <br />
+        <small>{releaseStore.saveError}</small>
+        <br />
+        <br />
+        <Button variant="primary" onClick={handleDismissSaveError}>
+          OK
+        </Button>
+      </ErrorPanel>
     );
   }
 
   if (releaseStore.fetchError) {
     return (
-      <div className={classes.container}>
-        <BGMessage icon="ban">
-          There has been an error while retrieving the release data for the
-          instance &quot;<i>{instance.id}&quot;</i>.
-          <br />
-          Please try again or contact our support if the problem persists.
-          <br />
-          <br />
-          <small>{releaseStore.fetchError}</small>
-          <br />
-          <br />
-          <Button variant="primary" onClick={handleRetryFetching}>
-            Retry
-          </Button>
-        </BGMessage>
-      </div>
+      <ErrorPanel>
+        There has been an error while retrieving the release data for the
+        instance &quot;<i>{instance.id}&quot;</i>.
+        <br />
+        Please try again or contact our support if the problem persists.
+        <br />
+        <br />
+        <small>{releaseStore.fetchError}</small>
+        <br />
+        <br />
+        <Button variant="primary" onClick={handleRetryFetching}>
+          Retry
+        </Button>
+      </ErrorPanel>
     );
   }
 
   if (releaseStore.isFetching) {
     return (
-      <div className={classes.container}>
-        <Spinner>Retrieving release data of instance {instance.id}...</Spinner>
-      </div>
+      <SpinnerPanel text={`Retrieving release data of instance ${instance.id}...`} />
     );
   }
 

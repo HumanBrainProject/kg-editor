@@ -196,10 +196,9 @@ const MoveInstance = observer(({ instance, className }) => {
   const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
-  const variant =
-    spaceId === appStore.currentSpace.id ? "secondary" : "warning";
-  const isDisabled =
-    status.data !== "UNRELEASED" || spaceId === appStore.currentSpace.id;
+  const variant = spaceId === appStore.currentSpace.id ? "secondary" : "warning";
+  const isDisabled = status.data !== "UNRELEASED" || spaceId === appStore.currentSpace.id;
+
   return (
     <>
       {permissions.canDelete && spaces.length > 1 && (

@@ -73,7 +73,7 @@ const useStyles = createUseStyles({
     margin: "0 !important",
     padding: "0 !important",
     transform: "translate(-5px, 5px)",
-    background: "var(--list-bg-hover)",
+    background: "var(--bg-color-ui-contrast6)",
     border: "1px solid var(--border-color-ui-contrast1)",
     borderRadius: 0,
     "& .popover-arrow:after": {
@@ -125,7 +125,7 @@ const useStyles = createUseStyles({
   tokenCopiedBar: {
     width: "100%",
     height: 0,
-    background: "var(--list-bg-hover)",
+    background: "var(--bg-color-ui-contrast6)",
     overflow: "hidden",
     transition: "height .3s ease-in-out",
     "&.show": {

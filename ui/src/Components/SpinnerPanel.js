@@ -41,10 +41,10 @@ const useStyles = createUseStyles({
     "& .spinnerPanel": {
       width: "auto",
       padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast1)",
+      border: "1px solid var(--border-color-ui-contrast6)",
       borderRadius: "4px",
       color: "var(--ft-color-loud)",
-      background: "var(--list-bg-hover)"
+      background: "var(--bg-color-ui-contrast6)"
     }
   }
 });
@@ -56,7 +56,7 @@ const SpinnerPanel = ({text}) => {
   return (
     <div className={classes.container}>
       <div className={classes.panel}>
-        <Spinner>{text}</Spinner>
+        <Spinner text={text} />
       </div>
     </div>
   );

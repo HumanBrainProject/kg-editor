@@ -45,10 +45,10 @@ const useStyles = createUseStyles({
     outline: 0
   },
   popOver: {
-    background: "var(--list-bg-hover)",
-    border: "1px solid var(--list-border-hover)",
+    background: "var(--bg-color-ui-contrast6)",
+    border: "1px solid var(--border-color-ui-contrast6)",
     "& .arrow:after": {
-      borderBottomColor: "var(--list-border-hover) !important"
+      borderBottomColor: "var(--border-color-ui-contrast6) !important"
     }
   },
   popOverContent: {

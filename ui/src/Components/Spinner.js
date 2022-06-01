@@ -42,14 +42,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const Spinner = ({children}) => {
+const Spinner = ({text}) => {
   const classes = useStyles();
   return (
     <div className={`${classes.spinnerPanel} spinnerPanel`}>
       <FontAwesomeIcon icon="circle-notch" spin/>
-      <span className={`${classes.spinnerLabel} spinnerLabel`}>
-        {children}
-      </span>
+      <span className={`${classes.spinnerLabel} spinnerLabel`}>{text}</span>
     </div>
   );
 };

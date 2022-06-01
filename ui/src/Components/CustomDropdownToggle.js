@@ -27,13 +27,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
   dropdownLink: {
-    color: "var(--ft-color-normal)",
-    fontSize: "0.9em",
+    color: "var(--ft-color-selected)",
     textDecoration: "none",
     backgroundColor: "transparent",
     border: "none",
+    transform: "translateY(-4px)",
     "&:hover": {
-      color: "var(--ft-color-loud)",
+      color: "var(--ft-color-selected-hover)",
       textDecoration: "none"
     }
   }

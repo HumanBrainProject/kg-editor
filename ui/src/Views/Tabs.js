@@ -67,7 +67,7 @@ const useStyles = createUseStyles({
   userProfileTab: {
     width: "50px",
     height: "50px",
-    lineHeight: "50px",
+    lineHeight: "41px",
     color: "var(--ft-color-normal)",
     background: "var(--bg-color-ui-contrast2)",
     border: "1px solid var(--border-color-ui-contrast2)",
@@ -85,10 +85,12 @@ const Tabs = observer(() => {
 
   const handleGoToDashboard = () => navigate("/")
 
+  const logo = appStore.currentTheme.name === "default"?`${window.rootPath}/assets/ebrains.svg`:`${window.rootPath}/assets/ebrains_dark.svg`;
+
   return (
       <div className={classes.container}>
         <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
-          <img src={`${window.rootPath}/assets/ebrains.svg`} alt="" height="30" />
+          <img src={logo} alt="" height="30" />
           <span>Knowledge Graph Editor</span>
         </div>
         {!appStore.globalError &&

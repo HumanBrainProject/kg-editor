@@ -75,56 +75,56 @@ const Reviewers = observer(({ id }) => {
 
   const classes = useStyles();
 
-  const { authStore, reviewsStore } = useStores();
+  const { authStore, invitedUsersStore } = useStores();
 
   useEffect(() => {
-    reviewsStore.getInstanceReviews(id);
+    invitedUsersStore.getInvitedUsers(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchInstanceReviews = () => reviewsStore.getInstanceReviews(id);
+  const fetchInstanceReviews = () => invitedUsersStore.getInvitedUsers(id);
 
-  const handleRemoveUserInvitation = userId => reviewsStore.removeInstanceReviewRequest(id, userId);
+  const handleRemoveUserInvitation = userId => invitedUsersStore.removeUserInvitation(id, userId);
 
-  const handleInviteUser = userId => reviewsStore.addInstanceReviewRequest(id, userId);
+  const handleInviteUser = userId => invitedUsersStore.inviteUser(id, userId);
 
-  const excludedUsers = reviewsStore.reviews.map(review => review.id);
+  const excludedUsers = invitedUsersStore.users.map(review => review.id);
   if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
     excludedUsers.push(authStore.user.id);
   }
 
-  if(reviewsStore.isFetching) {
+  if(invitedUsersStore.isFetching) {
     return(
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
         <FontAwesomeIcon icon="circle-notch" spin/>
         <span className={classes.fetchingLabel}>&nbsp;&nbsp;
-          Fetching reviewers...
+          Retrieving reviewers...
         </span>
         </div>
       </div>
     );
   }
 
-  if(reviewsStore.hasFetchError) {
+  if(invitedUsersStore.hasFetchError) {
     return(
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{reviewsStore.fetchError}</small>
+          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{invitedUsersStore.fetchError}</small>
           &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} title="retry" onClick={fetchInstanceReviews}/>
         </div>
       </div>
     );
   }
 
-  if(reviewsStore.error) {
+  if(invitedUsersStore.error) {
     return(
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{reviewsStore.error}</small>
+          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{invitedUsersStore.error}</small>
         </div>
       </div>
     );
@@ -136,7 +136,7 @@ const Reviewers = observer(({ id }) => {
       <div className={classes.panel}>
         <div className={classes.reviewers} >
           <ul>
-            {reviewsStore.reviews.map(review => (
+            {invitedUsersStore.users.map(review => (
               <li key={review.userId}>
                 <Reviewer review={review} onRemoveInvitation={handleRemoveUserInvitation} onInvite={handleInviteUser} />
               </li>

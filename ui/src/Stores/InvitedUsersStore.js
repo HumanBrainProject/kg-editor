@@ -22,10 +22,10 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-export class ReviewsStore {
-  reviews = [];
+export class InvitedUsersStore {
+  users = [];
   fetchError = null;
-  isFetching = true;
+  isFetching = false;
   isFetched = false;
   error = null;
 
@@ -33,15 +33,15 @@ export class ReviewsStore {
 
   constructor(transportLayer) {
     makeObservable(this, {
-      reviews: observable,
+      users: observable,
       fetchError: observable,
       isFetching: observable,
       isFetched: observable,
       error: observable,
       hasFetchError: computed,
-      getInstanceReviews: action,
-      addInstanceReviewRequest: action,
-      removeInstanceReviewRequest: action
+      getInvitedUsers: action,
+      inviteUser: action,
+      removeUserInvitation: action
     });
 
     this.transportLayer = transportLayer;
@@ -51,15 +51,18 @@ export class ReviewsStore {
     return !!this.fetchError;
   }
 
-  async getInstanceReviews(instanceId) {
+  async getInvitedUsers(instanceId) {
+    if (this.isFetching) {
+      return;
+    }
     this.isFetching = true;
-    this.reviews = [];
+    this.users = [];
     this.isFetched = false;
     this.fetchError = null;
     try {
-      const { data } = await this.transportLayer.getInstanceReviews(instanceId);
+      const { data } = await this.transportLayer.getInvitedUsers(instanceId);
       runInAction(() => {
-        this.reviews = data && data.data ? data.data : [];
+        this.users = data && data.data ? data.data : [];
         this.isFetching = false;
         this.isFetched = true;
         this.fetchError = null;
@@ -67,19 +70,19 @@ export class ReviewsStore {
     } catch (e) {
       runInAction(() => {
         const message = e.message ? e.message : e;
-        this.reviews = [];
-        this.fetchError = `Error while retrieving reviews for instance "${instanceId}" (${message})`;
+        this.users = [];
+        this.fetchError = `Error while retrieving invited users for instance "${instanceId}" (${message})`;
         this.isFetched = false;
         this.isFetching = false;
       });
     } 
   }
 
-  async addInstanceReviewRequest(instanceId, userId) {
+  async inviteUser(instanceId, userId) {
     try {
-      const { data } = await this.transportLayer.inviteUserToReviewInstance(instanceId, userId);
+      const { data } = await this.transportLayer.inviteUser(instanceId, userId);
       runInAction(() => {
-        this.reviews = data && data.data ? data.data : [];
+        this.users = data && data.data ? data.data : [];
       });
     } catch (e) {
       runInAction(() => {
@@ -89,19 +92,19 @@ export class ReviewsStore {
     }
   }
 
-  async removeInstanceReviewRequest(instanceId, userId) {
+  async removeUserInvitation(instanceId, userId) {
     try {
-      const { data } = await this.transportLayer.deleteInstanceReviewsByUser(instanceId, userId);
+      const { data } = await this.transportLayer.removeUserInvitation(instanceId, userId);
       runInAction(() => {
-        this.reviews = data && data.data ? data.data : [];
+        this.users = data && data.data ? data.data : [];
       });
     } catch (e) {
       runInAction(() => {
         const message = e.message ? e.message : e;
-        this.error = `Error while removing user "${userId}" to review instance "${instanceId}" (${message})`;
+        this.error = `Error while removing invitation to user "${userId}" to review instance "${instanceId}" (${message})`;
       });
     }
   }
 }
 
-export default new ReviewsStore();
+export default new InvitedUsersStore();

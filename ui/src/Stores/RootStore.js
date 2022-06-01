@@ -31,7 +31,7 @@ import { ViewStore } from "./ViewStore";
 import { GraphStore } from "./GraphStore";
 import { ReleaseStore } from "./ReleaseStore";
 import { UserStore } from "./UserStore";
-import { ReviewsStore } from "./ReviewsStore";
+import { InvitedUsersStore } from "./InvitedUsersStore";
 import { FeaturesStore } from "./FeaturesStore";
 
 export class RootStore  {
@@ -47,7 +47,7 @@ export class RootStore  {
   releaseStore= null
   userStore= null
   featuresStore= null
-  reviewsStore = null
+  invitedUsersStore = null
 
   constructor(transportLayer) {
 
@@ -67,7 +67,7 @@ export class RootStore  {
     this.userStore = new UserStore(transportLayer, this);
     this.featuresStore = new FeaturesStore(transportLayer, this);
     this.authStore = new AuthStore(transportLayer, this);
-    this.reviewsStore = new ReviewsStore(transportLayer, this)
+    this.invitedUsersStore = new InvitedUsersStore(transportLayer, this)
     transportLayer.setAuthStore(this.authStore);
 
     // UI stores

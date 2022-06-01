@@ -118,7 +118,7 @@ const InstancesResult = observer(({
   }
   if (browseStore.isFetching) {
     return (
-      <Spinner>Fetching instances...</Spinner>
+      <Spinner>Retrieving instances...</Spinner>
     );
   }
   if (!browseStore.instances.length) {

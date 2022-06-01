@@ -141,7 +141,7 @@ const InstanceRelease = observer(({ instance }) => {
     return (
       <div className={classes.container}>
         <BGMessage icon="ban">
-          There has been an error while fetching the release data for the
+          There has been an error while retrieving the release data for the
           instance &quot;<i>{instance.id}&quot;</i>.
           <br />
           Please try again or contact our support if the problem persists.
@@ -161,7 +161,7 @@ const InstanceRelease = observer(({ instance }) => {
   if (releaseStore.isFetching) {
     return (
       <div className={classes.container}>
-        <Spinner>Fetching release data of instance {instance.id}...</Spinner>
+        <Spinner>Retrieving release data of instance {instance.id}...</Spinner>
       </div>
     );
   }

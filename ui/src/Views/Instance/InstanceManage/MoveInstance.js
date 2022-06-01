@@ -121,7 +121,7 @@ const Status = observer(({
     return (
       <>
         <FontAwesomeIcon icon={"circle-notch"} spin />
-        &nbsp;&nbsp;Fetching instance release status
+        &nbsp;&nbsp;Retrieving instance release status
       </>
     );
   }

@@ -263,7 +263,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
                 <div>
                   { userStore.isFetchingSearch && (
                     <>
-                      <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; fetching...
+                      <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; retrieving...
                     </>
                   )}
                 </div>

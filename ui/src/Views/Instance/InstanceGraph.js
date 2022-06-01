@@ -111,7 +111,7 @@ const InstanceGraph = observer(({ instance }) => {
   if (graphStore.fetchError) {
     return (
       <div className={classes.fetchErrorPanel}>
-        <h4>Error while fetching graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})</h4>
+        <h4>Error while retrieving graph data for instance &quot;{instance.id}&quot; ({graphStore.fetchError})</h4>
         <Button variant="primary" onClick={fetch}>Retry</Button>
       </div>
     );
@@ -121,7 +121,7 @@ const InstanceGraph = observer(({ instance }) => {
 
     return (
       <div className={classes.loader}>
-        <Spinner>Fetching visualization data for instance {instance.id}...</Spinner>
+        <Spinner>Retrieving visualization data for instance {instance.id}...</Spinner>
       </div>
     );
   }

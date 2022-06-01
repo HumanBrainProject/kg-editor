@@ -60,7 +60,7 @@ const Types = observer(() => {
   }
 
   if (typeStore.isFetching) {
-    return <SpinnerPanel text="Fetching types..." />;
+    return <SpinnerPanel text="Retrieving types..." />;
   }
 
   if (typeStore.isFetched) {

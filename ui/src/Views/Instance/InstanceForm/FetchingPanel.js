@@ -73,7 +73,7 @@ const FetchingPanel = ({ id, show, inline }) => {
   return(
     <div className={classes.panel} inline={inline?"true":"false"}>
       <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
-      <span className={classes.label}>Fetching instance...</span>
+      <span className={classes.label}>Retrieving instance...</span>
       <small>ID: {id}</small>
     </div>
   );

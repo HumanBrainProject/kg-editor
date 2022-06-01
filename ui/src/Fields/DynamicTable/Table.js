@@ -92,7 +92,7 @@ const LabelCellRenderer = observer(({ instanceId }) => {
     return (
       <span>
         <FontAwesomeIcon icon="circle-notch" spin/>
-          &nbsp; fetching {instance.id}...
+          &nbsp; retrieving {instance.id}...
       </span>
     );
   }

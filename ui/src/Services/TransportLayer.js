@@ -123,20 +123,20 @@ export class TransportLayer {
     return this._axios.get(API.endpoints.userInfo(userId));
   }
 
-   getInstanceReviews(instanceId) {
-    return this._axios.get(API.endpoints.instanceReviews(instanceId));
+   getInvitedUsers(instanceId) {
+    return this._axios.get(API.endpoints.invitedUsers(instanceId));
   }
 
    getUsersForReview(search) {
     return this._axios.get(API.endpoints.usersForReview(search));
   }
 
-   inviteUserToReviewInstance(instanceId, userId) {
-    return this._axios.put(API.endpoints.inviteUserToReviewInstance(instanceId, userId));
+   inviteUser(instanceId, userId) {
+    return this._axios.put(API.endpoints.inviteUser(instanceId, userId));
   }
 
-   deleteInstanceReviewsByUser(instanceId, userId) {
-    return this._axios.delete(API.endpoints.inviteUserToReviewInstance(instanceId, userId));
+   removeUserInvitation(instanceId, userId) {
+    return this._axios.delete(API.endpoints.inviteUser(instanceId, userId));
   }
 
    getMessages() {

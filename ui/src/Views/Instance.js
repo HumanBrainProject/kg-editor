@@ -60,7 +60,7 @@ const Instance = observer(({instanceId}) => {
     if (instance.fetchError) {
       return (
         <ErrorPanel>
-          There was a network problem fetching the instance.<br />
+          There was a network problem retrieving the instance.<br />
           If the problem persists, please contact the support.<br />
           <small>{instance.fetchError}</small><br /><br />
           <Button variant={"primary"} onClick={handleRetry}>
@@ -73,7 +73,7 @@ const Instance = observer(({instanceId}) => {
 
     if (!instance.isFetched || instance.isFetching) {
       return (
-        <SpinnerPanel text={`Fetching instance ${instanceId}...`} />
+        <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />
       );
     }
 

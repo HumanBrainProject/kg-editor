@@ -144,7 +144,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
     return(
       <div className={`${classes.container} ${className?className:""}`}>
         <BGMessage icon={"ban"}>
-                There was a network problem fetching the instance &quot;<i>{instanceId}&quot;</i>.
+                There was a network problem retrieving the instance &quot;<i>{instanceId}&quot;</i>.
           <br />
                 If the problem persists, please contact the support.
           <br />
@@ -162,7 +162,7 @@ const Preview  = observer(({ className, instanceId, instanceName, showEmptyField
   if(!instance.isFetched || instance.isFetching) {
     return(
       <div className={`${classes.container} ${className?className:""}`}>
-        <Spinner>Fetching instance {instanceId}...</Spinner>
+        <Spinner>Retrieving instance {instanceId}...</Spinner>
       </div>
     );
   }

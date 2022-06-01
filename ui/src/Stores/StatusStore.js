@@ -147,7 +147,7 @@ export class StatusStore {
           if (status) {
             status.isFetching = false;
             status.hasFetchError = true;
-            status.fetchError = `Error while fetching instance status (${message})`;
+            status.fetchError = `Error while retrieving instance status (${message})`;
           }
         });
         this.isFetching = false;
@@ -193,7 +193,7 @@ export class StatusStore {
           if (status) {
             status.isFetchingChildren = false;
             status.hasFetchErrorChildren = true;
-            status.fetchErrorChildren = `Error while fetching instance child status (${message})`;
+            status.fetchErrorChildren = `Error while retrieving instance child status (${message})`;
           }
         });
         this.isFetchingChildren = false;

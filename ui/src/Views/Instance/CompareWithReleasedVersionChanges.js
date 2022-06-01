@@ -101,7 +101,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
   if ((releasedInstance && releasedInstance.isFetching) || instance.isFetching) {
     return(
       <div className={classes.container}>
-        <Spinner>Fetching instance {instanceId}...</Spinner>
+        <Spinner>Retrieving instance {instanceId}...</Spinner>
       </div>
     );
   }
@@ -110,7 +110,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
     return(
       <div className={classes.container}>
         <BGMessage icon={"ban"}>
-            There was a network problem fetching instance &quot;<i>{instanceId}&quot;</i>.<br/>
+            There was a network problem retrieving instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
           <small>{instance.fetchError}</small><br/><br/>
           <div>
@@ -126,7 +126,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
     return(
       <div className={classes.container}>
         <BGMessage icon={"ban"}>
-            There was a network problem fetching the released instance &quot;<i>{instanceId}&quot;</i>.<br/>
+            There was a network problem retrieving the released instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
           <small>{releasedInstance.fetchError}</small><br/><br/>
           <div>

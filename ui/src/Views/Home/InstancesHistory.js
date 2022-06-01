@@ -103,7 +103,7 @@ const useStyles = createUseStyles({
   noHistory: {
     extend: "message"
   },
-  fetching: {
+  retrieving: {
     extend: "message",
     "& span": {
       paddingLeft: "10px"
@@ -166,7 +166,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
 
   if (historyStore.isFetching) {
     return (
-      <div className={classes.fetching}><FontAwesomeIcon icon="circle-notch" spin/><span>Fetching history instances...</span></div>
+      <div className={classes.retrieving}><FontAwesomeIcon icon="circle-notch" spin/><span>Retrieving history instances...</span></div>
     );
   }
 
@@ -175,7 +175,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
       <div className={classes.fetchError}>
         <PopOverButton
           buttonClassName={classes.fetchErrorButton}
-          buttonTitle="fetching history instances failed, click for more information"
+          buttonTitle="retrieving history instances failed, click for more information"
           iconComponent={FontAwesomeIcon}
           iconProps={{icon: "exclamation-triangle", className:classes.fetchErrorIcon}}
           okComponent={() => (
@@ -187,7 +187,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
         >
           <h5 className={classes.textError}>{historyStore.fetchError}</h5>
         </PopOverButton>
-        <span>fetching history instances failed.</span>
+        <span>retrieving history instances failed.</span>
       </div>
     );
   }

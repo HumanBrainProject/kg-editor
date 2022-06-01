@@ -143,7 +143,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   if (leftStatus.isFetching || rightStatus.isFetching) {
     return (
       <div className={classes.container}>
-        <Spinner>Fetching children of instance {instanceId}...</Spinner>
+        <Spinner>Retrieving children of instance {instanceId}...</Spinner>
       </div>
     );
   }
@@ -152,7 +152,7 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
     return (
       <div className={classes.container}>
         <BGMessage icon={"ban"}>
-            There was a network problem fetching the links of instance &quot;<i>{instanceId}</i>&quot;.<br/>
+            There was a network problem retrieving the links of instance &quot;<i>{instanceId}</i>&quot;.<br/>
             If the problem persists, please contact the support.<br/><br/>
           <div>
             <Button onClick={onClose}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>

@@ -75,7 +75,7 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }) => {
     return (
       <>
         <FontAwesomeIcon icon={"circle-notch"} spin />
-        &nbsp;&nbsp;Fetching instance release status
+        &nbsp;&nbsp;Retrieving instance release status
       </>
     );
   }

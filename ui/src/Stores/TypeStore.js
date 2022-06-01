@@ -99,7 +99,7 @@ export class TypeStore {
         } catch (e) {
           runInAction(() => {
             const message = e.message ? e.message : e;
-            this.fetchError = `Error while fetching types (${message})`;
+            this.fetchError = `Error while retrieving types (${message})`;
             this.isFetching = false;
             this.types = [];
             this.isFetched = false;

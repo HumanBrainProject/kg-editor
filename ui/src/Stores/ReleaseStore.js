@@ -313,6 +313,9 @@ export class ReleaseStore {
   }
 
   async fetchReleaseData() {
+    if (this.isFetching) {
+      return;
+    }
     this.isFetched = false;
     this.isFetching = true;
     this.fetchError = null;

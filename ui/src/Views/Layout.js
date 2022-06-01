@@ -32,7 +32,47 @@ import Tabs from "./Tabs";
 import Authenticate from "./Authenticate";
 import Footer from "./Footer";
 
+
+const getBtnLinkStyle = theme => {
+  if (theme.name === "bright") {
+    return {
+      color: "var(--ft-color-selected)"
+    };
+  }
+  return {};
+};
+
+const getBtnLinkHoverStyle = theme => {
+  if (theme.name === "bright") {
+    return {
+      color: "var(--ft-color-selected-hover)"
+    }
+  }
+  return {};
+};
+
+const getPrimaryBtnStyle = theme => {
+  if (theme.name === "bright") {
+    return {
+      backgroundColor: "#45b07c",
+      borderColor: "#3e9e6f"
+    };
+  }
+  return {};
+};
+
+const getPrimaryBtnHoverStyle = theme => {
+  if (theme.name === "bright") {
+    return {
+      backgroundColor: "#378b62",
+      borderColor: "#3e9e6f"
+    };
+  }
+  return {};
+};
+
 const getGlobalUseStyles = () => createUseStyles(theme => {
+
   const styles = {
     "@global": {
       ":root": {
@@ -128,9 +168,13 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
     "@global button, @global input[type=button], @global a": {
       "-webkit-touch-callout": "none",
       userSelect: "none"
-    }
+    },
+    "@global .modal .btn-link": getBtnLinkStyle(theme),
+    "@global .modal .btn-link:hover": getBtnLinkStyle(theme),
+    "@global .modal .btn-primary": getPrimaryBtnStyle(theme),
+    "@global .modal .btn-primary:hover": getPrimaryBtnHoverStyle(theme)
   };
-
+  
   if (theme.name === "cupcake") {
     return {
       ...styles,
@@ -170,33 +214,7 @@ const getBackgroundSize = theme => {
     return "unset";
   }
   return "200%";
-}
-
-const getBtnLinkStyle = theme => {
-  if (theme.name === "bright") {
-    return {
-      color: "var(--ft-color-selected)",
-      "&:hover": {
-        color: "var(--ft-color-selected-hover)"
-      }
-    };
-  }
-  return {};
-}
-
-const getPrimaryBtnStyle = theme => {
-  if (theme.name === "bright") {
-    return {
-      backgroundColor: "#45b07c",
-      borderColor: "#3e9e6f",
-      "&:hover": {
-        backgroundColor: "#378b62",
-        borderColor: "#3e9e6f"
-      }
-    };
-  }
-  return {};
-}
+};
 
 const useStyles = createUseStyles(theme => ({
   container: {
@@ -206,7 +224,9 @@ const useStyles = createUseStyles(theme => ({
     gridTemplateColumns: "1fr",
     gridTemplateRows: "auto 1fr 20px",
     "& .btn-link": getBtnLinkStyle(theme),
+    "& .btn-link:hover": getBtnLinkHoverStyle(theme),
     "& .btn-primary": getPrimaryBtnStyle(theme),
+    "& .btn-primary:hover": getPrimaryBtnHoverStyle(theme)
   },
   body: {
     position: "relative",

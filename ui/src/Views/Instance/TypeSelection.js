@@ -36,10 +36,10 @@ const useStyles = createUseStyles({
   container: {
     display: "flex",
     flexDirection: "column",
-    width: "100%",   
+    width: "100%",
     height: "100%",
     background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",  
+    color: "var(--ft-color-normal)",
     border: "1px solid var(--border-color-ui-contrast1)",
     boxShadow: "0 2px 10px var(--pane-box-shadow)",
     "& button": {
@@ -90,28 +90,38 @@ const useStyles = createUseStyles({
 });
 
 const Type = ({ type, onClick }) => {
-
   const classes = useStyles();
 
   const handleClick = () => onClick(type);
 
   return (
-    <div className={classes.type} onClick={handleClick} title={type.description?type.description:type.name}>
-      <div className={classes.icon} style={type.color ? { color: type.color } : {}}>
+    <div
+      className={classes.type}
+      onClick={handleClick}
+      title={type.description ? type.description : type.name}
+    >
+      <div
+        className={classes.icon}
+        style={type.color ? { color: type.color } : {}}
+      >
         <FontAwesomeIcon fixedWidth icon="circle" />
       </div>
-      <span>{type.label}{type.description && <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />}</span>
+      <span>
+        {type.label}
+        {type.description && (
+          <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />
+        )}
+      </span>
     </div>
   );
 };
 
 const TypeSelection = observer(({ onSelect }) => {
-
   const classes = useStyles();
 
-  const { typeStore } = useStores();
+  const { typeStore, appStore } = useStores();
 
-  const [ filter, setFilter ] = useState();
+  const [filter, setFilter] = useState();
 
   const handleChange = value => {
     ReactPiwik.push(["trackEvent", "Browser", "FilterType", value]);
@@ -120,11 +130,22 @@ const TypeSelection = observer(({ onSelect }) => {
 
   const handleClick = type => onSelect(type);
 
-  const types = typeStore.filteredList(filter).filter(t => t.canCreate !== false);
+  const types = typeStore
+    .filteredList(filter)
+    .filter(
+      t =>
+        appStore.currentSpacePermissions.canCreate &&
+        t.canCreate !== false &&
+        typeStore.hasSpecification(t)
+    );
 
   return (
     <div className={classes.container}>
-      <Filter value={filter} placeholder="Filter types" onChange={handleChange} />
+      <Filter
+        value={filter}
+        placeholder="Filter types"
+        onChange={handleChange}
+      />
       <div className={classes.body}>
         <Scrollbars autoHide>
           <div className={classes.content}>

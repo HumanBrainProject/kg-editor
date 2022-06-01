@@ -136,7 +136,7 @@ const TypeSelection = observer(({ onSelect }) => {
       t =>
         appStore.currentSpacePermissions.canCreate &&
         t.canCreate !== false &&
-        typeStore.hasSpecification(t)
+        t.isSupported
     );
 
   return (

@@ -205,7 +205,7 @@ const CreateInstance = observer(({
 const TypesItem = observer(({ type }) => {
   const classes = useStyles();
 
-  const { appStore, browseStore, instanceStore, typeStore } = useStores();
+  const { appStore, browseStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
   const handleSelect = e => {
@@ -226,7 +226,7 @@ const TypesItem = observer(({ type }) => {
       ? browseStore.selectedItem.name === type.name
       : false;
   const color = type.color;
-  const canCreate = appStore.currentSpacePermissions.canCreate && type.canCreate !== false && typeStore.hasSpecification(type); // We are allowed to create unless canCreate is explicitly set to false and there are fields
+  const canCreate = appStore.currentSpacePermissions.canCreate && type.canCreate !== false && type.isSupported; // We are allowed to create unless canCreate is explicitly set to false and there are fields
 
   let cannotCreateTooltip = null;
   if (!appStore.currentSpacePermissions.canCreate) {

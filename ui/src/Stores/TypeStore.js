@@ -62,10 +62,6 @@ export class TypeStore {
     return this.types.filter(t => !t.embeddedOnly);
   }
 
-  hasSpecification(type) {
-    return Object.keys(type.fields).length !== 0;
-  }
-
   isTypesSupported(typeNames) {
     return typeNames.some(name => {
       const type = this.typesMap.get(name);

@@ -172,7 +172,11 @@ const getGlobalUseStyles = () => createUseStyles(theme => {
     "@global .modal .btn-link": getBtnLinkStyle(theme),
     "@global .modal .btn-link:hover": getBtnLinkStyle(theme),
     "@global .modal .btn-primary": getPrimaryBtnStyle(theme),
-    "@global .modal .btn-primary:hover": getPrimaryBtnHoverStyle(theme)
+    "@global .modal .btn-primary:hover": getPrimaryBtnHoverStyle(theme),
+    "@global [role=\"tooltip\"] .btn-link": getBtnLinkStyle(theme),
+    "@global [role=\"tooltip\"] .btn-link:hover": getBtnLinkStyle(theme),
+    "@global [role=\"tooltip\"] .btn-primary": getPrimaryBtnStyle(theme),
+    "@global [role=\"tooltip\"] .btn-primary:hover": getPrimaryBtnHoverStyle(theme)
   };
   
   if (theme.name === "cupcake") {

@@ -40,7 +40,7 @@ const matchInstance = pathname => matchPath({path:"/instances/:instanceId/:mode"
 
 const UserProfile = observer(() => {
 
-  const { authStore, typeStore } = useStores();
+  const { authStore, appStore, typeStore } = useStores();
   const location = useLocation();
   const match = matchInstance(location.pathname);
 
@@ -96,11 +96,13 @@ const UserProfile = observer(() => {
     );
   }
 
+  const isTypeFetched = appStore.currentSpace && typeStore.space === appStore.currentSpace.id && typeStore.isFetched;
+
   if (match) {
     const { params: { instanceId, mode }} = match;
     switch (mode) {
       case "create": {
-        if (typeStore.isFetched) {
+        if (isTypeFetched) {
           return <InstanceCreation instanceId={instanceId} />;
         }
         return <Navigate to="/browse" />; // App still loading, instance creation is disabled
@@ -109,7 +111,7 @@ const UserProfile = observer(() => {
         return <RawInstance instanceId={instanceId} />;
       }
       default: {
-        if (typeStore.isFetched) {
+        if (isTypeFetched) {
           return <Instance instanceId={instanceId} />;
         }
         return <RawInstance instanceId={instanceId} />; // App still loading, non raw instance creation is disabled

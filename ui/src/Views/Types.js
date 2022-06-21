@@ -47,7 +47,7 @@ const Types = observer(() => {
     return null;
   }
 
-  if (typeStore.fetchError) {
+  if (typeStore.space === appStore.currentSpace.id && typeStore.fetchError) {
     return (
       <ErrorPanel>
         There was a problem retrieving the types ({typeStore.fetchError}).
@@ -63,7 +63,7 @@ const Types = observer(() => {
     return <SpinnerPanel text="Retrieving types..." />;
   }
 
-  if (typeStore.isFetched) {
+  if (typeStore.space === appStore.currentSpace.id && typeStore.isFetched) {
     return (
       <View />
     );

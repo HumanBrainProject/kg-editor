@@ -309,8 +309,9 @@ export class AppStore{
         this.clearViews(location, navigate);
         this.rootStore.browseStore.clearInstancesFilter();
       }
-      this.setSpace(space.id);
+      this.rootStore.instanceStore.flush();
       this.rootStore.browseStore.clearInstances();
+      this.setSpace(space.id);
       const path = this.rootStore.viewStore.restoreViews();
       if (path) {
         navigate(path);

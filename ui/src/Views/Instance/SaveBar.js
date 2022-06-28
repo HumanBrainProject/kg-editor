@@ -232,7 +232,7 @@ const SaveBar = observer(() => {
 
   const handleSaveAll = () => {
     ReactPiwik.push(["trackEvent", "Instance", "SaveAll"]);
-    instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance));
+    instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance, navigate));
   };
 
   const handleSave = instance => {

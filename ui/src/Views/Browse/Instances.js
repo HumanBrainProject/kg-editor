@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
@@ -171,6 +171,13 @@ const Instances = observer(() => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (browseStore.selectedItem && browseStore.instancesFilter) {
+      browseStore.refreshFilter();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [browseStore.selectedItem, browseStore.instancesFilter]);
+
   const handleFilterChange = value => {
     ReactPiwik.push(["trackEvent", "Browse", "FilterInstance", value]);
     browseStore.setInstancesFilter(value);
@@ -224,7 +231,7 @@ const Instances = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.header}>
-        {browseStore.selectedItem !== null && (
+        {browseStore.selectedItem && (
           <>
             <Filter
               value={browseStore.instancesFilter}

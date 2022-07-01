@@ -40,6 +40,15 @@ const setNodeTypesAndSortChildren = node => {
       const ta = a.typesName.toUpperCase();
       const tb = b.typesName.toUpperCase();
       if (ta === tb) {
+        if (!a.label && !b.label) {
+            return 0;
+        }
+        if (!a.label) {
+          return 1;
+        }
+        if (!b.label) {
+          return -1;
+        }
         return a.label.toUpperCase().localeCompare(b.label.toUpperCase());
       }
       return ta.localeCompare(tb);
@@ -339,6 +348,7 @@ export class ReleaseStore {
       runInAction(() => {
         const message = e.message ? e.message : e;
         this.fetchError = message;
+        this.isFetching = false;
       });
     }
   }

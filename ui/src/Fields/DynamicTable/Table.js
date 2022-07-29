@@ -57,10 +57,16 @@ const useStyles = createUseStyles({
   },
   actionBtn: {
     padding: "1px 6px 1px 6px"
+  },
+  circular: {
+    color: "var(--bs-danger)",
+    "&:hover": {
+      color: "var(--bs-danger)"
+    }
   }
 });
 
-const LabelCellRenderer = observer(({ instanceId }) => {
+const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }) => {
 
   const { instanceStore } = useStores();
 
@@ -85,7 +91,8 @@ const LabelCellRenderer = observer(({ instanceId }) => {
   }
 
   if (instance.isFetched || instance.isLabelFetched) {
-    return instance.name;
+    const isCircular = mainInstanceId === instanceId;
+    return <span className={`${isCircular?className:""}`} title="This link points to itself!">{instance.name}</span>;
   }
 
   if (instance.isFetching || instance.isLabelFetching) {
@@ -142,7 +149,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 });
 ActionsCellRenderer.displayName = "ActionsCellRenderer";
 
-const Table = ({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
+const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
 
   const classes = useStyles();
   const scrollToIndex = -1;
@@ -164,7 +171,7 @@ const Table = ({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, o
 
   const handleRetry = id => fieldStore.fetchInstance(id);
 
-  const handleRowClick = ({index}) => onRowMouseOver && onRowClick(index);
+  const handleRowClick = ({index}) => onRowClick && onRowClick(index);
 
   const handleRowMouseOver = ({index}) => onRowMouseOver && onRowMouseOver(index);
 
@@ -180,7 +187,8 @@ const Table = ({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, o
     if (index < 0) {
       return classes.headerRow;
     } else {
-      return `${index % 2 === 0 ? classes.evenRow : classes.oddRow} ${enablePointerEvents?classes.activeRow:""}`;
+      const isCircular = list[index] === mainInstanceId;
+      return `${index % 2 === 0 ? classes.evenRow : classes.oddRow} ${(enablePointerEvents && !isCircular)?classes.activeRow:""}`;
     }
   };
 
@@ -196,7 +204,7 @@ const Table = ({ list, fieldStore, readOnly, enablePointerEvents, onRowDelete, o
     />
   );
 
-  const labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} />;
+  const labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} mainInstanceId={mainInstanceId} className={classes.circular}/>;
 
   return (
     <div className={classes.container} ref={wrapperRef}>

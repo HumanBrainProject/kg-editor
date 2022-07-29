@@ -40,7 +40,8 @@ const List = ({
   onBlur,
   onMouseOver,
   onMouseOut,
-  fetchLabel
+  fetchLabel,
+  mainInstanceId
 }) => (
   <span>
     {list.map((id, index) => (
@@ -49,6 +50,7 @@ const List = ({
         index={index}
         instanceId={id}
         readOnly={readOnly}
+        isCircular={mainInstanceId === id}
         disabled={disabled}
         enablePointerEvents={enablePointerEvents}
         onClick={onClick}

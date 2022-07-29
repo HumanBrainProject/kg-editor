@@ -73,7 +73,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const ReadOnlyValue = observer(({ id, fetchLabel, onClick }) => {
+const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }) => {
   if (!id) {
     return null;
   }
@@ -81,6 +81,7 @@ const ReadOnlyValue = observer(({ id, fetchLabel, onClick }) => {
   if (isClickable) {
     return (
       <ListItem
+        isCircular={id === instanceId}
         instanceId={id}
         readOnly={true}
         disabled={false}
@@ -92,6 +93,7 @@ const ReadOnlyValue = observer(({ id, fetchLabel, onClick }) => {
   }
   return (
     <ListItem
+      isCircular={id === instanceId}
       instanceId={id}
       readOnly={true}
       disabled={false}
@@ -270,6 +272,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
         <ReadOnlyValue
           id={id}
+          instanceId={instance.id}
           fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
           onClick={isClickable?handleClick:null}
         />
@@ -301,6 +304,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
       <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         {value &&
         <ListItem
+          isCircular={instance.id===id}
           instanceId={id}
           readOnly={false}
           disabled={isDisabled}

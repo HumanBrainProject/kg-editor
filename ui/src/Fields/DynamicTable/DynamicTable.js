@@ -238,7 +238,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const { value: values } = fieldStore;
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
-      if (id) {
+      if (id && id !== instance.id) {
         fieldStore.showLink(id);
         setTimeout(() => {
           view.resetInstanceHighlight();
@@ -254,7 +254,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const { value: values } = fieldStore;
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
-      if (id && fieldStore.isLinkVisible(id)) {
+      if (id && id !== instance.id && fieldStore.isLinkVisible(id)) {
         const idx = view.panes.findIndex(p => p === pane);
         if (idx !== -1 && idx < view.panes.length -1) {
           const targetPane = view.panes[idx+1];
@@ -302,6 +302,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       <div className={`${classes.table} ${hasValidationWarnings?classes.warning:""} ${returnAsNull?"disabled":""}`}>
         {(view && view.currentInstanceId === instance.id)?
           <Table
+            mainInstanceId={instance.id}
             list={links}
             fieldStore={fieldStore}
             readOnly={isDisabled}

@@ -34,11 +34,17 @@ const useStyles = createUseStyles({
       content: "';\\00a0'"
     }
   },
+  circular: {
+    color: "var(--bs-danger)",
+    "&:hover": {
+      color: "var(--bs-danger)"
+    }
+  },
   valueTag: {
     marginBottom: "5px",
     padding: "1px 5px",
     border: "1px solid #ced4da",
-    "&:hover": {
+    "&:not($circular):hover": {
       backgroundColor: "var(--link-bg-color-hover)",
       borderColor: "var(--link-border-color-hover)",
       color: "#143048"
@@ -85,7 +91,7 @@ const getLabel = (instance, hasError, isFetching) => {
   return instance.name;
 };
 
-const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut, fetchLabel }) => {
+const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut, fetchLabel }) => {
 
   const classes = useStyles();
 
@@ -167,8 +173,16 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
   const isFetching = instance && (instance.isFetching || instance.isFetchingLabel);
   const label = getLabel(instance, hasError, isFetching);
+  const isDisabled = disabled || isCircular;
 
   if (readOnly) {
+
+    if (isCircular) {
+      return (
+        <span className={`${classes.value} ${classes.circular}`}title="This link points to itself!" >{label}</span>
+      );
+    }
+
     if (!enablePointerEvents) {
       return (
         <span className={classes.value}>{label}</span>
@@ -176,23 +190,45 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, enablePointe
     }
 
     return (
-      <div className={`btn btn-xs btn-default ${classes.valueTag} ${hasError ? classes.notFound : ""}`}
+      <div className={`btn btn-xs btn-default ${classes.valueTag}  ${isDisabled? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
+        disabled={isDisabled}  
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
+        title={label}
       >{label}
       </div>
+    );
+  }
+
+  if (isCircular) {
+    return (
+      <div
+      tabIndex={"0"}
+      className={`btn btn-xs btn-default ${classes.valueTag} ${classes.circular} ${hasError ? classes.notFound : ""}`}
+      disabled={isDisabled}
+      draggable={!isDisabled}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragStart={handleDragStart}
+      onDrop={handleDrop}
+      onKeyDown={handleKeyDown}
+      title="This link points to itself!"
+    >
+      <span className={classes.valueLabel}>{label}</span>
+      {!disabled && <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />}
+    </div>
     );
   }
 
   return (
     <div
       tabIndex={"0"}
-      className={`btn btn-xs btn-default ${classes.valueTag} ${disabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
-      disabled={disabled}
-      draggable={!disabled}
+      className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
+      disabled={isDisabled}
+      draggable={!isDisabled}
       onClick={handleClick}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}

@@ -270,6 +270,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
         {(view && view.currentInstanceId === instance.id)?
           <List
+            mainInstanceId={instance.id}
             list={links}
             readOnly={true}
             disabled={false}
@@ -313,6 +314,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       </div>
       <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         <List
+          mainInstanceId={instance.id}
           list={links}
           readOnly={false}
           disabled={isDisabled}

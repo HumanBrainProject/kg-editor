@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import {useLocation, useNavigate, matchPath} from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
@@ -33,7 +33,8 @@ import { useStores } from "../Hooks/UseStores";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 import Panel from "../Components/Panel";
-import UserProfile from "./UserProfile";
+
+const UserProfile = React.lazy(() => import("./UserProfile"));
 
 const Authenticate = observer(() => {
   const { authStore } = useStores();
@@ -102,7 +103,9 @@ const Authenticate = observer(() => {
   }
 
   return (
-    <UserProfile />
+    <Suspense fallback={<SpinnerPanel text="Loading resource..." />}>
+      <UserProfile />
+    </Suspense>
   );
 });
 Authenticate.displayName = "Authenticate";

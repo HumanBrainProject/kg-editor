@@ -21,17 +21,18 @@
  *
  */
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { Route, Routes, matchPath, useNavigate } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
+import SpinnerPanel from "../Components/SpinnerPanel";
 
-import NotFound from "./NotFound";
-import Home from "./Home";
-import Help from "./Help";
-import Browse from "./Browse";
-import InstanceView from "./InstanceView";
+const NotFound = React.lazy(() => import("./NotFound"));
+const Home = React.lazy(() => import("./Home"));
+const Help = React.lazy(() => import("./Help"));
+const Browse = React.lazy(() => import("./Browse"));
+const InstanceView = React.lazy(() => import("./InstanceView"));
 
 const View = observer(() => {
 
@@ -61,20 +62,22 @@ const View = observer(() => {
   }
 
   return (
-    <Routes>
-      <Route path="/instances/:id" element={<InstanceView mode="view" />} />
-      <Route path="/instances/:id/create" element={<InstanceView mode="create" />} />
-      <Route path="/instances/:id/edit" element={<InstanceView mode="edit" />} />
-      <Route path="/instances/:id/graph" element={<InstanceView mode="graph" />} />
-      <Route path="/instances/:id/release" element={<InstanceView mode="release" />} />
-      <Route path="/instances/:id/manage"  element={<InstanceView mode="manage" />} />
-      <Route path="/instances/:id/raw"  element={<InstanceView mode="raw" />} />
+    <Suspense fallback={<SpinnerPanel text="Loading resource..." />}>
+      <Routes>
+        <Route path="/instances/:id" element={<InstanceView mode="view" />} />
+        <Route path="/instances/:id/create" element={<InstanceView mode="create" />} />
+        <Route path="/instances/:id/edit" element={<InstanceView mode="edit" />} />
+        <Route path="/instances/:id/graph" element={<InstanceView mode="graph" />} />
+        <Route path="/instances/:id/release" element={<InstanceView mode="release" />} />
+        <Route path="/instances/:id/manage"  element={<InstanceView mode="manage" />} />
+        <Route path="/instances/:id/raw"  element={<InstanceView mode="raw" />} />
 
-      <Route path="/browse" element={<Browse/>} />
-      <Route path="/help/*" element={<Help/>} />
-      <Route path="/" element={<Home/>} />
-      <Route path="*" element={<NotFound/>} />
-    </Routes>
+        <Route path="/browse" element={<Browse/>} />
+        <Route path="/help/*" element={<Help/>} />
+        <Route path="/" element={<Home/>} />
+        <Route path="*" element={<NotFound/>} />
+      </Routes>
+    </Suspense>
   );
 });
 View.displayName = "View";

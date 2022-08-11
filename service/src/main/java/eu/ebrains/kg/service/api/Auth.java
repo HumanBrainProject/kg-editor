@@ -38,7 +38,7 @@ import java.util.Map;
 @RestController
 public class Auth {
 
-    @Value("${eu.ebrains.kg.editor.sentry}")
+    @Value("${sentry.dsn.ui}")
     String sentryUrl;
 
     @Value("${eu.ebrains.kg.commit}")

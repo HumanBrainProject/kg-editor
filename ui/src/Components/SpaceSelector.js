@@ -23,11 +23,11 @@
 
 import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
-import ReactPiwik from "react-piwik";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import API from "../Services/API";
 import { useStores } from "../Hooks/UseStores";
 
 import CustomDropdownToggle from "./CustomDropdownToggle";
@@ -72,7 +72,7 @@ const SpaceSelector = observer(() => {
   const { appStore, authStore } = useStores();
 
   const handleSelectSpace = space => {
-    ReactPiwik.push(["trackEvent", "Space", "Select", space]);
+    API.trackEvent("Space", "Select", space);
     appStore.switchSpace(location, navigate, space);
   }
 

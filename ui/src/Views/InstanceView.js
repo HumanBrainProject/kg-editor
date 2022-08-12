@@ -23,9 +23,9 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import ReactPiwik from "react-piwik";
 import { useStores } from "../Hooks/UseStores";
 
+import API from "../Services/API";
 import Instance from "./Instance/Instance";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -40,8 +40,8 @@ const InstanceView = observer(({ mode }) => {
   const id = params.id;
 
   useEffect(() => {
-    ReactPiwik.push(["setCustomUrl", window.location.href]);
-    ReactPiwik.push(["trackPageView"]);
+    API.trackCustomUrl(window.location.href);
+    API.trackPageView();
     appStore.openInstance(id, id, {}, mode);
     instanceStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);

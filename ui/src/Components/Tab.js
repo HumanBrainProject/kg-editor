@@ -22,11 +22,10 @@
  */
 
 import React from "react";
-import ReactPiwik from "react-piwik";
 import { createUseStyles } from "react-jss";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import API from "../Services/API";
 import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
@@ -108,7 +107,7 @@ const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, pa
   const handleClick = e => {
     e.preventDefault();
     if(path){
-      ReactPiwik.push(["trackEvent", "Tab", "Select", path.label]);
+      API.trackEvent("Tab", "Select", path.label);
       navigate(path);
     }
     typeof onClick === "function" && onClick(e);

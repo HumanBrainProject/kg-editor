@@ -26,8 +26,8 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 
+import API from "../../../Services/API";
 import { useStores } from "../../../Hooks/UseStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
@@ -126,7 +126,7 @@ const DeleteInstance = observer(({ instance, className }) => {
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
   const handleDeleteInstance = () => {
-    ReactPiwik.push(["trackEvent", "Instance", "Delete", instance.id]);
+    API.trackEvent("Instance", "Delete", instance.id);
     appStore.deleteInstance(instance.id, location, navigate);
   };
 

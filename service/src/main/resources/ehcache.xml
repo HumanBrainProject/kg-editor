@@ -1,0 +1,42 @@
+<config
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xsi:schemaLocation="
+            http://www.ehcache.org/v3
+            http://www.ehcache.org/schema/ehcache-core-3.7.xsd">
+    <!-- Persistent cache directory -->
+
+    <cache-template name="inmemory">
+        <expiry>
+            <ttl unit="days">1</ttl>
+        </expiry>
+        <listeners>
+            <listener>
+                <class>eu.ebrains.kg.service.helpers.CacheEventLogger</class>
+                <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+                <event-ordering-mode>UNORDERED</event-ordering-mode>
+                <events-to-fire-on>CREATED</events-to-fire-on>
+                <events-to-fire-on>EXPIRED</events-to-fire-on>
+                <events-to-fire-on>EVICTED</events-to-fire-on>
+                <events-to-fire-on>UPDATED</events-to-fire-on>
+            </listener>
+        </listeners>
+    </cache-template>
+
+    <cache alias="authEndpoint" uses-template="inmemory">
+        <key-type>org.springframework.cache.interceptor.SimpleKey</key-type>
+        <value-type>java.lang.String</value-type>
+        <resources>
+            <heap>1</heap>
+        </resources>
+    </cache>
+
+    <cache alias="userPicture" uses-template="inmemory">
+        <key-type>java.lang.String</key-type>
+        <value-type>java.lang.String</value-type>
+        <resources>
+            <heap>1</heap>
+        </resources>
+    </cache>
+
+</config>

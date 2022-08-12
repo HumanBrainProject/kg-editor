@@ -26,8 +26,8 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 
+import API from "../../../Services/API";
 import { useStores } from "../../../Hooks/UseStores";
 
 import ClientPreviewModal from "./ClientPreviewModal";
@@ -135,7 +135,7 @@ const ReleaseAction = observer(() => {
 
   const handleProceed = () => {
     if (!releaseStore.isSaving) {
-      ReactPiwik.push(["trackEvent", "Instance", "Release", releaseStore.topInstanceId]);
+      API.trackEvent("Instance", "Release", releaseStore.topInstanceId);
       releaseStore.commitStatusChanges();
     }
   };

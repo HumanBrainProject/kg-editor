@@ -24,8 +24,8 @@
 import React, {useEffect} from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
-import ReactPiwik from "react-piwik";
 
+import API from "../Services/API";
 import Instances from "./Browse/Instances";
 import NavigationPanel from "./Browse/NavigationPanel";
 
@@ -42,8 +42,8 @@ const useStyles = createUseStyles({
 const Browse = observer(() => {
 
   useEffect(() => {
-    ReactPiwik.push(["setCustomUrl", window.location.href]);
-    ReactPiwik.push(["trackPageView"]);
+    API.trackCustomUrl(window.location.href);
+    API.trackPageView();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

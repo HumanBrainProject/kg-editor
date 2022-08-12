@@ -25,10 +25,10 @@ import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
-import ReactPiwik from "react-piwik";
 import Modal from "react-bootstrap/Modal";
 import _  from "lodash-uuid";
 
+import API from "../Services/API";
 import { useStores } from "../Hooks/UseStores";
 
 import Tab from "../Components/Tab";
@@ -71,7 +71,7 @@ const NewInstanceTab = observer(() => {
   const navigate = useNavigate();
 
   const handleCreateInstance = () => {
-    ReactPiwik.push(["trackEvent", "Tab", "CreateInstance"]);
+    API.trackEvent("Tab", "CreateInstance");
     setShowTypeSelection(true);
   };
 

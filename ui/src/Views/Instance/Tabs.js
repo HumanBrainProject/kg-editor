@@ -25,9 +25,9 @@ import React from "react";
 import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 import { useNavigate } from "react-router-dom";
 
+import API from "../../Services/API";
 import { useStores } from "../../Hooks/UseStores";
 
 const useStyles = createUseStyles({
@@ -98,7 +98,7 @@ const Tabs = observer(({ instance, mode }) => {
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
   const handleClick = instanceMode => {
-    ReactPiwik.push(["trackEvent", "Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id]);
+    API.trackEvent("Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id);
     if(instanceMode === "view") {
       navigate(`/instances/${instance.id}`);
     } else {

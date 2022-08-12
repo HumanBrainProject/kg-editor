@@ -26,9 +26,9 @@ import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
 import _ from "lodash-uuid";
-import ReactPiwik from "react-piwik";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import API from "../../Services/API";
 import { useStores } from "../../Hooks/UseStores";
 
 import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
@@ -195,10 +195,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-         ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInExternalSpace", option.type.name]);
+         API.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
-        ReactPiwik.push(["trackEvent", "Instance", "CreateInstanceInCurrentSpace", option.type.name]);
+        API.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
         addNewValue(name, option.type.name);
       }
     } else {

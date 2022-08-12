@@ -24,10 +24,10 @@
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import ReactPiwik from "react-piwik";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import API from "../../../Services/API";
 import { useStores } from "../../../Hooks/UseStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
@@ -189,7 +189,7 @@ const MoveInstance = observer(({ instance, className }) => {
   const handleSetSpaceId = e => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
-    ReactPiwik.push(["trackEvent", "Instance", "Move", instance.id]);
+    API.trackEvent("Instance", "Move", instance.id);
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 

@@ -26,8 +26,8 @@ import {useLocation, useNavigate, matchPath} from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 
+import API from "../Services/API";
 import { useStores } from "../Hooks/UseStores";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
@@ -51,12 +51,12 @@ const Authenticate = observer(() => {
   const handleRetryToAuthenticate = () => authStore.authenticate();
   
   const handleLogin = () =>  {
-    ReactPiwik.push(["trackEvent", "User", "Login"]);
+    API.trackEvent("User", "Login");
     authStore.login();
   };
 
   const handleReLogin = () =>  {
-    ReactPiwik.push(["trackEvent", "User", "Login"]);
+    API.trackEvent("User", "Login");
     navigate("/");
   };
 

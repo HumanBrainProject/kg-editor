@@ -51,8 +51,8 @@ export class TransportLayer {
     });
   }
 
-   getAuthEndpoint() {
-    return this._axios.get(API.endpoints.auth());
+   getSettings() {
+    return this._axios.get(API.endpoints.settings());
   }
 
    getUserProfile() {

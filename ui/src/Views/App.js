@@ -26,8 +26,8 @@ import { observer } from "mobx-react-lite";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
 import _  from "lodash-uuid";
-import ReactPiwik from "react-piwik";
 
+import API from "../Services/API";
 import { useStores } from "../Hooks/UseStores";
 
 import Layout from "./Layout";
@@ -79,29 +79,29 @@ const App = observer(() => {
 
   const handleKeyDown = e => {
     if ((e.ctrlKey || e.metaKey) && e.altKey && e.keyCode === 84) {
-      ReactPiwik.push(["trackEvent", "Shortcut", "ToggleTheme"]);
+      API.trackEvent("Shortcut", "ToggleTheme");
       appStore.toggleTheme();
     } else if (e.altKey && e.shiftKey && e.keyCode === 70) { // alt+shift+f, browse
-      ReactPiwik.push(["trackEvent", "Shortcut", "Browse"]);
+      API.trackEvent("Shortcut", "Browse");
       navigate("/browse");
     } else if (e.altKey && e.keyCode === 78) { // alt+n, new
-      ReactPiwik.push(["trackEvent", "Shortcut", "Create"]);
+      API.trackEvent("Shortcut", "Create");
       const uuid = _.uuid();
       navigate(`/instances/${uuid}/create`);
     } else if (e.altKey && e.keyCode === 68) { // alt+d, dashboard
-      ReactPiwik.push(["trackEvent", "Shortcut", "Home"]);
+      API.trackEvent("Shortcut", "Home");
       navigate("/");
     } else if (e.keyCode === 112) { // F1, help
-      ReactPiwik.push(["trackEvent", "Shortcut", "Help"]);
+      API.trackEvent("Shortcut", "Help");
       navigate("/help");
     } else if (e.altKey && e.keyCode === 87) { // alt+w, close
       if (e.shiftKey) { // alt+shift+w, close all
-        ReactPiwik.push(["trackEvent", "Shortcut", "CloseAllInstances"]);
+        API.trackEvent("Shortcut", "CloseAllInstances");
         appStore.closeAllInstances(location, navigate);
       } else {
         const matchInstanceTab = appStore.matchInstancePath(location.pathname);
         if (matchInstanceTab) {
-          ReactPiwik.push(["trackEvent", "Shortcut", "InstanceClose", matchInstanceTab.params.id]);
+          API.trackEvent("Shortcut", "InstanceClose", matchInstanceTab.params.id);
           appStore.closeInstance(location, navigate, matchInstanceTab.params.id);
         }
       }
@@ -115,7 +115,7 @@ const App = observer(() => {
       kCode.step = kCode.ref[kCode.step] === e.keyCode ? kCode.step + 1 : 0;
       if (kCode.step === kCode.ref.length) {
         kCode.step = 0;
-        ReactPiwik.push(["trackEvent", "Shortcut", "KonamiCode", ":-D"]);
+        API.trackEvent("Shortcut", "KonamiCode", ":-D");
         appStore.setTheme("cupcake");
       }
     }

@@ -25,9 +25,9 @@ import React, {useEffect} from "react";
 import { Route, Routes, NavLink, Navigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 import { Scrollbars } from "react-custom-scrollbars-2";
 
+import API from "../Services/API";
 import Introduction from "./Help/Introduction";
 
 import Browse from "./Help/Browse";
@@ -106,8 +106,8 @@ const Help = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    ReactPiwik.push(["setCustomUrl", window.location.href]);
-    ReactPiwik.push(["trackPageView"]);
+    API.trackCustomUrl(window.location.href);
+    API.trackPageView();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

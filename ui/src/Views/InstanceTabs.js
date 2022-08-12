@@ -25,8 +25,8 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
-import ReactPiwik from "react-piwik";
 
+import API from "../Services/API";
 import { useStores } from "../Hooks/UseStores";
 
 import Tab from "../Components/Tab";
@@ -87,9 +87,9 @@ const InstanceTab = observer(({view, pathname}) => {
 
   const handleClose = () => {
     if(isCurrent(view.instanceId, view.mode)) {
-      ReactPiwik.push(["trackEvent", "Tab", "CloseCurrentInstance", view.instanceId]);
+      API.trackEvent("Tab", "CloseCurrentInstance", view.instanceId);
     } else {
-      ReactPiwik.push(["trackEvent", "Tab", "CloseOtherInstance", view.instanceId]);
+      API.trackEvent("Tab", "CloseOtherInstance", view.instanceId);
     }
     appStore.closeInstance(location, navigate, view.instanceId);
   }

@@ -25,8 +25,8 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 
+import API from "../../../Services/API";
 import { useStores } from "../../../Hooks/UseStores";
 import { useNavigate } from "react-router-dom";
 
@@ -36,7 +36,7 @@ const DuplicateInstance = observer(({instance, className}) => {
   const navigate = useNavigate();
 
   const handleDuplicateInstance = () => {
-    ReactPiwik.push(["trackEvent", "Instance", "Duplicate", instance.id]);
+    API.trackEvent("Instance", "Duplicate", instance.id);
     appStore.duplicateInstance(instance.id, navigate);
   };
 

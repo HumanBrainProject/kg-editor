@@ -24,7 +24,10 @@
 package eu.ebrains.kg.service.services;
 
 import eu.ebrains.kg.service.models.KGCoreResult;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class AuthClient {
@@ -35,10 +38,17 @@ public class AuthClient {
         this.kg = kg;
     }
 
-    public KGCoreResult.Single getEndpoint() {
-        return kg.client().get().uri(kg.url("users/authorization"))
-                .retrieve()
-                .bodyToMono(KGCoreResult.Single.class)
-                .block();
+    @Cacheable(value = "authEndpoint", unless = "#result == null")
+    public String getEndpoint() {
+        try {
+            KGCoreResult.Single result = kg.client().get().uri(kg.url("users/authorization"))
+                    .retrieve()
+                    .bodyToMono(KGCoreResult.Single.class)
+                    .block();
+            Map<String, Object> data = result.getData();
+            return data == null ? null : data.get("endpoint").toString();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

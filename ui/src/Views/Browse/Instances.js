@@ -29,8 +29,8 @@ import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars-2";
-import ReactPiwik from "react-piwik";
 
+import API from "../../Services/API";
 import { useStores } from "../../Hooks/UseStores";
 
 import Spinner from "../../Components/Spinner";
@@ -179,23 +179,18 @@ const Instances = observer(() => {
   }, [browseStore.selectedItem, browseStore.instancesFilter]);
 
   const handleFilterChange = value => {
-    ReactPiwik.push(["trackEvent", "Browse", "FilterInstance", value]);
+    API.trackEvent("Browse", "FilterInstance", value);
     browseStore.setInstancesFilter(value);
   };
 
   const handleInstanceClick = instance => {
-    ReactPiwik.push(["trackEvent", "Browse", "InstancePreview", instance.id]);
+    API.trackEvent("Browse", "InstancePreview", instance.id);
     browseStore.selectInstance(instance);
   };
 
   const handleInstanceCtrlClick = instance => {
     if (instance && instance.id) {
-      ReactPiwik.push([
-        "trackEvent",
-        "Browse",
-        "InstanceOpenTabInBackground",
-        instance.id,
-      ]);
+      API.trackEvent( "Browse", "InstanceOpenTabInBackground", instance.id);
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
       appStore.openInstance(instance.id, instance.name, instance.primaryType, isTypesSupported?"view":"raw");
     }
@@ -208,12 +203,7 @@ const Instances = observer(() => {
         const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
-      ReactPiwik.push([
-        "trackEvent",
-        "Browse",
-        `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`,
-        id,
-      ]);
+      API.trackEvent("Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
       if (mode === "view") {
         navigate(`/instances/${id}`);
       } else {

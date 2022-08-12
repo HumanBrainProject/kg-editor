@@ -30,8 +30,8 @@ import Button from "react-bootstrap/Button";
 import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import ReactPiwik from "react-piwik";
 
+import API from "../Services/API";
 import { useStores } from "../Hooks/UseStores";
 
 import Avatar from "../Components/Avatar";
@@ -199,7 +199,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
 
   useEffect(() => {
     if(showPopOver) {
-      ReactPiwik.push(["trackEvent", "Tab", "UserProfile", "Open"]);
+      API.trackEvent("Tab", "UserProfile", "Open");
     }
     return () => {
       if (showPopOver) {
@@ -228,14 +228,14 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   };
 
   const handleCopyToken = () => {
-    ReactPiwik.push(["trackEvent", "Token", "Copy"]);
+    API.trackEvent("Token", "Copy");
     clearTimeout(tokenCopied);
     const timer = setTimeout(() => setTokenCopied(null), 2000);
     setTokenCopied(timer);
   };
 
   const handleLogout = () => {
-    ReactPiwik.push(["trackEvent", "User", "Logout"]);
+    API.trackEvent("User", "Logout");
     if (!instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       viewStore.flushStoredViews();
       authStore.logout();

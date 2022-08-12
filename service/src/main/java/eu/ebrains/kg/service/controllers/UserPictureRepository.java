@@ -22,7 +22,7 @@ public class UserPictureRepository {
         this.kg = kg;
     }
 
-    @Cacheable(value="userPicture")
+    @Cacheable(value = "userPicture", unless = "#result == null")
     public String fetchUserPicture(@NotNull String userId){
         logger.info("Fetching user {} picture from endpoint - no cache available", userId);
         String relativeUrl = "users/pictures";

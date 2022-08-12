@@ -25,12 +25,12 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import uniqueId from "lodash/uniqueId";
 import _  from "lodash-uuid";
 
+import API from "../../Services/API";
 import { useStores } from "../../Hooks/UseStores";
 import { useNavigate } from "react-router-dom";
 
@@ -210,12 +210,12 @@ const TypesItem = observer(({ type }) => {
 
   const handleSelect = e => {
     e && e.stopPropagation();
-    ReactPiwik.push(["trackEvent", "Browse", "SelectType", type.name]);
+    API.trackEvent("Browse", "SelectType", type.name);
     browseStore.selectItem(type);
   };
 
   const handleCreateInstance = () => {
-    ReactPiwik.push(["trackEvent", "Browse", "CreateInstance", type.name]);
+    API.trackEvent("Browse", "CreateInstance", type.name);
     const uuid = _.uuid();
     instanceStore.setInstanceIdAvailability(type, uuid);
     navigate(`/instances/${uuid}/create`);

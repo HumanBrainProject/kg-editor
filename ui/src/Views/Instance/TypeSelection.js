@@ -26,8 +26,8 @@ import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ReactPiwik from "react-piwik";
 
+import API from "../../Services/API";
 import { useStores } from "../../Hooks/UseStores";
 
 import Filter from "../../Components/Filter";
@@ -124,7 +124,7 @@ const TypeSelection = observer(({ onSelect }) => {
   const [filter, setFilter] = useState();
 
   const handleChange = value => {
-    ReactPiwik.push(["trackEvent", "Browser", "FilterType", value]);
+    API.trackEvent("Browser", "FilterType", value);
     setFilter(value);
   };
 

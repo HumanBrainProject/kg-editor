@@ -24,7 +24,6 @@
 import React from "react";
 import { createRoot } from 'react-dom/client';
 // import { configure } from "mobx"; //NOSONAR
-import ReactPiwik from "react-piwik";
 import { JssProvider } from "react-jss";
 import { BrowserRouter } from "react-router-dom";
 
@@ -48,12 +47,6 @@ configure({
 */
 
 //reportWebVitals(); //NOSONAR
-
-new ReactPiwik({ //NOSONAR
-  url: process.env.REACT_APP_MATOMO_URL,
-  siteId: process.env.REACT_APP_MATOMO_SITE_ID,
-  trackErrors: true
-});
 
 const container = document.getElementById('root');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript

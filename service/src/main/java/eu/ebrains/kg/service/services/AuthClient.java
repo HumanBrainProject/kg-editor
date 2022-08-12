@@ -24,6 +24,7 @@
 package eu.ebrains.kg.service.services;
 
 import eu.ebrains.kg.service.models.KGCoreResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -45,8 +46,10 @@ public class AuthClient {
                     .retrieve()
                     .bodyToMono(KGCoreResult.Single.class)
                     .block();
-            Map<String, Object> data = result.getData();
-            return data == null ? null : data.get("endpoint").toString();
+            if (result != null && result.getData() != null && result.getData().get("endpoint") != null && StringUtils.isNotBlank(result.getData().get("endpoint").toString())) {
+                return result.getData().get("endpoint").toString();
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }

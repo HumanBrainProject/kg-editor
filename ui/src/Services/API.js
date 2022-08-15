@@ -20,8 +20,7 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-
-import * as Sentry from "@sentry/browser";
+import { init as SentryInit, captureException as SentryCaptureException, showReportDialog as SentryShowReportDialog } from "@sentry/browser";
 import ReactPiwik from "react-piwik";
 
 const getStage = stage => {
@@ -59,9 +58,31 @@ const endpoints = {
   "incomingLinks": (instanceId, property, type, from, size) => `/editor/api/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`
 };
 class API {
-  setSentry(sentry) {
-    if (sentry) {
-      Sentry.init(sentry);
+
+  constructor() {
+    this._is_sentry_initilized = false;
+    this._matomo = null;
+  }
+
+  setSentry(settings) {
+    if (settings && !this._is_sentry_initilized) {
+      this._is_sentry_initilized = true;
+      SentryInit({
+        ...settings,
+        autoSessionTracking: false
+      });
+    }
+  }
+
+  captureException(e) {
+    if (this._is_sentry_initilized) {
+      SentryCaptureException(e);
+    }
+  }
+
+  showReportDialog(report) {
+    if (this._is_sentry_initilized) {
+      SentryShowReportDialog(report);
     }
   }
 

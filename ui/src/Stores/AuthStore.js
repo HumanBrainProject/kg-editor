@@ -267,7 +267,6 @@ export class AuthStore {
       });
     }
   }
-}
 
   // async saveProfilePicture(picture) {
   //   try {

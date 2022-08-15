@@ -31,12 +31,6 @@ export class TransportLayer {
     this._axios = axios.create({});
   }
 
-  captureException = e => {
-    if (e?.response?.status === 500) {
-      API.captureException(e);
-    }
-  }
-
   setAuthStore = authStore => {
     this.authStore = authStore;
     this._axios = axios.create({});

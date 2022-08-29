@@ -54,7 +54,7 @@ const TextArea = props => {
 
     if (fieldStore.markdown) {
       return (
-        <Form.Group className={`${classes.container} ${className} ${classes.readMode}`} >
+        <Form.Group className={`${classes.readMode} ${className}`} >
           {label && (
             <Label className={classes.label} label={label} />
           )}
@@ -63,7 +63,7 @@ const TextArea = props => {
       );
     }
     return (
-      <Form.Group className={`${classes.container} ${className} ${classes.readMode}`} >
+      <Form.Group className={`${classes.readMode} ${className}`} >
         {label && (
           <Label className={classes.label} label={label} />
         )}

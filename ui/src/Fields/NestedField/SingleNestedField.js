@@ -170,7 +170,7 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
   }
 
   return (
-    <div className={`${className} ${(readMode || isReadOnly)?classes.readMode:""} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
+    <div className={`${(readMode || isReadOnly)?classes.readMode:""} ${className} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} isReadOnly={isReadOnly} />

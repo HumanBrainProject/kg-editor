@@ -191,7 +191,8 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
       const selectedId = value && value[mappingValue];
       if (selectedId) {
         view.resetInstanceHighlight();
-        const _pane = view.currentInstanceIdPane;
+        const paneForInstanceId = view.getPaneByInstanceId(id);
+        const _pane = paneForInstanceId?paneForInstanceId:view.currentInstanceIdPane;
         view.selectPane(_pane);
         view.setCurrentInstanceId(_pane, selectedId);
         view.setInstanceHighlight(_pane, selectedId, fieldStore.label);

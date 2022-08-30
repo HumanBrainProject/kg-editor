@@ -169,7 +169,8 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
       if (id) {
-        const _pane = view.currentInstanceIdPane;
+        const paneForInstanceId = view.getPaneByInstanceId(id);
+        const _pane = paneForInstanceId?paneForInstanceId:view.currentInstanceIdPane;
         view.selectPane(_pane);
         view.setCurrentInstanceId(_pane, id);
         view.setInstanceHighlight(_pane, id, fieldStore.label);

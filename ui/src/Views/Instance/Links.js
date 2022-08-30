@@ -36,6 +36,27 @@ const useStyles = createUseStyles({
   }
 });
 
+const getGroups = (instance, instancePath) => {
+  if (!instance) {
+    return [];
+  }
+  const groups = instance.childrenIdsGroupedByField;
+  if (!groups.length) {
+    return [];
+  }
+
+  return groups.reduce((acc, group) => {
+    const ids = group.ids.filter(id => !instancePath.includes(id));
+    if (ids.length) {
+      acc.push({
+        ...group,
+        ids: ids
+      });
+    }
+    return acc;
+  }, []);
+};
+
 const Links = observer(({ instanceId }) => {
 
   const classes = useStyles();
@@ -59,16 +80,21 @@ const Links = observer(({ instanceId }) => {
     }
   };
 
-  const groups = instance.childrenIdsGroupedByField;
+  const view = viewStore.selectedView;
+
+  const path = view.instancePath;
+  const index = path.findIndex(id => id === instanceId);
+  const instancePath = index > 0?path.slice(0, index):[instanceId]; 
+
+  const groups = getGroups(instance, instancePath);
   if (!groups.length) {
     return null;
   }
 
-  const view = viewStore.selectedView;
   const paneId = `ChildrenOf${instanceId}`;
-  const path = view.instancePath;
-  const index = path.findIndex(id => id === instanceId);
   const childInstanceId = (index >=0 && path.length>index+1)?path[index+1]:null;
+  const childPaneIndex = childInstanceId?view.getPaneIndex(`ChildrenOf${childInstanceId}`):-1;
+  const showChildInstance = !!childInstanceId && (childPaneIndex == -1 || childPaneIndex > index);
   return (
     <>
       <Pane className={classes.pane} paneId={paneId}>
@@ -84,7 +110,7 @@ const Links = observer(({ instanceId }) => {
           </div>
         ))}
       </Pane>
-      {childInstanceId && <DecoratedLinks instanceId={childInstanceId} />}
+      {showChildInstance && <DecoratedLinks instanceId={childInstanceId} />}
     </>
   );
 });

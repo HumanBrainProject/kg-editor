@@ -89,6 +89,14 @@ class View {
     return this.panes[this.instancePath.length];
   }
 
+  getPaneByInstanceId(instanceId) {
+    const index = this.instancePath.findIndex(id => id === instanceId);
+    if (index != -1) {
+      return this.panes[index];
+    }
+    return null;
+  };
+
   setCurrentInstanceId(pane, instanceId) {
     const start = this.panes.findIndex(p => p === pane);
     this.instancePath.splice(start, this.instancePath.length-start, instanceId);
@@ -118,7 +126,7 @@ class View {
   }
 
   getPane(paneId) {
-    return this.panes.find(p => p.paneId === paneId);
+    return this.panes.find(p => p === paneId);
   }
 
   registerPane(paneId) {
@@ -135,6 +143,7 @@ class View {
   unregisterPane(paneId) {
     this.panes = this.panes.filter(p => p !== paneId);
   }
+
 }
 
 export class ViewStore{

@@ -167,9 +167,11 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           const index = view.panes.findIndex(p => p === pane);
           if (index !== -1 && index < view.panes.length -1) {
             const targetPane = view.panes[index+1];
-            view.setInstanceHighlight(targetPane, id, fieldStore.label);
-            view.setCurrentInstanceId(targetPane, id);
-            view.selectPane(targetPane);
+            const paneForInstanceId = view.getPaneByInstanceId(id);
+            const _pane = paneForInstanceId?paneForInstanceId:targetPane;
+            view.setInstanceHighlight(_pane, id, fieldStore.label);
+            view.setCurrentInstanceId(_pane, id);
+            view.selectPane(_pane);
             view.resetInstanceHighlight();
           }
         }
@@ -242,7 +244,9 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         fieldStore.showLink(id);
         setTimeout(() => {
           view.resetInstanceHighlight();
-          view.setCurrentInstanceId(pane, id);
+          const paneForInstanceId = view.getPaneByInstanceId(id);
+          const _pane = paneForInstanceId?paneForInstanceId:pane;
+          view.setCurrentInstanceId(_pane, id);
           view.selectPane(view.currentInstanceIdPane);
         }, fieldStore.isLinkVisible(id)?0:1000);
       }

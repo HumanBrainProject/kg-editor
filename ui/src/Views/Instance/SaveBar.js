@@ -213,14 +213,11 @@ const SaveBar = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-
-    const onUnload = e => { // the method that will be used for both add and remove event
-      if(!instanceStore.hasUnsavedChanges){
-        return null;
+    
+    const onUnload = e => {
+      if (instanceStore.hasUnsavedChanges) {
+        e.returnValue = true;
       }
-      appStore.toggleSavebarDisplay(true);
-      e.returnValue = "You have unsaved modifications. Are you sure you want to leave this page?";
-      return e.returnValue;
     };
 
     window.addEventListener("beforeunload", onUnload);

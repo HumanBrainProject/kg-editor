@@ -70,7 +70,7 @@ export class TypeStore {
   };
 
   async fetch(space) {
-    if (!this.isFetching && space !== this.space) {
+    if (!this.isFetching && (this.fetchError || space !== this.space)) {
       if (space) {
         this.space = space;
         this.types = [];

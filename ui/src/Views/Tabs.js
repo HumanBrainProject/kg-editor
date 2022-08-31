@@ -30,7 +30,7 @@ import { useStores } from "../Hooks/UseStores";
 
 import InstanceTabs from "./InstanceTabs";
 import UserProfileTab from "./UserProfileTab";
-import SpaceSelector from "../Components/SpaceSelector";
+import SpaceSelector from "../Components/SpaceSelector/SpaceSelector";
 import Tab from "../Components/Tab";
 import NewInstanceTab from "./NewInstanceTab";
 

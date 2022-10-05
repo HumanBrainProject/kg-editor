@@ -42,7 +42,7 @@ const endpoints = {
   "instancesList": (stage=null) => `/editor/api/instancesBulk/list${getStage(stage)}`,
   "instancesSummary": (stage=null) => `/editor/api/instancesBulk/summary${getStage(stage)}`,
   "instancesLabel": (stage=null) => `/editor/api/instancesBulk/label${getStage(stage)}`,
-  "searchInstancesByType": (space, type, from, size, search) => `/editor/api/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${search}`,
+  "searchInstancesByType": (space, type, from, size, search) => `/editor/api/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${encodeURIComponent(search)}`,
   "suggestions": (instanceId, field, sourceType, targetType, start, size, search) => `/editor/api/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?"&sourceType=" + encodeURIComponent(sourceType):""}${targetType?"&targetType=" + encodeURIComponent(targetType):""}&start=${start}&size=${size}&search=${search}`,
   "instance": instanceId => `/editor/api/instances/${instanceId}`,
   "rawInstance": instanceId => `/editor/api/instances/${instanceId}/raw`,

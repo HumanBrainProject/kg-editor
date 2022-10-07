@@ -149,6 +149,17 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         parentContainerRef={formGroupRef}
         ValueRenderer={AlternativeValueComponent}
       />
+      {inputType === "time" ? 
+      <Form.Control
+        value={value}
+        type={inputType}
+        step={1}
+        as={as}
+        onChange={handleChange}
+        disabled={isDisabled}
+        rows={rows}
+        className={hasValidationWarnings?classes.warning:""}
+      />:
       <Form.Control
         value={value}
         type={inputType}
@@ -158,6 +169,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         rows={rows}
         className={hasValidationWarnings?classes.warning:""}
       />
+      }
       <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
       <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>

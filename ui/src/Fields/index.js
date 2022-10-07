@@ -31,6 +31,7 @@ import CheckBox from "./CheckBox/CheckBox";
 import UnsupportedField from "./UnsupportedField/UnsupportedField";
 import NestedField from "./NestedField/NestedField";
 import SingleNestedField from "./NestedField/SingleNestedField";
+import InputDateTime from "./InputDateTime/InputDateTime";
 
 import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
 import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
@@ -50,7 +51,7 @@ import CheckBoxStore from "./Stores/CheckBoxStore";
 import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
 import InputNumberStore from "./Stores/InputNumberStore";
 import InputDateStore from "./Stores/InputDateStore";
-import InputDateTime from "./InputDateTime/InputDateTime";
+import InputTimeStore from "./Stores/InputTimeStore";
 import NestedFieldStore from "./Stores/NestedFieldStore";
 import SingleNestedFieldStore from "./Stores/SingleNestedFieldStore";
 
@@ -70,6 +71,10 @@ export const fieldsMapping = {
   "InputDateTime": {
     Component: InputDateTime,
     Store: InputTextStore
+  },
+  "InputTime": {
+    Component: InputText,
+    Store: InputTimeStore
   },
   "InputNumberMultiple":  {
     Component: InputNumberMultiple,

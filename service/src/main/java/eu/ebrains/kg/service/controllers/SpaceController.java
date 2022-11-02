@@ -181,9 +181,11 @@ public class SpaceController {
                 Map<String, StructureOfField> fields = new HashMap<>();
                 f.getTargetTypesNames().forEach(targetType -> {
                     StructureOfType structureOfType = typesMap.get(targetType);
-                    Map<String, StructureOfField> nestedFields = structureOfType.getFields().entrySet().stream()
-                            .collect(Collectors.toMap(Map.Entry::getKey, v -> SerializationUtils.clone(v.getValue())));
-                    fields.putAll(nestedFields);
+                    if(structureOfType != null) {
+                        Map<String, StructureOfField> nestedFields = structureOfType.getFields().entrySet().stream()
+                                .collect(Collectors.toMap(Map.Entry::getKey, v -> SerializationUtils.clone(v.getValue())));
+                        fields.putAll(nestedFields);
+                    }
                 });
                 f.setFields(fields);
             }

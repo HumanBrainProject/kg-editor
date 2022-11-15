@@ -58,6 +58,19 @@ const getColor = (instance, view) => {
   return "";
 };
 
+const getDescription = (instance, view) => {
+  if(instance && (instance.isFetched || instance.isLabelFetched)) {
+    if(instance.primaryType.description) {
+      return instance.primaryType.description;
+    }
+    return instance.primaryType.name;
+  }
+  if(view.description) {
+    return view.description;
+  }
+  return "";
+}
+
 const InstanceTab = observer(({view, pathname}) => {
 
   const location = useLocation();
@@ -96,6 +109,8 @@ const InstanceTab = observer(({view, pathname}) => {
 
   const label = getLabel(instance, view);
   const color = getColor(instance, view);
+  const description =  getDescription(instance, view);
+
   return (
     <Tab
       icon={instance && instance.isFetching ? "circle-notch" : "circle"}
@@ -105,6 +120,7 @@ const InstanceTab = observer(({view, pathname}) => {
       path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
       onClose={handleClose}
       label={label}
+      description={description}
     />
   );
 });

@@ -97,7 +97,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
+const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
 
   const  navigate = useNavigate();
 
@@ -120,7 +120,7 @@ const Tab = ({label, disabled, current, icon, iconColor, iconSpin, hideLabel, pa
 
   return (
     <div className={`${classes.container} ${disabled? classes.disabled: ""} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={handleClick}>
-      <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={label}>
+      <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={description}>
         {icon && <FontAwesomeIcon fixedWidth icon={icon} spin={iconSpin}/>}
       </div>
       {hideLabel?null:

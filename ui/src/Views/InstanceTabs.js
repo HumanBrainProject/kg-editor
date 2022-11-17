@@ -60,6 +60,9 @@ const getColor = (instance, view) => {
 
 const getDescription = (instance, view) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
+    if(instance.primaryType.description && instance.primaryType.name) {
+      return `${instance.primaryType.name} - ${instance.primaryType.description}`;
+    }
     if(instance.primaryType.description) {
       return instance.primaryType.description;
     }

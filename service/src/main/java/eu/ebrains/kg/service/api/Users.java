@@ -35,9 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -71,10 +69,6 @@ public class Users {
             if (spaces != null) {
                 userProfile.setSpaces(spaces.stream().filter(Users::isUserRelevantSpace).collect(Collectors.toList()));
             }
-            Map<?, ?> userPictures = userClient.getUserPictures(Collections.singletonList(userProfile.getId()));
-            if (userPictures != null && userPictures.get(userProfile.getId()) != null) {
-                userProfile.setPicture(userPictures.get(userProfile.getId()).toString());
-            }
             return new KGCoreResult<UserProfile>().setData(userProfile);
         }
         return null;
@@ -82,7 +76,7 @@ public class Users {
 
     @GetMapping("/search")
     public KGCoreResult<List<UserSummary>> getUsers(@RequestParam(value = "search", required = false) String search) {
-        return userClient.getUsers(search);
+        return new KGCoreResult<List<UserSummary>>().setData(userClient.getUsers(search));
     }
 
 }

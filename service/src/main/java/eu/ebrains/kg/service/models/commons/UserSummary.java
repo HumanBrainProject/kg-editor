@@ -30,22 +30,16 @@ import eu.ebrains.kg.service.models.HasId;
 
 public class UserSummary implements HasId {
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public UserSummary(
-            @JsonProperty("@id") String kgId,
-            @JsonProperty(SchemaFieldsConstants.ALTERNATENAME) String kgUserName,
-            @JsonProperty(SchemaFieldsConstants.NAME) String kgName
+    public UserSummary(String id, String username, String name
     ){
-        this.id = kgId;
-        this.username = kgUserName;
-        this.name = kgName;
+        this.id = id;
+        this.username = username;
+        this.name = name;
     }
 
     private String id;
     private final String username;
     private final String name;
-    //This is actually a data url...
-    private String picture;
 
     @Override
     public void setId(String id) {
@@ -65,11 +59,4 @@ public class UserSummary implements HasId {
         return name;
     }
 
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
 }

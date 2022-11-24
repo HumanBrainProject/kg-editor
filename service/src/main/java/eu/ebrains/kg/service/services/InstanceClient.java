@@ -26,6 +26,7 @@ package eu.ebrains.kg.service.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.ebrains.kg.service.constants.EditorConstants;
 import eu.ebrains.kg.service.controllers.IdController;
+import eu.ebrains.kg.service.controllers.keycloak.KeycloakUsers;
 import eu.ebrains.kg.service.models.HasError;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
@@ -34,6 +35,7 @@ import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.instance.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.*;
@@ -48,10 +50,13 @@ public class InstanceClient {
     private final ObjectMapper objectMapper;
     private final ServiceCall kg;
 
-    public InstanceClient(IdController idController, ServiceCall kg, ObjectMapper jacksonObjectMapper) {
+    private final KeycloakUsers keycloakUsers;
+
+    public InstanceClient(IdController idController, ServiceCall kg, ObjectMapper jacksonObjectMapper, KeycloakUsers keycloakUsers) {
         this.idController = idController;
         this.kg = kg;
         this.objectMapper = jacksonObjectMapper;
+        this.keycloakUsers = keycloakUsers;
     }
 
     public <T extends HasError> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
@@ -271,13 +276,18 @@ public class InstanceClient {
         return buildResultWithOriginalMap(response, InstanceFull.class);
     }
 
-    private static class UserSummaryKG extends KGCoreResult<List<UserSummary>>{}
+    private static class UserIds extends KGCoreResult<List<String>>{}
     public KGCoreResult<List<UserSummary>> getInvitedUsers(String id) {
         String relativeUrl = String.format("instances/%s/invitedUsers", id);
-        return kg.client().get().uri(kg.url(relativeUrl))
+        final KGCoreResult<List<String>> userIds = kg.client().get().uri(kg.url(relativeUrl))
                 .retrieve()
-                .bodyToMono(UserSummaryKG.class)
+                .bodyToMono(UserIds.class)
                 .block();
+        if(userIds!=null && !CollectionUtils.isEmpty(userIds.getData())){
+            final List<UserSummary> userSummaries = userIds.getData().stream().map(keycloakUsers::getUserById).filter(Objects::nonNull).toList();
+            return new KGCoreResult<List<UserSummary>>().setData(userSummaries);
+        }
+        return null;
     }
 
     public void moveInstance(String id, String space) {

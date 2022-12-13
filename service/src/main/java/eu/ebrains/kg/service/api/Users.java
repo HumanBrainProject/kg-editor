@@ -67,7 +67,8 @@ public class Users {
             }
             List<Space> spaces = spaceClient.getSpaces();
             if (spaces != null) {
-                userProfile.setSpaces(spaces.stream().filter(Users::isUserRelevantSpace).collect(Collectors.toList()));
+                List<Space> filteredSpaces = spaces.stream().filter(Users::isUserRelevantSpace).toList();
+                userProfile.setSpaces(filteredSpaces);
             }
             return new KGCoreResult<UserProfile>().setData(userProfile);
         }

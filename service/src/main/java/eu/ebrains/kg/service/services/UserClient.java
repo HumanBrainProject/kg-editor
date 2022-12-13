@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class UserClient{
+public class UserClient {
 
     private final ServiceCall kg;
     private final KeycloakUsers keycloakUsers;
@@ -44,7 +44,8 @@ public class UserClient{
         this.keycloakUsers = keycloakUsers;
     }
 
-    private static class UserFromKG extends KGCoreResult<UserProfile>{}
+    private static class UserFromKG extends KGCoreResult<UserProfile> {
+    }
 
     public UserProfile getUserProfile() {
         String relativeUrl = "users/me";
@@ -55,14 +56,8 @@ public class UserClient{
         return response != null ? response.getData() : null;
     }
 
-    private static class UserSummaryFromIAM extends KGCoreResult<List<UserSummary>> {}
     public List<UserSummary> getUsers(String search) {
         return keycloakUsers.findUser(search);
-    }
-
-    public Map<String, String> getUserPictures(List<String> userIds){
-        //FIXME Where do we get nice user avatars from?
-        return Collections.emptyMap();
     }
 
 }

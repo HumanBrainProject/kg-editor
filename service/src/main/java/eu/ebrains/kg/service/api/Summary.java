@@ -70,7 +70,7 @@ public class Summary {
         StructureOfType rootType = typesByName.get(type).getData();
         String rootLabelField =  rootType.getLabelField();
         Set<StructureOfField> searchableFields = rootType.getFields().values().stream().filter(f -> f.getSearchable()!=null && f.getSearchable() && !f.getFullyQualifiedName().equals(rootLabelField)).collect(Collectors.toSet());
-        List<String> otherTypes = result.getData().stream().map(r -> r.getResult().getTypes()).flatMap(Collection::stream).map(SimpleType::getName).filter(t -> !t.equals(type)).distinct().collect(Collectors.toList());
+        List<String> otherTypes = result.getData().stream().map(r -> r.getResult().getTypes()).flatMap(Collection::stream).map(SimpleType::getName).filter(t -> !t.equals(type)).distinct().toList();
         if(!otherTypes.isEmpty()) {
             Map<String, KGCoreResult<StructureOfType>> otherTypesByName = spaceClient.getTypesByName(otherTypes, false);
             if(otherTypesByName!=null) {
@@ -109,7 +109,7 @@ public class Summary {
             });
             idController.simplifyId(r.getResult());
             return r.getResult();
-        }).collect(Collectors.toList());
+        }).toList();
         return new KGCoreResult<List<InstanceSummary>>().setData(instanceSummary).setTotalResults(result.getTotal()).setSize(result.getSize()).setFrom(result.getFrom());
     }
 

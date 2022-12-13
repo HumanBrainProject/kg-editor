@@ -47,7 +47,7 @@ public class InstanceLabel implements HasId, HasError {
     }
 
     private List<SimpleType> handleTypes(List<String> types) {
-        return types != null ? types.stream().map(SimpleType::new).collect(Collectors.toList()) : null;
+        return types != null ? types.stream().map(SimpleType::new).toList() : null;
     }
 
     private final String space;

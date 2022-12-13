@@ -27,7 +27,6 @@ import eu.ebrains.kg.service.helpers.Helpers;
 import eu.ebrains.kg.service.models.HasId;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.ResultWithOriginalMap;
-import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.instance.*;
 import eu.ebrains.kg.service.models.type.SimpleType;
 import eu.ebrains.kg.service.models.type.StructureOfField;
@@ -108,7 +107,7 @@ public class InstanceController {
         List<String> types = getTypesNamesFromInstance(instance);
         List<String> incomingLinksTypes = new ArrayList<>();
         retrieveIncomingLinksTypes(typesByName, incomingLinksTypes, types);
-        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty() ? incomingLinksTypes.stream().distinct().collect(Collectors.toList()) : null;
+        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty() ? incomingLinksTypes.stream().distinct().toList() : null;
         if (!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
             typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes, true));
         }
@@ -155,7 +154,7 @@ public class InstanceController {
             List<String> types = getTypesNamesFromInstance(instance.getResult());
             retrieveIncomingLinksTypes(typesByName, incomingLinksTypes, types);
         });
-        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty() ? incomingLinksTypes.stream().distinct().collect(Collectors.toList()) : null;
+        List<String> filteredIncomingLinksTypes = !incomingLinksTypes.isEmpty() ? incomingLinksTypes.stream().distinct().toList() : null;
         if (!CollectionUtils.isEmpty(filteredIncomingLinksTypes)) {
             typesByName.putAll(getTypesByNameResult(filteredIncomingLinksTypes, true));
         }
@@ -293,7 +292,7 @@ public class InstanceController {
         if (fromMap instanceof Collection) {
             return ((Collection<?>) fromMap).stream()
                     .map(v -> simplifyIdsOfLinksInNested((Map<String, Object>) v, fields))
-                    .collect(Collectors.toList());
+                    .toList();
         } else if (fromMap instanceof String || fromMap instanceof Integer) {
             return fromMap;
         } else {
@@ -334,7 +333,7 @@ public class InstanceController {
                     .map(StructureOfType::getPromotedFields)
                     .flatMap(Collection::stream)
                     .distinct()
-                    .collect(Collectors.toList()));
+                    .toList());
 
 
             String labelField = instance.getTypes().stream()
@@ -416,7 +415,9 @@ public class InstanceController {
     private void enrichTypesAndSearchableFields(InstanceSummary instance, Map<?, ?> originalMap, Map<String, StructureOfType> typesByName) {
         if (typesByName != null) {
             // Fill the type information
-            instance.getTypes().forEach(t -> enrichSimpleType(t, typesByName));
+            if(instance.getTypes() != null) {
+                instance.getTypes().forEach(t -> enrichSimpleType(t, typesByName));
+            }
 
             // Define the fields with the structure of the type and the values of the instance
             List<String> types = getTypesNamesFromInstance(instance);
@@ -435,7 +436,7 @@ public class InstanceController {
                     .map(StructureOfType::getPromotedFields)
                     .flatMap(Collection::stream)
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
 
             Map<String, StructureOfField> filteredFields = fields.entrySet().stream()
                     .filter(f -> promotedFields.contains(f.getValue().getFullyQualifiedName()) && !f.getValue().getFullyQualifiedName().equals(labelField))
@@ -444,7 +445,7 @@ public class InstanceController {
             filteredFields.values().forEach(f -> simplifyIdsOfLinks(f, originalMap));
             instance.setFields(filteredFields);
 
-            if (labelField != null) {
+            if (labelField != null && originalMap != null) {
                 String name = (String) originalMap.get(labelField);
                 instance.setName(name);
             }
@@ -463,7 +464,7 @@ public class InstanceController {
     }
 
     private <T extends InstanceLabel> Map<String, StructureOfType> getTypesByName(Collection<ResultWithOriginalMap<T>> instancesWithResult, boolean withProperties) {
-        List<T> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).filter(Objects::nonNull).collect(Collectors.toList());
+        List<T> instanceLabelList = instancesWithResult.stream().map(ResultWithOriginalMap::getResult).filter(Objects::nonNull).toList();
         return getTypesByName(instanceLabelList, withProperties);
     }
 
@@ -485,7 +486,7 @@ public class InstanceController {
                 .collect(Collectors.toList())
                 .stream()
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
         Map<String, StructureOfType> typesByName = getTypesByNameResult(involvedTypes, withProperties);
         retrieveTargetTypesFromNestedTypes(typesByName, typesByName);
         return typesByName;

@@ -23,9 +23,6 @@
 
 package eu.ebrains.kg.service.models.commons;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
 import eu.ebrains.kg.service.models.HasId;
 
 public class UserSummary implements HasId {

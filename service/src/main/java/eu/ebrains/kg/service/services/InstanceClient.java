@@ -133,7 +133,7 @@ public class InstanceClient {
         }
         KGCoreResult.List response = kg.client().get().uri(kg.url(relativeUrl)).retrieve().bodyToMono(KGCoreResult.List.class).block();
         if(response!=null){
-            List<ResultWithOriginalMap<InstanceSummary>> resultList = response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).collect(Collectors.toList());
+            List<ResultWithOriginalMap<InstanceSummary>> resultList = response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).toList();
             return new KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>>().setData(resultList).setTotalResults(response.getTotal()).setFrom(response.getFrom()).setSize(response.getSize());
         }
         return null;

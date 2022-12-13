@@ -27,7 +27,7 @@ import java.util.List;
 
 public class Permissions {
 
-    private Permissions(boolean canCreate, boolean canInviteForReview, boolean canDelete, boolean canInviteForSuggestion, boolean canRead, boolean canSuggest, boolean canWrite, boolean canRelease) {
+    private Permissions(boolean canCreate, boolean canInviteForReview, boolean canDelete, boolean canInviteForSuggestion, boolean canRead, boolean canSuggest, boolean canWrite, boolean canRelease) { // NOSONAR
         this.canCreate = canCreate;
         this.canInviteForReview = canInviteForReview;
         this.canDelete = canDelete;

@@ -83,7 +83,7 @@ public class SpaceController {
                         }))
                 );
         if (!CollectionUtils.isEmpty(typesFromIncomingLinks)) {
-            List<String> uniqueTypes = typesFromIncomingLinks.stream().distinct().collect(Collectors.toList());
+            List<String> uniqueTypes = typesFromIncomingLinks.stream().distinct().toList();
             Map<String, KGCoreResult<StructureOfType>> incomingLinksTypesByNameResult = spaceClient.getTypesByName(uniqueTypes, false);
             Map<String, StructureOfType> incomingLinksTypes = Helpers.getTypesByName(incomingLinksTypesByNameResult);
             typesMap.putAll(incomingLinksTypes);
@@ -131,7 +131,7 @@ public class SpaceController {
             }
         }));
         Map<String, StructureOfType> targetTypesByName = new HashMap<>();
-        List<String> uniqueTypes = typesToRetrieve.stream().distinct().collect(Collectors.toList());
+        List<String> uniqueTypes = typesToRetrieve.stream().distinct().toList();
         if (!CollectionUtils.isEmpty(uniqueTypes)) {
             Map<String, KGCoreResult<StructureOfType>> targetTypesByNameResult = spaceClient.getTypesByName(uniqueTypes, false);
             targetTypesByName.putAll(Helpers.getTypesByName(targetTypesByNameResult));
@@ -168,7 +168,7 @@ public class SpaceController {
                 });
             }
         }));
-        List<String> uniqueTypes = typesToRetrieve.stream().distinct().collect(Collectors.toList());
+        List<String> uniqueTypes = typesToRetrieve.stream().distinct().toList();
         if (!CollectionUtils.isEmpty(uniqueTypes)) {
             Map<String, KGCoreResult<StructureOfType>> nestedTypesByNameResult = spaceClient.getTypesByName(uniqueTypes, true);
             Map<String, StructureOfType> nestedTypesByName = Helpers.getTypesByName(nestedTypesByNameResult);

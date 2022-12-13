@@ -29,9 +29,7 @@ import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.user.UserProfile;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class UserClient {

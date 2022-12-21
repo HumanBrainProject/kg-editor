@@ -523,7 +523,12 @@ public class InstanceController {
      */
     private void enrichAlternatives(InstanceFull instance) {
         if (instance.getAlternatives() != null) {
-            instance.getAlternatives().values().forEach(value -> value.forEach(v -> idController.simplifyIdIfObjectIsAMap(v.getValue())));
+            instance.getAlternatives().values().forEach(value -> value.forEach(v -> {
+                v.getUsers().forEach(u -> {
+                    u.setId(idController.simplifyFullyQualifiedId(u.getId()).toString());
+                });
+                idController.simplifyIdIfObjectIsAMap(v.getValue());
+            }));
         }
     }
 

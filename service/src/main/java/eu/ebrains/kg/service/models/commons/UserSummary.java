@@ -23,15 +23,21 @@
 
 package eu.ebrains.kg.service.models.commons;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
 import eu.ebrains.kg.service.models.HasId;
 
-public class UserSummary implements HasId {
 
-    public UserSummary(String id, String username, String name
-    ){
-        this.id = id;
-        this.username = username;
-        this.name = name;
+public class UserSummary implements HasId {
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public UserSummary(@JsonProperty("@id") String kgUserId,
+                       @JsonProperty(SchemaFieldsConstants.ALTERNATENAME) String kgUserUsername,
+                       @JsonProperty(SchemaFieldsConstants.NAME) String kgUserName
+    ) {
+        this.id = kgUserId;
+        this.username = kgUserUsername;
+        this.name = kgUserName;
     }
 
     private String id;

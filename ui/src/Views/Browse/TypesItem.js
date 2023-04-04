@@ -211,7 +211,7 @@ const TypesItem = observer(({ type }) => {
   const handleSelect = e => {
     e && e.stopPropagation();
     API.trackEvent("Browse", "SelectType", type.name);
-    browseStore.selectItem(type);
+    browseStore.selectType(type);
   };
 
   const handleCreateInstance = () => {
@@ -222,15 +222,15 @@ const TypesItem = observer(({ type }) => {
   };
 
   const selected =
-    browseStore.selectedItem && type
-      ? browseStore.selectedItem.name === type.name
+    browseStore.selectedType && type
+      ? browseStore.selectedType.name === type.name
       : false;
   const color = type.color;
   const canCreate = appStore.currentSpacePermissions.canCreate && type.canCreate !== false && type.isSupported; // We are allowed to create unless canCreate is explicitly set to false and there are fields
 
   let cannotCreateTooltip = null;
   if (!appStore.currentSpacePermissions.canCreate) {
-    cannotCreateTooltip = `You are not allowed to create a new ${type.label}.`;
+    cannotCreateTooltip = `You are not allowed to create a new ${type.label} in space ${appStore.currentSpaceName}.`;
   } else if (!type.canCreate) {
     cannotCreateTooltip = `You are not allowed to create a new ${type.label} in the editor.`;
   }
@@ -244,19 +244,12 @@ const TypesItem = observer(({ type }) => {
       onClick={handleSelect}
       title={type.description ? type.description : type.name}
     >
-      {color ? (
-        <FontAwesomeIcon
-          fixedWidth
-          icon="circle"
-          className={`${classes.icon} ${classes.typeIcon}`}
-          style={{ color: color }}
-        />
-      ) : (
-        <FontAwesomeIcon
-          icon={"code-branch"}
-          className={`${classes.icon} ${classes.typeIcon}`}
-        />
-      )}
+      <FontAwesomeIcon
+        fixedWidth
+        icon={color?"circle":"code-branch"}
+        className={classes.icon}
+        style={color?{ color: color }:undefined}
+      />
       <span>
         {type.label}
         {type.description && (

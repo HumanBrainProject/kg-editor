@@ -28,6 +28,7 @@ import { useStores } from "../Hooks/UseStores";
 
 import Types from "./Types";
 import SpaceModal from "./SpaceModal";
+import ErrorPanel from "../Components/ErrorPanel";
 
 const Space = observer(({space}) => {
 
@@ -43,16 +44,17 @@ const Space = observer(({space}) => {
   }, [space]);
 
   const getSpace = name => {
-
     if (name && authStore.spaces.find(s => s.id === name)) {
       return name;
     }
-    const savedSpaceName = localStorage.getItem("space");
-    if (!savedSpaceName) {
-      return null;
-    }
-    if (authStore.spaces.find(s => s.id === savedSpaceName)) {
-      return savedSpaceName;
+    if (!space) {
+      const savedSpaceName = localStorage.getItem("space");
+      if (!savedSpaceName) {
+        return null;
+      }
+      if (authStore.spaces.find(s => s.id === savedSpaceName)) {
+        return savedSpaceName;
+      }
     }
     return null;
   }
@@ -62,8 +64,16 @@ const Space = observer(({space}) => {
   }
 
   if (!appStore.currentSpace) {
+    if (!space) {
+      return (
+        <SpaceModal/>
+      );
+    }
     return (
-      <SpaceModal/>
+      <ErrorPanel>
+        <p>You are currently not granted permission to acccess the space  &quot;<i>{space}&quot;</i>.</p>
+        <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+      </ErrorPanel>
     );
   }
 

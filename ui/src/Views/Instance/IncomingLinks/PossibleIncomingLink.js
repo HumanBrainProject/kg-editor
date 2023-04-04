@@ -60,7 +60,7 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
       }
     }
     navigate("/browse");
-    browseStore.selectItem(type);
+    browseStore.selectType(type);
   };
 
   return(

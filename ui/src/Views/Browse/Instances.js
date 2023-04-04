@@ -22,6 +22,7 @@
  */
 
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
@@ -29,6 +30,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars-2";
+import _  from "lodash-uuid";
 
 import API from "../../Services/API";
 import { useStores } from "../../Hooks/UseStores";
@@ -38,7 +40,6 @@ import BGMessage from "../../Components/BGMessage";
 import Filter from "../../Components/Filter";
 import Preview from "../Preview";
 import InstanceRow from "../Instance/InstanceRow";
-import { useNavigate } from "react-router-dom";
 
 const useStyles = createUseStyles({
   container: {
@@ -83,11 +84,109 @@ const useStyles = createUseStyles({
     background: "var(--bg-color-ui-contrast2)",
     padding: "0 10px",
     margin: "10px 0 10px -10px"
-  }
+  },
+  noInstancesPanel:{
+    position:"absolute !important",
+    top:"50%",
+    left:"50%",
+    transform:"translate(-50%,-200px)",
+    textAlign:"center"
+  },
+  noInstancesText:{
+    fontWeight:"300",
+    fontSize:"1.2em"
+  },
+  createFirstInstanceButton:{
+    marginTop: "20px",
+    display: "flex",
+    alignItems: "center",
+    //border: "1px solid rgba(0, 0, 0, 0.4)",
+    border: "1px solid var(--ft-color-normal)",
+    borderRadius: "10px",
+    padding: "0 20px",
+    //background: "rgba(0, 0, 0, 0.4)",
+    background: "rgba(255, 255, 255, 0.1)",
+    cursor: "pointer",
+    transition: "border 0.25s ease",
+    "&:hover": {
+      border: "1px solid var(--ft-color-loud)",
+      "& $createFirstInstanceIcon path": {
+        fill: "rgba(255,255,255,0.6)"
+      },
+      "& $createFirstInstanceText": {
+        color: "var(--ft-color-loud)"
+      }
+    }
+  },
+  createFirstInstanceIcon:{
+    fontSize:"5em",
+    "& path":{
+      //fill:"var(--bg-color-blend-contrast1)",
+      fill: "rgba(255,255,255,0.4)",
+      stroke:"rgba(200,200,200,.1)",
+      strokeWidth:"3px",
+      transition: "fill 0.25s ease"
+    }
+  },
+  createFirstInstanceText:{
+    fontSize: "1.5em",
+    whiteSpace: "nowrap",
+    paddingLeft: "10px",
+    //color: "rgba(0,0,0,0.4)",
+    color: "var(--ft-color-normal)",
+    fontWeight: "800",
+    transition: "color 0.25s ease"
+  },
+  createInstanceButton:{
+    padding: "5px 20px",
+    background: "var(--bg-color-ui-contrast2)",
+    color: "var(--ft-color-normal)",
+    margin: "-16px 10px 0 10px",
+    display: "inline-block",
+    border: "1px solid var(--border-color-ui-contrast1)",
+    cursor: "pointer",
+    transition: "border 0.25s ease",
+    "&:hover": {
+      background: "var(--list-bg-hover)",
+      borderColor: "transparent",
+      "& $createInstanceIcon path": {
+        fill: "rgba(255,255,255,0.6)"
+      },
+      "& $createInstanceText": {
+        color: "var(--ft-color-loud)"
+      }
+    }
+  },
+  createInstanceIcon:{
+    display: "inline-block",
+    fontSize: "2em",
+    "& path":{
+      fill: "rgba(255,255,255,0.4)",
+      stroke:"rgba(200,200,200,.1)",
+      strokeWidth:"3px",
+      transition: "fill 0.25s ease"
+    }
+  },
+  createInstanceText:{
+    display: "inline-block",
+    fontSize: "1.2em",
+    whiteSpace: "nowrap",
+    paddingLeft: "10px",
+    color: "var(--ft-color-normal)",
+    transform: "translateY(-5px)",
+    transition: "color 0.25s ease"
+  },
+  typeIcon: {
+    position: "absolute",
+    top: "8px",
+    "& + span": {
+      display: "inline-block",
+      marginLeft: "22px"
+    }
+  },
 });
 
 const InstancesResult = observer(({
-  browseStore,
   onRetry,
   onClick,
   onActionClick,
@@ -95,17 +194,29 @@ const InstancesResult = observer(({
   loadMore,
   classes
 }) => {
-  if (!browseStore.selectedItem) {
+
+  const navigate = useNavigate();
+
+  const { appStore, browseStore, instanceStore } = useStores();
+
+  const handleCreateInstance = () => {
+    API.trackEvent("Browse", "CreateInstance", browseStore.selectedType.name);
+    const uuid = _.uuid();
+    instanceStore.setInstanceIdAvailability(browseStore.selectedType, uuid);
+    navigate(`/instances/${uuid}/create`);
+  };
+
+  if (!browseStore.selectedType) {
     return (
       <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
-        Select a list of instances in the left panel
+        Select a instance type in the left panel
       </BGMessage>
     );
   }
   if (browseStore.fetchError) {
     return (
       <BGMessage icon={"ban"}>
-        There was a network problem retrieving the list of instances.
+        There was a network problem retrieving {browseStore.selectedType.label} instances.
         <br />
         If the problem persists, please contact the support.
         <br />
@@ -118,17 +229,47 @@ const InstancesResult = observer(({
   }
   if (browseStore.isFetching) {
     return (
-      <Spinner text="Retrieving instances..." />
+      <Spinner text={`Retrieving ${browseStore.selectedType.label} instances...`} />
     );
   }
+
+  const canCreate = appStore.currentSpacePermissions.canCreate && browseStore.selectedType.canCreate !== false && browseStore.selectedType.isSupported;  // We are allowed to create unless canCreate is explicitly set to false and there are fields
+
   if (!browseStore.instances.length) {
     return (
-      <BGMessage icon={"unlink"}>
-        No instances could be found in this list
-        {browseStore.instancesFilter && (
-          <div>with the search term {`"${browseStore.instancesFilter}"`}</div>
+      <div className={classes.noInstancesPanel}>
+        <div className={classes.noInstancesText}>
+          <p>No&nbsp;
+          <FontAwesomeIcon
+            fixedWidth
+            icon="circle"
+            className={classes.typIcon}
+            style={browseStore.selectedType.color?{ color: browseStore.selectedType.color }:undefined}
+          />
+          &nbsp;{browseStore.selectedType.label}&nbsp;
+          {browseStore.instancesFilter?`could be found with the search term "${browseStore.instancesFilter}"`:"exists yet"}!</p>
+          {!canCreate && (
+            <p>You are currently not granted permission to create a {browseStore.selectedType.label} in space {appStore.currentSpaceName}.</p>
+          )}
+        </div>
+        {canCreate && (
+          <div className={classes.createFirstInstanceButton} onClick={handleCreateInstance}>
+            <div className={classes.createFirstInstanceIcon}>
+              <FontAwesomeIcon icon="plus" />
+            </div>
+            <div className={classes.createFirstInstanceText}>
+              Create a new&nbsp;
+              <FontAwesomeIcon
+                fixedWidth
+                icon="circle"
+                className={classes.typIcon}
+                style={browseStore.selectedType.color?{ color: browseStore.selectedType.color }:undefined}
+              />
+              &nbsp;{browseStore.selectedType.label}
+            </div>
+          </div>
         )}
-      </BGMessage>
+      </div>
     );
   }
   return (
@@ -140,7 +281,7 @@ const InstancesResult = observer(({
       loader={
         <div className={classes.loader} key={0}>
           <FontAwesomeIcon icon={"circle-notch"} spin />
-          &nbsp;&nbsp;<span>Loading more instances...</span>
+          &nbsp;&nbsp;<span>Loading more  {browseStore.selectedType.label} instances...</span>
         </div>
       }
       useWindow={false}
@@ -160,6 +301,23 @@ const InstancesResult = observer(({
           ))}
         </ul>
       </div>
+      {canCreate && !browseStore.canLoadMoreInstances && (
+        <div className={classes.createInstanceButton} onClick={handleCreateInstance}>
+          <div className={classes.createInstanceIcon}>
+            <FontAwesomeIcon icon="plus" />
+          </div>
+          <div className={classes.createInstanceText}>
+            Create a new&nbsp;
+            <FontAwesomeIcon
+              fixedWidth
+              icon="circle"
+              className={classes.typIcon}
+              style={browseStore.selectedType.color?{ color: browseStore.selectedType.color }:undefined}
+            />
+            &nbsp;{browseStore.selectedType.label}
+          </div>
+        </div>
+      )}
     </InfiniteScroll>
   );
 });
@@ -172,11 +330,11 @@ const Instances = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (browseStore.selectedItem && browseStore.instancesFilter) {
+    if (browseStore.selectedType && browseStore.instancesFilter) {
       browseStore.refreshFilter();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [browseStore.selectedItem, browseStore.instancesFilter]);
+  }, [browseStore.selectedType, browseStore.instancesFilter]);
 
   const handleFilterChange = value => {
     API.trackEvent("Browse", "FilterInstance", value);
@@ -221,11 +379,11 @@ const Instances = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.header}>
-        {browseStore.selectedItem && (
+        {browseStore.selectedType && (browseStore.isFetching || !!browseStore.instances.length || browseStore.instancesFilter) && (
           <>
             <Filter
               value={browseStore.instancesFilter}
-              placeholder={`Filter instances of ${browseStore.selectedItem.label}`}
+              placeholder={`Filter instances of ${browseStore.selectedType.label}`}
               onChange={handleFilterChange}
             />
             <div className={classes.instanceCount}>
@@ -237,7 +395,6 @@ const Instances = observer(() => {
       </div>
       <Scrollbars autoHide>
         <InstancesResult
-          browseStore={browseStore}
           onRetry={handleRetry}
           onClick={handleInstanceClick}
           onCtrlClick={handleInstanceCtrlClick}

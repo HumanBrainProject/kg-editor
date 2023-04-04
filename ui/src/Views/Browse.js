@@ -24,8 +24,10 @@
 import React, {useEffect} from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import API from "../Services/API";
+import { useStores } from "../Hooks/UseStores";
 import Instances from "./Browse/Instances";
 import NavigationPanel from "./Browse/NavigationPanel";
 
@@ -40,12 +42,29 @@ const useStyles = createUseStyles({
 });
 
 const Browse = observer(() => {
+ 
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const space = searchParams.get("space");
+  const type = searchParams.get("type");
+
+  const { browseStore, typeStore } = useStores();
 
   useEffect(() => {
     API.trackCustomUrl(window.location.href);
     API.trackPageView();
+
+    const typeToSelect = type && typeStore.typesMap.get(type);
+    if ( typeToSelect && typeToSelect.isSupported && !typeToSelect.embeddedOnly) {
+      browseStore.selectType(typeToSelect);
+    }
+
+    if (space || type) {
+      navigate("/browse", { replace: true});
+    }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [space, type]);
 
   const classes = useStyles();
 

@@ -23,7 +23,7 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Navigate, matchPath, useLocation } from "react-router-dom";
+import { Navigate, matchPath, useLocation, useSearchParams } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -37,12 +37,13 @@ import InstanceCreation from "./InstanceCreation";
 import Space from "./Space";
 
 const matchInstance = pathname => matchPath({path:"/instances/:instanceId/:mode"}, pathname) || matchPath({path:"/instances/:instanceId"}, pathname);
+const matchBrowse = pathname => matchPath({path:"/browse"}, pathname);
 
 const UserProfile = observer(() => {
 
   const { authStore, appStore, typeStore } = useStores();
   const location = useLocation();
-  const match = matchInstance(location.pathname);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     authStore.retrieveUserProfile();
@@ -98,8 +99,9 @@ const UserProfile = observer(() => {
 
   const isTypeFetched = appStore.currentSpace && typeStore.space === appStore.currentSpace.id && typeStore.isFetched;
 
-  if (match) {
-    const { params: { instanceId, mode }} = match;
+  const instanceMatch = matchInstance(location.pathname);
+  if (instanceMatch) {
+    const { params: { instanceId, mode }} = instanceMatch;
     switch (mode) {
       case "create": {
         if (isTypeFetched) {
@@ -118,6 +120,15 @@ const UserProfile = observer(() => {
       }
     }
   }
+
+  const browseMatch = matchBrowse(location.pathname);
+  if (browseMatch) {    
+    const space = searchParams.get("space");
+    return (
+      <Space space={space} />
+    );
+  }
+
   return (
     <Space/>
   )

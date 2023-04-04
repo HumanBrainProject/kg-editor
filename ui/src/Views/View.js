@@ -23,7 +23,7 @@
 
 import React, { Suspense, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Route, Routes, matchPath, useNavigate } from "react-router-dom";
+import { Route, Routes, matchPath, useNavigate, useSearchParams } from "react-router-dom";
 
 import { useStores } from "../Hooks/UseStores";
 import SpinnerPanel from "../Components/SpinnerPanel";
@@ -36,6 +36,8 @@ const InstanceView = React.lazy(() => import("./InstanceView"));
 
 const View = observer(() => {
 
+  const [searchParams] = useSearchParams();
+
   const [isInitialized, setInitialized] = useState(false);
 
   const navigate = useNavigate();
@@ -43,16 +45,23 @@ const View = observer(() => {
   const { viewStore } = useStores();
 
   useEffect(() => {
-    if (!viewStore.views.size) {
-      const path = viewStore.restoreViews();
-      const noRoute = !!matchPath({path:"/"}, location.pathname);
-      if (noRoute && path) {
-        navigate(path);
-      } else {
+      const browseMatch = !!matchPath({path:"/browse"}, location.pathname);
+      const hasSpace = searchParams.has("space");
+      if (browseMatch & hasSpace) {
+        viewStore.flushStoredViewsforSpace();
         setInitialized(true);
-      }
-    } else {
-      setInitialized(true);
+      } else {
+        if (!viewStore.views.size) {
+          const path = viewStore.restoreViews();
+          const noRoute = !!matchPath({path:"/"}, location.pathname);
+          if (noRoute && path) {
+            navigate(path);
+          } else {
+            setInitialized(true);
+          }
+        } else {
+          setInitialized(true);
+        }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

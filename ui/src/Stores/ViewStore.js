@@ -181,6 +181,14 @@ export class ViewStore{
     }
   }
 
+  flushStoredViewsforSpace(){
+    if (this.rootStore.appStore.currentSpace) {
+      const views = getStoredViews();
+      delete views[this.rootStore.appStore.currentSpace.id];
+      localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
+    }
+  }
+
   flushStoredViews(){
     localStorage.removeItem(STORED_INSTANCE_VIEWS_KEY);
   }

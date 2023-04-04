@@ -44,7 +44,7 @@ export class BrowseStore {
   isFetching = false;
   isFetched = false;
   fetchError = null;
-  selectedItem = null;
+  selectedType = null;
   selectedInstance = null;
 
   instances = [];
@@ -66,14 +66,14 @@ export class BrowseStore {
       isFetching: observable,
       isFetched: observable,
       fetchError: observable,
-      selectedItem: observable,
+      selectedType: observable,
       selectedInstance: observable,
       instances: observable,
       instancesFilter: observable,
       canLoadMoreInstances: observable,
       totalInstances: observable,
       navigationFilter: observable,
-      selectItem: action,
+      selectType: action,
       clearInstances: action,
       setNavigationFilterTerm: action,
       selectInstance: action,
@@ -88,9 +88,9 @@ export class BrowseStore {
     this.rootStore = rootStore;
   }
 
-  selectItem(item) {
+  selectType(item) {
     this.clearInstancesFilter();
-    this.selectedItem = item;
+    this.selectedType = item;
     this.fetchInstances();
   }
 
@@ -98,7 +98,7 @@ export class BrowseStore {
     this.instances.length = 0;
     this.totalInstances = 0;
     this.clearSelectedInstance();
-    this.selectedItem = null;
+    this.selectedType = null;
     this.clearInstancesFilter();
   }
 
@@ -129,7 +129,7 @@ export class BrowseStore {
   }, 750);
 
   async fetchInstances(loadMore = false) {
-    if(!this.selectedItem) {
+    if(!this.selectedType) {
       return;
     }
     if(loadMore){
@@ -142,7 +142,7 @@ export class BrowseStore {
     }
     this.fetchError = null;
     try {
-      const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedItem.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
         this.isFetching = false;
         const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
@@ -157,7 +157,7 @@ export class BrowseStore {
     } catch (e) {
       runInAction(() => {
         const message = e.message?e.message:e;
-        this.fetchError = `Error while retrieving instances of type "${this.selectedItem.type}" (${message})`;
+        this.fetchError = `Error while retrieving instances of type "${this.selectedType.name}" (${message})`;
         this.isFetching = false;
       });
     }

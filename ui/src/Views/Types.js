@@ -50,8 +50,7 @@ const Types = observer(() => {
   if (typeStore.space === appStore.currentSpace.id && typeStore.fetchError) {
     return (
       <ErrorPanel>
-        There was a problem retrieving the types ({typeStore.fetchError}).
-          If the problem persists, please contact the support.<br /><br />
+        {typeStore.fetchError}<br /><br />
         <Button variant={"primary"} onClick={handeRetry}>
           <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
         </Button>

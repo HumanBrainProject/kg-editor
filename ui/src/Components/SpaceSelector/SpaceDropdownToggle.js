@@ -23,39 +23,37 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  dropdownMenu: {
-    background: "var(--bg-color-ui-contrast2)",
-    fontSize: "0.9em",
-    border: "1px solid var(--border-color-ui-contrast2)"
-  },
-  list: {
-    paddingLeft: "0",
-    listStyle: "none",
-    marginBottom: "0",
-    "& .dropdown-item": {
-      lineHeight: "1.3rem",
-      padding: "4px 8px"
+  dropdownLink: {
+    color: "var(--ft-color-selected)",
+    textDecoration: "none",
+    backgroundColor: "transparent",
+    border: "none",
+    transform: "translateY(-4px)",
+    "&:hover": {
+      color: "var(--ft-color-selected-hover)",
+      textDecoration: "none"
     }
   }
 });
 
+const SpaceDropdownToggle = React.forwardRef(({ children, onClick }, ref) => {
+  const classes = useStyles();
 
-const CustomDropdownMenu = React.forwardRef(
-  ({ children, className, "aria-labelledby": labeledBy }, ref) => {
-    const classes = useStyles();
+  const handleClick = e => {
+    e.preventDefault();
+    onClick(e);
+  };
 
-    return (
-      <div ref={ref} className={`${className} ${classes.dropdownMenu}`} aria-labelledby={labeledBy}>
-        <ul className={classes.list}>
-          {children}
-        </ul>
-      </div>
-    );
-  },
-);
+  return (
+    <button onClick={handleClick} className={classes.dropdownLink} ref={ref}>
+      {children} <FontAwesomeIcon icon={"caret-down"} />
+    </button>
+  );
+});
 
-CustomDropdownMenu.displayName = "CustomDropdownMenu";
+SpaceDropdownToggle.displayName = "SpaceDropdownToggle";
 
-export default CustomDropdownMenu;
+export default SpaceDropdownToggle;

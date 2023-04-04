@@ -23,28 +23,27 @@
 
 package eu.ebrains.kg.service.services;
 
-import eu.ebrains.kg.service.controllers.UserPictureRepository;
+import eu.ebrains.kg.service.controllers.keycloak.KeycloakUsers;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.user.UserProfile;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
-public class UserClient{
+public class UserClient {
 
     private final ServiceCall kg;
-    private final UserPictureRepository userPictureRepository;
+    private final KeycloakUsers keycloakUsers;
 
-    public UserClient(ServiceCall kg, UserPictureRepository userPictureRepository) {
+    public UserClient(ServiceCall kg, KeycloakUsers keycloakUsers) {
         this.kg = kg;
-        this.userPictureRepository  = userPictureRepository;
+        this.keycloakUsers = keycloakUsers;
     }
 
-    private static class UserFromKG extends KGCoreResult<UserProfile>{}
+    private static class UserFromKG extends KGCoreResult<UserProfile> {
+    }
 
     public UserProfile getUserProfile() {
         String relativeUrl = "users/me";
@@ -55,25 +54,8 @@ public class UserClient{
         return response != null ? response.getData() : null;
     }
 
-    private static class UserSummaryFromIAM extends KGCoreResult<List<UserSummary>> {}
-    public KGCoreResult<List<UserSummary>> getUsers(String search) {
-        String relativeUrl = String.format("users/fromIAM?search=%s", search);
-        return kg.client().get()
-                .uri(kg.url(relativeUrl))
-                .retrieve()
-                .bodyToMono(UserSummaryFromIAM.class)
-                .block();
-    }
-
-    public Map<String, String> getUserPictures(List<String> userIds){
-        Map<String, String> result = new HashMap<>();
-        userIds.forEach(userId -> {
-            String picture = userId!=null ? userPictureRepository.fetchUserPicture(userId) : null;
-            if (picture != null) {
-                result.put(userId, picture);
-            }
-        });
-        return result;
+    public List<UserSummary> getUsers(String search) {
+        return keycloakUsers.findUser(search);
     }
 
 }

@@ -28,6 +28,7 @@ module.exports = function(app) {
     "/editor/api/**",
     createProxyMiddleware({
       target:"http://localhost:8080",
+      // target:"https://editor.kg-int.ebrains.eu",
       secure:false,
       changeOrigin: true,
       pathRewrite: function(path) {

@@ -47,17 +47,19 @@ class View {
   name = "";
   mode = "edit";
   color = "";
+  description = "";
   instancePath = [];
   instanceHighlight = {instanceId: null, provenance: null};
   selectedPane = null;
   panes = [];
 
-  constructor(instanceId, name, color, mode) {
+  constructor(instanceId, name, color, mode, description) {
     makeObservable(this, {
       instanceId: observable,
       name: observable,
       mode: observable,
       color: observable,
+      description: observable,
       instancePath: observable,
       instanceHighlight: observable,
       selectedPane: observable,
@@ -77,6 +79,7 @@ class View {
     this.instanceId = instanceId;
     this.name = name;
     this.color = color;
+    this.description = description;
     this.mode = mode;
     this.instancePath = [instanceId];
   }
@@ -176,7 +179,7 @@ export class ViewStore{
   syncStoredViews(){
     if (this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
-      views[this.rootStore.appStore.currentSpace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, mode: view.mode, selected:this.selectedView ? this.selectedView.instanceId === id:false}));
+      views[this.rootStore.appStore.currentSpace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, description: view.description, mode: view.mode, selected:this.selectedView ? this.selectedView.instanceId === id:false}));
       localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
     }
   }
@@ -204,8 +207,8 @@ export class ViewStore{
           if (view.selected) {
             selectedView = view;
           }
-          const {id, name, color, mode} = view;
-          this.views.set(id, new View(id, name, color, mode));
+          const {id, name, color, mode, description} = view;
+          this.views.set(id, new View(id, name, color, mode, description));
         });
       }
       if (!selectedView) {
@@ -245,13 +248,14 @@ export class ViewStore{
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
     } else {
-      this.views.set(instanceId, new View(instanceId, name, type?type.color:"", viewMode));
+      const typeDescription = type && type.description?type.description:type.name;
+      this.views.set(instanceId, new View(instanceId, name, type?type.color:"", viewMode, typeDescription));
     }
   }
 
   replaceViewByNewInstanceId(id, newId) {
     const view = this.views.get(id);
-    this.views.set(newId, new View(newId, view?view.name:"", "edit"));
+    this.views.set(newId, new View(newId, view?view.name:"", view?view.color:"", "edit", view?view.description:""));
     this.views.delete(id);
   }
 

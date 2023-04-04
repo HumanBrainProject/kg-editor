@@ -21,39 +21,10 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import InputTextStore from "./InputTextStore";
 
-const useStyles = createUseStyles({
-  dropdownLink: {
-    color: "var(--ft-color-selected)",
-    textDecoration: "none",
-    backgroundColor: "transparent",
-    border: "none",
-    transform: "translateY(-4px)",
-    "&:hover": {
-      color: "var(--ft-color-selected-hover)",
-      textDecoration: "none"
-    }
-  }
-});
+class InputTimeStore extends InputTextStore {
+  inputType = "time";
+}
 
-const CustomDropdownToggle = React.forwardRef(({ children, onClick }, ref) => {
-  const classes = useStyles();
-
-  const handleClick = e => {
-    e.preventDefault();
-    onClick(e);
-  };
-
-  return (
-    <button onClick={handleClick} className={classes.dropdownLink} ref={ref}>
-      {children} <FontAwesomeIcon icon={"caret-down"} />
-    </button>
-  );
-});
-
-CustomDropdownToggle.displayName = "CustomDropdownToggle";
-
-export default CustomDropdownToggle;
+export default InputTimeStore;

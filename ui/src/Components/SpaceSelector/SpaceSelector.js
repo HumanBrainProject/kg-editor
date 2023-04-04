@@ -21,18 +21,17 @@
  *
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { observer } from "mobx-react-lite";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import API from "../../Services/API";
+import { useStores } from "../../Hooks/UseStores";
 
-import CustomDropdownToggle from "./CustomDropdownToggle";
-import CustomDropdownMenu from "./CustomDropdownMenu";
-import Filter from "./Filter";
+import SpaceDropdownToggle from "./SpaceDropdownToggle";
+import SpaceDropdownMenu from "./SpaceDropdownMenu";
 
 const useStyles = createUseStyles({
   container: {
@@ -52,13 +51,6 @@ const useStyles = createUseStyles({
     "& .inputFilter": {
       minWidth: "286px"
     }
-  },
-  dropdownItem: {
-    color: "var(--ft-color-loud)",
-    "&:hover": {
-      backgroundColor: "var(--list-bg-hover)",
-      color: "var(--ft-color-loud)"
-    }
   }
 });
 
@@ -68,7 +60,6 @@ const SpaceSelector = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [ filter, setFilter ] = useState("");
   const { appStore, authStore } = useStores();
 
   const handleSelectSpace = space => {
@@ -76,29 +67,14 @@ const SpaceSelector = observer(() => {
     appStore.switchSpace(location, navigate, space);
   }
 
-  const handleChange = value => setFilter(value);
-
-  const spaces = authStore.filteredList(filter);
-
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
       {authStore.spaces.length > 1 ?
         <Dropdown onSelect={handleSelectSpace}>
-          <Dropdown.Toggle as={CustomDropdownToggle}>
+          <Dropdown.Toggle as={SpaceDropdownToggle}>
             {appStore.currentSpaceName}
           </Dropdown.Toggle>
-          <Dropdown.Menu as={CustomDropdownMenu} >
-            <Filter value={filter} placeholder="Filter spaces" onChange={handleChange} />
-            {spaces.map(space =>
-              <Dropdown.Item
-                key={space.id}
-                eventKey={space.id}
-                className={classes.dropdownItem}
-              >
-                {space.name||space.id}
-              </Dropdown.Item>
-            )}
-          </Dropdown.Menu>
+          <Dropdown.Menu as={SpaceDropdownMenu} />
         </Dropdown>
         : appStore.currentSpaceName}
     </div>

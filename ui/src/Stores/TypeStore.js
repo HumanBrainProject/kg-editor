@@ -70,7 +70,7 @@ export class TypeStore {
   };
 
   async fetch(space) {
-    if (!this.isFetching && space !== this.space) {
+    if (!this.isFetching && (this.fetchError || space !== this.space)) {
       if (space) {
         this.space = space;
         this.types = [];
@@ -87,7 +87,7 @@ export class TypeStore {
               }))
               :[];
             if(!this.types.length) {
-              this.fetchError = "No types available";
+              this.fetchError = "This space is currently empty, please add some instances or type specifications.";
               this.isFetching = false;
               this.isFetched = false;
             } else {
@@ -99,7 +99,7 @@ export class TypeStore {
         } catch (e) {
           runInAction(() => {
             const message = e.message ? e.message : e;
-            this.fetchError = `Error while retrieving types (${message})`;
+            this.fetchError = `There was a problem retrieving the types (${message}). If the problem persists, please contact the support.`;
             this.isFetching = false;
             this.types = [];
             this.isFetched = false;

@@ -28,24 +28,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.constants.SchemaFieldsConstants;
 import eu.ebrains.kg.service.models.HasId;
 
-public class UserSummary implements HasId {
 
+public class UserSummary implements HasId {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public UserSummary(
-            @JsonProperty("@id") String kgId,
-            @JsonProperty(SchemaFieldsConstants.ALTERNATENAME) String kgUserName,
-            @JsonProperty(SchemaFieldsConstants.NAME) String kgName
-    ){
-        this.id = kgId;
-        this.username = kgUserName;
-        this.name = kgName;
+    public UserSummary(@JsonProperty("@id") String kgUserId,
+                       @JsonProperty(SchemaFieldsConstants.ALTERNATENAME) String kgUserUsername,
+                       @JsonProperty(SchemaFieldsConstants.NAME) String kgUserName
+    ) {
+        this.id = kgUserId;
+        this.username = kgUserUsername;
+        this.name = kgUserName;
     }
 
     private String id;
     private final String username;
     private final String name;
-    //This is actually a data url...
-    private String picture;
 
     @Override
     public void setId(String id) {
@@ -65,11 +62,4 @@ public class UserSummary implements HasId {
         return name;
     }
 
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
 }

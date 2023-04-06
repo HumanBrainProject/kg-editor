@@ -69,7 +69,7 @@ public class InstanceClient {
                                                                                    Class<T> clazz) {
         String incomingLinksPageSizeParam = returnIncomingLinks?String.format("&incomingLinksPageSize=%d", INCOMING_LINKS_PAGE_SIZE):"";
         String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%b&returnAlternatives=%b&returnPermissions=%b&returnEmbedded=%b&returnIncomingLinks=%b%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded, returnIncomingLinks, incomingLinksPageSizeParam);
-        KGCoreResult.Single originalMap = kg.client().post().uri(kg.url(relativeUrl))
+        KGCoreResult.Single originalMap = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
@@ -102,7 +102,7 @@ public class InstanceClient {
                                                         Integer size) {
 
         String relativeUrl = String.format("instances/%s/incomingLinks?stage=IN_PROGRESS&property=%s&type=%s&from=%d&size=%d", id, property, type, from, size);
-        IncomingLinksResult response = kg.client().get().uri(kg.url(relativeUrl)).retrieve().bodyToMono(IncomingLinksResult.class).block();
+        IncomingLinksResult response = kg.client(true).get().uri(kg.url(relativeUrl)).retrieve().bodyToMono(IncomingLinksResult.class).block();
         if(response!=null){
             response.getData().forEach(lk -> {
                         UUID uuid = idController.simplifyFullyQualifiedId(lk.getId());
@@ -131,7 +131,7 @@ public class InstanceClient {
         if (size != null) {
             relativeUrl = String.format("%s&size=%s", relativeUrl, size);
         }
-        KGCoreResult.List response = kg.client().get().uri(kg.url(relativeUrl)).retrieve().bodyToMono(KGCoreResult.List.class).block();
+        KGCoreResult.List response = kg.client(true).get().uri(kg.url(relativeUrl)).retrieve().bodyToMono(KGCoreResult.List.class).block();
         if(response!=null){
             List<ResultWithOriginalMap<InstanceSummary>> resultList = response.getData().stream().map(m -> new ResultWithOriginalMap<>(m, objectMapper.convertValue(m, InstanceSummary.class))).toList();
             return new KGCoreResult<List<ResultWithOriginalMap<InstanceSummary>>>().setData(resultList).setTotalResults(response.getTotal()).setFrom(response.getFrom()).setSize(response.getSize());
@@ -143,7 +143,7 @@ public class InstanceClient {
 
     public Scope getInstanceScope(String id) {
         String relativeUrl = String.format("instances/%s/scope?stage=IN_PROGRESS&returnPermissions=true&applyRestrictions=true", id);
-        ScopeFromKG response = kg.client().get().uri(kg.url(relativeUrl))
+        ScopeFromKG response = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(ScopeFromKG.class)
                 .block();
@@ -153,7 +153,7 @@ public class InstanceClient {
     private static class NeighborFromKG extends KGCoreResult<Neighbor>{}
     public KGCoreResult<Neighbor> getNeighbors(String id) {
         String relativeUrl = String.format("instances/%s/neighbors?stage=IN_PROGRESS", id);
-        return kg.client().get().uri(kg.url(relativeUrl))
+        return kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(NeighborFromKG.class)
                 .block();
@@ -180,7 +180,7 @@ public class InstanceClient {
         if (StringUtils.isNotBlank(targetType)) {
             relativeUrl = String.format("%s&targetType=%s", relativeUrl, targetType);
         }
-        return kg.client().post().uri(kg.url(relativeUrl))
+        return kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(payload))
                 .retrieve()
                 .bodyToMono(SuggestionFromKG.class)
@@ -189,7 +189,7 @@ public class InstanceClient {
 
     public ResultWithOriginalMap<InstanceFull> getInstance(String id) {
         String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true&incomingLinksPageSize=%d", id, INCOMING_LINKS_PAGE_SIZE);
-        KGCoreResult.Single response = kg.client().get().uri(kg.url(relativeUrl))
+        KGCoreResult.Single response = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
                 .block();
@@ -198,7 +198,7 @@ public class InstanceClient {
 
     public Map<String, Object> getRawInstance(String id) {
         String relativeUrl = String.format("instances/%s?stage=IN_PROGRESS&returnPermissions=true&returnEmbedded=true", id);
-        Map<String, Object> result = kg.client().get().uri(kg.url(relativeUrl))
+        Map<String, Object> result = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
@@ -223,7 +223,7 @@ public class InstanceClient {
 
     public void deleteInstance(String id) {
         String relativeUrl = String.format("instances/%s", id);
-        kg.client().delete().uri(kg.url(relativeUrl))
+        kg.client(true).delete().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
@@ -231,7 +231,7 @@ public class InstanceClient {
 
     public ResultWithOriginalMap<InstanceFull> patchInstance(String id, Map<?, ?> body) {
         String relativeUrl = String.format("instances/%s?returnPermissions=true&returnAlternatives=true&returnIncomingLinks=true&incomingLinksPageSize=%d", id, INCOMING_LINKS_PAGE_SIZE);
-        KGCoreResult.Single response = kg.client().patch().uri(kg.url(relativeUrl))
+        KGCoreResult.Single response = kg.client(true).patch().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
@@ -258,7 +258,7 @@ public class InstanceClient {
 
     public ResultWithOriginalMap<InstanceFull> postInstance(String id, String space, Map<?, ?> body) {
         String relativeUrl = String.format("instances/%s?returnPermissions=true&space=%s&returnAlternatives=true", id, space);
-        KGCoreResult.Single response = kg.client().post().uri(kg.url(relativeUrl))
+        KGCoreResult.Single response = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
@@ -268,7 +268,7 @@ public class InstanceClient {
 
     public ResultWithOriginalMap<InstanceFull> postInstance(String space, Map<?, ?> body) {
         String relativeUrl = String.format("instances?returnPermissions=true&space=%s&returnAlternatives=true", space);
-        KGCoreResult.Single response = kg.client().post().uri(kg.url(relativeUrl))
+        KGCoreResult.Single response = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(body))
                 .retrieve()
                 .bodyToMono(KGCoreResult.Single.class)
@@ -279,7 +279,7 @@ public class InstanceClient {
     private static class UserIds extends KGCoreResult<List<String>>{}
     public KGCoreResult<List<UserSummary>> getInvitedUsers(String id) {
         String relativeUrl = String.format("instances/%s/invitedUsers", id);
-        final KGCoreResult<List<String>> userIds = kg.client().get().uri(kg.url(relativeUrl))
+        final KGCoreResult<List<String>> userIds = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(UserIds.class)
                 .block();
@@ -292,7 +292,7 @@ public class InstanceClient {
 
     public void moveInstance(String id, String space) {
         String relativeUrl = String.format("instances/%s/spaces/%s", id, space);
-        kg.client().put().uri(kg.url(relativeUrl))
+        kg.client(true).put().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -300,7 +300,7 @@ public class InstanceClient {
 
     public void deleteInvitedUser(String id, String userId) {
         String relativeUrl = String.format("instances/%s/invitedUsers/%s", id, userId);
-        kg.client().delete().uri(kg.url(relativeUrl))
+        kg.client(true).delete().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -308,7 +308,7 @@ public class InstanceClient {
 
     public void addInvitation(String id, String userId) {
         String relativeUrl = String.format("instances/%s/invitedUsers/%s", id, userId);
-        kg.client().put().uri(kg.url(relativeUrl))
+        kg.client(true).put().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();

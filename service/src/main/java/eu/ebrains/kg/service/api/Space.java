@@ -26,10 +26,7 @@ package eu.ebrains.kg.service.api;
 import eu.ebrains.kg.service.controllers.SpaceController;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.type.StructureOfType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,6 +44,11 @@ public class Space {
     public KGCoreResult<List<StructureOfType>> getSpaceTypes(@PathVariable("space") String space) {
         List<StructureOfType> spaceTypes = spaceController.getTypes(space);
         return new KGCoreResult<List<StructureOfType>>().setData(spaceTypes);
+    }
+
+    @PostMapping("/{space}/initialize")
+    public void initializeSpace(@PathVariable("space") String space, @RequestBody(required = false) List<String> types) {
+        spaceController.initialize(space, types);
     }
 
 }

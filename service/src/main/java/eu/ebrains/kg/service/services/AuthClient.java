@@ -32,6 +32,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthClient {
 
+    private static final String ENDPOINT = "endpoint";
+
     private final ServiceCall kg;
 
     public AuthClient(ServiceCall kg) {
@@ -41,12 +43,12 @@ public class AuthClient {
     @Cacheable(value = "authEndpoint", unless = "#result == null")
     public String getEndpoint() {
         try {
-            KGCoreResult.Single result = kg.client().get().uri(kg.url("users/authorization"))
+            KGCoreResult.Single result = kg.client(true).get().uri(kg.url("users/authorization"))
                     .retrieve()
                     .bodyToMono(KGCoreResult.Single.class)
                     .block();
-            if (result != null && result.getData() != null && result.getData().get("endpoint") != null && StringUtils.isNotBlank(result.getData().get("endpoint").toString())) {
-                return result.getData().get("endpoint").toString();
+            if (result != null && result.getData() != null && result.getData().get(ENDPOINT) != null && StringUtils.isNotBlank(result.getData().get(ENDPOINT).toString())) {
+                return result.getData().get(ENDPOINT).toString();
             }
             return null;
         } catch (Exception e) {

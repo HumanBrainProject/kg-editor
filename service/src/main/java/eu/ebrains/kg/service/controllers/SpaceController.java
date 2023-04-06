@@ -27,10 +27,12 @@ import eu.ebrains.kg.service.helpers.Helpers;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.type.StructureOfField;
 import eu.ebrains.kg.service.models.type.StructureOfType;
+import eu.ebrains.kg.service.models.user.Space;
 import eu.ebrains.kg.service.services.SpaceClient;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,6 +46,26 @@ public class SpaceController {
 
     public SpaceController(SpaceClient spaceClient) {
         this.spaceClient = spaceClient;
+    }
+
+    private boolean hasSpace(String name) {
+        try{
+            Space space = spaceClient.getSpace(name);
+            return space != null;
+        } catch (WebClientResponseException.NotFound e){
+            return false;
+        }
+        // Other exceptions are not handled here
+    }
+
+    // Exceptions are handled globally
+    public void initialize(String name, List<String> types) {
+        if (!hasSpace(name)) {
+            spaceClient.setSpecification(name);
+            if (!CollectionUtils.isEmpty(types)) {
+                types.forEach(t -> spaceClient.setAssignType(name, t));
+            }
+        }
     }
 
     public List<StructureOfType> getTypes(String space) {
@@ -73,8 +95,7 @@ public class SpaceController {
 
     private void getIncomingLinksTypes(List<StructureOfType> spaceTypes, Map<String, StructureOfType> typesMap) {
         List<String> typesFromIncomingLinks = new ArrayList<>();
-        spaceTypes.stream().filter(wt -> Objects.nonNull(wt.getIncomingLinks()))
-                .collect(Collectors.toList())
+        spaceTypes.stream().filter(wt -> Objects.nonNull(wt.getIncomingLinks())).toList()
                 .forEach(v -> v.getIncomingLinks().values()
                         .forEach(i -> i.getSourceTypes().forEach(s -> {
                             if (!typesMap.containsKey(s.getType().getName())) {
@@ -87,8 +108,7 @@ public class SpaceController {
             Map<String, KGCoreResult<StructureOfType>> incomingLinksTypesByNameResult = spaceClient.getTypesByName(uniqueTypes, false);
             Map<String, StructureOfType> incomingLinksTypes = Helpers.getTypesByName(incomingLinksTypesByNameResult);
             typesMap.putAll(incomingLinksTypes);
-            spaceTypes.stream().filter(wt -> Objects.nonNull(wt.getIncomingLinks()))
-                    .collect(Collectors.toList())
+            spaceTypes.stream().filter(wt -> Objects.nonNull(wt.getIncomingLinks())).toList()
                     .forEach(v -> v.getIncomingLinks().values()
                             .forEach(i -> i.getSourceTypes().forEach(s -> {
                                 StructureOfType structureOfType = typesMap.get(s.getType().getName());

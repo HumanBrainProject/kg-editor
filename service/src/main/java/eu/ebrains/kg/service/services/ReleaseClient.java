@@ -41,7 +41,7 @@ public class ReleaseClient {
 
     public void putRelease(String id) {
         String relativeUrl = String.format("instances/%s/release",  id);
-        kg.client().put().uri(kg.url(relativeUrl))
+        kg.client(true).put().uri(kg.url(relativeUrl))
             .retrieve()
             .bodyToMono(Map.class)
             .block();
@@ -49,7 +49,7 @@ public class ReleaseClient {
 
     public void deleteRelease(String id) {
         String relativeUrl = String.format("instances/%s/release", id);
-        kg.client().delete().uri(kg.url(relativeUrl))
+        kg.client(true).delete().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
@@ -59,7 +59,7 @@ public class ReleaseClient {
 
     public Map<String, KGCoreResult<String>> getReleaseStatus(List<String> ids, String releaseTreeScope) {
         String relativeUrl = String.format("instancesByIds/release/status?releaseTreeScope=%s", releaseTreeScope);
-        ReleaseStatusFromKG response = kg.client().post().uri(kg.url(relativeUrl))
+        ReleaseStatusFromKG response = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()
                 .bodyToMono(ReleaseStatusFromKG.class)

@@ -47,7 +47,7 @@ public class UserClient {
 
     public UserProfile getUserProfile() {
         String relativeUrl = "users/me";
-        UserFromKG response = kg.client().get().uri(kg.url(relativeUrl))
+        UserFromKG response = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(UserFromKG.class)
                 .block();

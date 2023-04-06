@@ -24,6 +24,7 @@
 package eu.ebrains.kg.service.services;
 
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,15 +32,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 public class ServiceCall {
 
-    private final WebClient webClient;
+    private final WebClient userWithServiceAccountWebClient;
+    private final WebClient userOnlyWebClient;
 
     private final String kgCoreEndpoint;
 
     private final String apiVersion;
 
 
-    public ServiceCall(WebClient webClient,  @Value("${kgcore.endpoint}") String kgCoreEndpoint, @Value("${kgcore.apiVersion}") String apiVersion) {
-        this.webClient = webClient;
+    public ServiceCall(@Qualifier("asUserWithServiceAccount") WebClient userWithServiceAccountWebClient, @Qualifier("asUserOnly") WebClient userOnlyWebClient, @Value("${kgcore.endpoint}") String kgCoreEndpoint, @Value("${kgcore.apiVersion}") String apiVersion) {
+        this.userWithServiceAccountWebClient = userWithServiceAccountWebClient;
+        this.userOnlyWebClient = userOnlyWebClient;
         this.kgCoreEndpoint = kgCoreEndpoint;
         this.apiVersion = apiVersion;
     }
@@ -48,7 +51,7 @@ public class ServiceCall {
         return String.format("%s/%s/%s", kgCoreEndpoint, apiVersion, relativeUri);
     }
 
-    public WebClient client() {
-        return webClient;
+    public WebClient client(boolean useServiceAccount) {
+        return useServiceAccount?userWithServiceAccountWebClient:userOnlyWebClient;
     }
 }

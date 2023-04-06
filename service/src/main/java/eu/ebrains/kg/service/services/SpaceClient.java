@@ -41,16 +41,42 @@ public class SpaceClient {
         this.kg = kg;
     }
 
-    private static class SpacesResultFromKG extends KGCoreResult<List<Space>> {
-    }
+    private static class SpaceResultFromKG extends KGCoreResult<Space> {}
+    private static class SpacesResultFromKG extends KGCoreResult<List<Space>> {}
 
     public List<Space> getSpaces() {
-        String relativeUrl = "spaces?stage=IN_PROGRESS&permissions=true";
-        KGCoreResult<List<Space>> response = kg.client().get().uri(kg.url(relativeUrl))
+        String relativeUrl = "spaces?permissions=true";
+        KGCoreResult<List<Space>> response = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(SpacesResultFromKG.class)
                 .block();
         return response != null ? response.getData() : null;
+    }
+
+    public Space getSpace(String space) {
+        String relativeUrl = String.format("spaces/%s", space);
+        KGCoreResult<Space> response = kg.client(true).get().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(SpaceResultFromKG.class)
+                .block();
+        return response != null ? response.getData() : null;
+    }
+
+    public void setSpecification(String space) {
+        String relativeUrl = String.format("spaces/%s/specification", space);
+        kg.client(false).put().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    public void setAssignType(String space, String type) {
+        String relativeUrl = String.format("spaces/%s/types?type=%s", space, type);
+        kg.client(false).put().uri(kg.url(relativeUrl))
+                .body(BodyInserters.fromValue(type))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
     private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType>> {
@@ -58,7 +84,7 @@ public class SpaceClient {
 
     public List<StructureOfType> getSpaceTypes(String space) {
         String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true&withIncomingLinks=true", space);
-        StructureTypeResultFromKG response = kg.client().get().uri(kg.url(relativeUrl))
+        StructureTypeResultFromKG response = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)
                 .block();
@@ -71,7 +97,7 @@ public class SpaceClient {
 
     public Map<String, KGCoreResult<StructureOfType>> getTypesByName(List<String> types, boolean withProperties) {
         String relativeUrl = String.format("typesByName?stage=IN_PROGRESS&withProperties=%s", withProperties);
-        StructureOfTypeByNameFromKG response = kg.client().post().uri(kg.url(relativeUrl))
+        StructureOfTypeByNameFromKG response = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(types))
                 .retrieve()
                 .bodyToMono(StructureOfTypeByNameFromKG.class)

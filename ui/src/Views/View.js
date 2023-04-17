@@ -47,7 +47,7 @@ const View = observer(() => {
   useEffect(() => {
       const browseMatch = !!matchPath({path:"/browse"}, location.pathname);
       const hasSpace = searchParams.has("space");
-      if (browseMatch & hasSpace) {
+      if (browseMatch && hasSpace) {
         viewStore.flushStoredViewsforSpace();
         setInitialized(true);
       } else {

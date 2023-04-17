@@ -193,7 +193,9 @@ const InstancesHistoryBody = observer(({ onError }) => {
   }
 
   if (!historyStore.instances.length) {
-    <div className={classes.noHistory}>No instances matches your filters in your history.</div>
+    return (
+      <div className={classes.noHistory}>No instances matches your filters in your history.</div>
+    );
   }
 
   return (

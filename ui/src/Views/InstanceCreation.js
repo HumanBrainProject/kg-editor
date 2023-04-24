@@ -25,7 +25,7 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { Navigate, Link } from "react-router-dom";
 
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 import Instance from "./Instance";
 import SpinnerPanel from "../Components/SpinnerPanel";

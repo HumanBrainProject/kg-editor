@@ -27,7 +27,7 @@ import { List } from "react-virtualized";
 import { observer } from "mobx-react-lite";
 import debounce from "lodash/debounce";
 
-import { useStores } from "../../../Hooks/UseStores";
+import { useStores } from "../../../Hooks/useStores";
 
 import ReleaseNode from "./ReleaseNode";
 

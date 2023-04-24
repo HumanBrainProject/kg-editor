@@ -26,8 +26,8 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import Matomo from "../Services/Matomo";
+import { useStores } from "../Hooks/useStores";
 
 import ThemeSwitcher from "./Home/ThemeSwitcher";
 import InstancesHistory from "./Home/InstancesHistory";
@@ -249,8 +249,8 @@ const Home = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    API.trackCustomUrl(window.location.href);
-    API.trackPageView();
+    Matomo.trackCustomUrl(window.location.href);
+    Matomo.trackPageView();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -29,7 +29,7 @@ import { Column, Table as TableComponent } from "react-virtualized";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

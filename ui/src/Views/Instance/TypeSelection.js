@@ -27,10 +27,10 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 
 import Filter from "../../Components/Filter";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -124,7 +124,7 @@ const TypeSelection = observer(({ onSelect }) => {
   const [filter, setFilter] = useState();
 
   const handleChange = value => {
-    API.trackEvent("Browser", "FilterType", value);
+    Matomo.trackEvent("Browser", "FilterType", value);
     setFilter(value);
   };
 

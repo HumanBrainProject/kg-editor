@@ -34,6 +34,8 @@ import "./Services/IconsImport";
 
 import App from "./Views/App";
 import ErrorBoundary from "./Views/ErrorBoundary";
+import axios, { InternalAxiosRequestConfig } from "axios";
+import KeycloakAuthAdapter from "./services/KeycloakAuthAdapter";
 
 
 /* //NOSONAR React debug flags
@@ -46,16 +48,35 @@ configure({
 });
 */
 
+const authAdapter = new KeycloakAuthAdapter({
+  onLoad: "login-required",
+  flow: "standard",
+  pkceMethod: "S256",
+  checkLoginIframe: false,
+  enableLogging: true
+});
+
 //reportWebVitals(); //NOSONAR
+const axiosInstance = axios.create({});
+axiosInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  if (authAdapter.tokenProvider?.token && config.headers) {
+      config.headers.Authorization = `Bearer ${authAdapter.tokenProvider.token}`;
+  }
+  return Promise.resolve(config);
+});
+authAdapter.setAxios(axiosInstance);
 
 const container = document.getElementById('root');
-const root = createRoot(container); // createRoot(container!) if you use TypeScript
+if (!container) {
+  throw new Error("Failed to find the root element");
+}
+const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
       <ErrorBoundary>
         <BrowserRouter>
-          <App />
+          <App authAdapter={authAdapter}/>
         </BrowserRouter>
       </ErrorBoundary>
     </JssProvider>

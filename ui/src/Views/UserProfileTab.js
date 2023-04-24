@@ -31,10 +31,10 @@ import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 import Avatar from "../Components/Avatar";
+import Matomo from "../Services/Matomo";
 
 const PopOverContent = ({onSizeChange, children}) => {
   const ref = useRef();
@@ -175,7 +175,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
 
   useEffect(() => {
     if(showPopOver) {
-      API.trackEvent("Tab", "UserProfile", "Open");
+      Matomo.trackEvent("Tab", "UserProfile", "Open");
     }
     return () => {
       if (showPopOver) {
@@ -204,14 +204,14 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   };
 
   const handleCopyToken = () => {
-    API.trackEvent("Token", "Copy");
+    Matomo.trackEvent("Token", "Copy");
     clearTimeout(tokenCopied);
     const timer = setTimeout(() => setTokenCopied(null), 2000);
     setTokenCopied(timer);
   };
 
   const handleLogout = () => {
-    API.trackEvent("User", "Logout");
+    Matomo.trackEvent("User", "Logout");
     if (!instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       viewStore.flushStoredViews();
       authStore.logout();

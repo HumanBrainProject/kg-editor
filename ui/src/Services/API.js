@@ -20,8 +20,6 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import { init as SentryInit, captureException as SentryCaptureException, showReportDialog as SentryShowReportDialog } from "@sentry/browser";
-import ReactPiwik from "react-piwik";
 
 const getStage = stage => {
   if(stage) {
@@ -58,80 +56,6 @@ const endpoints = {
   "incomingLinks": (instanceId, property, type, from, size) => `/editor/api/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`
 };
 class API {
-
-  constructor() {
-    this._is_sentry_initilized = false;
-    this._matomo = null;
-  }
-
-  setSentry(settings) {
-    if (settings && !this._is_sentry_initilized) {
-      this._is_sentry_initilized = true;
-      SentryInit({
-        ...settings,
-        autoSessionTracking: false
-      });
-    }
-  }
-
-  captureException(e) {
-    if (this._is_sentry_initilized) {
-      SentryCaptureException(e);
-    }
-  }
-
-  showReportDialog(customSettings) {
-    if (this._is_sentry_initilized) {
-      const defaultSettings = {
-        title: "An unexpected error has occured.",
-        subtitle2: "We recommend you to save all your changes and reload the application in your browser. The KG team has been notified. If you'd like to help, tell us what happened below.",
-        labelEmail: "Email",
-        labelName: "Name",
-        labelComments: "Please fill in a description of your error use case"
-      };
-      const settings = {
-        ...defaultSettings,
-        ...customSettings
-      };
-      SentryCaptureException(new Error(settings.title)); //We generate a custom error as report dialog is only linked to an error.
-      SentryShowReportDialog(settings);
-    }
-  }
-
-  setMatomo(settings) {
-    if (settings?.url && settings?.siteId) {
-      this._matomo = new ReactPiwik({
-        url: settings.url,
-        siteId:settings.siteId,
-        trackErrors: true
-      });
-    }
-  }
-
-  trackCustomUrl(url) {
-    if (this._matomo && url) {
-      ReactPiwik.push(["setCustomUrl", url]);
-    }
-  }
-
-  trackPageView() {
-    if (this._matomo) {
-      ReactPiwik.push(["trackPageView"]);
-    }
-  }
-
-  trackEvent(category, name, value) {
-    if (this._matomo) {
-      ReactPiwik.push(["trackEvent", category, name, value]);
-    }
-  }
-
-  trackLink(category, name) {
-    if (this._matomo) {
-      ReactPiwik.push(["trackLink", category, name]);
-    }
-  }
-
   get endpoints() {
     return endpoints;
   }

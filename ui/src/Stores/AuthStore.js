@@ -24,8 +24,6 @@
 import { observable, computed, action, runInAction, makeObservable, toJS } from "mobx";
 import API from "../Services/API";
 
-const rootPath = window.rootPath || "";
-
 export class AuthStore {
   isUserAuthorized = false;
   isUserAuthorizationInitialized = false;
@@ -38,7 +36,6 @@ export class AuthStore {
   isInitializing = false;
   initializationError = null;
   isLogout = false;
-  keycloak = null;
   endpoint = null;
   commit = null;
 
@@ -63,10 +60,7 @@ export class AuthStore {
       hasUserProfile: computed,
       hasSpaces: computed,
       spaces: computed,
-      logout: action,
       retrieveUserProfile: action,
-      initializeKeycloak: action,
-      login: action,
       authenticate: action,
       firstName: computed
     });
@@ -80,15 +74,6 @@ export class AuthStore {
       return this.spaces.filter(t => t.id.toLowerCase().includes(term));
     }
     return this.spaces;
-  }
-
-
-  get accessToken() {
-    return this.isAuthenticated ? this.keycloak.token: "";
-  }
-
-  get isAuthenticated() {
-    return this.authSuccess;
   }
 
   get hasUserProfile() {
@@ -134,16 +119,6 @@ export class AuthStore {
     return "";
   }
 
-  logout() {
-    this.authSuccess = false;
-    this.isTokenExpired = true;
-    this.isUserAuthorized = false;
-    this.user = null;
-    this.isUserAuthorizationInitialized = false;
-    this.keycloak.logout({redirectUri: `${window.location.protocol}//${window.location.host}${rootPath}/logout`});
-    this.isLogout = true;
-  }
-
   async retrieveUserProfile() {
     if (this.isAuthenticated && !this.isRetrievingUserProfile && !this.user) {
       this.userProfileError = null;
@@ -175,55 +150,7 @@ export class AuthStore {
     }
   }
 
-  login() {
-    if(!this.isAuthenticated && this.keycloak) {
-      this.keycloak.login();
-    }
-  }
-
-  initializeKeycloak(keycloakSettings, onSuccess) {
-    try {
-      const keycloak = window.Keycloak(keycloakSettings);
-      runInAction(() => this.keycloak = keycloak);
-      keycloak.onAuthSuccess = () => {
-        runInAction(() => {
-          this.authSuccess = true;
-          this.isInitializing = false;
-        });
-        onSuccess();
-      };
-      keycloak.onAuthError = error => {
-        const message = (error && error.error_description)?error.error_description:"Failed to authenticate";
-        runInAction(() => {
-          this.authError = message;
-        });
-      };
-      keycloak.onTokenExpired = () => {
-        keycloak
-          .updateToken(30)
-          .catch(() => runInAction(() => {
-            this.authSuccess = false;
-            this.isTokenExpired = true;
-          }));
-      };
-      keycloak.init({
-        onLoad: "login-required",
-        pkceMethod: "S256",
-        checkLoginIframe: !window.location.host.startsWith("localhost") // avoid CORS error with UI running on localhost with Firefox
-      }).catch(() => {
-        runInAction(() => {
-          this.isInitializing = false;
-          this.authError = "Failed to initialize authentication";
-        });
-      });
-    } catch (e) { // if keycloak script url return unexpected content
-      runInAction(() => {
-        this.isInitializing = false;
-        this.authError = "Failed to initialize authentication";
-      });
-    }
-  }
-
+ 
   async authenticate() {
     if (this.isInitializing || this.authSuccess) {
       return;
@@ -234,36 +161,13 @@ export class AuthStore {
     try {
       const { data } = await this.transportLayer.getSettings();
       const commit = data?.data.commit;
-      const keycloakSettings =  data?.data?.keycloak;
       const sentrySettings = data?.data?.sentry;
       const matomoSettings = data?.data?.matomo;
       runInAction(() => {
         this.commit = commit;
       });
-      if(keycloakSettings) {
-        const keycloakScript = document.createElement("script");
-        keycloakScript.src = `${keycloakSettings.url}/js/keycloak.js`;
-        keycloakScript.async = true;
-        document.head.appendChild(keycloakScript);
-        keycloakScript.onload = () => {
-          this.initializeKeycloak(keycloakSettings, () => {
-            API.setSentry(sentrySettings);
-            API.setMatomo(matomoSettings);
-          });
-        };
-        keycloakScript.onerror = () => {
-          document.head.removeChild(keycloakScript);
-          runInAction(() => {
-            this.isInitializing = false;
-            this.authError = `Failed to load resource! (${keycloakScript.src})`;
-          });
-        };
-      } else {
-        runInAction(() => {
-          this.isInitializing = false;
-          this.authError = "The service is temporary unavailable. Please retry in a moment. (failed to load keycloak settings)";
-        });
-      }
+      API.setSentry(sentrySettings);
+      API.setMatomo(matomoSettings);
     } catch (e) {
       runInAction(() => {
         this.isInitializing = false;
@@ -272,16 +176,6 @@ export class AuthStore {
     }
   }
 
-  // async saveProfilePicture(picture) {
-  //   try {
-  //     await this.transportLayer.updateUserPicture(picture);
-  //     runInAction(() => {
-  //       this.user.picture = picture;
-  //     });
-  //   } catch (e) {
-  //     // Catch Error
-  //   }
-  // }
 
 }
 

@@ -27,7 +27,7 @@ import { createUseStyles } from "react-jss";
 import Badge from "react-bootstrap/Badge";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStores } from "../../../Hooks/UseStores";
+import { useStores } from "../../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   pill: {

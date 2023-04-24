@@ -23,9 +23,9 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
-import API from "../Services/API";
+import Matomo from "../Services/Matomo";
 import Instance from "./Instance/Instance";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -40,8 +40,8 @@ const InstanceView = observer(({ mode }) => {
   const id = params.id;
 
   useEffect(() => {
-    API.trackCustomUrl(window.location.href);
-    API.trackPageView();
+    Matomo.trackCustomUrl(window.location.href);
+    Matomo.trackPageView();
     appStore.openInstance(id, id, {}, mode);
     instanceStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(id);

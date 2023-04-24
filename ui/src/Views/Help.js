@@ -27,7 +27,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Scrollbars } from "react-custom-scrollbars-2";
 
-import API from "../Services/API";
+import Matomo from "../Services/Matomo";
 import Introduction from "./Help/Introduction";
 
 import Browse from "./Help/Browse";
@@ -106,8 +106,8 @@ const Help = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    API.trackCustomUrl(window.location.href);
-    API.trackPageView();
+    Matomo.trackCustomUrl(window.location.href);
+    Matomo.trackPageView();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -30,7 +30,7 @@ import Color from "color";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/UseStores";
+import { useStores } from "../../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

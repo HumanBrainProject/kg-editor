@@ -98,7 +98,7 @@ class View {
       return this.panes[index];
     }
     return null;
-  };
+  }
 
   setCurrentInstanceId(pane, instanceId) {
     const start = this.panes.findIndex(p => p === pane);

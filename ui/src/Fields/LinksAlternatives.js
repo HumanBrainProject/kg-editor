@@ -24,7 +24,7 @@
 import React, { useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 import Alternatives from "./Alternatives";
 

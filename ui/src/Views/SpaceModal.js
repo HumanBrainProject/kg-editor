@@ -28,7 +28,7 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import Modal from "react-bootstrap/Modal";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

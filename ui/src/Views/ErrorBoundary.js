@@ -23,7 +23,7 @@
 
 import React from "react";
 
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 class ErrorBoundaryComponent extends React.Component {
 

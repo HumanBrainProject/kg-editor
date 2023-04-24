@@ -25,6 +25,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Color from "color";
 import uniqueId from "lodash/uniqueId";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const jsdiff = require("diff");
 
 const useStyles = createUseStyles({

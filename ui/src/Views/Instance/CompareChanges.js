@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 
 import CompareFieldsChanges from "./CompareFieldsChanges";
 import { createInstanceStore } from "../../Stores/InstanceStore";
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

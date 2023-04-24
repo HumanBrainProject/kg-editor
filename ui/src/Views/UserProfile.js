@@ -27,7 +27,7 @@ import { Navigate, matchPath, useLocation, useSearchParams } from "react-router-
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 

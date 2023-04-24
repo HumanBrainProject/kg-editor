@@ -27,12 +27,12 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../Services/API";
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
 
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -135,7 +135,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
   const handleInstanceClick = instance => {
     let id = instance && instance.id;
     if (id) {
-      API.trackEvent("Home", "InstanceOpenTab", instance.id);
+      Matomo.trackEvent("Home", "InstanceOpenTab", instance.id);
       navigate(`/instances/${id}`);
     }
   };
@@ -143,7 +143,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
   const handleInstanceCtrlClick = instance => {
     const id = instance?.id;
     if (id) {
-      API.trackEvent("Home", "InstanceOpenTabInBackground", instance.id);
+      Matomo.trackEvent("Home", "InstanceOpenTabInBackground", instance.id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     }
   };
@@ -155,7 +155,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
         const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(historyInstance));
       }
-      API.trackEvent("Home", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
+      Matomo.trackEvent("Home", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
       if(mode === "view") {
         navigate(`/instances/${id}`);
       } else {

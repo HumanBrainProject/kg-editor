@@ -27,12 +27,12 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../../Services/API";
-import { useStores } from "../../../Hooks/UseStores";
+import { useStores } from "../../../Hooks/useStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
 import { useNavigate, useLocation } from "react-router-dom";
+import Matomo from "../../../Services/Matomo";
 
 const useStyles = createUseStyles({
   title: {
@@ -189,7 +189,7 @@ const MoveInstance = observer(({ instance, className }) => {
   const handleSetSpaceId = e => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
-    API.trackEvent("Instance", "Move", instance.id);
+    Matomo.trackEvent("Instance", "Move", instance.id);
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 

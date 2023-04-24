@@ -31,10 +31,10 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 
 import CompareChanges from "./CompareChanges";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container:{
@@ -228,18 +228,18 @@ const SaveBar = observer(() => {
   }, []);
 
   const handleSaveAll = () => {
-    API.trackEvent("Instance", "SaveAll");
+    Matomo.trackEvent("Instance", "SaveAll");
     instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance, navigate));
   };
 
   const handleSave = instance => {
-    API.trackEvent("Instance", "InstanceSave", instance.id);
+    Matomo.trackEvent("Instance", "InstanceSave", instance.id);
     appStore.saveInstance(instance, navigate);
     setComparedInstance(null);
   };
 
   const handleReset = instance => {
-    API.trackEvent("Instance", "InstanceReset", instance.id);
+    Matomo.trackEvent("Instance", "InstanceReset", instance.id);
     instanceStore.confirmCancelInstanceChanges(instance.id);
     setComparedInstance(null);
   };
@@ -247,7 +247,7 @@ const SaveBar = observer(() => {
   const handleDismissSaveError = instance => instance.cancelSave();
 
   const handleCompare = instance => {
-    API.trackEvent("Instance", "InstanceCompare", instance.id);
+    Matomo.trackEvent("Instance", "InstanceCompare", instance.id);
     setComparedInstance(instance);
   };
 

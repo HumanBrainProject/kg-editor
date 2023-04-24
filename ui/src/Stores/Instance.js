@@ -607,7 +607,7 @@ export class Instance {
       return this.types
         .map(t => t.name)
         .filter(t => t !== null);
-    };
+    }
     if (this.isRawFetched && Array.isArray(this.rawData?.["@type"])) {
       return this.rawData["@type"];
     }

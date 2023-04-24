@@ -28,11 +28,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import uniqueId from "lodash/uniqueId";
-import _  from "lodash-uuid";
+import { v4 as uuidv4 } from "uuid";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -210,13 +210,13 @@ const TypesItem = observer(({ type }) => {
 
   const handleSelect = e => {
     e && e.stopPropagation();
-    API.trackEvent("Browse", "SelectType", type.name);
+    Matomo.trackEvent("Browse", "SelectType", type.name);
     browseStore.selectType(type);
   };
 
   const handleCreateInstance = () => {
-    API.trackEvent("Browse", "CreateInstance", type.name);
-    const uuid = _.uuid();
+    Matomo.trackEvent("Browse", "CreateInstance", type.name);
+    const uuid = uuidv4();
     instanceStore.setInstanceIdAvailability(type, uuid);
     navigate(`/instances/${uuid}/create`);
   };

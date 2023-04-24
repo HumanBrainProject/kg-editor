@@ -25,10 +25,11 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles, useTheme } from "react-jss";
 
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 import GlobalError from "./GlobalError";
 import Tabs from "./Tabs";
+import Settings from "./Settings";
 import Authenticate from "./Authenticate";
 import Footer from "./Footer";
 
@@ -243,9 +244,8 @@ const useStyles = createUseStyles(theme => ({
   },
 }));
 
-const Layout = observer(() => {
+const Layout = observer(({ authAdapter, children }) => {
 
-  const { appStore } = useStores();
   const theme = useTheme();
   const classes = useStyles({ theme });
   
@@ -256,7 +256,7 @@ const Layout = observer(() => {
     <div className={classes.container}>
       <Tabs />
       <div className={classes.body}>
-        {appStore.globalError?<GlobalError />:<Authenticate/>}
+        {children}
       </div>
       <Footer />
     </div>

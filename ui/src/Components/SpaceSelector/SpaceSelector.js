@@ -28,10 +28,11 @@ import { createUseStyles } from "react-jss";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 
 import SpaceDropdownToggle from "./SpaceDropdownToggle";
 import SpaceDropdownMenu from "./SpaceDropdownMenu";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -63,7 +64,7 @@ const SpaceSelector = observer(() => {
   const { appStore, authStore } = useStores();
 
   const handleSelectSpace = space => {
-    API.trackEvent("Space", "Select", space);
+    Matomo.trackEvent("Space", "Select", space);
     appStore.switchSpace(location, navigate, space);
   }
 

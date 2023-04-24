@@ -26,7 +26,7 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/UseStores";
+import { useStores } from "../../../Hooks/useStores";
 
 import ReleaseStatus from "../../../Components/ReleaseStatus";
 import ReleaseNodeToggle from "./ReleaseNodeToggle";

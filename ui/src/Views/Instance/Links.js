@@ -28,7 +28,7 @@ import { observer } from "mobx-react-lite";
 import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 
-import { useStores } from "../../Hooks/UseStores";
+import { useStores } from "../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   pane: {

@@ -28,11 +28,11 @@ import { createUseStyles } from "react-jss";
 import Modal from "react-bootstrap/Modal";
 import _  from "lodash-uuid";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 import Tab from "../Components/Tab";
 import TypeSelection from "./Instance/TypeSelection";
+import Matomo from "../Services/Matomo";
 
 const useStyles = createUseStyles({
   typeSelectionModal: {
@@ -71,13 +71,13 @@ const NewInstanceTab = observer(() => {
   const navigate = useNavigate();
 
   const handleCreateInstance = () => {
-    API.trackEvent("Tab", "CreateInstance");
+    Matomo.trackEvent("Tab", "CreateInstance");
     setShowTypeSelection(true);
   };
 
   const handleTypeSelection = type => {
     setShowTypeSelection(false);
-    const uuid = _.uuid();
+    const uuid = uuidv4();
     instanceStore.setInstanceIdAvailability(type, uuid);
     navigate(`/instances/${uuid}/create`);
   }

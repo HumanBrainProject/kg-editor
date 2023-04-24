@@ -27,16 +27,14 @@ import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import { useStores } from "../Hooks/useStores";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 import Panel from "../Components/Panel";
+import Matomo from "../Services/Matomo";
 
-const UserProfile = React.lazy(() => import("./UserProfile"));
-
-const Authenticate = observer(() => {
+const Authenticate = observer(({children}) => {
   const { authStore } = useStores();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,12 +49,12 @@ const Authenticate = observer(() => {
   const handleRetryToAuthenticate = () => authStore.authenticate();
   
   const handleLogin = () =>  {
-    API.trackEvent("User", "Login");
+    Matomo.trackEvent("User", "Login");
     authStore.login();
   };
 
   const handleReLogin = () =>  {
-    API.trackEvent("User", "Login");
+    Matomo.trackEvent("User", "Login");
     navigate("/");
   };
 
@@ -103,9 +101,7 @@ const Authenticate = observer(() => {
   }
 
   return (
-    <Suspense fallback={<SpinnerPanel text="Loading resource..." />}>
-      <UserProfile />
-    </Suspense>
+    {children}
   );
 });
 Authenticate.displayName = "Authenticate";

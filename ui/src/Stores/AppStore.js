@@ -23,7 +23,7 @@
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import { matchPath } from "react-router-dom";
-import _ from "lodash-uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -152,7 +152,7 @@ export class AppStore{
       this.externalCreateModal = null;
       await this.switchSpace(location, navigate, space);
       const type = this.rootStore.typeStore.typesMap.get(typeName);
-      const uuid = _.uuid();
+      const uuid = uuidv4();
       this.rootStore.instanceStore.createNewInstance(type, uuid, value);
       navigate(`/instances/${uuid}/create`);
     }

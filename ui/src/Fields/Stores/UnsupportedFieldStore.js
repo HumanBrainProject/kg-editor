@@ -62,6 +62,7 @@ class UnsupportedFieldStore extends FieldStore {
     this.value = value;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   reset() {} //NOSONAR this class extends FieldStore which require that the reset methode should be implemented
 
   get hasChanged() {

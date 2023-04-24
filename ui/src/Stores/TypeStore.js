@@ -67,7 +67,7 @@ export class TypeStore {
       const type = this.typesMap.get(name);
       return type && type.isSupported;
     });
-  };
+  }
 
   async fetch(space) {
     if (!this.isFetching && (this.fetchError || space !== this.space)) {

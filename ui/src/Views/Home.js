@@ -38,22 +38,22 @@ const rootPath = window.rootPath || "";
 
 const DisplayName = observer(() => {
 
-  const { authStore } = useStores();
+  const { userProfileStore } = useStores();
 
-  if (authStore.hasUserProfile && authStore.user && authStore.user.givenName) {
-    return authStore.user.givenName;
+  if (userProfileStore.isAuthorized && userProfileStore.user && userProfileStore.user.givenName) {
+    return userProfileStore.user.givenName;
   }
 
-  if (authStore.user.name) {
+  if (userProfileStore.user.name) {
     const firstNameReg = /^([^ ]+) .*$/;
-    if (firstNameReg.test(authStore.user.name)) {
-      return authStore.user.name.match(firstNameReg)[1];
+    if (firstNameReg.test(userProfileStore.user.name)) {
+      return userProfileStore.user.name.match(firstNameReg)[1];
     }
-    return authStore.user.name;
+    return userProfileStore.user.name;
   }
 
-  if (authStore.user.username) {
-    return authStore.user.username;
+  if (userProfileStore.user.username) {
+    return userProfileStore.user.username;
   }
 
   return "";

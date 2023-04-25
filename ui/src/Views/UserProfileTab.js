@@ -171,7 +171,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   const [popOverPosition, setPopOverPosition] = useState("bottom");
   const [tokenCopied, setTokenCopied] = useState(null);
 
-  const { viewStore, authStore, instanceStore } = useStores();
+  const { viewStore, userProfileStore, instanceStore } = useStores();
 
   useEffect(() => {
     if(showPopOver) {
@@ -214,18 +214,18 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     Matomo.trackEvent("User", "Logout");
     if (!instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       viewStore.flushStoredViews();
-      authStore.logout();
+      userProfileStore.logout();
     }
   }
 
-  if (!authStore.isAuthenticated || !authStore.isUserAuthorized || !authStore.user) {
+  if (!userProfileStore.isAuthenticated || !userProfileStore.isAuthorized || !userProfileStore.user) {
     return null;
   }
 
   return (
     <div className={`${classes.container} ${className?className:""}`}>
       <button className={classes.button} onClick={handleButtonClick} title="Account" ref={buttonRef}>
-        <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={size} />
+        <Avatar userId={userProfileStore.user.id} name={userProfileStore.user.name} picture={userProfileStore.user.picture} size={size} />
       </button>
       <Overlay
         show={showPopOver}
@@ -240,16 +240,16 @@ const UserProfileTab = observer(({ className, size=30 }) => {
           <PopOverContent onSizeChange={handlePopOverPosition}>
             <div className={classes.popOverContent}>
               <div className={classes.icon} >
-                <Avatar userId={authStore.user.id} name={authStore.user.name} picture={authStore.user.picture} size={100}  title={authStore.user.name} />
+                <Avatar userId={userProfileStore.user.id} name={userProfileStore.user.name} picture={userProfileStore.user.picture} size={100}  title={userProfileStore.user.name} />
               </div>
               <div>
-                <div className={classes.name}>{authStore.user.name}</div>
-                <div className={classes.email}>{authStore.user.email}</div>
+                <div className={classes.name}>{userProfileStore.user.name}</div>
+                <div className={classes.email}>{userProfileStore.user.email}</div>
               </div>
             </div>
             <div className={classes.popOverFooterBar}>
               <div>
-                <CopyToClipboard text={authStore.accessToken} onCopy={handleCopyToken}>
+                <CopyToClipboard text={userProfileStore.accessToken} onCopy={handleCopyToken}>
                   <Button variant="secondary">Copy token to clipboard</Button>
                 </CopyToClipboard>
               </div>

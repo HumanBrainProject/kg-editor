@@ -22,7 +22,7 @@
  */
 import API from "../Services/API";
 import { AppStore } from "./AppStore";
-import { AuthStore } from "./AuthStore";
+import { UserProfileStore } from "./UserProfileStore";
 import { HistoryStore } from "./HistoryStore";
 import { TypeStore } from "./TypeStore";
 import { BrowseStore } from "./BrowseStore";
@@ -36,7 +36,7 @@ import { InvitedUsersStore } from "./InvitedUsersStore";
 
 class RootStore {
 
-  authStore: AuthStore;
+  userProfileStore: UserProfileStore;
   historyStore: HistoryStore;
   typeStore: TypeStore;
   browseStore: BrowseStore;
@@ -65,7 +65,7 @@ class RootStore {
     this.graphStore = new GraphStore(api);
     this.releaseStore = new ReleaseStore(api, this);
     this.userStore = new UserStore(api);
-    this.authStore = new AuthStore(api);
+    this.userProfileStore = new UserProfileStore();
     this.invitedUsersStore = new InvitedUsersStore(api)
 
     // UI stores

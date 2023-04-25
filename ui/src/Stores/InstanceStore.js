@@ -258,12 +258,12 @@ export class InstanceStore {
       links.isFetching = true;
       links.fetchError = null;
       try {
-        const { data } = await this.transportLayer.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
+        const data = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
         runInAction(() => {
           links.isFetching = false;
           links.size += data.size;
           links.total = data.total;
-          links.instances = [...links.instances, ...data.data];
+          links.instances = [...links.instances, ...data];
         });
       } catch(e){
         runInAction(() => {
@@ -308,14 +308,14 @@ export class InstanceStore {
     status.isChecking = true;
     status.error = null;
     try{
-      const { data } = await this.transportLayer.getInstance(instanceId);
+      const data = await this.api.getInstance(instanceId);
       runInAction(() => {
-        const resolvedId = data && data.data && data.data.id;
+        const resolvedId = data?.id;
         if (!resolvedId) {
           throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
         }
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(this.api, this.rootStore, data && data.data);
+        instance.initializeData(this.api, this.rootStore, data);
         status.resolvedId = resolvedId;
         status.isChecked = true;
         status.isChecking = false;
@@ -402,12 +402,12 @@ export class InstanceStore {
       }
     });
     try {
-      const response = await this.transportLayer.getInstancesList(this.stage, toProcess);
+      const response = await this.api.getInstancesList(this.stage, toProcess);
       runInAction(() => {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = response && response.data && response.data.data && response.data.data[identifier];
+            const data = response?response[identifier]:undefined;
             if (data) {
               if (data.error) {
                 const code = data.error.code?` [error ${data.error.code}]`:"";
@@ -465,12 +465,12 @@ export class InstanceStore {
       }
     });
     try {
-      const response = await this.transportLayer.getInstancesLabel(this.stage, toProcess);
+      const response = await this.api.getInstancesLabel(this.stage, toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = response && response.data && response.data.data && response.data.data[identifier];
+            const data = response?response[identifier]:undefined;
             if (data) {
               if (data.error) {
                 const code = data.error.code?` [${data.error.code}]`:"";

@@ -21,44 +21,42 @@
  *
  */
 
-import React, { useEffect } from "react";
-import {useLocation, useNavigate, matchPath} from "react-router-dom";
+import React from "react";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import useStores from "../Hooks/useStores";
-
+import useAuth from "../Hooks/useAuth";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
-import Panel from "../Components/Panel";
 import Matomo from "../Services/Matomo";
 
 const Authenticate = observer(({children}) => {
-  const { authStore } = useStores();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isLogout = !!matchPath({path:"/logout"}, location.pathname);
-  useEffect(() => {
-    if (!isLogout) {
-      authStore.authenticate();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLogout]);
 
-  const handleRetryToAuthenticate = () => authStore.authenticate();
-  
+  const {
+    isTokenExpired,
+    error,
+    isError,
+    isUninitialized,
+    isInitializing,
+    isAuthenticated,
+    isAuthenticating,
+    retryInitialize,
+    login
+  } = useAuth();
+
   const handleLogin = () =>  {
     Matomo.trackEvent("User", "Login");
-    authStore.login();
+    login();
   };
 
-  const handleReLogin = () =>  {
-    Matomo.trackEvent("User", "Login");
-    navigate("/");
-  };
+  if(isUninitialized || isInitializing || isAuthenticating) {
+    return (
+      <SpinnerPanel text="User authenticating..." />
+    );
+  }
 
-  if (authStore.isTokenExpired && !authStore.isLogout) {
+  if (isTokenExpired) {
     return (
       <ErrorPanel>
         <h3>Your session has expired</h3>
@@ -71,38 +69,26 @@ const Authenticate = observer(({children}) => {
     );
   }
 
-  if (!authStore.isAuthenticated) {
-
-    if (authStore.authError) {
-      return (
-        <ErrorPanel>
-          There was a problem authenticating ({authStore.authError}).
-            If the problem persists, please contact the support.<br /><br />
-          <Button variant={"primary"} onClick={handleRetryToAuthenticate}>
-            <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-          </Button>
-        </ErrorPanel>
-      );
-    }
-
-    if (isLogout) {
-      return (
-        <Panel>
-          <h3>You are logged out of the application</h3>
-          <p></p>
-          <Button variant={"primary"} onClick={handleReLogin}>Login</Button>
-        </Panel>
-      );
-    }
-  
+  if (isError) {
     return (
-      <SpinnerPanel text="User authenticating..." />
+      <ErrorPanel>
+      There was a problem authenticating ({error}).
+        If the problem persists, please contact the support.<br /><br />
+      <Button variant={"primary"} onClick={retryInitialize}>
+        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+      </Button>
+    </ErrorPanel>
     );
   }
 
-  return (
-    {children}
-  );
+  if (isAuthenticated) {
+    return (
+      <>
+        {children}
+      </>
+    );
+  }
+  return null;
 });
 Authenticate.displayName = "Authenticate";
 

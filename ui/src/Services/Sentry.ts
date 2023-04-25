@@ -49,10 +49,12 @@ class Sentry {
   initialize(settings?: SentrySettings): void {
     if (settings && !this._isInitialized) {
       this._isInitialized = true;
-      init({
-        ...settings,
-        autoSessionTracking: false
-      });
+      if (!window.location.host.startsWith("localhost")) {
+        init({
+          ...settings,
+          autoSessionTracking: false
+        });
+      }
     }
   }
 

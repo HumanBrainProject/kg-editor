@@ -48,9 +48,9 @@ const Footer = observer(() => {
 
   const classes = useStyles();
 
-  const { authStore } = useStores();
+  const { userProfileStore } = useStores();
   
-  const commit = authStore.commit;
+  const commit = userProfileStore.commit;
 
   return(
     <div className={classes.container}>
@@ -58,7 +58,7 @@ const Footer = observer(() => {
               Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
       </div>
       <div className={classes.build}>
-        {commit && <span >build: <i>{authStore.commit}</i></span>}
+        {commit && <span >build: <i>{userProfileStore.commit}</i></span>}
       </div>
     </div>
   );

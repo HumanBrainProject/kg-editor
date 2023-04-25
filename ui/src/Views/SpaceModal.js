@@ -108,7 +108,7 @@ const SpaceModal = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { appStore, authStore } = useStores();
+  const { appStore, userProfileStore } = useStores();
 
   const handleClick = space => appStore.switchSpace(location, navigate, space);
 
@@ -117,12 +117,12 @@ const SpaceModal = observer(() => {
       <Modal dialogClassName={classes.workspaceSelectionModal} show={true} >
         <Modal.Body>
           <div className={classes.workspacesSelection}>
-            <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
+            <h1>Welcome <span title={userProfileStore.firstName}>{userProfileStore.firstName}</span></h1>
             <p>Please select a space:</p>
-            <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(authStore.spaces.length / 3) * 90))}px`}}>
+            <div style={{height: `${Math.round(Math.min(window.innerHeight * 0.5 - 140, Math.ceil(userProfileStore.spaces.length / 3) * 90))}px`}}>
               <Scrollbars>
                 <div className={classes.spaces}>
-                  {authStore.spaces.map(space =>
+                  {userProfileStore.spaces.map(space =>
                     <div className={classes.space} key={space.id} onClick={() => handleClick(space.id)}>{space.name||space.id}</div>
                   )}
                 </div>

@@ -21,36 +21,20 @@
  *
  */
 
-import { observable, computed, action, runInAction, makeObservable, toJS } from "mobx";
+import { observable, computed, action, makeObservable, toJS } from "mobx";
 
-export class AuthStore {
-  isUserAuthorized = false;
-  isUserAuthorizationInitialized = false;
+export class UserProfileStore {
   user = null;
-  isRetrievingUserProfile = false;
-  userProfileError = null;
-  isInitializing = false;
-  initializationError = null;
 
-  api = null;
-
-  constructor(api) {
+  constructor() {
     makeObservable(this, {
-      isUserAuthorized: observable,
-      isUserAuthorizationInitialized: observable,
       user: observable,
-      isRetrievingUserProfile: observable,
-      userProfileError: observable,
-      isInitializing: observable,
-      initializationError: observable,
-      hasUserProfile: computed,
+      isAuthorized: computed,
       hasSpaces: computed,
       spaces: computed,
-      retrieveUserProfile: action,
-      firstName: computed
+      firstName: computed,
+      setUserProfile: action
     });
-
-    this.api = api;
   }
 
   filteredList(term) {
@@ -61,7 +45,7 @@ export class AuthStore {
     return this.spaces;
   }
 
-  get hasUserProfile() {
+  get isAuthorized() {
     return !!this.user;
   }
 
@@ -87,7 +71,7 @@ export class AuthStore {
 
   get firstName() {
     const firstNameReg = /^([^ ]+) .*$/;
-    if (this.hasUserProfile && this.user) {
+    if (this.isAuthorized && this.user) {
       if (this.user.givenName) {
         return this.user.givenName;
       }
@@ -104,36 +88,9 @@ export class AuthStore {
     return "";
   }
 
-  async retrieveUserProfile() {
-    if (this.isAuthenticated && !this.isRetrievingUserProfile && !this.user) {
-      this.userProfileError = null;
-      this.isRetrievingUserProfile = true;
-      this.isUserAuthorizationInitialized = true;
-      try {
-        const { data } = await this.transportLayer.getUserProfile();
-        runInAction(() => {
-          this.isUserAuthorized = true;
-          const user = (data && data.data)?data.data:{ spaces: []};
-          user.spaces = Array.isArray(user.spaces)?user.spaces.sort((a, b) => a.name.localeCompare(b.name)):[];
-          this.user = user;
-          this.isRetrievingUserProfile = false;
-        });
-      } catch (e) {
-        runInAction(() => {
-          if (e.response && e.response.status === 403) {
-            this.isUserAuthorized = false;
-            this.isRetrievingUserProfile = false;
-            this.isUserAuthorizationInitialized = false;
-          } else {
-            this.isUserAuthorized = false;
-            this.userProfileError = e.message ? e.message : e;
-            this.isRetrievingUserProfile = false;
-            this.isUserAuthorizationInitialized = false;
-          }
-        });
-      }
-    }
+  setUserProfile(user) {
+    this.user = user
   }
 }
 
-export default AuthStore;
+export default UserProfileStore;

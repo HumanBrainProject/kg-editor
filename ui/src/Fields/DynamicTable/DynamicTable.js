@@ -126,7 +126,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { typeStore, instanceStore, authStore, appStore } = useStores();
+  const { typeStore, instanceStore, userProfileStore, appStore } = useStores();
 
   const formControlRef = useRef();
   const dropdownInputRef = useRef();
@@ -332,7 +332,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 className={classes.dropdown}
                 searchTerm={optionsSearchTerm}
                 options={options}
-                spaces={authStore.spaces}
+                spaces={userProfileStore.spaces}
                 loading={fetchingOptions}
                 hasMore={hasMoreOptions}
                 inputPlaceholder={`type to add a ${fieldStoreLabel}`}

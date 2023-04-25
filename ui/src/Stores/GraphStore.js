@@ -151,10 +151,10 @@ export class GraphStore {
     this.groups = {};
     this.links = [];
     try {
-      const { data } = await this.transportLayer.getInstanceNeighbors(id);
+      const data = await this.api.getInstanceNeighbors(id);
       runInAction(() => {
         this.mainId = id;
-        this.extractGroupsAndLinks(data.data);
+        this.extractGroupsAndLinks(data);
         this.isFetched = true;
         this.isFetching = false;
       });

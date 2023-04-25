@@ -27,6 +27,8 @@ import { Navigate, matchPath, useLocation, useSearchParams } from "react-router-
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import useGetUserProfileQuery from "../Hooks/useGetUserProfileQuery";
+import useAuth from "../Hooks/useAuth";
 import useStores from "../Hooks/useStores";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
@@ -41,60 +43,71 @@ const matchBrowse = pathname => matchPath({path:"/browse"}, pathname);
 
 const UserProfile = observer(() => {
 
-  const { authStore, appStore, typeStore } = useStores();
+  const {
+    data: userProfile,
+    error,
+    isUninitialized,
+    isFetching,
+    isSuccess,
+    isError,
+    refetch,
+  } = useGetUserProfileQuery();
+
+  const { logout } = useAuth();
+
+  const { userProfileStore, appStore, typeStore } = useStores();
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    authStore.retrieveUserProfile();
+    if (userProfile) {
+      userProfileStore.setUserProfile(userProfile);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userProfile]);
 
-  const handleLogout = () => authStore.logout();
+  if (isError) {
+    return (
+      <ErrorPanel>
+        There was a problem retrieving the user profile ({error}).
+          If the problem persists, please contact the support.<br /><br />
+        <Button variant={"primary"} onClick={refetch}>
+          <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+        </Button>
+      </ErrorPanel>
+    );
+  }
 
-  const handleRetryToRetrieveUserProfile = () => authStore.retrieveUserProfile();
+  if (isUninitialized || isFetching) {
+    return (
+      <SpinnerPanel text="Retrieving user profile..." />
+    );
+  }
 
-  if (!authStore.hasUserProfile) {
+  if (isSuccess) {
 
-    if (authStore.userProfileError) {
-      return (
-        <ErrorPanel>
-          There was a problem retrieving the user profile ({authStore.userProfileError}).
-            If the problem persists, please contact the support.<br /><br />
-          <Button variant={"primary"} onClick={handleRetryToRetrieveUserProfile}>
-            <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-          </Button>
-        </ErrorPanel>
-      );
-    }
-
-    if (!authStore.isUserAuthorizationInitialized || authStore.isRetrievingUserProfile) {
-      return (
-        <SpinnerPanel text="Retrieving user profile..." />
-      );
-    }
-
-    if (!authStore.isUserAuthorized) {
+    if (!userProfile) {
       return (
         <ErrorPanel>
           <h1>Welcome</h1>
           <p>You are currently not granted permission to acccess the application.</p>
           <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-          <Button onClick={handleLogout}>Logout</Button>
+          <Button onClick={logout}>Logout</Button>
         </ErrorPanel>
       );
     }
-  }
 
-  if (!authStore.hasSpaces) {
-    return (
-      <ErrorPanel>
-        <h1>Welcome <span title={authStore.firstName}>{authStore.firstName}</span></h1>
-        <p>You are currently not granted permission to acccess any spaces.</p>
-        <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-        <Button onClick={handleLogout}>Logout</Button>
-      </ErrorPanel>
-    );
+    if (userProfile.spaces.length === 0) {
+      return (
+        <ErrorPanel>
+          <h1>Welcome <span title={userProfileStore.firstName}>{userProfileStore.firstName}</span></h1>
+          <p>You are currently not granted permission to acccess any spaces.</p>
+          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+          <Button onClick={logout}>Logout</Button>
+        </ErrorPanel>
+      );
+    }
+  
   }
 
   const isTypeFetched = appStore.currentSpace && typeStore.space === appStore.currentSpace.id && typeStore.isFetched;

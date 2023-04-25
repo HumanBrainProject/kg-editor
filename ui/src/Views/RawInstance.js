@@ -35,7 +35,7 @@ import Space from "./Space";
 
 const RawInstance = observer(({instanceId}) => {
   const navigate = useNavigate();
-  const {instanceStore, authStore} = useStores();
+  const {instanceStore, userProfileStore} = useStores();
 
   useEffect(() => {
     const instance = instanceStore.createInstanceOrGet(instanceId);
@@ -73,7 +73,7 @@ const RawInstance = observer(({instanceId}) => {
     );
   }
 
-  if (!authStore.spaces.find(s => s.id === instance.space)) {
+  if (!userProfileStore.spaces.find(s => s.id === instance.space)) {
     return (
       <ErrorPanel>
         You do not have permission to access the space &quot;<i>{instance.space}&quot;</i>.<br /><br />

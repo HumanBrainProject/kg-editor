@@ -27,7 +27,7 @@ import debounce from "lodash/debounce";
 import Instance from "./Instance";
 
 const normalizeInstancesData = (api, rootStore, data) => {
-  return (data && Array.isArray(data.data))?data.data.map(rowData => {
+  return (Array.isArray(data))?data.map(rowData => {
     Object.values(rowData.fields).forEach(d => {
       if(d.widget === "TextArea") {
         d.value = d.value && d.value.substr(0, 197) + "...";
@@ -142,7 +142,7 @@ export class BrowseStore {
     }
     this.fetchError = null;
     try {
-      const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      const data = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
         this.isFetching = false;
         const instances = normalizeInstancesData(this.api, this.rootStore, data);

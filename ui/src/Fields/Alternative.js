@@ -61,7 +61,7 @@ const useStyles = createUseStyles({
 
 const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
 
-  const { authStore } = useStores();
+  const { userProfileStore } = useStores();
 
   const classes = useStyles();
 
@@ -112,7 +112,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   };
 
   const users = (!alternative || !alternative.users)?[]:alternative.users;
-  const isOwnAlternative = users.find(user => authStore.user.id === user.id);
+  const isOwnAlternative = users.find(user => userProfileStore.user.id === user.id);
   return (
     <Dropdown.Item className={classes.container} onClick={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >

@@ -20,10 +20,6 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-
-// eslint-disable-next-line no-unused-vars
-import React from "react";
-
 const UnsupportedField = ({fieldStore}) => {
   console.warn(fieldStore.warning);
   return null;

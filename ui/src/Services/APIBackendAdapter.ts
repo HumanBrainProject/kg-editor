@@ -53,7 +53,7 @@ const getStage = (stage?: Stage) => {
 
 const endpoints = {
   settings: () => `${RELATIVE_ROOT_PATH}/settings`,
-  user: () => "${RELATIVE_ROOT_PATH}/users/me",
+  user: () => `${RELATIVE_ROOT_PATH}/users/me`,
   usersForReview: (search: string) => `${RELATIVE_ROOT_PATH}/users/search?search=${search}`,
   invitedUsers: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/invitedUsers`,
   inviteUser: (instanceId: UUID, userId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/users/${userId}/invite`,
@@ -83,11 +83,11 @@ class APIBackendAdapter implements API {
   }
   
   async getSettings(): Promise<Settings> {
-    const { data } = await await this._axios.get(endpoints.settings());
+    const { data } = await this._axios.get(endpoints.settings());
     return data?.data as Settings;
   }
 
-  async getUserProfile() {
+  async getUserProfile(): Promise<UserProfile> {
     const { data } = await this._axios.get(endpoints.user());
     return data?.data as UserProfile;
   }
@@ -111,7 +111,7 @@ class APIBackendAdapter implements API {
     await this._axios.delete(endpoints.instance(instanceId));
   }
 
-  async createInstance(space, instanceId: UUID, payload: object): Promise<KGCoreResult<InstanceFull>> {
+  async createInstance(space: string, instanceId: UUID, payload: object): Promise<KGCoreResult<InstanceFull>> {
     const { data } = await this._axios.post(endpoints.createInstance(space, instanceId), payload);
     return data;
   }

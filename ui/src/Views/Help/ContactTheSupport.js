@@ -28,13 +28,13 @@ import useStores from "../../Hooks/useStores";
 import Sentry from "../../Services/Sentry";
 
 const ContactTheSupport = () => {
-  const { authStore } = useStores();
+  const { userProfileStore } = useStores();
   
   const handleErrorReport = () => {
     Sentry.showReportDialog({
       user: {
-        email: authStore.user.email,
-        name: `${authStore.user.name} (${authStore.user.username})`
+        email: userProfileStore.user.email,
+        name: `${userProfileStore.user.name} (${userProfileStore.user.username})`
       }
     });
   };

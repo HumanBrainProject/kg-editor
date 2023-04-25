@@ -60,9 +60,9 @@ export class InvitedUsersStore {
     this.isFetched = false;
     this.fetchError = null;
     try {
-      const { data } = await this.transportLayer.getInvitedUsers(instanceId);
+      const data = await this.api.getInvitedUsers(instanceId);
       runInAction(() => {
-        this.users = data && data.data ? data.data : [];
+        this.users = data ?? [];
         this.isFetching = false;
         this.isFetched = true;
         this.fetchError = null;
@@ -80,9 +80,9 @@ export class InvitedUsersStore {
 
   async inviteUser(instanceId, userId) {
     try {
-      const { data } = await this.transportLayer.inviteUser(instanceId, userId);
+      const data = await this.api.inviteUser(instanceId, userId);
       runInAction(() => {
-        this.users = data && data.data ? data.data : [];
+        this.users = data ?? [];
       });
     } catch (e) {
       runInAction(() => {
@@ -94,9 +94,9 @@ export class InvitedUsersStore {
 
   async removeUserInvitation(instanceId, userId) {
     try {
-      const { data } = await this.transportLayer.removeUserInvitation(instanceId, userId);
+      const data = await this.api.removeUserInvitation(instanceId, userId);
       runInAction(() => {
-        this.users = data && data.data ? data.data : [];
+        this.users = data ?? [];
       });
     } catch (e) {
       runInAction(() => {

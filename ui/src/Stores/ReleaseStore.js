@@ -328,18 +328,16 @@ export class ReleaseStore {
     this.isFetching = true;
     this.fetchError = null;
     try {
-      const { data } = await this.transportLayer.getInstanceScope(
-        this.topInstanceId
-      );
+      const data = await this.api.getInstanceScope(this.topInstanceId);
       runInAction(() => {
         this.hideReleasedInstances = false;
-        populateStatuses(data.data);
+        populateStatuses(data);
         // Default release state
-        this.recursiveMarkNodeForChange(data.data, null); // "RELEASED"
-        populateStatuses(data.data, "pending_");
-        setNodeTypesAndSortChildren(data.data);
-        removeDuplicates(data.data); // after sorting!
-        this.instancesTree = data.data;
+        this.recursiveMarkNodeForChange(data, null); // "RELEASED"
+        populateStatuses(data, "pending_");
+        setNodeTypesAndSortChildren(data);
+        removeDuplicates(data); // after sorting!
+        this.instancesTree = data;
         this.isFetched = true;
         this.isFetching = false;
       });
@@ -388,7 +386,7 @@ export class ReleaseStore {
 
   async releaseNode(node) {
     try {
-      await this.transportLayer.releaseInstance(node.id);
+      await this.api.releaseInstance(node.id);
       runInAction(() => {
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} released successfully`;
         this.savingLastEndedNode = node;
@@ -413,7 +411,7 @@ export class ReleaseStore {
 
   async unreleaseNode(node) {
     try {
-      await this.transportLayer.unreleaseInstance(node.id);
+      await this.api.unreleaseInstance(node.id);
       runInAction(() => {
         this.savingLastEndedRequest = `(${node.typesName}) ${node.label} unreleased successfully`;
         this.savingLastEndedNode = node;

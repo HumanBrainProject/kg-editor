@@ -46,7 +46,7 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
 
   const classes = useStyles();
 
-  const { authStore, appStore, instanceStore } = useStores();
+  const { userProfileStore, appStore, instanceStore } = useStores();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
     label = instanceStore.instances.get(instance.id).name;
   }
 
-  const isForbidden = !authStore.hasSpace(instance.space);
+  const isForbidden = !userProfileStore.hasSpace(instance.space);
 
   if (readMode || isForbidden) {
     return (

@@ -75,7 +75,7 @@ const Reviewers = observer(({ id }) => {
 
   const classes = useStyles();
 
-  const { authStore, invitedUsersStore } = useStores();
+  const { userProfileStore, invitedUsersStore } = useStores();
 
   useEffect(() => {
     invitedUsersStore.getInvitedUsers(id);
@@ -89,8 +89,8 @@ const Reviewers = observer(({ id }) => {
   const handleInviteUser = userId => invitedUsersStore.inviteUser(id, userId);
 
   const excludedUsers = invitedUsersStore.users.map(review => review.id);
-  if (authStore.hasUserProfile && authStore.user && authStore.user.id && !excludedUsers.includes(authStore.user.id)) {
-    excludedUsers.push(authStore.user.id);
+  if (userProfileStore.isAuthorized && userProfileStore.user && userProfileStore.user.id && !excludedUsers.includes(userProfileStore.user.id)) {
+    excludedUsers.push(userProfileStore.user.id);
   }
 
   if(invitedUsersStore.isFetching) {

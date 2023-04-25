@@ -79,7 +79,7 @@ const useStyles = createUseStyles({
 const Tabs = observer(() => {
   const classes = useStyles();
 
-  const { appStore, authStore } = useStores();
+  const { appStore, userProfileStore } = useStores();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -96,7 +96,7 @@ const Tabs = observer(() => {
         {!appStore.globalError &&
           <>
             <div className={classes.fixedTabsLeft}>
-              {authStore.isAuthenticated && authStore.isUserAuthorized && authStore.hasSpaces && appStore.currentSpace?
+              {userProfileStore.isAuthenticated && userProfileStore.isAuthorized && userProfileStore.hasSpaces && appStore.currentSpace?
                 <>
                   <SpaceSelector />
                   <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
@@ -108,7 +108,7 @@ const Tabs = observer(() => {
             </div>
             <InstanceTabs pathname={location.pathname} />
             <div className={classes.fixedTabsRight}>
-              {authStore.isAuthenticated && authStore.isUserAuthorized && (
+              {userProfileStore.isAuthenticated && userProfileStore.isAuthorized && (
                 <>
                   <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
                   <UserProfileTab className={classes.userProfileTab} size={32} />

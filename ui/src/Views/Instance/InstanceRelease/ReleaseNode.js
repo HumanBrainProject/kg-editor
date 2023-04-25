@@ -38,13 +38,13 @@ const useStyles = createUseStyles({
     position: "relative",
     transition: "outline-color 0.25s ease, background 0.25s ease",
     outlineColor: "transparent",
-    "&[status=UNRELEASED] > .node-content": {
+    "&.status-UNRELEASED > .node-content": {
       backgroundColor: "var(--release-bg-not-released)"
     },
-    "&[status=HAS_CHANGED] > .node-content": {
+    "&.status-HAS_CHANGED > .node-content": {
       backgroundColor: "var(--release-bg-has-changed)"
     },
-    "&[status=RELEASED] > .node-content": {
+    "&.status-RELEASED > .node-content": {
       backgroundColor: "var(--release-bg-released)"
     },
     "& .glyphicon + $label": {
@@ -53,7 +53,7 @@ const useStyles = createUseStyles({
     "&:hover": {
       outline: "1"
     },
-    "&:not([status])": {
+    "&.status-undefined": {
       "& .node-type,& $label": {
         color: "gray"
       }
@@ -160,7 +160,7 @@ const ReleaseNode = observer(({ node, level = 0 }) => {
   }
 
   return (
-    <div className={`${classes.container}`} status={node["pending_status"]} style={{marginLeft: 32*level}}>
+    <div className={`${classes.container} status-${node["pending_status"]}`} style={{marginLeft: 32*level}}>
       <div
         className="node-content">
         <div className={"status-indicator"}>

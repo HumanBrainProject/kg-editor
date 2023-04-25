@@ -151,7 +151,7 @@ const Status = observer(({
 const MoveInstance = observer(({ instance, className }) => {
   const classes = useStyles();
 
-  const { appStore, statusStore, authStore } = useStores();
+  const { appStore, statusStore, userProfileStore } = useStores();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -172,7 +172,7 @@ const MoveInstance = observer(({ instance, className }) => {
     return null;
   }
 
-  const spaces = authStore.spaces.filter((s) => {
+  const spaces = userProfileStore.spaces.filter((s) => {
     if (s.id === appStore.currentSpace.id) {
       return true;
     }

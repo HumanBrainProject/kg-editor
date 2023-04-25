@@ -126,7 +126,7 @@ export class HistoryStore {
         this.instances = [];
         this.isFetching = true;
         this.fetchError = null;
-        const response = await this.transportLayer.getInstancesSummary(null, list);
+        const response = await this.api.getInstancesSummary(null, list);
         runInAction(() => {
           list.forEach(identifier => {
             const data = response && response.data && response.data.data && response.data.data[identifier];

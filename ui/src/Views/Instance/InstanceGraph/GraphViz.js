@@ -72,7 +72,7 @@ const GraphViz = observer(() => {
 
   const classes = useStyles();
 
-  const { appStore, graphStore, authStore } = useStores();
+  const { appStore, graphStore, userProfileStore } = useStores();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -99,7 +99,7 @@ const GraphViz = observer(() => {
     } else if (node.id !== graphStore.mainId) {
       graphStore.reset();
       if(node.space && node.space !== appStore.currentSpace.id) {
-        const space = authStore.getSpaceInfo(node.space);
+        const space = userProfileStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
           appStore.switchSpace(location, navigate, node.space);
           navigate(`/instances/${node.id}/graph`);

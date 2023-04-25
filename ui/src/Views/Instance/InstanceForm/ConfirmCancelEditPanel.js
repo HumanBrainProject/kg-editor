@@ -35,7 +35,7 @@ const useStyles = createUseStyles({
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: "9px",
     zIndex: "1200",
-    "&[inline='false']": {
+    "&.block": {
       top: "-10px",
       left: "-10px",
       width: "calc(100% + 20px)",
@@ -87,7 +87,7 @@ const ConfirmCancelEditPanel = ({ show, text, inline, onConfirm, onCancel }) => 
   }
 
   return (
-    <div className={classes.container} inline={inline?"true":"false"}>
+    <div className={`${classes.container} ${inline?"":"block"}`}>
       <div className={classes.panel}>
         <h4>{text}</h4>
         <div>

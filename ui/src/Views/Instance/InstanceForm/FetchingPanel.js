@@ -37,7 +37,7 @@ const useStyles = createUseStyles({
         width: "180px"
       }
     },
-    "&[inline='false']": {
+    "&.block": {
       position: "absolute !important",
       top: "50%",
       left: "50%",
@@ -71,7 +71,7 @@ const FetchingPanel = ({ id, show, inline }) => {
   }
 
   return(
-    <div className={classes.panel} inline={inline?"true":"false"}>
+    <div className={`${classes.panel} ${inline?"":"block"} `}>
       <FontAwesomeIcon className={classes.icon} icon="circle-notch" spin/>
       <span className={classes.label}>Retrieving instance...</span>
       <small>ID: {id}</small>

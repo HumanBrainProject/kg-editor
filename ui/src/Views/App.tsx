@@ -59,7 +59,8 @@ const BrowserEventHandler = observer(({ stores }: { stores: RootStore }) => {
       if(path.startsWith("/instance")) {
         const id = path.split("/")[2];
         const instance = instanceStore?.instances.get(id);
-        if (!instance || instance.space !== appStore.currentSpace?.id) {
+        const currentSpace = appStore.currentSpace as { id: string}|null;
+        if (!instance || instance.space !== currentSpace?.id) {
           appStore.closeInstance(location, navigate, id);
           window.location.replace(location.pathname);
         }
@@ -112,17 +113,17 @@ const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: A
         Matomo.trackEvent("Shortcut", "CloseAllInstances");
         appStore.closeAllInstances(location, navigate);
       } else {
-        const matchInstanceTab = appStore.matchInstancePath(location.pathname);
+        const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
         if (matchInstanceTab) {
           Matomo.trackEvent("Shortcut", "InstanceClose", matchInstanceTab.params.id);
           appStore.closeInstance(location, navigate, matchInstanceTab.params.id);
         }
       }
     } else if (e.altKey && e.keyCode === 37) { // left arrow, previous
-      const matchInstanceTab = appStore.matchInstancePath(location.pathname);
+      const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
       appStore.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
     } else if (e.altKey && e.keyCode === 39) { // right arrow, next
-      const matchInstanceTab = appStore.matchInstancePath(location.pathname);
+      const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
       appStore.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
     } else {
       kCode.step = kCode.ref[kCode.step] === e.keyCode ? kCode.step + 1 : 0;
@@ -138,11 +139,11 @@ const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: A
     <>
       <BrowserEventHandler stores={stores} />
       <ThemeProvider theme={theme}>
-        <Layout>
-          {appStore.globalError?
-            <GlobalError />
-            :
-            <StoresProvider stores={stores}>
+        <StoresProvider stores={stores}>
+          <Layout>
+            {appStore.globalError?
+              <GlobalError />
+              :
               <APIProvider api={api}>
                 <Settings>
                   {settings => {
@@ -170,9 +171,9 @@ const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: A
                   }}
                 </Settings>
               </APIProvider>
-            </StoresProvider>
-          }
-        </Layout>
+            }
+          </Layout>
+        </StoresProvider>
       </ThemeProvider>
     </>
   );

@@ -60,7 +60,7 @@ const SpaceSelector = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { appStore, authStore } = useStores();
+  const { appStore, userProfileStore } = useStores();
 
   const handleSelectSpace = space => {
     Matomo.trackEvent("Space", "Select", space);
@@ -69,7 +69,7 @@ const SpaceSelector = observer(() => {
 
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
-      {authStore.spaces.length > 1 ?
+      {userProfileStore.spaces.length > 1 ?
         <Dropdown onSelect={handleSelectSpace}>
           <Dropdown.Toggle as={SpaceDropdownToggle}>
             {appStore.currentSpaceName}

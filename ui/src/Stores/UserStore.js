@@ -93,18 +93,17 @@ export class UserStore {
         this.searchResult = [];
         this.isFetchingSearch = true;
         this.searchFetchError = null;
-        const { data } = await this.transportLayer.getUsersForReview(this.searchFilter.queryString);
+        const data = await this.api.getUsersForReview(this.searchFilter.queryString);
         runInAction(() => {
           if (!this.hasSearchFilter) {
             this.clearSearch();
           } else {
             this.isSearchFetched = true;
             this.isFetchingSearch = false;
-            let result = data && data.data ? data.data : [];
             if (this.searchFilter.excludedUsers && this.searchFilter.excludedUsers.length) {
-              this.searchResult = result.filter(user => !this.searchFilter.excludedUsers.includes(user.id));
+              this.searchResult = data.filter(user => !this.searchFilter.excludedUsers.includes(user.id));
             } else {
-              this.searchResult = result;
+              this.searchResult = data;
             }
             this.totalSearchCount = this.searchResult.length;
           }

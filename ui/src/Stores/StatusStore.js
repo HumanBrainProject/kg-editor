@@ -126,9 +126,9 @@ export class StatusStore {
       }
     });
     try {
-      let { data } = await this.transportLayer.getReleaseStatusTopInstance(toProcess);
+      let data = await this.api.getReleaseStatusTopInstance(toProcess);
       runInAction(() => {
-        Object.entries(data.data).forEach(([id, responseStatus]) => {
+        Object.entries(data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
           if (status) {
             status.data = responseStatus.data;
@@ -172,9 +172,9 @@ export class StatusStore {
       }
     });
     try {
-      let { data } = await this.transportLayer.getReleaseStatusChildren(toProcessChildren);
+      const data = await this.api.getReleaseStatusChildren(toProcessChildren);
       runInAction(() => {
-        Object.entries(data.data).forEach(([id, responseStatus]) => {
+        Object.entries(data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
           if (status) {
             status.childrenData = responseStatus.data;

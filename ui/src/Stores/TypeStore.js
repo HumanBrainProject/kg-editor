@@ -78,10 +78,10 @@ export class TypeStore {
         this.fetchError = null;
         this.isFetched = false;
         try {
-          const response = await this.transportLayer.getSpaceTypes(space);
+          const data = await this.api.getSpaceTypes(space);
           runInAction(() => {
-            this.types = (response.data && response.data.data && response.data.data.length)?
-              response.data.data.map(type => ({
+            this.types = data.length ?
+              data.map(type => ({
                 ...type,
                 isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
               }))

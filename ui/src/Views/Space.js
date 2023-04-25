@@ -34,7 +34,7 @@ const Space = observer(({space}) => {
 
   const [isInitialized, setInitialized] = useState(false);
 
-  const { appStore, authStore } = useStores();
+  const { appStore, userProfileStore } = useStores();
 
   useEffect(() => {
     const selectedSpace = getSpace(space);
@@ -44,7 +44,7 @@ const Space = observer(({space}) => {
   }, [space]);
 
   const getSpace = name => {
-    if (name && authStore.spaces.find(s => s.id === name)) {
+    if (name && userProfileStore.spaces.find(s => s.id === name)) {
       return name;
     }
     if (!space) {
@@ -52,7 +52,7 @@ const Space = observer(({space}) => {
       if (!savedSpaceName) {
         return null;
       }
-      if (authStore.spaces.find(s => s.id === savedSpaceName)) {
+      if (userProfileStore.spaces.find(s => s.id === savedSpaceName)) {
         return savedSpaceName;
       }
     }

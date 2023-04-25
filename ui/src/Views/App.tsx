@@ -28,9 +28,12 @@ import { ThemeProvider } from "react-jss";
 import { v4 as uuidv4 } from "uuid";
 
 import API from "../Services/API";
+import RootStore from "../Stores/RootStore";
+import StoresProvider from "./StoresProvider";
 import Matomo from "../Services/Matomo";
 import Sentry from "../Services/Sentry";
 import AuthAdapter from "../Services/AuthAdapter";
+import APIProvider from "./APIProvider";
 import { useStores } from "../Hooks/useStores";
 
 import Layout from "./Layout";
@@ -71,7 +74,7 @@ const BrowserEventHandler = observer(() => {
 BrowserEventHandler.displayName = "BrowserEventHandler";
 
 
-const App = observer(({ authAdapter } : { authAdapter?: AuthAdapter}) => {
+const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: API, authAdapter?: AuthAdapter}) => {
 
   const { appStore } = useStores();
 
@@ -140,31 +143,35 @@ const App = observer(({ authAdapter } : { authAdapter?: AuthAdapter}) => {
           {appStore.globalError?
             <GlobalError />
             :
-            <Settings>
-              {settings => {
-                  Matomo.initialize(settings?.matomo);
-                  Sentry.initialize(settings?.sentry);
-                  if (authAdapter instanceof KeycloakAuthAdapter) {
-                    if (settings?.keycloak) {
-                      authAdapter.setConfig(settings?.keycloak);
-                    } else {
+            <StoresProvider value={stores}>
+              <APIProvider api={api}>
+                <Settings>
+                  {settings => {
+                      Matomo.initialize(settings?.matomo);
+                      Sentry.initialize(settings?.sentry);
+                      if (authAdapter instanceof KeycloakAuthAdapter) {
+                        if (settings?.keycloak) {
+                          authAdapter.setConfig(settings?.keycloak);
+                        } else {
+                          return (
+                            <ErrorPanel>
+                              <p>Failed to initialize authentication!</p>
+                              <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+                            </ErrorPanel>
+                          );
+                        }
+                      }
                       return (
-                        <ErrorPanel>
-                          <p>Failed to initialize authentication!</p>
-                          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-                        </ErrorPanel>
+                        <AuthProvider adapter={authAdapter} >
+                          <Authenticate >
+                            <UserProfile />
+                          </Authenticate>
+                        </AuthProvider>
                       );
-                    }
-                  }
-                  return (
-                    <AuthProvider adapter={authAdapter} >
-                      <Authenticate >
-                        <UserProfile />
-                      </Authenticate>
-                    </AuthProvider>
-                  );
-              }}
-            </Settings>
+                  }}
+                </Settings>
+              </APIProvider>
+            </StoresProvider>
           }
         </Layout>
       </ThemeProvider>

@@ -35,9 +35,9 @@ export class UserStore {
   };
   totalSearchCount = 0;
 
-  transportLayer = null;
+  api = null;
 
-  constructor(transportLayer) {
+  constructor(api) {
     makeObservable(this, {
       isFetchingSearch: observable,
       isSearchFetched: observable,
@@ -51,7 +51,7 @@ export class UserStore {
       searchUsers: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
 
   get hasSearchFilter() {

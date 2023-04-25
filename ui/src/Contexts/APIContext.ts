@@ -32,10 +32,9 @@
  *   limitations under the License.
  *
  */
-import TokenProvider from "./TokenProvider";
-import UnauthorizedRequestResponseHandlerProvider from "./UnauthorizedRequestResponseHandlerProvider";
+import React from "react";
+import API from "../Services/API";
 
-export default interface AuthAdapter {
-    get tokenProvider(): TokenProvider|undefined;
-    get unauthorizedRequestResponseHandlerProvider(): UnauthorizedRequestResponseHandlerProvider|undefined;
-}
+const APIContext = React.createContext<API|undefined>(undefined);
+
+export default APIContext;

@@ -32,10 +32,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import "./Services/IconsImport";
 
+import RootStore from "./Stores/RootStore";
 import App from "./Views/App";
 import ErrorBoundary from "./Views/ErrorBoundary";
 import axios, { InternalAxiosRequestConfig } from "axios";
 import KeycloakAuthAdapter from "./services/KeycloakAuthAdapter";
+import APIBackendAdapter from "./Services/APIBackendAdapter";
 
 
 /* //NOSONAR React debug flags
@@ -64,7 +66,18 @@ axiosInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig
   }
   return Promise.resolve(config);
 });
-authAdapter.setAxios(axiosInstance);
+axiosInstance.interceptors.response.use(undefined, (error) => {
+  if (error.response && error.response.status === 401 && !error.config._isRetry) {
+      authAdapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler && authAdapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler();
+      return axios.request(error.config);
+  } else {
+      return Promise.reject(error);
+  }
+  });
+
+const api = new APIBackendAdapter(axiosInstance);
+
+const stores = new RootStore(api);
 
 const container = document.getElementById('root');
 if (!container) {
@@ -76,7 +89,7 @@ root.render(
     <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
       <ErrorBoundary>
         <BrowserRouter>
-          <App authAdapter={authAdapter}/>
+          <App stores={stores} api={api} authAdapter={authAdapter}/>
         </BrowserRouter>
       </ErrorBoundary>
     </JssProvider>

@@ -144,10 +144,10 @@ export class ReleaseStore {
   historyStore = null;
   statusStore = null;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
       topInstanceId: observable,
       instancesTree: observable,
@@ -190,7 +190,7 @@ export class ReleaseStore {
       handleWarning: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 

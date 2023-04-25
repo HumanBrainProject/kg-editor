@@ -34,7 +34,7 @@ import { UserStore } from "./UserStore";
 import { InvitedUsersStore } from "./InvitedUsersStore";
 import { FeaturesStore } from "./FeaturesStore";
 
-export class RootStore  {
+class RootStore  {
 
   authStore= null
   historyStore= null
@@ -49,28 +49,29 @@ export class RootStore  {
   featuresStore= null
   invitedUsersStore = null
 
-  constructor(transportLayer) {
+  constructor(api) {
 
-    if (!transportLayer) {
-      throw new Error("no transport layer provided!");
+    if (!api) {
+      throw new Error("no api provided!");
     }
 
     // Domain stores
-    this.historyStore = new HistoryStore(transportLayer, this);
-    this.typeStore = new TypeStore(transportLayer, this);
-    this.browseStore = new BrowseStore(transportLayer, this);
-    this.instanceStore = new InstanceStore(transportLayer, this);
-    this.statusStore = new StatusStore(transportLayer, this);
-    this.viewStore = new ViewStore(transportLayer, this);
-    this.graphStore = new GraphStore(transportLayer, this);
-    this.releaseStore = new ReleaseStore(transportLayer, this);
-    this.userStore = new UserStore(transportLayer, this);
-    this.featuresStore = new FeaturesStore(transportLayer, this);
-    this.authStore = new AuthStore(transportLayer, this);
-    this.invitedUsersStore = new InvitedUsersStore(transportLayer, this)
-    transportLayer.setAuthStore(this.authStore);
+    this.historyStore = new HistoryStore(api, this);
+    this.typeStore = new TypeStore(api, this);
+    this.browseStore = new BrowseStore(api, this);
+    this.instanceStore = new InstanceStore(api, this);
+    this.statusStore = new StatusStore(api, this);
+    this.viewStore = new ViewStore(api, this);
+    this.graphStore = new GraphStore(api, this);
+    this.releaseStore = new ReleaseStore(api, this);
+    this.userStore = new UserStore(api, this);
+    this.featuresStore = new FeaturesStore(api, this);
+    this.authStore = new AuthStore(api, this);
+    this.invitedUsersStore = new InvitedUsersStore(api, this)
 
     // UI stores
-    this.appStore = new AppStore(transportLayer, this);
+    this.appStore = new AppStore(api, this);
   }
 }
+
+export default RootStore;

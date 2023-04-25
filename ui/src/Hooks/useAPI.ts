@@ -23,8 +23,15 @@
 
 import React from "react";
 
-import RootStore from "../Stores/RootStore";
+import API from "../Services/API";
+import APIContext from "../Contexts/APIContext";
 
-const StoresContext = React.createContext<RootStore|undefined>(undefined);
+const useAPI = ():API => {
+  const api = React.useContext<API|undefined>(APIContext);
+  if (!api) {
+    throw new Error("useAPI must be used within a APIContext.Provider.");
+  }
+  return api;
+};
 
-export default StoresContext;
+export default useAPI;

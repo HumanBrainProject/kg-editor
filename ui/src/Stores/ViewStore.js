@@ -153,11 +153,11 @@ export class ViewStore{
   views = new Map();
   selectedView = null;
 
-  transportLayer = null;
+  api = null;
 
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
       views: observable,
       selectedView: observable,
@@ -172,7 +172,7 @@ export class ViewStore{
       syncStoredViews: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 

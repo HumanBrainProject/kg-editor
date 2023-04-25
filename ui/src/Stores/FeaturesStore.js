@@ -29,10 +29,10 @@ export class FeaturesStore{
   isFetching = false;
   fetchError = null;
 
-  transportLayer = null;
+  api = null;
 
 
-  constructor(transportLayer) {
+  constructor(api) {
     makeObservable(this, {
       releases: observable,
       isFetched: observable,
@@ -43,7 +43,7 @@ export class FeaturesStore{
       fetchFeatures: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
 
   get latestReleases() {

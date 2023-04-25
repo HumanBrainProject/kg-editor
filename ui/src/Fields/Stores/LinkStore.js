@@ -50,8 +50,8 @@ class LinkStore extends FieldStore {
 
   appStore = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
+  constructor(definition, options, instance, api, rootStore) {
+    super(definition, options, instance, api, rootStore);
     this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];
     this.targetType = this.targetTypes.length?this.targetTypes[0]:null;
     if (definition.defaultTargetType) {

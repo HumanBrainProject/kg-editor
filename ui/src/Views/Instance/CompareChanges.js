@@ -45,7 +45,7 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
 
   useEffect(() => {
     if(!savedInstanceStore){
-      const store = createInstanceStore(instanceStore.transportLayer);
+      const store = createInstanceStore(instanceStore.api);
       setSavedInstanceStore(store);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,12 +56,12 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
       const savedInst = savedInstanceStore.createInstanceOrGet(instanceId);
       const inst = instanceStore.instances.get(instanceId);
       const data = inst.cloneInitialData;
-      savedInst.initializeData(savedInstanceStore.transportLayer, inst.store.rootStore, data);
+      savedInst.initializeData(savedInstanceStore.api, inst.store.rootStore, data);
     }
     return () => {
       savedInstanceStore && savedInstanceStore.flush();
     };
-  }, [instanceStore.transportLayer, instanceStore.instances, savedInstanceStore, instanceId]);
+  }, [instanceStore.api, instanceStore.instances, savedInstanceStore, instanceId]);
 
 
   const instance = instanceStore.instances.get(instanceId);

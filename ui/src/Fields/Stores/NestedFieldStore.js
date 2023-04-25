@@ -34,8 +34,8 @@ class NestedFieldStore extends FieldStore {
   minItems = null;
   maxItems = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
+  constructor(definition, options, instance, api, rootStore) {
+    super(definition, options, instance, api, rootStore);
     this.fieldsTemplate = definition.fields;
     this.targetTypes = definition.targetTypes;
     this.minItems = definition.minItems;
@@ -149,7 +149,7 @@ class NestedFieldStore extends FieldStore {
         }
       }
       const options = {...fieldMapping.options, sourceType: value["@type"]};
-      stores[name] = new fieldMapping.Store(field, options, this.instance, this.transportLayer, this.rootStore);
+      stores[name] = new fieldMapping.Store(field, options, this.instance, this.api, this.rootStore);
     }
     const store = stores[name];
     store.updateValue(value[name]);

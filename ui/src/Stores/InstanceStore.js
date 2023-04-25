@@ -127,7 +127,7 @@ class Instance extends BaseInstance {
             this.store.instance.delete(this.id);
             this.id = newId;
           }
-          this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
+          this.initializeData(this.store.api, this.store.rootStore, data.data);
         });
       } else {
         const { data } = await this.store.transportLayer.patchInstance(this.id, payload);
@@ -140,7 +140,7 @@ class Instance extends BaseInstance {
           this.hasRawFetchError = false;
           this.isRawFetched = false;
           this.isRawFetching = false;
-          this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
+          this.initializeData(this.store.api, this.store.rootStore, data.data);
         });
       }
     } catch (e) {
@@ -181,10 +181,10 @@ export class InstanceStore {
   queueThreshold = 1000;
   queueTimeout = 250;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore, stage=null) {
+  constructor(api, rootStore, stage=null) {
     makeObservable(this, {
       stage: observable,
       instances: observable,
@@ -213,7 +213,7 @@ export class InstanceStore {
 
     this.stage = stage?stage:null;
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 
@@ -315,7 +315,7 @@ export class InstanceStore {
           throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
         }
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(this.transportLayer, this.rootStore, data && data.data);
+        instance.initializeData(this.api, this.rootStore, data && data.data);
         status.resolvedId = resolvedId;
         status.isChecked = true;
         status.isChecking = false;
@@ -416,7 +416,7 @@ export class InstanceStore {
                 instance.isFetching = false;
                 instance.isFetched = false;
               } else {
-                instance.initializeData(this.transportLayer, this.rootStore, data, false);
+                instance.initializeData(this.api, this.rootStore, data, false);
                 this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
               }
             } else {
@@ -543,7 +543,7 @@ export class InstanceStore {
       data.labelField = type.labelField;
     }
     const instance  = new Instance(id, this);
-    instance.initializeData(this.transportLayer, this.rootStore, data, true);
+    instance.initializeData(this.api, this.rootStore, data, true);
     if (instance.labelField) {
       instance.fields[instance.labelField].setValue(name);
     }
@@ -567,8 +567,8 @@ export class InstanceStore {
   }
 }
 
-export const createInstanceStore = (transportLayer, rootStore, stage=null) => {
-  return new InstanceStore(transportLayer, rootStore, stage);
+export const createInstanceStore = (api, rootStore, stage=null) => {
+  return new InstanceStore(api, rootStore, stage);
 };
 
 export default InstanceStore;

@@ -53,7 +53,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
 
   useEffect(() => {
     if(!releasedInstanceStore) {
-      const store = createInstanceStore(instanceStore.transportLayer, instanceStore.rootStore, "RELEASED");
+      const store = createInstanceStore(instanceStore.api, instanceStore.rootStore, "RELEASED");
       setReleasedInstanceStore(store);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

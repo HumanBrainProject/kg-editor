@@ -32,8 +32,8 @@ class InputNumberStore extends FieldStore {
   minValue = null;
   maxValue = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
+  constructor(definition, options, instance, api, rootStore) {
+    super(definition, options, instance, api, rootStore);
     makeObservable(this, {
       value: observable,
       returnAsNull: observable,

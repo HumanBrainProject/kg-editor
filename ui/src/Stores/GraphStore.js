@@ -101,7 +101,9 @@ export class GraphStore {
   links = [];
   highlightedNode = null;
 
-  constructor(transportLayer) {
+  api = null;
+
+  constructor(api) {
     makeObservable(this, {
       isFetching: observable,
       isFetched: observable,
@@ -122,7 +124,7 @@ export class GraphStore {
       graphDataLinks: computed
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
   
   get graphDataNodes() {

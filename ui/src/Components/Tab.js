@@ -25,7 +25,6 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../Services/API";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../Services/Matomo";
 

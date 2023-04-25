@@ -22,7 +22,6 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable, toJS } from "mobx";
-import API from "../Services/API";
 
 export class AuthStore {
   isUserAuthorized = false;
@@ -30,42 +29,28 @@ export class AuthStore {
   user = null;
   isRetrievingUserProfile = false;
   userProfileError = null;
-  authError = null;
-  authSuccess = false;
-  isTokenExpired = false;
   isInitializing = false;
   initializationError = null;
-  isLogout = false;
-  endpoint = null;
-  commit = null;
 
-  transportLayer = null;
+  api = null;
 
-  constructor(transportLayer) {
+  constructor(api) {
     makeObservable(this, {
       isUserAuthorized: observable,
       isUserAuthorizationInitialized: observable,
       user: observable,
-      commit: observable,
       isRetrievingUserProfile: observable,
       userProfileError: observable,
-      authError: observable,
-      authSuccess: observable,
-      isTokenExpired: observable,
       isInitializing: observable,
       initializationError: observable,
-      isLogout: observable,
-      accessToken: computed,
-      isAuthenticated: computed,
       hasUserProfile: computed,
       hasSpaces: computed,
       spaces: computed,
       retrieveUserProfile: action,
-      authenticate: action,
       firstName: computed
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
 
   filteredList(term) {
@@ -149,34 +134,6 @@ export class AuthStore {
       }
     }
   }
-
- 
-  async authenticate() {
-    if (this.isInitializing || this.authSuccess) {
-      return;
-    }
-    this.isLogout = false;
-    this.isInitializing = true;
-    this.authError = null;
-    try {
-      const { data } = await this.transportLayer.getSettings();
-      const commit = data?.data.commit;
-      const sentrySettings = data?.data?.sentry;
-      const matomoSettings = data?.data?.matomo;
-      runInAction(() => {
-        this.commit = commit;
-      });
-      API.setSentry(sentrySettings);
-      API.setMatomo(matomoSettings);
-    } catch (e) {
-      runInAction(() => {
-        this.isInitializing = false;
-        this.authError = `The service is temporary unavailable. Please retry in a moment. (${e.message?e.message:e})`;
-      });
-    }
-  }
-
-
 }
 
 export default AuthStore;

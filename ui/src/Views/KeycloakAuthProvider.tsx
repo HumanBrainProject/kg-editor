@@ -21,37 +21,20 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React from "react";
 
-import AuthContext from "../contexts/AuthContext";
+import AuthContext from "../Contexts/AuthContext";
 import KeycloakAuthAdapter from "../services/KeycloakAuthAdapter";
 import useKeycloak from "../Hooks/useKeycloak";
 
 interface KeycloakAuthProviderProps {
   adapter: KeycloakAuthAdapter;
   loginRequired?: boolean;
-  children?: string|JSX.Element|(string|JSX.Element)[];
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
 const KeycloakAuthProvider = ({ adapter, loginRequired, children }:KeycloakAuthProviderProps) => {
   const auth = useKeycloak(adapter, loginRequired);
-
-  useEffect(() => {
-    const axios = adapter.axios;
-    if (axios) {
-      axios.interceptors.response.use(undefined, (error) => {
-      if (error.response && error.response.status === 401 && !error.config._isRetry) {
-          auth.logout();
-          return axios.request(error.config);
-      } else {
-          return Promise.reject(error);
-      }
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  
   return (
     <AuthContext.Provider value={auth} >
       {children}

@@ -33,9 +33,9 @@ export class StatusStore {
   fetchQueue = [];
   fetchQueueChildren = [];
 
-  transportLayer = null;
+  api = null;
 
-  constructor(transportLayer) {
+  constructor(api) {
     makeObservable(this, {
       statuses: observable,
       isFetching: observable,
@@ -48,7 +48,7 @@ export class StatusStore {
       processQueueChildren: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
 
   getInstance(id) {

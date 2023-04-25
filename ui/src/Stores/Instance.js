@@ -415,7 +415,9 @@ export class Instance {
   isRawFetched = false;
   isRawFetching = false;
 
-  constructor(id, transportLayer) {
+  api = null;
+
+  constructor(id, api) {
     makeObservable(this, {
       id: observable,
       _name: observable,
@@ -466,7 +468,7 @@ export class Instance {
     });
 
     this.id = id;
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
 
   get cloneInitialData() {
@@ -614,7 +616,7 @@ export class Instance {
     return [];
   }
 
-  initializeData(transportLayer, rootStore, data, isNew = false) {
+  initializeData(api, rootStore, data, isNew = false) {
     const _initializeFields = _fields => {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
@@ -657,7 +659,7 @@ export class Instance {
             field.widget = "UnsupportedField";
           }
           const fieldMapping = fieldsMapping[field.widget];
-          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, transportLayer, rootStore);
+          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, api, rootStore);
         }
         const store = this.fields[name];
         store.updateValue(field.value);

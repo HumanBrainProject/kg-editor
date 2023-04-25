@@ -30,7 +30,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import API from "../../Services/API";
 import { useStores } from "../../Hooks/useStores";
 
 import DropdownComponent from "../../Components/DynamicDropdown/Dropdown";

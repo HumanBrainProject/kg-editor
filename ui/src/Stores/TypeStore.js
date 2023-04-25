@@ -31,10 +31,10 @@ export class TypeStore {
   isFetching = false;
   isFetched = false;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
       space: observable,
       types: observable,
@@ -46,7 +46,7 @@ export class TypeStore {
       fetch: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 

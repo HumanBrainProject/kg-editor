@@ -32,10 +32,20 @@
  *   limitations under the License.
  *
  */
-import TokenProvider from "./TokenProvider";
-import UnauthorizedRequestResponseHandlerProvider from "./UnauthorizedRequestResponseHandlerProvider";
 
-export default interface AuthAdapter {
-    get tokenProvider(): TokenProvider|undefined;
-    get unauthorizedRequestResponseHandlerProvider(): UnauthorizedRequestResponseHandlerProvider|undefined;
+import React from "react";
+import RootStore from "../Stores/RootStore";
+import StoresContext from "../Contexts/StoresContext";
+
+interface StoresProviderProps {
+  stores: RootStore;
+  children?: JSX.Element|JSX.Element[];
 }
+
+const StoresProvider = ({ stores, children }: StoresProviderProps): JSX.Element => (
+  <StoresContext.Provider value={stores} >
+    {children}
+  </StoresContext.Provider>
+);
+
+export default StoresProvider;

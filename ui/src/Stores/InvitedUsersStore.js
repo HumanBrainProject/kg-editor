@@ -29,9 +29,9 @@ export class InvitedUsersStore {
   isFetched = false;
   error = null;
 
-  transportLayer = null;
+  api = null;
 
-  constructor(transportLayer) {
+  constructor(api) {
     makeObservable(this, {
       users: observable,
       fetchError: observable,
@@ -44,7 +44,7 @@ export class InvitedUsersStore {
       removeUserInvitation: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
   }
 
   get hasFetchError() {

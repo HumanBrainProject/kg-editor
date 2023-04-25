@@ -66,10 +66,10 @@ export class AppStore{
   instanceToMove = null;
   pathsToResolve = new Map();
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
       externalCreateModal: observable,
       globalError: observable,
@@ -120,7 +120,7 @@ export class AppStore{
       cancelMoveInstance: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
 
     this.setTheme(localStorage.getItem("theme"));
@@ -449,7 +449,7 @@ export class AppStore{
       });
       const newId = data.data.id;
       const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
-      newInstance.initializeData(this.transportLayer, this.rootStore, data.data);
+      newInstance.initializeData(this.api, this.rootStore, data.data);
       navigate(`/instances/${newId}/edit`);
     } catch(e){
       runInAction(() => {

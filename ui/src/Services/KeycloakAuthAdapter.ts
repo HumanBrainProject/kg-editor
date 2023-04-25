@@ -35,10 +35,12 @@
 import { KeycloakInstance, KeycloakConfig, KeycloakInitOptions, KeycloakOnLoad } from "keycloak-js";
 import { AxiosInstance } from "axios";
 import KeyCloakTokenProvider from "./KeycloakTokenProvider";
+import UnauthorizedRequestResponseHandlerProvider from "./UnauthorizedRequestResponseHandlerProvider";
 import AuthAdapter from "./AuthAdapter";
 
 class KeycloakAuthAdapter implements AuthAdapter {
     private _tokenProvider: KeyCloakTokenProvider;
+    private _unauthorizedRequestResponseHandlerProvider: UnauthorizedRequestResponseHandlerProvider;
     private _initOptions: KeycloakInitOptions | undefined;
     private _redirectUri: string | undefined;
     private _config: KeycloakConfig | undefined = undefined;
@@ -47,6 +49,7 @@ class KeycloakAuthAdapter implements AuthAdapter {
 
     constructor(initOptions?: KeycloakInitOptions, redirectUri?: string) {
         this._tokenProvider = new KeyCloakTokenProvider();
+        this._unauthorizedRequestResponseHandlerProvider = new UnauthorizedRequestResponseHandlerProvider;
         this._initOptions = initOptions;
         this._redirectUri = redirectUri;
     }
@@ -55,6 +58,10 @@ class KeycloakAuthAdapter implements AuthAdapter {
         return this._tokenProvider;
     }
  
+    get unauthorizedRequestResponseHandlerProvider() {
+        return this._unauthorizedRequestResponseHandlerProvider;
+    }
+
     setOnLoad(onLoad: KeycloakOnLoad) {
         if (this._initOptions) {
             this._initOptions = {
@@ -89,14 +96,6 @@ class KeycloakAuthAdapter implements AuthAdapter {
     setKeycloak(keycloak: KeycloakInstance) {
         this._tokenProvider.setKeycloak(keycloak);
         this._keycloak = keycloak;
-    }
-
-    setAxios(axios: AxiosInstance) {
-        this._axios = axios;
-    }
-
-    get axios(): AxiosInstance {
-        return this._axios;
     }
 }
 

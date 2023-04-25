@@ -33,12 +33,37 @@
  *
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import Auth from "../services/Auth";
 import AuthContext from "../Contexts/AuthContext";
 import AuthAdapter from "../Services/AuthAdapter";
 import KeycloakAuthAdapter from "../services/KeycloakAuthAdapter";
 import KeycloakAuthProvider from "./KeycloakAuthProvider";
+import useAuth from "../Hooks/useAuth";
+
+interface AuthSetupProps {
+  adapter?: AuthAdapter;
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+}
+const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
+
+  const auth = useAuth();
+
+  useEffect(() => {
+    if (adapter?.unauthorizedRequestResponseHandlerProvider) {
+      adapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler = () => {
+        auth.logout();
+      };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <>
+      {children}
+    </>
+  );
+}
 
 const bypassAuth = {
   token: undefined,
@@ -61,11 +86,20 @@ const bypassAuth = {
 interface AuthProviderProps {
   adapter?: AuthAdapter;
   loginRequired?: boolean;
-  children?: string|JSX.Element|(string|JSX.Element)[];
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
 // loginRequired allow to overrule the onLoad option of the keycloak adapter when the authentidation should differ depenging on the route
 const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) => {
+
+  useEffect(() => {
+    if (!(adapter instanceof KeycloakAuthAdapter) && adapter?.unauthorizedRequestResponseHandlerProvider) {
+      adapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler = () => {
+        bypassAuth.logout();
+      };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (adapter instanceof KeycloakAuthAdapter) {
     const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === "login-required";
@@ -75,7 +109,9 @@ const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) =>
     } else {
       return (
         <KeycloakAuthProvider adapter={adapter} loginRequired={loginRequired} >
-          {children}
+          <AuthSetup adapter={adapter}>
+            {children}
+          </AuthSetup>
         </KeycloakAuthProvider>
       );
     }
@@ -83,7 +119,9 @@ const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) =>
 
   return (
     <AuthContext.Provider value={bypassAuth} >
-      {children}
+      <AuthSetup adapter={adapter}>
+        {children}
+      </AuthSetup>
     </AuthContext.Provider>
   );
 };

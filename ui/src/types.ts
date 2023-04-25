@@ -37,7 +37,81 @@ import { MatomoSettings } from "./Services/Matomo";
 import { SentrySettings } from "./Services/Sentry";
 
 export interface Settings {
+    commit: string;
     keycloak: KeycloakConfig;
     matomo?: MatomoSettings; 
     sentry?: SentrySettings;
+}
+
+export interface Permissions {
+    canCreate: boolean;
+    canInviteForReview: boolean;
+    canDelete: boolean;
+    canInviteForSuggestion: boolean;
+    canRead: boolean;
+    canSuggest: boolean;
+    canWrite: boolean;
+    canRelease: boolean;
+}
+
+export interface Space {
+    id: string;
+    name: string;
+    autorelease: boolean;
+    clientSpace: boolean;
+    internalSpace: boolean;
+    permissions: Permissions;
+}
+
+export interface UserProfile {
+    givenName: string;
+    familyName: string;
+    email: string;
+    spaces: Space[];
+}
+
+export interface UserSummary {
+    id: string;
+    username: string;
+    name: string;
+}
+
+export type Stage = "IN_PROGRESS" | "RELEASED";
+
+export interface UUID extends String {};
+export interface KGCoreError {
+    code: number;
+    message: string;
+    instanceId: UUID;
+}
+
+export interface KGCoreResult<T> {
+    data: T;
+    message: string;
+    error: KGCoreError;
+    total: number;
+    size: number;
+    from: number;
+}
+
+export interface KGCoreListResult<T> extends KGCoreResult<T[]> {}
+
+export interface SimpleType {
+    name: string;
+    description: string;
+    label: string;
+    color: string;
+    labelField: string;
+}
+
+export interface SimpleTypeWithSpaces extends SimpleType {
+    space: string[];
+}
+
+export interface Suggestion {
+    id: string;
+    name: string;
+    additionalInformation: string;
+    type: SimpleTypeWithSpaces;
+    space: string;
 }

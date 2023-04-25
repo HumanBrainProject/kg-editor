@@ -56,8 +56,8 @@ class LinksStore extends FieldStore {
 
   appStore = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
+  constructor(definition, options, instance, api, rootStore) {
+    super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
     this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];

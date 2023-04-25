@@ -21,7 +21,7 @@
  *
  */
 
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
 import {useLocation, useNavigate, matchPath} from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";

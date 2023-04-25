@@ -50,13 +50,15 @@ configure({
 });
 */
 
+const rootPath = window.rootPath || "";
+
 const authAdapter = new KeycloakAuthAdapter({
   onLoad: "login-required",
   flow: "standard",
   pkceMethod: "S256",
   checkLoginIframe: false,
   enableLogging: true
-});
+}, `${window.location.protocol}//${window.location.host}${rootPath}/logout`);
 
 //reportWebVitals(); //NOSONAR
 const axiosInstance = axios.create({});

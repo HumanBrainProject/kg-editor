@@ -26,6 +26,9 @@ import Button from "react-bootstrap/Button";
 
 import { Settings as SettingsType } from "../../src/types";
 import useGetSettingsQuery from "../Hooks/useGetSettingsQuery";
+import SpinnerPanel from "../Components/SpinnerPanel";
+import ErrorPanel from "../Components/ErrorPanel";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 interface SettingsProps {
@@ -46,13 +49,18 @@ const Settings = ({ children }: SettingsProps) => {
 
   if (isError) {
     return (
-        
+      <ErrorPanel>
+        The service is temporary unavailable. Please retry in a moment. ({error}).<br /><br />
+      <Button variant={"primary"} onClick={refetch}>
+        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+      </Button>
+    </ErrorPanel>
     );
   }
 
   if(isUninitialized || isFetching) {
     return (
-
+      <SpinnerPanel text="Retrieving settings..." />
     );
   }
 

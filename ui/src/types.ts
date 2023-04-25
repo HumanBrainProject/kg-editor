@@ -36,6 +36,8 @@ import { KeycloakConfig } from "keycloak-js";
 import { MatomoSettings } from "./Services/Matomo";
 import { SentrySettings } from "./Services/Sentry";
 
+export type UUID = string;
+
 export interface Settings {
     commit: string;
     keycloak: KeycloakConfig;
@@ -78,7 +80,6 @@ export interface UserSummary {
 
 export type Stage = "IN_PROGRESS" | "RELEASED";
 
-export interface UUID extends String {};
 export interface KGCoreError {
     code: number;
     message: string;
@@ -93,8 +94,6 @@ export interface KGCoreResult<T> {
     size: number;
     from: number;
 }
-
-export interface KGCoreListResult<T> extends KGCoreResult<T[]> {}
 
 export interface SimpleType {
     name: string;
@@ -114,4 +113,126 @@ export interface Suggestion {
     additionalInformation: string;
     type: SimpleTypeWithSpaces;
     space: string;
+}
+
+export interface StructureOfType  {
+    label: string;
+    name: string;
+    description: string;
+    color: string;
+    labelField: string;
+    embeddedOnly: boolean;
+    fields: Map<string,StructureOfField>;
+    promotedFields: string[];
+    incomingLinks: Map<string,StructureOfIncomingLink>;
+    canCreat: boolean;
+}
+
+export interface StructureOfField  {
+    fullyQualifiedName: string;
+    numOfOccurrences: number;
+    order: number;
+    name: string;
+    label: string;
+    widget: string;
+    regex: string;
+    maxLength: number;
+    minItems: number;
+    maxItems: number;
+    minValue: number;
+    maxValue: number;
+    labelTooltip: string;
+    searchable: boolean;
+    required: boolean;
+    readOnly: boolean;
+    fields: Map<string,StructureOfField>;
+    value: object; // or array?
+    defaultTargetType: string;
+    targetTypes: SimpleType[];
+    validation: ValidationRule[];
+    warning: string;
+}
+export interface StructureOfIncomingLink  {
+    fullyQualifiedName: string;
+    sourceTypes: SourceType[];
+}
+export interface SourceType {
+    type: SimpleType;
+    spaces: string[];
+}
+export interface ValidationRule {
+    regex: string;
+    errorMessage: string;
+}
+
+export interface InstanceLabel {
+    space: string;
+    types: SimpleType[];
+    id: UUID;
+    name: string;
+    error: Error;
+}
+
+export interface InstanceSummary extends InstanceLabel {
+    permissions: Permissions;
+    fields: Map<string,StructureOfField>;
+}
+
+export interface InstanceFull extends InstanceSummary {
+    alternatives: Map<string,Alternative[]>;
+    labelField: string;
+    promotedFields: string[];
+    incomingLinks: Map<string,Map<string,IncomingLinksByType>>;
+    possibleIncomingLinks: Map<string, StructureOfIncomingLink>;
+}
+
+export interface Alternative {
+    value: unknown;
+    selected: boolean;
+    users: UserSummary[];
+}
+
+export interface IncomingLinksByType {
+    label: string;
+    color: string;
+    data: IncomingLink[];
+    total: number;
+    from: number;
+    size: number;
+    nameForReverseLink: string
+}
+
+export interface IncomingLink {
+    id: UUID;
+    label: string;
+    space: string;
+}
+
+export interface Error {
+    code: number;
+    message: string;
+    instanceId: UUID;
+}
+
+export interface SuggestionStructure {
+    suggestions: KGCoreResult<Suggestion[]>;
+    types: Map<string, SimpleTypeWithSpaces>;
+}
+
+export interface Neighbor {
+    id: UUID;
+    name: string;
+    types: SimpleType[];
+    space: string;
+    inbound: Neighbor[];
+    outbound: Neighbor[];
+}
+
+export interface Scope {
+    id: UUID;
+    label: string;
+    permissions: Permissions;
+    children: Scope[];
+    types: SimpleType[];
+    status: string;
 }

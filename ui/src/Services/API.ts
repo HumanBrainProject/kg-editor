@@ -32,7 +32,7 @@
  *   limitations under the License.
  *
  */
-import { Settings, UserProfile, KGCoreResult, UUID, Stage } from "../types";
+import { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from "../types";
 
 export default interface API {
 
@@ -40,53 +40,49 @@ export default interface API {
 
   getUserProfile(): Promise<UserProfile>;
 
-  getSpaceTypes(space: string): Promise<void>;
+  getSpaceTypes(space: string): Promise<KGCoreResult<StructureOfType[]>>;
 
-  getInstance(instanceId: UUID): Promise<void>;
+  getInstance(instanceId: UUID): Promise<KGCoreResult<InstanceFull>>;
 
-  getRawInstance(instanceId: UUID): Promise<void>;
+  getRawInstance(instanceId: UUID): Promise<Map<string, unknown>>;
 
   deleteInstance(instanceId: UUID): Promise<void>;
 
-  createInstance(space: string, instanceId: UUID, payload): Promise<void>;
+  createInstance(space: string, instanceId: UUID, payload): Promise<KGCoreResult<InstanceFull>>;
 
   moveInstance(instanceId: UUID, space: string): Promise<void>;
 
-  patchInstance(instanceId: UUID, payload: object): Promise<void>;
+  patchInstance(instanceId: UUID, payload: object):  Promise<KGCoreResult<InstanceFull>>;
 
-  searchInstancesByType(space: string, type: string, from: number, size: number, search: string): Promise<void>;
+  searchInstancesByType(space: string, type: string, from: number, size: number, search: string): Promise<KGCoreResult<InstanceSummary[]>>;
 
-  getSuggestions(instanceId: UUID, field: string, sourceType: string, targetType: string, from: number, size: number, search: string, payload: object): Promise<void>;
+  getSuggestions(instanceId: UUID, field: string, sourceType: string, targetType: string, from: number, size: number, search: string, payload: object): Promise<KGCoreResult<SuggestionStructure>>;
 
-  getInstanceNeighbors(instanceId: UUID): Promise<void>;
+  getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor[]>>;
 
-  getInstanceScope(instanceId: UUID): Promise<void>;
+  getInstanceScope(instanceId: UUID): Promise<KGCoreResult<Scope>>;
 
-  getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<void>;
+  getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceLabel>>>;
 
-  getInstancesSummary(stage: Stage, instanceIds: UUID[]): Promise<void>;
+  getInstancesSummary(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>>;
 
-  getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<void>;
+  getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceFull>>>;
 
-  getInvitedUsers(instanceId: UUID): Promise<void>;
+  getInvitedUsers(instanceId: UUID): Promise<KGCoreResult<UserSummary[]>>;
 
-  getUsersForReview(search: string): Promise<void>;
+  getUsersForReview(search: string): Promise<KGCoreResult<UserSummary[]>>;
 
-  inviteUser(instanceId: UUID, userId: UUID): Promise<void>;
+  inviteUser(instanceId: UUID, userId: UUID): Promise<KGCoreResult<UserSummary[]>>;
 
-  removeUserInvitation(instanceId: UUID, userId: UUID): Promise<void>;
-
-  getMessages(): Promise<void>;
+  removeUserInvitation(instanceId: UUID, userId: UUID): Promise<KGCoreResult<UserSummary[]>>;
 
   releaseInstance(instanceId: UUID): Promise<void>;
 
   unreleaseInstance(instanceId: UUID): Promise<void>;
 
-  getReleaseStatusTopInstance(instanceIds: UUID[]): Promise<void>;
+  getReleaseStatusTopInstance(instanceIds: UUID[]): Promise<KGCoreResult<Map<string, KGCoreResult<string>>>>;
 
-  getReleaseStatusChildren(instanceIds: UUID[]): Promise<void>;
+  getReleaseStatusChildren(instanceIds: UUID[]): Promise<KGCoreResult<Map<string, KGCoreResult<string>>>>;
 
-  getFeatures(): Promise<void>;
-
-  getMoreIncomingLinks(instanceId: UUID, property: string, type: string, from: number, size: number): Promise<void>;
+  getMoreIncomingLinks(instanceId: UUID, property: string, type: string, from: number, size: number): Promise<KGCoreResult<IncomingLink[]>>;
 }

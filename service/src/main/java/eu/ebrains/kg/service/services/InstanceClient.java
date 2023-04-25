@@ -225,7 +225,7 @@ public class InstanceClient {
         String relativeUrl = String.format("instances/%s", id);
         kg.client(true).delete().uri(kg.url(relativeUrl))
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(Void.class)
                 .block();
     }
 

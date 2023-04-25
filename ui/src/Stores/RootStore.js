@@ -32,7 +32,6 @@ import { GraphStore } from "./GraphStore";
 import { ReleaseStore } from "./ReleaseStore";
 import { UserStore } from "./UserStore";
 import { InvitedUsersStore } from "./InvitedUsersStore";
-import { FeaturesStore } from "./FeaturesStore";
 
 class RootStore  {
 
@@ -46,7 +45,6 @@ class RootStore  {
   graphStore= null
   releaseStore= null
   userStore= null
-  featuresStore= null
   invitedUsersStore = null
 
   constructor(api) {
@@ -65,7 +63,6 @@ class RootStore  {
     this.graphStore = new GraphStore(api, this);
     this.releaseStore = new ReleaseStore(api, this);
     this.userStore = new UserStore(api, this);
-    this.featuresStore = new FeaturesStore(api, this);
     this.authStore = new AuthStore(api, this);
     this.invitedUsersStore = new InvitedUsersStore(api, this)
 

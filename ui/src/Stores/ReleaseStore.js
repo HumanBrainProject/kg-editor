@@ -177,7 +177,6 @@ export class ReleaseStore {
       stopRelease: action,
       setTopInstanceId: action,
       fetchReleaseData: action,
-      fetchWarningMessages: action,
       commitStatusChanges: action,
       releaseNode: action,
       unreleaseNode: action,
@@ -349,35 +348,6 @@ export class ReleaseStore {
         const message = e.message ? e.message : e;
         this.fetchError = message;
         this.isFetching = false;
-      });
-    }
-  }
-
-  async fetchWarningMessages() {
-    if (this.isFetchingWarningMessages || this.isWarningMessagesFetched) {
-      return;
-    }
-    this.isFetchingWarningMessages = true;
-    this.fetchWarningMessagesError = null;
-    this.validationWarnings.clear();
-    try {
-      const { data } = await this.transportLayer.getMessages();
-      runInAction(() => {
-        Object.entries(data.data).forEach(([typePath, messages]) => {
-          this.validationWarnings.set(typePath, {
-            releaseFlags: new Map(),
-            messages: messages
-          });
-        });
-        this.isWarningMessagesFetched = true;
-        this.isFetchingWarningMessages = false;
-      });
-    } catch (e) {
-      runInAction(() => {
-        const message = e.message ? e.message : e;
-        this.fetchWarningMessagesError = message;
-        this.isWarningMessagesFetched = false;
-        this.isFetchingWarningMessages = false;
       });
     }
   }

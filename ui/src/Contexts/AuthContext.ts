@@ -33,7 +33,7 @@
  *
  */
 import React from "react";
-import Auth from "../services/Auth";
+import Auth from "../Services/Auth";
 
 const AuthContext = React.createContext<Auth|undefined>(undefined);
 

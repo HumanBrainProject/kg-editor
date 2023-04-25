@@ -25,7 +25,7 @@ import { observer } from "mobx-react-lite";
 import React, { useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 import Filter from "../Filter";
 
 const useStyles = createUseStyles({

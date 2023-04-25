@@ -27,7 +27,7 @@ import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({

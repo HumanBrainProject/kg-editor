@@ -31,7 +31,7 @@ import uniqueId from "lodash/uniqueId";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 
 import Avatar from "../Components/Avatar";
 import Matomo from "../Services/Matomo";

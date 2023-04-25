@@ -29,7 +29,7 @@ import Modal from "react-bootstrap/Modal";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/useStores";
+import useStores from "../../../Hooks/useStores";
 
 import CompareWithReleasedVersionChanges from "../CompareWithReleasedVersionChanges";
 

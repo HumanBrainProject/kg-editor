@@ -27,7 +27,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 import SpaceDropdownToggle from "./SpaceDropdownToggle";
 import SpaceDropdownMenu from "./SpaceDropdownMenu";

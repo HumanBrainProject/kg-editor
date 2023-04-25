@@ -33,13 +33,13 @@ import StoresProvider from "./StoresProvider";
 import Matomo from "../Services/Matomo";
 import Sentry from "../Services/Sentry";
 import AuthAdapter from "../Services/AuthAdapter";
+import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import APIProvider from "./APIProvider";
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 
 import Layout from "./Layout";
 import GlobalError from "./GlobalError";
 import Settings from "./Settings";
-import KeycloakAuthAdapter from "../services/KeycloakAuthAdapter";
 import AuthProvider from "./AuthProvider";
 import Authenticate from "./Authenticate";
 import ErrorPanel from "../Components/ErrorPanel";

@@ -20,6 +20,7 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
+import API from "../Services/API";
 import { AppStore } from "./AppStore";
 import { AuthStore } from "./AuthStore";
 import { HistoryStore } from "./HistoryStore";
@@ -33,21 +34,22 @@ import { ReleaseStore } from "./ReleaseStore";
 import { UserStore } from "./UserStore";
 import { InvitedUsersStore } from "./InvitedUsersStore";
 
-class RootStore  {
+class RootStore {
 
-  authStore= null
-  historyStore= null
-  typeStore= null
-  browseStore= null
-  instanceStore= null
-  statusStore= null
-  viewStore= null
-  graphStore= null
-  releaseStore= null
-  userStore= null
-  invitedUsersStore = null
+  authStore?: AuthStore;
+  historyStore?: HistoryStore;
+  typeStore?: TypeStore;
+  browseStore?: BrowseStore;
+  instanceStore?: InstanceStore;
+  statusStore?: StatusStore;
+  viewStore?: ViewStore;
+  graphStore?: GraphStore;
+  releaseStore?: ReleaseStore;
+  userStore?: UserStore;
+  invitedUsersStore?: InvitedUsersStore;
+  appStore?: AppStore;
 
-  constructor(api) {
+  constructor(api: API) {
 
     if (!api) {
       throw new Error("no api provided!");
@@ -58,13 +60,13 @@ class RootStore  {
     this.typeStore = new TypeStore(api, this);
     this.browseStore = new BrowseStore(api, this);
     this.instanceStore = new InstanceStore(api, this);
-    this.statusStore = new StatusStore(api, this);
+    this.statusStore = new StatusStore(api);
     this.viewStore = new ViewStore(api, this);
-    this.graphStore = new GraphStore(api, this);
+    this.graphStore = new GraphStore(api);
     this.releaseStore = new ReleaseStore(api, this);
-    this.userStore = new UserStore(api, this);
-    this.authStore = new AuthStore(api, this);
-    this.invitedUsersStore = new InvitedUsersStore(api, this)
+    this.userStore = new UserStore(api);
+    this.authStore = new AuthStore(api);
+    this.invitedUsersStore = new InvitedUsersStore(api)
 
     // UI stores
     this.appStore = new AppStore(api, this);

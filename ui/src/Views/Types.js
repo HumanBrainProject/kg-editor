@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button"
 
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";

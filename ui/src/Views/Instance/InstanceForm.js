@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 import HeaderPanel from "./InstanceForm/HeaderPanel";
 import BodyPanel from "./InstanceForm/BodyPanel";

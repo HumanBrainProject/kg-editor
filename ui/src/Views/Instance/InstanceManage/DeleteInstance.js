@@ -27,7 +27,7 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/useStores";
+import useStores from "../../../Hooks/useStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";

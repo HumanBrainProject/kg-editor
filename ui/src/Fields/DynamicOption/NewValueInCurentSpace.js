@@ -25,7 +25,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createUseStyles } from "react-jss";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

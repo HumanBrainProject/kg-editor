@@ -30,7 +30,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InstanceRow from "../Instance/InstanceRow";
 import PopOverButton from "../../Components/PopOverButton";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../../Services/Matomo";
 

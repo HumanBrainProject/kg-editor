@@ -24,7 +24,7 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 import Sentry from "../../Services/Sentry";
 
 const ContactTheSupport = () => {

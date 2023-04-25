@@ -30,7 +30,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import uniqueId from "lodash/uniqueId";
 import { v4 as uuidv4 } from "uuid";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../../Services/Matomo";
 

@@ -24,7 +24,7 @@
 import React from "react";
 
 import AuthContext from "../Contexts/AuthContext";
-import KeycloakAuthAdapter from "../services/KeycloakAuthAdapter";
+import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import useKeycloak from "../Hooks/useKeycloak";
 
 interface KeycloakAuthProviderProps {

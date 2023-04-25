@@ -32,7 +32,7 @@ import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { v4 as uuidv4 } from "uuid";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";

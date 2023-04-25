@@ -25,7 +25,7 @@ import React, { Suspense, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { Route, Routes, matchPath, useNavigate, useSearchParams } from "react-router-dom";
 
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 import SpinnerPanel from "../Components/SpinnerPanel";
 
 const NotFound = React.lazy(() => import("./NotFound"));

@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import MultiToggle from "../../../Components/MultiToggle";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/useStores";
+import useStores from "../../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

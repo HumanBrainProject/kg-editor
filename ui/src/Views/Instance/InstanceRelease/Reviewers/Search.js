@@ -28,7 +28,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "./User";
 
-import { useStores } from "../../../../Hooks/useStores";
+import useStores from "../../../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

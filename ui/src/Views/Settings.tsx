@@ -25,10 +25,8 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 
 import { Settings as SettingsType } from "../../src/types";
-import useGetSettingsQuery from "../hooks/useGetSettingsQuery";
-import Fetching from "./Fetching";
-import Error from "./Error";
-import ContactText from "./ContactText";
+import useGetSettingsQuery from "../Hooks/useGetSettingsQuery";
+
 
 interface SettingsProps {
   children: (settings?: SettingsType) => null|JSX.Element|(null|JSX.Element)[];

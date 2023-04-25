@@ -23,6 +23,7 @@
 
 import React from "react";
 import { createRoot } from 'react-dom/client';
+import axios, { InternalAxiosRequestConfig } from "axios";
 // import { configure } from "mobx"; //NOSONAR
 import { JssProvider } from "react-jss";
 import { BrowserRouter } from "react-router-dom";
@@ -33,11 +34,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Services/IconsImport";
 
 import RootStore from "./Stores/RootStore";
+import KeycloakAuthAdapter from "./Services/KeycloakAuthAdapter";
+import APIBackendAdapter from "./Services/APIBackendAdapter";
 import App from "./Views/App";
 import ErrorBoundary from "./Views/ErrorBoundary";
-import axios, { InternalAxiosRequestConfig } from "axios";
-import KeycloakAuthAdapter from "./services/KeycloakAuthAdapter";
-import APIBackendAdapter from "./Services/APIBackendAdapter";
 
 
 /* //NOSONAR React debug flags

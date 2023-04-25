@@ -34,12 +34,12 @@
  */
 
 import React, { useEffect } from "react";
-import Auth from "../services/Auth";
+import Auth from "../Services/Auth";
 import AuthContext from "../Contexts/AuthContext";
 import AuthAdapter from "../Services/AuthAdapter";
-import KeycloakAuthAdapter from "../services/KeycloakAuthAdapter";
-import KeycloakAuthProvider from "./KeycloakAuthProvider";
+import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import useAuth from "../Hooks/useAuth";
+import KeycloakAuthProvider from "./KeycloakAuthProvider";
 
 interface AuthSetupProps {
   adapter?: AuthAdapter;

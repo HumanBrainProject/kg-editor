@@ -27,7 +27,7 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 import Filter from "../../Components/Filter";
 import Matomo from "../../Services/Matomo";

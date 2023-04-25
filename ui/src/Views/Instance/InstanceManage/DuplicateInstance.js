@@ -26,7 +26,7 @@ import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/useStores";
+import useStores from "../../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../../../Services/Matomo";
 

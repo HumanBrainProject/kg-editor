@@ -30,7 +30,7 @@ import Color from "color";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useStores } from "../../../Hooks/useStores";
+import useStores from "../../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   graph: {

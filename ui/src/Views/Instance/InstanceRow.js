@@ -29,7 +29,7 @@ import Field from "../../Fields/Field";
 import Status from "./Status";
 import { observer } from "mobx-react-lite";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {

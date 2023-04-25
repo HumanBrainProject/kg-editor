@@ -25,7 +25,7 @@ import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles, useTheme } from "react-jss";
 
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 
 import GlobalError from "./GlobalError";
 import Tabs from "./Tabs";

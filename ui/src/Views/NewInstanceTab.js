@@ -28,7 +28,7 @@ import { createUseStyles } from "react-jss";
 import Modal from "react-bootstrap/Modal";
 import _  from "lodash-uuid";
 
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 
 import Tab from "../Components/Tab";
 import TypeSelection from "./Instance/TypeSelection";

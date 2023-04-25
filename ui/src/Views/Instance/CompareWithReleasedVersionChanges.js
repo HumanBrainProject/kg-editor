@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 import { createInstanceStore } from "../../Stores/InstanceStore";
 
 import Spinner from "../../Components/Spinner";

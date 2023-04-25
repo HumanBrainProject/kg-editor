@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Matomo from "../Services/Matomo";
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 import Instances from "./Browse/Instances";
 import NavigationPanel from "./Browse/NavigationPanel";
 

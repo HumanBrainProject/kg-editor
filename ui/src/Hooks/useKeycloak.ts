@@ -23,8 +23,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Keycloak, { KeycloakError } from "keycloak-js";
-import Auth from "../services/Auth"; 
-import KeycloakAuthAdapter from "../services/KeycloakAuthAdapter";
+import Auth from "../Services/Auth"; 
+import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 
 const useKeycloak = (adapter: KeycloakAuthAdapter, loginRequired?: boolean) : Auth => {
   

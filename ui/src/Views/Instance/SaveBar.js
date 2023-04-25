@@ -31,7 +31,7 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 
-import { useStores } from "../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
 
 import CompareChanges from "./CompareChanges";
 import Matomo from "../../Services/Matomo";

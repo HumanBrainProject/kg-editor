@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 
 import Matomo from "../Services/Matomo";
-import { useStores } from "../Hooks/useStores";
+import useStores from "../Hooks/useStores";
 
 import ThemeSwitcher from "./Home/ThemeSwitcher";
 import InstancesHistory from "./Home/InstancesHistory";

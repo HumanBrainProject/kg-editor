@@ -76,7 +76,7 @@ const endpoints = {
 };
 
 class APIBackendAdapter implements API {
-  _axios: AxiosInstance;
+  private _axios: AxiosInstance;
 
   constructor(axios: AxiosInstance) {
     this._axios = axios;

@@ -89,7 +89,7 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
-      <ErrorBoundary>
+      <ErrorBoundary stores={stores} >
         <BrowserRouter>
           <App stores={stores} api={api} authAdapter={authAdapter}/>
         </BrowserRouter>

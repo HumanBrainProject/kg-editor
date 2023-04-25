@@ -23,8 +23,6 @@
 
 import React from "react";
 
-import useStores from "../Hooks/useStores";
-
 class ErrorBoundaryComponent extends React.Component {
 
   static getDerivedStateFromError() {
@@ -42,15 +40,10 @@ class ErrorBoundaryComponent extends React.Component {
   }
 }
 
-const ErrorBoundary = ({ children }) => {
-
-  const stores = useStores();
-
-  return (
-    <ErrorBoundaryComponent stores={stores} >
-      {children}
-    </ErrorBoundaryComponent>
-  );
-};
+const ErrorBoundary = ({ stores, children }) => (
+  <ErrorBoundaryComponent stores={stores} >
+    {children}
+  </ErrorBoundaryComponent>
+);
 
 export default ErrorBoundary;

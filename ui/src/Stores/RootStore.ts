@@ -36,18 +36,18 @@ import { InvitedUsersStore } from "./InvitedUsersStore";
 
 class RootStore {
 
-  authStore?: AuthStore;
-  historyStore?: HistoryStore;
-  typeStore?: TypeStore;
-  browseStore?: BrowseStore;
-  instanceStore?: InstanceStore;
-  statusStore?: StatusStore;
-  viewStore?: ViewStore;
-  graphStore?: GraphStore;
-  releaseStore?: ReleaseStore;
-  userStore?: UserStore;
-  invitedUsersStore?: InvitedUsersStore;
-  appStore?: AppStore;
+  authStore: AuthStore;
+  historyStore: HistoryStore;
+  typeStore: TypeStore;
+  browseStore: BrowseStore;
+  instanceStore: InstanceStore;
+  statusStore: StatusStore;
+  viewStore: ViewStore;
+  graphStore: GraphStore;
+  releaseStore: ReleaseStore;
+  userStore: UserStore;
+  invitedUsersStore: InvitedUsersStore;
+  appStore: AppStore;
 
   constructor(api: API) {
 

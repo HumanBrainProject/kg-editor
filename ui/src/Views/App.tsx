@@ -35,7 +35,6 @@ import Sentry from "../Services/Sentry";
 import AuthAdapter from "../Services/AuthAdapter";
 import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import APIProvider from "./APIProvider";
-import useStores from "../Hooks/useStores";
 
 import Layout from "./Layout";
 import GlobalError from "./GlobalError";
@@ -48,19 +47,19 @@ import UserProfile from "./UserProfile";
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
 
-const BrowserEventHandler = observer(() => {
+const BrowserEventHandler = observer(({ stores }: { stores: RootStore }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { appStore, instanceStore } = useStores();
+  const { appStore, instanceStore } = stores;
 
   useEffect(() => {
     window.onpopstate = () => {
       const path = location.pathname;
       if(path.startsWith("/instance")) {
         const id = path.split("/")[2];
-        const instance = instanceStore.instances.get(id);
-        if (!instance || instance.space !== appStore.currentSpace.id) {
+        const instance = instanceStore?.instances.get(id);
+        if (!instance || instance.space !== appStore.currentSpace?.id) {
           appStore.closeInstance(location, navigate, id);
           window.location.replace(location.pathname);
         }
@@ -76,7 +75,7 @@ BrowserEventHandler.displayName = "BrowserEventHandler";
 
 const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: API, authAdapter?: AuthAdapter}) => {
 
-  const { appStore } = useStores();
+  const { appStore } = stores;
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -137,13 +136,13 @@ const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: A
 
   return (
     <>
-      <BrowserEventHandler />
+      <BrowserEventHandler stores={stores} />
       <ThemeProvider theme={theme}>
         <Layout>
           {appStore.globalError?
             <GlobalError />
             :
-            <StoresProvider value={stores}>
+            <StoresProvider stores={stores}>
               <APIProvider api={api}>
                 <Settings>
                   {settings => {

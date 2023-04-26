@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,10 +30,16 @@ import useAuth from "../Hooks/useAuth";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 import Matomo from "../Services/Matomo";
+import useStores from "../Hooks/useStores";
 
-const Authenticate = observer(({children}) => {
+interface AuthenticateProps {
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+}
+
+const Authenticate = observer(({children}: AuthenticateProps) => {
 
   const {
+    token,
     isTokenExpired,
     error,
     isError,
@@ -42,8 +48,17 @@ const Authenticate = observer(({children}) => {
     isAuthenticated,
     isAuthenticating,
     retryInitialize,
-    login
+    login,
+    logout
   } = useAuth();
+
+  const { appStore } = useStores();
+
+  useEffect(() => {
+    appStore.setToken(token);
+    appStore.setLogoutCallback(logout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, logout]);
 
   const handleLogin = () =>  {
     Matomo.trackEvent("User", "Login");

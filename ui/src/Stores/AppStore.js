@@ -49,6 +49,8 @@ const getLinkedInstanceIds = (instanceStore, instanceIds) => {
 };
 
 export class AppStore{
+  commit = null;
+  token = null;
   globalError = null;
   currentSpace = null;
   savePercentage = null;
@@ -65,12 +67,16 @@ export class AppStore{
   instanceMovingError = null;
   instanceToMove = null;
   pathsToResolve = new Map();
+  logoutCallback = undefined;
 
   api = null;
   rootStore = null;
 
   constructor(api, rootStore) {
     makeObservable(this, {
+      commit: observable,
+      token: observable,
+      logoutCallback: observable,
       externalCreateModal: observable,
       globalError: observable,
       currentSpace: observable,
@@ -117,7 +123,10 @@ export class AppStore{
       updateExternalInstanceModal: action,
       clearExternalCreateModal: action,
       moveInstance: action,
-      cancelMoveInstance: action
+      cancelMoveInstance: action,
+      setCommit: action,
+      setToken: action,
+      setLogoutCallback: action
     });
 
     this.api = api;
@@ -143,6 +152,18 @@ export class AppStore{
       };
     }
     this.historySettings = savedHistorySettings;
+  }
+
+  setCommit(commit) {
+    this.commit = commit;
+  }
+  
+  setToken(token) {
+    this.token = token;
+  }
+
+  setLogoutCallback(logoutCallback) {
+    this.logoutCallback = logoutCallback;
   }
 
   async createExternalInstance(space, typeName, value, location, navigate) {

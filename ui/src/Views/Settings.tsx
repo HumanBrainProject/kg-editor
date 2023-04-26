@@ -21,21 +21,27 @@
  *
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "react-bootstrap/Button";
+import { observer } from "mobx-react-lite";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Settings as SettingsType } from "../../src/types";
 import useGetSettingsQuery from "../Hooks/useGetSettingsQuery";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useStores from "../Hooks/useStores";
+import AuthAdapter from "../Services/AuthAdapter";
+import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
+import Matomo from "../Services/Matomo";
+import Sentry from "../Services/Sentry";
 
 
 interface SettingsProps {
-  children: (settings?: SettingsType) => null|JSX.Element|(null|JSX.Element)[];
+  authAdapter?: AuthAdapter;
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
-const Settings = ({ children }: SettingsProps) => {
+const Settings = observer(({ authAdapter, children }: SettingsProps) => {
 
   const {
     data: settings,
@@ -46,6 +52,21 @@ const Settings = ({ children }: SettingsProps) => {
     isError,
     refetch,
   } = useGetSettingsQuery();
+
+  const { appStore } = useStores();
+
+  useEffect(() => {
+    if (settings) {
+      Matomo.initialize(settings?.matomo);
+      Sentry.initialize(settings?.sentry);
+      appStore.setCommit(settings?.commit);
+      if (authAdapter instanceof KeycloakAuthAdapter && settings.keycloak) {
+        authAdapter.setConfig(settings.keycloak);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+  
 
   if (isError) {
     return (
@@ -65,14 +86,25 @@ const Settings = ({ children }: SettingsProps) => {
   }
 
   if (isSuccess) {
+
+    if (authAdapter instanceof KeycloakAuthAdapter && !settings?.keycloak) {
+      return (
+        <ErrorPanel>
+          <p>Failed to initialize authentication!</p>
+          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+        </ErrorPanel>
+      );
+    }
+
     return (
       <>
-        {children(settings)}
+        {children}
       </>
     );
   }
 
   return null;
-};
+});
+Settings.displayName = "Settings";
 
 export default Settings;

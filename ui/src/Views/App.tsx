@@ -23,7 +23,7 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
 import { v4 as uuidv4 } from "uuid";
 
@@ -31,9 +31,7 @@ import API from "../Services/API";
 import RootStore from "../Stores/RootStore";
 import StoresProvider from "./StoresProvider";
 import Matomo from "../Services/Matomo";
-import Sentry from "../Services/Sentry";
 import AuthAdapter from "../Services/AuthAdapter";
-import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import APIProvider from "./APIProvider";
 
 import Layout from "./Layout";
@@ -41,8 +39,8 @@ import GlobalError from "./GlobalError";
 import Settings from "./Settings";
 import AuthProvider from "./AuthProvider";
 import Authenticate from "./Authenticate";
-import ErrorPanel from "../Components/ErrorPanel";
 import UserProfile from "./UserProfile";
+import Logout from "./Logout";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
@@ -76,10 +74,11 @@ BrowserEventHandler.displayName = "BrowserEventHandler";
 
 const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: API, authAdapter?: AuthAdapter}) => {
 
-  const { appStore } = stores;
+  const { appStore, typeStore } = stores;
 
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const theme = appStore.currentTheme;
 
@@ -135,45 +134,84 @@ const App = observer(({ stores, api, authAdapter } : { stores: RootStore, api: A
     }
   };
 
+  const currentSpace = appStore.currentSpace as { id: string}|null;
+  const isTypeFetched = currentSpace && typeStore.space === currentSpace.id && typeStore.isFetched;
+  const spaceParam = searchParams.get("space");
+
   return (
     <>
       <BrowserEventHandler stores={stores} />
       <ThemeProvider theme={theme}>
-        <StoresProvider stores={stores}>
-          <Layout>
-            {appStore.globalError?
-              <GlobalError />
-              :
-              <APIProvider api={api}>
-                <Settings>
-                  {settings => {
-                      Matomo.initialize(settings?.matomo);
-                      Sentry.initialize(settings?.sentry);
-                      if (authAdapter instanceof KeycloakAuthAdapter) {
-                        if (settings?.keycloak) {
-                          authAdapter.setConfig(settings?.keycloak);
-                        } else {
-                          return (
-                            <ErrorPanel>
-                              <p>Failed to initialize authentication!</p>
-                              <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-                            </ErrorPanel>
-                          );
-                        }
-                      }
-                      return (
+          <StoresProvider stores={stores}>
+            <Layout>
+              {appStore.globalError?
+                <GlobalError />
+                :
+                <APIProvider api={api}>
+                  <Settings authAdapter={authAdapter}>
+                    <Routes>
+                      <Route path={"/logout"} element={<Logout />}/>
+                      <Route path={"*"} element={
                         <AuthProvider adapter={authAdapter} >
                           <Authenticate >
-                            <UserProfile />
+                            <UserProfile>
+                              <Routes>
+                                <Route 
+                                  path="/instances/" 
+                                  element={
+                                    <Instance>
+                                      {{space, instanceId} => (
+                                        <Space space={space}>
+                                          <Types>
+                                            <Routes>
+                                              <Route path=":id" element={<InstanceView mode="view" />} />
+                                              <Route path=":id/create" element={<InstanceView mode="create" />} />
+                                              <Route path=":id/edit" element={<InstanceView mode="edit" />} />
+                                              <Route path=":id/graph" element={<InstanceView mode="graph" />} />
+                                              <Route path=":id/release" element={<InstanceView mode="release" />} />
+                                              <Route path=":id/manage"  element={<InstanceView mode="manage" />} />
+                                              <Route path=":id/raw"  element={<InstanceView mode="raw" />} />
+                                              <Route path="*" element={<NotFound/>} />
+                                            </Routes>
+                                          </Types>
+                                        </Space>
+                                      )}  
+                                    </Instance>
+                                  } 
+                                />
+                                <Route
+                                  path="/browse"
+                                  element={
+                                    <Space space={spaceParam} noTabs={!!spaceParam}>
+                                      <Types>
+                                        <Browse />
+                                      </Types>
+                                    </Space>
+                                  } 
+                                />
+                                <Route path="/help/*" element={<Help/>} />
+                                <Route
+                                  path="/"
+                                  element={
+                                    <Space space={spaceParam} noTabs={!!spaceParam}>
+                                      <Types>
+                                        <Home />
+                                      </Types>
+                                    </Space>
+                                  } 
+                                />
+                                <Route path="*" element={<NotFound/>} />
+                              </Routes>
+                            </UserProfile>
                           </Authenticate>
                         </AuthProvider>
-                      );
-                  }}
-                </Settings>
-              </APIProvider>
-            }
-          </Layout>
-        </StoresProvider>
+                      }/>
+                    </Routes>
+                  </Settings>
+                </APIProvider>
+              }
+            </Layout>
+          </StoresProvider>
       </ThemeProvider>
     </>
   );

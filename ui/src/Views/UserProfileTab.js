@@ -171,7 +171,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   const [popOverPosition, setPopOverPosition] = useState("bottom");
   const [tokenCopied, setTokenCopied] = useState(null);
 
-  const { viewStore, userProfileStore, instanceStore } = useStores();
+  const { viewStore, userProfileStore, instanceStore, appStore } = useStores();
 
   useEffect(() => {
     if(showPopOver) {
@@ -214,11 +214,11 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     Matomo.trackEvent("User", "Logout");
     if (!instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       viewStore.flushStoredViews();
-      userProfileStore.logout();
+      appStore.logoutCallback();
     }
   }
 
-  if (!userProfileStore.isAuthenticated || !userProfileStore.isAuthorized || !userProfileStore.user) {
+  if (!userProfileStore.isAuthorized) {
     return null;
   }
 
@@ -249,7 +249,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
             </div>
             <div className={classes.popOverFooterBar}>
               <div>
-                <CopyToClipboard text={userProfileStore.accessToken} onCopy={handleCopyToken}>
+                <CopyToClipboard text={appStore.token} onCopy={handleCopyToken}>
                   <Button variant="secondary">Copy token to clipboard</Button>
                 </CopyToClipboard>
               </div>

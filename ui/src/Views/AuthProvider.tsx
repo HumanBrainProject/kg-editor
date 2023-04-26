@@ -34,16 +34,12 @@
  */
 
 import React, { useEffect } from "react";
-import {useLocation, useNavigate, matchPath} from "react-router-dom";
-import Matomo from "../Services/Matomo";
 import Auth from "../Services/Auth";
 import AuthContext from "../Contexts/AuthContext";
 import AuthAdapter from "../Services/AuthAdapter";
 import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import useAuth from "../Hooks/useAuth";
 import KeycloakAuthProvider from "./KeycloakAuthProvider";
-import Panel from "../Components/Panel";
-import Button from "react-bootstrap/Button";
 
 interface AuthSetupProps {
   adapter?: AuthAdapter;
@@ -96,10 +92,6 @@ interface AuthProviderProps {
 // loginRequired allow to overrule the onLoad option of the keycloak adapter when the authentidation should differ depenging on the route
 const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) => {
 
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isLogout = !!matchPath({path:"/logout"}, location.pathname);
-  
   useEffect(() => {
     if (!(adapter instanceof KeycloakAuthAdapter) && adapter?.unauthorizedRequestResponseHandlerProvider) {
       adapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler = () => {
@@ -108,21 +100,6 @@ const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) =>
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const handleReLogin = () =>  {
-    Matomo.trackEvent("User", "Login");
-    navigate("/");
-  };
-
-  if (isLogout) {
-    return (
-      <Panel icon={undefined}>
-        <h3>You are logged out of the application</h3>
-        <p></p>
-        <Button variant={"primary"} onClick={handleReLogin}>Login</Button>
-      </Panel>
-    );
-  }
 
   if (adapter instanceof KeycloakAuthAdapter) {
     const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === "login-required";

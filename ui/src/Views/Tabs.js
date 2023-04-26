@@ -96,7 +96,7 @@ const Tabs = observer(() => {
         {!appStore.globalError &&
           <>
             <div className={classes.fixedTabsLeft}>
-              {userProfileStore.isAuthenticated && userProfileStore.isAuthorized && userProfileStore.hasSpaces && appStore.currentSpace?
+              {userProfileStore.isAuthorized && userProfileStore.hasSpaces && appStore.currentSpace?
                 <>
                   <SpaceSelector />
                   <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
@@ -108,7 +108,7 @@ const Tabs = observer(() => {
             </div>
             <InstanceTabs pathname={location.pathname} />
             <div className={classes.fixedTabsRight}>
-              {userProfileStore.isAuthenticated && userProfileStore.isAuthorized && (
+              {userProfileStore.isAuthorized && (
                 <>
                   <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
                   <UserProfileTab className={classes.userProfileTab} size={32} />

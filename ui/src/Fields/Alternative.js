@@ -79,23 +79,23 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
 
   const handleKeyDown = e => {
     if(e) {
-      switch(e.keyCode) {
-      case 38: {
+      switch(e.key) {
+      case "ArrowUp": {
         e.preventDefault();
         onSelectPrevious(alternative.value);
         break;
       }
-      case 40: {
+      case "ArrowDown": {
         e.preventDefault();
         onSelectNext(alternative.value);
         break;
       }
-      case 13: {
+      case "Enter": {
         e.preventDefault();
         onSelect(alternative.value);
         break;
       }
-      case 27: {
+      case "Escape": {
         e.preventDefault();
         onCancel();
         break;

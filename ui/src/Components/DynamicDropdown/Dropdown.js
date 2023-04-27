@@ -56,10 +56,10 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
   }, []);
 
   const handleInputKeyStrokes = e => {
-    if(e.keyCode === 8 && !e.target.value){
+    if(e.key === "Backspace" && !e.target.value){
       e.preventDefault();
       onDeleteLastValue && onDeleteLastValue();
-    } else if(e.keyCode === 40){ //down
+    } else if(e.key === "ArrowDown"){
       e.preventDefault();
       if(options.length){
         const option = options[0];
@@ -67,7 +67,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
       } else {
         setCurrent(null);
       }
-    } else if(e.keyCode === 38){ //up
+    } else if(e.key === "ArrowUp"){
       e.preventDefault();
       if(options.length){
         const option = options[options.length - 1];
@@ -75,7 +75,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
       } else {
         setCurrent(null);
       }
-    } else if(e.keyCode === 27) {
+    } else if(e.key === "Escape") {
       //escape key -> we want to reset the search
       handleReset();
     }

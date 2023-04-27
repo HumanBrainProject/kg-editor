@@ -127,16 +127,16 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     if (disabled || !e) {
       return;
     }
-    if(e.keyCode === 40){ // Down
+    if(e.key === "ArrowDown"){
       e.preventDefault();
       handleSelectNext(current);
-    } else if(e.keyCode === 38){ // Up
+    } else if(e.key === "ArrowUp"){
       e.preventDefault();
       handleSelectPrevious(current);
-    } else if(e.keyCode === 27) { //escape
+    } else if(e.key === "Escape") {
       e.preventDefault();
       close();
-    } else if (e.keyCode === 13) { // enter
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (open) {
         if (current) {

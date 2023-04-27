@@ -222,7 +222,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   };
 
   const handleKeyDown = (value, e) => {
-    if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
+    if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
       instanceStore.togglePreviewInstance();

@@ -78,7 +78,7 @@ export class TypeStore {
         this.fetchError = null;
         this.isFetched = false;
         try {
-          const data = await this.api.getSpaceTypes(space);
+          const { data } = await this.api.getSpaceTypes(space);
           runInAction(() => {
             this.types = data.length ?
               data.map(type => ({

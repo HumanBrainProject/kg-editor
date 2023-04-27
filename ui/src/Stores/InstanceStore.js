@@ -88,8 +88,8 @@ class Instance extends BaseInstance {
       this.hasRawFetchError = false;
       this.rawFetchError = null;
       try {
-        const { data } = await this.store.transportLayer.getRawInstance(this.id);
-        this.initializeRawData(data && data.data, data && data.permissions);
+        const data = await this.store.api.getRawInstance(this.id);
+        this.initializeRawData(data?.data, data?.permissions);
       } catch (e) {
         runInAction(() => {
           if(e.response && e.response.status === 404){
@@ -110,9 +110,9 @@ class Instance extends BaseInstance {
     const payload = this.returnValue;
     try {
       if (this.isNew) {
-        const { data } = await this.store.transportLayer.createInstance(this.space, this.id, payload);
+        const { data } = await this.store.api.createInstance(this.space, this.id, payload);
         runInAction(() => {
-          const newId = data.data.id;
+          const newId = data.id;
           this.isNew = false;
           this.saveError = null;
           this.hasSaveError = false;
@@ -127,10 +127,10 @@ class Instance extends BaseInstance {
             this.store.instance.delete(this.id);
             this.id = newId;
           }
-          this.initializeData(this.store.api, this.store.rootStore, data.data);
+          this.initializeData(this.store.api, this.store.rootStore, data);
         });
       } else {
-        const { data } = await this.store.transportLayer.patchInstance(this.id, payload);
+        const { data } = await this.store.api.patchInstance(this.id, payload);
         runInAction(() => {
           this.saveError = null;
           this.hasSaveError = false;
@@ -140,7 +140,7 @@ class Instance extends BaseInstance {
           this.hasRawFetchError = false;
           this.isRawFetched = false;
           this.isRawFetching = false;
-          this.initializeData(this.store.api, this.store.rootStore, data.data);
+          this.initializeData(this.store.api, this.store.rootStore, data);
         });
       }
     } catch (e) {
@@ -258,7 +258,7 @@ export class InstanceStore {
       links.isFetching = true;
       links.fetchError = null;
       try {
-        const data = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
+        const { data } = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
         runInAction(() => {
           links.isFetching = false;
           links.size += data.size;
@@ -308,7 +308,7 @@ export class InstanceStore {
     status.isChecking = true;
     status.error = null;
     try{
-      const data = await this.api.getInstance(instanceId);
+      const { data } = await this.api.getInstance(instanceId);
       runInAction(() => {
         const resolvedId = data?.id;
         if (!resolvedId) {
@@ -402,7 +402,7 @@ export class InstanceStore {
       }
     });
     try {
-      const response = await this.api.getInstancesList(this.stage, toProcess);
+      const {data: response} = await this.api.getInstancesList(this.stage, toProcess);
       runInAction(() => {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
@@ -465,7 +465,7 @@ export class InstanceStore {
       }
     });
     try {
-      const response = await this.api.getInstancesLabel(this.stage, toProcess);
+      const { data:response } = await this.api.getInstancesLabel(this.stage, toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if (this.instances.has(identifier)) {

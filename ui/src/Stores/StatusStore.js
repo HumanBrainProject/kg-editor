@@ -126,7 +126,7 @@ export class StatusStore {
       }
     });
     try {
-      let data = await this.api.getReleaseStatusTopInstance(toProcess);
+      const { data } = await this.api.getReleaseStatusTopInstance(toProcess);
       runInAction(() => {
         Object.entries(data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
@@ -172,7 +172,7 @@ export class StatusStore {
       }
     });
     try {
-      const data = await this.api.getReleaseStatusChildren(toProcessChildren);
+      const { data } = await this.api.getReleaseStatusChildren(toProcessChildren);
       runInAction(() => {
         Object.entries(data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);

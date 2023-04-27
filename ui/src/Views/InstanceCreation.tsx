@@ -23,16 +23,24 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Navigate, Link } from "react-router-dom";
+import { useParams, Navigate, Link } from "react-router-dom";
 
 import useStores from "../Hooks/useStores";
 
-import Instance from "./Instance";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 
-const InstanceCreation = observer(({instanceId}) => {
+interface InstanceCreationProps {
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+}
+
+const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
+  const params = useParams();
+
+  const instanceId = params.id;
+
   const {instanceStore} = useStores();
+
   useEffect(() => {
     instanceStore.checkInstanceIdAvailability(instanceId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +66,9 @@ const InstanceCreation = observer(({instanceId}) => {
 
       if (status.isAvailable) {
         return (
-          <Instance instanceId={instanceId} />
+          <>
+            {children}
+          </>
         );
       }
 

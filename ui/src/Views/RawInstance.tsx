@@ -22,19 +22,27 @@
  */
 
 import React, { useEffect } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
 import useStores from "../Hooks/useStores";
+import { UUID } from "../types";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
-import Space from "./Space";
 
-const RawInstance = observer(({instanceId}) => {
+interface RawInstanceProps {
+  children: (instanceId: UUID, space: string) => null|undefined|string|JSX.Element|(null|undefined|string|JSX.Element)[];
+}
+
+const RawInstance = observer(({ children }: RawInstanceProps) => {
   const navigate = useNavigate();
+  const params = useParams();
+
+  const instanceId = params.id;
+
   const {instanceStore, userProfileStore} = useStores();
 
   useEffect(() => {
@@ -83,7 +91,9 @@ const RawInstance = observer(({instanceId}) => {
   }
 
   return (
-    <Space space={instance.space} />
+    <>
+      {children(instanceId as UUID, instance.space)}
+    </>
   );
 });
 RawInstance.displayName = "RawInstance";

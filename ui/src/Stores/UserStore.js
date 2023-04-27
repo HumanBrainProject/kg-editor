@@ -93,7 +93,7 @@ export class UserStore {
         this.searchResult = [];
         this.isFetchingSearch = true;
         this.searchFetchError = null;
-        const data = await this.api.getUsersForReview(this.searchFilter.queryString);
+        const { data } = await this.api.getUsersForReview(this.searchFilter.queryString);
         runInAction(() => {
           if (!this.hasSearchFilter) {
             this.clearSearch();

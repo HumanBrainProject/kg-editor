@@ -61,7 +61,7 @@ class Matomo {
     if (this.reactPiwik) {
       ReactPiwik.push(["trackPageView"]);
     } else {
-      console.info("%cMatomo:trackPageView", style);
+      console.info("%c[Matomo] trackPageView", style);
     }
   }
 
@@ -69,7 +69,7 @@ class Matomo {
     if (this.reactPiwik && url) {
       ReactPiwik.push(["setCustomUrl", url]);
     } else {
-      console.info("%cMatomo:trackCustomUrl", style);
+      console.info(`%c[Matomo] trackCustomUrl: ${url}`, style);
     }
   }
 
@@ -77,7 +77,7 @@ class Matomo {
     if (this.reactPiwik) {
       ReactPiwik.push(["trackEvent", category, name, value]);
     } else {
-      console.info("%cMatomo:trackEvent", style);
+      console.info(`%c[Matomo] trackEvent: category="${category}", name="${name}", value="${value}"`, style);
     }
   }
 
@@ -85,7 +85,7 @@ class Matomo {
     if (this.reactPiwik) {
       ReactPiwik.push(["trackLink", category, name]);
     } else {
-      console.info("%cMatomo:trackLink", style);
+      console.info(`%c[Matomo] trackLink: category="${category}", name="${name}"`, style);
     }
   }
 }

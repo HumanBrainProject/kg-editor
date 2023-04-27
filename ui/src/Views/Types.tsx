@@ -31,7 +31,6 @@ import { Space as SpaceType } from "../types";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
-import View from "./View";
 
 interface TypesProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];

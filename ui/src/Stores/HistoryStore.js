@@ -126,10 +126,10 @@ export class HistoryStore {
         this.instances = [];
         this.isFetching = true;
         this.fetchError = null;
-        const response = await this.api.getInstancesSummary(null, list);
+        const { data:response } = await this.api.getInstancesSummary(null, list);
         runInAction(() => {
           list.forEach(identifier => {
-            const data = response && response.data && response.data.data && response.data.data[identifier];
+            const data = response?.[identifier];
             if(data) {
               if (!data.error) {
                 Object.values(data.fields).forEach(d => {

@@ -461,7 +461,7 @@ export class AppStore{
     }
     this.isCreatingNewInstance = true;
     try{
-      const data = await this.api.createInstance(this.currentSpace.id, null, payload);
+      const { data } = await this.api.createInstance(this.currentSpace.id, null, payload);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });

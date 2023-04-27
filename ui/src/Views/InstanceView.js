@@ -37,32 +37,30 @@ const InstanceView = observer(({ mode }) => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const id = params.id;
+  const instanceId = params.id;
 
   useEffect(() => {
     Matomo.trackCustomUrl(window.location.href);
     Matomo.trackPageView();
-    appStore.openInstance(id, id, {}, mode);
+    appStore.openInstance(instanceId, instanceId, {}, mode);
     instanceStore.togglePreviewInstance();
-    viewStore.selectViewByInstanceId(id);
-    const instance = instanceStore.instances.get(id); //NOSONAR
-    if (mode === "create") {
-      if (!instance.isNew) {
-        navigate(`/instances/${id}/edit`, {replace: true});
-      }
-    } else if (instance.space ===  typeStore.space) {
+    viewStore.selectViewByInstanceId(instanceId);
+    const instance = instanceStore.instances.get(instanceId); //NOSONAR
+    if (instance.space ===  typeStore.space) {
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
       if (!isTypesSupported && !["raw", "graph", "manage"].includes(mode)) {
-        navigate(`/instances/${id}/raw`, {replace: true});
+        navigate(`/instances/${instanceId}/raw`, {replace: true});
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, mode, typeStore.space]);
+  }, [instanceId, mode, typeStore.space]);
 
-  const instance = instanceStore.instances.get(id);
-  if (instance.space !==  typeStore.space) {
+  const instance = instanceStore.instances.get(instanceId);
+  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+  if (instance.space !== typeStore.space || (!isTypesSupported && !["raw", "graph", "manage"].includes(mode))) {
     return null;
   }
+
   return (
     <Instance instance={instance} mode={mode} />
   );

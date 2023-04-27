@@ -137,7 +137,7 @@ const InstanceTabs = observer(({ pathname }) => {
 
   return (
     <div className={classes.container} >
-      {userProfileStore.isAuthenticated && userProfileStore.isAuthorized && Array.from(viewStore.views.values()).map(view => (
+      {userProfileStore.isAuthorized && Array.from(viewStore.views.values()).map(view => (
         <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
       ))}
     </div>

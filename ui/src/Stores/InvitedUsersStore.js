@@ -60,7 +60,7 @@ export class InvitedUsersStore {
     this.isFetched = false;
     this.fetchError = null;
     try {
-      const data = await this.api.getInvitedUsers(instanceId);
+      const { data } = await this.api.getInvitedUsers(instanceId);
       runInAction(() => {
         this.users = data ?? [];
         this.isFetching = false;
@@ -80,7 +80,7 @@ export class InvitedUsersStore {
 
   async inviteUser(instanceId, userId) {
     try {
-      const data = await this.api.inviteUser(instanceId, userId);
+      const { data } = await this.api.inviteUser(instanceId, userId);
       runInAction(() => {
         this.users = data ?? [];
       });
@@ -94,7 +94,7 @@ export class InvitedUsersStore {
 
   async removeUserInvitation(instanceId, userId) {
     try {
-      const data = await this.api.removeUserInvitation(instanceId, userId);
+      const { data } = await this.api.removeUserInvitation(instanceId, userId);
       runInAction(() => {
         this.users = data ?? [];
       });

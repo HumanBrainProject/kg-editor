@@ -328,7 +328,7 @@ export class ReleaseStore {
     this.isFetching = true;
     this.fetchError = null;
     try {
-      const data = await this.api.getInstanceScope(this.topInstanceId);
+      const { data } = await this.api.getInstanceScope(this.topInstanceId);
       runInAction(() => {
         this.hideReleasedInstances = false;
         populateStatuses(data);

@@ -151,7 +151,7 @@ export class GraphStore {
     this.groups = {};
     this.links = [];
     try {
-      const data = await this.api.getInstanceNeighbors(id);
+      const { data } = await this.api.getInstanceNeighbors(id);
       runInAction(() => {
         this.mainId = id;
         this.extractGroupsAndLinks(data);

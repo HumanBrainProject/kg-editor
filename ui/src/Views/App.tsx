@@ -23,7 +23,7 @@
 
 import React, { Suspense } from "react";
 import { observer } from "mobx-react-lite";
-import { Navigate, useNavigate, useLocation, useSearchParams, Route, Routes } from "react-router-dom";
+import { Navigate, useSearchParams, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "react-jss";
 
 import API from "../Services/API";
@@ -67,8 +67,6 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
 
   const { appStore, typeStore } = stores;
 
-  //const location = useLocation();
-  //const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const theme = appStore.currentTheme;
@@ -78,121 +76,113 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
   const spaceParam = searchParams.get("space");
   const skipHistory = searchParams.get("skipHistory") === "true";
 
-
-  // const matchInstance = (pathname: string) => matchPath({path:"/instances/:instanceId/:mode"}, pathname) || matchPath({path:"/instances/:instanceId"}, pathname);
-  // const matchBrowse = (pathname: string) => matchPath({path:"/browse"}, pathname);
-
-  //const InstanceComponent = isTypeFetched?:
+  const InstanceComponent = isTypeFetched?Instance:RawInstance;
 
   return (
     <ThemeProvider theme={theme}>
-        <Styles />
-        <StoresProvider stores={stores}>
-          <Layout>
-            {appStore.globalError?
-              <GlobalError />
-              :
-              <APIProvider api={api}>
-                <Settings authAdapter={authAdapter}>
-                  <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
-                    <Routes>
-                      <Route path={"/logout"} element={<Logout />}/>
-                      <Route path={"*"} element={
-                        <AuthProvider adapter={authAdapter} >
-                          <Authenticate >
-                            <UserProfile>
-                              <Shortcuts />
-                              <BrowserEventHandler />
-                              <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
-                                <Routes>
-                                  {!isTypeFetched && (
-                                    <Route path=":id/create" element={<Navigate to="/browse" />} />
-
-                                  )}
-                                  {
-
-                                    // const instanceMatch = matchInstance(location.pathname);
-                                    // if (instanceMatch) {
-                                    //   const { params: { instanceId, mode }} = instanceMatch;
-                                    //   switch (mode) {
-                                    //     case "create": {
-                                    //       if (isTypeFetched) {
-                                    //         return <InstanceCreation instanceId={instanceId} />;
-                                    //       }
-                                    //       return <Navigate to="/browse" />; // App still loading, instance creation is disabled
-                                    //     }
-                                    //     case "raw": {
-                                    //       return <RawInstance instanceId={instanceId} />;
-                                    //     }
-                                    //     default: {
-                                    //       if (isTypeFetched) {
-                                    //         return <Instance instanceId={instanceId} />;
-                                    //       }
-                                    //       return <RawInstance instanceId={instanceId} />; // App still loading, non raw instance creation is disabled
-                                    //     }
-                                    //   }
-                                    // }
-
-
-                                  }
-                                  <Route 
-                                    path="/instances/" 
-                                    element={
-                                      <Instance>
-                                        {{space, instanceId} => (
-                                          <Space space={space} skipHistory={skipHistory} >
-                                            <Types>
-                                              <Routes>
-                                                <Route path=":id" element={<InstanceView mode="view" />} />
-                                                <Route path=":id/create" element={<InstanceView mode="create" />} />
-                                                <Route path=":id/edit" element={<InstanceView mode="edit" />} />
-                                                <Route path=":id/graph" element={<InstanceView mode="graph" />} />
-                                                <Route path=":id/release" element={<InstanceView mode="release" />} />
-                                                <Route path=":id/manage"  element={<InstanceView mode="manage" />} />
-                                                <Route path=":id/raw"  element={<InstanceView mode="raw" />} />
-                                                <Route path="*" element={<NotFound/>} />
-                                              </Routes>
-                                            </Types>
-                                          </Space>
-                                        )}  
-                                      </Instance>
-                                    } 
-                                  />
-                                  <Route
-                                    path="/browse"
-                                    element={
-                                      <Space space={spaceParam} skipHistory={skipHistory} >
-                                        <Types>
-                                          <Browse />
-                                        </Types>
-                                      </Space>
-                                    } 
-                                  />
-                                  <Route path="/help/*" element={<Help/>} />
-                                  <Route
-                                    path="/"
-                                    element={
-                                      <Space space={spaceParam} skipHistory={skipHistory} >
-                                        <Types>
-                                          <Home />
-                                        </Types>
-                                      </Space>
-                                    } 
-                                  />
-                                  <Route path="*" element={<NotFound/>} />
-                                </Routes>
-                              </Suspense>
-                            </UserProfile>
-                          </Authenticate>
-                        </AuthProvider>
-                      }/>
-                    </Routes>
-                  </Suspense>
-                </Settings>
-              </APIProvider>
-            }
-          </Layout>
-        </StoresProvider>
+      <Styles />
+      <StoresProvider stores={stores}>
+        <Layout>
+          {appStore.globalError?
+            <GlobalError />
+            :
+            <APIProvider api={api}>
+              <Settings authAdapter={authAdapter}>
+                <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
+                  <Routes>
+                    <Route path={"/logout"} element={<Logout />}/>
+                    <Route path={"*"} element={
+                      <AuthProvider adapter={authAdapter} >
+                        <Authenticate >
+                          <UserProfile>
+                            <Shortcuts />
+                            <BrowserEventHandler />
+                            <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
+                              <Routes>
+                                <Route
+                                  path="/instances/:id/create"
+                                  element={
+                                    <>
+                                    {isTypeFetched?
+                                      <InstanceCreation>
+                                        <InstanceView mode="create" />
+                                      </InstanceCreation>
+                                      :
+                                      <Navigate to="/browse" />
+                                    }
+                                    </>
+                                  } 
+                                />
+                                 <Route
+                                  path="/instances/:id/raw"
+                                  element={
+                                    <RawInstance>
+                                      {(_, space) => (
+                                        <Space space={space} skipHistory={skipHistory} >
+                                          <Types>
+                                            <InstanceView mode="raw" />
+                                          </Types>
+                                        </Space>
+                                      )}  
+                                    </RawInstance>
+                                  } 
+                                />
+                                <Route 
+                                  path="/instances/:id/*" 
+                                  element={
+                                    <InstanceComponent>
+                                      {(instanceId, space) => (
+                                        <Space space={space} skipHistory={skipHistory} >
+                                          <Types>
+                                            <Routes>
+                                              <Route path="" element={<InstanceView mode="view" />} />
+                                              <Route path="edit" element={<InstanceView mode="edit" />} />
+                                              <Route path="graph" element={<InstanceView mode="graph" />} />
+                                              <Route path="release" element={<InstanceView mode="release" />} />
+                                              <Route path="manage"  element={<InstanceView mode="manage" />} />
+                                              <Route path="*" element={<Navigate to={`/instances/${instanceId}`} />} />
+                                            </Routes>
+                                          </Types>
+                                        </Space>
+                                      )}  
+                                    </InstanceComponent>
+                                  } 
+                                />
+                                <Route
+                                  path="/browse"
+                                  element={
+                                    <Space space={spaceParam} skipHistory={skipHistory} >
+                                      <Types>
+                                        <Browse />
+                                      </Types>
+                                    </Space>
+                                  } 
+                                />
+                                <Route path="/help/*" element={<Help/>} />
+                                <Route
+                                  path="/"
+                                  element={
+                                    <Space space={spaceParam} skipHistory={skipHistory} >
+                                      <Types>
+                                        <Home />
+                                      </Types>
+                                    </Space>
+                                  } 
+                                />
+                                <Route path="*" element={<NotFound/>} />
+                              </Routes>
+                            </Suspense>
+                          </UserProfile>
+                        </Authenticate>
+                      </AuthProvider>
+                    }/>
+                  </Routes>
+                </Suspense>
+              </Settings>
+            </APIProvider>
+          }
+        </Layout>
+      </StoresProvider>
     </ThemeProvider>
   );
 });

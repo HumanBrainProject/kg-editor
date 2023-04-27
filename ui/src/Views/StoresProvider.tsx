@@ -39,12 +39,14 @@ import StoresContext from "../Contexts/StoresContext";
 
 interface StoresProviderProps {
   stores: RootStore;
-  children?: JSX.Element|JSX.Element[];
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
 const StoresProvider = ({ stores, children }: StoresProviderProps): JSX.Element => (
   <StoresContext.Provider value={stores} >
-    {children}
+    <>
+      {children}
+    </>
   </StoresContext.Provider>
 );
 

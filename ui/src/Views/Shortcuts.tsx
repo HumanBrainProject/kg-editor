@@ -26,19 +26,17 @@ import { observer } from "mobx-react-lite";
 import { useNavigate, useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import AppStore from "../Stores/AppStore";
+import useStores from "../Hooks/useStores";
 import Matomo from "../Services/Matomo";
 
 const kCode = { step: 0, ref: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65] };
 
-interface ShortcutsProps {
-  appStore: AppStore;
-}
-
-const Shortcuts = observer(({ appStore }: ShortcutsProps) => {
+const Shortcuts = observer(() => {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { appStore } = useStores();
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);

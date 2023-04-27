@@ -37,7 +37,9 @@ const KeycloakAuthProvider = ({ adapter, loginRequired, children }:KeycloakAuthP
   const auth = useKeycloak(adapter, loginRequired);
   return (
     <AuthContext.Provider value={auth} >
-      {children}
+      <>
+        {children}
+      </>
     </AuthContext.Provider>
   );
 };

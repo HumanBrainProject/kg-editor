@@ -25,13 +25,13 @@ import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import RootStore from "../Stores/RootStore";
+import useStores from "../Hooks/useStores";
 
-const BrowserEventHandler = observer(({ stores }: { stores: RootStore }) => {
+const BrowserEventHandler = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { appStore, instanceStore } = stores;
+  const { appStore, instanceStore } = useStores();
 
   useEffect(() => {
     window.onpopstate = () => {

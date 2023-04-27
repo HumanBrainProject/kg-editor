@@ -87,8 +87,6 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
   return (
     <ThemeProvider theme={theme}>
         <Styles />
-        <Shortcuts appStore={stores.appStore} />
-        <BrowserEventHandler stores={stores} />
         <StoresProvider stores={stores}>
           <Layout>
             {appStore.globalError?
@@ -103,6 +101,8 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                         <AuthProvider adapter={authAdapter} >
                           <Authenticate >
                             <UserProfile>
+                              <Shortcuts />
+                              <BrowserEventHandler />
                               <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
                                 <Routes>
                                   {!isTypeFetched && (

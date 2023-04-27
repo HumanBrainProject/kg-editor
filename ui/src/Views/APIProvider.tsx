@@ -39,12 +39,14 @@ import APIContext from "../Contexts/APIContext";
 
 interface APIProviderProps {
   api: API;
-  children?: JSX.Element|JSX.Element[];
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
 const APIProvider = ({ api, children }: APIProviderProps): JSX.Element => (
   <APIContext.Provider value={api} >
-    {children}
+    <>
+      {children}
+    </>
   </APIContext.Provider>
 );
 

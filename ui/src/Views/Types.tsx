@@ -27,21 +27,28 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button"
 
 import useStores from "../Hooks/useStores";
+import { Space as SpaceType } from "../types";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 import View from "./View";
 
-const Types = observer(() => {
+interface TypesProps {
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+}
+
+const Types = observer(({ children }: TypesProps) => {
 
   const { appStore, typeStore } = useStores();
 
-  const handeRetry = () => typeStore.fetch(appStore.currentSpace.id);
+  const currentSpace = appStore.currentSpace as SpaceType|null;
+
+  const handeRetry = () => currentSpace && typeStore.fetch(currentSpace.id);
 
   useEffect(() => {
-    typeStore.fetch(appStore.currentSpace.id);
+    currentSpace && typeStore.fetch(currentSpace.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appStore.currentSpace.id]);
+  }, [currentSpace?.id]);
 
   if (!appStore.currentSpace) {
     return null;
@@ -62,9 +69,11 @@ const Types = observer(() => {
     return <SpinnerPanel text="Retrieving types..." />;
   }
 
-  if (typeStore.space === appStore.currentSpace.id && typeStore.isFetched) {
+  if (currentSpace && typeStore.space === currentSpace.id && typeStore.isFetched) {
     return (
-      <View />
+      <>
+        {children}
+      </>
     );
   }
 

@@ -33,7 +33,8 @@ export class UserProfileStore {
       hasSpaces: computed,
       spaces: computed,
       firstName: computed,
-      setUserProfile: action
+      setUserProfile: action,
+      defaultSpace: computed
     });
   }
 
@@ -59,6 +60,22 @@ export class UserProfileStore {
 
   hasSpace(id) {
     return !!this.spaces.find(s => s.id === id);
+  }
+
+  getSpace(id) {
+    return id?this.spaces.find(s => s.id === id):undefined;
+  }
+
+  getSpaceOrDefault(id) {
+    const space = this.getSpace(id);
+    if (space) {
+      return space;
+    }
+    return this.defaultSpaces;
+  }
+
+  get defaultSpace() {
+    return this.hasSpaces?this.spaces[0]:undefined;
   }
 
   getSpaceInfo(id) {

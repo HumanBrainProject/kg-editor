@@ -77,7 +77,7 @@ const Instance = observer(({instanceId}) => {
       );
     }
 
-    if (!userProfileStore.spaces.find(s => s.id === instance.space)) {
+    if (!userProfileStore.hasSpace(instance.space)) {
       return (
         <ErrorPanel>
           You do not have permission to access the space &quot;<i>{instance.space}&quot;</i>.<br /><br />

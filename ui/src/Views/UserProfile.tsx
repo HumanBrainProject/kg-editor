@@ -23,7 +23,6 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { Navigate, matchPath, useLocation, useSearchParams } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -33,15 +32,11 @@ import useStores from "../Hooks/useStores";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 
-import Instance from "./Instance";
-import RawInstance from "./RawInstance";
-import InstanceCreation from "./InstanceCreation";
-import Space from "./Space";
+interface UserProfileProps {
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+}
 
-const matchInstance = pathname => matchPath({path:"/instances/:instanceId/:mode"}, pathname) || matchPath({path:"/instances/:instanceId"}, pathname);
-const matchBrowse = pathname => matchPath({path:"/browse"}, pathname);
-
-const UserProfile = observer(() => {
+const UserProfile = observer(({ children }: UserProfileProps) => {
 
   const {
     data: userProfile,
@@ -55,9 +50,7 @@ const UserProfile = observer(() => {
 
   const { logout } = useAuth();
 
-  const { userProfileStore, appStore, typeStore } = useStores();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const { userProfileStore } = useStores();
 
   useEffect(() => {
     if (userProfile) {
@@ -96,56 +89,13 @@ const UserProfile = observer(() => {
         </ErrorPanel>
       );
     }
-
-    if (userProfile.spaces.length === 0) {
-      return (
-        <ErrorPanel>
-          <h1>Welcome <span title={userProfileStore.firstName}>{userProfileStore.firstName}</span></h1>
-          <p>You are currently not granted permission to acccess any spaces.</p>
-          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-          <Button onClick={logout}>Logout</Button>
-        </ErrorPanel>
-      );
-    }
-  
-  }
-
-  const isTypeFetched = appStore.currentSpace && typeStore.space === appStore.currentSpace.id && typeStore.isFetched;
-
-  const instanceMatch = matchInstance(location.pathname);
-  if (instanceMatch) {
-    const { params: { instanceId, mode }} = instanceMatch;
-    switch (mode) {
-      case "create": {
-        if (isTypeFetched) {
-          return <InstanceCreation instanceId={instanceId} />;
-        }
-        return <Navigate to="/browse" />; // App still loading, instance creation is disabled
-      }
-      case "raw": {
-        return <RawInstance instanceId={instanceId} />;
-      }
-      default: {
-        if (isTypeFetched) {
-          return <Instance instanceId={instanceId} />;
-        }
-        return <RawInstance instanceId={instanceId} />; // App still loading, non raw instance creation is disabled
-      }
-    }
-  }
-
-  const browseMatch = matchBrowse(location.pathname);
-  if (browseMatch) {    
-    const space = searchParams.get("space");
-    return (
-      <Space space={space} />
-    );
   }
 
   return (
-    <Space/>
-  )
-
+    <>
+      {children}
+    </>
+  );
 });
 UserProfile.displayName = "UserProfile";
 

@@ -304,7 +304,7 @@ export class AppStore{
 
   setSpace = spaceName => {
     if (spaceName) {
-      this.currentSpace = this.rootStore.userProfileStore.spaces.find( w => w.id === spaceName);
+      this.currentSpace = this.rootStore.userProfileStore.getSpace(spaceName);
       localStorage.setItem("space", spaceName);
     } else {
       this.currentSpace = null;
@@ -312,11 +312,8 @@ export class AppStore{
     }
   }
 
-  async switchSpace(location, navigate, selectedSpace) {
-    let space = selectedSpace?this.rootStore.userProfileStore.spaces.find( w => w.id === selectedSpace):null;
-    if (!space && this.rootStore.userProfileStore.hasSpaces && this.rootStore.userProfileStore.spaces.length === 1) {
-      space = this.rootStore.userProfileStore.spaces[0];
-    }
+  async switchSpace(location, navigate, spaceName) {
+    let space = this.rootStore.userProfileStore.getSpaceOrDefault(spaceName);
     if(this.currentSpace !== space) {
       if(this.rootStore.instanceStore.hasUnsavedChanges) {
         if (window.confirm("You are about to change space. All unsaved changes will be lost. Continue ?")) {

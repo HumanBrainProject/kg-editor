@@ -24,7 +24,6 @@
 import React from "react";
 import { createUseStyles, useTheme } from "react-jss";
 
-import Styles from "./Styles";
 import Tabs from "./Tabs";
 import Footer from "./Footer";
 
@@ -64,7 +63,6 @@ const Layout = ({ children }) => {
   
   return (
     <>
-      <Styles />
       <div className={classes.container}>
         <Tabs />
         <div className={classes.body}>

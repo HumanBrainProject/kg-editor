@@ -33,7 +33,6 @@
  *
  */
 import { KeycloakInstance, KeycloakConfig, KeycloakInitOptions, KeycloakOnLoad } from "keycloak-js";
-import { AxiosInstance } from "axios";
 import KeyCloakTokenProvider from "./KeycloakTokenProvider";
 import UnauthorizedRequestResponseHandlerProvider from "./UnauthorizedRequestResponseHandlerProvider";
 import AuthAdapter from "./AuthAdapter";
@@ -45,7 +44,6 @@ class KeycloakAuthAdapter implements AuthAdapter {
     private _redirectUri: string | undefined;
     private _config: KeycloakConfig | undefined = undefined;
     private _keycloak: KeycloakInstance | undefined = undefined;
-    private _axios: AxiosInstance;
 
     constructor(initOptions?: KeycloakInitOptions, redirectUri?: string) {
         this._tokenProvider = new KeyCloakTokenProvider();

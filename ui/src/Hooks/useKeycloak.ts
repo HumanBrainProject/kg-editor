@@ -21,15 +21,13 @@
  *
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Keycloak, { KeycloakError } from "keycloak-js";
 import Auth from "../Services/Auth"; 
 import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 
 const useKeycloak = (adapter: KeycloakAuthAdapter, loginRequired?: boolean) : Auth => {
   
-  const initializedRef = useRef(false);
-
   const [isUninitialized, setUninitialized] = useState(true);
   const [isInitialized, setInitialized] = useState(false);
   const [isInitializing, setInitializing] = useState(false);
@@ -41,8 +39,8 @@ const useKeycloak = (adapter: KeycloakAuthAdapter, loginRequired?: boolean) : Au
   const [isLogingOut, setLogingOut] = useState(false);
   const [userId, setUserId] = useState<string|undefined>(undefined);
 
-  const initialize = () => {
-    if (adapter.config) {
+  const authenticate = async () => {
+    if (adapter.config?.url) {
       setUninitialized(false);
       setInitializing(true);
       setAuthenticating(true);
@@ -108,6 +106,12 @@ const useKeycloak = (adapter: KeycloakAuthAdapter, loginRequired?: boolean) : Au
         setInitializing(false);
         setAuthenticating(false);
       }
+    } else {
+      //throw new Error("keycloak cannot be initialized due to missing/uncomplete config!");
+      setError("Failed to initialize authentication");
+      setInitialized(false);
+      setInitializing(false);
+      setAuthenticating(false);
     }
   };
   
@@ -131,25 +135,8 @@ const useKeycloak = (adapter: KeycloakAuthAdapter, loginRequired?: boolean) : Au
     setAuthenticated(false);
   };
 
-
-  useEffect(() => {
-    if (adapter?.config?.url && !initializedRef.current) {
-      initializedRef.current = true;
-      initialize();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [adapter?.config?.url]);
-
-  const retryInitialize = async () => {
-    if (isInitialized) {
-      throw new Error("retryInitialize cannot be called after successfull initialization!");
-    } else if (adapter.config?.url && !isInitializing) {
-      initialize();
-    }
-  };
-
   return {
-    token: adapter.tokenProvider?.token,
+    tokenProvider: adapter.tokenProvider,
     isTokenExpired: isTokenExpired,
     error: error,
     isError: isError,
@@ -161,9 +148,9 @@ const useKeycloak = (adapter: KeycloakAuthAdapter, loginRequired?: boolean) : Au
     isLogingOut: isLogingOut,
     loginRequired: loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === "login-required",
     userId: userId,
+    authenticate: authenticate,
     login: login,
-    logout: logout,
-    retryInitialize: retryInitialize
+    logout: logout
   };
   
 };

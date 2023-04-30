@@ -66,7 +66,7 @@ const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
 }
 
 const bypassAuth = {
-  token: undefined,
+  tokenProvider: undefined,
   isTokenExpired: false,
   error: undefined,
   isError: false,
@@ -78,9 +78,9 @@ const bypassAuth = {
   isLogingOut: false,
   loginRequired: false,
   userId: undefined,
+  authenticate: async () => Promise.resolve(undefined),
   login: async () => Promise.resolve(undefined),
-  logout: async () => Promise.resolve(undefined),
-  retryInitialize: async () => Promise.resolve(undefined)
+  logout: async () => Promise.resolve(undefined)
 } as Auth;
 
 interface AuthProviderProps {

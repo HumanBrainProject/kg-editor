@@ -32,6 +32,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import useStores from "../Hooks/useStores";
+import useAuth from "../Hooks/useAuth";
 
 import Avatar from "../Components/Avatar";
 import Matomo from "../Services/Matomo";
@@ -165,13 +166,15 @@ const UserProfileTab = observer(({ className, size=30 }) => {
 
   const classes = useStyles();
 
+  const { tokenProvider, logout } = useAuth();
+
   const buttonRef = useRef();
 
   const [showPopOver, setShowPopOver] = useState(false);
   const [popOverPosition, setPopOverPosition] = useState("bottom");
   const [tokenCopied, setTokenCopied] = useState(null);
 
-  const { viewStore, userProfileStore, instanceStore, appStore } = useStores();
+  const { viewStore, userProfileStore, instanceStore } = useStores();
 
   useEffect(() => {
     if(showPopOver) {
@@ -214,7 +217,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     Matomo.trackEvent("User", "Logout");
     if (!instanceStore.hasUnsavedChanges || window.confirm("You have unsaved changes pending. Are you sure you want to logout?")) {
       viewStore.flushStoredViews();
-      appStore.logoutCallback();
+      logout();
     }
   }
 
@@ -249,7 +252,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
             </div>
             <div className={classes.popOverFooterBar}>
               <div>
-                <CopyToClipboard text={appStore.token} onCopy={handleCopyToken}>
+                <CopyToClipboard text={tokenProvider?.token} onCopy={handleCopyToken}>
                   <Button variant="secondary">Copy token to clipboard</Button>
                 </CopyToClipboard>
               </div>

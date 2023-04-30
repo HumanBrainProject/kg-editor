@@ -81,18 +81,18 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
   return (
     <ThemeProvider theme={theme}>
       <Styles />
-      <StoresProvider stores={stores}>
-        <Layout>
-          {appStore.globalError?
-            <GlobalError />
-            :
-            <APIProvider api={api}>
-              <Settings authAdapter={authAdapter}>
-                <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
-                  <Routes>
-                    <Route path={"/logout"} element={<Logout />}/>
-                    <Route path={"*"} element={
-                      <AuthProvider adapter={authAdapter} >
+      <AuthProvider adapter={authAdapter} >
+        <StoresProvider stores={stores}>
+          <Layout>
+            {appStore.globalError?
+              <GlobalError />
+              :
+              <APIProvider api={api}>
+                <Settings authAdapter={authAdapter}>
+                  <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
+                    <Routes>
+                      <Route path={"/logout"} element={<Logout />}/>
+                      <Route path={"*"} element={
                         <Authenticate >
                           <UserProfile>
                             <Shortcuts />
@@ -174,15 +174,15 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                             </Suspense>
                           </UserProfile>
                         </Authenticate>
-                      </AuthProvider>
-                    }/>
-                  </Routes>
-                </Suspense>
-              </Settings>
-            </APIProvider>
-          }
-        </Layout>
-      </StoresProvider>
+                      }/>
+                    </Routes>
+                  </Suspense>
+                </Settings>
+              </APIProvider>
+            }
+          </Layout>
+        </StoresProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 });

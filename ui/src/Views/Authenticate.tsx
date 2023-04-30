@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,7 +30,6 @@ import useAuth from "../Hooks/useAuth";
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 import Matomo from "../Services/Matomo";
-import useStores from "../Hooks/useStores";
 
 interface AuthenticateProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -38,8 +37,9 @@ interface AuthenticateProps {
 
 const Authenticate = observer(({children}: AuthenticateProps) => {
 
+  const initializedRef = useRef(false);
+
   const {
-    token,
     isTokenExpired,
     error,
     isError,
@@ -47,18 +47,17 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
     isInitializing,
     isAuthenticated,
     isAuthenticating,
-    retryInitialize,
-    login,
-    logout
+    authenticate,
+    login
   } = useAuth();
 
-  const { appStore } = useStores();
-
   useEffect(() => {
-    appStore.setToken(token);
-    appStore.setLogoutCallback(logout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, logout]);
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      authenticate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = () =>  {
     Matomo.trackEvent("User", "Login");
@@ -89,7 +88,7 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
       <ErrorPanel>
       There was a problem authenticating ({error}).
         If the problem persists, please contact the support.<br /><br />
-      <Button variant={"primary"} onClick={retryInitialize}>
+      <Button variant={"primary"} onClick={authenticate}>
         <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
       </Button>
     </ErrorPanel>

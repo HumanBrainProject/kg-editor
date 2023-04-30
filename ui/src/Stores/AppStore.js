@@ -125,8 +125,6 @@ export class AppStore{
       moveInstance: action,
       cancelMoveInstance: action,
       setCommit: action,
-      setToken: action,
-      setLogoutCallback: action
     });
 
     this.api = api;
@@ -158,14 +156,6 @@ export class AppStore{
     this.commit = commit;
   }
   
-  setToken(token) {
-    this.token = token;
-  }
-
-  setLogoutCallback(logoutCallback) {
-    this.logoutCallback = logoutCallback;
-  }
-
   async createExternalInstance(space, typeName, value, location, navigate) {
     if (this.rootStore.instanceStore.hasUnsavedChanges) {
       this.externalCreateModal = {space: space, type: typeName, value: value};

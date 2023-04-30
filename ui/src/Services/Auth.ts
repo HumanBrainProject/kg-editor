@@ -33,9 +33,9 @@
  *   limitations under the License.
  *
  */
-
+import TokenProvider from "./TokenProvider";
 export default interface Auth {
-  token?: string;
+  tokenProvider?: TokenProvider;
   isTokenExpired?: boolean;
   error?: string;
   isError: boolean;
@@ -47,7 +47,7 @@ export default interface Auth {
   isLogingOut: boolean;
   loginRequired: boolean;
   userId?: string;
+  authenticate(): Promise<void>;
   login(): Promise<void>;
   logout(): Promise<void>;
-  retryInitialize: () => Promise<void>;
 }

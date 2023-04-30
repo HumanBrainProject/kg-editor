@@ -32,12 +32,7 @@
  *   limitations under the License.
  *
  */
-import { init, captureException as SentryCaptureException, showReportDialog as SentryShowReportDialog } from "@sentry/browser";
-
-export type SentrySettings = {
-  dsn: string;
-  environment: string;
-}
+import { init, BrowserOptions, ReportDialogOptions, captureException as SentryCaptureException, showReportDialog as SentryShowReportDialog } from "@sentry/browser";
 
 class Sentry {
   private _isInitialized: boolean;
@@ -46,19 +41,19 @@ class Sentry {
     this._isInitialized = false;
   }
 
-  initialize(settings?: SentrySettings): void {
+  initialize(settings?: BrowserOptions): void {
     if (settings && !this._isInitialized) {
       this._isInitialized = true;
       if (!window.location.host.startsWith("localhost")) {
         init({
           ...settings,
           autoSessionTracking: false
-        });
+        } as BrowserOptions);
       }
     }
   }
 
-  showReportDialog(customSettings) {
+  showReportDialog(customSettings: ReportDialogOptions) {
     if (this._isInitialized) {
       const defaultSettings = {
         title: "An unexpected error has occured.",
@@ -70,7 +65,7 @@ class Sentry {
       const settings = {
         ...defaultSettings,
         ...customSettings
-      };
+      } as ReportDialogOptions;
       SentryCaptureException(new Error(settings.title)); //We generate a custom error as report dialog is only linked to an error.
       SentryShowReportDialog(settings);
     }

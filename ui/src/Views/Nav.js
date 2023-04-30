@@ -23,7 +23,7 @@
 
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { matchPath, useLocation, useNavigate } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 
 import useStores from "../Hooks/useStores";
@@ -36,10 +36,9 @@ import NewInstanceTab from "./NewInstanceTab";
 
 const useStyles = createUseStyles({
   container: {
-    background: "var(--bg-color-ui-contrast1)",
     display: "grid",
     gridTemplateRows: "1fr",
-    gridTemplateColumns: "auto auto 1fr auto"
+    gridTemplateColumns: "auto 1fr auto"
   },
   fixedTabsLeft: {
     display: "grid",
@@ -75,52 +74,41 @@ const useStyles = createUseStyles({
   }
 });
 
-
-const Tabs = observer(() => {
+const Nav = observer(() => {
   const classes = useStyles();
 
   const { appStore, userProfileStore } = useStores();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const handleGoToDashboard = () => navigate("/")
-
-  const logo = appStore.currentTheme.name === "default"?`${window.rootPath}/assets/ebrains.svg`:`${window.rootPath}/assets/ebrains_dark.svg`;
+  if (appStore.globalError) {
+    return null;
+  }
 
   return (
-      <div className={classes.container}>
-        <div className={`${classes.logo} layout-logo`} onClick={handleGoToDashboard}>
-          <img src={logo} alt="" height="30" />
-          <span>Knowledge Graph Editor</span>
-        </div>
-        {!appStore.globalError &&
+    <nav className={classes.container}>
+      <div className={classes.fixedTabsLeft}>
+        {userProfileStore.isAuthorized && userProfileStore.hasSpaces && !!appStore.currentSpace && (
           <>
-            <div className={classes.fixedTabsLeft}>
-              {userProfileStore.isAuthorized && userProfileStore.hasSpaces && appStore.currentSpace?
-                <>
-                  <SpaceSelector />
-                  <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
-                  <Tab icon={"search"} current={matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
-                  <NewInstanceTab />
-                </>
-                : null
-              }
-            </div>
-            <InstanceTabs pathname={location.pathname} />
-            <div className={classes.fixedTabsRight}>
-              {userProfileStore.isAuthorized && (
-                <>
-                  <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
-                  <UserProfileTab className={classes.userProfileTab} size={32} />
-                </>
-              )}
-            </div>
+            <SpaceSelector />
+            <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
+            <Tab icon={"search"} current={matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
+            <NewInstanceTab />
           </>
-        }
+        )}
       </div>
+      <InstanceTabs pathname={location.pathname} />
+      <div className={classes.fixedTabsRight}>
+        {userProfileStore.isAuthorized && (
+          <>
+            <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
+            <UserProfileTab className={classes.userProfileTab} size={32} />
+          </>
+        )}
+      </div>
+    </nav>
   );
 });
-Tabs.displayName = "Tabs";
+Nav.displayName = "Nav";
 
-export default Tabs;
+export default Nav;
 

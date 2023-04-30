@@ -22,47 +22,9 @@
  */
 
 import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
 
-import useStores from "../Hooks/useStores";
+const Copyright = () => (
+    <div className="copyright">Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.</div>
+);
 
-const useStyles = createUseStyles({
-  container: {
-    position: "relative"
-  },
-  copyright: {
-    background: "var(--bg-color-ui-contrast1)",
-    color: "var(--ft-color-loud)",
-    paddingLeft: "10px"
-  },
-  build: {
-    color: "var(--ft-color-loud)",
-    position: "absolute",
-    top: "0px",
-    right: "10px"
-  }
-});
-
-const Footer = observer(() => {
-
-  const classes = useStyles();
-
-  const { appStore } = useStores();
-  
-  const commit = appStore.commit;
-
-  return(
-    <div className={classes.container}>
-      <div className={`${classes.copyright} copyright`}>
-              Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.
-      </div>
-      <div className={classes.build}>
-        {commit && <span >build: <i>{commit}</i></span>}
-      </div>
-    </div>
-  );
-});
-Footer.displayName = "Footer";
-
-export default Footer;
+export default Copyright;

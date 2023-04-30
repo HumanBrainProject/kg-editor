@@ -24,8 +24,10 @@
 import React from "react";
 import { createUseStyles, useTheme } from "react-jss";
 
-import Tabs from "./Tabs";
-import Footer from "./Footer";
+import Logo from "./Logo";
+import Nav from "./Nav";
+import Copyright from "./Copyright";
+import Commit from "./Commit";
 
 const getBackgroundSize = theme => {
   if(theme.background.size) {
@@ -45,7 +47,14 @@ const useStyles = createUseStyles(theme => ({
     gridTemplateColumns: "1fr",
     gridTemplateRows: "auto 1fr 20px"
   },
-  body: {
+  header: {
+    position: "relative",
+    display: "grid",
+    gridTemplateRows: "1fr",
+    gridTemplateColumns: "auto 1fr",
+    background: "var(--bg-color-ui-contrast1)"
+  },
+  main: {
     position: "relative",
     overflow: "hidden",
     background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
@@ -54,6 +63,15 @@ const useStyles = createUseStyles(theme => ({
     backgroundPosition: theme.background.position?theme.background.position:"unset",
     backgroundColor: theme.backgroundColor?theme.backgroundColor:"unset",
   },
+  footer: {
+    position: "relative",
+    display: "grid",
+    gridTemplateRows: "1fr",
+    gridTemplateColumns: "1fr auto",
+    background: "var(--bg-color-ui-contrast1)",
+    color: "var(--ft-color-loud)",
+    padding: "0 10px"
+  }
 }));
 
 const Layout = ({ children }) => {
@@ -62,15 +80,19 @@ const Layout = ({ children }) => {
   const classes = useStyles({ theme });
   
   return (
-    <>
-      <div className={classes.container}>
-        <Tabs />
-        <div className={classes.body}>
-          {children}
-        </div>
-        <Footer />
-      </div>
-    </>
+    <div className={classes.container}>
+      <header className={classes.header}>
+        <Logo />
+        <Nav />
+      </header>
+      <main className={classes.main}>
+        {children}
+      </main>
+      <footer className={classes.footer}>
+        <Copyright />
+        <Commit />
+      </footer>
+    </div>
   );
 };
 

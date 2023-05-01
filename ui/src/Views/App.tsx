@@ -81,13 +81,13 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
   return (
     <ThemeProvider theme={theme}>
       <Styles />
-      <AuthProvider adapter={authAdapter} >
-        <StoresProvider stores={stores}>
-          <Layout>
-            {appStore.globalError?
-              <GlobalError />
-              :
-              <APIProvider api={api}>
+      <APIProvider api={api}>
+        <AuthProvider adapter={authAdapter} >
+          <StoresProvider stores={stores}>
+            <Layout>
+              {appStore.globalError?
+                <GlobalError />
+                :
                 <Settings authAdapter={authAdapter}>
                   <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
                     <Routes>
@@ -113,7 +113,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                     </>
                                   } 
                                 />
-                                 <Route
+                                <Route
                                   path="/instances/:id/raw"
                                   element={
                                     <RawInstance>
@@ -178,11 +178,11 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                     </Routes>
                   </Suspense>
                 </Settings>
-              </APIProvider>
-            }
-          </Layout>
-        </StoresProvider>
-      </AuthProvider>
+              }
+            </Layout>
+          </StoresProvider>
+        </AuthProvider>
+      </APIProvider>
     </ThemeProvider>
   );
 });

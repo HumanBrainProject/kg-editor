@@ -41,6 +41,8 @@ import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import useAuth from "../Hooks/useAuth";
 import KeycloakAuthProvider from "./KeycloakAuthProvider";
 
+const BYPASSS_KEYCLOAK_FOR_LOCAL_DEV = false; // set to true to bypass keycloak authentication for local development
+
 interface AuthSetupProps {
   adapter?: AuthAdapter;
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -103,7 +105,7 @@ const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) =>
 
   if (adapter instanceof KeycloakAuthAdapter) {
     const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === "login-required";
-    const canBypassKeyCloak = window.location.host.startsWith("localhost") && !isLoginRequired;
+    const canBypassKeyCloak = BYPASSS_KEYCLOAK_FOR_LOCAL_DEV && window.location.host.startsWith("localhost") && !isLoginRequired;
     if (canBypassKeyCloak) {
       console.info("%cAuth: Keycloak authentication is disabled for local development", "color: #f88900;");
     } else {

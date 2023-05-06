@@ -32,17 +32,17 @@
  *   limitations under the License.
  *
  */
+import { BrowserOptions } from "@sentry/browser";
 import { KeycloakConfig } from "keycloak-js";
-import { MatomoSettings } from "./Services/Matomo";
-import { SentrySettings } from "./Services/Sentry";
+import { PiwikOptions } from "react-piwik";
 
 export type UUID = string;
 
 export interface Settings {
     commit: string;
     keycloak: KeycloakConfig;
-    matomo?: MatomoSettings; 
-    sentry?: SentrySettings;
+    matomo?: PiwikOptions; 
+    sentry?: BrowserOptions;
 }
 
 export interface Permissions {

@@ -32,14 +32,9 @@
  *   limitations under the License.
  *
  */
-import ReactPiwik from "react-piwik";
+import ReactPiwik, { PiwikOptions } from "react-piwik";
 
 const style = "color: #f88900;";
-
-export type MatomoSettings = {
-  url: string;
-  siteId: number;
-}
 
 class Matomo {
   private reactPiwik?: ReactPiwik;
@@ -48,7 +43,7 @@ class Matomo {
     this.reactPiwik = undefined;
   }
 
-  initialize(settings?: MatomoSettings): void {
+  initialize(settings?: PiwikOptions): void {
     if (settings?.url && settings?.siteId && !this.reactPiwik) {
       this.reactPiwik = new ReactPiwik({
         url: settings.url,

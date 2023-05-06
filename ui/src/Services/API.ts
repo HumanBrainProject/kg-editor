@@ -34,6 +34,17 @@
  */
 import { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from "../types";
 
+interface APIErrorResponse {
+  status: number;
+  data: unknown;
+}
+
+export interface APIError {
+  message?: string;
+  code?: string;
+  response?: APIErrorResponse;
+}
+
 export default interface API {
 
   getSettings(): Promise<Settings>;
@@ -48,7 +59,7 @@ export default interface API {
 
   deleteInstance(instanceId: UUID): Promise<void>;
 
-  createInstance(space: string, instanceId: UUID, payload): Promise<KGCoreResult<InstanceFull>>;
+  createInstance(space: string, instanceId: UUID, payload: object): Promise<KGCoreResult<InstanceFull>>;
 
   moveInstance(instanceId: UUID, space: string): Promise<void>;
 

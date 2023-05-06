@@ -21,84 +21,43 @@
  *
  */
 
-import { useState, useEffect, useRef } from "react";
-import { AxiosError } from "axios";
-import { UserProfile, Space } from "../../src/types";
+import { useMemo } from "react";
+import { UserProfile, Space } from "../types";
 import useAPI from "./useAPI";
+import { APIError } from "../Services/API";
+import useGenericQuery, { GenericQuery } from "./useGenericQuery";
 
-export interface GetUserProfileQuery {
-  data?: UserProfile;
-  isUninitialized: boolean;
-  isFetching: boolean;
-  error?: string;
-  isError: boolean;
-  isSuccess?: boolean;
-  refetch: () => Promise<void>;
+const spaceComparer = (a: Space, b: Space) => a.name.localeCompare(b.name);
+
+const sortSpaces = (spaces?: Space[]) => {
+  if (Array.isArray(spaces)) {
+    return spaces.sort(spaceComparer);
+  }
+  return [];
 }
 
+export type GetUserProfileQuery = GenericQuery<UserProfile|undefined>;
+
 const useGetUserProfileQuery = (): GetUserProfileQuery => {
-  const initializedRef = useRef(false);
-
-  const [isUninitialized, setUninitialized] = useState(true);
-  const [isFetching, setFetching] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [isError, setIsError] = useState(false);
-  const [isSuccess, setSuccess] = useState<boolean | undefined>(undefined);
-  const [data, setData] = useState<UserProfile | undefined>(undefined);
-
+  
   const API = useAPI();
 
-  const spaceComparer = (a: Space, b: Space) => a.name.localeCompare(b.name);
-
-  const sortSpaces = (spaces?: Space[]) => {
-    if (Array.isArray(spaces)) {
-      return spaces.sort(spaceComparer);
-    }
-    return [];
-  }
-
-  const getUserProfile = async (): Promise<void> => {
-    setUninitialized(false);
-    setFetching(true);
-    setError(undefined);
-    setIsError(false);
-    setSuccess(undefined);
-    setData(undefined);
+  const fetch = useMemo(() => async () => {
     try {
       const userProfile = await API.getUserProfile();
       userProfile.spaces = sortSpaces(userProfile.spaces);
-      setData(userProfile);
-      setSuccess(true);
+      return userProfile;
     } catch (e) {
-      const err = e as AxiosError;
+      const err = e as APIError;
       if (err.response && err.response.status === 403) {
-        setSuccess(true);
+        return undefined;
       } else {
-        setError(err.message);
-        setIsError(true);
+        throw e;
       }
-    } finally {
-      setFetching(false);
     }
-  };
+  }, [API]);
 
-  useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true;
-      getUserProfile();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return {
-    data: data,
-    isUninitialized: isUninitialized,
-    isFetching: isFetching,
-    error: error,
-    isError: isError,
-    isSuccess: isSuccess,
-    refetch: getUserProfile
-  };
+  return useGenericQuery<UserProfile|undefined>(fetch);
 };
 
 export default useGetUserProfileQuery;

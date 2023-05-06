@@ -29,7 +29,7 @@ module.exports = function(app) {
     "/editor/api/**",
     createProxyMiddleware({
       // target:"http://localhost:8080",
-      target:"https://editor.kg-int.ebrains.eu",
+      target:"https://editor.kg-dev.ebrains.eu",
       secure:false,
       changeOrigin: false,
       // pathRewrite: function(path) {

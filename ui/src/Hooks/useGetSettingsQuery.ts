@@ -21,70 +21,20 @@
  *
  */
 
-import { useState, useEffect, useRef } from "react";
-import { AxiosError } from "axios";
+import { useMemo } from "react";
 import { Settings } from "../../src/types";
 import useAPI from "./useAPI";
+import useGenericQuery, { GenericQuery } from "./useGenericQuery";
 
-export interface GetSettingsQuery {
-  data?: Settings;
-  isUninitialized: boolean;
-  isFetching: boolean;
-  error?: string;
-  isError: boolean;
-  isSuccess?: boolean;
-  refetch: () => Promise<void>;
-}
+export type GetSettingsQuery = GenericQuery<Settings>;
 
 const useGetSettingsQuery = (): GetSettingsQuery => {
-  const initializedRef = useRef(false);
-
-  const [isUninitialized, setUninitialized] = useState(true);
-  const [isFetching, setFetching] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [isError, setIsError] = useState(false);
-  const [isSuccess, setSuccess] = useState<boolean | undefined>(undefined);
-  const [data, setData] = useState<Settings | undefined>(undefined);
-
+  
   const API = useAPI();
 
-  const getSettings = async (): Promise<void> => {
-    setUninitialized(false);
-    setFetching(true);
-    setError(undefined);
-    setIsError(false);
-    setSuccess(undefined);
-    setData(undefined);
-    try {
-      const settings = await API.getSettings();
-      setData(settings);
-      setSuccess(true);
-    } catch (e) {
-      const err = e as AxiosError;
-      setError(err.message);
-      setIsError(true);
-    } finally {
-      setFetching(false);
-    }
-  };
+  const fetch = useMemo(() => () => API.getSettings(), [API]);
 
-  useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true;
-      getSettings();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return {
-    data: data,
-    isUninitialized: isUninitialized,
-    isFetching: isFetching,
-    error: error,
-    isError: isError,
-    isSuccess: isSuccess,
-    refetch: getSettings
-  };
+  return useGenericQuery<Settings>(fetch);
 };
 
 export default useGetSettingsQuery;

@@ -41,7 +41,12 @@ import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import useAuth from "../Hooks/useAuth";
 import KeycloakAuthProvider from "./KeycloakAuthProvider";
 
-const BYPASSS_KEYCLOAK_FOR_LOCAL_DEV = false; // set to true to bypass keycloak authentication for local development
+/* For debugging purpose only, when running the ui app locally but connecting to
+ * backend prod (where keycloak is not allowing localhost), 
+ * if the authentication is not required, you can bypass the keycloak authentication 
+ * by setting the following variable to true
+*/
+const BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING = false;
 
 interface AuthSetupProps {
   adapter?: AuthAdapter;
@@ -105,7 +110,7 @@ const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) =>
 
   if (adapter instanceof KeycloakAuthAdapter) {
     const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === "login-required";
-    const canBypassKeyCloak = BYPASSS_KEYCLOAK_FOR_LOCAL_DEV && window.location.host.startsWith("localhost") && !isLoginRequired;
+    const canBypassKeyCloak = BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING && window.location.host.startsWith("localhost") && !isLoginRequired;
     if (canBypassKeyCloak) {
       console.info("%cAuth: Keycloak authentication is disabled for local development", "color: #f88900;");
     } else {

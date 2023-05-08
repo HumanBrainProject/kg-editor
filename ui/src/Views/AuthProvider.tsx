@@ -80,7 +80,7 @@ const bypassAuth = {
   isUninitialized: false,
   isInitialized: true,
   isInitializing: false,
-  isAuthenticated: true,
+  isAuthenticated: false,
   isAuthenticating: false,
   isLogingOut: false,
   loginRequired: false,

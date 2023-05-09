@@ -26,7 +26,7 @@ import { createUseStyles } from "react-jss";
 import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../Hooks/UseStores";
+import useStores from "../Hooks/useStores";
 
 import User from "../Components/User";
 
@@ -61,7 +61,7 @@ const useStyles = createUseStyles({
 
 const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
 
-  const { authStore } = useStores();
+  const { userProfileStore } = useStores();
 
   const classes = useStyles();
 
@@ -79,23 +79,23 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
 
   const handleKeyDown = e => {
     if(e) {
-      switch(e.keyCode) {
-      case 38: {
+      switch(e.key) {
+      case "ArrowUp": {
         e.preventDefault();
         onSelectPrevious(alternative.value);
         break;
       }
-      case 40: {
+      case "ArrowDown": {
         e.preventDefault();
         onSelectNext(alternative.value);
         break;
       }
-      case 13: {
+      case "Enter": {
         e.preventDefault();
         onSelect(alternative.value);
         break;
       }
-      case 27: {
+      case "Escape": {
         e.preventDefault();
         onCancel();
         break;
@@ -112,7 +112,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   };
 
   const users = (!alternative || !alternative.users)?[]:alternative.users;
-  const isOwnAlternative = users.find(user => authStore.user.id === user.id);
+  const isOwnAlternative = users.find(user => userProfileStore.user.id === user.id);
   return (
     <Dropdown.Item className={classes.container} onClick={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >

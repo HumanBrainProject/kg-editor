@@ -27,12 +27,12 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../../Services/API";
-import { useStores } from "../../../Hooks/UseStores";
+import useStores from "../../../Hooks/useStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
 import { useLocation, useNavigate } from "react-router-dom";
+import Matomo from "../../../Services/Matomo";
 
 const useStyles = createUseStyles({
   error: {
@@ -126,7 +126,7 @@ const DeleteInstance = observer(({ instance, className }) => {
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
   const handleDeleteInstance = () => {
-    API.trackEvent("Instance", "Delete", instance.id);
+    Matomo.trackEvent("Instance", "Delete", instance.id);
     appStore.deleteInstance(instance.id, location, navigate);
   };
 

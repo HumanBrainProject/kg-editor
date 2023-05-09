@@ -23,9 +23,9 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
-import { useStores } from "../Hooks/UseStores";
+import useStores from "../Hooks/useStores";
 
-import API from "../Services/API";
+import Matomo from "../Services/Matomo";
 import Instance from "./Instance/Instance";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -37,32 +37,30 @@ const InstanceView = observer(({ mode }) => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const id = params.id;
+  const instanceId = params.id;
 
   useEffect(() => {
-    API.trackCustomUrl(window.location.href);
-    API.trackPageView();
-    appStore.openInstance(id, id, {}, mode);
+    Matomo.trackCustomUrl(window.location.href);
+    Matomo.trackPageView();
+    appStore.openInstance(instanceId, instanceId, {}, mode);
     instanceStore.togglePreviewInstance();
-    viewStore.selectViewByInstanceId(id);
-    const instance = instanceStore.instances.get(id); //NOSONAR
-    if (mode === "create") {
-      if (!instance.isNew) {
-        navigate(`/instances/${id}/edit`, {replace: true});
-      }
-    } else if (instance.space ===  typeStore.space) {
+    viewStore.selectViewByInstanceId(instanceId);
+    const instance = instanceStore.instances.get(instanceId); //NOSONAR
+    if (instance.space ===  typeStore.space) {
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
       if (!isTypesSupported && !["raw", "graph", "manage"].includes(mode)) {
-        navigate(`/instances/${id}/raw`, {replace: true});
+        navigate(`/instances/${instanceId}/raw`, {replace: true});
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, mode, typeStore.space]);
+  }, [instanceId, mode, typeStore.space]);
 
-  const instance = instanceStore.instances.get(id);
-  if (instance.space !==  typeStore.space) {
+  const instance = instanceStore.instances.get(instanceId);
+  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+  if (instance.space !== typeStore.space || (!isTypesSupported && !["raw", "graph", "manage"].includes(mode))) {
     return null;
   }
+
   return (
     <Instance instance={instance} mode={mode} />
   );

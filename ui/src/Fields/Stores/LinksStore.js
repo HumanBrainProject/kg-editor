@@ -56,8 +56,8 @@ class LinksStore extends FieldStore {
 
   appStore = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
+  constructor(definition, options, instance, api, rootStore) {
+    super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
     this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];
@@ -357,7 +357,7 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload["@type"] = this.instance.types.map(t => t.name);
     try{
-      const { data: { data: { suggestions: { data: values, total }, types }} } = await this.transportLayer.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { suggestions: { data: values, total }, types }}  = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const newOptions = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (this.optionsSearchActive) {
@@ -368,7 +368,7 @@ class LinksStore extends FieldStore {
               newValues.push({
                 id: `${space}-${type.name}`,
                 type: type,
-                space: this.rootStore.authStore.getSpaceInfo(space),
+                space: this.rootStore.userProfileStore.getSpaceInfo(space),
                 isExternal: space !== this.rootStore.appStore.currentSpace.id,
                 isNew: true
               });

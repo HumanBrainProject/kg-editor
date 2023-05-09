@@ -26,10 +26,10 @@ import { observer } from "mobx-react-lite";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import { createUseStyles } from "react-jss";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import useStores from "../Hooks/useStores";
 
 import Tab from "../Components/Tab";
+import Matomo from "../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -103,9 +103,9 @@ const InstanceTab = observer(({view, pathname}) => {
 
   const handleClose = () => {
     if(isCurrent(view.instanceId, view.mode)) {
-      API.trackEvent("Tab", "CloseCurrentInstance", view.instanceId);
+      Matomo.trackEvent("Tab", "CloseCurrentInstance", view.instanceId);
     } else {
-      API.trackEvent("Tab", "CloseOtherInstance", view.instanceId);
+      Matomo.trackEvent("Tab", "CloseOtherInstance", view.instanceId);
     }
     appStore.closeInstance(location, navigate, view.instanceId);
   }
@@ -133,11 +133,11 @@ const InstanceTabs = observer(({ pathname }) => {
 
   const classes = useStyles();
 
-  const { authStore, viewStore } = useStores();
+  const { userProfileStore, viewStore } = useStores();
 
   return (
     <div className={classes.container} >
-      {authStore.isAuthenticated && authStore.isUserAuthorized && Array.from(viewStore.views.values()).map(view => (
+      {userProfileStore.isAuthorized && Array.from(viewStore.views.values()).map(view => (
         <InstanceTab key={view.instanceId} view={view} pathname={pathname} />
       ))}
     </div>

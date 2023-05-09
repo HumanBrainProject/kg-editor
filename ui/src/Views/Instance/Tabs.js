@@ -27,8 +27,8 @@ import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   tabs: {
@@ -98,7 +98,7 @@ const Tabs = observer(({ instance, mode }) => {
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
   const handleClick = instanceMode => {
-    API.trackEvent("Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id);
+    Matomo.trackEvent("Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id);
     if(instanceMode === "view") {
       navigate(`/instances/${instance.id}`);
     } else {

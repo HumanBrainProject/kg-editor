@@ -26,8 +26,8 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import API from "../Services/API";
-import { useStores } from "../Hooks/UseStores";
+import Matomo from "../Services/Matomo";
+import useStores from "../Hooks/useStores";
 import Instances from "./Browse/Instances";
 import NavigationPanel from "./Browse/NavigationPanel";
 
@@ -51,8 +51,8 @@ const Browse = observer(() => {
   const { browseStore, typeStore } = useStores();
 
   useEffect(() => {
-    API.trackCustomUrl(window.location.href);
-    API.trackPageView();
+    Matomo.trackCustomUrl(window.location.href);
+    Matomo.trackPageView();
 
     const typeToSelect = type && typeStore.typesMap.get(type);
     if ( typeToSelect && typeToSelect.isSupported && !typeToSelect.embeddedOnly) {

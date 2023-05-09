@@ -134,7 +134,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   };
 
   const handleKeyDown = (value, e) => {
-    if (e.keyCode === 8) { //User pressed "Backspace" while focus on a value
+    if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
     }
@@ -151,14 +151,14 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   };
 
   const handleKeyStrokes = e => {
-    if(e.keyCode === 13){
+    if(e.key === "Enter"){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
       const value = e.target.value.trim();
       if (value) {
         handleOnAddValue(value);
       }
       e.target.value = "";
-    } else if(!e.target.value && fieldStore.value.length > 0 && e.keyCode === 8){
+    } else if(!e.target.value && fieldStore.value.length > 0 && e.key === "Backspace"){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
       e.target.value = list[list.length-1];

@@ -25,11 +25,10 @@ import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
-import _ from "lodash-uuid";
+import { v4 as uuidv4 } from "uuid";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
 
 import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
 import DynamicOption  from "../DynamicOption/DynamicOption";
@@ -40,6 +39,7 @@ import Warning from "../Warning";
 
 import ListItem from "../DynamicDropdown/ListItem";
 import TargetTypeSelection from "../TargetTypeSelection";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   labelContainer: {
@@ -145,7 +145,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const addNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
-      const newId = _.uuid();
+      const newId = uuidv4();
       const type = typeStore.typesMap.get(typeName);
       instanceStore.createNewInstance(type, newId, name);
       const newValue = {[mappingValue]: newId};
@@ -217,10 +217,10 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-         API.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
+        Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
-        API.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
+        Matomo.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
         addNewValue(name, option.type.name);
       }
     } else {

@@ -25,8 +25,8 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../Services/API";
 import { useNavigate } from "react-router-dom";
+import Matomo from "../Services/Matomo";
 
 const useStyles = createUseStyles({
   container:{
@@ -107,7 +107,7 @@ const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, 
   const handleClick = e => {
     e.preventDefault();
     if(path){
-      API.trackEvent("Tab", "Select", path.label);
+      Matomo.trackEvent("Tab", "Select", path.label);
       navigate(path);
     }
     typeof onClick === "function" && onClick(e);

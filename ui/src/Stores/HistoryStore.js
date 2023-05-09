@@ -33,10 +33,10 @@ export class HistoryStore {
   isFetching = false;
   fetchError = null;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore){
+  constructor(api, rootStore){
     makeObservable(this, {
       instancesHistory: observable,
       instances: observable,
@@ -47,7 +47,7 @@ export class HistoryStore {
       fetchInstances: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
 
     if (localStorage.getItem("instancesHistory")) {
@@ -126,10 +126,10 @@ export class HistoryStore {
         this.instances = [];
         this.isFetching = true;
         this.fetchError = null;
-        const response = await this.transportLayer.getInstancesSummary(null, list);
+        const { data:response } = await this.api.getInstancesSummary(null, list);
         runInAction(() => {
           list.forEach(identifier => {
-            const data = response && response.data && response.data.data && response.data.data[identifier];
+            const data = response?.[identifier];
             if(data) {
               if (!data.error) {
                 Object.values(data.fields).forEach(d => {
@@ -139,7 +139,7 @@ export class HistoryStore {
                   }
                 });
                 const instance = new Instance(identifier);
-                instance.initializeData(this.transportLayer, this.rootStore, data);
+                instance.initializeData(this.api, this.rootStore, data);
                 this.instances.push(instance);
               }
               // else {

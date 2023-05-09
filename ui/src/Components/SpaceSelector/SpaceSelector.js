@@ -27,11 +27,11 @@ import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
 
 import SpaceDropdownToggle from "./SpaceDropdownToggle";
 import SpaceDropdownMenu from "./SpaceDropdownMenu";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -60,16 +60,16 @@ const SpaceSelector = observer(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { appStore, authStore } = useStores();
+  const { appStore, userProfileStore } = useStores();
 
   const handleSelectSpace = space => {
-    API.trackEvent("Space", "Select", space);
+    Matomo.trackEvent("Space", "Select", space);
     appStore.switchSpace(location, navigate, space);
   }
 
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
-      {authStore.spaces.length > 1 ?
+      {userProfileStore.spaces.length > 1 ?
         <Dropdown onSelect={handleSelectSpace}>
           <Dropdown.Toggle as={SpaceDropdownToggle}>
             {appStore.currentSpaceName}

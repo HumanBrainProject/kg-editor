@@ -39,10 +39,10 @@ class FieldStore {
   isRequired = false;
   isReadOnly = false;
   instance = null;
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(definition, _options, instance, transportLayer, rootStore) {
+  constructor(definition, _options, instance, api, rootStore) {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,
@@ -76,7 +76,7 @@ class FieldStore {
     this.isReadOnly = definition.isReadOnly;
     this.warning = definition.warning;
     this.type = definition.type;
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 

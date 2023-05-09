@@ -27,13 +27,13 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../../Services/API";
-import { useStores } from "../../../Hooks/UseStores";
+import useStores from "../../../Hooks/useStores";
 
 import ClientPreviewModal from "./ClientPreviewModal";
 import ReleaseStats from "./ReleaseStats";
 import ReleaseMessages from "./ReleaseMessages";
 import Reviewers from "./Reviewers";
+import Matomo from "../../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -135,7 +135,7 @@ const ReleaseAction = observer(() => {
 
   const handleProceed = () => {
     if (!releaseStore.isSaving) {
-      API.trackEvent("Instance", "Release", releaseStore.topInstanceId);
+      Matomo.trackEvent("Instance", "Release", releaseStore.topInstanceId);
       releaseStore.commitStatusChanges();
     }
   };

@@ -26,8 +26,8 @@ import debounce from "lodash/debounce";
 
 import Instance from "./Instance";
 
-const normalizeInstancesData = (transportLayer, rootStore, data) => {
-  return (data && Array.isArray(data.data))?data.data.map(rowData => {
+const normalizeInstancesData = (api, rootStore, data) => {
+  return (Array.isArray(data))?data.map(rowData => {
     Object.values(rowData.fields).forEach(d => {
       if(d.widget === "TextArea") {
         d.value = d.value && d.value.substr(0, 197) + "...";
@@ -35,7 +35,7 @@ const normalizeInstancesData = (transportLayer, rootStore, data) => {
       }
     });
     const instance = new Instance(rowData.id);
-    instance.initializeData(transportLayer, rootStore, rowData);
+    instance.initializeData(api, rootStore, rowData);
     return instance;
   }):[];
 };
@@ -58,10 +58,10 @@ export class BrowseStore {
   pageStart = 0;
   pageSize = 20;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
       isFetching: observable,
       isFetched: observable,
@@ -84,7 +84,7 @@ export class BrowseStore {
       clearInstancesFilter: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 
@@ -142,10 +142,10 @@ export class BrowseStore {
     }
     this.fetchError = null;
     try {
-      const { data } = await this.transportLayer.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      const { data } = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
         this.isFetching = false;
-        const instances = normalizeInstancesData(this.transportLayer, this.rootStore, data);
+        const instances = normalizeInstancesData(this.api, this.rootStore, data);
         if(loadMore){
           this.instances = [...this.instances, ...instances];
         } else {

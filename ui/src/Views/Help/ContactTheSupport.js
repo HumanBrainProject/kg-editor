@@ -24,17 +24,17 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStores } from "../../Hooks/UseStores";
-import API from "../../Services/API";
+import useStores from "../../Hooks/useStores";
+import Sentry from "../../Services/Sentry";
 
 const ContactTheSupport = () => {
-  const { authStore } = useStores();
+  const { userProfileStore } = useStores();
   
   const handleErrorReport = () => {
-    API.showReportDialog({
+    Sentry.showReportDialog({
       user: {
-        email: authStore.user.email,
-        name: `${authStore.user.name} (${authStore.user.username})`
+        email: userProfileStore.user.email,
+        name: `${userProfileStore.user.name} (${userProfileStore.user.username})`
       }
     });
   };

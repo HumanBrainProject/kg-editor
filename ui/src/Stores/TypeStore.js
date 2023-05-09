@@ -31,10 +31,10 @@ export class TypeStore {
   isFetching = false;
   isFetched = false;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
       space: observable,
       types: observable,
@@ -46,7 +46,7 @@ export class TypeStore {
       fetch: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 
@@ -67,7 +67,7 @@ export class TypeStore {
       const type = this.typesMap.get(name);
       return type && type.isSupported;
     });
-  };
+  }
 
   async fetch(space) {
     if (!this.isFetching && (this.fetchError || space !== this.space)) {
@@ -78,10 +78,10 @@ export class TypeStore {
         this.fetchError = null;
         this.isFetched = false;
         try {
-          const response = await this.transportLayer.getSpaceTypes(space);
+          const { data } = await this.api.getSpaceTypes(space);
           runInAction(() => {
-            this.types = (response.data && response.data.data && response.data.data.length)?
-              response.data.data.map(type => ({
+            this.types = data.length ?
+              data.map(type => ({
                 ...type,
                 isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
               }))

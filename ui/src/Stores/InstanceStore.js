@@ -88,8 +88,8 @@ class Instance extends BaseInstance {
       this.hasRawFetchError = false;
       this.rawFetchError = null;
       try {
-        const { data } = await this.store.transportLayer.getRawInstance(this.id);
-        this.initializeRawData(data && data.data, data && data.permissions);
+        const data = await this.store.api.getRawInstance(this.id);
+        this.initializeRawData(data?.data, data?.permissions);
       } catch (e) {
         runInAction(() => {
           if(e.response && e.response.status === 404){
@@ -110,9 +110,9 @@ class Instance extends BaseInstance {
     const payload = this.returnValue;
     try {
       if (this.isNew) {
-        const { data } = await this.store.transportLayer.createInstance(this.space, this.id, payload);
+        const { data } = await this.store.api.createInstance(this.space, this.id, payload);
         runInAction(() => {
-          const newId = data.data.id;
+          const newId = data.id;
           this.isNew = false;
           this.saveError = null;
           this.hasSaveError = false;
@@ -127,10 +127,10 @@ class Instance extends BaseInstance {
             this.store.instance.delete(this.id);
             this.id = newId;
           }
-          this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
+          this.initializeData(this.store.api, this.store.rootStore, data);
         });
       } else {
-        const { data } = await this.store.transportLayer.patchInstance(this.id, payload);
+        const { data } = await this.store.api.patchInstance(this.id, payload);
         runInAction(() => {
           this.saveError = null;
           this.hasSaveError = false;
@@ -140,7 +140,7 @@ class Instance extends BaseInstance {
           this.hasRawFetchError = false;
           this.isRawFetched = false;
           this.isRawFetching = false;
-          this.initializeData(this.store.transportLayer, this.store.rootStore, data.data);
+          this.initializeData(this.store.api, this.store.rootStore, data);
         });
       }
     } catch (e) {
@@ -181,10 +181,10 @@ export class InstanceStore {
   queueThreshold = 1000;
   queueTimeout = 250;
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore, stage=null) {
+  constructor(api, rootStore, stage=null) {
     makeObservable(this, {
       stage: observable,
       instances: observable,
@@ -213,7 +213,7 @@ export class InstanceStore {
 
     this.stage = stage?stage:null;
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
   }
 
@@ -258,12 +258,12 @@ export class InstanceStore {
       links.isFetching = true;
       links.fetchError = null;
       try {
-        const { data } = await this.transportLayer.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
+        const { data } = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
         runInAction(() => {
           links.isFetching = false;
           links.size += data.size;
           links.total = data.total;
-          links.instances = [...links.instances, ...data.data];
+          links.instances = [...links.instances, ...data];
         });
       } catch(e){
         runInAction(() => {
@@ -308,14 +308,14 @@ export class InstanceStore {
     status.isChecking = true;
     status.error = null;
     try{
-      const { data } = await this.transportLayer.getInstance(instanceId);
+      const { data } = await this.api.getInstance(instanceId);
       runInAction(() => {
-        const resolvedId = data && data.data && data.data.id;
+        const resolvedId = data?.id;
         if (!resolvedId) {
           throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
         }
         const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(this.transportLayer, this.rootStore, data && data.data);
+        instance.initializeData(this.api, this.rootStore, data);
         status.resolvedId = resolvedId;
         status.isChecked = true;
         status.isChecking = false;
@@ -402,12 +402,12 @@ export class InstanceStore {
       }
     });
     try {
-      const response = await this.transportLayer.getInstancesList(this.stage, toProcess);
+      const {data: response} = await this.api.getInstancesList(this.stage, toProcess);
       runInAction(() => {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = response && response.data && response.data.data && response.data.data[identifier];
+            const data = response?response[identifier]:undefined;
             if (data) {
               if (data.error) {
                 const code = data.error.code?` [error ${data.error.code}]`:"";
@@ -416,7 +416,7 @@ export class InstanceStore {
                 instance.isFetching = false;
                 instance.isFetched = false;
               } else {
-                instance.initializeData(this.transportLayer, this.rootStore, data, false);
+                instance.initializeData(this.api, this.rootStore, data, false);
                 this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
               }
             } else {
@@ -465,12 +465,12 @@ export class InstanceStore {
       }
     });
     try {
-      const response = await this.transportLayer.getInstancesLabel(this.stage, toProcess);
+      const { data:response } = await this.api.getInstancesLabel(this.stage, toProcess);
       runInAction(() =>{
         toProcess.forEach(identifier => {
           if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            const data = response && response.data && response.data.data && response.data.data[identifier];
+            const data = response?response[identifier]:undefined;
             if (data) {
               if (data.error) {
                 const code = data.error.code?` [${data.error.code}]`:"";
@@ -543,7 +543,7 @@ export class InstanceStore {
       data.labelField = type.labelField;
     }
     const instance  = new Instance(id, this);
-    instance.initializeData(this.transportLayer, this.rootStore, data, true);
+    instance.initializeData(this.api, this.rootStore, data, true);
     if (instance.labelField) {
       instance.fields[instance.labelField].setValue(name);
     }
@@ -567,8 +567,8 @@ export class InstanceStore {
   }
 }
 
-export const createInstanceStore = (transportLayer, rootStore, stage=null) => {
-  return new InstanceStore(transportLayer, rootStore, stage);
+export const createInstanceStore = (api, rootStore, stage=null) => {
+  return new InstanceStore(api, rootStore, stage);
 };
 
 export default InstanceStore;

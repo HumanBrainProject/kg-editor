@@ -26,9 +26,9 @@ import { observer } from "mobx-react-lite";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../../Services/API";
-import { useStores } from "../../../Hooks/UseStores";
+import useStores from "../../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
+import Matomo from "../../../Services/Matomo";
 
 const DuplicateInstance = observer(({instance, className}) => {
 
@@ -36,7 +36,7 @@ const DuplicateInstance = observer(({instance, className}) => {
   const navigate = useNavigate();
 
   const handleDuplicateInstance = () => {
-    API.trackEvent("Instance", "Duplicate", instance.id);
+    Matomo.trackEvent("Instance", "Duplicate", instance.id);
     appStore.duplicateInstance(instance.id, navigate);
   };
 

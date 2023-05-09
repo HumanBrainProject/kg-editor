@@ -28,8 +28,8 @@ import FieldStore from "./FieldStore";
 class UnsupportedFieldStore extends FieldStore {
   value = null;
 
-  constructor(definition, options, instance, transportLayer, rootStore) {
-    super(definition, options, instance, transportLayer, rootStore);
+  constructor(definition, options, instance, api, rootStore) {
+    super(definition, options, instance, api, rootStore);
 
     makeObservable(this, {
       value: observable,
@@ -62,6 +62,7 @@ class UnsupportedFieldStore extends FieldStore {
     this.value = value;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   reset() {} //NOSONAR this class extends FieldStore which require that the reset methode should be implemented
 
   get hasChanged() {

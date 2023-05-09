@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
 
 import SpinnerPanel from "../../Components/SpinnerPanel";
 import ErrorPanel from "../../Components/ErrorPanel";

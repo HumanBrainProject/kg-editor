@@ -27,7 +27,7 @@ import { observer } from "mobx-react-lite";
 import MultiToggle from "../../../Components/MultiToggle";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import { useStores } from "../../../Hooks/UseStores";
+import useStores from "../../../Hooks/useStores";
 
 const useStyles = createUseStyles({
   container: {
@@ -43,7 +43,7 @@ const useStyles = createUseStyles({
       color: "var(--release-color-not-released)",
       fontSize: "1.5em"
     },
-    "&:not([status]) .ban svg": {
+    "&.status-undefined .ban svg": {
       color: "gray"
     }
   }
@@ -71,7 +71,7 @@ const ReleaseNodeToggle = observer(({ node }) => {
 
   if(!node.permissions.canRelease || node.status === null) {
     return (
-      <div className={classes.container} title={node.status === null ? "Unknown entity": "You do not have permission to release the instance."} status={node.status}>
+      <div className={`${classes.container} status-${node.status}`} title={node.status === null ? "Unknown entity": "You do not have permission to release the instance."} >
         <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
       </div>
     );

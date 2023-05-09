@@ -23,7 +23,7 @@
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import { matchPath } from "react-router-dom";
-import _ from "lodash-uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
@@ -49,6 +49,7 @@ const getLinkedInstanceIds = (instanceStore, instanceIds) => {
 };
 
 export class AppStore{
+  commit = null;
   globalError = null;
   currentSpace = null;
   savePercentage = null;
@@ -66,11 +67,12 @@ export class AppStore{
   instanceToMove = null;
   pathsToResolve = new Map();
 
-  transportLayer = null;
+  api = null;
   rootStore = null;
 
-  constructor(transportLayer, rootStore) {
+  constructor(api, rootStore) {
     makeObservable(this, {
+      commit: observable,
       externalCreateModal: observable,
       globalError: observable,
       currentSpace: observable,
@@ -117,10 +119,11 @@ export class AppStore{
       updateExternalInstanceModal: action,
       clearExternalCreateModal: action,
       moveInstance: action,
-      cancelMoveInstance: action
+      cancelMoveInstance: action,
+      setCommit: action
     });
 
-    this.transportLayer = transportLayer;
+    this.api = api;
     this.rootStore = rootStore;
 
     this.setTheme(localStorage.getItem("theme"));
@@ -145,6 +148,10 @@ export class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
+  setCommit(commit) {
+    this.commit = commit;
+  }
+  
   async createExternalInstance(space, typeName, value, location, navigate) {
     if (this.rootStore.instanceStore.hasUnsavedChanges) {
       this.externalCreateModal = {space: space, type: typeName, value: value};
@@ -152,7 +159,7 @@ export class AppStore{
       this.externalCreateModal = null;
       await this.switchSpace(location, navigate, space);
       const type = this.rootStore.typeStore.typesMap.get(typeName);
-      const uuid = _.uuid();
+      const uuid = uuidv4();
       this.rootStore.instanceStore.createNewInstance(type, uuid, value);
       navigate(`/instances/${uuid}/create`);
     }
@@ -283,7 +290,7 @@ export class AppStore{
 
   setSpace = spaceName => {
     if (spaceName) {
-      this.currentSpace = this.rootStore.authStore.spaces.find( w => w.id === spaceName);
+      this.currentSpace = this.rootStore.userProfileStore.getSpace(spaceName);
       localStorage.setItem("space", spaceName);
     } else {
       this.currentSpace = null;
@@ -291,11 +298,8 @@ export class AppStore{
     }
   }
 
-  async switchSpace(location, navigate, selectedSpace) {
-    let space = selectedSpace?this.rootStore.authStore.spaces.find( w => w.id === selectedSpace):null;
-    if (!space && this.rootStore.authStore.hasSpaces && this.rootStore.authStore.spaces.length === 1) {
-      space = this.rootStore.authStore.spaces[0];
-    }
+  async switchSpace(location, navigate, spaceName) {
+    let space = this.rootStore.userProfileStore.getSpaceOrDefault(spaceName);
     if(this.currentSpace !== space) {
       if(this.rootStore.instanceStore.hasUnsavedChanges) {
         if (window.confirm("You are about to change space. All unsaved changes will be lost. Continue ?")) {
@@ -400,7 +404,7 @@ export class AppStore{
       this.isDeletingInstance = true;
       this.deleteInstanceError = null;
       try{
-        await this.transportLayer.deleteInstance(instanceId);
+        await this.api.deleteInstance(instanceId);
         runInAction(() => {
           this.instanceToDelete = null;
           this.isDeletingInstance = false;
@@ -443,14 +447,16 @@ export class AppStore{
     }
     this.isCreatingNewInstance = true;
     try{
-      const { data } = await this.transportLayer.createInstance(this.currentSpace.id, null, payload);
+      const { data } = await this.api.createInstance(this.currentSpace.id, null, payload);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });
-      const newId = data.data.id;
-      const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
-      newInstance.initializeData(this.transportLayer, this.rootStore, data.data);
-      navigate(`/instances/${newId}/edit`);
+      const newId = data?.id;
+      if(newId) {
+        const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
+        newInstance.initializeData(this.api, this.rootStore, data);
+        navigate(`/instances/${newId}/edit`);
+      }
     } catch(e){
       runInAction(() => {
         this.isCreatingNewInstance = false;
@@ -467,7 +473,7 @@ export class AppStore{
     this.instanceMovingError = null;
     this.isMovingInstance = true;
     try{
-      await this.transportLayer.moveInstance(instanceId, space);
+      await this.api.moveInstance(instanceId, space);
       runInAction(() => {
         this.isMovingInstance = false;
         this.instanceToMove = null;

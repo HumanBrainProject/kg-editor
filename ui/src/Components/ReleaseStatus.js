@@ -40,16 +40,16 @@ const useStyles = createUseStyles({
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",
     color: "#404040",
-    "&[status=UNRELEASED]": {
+    "&.status-UNRELEASED": {
       color: "var(--ft-color-error)"
     },
-    "&[status=HAS_CHANGED]": {
+    "&.status-HAS_CHANGED": {
       color: "#f39c12"
     },
-    "&[status=RELEASED]": {
+    "&.status-RELEASED": {
       color: "#337ab7"
     },
-    "&:not([status]) $instanceStatus": {
+    "&.status-undefined $instanceStatus": {
       color: "gray"
     },
     "&.darkmode $instanceStatus": {
@@ -104,7 +104,7 @@ const ReleaseStatus = ({instanceStatus, darkmode}) => {
       </div>
     </Tooltip>
     }>
-      <div className={`${classes.status} ${darkmode? "darkmode" : ""} `} status={instanceStatus}>
+      <div className={`${classes.status} ${darkmode? "darkmode" : ""} status-${instanceStatus}`}>
         <div className={`${classes.instanceStatus}  `}>
           <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
         </div>

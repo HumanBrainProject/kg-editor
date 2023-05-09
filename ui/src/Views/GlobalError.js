@@ -25,7 +25,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 
-import { useStores } from "../Hooks/UseStores";
+import useStores from "../Hooks/useStores";
 
 import BGMessage from "../Components/BGMessage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

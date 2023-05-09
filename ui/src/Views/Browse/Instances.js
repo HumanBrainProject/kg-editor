@@ -30,16 +30,16 @@ import InfiniteScroll from "react-infinite-scroller";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { Scrollbars } from "react-custom-scrollbars-2";
-import _  from "lodash-uuid";
+import { v4 as uuidv4 } from "uuid";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
 
 import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import Filter from "../../Components/Filter";
 import Preview from "../Preview";
 import InstanceRow from "../Instance/InstanceRow";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -200,8 +200,8 @@ const InstancesResult = observer(({
   const { appStore, browseStore, instanceStore } = useStores();
 
   const handleCreateInstance = () => {
-    API.trackEvent("Browse", "CreateInstance", browseStore.selectedType.name);
-    const uuid = _.uuid();
+    Matomo.trackEvent("Browse", "CreateInstance", browseStore.selectedType.name);
+    const uuid = uuidv4();
     instanceStore.setInstanceIdAvailability(browseStore.selectedType, uuid);
     navigate(`/instances/${uuid}/create`);
   };
@@ -337,18 +337,18 @@ const Instances = observer(() => {
   }, [browseStore.selectedType, browseStore.instancesFilter]);
 
   const handleFilterChange = value => {
-    API.trackEvent("Browse", "FilterInstance", value);
+    Matomo.trackEvent("Browse", "FilterInstance", value);
     browseStore.setInstancesFilter(value);
   };
 
   const handleInstanceClick = instance => {
-    API.trackEvent("Browse", "InstancePreview", instance.id);
+    Matomo.trackEvent("Browse", "InstancePreview", instance.id);
     browseStore.selectInstance(instance);
   };
 
   const handleInstanceCtrlClick = instance => {
     if (instance && instance.id) {
-      API.trackEvent( "Browse", "InstanceOpenTabInBackground", instance.id);
+      Matomo.trackEvent( "Browse", "InstanceOpenTabInBackground", instance.id);
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
       appStore.openInstance(instance.id, instance.name, instance.primaryType, isTypesSupported?"view":"raw");
     }
@@ -361,7 +361,7 @@ const Instances = observer(() => {
         const instance = instanceStore.createInstanceOrGet(id);
         instance.initializeLabelData(toJS(summaryInstance));
       }
-      API.trackEvent("Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
+      Matomo.trackEvent("Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
       if (mode === "view") {
         navigate(`/instances/${id}`);
       } else {

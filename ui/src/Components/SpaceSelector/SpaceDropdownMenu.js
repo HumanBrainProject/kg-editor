@@ -25,7 +25,7 @@ import { observer } from "mobx-react-lite";
 import React, { useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
 import Filter from "../Filter";
 
 const useStyles = createUseStyles({
@@ -57,11 +57,11 @@ const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef})
     const classes = useStyles();
     const [ filter, setFilter ] = useState("");
 
-    const { authStore } = useStores();
+    const { userProfileStore } = useStores();
 
     const handleChange = value => setFilter(value);
 
-    const spaces = authStore.filteredList(filter);
+    const spaces = userProfileStore.filteredList(filter);
 
     return (
       <div ref={wrapperRef} className={`${className} ${classes.dropdownMenu}`} aria-labelledby={labeledBy}>

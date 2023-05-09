@@ -24,14 +24,13 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import _  from "lodash-uuid";
+import { v4 as uuidv4 } from "uuid";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import API from "../../Services/API";
-import { useStores } from "../../Hooks/UseStores";
+import useStores from "../../Hooks/useStores";
 
 import DropdownComponent from "../../Components/DynamicDropdown/Dropdown";
 import DynamicOption  from "../DynamicOption/DynamicOption";
@@ -40,6 +39,7 @@ import Label from "../Label";
 import Invalid from "../Invalid";
 import Warning from "../Warning";
 import TargetTypeSelection from "../TargetTypeSelection";
+import Matomo from "../../Services/Matomo";
 
 const useStyles = createUseStyles({
   container: {
@@ -126,7 +126,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { typeStore, instanceStore, authStore, appStore } = useStores();
+  const { typeStore, instanceStore, userProfileStore, appStore } = useStores();
 
   const formControlRef = useRef();
   const dropdownInputRef = useRef();
@@ -157,7 +157,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const addNewValue = (name, typeName) => {
     if (fieldStore.allowCustomValues) {
-      const id = _.uuid();
+      const id = uuidv4();
       const type = typeStore.typesMap.get(typeName);
       instanceStore.createNewInstance(type, id, name);
       const value = {[fieldStore.mappingValue]: id};
@@ -208,10 +208,10 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-        API.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
+        Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
-        API.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
+        Matomo.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
         addNewValue(name, option.type.name);
       }
     } else {
@@ -332,7 +332,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 className={classes.dropdown}
                 searchTerm={optionsSearchTerm}
                 options={options}
-                spaces={authStore.spaces}
+                spaces={userProfileStore.spaces}
                 loading={fetchingOptions}
                 hasMore={hasMoreOptions}
                 inputPlaceholder={`type to add a ${fieldStoreLabel}`}

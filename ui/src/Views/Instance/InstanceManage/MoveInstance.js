@@ -27,12 +27,12 @@ import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import API from "../../../Services/API";
-import { useStores } from "../../../Hooks/UseStores";
+import useStores from "../../../Hooks/useStores";
 
 import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
 import { useNavigate, useLocation } from "react-router-dom";
+import Matomo from "../../../Services/Matomo";
 
 const useStyles = createUseStyles({
   title: {
@@ -151,7 +151,7 @@ const Status = observer(({
 const MoveInstance = observer(({ instance, className }) => {
   const classes = useStyles();
 
-  const { appStore, statusStore, authStore } = useStores();
+  const { appStore, statusStore, userProfileStore } = useStores();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -172,7 +172,7 @@ const MoveInstance = observer(({ instance, className }) => {
     return null;
   }
 
-  const spaces = authStore.spaces.filter((s) => {
+  const spaces = userProfileStore.spaces.filter((s) => {
     if (s.id === appStore.currentSpace.id) {
       return true;
     }
@@ -189,7 +189,7 @@ const MoveInstance = observer(({ instance, className }) => {
   const handleSetSpaceId = e => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
-    API.trackEvent("Instance", "Move", instance.id);
+    Matomo.trackEvent("Instance", "Move", instance.id);
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 

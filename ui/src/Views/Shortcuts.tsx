@@ -39,6 +39,51 @@ const Shortcuts = observer(() => {
   const { appStore } = useStores();
 
   useEffect(() => {
+  
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === "t") {
+        Matomo.trackEvent("Shortcut", "ToggleTheme");
+        appStore.toggleTheme();
+      } else if (e.altKey && e.shiftKey && e.key === "f") { // alt+shift+f, browse
+        Matomo.trackEvent("Shortcut", "Browse");
+        navigate("/browse");
+      } else if (e.altKey && e.key === "n") { // alt+n, new
+        Matomo.trackEvent("Shortcut", "Create");
+        const uuid = uuidv4();
+        navigate(`/instances/${uuid}/create`);
+      } else if (e.altKey && e.key === "d") { // alt+d, dashboard
+        Matomo.trackEvent("Shortcut", "Home");
+        navigate("/");
+      } else if (e.key === "F1") { // F1, help
+        Matomo.trackEvent("Shortcut", "Help");
+        navigate("/help");
+      } else if (e.altKey && e.key === "w") { // alt+w, close
+        if (e.shiftKey) { // alt+shift+w, close all
+          Matomo.trackEvent("Shortcut", "CloseAllInstances");
+          appStore.closeAllInstances(location, navigate);
+        } else {
+          const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
+          if (matchInstanceTab) {
+            Matomo.trackEvent("Shortcut", "InstanceClose", matchInstanceTab.params.id);
+            appStore.closeInstance(location, navigate, matchInstanceTab.params.id);
+          }
+        }
+      } else if (e.altKey && e.key === "ArrowLeft") { // left arrow, previous
+        const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
+        appStore.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
+      } else if (e.altKey && e.key === "ArrowRight") { // right arrow, next
+        const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
+        appStore.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
+      } else {
+        kCode.step = kCode.ref[kCode.step] === e.key ? kCode.step + 1 : 0;
+        if (kCode.step === kCode.ref.length) {
+          kCode.step = 0;
+          Matomo.trackEvent("Shortcut", "KonamiCode", ":-D");
+          appStore.setTheme("cupcake");
+        }
+      }
+    };
+    
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -46,49 +91,6 @@ const Shortcuts = observer(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === "t") {
-      Matomo.trackEvent("Shortcut", "ToggleTheme");
-      appStore.toggleTheme();
-    } else if (e.altKey && e.shiftKey && e.key === "f") { // alt+shift+f, browse
-      Matomo.trackEvent("Shortcut", "Browse");
-      navigate("/browse");
-    } else if (e.altKey && e.key === "n") { // alt+n, new
-      Matomo.trackEvent("Shortcut", "Create");
-      const uuid = uuidv4();
-      navigate(`/instances/${uuid}/create`);
-    } else if (e.altKey && e.key === "d") { // alt+d, dashboard
-      Matomo.trackEvent("Shortcut", "Home");
-      navigate("/");
-    } else if (e.key === "F1") { // F1, help
-      Matomo.trackEvent("Shortcut", "Help");
-      navigate("/help");
-    } else if (e.altKey && e.key === "w") { // alt+w, close
-      if (e.shiftKey) { // alt+shift+w, close all
-        Matomo.trackEvent("Shortcut", "CloseAllInstances");
-        appStore.closeAllInstances(location, navigate);
-      } else {
-        const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
-        if (matchInstanceTab) {
-          Matomo.trackEvent("Shortcut", "InstanceClose", matchInstanceTab.params.id);
-          appStore.closeInstance(location, navigate, matchInstanceTab.params.id);
-        }
-      }
-    } else if (e.altKey && e.key === "ArrowLeft") { // left arrow, previous
-      const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
-      appStore.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
-    } else if (e.altKey && e.key === "ArrowRight") { // right arrow, next
-      const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
-      appStore.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
-    } else {
-      kCode.step = kCode.ref[kCode.step] === e.key ? kCode.step + 1 : 0;
-      if (kCode.step === kCode.ref.length) {
-        kCode.step = 0;
-        Matomo.trackEvent("Shortcut", "KonamiCode", ":-D");
-        appStore.setTheme("cupcake");
-      }
-    }
-  };
   return null;
 });
 Shortcuts.displayName = "Shortcuts";

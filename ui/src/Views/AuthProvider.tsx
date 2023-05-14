@@ -54,12 +54,14 @@ interface AuthSetupProps {
 }
 const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
 
-  const auth = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     if (adapter?.unauthorizedRequestResponseHandlerProvider) {
       adapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler = () => {
-        auth.logout();
+        if (isAuthenticated) {
+          logout();
+        }
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

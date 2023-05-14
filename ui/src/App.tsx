@@ -23,39 +23,45 @@
 
 import React, { Suspense } from "react";
 import { observer } from "mobx-react-lite";
-import { Navigate, useSearchParams, Route, Routes } from "react-router-dom";
-import { ThemeProvider } from "react-jss";
+import { BrowserRouter, Navigate, useSearchParams, Route, Routes } from "react-router-dom";
+import { JssProvider, ThemeProvider } from "react-jss";
 
-import API from "../Services/API";
-import RootStore from "../Stores/RootStore";
-import StoresProvider from "./StoresProvider";
-import AuthAdapter from "../Services/AuthAdapter";
-import APIProvider from "./APIProvider";
-import { Space as SpaceType } from "../types";
+import "react-virtualized/styles.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-import BrowserEventHandler from "./BrowserEventHandler";
-import Shortcuts from "./Shortcuts";
-import Styles from "./Styles";
-import Layout from "./Layout";
-import GlobalError from "./GlobalError";
-import SpinnerPanel from "../Components/SpinnerPanel";
-import Settings from "./Settings";
+import "./Services/IconsImport";
 
-const AuthProvider = React.lazy(() => import("./AuthProvider"));
-const UserProfile = React.lazy(() => import("./UserProfile"));
-const Authenticate = React.lazy(() => import("./Authenticate"));
-const Space = React.lazy(() => import("./Space"));
-const Types = React.lazy(() => import("./Types"));
-const NotFound = React.lazy(() => import("./NotFound"));
-const Home = React.lazy(() => import("./Home"));
-const Help = React.lazy(() => import("./Help"));
-const Browse = React.lazy(() => import("./Browse"));
+import API from "./Services/API";
+import RootStore from "./Stores/RootStore";
+import StoresProvider from "./Views/StoresProvider";
+import AuthAdapter from "./Services/AuthAdapter";
+import APIProvider from "./Views/APIProvider";
+import { Space as SpaceType } from "./types";
 
-const Instance = React.lazy(() => import("./Instance"));
-const RawInstance = React.lazy(() => import("./RawInstance"));
-const InstanceCreation = React.lazy(() => import("./InstanceCreation"));
-const InstanceView = React.lazy(() => import("./InstanceView"));
-const Logout = React.lazy(() => import("./Logout"));
+import ErrorBoundary from "./Views/ErrorBoundary";
+import BrowserEventHandler from "./Views/BrowserEventHandler";
+import Shortcuts from "./Views/Shortcuts";
+import Styles from "./Views/Styles";
+import Layout from "./Views/Layout";
+import GlobalError from "./Views/GlobalError";
+import SpinnerPanel from "./Components/SpinnerPanel";
+import Settings from "./Views/Settings";
+
+const AuthProvider = React.lazy(() => import("./Views/AuthProvider"));
+const UserProfile = React.lazy(() => import("./Views/UserProfile"));
+const Authenticate = React.lazy(() => import("./Views/Authenticate"));
+const Space = React.lazy(() => import("./Views/Space"));
+const Types = React.lazy(() => import("./Views/Types"));
+const NotFound = React.lazy(() => import("./Views/NotFound"));
+const Home = React.lazy(() => import("./Views/Home"));
+const Help = React.lazy(() => import("./Views/Help"));
+const Browse = React.lazy(() => import("./Views/Browse"));
+
+const Instance = React.lazy(() => import("./Views/Instance"));
+const RawInstance = React.lazy(() => import("./Views/RawInstance"));
+const InstanceCreation = React.lazy(() => import("./Views/InstanceCreation"));
+const InstanceView = React.lazy(() => import("./Views/InstanceView"));
+const Logout = React.lazy(() => import("./Views/Logout"));
 
 interface AppProps {
   stores: RootStore;
@@ -188,4 +194,14 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
 });
 App.displayName = "App";
 
-export default App;
+const Component = ({ stores, api, authAdapter }: AppProps) => (
+  <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>
+    <ErrorBoundary stores={stores} >
+      <BrowserRouter>
+        <App stores={stores} api={api} authAdapter={authAdapter}/>
+      </BrowserRouter>
+    </ErrorBoundary>
+  </JssProvider>
+);
+
+export default Component;

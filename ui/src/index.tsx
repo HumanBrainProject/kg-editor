@@ -20,25 +20,15 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-
 import React from "react";
 import { createRoot } from 'react-dom/client';
 import axios, { InternalAxiosRequestConfig } from "axios";
 // import { configure } from "mobx"; //NOSONAR
-import { JssProvider } from "react-jss";
-import { BrowserRouter } from "react-router-dom";
-
-import "react-virtualized/styles.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import "./Services/IconsImport";
 
 import RootStore from "./Stores/RootStore";
 import KeycloakAuthAdapter from "./Services/KeycloakAuthAdapter";
 import APIBackendAdapter from "./Services/APIBackendAdapter";
-import App from "./Views/App";
-import ErrorBoundary from "./Views/ErrorBoundary";
-
+import App from "./App";
 
 /* //NOSONAR React debug flags
 configure({
@@ -88,12 +78,6 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <JssProvider id={{ minify: process.env.NODE_ENV === 'production' }}>
-      <ErrorBoundary stores={stores} >
-        <BrowserRouter>
-          <App stores={stores} api={api} authAdapter={authAdapter}/>
-        </BrowserRouter>
-      </ErrorBoundary>
-    </JssProvider>
+    <App stores={stores} api={api} authAdapter={authAdapter} />
   </React.StrictMode>
 );

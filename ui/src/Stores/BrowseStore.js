@@ -142,10 +142,10 @@ export class BrowseStore {
     }
     this.fetchError = null;
     try {
-      const { data } = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      const data  = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
         this.isFetching = false;
-        const instances = normalizeInstancesData(this.api, this.rootStore, data);
+        const instances = normalizeInstancesData(this.api, this.rootStore, data.data);
         if(loadMore){
           this.instances = [...this.instances, ...instances];
         } else {

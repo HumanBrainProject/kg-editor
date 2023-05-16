@@ -258,12 +258,12 @@ export class InstanceStore {
       links.isFetching = true;
       links.fetchError = null;
       try {
-        const { data } = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
+        const data = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
         runInAction(() => {
           links.isFetching = false;
           links.size += data.size;
           links.total = data.total;
-          links.instances = [...links.instances, ...data];
+          links.instances = [...links.instances, ...data.data];
         });
       } catch(e){
         runInAction(() => {

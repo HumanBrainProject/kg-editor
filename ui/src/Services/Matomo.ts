@@ -44,7 +44,7 @@ class Matomo {
   }
 
   initialize(settings?: PiwikOptions): void {
-    if (settings?.url && settings?.siteId && !this.reactPiwik) {
+    if (settings?.url && settings?.siteId && !this.reactPiwik && !window.location.host.startsWith("localhost")) {
       this.reactPiwik = new ReactPiwik({
         url: settings.url,
         siteId:settings.siteId

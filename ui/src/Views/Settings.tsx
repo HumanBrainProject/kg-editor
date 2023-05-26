@@ -35,7 +35,6 @@ import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
 import Matomo from "../Services/Matomo";
 import Sentry from "../Services/Sentry";
 
-
 interface SettingsProps {
   authAdapter?: AuthAdapter;
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -57,8 +56,8 @@ const Settings = observer(({ authAdapter, children }: SettingsProps) => {
 
   useEffect(() => {
     if (settings) {
-      Matomo.initialize(settings?.matomo);
       Sentry.initialize(settings?.sentry);
+      Matomo.initialize(settings?.matomo);
       appStore.setCommit(settings?.commit);
       if (authAdapter instanceof KeycloakAuthAdapter && settings.keycloak) {
         authAdapter.setConfig(settings.keycloak);

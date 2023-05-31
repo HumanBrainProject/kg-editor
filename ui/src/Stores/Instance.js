@@ -172,7 +172,7 @@ export const normalizeLabelInstanceData = data => {
   return instance;
 };
 
-export const normalizeInstanceData = data => {
+export const normalizeInstanceData = (data, typeFromStore) => {
 
   const instance = {
     ...normalizeLabelInstanceData(data),
@@ -182,7 +182,8 @@ export const normalizeInstanceData = data => {
     alternatives: {},
     metadata: {},
     permissions: {},
-    incomingLinks: []
+    incomingLinks: [],
+    possibleIncomingLinks: []
   };
 
   if (!data) {
@@ -235,8 +236,8 @@ export const normalizeInstanceData = data => {
     });
     instance.incomingLinks = incomingLinks;
   }
-  if(data.possibleIncomingLinks) {
-    instance.possibleIncomingLinks = Object.values(data.possibleIncomingLinks)
+  if(typeFromStore.incomingLinks) {
+    instance.possibleIncomingLinks = Object.values(typeFromStore.incomingLinks)
       .flatMap(link => link.sourceTypes)
       .reduce((acc, current) => {
         if(!acc.some(obj => obj.type.name === current.type.name && JSON.stringify(obj.spaces) === JSON.stringify(current.spaces))) {
@@ -670,7 +671,9 @@ export class Instance {
       });
     };
 
-    const normalizedData = normalizeInstanceData(data);
+    const typeFromStore = (Array.isArray(data.types) && data.types.length) ? rootStore.typeStore.typesMap.get(data.types[0].name):undefined; 
+
+    const normalizedData = normalizeInstanceData(data, typeFromStore);
     this._name = normalizedData.name;
     this.space = normalizedData.space;
     this.types = normalizedData.types;

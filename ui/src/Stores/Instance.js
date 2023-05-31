@@ -236,7 +236,7 @@ export const normalizeInstanceData = (data, typeFromStore) => {
     });
     instance.incomingLinks = incomingLinks;
   }
-  if(typeFromStore.incomingLinks) {
+  if(typeFromStore?.incomingLinks) {
     instance.possibleIncomingLinks = Object.values(typeFromStore.incomingLinks)
       .flatMap(link => link.sourceTypes)
       .reduce((acc, current) => {

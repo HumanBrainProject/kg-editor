@@ -158,9 +158,10 @@ export class AppStore{
     } else {
       this.externalCreateModal = null;
       await this.switchSpace(location, navigate, space);
+      await this.rootStore.typeStore.fetch(space);
       const type = this.rootStore.typeStore.typesMap.get(typeName);
       const uuid = uuidv4();
-      this.rootStore.instanceStore.createNewInstance(type, uuid, value);
+      this.rootStore.instanceStore.setInstanceIdAvailability(type, uuid);
       navigate(`/instances/${uuid}/create`);
     }
   }

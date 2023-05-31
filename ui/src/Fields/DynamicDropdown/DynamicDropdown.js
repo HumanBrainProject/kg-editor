@@ -196,7 +196,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-         Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
+        Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
         Matomo.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);

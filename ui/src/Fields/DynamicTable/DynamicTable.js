@@ -245,9 +245,10 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         setTimeout(() => {
           view.resetInstanceHighlight();
           const paneForInstanceId = view.getPaneByInstanceId(id);
-          const _pane = paneForInstanceId?paneForInstanceId:pane;
+          const _pane = paneForInstanceId?paneForInstanceId:view.currentInstanceIdPane;
+          view.selectPane(_pane);
           view.setCurrentInstanceId(_pane, id);
-          view.selectPane(view.currentInstanceIdPane);
+          view.setInstanceHighlight(_pane, id, fieldStore.label);
         }, fieldStore.isLinkVisible(id)?0:1000);
       }
     }

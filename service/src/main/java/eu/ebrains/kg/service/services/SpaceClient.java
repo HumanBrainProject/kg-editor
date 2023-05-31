@@ -29,6 +29,7 @@ import eu.ebrains.kg.service.models.type.StructureOfType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,13 +83,34 @@ public class SpaceClient {
     private static class StructureTypeResultFromKG extends KGCoreResult<List<StructureOfType>> {
     }
 
-    public List<StructureOfType> getSpaceTypes(String space) {
-        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=true&withIncomingLinks=true", space);
+    private List<StructureOfType> getSpaceTypes(String space, boolean withProperties, boolean withIncomingLinks) {
+        String relativeUrl = String.format("types?stage=IN_PROGRESS&space=%s&withProperties=%s&withIncomingLinks=%s", space, withProperties, withIncomingLinks);
         StructureTypeResultFromKG response = kg.client(true).get().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(StructureTypeResultFromKG.class)
                 .block();
         return response != null ? response.getData() : null;
+    }
+
+    public List<StructureOfType> getSpaceTypes(String space) {
+        return getSpaceTypes(space, true, true);
+    }
+
+    public List<StructureOfType> getSpaceAvailableTypes(String space) {
+        String relativeUrl = "types?stage=IN_PROGRESS&withProperties=false&withIncomingLinks=false";
+        StructureTypeResultFromKG response = kg.client(true).get().uri(kg.url(relativeUrl))
+                .retrieve()
+                .bodyToMono(StructureTypeResultFromKG.class)
+                .block();
+        if (response != null) {
+            List<StructureOfType> all = response.getData();
+            List<StructureOfType> current = getSpaceTypes(space, false, false);
+            if (current != null) {
+                all.removeAll(current);
+            }
+            return all;
+        }
+        return Collections.emptyList();
     }
 
 

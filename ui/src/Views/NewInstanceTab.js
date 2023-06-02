@@ -67,7 +67,7 @@ const NewInstanceTab = observer(() => {
   const [showTypeSelection, setShowTypeSelection] = useState(false);
   const classes = useStyles();
 
-  const { appStore, typeStore, instanceStore } = useStores();
+  const { appStore, typeStore } = useStores();
   const navigate = useNavigate();
 
   const handleCreateInstance = () => {
@@ -78,8 +78,7 @@ const NewInstanceTab = observer(() => {
   const handleTypeSelection = type => {
     setShowTypeSelection(false);
     const uuid = uuidv4();
-    instanceStore.setInstanceIdAvailability(type, uuid);
-    navigate(`/instances/${uuid}/create`);
+    navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(type.name)}`);
   }
 
   const handleClose = () => setShowTypeSelection(false);

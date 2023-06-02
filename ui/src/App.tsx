@@ -108,15 +108,19 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                 <Route
                                   path="/instances/:id/create"
                                   element={
-                                    <>
-                                    {isTypeFetched?
-                                      <InstanceCreation>
-                                        <InstanceView mode="create" />
-                                      </InstanceCreation>
-                                      :
-                                      <Navigate to="/browse" />
-                                    }
-                                    </>
+                                      <>
+                                        {spaceParam?
+                                          <Space space={spaceParam} skipHistory={skipHistory} >
+                                            <Types>
+                                              <InstanceCreation>
+                                                <InstanceView mode="create" />
+                                              </InstanceCreation>
+                                            </Types>
+                                          </Space>
+                                          :
+                                          <Navigate to="/browse" />
+                                        }
+                                      </>
                                   } 
                                 />
                                 <Route

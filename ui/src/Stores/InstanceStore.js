@@ -172,7 +172,6 @@ export class InstanceStore {
   stage = null;
   instances = new Map();
   previewInstance = null;
-  instanceIdAvailability = new Map();
 
   instancesQueue = new Set();
   instanceLabelsQueue = new Set();
@@ -189,11 +188,7 @@ export class InstanceStore {
       stage: observable,
       instances: observable,
       previewInstance: observable,
-      instanceIdAvailability: observable,
       togglePreviewInstance: action,
-      setInstanceIdAvailability: action,
-      resetInstanceIdAvailability: action,
-      checkInstanceIdAvailability: action,
       getUnsavedInstances: computed,
       hasUnsavedChanges: computed,
       processQueue: action,
@@ -273,68 +268,6 @@ export class InstanceStore {
           links.isFetching = false;
         });
       }
-    }
-  }
-
-  setInstanceIdAvailability = (type, uuid) => {
-    this.instanceIdAvailability.set(uuid, {
-      isChecked: false,
-      isAvailable: false,
-      isChecking: false,
-      error: null,
-      type: type,
-      resolvedId: null
-    });
-  }
-
-  resetInstanceIdAvailability() {
-    this.instanceIdAvailability.clear();
-  }
-
-  async checkInstanceIdAvailability(instanceId) {
-    if (!this.instanceIdAvailability.has(instanceId)) {
-      this.instanceIdAvailability.set(instanceId, {
-        isChecked: false,
-        isAvailable: false,
-        isChecking: false,
-        error: null,
-        resolvedId: null
-      });
-    }
-    const status = this.instanceIdAvailability.get(instanceId);
-    if (status.isChecked || status.isChecking) {
-      return;
-    }
-    status.isChecking = true;
-    status.error = null;
-    try{
-      const { data } = await this.api.getInstance(instanceId);
-      runInAction(() => {
-        const resolvedId = data?.id;
-        if (!resolvedId) {
-          throw new Error(`Failed to fetch instance "${instanceId}" (Invalid response) (${data})`);
-        }
-        const instance = this.createInstanceOrGet(resolvedId);
-        instance.initializeData(this.api, this.rootStore, data);
-        status.resolvedId = resolvedId;
-        status.isChecked = true;
-        status.isChecking = false;
-      });
-    } catch(e){
-      runInAction(() => {
-        if (e.response && e.response.status === 404) {
-          this.createNewInstance(status.type, instanceId);
-          status.isAvailable = true;
-          status.isChecked = true;
-          status.isChecking = false;
-        } else {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          status.error = `Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`;
-          status.isChecked = true;
-          status.isChecking = false;
-        }
-      });
     }
   }
 
@@ -512,7 +445,6 @@ export class InstanceStore {
 
   flush() {
     this.instances.clear();
-    this.resetInstanceIdAvailability();
   }
 
   createInstanceOrGet(instanceId) {

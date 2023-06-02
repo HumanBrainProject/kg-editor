@@ -205,7 +205,7 @@ const CreateInstance = observer(({
 const TypesItem = observer(({ type }) => {
   const classes = useStyles();
 
-  const { appStore, browseStore, instanceStore } = useStores();
+  const { appStore, browseStore } = useStores();
   const navigate = useNavigate();
 
   const handleSelect = e => {
@@ -217,8 +217,7 @@ const TypesItem = observer(({ type }) => {
   const handleCreateInstance = () => {
     Matomo.trackEvent("Browse", "CreateInstance", type.name);
     const uuid = uuidv4();
-    instanceStore.setInstanceIdAvailability(type, uuid);
-    navigate(`/instances/${uuid}/create`);
+    navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(type.name)}`);
   };
 
   const selected =

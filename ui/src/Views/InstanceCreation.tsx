@@ -21,64 +21,109 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useParams, Navigate, Link } from "react-router-dom";
+import { useParams, useSearchParams, Navigate, Link } from "react-router-dom";
 
 import useStores from "../Hooks/useStores";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
+import useCheckInstanceQuery from "../Hooks/useCheckInstanceQuery";
+import useAPI from "../Hooks/useAPI";
 
 interface InstanceCreationProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
 const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
+
+  const [isReady, setReady] = useState(false);
+  const [isTypeUnresolved, setTypeUnresolved] = useState(false);
+
   const params = useParams();
+  const [searchParams] = useSearchParams();
 
   const instanceId = params.id;
+  const typeName = searchParams.get("type");
 
-  const {instanceStore} = useStores();
+  const {
+    data,
+    error,
+    resolvedId,
+    isAvailable,
+    isUninitialized,
+    isFetching,
+    isError,
+  } = useCheckInstanceQuery(instanceId as string, !instanceId && !typeName);
+
+  const api = useAPI();
+
+  const rootStore = useStores();
+  const { typeStore, instanceStore } = rootStore;
 
   useEffect(() => {
-    instanceStore.checkInstanceIdAvailability(instanceId);
+    if (isAvailable) {
+      const type = typeStore.typesMap.get(typeName);
+      if (type) {
+        instanceStore.createNewInstance(type, instanceId);
+        setReady(true);
+      } else {
+        setTypeUnresolved(true);
+      }
+    } else if (resolvedId && data) {
+      const instance = instanceStore.createInstanceOrGet(resolvedId);
+      instance.initializeData(api, rootStore, data);
+      setReady(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instanceId]);
+  }, [isAvailable, resolvedId, data]);
 
-  const status = instanceStore.instanceIdAvailability.get(instanceId);
-
-  if (status) {
-    if (status.error) {
-      return (
-        <ErrorPanel>
-           {status.error}<br /><br />
-          <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
-      </ErrorPanel>
-      );
-    }
-
-    if (status.isChecking) {
-      return <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />;
-    }
-
-    if (status.isChecked) {
-
-      if (status.isAvailable) {
-        return (
-          <>
-            {children}
-          </>
-        );
-      }
-
-      if (status.resolvedId) {
-        return (
-          <Navigate to={`/instances/${status.resolvedId}`} />
-        );
-      }
-    }
+  if (!typeName) {
+    return (
+      <ErrorPanel>
+          query parameter &quot;type&quot; is missing!<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+    </ErrorPanel>
+    );
   }
+
+  if (isTypeUnresolved) {
+    return (
+      <ErrorPanel>
+          Failed to retrieve type &quot;{typeName}&quot;<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+    </ErrorPanel>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ErrorPanel>
+          {error}<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+    </ErrorPanel>
+    );
+  }
+
+  if (isUninitialized || isFetching) {
+    return <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />;
+  }
+
+  if (isReady && isAvailable) {
+    return (
+      <>
+        {children}
+      </>
+    );
+  }
+
+  if (isReady && resolvedId) {
+    return (
+      <Navigate to={`/instances/${resolvedId}`} />
+    );
+  }
+
   return null;
 });
 InstanceCreation.displayName = "InstanceCreation";

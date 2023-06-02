@@ -197,13 +197,12 @@ const InstancesResult = observer(({
 
   const navigate = useNavigate();
 
-  const { appStore, browseStore, instanceStore } = useStores();
+  const { appStore, browseStore } = useStores();
 
   const handleCreateInstance = () => {
     Matomo.trackEvent("Browse", "CreateInstance", browseStore.selectedType.name);
     const uuid = uuidv4();
-    instanceStore.setInstanceIdAvailability(browseStore.selectedType, uuid);
-    navigate(`/instances/${uuid}/create`);
+    navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(browseStore.selectedType.name)}`);
   };
 
   if (!browseStore.selectedType) {

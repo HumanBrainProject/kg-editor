@@ -74,6 +74,15 @@ const getDescription = (instance, view) => {
   return "";
 }
 
+const getInstanceTabPath = (instanceId, mode, space, type) => {
+  if(mode === "view") {
+    return `/instances/${instanceId}`;
+  } else if (mode === "create") {
+    return `/instances/${instanceId}/create?space=${space}&type=${encodeURIComponent(type)}`;
+  }
+  return `/instances/${instanceId}/${mode}`;
+};
+
 const InstanceTab = observer(({view, pathname}) => {
 
   const location = useLocation();
@@ -120,7 +129,7 @@ const InstanceTab = observer(({view, pathname}) => {
       iconSpin={instance && instance.isFetching}
       iconColor={color}
       current={isCurrent(view.instanceId, view.mode)}
-      path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
+      path={getInstanceTabPath(view.instanceId, view.mode, appStore.currentSpaceName, view.type)}
       onClose={handleClose}
       label={label}
       description={description}

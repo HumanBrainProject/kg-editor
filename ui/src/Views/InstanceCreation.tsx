@@ -39,6 +39,7 @@ interface InstanceCreationProps {
 const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
 
   const [isReady, setReady] = useState(false);
+  const [isNotAllowedToCreate, setNotAllowedToCreate] = useState(false);
   const [isTypeUnresolved, setTypeUnresolved] = useState(false);
 
   const params = useParams();
@@ -60,20 +61,28 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
   const api = useAPI();
 
   const rootStore = useStores();
-  const { typeStore, instanceStore } = rootStore;
+  const { appStore, viewStore, typeStore, instanceStore } = rootStore;
 
   useEffect(() => {
     if (isAvailable) {
-      const type = typeStore.typesMap.get(typeName);
-      if (type) {
-        instanceStore.createNewInstance(type, instanceId);
-        setReady(true);
+      if (appStore.currentSpacePermissions.canCreate) {
+        const type = typeStore.typesMap.get(typeName);
+        if (type) {
+          instanceStore.createNewInstance(type, instanceId);
+          setReady(true);
+        } else {
+          setTypeUnresolved(true);
+        }
       } else {
-        setTypeUnresolved(true);
+        setNotAllowedToCreate(true);
       }
     } else if (resolvedId && data) {
-      const instance = instanceStore.createInstanceOrGet(resolvedId);
-      instance.initializeData(api, rootStore, data);
+      if (data.space !== appStore.currentSpaceName) {
+        viewStore.clearViews();
+      } else {
+        const instance = instanceStore.createInstanceOrGet(resolvedId);
+        instance.initializeData(api, rootStore, data);
+      }
       setReady(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,27 +91,36 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
   if (!typeName) {
     return (
       <ErrorPanel>
-          query parameter &quot;type&quot; is missing!<br /><br />
+        query parameter &quot;type&quot; is missing!<br /><br />
         <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
-    </ErrorPanel>
+      </ErrorPanel>
+    );
+  }
+
+  if (isNotAllowedToCreate) {
+    return (
+      <ErrorPanel>
+        Your current space credentials does not allow you to create instances in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
     );
   }
 
   if (isTypeUnresolved) {
     return (
       <ErrorPanel>
-          Failed to retrieve type &quot;{typeName}&quot;<br /><br />
+        Creating an instance of type &quot;{typeName}&quot; is currently not allowed in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
         <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
-    </ErrorPanel>
+      </ErrorPanel>
     );
   }
 
   if (isError) {
     return (
       <ErrorPanel>
-          {error}<br /><br />
+        {error}<br /><br />
         <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
-    </ErrorPanel>
+      </ErrorPanel>
     );
   }
 

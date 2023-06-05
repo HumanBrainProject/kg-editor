@@ -39,7 +39,8 @@ interface InstanceCreationProps {
 const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
 
   const [isReady, setReady] = useState(false);
-  const [isNotAllowedToCreate, setNotAllowedToCreate] = useState(false);
+  const [spaceForbidCreation, setSpaceForbidCreation] = useState(false);
+  const [isTypeNotSupported, setTypeNotSupported] = useState(false);
   const [isTypeUnresolved, setTypeUnresolved] = useState(false);
 
   const params = useParams();
@@ -68,13 +69,17 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
       if (appStore.currentSpacePermissions.canCreate) {
         const type = typeStore.typesMap.get(typeName);
         if (type) {
-          instanceStore.createNewInstance(type, instanceId);
-          setReady(true);
+          if (type.canCreate != false && type.isSupported && !type.embeddedOnly) {
+            instanceStore.createNewInstance(type, instanceId);
+            setReady(true);
+          } else {
+            setTypeNotSupported(true);
+          }
         } else {
           setTypeUnresolved(true);
         }
       } else {
-        setNotAllowedToCreate(true);
+        setSpaceForbidCreation(true);
       }
     } else if (resolvedId && data) {
       if (data.space !== appStore.currentSpaceName) {
@@ -97,10 +102,19 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
     );
   }
 
-  if (isNotAllowedToCreate) {
+  if (spaceForbidCreation) {
     return (
       <ErrorPanel>
         Your current space credentials does not allow you to create instances in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
+    );
+  }
+
+  if (isTypeNotSupported) {
+    return (
+      <ErrorPanel>
+        Creation of instance of type &quot;{typeName}&quot; is not supported<br /><br />
         <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
       </ErrorPanel>
     );

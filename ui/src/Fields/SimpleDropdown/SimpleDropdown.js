@@ -286,6 +286,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
+  const sortedTargetTypes = hasMultipleTypes && [...targetTypes].sort((a, b) => a.label.localeCompare(b.label));
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <div className={classes.labelContainer}>
@@ -300,7 +301,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
             parentContainerRef={formGroupRef}
           />
         </div>
-        {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
+        {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
       <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         {value &&

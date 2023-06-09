@@ -226,7 +226,7 @@ const UserProfileTab = observer(({ className, size=30 }) => {
   }
 
   return (
-    <div className={`${classes.container} ${className?className:""}`}>
+    <div className={`${classes.container} ${className??""}`}>
       <button className={classes.button} onClick={handleButtonClick} title="Account" ref={buttonRef}>
         <Avatar userId={userProfileStore.user.id} name={userProfileStore.user.name} picture={userProfileStore.user.picture} size={size} />
       </button>

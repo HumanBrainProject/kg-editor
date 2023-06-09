@@ -119,7 +119,7 @@ const InstanceTab = observer(({view, pathname}) => {
       icon={instance && instance.isFetching ? "circle-notch" : "circle"}
       iconSpin={instance && instance.isFetching}
       iconColor={color}
-      current={isCurrent(view.instanceId, view.mode)}
+      active={isCurrent(view.instanceId, view.mode)}
       path={view.mode === "view" ? `/instances/${view.instanceId}`:`/instances/${view.instanceId}/${view.mode}`}
       onClose={handleClose}
       label={label}

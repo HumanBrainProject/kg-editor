@@ -23,14 +23,15 @@
 
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useNavigate, matchPath } from "react-router-dom";
+import { useLocation, useNavigate, matchPath } from "react-router-dom";
 
 import useStores from "../Hooks/useStores";
 import { Space as SpaceType } from "../types";
 import useAuth from "../Hooks/useAuth";
 
-import SpaceModal from "./SpaceModal";
+import Modal from "../Components/Modal";
 import ErrorPanel from "../Components/ErrorPanel";
+import GridSelector from "../Components/GridSelector";
 import Button from "react-bootstrap/Button";
 
 const hasSpace = (spaces: SpaceType[], name?: string|null) => !!name && spaces.find(s => s.id === name);
@@ -49,6 +50,8 @@ const getSpace = (spaces: SpaceType[], name?: string|null) => {
   return null;
 };
 
+const SpaceItem = ({ item: space }: { item: SpaceType }) => <>{space.name??space.id}</>;
+
 interface SpaceProps {
   space?: string|null;
   skipHistory?: boolean;
@@ -57,13 +60,16 @@ interface SpaceProps {
 
 const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
 
-  const  navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { logout } = useAuth();
 
   const [isInitialized, setInitialized] = useState(false);
 
   const { appStore, userProfileStore, viewStore } = useStores();
+
+  const handleSpaceSelection = (space: SpaceType) => appStore.switchSpace(location, navigate, space.id);
 
   useEffect(() => {
     const selectedSpace = getSpace(userProfileStore.spaces as SpaceType[], space);
@@ -104,8 +110,16 @@ const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
 
   if (!appStore.currentSpace) {
     if (!space) {
+      const Component = GridSelector<SpaceType>;
+      
+      const list = userProfileStore.spaces as SpaceType[];
+
+      const handleSpaceFilter = (list: SpaceType[], term: string) => list.filter(space => space.id.toLowerCase().includes(term));
+
       return (
-        <SpaceModal/>
+        <Modal title={`Welcome ${userProfileStore.firstName}, please select a space:`} show={true} closeButton={false} >
+          <Component list={list} itemComponent={SpaceItem} getKey={space => space.id} onSelect={handleSpaceSelection} onFilter={handleSpaceFilter} filterPlaceholder="Filter spaces" />
+        </Modal>
       );
     }
     return (

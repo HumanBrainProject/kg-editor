@@ -27,6 +27,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useNavigate } from "react-router-dom";
 import Matomo from "../Services/Matomo";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
   container:{
@@ -64,7 +65,7 @@ const useStyles = createUseStyles({
       }
     }
   },
-  current:{
+  active:{
     backgroundColor:"var(--bg-color-ui-contrast3)",
     color:"var(--ft-color-loud)",
     borderBottom:"1px solid var(--list-border-selected)",
@@ -97,29 +98,43 @@ const useStyles = createUseStyles({
   }
 });
 
-const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
+interface TabProps {
+  label?: string;
+  description?: string;
+  disabled?: boolean;
+  active?: boolean;
+  icon?: IconProp;
+  iconColor?: string;
+  iconSpin?: boolean;
+  hideLabel?: boolean;
+  path?: string;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onClose?: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}: TabProps) => {
 
   const  navigate = useNavigate();
 
   const classes = useStyles();
   const closeable = typeof onClose === "function";
 
-  const handleClick = e => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     if(path){
-      Matomo.trackEvent("Tab", "Select", path.label);
+      Matomo.trackEvent("Tab", "Select", path);
       navigate(path);
     }
     typeof onClick === "function" && onClick(e);
   };
 
-  const handleClose = e => {
+  const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    onClose(e);
+    typeof onClose === "function" && onClose(e);
   };
 
   return (
-    <div className={`${classes.container} ${disabled? classes.disabled: ""} ${current? classes.current: ""} ${onClose?classes.closable:""}`} onClick={handleClick}>
+    <div className={`${classes.container} ${disabled? classes.disabled: ""} ${active? classes.active: ""} ${closeable?classes.closable:""}`} onClick={handleClick}>
       <div className={classes.icon} style={iconColor?{color:iconColor}:{}} title={description}>
         {icon && <FontAwesomeIcon fixedWidth icon={icon} spin={iconSpin}/>}
       </div>

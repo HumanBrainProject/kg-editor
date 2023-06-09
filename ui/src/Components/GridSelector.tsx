@@ -22,15 +22,10 @@
  */
 
 import React, { useState } from "react";
-import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import useStores from "../../Hooks/useStores";
-
-import Filter from "../../Components/Filter";
-import Matomo from "../../Services/Matomo";
+import Filter from "./Filter";
 
 const useStyles = createUseStyles({
   container: {
@@ -41,19 +36,18 @@ const useStyles = createUseStyles({
     background: "var(--bg-color-ui-contrast2)",
     color: "var(--ft-color-normal)",
     border: "1px solid var(--border-color-ui-contrast1)",
-    boxShadow: "0 2px 10px var(--pane-box-shadow)",
-    "& button": {
-      margin: "0 10px"
-    }
+    boxShadow: "0 2px 10px var(--pane-box-shadow)"
   },
   body: {
     flex: 1,
     padding: "0 0 10px 0"
   },
-  content: {
+  list: {
+    listStyleType: "none",
     display: "grid",
     gridTemplateColumns: "repeat(1, 1fr)",
     gridGap: "10px",
+    margin: 0,
     padding: "0 10px",
     "@media screen and (min-width:1200px)": {
       gridTemplateColumns: "repeat(2, 1fr)"
@@ -62,102 +56,70 @@ const useStyles = createUseStyles({
       gridTemplateColumns: "repeat(3, 1fr)"
     }
   },
-  type: {
-    display: "grid",
-    gridTemplateColumns: "auto 1fr",
-    gridGap: "8px",
+  item: {
     position: "relative",
     padding: "15px",
-    fontSize: "1.1em",
-    fontWeight: "300",
     background: "var(--bg-color-ui-contrast3)",
     border: "1px solid var(--border-color-ui-contrast2)",
     borderRadius: "10px",
     cursor: "pointer",
     wordBreak: "break-word",
+    transition: "background .3s ease-in-out, color .3s ease-in-out",
     "&:hover": {
       background: "var(--bg-color-blend-contrast1)",
       color: "var(--ft-color-loud)"
     }
-  },
-  icon: {
-    alignSelf: "center"
-  },
-  infoCircle: {
-    marginLeft: "5px",
-    transform: "translateY(2px)"
   }
 });
 
-const Type = ({ type, onClick }) => {
+interface GridSelectorProps<T> {
+  list: T[];
+  itemComponent: React.ComponentType<{ item: T }>;
+  getKey: (item: T) => string;
+  onSelect: (item: T) => void;
+  onFilter: (list: T[], term: string) => T[];
+  filterPlaceholder?: string;
+  className?: string;
+}
+
+const GridSelector = <T,>({ list, itemComponent, getKey, onSelect, onFilter, filterPlaceholder, className }: GridSelectorProps<T>) => {
+  
   const classes = useStyles();
 
-  const handleClick = () => onClick(type);
+  const [filter, setFilter] = useState<string>("");
 
-  return (
-    <div
-      className={classes.type}
-      onClick={handleClick}
-      title={type.description ? type.description : type.name}
-    >
-      <div
-        className={classes.icon}
-        style={type.color ? { color: type.color } : {}}
-      >
-        <FontAwesomeIcon fixedWidth icon="circle" />
-      </div>
-      <span>
-        {type.label}
-        {type.description && (
-          <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />
-        )}
-      </span>
-    </div>
-  );
-};
-
-const TypeSelection = observer(({ onSelect }) => {
-  const classes = useStyles();
-
-  const { typeStore, appStore } = useStores();
-
-  const [filter, setFilter] = useState();
-
-  const handleChange = value => {
-    Matomo.trackEvent("Browser", "FilterType", value);
-    setFilter(value);
+  const getFilteredList = (list: T[], term: string) => {
+    term = term && term.trim().toLowerCase();
+    if(term) {
+      return onFilter(list, term);
+    }
+    return list;
   };
 
-  const handleClick = type => onSelect(type);
+  const filteredList = getFilteredList(list, filter);
 
-  const types = typeStore
-    .filteredList(filter)
-    .filter(
-      t =>
-        appStore.currentSpacePermissions.canCreate &&
-        t.canCreate !== false &&
-        t.isSupported
-    );
+  const ItemComponent = itemComponent;
 
   return (
-    <div className={classes.container}>
+    <div className={`${classes.container} ${className?className:''}`}>
       <Filter
         value={filter}
-        placeholder="Filter types"
-        onChange={handleChange}
+        placeholder={filterPlaceholder}
+        onChange={setFilter}
       />
       <div className={classes.body}>
         <Scrollbars autoHide>
-          <div className={classes.content}>
-            {types.map(type => (
-              <Type key={type.name} type={type} onClick={handleClick} />
+          <ul className={classes.list}>
+            {filteredList.map(item => (
+              <li key={getKey(item)} className={classes.item} onClick={() => onSelect(item)}>
+                <ItemComponent item={item} />
+              </li>
             ))}
-          </div>
+          </ul>
         </Scrollbars>
       </div>
     </div>
   );
-});
-TypeSelection.displayName = "TypeSelection";
+};
 
-export default TypeSelection;
+export default GridSelector;

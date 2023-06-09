@@ -78,13 +78,13 @@ const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }) => 
         <Dropdown.Menu>
           {types.length > FILTER_THRESHOLD && (
             <>
-            <div className={classes.targetTypesSearch}>
-              <Form.Control
-                type="text"
-                placeholder="Search type..."
-                value={filter}
-                onChange={handleFilterChange}
-              />
+              <div className={classes.targetTypesSearch}>
+                <Form.Control
+                  type="text"
+                  placeholder="Search type..."
+                  value={filter}
+                  onChange={handleFilterChange}
+                />
               </div>
               <Dropdown.Divider />
             </>

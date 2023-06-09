@@ -30,6 +30,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const useStyles = createUseStyles({
   targetTypes: {
     minWidth: "30%",
+    "&.dropdown > .dropdown-menu": {
+      minWidth: "270px"
+    },
     "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active":
       {
         border: 0, //"1px solid #ced4da",
@@ -75,7 +78,7 @@ const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }) => 
           &nbsp;&nbsp;
           {selectedType.label ? selectedType.label : selectedType.name}
         </Dropdown.Toggle>
-        <Dropdown.Menu>
+        <Dropdown.Menu align="end">
           {types.length > FILTER_THRESHOLD && (
             <>
               <div className={classes.targetTypesSearch}>

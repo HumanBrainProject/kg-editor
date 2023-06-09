@@ -24,7 +24,6 @@
 import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useLocation } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 
 import useStores from "../Hooks/useStores";
 import Matomo from "../Services/Matomo";
@@ -47,10 +46,6 @@ const Shortcuts = observer(() => {
       } else if (e.altKey && e.shiftKey && e.code === "KeyF") { // alt+shift+f, browse
         Matomo.trackEvent("Shortcut", "Browse");
         navigate("/browse");
-      } else if (e.altKey && e.code === "KeyN") { // alt+n, new
-        Matomo.trackEvent("Shortcut", "Create");
-        const uuid = uuidv4();
-        navigate(`/instances/${uuid}/create`);
       } else if (e.altKey && e.code === "KeyD") { // alt+d, dashboard
         Matomo.trackEvent("Shortcut", "Home");
         navigate("/");

@@ -48,6 +48,15 @@ const getLinkedInstanceIds = (instanceStore, instanceIds) => {
   return Array.from(new Set(result));
 };
 
+const navigateToInstance = (navigate, instanceId, mode, type) => {
+  if(mode === "view"){
+    navigate(`/instances/${instanceId}`);
+  } else if(mode === "create"){
+    navigate(`/instances/${instanceId}/create?space=${this.currentSpaceName}&type=${encodeURIComponent(type)}`);
+  } else {
+    navigate(`/instances/${instanceId}/${mode}`);
+  }
+};
 export class AppStore{
   commit = null;
   globalError = null;
@@ -158,11 +167,8 @@ export class AppStore{
     } else {
       this.externalCreateModal = null;
       await this.switchSpace(location, navigate, space);
-      await this.rootStore.typeStore.fetch(space);
-      const type = this.rootStore.typeStore.typesMap.get(typeName);
       const uuid = uuidv4();
-      this.rootStore.instanceStore.setInstanceIdAvailability(type, uuid);
-      navigate(`/instances/${uuid}/create`);
+      navigate(`/instances/${uuid}/create?space=${space}&type=${encodeURIComponent(typeName)}`);
     }
   }
 
@@ -213,7 +219,6 @@ export class AppStore{
   }
 
   closeAllInstances(location, navigate) {
-    this.rootStore.instanceStore.resetInstanceIdAvailability();
     if (!(matchPath({ path: "/" }, location.pathname)
       || matchPath({ path: "/browse" }, location.pathname)
       || matchPath({ path: "/help/*" }, location.pathname))) {
@@ -223,7 +228,6 @@ export class AppStore{
   }
 
   clearViews(location, navigate) {
-    this.rootStore.instanceStore.resetInstanceIdAvailability();
     if (!(matchPath({ path: "/" }, location.pathname)
       || matchPath({ path: "/browse" }, location.pathname)
       || matchPath({ path: "/help/*" }, location.pathname))) {
@@ -348,11 +352,7 @@ export class AppStore{
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        if(openedInstance.mode === "view"){
-          navigate(`/instances/${newCurrentInstanceId}`);
-        } else {
-          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
-        }
+        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
         this.rootStore.browseStore.clearSelectedInstance();
@@ -532,11 +532,7 @@ export class AppStore{
         let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
         let openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        if(openedInstance.mode === "view"){
-          navigate(`/instances/${newCurrentInstanceId}`);
-        } else {
-          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
-        }
+        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }
@@ -545,11 +541,7 @@ export class AppStore{
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        if(openedInstance.mode === "view"){
-          navigate(`/instances/${newCurrentInstanceId}`);
-        } else {
-          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
-        }
+        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }
@@ -564,11 +556,7 @@ export class AppStore{
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        if(openedInstance.mode === "view"){
-          navigate(`/instances/${newCurrentInstanceId}`);
-        } else {
-          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
-        }
+        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }
@@ -577,11 +565,7 @@ export class AppStore{
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[0];
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        if(openedInstance.mode === "view"){
-          navigate(`/instances/${newCurrentInstanceId}`);
-        } else {
-          navigate(`/instances/${newCurrentInstanceId}/${openedInstance.mode}`);
-        }
+        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }

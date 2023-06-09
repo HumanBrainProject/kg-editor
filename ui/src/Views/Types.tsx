@@ -49,11 +49,11 @@ const Types = observer(({ children }: TypesProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpace?.id]);
 
-  if (!appStore.currentSpace) {
+  if (!currentSpace) {
     return null;
   }
 
-  if (typeStore.space === appStore.currentSpace.id && typeStore.fetchError) {
+  if (typeStore.space === currentSpace.id && typeStore.fetchError) {
     return (
       <ErrorPanel>
         {typeStore.fetchError}<br /><br />

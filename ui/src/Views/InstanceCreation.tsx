@@ -21,64 +21,141 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useParams, Navigate, Link } from "react-router-dom";
+import { useParams, useSearchParams, Navigate, Link } from "react-router-dom";
 
 import useStores from "../Hooks/useStores";
 
 import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
+import useCheckInstanceQuery from "../Hooks/useCheckInstanceQuery";
+import useAPI from "../Hooks/useAPI";
 
 interface InstanceCreationProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 
 const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
+
+  const [isReady, setReady] = useState(false);
+  const [spaceForbidCreation, setSpaceForbidCreation] = useState(false);
+  const [isTypeNotSupported, setTypeNotSupported] = useState(false);
+  const [isTypeUnresolved, setTypeUnresolved] = useState(false);
+
   const params = useParams();
+  const [searchParams] = useSearchParams();
 
   const instanceId = params.id;
+  const typeName = searchParams.get("type");
 
-  const {instanceStore} = useStores();
+  const {
+    data,
+    error,
+    resolvedId,
+    isAvailable,
+    isUninitialized,
+    isFetching,
+    isError,
+  } = useCheckInstanceQuery(instanceId as string, !instanceId && !typeName);
+
+  const api = useAPI();
+
+  const rootStore = useStores();
+  const { appStore, viewStore, typeStore, instanceStore } = rootStore;
 
   useEffect(() => {
-    instanceStore.checkInstanceIdAvailability(instanceId);
+    if (isAvailable) {
+      if (appStore.currentSpacePermissions.canCreate) {
+        const type = typeStore.typesMap.get(typeName);
+        if (type) {
+          if (type.canCreate != false && type.isSupported && !type.embeddedOnly) {
+            instanceStore.createNewInstance(type, instanceId);
+            setReady(true);
+          } else {
+            setTypeNotSupported(true);
+          }
+        } else {
+          setTypeUnresolved(true);
+        }
+      } else {
+        setSpaceForbidCreation(true);
+      }
+    } else if (resolvedId && data) {
+      if (data.space !== appStore.currentSpaceName) {
+        viewStore.clearViews();
+      } else {
+        const instance = instanceStore.createInstanceOrGet(resolvedId);
+        instance.initializeData(api, rootStore, data);
+      }
+      setReady(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [instanceId]);
+  }, [isAvailable, resolvedId, data]);
 
-  const status = instanceStore.instanceIdAvailability.get(instanceId);
-
-  if (status) {
-    if (status.error) {
-      return (
-        <ErrorPanel>
-           {status.error}<br /><br />
-          <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+  if (!typeName) {
+    return (
+      <ErrorPanel>
+        query parameter &quot;type&quot; is missing!<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
       </ErrorPanel>
-      );
-    }
-
-    if (status.isChecking) {
-      return <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />;
-    }
-
-    if (status.isChecked) {
-
-      if (status.isAvailable) {
-        return (
-          <>
-            {children}
-          </>
-        );
-      }
-
-      if (status.resolvedId) {
-        return (
-          <Navigate to={`/instances/${status.resolvedId}`} />
-        );
-      }
-    }
+    );
   }
+
+  if (spaceForbidCreation) {
+    return (
+      <ErrorPanel>
+        Your current space credentials does not allow you to create instances in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
+    );
+  }
+
+  if (isTypeNotSupported) {
+    return (
+      <ErrorPanel>
+        Creation of instance of type &quot;{typeName}&quot; is not supported<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
+    );
+  }
+
+  if (isTypeUnresolved) {
+    return (
+      <ErrorPanel>
+        Creating an instance of type &quot;{typeName}&quot; is currently not allowed in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ErrorPanel>
+        {error}<br /><br />
+        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+      </ErrorPanel>
+    );
+  }
+
+  if (isUninitialized || isFetching) {
+    return <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />;
+  }
+
+  if (isReady && isAvailable) {
+    return (
+      <>
+        {children}
+      </>
+    );
+  }
+
+  if (isReady && resolvedId) {
+    return (
+      <Navigate to={`/instances/${resolvedId}`} />
+    );
+  }
+
   return null;
 });
 InstanceCreation.displayName = "InstanceCreation";

@@ -47,6 +47,7 @@ class View {
   name = "";
   mode = "edit";
   color = "";
+  type = "";
   description = "";
   instancePath = [];
   instanceHighlight = {instanceId: null, provenance: null};
@@ -73,7 +74,8 @@ class View {
       selectedPaneIndex: computed,
       registerPane: action,
       selectPane: action,
-      unregisterPane: action
+      unregisterPane: action,
+      setType: action
     });
 
     this.instanceId = instanceId;
@@ -147,6 +149,9 @@ class View {
     this.panes = this.panes.filter(p => p !== paneId);
   }
 
+  setType(type) {
+    this.type = type;
+  }
 }
 
 export class ViewStore{
@@ -248,14 +253,18 @@ export class ViewStore{
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
     } else {
-      const typeDescription = type && type.description?type.description:type.name;
-      this.views.set(instanceId, new View(instanceId, name, type?type.color:"", viewMode, typeDescription));
+      const typeDescription = type?.description??type?.name;
+      const view = new View(instanceId, name, type?type.color:"", viewMode, typeDescription);
+      if (viewMode === "create") {
+        view.setType(type?.name);
+      }
+      this.views.set(instanceId, view);
     }
   }
 
   replaceViewByNewInstanceId(id, newId) {
     const view = this.views.get(id);
-    this.views.set(newId, new View(newId, view?view.name:"", view?view.color:"", "edit", view?view.description:""));
+    this.views.set(newId, new View(newId, view?view.name:"", view?.color??"", "edit", view?.description??""));
     this.views.delete(id);
   }
 

@@ -107,7 +107,7 @@ const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, 
   const handleClick = e => {
     e.preventDefault();
     if(path){
-      Matomo.trackEvent("Tab", "Select", path.label);
+      Matomo.trackEvent("Tab", "Select", path);
       navigate(path);
     }
     typeof onClick === "function" && onClick(e);

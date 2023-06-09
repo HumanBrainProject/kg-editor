@@ -82,7 +82,6 @@ const ClientPreviewModal = observer(({ store, show, handleClose }) => {
           <Iframe url={url}
             width="100%"
             height="100%"
-            allow="same-origin"
             id={store.topInstanceId}
             className={classes.frame}
             display="initial"

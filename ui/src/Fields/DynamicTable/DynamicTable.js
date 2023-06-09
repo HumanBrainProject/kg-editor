@@ -287,6 +287,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
+  const sortedTargetTypes = hasMultipleTypes && [...targetTypes].sort((a, b) => a.label.localeCompare(b.label));
   if (readMode && !links.length && !showIfNoValue) {
     return null;
   }
@@ -344,7 +345,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 optionComponent={DynamicOption}
               />
             </div>
-            {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={targetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
+            {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
           </div>
         )}
       </div>

@@ -84,7 +84,7 @@ const TypeSelection = observer(({ onSelect }: TypeSelectionProps) => {
 
   const { typeStore, appStore } = useStores();
 
-  const list = (typeStore.filteredTypes as Type[]).filter(t =>
+  const list = (typeStore.nonEmbeddedTypes as Type[]).filter(t =>
     appStore.currentSpacePermissions.canCreate &&
     t.canCreate !== false &&
     t.isSupported

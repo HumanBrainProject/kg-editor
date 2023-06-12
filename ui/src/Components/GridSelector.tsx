@@ -88,7 +88,7 @@ const GridSelector = <T,>({ list, itemComponent, getKey, onSelect, onFilter, fil
 
   const [filter, setFilter] = useState<string>("");
 
-  const getFilteredList = (list: T[], term: string) => {
+  const filterList = (list: T[], term: string) => {
     term = term && term.trim().toLowerCase();
     if(term) {
       return onFilter(list, term);
@@ -96,7 +96,7 @@ const GridSelector = <T,>({ list, itemComponent, getKey, onSelect, onFilter, fil
     return list;
   };
 
-  const filteredList = getFilteredList(list, filter);
+  const filteredList = filterList(list, filter);
 
   const ItemComponent = itemComponent;
 

@@ -52,7 +52,7 @@ const NewInstanceTab = observer(() => {
 
   const handleClose = () => setShowTypeSelection(false);
 
-  const canCreate = appStore.currentSpacePermissions.canCreate && !typeStore.isFetching && typeStore.isFetched && !!typeStore.filteredTypes.filter(t => t.canCreate !== false && t.isSupported).length;
+  const canCreate = appStore.currentSpacePermissions.canCreate && !!typeStore.nonEmbeddedTypes.filter(t => t.canCreate !== false && t.isSupported).length;
 
   if (!canCreate) {
     return null;

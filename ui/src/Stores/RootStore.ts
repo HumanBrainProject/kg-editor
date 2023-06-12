@@ -57,7 +57,7 @@ class RootStore {
 
     // Domain stores
     this.historyStore = new HistoryStore(api, this);
-    this.typeStore = new TypeStore(api, this);
+    this.typeStore = new TypeStore();
     this.browseStore = new BrowseStore(api, this);
     this.instanceStore = new InstanceStore(api, this);
     this.statusStore = new StatusStore(api);

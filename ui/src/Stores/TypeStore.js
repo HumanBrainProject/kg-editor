@@ -27,10 +27,7 @@ export class TypeStore {
   space = null;
   types = [];
 
-  api = null;
-  rootStore = null;
-
-  constructor(api, rootStore) {
+  constructor() {
     makeObservable(this, {
       space: observable,
       types: observable,
@@ -39,9 +36,6 @@ export class TypeStore {
       setTypes: action,
       clear: action
     });
-
-    this.api = api;
-    this.rootStore = rootStore;
   }
 
   filterTypes(term) {

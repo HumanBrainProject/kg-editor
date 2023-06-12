@@ -39,7 +39,7 @@ export class TypeStore {
   }
 
   filterTypes(term) {
-    term = term && term.trim().toLowerCase();
+    term = term?.trim().toLowerCase();
     if(term) {
       return this.nonEmbeddedTypes.filter(type => type.label.toLowerCase().includes(term));
     }
@@ -51,10 +51,7 @@ export class TypeStore {
   }
 
   isTypesSupported(typeNames) {
-    return typeNames.some(name => {
-      const type = this.typesMap.get(name);
-      return type && type.isSupported;
-    });
+    return typeNames.some(name => this.typesMap.get(name)?.isSupported);
   }
 
   get typesMap() {

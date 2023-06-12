@@ -125,8 +125,8 @@ const InstanceTab = observer(({view, pathname}) => {
 
   return (
     <Tab
-      icon={instance && instance.isFetching ? "circle-notch" : "circle"}
-      iconSpin={instance && instance.isFetching}
+      icon={instance?.isFetching ? "circle-notch" : "circle"}
+      iconSpin={instance?.isFetching}
       iconColor={color}
       active={isCurrent(view.instanceId, view.mode)}
       path={getInstanceTabPath(view.instanceId, view.mode, appStore.currentSpaceName, view.type)}

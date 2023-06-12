@@ -39,7 +39,7 @@ export class UserProfileStore {
   }
 
   filterSpaces(term) {
-    term = term && term.trim().toLowerCase();
+    term = term?.trim().toLowerCase();
     if(term) {
       return this.spaces.filter(t => t.id.toLowerCase().includes(term));
     }

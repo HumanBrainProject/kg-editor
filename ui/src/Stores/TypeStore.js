@@ -32,6 +32,8 @@ export class TypeStore {
       space: observable,
       types: observable,
       nonEmbeddedTypes: computed,
+      canCreateTypes: computed,
+      hasCanCreateTypes: computed,
       typesMap: computed,
       setTypes: action,
       clear: action
@@ -48,6 +50,14 @@ export class TypeStore {
 
   get nonEmbeddedTypes() {
     return this.types.filter(t => !t.embeddedOnly);
+  }
+
+  get canCreateTypes() {
+    return this.nonEmbeddedTypes.filter(t => t.canCreate !== false && t.isSupported)
+  }
+
+  get hasCanCreateTypes() {
+    return !!this.canCreateTypes.length;
   }
 
   isTypesSupported(typeNames) {

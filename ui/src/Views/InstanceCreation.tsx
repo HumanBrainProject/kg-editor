@@ -69,7 +69,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
       if (appStore.currentSpacePermissions.canCreate) {
         const type = typeStore.typesMap.get(typeName);
         if (type) {
-          if (type.canCreate != false && type.isSupported && !type.embeddedOnly) {
+          if (type.canCreate !== false && type.isSupported && !type.embeddedOnly) {
             instanceStore.createNewInstance(type, instanceId);
             setReady(true);
           } else {

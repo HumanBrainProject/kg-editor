@@ -28,7 +28,7 @@ import xssFilter from "showdown-xss-filter";
 const converter = new showdown.Converter({extensions: [xssFilter]});
 
 const Markdown = props => {
-  let markdownEval = converter.makeHtml(props.value);
+  const markdownEval = converter.makeHtml(props.value);
   return(
     <span dangerouslySetInnerHTML={{__html:markdownEval}} />
   );

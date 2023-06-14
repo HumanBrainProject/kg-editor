@@ -21,12 +21,13 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useNavigate } from "react-router-dom";
 import Matomo from "../Services/Matomo";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
   container:{
@@ -97,14 +98,28 @@ const useStyles = createUseStyles({
   }
 });
 
-const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}) => {
+interface TabProps {
+  label: string;
+  description: string;
+  disabled: boolean;
+  current: boolean;
+  icon: IconProp
+  iconColor: string;
+  iconSpin: boolean;
+  hideLabel: boolean;
+  path: string;
+  onClick: (e: MouseEvent<HTMLDivElement>) => void;
+  onClose: (e: MouseEvent<HTMLDivElement>) => void;
+}
+
+const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}: TabProps) => {
 
   const  navigate = useNavigate();
 
   const classes = useStyles();
   const closeable = typeof onClose === "function";
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     if(path){
       Matomo.trackEvent("Tab", "Select", path);
@@ -113,7 +128,7 @@ const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, 
     typeof onClick === "function" && onClick(e);
   };
 
-  const handleClose = e => {
+  const handleClose = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     onClose(e);
   };

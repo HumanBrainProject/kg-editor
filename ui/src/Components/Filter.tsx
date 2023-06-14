@@ -21,10 +21,11 @@
  *
  */
 
-import React, { useRef, useEffect} from "react";
+import React, { useRef, useEffect, ChangeEvent} from "react";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
 
@@ -56,11 +57,18 @@ const useStyles = createUseStyles({
   }
 });
 
-const Filter = ({ value, placeholder="filter...", icon="search", onChange }) => {
+interface FilterProps {
+  value: string;
+  placeholder: string;
+  icon: IconProp;
+  onChange: (value:string) => void;
+}
+
+const Filter = ({ value, placeholder="filter...", icon="search", onChange }: FilterProps) => {
 
   const classes = useStyles();
 
-  const ref = useRef();
+  const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (ref.current) {
@@ -69,7 +77,7 @@ const Filter = ({ value, placeholder="filter...", icon="search", onChange }) => 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleChange = e => onChange(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value);
 
   return (
     <div className={classes.container}>

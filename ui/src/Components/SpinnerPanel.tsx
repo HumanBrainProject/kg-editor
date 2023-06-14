@@ -24,29 +24,46 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 
-import Avatar from "./Avatar";
+import Spinner from "./Spinner";
 
 const useStyles = createUseStyles({
-  user: {
-    "& .avatar.default": {
-      margin: "0 5px"
-    },
-    "& .avatar.picture": {
-      margin: "0 2px 0 5px"
+  container: {
+    height: "100%"
+  },
+  panel: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    background: "var(--bg-color-blend-contrast1)",
+    "& .spinnerPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast6)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--bg-color-ui-contrast6)"
     }
   }
 });
 
-const User = ({userId, name, picture, title})  => {
+interface SpinnerPanelProps {
+  text: string;
+}
+
+const SpinnerPanel = ({text}: SpinnerPanelProps) => {
 
   const classes = useStyles();
 
   return (
-    <span className={`${classes.user} user`}>
-      <Avatar userId={userId} name={name} picture={picture} />
-      <span title={title?title:""}>{name?name:userId}</span>
-    </span>
+    <div className={classes.container}>
+      <div className={classes.panel}>
+        <Spinner text={text} />
+      </div>
+    </div>
   );
 };
 
-export default User;
+export default SpinnerPanel;

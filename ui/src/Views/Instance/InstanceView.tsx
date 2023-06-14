@@ -22,45 +22,48 @@
  */
 
 import React from "react";
+import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+import useStores from "../../Hooks/useStores";
+import { ViewContext} from "../../Stores/ViewStore";
+
+import InstanceForm from "./InstanceForm";
+import Pane from "./Pane";
+import Links from "./Links";
 
 const useStyles = createUseStyles({
-  container:{
-    position:"absolute !important",
-    top:"50%",
-    left:"50%",
-    transform:"translate(-50%,-200px)",
-    textAlign:"center"
-  },
-  icon:{
-    fontSize:"10em",
-    "& path":{
-      fill:"var(--bg-color-blend-contrast1)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px"
-    }
-  },
-  text:{
-    fontWeight:"300",
-    fontSize:"1.2em"
+  container: {
+    height: "100%",
+    width: "100%",
+    display: "grid",
+    position:"relative",
+    overflow: "hidden",
+    "--selected-index":"0"
   }
 });
 
-const BGMessage = ({ icon, transform, children, className }) => {
-  const classes = useStyles();
-  return(
-    <div className={`${classes.container} ${className?className:""}`}>
-      {icon && (
-        <div className={classes.icon}>
-          <FontAwesomeIcon icon={icon} transform={transform}/>
-        </div>
-      )}
-      <div className={classes.text}>
-        {children}
-      </div>
-    </div>
-  );
-};
+const InstanceView = observer(({ instance }: { instance: any}) => {
 
-export default BGMessage;
+  const classes = useStyles();
+
+  const { viewStore } = useStores();
+
+  if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== instance.id) {
+    return null;
+  }
+
+  return (
+    <ViewContext.Provider value={viewStore.selectedView} >
+      <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
+        <Pane paneId={instance.id} >
+          <InstanceForm view={viewStore.selectedView} pane={instance.id} id={instance.id} />
+        </Pane>
+        <Links instanceId={instance.id} />
+      </div>
+    </ViewContext.Provider>
+  );
+});
+InstanceView.displayName = "InstanceView";
+
+export default InstanceView;

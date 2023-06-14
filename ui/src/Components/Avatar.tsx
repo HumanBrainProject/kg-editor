@@ -23,34 +23,57 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-
-import BGMessage from "./BGMessage";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  container: {
-    height: "100%"
-  },
-  panel: {
-    color: "var(--ft-color-loud)",
-    "& button + button": {
-      marginLeft: "60px"
+  avatar: {
+    verticalAlign: "middle",
+    "&.picture": {
+      border: 0,
+      borderRadius: "50%"
+    },
+    "&.default": {
+      transform: "scale(1.35)"
     }
-  },
+  }
 });
 
-const Panel = ({icon, children}) => {
+const getImageTitle = (title, name, userId) => {
+  if (title) {
+    return title;
+  }
+  if (name) {
+    return name;
+  }
+  return userId;
+};
+
+interface AvatarProps {
+  userId: string;
+  name: string;
+  picture: string;
+  title?: string;
+  size?: number;
+}
+
+const Avatar = ({userId, name, picture, title, size=20}:AvatarProps) => {
 
   const classes = useStyles();
 
+  if (!userId) {
+    return null;
+  }
+
+  if (picture) {
+    const imgTitle = getImageTitle(title, name, userId);
+    return (
+      <img alt={name?name:userId} width={size} height={size} src={picture} title={imgTitle} className={`${classes.avatar} avatar picture`} />
+    );
+  }
+
   return (
-    <div className={classes.container}>
-      <div className={classes.panel}>
-        <BGMessage icon={icon}>
-          {children}
-        </BGMessage>
-      </div>
-    </div>
+    <FontAwesomeIcon icon="user" title={name?name:userId} className={`${classes.avatar} avatar default`} />
   );
 };
 
-export default Panel;
+export default Avatar;

@@ -24,6 +24,7 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import Modal from "react-bootstrap/Modal";
+import Spinner from "./Spinner";
 
 const useStyles = createUseStyles({
   modal: {
@@ -42,13 +43,28 @@ const useStyles = createUseStyles({
         border: "1px solid var(--ft-color-loud)",
         borderRadius: "4px",
         color: "var(--ft-color-loud)",
-        background: "var(--bg-color-ui-contrast6)"
+        background: "var(--bg-color-ui-contrast6)",
+        "& .spinnerPanel": {
+          position: "unset !important",
+          top: "unset",
+          left: "unset",
+          width: "unset",
+          transform: "none",
+          wordBreak: "break-word",
+          "& .spinnerLabel": {
+            display: "inline"
+          }
+        }
       }
     }
   }
 });
 
-const ErrorModal = ({children}) => {
+interface SpinnerModalProps {
+  text: string;
+}
+
+const SpinnerModal = ({text}: SpinnerModalProps) => {
 
   const classes = useStyles();
 
@@ -56,11 +72,11 @@ const ErrorModal = ({children}) => {
     <div className={classes.modal}>
       <Modal.Dialog>
         <Modal.Body>
-        {children}
+          <Spinner text={text} />
         </Modal.Body>
       </Modal.Dialog>
     </div>
   );
 };
 
-export default ErrorModal;
+export default SpinnerModal;

@@ -110,7 +110,7 @@ const SpaceModal = observer(() => {
 
   const { appStore, userProfileStore } = useStores();
 
-  const handleClick = space => appStore.switchSpace(location, navigate, space);
+  const handleClick = (space: string) => appStore.switchSpace(location, navigate, space);
 
   return (
     <div className={classes.container}>

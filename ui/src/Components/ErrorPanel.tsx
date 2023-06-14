@@ -21,11 +21,14 @@
  *
  */
 
-import React from "react";
-
+import React, { ReactNode } from "react";
 import Panel from "./Panel";
 
-const ErrorPanel = ({children}) => (
+interface ErrorPanelProps {
+  children: ReactNode;
+}
+
+const ErrorPanel = ({children}: ErrorPanelProps) => (
   <Panel icon="ban" >
     {children}
   </Panel>

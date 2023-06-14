@@ -62,9 +62,11 @@ const SpaceSelector = observer(() => {
 
   const { appStore, userProfileStore } = useStores();
 
-  const handleSelectSpace = space => {
-    Matomo.trackEvent("Space", "Select", space);
-    appStore.switchSpace(location, navigate, space);
+  const handleSelectSpace = (space: string | null) => {
+    if(space) {
+      Matomo.trackEvent("Space", "Select", space);
+      appStore.switchSpace(location, navigate, space);
+    }
   }
 
   return (

@@ -22,48 +22,38 @@
  */
 
 import React from "react";
-import {observer} from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 
-import useStores from "../../Hooks/useStores";
-import { ViewContext} from "../../Stores/ViewStore";
-
-import InstanceForm from "./InstanceForm";
-import Pane from "./Pane";
-import Links from "./Links";
+import Avatar from "./Avatar";
 
 const useStyles = createUseStyles({
-  container: {
-    height: "100%",
-    width: "100%",
-    display: "grid",
-    position:"relative",
-    overflow: "hidden",
-    "--selected-index":"0"
+  user: {
+    "& .avatar.default": {
+      margin: "0 5px"
+    },
+    "& .avatar.picture": {
+      margin: "0 2px 0 5px"
+    }
   }
 });
 
-const InstanceView = observer(({ instance }) => {
+interface UserProps {
+  userId: string;
+  name: string;
+  picture: string;
+  title: string;
+}
+
+const User = ({userId, name, picture, title}: UserProps)  => {
 
   const classes = useStyles();
 
-  const { viewStore } = useStores();
-
-  if (!viewStore.selectedView ||  viewStore.selectedView.instanceId !== instance.id) {
-    return null;
-  }
-
   return (
-    <ViewContext.Provider value={viewStore.selectedView} >
-      <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
-        <Pane paneId={instance.id} >
-          <InstanceForm view={viewStore.selectedView} pane={instance.id} id={instance.id} />
-        </Pane>
-        <Links instanceId={instance.id} />
-      </div>
-    </ViewContext.Provider>
+    <span className={`${classes.user} user`}>
+      <Avatar userId={userId} name={name} picture={picture} />
+      <span title={title?title:""}>{name?name:userId}</span>
+    </span>
   );
-});
-InstanceView.displayName = "InstanceView";
+};
 
-export default InstanceView;
+export default User;

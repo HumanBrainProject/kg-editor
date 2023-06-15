@@ -23,11 +23,12 @@
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
+import { APIError } from "../Services/API";
 
 export class UserStore {
   isFetchingSearch = false;
   isSearchFetched = false;
-  searchFetchError = null;
+  searchFetchError?: string = undefined;
   searchResult = [];
   searchFilter = {
     queryString: "",
@@ -62,7 +63,7 @@ export class UserStore {
     this.searchUsers();
   }, 750);
 
-  setSearchFilter(queryString, excludedUsers = []) {
+  setSearchFilter(queryString: string | null, excludedUsers = []) {
     if (!queryString) {
       queryString = "";
     }
@@ -92,7 +93,7 @@ export class UserStore {
       try {
         this.searchResult = [];
         this.isFetchingSearch = true;
-        this.searchFetchError = null;
+        this.searchFetchError = undefined;
         const { data } = await this.api.getUsersForReview(this.searchFilter.queryString);
         runInAction(() => {
           if (!this.hasSearchFilter) {
@@ -109,12 +110,12 @@ export class UserStore {
           }
         });
       } catch (e) {
+        const err = e as APIError;
         runInAction(() => {
           if (!this.hasSearchFilter) {
             this.clearSearch();
           } else {
-            const message = e.message ? e.message : e;
-            this.searchFetchError = `Error while searching users (${message})`;
+            this.searchFetchError = `Error while searching users (${err?.message})`;
             this.isSearchFetched = true;
             this.isFetchingSearch = false;
           }

@@ -21,28 +21,8 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { ShowdownExtension } from 'showdown';
 
-const useStyles = createUseStyles({
-  warning: {
-    marginBottom: "15px",
-    color: "var(--ft-color-error)"
-  }
-});
-
-const Warning = ({ show, message }) => {
-  
-  const classes = useStyles();
-
-  if (!show || !message) {
-    return null;
-  }
-
-  return (
-    <div className={classes.warning}><FontAwesomeIcon icon="exclamation-triangle" title="Error"/> {message}</div>
-  );
-};
-
-export default Warning;
+declare module 'showdown-xss-filter' {
+  export default function xssfilter (): ShowdownExtension[];
+}

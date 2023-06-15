@@ -22,16 +22,32 @@
  */
 
 import React from "react";
-import showdown from "showdown";
-import xssFilter from "showdown-xss-filter";
+import { createUseStyles } from "react-jss";
 
-const converter = new showdown.Converter({extensions: [xssFilter]});
+const useStyles = createUseStyles({
+  invalid: {
+    display: "block",
+    width: "100%",
+    marginTop: ".25rem",
+    fontSize: "80%",
+    color: "var(--ft-color-warn)",
+    fontWeight: "bold"
+  }
+});
 
-const Markdown = props => {
-  const markdownEval = converter.makeHtml(props.value);
-  return(
-    <span dangerouslySetInnerHTML={{__html:markdownEval}} />
+interface InvalidProps {
+  show: boolean;
+  messages: string[];
+}
+
+const Invalid = ({ show, messages }: InvalidProps) => {
+  const classes = useStyles();
+  if (!show || typeof messages !== "object") {
+    return null;
+  }
+  return (
+    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message}</div>)
   );
 };
 
-export default Markdown;
+export default Invalid;

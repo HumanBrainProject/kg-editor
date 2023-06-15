@@ -25,7 +25,7 @@ import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useNavigate } from "react-router-dom";
+import { PathMatch, useNavigate } from "react-router-dom";
 import Matomo from "../Services/Matomo";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
@@ -100,16 +100,16 @@ const useStyles = createUseStyles({
 
 interface TabProps {
   label: string;
-  description: string;
-  disabled: boolean;
-  current: boolean;
+  description?: string;
+  disabled?: boolean;
+  current: PathMatch<string> | null;
   icon: IconProp
-  iconColor: string;
-  iconSpin: boolean;
+  iconColor?: string;
+  iconSpin?: boolean;
   hideLabel: boolean;
   path: string;
-  onClick: (e: MouseEvent<HTMLDivElement>) => void;
-  onClose: (e: MouseEvent<HTMLDivElement>) => void;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  onClose?: (e: MouseEvent<HTMLDivElement>) => void;
 }
 
 const Tab = ({label, description, disabled, current, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}: TabProps) => {

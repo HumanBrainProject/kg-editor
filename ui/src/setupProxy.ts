@@ -21,28 +21,20 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { createProxyMiddleware } = require("http-proxy-middleware"); //setup proxy currently supports only node syntax 
 
-const useStyles = createUseStyles({
-  invalid: {
-    display: "block",
-    width: "100%",
-    marginTop: ".25rem",
-    fontSize: "80%",
-    color: "var(--ft-color-warn)",
-    fontWeight: "bold"
-  }
-});
-
-const Invalid = ({ show, messages }) => {
-  const classes = useStyles();
-  if (!show || typeof messages !== "object") {
-    return null;
-  }
-  return (
-    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message}</div>)
+module.exports = function(app: any) {
+  app.use(
+    "/editor/api/**",
+    createProxyMiddleware({
+      // target:"http://localhost:8080",
+      target:"https://editor.kg-dev.ebrains.eu",
+      secure:false,
+      changeOrigin: false,
+      // pathRewrite: function(path) {
+      //   return path.replace("/editor/api/", "/");
+      //  }
+    })
   );
 };
-
-export default Invalid;

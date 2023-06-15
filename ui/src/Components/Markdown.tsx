@@ -21,20 +21,21 @@
  *
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { createProxyMiddleware } = require("http-proxy-middleware"); //setup proxy currently supports only node syntax 
+import React from "react";
+import showdown from "showdown";
+import xssFilter from "showdown-xss-filter";
 
-module.exports = function(app) {
-  app.use(
-    "/editor/api/**",
-    createProxyMiddleware({
-      // target:"http://localhost:8080",
-      target:"https://editor.kg-dev.ebrains.eu",
-      secure:false,
-      changeOrigin: false,
-      // pathRewrite: function(path) {
-      //   return path.replace("/editor/api/", "/");
-      //  }
-    })
+const converter = new showdown.Converter({extensions: [xssFilter]});
+
+interface MarkdownProps {
+  value: string;
+}
+
+const Markdown = ({value}: MarkdownProps) => {
+  const markdownEval = converter.makeHtml(value);
+  return(
+    <span dangerouslySetInnerHTML={{__html:markdownEval}} />
   );
 };
+
+export default Markdown;

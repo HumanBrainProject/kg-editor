@@ -76,9 +76,9 @@ const Types = observer(() => {
 
   const { typeStore, browseStore } = useStores();
 
-  const list = typeStore.filteredList(browseStore.navigationFilter);
+  const list = typeStore.filterTypes(browseStore.navigationFilter);
 
-  if (!typeStore.fetchError && !typeStore.isFetching && !list.length) {
+  if (!list.length) {
     return null;
   }
 

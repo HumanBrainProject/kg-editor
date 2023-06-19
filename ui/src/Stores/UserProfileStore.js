@@ -38,8 +38,8 @@ export class UserProfileStore {
     });
   }
 
-  filteredList(term) {
-    term = term && term.trim().toLowerCase();
+  filterSpaces(term) {
+    term = term?.trim().toLowerCase();
     if(term) {
       return this.spaces.filter(t => t.id.toLowerCase().includes(term));
     }

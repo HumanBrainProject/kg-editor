@@ -56,7 +56,7 @@ const NavigationPanel = observer(() => {
 
   const handleFilterChange = value => browseStore.setNavigationFilterTerm(value);
 
-  const typeList = typeStore.filteredList(browseStore.navigationFilter);
+  const typeList = typeStore.filterTypes(browseStore.navigationFilter);
 
   return (
     <div className={classes.container}>

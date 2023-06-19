@@ -61,7 +61,7 @@ const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef})
 
     const handleChange = value => setFilter(value);
 
-    const spaces = userProfileStore.filteredList(filter);
+    const spaces = userProfileStore.filterSpaces(filter);
 
     return (
       <div ref={wrapperRef} className={`${className} ${classes.dropdownMenu}`} aria-labelledby={labeledBy}>

@@ -78,10 +78,10 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
   const theme = appStore.currentTheme;
 
   const currentSpace = appStore.currentSpace as SpaceType|null;
-  const isTypeFetched = currentSpace && typeStore.space === currentSpace.id && typeStore.isFetched;
   const spaceParam = searchParams.get("space");
   const skipHistory = searchParams.get("skipHistory") === "true";
 
+  const isTypeFetched = currentSpace && typeStore.space === currentSpace.id;
   const InstanceComponent = isTypeFetched?Instance:RawInstance;
 
   return (

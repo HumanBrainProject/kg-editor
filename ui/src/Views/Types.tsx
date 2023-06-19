@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button"
@@ -39,11 +39,11 @@ interface TypesProps {
 
 const Types = observer(({ children }: TypesProps) => {
 
-  const [isReady, setReady] = useState(false);
-
   const { appStore, typeStore } = useStores();
 
   const space = (appStore.currentSpace as SpaceType|null)?.id??"";
+
+  const isReady = !!space && typeStore.space === space;
 
   const {
     data: types,
@@ -53,18 +53,27 @@ const Types = observer(({ children }: TypesProps) => {
     isSuccess,
     isError,
     refetch,
-  } = useListTypesQuery(space, !space || typeStore.space === space);
+  } = useListTypesQuery(space, !space || isReady);
+
+  console.log("Types.tsx", space, typeStore.space, isUninitialized, isFetching);
 
   useEffect(() => {
     if (isFetching) {
       typeStore.clear();
     } else if (isSuccess) {
       typeStore.setTypes(space, types);
-      setReady(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [space, isFetching, isSuccess, types]);
 
+
+  if (isReady) {
+    return (
+      <>
+        {children}
+      </>
+    );
+  }
 
   if (isError) {
     return (
@@ -79,14 +88,6 @@ const Types = observer(({ children }: TypesProps) => {
 
   if (space && (isUninitialized || isFetching)) {
     return <SpinnerPanel text={`Retrieving types for space "${space}"...`} />;
-  }
-
-  if (isReady) {
-    return (
-      <>
-        {children}
-      </>
-    );
   }
 
   return null;

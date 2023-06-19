@@ -90,8 +90,8 @@ const Nav = observer(() => {
         {userProfileStore.isAuthorized && userProfileStore.hasSpaces && !!appStore.currentSpace && (
           <>
             <SpaceSelector />
-            <Tab icon={"home"} current={matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
-            <Tab icon={"search"} current={matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
+            <Tab icon={"home"} active={!!matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
+            <Tab icon={"search"} active={!!matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
             <NewInstanceTab />
           </>
         )}
@@ -100,7 +100,7 @@ const Nav = observer(() => {
       <div className={classes.fixedTabsRight}>
         {userProfileStore.isAuthorized && (
           <>
-            <Tab icon={"question-circle"} current={matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
+            <Tab icon="question-circle" active={!!matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
             <UserProfileTab className={classes.userProfileTab} size={32} />
           </>
         )}

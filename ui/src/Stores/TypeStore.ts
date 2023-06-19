@@ -21,14 +21,15 @@
  *
  */
 
-import { observable, action, computed, runInAction, makeObservable } from "mobx";
+import { observable, action, computed, makeObservable } from "mobx";
 
 export interface Type {
   color: string;
   description: string;
   embeddedOnly?: boolean;
+  canCreate?: boolean;
   isSupported: boolean;
-  fields: unknown; 
+  fields: unknown;
   incomingLinks: unknown;
   label: string;
   labelField: string;
@@ -37,93 +38,69 @@ export interface Type {
 }
 
 export class TypeStore {
-  space?:string;
+  space?: string;
   types: Type[] = [];
-  typesMap: Map<string, Type> = new Map<string, Type>();
-  fetchError?: string;
-  isFetching = false;
-  isFetched = false;
 
-  api = null;
-  rootStore = null;
-
-  constructor(api, rootStore) {
+  constructor() {
     makeObservable(this, {
       space: observable,
       types: observable,
-      typesMap: observable,
-      fetchError: observable,
-      isFetching: observable,
-      isFetched: observable,
-      filteredTypes: computed,
-      fetch: action
+      nonEmbeddedTypes: computed,
+      canCreateTypes: computed,
+      hasCanCreateTypes: computed,
+      typesMap: computed,
+      setTypes: action,
+      clear: action
     });
-
-    this.api = api;
-    this.rootStore = rootStore;
   }
 
-  filteredList(term: string) {
-    term = term && term.trim().toLowerCase();
-    if(term) {
-      return this.filteredTypes.filter((type: Type) => type.label.toLowerCase().includes(term));
+  filterTypes(term: string) {
+    term = term?.trim().toLowerCase();
+    if (term) {
+      return this.nonEmbeddedTypes.filter(type =>
+        type.label.toLowerCase().includes(term)
+      );
     }
-    return this.filteredTypes;
+    return this.nonEmbeddedTypes;
   }
 
-  get filteredTypes() {
-    return this.types.filter((t: Type) => !t.embeddedOnly);
+  get nonEmbeddedTypes() {
+    return this.types.filter(t => !t.embeddedOnly);
+  }
+
+  get canCreateTypes() {
+    return this.nonEmbeddedTypes.filter(
+      t => t.canCreate !== false && t.isSupported
+    );
+  }
+
+  get hasCanCreateTypes() {
+    return !!this.canCreateTypes.length;
   }
 
   isTypesSupported(typeNames: string[]) {
-    return typeNames.some(name => {
-      const type = this.typesMap.get(name);
-      return type && type.isSupported;
-    });
+    return typeNames.some(name => this.typesMap.get(name)?.isSupported);
   }
 
-  async fetch(space: string) {
-    if (!this.isFetching && (this.fetchError || space !== this.space)) {
-      if (space) {
-        this.space = space;
-        this.types = [];
-        this.isFetching = true;
-        this.fetchError = undefined;
-        this.isFetched = false;
-        try {
-          const { data } = await this.api.getSpaceTypes(space);
-          runInAction(() => {
-            this.types = data.length ?
-              data.map((type: Type) => ({
-                ...type,
-                isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
-              }))
-              :[];
-            if(!this.types.length) {
-              this.fetchError = "This space is currently empty, please add some instances or type specifications.";
-              this.isFetching = false;
-              this.isFetched = false;
-            } else {
-              this.typesMap = this.types.reduce((acc, current) => acc.set(current.name, current), new Map());
-              this.isFetching = false;
-              this.isFetched = true;
-            }
-          });
-        } catch (e) {
-          runInAction(() => {
-            const message = e.message ? e.message : e;
-            this.fetchError = `There was a problem retrieving the types (${message}). If the problem persists, please contact the support.`;
-            this.isFetching = false;
-            this.types = [];
-            this.isFetched = false;
-          });
-        }
-      } else {
-        this.types = [];
-        this.fetchError = undefined;
-        this.isFetched = false;
-      }
+  get typesMap() {
+    const map = new Map();
+    if (this.types.length) {
+      return this.types.reduce(
+        (acc, current) => acc.set(current.name, current),
+        map
+      );
     }
+    return map;
+  }
+
+  setTypes(space: string, types: Type[]) {
+    this.space = space;
+    this.types = types;
+  }
+
+  clear() {
+    this.space = undefined;
+    this.types = [];
   }
 }
 

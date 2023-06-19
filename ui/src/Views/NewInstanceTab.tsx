@@ -24,48 +24,17 @@
 import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { createUseStyles } from "react-jss";
-import Modal from "react-bootstrap/Modal";
 import { v4 as uuidv4 } from "uuid";
 
 import useStores from "../Hooks/useStores";
 
 import Tab from "../Components/Tab";
+import Modal from "../Components/Modal";
 import TypeSelection from "./Instance/TypeSelection";
 import Matomo from "../Services/Matomo";
 
-const useStyles = createUseStyles({
-  typeSelectionModal: {
-    overflow: "hidden",
-    width: "90%",
-    margin: "auto",
-    "@media screen and (min-width:1024px)": {
-      width: "900px"
-    },
-    "&.modal-dialog": {
-      marginTop: "5vh",
-      maxWidth: "unset",
-      "& .modal-content": {
-        background: "var(--bg-color-ui-contrast2)",
-        color: "var(--ft-color-normal)",
-        border: "1px solid var(--border-color-ui-contrast5)",
-        "& .modal-header": {
-          borderBottom: "1px solid var(--border-color-ui-contrast5)"
-        },
-        "& .modal-body": {
-          padding: "0",  
-          height: "80vh",
-          overflowY: "hidden"
-        }
-      }
-    }
-  }
-});
-
-
 const NewInstanceTab = observer(() => {
   const [showTypeSelection, setShowTypeSelection] = useState(false);
-  const classes = useStyles();
 
   const { appStore, typeStore } = useStores();
   const navigate = useNavigate();
@@ -83,7 +52,7 @@ const NewInstanceTab = observer(() => {
 
   const handleClose = () => setShowTypeSelection(false);
 
-  const canCreate = appStore.currentSpacePermissions.canCreate && !typeStore.isFetching && typeStore.isFetched && !!typeStore.filteredTypes.filter(t => t.canCreate !== false).length;
+  const canCreate = appStore.currentSpacePermissions.canCreate && typeStore.hasCanCreateTypes;
 
   if (!canCreate) {
     return null;
@@ -91,14 +60,9 @@ const NewInstanceTab = observer(() => {
 
   return (
     <>
-      <Tab icon={"file"} onClick={handleCreateInstance} hideLabel label={"New instance"} />
-      <Modal dialogClassName={classes.typeSelectionModal} show={showTypeSelection} onHide={handleClose}>
-        <Modal.Header closeButton closeVariant="white">
-          <Modal.Title>Create a new instance</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <TypeSelection onSelect={handleTypeSelection} />
-        </Modal.Body>
+      <Tab icon="file" onClick={handleCreateInstance} hideLabel label="New instance" />
+      <Modal title="Create a new instance" show={showTypeSelection} onHide={handleClose}>
+        <TypeSelection onSelect={handleTypeSelection} />
       </Modal>
     </>
   );

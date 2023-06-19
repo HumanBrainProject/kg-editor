@@ -55,7 +55,7 @@ const Browse = observer(() => {
     Matomo.trackPageView();
 
     const typeToSelect = type && typeStore.typesMap.get(type);
-    if ( typeToSelect && typeToSelect.isSupported && !typeToSelect.embeddedOnly) {
+    if (typeToSelect?.isSupported && !typeToSelect.embeddedOnly) {
       browseStore.selectType(typeToSelect);
     }
 

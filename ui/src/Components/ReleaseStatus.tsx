@@ -74,7 +74,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getIconStatus = status => {
+const getIconStatus = (status: string) => {
   switch (status) {
   case "UNRELEASED": return "unlink";
   case "HAS_CHANGED": return "pencil-alt";
@@ -84,7 +84,11 @@ const getIconStatus = status => {
   return "question";
 };
 
-const MessageStatus = ({status}) => {
+interface MessageStatusProps {
+  status: string;
+}
+
+const MessageStatus = ({status}: MessageStatusProps) => {
   switch (status) {
   case "UNRELEASED": return <span>This instance is <strong>not released</strong>.</span>;
   case "HAS_CHANGED": return <span>This instance is <strong>different</strong> than its released version</span>;
@@ -94,7 +98,12 @@ const MessageStatus = ({status}) => {
   return <strong>Unknown entity</strong>;
 };
 
-const ReleaseStatus = ({instanceStatus, darkmode}) => {
+interface ReleaseStatusProps {
+  instanceStatus: string;
+  darkmode: boolean;
+}
+
+const ReleaseStatus = ({instanceStatus, darkmode}: ReleaseStatusProps) => {
   const classes = useStyles();
   return (
     <OverlayTrigger placement="top" overlay={

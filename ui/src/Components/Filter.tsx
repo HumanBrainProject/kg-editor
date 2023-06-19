@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef, useEffect} from "react";
+import React, { useRef, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -21,16 +21,49 @@
  *
  */
 
-const reportWebVitals = onPerfEntry => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
-    });
+import React from "react";
+import { createUseStyles } from "react-jss";
+
+import Spinner from "./Spinner";
+
+const useStyles = createUseStyles({
+  container: {
+    height: "100%"
+  },
+  panel: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: 10000,
+    background: "var(--bg-color-blend-contrast1)",
+    "& .spinnerPanel": {
+      width: "auto",
+      padding: "30px",
+      border: "1px solid var(--border-color-ui-contrast6)",
+      borderRadius: "4px",
+      color: "var(--ft-color-loud)",
+      background: "var(--bg-color-ui-contrast6)"
+    }
   }
+});
+
+interface SpinnerPanelProps {
+  text: string;
+}
+
+const SpinnerPanel = ({text}: SpinnerPanelProps) => {
+
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container}>
+      <div className={classes.panel}>
+        <Spinner text={text} />
+      </div>
+    </div>
+  );
 };
 
-export default reportWebVitals;
+export default SpinnerPanel;

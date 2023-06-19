@@ -21,36 +21,17 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
+import React, { ReactNode } from "react";
+import Panel from "./Panel";
 
-import BGMessage from "./BGMessage";
+interface ErrorPanelProps {
+  children: ReactNode;
+}
 
-const useStyles = createUseStyles({
-  container: {
-    height: "100%"
-  },
-  panel: {
-    color: "var(--ft-color-loud)",
-    "& button + button": {
-      marginLeft: "60px"
-    }
-  },
-});
+const ErrorPanel = ({children}: ErrorPanelProps) => (
+  <Panel icon="ban" >
+    {children}
+  </Panel>
+);
 
-const Panel = ({icon, children}) => {
-
-  const classes = useStyles();
-
-  return (
-    <div className={classes.container}>
-      <div className={classes.panel}>
-        <BGMessage icon={icon}>
-          {children}
-        </BGMessage>
-      </div>
-    </div>
-  );
-};
-
-export default Panel;
+export default ErrorPanel;

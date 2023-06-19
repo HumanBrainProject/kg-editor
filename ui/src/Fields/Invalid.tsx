@@ -23,44 +23,31 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
-  container:{
-    position:"absolute !important",
-    top:"50%",
-    left:"50%",
-    transform:"translate(-50%,-200px)",
-    textAlign:"center"
-  },
-  icon:{
-    fontSize:"10em",
-    "& path":{
-      fill:"var(--bg-color-blend-contrast1)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px"
-    }
-  },
-  text:{
-    fontWeight:"300",
-    fontSize:"1.2em"
+  invalid: {
+    display: "block",
+    width: "100%",
+    marginTop: ".25rem",
+    fontSize: "80%",
+    color: "var(--ft-color-warn)",
+    fontWeight: "bold"
   }
 });
 
-const BGMessage = ({ icon, transform, children, className }) => {
+interface InvalidProps {
+  show: boolean;
+  messages: string[];
+}
+
+const Invalid = ({ show, messages }: InvalidProps) => {
   const classes = useStyles();
-  return(
-    <div className={`${classes.container} ${className?className:""}`}>
-      {icon && (
-        <div className={classes.icon}>
-          <FontAwesomeIcon icon={icon} transform={transform}/>
-        </div>
-      )}
-      <div className={classes.text}>
-        {children}
-      </div>
-    </div>
+  if (!show || typeof messages !== "object") {
+    return null;
+  }
+  return (
+    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message}</div>)
   );
 };
 
-export default BGMessage;
+export default Invalid;

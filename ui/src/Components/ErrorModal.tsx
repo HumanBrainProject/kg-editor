@@ -21,35 +21,50 @@
  *
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Modal from "react-bootstrap/Modal";
 
 const useStyles = createUseStyles({
-  spinnerPanel: {
-    position: "absolute !important",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    fontSize: "1.2em",
-    fontWeight: "lighter",
-    width:"100%",
-    textAlign:"center"
-  },
-  spinnerLabel: {
-    paddingLeft: "6px",
-    display:"inline-block"
+  modal: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    background: "rgba(0, 0, 0, 0.3)",
+    "& .modal-dialog": {
+      top: "35%",
+      width: "max-content",
+      maxWidth: "800px",
+      "& .modal-body": {
+        padding: "30px",
+        border: "1px solid var(--ft-color-loud)",
+        borderRadius: "4px",
+        color: "var(--ft-color-loud)",
+        background: "var(--bg-color-ui-contrast6)"
+      }
+    }
   }
 });
 
-const Spinner = ({text}) => {
+interface ErrorModalProps {
+  children: ReactNode;
+}
+
+const ErrorModal = ({children}:ErrorModalProps) => {
+
   const classes = useStyles();
+
   return (
-    <div className={`${classes.spinnerPanel} spinnerPanel`}>
-      <FontAwesomeIcon icon="circle-notch" spin/>
-      <span className={`${classes.spinnerLabel} spinnerLabel`}>{text}</span>
+    <div className={classes.modal}>
+      <Modal.Dialog>
+        <Modal.Body>
+        {children}
+        </Modal.Body>
+      </Modal.Dialog>
     </div>
   );
 };
 
-export default Spinner;
+export default ErrorModal;

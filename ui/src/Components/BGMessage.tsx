@@ -23,49 +23,53 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { ReactNode } from "react-markdown/lib/ast-to-react";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
-  avatar: {
-    verticalAlign: "middle",
-    "&.picture": {
-      border: 0,
-      borderRadius: "50%"
-    },
-    "&.default": {
-      transform: "scale(1.35)"
+  container:{
+    position:"absolute !important",
+    top:"50%",
+    left:"50%",
+    transform:"translate(-50%,-200px)",
+    textAlign:"center"
+  },
+  icon:{
+    fontSize:"10em",
+    "& path":{
+      fill:"var(--bg-color-blend-contrast1)",
+      stroke:"rgba(200,200,200,.1)",
+      strokeWidth:"3px"
     }
+  },
+  text:{
+    fontWeight:"300",
+    fontSize:"1.2em"
   }
 });
 
-const getImageTitle = (title, name, userId) => {
-  if (title) {
-    return title;
-  }
-  if (name) {
-    return name;
-  }
-  return userId;
-};
+interface BGMessageProps {
+  icon: IconProp;
+  children: ReactNode;
+  transform?: string;
+  className?: string;
+}
 
-const Avatar = ({userId, name, picture, title, size=20}) => {
-
+const BGMessage = ({ icon, transform, children, className }: BGMessageProps) => {
   const classes = useStyles();
-
-  if (!userId) {
-    return null;
-  }
-
-  if (picture) {
-    const imgTitle = getImageTitle(title, name, userId);
-    return (
-      <img alt={name?name:userId} width={size} height={size} src={picture} title={imgTitle} className={`${classes.avatar} avatar picture`} />
-    );
-  }
-
-  return (
-    <FontAwesomeIcon icon="user" title={name?name:userId} className={`${classes.avatar} avatar default`} />
+  return(
+    <div className={`${classes.container} ${className?className:""}`}>
+      {icon && (
+        <div className={classes.icon}>
+          <FontAwesomeIcon icon={icon} transform={transform}/>
+        </div>
+      )}
+      <div className={classes.text}>
+        {children}
+      </div>
+    </div>
   );
 };
 
-export default Avatar;
+export default BGMessage;

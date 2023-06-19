@@ -21,28 +21,18 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ReportHandler } from 'web-vitals';
 
-const useStyles = createUseStyles({
-  warning: {
-    marginBottom: "15px",
-    color: "var(--ft-color-error)"
+const reportWebVitals = (onPerfEntry?: ReportHandler) => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
+    });
   }
-});
-
-const Warning = ({ show, message }) => {
-  
-  const classes = useStyles();
-
-  if (!show || !message) {
-    return null;
-  }
-
-  return (
-    <div className={classes.warning}><FontAwesomeIcon icon="exclamation-triangle" title="Error"/> {message}</div>
-  );
 };
 
-export default Warning;
+export default reportWebVitals;

@@ -21,14 +21,20 @@
  *
  */
 
-import React from "react";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { createProxyMiddleware } = require("http-proxy-middleware"); //setup proxy currently supports only node syntax 
 
-import Panel from "./Panel";
-
-const ErrorPanel = ({children}) => (
-  <Panel icon="ban" >
-    {children}
-  </Panel>
-);
-
-export default ErrorPanel;
+module.exports = function(app: any) {
+  app.use(
+    "/editor/api/**",
+    createProxyMiddleware({
+      // target:"http://localhost:8080",
+      target:"https://editor.kg-dev.ebrains.eu",
+      secure:false,
+      changeOrigin: false,
+      // pathRewrite: function(path) {
+      //   return path.replace("/editor/api/", "/");
+      //  }
+    })
+  );
+};

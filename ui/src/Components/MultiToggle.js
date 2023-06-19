@@ -78,6 +78,7 @@ const useToggleStyles = createUseStyles({
   }
 });
 
+
 const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
   const classes = useToggleStyles();
 

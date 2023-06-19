@@ -23,38 +23,31 @@
 
 import React from "react";
 import { createUseStyles } from "react-jss";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Form from "react-bootstrap/Form";
-import Tooltip from "react-bootstrap/Tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import uniqueId from "lodash/uniqueId";
 
 const useStyles = createUseStyles({
-  label: {
-    fontWeight: "bold",
-    marginBottom: "5px"
+  warning: {
+    marginBottom: "15px",
+    color: "var(--ft-color-error)"
   }
 });
 
-const LabelTooltip = ({tooltip, icon}) => (
-  <>
-  &nbsp;
-    <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{tooltip}</Tooltip>}>
-      <span><FontAwesomeIcon icon={icon?icon:"info-circle"}/></span>
-    </OverlayTrigger>
-  </>
-);
+interface WarningProps {
+  show: boolean;
+  message: string;
+}
 
-const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic }) => {
+const Warning = ({ show, message }: WarningProps) => {
+  
   const classes = useStyles();
+
+  if (!show || !message) {
+    return null;
+  }
+
   return (
-    <Form.Label className={`${classes.label} ${className?className:""}`}>
-      {label}{isRequired && " *"}
-      {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" icon="cogs" />}
-      {isPublic && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon="globe" />}
-      {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
-    </Form.Label>
+    <div className={classes.warning}><FontAwesomeIcon icon="exclamation-triangle" title="Error"/> {message}</div>
   );
 };
 
-export default Label;
+export default Warning;

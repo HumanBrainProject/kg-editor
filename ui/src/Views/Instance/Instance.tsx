@@ -101,7 +101,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const View = observer(({instance, mode}) => {
+interface InstanceProps {
+  instance: any;
+  mode:string;
+}
+
+
+const View = observer(({instance, mode}: InstanceProps) => {
 
   const { typeStore } = useStores();
 
@@ -192,7 +198,8 @@ const NoPermissionForView = observer(({instance, mode}) => {
   );
 });
 
-const Instance = observer(({ instance, mode }) =>  {
+
+const Instance = observer(({ instance, mode }: InstanceProps) =>  {
 
   const classes = useStyles();
 

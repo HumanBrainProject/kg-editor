@@ -61,7 +61,7 @@ const endpoints = {
   instancesSummary: (stage?: Stage) => `${RELATIVE_ROOT_PATH}/instancesBulk/summary${getStage(stage)}`,
   instancesLabel: (stage?: Stage) => `${RELATIVE_ROOT_PATH}/instancesBulk/label${getStage(stage)}`,
   searchInstancesByType: (space: string, type: string, from: number, size: number, search: string) => `${RELATIVE_ROOT_PATH}/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${encodeURIComponent(search)}`,
-  suggestions: (instanceId: UUID, field: string, sourceType: string, targetType: string, start, size, search: string) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?"&sourceType=" + encodeURIComponent(sourceType):""}${targetType?"&targetType=" + encodeURIComponent(targetType):""}&start=${start}&size=${size}&search=${search}`,
+  suggestions: (instanceId: UUID, field: string, sourceType: string, targetType: string, start:number, size:number, search: string) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?"&sourceType=" + encodeURIComponent(sourceType):""}${targetType?"&targetType=" + encodeURIComponent(targetType):""}&start=${start}&size=${size}&search=${search}`,
   instance: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}`,
   rawInstance: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/raw`,
   instanceScope: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/scope`,

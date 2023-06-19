@@ -117,7 +117,17 @@ const useStyles = createUseStyles({
   }
 });
 
-const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}) => {
+interface PreviewProps {
+  instanceId: string;
+  instanceName: string;
+  showEmptyFields: boolean;
+  showAction: boolean;
+  showTypes: boolean; 
+  showStatus: boolean; 
+  showMetaData: boolean;
+}
+
+const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}: PreviewProps) => {
 
   const classes = useStyles();
 

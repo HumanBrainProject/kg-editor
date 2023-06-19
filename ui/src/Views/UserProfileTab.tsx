@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, MouseEvent, ReactNode } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Overlay from "react-bootstrap/Overlay";
@@ -37,8 +37,13 @@ import useAuth from "../Hooks/useAuth";
 import Avatar from "../Components/Avatar";
 import Matomo from "../Services/Matomo";
 
-const PopOverContent = ({onSizeChange, children}) => {
-  const ref = useRef();
+interface PopOverContentProps {
+  onSizeChange: (rec:DOMRect) => void;
+  children: ReactNode;
+}
+
+const PopOverContent = ({onSizeChange, children}:PopOverContentProps) => {
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (ref.current) {
@@ -162,13 +167,18 @@ const windowHeight = () => {
   return w.innerHeight || e.clientHeight || g.clientHeight;
 };
 
-const UserProfileTab = observer(({ className, size=30 }) => {
+interface UserProfileTabProps {
+  className: string;
+  size: number;
+}
+
+const UserProfileTab = observer(({ className, size=30 }: UserProfileTabProps) => {
 
   const classes = useStyles();
 
   const { tokenProvider, logout } = useAuth();
 
-  const buttonRef = useRef();
+  const buttonRef = useRef<HTMLButtonElement>();
 
   const [showPopOver, setShowPopOver] = useState(false);
   const [popOverPosition, setPopOverPosition] = useState("bottom");
@@ -187,16 +197,16 @@ const UserProfileTab = observer(({ className, size=30 }) => {
     };
   }, [showPopOver]);
 
-  const handlePopOverPosition = popOverRect => {
+  const handlePopOverPosition = (popOverRect: DOMRect) => {
     if (!popOverRect) { return null; }
-    const buttonRect = buttonRef.current.getBoundingClientRect();
-    const position = (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?"top":"bottom";
+    const buttonRect = buttonRef.current?.getBoundingClientRect();
+    const position = buttonRect && (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?"top":"bottom";
     if (popOverPosition !== position) {
       setPopOverPosition(position);
     }
   };
 
-  const handleButtonClick = e => {
+  const handleButtonClick = (e:MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setShowPopOver(!showPopOver);
   };

@@ -21,45 +21,42 @@
  *
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { createUseStyles } from "react-jss";
 
-import Spinner from "./Spinner";
+import BGMessage from "./BGMessage";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
   container: {
     height: "100%"
   },
   panel: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    zIndex: 10000,
-    background: "var(--bg-color-blend-contrast1)",
-    "& .spinnerPanel": {
-      width: "auto",
-      padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast6)",
-      borderRadius: "4px",
-      color: "var(--ft-color-loud)",
-      background: "var(--bg-color-ui-contrast6)"
+    color: "var(--ft-color-loud)",
+    "& button + button": {
+      marginLeft: "60px"
     }
-  }
+  },
 });
 
-const SpinnerPanel = ({text}) => {
+interface PanelProps {
+  icon: IconProp;
+  children: ReactNode;
+}
+
+const Panel = ({icon, children}: PanelProps) => {
 
   const classes = useStyles();
 
   return (
     <div className={classes.container}>
       <div className={classes.panel}>
-        <Spinner text={text} />
+        <BGMessage icon={icon}>
+          {children}
+        </BGMessage>
       </div>
     </div>
   );
 };
 
-export default SpinnerPanel;
+export default Panel;

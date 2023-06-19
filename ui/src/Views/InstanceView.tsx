@@ -31,7 +31,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 
 
-const InstanceView = observer(({ mode }) => {
+const InstanceView = observer(({ mode }: {mode:string}) => {
 
   const { appStore, instanceStore, viewStore, typeStore } = useStores();
   const navigate = useNavigate();

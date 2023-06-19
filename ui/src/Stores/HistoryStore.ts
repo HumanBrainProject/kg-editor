@@ -24,6 +24,7 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 
 import Instance from "./Instance";
+import { APIError } from "../Services/API";
 
 const maxItems = 100;
 
@@ -31,7 +32,7 @@ export class HistoryStore {
   instancesHistory = [];
   instances = [];
   isFetching = false;
-  fetchError = null;
+  fetchError?: string;
 
   api = null;
   rootStore = null;
@@ -62,7 +63,7 @@ export class HistoryStore {
     }
   }
 
-  updateInstanceHistory(id, mode, remove) {
+  updateInstanceHistory(id: string, mode: string, remove: boolean) {
     if (!this.rootStore.appStore.currentSpace) {
       return;
     }
@@ -86,7 +87,7 @@ export class HistoryStore {
     return this.instancesHistory;
   }
 
-  getFileredInstancesHistory(space, modes, max=10) {
+  getFileredInstancesHistory(space: string, modes: string[], max=10) {
     if (!space) {
       return [];
     }
@@ -116,16 +117,16 @@ export class HistoryStore {
       .slice(0, isNaN(max) || max < 0?0:max);
   }
 
-  async fetchInstances(list) {
+  async fetchInstances(list: string[]) {
     if (!list.length) {
       this.instances = [];
       this.isFetching = false;
-      this.fetchError = null;
+      this.fetchError = undefined;
     } else {
       try {
         this.instances = [];
         this.isFetching = true;
-        this.fetchError = null;
+        this.fetchError = undefined;
         const { data:response } = await this.api.getInstancesSummary(null, list);
         runInAction(() => {
           list.forEach(identifier => {
@@ -154,9 +155,9 @@ export class HistoryStore {
           this.isFetching = false;
         });
       } catch (e) {
+        const err = e as APIError;
         runInAction(() => {
-          const message = e.message?e.message:e;
-          this.fetchError = `Error while retrieving history instances (${message})`;
+          this.fetchError = `Error while retrieving history instances (${err?.message})`;
           this.isFetching = false;
         });
       }

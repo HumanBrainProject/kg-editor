@@ -25,6 +25,8 @@ import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
 import Instance from "./Instance";
+import { APIError } from "../Services/API";
+import { Type } from "./TypeStore";
 
 const normalizeInstancesData = (api, rootStore, data) => {
   return (Array.isArray(data))?data.map(rowData => {
@@ -43,8 +45,8 @@ const normalizeInstancesData = (api, rootStore, data) => {
 export class BrowseStore {
   isFetching = false;
   isFetched = false;
-  fetchError = null;
-  selectedType = null;
+  fetchError?: string;
+  selectedType?: Type;
   selectedInstance = null;
 
   instances = [];
@@ -88,7 +90,7 @@ export class BrowseStore {
     this.rootStore = rootStore;
   }
 
-  selectType(item) {
+  selectType(item: Type) {
     this.clearInstancesFilter();
     this.selectedType = item;
     this.fetchInstances();
@@ -98,11 +100,11 @@ export class BrowseStore {
     this.instances.length = 0;
     this.totalInstances = 0;
     this.clearSelectedInstance();
-    this.selectedType = null;
+    this.selectedType = undefined;
     this.clearInstancesFilter();
   }
 
-  setNavigationFilterTerm(filter) {
+  setNavigationFilterTerm(filter: string) {
     this.navigationFilter = filter;
   }
 
@@ -114,7 +116,7 @@ export class BrowseStore {
     this.selectedInstance = null;
   }
 
-  setInstancesFilter(filter) {
+  setInstancesFilter(filter: string) {
     this.instancesFilter = filter;
     this.isFetching = true;
     this.applyInstancesFilter();
@@ -140,7 +142,7 @@ export class BrowseStore {
       this.selectedInstance = null;
       this.instances = [];
     }
-    this.fetchError = null;
+    this.fetchError = undefined;
     try {
       const data  = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
@@ -155,9 +157,9 @@ export class BrowseStore {
         this.totalInstances = data.total;
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message?e.message:e;
-        this.fetchError = `Error while retrieving instances of type "${this.selectedType.name}" (${message})`;
+        this.fetchError = `Error while retrieving instances of type "${this.selectedType?.name}" (${err?.message})`;
         this.isFetching = false;
       });
     }

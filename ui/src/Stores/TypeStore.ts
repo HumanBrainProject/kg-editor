@@ -23,11 +23,24 @@
 
 import { observable, action, computed, runInAction, makeObservable } from "mobx";
 
+export interface Type {
+  color: string;
+  description: string;
+  embeddedOnly?: boolean;
+  isSupported: boolean;
+  fields: unknown; 
+  incomingLinks: unknown;
+  label: string;
+  labelField: string;
+  name: string;
+  promotedFields: string[];
+}
+
 export class TypeStore {
-  space = null;
-  types = [];
-  typesMap = new Map();
-  fetchError = null;
+  space?:string;
+  types: Type[] = [];
+  typesMap: Map<string, Type> = new Map<string, Type>();
+  fetchError?: string;
   isFetching = false;
   isFetched = false;
 
@@ -50,38 +63,38 @@ export class TypeStore {
     this.rootStore = rootStore;
   }
 
-  filteredList(term) {
+  filteredList(term: string) {
     term = term && term.trim().toLowerCase();
     if(term) {
-      return this.filteredTypes.filter(type => type.label.toLowerCase().includes(term));
+      return this.filteredTypes.filter((type: Type) => type.label.toLowerCase().includes(term));
     }
     return this.filteredTypes;
   }
 
   get filteredTypes() {
-    return this.types.filter(t => !t.embeddedOnly);
+    return this.types.filter((t: Type) => !t.embeddedOnly);
   }
 
-  isTypesSupported(typeNames) {
+  isTypesSupported(typeNames: string[]) {
     return typeNames.some(name => {
       const type = this.typesMap.get(name);
       return type && type.isSupported;
     });
   }
 
-  async fetch(space) {
+  async fetch(space: string) {
     if (!this.isFetching && (this.fetchError || space !== this.space)) {
       if (space) {
         this.space = space;
         this.types = [];
         this.isFetching = true;
-        this.fetchError = null;
+        this.fetchError = undefined;
         this.isFetched = false;
         try {
           const { data } = await this.api.getSpaceTypes(space);
           runInAction(() => {
             this.types = data.length ?
-              data.map(type => ({
+              data.map((type: Type) => ({
                 ...type,
                 isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
               }))
@@ -107,7 +120,7 @@ export class TypeStore {
         }
       } else {
         this.types = [];
-        this.fetchError = null;
+        this.fetchError = undefined;
         this.isFetched = false;
       }
     }

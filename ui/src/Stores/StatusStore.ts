@@ -24,14 +24,33 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
+interface StatusResponse {
+  data: string;
+}
+
+interface Status {
+  isFetching: boolean;
+  isFetched: boolean;
+  hasFetchError: boolean;
+  fetchError?: string;
+  isFetchingChildren: boolean;
+  isFetchedChildren: boolean;
+  hasFetchErrorChildren: boolean;
+  fetchErrorChildren?: string;
+  data?: string;
+  childrenData?: string;
+}
+
+type Statuses = Map<string, Status>;
+
 export class StatusStore {
-  statuses = new Map();
+  statuses: Statuses = new Map<string, Status>();
   isFetching = false;
   isFetchingChildren = false;
 
   processSize = 20;
-  fetchQueue = [];
-  fetchQueueChildren = [];
+  fetchQueue: string[] = [];
+  fetchQueueChildren: string[] = [];
 
   api = null;
 
@@ -55,30 +74,34 @@ export class StatusStore {
     return this.statuses.get(id);
   }
 
-  _debouncedProcessQueue = debounce(() => { this.processQueue(); }, 250);
-  _debouncedProcessQueueChildren = debounce(() => { this.processQueueChildren(); }, 250);
+  _debouncedProcessQueue = debounce(() => {
+    this.processQueue();
+  }, 250);
+  _debouncedProcessQueueChildren = debounce(() => {
+    this.processQueueChildren();
+  }, 250);
 
   flush() {
     this.statuses.clear();
   }
 
-  fetchStatus(instanceIds) {
+  fetchStatus(instanceIds: string[]) {
     if (!Array.isArray(instanceIds)) {
       instanceIds = [instanceIds];
     }
     instanceIds.forEach(id => {
-      if (!this.statuses.has(id) || this.statuses.get(id).hasFetchError) {
+      if (!this.statuses.has(id) || this.statuses.get(id)?.hasFetchError) {
         this.statuses.set(id, {
           isFetching: false,
           isFetched: false,
           hasFetchError: false,
-          fetchError: null,
+          fetchError: undefined,
           isFetchingChildren: false,
           isFetchedChildren: false,
           hasFetchErrorChildren: false,
-          fetchErrorChildren: null,
-          data: null,
-          childrenData: null
+          fetchErrorChildren: undefined,
+          data: undefined,
+          childrenData: undefined
         });
         this.fetchQueue.push(id);
         this.fetchQueueChildren.push(id);
@@ -87,7 +110,6 @@ export class StatusStore {
     this.smartProcessQueue();
     this.smartProcessQueueChildren();
   }
-
 
   smartProcessQueue() {
     if (this.fetchQueue.length <= 0) {
@@ -116,13 +138,13 @@ export class StatusStore {
       return;
     }
     this.isFetching = true;
-    let toProcess = this.fetchQueue.splice(0, this.processSize);
+    const toProcess = this.fetchQueue.splice(0, this.processSize);
     toProcess.forEach(id => {
       const status = this.statuses.get(id);
       if (status) {
         status.isFetching = true;
         status.hasFetchError = false;
-        status.fetchError = null;
+        status.fetchError = undefined;
       }
     });
     try {
@@ -131,7 +153,7 @@ export class StatusStore {
         Object.entries(data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
           if (status) {
-            status.data = responseStatus.data;
+            status.data = (responseStatus as StatusResponse).data;
             status.isFetching = false;
             status.isFetched = true;
           }
@@ -154,7 +176,6 @@ export class StatusStore {
         this.smartProcessQueue();
       });
     }
-
   }
 
   async processQueueChildren() {
@@ -162,22 +183,27 @@ export class StatusStore {
       return;
     }
     this.isFetchingChildren = true;
-    let toProcessChildren = this.fetchQueueChildren.splice(0, this.processSize);
+    const toProcessChildren = this.fetchQueueChildren.splice(
+      0,
+      this.processSize
+    );
     toProcessChildren.forEach(id => {
       const status = this.statuses.get(id);
       if (status) {
         status.isFetchingChildren = true;
         status.hasFetchErrorChildren = false;
-        status.fetchErrorChildren = null;
+        status.fetchErrorChildren = undefined;
       }
     });
     try {
-      const { data } = await this.api.getReleaseStatusChildren(toProcessChildren);
+      const { data } = await this.api.getReleaseStatusChildren(
+        toProcessChildren
+      );
       runInAction(() => {
         Object.entries(data).forEach(([id, responseStatus]) => {
           const status = this.statuses.get(id);
           if (status) {
-            status.childrenData = responseStatus.data;
+            status.childrenData = (responseStatus as StatusResponse).data;
             status.isFetchingChildren = false;
             status.isFetchedChildren = true;
           }

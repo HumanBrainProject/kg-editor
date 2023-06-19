@@ -22,12 +22,20 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
+import { APIError } from "../Services/API";
+
+interface InvitedUser {
+  id: string;
+  name: string; 
+  username: string;
+}
+
 export class InvitedUsersStore {
-  users = [];
-  fetchError = null;
+  users: InvitedUser [] = [];
+  fetchError?: string;
   isFetching = false;
   isFetched = false;
-  error = null;
+  error?: string;
 
   api = null;
 
@@ -51,21 +59,21 @@ export class InvitedUsersStore {
     return !!this.fetchError;
   }
 
-  async getInvitedUsers(instanceId) {
+  async getInvitedUsers(instanceId: string) {
     if (this.isFetching) {
       return;
     }
     this.isFetching = true;
     this.users = [];
     this.isFetched = false;
-    this.fetchError = null;
+    this.fetchError = undefined;
     try {
       const { data } = await this.api.getInvitedUsers(instanceId);
       runInAction(() => {
         this.users = data ?? [];
         this.isFetching = false;
         this.isFetched = true;
-        this.fetchError = null;
+        this.fetchError = undefined;
       });
     } catch (e) {
       runInAction(() => {
@@ -78,21 +86,21 @@ export class InvitedUsersStore {
     } 
   }
 
-  async inviteUser(instanceId, userId) {
+  async inviteUser(instanceId: string, userId: string) {
     try {
       const { data } = await this.api.inviteUser(instanceId, userId);
       runInAction(() => {
         this.users = data ?? [];
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message ? e.message : e;
-        this.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${message})`;
+        this.error = `Error while inviting user "${userId}" to review instance "${instanceId}" (${err?.message})`;
       });
     }
   }
 
-  async removeUserInvitation(instanceId, userId) {
+  async removeUserInvitation(instanceId: string, userId: string) {
     try {
       const { data } = await this.api.removeUserInvitation(instanceId, userId);
       runInAction(() => {

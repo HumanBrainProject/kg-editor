@@ -23,8 +23,35 @@
 
 import { observable, computed, action, makeObservable, toJS } from "mobx";
 
+interface Space {
+  id: string;
+  name: string;
+  autorelease: boolean;
+  clientSpace: boolean;
+  permissions: {
+      canCreate: boolean;
+      canInviteForReview: boolean;
+      canDelete: boolean;
+      canInviteForSuggestion: boolean;
+      canRead: boolean;
+      canSuggest: boolean;
+      canWrite: boolean;
+      canRelease: boolean;
+  }
+}
+
+interface UserProfile {
+  id: string;
+  username: string;
+  name: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+  spaces: Space[];
+}
+
 export class UserProfileStore {
-  user = null;
+  user?: UserProfile;
 
   constructor() {
     makeObservable(this, {
@@ -38,10 +65,10 @@ export class UserProfileStore {
     });
   }
 
-  filteredList(term) {
+  filteredList(term: string) {
     term = term && term.trim().toLowerCase();
     if(term) {
-      return this.spaces.filter(t => t.id.toLowerCase().includes(term));
+      return this.spaces?.filter(t => t.id.toLowerCase().includes(term));
     }
     return this.spaces;
   }
@@ -55,31 +82,31 @@ export class UserProfileStore {
   }
 
   get spaces() {
-    return this.hasSpaces ? this.user.spaces: [];
+    return this.hasSpaces ? this.user?.spaces: [];
   }
 
-  hasSpace(id) {
-    return !!this.spaces.find(s => s.id === id);
+  hasSpace(id: string) {
+    return !!this.spaces?.find(s => s.id === id);
   }
 
-  getSpace(id) {
-    return id?this.spaces.find(s => s.id === id):undefined;
+  getSpace(id: string) {
+    return id?this.spaces?.find(s => s.id === id):undefined;
   }
 
-  getSpaceOrDefault(id) {
+  getSpaceOrDefault(id: string) {
     const space = this.getSpace(id);
     if (space) {
       return space;
     }
-    return this.defaultSpaces;
+    return this.defaultSpace;
   }
 
   get defaultSpace() {
-    return this.hasSpaces?this.spaces[0]:undefined;
+    return this.hasSpaces?(this.spaces as Space[])[0]:undefined;
   }
 
-  getSpaceInfo(id) {
-    const space = this.spaces.find(us => us.id === id);
+  getSpaceInfo(id: string) {
+    const space = this.spaces?.find(us => us.id === id);
     if (space) {
       return toJS(space);
     }
@@ -94,7 +121,10 @@ export class UserProfileStore {
       }
       if (this.user.name) {
         if (firstNameReg.test(this.user.name)) {
-          return this.user.name.match(firstNameReg)[1];
+          const match = this.user.name.match(firstNameReg);
+          if (match) {
+            return [1];
+          }
         }
         return this.user.name;
       }
@@ -105,7 +135,7 @@ export class UserProfileStore {
     return "";
   }
 
-  setUserProfile(user) {
+  setUserProfile(user: UserProfile) {
     this.user = user
   }
 }

@@ -23,6 +23,7 @@
 
 import React from "react";
 import { observable, action, computed, makeObservable } from "mobx";
+import { Type } from "./TypeStore";
 
 const STORED_INSTANCE_VIEWS_KEY = "views";
 
@@ -42,19 +43,25 @@ const getStoredViews = () => {
   }
 };
 
+interface InstanceHighlight {
+  pane?: string;
+  instanceId?: string;
+  provenance?: string; 
+}
+
 class View {
-  instanceId = null;
+  instanceId?: string;
   name = "";
   mode = "edit";
   color = "";
   type = "";
   description = "";
-  instancePath = [];
-  instanceHighlight = {instanceId: null, provenance: null};
-  selectedPane = null;
-  panes = [];
+  instancePath: string[] = [];
+  instanceHighlight: InstanceHighlight = {pane: undefined, instanceId: undefined, provenance: undefined};
+  selectedPane?: string;
+  panes: string[] = [];
 
-  constructor(instanceId, name, color, mode, description) {
+  constructor(instanceId: string, name: string, color: string, mode: string, description: string) {
     makeObservable(this, {
       instanceId: observable,
       name: observable,
@@ -94,7 +101,7 @@ class View {
     return this.panes[this.instancePath.length];
   }
 
-  getPaneByInstanceId(instanceId) {
+  getPaneByInstanceId(instanceId: string) {
     const index = this.instancePath.findIndex(id => id === instanceId);
     if (index != -1) {
       return this.panes[index];
@@ -102,54 +109,57 @@ class View {
     return null;
   }
 
-  setCurrentInstanceId(pane, instanceId) {
+  setCurrentInstanceId(pane: string, instanceId: string) {
     const start = this.panes.findIndex(p => p === pane);
     this.instancePath.splice(start, this.instancePath.length-start, instanceId);
   }
 
-  setInstanceHighlight(pane, instanceId, provenance) {
+  setInstanceHighlight(pane?: string, instanceId?: string, provenance?: string) {
     this.instanceHighlight.pane = pane;
     this.instanceHighlight.instanceId = instanceId;
     this.instanceHighlight.provenance = provenance;
   }
 
   resetInstanceHighlight() {
-    this.setInstanceHighlight(null, null, null);
+    this.setInstanceHighlight(undefined, undefined, undefined);
   }
 
-  setNameAndColor(name, color) {
+  setNameAndColor(name: string, color: string) {
     this.name = name;
     this.color = color;
   }
 
   get selectedPaneIndex() {
-    return this.getPaneIndex(this.selectedPane);
+    if(this.selectedPane) {
+      return this.getPaneIndex(this.selectedPane);
+    }
+    return undefined;
   }
 
-  getPaneIndex(paneId) {
+  getPaneIndex(paneId: string) {
     return this.panes.indexOf(paneId);
   }
 
-  getPane(paneId) {
+  getPane(paneId: string) {
     return this.panes.find(p => p === paneId);
   }
 
-  registerPane(paneId) {
+  registerPane(paneId: string) {
     this.panes.push(paneId);
     if(!this.selectedPane){
       this.selectedPane = paneId;
     }
   }
 
-  selectPane(pane) {
+  selectPane(pane: string) {
     this.selectedPane = pane;
   }
 
-  unregisterPane(paneId) {
+  unregisterPane(paneId: string) {
     this.panes = this.panes.filter(p => p !== paneId);
   }
 
-  setType(type) {
+  setType(type: string) {
     this.type = type;
   }
 }
@@ -226,12 +236,12 @@ export class ViewStore{
     }
   }
 
-  selectViewByInstanceId(instanceId) {
+  selectViewByInstanceId(instanceId: string) {
     this.selectedView = this.views.get(instanceId);
     this.syncStoredViews();
   }
 
-  unregisterViewByInstanceId(instanceId) {
+  unregisterViewByInstanceId(instanceId: string) {
     if (this.selectedView && this.selectedView.instanceId === instanceId) {
       this.selectedView = null;
     }
@@ -249,7 +259,7 @@ export class ViewStore{
     this.views.clear();
   }
 
-  registerViewByInstanceId(instanceId, name, type, viewMode) {
+  registerViewByInstanceId(instanceId: string, name: string, type: Type, viewMode: string) {
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
     } else {
@@ -262,7 +272,7 @@ export class ViewStore{
     }
   }
 
-  replaceViewByNewInstanceId(id, newId) {
+  replaceViewByNewInstanceId(id: string, newId: string) {
     const view = this.views.get(id);
     this.views.set(newId, new View(newId, view?view.name:"", view?.color??"", "edit", view?.description??""));
     this.views.delete(id);

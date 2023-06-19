@@ -30,6 +30,7 @@ import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 import RootStore from "./RootStore";
 import { Space } from "../types";
+import { APIError } from "../Services/API";
 
 const themes = {};
 themes[DefaultTheme.name] = DefaultTheme;
@@ -70,11 +71,11 @@ export class AppStore{
   externalCreateModal = false;
   instanceToDelete?: string;
   isDeletingInstance = false;
-  deleteInstanceError = null;
+  deleteInstanceError?: string;
   isCreatingNewInstance = false;
   instanceCreationError = null;
   isMovingInstance = false;
-  instanceMovingError = null;
+  instanceMovingError?: string;
   instanceToMove = null;
   pathsToResolve = new Map();
 
@@ -196,10 +197,10 @@ export class AppStore{
     this.instanceCreationError = null;
     this.instanceToMove = null;
     this.isMovingInstance = false;
-    this.instanceMovingError = null;
+    this.instanceMovingError = undefined;
     this.instanceToDelete = undefined;
     this.isDeletingInstance = false;
-    this.deleteInstanceError = null;
+    this.deleteInstanceError = undefined;
     this.pathsToResolve.clear();
   }
 
@@ -405,7 +406,7 @@ export class AppStore{
     if (instanceId) {
       this.instanceToDelete = instanceId;
       this.isDeletingInstance = true;
-      this.deleteInstanceError = null;
+      this.deleteInstanceError = undefined;
       try{
         await this.api.deleteInstance(instanceId);
         runInAction(() => {
@@ -431,10 +432,10 @@ export class AppStore{
           }
         });
       } catch(e){
+        const err = e as APIError;
         runInAction(() => {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${message}) ${errorMessage}`;
+          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:"";
+          this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${err?.message}) ${errorMessage}`;
           this.isDeletingInstance = false;
         });
       }
@@ -468,12 +469,12 @@ export class AppStore{
     }
   }
 
-  async moveInstance(instanceId, space, location, navigate) {
+  async moveInstance(instanceId: string, space: string, location: Location, navigate: NavigateFunction) {
     this.instanceToMove = {
       id: instanceId,
       space: space
     };
-    this.instanceMovingError = null;
+    this.instanceMovingError = undefined;
     this.isMovingInstance = true;
     try{
       await this.api.moveInstance(instanceId, space);
@@ -487,38 +488,39 @@ export class AppStore{
       await this.switchSpace(location, navigate, space);
       navigate(`/instances/${instanceId}`);
     } catch(e){
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message?e.message:e;
-        const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
+        const message = err.message?err.message:err;
+        const errorMessage = err.response && err.response.status !== 500 ? err.response.data:"";
         this.instanceMovingError = `Failed to move instance "${instanceId}" to space "${space}" (${message}) ${errorMessage}`;
         this.isMovingInstance = false;
       });
     }
   }
 
-  async retryMoveInstance(location, navigate) {
+  async retryMoveInstance(location: Location, navigate: NavigateFunction) {
     return this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, location, navigate);
   }
 
   cancelMoveInstance() {
     this.instanceToMove = null;
-    this.instanceMovingError = null;
+    this.instanceMovingError = undefined;
   }
 
-  async retryDeleteInstance(location, navigate) {
+  async retryDeleteInstance(location: Location, navigate: NavigateFunction) {
     return this.deleteInstance(this.instanceToDelete, location, navigate);
   }
 
-  async deleteInstance(instanceId, location, navigate) {
+  async deleteInstance(instanceId: string, location: Location, navigate: NavigateFunction) {
     return this.delete(instanceId, location, navigate);
   }
 
   cancelDeleteInstance() {
-    this.instanceToDelete = null;
-    this.deleteInstanceError = null;
+    this.instanceToDelete = undefined;
+    this.deleteInstanceError = undefined;
   }
 
-  replaceInstanceResolvedIdPath(path, navigate) {
+  replaceInstanceResolvedIdPath(path: string, navigate: NavigateFunction) {
     if (this.pathsToResolve.has(path)) {
       const newPath = this.pathsToResolve.get(path);
       this.pathsToResolve.delete(path);
@@ -526,7 +528,7 @@ export class AppStore{
     }
   }
 
-  focusPreviousInstance(instanceId, location, navigate) {
+  focusPreviousInstance(instanceId: string, location: Location, navigate: NavigateFunction) {
     if (this.matchInstancePath(location.pathname, instanceId)) {
       if (this.rootStore.viewStore.views.size > 1) {
         let openedInstances = this.rootStore.viewStore.instancesIds;
@@ -550,7 +552,7 @@ export class AppStore{
     }
   }
 
-  focusNextInstance(instanceId, location, navigate) {
+  focusNextInstance(instanceId: string, location: Location, navigate: NavigateFunction) {
     if (this.matchInstancePath(location.pathname, instanceId)) {
       if (this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;

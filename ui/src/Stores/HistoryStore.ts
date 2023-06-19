@@ -63,7 +63,7 @@ export class HistoryStore {
     }
   }
 
-  updateInstanceHistory(id: string, mode: string, remove: boolean) {
+  updateInstanceHistory(id: string, mode: string, remove?: boolean) {
     if (!this.rootStore.appStore.currentSpace) {
       return;
     }

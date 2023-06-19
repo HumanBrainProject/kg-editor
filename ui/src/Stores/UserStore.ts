@@ -24,23 +24,13 @@
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 import { APIError } from "../Services/API";
-
-interface User {
-  id: string;
-  name: string;
-  username: string;
-}
-
-interface SearchFilter {
-  queryString: string;
-  excludedUsers: string[];
-}
+import { SearchFilter, UserSummary } from "../types";
 
 export class UserStore {
   isFetchingSearch = false;
   isSearchFetched = false;
   searchFetchError?: string = undefined;
-  searchResult: User[] = [];
+  searchResult: UserSummary[] = [];
   searchFilter: SearchFilter = {
     queryString: "",
     excludedUsers: []
@@ -113,7 +103,7 @@ export class UserStore {
             this.isSearchFetched = true;
             this.isFetchingSearch = false;
             if (this.searchFilter.excludedUsers && this.searchFilter.excludedUsers.length) {
-              this.searchResult = data.filter((user: User) => !this.searchFilter.excludedUsers.includes(user.id));
+              this.searchResult = data.filter((user: UserSummary) => !this.searchFilter.excludedUsers.includes(user.id));
             } else {
               this.searchResult = data;
             }

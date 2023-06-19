@@ -23,15 +23,11 @@
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
 import { APIError } from "../Services/API";
+import { UserSummary } from "../types";
 
-interface InvitedUser {
-  id: string;
-  name: string; 
-  username: string;
-}
 
 export class InvitedUsersStore {
-  users: InvitedUser [] = [];
+  users: UserSummary [] = [];
   fetchError?: string;
   isFetching = false;
   isFetched = false;

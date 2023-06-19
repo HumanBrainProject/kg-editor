@@ -22,19 +22,21 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import { matchPath } from "react-router-dom";
+import { NavigateFunction, matchPath } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
+import RootStore from "./RootStore";
+import { Space } from "../types";
 
 const themes = {};
 themes[DefaultTheme.name] = DefaultTheme;
 themes[BrightTheme.name] = BrightTheme;
 themes[CupcakeTheme.name] = CupcakeTheme;
 
-const getLinkedInstanceIds = (instanceStore, instanceIds) => {
+const getLinkedInstanceIds = (instanceStore, instanceIds: string []) => {
   const result = instanceIds.reduce((acc, id) => {
     const instance = instanceStore.instances.get(id);
     if (instance) {
@@ -48,7 +50,7 @@ const getLinkedInstanceIds = (instanceStore, instanceIds) => {
   return Array.from(new Set(result));
 };
 
-const navigateToInstance = (navigate, instanceId, mode, type) => {
+const navigateToInstance = (navigate:NavigateFunction, instanceId: string, mode: string, type: string) => {
   if(mode === "view"){
     navigate(`/instances/${instanceId}`);
   } else if(mode === "create"){
@@ -58,15 +60,15 @@ const navigateToInstance = (navigate, instanceId, mode, type) => {
   }
 };
 export class AppStore{
-  commit = null;
+  commit?: string;
   globalError = null;
-  currentSpace = null;
+  currentSpace?: Space;
   savePercentage = null;
   _currentThemeName = DefaultTheme.name;
   historySettings = null;
   showSaveBar = false;
   externalCreateModal = false;
-  instanceToDelete = null;
+  instanceToDelete?: string;
   isDeletingInstance = false;
   deleteInstanceError = null;
   isCreatingNewInstance = false;
@@ -77,9 +79,9 @@ export class AppStore{
   pathsToResolve = new Map();
 
   api = null;
-  rootStore = null;
+  rootStore?: RootStore;
 
-  constructor(api, rootStore) {
+  constructor(api, rootStore: RootStore) {
     makeObservable(this, {
       commit: observable,
       externalCreateModal: observable,
@@ -157,15 +159,15 @@ export class AppStore{
     this.historySettings = savedHistorySettings;
   }
 
-  setCommit(commit) {
+  setCommit(commit: string) {
     this.commit = commit;
   }
   
-  async createExternalInstance(space, typeName, value, location, navigate) {
-    if (this.rootStore.instanceStore.hasUnsavedChanges) {
+  async createExternalInstance(space: string, typeName: string, value: string, location: Location, navigate: NavigateFunction) {
+    if (this.rootStore?.instanceStore.hasUnsavedChanges) {
       this.externalCreateModal = {space: space, type: typeName, value: value};
     } else {
-      this.externalCreateModal = null;
+      this.externalCreateModal = undefined;
       await this.switchSpace(location, navigate, space);
       const uuid = uuidv4();
       navigate(`/instances/${uuid}/create?space=${space}&type=${encodeURIComponent(typeName)}`);
@@ -183,25 +185,25 @@ export class AppStore{
   }
 
   clearExternalCreateModal() {
-    this.externalCreateModal = null;
+    this.externalCreateModal = undefined;
   }
 
   flush() {
-    this.rootStore.instanceStore.flush();
-    this.rootStore.statusStore.flush();
+    this.rootStore?.instanceStore.flush();
+    this.rootStore?.statusStore.flush();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
     this.instanceToMove = null;
     this.isMovingInstance = false;
     this.instanceMovingError = null;
-    this.instanceToDelete = null;
+    this.instanceToDelete = undefined;
     this.isDeletingInstance = false;
     this.deleteInstanceError = null;
     this.pathsToResolve.clear();
   }
 
-  matchInstancePath = (pathname, id=":id") => { //NOSONAR
+  matchInstancePath = (pathname: string, id=":id") => { //NOSONAR
     let path =  matchPath({ path: `/instances/${id}/:mode` }, pathname);
     if(path) {
       return path;
@@ -218,22 +220,22 @@ export class AppStore{
     };
   }
 
-  closeAllInstances(location, navigate) {
+  closeAllInstances(location: Location, navigate: NavigateFunction) {
     if (!(matchPath({ path: "/" }, location.pathname)
       || matchPath({ path: "/browse" }, location.pathname)
       || matchPath({ path: "/help/*" }, location.pathname))) {
       navigate("/browse");
     }
-    this.rootStore.viewStore.unregisterAllViews();
+    this.rootStore?.viewStore.unregisterAllViews();
   }
 
-  clearViews(location, navigate) {
+  clearViews(location: Location, navigate: NavigateFunction) {
     if (!(matchPath({ path: "/" }, location.pathname)
       || matchPath({ path: "/browse" }, location.pathname)
       || matchPath({ path: "/help/*" }, location.pathname))) {
         navigate("/browse");
     }
-    this.rootStore.viewStore.clearViews();
+    this.rootStore?.viewStore.clearViews();
   }
 
   setGlobalError(error, info) {
@@ -248,7 +250,7 @@ export class AppStore{
     return themes[this._currentThemeName];
   }
 
-  setTheme(name){
+  setTheme(name: string){
     this._currentThemeName = themes[name]? name: DefaultTheme.name;
     localStorage.setItem("theme", this._currentThemeName);
   }
@@ -272,7 +274,7 @@ export class AppStore{
     return this.currentSpace?this.currentSpace.permissions:{};
   }
 
-  setSizeHistorySetting(size){
+  setSizeHistorySetting(size: number){
     size = Number(size);
     this.historySettings.size = (!isNaN(size) && size > 0)?size:10;
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
@@ -293,9 +295,9 @@ export class AppStore{
     localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
   }
 
-  setSpace = spaceName => {
+  setSpace = (spaceName: string) => {
     if (spaceName) {
-      this.currentSpace = this.rootStore.userProfileStore.getSpace(spaceName);
+      this.currentSpace = this.rootStore?.userProfileStore.getSpace(spaceName);
       localStorage.setItem("space", spaceName);
     } else {
       this.currentSpace = null;
@@ -303,10 +305,10 @@ export class AppStore{
     }
   }
 
-  async switchSpace(location, navigate, spaceName) {
-    let space = this.rootStore.userProfileStore.getSpaceOrDefault(spaceName);
-    if(this.currentSpace !== space) {
-      if(this.rootStore.instanceStore.hasUnsavedChanges) {
+  async switchSpace(location: Location, navigate: NavigateFunction, spaceName: string) {
+    const space = this.rootStore?.userProfileStore.getSpaceOrDefault(spaceName);
+    if(space && this.currentSpace !== space) {
+      if(this.rootStore?.instanceStore.hasUnsavedChanges) {
         if (window.confirm("You are about to change space. All unsaved changes will be lost. Continue ?")) {
           this.rootStore.instanceStore.clearUnsavedChanges();
           this.clearViews(location, navigate);
@@ -316,12 +318,12 @@ export class AppStore{
         }
       } else {
         this.clearViews(location, navigate);
-        this.rootStore.browseStore.clearInstancesFilter();
+        this.rootStore?.browseStore.clearInstancesFilter();
       }
-      this.rootStore.instanceStore.flush();
-      this.rootStore.browseStore.clearInstances();
+      this.rootStore?.instanceStore.flush();
+      this.rootStore?.browseStore.clearInstances();
       this.setSpace(space.id);
-      const path = this.rootStore.viewStore.restoreViews();
+      const path = this.rootStore?.viewStore.restoreViews();
       if (path) {
         navigate(path);
       }
@@ -332,21 +334,21 @@ export class AppStore{
     this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
   }
 
-  openInstance(instanceId, instanceName, instancePrimaryType, viewMode = "view") {
-    const instance = this.rootStore.instanceStore.instances.get(instanceId);
+  openInstance(instanceId: string, instanceName: string, instancePrimaryType: string, viewMode = "view") {
+    const instance = this.rootStore?.instanceStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
     const name = isFetched?instance.name:instanceName;
     const primaryType = isFetched?instance.primaryType:instancePrimaryType;
-    this.rootStore.viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
+    this.rootStore?.viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
     if(viewMode !== "create") {
-      this.rootStore.historyStore.updateInstanceHistory(instanceId, "viewed");
+      this.rootStore?.historyStore.updateInstanceHistory(instanceId, "viewed");
     }
-    this.rootStore.viewStore.syncStoredViews();
+    this.rootStore?.viewStore.syncStoredViews();
   }
 
-  closeInstance(location, navigate, instanceId) {
+  closeInstance(location: Location, navigate: NavigateFunction, instanceId: string) {
     if (this.matchInstancePath(location.pathname, instanceId)) {
-      if (this.rootStore.viewStore.views.size > 1) {
+      if (this.rootStore?.viewStore && this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
@@ -355,19 +357,19 @@ export class AppStore{
         navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
-        this.rootStore.browseStore.clearSelectedInstance();
+        this.rootStore?.browseStore.clearSelectedInstance();
       }
     }
-    this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
-    const instance = this.rootStore.instanceStore.instances.get(instanceId);
+    this.rootStore?.viewStore.unregisterViewByInstanceId(instanceId);
+    const instance = this.rootStore?.instanceStore.instances.get(instanceId);
     if (instance) {
-      const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore.instanceStore, this.rootStore.viewStore.instancesIds);
-      const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
-      this.rootStore.instanceStore.removeInstances(instanceIdsToBeRemoved);
+      const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore?.instanceStore, this.rootStore?.viewStore.instancesIds);
+      const instanceIdsToBeRemoved = instance.linkedIds.filter((id:string) => !instanceIdsToBeKept.includes(id));
+      this.rootStore?.instanceStore.removeInstances(instanceIdsToBeRemoved);
     }
   }
 
-  async saveInstance(instance, navigate) {
+  async saveInstance(instance, navigate: NavigateFunction) {
     const isNew = instance.isNew;
     const id = instance.id;
     await instance.save();
@@ -393,13 +395,13 @@ export class AppStore{
     this.rootStore.statusStore.flush();
   }
 
-  syncInstancesHistory(instance, mode) {
+  syncInstancesHistory(instance, mode: string) {
     if(instance && this.rootStore.viewStore.views.has(instance.id)){
       this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
     }
   }
 
-  async delete(instanceId, location, navigate) {
+  async delete(instanceId: string, location: Location, navigate: NavigateFunction) {
     if (instanceId) {
       this.instanceToDelete = instanceId;
       this.isDeletingInstance = true;
@@ -439,7 +441,7 @@ export class AppStore{
     }
   }
 
-  async duplicateInstance(fromInstanceId, navigate) {
+  async duplicateInstance(fromInstanceId: string, navigate: NavigateFunction) {
     const instanceToCopy = this.rootStore.instanceStore.instances.get(fromInstanceId);
     const payload = instanceToCopy.payload;
     const labelField = instanceToCopy.labelField;

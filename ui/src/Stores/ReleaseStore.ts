@@ -130,13 +130,8 @@ export class ReleaseStore {
   savingErrors = [];
   savingLastEndedNode = null;
   savingLastEndedRequest = "";
-  hasWarning = false;
   fetchError = null;
   saveError = null;
-  validationWarnings = new Map();
-  fetchWarningMessagesError = null;
-  isWarningMessagesFetched = false;
-  isFetchingWarningMessages = false;
   isStopped = false;
   hideReleasedInstances = false;
   comparedInstance = null;
@@ -159,18 +154,12 @@ export class ReleaseStore {
       savingErrors: observable,
       savingLastEndedNode: observable,
       savingLastEndedRequest: observable,
-      hasWarning: observable,
       fetchError: observable,
       saveError: observable,
-      validationWarnings: observable,
-      fetchWarningMessagesError: observable,
-      isWarningMessagesFetched: observable,
-      isFetchingWarningMessages: observable,
       isStopped: observable,
       hideReleasedInstances: observable,
       comparedInstance: observable,
       setComparedInstance: action,
-      visibleWarningMessages: computed,
       treeStats: computed,
       instanceList: computed,
       toggleHideReleasedInstances: action,
@@ -185,8 +174,6 @@ export class ReleaseStore {
       markNodeForChange: action,
       markAllNodeForChange: action,
       recursiveMarkNodeForChange: action,
-      clearWarningMessages: action,
-      handleWarning: action
     });
 
     this.api = api;
@@ -195,24 +182,6 @@ export class ReleaseStore {
 
   setComparedInstance(instance) {
     this.comparedInstance = instance;
-  }
-
-  get visibleWarningMessages() {
-    let results = [];
-    this.validationWarnings.forEach((message) => {
-      let release = 0;
-      let unrelease = 0;
-      message.releaseFlags.forEach((flag) => {
-        flag ? release++ : unrelease++;
-      });
-      if (release && message.messages.release) {
-        results.push(message.messages.release);
-      }
-      if (unrelease && message.messages.unrelease) {
-        results.push(message.messages.unrelease);
-      }
-    });
-    return results;
   }
 
   get treeStats() {
@@ -447,8 +416,6 @@ export class ReleaseStore {
           this.savingErrors = [];
           this.savingTotal = 0;
           this.savingProgress = 0;
-          this.hasWarning = false;
-          this.clearWarningMessages();
           this.fetchReleaseData();
         });
       }, 2000);
@@ -477,7 +444,6 @@ export class ReleaseStore {
   recursiveMarkNodeForChange(node, newStatus) {
     if (node.permissions.canRelease) {
       node.pending_status = newStatus ? newStatus : node.status;
-      this.handleWarning(node, node.pending_status);
       if (node.children && node.children.length > 0) {
         node.children.forEach((child) =>
           this.recursiveMarkNodeForChange(child, newStatus)
@@ -486,28 +452,6 @@ export class ReleaseStore {
     }
   }
 
-  clearWarningMessages() {
-    this.validationWarnings.forEach((message) => message.releaseFlags.clear());
-  }
 
-  //TODO: Check if this logic is still valid
-  handleWarning(node, newStatus) {
-    if (this.validationWarnings.has(node.typePath)) {
-      const messages = this.validationWarnings.get(node.typePath);
-      if (
-        newStatus === "RELEASED" &&
-        (node.status === "HAS_CHANGED" || node.status === "UNRELEASED")
-      ) {
-        messages.releaseFlags.set(node.relativeUrl, true);
-      } else if (
-        newStatus === "UNRELEASED" &&
-        (node.status === "HAS_CHANGED" || node.status === "RELEASED")
-      ) {
-        messages.releaseFlags.set(node.relativeUrl, false);
-      } else {
-        messages.releaseFlags.delete(node.relativeUrl);
-      }
-    }
-  }
 }
 export default ReleaseStore;

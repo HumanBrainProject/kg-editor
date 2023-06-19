@@ -23,10 +23,8 @@
 
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
+import { StatusResponse } from "../types";
 
-interface StatusResponse {
-  data: string;
-}
 
 interface Status {
   isFetching: boolean;

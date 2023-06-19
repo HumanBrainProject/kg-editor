@@ -22,24 +22,11 @@
  */
 
 import { observable, action, computed, makeObservable } from "mobx";
-
-export interface Type {
-  color: string;
-  description: string;
-  embeddedOnly?: boolean;
-  canCreate?: boolean;
-  isSupported: boolean;
-  fields: unknown;
-  incomingLinks: unknown;
-  label: string;
-  labelField: string;
-  name: string;
-  promotedFields: string[];
-}
+import { StructureOfType } from "../types";
 
 export class TypeStore {
   space?: string;
-  types: Type[] = [];
+  types: StructureOfType[] = [];
 
   constructor() {
     makeObservable(this, {
@@ -93,7 +80,7 @@ export class TypeStore {
     return map;
   }
 
-  setTypes(space: string, types: Type[]) {
+  setTypes(space: string, types: StructureOfType[]) {
     this.space = space;
     this.types = types;
   }

@@ -58,7 +58,6 @@ const ReleaseNodeToggle = observer(({ node }) => {
   const handleChange = status => {
     instanceStore.togglePreviewInstance();
     releaseStore.markNodeForChange(node, status);
-    releaseStore.handleWarning(node, status);
   };
 
   const handleStopClick = e => {

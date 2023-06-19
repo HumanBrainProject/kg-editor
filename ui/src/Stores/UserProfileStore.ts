@@ -22,33 +22,8 @@
  */
 
 import { observable, computed, action, makeObservable, toJS } from "mobx";
+import { Space, UserProfile } from "../types";
 
-interface Space {
-  id: string;
-  name: string;
-  autorelease: boolean;
-  clientSpace: boolean;
-  permissions: {
-      canCreate: boolean;
-      canInviteForReview: boolean;
-      canDelete: boolean;
-      canInviteForSuggestion: boolean;
-      canRead: boolean;
-      canSuggest: boolean;
-      canWrite: boolean;
-      canRelease: boolean;
-  }
-}
-
-interface UserProfile {
-  id: string;
-  username: string;
-  name: string;
-  givenName: string;
-  familyName: string;
-  email: string;
-  spaces: Space[];
-}
 
 export class UserProfileStore {
   user?: UserProfile;

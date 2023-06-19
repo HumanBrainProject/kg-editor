@@ -94,7 +94,6 @@ const InstanceRelease = observer(({ instance }) => {
 
   useEffect(() => {
     releaseStore.setTopInstanceId(instance.id);
-    releaseStore.clearWarningMessages();
     releaseStore.fetchReleaseData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance.id]);

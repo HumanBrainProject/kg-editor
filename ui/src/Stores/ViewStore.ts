@@ -23,7 +23,7 @@
 
 import React from "react";
 import { observable, action, computed, makeObservable } from "mobx";
-import { Type } from "./TypeStore";
+import { StructureOfType } from "../types";
 
 const STORED_INSTANCE_VIEWS_KEY = "views";
 
@@ -259,7 +259,7 @@ export class ViewStore{
     this.views.clear();
   }
 
-  registerViewByInstanceId(instanceId: string, name: string, type: Type, viewMode: string) {
+  registerViewByInstanceId(instanceId: string, name: string, type: StructureOfType, viewMode: string) {
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
     } else {

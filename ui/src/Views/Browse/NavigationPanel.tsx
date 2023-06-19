@@ -22,49 +22,56 @@
  */
 
 import React from "react";
-import { observer } from "mobx-react-lite";
-import Alert from "react-bootstrap/Alert";
 import { createUseStyles } from "react-jss";
+import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
 
-import useStores from "../../../Hooks/useStores";
+import useStores from "../../Hooks/useStores";
+
+import Types from "./Types";
+import Filter from "../../Components/Filter";
 
 const useStyles = createUseStyles({
   container: {
-    width: "100%",
-    height: "100%"
+    background: "var(--bg-color-ui-contrast2)",
+    borderRight: "1px solid var(--border-color-ui-contrast1)",
+    color: "var(--ft-color-loud)",
+    position: "relative",
+    display: "grid",
+    gridTemplateRows:"auto 1fr"
   },
-  alert: {
-    background: "var(--release-color-has-changed)",
-    color: "black",
-    borderColor: "transparent",
-    paddingTop: "6px",
-    paddingBottom: "6px",
-    marginBottom: "10px"
-
+  header: {
+    position: "relative"
+  },
+  noMatch: {
+    padding: "0 15px"
   }
 });
 
-const ReleaseMessages = observer(() => {
+const NavigationPanel = observer(() => {
 
   const classes = useStyles();
 
-  const { releaseStore } = useStores();
+  const { typeStore, browseStore } = useStores();
+
+  const handleFilterChange = (value: string) => browseStore.setNavigationFilterTerm(value);
+
+  const typeList = typeStore.filterTypes(browseStore.navigationFilter);
 
   return (
     <div className={classes.container}>
+      <div className={classes.header}>
+        <Filter value={browseStore.navigationFilter} placeholder="Filter types" onChange={handleFilterChange} />
+      </div>
       <Scrollbars autoHide>
-        {releaseStore.visibleWarningMessages.map(
-          (message, index) => (
-            <Alert key={`${message}-${index}`} className={classes.alert} >
-              {message}
-            </Alert>
-          )
-        )}
+        {browseStore.navigationFilter.trim() &&
+              typeList.length === 0 && <em className={classes.noMatch}>No matches found</em>
+        }
+        <Types />
       </Scrollbars>
     </div>
   );
 });
-ReleaseMessages.displayName = "ReleaseMessages";
+NavigationPanel.displayName = "NavigationPanel";
 
-export default ReleaseMessages;
+export default NavigationPanel;

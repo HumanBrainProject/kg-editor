@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,6 +33,7 @@ import { v4 as uuidv4 } from "uuid";
 import useStores from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../../Services/Matomo";
+import { Type } from "../../Stores/TypeStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -156,6 +157,15 @@ const useStyles = createUseStyles({
   }
 });
 
+interface CreateInstanceProps {
+  canCreate: boolean;
+  isCreatingNewInstance: boolean;
+  classes: unknown; // TODO: fix me
+  onClick: () => void; // TODO: fix me
+  cannotCreateTooltip?: string;
+  label: string;
+}
+
 const CreateInstance = observer(({
   canCreate,
   isCreatingNewInstance,
@@ -163,7 +173,7 @@ const CreateInstance = observer(({
   onClick,
   cannotCreateTooltip,
   label
-}) => {
+}: CreateInstanceProps) => {
   if (canCreate) {
     if (isCreatingNewInstance) {
       return (
@@ -202,13 +212,17 @@ const CreateInstance = observer(({
   );
 });
 
-const TypesItem = observer(({ type }) => {
+interface TypesItemProps {
+  type: Type;
+}
+
+const TypesItem = observer(({ type }: TypesItemProps) => {
   const classes = useStyles();
 
   const { appStore, browseStore } = useStores();
   const navigate = useNavigate();
 
-  const handleSelect = e => {
+  const handleSelect = (e: MouseEvent<HTMLDivElement> ) => {
     e && e.stopPropagation();
     Matomo.trackEvent("Browse", "SelectType", type.name);
     browseStore.selectType(type);
@@ -227,7 +241,7 @@ const TypesItem = observer(({ type }) => {
   const color = type.color;
   const canCreate = appStore.currentSpacePermissions.canCreate && type.canCreate !== false && type.isSupported; // We are allowed to create unless canCreate is explicitly set to false and there are fields
 
-  let cannotCreateTooltip = null;
+  let cannotCreateTooltip = undefined;
   if (!appStore.currentSpacePermissions.canCreate) {
     cannotCreateTooltip = `You are not allowed to create a new ${type.label} in space ${appStore.currentSpaceName}.`;
   } else if (!type.canCreate) {
@@ -236,7 +250,7 @@ const TypesItem = observer(({ type }) => {
 
   return (
     <div
-      key={type.id}
+      key={type.name}
       className={`${classes.container} ${selected ? "selected" : ""} ${
         browseStore.isFetching.instances ? "disabled" : ""
       }`}

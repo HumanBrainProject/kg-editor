@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { toJS } from "mobx";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
@@ -115,9 +115,6 @@ const useStyles = createUseStyles({
       paddingLeft: "10px"
     }
   },
-  fetchErrorIcon: {
-    color: "var(--ft-color-error)"
-  },
   textError: {
     margin: 0,
     wordBreak: "keep-all",
@@ -125,7 +122,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstancesHistoryBody = observer(({ onError }) => {
+interface InstancesHistoryBodyProps {
+  onError: () => void;
+}
+
+const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) => {
 
   const classes = useStyles();
 
@@ -174,15 +175,7 @@ const InstancesHistoryBody = observer(({ onError }) => {
     return (
       <div className={classes.fetchError}>
         <PopOverButton
-          buttonClassName={classes.fetchErrorButton}
           buttonTitle="retrieving history instances failed, click for more information"
-          iconComponent={FontAwesomeIcon}
-          iconProps={{icon: "exclamation-triangle", className:classes.fetchErrorIcon}}
-          okComponent={() => (
-            <>
-              <FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry
-            </>
-          )}
           onOk={onError}
         >
           <h5 className={classes.textError}>{historyStore.fetchError}</h5>
@@ -212,26 +205,30 @@ const InstancesHistoryBody = observer(({ onError }) => {
 });
 InstancesHistoryBody.displayName = "InstancesHistoryBody";
 
-const InstancesHistoryHeader = observer(({ onChange }) => {
+interface InstancesHistoryHeaderProps {
+  onChange: () => void;
+}
+
+const InstancesHistoryHeader = observer(({ onChange }: InstancesHistoryHeaderProps) => {
 
   const { appStore } = useStores();
 
-  const handleHistorySizeChange = e => {
+  const handleHistorySizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     appStore.setSizeHistorySetting(e.target.value);
     onChange();
   };
 
-  const handleHistoryViewedFlagChange = e => {
+  const handleHistoryViewedFlagChange = (e: ChangeEvent<HTMLInputElement>) => {
     appStore.toggleViewedFlagHistorySetting(e.target.checked);
     onChange();
   };
 
-  const handleHistoryEditedFlagChange = e => {
+  const handleHistoryEditedFlagChange = (e: ChangeEvent<HTMLInputElement>) => {
     appStore.toggleEditedFlagHistorySetting(e.target.checked);
     onChange();
   };
 
-  const handleHistoryReleasedFlagChange = e => {
+  const handleHistoryReleasedFlagChange = (e: ChangeEvent<HTMLInputElement>) => {
     appStore.toggleReleasedFlagHistorySetting(e.target.checked);
     onChange();
   };
@@ -241,7 +238,7 @@ const InstancesHistoryHeader = observer(({ onChange }) => {
       <h3>
         <span>Your last </span>
         <div className="selector">
-          <select value={appStore.historySettings.size} onChange={handleHistorySizeChange} >
+          <select value={appStore.historySettings?.size} onChange={handleHistorySizeChange} >
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -251,9 +248,9 @@ const InstancesHistoryHeader = observer(({ onChange }) => {
           instances in {appStore.currentSpaceName}
       </h3>
       <ul className="config">
-        <li><input type="checkbox" checked={appStore.historySettings.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>
-        <li><input type="checkbox" checked={appStore.historySettings.eventTypes.edited} onChange={handleHistoryEditedFlagChange} />Edited</li>
-        <li><input type="checkbox" checked={appStore.historySettings.eventTypes.released} onChange={handleHistoryReleasedFlagChange} />Released</li>
+        <li><input type="checkbox" checked={appStore.historySettings?.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>
+        <li><input type="checkbox" checked={appStore.historySettings?.eventTypes.edited} onChange={handleHistoryEditedFlagChange} />Edited</li>
+        <li><input type="checkbox" checked={appStore.historySettings?.eventTypes.released} onChange={handleHistoryReleasedFlagChange} />Released</li>
       </ul>
     </div>
   );
@@ -267,22 +264,22 @@ const InstancesHistory = observer(() => {
   const { appStore, historyStore } = useStores();
 
   useEffect(() => {
-    fetchInstances(appStore.currentSpace.id);
+    fetchInstances(appStore.currentSpace?.id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appStore.currentSpace.id]);
+  }, [appStore.currentSpace?.id]);
 
-  const fetchInstances = space => {
+  const fetchInstances = (space?: string) => {
     const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
       if (eventValue) {
         acc.push(eventType);
       }
       return acc;
     }, []);
-    const history = historyStore.getFileredInstancesHistory(space, eventTypes, appStore.historySettings.size);
+    const history = historyStore.getFileredInstancesHistory(space, eventTypes, appStore.historySettings?.size);
     historyStore.fetchInstances(history);
   };
 
-  const fetch = () => fetchInstances(appStore.currentSpace.id);
+  const fetch = () => fetchInstances(appStore.currentSpace?.id);
 
   return(
     <div className={classes.container}>

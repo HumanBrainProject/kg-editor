@@ -87,9 +87,9 @@ const useToggleStyles = createUseStyles({
 
 
 interface ToggleProps {
-  onSelect: (value: string) => void;
+  onSelect?: (value: string) => void;
   value: string;
-  selectedValue: string;
+  selectedValue?: string;
   noscale?: boolean;
   icon: IconProp;
   color: string;

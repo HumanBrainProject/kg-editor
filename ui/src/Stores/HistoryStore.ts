@@ -88,7 +88,7 @@ export class HistoryStore {
     return this.instancesHistory;
   }
 
-  getFileredInstancesHistory(space: string, modes: string[], max=10) {
+  getFileredInstancesHistory(space: string | undefined, modes: string[], max=10) {
     if (!space) {
       return [];
     }

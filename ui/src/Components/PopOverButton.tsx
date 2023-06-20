@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ReactNode, MouseEvent } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,6 +29,7 @@ import Overlay from "react-bootstrap/Overlay";
 import Popover from "react-bootstrap/Popover";
 import Button from "react-bootstrap/Button";
 import uniqueId from "lodash/uniqueId";
+import { Placement } from "react-bootstrap/esm/types";
 
 const useStyles = createUseStyles({
   container: {
@@ -72,6 +73,9 @@ const useStyles = createUseStyles({
     "& button + button": {
       marginLeft: "20px"
     }
+  },
+  fetchErrorIcon: {
+    color: "var(--ft-color-error)"
   }
 });
 
@@ -83,9 +87,14 @@ const windowHeight = () => {
   return w.innerHeight || e.clientHeight || g.clientHeight;
 };
 
-const PopOverContent = ({ onSizeChange, children}) => {
+interface PopOverContentProps {
+  onSizeChange: (v: DOMRect) => void;
+  children: ReactNode;
+}
 
-  const ref = useRef();
+const PopOverContent = ({ onSizeChange, children}: PopOverContentProps) => {
+
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (ref.current) {
@@ -100,53 +109,50 @@ const PopOverContent = ({ onSizeChange, children}) => {
   );
 };
 
-const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconComponent, iconProps, okComponent, okProps, cancelComponent, cancelProps, children, onOk, onCancel }) => {
+interface PopOverButtonProps {
+  buttonTitle: string;
+  children: ReactNode;
+  onOk: () => void;
+}
+
+const PopOverButton = observer(({ buttonTitle, children, onOk }: PopOverButtonProps) => {
 
   const classes = useStyles();
 
   const [showPopOver, setShowPopOver] = useState(false);
-  const [popOverPosition, setPopOverPosition] = useState("bottom");
+  const [popOverPosition, setPopOverPosition] = useState<Placement>("bottom");
 
-  const buttonRef = useRef();
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const handlePopOverPosition = popOverRect => {
+  const handlePopOverPosition = (popOverRect:DOMRect ) => {
     if (!popOverRect) { return null; }
-    const buttonRect = buttonRef.current.getBoundingClientRect();
-    const position = (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?"top":"bottom";
+    const buttonRect = buttonRef.current?.getBoundingClientRect();
+    const position = buttonRect && (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?"top":"bottom";
     if (popOverPosition !== position) {
       setPopOverPosition(position);
     }
   };
 
-  const handleButtonClick = event => {
-    event.stopPropagation();
+  const handleButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setShowPopOver(!showPopOver);
   };
 
-  const handlePopOverClose = e => {
+  const handlePopOverClose = (e: Event | MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     setShowPopOver(false);
   };
 
-  const handleCancelClick = e => {
+  const handleOkClick = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     setShowPopOver(false);
-    typeof onCancel === "function" && onCancel();
+    onOk();
   };
 
-  const handleOkClick = e => {
-    e && e.stopPropagation();
-    setShowPopOver(false);
-    typeof onOk === "function" && onOk();
-  };
-
-  const IconComponent = iconComponent;
-  const OkComponent = okComponent;
-  const CancelComponent = cancelComponent;
   return(
-    <div className={`${classes.container} ${className?className:""}`}>
-      <button className={`${classes.button} ${buttonClassName?buttonClassName:""}`} onClick={handleButtonClick} title={buttonTitle} ref={buttonRef}>
-        <IconComponent {...iconProps} />
+    <div className={classes.container}>
+      <button className={classes.button} onClick={handleButtonClick} title={buttonTitle} ref={buttonRef}>
+        <FontAwesomeIcon icon="exclamation-triangle" className={classes.fetchErrorIcon}/>
       </button>
       <Overlay
         show={showPopOver}
@@ -160,17 +166,10 @@ const PopOverButton = observer(({ className, buttonClassName, buttonTitle, iconC
           <PopOverContent onSizeChange={handlePopOverPosition}>
             <div className={classes.popOverContent}>
               {children}
+            </div>            
+            <div className={classes.popOverFooterBar}>
+              <Button variant="primary" size="sm" onClick={handleOkClick}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
             </div>
-            {(CancelComponent || OkComponent) && (
-              <div className={classes.popOverFooterBar}>
-                {CancelComponent && (
-                  <Button size="sm" onClick={handleCancelClick}><CancelComponent {...cancelProps} /></Button>
-                )}
-                {OkComponent && (
-                  <Button variant="primary" size="sm" onClick={handleOkClick}><OkComponent {...okProps}  /></Button>
-                )}
-              </div>
-            )}
             <button className={classes.popOverCloseButton} onClick={handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
           </PopOverContent>
         </Popover>

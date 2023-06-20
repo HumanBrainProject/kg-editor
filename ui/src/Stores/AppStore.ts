@@ -300,10 +300,10 @@ export class AppStore{
     return this.currentSpace?this.currentSpace.permissions:{};
   }
 
-  setSizeHistorySetting(size: number){
-    size = Number(size);
+  setSizeHistorySetting(size: string){
+    const sizeAsNumber = Number(size);
     if(this.historySettings) {
-      this.historySettings.size = (!isNaN(size) && size > 0)?size:10;
+      this.historySettings.size = (!isNaN(sizeAsNumber) && sizeAsNumber > 0)?sizeAsNumber:10;
       localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
     }
   }

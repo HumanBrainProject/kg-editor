@@ -30,14 +30,16 @@ import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 import RootStore from "./RootStore";
 import { Space } from "../types";
-import { APIError } from "../Services/API";
+import API, { APIError } from "../Services/API";
+import InstanceStore from "./InstanceStore";
 
-const themes = {};
-themes[DefaultTheme.name] = DefaultTheme;
-themes[BrightTheme.name] = BrightTheme;
-themes[CupcakeTheme.name] = CupcakeTheme;
+const themes = {
+  [DefaultTheme.name]: DefaultTheme,
+  [BrightTheme.name]: BrightTheme,
+  [CupcakeTheme.name]: CupcakeTheme
+};
 
-const getLinkedInstanceIds = (instanceStore, instanceIds: string []) => {
+const getLinkedInstanceIds = (instanceStore: InstanceStore, instanceIds: string []) => {
   const result = instanceIds.reduce((acc, id) => {
     const instance = instanceStore.instances.get(id);
     if (instance) {
@@ -51,24 +53,36 @@ const getLinkedInstanceIds = (instanceStore, instanceIds: string []) => {
   return Array.from(new Set(result));
 };
 
-const navigateToInstance = (navigate:NavigateFunction, instanceId: string, mode: string, type: string) => {
-  if(mode === "view"){
-    navigate(`/instances/${instanceId}`);
-  } else if(mode === "create"){
-    navigate(`/instances/${instanceId}/create?space=${this.currentSpaceName}&type=${encodeURIComponent(type)}`);
-  } else {
-    navigate(`/instances/${instanceId}/${mode}`);
+interface ExternalCreateModal {
+  space: string;
+  type: string;
+  value: string;
+  toSave?: boolean;
+  saved?: number;
+}
+
+interface InstanceToMove {
+  id: string;
+  space: string;
+}
+
+interface HistorySettings {
+  size: number,
+  eventTypes: {
+    viewed: boolean,
+    edited: boolean,
+    released: boolean
   }
-};
+}
 export class AppStore{
   commit?: string;
-  globalError = null;
+  globalError?: boolean;
   currentSpace?: Space;
   savePercentage = null;
   _currentThemeName = DefaultTheme.name;
-  historySettings = null;
+  historySettings?: HistorySettings;
   showSaveBar = false;
-  externalCreateModal = false;
+  externalCreateModal?: ExternalCreateModal;
   instanceToDelete?: string;
   isDeletingInstance = false;
   deleteInstanceError?: string;
@@ -76,13 +90,13 @@ export class AppStore{
   instanceCreationError = null;
   isMovingInstance = false;
   instanceMovingError?: string;
-  instanceToMove = null;
+  instanceToMove?: InstanceToMove;
   pathsToResolve = new Map();
 
-  api = null;
+  api: API;
   rootStore?: RootStore;
 
-  constructor(api, rootStore: RootStore) {
+  constructor(api: API, rootStore: RootStore) {
     makeObservable(this, {
       commit: observable,
       externalCreateModal: observable,
@@ -110,7 +124,6 @@ export class AppStore{
       flush: action,
       setGlobalError: action,
       dismissGlobalError: action,
-      toggleSavebarDisplay: action,
       openInstance: action,
       focusPreviousInstance: action,
       focusNextInstance: action,
@@ -138,11 +151,12 @@ export class AppStore{
     this.api = api;
     this.rootStore = rootStore;
 
-    this.setTheme(localStorage.getItem("theme"));
+    this.setTheme(localStorage.getItem("theme") as string);
     let savedHistorySettings = null;
-    if (localStorage.getItem("historySettings")) {
+    const localStorageHistorySettings = localStorage.getItem("historySettings");
+    if (localStorageHistorySettings) {
       try {
-        savedHistorySettings = JSON.parse(localStorage.getItem("historySettings"));
+        savedHistorySettings = JSON.parse(localStorageHistorySettings);
       } catch (e) {
         savedHistorySettings = null;
       }
@@ -195,7 +209,7 @@ export class AppStore{
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
     this.instanceCreationError = null;
-    this.instanceToMove = null;
+    this.instanceToMove = undefined;
     this.isMovingInstance = false;
     this.instanceMovingError = undefined;
     this.instanceToDelete = undefined;
@@ -239,12 +253,12 @@ export class AppStore{
     this.rootStore?.viewStore.clearViews();
   }
 
-  setGlobalError(error, info) {
-    this.globalError = {error, info};
+  setGlobalError() {
+    this.globalError = true;
   }
 
   dismissGlobalError() {
-    this.globalError = null;
+    this.globalError = undefined;
   }
 
   get currentTheme() {
@@ -264,6 +278,17 @@ export class AppStore{
     }
   }
 
+  navigateToInstance(navigate:NavigateFunction, instanceId: string, mode: string, type: string) {
+    if(mode === "view"){
+      navigate(`/instances/${instanceId}`);
+    } else if(mode === "create"){
+      navigate(`/instances/${instanceId}/create?space=${this.currentSpaceName}&type=${encodeURIComponent(type)}`);
+    } else {
+      navigate(`/instances/${instanceId}/${mode}`);
+    }
+  }
+  
+
   get currentSpaceName() {
     if (this.currentSpace) {
       return this.currentSpace.name || this.currentSpace.id;
@@ -277,23 +302,31 @@ export class AppStore{
 
   setSizeHistorySetting(size: number){
     size = Number(size);
-    this.historySettings.size = (!isNaN(size) && size > 0)?size:10;
-    localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+    if(this.historySettings) {
+      this.historySettings.size = (!isNaN(size) && size > 0)?size:10;
+      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+    }
   }
 
-  toggleViewedFlagHistorySetting(on){
-    this.historySettings.eventTypes.viewed = on?true:false;
-    localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+  toggleViewedFlagHistorySetting(on: boolean){
+    if(this.historySettings) {
+      this.historySettings.eventTypes.viewed = on?true:false;
+      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+    }
   }
 
-  toggleEditedFlagHistorySetting(on){
-    this.historySettings.eventTypes.edited = on?true:false;
-    localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+  toggleEditedFlagHistorySetting(on: boolean){
+    if(this.historySettings) {
+      this.historySettings.eventTypes.edited = on?true:false;
+      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+    }
   }
 
-  toggleReleasedFlagHistorySetting(on){
-    this.historySettings.eventTypes.released = on?true:false;
-    localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+  toggleReleasedFlagHistorySetting(on: boolean) {
+    if(this.historySettings) {
+      this.historySettings.eventTypes.released = on?true:false;
+      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+    }
   }
 
   setSpace = (spaceName: string) => {
@@ -301,7 +334,7 @@ export class AppStore{
       this.currentSpace = this.rootStore?.userProfileStore.getSpace(spaceName);
       localStorage.setItem("space", spaceName);
     } else {
-      this.currentSpace = null;
+      this.currentSpace = undefined;
       localStorage.removeItem("space");
     }
   }
@@ -331,10 +364,6 @@ export class AppStore{
     }
   }
 
-  toggleSavebarDisplay = state => {
-    this.showSaveBar = state !== undefined? !!state: !this.showSaveBar;
-  }
-
   openInstance(instanceId: string, instanceName: string, instancePrimaryType: string, viewMode = "view") {
     const instance = this.rootStore?.instanceStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
@@ -355,7 +384,7 @@ export class AppStore{
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
+        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
         this.rootStore?.browseStore.clearSelectedInstance();
@@ -378,10 +407,10 @@ export class AppStore{
     if (!instance.hasSaveError) {
       if (isNew) {
         runInAction(() => {
-          const view = this.rootStore.viewStore.views.get(id);
+          const view = this.rootStore?.viewStore.views.get(id);
           if(view) {
             if (newId !== id) {
-              this.rootStore.viewStore.replaceViewByNewInstanceId(id, newId);
+              this.rootStore?.viewStore.replaceViewByNewInstanceId(id, newId);
             } else {
               view.mode = "edit";
             }
@@ -389,15 +418,15 @@ export class AppStore{
             this.replaceInstanceResolvedIdPath(`/instances/${id}/create`, navigate);
           }
         });
-        this.rootStore.viewStore.syncStoredViews();
+        this.rootStore?.viewStore.syncStoredViews();
       }
     }
-    this.rootStore.historyStore.updateInstanceHistory(instance.id, "edited");
-    this.rootStore.statusStore.flush();
+    this.rootStore?.historyStore.updateInstanceHistory(instance.id, "edited");
+    this.rootStore?.statusStore.flush();
   }
 
   syncInstancesHistory(instance, mode: string) {
-    if(instance && this.rootStore.viewStore.views.has(instance.id)){
+    if(instance && this.rootStore?.viewStore.views.has(instance.id)){
       this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
     }
   }
@@ -410,22 +439,22 @@ export class AppStore{
       try{
         await this.api.deleteInstance(instanceId);
         runInAction(() => {
-          this.instanceToDelete = null;
+          this.instanceToDelete = undefined;
           this.isDeletingInstance = false;
           let nextLocation = null;
           if(this.matchInstancePath(location.pathname, instanceId)){
-            const ids = this.rootStore.viewStore.instancesIds;
-            if(ids.length > 1){
+            const ids = this.rootStore?.viewStore.instancesIds;
+            if(ids && ids.length > 1){
               const currentInstanceIndex = ids.indexOf(instanceId);
               const newInstanceId = currentInstanceIndex >= ids.length - 1 ? ids[currentInstanceIndex-1]: ids[currentInstanceIndex+1];
-              const view = this.rootStore.viewStore.views.get(newInstanceId);
+              const view = this.rootStore?.viewStore.views.get(newInstanceId);
               nextLocation = `/instances/${newInstanceId}/${view.mode}`;
             } else {
               nextLocation = "/browse";
             }
           }
-          this.rootStore.browseStore.refreshFilter();
-          this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
+          this.rootStore?.browseStore.refreshFilter();
+          this.rootStore?.viewStore.unregisterViewByInstanceId(instanceId);
           this.flush();
           if (nextLocation) {
             navigate(nextLocation);
@@ -443,7 +472,7 @@ export class AppStore{
   }
 
   async duplicateInstance(fromInstanceId: string, navigate: NavigateFunction) {
-    const instanceToCopy = this.rootStore.instanceStore.instances.get(fromInstanceId);
+    const instanceToCopy = this.rootStore?.instanceStore.instances.get(fromInstanceId);
     const payload = instanceToCopy.payload;
     const labelField = instanceToCopy.labelField;
     if(labelField) {
@@ -451,13 +480,13 @@ export class AppStore{
     }
     this.isCreatingNewInstance = true;
     try{
-      const { data } = await this.api.createInstance(this.currentSpace.id, null, payload);
+      const { data } = await this.api.createInstance(this.currentSpace?.id, null, payload);
       runInAction(() => {
         this.isCreatingNewInstance = false;
       });
       const newId = data?.id;
       if(newId) {
-        const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
+        const newInstance = this.rootStore?.instanceStore.createInstanceOrGet(newId);
         newInstance.initializeData(this.api, this.rootStore, data);
         navigate(`/instances/${newId}/edit`);
       }
@@ -480,10 +509,10 @@ export class AppStore{
       await this.api.moveInstance(instanceId, space);
       runInAction(() => {
         this.isMovingInstance = false;
-        this.instanceToMove = null;
+        this.instanceToMove = undefined;
       });
-      this.rootStore.browseStore.refreshFilter();
-      this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
+      this.rootStore?.browseStore.refreshFilter();
+      this.rootStore?.viewStore.unregisterViewByInstanceId(instanceId);
       this.flush();
       await this.switchSpace(location, navigate, space);
       navigate(`/instances/${instanceId}`);
@@ -499,11 +528,11 @@ export class AppStore{
   }
 
   async retryMoveInstance(location: Location, navigate: NavigateFunction) {
-    return this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, location, navigate);
+    return this.moveInstance(this.instanceToMove?.id, this.instanceToMove?.space, location, navigate);
   }
 
   cancelMoveInstance() {
-    this.instanceToMove = null;
+    this.instanceToMove = undefined;
     this.instanceMovingError = undefined;
   }
 
@@ -530,22 +559,22 @@ export class AppStore{
 
   focusPreviousInstance(instanceId: string, location: Location, navigate: NavigateFunction) {
     if (this.matchInstancePath(location.pathname, instanceId)) {
-      if (this.rootStore.viewStore.views.size > 1) {
-        let openedInstances = this.rootStore.viewStore.instancesIds;
-        let currentInstanceIndex = openedInstances.indexOf(instanceId);
-        let newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
+      if (this.rootStore && this.rootStore.viewStore && this.rootStore.viewStore.views.size > 1) {
+        const openedInstances = this.rootStore?.viewStore.instancesIds;
+        const currentInstanceIndex = openedInstances?.indexOf(instanceId);
+        const newCurrentInstanceId = currentInstanceIndex === 0 ? openedInstances[openedInstances.length - 1] : openedInstances[currentInstanceIndex - 1];
 
-        let openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
+        const openedInstance = this.rootStore?.viewStore.views.get(newCurrentInstanceId);
+        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }
     } else {
-      if (this.rootStore.viewStore.views.size > 1) {
+      if (this.rootStore && this.rootStore.viewStore && this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[openedInstances.length - 1];
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
+        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }
@@ -554,22 +583,22 @@ export class AppStore{
 
   focusNextInstance(instanceId: string, location: Location, navigate: NavigateFunction) {
     if (this.matchInstancePath(location.pathname, instanceId)) {
-      if (this.rootStore.viewStore.views.size > 1) {
+      if (this.rootStore && this.rootStore.viewStore && this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const currentInstanceIndex = openedInstances.indexOf(instanceId);
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[0] : openedInstances[currentInstanceIndex + 1];
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
+        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }
     } else {
-      if (this.rootStore.viewStore.views.size > 1) {
+      if (this.rootStore && this.rootStore.viewStore && this.rootStore.viewStore.views.size > 1) {
         const openedInstances = this.rootStore.viewStore.instancesIds;
         const newCurrentInstanceId = openedInstances[0];
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
+        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
         navigate("/browse");
       }

@@ -20,7 +20,7 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import { createUseStyles, useTheme } from "react-jss";
+import { DefaultTheme, createUseStyles, useTheme } from "react-jss";
 
 const getBtnLinkStyle = theme => {
   if (theme.name === "bright") {
@@ -60,8 +60,7 @@ const getPrimaryBtnHoverStyle = theme => {
   return {};
 };
 
-const getUseStyles = () => createUseStyles(theme => {
-
+const getUseStyles = () => createUseStyles((theme: Jss.Theme)  => {
   const styles = {
     "@global": {
       ":root": {
@@ -205,7 +204,7 @@ const getUseStyles = () => createUseStyles(theme => {
 
 const Styles = () => {
 
-  const theme = useTheme();
+  const theme = useTheme<DefaultTheme>();
   
   const useStyles = getUseStyles();
   useStyles({ theme });

@@ -21,7 +21,8 @@
  *
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
+import RootStore from "../Stores/RootStore";
 
 class ErrorBoundaryComponent extends React.Component {
 
@@ -29,9 +30,8 @@ class ErrorBoundaryComponent extends React.Component {
     return null;
   }
 
-  componentDidCatch(error, info) {
-    const { stores:{ appStore } } = this.props;
-    appStore.setGlobalError(error, info);
+  componentDidCatch() {
+    this.props.stores.appStore.setGlobalError();
   }
 
   render() {
@@ -40,7 +40,13 @@ class ErrorBoundaryComponent extends React.Component {
   }
 }
 
-const ErrorBoundary = ({ stores, children }) => (
+
+interface ErrorBoundaryProps {
+  stores: RootStore;
+  children: ReactNode;
+}
+
+const ErrorBoundary = ({ stores, children }:ErrorBoundaryProps) => (
   <ErrorBoundaryComponent stores={stores} >
     {children}
   </ErrorBoundaryComponent>

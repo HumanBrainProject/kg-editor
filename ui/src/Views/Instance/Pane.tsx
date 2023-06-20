@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { Scrollbars } from "react-custom-scrollbars-2";
@@ -62,11 +62,16 @@ const useStyles = createUseStyles({
   }
 });
 
-const Pane = observer(({ paneId, children }) => {
+interface PaneProps {
+  paneId: string;
+  children: ReactNode;
+}
+
+const Pane = observer(({ paneId, children }: PaneProps) => {
 
   const classes = useStyles();
 
-  const paneRef = useRef();
+  const paneRef = useRef<HTMLDivElement>(null);
 
   const view = React.useContext(ViewContext);
 

@@ -51,7 +51,7 @@ const getImageTitle = (title, name, userId) => {
 interface AvatarProps {
   userId: string;
   name: string;
-  picture: string;
+  picture?: string;
   title?: string;
   size?: number;
 }

@@ -72,10 +72,10 @@ export class InvitedUsersStore {
         this.fetchError = undefined;
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message ? e.message : e;
         this.users = [];
-        this.fetchError = `Error while retrieving invited users for instance "${instanceId}" (${message})`;
+        this.fetchError = `Error while retrieving invited users for instance "${instanceId}" (${err?.message})`;
         this.isFetched = false;
         this.isFetching = false;
       });

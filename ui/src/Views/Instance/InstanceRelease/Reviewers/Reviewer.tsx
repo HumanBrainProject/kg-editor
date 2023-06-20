@@ -27,6 +27,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import User from "../../../../Components/User";
+import { UserSummary } from "../../../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -86,7 +87,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const Reviewer = observer(({ review, onRemoveInvitation }) => {
+interface ReviewerProps {
+  review: UserSummary;
+  onRemoveInvitation: (id: string) => void;
+}
+
+const Reviewer = observer(({ review, onRemoveInvitation }: ReviewerProps) => {
 
   const classes = useStyles();
 

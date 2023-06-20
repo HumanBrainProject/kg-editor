@@ -71,7 +71,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const Reviewers = observer(({ id }) => {
+interface ReviewersProps {
+  id: string;
+}
+
+const Reviewers = observer(({ id }: ReviewersProps) => {
 
   const classes = useStyles();
 
@@ -84,9 +88,9 @@ const Reviewers = observer(({ id }) => {
 
   const fetchInstanceReviews = () => invitedUsersStore.getInvitedUsers(id);
 
-  const handleRemoveUserInvitation = userId => invitedUsersStore.removeUserInvitation(id, userId);
+  const handleRemoveUserInvitation = (userId: string) => invitedUsersStore.removeUserInvitation(id, userId);
 
-  const handleInviteUser = userId => invitedUsersStore.inviteUser(id, userId);
+  const handleInviteUser = (userId: string) => invitedUsersStore.inviteUser(id, userId);
 
   const excludedUsers = invitedUsersStore.users.map(review => review.id);
   if (userProfileStore.isAuthorized && userProfileStore.user && userProfileStore.user.id && !excludedUsers.includes(userProfileStore.user.id)) {
@@ -137,7 +141,7 @@ const Reviewers = observer(({ id }) => {
         <div className={classes.reviewers} >
           <ul>
             {invitedUsersStore.users.map(review => (
-              <li key={review.userId}>
+              <li key={review.id}>
                 <Reviewer review={review} onRemoveInvitation={handleRemoveUserInvitation} onInvite={handleInviteUser} />
               </li>
             ))}

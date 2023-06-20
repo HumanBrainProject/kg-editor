@@ -40,7 +40,7 @@ const useStyles = createUseStyles({
 interface UserProps {
   userId: string;
   name: string;
-  picture: string;
+  picture?: string;
   title: string;
 }
 

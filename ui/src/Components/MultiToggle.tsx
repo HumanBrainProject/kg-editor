@@ -21,9 +21,10 @@
  *
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
   container:{
@@ -34,11 +35,17 @@ const useStyles = createUseStyles({
   }
 });
 
-const MultiToggle = ({ selectedValue, children , onChange}) => {
+interface MultiToggleProps {
+  selectedValue: string;
+  children: ReactNode;
+  onChange: (value: string) => void;
+}
+
+const MultiToggle = ({ selectedValue, children, onChange}: MultiToggleProps) => {
 
   const classes = useStyles();
 
-  const handleSelect = value => {
+  const handleSelect = (value: string) => {
     if(typeof onChange === "function"){
       onChange(value);
     }
@@ -79,7 +86,16 @@ const useToggleStyles = createUseStyles({
 });
 
 
-const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}) => {
+interface ToggleProps {
+  onSelect: (value: string) => void;
+  value: string;
+  selectedValue: string;
+  noscale?: boolean;
+  icon: IconProp;
+  color: string;
+}
+
+const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}: ToggleProps) => {
   const classes = useToggleStyles();
 
   const handleClick = () => {

@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent, ReactNode } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -39,10 +39,17 @@ const useStyles = createUseStyles({
   }
 });
 
-const SpaceDropdownToggle = React.forwardRef(({ children, onClick }, ref) => {
+interface SpaceDropdownToggleProps {
+  children: ReactNode;
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+}
+
+type RefType = HTMLButtonElement;
+
+const SpaceDropdownToggle = React.forwardRef<RefType,  SpaceDropdownToggleProps>(({ children, onClick }, ref) => {
   const classes = useStyles();
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     onClick(e);
   };

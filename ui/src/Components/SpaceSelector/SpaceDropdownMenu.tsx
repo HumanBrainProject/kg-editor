@@ -22,7 +22,7 @@
  */
 
 import { observer } from "mobx-react-lite";
-import React, { useState } from "react";
+import React, { ForwardedRef, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { createUseStyles } from "react-jss";
 import useStores from "../../Hooks/useStores";
@@ -52,14 +52,19 @@ const useStyles = createUseStyles({
   }
 });
 
+interface SpaceDropdownMenuComponentProps {
+  className: string;
+  labeledBy: string;
+  wrapperRef: HTMLDivElement;
+}
 
-const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef}) => {
+const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef}: SpaceDropdownMenuComponentProps) => {
     const classes = useStyles();
     const [ filter, setFilter ] = useState("");
 
     const { userProfileStore } = useStores();
 
-    const handleChange = value => setFilter(value);
+    const handleChange = (value: string) => setFilter(value);
 
     const spaces = userProfileStore.filterSpaces(filter);
 
@@ -67,7 +72,7 @@ const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef})
       <div ref={wrapperRef} className={`${className} ${classes.dropdownMenu}`} aria-labelledby={labeledBy}>
         <Filter value={filter} placeholder="Filter spaces" onChange={handleChange} />
         <ul className={classes.list}>
-          {spaces.map(space =>
+          {spaces?.map(space =>
               <Dropdown.Item
                 key={space.id}
                 eventKey={space.id}
@@ -83,7 +88,14 @@ const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef})
 );
 SpaceDropdownMenuComponent.displayName = "SpaceDropdownMenuComponent";
 
-const SpaceDropdownMenu = React.forwardRef(
+interface SpaceDropdownMenuProps {
+  className: string;
+  "aria-labelledby": string;
+}
+
+type WrapperRef = ForwardedRef<HTMLDivElement>;
+
+const SpaceDropdownMenu = React.forwardRef<WrapperRef, SpaceDropdownMenuProps>(
   ({ className, "aria-labelledby": labeledBy }, ref) => <SpaceDropdownMenuComponent className={className} labeledBy={labeledBy} wrapperRef={ref} />);
   SpaceDropdownMenu.displayName = "SpaceDropdownMenu";
 

@@ -122,7 +122,7 @@ const processChildrenInstanceList = (node, list, level, hideReleasedInstances) =
   }
 };
 export class ReleaseStore {
-  topInstanceId = null;
+  topInstanceId?: string;
   instancesTree = null;
   isFetching = false;
   isFetched = false;
@@ -276,7 +276,7 @@ export class ReleaseStore {
     return nodesByStatus;
   }
 
-  toggleHideReleasedInstances(hideReleasedInstances) {
+  toggleHideReleasedInstances(hideReleasedInstances?: boolean) {
     this.hideReleasedInstances =
       hideReleasedInstances === undefined
         ? !this.hideReleasedInstances
@@ -287,7 +287,7 @@ export class ReleaseStore {
     this.isStopped = true;
   }
 
-  setTopInstanceId(instanceId) {
+  setTopInstanceId(instanceId: string) {
     this.topInstanceId = instanceId;
   }
 

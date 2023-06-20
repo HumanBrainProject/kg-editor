@@ -24,6 +24,7 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 import { StatusResponse } from "../types";
+import API from "../Services/API";
 
 
 interface Status {
@@ -50,9 +51,9 @@ export class StatusStore {
   fetchQueue: string[] = [];
   fetchQueueChildren: string[] = [];
 
-  api = null;
+  api: API;
 
-  constructor(api) {
+  constructor(api: API) {
     makeObservable(this, {
       statuses: observable,
       isFetching: observable,

@@ -25,8 +25,9 @@ import { observable, action, runInAction, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
 
 import Instance from "./Instance";
-import { APIError } from "../Services/API";
+import API, { APIError } from "../Services/API";
 import { Type } from "./TypeStore";
+import RootStore from "./RootStore";
 
 const normalizeInstancesData = (api, rootStore, data) => {
   return (Array.isArray(data))?data.map(rowData => {
@@ -60,10 +61,10 @@ export class BrowseStore {
   pageStart = 0;
   pageSize = 20;
 
-  api = null;
-  rootStore = null;
+  api: API;
+  rootStore: RootStore;
 
-  constructor(api, rootStore) {
+  constructor(api: API, rootStore: RootStore) {
     makeObservable(this, {
       isFetching: observable,
       isFetched: observable,

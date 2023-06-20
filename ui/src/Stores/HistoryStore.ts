@@ -24,7 +24,8 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 
 import Instance from "./Instance";
-import { APIError } from "../Services/API";
+import API, { APIError } from "../Services/API";
+import RootStore from "./RootStore";
 
 const maxItems = 100;
 
@@ -34,10 +35,10 @@ export class HistoryStore {
   isFetching = false;
   fetchError?: string;
 
-  api = null;
-  rootStore = null;
+  api: API;
+  rootStore: RootStore;
 
-  constructor(api, rootStore){
+  constructor(api: API, rootStore: RootStore){
     makeObservable(this, {
       instancesHistory: observable,
       instances: observable,
@@ -50,10 +51,10 @@ export class HistoryStore {
 
     this.api = api;
     this.rootStore = rootStore;
-
-    if (localStorage.getItem("instancesHistory")) {
+    const localStorageInstancesHistory = localStorage.getItem("instancesHistory")
+    if (localStorageInstancesHistory) {
       try {
-        this.instancesHistory = JSON.parse(localStorage.getItem("instancesHistory"));
+        this.instancesHistory = JSON.parse(localStorageInstancesHistory);
         if (!(this.instancesHistory instanceof Array)) {
           this.instancesHistory  = [];
         }

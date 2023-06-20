@@ -28,6 +28,8 @@ import {
   computed,
   makeObservable
 } from "mobx";
+import API from "../Services/API";
+import RootStore from "./RootStore";
 
 const setNodeTypesAndSortChildren = node => {
   node.typesName = node.types.reduce(
@@ -139,10 +141,10 @@ export class ReleaseStore {
   historyStore = null;
   statusStore = null;
 
-  api = null;
-  rootStore = null;
+  api: API;
+  rootStore: RootStore;
 
-  constructor(api, rootStore) {
+  constructor(api: API, rootStore: RootStore) {
     makeObservable(this, {
       topInstanceId: observable,
       instancesTree: observable,

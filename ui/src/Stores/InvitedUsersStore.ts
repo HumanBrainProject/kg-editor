@@ -22,7 +22,7 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import { APIError } from "../Services/API";
+import API, { APIError } from "../Services/API";
 import { UserSummary } from "../types";
 
 
@@ -33,9 +33,9 @@ export class InvitedUsersStore {
   isFetched = false;
   error?: string;
 
-  api = null;
+  api: API;
 
-  constructor(api) {
+  constructor(api: API) {
     makeObservable(this, {
       users: observable,
       fetchError: observable,

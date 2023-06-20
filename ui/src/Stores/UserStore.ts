@@ -23,7 +23,7 @@
 
 import { observable, action, runInAction, computed, makeObservable } from "mobx";
 import debounce from "lodash/debounce";
-import { APIError } from "../Services/API";
+import API, { APIError } from "../Services/API";
 import { SearchFilter, UserSummary } from "../types";
 
 export class UserStore {
@@ -37,9 +37,9 @@ export class UserStore {
   };
   totalSearchCount = 0;
 
-  api = null;
+  api: API;
 
-  constructor(api) {
+  constructor(api: API) {
     makeObservable(this, {
       isFetchingSearch: observable,
       isSearchFetched: observable,

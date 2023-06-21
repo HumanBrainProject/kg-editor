@@ -27,6 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import useStores from "../Hooks/useStores";
+import { StructureOfType } from "../types";
 
 import Tab from "../Components/Tab";
 import Modal from "../Components/Modal";
@@ -44,7 +45,7 @@ const NewInstanceTab = observer(() => {
     setShowTypeSelection(true);
   };
 
-  const handleTypeSelection = type => {
+  const handleTypeSelection = (type: StructureOfType) => {
     setShowTypeSelection(false);
     const uuid = uuidv4();
     navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(type.name)}`);

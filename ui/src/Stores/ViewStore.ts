@@ -49,7 +49,7 @@ interface InstanceHighlight {
   provenance?: string; 
 }
 
-class View {
+export class View {
   instanceId?: string;
   name = "";
   mode = "edit";
@@ -61,7 +61,7 @@ class View {
   selectedPane?: string;
   panes: string[] = [];
 
-  constructor(instanceId: string, name: string, color: string, mode: string, description: string) {
+  constructor(instanceId: string, name: string, color: string, mode: string, description?: string) {
     makeObservable(this, {
       instanceId: observable,
       name: observable,
@@ -88,7 +88,7 @@ class View {
     this.instanceId = instanceId;
     this.name = name;
     this.color = color;
-    this.description = description;
+    this.description = description??"";
     this.mode = mode;
     this.instancePath = [instanceId];
   }
@@ -159,8 +159,8 @@ class View {
     this.panes = this.panes.filter(p => p !== paneId);
   }
 
-  setType(type: string) {
-    this.type = type;
+  setType(type?: string) {
+    this.type = type??"";
   }
 }
 
@@ -259,7 +259,7 @@ export class ViewStore{
     this.views.clear();
   }
 
-  registerViewByInstanceId(instanceId: string, name: string, type: StructureOfType, viewMode: string) {
+  registerViewByInstanceId(instanceId: string, name: string, type: StructureOfType|undefined, viewMode: string) {
     if (this.views.has(instanceId)) {
       this.views.get(instanceId).mode = viewMode;
     } else {
@@ -283,7 +283,7 @@ export class ViewStore{
   }
 }
 
-export const PaneContext = React.createContext(null);
-export const ViewContext = React.createContext(null);
+export const PaneContext = React.createContext<string|undefined>(undefined);
+export const ViewContext = React.createContext<View|undefined>(undefined);
 
 export default ViewStore;

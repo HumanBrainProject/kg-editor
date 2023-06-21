@@ -37,12 +37,12 @@ const InstanceView = observer(({ mode }: {mode:string}) => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const instanceId = params.id;
+  const instanceId = params.id as string;
 
   useEffect(() => {
     Matomo.trackCustomUrl(window.location.href);
     Matomo.trackPageView();
-    appStore.openInstance(instanceId, instanceId, {}, mode);
+    appStore.openInstance(instanceId, instanceId, undefined, mode);
     instanceStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(instanceId);
     const instance = instanceStore.instances.get(instanceId); //NOSONAR

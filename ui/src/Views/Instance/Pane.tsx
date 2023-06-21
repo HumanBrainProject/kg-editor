@@ -107,6 +107,9 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
   };
 
   const geActiveClass = () => {
+    if (!view) {
+      return "";
+    }
     if(paneId === view.selectedPane) {
       return "active";
     }
@@ -114,6 +117,10 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
       return "after";
     }
     return "before";
+  }
+
+  if (!view) {
+    return null;
   }
 
   const index = view.getPaneIndex(paneId);

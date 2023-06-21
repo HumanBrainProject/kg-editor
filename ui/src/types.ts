@@ -131,7 +131,8 @@ export interface StructureOfType {
   fields: Map<string, StructureOfField>;
   promotedFields: string[];
   incomingLinks: Map<string, StructureOfIncomingLink>;
-  canCreat: boolean;
+  canCreate: boolean;
+  isSupported?: boolean;
 }
 
 export interface StructureOfField {

@@ -64,7 +64,7 @@ export class UserProfileStore {
     return !!this.spaces?.find(s => s.id === id);
   }
 
-  getSpace(id: string) {
+  getSpace(id: string): Space|undefined {
     return id?this.spaces?.find(s => s.id === id):undefined;
   }
 

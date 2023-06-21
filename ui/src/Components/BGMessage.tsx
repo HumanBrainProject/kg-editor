@@ -50,7 +50,7 @@ const useStyles = createUseStyles({
 });
 
 interface BGMessageProps {
-  icon: IconProp;
+  icon?: IconProp;
   children: ReactNode;
   transform?: string;
   className?: string;

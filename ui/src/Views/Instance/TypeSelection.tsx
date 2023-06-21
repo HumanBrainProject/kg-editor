@@ -27,6 +27,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import useStores from "../../Hooks/useStores";
+import { StructureOfType } from "../../types";
 
 import GridSelector from "../../Components/GridSelector";
 
@@ -48,16 +49,7 @@ const useStyles = createUseStyles({
   }
 });
 
-interface Type {
-  name: string;
-  label: string;
-  description?: string;
-  color?: string;
-  canCreate?: boolean;
-  isSupported: boolean;
-}
-
-const TypeComponent = ({ item: type }: { item: Type }) => {
+const TypeComponent = ({ item: type }: { item: StructureOfType }) => {
   
   const classes = useStyles();
 
@@ -77,18 +69,18 @@ const TypeComponent = ({ item: type }: { item: Type }) => {
 };
 
 interface TypeSelectionProps {
-  onSelect: (type: Type) => void;
+  onSelect: (type: StructureOfType) => void;
 }
 
 const TypeSelection = observer(({ onSelect }: TypeSelectionProps) => {
 
   const { typeStore, appStore } = useStores();
 
-  const list = appStore.currentSpacePermissions.canCreate?typeStore.canCreateTypes:[] as Type[];
+  const list = appStore.currentSpacePermissions.canCreate?typeStore.canCreateTypes:[] as StructureOfType[];
 
-  const handleFilter = (list: Type[], term: string) => list.filter(type => type.label.toLowerCase().includes(term));
+  const handleFilter = (list: StructureOfType[], term: string) => list.filter(type => type.label.toLowerCase().includes(term));
 
-  const Component = GridSelector<Type>;
+  const Component = GridSelector<StructureOfType>;
 
   return (
     <Component list={list} itemComponent={TypeComponent} getKey={type => type.name} onSelect={onSelect} onFilter={handleFilter} filterPlaceholder="Filter types" />

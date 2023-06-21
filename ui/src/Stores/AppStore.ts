@@ -29,7 +29,7 @@ import DefaultTheme from "../Themes/Default";
 import BrightTheme from "../Themes/Bright";
 import CupcakeTheme from "../Themes/Cupcake";
 import RootStore from "./RootStore";
-import { Space } from "../types";
+import { Space, Permissions, StructureOfType } from "../types";
 import API, { APIError } from "../Services/API";
 import InstanceStore from "./InstanceStore";
 
@@ -297,7 +297,20 @@ export class AppStore{
   }
 
   get currentSpacePermissions() {
-    return this.currentSpace?this.currentSpace.permissions:{};
+    if (this.currentSpace) {
+      return this.currentSpace.permissions;
+    }
+    
+    return {
+      canCreate: false,
+      canInviteForReview: false,
+      canDelete: false,
+      canInviteForSuggestion: false,
+      canRead: false,
+      canSuggest: false,
+      canWrite: false,
+      canRelease: false
+    } as Permissions;
   }
 
   setSizeHistorySetting(size: string){
@@ -364,7 +377,7 @@ export class AppStore{
     }
   }
 
-  openInstance(instanceId: string, instanceName: string, instancePrimaryType: string, viewMode = "view") {
+  openInstance(instanceId: string, instanceName: string, instancePrimaryType: StructureOfType|undefined, viewMode = "view") {
     const instance = this.rootStore?.instanceStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
     const name = isFetched?instance.name:instanceName;

@@ -252,3 +252,49 @@ export interface Scope {
 export interface StatusResponse {
   data: string;
 }
+
+export interface GraphNode {
+  id: string;
+  name: string;
+  space: string;
+  color: string;
+  groupId: string;
+  highlighted: boolean;
+}
+
+export interface GraphNodes {
+  [key: string]: GraphNode;
+}
+
+export interface GraphGroups {
+  [key: string]: GraphGroup;
+}
+export interface GraphSource {
+  id: string;
+}
+
+export interface GraphTarget {
+  id: string;
+}
+
+export interface GraphLink {
+  id: string;
+  source: GraphSource;
+  target: GraphTarget;
+}
+
+export interface GraphLinks {
+  [key:string]: GraphLink;
+}
+
+export interface GraphGroup {
+  id: string;
+  name: string;
+  color: string;
+  isGroup: boolean;
+  types: SimpleType[];
+  nodes: GraphNode[];
+  show: boolean;
+  grouped: boolean;
+  highlighted: boolean;
+}

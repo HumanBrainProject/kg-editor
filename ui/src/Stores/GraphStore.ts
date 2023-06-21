@@ -22,18 +22,20 @@
  */
 
 import { observable, action, computed, runInAction, set, values, makeObservable } from "mobx";
+import API from "../Services/API";
+import { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, GraphSource, GraphTarget, SimpleType, UUID } from "../types";
 
 const typeDefaultColor = "white";
 const typeDefaultName = "-";
 const typeDefaultLabel = "Unknown";
 
-const getGroupId = types => types.map(t => t.name).join("|");
+const getGroupId = (types: SimpleType[]) => types.map(t => t.name).join("|");
 
-const getGroupName = types => types.map(t => t.label).join(", ");
+const getGroupName = (types: SimpleType[]) => types.map(t => t.label).join(", ");
 
-const getColor = types => types[0].color?types[0].color:typeDefaultColor;
+const getColor = (types: SimpleType[]) => types[0].color?types[0].color:typeDefaultColor;
 
-const createGroup = (id, types) => ({
+const createGroup = (id: string, types: SimpleType[]) => ({
   id: id,
   name: getGroupName(types),
   color: getColor(types),
@@ -45,7 +47,7 @@ const createGroup = (id, types) => ({
   highlighted: false
 });
 
-const createNode = (id, name, space, color, groupId) => ({
+const createNode = (id: UUID, name: string, space: string, color: string, groupId: string) => ({
   id: id,
   name: name?name:id,
   space: space,
@@ -54,13 +56,13 @@ const createNode = (id, name, space, color, groupId) => ({
   highlighted: false
 });
 
-const createLink = (id, source, target) => ({
+const createLink = (id: string, source: GraphSource, target: GraphTarget) => ({
   id: id,
   source: source,
   target: target
 });
 
-const isNodeVisible = (groups, node) => {
+const isNodeVisible = (groups: GraphGroups, node) => {
   if(node.isGroup) {
     if (node.grouped) {
       return node.show;
@@ -74,7 +76,7 @@ const isNodeVisible = (groups, node) => {
   return false;
 };
 
-const getGraphNodes = groups => Object.values(groups).reduce((acc, group) => {
+const getGraphNodes = (groups: GraphGroups) => Object.values(groups).reduce((acc, group) => {
   if (group.show) {
     if (group.grouped) {
       acc.push(group);
@@ -85,7 +87,7 @@ const getGraphNodes = groups => Object.values(groups).reduce((acc, group) => {
   return acc;
 }, []);
 
-const getGraphLinks = (groups, links) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target)).map(link => ({
+const getGraphLinks = (groups: GraphGroups, links: GraphLink[]) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target)).map(link => ({
   id: link.id,
   source: link.source,
   target: link.target
@@ -95,15 +97,15 @@ export class GraphStore {
   isFetching = false;
   isFetched = false;
   fetchError = null;
-  mainId = null;
-  groups = {};
-  nodes = {};
-  links = [];
-  highlightedNode = null;
+  mainId?: string;
+  groups: GraphGroups = {};
+  nodes: GraphNodes = {};
+  links: GraphLink[] = [];
+  highlightedNode?: GraphNode;
 
-  api = null;
+  api: API;
 
-  constructor(api) {
+  constructor(api: API) {
     makeObservable(this, {
       isFetching: observable,
       isFetched: observable,
@@ -139,14 +141,14 @@ export class GraphStore {
     return values(this.groups).sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  async fetch(id) {
+  async fetch(id: UUID) {
     if (this.isFetching) {
       return;
     }
     this.fetchError = null;
     this.isFetched = false;
     this.isFetching = true;
-    this.highlightedNode = null;
+    this.highlightedNode = undefined;
     this.nodes = {};
     this.groups = {};
     this.links = [];
@@ -171,11 +173,11 @@ export class GraphStore {
     this.isFetching = false;
     this.groups = {};
     this.links = [];
-    this.mainId = null;
+    this.mainId = undefined;
   }
 
-  setHighlightNodeConnections(node, highlighted=false) {
-    this.highlightedNode = highlighted?node:null;
+  setHighlightNodeConnections(node: GraphNode, highlighted=false) {
+    this.highlightedNode = highlighted?node:undefined;
     if(node) {
       set(node, "highlighted", highlighted);
     }
@@ -193,18 +195,18 @@ export class GraphStore {
     }
   }
 
-  setGroupVisibility(group, show=true) {
+  setGroupVisibility(group: GraphGroup, show=true) {
     set(group, "show", show);
   }
 
-  setGrouping(group, grouped=true) {
+  setGrouping(group: GraphGroup, grouped=true) {
     set(group, "grouped", grouped);
   }
 
   extractGroupsAndLinks = rootData => {
-    const links = {};
+    const links: GraphLinks = {};
 
-    const getOrCreateNode = (id, name, space, group) => {
+    const getOrCreateNode = (id: string, name: string, space: string, group: GraphGroup) => {
       let node = this.nodes[id];
       if (!node) {
         set(this.nodes, id, createNode(id, name, space, group.color, group.id));
@@ -227,14 +229,14 @@ export class GraphStore {
       return group;
     };
 
-    const addDirectionalLink = (source, target) => {
+    const addDirectionalLink = (source: GraphSource, target: GraphTarget) => {
       const id = `${source.id}->${target.id}`;
       if (!links[id]) {
         links[id] = createLink(id, source, target);
       }
     };
 
-    const addLink = (source, target, isReverse) => {
+    const addLink = (source: GraphSource, target: GraphTarget, isReverse?: boolean) => {
       if (isReverse) {
         addDirectionalLink(target, source); //NOSONAR swap of target & source order are intended, it is reverse
       } else {
@@ -242,7 +244,7 @@ export class GraphStore {
       }
     };
 
-    const extractData = (data, parentNode, parentGroup, isReverse) => {
+    const extractData = (data, parentNode?: GraphNode, parentGroup?: GraphGroup, isReverse?: boolean) => {
       const types = (data.types && data.types.length)?data.types:[{name: typeDefaultName, label: typeDefaultLabel}];
       const group = getOrCreateGroup(types);
       const node = getOrCreateNode(data.id, data.name, data.space, group);
@@ -264,7 +266,7 @@ export class GraphStore {
       Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, true));
     };
 
-    extractData(rootData, null, null, false);
+    extractData(rootData, undefined, undefined, false);
 
     values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
 

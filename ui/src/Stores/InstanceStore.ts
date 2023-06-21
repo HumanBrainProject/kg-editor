@@ -25,17 +25,20 @@ import { observable, action, runInAction, computed, toJS, makeObservable } from 
 import debounce from "lodash/debounce";
 
 import { Instance as BaseInstance } from "./Instance";
+import API, { APIError } from "../Services/API";
+import RootStore from "./RootStore";
+import { InstanceLabel, Stage, StructureOfType, UUID } from "../types";
 
 class Instance extends BaseInstance {
 
-  cancelChangesPending = null;
-  saveError = null;
+  cancelChangesPending?: boolean;
+  saveError?: string;
   hasSaveError = false;
   isSaving = false;
 
-  store = null;
+  store: InstanceStore;
 
-  constructor(id, store) {
+  constructor(id: string, store: InstanceStore) {
     super(id);
 
     makeObservable(this, {
@@ -114,7 +117,7 @@ class Instance extends BaseInstance {
         runInAction(() => {
           const newId = data.id;
           this.isNew = false;
-          this.saveError = null;
+          this.saveError = undefined;
           this.hasSaveError = false;
           this.isSaving = false;
           this.rawData = null;
@@ -132,7 +135,7 @@ class Instance extends BaseInstance {
       } else {
         const { data } = await this.store.api.patchInstance(this.id, payload);
         runInAction(() => {
-          this.saveError = null;
+          this.saveError = undefined;
           this.hasSaveError = false;
           this.isSaving = false;
           this.rawData = null;
@@ -144,10 +147,10 @@ class Instance extends BaseInstance {
         });
       }
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message ? e.message : e;
-        const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
-        this.saveError = `Error while saving instance "${this.id}" (${message}) ${errorMessage}`;
+        const errorMessage = err.response && err.response.status !== 500 ? err.response.data : "";
+        this.saveError = `Error while saving instance "${this.id}" (${err?.message}) ${errorMessage}`;
         this.hasSaveError = true;
         this.isSaving = false;
       });
@@ -155,35 +158,35 @@ class Instance extends BaseInstance {
   }
 
   cancelSave() {
-    this.saveError = null;
+    this.saveError = undefined;
     this.hasSaveError = false;
   }
 
   cancelChanges() {
     Object.values(this.fields).forEach(field => field.reset());
     this.cancelChangesPending = false;
-    this.saveError = null;
+    this.saveError = undefined;
     this.hasSaveError = false;
   }
 
 }
 
 export class InstanceStore {
-  stage = null;
-  instances = new Map();
+  stage?: Stage;
+  instances: Map<UUID, Instance> = new Map();
   previewInstance = null;
 
-  instancesQueue = new Set();
-  instanceLabelsQueue = new Set();
+  instancesQueue: Set<UUID> = new Set();
+  instanceLabelsQueue: Set<UUID> = new Set();
   isFetchingQueue = false;
   isFetchingLabelsQueue = false;
   queueThreshold = 1000;
   queueTimeout = 250;
 
-  api = null;
-  rootStore = null;
+  api: API;
+  rootStore: RootStore;
 
-  constructor(api, rootStore, stage=null) {
+  constructor(api: API, rootStore: RootStore, stage?: Stage) {
     makeObservable(this, {
       stage: observable,
       instances: observable,
@@ -206,27 +209,27 @@ export class InstanceStore {
       fetchMoreIncomingLinks: action
     });
 
-    this.stage = stage?stage:null;
+    this.stage = stage;
 
     this.api = api;
     this.rootStore = rootStore;
   }
 
-  fetchInstance(instance){
+  fetchInstance(instance: InstanceLabel){
     if(!this.instancesQueue.has(instance.id)){
       this.instancesQueue.add(instance.id);
       this.processQueue();
     }
   }
 
-  fetchInstanceLabel(instance){
+  fetchInstanceLabel(instance: InstanceLabel){
     if(!this.instanceLabelsQueue.has(instance.id)){
       this.instanceLabelsQueue.add(instance.id);
       this.processLabelsQueue();
     }
   }
 
-  togglePreviewInstance(instanceId, instanceName, options) {
+  togglePreviewInstance(instanceId: UUID, instanceName: string, options) {
     if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
       this.previewInstance = null;
     } else {
@@ -235,7 +238,7 @@ export class InstanceStore {
   }
 
 
-  getIncomingLinksOfType(instanceId, property, type) {
+  getIncomingLinksOfType(instanceId: UUID, property: string, type: string) {
     const instance = this.instances.get(instanceId);
     if (!instance) {
       return null;
@@ -247,7 +250,7 @@ export class InstanceStore {
     return prop.links.find(lk => lk.type.name === type);
   }
 
-  async fetchMoreIncomingLinks(instanceId, property, type) {
+  async fetchMoreIncomingLinks(instanceId: UUID, property: string, type: string) {
     const links = this.getIncomingLinksOfType(instanceId, property, type);
     if (links) {
       links.isFetching = true;
@@ -261,10 +264,10 @@ export class InstanceStore {
           links.instances = [...links.instances, ...data.data];
         });
       } catch(e){
+        const err = e as APIError;
         runInAction(() => {
-          const message = e.message?e.message:e;
-          const errorMessage = e.response && e.response.status !== 500 ? e.response.data:"";
-          links.fetchError = `Failed to retrieve more incoming links "(${message}) ${errorMessage}"`;
+          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:"";
+          links.fetchError = `Failed to retrieve more incoming links "(${err?.message}) ${errorMessage}"`;
           links.isFetching = false;
         });
       }
@@ -323,15 +326,18 @@ export class InstanceStore {
     toProcess.forEach(identifier => {
       if(this.instances.has(identifier)) {
         const instance = this.instances.get(identifier);
-        instance.cancelChangesPending = false;
-        instance.isFetching = true;
-        instance.isSaving = false;
-        instance.isFetched = false;
-        instance.fetchError = null;
-        instance.hasFetchError = false;
-        instance.saveError = null;
-        instance.hasSaveError = false;
-        instance.clearFieldsErrors();
+        if(instance) {
+          instance.cancelChangesPending = false;
+          instance.isFetching = true;
+          instance.isSaving = false;
+          instance.isFetched = false;
+          instance.fetchError = null;
+          instance.hasFetchError = false;
+          instance.saveError = undefined;
+          instance.hasSaveError = false;
+          instance.clearFieldsErrors();
+        }
+        
       }
     });
     try {
@@ -345,18 +351,24 @@ export class InstanceStore {
               if (data.error) {
                 const code = data.error.code?` [error ${data.error.code}]`:"";
                 const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
-                instance.errorInstance(message, data.error.code === 404);
-                instance.isFetching = false;
-                instance.isFetched = false;
+                if(instance) {
+                  instance.errorInstance(message, data.error.code === 404);
+                  instance.isFetching = false;
+                  instance.isFetched = false;
+                }
               } else {
-                instance.initializeData(this.api, this.rootStore, data, false);
-                this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
+                if(instance) {
+                  instance.initializeData(this.api, this.rootStore, data, false);
+                  this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
+                }
               }
             } else {
               const message = "Unexpected error: no response returned.";
-              instance.errorInstance(message, true);
-              instance.isFetching = false;
-              instance.isFetched = false;
+              if(instance) {
+                instance.errorInstance(message, true);
+                instance.isFetching = false;
+                instance.isFetched = false;
+              }
             }
           }
           this.instancesQueue.delete(identifier);
@@ -369,9 +381,11 @@ export class InstanceStore {
         toProcess.forEach(identifier => {
           if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            instance.errorInstance(e);
-            instance.isFetching = false;
-            instance.isFetched = false;
+            if(instance) {
+              instance.errorInstance(e);
+              instance.isFetching = false;
+              instance.isFetched = false;
+            }
           }
           this.instancesQueue.delete(identifier);
         });
@@ -390,11 +404,13 @@ export class InstanceStore {
     toProcess.forEach(identifier => {
       if (this.instances.has(identifier)) {
         const instance = this.instances.get(identifier);
-        instance.isLabelFetching = true;
-        instance.isLabelFetched = false;
-        instance.labelFetchError = null;
-        instance.hasLabelFetchError = false;
-        instance.saveError = null;
+        if(instance) {
+          instance.isLabelFetching = true;
+          instance.isLabelFetched = false;
+          instance.fetchLabelError = null;
+          instance.hasLabelFetchError = false;
+          instance.saveError = undefined;
+        }
       }
     });
     try {
@@ -408,17 +424,21 @@ export class InstanceStore {
               if (data.error) {
                 const code = data.error.code?` [${data.error.code}]`:"";
                 const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
-                instance.errorLabelInstance(message, data.error.code === 404);
-                instance.isLabelFetching = false;
-                instance.isLabelFetched = false;
+                if(instance) {
+                  instance.errorLabelInstance(message, data.error.code === 404);
+                  instance.isLabelFetching = false;
+                  instance.isLabelFetched = false;  
+                }
               } else {
-                instance.initializeLabelData(data);
+                instance?.initializeLabelData(data);
               }
             } else {
               const message = "Unexpected error: no response returned.";
-              instance.errorLabelInstance(message, true);
-              instance.isLabelFetching = false;
-              instance.isLabelFetched = false;
+              if(instance) {
+                instance.errorLabelInstance(message, true);
+                instance.isLabelFetching = false;
+                instance.isLabelFetched = false;
+              }
             }
           }
           this.instanceLabelsQueue.delete(identifier);
@@ -431,9 +451,11 @@ export class InstanceStore {
         toProcess.forEach(identifier => {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
-            instance.errorLabelInstance(e);
-            instance.isLabelFetching = false;
-            instance.isLabelFetched = false;
+            if(instance) {
+              instance.errorLabelInstance(e);
+              instance.isLabelFetching = false;
+              instance.isLabelFetched = false;
+            }
           }
           this.instanceLabelsQueue.delete(identifier);
         });
@@ -447,7 +469,7 @@ export class InstanceStore {
     this.instances.clear();
   }
 
-  createInstanceOrGet(instanceId) {
+  createInstanceOrGet(instanceId: UUID) {
     if (!this.instances.has(instanceId)) {
       const instance = new Instance(instanceId, this);
       this.instances.set(instanceId, instance);
@@ -455,7 +477,7 @@ export class InstanceStore {
     return this.instances.get(instanceId);
   }
 
-  createNewInstance(type, id, name="") {
+  createNewInstance(type: StructureOfType, id: UUID, name="") {
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
     const data = {
@@ -482,24 +504,33 @@ export class InstanceStore {
     this.instances.set(id, instance);
   }
   
-  removeInstances(instanceIds) {
+  removeInstances(instanceIds: UUID[]) {
     instanceIds.forEach(id => this.instances.delete(id));
   }
 
-  cancelInstanceChanges(instanceId) {
-    this.instances.get(instanceId).cancelChangesPending = true;
+  cancelInstanceChanges(instanceId: UUID) {
+    const instance = this.instances.get(instanceId);
+    if(instance) {
+      instance.cancelChangesPending = true;
+    }
   }
 
-  confirmCancelInstanceChanges(instanceId) {
-    this.instances.get(instanceId).cancelChanges();
+  confirmCancelInstanceChanges(instanceId: UUID) {
+    const instance = this.instances.get(instanceId);
+    if(instance) {
+      instance.cancelChanges();
+    }
   }
 
-  abortCancelInstanceChange(instanceId) {
-    this.instances.get(instanceId).cancelChangesPending = false;
+  abortCancelInstanceChange(instanceId: UUID) {
+    const instance = this.instances.get(instanceId);
+    if(instance) {
+      instance.cancelChangesPending = false;
+    }
   }
 }
 
-export const createInstanceStore = (api, rootStore, stage=null) => {
+export const createInstanceStore = (api: API, rootStore:RootStore, stage?: Stage) => {
   return new InstanceStore(api, rootStore, stage);
 };
 

@@ -81,11 +81,11 @@ const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }) =
     return "Unknown instance";
   }
 
-  if (instance.fetchError || instance.labelFetchError) {
+  if (instance.fetchError || instance.fetchLabelError) {
     return (
       <span style={{color: "var(--ft-color-error)"}}>
         <FontAwesomeIcon icon="exclamation-triangle"/>
-        &nbsp; {instance.fetchError || instance.labelFetchError}
+        &nbsp; {instance.fetchError || instance.fetchLabelError}
       </span>
     );
   }

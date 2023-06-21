@@ -24,8 +24,11 @@
 import { observable, action, computed, makeObservable } from "mobx";
 
 import { fieldsMapping } from "../Fields";
+import { Alternative, Alternatives, StructureOfField, StructureOfType, UUID } from "../types";
+import API, { APIError } from "../Services/API";
+import RootStore from "./RootStore";
 
-const compareAlternatives = (a, b) => {
+const compareAlternatives = (a: Alternative, b: Alternative) => {
   if (a.selected === b.selected) {
     return 0;
   }
@@ -35,23 +38,23 @@ const compareAlternatives = (a, b) => {
   return 1;
 };
 
-const normalizeAlternative = (name, field, alternatives) => {
+const normalizeAlternative = (name: string, field: StructureOfField, alternatives?: Alternatives) => {
   field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
     .sort(compareAlternatives)
-    .map(alternative => ({
+    .map((alternative: Alternative) => ({
       value: alternative.value === undefined ? null : alternative.value,
       users: alternative.users,
       selected: !!alternative.selected
     }));
 };
 
-const normalizeField = (field, instanceId) => {
+const normalizeField = (field: StructureOfField, instanceId: UUID) => {
   if (field instanceof Object && !Array.isArray(field) && (field.widget === "Nested" || field.widget === "SingleNested")) {
     normalizeFields(field.fields, instanceId);
   }
 };
 
-const normalizeFields = (fields, instanceId, alternatives) => {
+const normalizeFields = (fields: Map<string, StructureOfField>, instanceId: UUID, alternatives?: Alternatives) => {
   if (fields instanceof Object && !Array.isArray(fields)) {
     Object.entries(fields).forEach(([name, field]) => {
       normalizeField(field, instanceId);
@@ -60,7 +63,7 @@ const normalizeFields = (fields, instanceId, alternatives) => {
   }
 };
 
-const getChildrenIds = fields => {
+const getChildrenIds = (fields: Map<string, StructureOfField>) => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
@@ -86,9 +89,9 @@ const getChildrenIds = fields => {
   }, new Set());
 };
 
-const getChildrenIdsOfNestedFields = fields => {
+const getChildrenIdsOfNestedFields = (fields: Map<string, StructureOfField>) => {
   if (!Array.isArray(fields)) {
-    return Set();
+    return new Set();
   }
   return fields.reduce((acc, rowFields) => {
     const ids = getChildrenIds(rowFields.stores);
@@ -97,7 +100,7 @@ const getChildrenIdsOfNestedFields = fields => {
   }, new Set());
 };
 
-const getChildrenIdsOfSingleNestedFields = fields => {
+const getChildrenIdsOfSingleNestedFields = (fields: Map<string, StructureOfField>) => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
@@ -172,7 +175,7 @@ export const normalizeLabelInstanceData = data => {
   return instance;
 };
 
-export const normalizeInstanceData = (data, typeFromStore) => {
+export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
 
   const instance = {
     ...normalizeLabelInstanceData(data),
@@ -210,7 +213,7 @@ export const normalizeInstanceData = (data, typeFromStore) => {
   if(data.incomingLinks) {
     const incomingLinks = Object.entries(data.incomingLinks).map(([property, field])=> {
       let label = "";
-      let links = Object.entries(field).map(([typeName, type]) => {
+      const links = Object.entries(field).map(([typeName, type]) => {
         label = type.nameForReverseLink;
         return {
           instanceId: instance.id,
@@ -384,9 +387,9 @@ const getUniqueGroups = fields => {
 const getChildrenIdsGroupedByField = fields => getUniqueGroups(fields);
 
 export class Instance {
-  id = null;
+  id?: UUID;
   _name = null;
-  types = [];
+  types: StructureOfType[] = [];
   isNew = false;
   labelField = null;
   _promotedFields = [];
@@ -397,6 +400,7 @@ export class Instance {
   fields = {};
   incomingLinks=[];
   possibleIncomingLinks=[];
+  alternatives = {};
 
   isLabelFetching = false;
   isLabelFetched = false;
@@ -406,21 +410,22 @@ export class Instance {
 
   isFetching = false;
   isFetched = false;
-  fetchError = null;
+  fetchError?:string;
   isNotFound = false
   hasFetchError = false;
 
   rawData = null;
-  rawFetchError = null;
+  rawFetchError?: string;
   hasRawFetchError = false;
   isRawFetched = false;
   isRawFetching = false;
 
-  api = null;
+  api: API;
 
-  constructor(id, api) {
+  constructor(id: UUID, api: API) {
     makeObservable(this, {
       id: observable,
+      alternatives: observable,
       _name: observable,
       types: observable,
       isNew: observable,
@@ -595,9 +600,9 @@ export class Instance {
   }
 
 
-  initializeRawData(data, permissions) {
+  initializeRawData(data, permissions: Permissions) {
     this.rawData = data;
-    this.rawFetchError = null;
+    this.rawFetchError = undefined;
     this.hasRawFetchError = false;
     this.isRawFetched = true;
     this.isRawFetching = false;
@@ -617,7 +622,7 @@ export class Instance {
     return [];
   }
 
-  initializeData(api, rootStore, data, isNew = false) {
+  initializeData(api: API, rootStore: RootStore, data, isNew = false) {
     const _initializeFields = _fields => {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
@@ -687,16 +692,14 @@ export class Instance {
     this.incomingLinks = normalizedData.incomingLinks;
     this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;
     _initializeFields(normalizedData.fields);
-    this.fetchError = null;
+    this.fetchError = undefined;
     this.isNotFound = false;
     this.hasFetchError = false;
     this.isFetching = false;
     this.isFetched = true;
   }
 
-  
-
-  buildErrorMessage(e) {
+  buildErrorMessage(e: APIError) {
     const message = e.message ? e.message : e;
     const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
     if (e.response && e.response.status === 404) {
@@ -705,23 +708,27 @@ export class Instance {
     return `Error while retrieving instance "${this.id}" (${message}) ${errorMessage}`;
   }
 
-  errorLabelInstance(e, isNotFound=false) {
+  buildErrorMessageFromString(message: string) {
+    return `Error while retrieving instance "${this.id}" (${message})}`;
+  }
+
+  errorLabelInstance(e: APIError|string, isNotFound=false) {
     this.isLabelNotFound = isNotFound;
-    this.fetchLabelError = this.buildErrorMessage(e);
+    this.fetchError = typeof e === "string" ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
     this.hasLabelFetchError = true;
     this.isLabelFetched = false;
     this.isLabelFetching = false;
   }
 
-  errorInstance(e, isNotFound=false) {
+  errorInstance(e: APIError|string, isNotFound=false) {
     this.isNotFound = isNotFound;
-    this.fetchError = this.buildErrorMessage(e);
+    this.fetchError = typeof e === "string" ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;
   }
 
-  errorRawInstance(e, isNotFound=false) {
+  errorRawInstance(e: APIError, isNotFound=false) {
     this.rawData = null;
     this.isNotFound = isNotFound;
     this.rawFetchError = this.buildErrorMessage(e);

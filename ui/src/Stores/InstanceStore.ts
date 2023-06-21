@@ -94,11 +94,12 @@ class Instance extends BaseInstance {
         const data = await this.store.api.getRawInstance(this.id);
         this.initializeRawData(data?.data, data?.permissions);
       } catch (e) {
+        const err = e as APIError;
         runInAction(() => {
-          if(e.response && e.response.status === 404){
-            this.errorRawInstance(e, true);
+          if(err.response && err.response.status === 404){
+            this.errorRawInstance(err, true);
           } else {
-            this.errorRawInstance(e);
+            this.errorRawInstance(err);
           }
         });
       }
@@ -382,7 +383,7 @@ export class InstanceStore {
           if (this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             if(instance) {
-              instance.errorInstance(e);
+              instance.errorInstance(e as APIError);
               instance.isFetching = false;
               instance.isFetched = false;
             }
@@ -452,7 +453,7 @@ export class InstanceStore {
           if(this.instances.has(identifier)) {
             const instance = this.instances.get(identifier);
             if(instance) {
-              instance.errorLabelInstance(e);
+              instance.errorLabelInstance(e as APIError);
               instance.isLabelFetching = false;
               instance.isLabelFetched = false;
             }

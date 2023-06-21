@@ -136,6 +136,7 @@ export interface StructureOfType {
 }
 
 export interface StructureOfField {
+  alternatives: Alternative[];
   fullyQualifiedName: string;
   numOfOccurrences: number;
   order: number;
@@ -191,6 +192,10 @@ export interface InstanceFull extends InstanceSummary {
   promotedFields: string[];
   incomingLinks: Map<string, Map<string, IncomingLinksByType>>;
   possibleIncomingLinks: Map<string, StructureOfIncomingLink>;
+}
+
+export interface Alternatives {
+  [key: string]: Alternative[];
 }
 
 export interface Alternative {

@@ -31,7 +31,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useStores from "../../Hooks/useStores";
 
 import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
-import DynamicOption  from "../DynamicOption/DynamicOption";
 import LinksAlternatives from "../LinksAlternatives";
 import Label from "../Label";
 import Invalid from "../Invalid";
@@ -329,7 +328,6 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
             onLoadMore={handleLoadMoreOptions}
             onReset={handleDropdownReset}
             onSelect={handleOnSelectOption}
-            optionComponent={DynamicOption}
           />
         )}
       </div>

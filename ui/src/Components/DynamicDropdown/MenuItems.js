@@ -53,8 +53,7 @@ const MenuItems = ({
   onSelect,
   onSelectPrevious,
   onSelectNext,
-  onCancel,
-  menuItemComponent
+  onCancel
 }) => {
 
   const classes = useStyles();
@@ -78,7 +77,6 @@ const MenuItems = ({
               onSelectPrevious={onSelectPrevious} 
               onSelect={onSelect} 
               onCancel={onCancel} 
-              component={menuItemComponent}
             />
           )}      
         </ul>

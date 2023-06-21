@@ -73,8 +73,7 @@ const Menu = ({
   onSelect,
   onSelectNext,
   onSelectPrevious,
-  onCancel,
-  menuItemComponent
+  onCancel
 }) => {
 
   const classes = useStyles();
@@ -97,7 +96,6 @@ const Menu = ({
             onSelectNext={onSelectNext}
             onSelectPrevious={onSelectPrevious}
             onCancel={onCancel}
-            menuItemComponent={menuItemComponent}
         />
       </InfiniteScroll>
     </div>

@@ -21,11 +21,12 @@
  *
  */
 
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { Dropdown, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SimpleType } from "../types";
 
 const useStyles = createUseStyles({
   targetTypes: {
@@ -55,15 +56,22 @@ const useStyles = createUseStyles({
   }
 });
 
+interface TargetTypeSelectionProps {
+  types: SimpleType[];
+  selectedType: SimpleType;
+  id: string;
+  onSelect: () => void; //TODO: fix this
+}
+
 const FILTER_THRESHOLD = 10; //Show filter only if there are more than 5 elements
 
-const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }) => {
+const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }: TargetTypeSelectionProps) => {
     const [filter, setFilter] = useState("");
     const [filteredTypes, setFilteredTypes] = useState(types);
     const classes = useStyles();
 
-    const handleFilterChange = event => {
-      const { value } = event.target;
+    const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target;
       setFilter(value);
       const filtered = types.filter(type =>
         type.label.toLowerCase().includes(value.toLowerCase())

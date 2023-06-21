@@ -21,8 +21,9 @@
  *
  */
 
-import React, {useRef, useEffect} from "react";
+import React, {useRef, useEffect, ChangeEvent, KeyboardEvent} from "react";
 import { createUseStyles } from "react-jss";
+import DynamicOption from "../../Fields/DynamicOption/DynamicOption";
 
 const useStyles = createUseStyles({
   item: {
@@ -35,21 +36,32 @@ const useStyles = createUseStyles({
   }
 });
 
-const MenuItem = ({ item, searchTerm, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel, component: Component }) => {
+//TODO: Fix this
+interface MenuItemProps {
+  item: any;
+  searchTerm: string;
+  hasFocus: boolean;
+  onSelectNext: (item: any) => void;
+  onSelectPrevious: (item: any) => void;
+  onSelect: (item: any) => void;
+  onCancel: () => void;
+}
+
+const MenuItem = ({ item, searchTerm, hasFocus, onSelectNext, onSelectPrevious, onSelect, onCancel }: MenuItemProps) => {
 
   const classes = useStyles();
 
-  const ref = useRef();
+  const ref = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     if (hasFocus) {
-      ref.current.focus();
+      ref.current?.focus();
     }
   });
 
   const handleOnSelect = () => onSelect(item);
 
-  const handleKeyDown = e => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if(e) {
       switch(e.key) {
       case "ArrowUp": {
@@ -79,8 +91,8 @@ const MenuItem = ({ item, searchTerm, hasFocus, onSelectNext, onSelectPrevious, 
   };
 
   return (
-    <li tabIndex="0" className={`dropdown-item ${classes.item}`} onClick={handleOnSelect} onKeyDown={handleKeyDown} ref={ref}>
-      <Component item={item} searchTerm={searchTerm}/>
+    <li tabIndex={0} className={`dropdown-item ${classes.item}`} onClick={handleOnSelect} onKeyDown={handleKeyDown} ref={ref}>
+      <DynamicOption item={item} searchTerm={searchTerm}/>
     </li>
   );
 };

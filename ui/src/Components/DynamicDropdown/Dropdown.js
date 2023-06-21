@@ -40,7 +40,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop, optionComponent }) => {
+const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop }) => {
 
   const classes = useStyles();
 
@@ -174,7 +174,6 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
           onSelectNext={handleOnSelectNext}
           onSelectPrevious={handleOnSelectPrevious}
           onCancel={handleReset}
-          menuItemComponent={optionComponent}
         />
       )}
     </div>

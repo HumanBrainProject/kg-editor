@@ -85,14 +85,14 @@ class FieldStore {
     this.rootStore = rootStore;
   }
 
-  get returnValue() {
+  get returnValue(): any {
     throw new Error(`returnValue getter is not implemented for ${this.widget} store`);
   }
 
   /**
    * @param {any} value field value
    */
-  updateValue() {
+  updateValue(value: any): void {
     throw new Error(`update method is not implemented for ${this.widget} store`);
   }
 
@@ -100,19 +100,19 @@ class FieldStore {
     throw new Error(`reset method is not implemented for ${this.widget} store`);
   }
 
-  get hasChanged() {
+  get hasChanged(): boolean {
     throw new Error(`hasChanged getter is not implemented for ${this.widget} store`);
   }
 
-  get shouldCheckValidation() {
+  get shouldCheckValidation(): boolean {
     throw new Error(`shouldCheckValidation getter is not implemented for ${this.widget} store`);
   }
 
-  get cloneWithInitialValue() {
+  get cloneWithInitialValue(): any {
     throw new Error(`cloneWithInitialValue getter is not implemented for ${this.widget} store`);
   }
 
-  get requiredValidationWarning() {
+  get requiredValidationWarning(): boolean {
     throw new Error(`requiredValidationWarning getter is not implemented for ${this.widget} store`);
   }
 

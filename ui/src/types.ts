@@ -32,6 +32,7 @@
  *   limitations under the License.
  *
  */
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { BrowserOptions } from "@sentry/browser";
 import { KeycloakConfig } from "keycloak-js";
 import { PiwikOptions } from "react-piwik";
@@ -299,4 +300,19 @@ export interface GraphGroup {
   show: boolean;
   grouped: boolean;
   highlighted: boolean;
+}
+
+export interface FieldStoreDefinition {
+    widget: string;
+    label: string;
+    labelTooltip: string;
+    labelTooltipIcon: IconProp;
+    isPublic: boolean;
+    fullyQualifiedName: string;
+    order: number;
+    isRequired: boolean;
+    isReadOnly: boolean;
+    warning: string;
+    minValue?: number;
+    maxValue?: number; 
 }

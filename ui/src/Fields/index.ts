@@ -55,19 +55,20 @@ import InputDateStore from "./Stores/InputDateStore";
 import InputTimeStore from "./Stores/InputTimeStore";
 import NestedFieldStore from "./Stores/NestedFieldStore";
 import SingleNestedFieldStore from "./Stores/SingleNestedFieldStore";
+import React from "react";
 
-interface WidgetOptions {
+export interface WidgetOptions {
   [option: string]: any;
 }
 
 interface Widget<T extends FieldStore>  {
-  Component: React.ComponentType;
+  Component: React.ComponentType | React.ReactNode;
   Store: T;
   options?: WidgetOptions;
 }
 
 interface FieldMapping {
-  [widget: string]: Widget<?>;
+  [widget: string]: Widget<any>;
 }
 
 export const fieldsMapping: FieldMapping = {

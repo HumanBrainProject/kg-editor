@@ -23,16 +23,20 @@
 import { observable, toJS, makeObservable, action, computed } from "mobx";
 
 import FieldStore from "./FieldStore";
+import { FieldStoreDefinition } from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
 
 class InputNumberStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = null;
   inputType = "number";
-  minValue = null;
-  maxValue = null;
+  minValue?: number;
+  maxValue?: number;
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     makeObservable(this, {
       value: observable,

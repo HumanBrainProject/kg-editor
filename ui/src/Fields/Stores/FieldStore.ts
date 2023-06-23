@@ -22,27 +22,32 @@
  */
 
 import { observable, action, computed, makeObservable } from "mobx";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
+import { FieldStoreDefinition } from "../../types";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { WidgetOptions } from "..";
 
 class FieldStore {
-  label = null;
-  labelTooltip = null;
-  labelTooltipIcon = null;
+  label?:string;
+  labelTooltip?: string;
+  labelTooltipIcon?: IconProp;
   isPublic = false;
-  fullyQualifiedName = null;
+  fullyQualifiedName?: string;
   alternatives = [];
-  warning = null;
-  errorMessage = null;
-  errorInfo = null;
+  warning?: string;
+  errorMessage?: string;
+  errorInfo?: string;
   type = null;
-  order = null;
-  widget = null;
+  order?: number;
+  widget?: string;
   isRequired = false;
   isReadOnly = false;
   instance = null;
-  api = null;
-  rootStore = null;
+  api: API;
+  rootStore: RootStore;
 
-  constructor(definition, _options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, _options: WidgetOptions, instance, api:API, rootStore: RootStore) {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,
@@ -75,7 +80,7 @@ class FieldStore {
     this.isRequired = definition.isRequired;
     this.isReadOnly = definition.isReadOnly;
     this.warning = definition.warning;
-    this.type = definition.type;
+    this.type = definition.type; // TODO: Check if this is still valid
     this.api = api;
     this.rootStore = rootStore;
   }
@@ -121,25 +126,25 @@ class FieldStore {
     };
   }
 
-  setWarning(message) {
+  setWarning(message?: string) {
     this.warning = message;
   }
 
   clearWarning() {
-    this.setWarning(null);
+    this.setWarning(undefined);
   }
 
   get hasWarning() {
     return !!this.warning;
   }
 
-  setError(message, info) {
+  setError(message?: string, info?: string) {
     this.errorMessage = message;
     this.errorInfo = info;
   }
 
   clearError() {
-    this.setError(null, null);
+    this.setError(undefined, undefined);
   }
 
   get hasError() {

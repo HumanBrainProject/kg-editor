@@ -17,10 +17,17 @@
  * Human Brain Project, funded from the European Union's Horizon 2020
  * Framework Programme for Research and Innovation under
  * Specific Grant Agreements No. 720270, No. 785907, and No. 945539
- * (Human Brain Project SGA1, SGA2 and SGA3).
+ * (Human Brain Project SGA1, SGA2 and SGA3).`
  *
  */
-const UnsupportedField = ({fieldStore}) => {
+import React from "react";
+import UnsupportedFieldStore from "../Stores/UnsupportedFieldStore";
+
+interface UnsupportedFieldProps {
+  fieldStore: UnsupportedFieldStore;
+}
+
+const UnsupportedField = ({fieldStore}: UnsupportedFieldProps): React.ReactNode => {
   console.warn(fieldStore.warning);
   return null;
 };

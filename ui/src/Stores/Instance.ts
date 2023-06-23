@@ -292,7 +292,7 @@ const getPagination = field => {
   return null;
 };
 
-const showId = (field, id) => {
+const showId = (field, id: string) => {
   if (id) {
     if (field.lazyShowLinks) {
       return field.isLinkVisible(id);

@@ -38,6 +38,8 @@ import { PiwikOptions } from "react-piwik";
 
 export type UUID = string;
 
+export type ViewMode = "view" | "edit" | "graph" | "manage" | "release" | "create";
+
 export interface Settings {
   commit: string;
   keycloak: KeycloakConfig;

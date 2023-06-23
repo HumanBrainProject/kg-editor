@@ -23,11 +23,26 @@
 
 import React from "react";
 import { observable, action, computed, makeObservable } from "mobx";
-import { StructureOfType } from "../types";
+import { StructureOfType, UUID, ViewMode } from "../types";
+import RootStore from "./RootStore";
+import API from "../Services/API";
+
+interface StoredSpaceView {
+  id: UUID;
+  name: string;
+  mode: ViewMode;
+  color: string;
+  description: string;
+  selected: boolean;
+}
+
+interface StoredViews {
+  [space: string]: StoredSpaceView[];
+}
 
 const STORED_INSTANCE_VIEWS_KEY = "views";
 
-const getStoredViews = () => {
+const getStoredViews = (): StoredViews => {
   const value = localStorage.getItem(STORED_INSTANCE_VIEWS_KEY);
   if(!value) {
     return {};
@@ -50,18 +65,18 @@ interface InstanceHighlight {
 }
 
 export class View {
-  instanceId?: string;
-  name = "";
-  mode = "edit";
-  color = "";
-  type = "";
-  description = "";
+  instanceId: UUID;
+  name: string;
+  mode: ViewMode;
+  color: string;
+  type?: string;
+  description: string;
   instancePath: string[] = [];
   instanceHighlight: InstanceHighlight = {pane: undefined, instanceId: undefined, provenance: undefined};
   selectedPane?: string;
   panes: string[] = [];
 
-  constructor(instanceId: string, name: string, color: string, mode: string, description?: string) {
+  constructor(instanceId: string, name: string, color: string, mode: ViewMode, description?: string) {
     makeObservable(this, {
       instanceId: observable,
       name: observable,
@@ -101,7 +116,7 @@ export class View {
     return this.panes[this.instancePath.length];
   }
 
-  getPaneByInstanceId(instanceId: string) {
+  getPaneByInstanceId(instanceId: UUID) {
     const index = this.instancePath.findIndex(id => id === instanceId);
     if (index != -1) {
       return this.panes[index];
@@ -109,12 +124,12 @@ export class View {
     return null;
   }
 
-  setCurrentInstanceId(pane: string, instanceId: string) {
+  setCurrentInstanceId(pane: string, instanceId: UUID) {
     const start = this.panes.findIndex(p => p === pane);
     this.instancePath.splice(start, this.instancePath.length-start, instanceId);
   }
 
-  setInstanceHighlight(pane?: string, instanceId?: string, provenance?: string) {
+  setInstanceHighlight(pane?: string, instanceId?: UUID, provenance?: string) {
     this.instanceHighlight.pane = pane;
     this.instanceHighlight.instanceId = instanceId;
     this.instanceHighlight.provenance = provenance;
@@ -165,14 +180,13 @@ export class View {
 }
 
 export class ViewStore{
-  views = new Map();
-  selectedView = null;
+  views = new Map<string, View>();
+  selectedView?: View;
 
-  api = null;
+  api: API;
+  rootStore: RootStore;
 
-  rootStore = null;
-
-  constructor(api, rootStore) {
+  constructor(api: API, rootStore: RootStore) {
     makeObservable(this, {
       views: observable,
       selectedView: observable,
@@ -211,14 +225,14 @@ export class ViewStore{
     localStorage.removeItem(STORED_INSTANCE_VIEWS_KEY);
   }
 
-  restoreViews(){
+  restoreViews(): string|null{
     this.clearViews();
     if(this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
-      const workspaceViews = views[this.rootStore.appStore.currentSpace.id];
-      let selectedView = null;
-      if (Array.isArray(workspaceViews)) {
-        workspaceViews.forEach(view => {
+      const spaceViews = views[this.rootStore.appStore.currentSpace.id];
+      let selectedView: StoredSpaceView|undefined;
+      if (Array.isArray(spaceViews)) {
+        spaceViews.forEach(view => {
           if (view.selected) {
             selectedView = view;
           }
@@ -234,6 +248,7 @@ export class ViewStore{
       } 
       return `/instances/${selectedView.id}/${selectedView.mode}`;
     }
+    return null;
   }
 
   selectViewByInstanceId(instanceId: string) {
@@ -243,7 +258,7 @@ export class ViewStore{
 
   unregisterViewByInstanceId(instanceId: string) {
     if (this.selectedView && this.selectedView.instanceId === instanceId) {
-      this.selectedView = null;
+      this.selectedView = undefined;
     }
     this.views.delete(instanceId);
     this.syncStoredViews();
@@ -255,13 +270,14 @@ export class ViewStore{
   }
 
   clearViews() {
-    this.selectedView = null;
+    this.selectedView = undefined;
     this.views.clear();
   }
 
-  registerViewByInstanceId(instanceId: string, name: string, type: StructureOfType|undefined, viewMode: string) {
-    if (this.views.has(instanceId)) {
-      this.views.get(instanceId).mode = viewMode;
+  registerViewByInstanceId(instanceId: string, name: string, type: StructureOfType|undefined, viewMode: ViewMode) {
+    const existingView = this.views.get(instanceId);
+    if (existingView) {
+      existingView.mode = viewMode;
     } else {
       const typeDescription = type?.description??type?.name;
       const view = new View(instanceId, name, type?type.color:"", viewMode, typeDescription);

@@ -45,6 +45,7 @@ import InputNumberMultipleStore from "./Stores/InputNumberMultipleStore";
 import SimpleDropdown from "./SimpleDropdown/SimpleDropdown";
 import LinkStore from "./Stores/LinkStore";
 
+import FieldStore from "./Stores/FieldStore";
 import InputTextStore from "./Stores/InputTextStore";
 import LinksStore from "./Stores/LinksStore";
 import CheckBoxStore from "./Stores/CheckBoxStore";
@@ -55,7 +56,21 @@ import InputTimeStore from "./Stores/InputTimeStore";
 import NestedFieldStore from "./Stores/NestedFieldStore";
 import SingleNestedFieldStore from "./Stores/SingleNestedFieldStore";
 
-export const fieldsMapping = {
+interface WidgetOptions {
+  [option: string]: any;
+}
+
+interface Widget<T extends FieldStore>  {
+  Component: React.ComponentType;
+  Store: T;
+  options?: WidgetOptions;
+}
+
+interface FieldMapping {
+  [widget: string]: Widget<?>;
+}
+
+export const fieldsMapping: FieldMapping = {
   "InputText":  {
     Component: InputText,
     Store: InputTextStore

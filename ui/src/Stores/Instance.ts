@@ -27,6 +27,9 @@ import { fieldsMapping } from "../Fields";
 import { Alternative, Alternatives, StructureOfField, StructureOfType, UUID } from "../types";
 import API, { APIError } from "../Services/API";
 import RootStore from "./RootStore";
+import FieldStore from "../Fields/Stores/FieldStore";
+import NestedFieldStore from "../Fields/Stores/NestedFieldStore";
+import SingleNestedFieldStore from "../Fields/Stores/SingleNestedFieldStore";
 
 const compareAlternatives = (a: Alternative, b: Alternative) => {
   if (a.selected === b.selected) {
@@ -63,16 +66,20 @@ const normalizeFields = (fields: Map<string, StructureOfField>, instanceId: UUID
   }
 };
 
-const getChildrenIds = (fields: Map<string, StructureOfField>) => {
+const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
   return Object.values(fields).reduce((acc, field) => {
     if (field.widget === "SingleNested") {
-      const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(field.nestedFieldsStores);
+      //const singleNestedField = field as fieldsMapping["SingleNested"].Store;
+      const singleNestedField = field as SingleNestedFieldStore;
+      const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(singleNestedField.nestedFieldsStores);
       idsOfNestedFields.forEach(id => acc.add(id));
     } else if (field.widget === "Nested") {
-      const idsOfNestedFields = getChildrenIdsOfNestedFields(field.nestedFieldsStores);
+      //const nestedField = field as fieldsMapping["Nested"].Store;
+      const nestedField = field as NestedFieldStore;
+      const idsOfNestedFields = getChildrenIdsOfNestedFields(nestedField.nestedFieldsStores);
       idsOfNestedFields.forEach(id => acc.add(id));
     } else if (field.isLink) {
       const values = field.returnValue;
@@ -86,10 +93,10 @@ const getChildrenIds = (fields: Map<string, StructureOfField>) => {
       }
     }
     return acc;
-  }, new Set());
+  }, new Set<UUID>());
 };
 
-const getChildrenIdsOfNestedFields = (fields: Map<string, StructureOfField>) => {
+const getChildrenIdsOfNestedFields = (fields: InstanceFields): Set<UUID> => {
   if (!Array.isArray(fields)) {
     return new Set();
   }
@@ -97,10 +104,10 @@ const getChildrenIdsOfNestedFields = (fields: Map<string, StructureOfField>) => 
     const ids = getChildrenIds(rowFields.stores);
     ids.forEach(id => acc.add(id));
     return acc;
-  }, new Set());
+  }, new Set<UUID>());
 };
 
-const getChildrenIdsOfSingleNestedFields = (fields: Map<string, StructureOfField>) => {
+const getChildrenIdsOfSingleNestedFields = (fields:InstanceFields): Set<UUID> => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
@@ -386,6 +393,10 @@ const getUniqueGroups = fields => {
 
 const getChildrenIdsGroupedByField = fields => getUniqueGroups(fields);
 
+interface InstanceFields {
+  [name: string]: FieldStore;
+}
+
 export class Instance {
   id?: UUID;
   _name = null;
@@ -397,7 +408,7 @@ export class Instance {
   space = "";
   metadata = {};
   permissions = {};
-  fields = {};
+  fields: InstanceFields = {};
   incomingLinks=[];
   possibleIncomingLinks=[];
   alternatives = {};
@@ -547,7 +558,7 @@ export class Instance {
   }
 
   get name() {
-    const field = this.isFetched && this.labelField && this.fields[this.labelField];
+    const field = (this.isFetched && this.labelField)?this.fields[this.labelField]:undefined;
     if (field) {
       return (this.isNew && !field.value) ? `<New ${this.primaryType.label}>` : field.value;
     }
@@ -665,7 +676,7 @@ export class Instance {
             field.widget = "UnsupportedField";
           }
           const fieldMapping = fieldsMapping[field.widget];
-          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, api, rootStore);
+          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, api, rootStore) as FieldStore;
         }
         const store = this.fields[name];
         store.updateValue(field.value);

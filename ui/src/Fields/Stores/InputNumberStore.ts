@@ -28,6 +28,10 @@ import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
 
+interface Messages {
+  minMaxValue?: string;
+}
+
 class InputNumberStore extends FieldStore {
   value = "";
   returnAsNull = false;
@@ -67,16 +71,17 @@ class InputNumberStore extends FieldStore {
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.minMaxValueWarning && this.value !== "") {
+        const v = parseInt(this.value);
         if(this.minValue && this.maxValue) {
-          if(this.value < this.minValue || this.value > this.maxValue) {
+          if(v < this.minValue || v > this.maxValue) {
             messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
           }
-        } else if(this.value < this.minValue) {
+        } else if(this.minValue && v < this.minValue) {
           messages.minMaxValue = `Value should be bigger than ${this.minValue}`;
-        } else if(this.value.length > this.maxValue) {
+        } else if(this.maxValue && v > this.maxValue) {
           messages.minMaxValue = `Value should be smaller than ${this.maxValue}`;
         }
       }

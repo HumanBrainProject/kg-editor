@@ -24,25 +24,26 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
+import { FieldStoreDefinition } from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
 
-class CheckBoxStore extends FieldStore {
-  value = false;
-  initialValue = false;
+class UnsupportedFieldStore extends FieldStore {
+  value = null;
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
 
     makeObservable(this, {
       value: observable,
-      initialValue: observable,
       returnValue: computed,
-      requiredValidationWarning: computed,
       cloneWithInitialValue: computed,
+      requiredValidationWarning: computed,
       updateValue: action,
       reset: action,
       hasChanged: computed,
-      shouldCheckValidation: computed,
-      toggleValue: action
+      shouldCheckValidation: computed
     });
   }
 
@@ -57,33 +58,24 @@ class CheckBoxStore extends FieldStore {
   get cloneWithInitialValue() {
     return {
       ...this.definition,
-      value: toJS(this.initialValue)
+      value: toJS(this.value)
     };
   }
 
   updateValue(value) {
-    this.initialValue = (value !== null && value !== undefined)?!!value:false;
-    this.value = this.initialValue;
+    this.value = value;
   }
 
-  reset() {
-    this.value = this.initialValue;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  reset() {} //NOSONAR this class extends FieldStore which require that the reset methode should be implemented
 
   get hasChanged() {
-    if (typeof this.initialValue === "object") {
-      return typeof this.returnValue !== "object"; // user did not change the value
-    }
-    return this.returnValue !== this.initialValue;
+    return false;
   }
 
   get shouldCheckValidation() {
-    return this.hasChanged;
-  }
-
-  toggleValue() {
-    this.value = !this.value;
+    return false;
   }
 }
 
-export default CheckBoxStore;
+export default UnsupportedFieldStore;

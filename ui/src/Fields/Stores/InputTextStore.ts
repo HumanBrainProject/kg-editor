@@ -24,6 +24,20 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
+import {
+  FieldStoreDefinition,
+  FieldStoreRegexRule,
+  FieldStoreValidation
+} from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
+
+interface Message {
+  required?: string;
+  regex?: string;
+  maxLength?: string;
+}
 
 const DEFAULT_REGEX = {
   // regex: /^(?!\s)(.|\n)*(?<!\s)$/, -> Negative lookout is not supported by safari
@@ -31,28 +45,41 @@ const DEFAULT_REGEX = {
   errorMessage: "leading/trailling spaces are not allowed"
 };
 
-const getRegexRules = validation => {
-  const rules = Array.isArray(validation)?
-  validation.map(rule => ({
-      regex: new RegExp(rule.regex),
-      errorMessage: rule.errorMessage
-    })):[];
+const getRegexRules = (
+  validation?: FieldStoreValidation[]
+): FieldStoreRegexRule[] => {
+  const rules = Array.isArray(validation)
+    ? validation.map(rule => ({
+        regex: new RegExp(rule.regex),
+        errorMessage: rule.errorMessage
+      }))
+    : [];
   rules.push(DEFAULT_REGEX);
   return rules;
 };
+
 class InputTextStore extends FieldStore {
   value = "";
   returnAsNull = false;
   initialValue = "";
-  maxLength = null;
-  regexRules = [DEFAULT_REGEX];
+  maxLength?: number;
+  regexRules: FieldStoreRegexRule[] = [DEFAULT_REGEX];
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(
+    definition: FieldStoreDefinition,
+    options: WidgetOptions,
+    instance,
+    api: API,
+    rootStore: RootStore
+  ) {
     super(definition, options, instance, api, rootStore);
     this.maxLength = definition.maxLength;
     this.regexRules = getRegexRules(definition.validation);
     //TODO: remove backward compatibility for deprecated regex property
-    if (definition.regex && !(Array.isArray(definition.validation) && definition.validation.length)) {
+    if (
+      definition.regex &&
+      !(Array.isArray(definition.validation) && definition.validation.length)
+    ) {
       this.regexRules = [
         {
           regex: new RegExp(definition.regex),
@@ -84,7 +111,8 @@ class InputTextStore extends FieldStore {
     });
   }
 
-  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
+  get returnValue() {
+    //NOSONAR, by design spec it can return that specific string constant or a value
     if (this.value === "" && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
@@ -92,21 +120,26 @@ class InputTextStore extends FieldStore {
   }
 
   get requiredValidationWarning() {
-    if(!this.isRequired) {
+    if (!this.isRequired) {
       return false;
     }
     return this.value === "";
   }
 
   get maxLengthWarning() {
-    if(!this.maxLength) {
+    if (!this.maxLength) {
       return false;
     }
     return this.value.length > this.maxLength;
   }
 
-  get regexWarning() { //NOSONAR by design return null when no warning
-    return this.regexRules.reduce((message, rule) => (message || rule.regex.test(this.value))?message:rule.errorMessage, null);
+  get regexWarning() {
+    //NOSONAR by design return null when no warning
+    return this.regexRules.reduce(
+      (message, rule) =>
+        message || rule.regex.test(this.value) ? message : rule.errorMessage,
+      undefined
+    );
   }
 
   get hasRegexWarning() {
@@ -114,15 +147,19 @@ class InputTextStore extends FieldStore {
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Message = {};
     if (this.shouldCheckValidation) {
-      if(this.requiredValidationWarning) {
+      if (this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
       }
-      if(this.hasRegexWarning && !this.requiredValidationWarning) {
+      if (this.hasRegexWarning && !this.requiredValidationWarning) {
         messages.regex = this.regexWarning;
       }
-      if(this.maxLengthWarning && !this.requiredValidationWarning && !this.hasRegexWarning) {
+      if (
+        this.maxLengthWarning &&
+        !this.requiredValidationWarning &&
+        !this.hasRegexWarning
+      ) {
         messages.maxLength = `Maximum characters allowed: ${this.maxLength}`;
       }
     }
@@ -140,9 +177,9 @@ class InputTextStore extends FieldStore {
     };
   }
 
-  updateValue(value) {
+  updateValue(value: string | null | undefined) {
     this.returnAsNull = false;
-    this.initialValue = (value !== null && value !== undefined)?value:"";
+    this.initialValue = value !== null && value !== undefined ? value : "";
     this.value = this.initialValue;
   }
 
@@ -152,7 +189,7 @@ class InputTextStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (typeof this.initialValue  === "object") {
+    if (typeof this.initialValue === "object") {
       return typeof this.returnValue !== "object"; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
@@ -162,13 +199,13 @@ class InputTextStore extends FieldStore {
     return this.initialValue !== "" || this.hasChanged;
   }
 
-  setValue(value) {
+  setValue(value: string | null | undefined) {
     if (value !== null && value !== undefined) {
       if (value !== "" || !this.returnAsNull) {
         this.returnAsNull = false;
         this.value = value;
       }
-    } else  {
+    } else {
       this.returnAsNull = true;
       this.value = "";
     }

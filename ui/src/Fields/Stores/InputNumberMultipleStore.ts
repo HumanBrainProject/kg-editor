@@ -23,8 +23,12 @@
 
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
+import { FieldStoreDefinition } from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
 
-const normalizeValues = values => {
+const normalizeValues = (values: string[]|null|undefined) => {
   if (Array.isArray(values)) {
     return values;
   }
@@ -34,19 +38,25 @@ const normalizeValues = values => {
   return [];
 };
 
+interface Messages {
+  required?: string; 
+  minMaxValues?: string;
+  numberOfItems?: string;
+}
+
 class InputNumberMultipleStore extends FieldStore {
-  value = [];
+  value: string[] = [];
   options = [];
   returnAsNull = false;
-  initialValue = [];
-  maxLength = null;
-  regex = null;
-  minItems = null;
-  maxItems = null;
-  minValue = null;
-  maxValue = null;
+  initialValue: string[] = [];
+  maxLength?: number;
+  regex?: string;
+  minItems?: number;
+  maxItems?: number;
+  minValue?: number;
+  maxValue?: number;
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
@@ -105,7 +115,7 @@ class InputNumberMultipleStore extends FieldStore {
     return this.value.length === 0;
   }
 
-  updateValue(value) {
+  updateValue(value: string[]|null|undefined) {
     this.returnAsNull = false;
     const values = normalizeValues(value);
     this.initialValue = [...values];
@@ -132,7 +142,7 @@ class InputNumberMultipleStore extends FieldStore {
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
@@ -142,9 +152,9 @@ class InputNumberMultipleStore extends FieldStore {
           if(this.value.length < this.minItems || this.value.length > this.maxItems) {
             messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
           }
-        } else if(this.value.length < this.minItems) {
+        } else if(this.minItems && this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
-        } else if(this.value.length > this.maxItems) {
+        } else if(this.maxItems && this.value.length > this.maxItems) {
           messages.numberOfItems = `Number of values should be smaller than ${this.maxItems}`;
         }
       }

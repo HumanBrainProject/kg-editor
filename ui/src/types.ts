@@ -302,6 +302,17 @@ export interface GraphGroup {
   highlighted: boolean;
 }
 
+export interface FieldStoreValidation {
+  regex: string;
+  errorMessage: string;
+}
+
+export interface FieldStoreRegexRule {
+  errorMessage: string;
+  regex: RegExp | string;
+}
+
+
 export interface FieldStoreDefinition {
     widget: string;
     label: string;
@@ -315,4 +326,9 @@ export interface FieldStoreDefinition {
     warning: string;
     minValue?: number;
     maxValue?: number; 
+    minItems?: number;
+    maxItems?: number;
+    maxLength?: number;
+    validation?: FieldStoreValidation[];
+    regex?: string;
 }

@@ -23,6 +23,10 @@
 
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 import FieldStore from "./FieldStore";
+import { FieldStoreDefinition } from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
 
 const normalizeValues = values => {
   if (Array.isArray(values)) {
@@ -40,10 +44,10 @@ class AnnotatedInputTextStore extends FieldStore {
   returnAsNull = false;
   initialValue = [];
   mappingValue = "@id";
-  minItems = null;
-  maxItems = null;
+  minItems?: number;
+  maxItems?: number;
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;

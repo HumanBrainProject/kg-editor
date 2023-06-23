@@ -24,32 +24,53 @@
 import { observable, action, computed, toJS, makeObservable } from "mobx";
 
 import FieldStore from "./FieldStore";
+import { FieldStoreDefinition, FieldStoreRegexRule, FieldStoreValidation } from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
 
-const getRegexRules = validation => Array.isArray(validation)?
-  validation.map(rule => ({
-      regex: new RegExp(rule.regex),
-      errorMessage: rule.errorMessage
-  }))
-  :[];
-    
+const getRegexRules = (validation?: FieldStoreValidation[]): FieldStoreRegexRule[] =>
+  Array.isArray(validation)
+    ? validation.map(rule => ({
+        regex: new RegExp(rule.regex),
+        errorMessage: rule.errorMessage
+      }))
+    : [];
+
+interface Message {
+  numberOfItems?: string;
+  regex?: string;
+  required?: string;
+  maxValues?: string;
+}
+
 class InputTextMultipleStore extends FieldStore {
-  value = [];
+  value: string[] = [];
   options = [];
   returnAsNull = false;
-  initialValue = [];
-  maxLength = null;
-  minItems = null;
-  maxItems = null;
-  regexRules = [];
+  initialValue: string[] = [];
+  maxLength?: number;
+  minItems?: number;
+  maxItems?: number;
+  regexRules: FieldStoreRegexRule[] = [];
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(
+    definition: FieldStoreDefinition,
+    options: WidgetOptions,
+    instance,
+    api: API,
+    rootStore: RootStore
+  ) {
     super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
     this.maxLength = definition.maxLength;
     this.regexRules = getRegexRules(definition.validation);
     //TODO: remove backward compatibility for deprecated regex property
-    if (definition.regex && !(Array.isArray(definition.validation) && definition.validation.length)) {
+    if (
+      definition.regex &&
+      !(Array.isArray(definition.validation) && definition.validation.length)
+    ) {
       this.regexRules = [
         {
           regex: definition.regex,
@@ -97,7 +118,8 @@ class InputTextMultipleStore extends FieldStore {
     };
   }
 
-  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a list of value
+  get returnValue() {
+    //NOSONAR, by design spec it can return that specific string constant or a list of value
     if (!this.value.length && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
@@ -105,7 +127,7 @@ class InputTextMultipleStore extends FieldStore {
   }
 
   get requiredValidationWarning() {
-    if(!this.isRequired) {
+    if (!this.isRequired) {
       return false;
     }
     return this.value.length === 0;
@@ -117,15 +139,17 @@ class InputTextMultipleStore extends FieldStore {
 
   get regexWarning() {
     return this.regexRules.reduce((message, rule) => {
-      !message && Array.isArray(this.value) && this.value.some(val => {
-        if (!rule.regex.test(val)) {
-          message = rule.errorMessage;
-          return true;
-        }
-        return false;
-      });
+      !message &&
+        Array.isArray(this.value) &&
+        this.value.some(val => {
+          if (!rule.regex.test(val)) {
+            message = rule.errorMessage;
+            return true;
+          }
+          return false;
+        });
       return message;
-    }, null);
+    }, undefined);
   }
 
   get hasRegexWarning() {
@@ -133,35 +157,40 @@ class InputTextMultipleStore extends FieldStore {
   }
 
   get numberOfItemsWarning() {
-    if(!this.minItems && !this.maxItems) {
+    if (!this.minItems && !this.maxItems) {
       return false;
     }
     return this.minItems || this.maxItems;
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Message = {};
     if (this.shouldCheckValidation) {
-      if(this.requiredValidationWarning) {
+      if (this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
       }
-      if(this.numberOfItemsWarning) {
-        if(this.minItems && this.maxItems) {
-          if(this.value.length < this.minItems || this.value.length > this.maxItems) {
+      if (this.numberOfItemsWarning) {
+        if (this.minItems && this.maxItems) {
+          if (
+            this.value.length < this.minItems ||
+            this.value.length > this.maxItems
+          ) {
             messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
           }
-        } else if(this.value.length < this.minItems) {
+        } else if (this.minItems && this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
-        } else if(this.value.length > this.maxItems) {
+        } else if (this.maxItems && this.value.length > this.maxItems) {
           messages.numberOfItems = `Number of values should be smaller than ${this.maxItems}`;
         }
       }
-      if(this.maxLengthWarning) {
-        if (this.value.some(val => val.length > this.maxLength)) {
+      if (this.maxLengthWarning) {
+        if (
+          this.value.some(val => this.maxLength && val.length > this.maxLength)
+        ) {
           messages.maxValues = `Maximum characters allowed per value: ${this.maxLength}`;
         }
       }
-      if(this.hasRegexWarning) {
+      if (this.hasRegexWarning) {
         messages.regex = this.regexWarning;
       }
     }
@@ -173,7 +202,14 @@ class InputTextMultipleStore extends FieldStore {
   }
 
   get hasChanged() {
-    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val !== this.initialValue[index]));
+    return (
+      this.value.length !== this.initialValue.length ||
+      this.value.some((val, index) =>
+        val === null
+          ? this.initialValue[index] !== null
+          : val !== this.initialValue[index]
+      )
+    );
   }
 
   get shouldCheckValidation() {
@@ -181,16 +217,16 @@ class InputTextMultipleStore extends FieldStore {
   }
 
   getValues(value) {
-    if(Array.isArray(value)) {
+    if (Array.isArray(value)) {
       return value;
     }
-    if(value !== null && value !== undefined) {
+    if (value !== null && value !== undefined) {
       return [value];
     }
-    return []; 
+    return [];
   }
 
-  updateValue(value) {
+  updateValue(value: string) {
     this.returnAsNull = false;
     const values = this.getValues(value);
     this.initialValue = [...values];
@@ -202,10 +238,13 @@ class InputTextMultipleStore extends FieldStore {
     this.value = [...this.initialValue];
   }
 
-
-  insertValue(value, index) {
-    if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
-      if(index !== undefined && index !== -1){
+  insertValue(value: string, index?: number) {
+    if (
+      value &&
+      this.value.length !== undefined &&
+      this.value.indexOf(value) === -1
+    ) {
+      if (index !== undefined && index !== -1) {
         this.value.splice(index, 0, value);
       } else {
         this.value.push(value);
@@ -213,37 +252,37 @@ class InputTextMultipleStore extends FieldStore {
     }
   }
 
-  deleteValue(value) {
-    if(this.value.length !== undefined){
+  deleteValue(value: string) {
+    if (this.value.length !== undefined) {
       this.value = this.value.filter(val => val !== value);
     }
   }
 
-  addValue(value) {
+  addValue(value: string) {
     this.insertValue(value);
   }
 
-  setValues(values) {
+  setValues(values: string[] | null | undefined) {
     if (values !== null && values !== undefined) {
-      if (values.length  || !this.returnAsNull) {
+      if (values.length || !this.returnAsNull) {
         this.returnAsNull = false;
         this.value = values;
       }
-    } else  {
+    } else {
       this.returnAsNull = true;
       this.value = [];
     }
   }
 
-  moveValueAfter(value, afterValue) {
-    if(value) {
+  moveValueAfter(value: string, afterValue: string) {
+    if (value) {
       const index = this.value.indexOf(afterValue);
       this.deleteValue(value);
       this.insertValue(value, index);
     }
   }
 
-  removeValue(value) {
+  removeValue(value: string) {
     this.deleteValue(value);
   }
 
@@ -253,7 +292,7 @@ class InputTextMultipleStore extends FieldStore {
 
   removeLastValue() {
     if (this.value.length) {
-      this.deleteValue(this.value[this.value.length-1]);
+      this.deleteValue(this.value[this.value.length - 1]);
     }
   }
 }

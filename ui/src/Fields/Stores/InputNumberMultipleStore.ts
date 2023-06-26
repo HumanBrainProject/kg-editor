@@ -160,12 +160,12 @@ class InputNumberMultipleStore extends FieldStore {
       }
       if(this.minMaxValueWarning) {
         if(this.minValue && this.maxValue) {
-          if (this.value.some(val => val < this.minValue || val > this.maxValue)) {
+          if (this.value.some(val => (this.minValue && parseInt(val) < this.minValue) || (this.maxValue && parseInt(val) > this.maxValue))) {
             messages.minMaxValues = `Values should be between ${this.minValue} and ${this.maxValue}`;
           }
-        } else if (this.value.some(val => val < this.minValue)) {
+        } else if (this.value.some(val => this.minValue && parseInt(val) < this.minValue)) {
           messages.minMaxValues = `Values should be bigger than ${this.minValue}`;
-        } else if (this.value.some(val => val > this.maxValue)) {
+        } else if (this.value.some(val => this.maxValue && parseInt(val) > this.maxValue)) {
           messages.minMaxValues = `Values should be smaller than ${this.maxValue}`;
         }
       }
@@ -185,7 +185,7 @@ class InputNumberMultipleStore extends FieldStore {
     return !!this.initialValue.length || this.hasChanged;
   }
 
-  insertValue(value, index) {
+  insertValue(value, index: number) {
     if(value !== undefined && value !== null && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
         this.value.splice(index, 0, value);

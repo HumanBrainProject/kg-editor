@@ -28,26 +28,42 @@ import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
 
-const normalizeValues = values => {
+const normalizeValues = (values: Value[] | null | undefined) => {
   if (Array.isArray(values)) {
     return values;
   }
-  if(values !== null && values !== undefined && typeof values === "object") {
+  if (values !== null && values !== undefined && typeof values === "object") {
     return [values];
   }
   return [];
 };
 
+interface Messages {
+  required?: string;
+  minMaxValues?: string;
+  numberOfItems?: string;
+}
+
+interface Value {
+  [key: string]: string;
+}
+
 class AnnotatedInputTextStore extends FieldStore {
-  value = [];
+  value: Value[] = [];
+  initialValue: Value[] = [];
   options = [];
   returnAsNull = false;
-  initialValue = [];
   mappingValue = "@id";
   minItems?: number;
   maxItems?: number;
 
-  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
+  constructor(
+    definition: FieldStoreDefinition,
+    options: WidgetOptions,
+    instance,
+    api: API,
+    rootStore: RootStore
+  ) {
     super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
@@ -88,7 +104,8 @@ class AnnotatedInputTextStore extends FieldStore {
     };
   }
 
-  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
+  get returnValue() {
+    //NOSONAR, by design spec it can return that specific string constant or a value
     if (!this.value.length && this.returnAsNull) {
       return "https://core.kg.ebrains.eu/vocab/resetValue";
     }
@@ -96,33 +113,36 @@ class AnnotatedInputTextStore extends FieldStore {
   }
 
   get requiredValidationWarning() {
-    if(!this.isRequired) {
+    if (!this.isRequired) {
       return false;
     }
     return this.value.length === 0;
   }
 
   get numberOfItemsWarning() {
-    if(!this.minItems && !this.maxItems) {
+    if (!this.minItems && !this.maxItems) {
       return false;
     }
     return this.minItems || this.maxItems;
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Messages = {};
     if (this.shouldCheckValidation) {
-      if(this.requiredValidationWarning) {
+      if (this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
       }
-      if(this.numberOfItemsWarning) {
-        if(this.minItems && this.maxItems) {
-          if(this.value.length < this.minItems || this.value.length > this.maxItems) {
+      if (this.numberOfItemsWarning) {
+        if (this.minItems && this.maxItems) {
+          if (
+            this.value.length < this.minItems ||
+            this.value.length > this.maxItems
+          ) {
             messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
           }
-        } else if(this.value.length < this.minItems) {
+        } else if (this.minItems && this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
-        } else if(this.value.length > this.maxItems) {
+        } else if (this.maxItems && this.value.length > this.maxItems) {
           messages.numberOfItems = `Number of values should be smaller than ${this.minItems}`;
         }
       }
@@ -147,16 +167,28 @@ class AnnotatedInputTextStore extends FieldStore {
   }
 
   get hasChanged() {
-    return this.value.length !== this.initialValue.length || this.value.some((val, index) => val === null?(this.initialValue[index] !== null):(val[this.mappingValue] !== this.initialValue[index][this.mappingValue]));
+    return (
+      this.value.length !== this.initialValue.length ||
+      this.value.some((val, index) =>
+        val === null
+          ? this.initialValue[index] !== null
+          : val[this.mappingValue] !==
+            this.initialValue[index][this.mappingValue]
+      )
+    );
   }
 
   get shouldCheckValidation() {
     return !!this.initialValue.length || this.hasChanged;
   }
 
-  insertValue(value, index) {
-    if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
-      if(index !== undefined && index !== -1){
+  insertValue(value: Value | null | undefined, index?: number) {
+    if (
+      value &&
+      this.value.length !== undefined &&
+      this.value.indexOf(value) === -1
+    ) {
+      if (index !== undefined && index !== -1) {
         this.value.splice(index, 0, value);
       } else {
         this.value.push(value);
@@ -164,37 +196,37 @@ class AnnotatedInputTextStore extends FieldStore {
     }
   }
 
-  deleteValue(value) {
+  deleteValue(value: Value) {
     if (this.value.length !== undefined) {
       this.value = this.value.filter(val => val !== value);
     }
   }
 
-  addValue(value) {
+  addValue(value?: Value | null) {
     this.insertValue(value);
   }
 
-  setValues(values) {
+  setValues(values?: Value[]|null ) {
     if (values !== null && values !== undefined) {
-      if (values.length  || !this.returnAsNull) {
+      if (values.length || !this.returnAsNull) {
         this.returnAsNull = false;
         this.value = values;
       }
-    } else  {
+    } else {
       this.returnAsNull = true;
       this.value = [];
     }
   }
 
-  moveValueAfter(value, afterValue) {
-    if(value) {
+  moveValueAfter(value: Value, afterValue: Value) {
+    if (value) {
       const index = this.value.indexOf(afterValue);
       this.deleteValue(value);
       this.insertValue(value, index);
     }
   }
 
-  removeValue(value) {
+  removeValue(value: Value) {
     this.deleteValue(value);
   }
 
@@ -204,12 +236,17 @@ class AnnotatedInputTextStore extends FieldStore {
 
   removeLastValue() {
     if (this.value.length) {
-      this.deleteValue(this.value[this.value.length-1]);
+      this.deleteValue(this.value[this.value.length - 1]);
     }
   }
 
-  get resources() { // be aware that it may contains null values and null value are needed!
-    return this.value.map(value => (value && value[this.mappingValue])?value[this.mappingValue]:"Unknown ressource");
+  get resources() {
+    // be aware that it may contains null values and null value are needed!
+    return this.value.map(value =>
+      value && value[this.mappingValue]
+        ? value[this.mappingValue]
+        : "Unknown ressource"
+    );
   }
 }
 

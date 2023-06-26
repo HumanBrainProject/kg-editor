@@ -23,18 +23,30 @@
 
 import { observable, action, computed, makeObservable, toJS } from "mobx";
 import FieldStore from "./FieldStore";
-import { fieldsMapping } from "../../Fields";
+import { WidgetOptions, fieldsMapping } from "..";
+import { FieldStoreDefinition, SimpleType } from "../../types";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
+
+interface Messages {
+  numberOfItems?: string;
+}
+
+interface Value {
+  [key: string]: string[];
+}
 
 class NestedFieldStore extends FieldStore {
   fieldsTemplate = {};
   initialValue = [];
   returnAsNull = false;
   nestedFieldsStores = [];
-  targetTypes = [];
-  minItems = null;
-  maxItems = null;
+  targetTypes?: SimpleType[] = [];
+  minItems?: number;
+  maxItems?: number;
+  labelField?: string;
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.fieldsTemplate = definition.fields;
     this.targetTypes = definition.targetTypes;
@@ -95,16 +107,16 @@ class NestedFieldStore extends FieldStore {
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.numberOfItemsWarning) {
         if(this.minItems && this.maxItems) {
           if(this.nestedFieldsStores.length < this.minItems || this.nestedFieldsStores.length > this.maxItems) {
             messages.numberOfItems = `Number of items should be between ${this.minItems} and ${this.maxItems}`;
           }
-        } else if(this.nestedFieldsStores.length < this.minItems) {
+        } else if(this.minItems && this.nestedFieldsStores.length < this.minItems) {
           messages.numberOfItems = `Number of items should be bigger than ${this.minItems}`;
-        } else if(this.nestedFieldsStores.length > this.maxItems) {
+        } else if(this.maxItems && this.nestedFieldsStores.length > this.maxItems) {
           messages.numberOfItems = `Number of items should be smaller than ${this.maxItems}`;
         }
       }
@@ -117,15 +129,15 @@ class NestedFieldStore extends FieldStore {
   }
 
   get resolvedTargetTypes() {
-    return this.targetTypes.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type);
+    return this.targetTypes?.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type);
   }
 
-  getType(types) {
+  getType(types: string[]) {
     const typeName = (Array.isArray(types) && types.length)?types[0]:null; // for embeded: value should only belong to a single type.
     return typeName && this.rootStore.typeStore.typesMap.get(typeName);
   }
 
-  _addNestedStore = (stores, name, template, value) => {
+  _addNestedStore = (stores: any, name: string, template, value: Value) => {
     const field = JSON.parse(JSON.stringify(toJS(template)));
     let warning = null;
     if(name === this.labelField) {
@@ -179,7 +191,7 @@ class NestedFieldStore extends FieldStore {
     this.initialValue = this.returnValue;
   }
 
-  addValue(type) {
+  addValue(type: string) {
     const values = this.returnValue;
     values.push({
       "@type": [type] // for embeded: value should only belong to a single type.
@@ -187,7 +199,7 @@ class NestedFieldStore extends FieldStore {
     this._setValue(values);
   }
 
-  deleteItemByIndex(index) {
+  deleteItemByIndex(index: number) {
     if (index >= 0 && index < this.nestedFieldsStores.length) {
       const values = this.returnValue;
       values.splice(index, 1);
@@ -195,7 +207,7 @@ class NestedFieldStore extends FieldStore {
     }
   }
 
-  moveItemUpByIndex(index) {
+  moveItemUpByIndex(index: number) {
     if (index > 0 && index < this.nestedFieldsStores.length) {
       const values = this.returnValue;
       const item = values[index];
@@ -205,7 +217,7 @@ class NestedFieldStore extends FieldStore {
     }
   }
 
-  moveItemDownByIndex(index) {
+  moveItemDownByIndex(index: number) {
     if (index >= 0 && index < this.nestedFieldsStores.length -1) {
       const values = this.returnValue;
       const item = values[index];

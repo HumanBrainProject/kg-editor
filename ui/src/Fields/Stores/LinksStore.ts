@@ -439,7 +439,7 @@ class LinksStore extends FieldStore {
     }
   }
 
-  setTargetType(type) {
+  setTargetType(type: SimpleType) {
     this.targetType = type;
     this.resetOptionsSearch();
   }

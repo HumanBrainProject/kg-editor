@@ -26,8 +26,22 @@ import { observable, action, runInAction, computed, toJS, makeObservable } from 
 import debounce from "lodash/debounce";
 
 import FieldStore from "./FieldStore";
+import { FieldStoreDefinition, SimpleType } from "../../types";
+import { WidgetOptions } from "..";
+import API from "../../Services/API";
+import RootStore from "../../Stores/RootStore";
 
 const defaultNumberOfVisibleLinks = 10;
+
+interface Messages {
+  required?: string; 
+  numberOfItems?: string;
+}
+
+interface Value {
+  [key: string]: string;
+}
+
 
 class LinksStore extends FieldStore {
   value = [];
@@ -37,7 +51,7 @@ class LinksStore extends FieldStore {
   returnAsNull = false;
   optionsSearchActive = false;
   optionsSearchTerm = "";
-  optionsPreviousSearchTerm = null;
+  optionsPreviousSearchTerm?: string;
   optionsFrom = 0;
   optionsPageSize = 50;
   optionsSize = 0;
@@ -47,21 +61,21 @@ class LinksStore extends FieldStore {
   visibleLinks = new Set();
   initialValue = [];
   isLink = true;
-  targetTypes = [];
+  targetTypes: SimpleType[] = [];
+  targetType?: SimpleType;
   mappingValue = "@id";
-  minItems = null;
-  maxItems = null;
-  targetType = null;
+  minItems?: number;
+  maxItems?: number;
   sourceType = null;
 
   appStore = null;
 
-  constructor(definition, options, instance, api, rootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;
     this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];
-    this.targetType = this.targetTypes.length?this.targetTypes[0]:null;
+    this.targetType = this.targetTypes.length?this.targetTypes[0]:undefined;
     if (definition.defaultTargetType) {
       const defaultTargetType = this.targetTypes.find(type => type.name === definition.defaultTargetType);
       if (defaultTargetType) {
@@ -167,7 +181,7 @@ class LinksStore extends FieldStore {
   }
 
   get validationWarnings() {
-    const messages = {};
+    const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.requiredValidationWarning) {
         messages.required = "This field is marked as required.";
@@ -177,9 +191,9 @@ class LinksStore extends FieldStore {
           if(this.value.length < this.minItems || this.value.length > this.maxItems) {
             messages.numberOfItems = `Number of values should be between ${this.minItems} and ${this.maxItems}`;
           }
-        } else if(this.value.length < this.minItems) {
+        } else if(this.minItems && this.value.length < this.minItems) {
           messages.numberOfItems = `Number of values should be bigger than ${this.minItems}`;
-        } else if(this.value.length > this.maxItems) {
+        } else if(this.maxItems && this.value.length > this.maxItems) {
           messages.numberOfItems = `Number of values should be smaller than ${this.maxItems}`;
         }
       }
@@ -191,7 +205,7 @@ class LinksStore extends FieldStore {
     return Object.keys(this.validationWarnings).length > 0;
   }
 
-  getValues(value) {
+  getValues(value: Value | Value[] | null | undefined) {
     if(Array.isArray(value)) {
       return value;
     }
@@ -239,7 +253,7 @@ class LinksStore extends FieldStore {
     return !this.fetchingOptions && this.options.length < this.optionsTotal;
   }
 
-  insertValue(value, index) {
+  insertValue(value: Value, index?: number) {
     if(value && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
         this.value.splice(index, 0, value);
@@ -249,13 +263,13 @@ class LinksStore extends FieldStore {
     }
   }
 
-  deleteValue(value) {
+  deleteValue(value: Value) {
     if(this.value.length !== undefined){
       this.value = this.value.filter(val => val !== value);
     }
   }
 
-  addValue(value) {
+  addValue(value: Value) {
     if(!this.value.some(v => v[this.mappingValue] === value[this.mappingValue])) {
       this.insertValue(value);
       if (this.lazyShowLinks) {
@@ -288,7 +302,7 @@ class LinksStore extends FieldStore {
     this.resetOptionsSearch();
   }
 
-  moveValueAfter(value, afterValue) {
+  moveValueAfter(value: Value, afterValue: Value) {
     if(value) {
       const index = this.value.indexOf(afterValue);
       this.deleteValue(value);
@@ -297,7 +311,7 @@ class LinksStore extends FieldStore {
     }
   }
 
-  removeValue(value) {
+  removeValue(value: Value) {
     this.visibleLinks.delete(value[this.mappingValue]);
     this.deleteValue(value);
     this.resetOptionsSearch();
@@ -318,7 +332,7 @@ class LinksStore extends FieldStore {
     return this.value.map(value => value && value[this.mappingValue]);
   }
 
-  showLink(id) {
+  showLink(id: string) {
     this.visibleLinks.add(id);
   }
 
@@ -330,9 +344,9 @@ class LinksStore extends FieldStore {
     return this.fetchingCounter > 0;
   }
 
-  isLinkVisible = id => this.visibleLinks.has(id);
+  isLinkVisible = (id: string) => this.visibleLinks.has(id);
 
-  triggerSearchOption(append) {
+  triggerSearchOption(append: boolean) {
     if (!this.optionsSearchActive) {
       return;
     }
@@ -346,7 +360,7 @@ class LinksStore extends FieldStore {
     this.performSearchOptions(from);
   }
 
-  async performSearchOptions(from) {
+  async performSearchOptions(from: number) {
     this.fetchingCounter++;
     if (from === 0) {
       this.options = [];
@@ -369,7 +383,7 @@ class LinksStore extends FieldStore {
                 id: `${space}-${type.name}`,
                 type: type,
                 space: this.rootStore.userProfileStore.getSpaceInfo(space),
-                isExternal: space !== this.rootStore.appStore.currentSpace.id,
+                isExternal: space !== this.rootStore.appStore.currentSpace?.id,
                 isNew: true
               });
             })
@@ -404,7 +418,7 @@ class LinksStore extends FieldStore {
 
   _debouncedSearchOptions = debounce(append=>{this.triggerSearchOption(append);}, 250);
 
-  searchOptions(searchTerm) {
+  searchOptions(searchTerm: string) {
     this.optionsSearchActive = true;
     this.optionsSearchTerm = searchTerm;
     this._debouncedSearchOptions(false);
@@ -413,7 +427,7 @@ class LinksStore extends FieldStore {
   resetOptionsSearch() {
     this.optionsSearchActive = false;
     this.optionsSearchTerm = "";
-    this.optionsPreviousSearchTerm = null;
+    this.optionsPreviousSearchTerm = undefined;
     this.optionsFrom = 0;
     this.optionsTotal = Infinity;
     this.options = [];

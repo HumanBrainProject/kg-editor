@@ -331,4 +331,8 @@ export interface FieldStoreDefinition {
     maxLength?: number;
     validation?: FieldStoreValidation[];
     regex?: string;
+    defaultTargetType?: string;
+    allowCustomValues?: boolean;
+    lazyShowLinks?: boolean;
+    targetTypes?: SimpleType[];
 }

@@ -33,8 +33,8 @@ const ContactTheSupport = () => {
   const handleErrorReport = () => {
     Sentry.showReportDialog({
       user: {
-        email: userProfileStore.user.email,
-        name: `${userProfileStore.user.name} (${userProfileStore.user.username})`
+        email: userProfileStore.user?.email,
+        name: `${userProfileStore.user?.name} (${userProfileStore.user?.username})`
       }
     });
   };

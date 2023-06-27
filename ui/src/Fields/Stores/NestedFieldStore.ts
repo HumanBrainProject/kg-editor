@@ -27,6 +27,7 @@ import { WidgetOptions, fieldsMapping } from "..";
 import { FieldStoreDefinition, SimpleType } from "../../types";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
 
 interface Messages {
   numberOfItems?: string;
@@ -46,7 +47,7 @@ class NestedFieldStore extends FieldStore {
   maxItems?: number;
   labelField?: string;
 
-  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance: Instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.fieldsTemplate = definition.fields;
     this.targetTypes = definition.targetTypes;

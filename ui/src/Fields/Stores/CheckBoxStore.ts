@@ -28,12 +28,14 @@ import { FieldStoreDefinition } from "../../types";
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
+
 
 class CheckBoxStore extends FieldStore {
   value = false;
   initialValue = false;
 
-  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance: Instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
 
     makeObservable(this, {

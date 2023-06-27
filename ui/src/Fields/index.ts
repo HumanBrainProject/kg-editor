@@ -58,16 +58,19 @@ import SingleNestedFieldStore from "./Stores/SingleNestedFieldStore";
 import React from "react";
 
 export interface WidgetOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [option: string]: any;
 }
 
 interface Widget<T extends FieldStore>  {
-  Component: React.ComponentType | React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Component: React.ComponentType<any> | React.ReactNode;
   Store: T;
   options?: WidgetOptions;
 }
 
 interface FieldMapping {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [widget: string]: Widget<any>;
 }
 

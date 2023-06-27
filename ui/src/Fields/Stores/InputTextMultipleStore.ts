@@ -28,6 +28,7 @@ import { FieldStoreDefinition, FieldStoreRegexRule, FieldStoreValidation } from 
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
 
 const getRegexRules = (validation?: FieldStoreValidation[]): FieldStoreRegexRule[] =>
   Array.isArray(validation)
@@ -57,7 +58,7 @@ class InputTextMultipleStore extends FieldStore {
   constructor(
     definition: FieldStoreDefinition,
     options: WidgetOptions,
-    instance,
+    instance: Instance,
     api: API,
     rootStore: RootStore
   ) {

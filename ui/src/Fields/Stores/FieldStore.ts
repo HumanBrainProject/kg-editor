@@ -27,6 +27,7 @@ import RootStore from "../../Stores/RootStore";
 import { FieldStoreDefinition } from "../../types";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { WidgetOptions } from "..";
+import Instance from "../../Stores/Instance";
 
 class FieldStore {
   label?:string;
@@ -47,7 +48,7 @@ class FieldStore {
   api: API;
   rootStore: RootStore;
 
-  constructor(definition: FieldStoreDefinition, _options: WidgetOptions, instance, api:API, rootStore: RootStore) {
+  constructor(definition: FieldStoreDefinition, _options: WidgetOptions, instance: Instance, api:API, rootStore: RootStore) {
     makeObservable(this, {
       label: observable,
       labelTooltip: observable,

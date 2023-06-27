@@ -32,6 +32,7 @@ import {
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
 
 interface Message {
   required?: string;
@@ -68,7 +69,7 @@ class InputTextStore extends FieldStore {
   constructor(
     definition: FieldStoreDefinition,
     options: WidgetOptions,
-    instance,
+    instance: Instance,
     api: API,
     rootStore: RootStore
   ) {

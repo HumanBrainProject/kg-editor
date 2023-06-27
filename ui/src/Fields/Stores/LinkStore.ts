@@ -30,6 +30,7 @@ import { FieldStoreDefinition, SimpleType } from "../../types";
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
 
 interface Value {
   [key: string]: string;
@@ -62,7 +63,7 @@ class LinkStore extends FieldStore {
 
   appStore = null;
 
-  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance: Instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.targetTypes = Array.isArray(definition.targetTypes)?definition.targetTypes:[];
     this.targetType = this.targetTypes.length?this.targetTypes[0]:undefined;

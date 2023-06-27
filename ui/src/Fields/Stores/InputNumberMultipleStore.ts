@@ -27,6 +27,7 @@ import { FieldStoreDefinition } from "../../types";
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
 
 const normalizeValues = (values: string[]|null|undefined) => {
   if (Array.isArray(values)) {
@@ -56,7 +57,7 @@ class InputNumberMultipleStore extends FieldStore {
   minValue?: number;
   maxValue?: number;
 
-  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance, api: API, rootStore: RootStore) {
+  constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance: Instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     this.minItems = definition.minItems;
     this.maxItems = definition.maxItems;

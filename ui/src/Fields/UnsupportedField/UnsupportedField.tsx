@@ -27,7 +27,7 @@ interface UnsupportedFieldProps {
   fieldStore: UnsupportedFieldStore;
 }
 
-const UnsupportedField = ({fieldStore}: UnsupportedFieldProps): React.ReactNode => {
+const UnsupportedField = ({fieldStore}: UnsupportedFieldProps) => {
   console.warn(fieldStore.warning);
   return null;
 };

@@ -27,6 +27,7 @@ import { FieldStoreDefinition } from "../../types";
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
+import Instance from "../../Stores/Instance";
 
 const normalizeValues = (values: Value[] | null | undefined) => {
   if (Array.isArray(values)) {
@@ -60,7 +61,7 @@ class AnnotatedInputTextStore extends FieldStore {
   constructor(
     definition: FieldStoreDefinition,
     options: WidgetOptions,
-    instance,
+    instance: Instance,
     api: API,
     rootStore: RootStore
   ) {

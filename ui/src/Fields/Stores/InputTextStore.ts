@@ -60,6 +60,7 @@ const getRegexRules = (
 };
 
 class InputTextStore extends FieldStore {
+  inputType = "text";
   value = "";
   returnAsNull = false;
   initialValue = "";

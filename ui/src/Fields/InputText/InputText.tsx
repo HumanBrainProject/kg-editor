@@ -48,12 +48,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const getStringValue = value => !value || typeof value === "string"? value:JSON.stringify(value);
+const getStringValue = (value?: any) => !value || typeof value === "string"? value:JSON.stringify(value);
 
-const getDateValue = value => {
+const getDateValue = (value?: any)  => {
   if (value && typeof value === "string") {
     const d = new Date(value);
-    if (d instanceof Date && !isNaN(d)) {
+    if (d && d instanceof Date) {
       return d.toLocaleDateString();
     }
     return value
@@ -61,7 +61,11 @@ const getDateValue = value => {
   return JSON.stringify(value);
 }
 
-const Lines = ({lines}) => {
+interface LinesProps {
+  lines: string[];
+}
+
+const Lines = ({lines}: LinesProps) => {
   return (
     <div>
       {lines.map((line, index) => {
@@ -73,7 +77,12 @@ const Lines = ({lines}) => {
   );
 };
 
-const FieldValue = ({field, splitLines}) => {
+interface FieldValueProps {
+  field: InputTextStore;
+  splitLines: boolean;
+}
+
+const FieldValue = ({field, splitLines}: FieldValueProps) => {
   const { value } = field;
 
   if (splitLines) {
@@ -112,12 +121,12 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   const classes = useStyles();
 
-  const formGroupRef = useRef();
+  const formGroupRef = useRef<HTMLInputElement>(null);
 
   const {
     value,
     inputType,
-    rows,
+    rows, //TODO: is this still needed ? Remove if not. Currently it always resolved to undefined
     returnAsNull,
     alternatives,
     label,

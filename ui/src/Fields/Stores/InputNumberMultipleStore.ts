@@ -186,7 +186,7 @@ class InputNumberMultipleStore extends FieldStore {
     return !!this.initialValue.length || this.hasChanged;
   }
 
-  insertValue(value, index: number) {
+  insertValue(value: string, index?: number) {
     if(value !== undefined && value !== null && this.value.length !== undefined && this.value.indexOf(value) === -1){
       if(index !== undefined && index !== -1){
         this.value.splice(index, 0, value);
@@ -196,13 +196,13 @@ class InputNumberMultipleStore extends FieldStore {
     }
   }
 
-  deleteValue(value) {
+  deleteValue(value: string) {
     if(this.value.length !== undefined){
       this.value = this.value.filter(val => val !== value);
     }
   }
 
-  addValue(value) {
+  addValue(value: string) {
     this.insertValue(value);
   }
 
@@ -218,7 +218,7 @@ class InputNumberMultipleStore extends FieldStore {
     }
   }
 
-  moveValueAfter(value, afterValue) {
+  moveValueAfter(value: string, afterValue: string) {
     if(value) {
       const index = this.value.indexOf(afterValue);
       this.deleteValue(value);
@@ -226,7 +226,7 @@ class InputNumberMultipleStore extends FieldStore {
     }
   }
 
-  removeValue(value) {
+  removeValue(value: string) {
     this.deleteValue(value);
   }
 

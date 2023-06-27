@@ -25,13 +25,23 @@ import React, { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
+import DatePicker from "react-datepicker";
 
 import Alternatives from "../Alternatives";
 import Label from "../Label";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
+import "react-datepicker/dist/react-datepicker.css";
+import { Alternative } from "../../types";
+import InputDateStore from "../Stores/InputDateStore";
 
 const useStyles = createUseStyles({
+  containerDatepicker: {
+    "& > .react-datepicker-wrapper": {
+      display: "block"
+    },
+    "& .react-datepicker__triangle": {
+      left: "50px !important"
+    }
+  },
   alternatives: {
     marginLeft: "3px"
   },
@@ -41,15 +51,56 @@ const useStyles = createUseStyles({
       content: "':\\00a0'"
     }
   },
+  datePicker: {
+    display: "block",
+    width: "100%",
+    padding: ".375rem .75rem",
+    fontSize: "1rem",
+    fontWeight: "400",
+    lineHeight: "1.5",
+    color: "#495057",
+    backgroundColor: "#fff",
+    backgroundClip: "padding-box",
+    border: "1px solid #ced4da",
+    borderRadius: ".25rem",
+    transition: "border-color .15s ease-in-out,box-shadow .15s ease-in-out",
+    height: "auto",
+    position: "relative",
+    minHeight: "34px",
+    paddingBottom: "3px"
+  },
   warning: {
     borderColor: "var(--ft-color-warn)"
   }
 });
 
-const AlternativeValue = observer(({alternative}) => JSON.stringify(alternative.value));
+
+const getDateTimeValue = (value?: any) => {
+  if (value && typeof value === "string") {
+    const d = new Date(value);
+    if (d && d instanceof Date) {
+      return d.toLocaleString();
+    }
+    return value
+  }
+  return JSON.stringify(value);
+};
+
+interface AlternativeValueProps {
+  alternative: Alternative;
+}
+
+const AlternativeValue = observer(({alternative}: AlternativeValueProps) => getDateTimeValue(alternative.value));
 AlternativeValue.displayName = "AlternativeValue";
 
-const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
+interface InputDateTimeProps {
+  fieldStore: InputDateStore;
+  className: string;
+  readMode: boolean;
+  showIfNoValue: boolean;
+} 
+
+const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue }:InputDateTimeProps) => {
 
   const classes = useStyles();
 
@@ -57,7 +108,6 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
 
   const {
     value,
-    inputType,
     returnAsNull,
     alternatives,
     label,
@@ -68,7 +118,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
     isReadOnly
   } = fieldStore;
 
-  const handleChange = e => fieldStore.setValue(e.target.value);
+  const handleChange = val => fieldStore.setValue(val);
 
   const handleSelectAlternative = val => fieldStore.setValue(val);
 
@@ -78,9 +128,8 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
     return null;
   }
 
-  if(readMode || isReadOnly){
-
-    const val = !value || typeof value === "string"? value:value.toString();
+  if (readMode || isReadOnly) {
+    const val = getDateTimeValue(value);
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} isReadOnly={readMode?false:isReadOnly} />
@@ -88,12 +137,11 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
       </Form.Group>
     );
   }
-
+  const dateValue = value === "" ? null:new Date(value);
   const isDisabled = returnAsNull;
-  const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
-  const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
+  const checkValidationWarnings = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
-    <Form.Group className={className} ref={formGroupRef} >
+    <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
       <Alternatives
         className={classes.alternatives}
@@ -103,18 +151,19 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         parentContainerRef={formGroupRef}
         ValueRenderer={AlternativeValue}
       />
-      <Form.Control
-        value={value}
-        type={inputType}
-        onChange={handleChange}
+      <DatePicker
+        className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:""}`}
+        selected={dateValue}
         disabled={isDisabled}
-        className={hasValidationWarnings?classes.warning:""}
+        onChange={handleChange}
+        showTimeSelect
+        timeFormat="p"
+        timeIntervals={15}
+        dateFormat="Pp"
       />
-      <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
-      <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>
   );
 });
-InputNumber.displayName = "InputNumber";
+InputDateTime.displayName = "InputDateTime";
 
-export default InputNumber;
+export default InputDateTime;

@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Color from "color";
@@ -32,6 +32,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Label from "../Label";
 import Invalid from "../Invalid";
 import Warning from "../Warning";
+import InputTextStore from "../Stores/InputTextStore";
 
 const useStyles = createUseStyles({
   label: {},
@@ -69,8 +70,14 @@ const useStyles = createUseStyles({
   }
 });
 
+interface InputColorProps {
+  fieldStore: InputTextStore;
+  className: string;
+  readMode: boolean;
+  showIfNoValue: boolean;
+} 
 
-const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }) => {
+const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }: InputColorProps) => {
 
   const classes = useStyles();
 
@@ -88,7 +95,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
     isReadOnly
   } = fieldStore;
 
-  const handleChange = e => fieldStore.setValue(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
   const handleAddColor = () => fieldStore.setValue("#000");
 
@@ -122,7 +129,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
     return (
       <Form.Group className={className}>
         <Label className={classes.label} label={label} />
-        <Button className={classes.addColorBtn} size="small" variant="primary" onClick={handleAddColor} title="Set color" >
+        <Button className={classes.addColorBtn} size="sm" variant="primary" onClick={handleAddColor} title="Set color" >
           <FontAwesomeIcon icon="plus"/>
         </Button>
       </Form.Group>
@@ -145,7 +152,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue })
           rows={rows}
           className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:""}`}
         />
-        <Button className={classes.removeColorBtn} size="small" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
+        <Button className={classes.removeColorBtn} size="sm" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
           <FontAwesomeIcon icon="times"/>
         </Button>
       </div>

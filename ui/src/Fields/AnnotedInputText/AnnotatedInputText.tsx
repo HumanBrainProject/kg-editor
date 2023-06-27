@@ -171,15 +171,15 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
   const handleKeyStrokes = (e: KeyboardEvent<HTMLInputElement>) => {
     if(e.key === "Enter"){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
-      const value = e.target.value.trim();
+      const value = e.currentTarget.value.trim();
       if (value) {
         handleOnAddValue(value);
       }
-      e.target.value = "";
-    } else if(!e.target.value && fieldStore.resources.length > 0 && e.key === "Backspace"){
+      e.currentTarget.value = "";
+    } else if(!e.currentTarget.value && fieldStore.resources.length > 0 && e.key === "Backspace"){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
-      e.target.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
+      e.currentTarget.value = fieldStore.value[fieldStore.value.length-1][fieldStore.mappingValue];
       handleDeleteLastValue();
     }
   };

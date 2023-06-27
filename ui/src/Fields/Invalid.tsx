@@ -37,7 +37,7 @@ const useStyles = createUseStyles({
 
 interface InvalidProps {
   show: boolean;
-  messages: string[];
+  messages: any;
 }
 
 const Invalid = ({ show, messages }: InvalidProps) => {

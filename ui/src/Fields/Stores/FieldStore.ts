@@ -44,7 +44,7 @@ class FieldStore {
   widget?: string;
   isRequired = false;
   isReadOnly = false;
-  instance = null;
+  instance?: Instance;
   api: API;
   rootStore: RootStore;
 

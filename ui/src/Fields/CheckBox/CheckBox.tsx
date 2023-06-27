@@ -26,6 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import Label from "../Label";
+import CheckBoxStore from "../Stores/CheckBoxStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -41,15 +42,20 @@ const useStyles = createUseStyles({
   }
 });
 
-const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }) => {
+interface CheckBoxProps {
+  className: string;
+  fieldStore: CheckBoxStore;
+  readMode: boolean;
+  showIfNoValue: boolean;
+}
+
+const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }: CheckBoxProps) => {
 
   const { value, label, labelTooltip, labelTooltipIcon, isPublic } = fieldStore;
   const classes = useStyles();
 
   const handleChange = () => {
-    if (!fieldStore.disabled && !fieldStore.readOnly) {
-      fieldStore.toggleValue();
-    }
+    fieldStore.toggleValue();
   };
 
   if(readMode) {

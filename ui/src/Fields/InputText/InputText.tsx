@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
@@ -30,6 +30,8 @@ import Alternatives from "../Alternatives";
 import Label from "../Label";
 import Invalid from "../Invalid";
 import Warning from "../Warning";
+import { Alternative } from "../../types";
+import InputTextStore from "../Stores/InputTextStore";
 
 const useStyles = createUseStyles({
   alternatives: {
@@ -88,13 +90,25 @@ const FieldValue = ({field, splitLines}) => {
   );
 };
 
-const AlternativeValue = observer(({alternative}) => typeof alternative.value === "string"?alternative.value:JSON.stringify(alternative.value));
+interface AlternativeValueProps {
+  alternative: Alternative;
+}
+
+const AlternativeValue = observer(({alternative}: AlternativeValueProps) => typeof alternative.value === "string"?alternative.value:JSON.stringify(alternative.value));
 AlternativeValue.displayName = "AlternativeValue";
 
-const AlternativeDateValue = observer(({alternative}) => getDateValue(alternative.value));
+const AlternativeDateValue = observer(({alternative}: AlternativeValueProps) => getDateValue(alternative.value));
 AlternativeDateValue.displayName = "AlternativeDateValue";
 
-const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }) => {
+interface InputTextProps {
+  fieldStore: InputTextStore;
+  className: string;
+  as: string; 
+  readMode: boolean;
+  showIfNoValue: boolean;
+} 
+
+const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }: InputTextProps) => {
 
   const classes = useStyles();
 
@@ -114,7 +128,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
     isReadOnly
   } = fieldStore;
 
-  const handleChange = e => fieldStore.setValue(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
   const handleSelectAlternative = val => fieldStore.setValue(val);
 

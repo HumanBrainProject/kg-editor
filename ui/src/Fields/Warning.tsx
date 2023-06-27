@@ -34,7 +34,7 @@ const useStyles = createUseStyles({
 
 interface WarningProps {
   show: boolean;
-  message: string;
+  message?: string;
 }
 
 const Warning = ({ show, message }: WarningProps) => {

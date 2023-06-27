@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { ClipboardEvent, FocusEvent, KeyboardEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
@@ -32,6 +32,8 @@ import Label from "../Label";
 import Alternatives from "../Alternatives";
 import Invalid from "../Invalid";
 import Warning from "../Warning";
+import AnnotatedInputTextStore, { Value } from "../Stores/AnnotatedInputTextStore";
+import { Alternative } from "../../types";
 
 const useStyles = createUseStyles({
   values:{
@@ -74,19 +76,30 @@ const useStyles = createUseStyles({
   }
 });
 
+interface AlternativeValueProps {
+  alternative: Alternative;
+}
 
-const getAlternativeValue = mappingValue => {
-  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value)?alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "):JSON.stringify(alternative.value));
+const getAlternativeValue = (mappingValue: string) => {
+  const AlternativeValue = observer(({alternative}: AlternativeValueProps) => Array.isArray(alternative.value)?alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:"Unknown resource").join("; "):JSON.stringify(alternative.value));
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };
 
-const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+interface AnnotatedInputTextProps {
+  className: string;
+  fieldStore: AnnotatedInputTextStore;
+  readMode: boolean;
+  showIfNoValue: boolean;
+}
+
+
+const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoValue}: AnnotatedInputTextProps) => {
 
   const classes = useStyles();
 
-  const draggedIndex = useRef();
-  const formGroupRef = useRef();
+  const draggedIndex = useRef<number|null>(null);
+  const formGroupRef = useRef<HTMLInputElement>(null);
 
   const {
     value: values,
@@ -112,17 +125,17 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
 
   const handleDeleteLastValue = () => fieldStore.removeLastValue();
 
-  const handleDelete = index => {
+  const handleDelete = (index: number) => {
     const value = values[index];
     fieldStore.removeValue(value);
   };
 
   const handleDragEnd = () => draggedIndex.current = null;
 
-  const handleDragStart = index => draggedIndex.current = index;
+  const handleDragStart = (index: number) => draggedIndex.current = index;
 
-  const handleDrop = droppedIndex => {
-    if (Array.isArray(values) && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
+  const handleDrop = (droppedIndex: number) => {
+    if (Array.isArray(values) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
       const value = values[draggedIndex.current];
       const afterValue = values[droppedIndex];
       fieldStore.moveValueAfter(value, afterValue);
@@ -130,7 +143,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     draggedIndex.current = null;
   };
 
-  const handleBlur = e => {
+  const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
     const value = e.target.value.trim();
     if (value) {
       handleOnAddValue(value);
@@ -138,16 +151,16 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     e.target.value = "";
   };
 
-  const handleKeyDown = (value, e) => {
+  const handleKeyDown = (value: Value, e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
     }
   };
 
-  const handleNativePaste = e => {
+  const handleNativePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    e.clipboardData.getData("text").split("\n").forEach(value => {
+    e.clipboardData.getData("text").split("\n").forEach((value: string) => {
       const val = value.trim();
       if (val) {
         handleOnAddValue(val);
@@ -155,7 +168,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     });
   };
 
-  const handleKeyStrokes = e => {
+  const handleKeyStrokes = (e: KeyboardEvent<HTMLInputElement>) => {
     if(e.key === "Enter"){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
       const value = e.target.value.trim();

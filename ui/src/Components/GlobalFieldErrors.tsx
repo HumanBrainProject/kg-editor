@@ -24,6 +24,7 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
+import { InstanceFull } from "../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -35,12 +36,16 @@ const useStyles = createUseStyles({
   }
 });
 
-const GlobalFieldErrors = observer(({ instance }) => {
+interface GlobalFieldErrorsProps {
+  instance: InstanceFull;
+}
+
+const GlobalFieldErrors = observer(({ instance }: GlobalFieldErrorsProps) => {
   const classes = useStyles();
   return (
     <div className={classes.container}>
       <h4>
-        {`The ${instance.primaryTypeLabel?instance.primaryTypeLabel:"instance"} ${instance.id} could not be rendered because it contains unexpected type of values in the below fields:`}
+        {`The instance ${instance.id} could not be rendered because it contains unexpected type of values in the below fields:`}
       </h4>
       <ul>
         {Object.values(instance.fields).filter(field => field.hasError).map(field => ( // [{field.errorMessage?field.errorMessage.toString():"null"}: {JSON.stringify(field.errorInfo)}]

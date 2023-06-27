@@ -39,7 +39,7 @@ const useStyles = createUseStyles({
 
 interface LabelTooltipProps {
   tooltip: string;
-  icon: IconProp;
+  icon?: IconProp;
 }
 
 const LabelTooltip = ({tooltip, icon}:LabelTooltipProps) => (
@@ -53,12 +53,12 @@ const LabelTooltip = ({tooltip, icon}:LabelTooltipProps) => (
 
 interface LabelProps {
   className: string;
-  label: string;
-  labelTooltip: string;
-  labelTooltipIcon: IconProp;
-  isReadOnly: boolean;
-  isRequired: boolean;
-  isPublic: boolean;
+  label?: string;
+  labelTooltip?: string;
+  labelTooltipIcon?: IconProp;
+  isReadOnly?: boolean;
+  isRequired?: boolean;
+  isPublic?: boolean;
 }
 
 const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic }: LabelProps) => {

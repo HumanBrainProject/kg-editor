@@ -21,10 +21,21 @@
  *
  */
 
-import React from "react";
+import React, { KeyboardEvent } from "react";
 import { observer } from "mobx-react-lite";
 
 import ListItem from "./ListItem";
+
+interface ListProps {
+  list: string[];
+  readOnly: boolean;
+  disabled: boolean;
+  onDelete: (index: number) => void;
+  onDragEnd: () => void;
+  onDragStart: (index: number) => void;
+  onDrop: (droppedIndex: number) => void;
+  onKeyDown: (value: number, e: KeyboardEvent<HTMLDivElement>) => void;
+}
 
 const List = observer(({
   list,
@@ -35,7 +46,7 @@ const List = observer(({
   onDragStart,
   onDrop,
   onKeyDown
-}) => (
+}: ListProps) => (
   <span>
     {list.map((value, index) => (
       <ListItem

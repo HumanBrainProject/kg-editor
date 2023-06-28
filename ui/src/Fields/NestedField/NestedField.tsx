@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { MouseEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,6 +33,8 @@ import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 import { compareField } from "../../Stores/Instance";
 import Invalid from "../Invalid";
 import Warning from "../Warning";
+import NestedFieldStore from "../Stores/NestedFieldStore";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
   label: {},
@@ -116,11 +118,18 @@ const useStyles = createUseStyles({
   }
 });
 
-const Action = ({ icon, title, single, onClick }) => {
+interface ActionProps {
+  icon: IconProp;
+  title: string;
+  single?: boolean;
+  onClick: () => void;
+}
+
+const Action = ({ icon, title, single, onClick }: ActionProps) => {
 
   const classes = useStyles();
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.target)) {
       return;
@@ -135,7 +144,18 @@ const Action = ({ icon, title, single, onClick }) => {
   );
 };
 
-const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMoveUp, onMoveDown }) => {
+interface ItemProps {
+  itemFieldStores: any;
+  readMode: boolean;
+  active: boolean;
+  index: number;
+  total: number;
+  onDelete: (v:number) => void;
+  onMoveUp: (v:number) => void;
+  onMoveDown: (v:number) => void;
+}
+
+const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMoveUp, onMoveDown }: ItemProps) => {
 
   const classes = useStyles();
 
@@ -168,11 +188,18 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
   );
 };
 
-const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+interface NestedFieldProps {
+  className: string;
+  fieldStore: NestedFieldStore;
+  readMode: boolean; 
+  showIfNoValue: boolean;
+}
+
+const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: NestedFieldProps) => {
 
   const classes = useStyles();
 
-  const formGroupRef = useRef();
+  const formGroupRef = useRef<HTMLDivElement>(null);
 
   const view = React.useContext(ViewContext);
 
@@ -187,11 +214,11 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}) 
     nestedFieldsStores
   } = fieldStore;
 
-  const addValue = type => fieldStore.addValue(type);
+  const addValue = (type: string) => fieldStore.addValue(type);
 
-  const handleDeleteItem = index => fieldStore.deleteItemByIndex(index);
-  const handleMoveItemUp = index => fieldStore.moveItemUpByIndex(index);
-  const handleMoveItemDown = index => fieldStore.moveItemDownByIndex(index);
+  const handleDeleteItem = (index: number) => fieldStore.deleteItemByIndex(index);
+  const handleMoveItemUp = (index: number) => fieldStore.moveItemUpByIndex(index);
+  const handleMoveItemDown = (index: number) => fieldStore.moveItemDownByIndex(index);
 
   const active = view && view.currentInstanceId === instance.id;
 

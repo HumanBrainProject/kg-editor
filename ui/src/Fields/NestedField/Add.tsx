@@ -29,6 +29,7 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SimpleType } from "../../types";
 
 const useStyles = createUseStyles({
   actionBtn: {
@@ -44,8 +45,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const Add = observer(({className, types, onClick}) => {
+interface AddProps {
+  className: string;
+  types: SimpleType[];
+  onClick: (type: string) => void;
+}
 
+const Add = observer(({ className, types, onClick }: AddProps) => {
   const classes = useStyles();
 
   if (!Array.isArray(types) || !types.length) {
@@ -54,12 +60,16 @@ const Add = observer(({className, types, onClick}) => {
 
   const handleSingleTypeAdd = () => onClick(types[0].name);
 
-  const handleOnSelect = type =>onClick(type);
-
   if (types.length === 1) {
-    return(
-      <Button className={`${classes.actionBtn} ${className?className:""}`} size="small" variant="primary" onClick={handleSingleTypeAdd} title="Add" >
-        <FontAwesomeIcon icon="plus"/>
+    return (
+      <Button
+        className={`${classes.actionBtn} ${className ? className : ""}`}
+        size="sm"
+        variant="primary"
+        onClick={handleSingleTypeAdd}
+        title="Add"
+      >
+        <FontAwesomeIcon icon="plus" />
       </Button>
     );
   }
@@ -69,12 +79,20 @@ const Add = observer(({className, types, onClick}) => {
       as={ButtonGroup}
       key="right"
       id="dropdown-button-drop-right"
-      drop="right"
+      drop="end"
       variant="primary"
       title={<FontAwesomeIcon icon="plus" />}
-      className={`${classes.dropdownBtn} ${className?className:""}`}
+      className={`${classes.dropdownBtn} ${className ? className : ""}`}
     >
-      {types.map(type=> <Dropdown.Item key={type.name} eventKey={type.name} onClick={() => handleOnSelect(type.name)}>{type.label}</Dropdown.Item>)}
+      {types.map(type => (
+        <Dropdown.Item
+          key={type.name}
+          eventKey={type.name}
+          onClick={() => onClick(type.name)}
+        >
+          {type.label}
+        </Dropdown.Item>
+      ))}
     </DropdownButton>
   );
 });

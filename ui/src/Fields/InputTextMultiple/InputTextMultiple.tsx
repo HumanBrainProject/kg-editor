@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { ClipboardEvent, FocusEvent, KeyboardEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
@@ -32,6 +32,8 @@ import Label from "../Label";
 import Alternatives from "../Alternatives";
 import Invalid from "../Invalid";
 import Warning from "../Warning";
+import { Alternative } from "../../types";
+import InputTextMultipleStore from "../Stores/InputTextMultipleStore";
 
 const useStyles = createUseStyles({
   values:{
@@ -74,18 +76,29 @@ const useStyles = createUseStyles({
   }
 });
 
+interface AlternativeValueProps {
+  alternative: Alternative;
+}
+
 const getAlternativeValue = () => {
-  const AlternativeValue = observer(({alternative}) => Array.isArray(alternative.value) ? alternative.value.map(v => typeof v === "string"?v:JSON.stringify(v)).join("; "):JSON.stringify(alternative.value));
+  const AlternativeValue = observer(({alternative}: AlternativeValueProps) => Array.isArray(alternative.value) ? alternative.value.map(v => typeof v === "string"?v:JSON.stringify(v)).join("; "):JSON.stringify(alternative.value));
   AlternativeValue.displayName = "AlternativeValue";
   return AlternativeValue;
 };
 
-const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+interface InputTextMultipleProps {
+  className: string;
+  fieldStore: InputTextMultipleStore
+  readMode: boolean;
+  showIfNoValue: boolean;
+}
+
+const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}: InputTextMultipleProps) => {
 
   const classes = useStyles();
 
-  const draggedIndex = useRef();
-  const formGroupRef = useRef();
+  const draggedIndex = useRef<number|null>(null);
+  const formGroupRef = useRef<HTMLInputElement>(null);
 
   const {
     value: list,
@@ -99,7 +112,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     isReadOnly
   } = fieldStore;
 
-  const handleOnAddValue = value => fieldStore.addValue(value);
+  const handleOnAddValue = (value: string) => fieldStore.addValue(value);
 
   const handleSelectAlternative = values => fieldStore.setValues([...values]);
 
@@ -107,17 +120,17 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
   const handleDeleteLastValue = () => fieldStore.removeLastValue();
 
-  const handleDelete = index => {
+  const handleDelete = (index: number) => {
     const value = list[index];
     fieldStore.removeValue(value);
   };
 
   const handleDragEnd = () => draggedIndex.current = null;
 
-  const handleDragStart = index => draggedIndex.current = index;
+  const handleDragStart = (index: number) => draggedIndex.current = index;
 
-  const handleDrop = droppedIndex => {
-    if (Array.isArray(list) && draggedIndex.current >= 0 && draggedIndex.current < list.length && droppedIndex >= 0 && droppedIndex < list.length) {
+  const handleDrop = (droppedIndex: number) => {
+    if (Array.isArray(list) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < list.length && droppedIndex >= 0 && droppedIndex < list.length) {
       const value = list[draggedIndex.current];
       const afterValue = list[droppedIndex];
       fieldStore.moveValueAfter(value, afterValue);
@@ -125,7 +138,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     draggedIndex.current = null;
   };
 
-  const handleBlur = e => {
+  const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
     const value = e.target.value.trim();
     if (value) {
       handleOnAddValue(value);
@@ -133,14 +146,14 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     e.target.value = "";
   };
 
-  const handleKeyDown = (value, e) => {
+  const handleKeyDown = (value: number, e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
     }
   };
 
-  const handleNativePaste = e => {
+  const handleNativePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.clipboardData.getData("text").split("\n").forEach(value => {
       const val = value.trim();
@@ -150,18 +163,18 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     });
   };
 
-  const handleKeyStrokes = e => {
+  const handleKeyStrokes = (e: KeyboardEvent<HTMLInputElement>) => {
     if(e.key === "Enter"){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
-      const value = e.target.value.trim();
+      const value = e.currentTarget.value.trim();
       if (value) {
         handleOnAddValue(value);
       }
-      e.target.value = "";
-    } else if(!e.target.value && fieldStore.value.length > 0 && e.key === "Backspace"){
+      e.currentTarget.value = "";
+    } else if(!e.currentTarget.value && fieldStore.value.length > 0 && e.key === "Backspace"){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
-      e.target.value = list[list.length-1];
+      e.currentTarget.value = list[list.length-1];
       handleDeleteLastValue();
     }
   };

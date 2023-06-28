@@ -21,7 +21,7 @@
  *
  */
 
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, SyntheticEvent, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import { Dropdown, Form } from "react-bootstrap";
@@ -60,7 +60,7 @@ interface TargetTypeSelectionProps {
   types: SimpleType[];
   selectedType: SimpleType;
   id: string;
-  onSelect: () => void; //TODO: fix this
+  onSelect: (eventKey: string | null, e: SyntheticEvent<Item>) => void; //TODO: fix this
 }
 
 const FILTER_THRESHOLD = 10; //Show filter only if there are more than 5 elements

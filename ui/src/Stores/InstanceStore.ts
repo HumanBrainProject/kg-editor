@@ -230,7 +230,7 @@ export class InstanceStore {
     }
   }
 
-  togglePreviewInstance(instanceId: UUID, instanceName: string, options) {
+  togglePreviewInstance(instanceId?: UUID, instanceName?: string, options?: any) {
     if (!instanceId || (this.previewInstance && this.previewInstance.id === instanceId)) {
       this.previewInstance = null;
     } else {

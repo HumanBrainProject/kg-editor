@@ -118,7 +118,7 @@ const useStyles = createUseStyles({
   }
 });
 
-interface ActionProps {
+export interface ActionProps {
   icon: IconProp;
   title: string;
   single?: boolean;
@@ -220,7 +220,7 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: 
   const handleMoveItemUp = (index: number) => fieldStore.moveItemUpByIndex(index);
   const handleMoveItemDown = (index: number) => fieldStore.moveItemDownByIndex(index);
 
-  const active = view && view.currentInstanceId === instance.id;
+  const active = view && view.currentInstanceId === instance.id?true: false;
 
   if(readMode && !showIfNoValue && (!initialValue || !initialValue.length )) {
     return null;

@@ -249,7 +249,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     }
   };
 
-  const handleSearchOptions = term => fieldStore.searchOptions(term);
+  const handleSearchOptions = (term: string) => fieldStore.searchOptions(term);
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 

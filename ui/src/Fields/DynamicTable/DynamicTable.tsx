@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { MouseEvent, SyntheticEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { v4 as uuidv4 } from "uuid";
@@ -40,6 +40,9 @@ import Invalid from "../Invalid";
 import Warning from "../Warning";
 import TargetTypeSelection from "../TargetTypeSelection";
 import Matomo from "../../Services/Matomo";
+import LinksStore from "../Stores/LinksStore";
+import { View } from "../../Stores/ViewStore";
+import { Dropdown } from "react-bootstrap";
 
 const useStyles = createUseStyles({
   container: {
@@ -119,7 +122,16 @@ const useStyles = createUseStyles({
   }
 });
 
-const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, showIfNoValue}) => {
+interface DynamicTableProps {
+  className: string;
+  fieldStore: LinksStore;
+  view: View;
+  pane: string;
+  readMode: boolean;
+  showIfNoValue: boolean;
+}
+
+const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, showIfNoValue}: DynamicTableProps) => {
 
   const classes = useStyles();
 
@@ -128,8 +140,8 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
 
   const { typeStore, instanceStore, userProfileStore, appStore } = useStores();
 
-  const formControlRef = useRef();
-  const dropdownInputRef = useRef();
+  const formControlRef = useRef<HTMLDivElement>(null);
+  const dropdownInputRef = useRef<HTMLInputElement>(null);
 
   const {
     instance,
@@ -155,7 +167,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const addNewValue = (name, typeName) => {
+  const addNewValue = (name: string, typeName: string) => {
     if (fieldStore.allowCustomValues) {
       const id = uuidv4();
       const type = typeStore.typesMap.get(typeName);
@@ -180,7 +192,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const addValue = id => {
+  const addValue = (id: string) => {
     instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
@@ -196,7 +208,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectTargetType = (eventKey, e) => {
+  const handleSelectTargetType =  (eventKey: string | null, e: SyntheticEvent<Dropdown.Item>)  => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
     if (type) {
@@ -224,18 +236,18 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSearchOptions = term => fieldStore.searchOptions(term);
+  const handleSearchOptions = (term: string) => fieldStore.searchOptions(term);
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
-  const handleRowDelete = index => {
+  const handleRowDelete = (index: number) => {
     const { value: values } = fieldStore;
     const value = values[index];
     fieldStore.removeValue(value);
     instanceStore.togglePreviewInstance();
   };
 
-  const handleRowClick = index => {
+  const handleRowClick = (index: number) => {
     if (view && pane) {
       const { value: values } = fieldStore;
       const value = values[index];
@@ -254,7 +266,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     }
   };
 
-  const handleRowMouseOver = index => {
+  const handleRowMouseOver = (index: number) => {
     if (view) {
       const { value: values } = fieldStore;
       const value = values[index];
@@ -275,13 +287,13 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     }
   };
 
-  const handleDropDownFocus = e => {
+  const handleDropDownFocus = (e: MouseEvent<HTMLDivElement>) => {
     if (formControlRef && formControlRef.current === e.target && dropdownInputRef) {
-      dropdownInputRef.current.focus();
+      dropdownInputRef.current?.focus();
     }
   };
 
-  const fieldStoreLabel = label.toLowerCase();
+  const fieldStoreLabel = label?.toLowerCase();
   const isDisabled =  readMode || isReadOnly || returnAsNull;
   const canAddValues = !isDisabled;
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
@@ -300,7 +312,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       }
       {!isDisabled && (view && view.currentInstanceId === instance.id) && (
         <div className={classes.deleteBtn}>
-          <Button size="small" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
+          <Button size="sm" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
             <FontAwesomeIcon icon="times"/>
           </Button>
         </div>

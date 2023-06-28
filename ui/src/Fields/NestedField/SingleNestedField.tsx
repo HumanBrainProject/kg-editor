@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { MouseEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,6 +31,8 @@ import Field from "../Field";
 import Add from "./Add";
 import { ViewContext, PaneContext } from "../../Stores/ViewStore";
 import { compareField } from "../../Stores/Instance";
+import { ActionProps } from "./NestedField";
+import SingleNestedFieldStore from "../Stores/SingleNestedFieldStore";
 
 const useStyles = createUseStyles({
   label: {},
@@ -96,11 +98,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const Action = ({ icon, title, onClick }) => {
+
+const Action = ({ icon, title, onClick }: ActionProps) => {
 
   const classes = useStyles();
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.target)) {
       return;
@@ -115,7 +118,16 @@ const Action = ({ icon, title, onClick }) => {
   );
 };
 
-const Item = ({ itemFieldsStores, readMode, active, index, onDelete }) => {
+interface ItemProps {
+  itemFieldStores: any;
+  readMode: boolean;
+  active: boolean;
+  index: number;
+  onDelete: (v:number) => void;
+}
+
+
+const Item = ({ itemFieldStores, readMode, active, index, onDelete }: ItemProps) => {
 
   const classes = useStyles();
 
@@ -124,7 +136,7 @@ const Item = ({ itemFieldsStores, readMode, active, index, onDelete }) => {
 
   const handleDelete = () => onDelete(index);
 
-  const sortedStores = Object.values(itemFieldsStores).sort((a, b) => compareField(a, b, true));
+  const sortedStores = Object.values(itemFieldStores).sort((a, b) => compareField(a, b, true));
 
   return (
     <div className={classes.item}>
@@ -140,7 +152,14 @@ const Item = ({ itemFieldsStores, readMode, active, index, onDelete }) => {
   );
 };
 
-const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoValue}) => {
+interface SingleNestedFieldProps {
+  className: string;
+  fieldStore: SingleNestedFieldStore;
+  readMode: boolean; 
+  showIfNoValue: boolean;
+}
+
+const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoValue}:SingleNestedFieldProps) => {
 
   const classes = useStyles();
 
@@ -159,7 +178,7 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
     nestedFieldsStores
   } = fieldStore;
 
-  const handleAdd = type => fieldStore.add(type);
+  const handleAdd = (type: string) => fieldStore.add(type);
 
   const handleDelete = () => fieldStore.delete();
 
@@ -177,7 +196,7 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
       }
       <div className={classes.form} >
         {nestedFieldsStores && (
-          <Item itemFieldsStores={nestedFieldsStores.stores} readMode={readMode || isReadOnly} active={active}  onDelete={handleDelete} />
+          <Item itemFieldStores={nestedFieldsStores.stores} readMode={readMode || isReadOnly} active={active}  onDelete={handleDelete} />
         )}
         {!readMode && !isReadOnly && active && !nestedFieldsStores && (
           <Add className={`${classes.actionBtn} ${nestedFieldsStores?"":classes.noItems}`} onClick={handleAdd} types={fieldStore.resolvedTargetTypes} />

@@ -38,7 +38,7 @@ interface NestedFieldStores {
   [key: string]: string[];
 }
 
-class NestedFieldStore extends FieldStore {
+class SingleNestedFieldStore extends FieldStore {
   fieldsTemplate = {};
   initialValue = null;
   returnAsNull = false;
@@ -175,4 +175,4 @@ class NestedFieldStore extends FieldStore {
 
 }
 
-export default NestedFieldStore;
+export default SingleNestedFieldStore;

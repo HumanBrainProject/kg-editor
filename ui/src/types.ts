@@ -113,7 +113,7 @@ export interface SimpleType {
 }
 
 export interface SimpleTypeWithSpaces extends SimpleType {
-  space: string[];
+  space: Space[];
 }
 
 export interface Suggestion {
@@ -121,7 +121,9 @@ export interface Suggestion {
   name: string;
   additionalInformation: string;
   type: SimpleTypeWithSpaces;
-  space: string;
+  space: Space;
+  isNew?: boolean;
+  isExternal?: boolean;
 }
 
 export interface StructureOfType {

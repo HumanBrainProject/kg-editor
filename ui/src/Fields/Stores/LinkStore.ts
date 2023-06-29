@@ -26,7 +26,7 @@ import { observable, action, runInAction, computed, toJS, makeObservable } from 
 import debounce from "lodash/debounce";
 
 import FieldStore from "./FieldStore";
-import { FieldStoreDefinition, SimpleType } from "../../types";
+import { FieldStoreDefinition, SimpleType, Space } from "../../types";
 import { WidgetOptions } from "..";
 import API from "../../Services/API";
 import RootStore from "../../Stores/RootStore";
@@ -40,10 +40,18 @@ interface Messages {
   required?: string;
 }
 
+export interface Option {
+  id: string;
+  type: SimpleType;
+  space: Space;
+  isExternal: boolean;
+  isNew: boolean;
+}
+
 class LinkStore extends FieldStore {
   value?: Value | null;
   initialValue?: Value | null;
-  options = [];
+  options: Option[] = [];
   optionsResult = [];
   allowCustomValues = true;
   returnAsNull = false;

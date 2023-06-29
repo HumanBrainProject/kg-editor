@@ -21,9 +21,27 @@
  *
  */
 
-import React from "react";
+import React, { KeyboardEvent } from "react";
 
 import ListItem from "./ListItem";
+import { Value } from "../Stores/LinksStore";
+
+interface ListProps {
+  list: string[];
+  readOnly: boolean;
+  disabled: boolean;
+  enablePointerEvents: boolean;
+  onClick: (index: number) => void;
+  onDelete: (index: number) => void;
+  onDragEnd: () => void;
+  onDragStart: (index: number) => void;
+  onDrop: (droppedIndex: number) => void;
+  onKeyDown: (value: Value, e: KeyboardEvent<HTMLDivElement>) => void;
+  onFocus: (index: number) => void;
+  onBlur: () => void;
+  fetchLabel: boolean;
+  mainInstanceId: string;
+}
 
 const List = ({
   list,
@@ -38,11 +56,9 @@ const List = ({
   onKeyDown,
   onFocus,
   onBlur,
-  onMouseOver,
-  onMouseOut,
   fetchLabel,
   mainInstanceId
-}) => (
+}: ListProps) => (
   <span>
     {list.map((id, index) => (
       <ListItem
@@ -61,8 +77,6 @@ const List = ({
         onKeyDown={onKeyDown}
         onFocus={onFocus}
         onBlur={onBlur}
-        onMouseOver={onMouseOver}
-        onMouseOut={onMouseOut}
         fetchLabel={fetchLabel}
       />
     ))}

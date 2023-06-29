@@ -39,7 +39,7 @@ interface Messages {
   numberOfItems?: string;
 }
 
-interface Value {
+export interface Value {
   [key: string]: string;
 }
 

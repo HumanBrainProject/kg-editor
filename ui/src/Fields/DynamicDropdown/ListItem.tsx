@@ -21,12 +21,14 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { DragEvent, FocusEvent, KeyboardEvent, MouseEvent, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import useStores from "../../Hooks/useStores";
+import { Value } from "../Stores/LinksStore";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   value: {
@@ -78,7 +80,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getLabel = (instance, hasError, isFetching) => {
+const getLabel = (instance?: Instance, hasError?: boolean, isFetching?: boolean) => {
   if (!instance) {
     return  "Unknown instance"
   }
@@ -91,7 +93,25 @@ const getLabel = (instance, hasError, isFetching) => {
   return instance.name;
 };
 
-const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, onMouseOver, onMouseOut, fetchLabel }) => {
+interface ListItemProps {
+  index?: number;
+  instanceId: string; 
+  readOnly: boolean;
+  disabled: boolean;
+  isCircular: boolean;
+  enablePointerEvents: boolean;
+  onClick?: (index: number) => void;
+  onDelete?: (index: number) => void;
+  onDragEnd?: () => void;
+  onDragStart?: (index: number) => void;
+  onDrop?: (droppedIndex: number) => void;
+  onKeyDown?: (value: Value, e: KeyboardEvent<HTMLDivElement>) => void;
+  onFocus?: (index: number) => void;
+  onBlur?: () => void;
+  fetchLabel: boolean;
+}
+
+const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, enablePointerEvents, onClick, onDelete, onDragEnd, onDragStart, onDrop, onKeyDown, onFocus, onBlur, fetchLabel }: ListItemProps) => {
 
   const classes = useStyles();
 
@@ -99,80 +119,71 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
 
   useEffect(() => {
     if (fetchLabel) {
-      instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+      instanceStore.createInstanceOrGet(instanceId)?.fetchLabel();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId, fetchLabel]);
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
       onClick && onClick(index);
     }
   };
 
-  const handleDelete = e => {
+  const handleDelete = (e: MouseEvent<SVGSVGElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
       onDelete && onDelete(index);
     }
   };
 
-  const handleDragEnd = e => {
+  const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
       onDragEnd && onDragEnd();
     }
   };
 
-  const handleDragOver = e => e.preventDefault();
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => e.preventDefault();
 
-  const handleDragStart = e => {
+  const handleDragStart = (e: DragEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
       onDragStart && onDragStart(index);
     }
   };
 
-  const handleDrop = e => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
       onDrop && onDrop(index);
     }
   };
 
-  const handleKeyDown = e => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
       onKeyDown && onKeyDown(index, e);
     }
   };
 
-  const handleFocus = e => {
+  const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
     e.stopPropagation();
     onFocus && onFocus(index);
   };
 
-  const handleBlur = e => {
+  const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
     e.stopPropagation();
     onBlur && onBlur(index);
   };
 
-  const handleMouseOver = e => {
-    e.stopPropagation();
-    onMouseOver && onMouseOver(index);
-  };
-
-  const handleMouseOut = e => {
-    e.stopPropagation();
-    onMouseOut && onMouseOut(index);
-  };
-
+  
   const instance = instanceStore.instances.get(instanceId);
 
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
-  const isFetching = instance && (instance.isFetching || instance.isFetchingLabel);
-  const label = getLabel(instance, hasError, isFetching);
+  const isFetching = instance && (instance.isFetching || instance.isLabelFetching);
+  const label = getLabel(instance, !!hasError, isFetching);
   const isDisabled = disabled || isCircular;
 
   if (readOnly) {
@@ -195,8 +206,6 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
         title={label}
       >{label}
       </div>
@@ -206,7 +215,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
   if (isCircular) {
     return (
       <div
-      tabIndex={"0"}
+      tabIndex={0}
       className={`btn btn-xs btn-default ${classes.valueTag} ${classes.circular} ${hasError ? classes.notFound : ""}`}
       disabled={isDisabled}
       draggable={!isDisabled}
@@ -225,7 +234,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
 
   return (
     <div
-      tabIndex={"0"}
+      tabIndex={0}
       className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
       disabled={isDisabled}
       draggable={!isDisabled}
@@ -237,8 +246,6 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
       onKeyDown={handleKeyDown}
       onFocus={handleFocus}
       onBlur={handleBlur}
-      onMouseOver={handleMouseOver}
-      onMouseOut={handleMouseOut}
       title={label}
     >
       <span className={classes.valueLabel}>{label}</span>

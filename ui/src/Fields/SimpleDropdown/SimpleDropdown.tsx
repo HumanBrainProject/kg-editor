@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { MouseEvent, SyntheticEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
@@ -39,6 +39,9 @@ import Warning from "../Warning";
 import ListItem from "../DynamicDropdown/ListItem";
 import TargetTypeSelection from "../TargetTypeSelection";
 import Matomo from "../../Services/Matomo";
+import LinkStore from "../Stores/LinkStore";
+import { View } from "../../Stores/ViewStore";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   labelContainer: {
@@ -72,7 +75,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }) => {
+interface ReadOnlyValueProps {
+  id?: string | null;
+  instanceId?: string;
+  fetchLabel: boolean;
+  onClick?: () => void;
+}
+
+const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }: ReadOnlyValueProps) => {
   if (!id) {
     return null;
   }
@@ -102,7 +112,16 @@ const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }) => {
   );
 });
 
-const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}) => {
+interface SimpleDropdownProps {
+  className: string; 
+  fieldStore: LinkStore; 
+  readMode: boolean;
+  showIfNoValue: boolean; 
+  view: View;
+  pane: string;
+}
+
+const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane }: SimpleDropdownProps) => {
 
   const classes = useStyles();
 
@@ -111,9 +130,9 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const { typeStore, instanceStore, appStore } = useStores();
 
-  const formGroupRef = useRef();
-  const formControlRef = useRef();
-  const dropdownInputRef = useRef();
+  const formGroupRef = useRef<HTMLInputElement>(null);
+  const formControlRef = useRef<HTMLDivElement>(null);
+  const dropdownInputRef = useRef<HTMLInputElement>(null);
 
   const {
     instance,
@@ -142,7 +161,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const addNewValue = (name, typeName) => {
+  const addNewValue = (name: string, typeName: string) => {
     if (fieldStore.allowCustomValues) {
       const newId = uuidv4();
       const type = typeStore.typesMap.get(typeName);
@@ -163,7 +182,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const addValue = idToAdd => {
+  const addValue = (idToAdd: string) => {
     instanceStore.createInstanceOrGet(idToAdd);
     const val = {[mappingValue]: idToAdd};
     fieldStore.addValue(val);
@@ -204,7 +223,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectTargetType = (eventKey, e) => {
+  const handleSelectTargetType = (eventKey: string | null, e: SyntheticEvent<Dropdown.Item>) => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
     if (type) {
@@ -212,7 +231,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     }
   };
 
-  const handleOnSelectOption = option => {
+  const handleOnSelectOption = (option: Suggestion) => {
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
@@ -253,28 +272,29 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
-  const handleDropDownFocus = e => {
+  const handleDropDownFocus = (e: MouseEvent<HTMLDivElement>) => {
     if (formControlRef && formControlRef.current === e.target && dropdownInputRef) {
-      dropdownInputRef.current.focus();
+      dropdownInputRef.current?.focus();
     }
   };
 
   const id = value && value[mappingValue];
+  const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)))
 
   if (readMode && !id && !showIfNoValue) {
     return null;
   }
 
   if(readMode || isReadOnly){
-    const isClickable = view && view.currentInstanceId === instance.id;
+    const isClickable = view && view.currentInstanceId === instance?.id;
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
         <ReadOnlyValue
           id={id}
-          instanceId={instance.id}
-          fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
-          onClick={isClickable?handleClick:null}
+          instanceId={instance?.id}
+          fetchLabel={fetchLabel}
+          onClick={isClickable?handleClick:undefined}
         />
       </Form.Group>
     );
@@ -305,16 +325,16 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
       <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         {value &&
         <ListItem
-          isCircular={instance.id===id}
+          isCircular={instance?.id===id}
           instanceId={id}
           readOnly={false}
           disabled={isDisabled}
-          enablePointerEvents={(view && view.currentInstanceId === instance.id)}
+          enablePointerEvents={(view && view.currentInstanceId === instance?.id)}
           onClick={handleClick}
           onDelete={handleDelete}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+          fetchLabel={fetchLabel}
         />
         }
         {canAddValues && (

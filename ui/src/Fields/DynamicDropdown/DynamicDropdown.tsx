@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { KeyboardEvent, MouseEvent, SyntheticEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";
@@ -40,6 +40,8 @@ import Warning from "../Warning";
 import List from "./List";
 import TargetTypeSelection from "../TargetTypeSelection";
 import Matomo from "../../Services/Matomo";
+import LinksStore, { Value } from "../Stores/LinksStore";
+import { View } from "../../Stores/ViewStore";
 
 const useStyles = createUseStyles({
   labelContainer: {
@@ -73,7 +75,16 @@ const useStyles = createUseStyles({
   }
 });
 
-const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}) => {
+interface DynamicDropdownProps {
+  className: string;
+  fieldStore: LinksStore;
+  view: View;
+  pane: string;
+  readMode: boolean;
+  showIfNoValue: boolean;
+}
+
+const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoValue, view, pane}: DynamicDropdownProps) => {
 
   const classes = useStyles();
 
@@ -82,10 +93,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const { typeStore, instanceStore, appStore } = useStores();
 
-  const draggedIndex = useRef();
-  const formGroupRef = useRef();
-  const formControlRef = useRef();
-  const dropdownInputRef = useRef();
+  const draggedIndex = useRef<number|null>(null);
+  const formGroupRef = useRef<HTMLInputElement>(null);
+  const formControlRef = useRef<HTMLDivElement>(null);
+  const dropdownInputRef = useRef<HTMLInputElement>(null);
 
   const {
     instance,
@@ -114,7 +125,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const addNewValue = (name, typeName) => {
+  const addNewValue = (name: string, typeName: string) => {
     if (fieldStore.allowCustomValues) {
       const id = uuidv4();
       const type = typeStore.typesMap.get(typeName);
@@ -135,7 +146,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const addValue = id => {
+  const addValue = (id: string) => {
     instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
@@ -163,7 +174,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleClick = index => {
+  const handleClick = (index: number) => {
     if (view && pane) {
       view.resetInstanceHighlight();
       const value = values[index];
@@ -178,13 +189,13 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleDelete = index => {
+  const handleDelete = (index: number) => {
     const value = values[index];
     fieldStore.removeValue(value);
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectTargetType = (eventKey, e) => {
+  const handleSelectTargetType = (eventKey: string | null, e: SyntheticEvent<Dropdown.Item>) => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
     if (type) {
@@ -209,10 +220,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const handleDragEnd = () => draggedIndex.current = null;
 
-  const handleDragStart = index => draggedIndex.current = index;
+  const handleDragStart = (index: number) => draggedIndex.current = index;
 
-  const handleDrop = droppedIndex => {
-    if (Array.isArray(values) && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
+  const handleDrop = (droppedIndex: number) => {
+    if (Array.isArray(values) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
       const value = values[draggedIndex.current];
       const afterValue = values[droppedIndex];
       fieldStore.moveValueAfter(value, afterValue);
@@ -221,7 +232,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleKeyDown = (value, e) => {
+  const handleKeyDown = (value: number , e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
@@ -229,7 +240,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleFocus = index => {
+  const handleFocus = (index: number) => {
     if (view) {
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
@@ -251,13 +262,13 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleSearchOptions = term => fieldStore.searchOptions(term);
+  const handleSearchOptions = (term: string) => fieldStore.searchOptions(term);
 
   const handleLoadMoreOptions = () => fieldStore.loadMoreOptions();
 
-  const handleDropDownFocus = e => {
+  const handleDropDownFocus = (e: MouseEvent<HTMLDivElement>) => {
     if (formControlRef && formControlRef.current === e.target && dropdownInputRef) {
-      dropdownInputRef.current.focus();
+      dropdownInputRef.current?.focus();
     }
   };
 

@@ -26,6 +26,8 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import useStores from "../../Hooks/useStores";
+import { Option } from "../Stores/LinkStore";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   option: {
@@ -60,7 +62,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const Option = ({ item }) => {
+interface OptionProps {
+  item: Suggestion;
+}
+
+const Option = ({ item }: OptionProps) => {
   const classes = useStyles();
 
   const { instanceStore } = useStores();

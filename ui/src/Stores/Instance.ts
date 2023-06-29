@@ -415,7 +415,7 @@ export class Instance {
 
   isLabelFetching = false;
   isLabelFetched = false;
-  fetchLabelError = null;
+  fetchLabelError = undefined;
   isLabelNotFound = false;
   hasLabelFetchError = false;
 
@@ -605,7 +605,7 @@ export class Instance {
     this.primaryType = normalizedData.primaryType;
     this.isLabelFetching = false;
     this.isLabelFetched = true;
-    this.fetchLabelError = null;
+    this.fetchLabelError = undefined;
     this.isLabelNotFound = false;
     this.hasLabelFetchError = false;
   }

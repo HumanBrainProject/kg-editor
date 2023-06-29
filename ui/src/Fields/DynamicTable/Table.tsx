@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, MouseEvent } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import debounce from "lodash/debounce";
@@ -30,6 +30,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
 import useStores from "../../Hooks/useStores";
+import LinksStore from "../Stores/LinksStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -66,12 +67,18 @@ const useStyles = createUseStyles({
   }
 });
 
-const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }) => {
+interface LabelCellRendererProps {
+  instanceId: string;
+  mainInstanceId: string; 
+  className: string;
+}
+
+const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }: LabelCellRendererProps) => {
 
   const { instanceStore } = useStores();
 
   useEffect(() => {
-    instanceStore.createInstanceOrGet(instanceId).fetchLabel();
+    instanceStore.createInstanceOrGet(instanceId)?.fetchLabel();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
@@ -108,7 +115,15 @@ const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }) =
 });
 LabelCellRenderer.displayName = "LabelCellRenderer";
 
-const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, onDeleteRow }) => {
+interface ActionsCellRendererProps {
+  index: number;
+  instanceId: string;
+  readOnly: boolean;
+  onRetry: (id: string) => void;
+  onDeleteRow: (index: number) => void;
+}
+
+const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, onDeleteRow }: ActionsCellRendererProps) => {
 
   const classes = useStyles();
 
@@ -116,12 +131,12 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
     return null;
   }
 
-  const handleRetry = e => {
+  const handleRetry = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onRetry(instanceId);
   };
 
-  const handleDelete = e => {
+  const handleDelete = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onDeleteRow(index);
   };
@@ -132,7 +147,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 
   if (instance && instance.fetchError) {
     return (
-      <Button className={classes.actionBtn} size="small" variant={"danger"} onClick={handleRetry} >
+      <Button className={classes.actionBtn} size="sm" variant={"danger"} onClick={handleRetry} >
         <FontAwesomeIcon icon="redo-alt"/>
       </Button>
     );
@@ -140,7 +155,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 
   if (!instance || instance.isFetched || instance.isLabelFetched) {
     return (
-      <Button className={classes.actionBtn} size="small" variant={"primary"} onClick={handleDelete} >
+      <Button className={classes.actionBtn} size="sm" variant={"primary"} onClick={handleDelete} >
         <FontAwesomeIcon icon="times"/>
       </Button>
     );
@@ -149,14 +164,26 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 });
 ActionsCellRenderer.displayName = "ActionsCellRenderer";
 
-const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut}) => {
+interface TableProps {
+  mainInstanceId: string;
+  list: any;
+  fieldStore: LinksStore;
+  readOnly: boolean;
+  enablePointerEvents: boolean;
+  onRowDelete: (index: number) => void;
+  onRowClick: (index: number) => void;
+  onRowMouseOver: (index: number) => void;
+  onRowMouseOut: (index: number) => void;
+}
+
+const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut }: TableProps) => {
 
   const classes = useStyles();
   const scrollToIndex = -1;
 
   const [containerWidth, setContainerWidth] = useState(0);
 
-  const wrapperRef = useRef();
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     updateContainerWidth();
@@ -167,15 +194,15 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDeleteRow = index => onRowDelete(index);
+  const handleDeleteRow = (index: number) => onRowDelete(index);
 
-  const handleRetry = id => fieldStore.fetchInstance(id);
+  const handleRetry = (id: string) => fieldStore.fetchInstance(id); //TODO: fix this. THis is not correct! 
 
-  const handleRowClick = ({index}) => onRowClick && onRowClick(index);
+  const handleRowClick = ({index}: {index:number}) => onRowClick && onRowClick(index);
 
-  const handleRowMouseOver = ({index}) => onRowMouseOver && onRowMouseOver(index);
+  const handleRowMouseOver = ({index}: {index:number}) => onRowMouseOver && onRowMouseOver(index);
 
-  const handleRowMouseOut = ({index}) => onRowMouseOut && onRowMouseOut(index);
+  const handleRowMouseOut = ({index}: {index:number}) => onRowMouseOut && onRowMouseOut(index);
 
   const updateContainerWidth = debounce(() => {
     if(wrapperRef.current){
@@ -183,7 +210,7 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
     }
   }, 250);
 
-  const rowClassName = ({index}) => {
+  const rowClassName = ({index}: {index:number}) => {
     if (index < 0) {
       return classes.headerRow;
     } else {
@@ -192,9 +219,9 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
     }
   };
 
-  const rowGetter = ({index}) => list[index];
+  const rowGetter = ({index}: {index:number}) => list[index];
 
-  const actionsCellRenderer = ({rowData: instanceId, rowIndex}) => (
+  const actionsCellRenderer = ({rowData: instanceId, rowIndex}: {rowData:string, rowIndex:number}) => (
     <ActionsCellRenderer
       instanceId={instanceId}
       index={rowIndex}
@@ -204,7 +231,7 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
     />
   );
 
-  const labelCellRenderer = ({rowData: instanceId}) => <LabelCellRenderer instanceId={instanceId} mainInstanceId={mainInstanceId} className={classes.circular}/>;
+  const labelCellRenderer = ({rowData: instanceId}:{rowData: string}) => <LabelCellRenderer instanceId={instanceId} mainInstanceId={mainInstanceId} className={classes.circular}/>;
 
   return (
     <div className={classes.container} ref={wrapperRef}>
@@ -216,9 +243,9 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
         rowClassName={rowClassName}
         rowCount={list.length}
         rowGetter={rowGetter}
-        onRowClick={enablePointerEvents?handleRowClick:null}
-        onRowMouseOver={enablePointerEvents?handleRowMouseOver:null}
-        onRowMouseOut={enablePointerEvents?handleRowMouseOut:null}
+        onRowClick={enablePointerEvents?handleRowClick:undefined}
+        onRowMouseOver={enablePointerEvents?handleRowMouseOver:undefined}
+        onRowMouseOut={enablePointerEvents?handleRowMouseOut:undefined}
         scrollToIndex={scrollToIndex-1}
       >
         <Column

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright 2018 - 2021 Swiss Federal Institute of Technology Lausanne (EPFL)
  *
@@ -23,47 +21,41 @@
  *
  */
 
-
 import React from "react";
-import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createUseStyles } from "react-jss";
+
+import useStores from "../../Hooks/useStores";
+import { DynamicOptionProps } from "./DynamicOption";
 
 const useStyles = createUseStyles({
-  create: {
-    whiteSpace: "normal"
-  },
-  info: {
-    position: "relative",
-    backgroundColor: "rgba(255, 226, 20, 0.6)",
-    padding: "5px",
-    marginTop: "2px",
+  container: {
     whiteSpace: "normal"
   }
 });
-  
-const NewValueInExternalSpace = ({item:{space, type}}) => {
 
-    const classes = useStyles();
+const NewValueInCurentSpace = ({ item, searchTerm }: DynamicOptionProps) => {
+    const classes = useStyles();  
+
+    const  { typeStore } = useStores();
   
-    const style = type.color ? { color: type.color } : {};
+    const style = item.type.color ? { color: item.type.color } : {};
   
-    if (space.permissions.canCreate) {
-      return (
-        <em className={classes.create}>
-          Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
-          {type.label} in space <strong>{space.name}</strong>
-        </em>
-      );
-    }
+    const typeDefinition = typeStore.typesMap.get(item.type.name);
   
     return (
-      <div className={classes.info}>
-        <em>You are not allowed to create a new <span style={style}>
-          <FontAwesomeIcon fixedWidth icon="circle" />
-        </span>
-        {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>
-      </div>
+      <span className={classes.container}>
+        <em>Add a new&nbsp;
+          <span style={style}>
+            <FontAwesomeIcon fixedWidth icon="circle" />
+          </span>{item.type.label}
+        </em>&nbsp;
+        {!!typeDefinition && !!typeDefinition.labelField && (
+          <strong>{searchTerm}</strong>
+        )}
+      </span>
     );
   };
   
-export default NewValueInExternalSpace;
+
+  export default NewValueInCurentSpace;

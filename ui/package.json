@@ -92,6 +92,7 @@
   "repository": "https://github.com/HumanBrainProject/kg-editor.git",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/color": "^3.0.3"
+    "@types/color": "^3.0.3",
+    "@types/react-virtualized": "^9.21.22"
   }
 }

@@ -21,12 +21,13 @@
  *
  */
 
-import React from "react";
+import React, { KeyboardEvent, MouseEvent } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Dropdown from "react-bootstrap/Dropdown";
 
 import UserComponent from "../../../../Components/User";
+import { UserSummary } from "../../../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -74,7 +75,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const User = observer(({ user, onSelect }) => {
+interface UserProps {
+  user: UserSummary;
+  onSelect: (user: UserSummary, e: KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => void;
+}
+
+const User = observer(({ user, onSelect }: UserProps) => {
 
   const classes = useStyles();
 
@@ -82,7 +88,7 @@ const User = observer(({ user, onSelect }) => {
     return null;
   }
 
-  const handleSelect = e => onSelect(user, e);
+  const handleSelect = (e: KeyboardEvent<HTMLDivElement> | MouseEvent<HTMLElement>) => onSelect(user, e);
 
   return (
     <Dropdown.Item className={classes.container} onClick={handleSelect} >

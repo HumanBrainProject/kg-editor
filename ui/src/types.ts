@@ -79,6 +79,7 @@ export interface UserSummary {
   id: string;
   username: string;
   name: string;
+  picture?: string;
 }
 
 export type Stage = "IN_PROGRESS" | "RELEASED";

@@ -29,6 +29,9 @@ import { useNavigate } from "react-router-dom";
 
 import useStores from "../../Hooks/useStores";
 import Matomo from "../../Services/Matomo";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import Instance from "../../Stores/Instance";
+import { Permissions } from "../../types";
 
 const useStyles = createUseStyles({
   tabs: {
@@ -64,7 +67,18 @@ const useStyles = createUseStyles({
   }
 });
 
-const Tab = ({ className, show, disabled, active, icon, mode, label, onClick }) => {
+interface TabProps {
+  className: string;
+  show: boolean;
+  disabled: boolean;
+  active: boolean;
+  icon: IconProp;
+  mode: string;
+  label: string;
+  onClick: (mode: string) => void;
+}
+
+const Tab = ({ className, show, disabled, active, icon, mode, label, onClick }: TabProps) => {
 
   if(!show) {
     return null;
@@ -87,7 +101,12 @@ const Tab = ({ className, show, disabled, active, icon, mode, label, onClick }) 
   );
 };
 
-const Tabs = observer(({ instance, mode }) => {
+interface TabsProps {
+  instance: Instance;
+  mode: string;
+}
+
+const Tabs = observer(({ instance, mode }:TabsProps) => {
 
   const classes = useStyles();
 
@@ -97,7 +116,7 @@ const Tabs = observer(({ instance, mode }) => {
 
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
-  const handleClick = instanceMode => {
+  const handleClick = (instanceMode: string) => {
     Matomo.trackEvent("Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id);
     if(instanceMode === "view") {
       navigate(`/instances/${instance.id}`);
@@ -106,7 +125,7 @@ const Tabs = observer(({ instance, mode }) => {
     }
   };
 
-  const permissions = instance?instance.permissions:{};
+  const permissions: Permissions = instance?instance.permissions:{};
 
   return (
     <div className={classes.tabs}>

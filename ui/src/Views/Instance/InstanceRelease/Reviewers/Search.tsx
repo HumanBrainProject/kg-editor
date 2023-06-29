@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { ChangeEvent, KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,6 +29,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import User from "./User";
 
 import useStores from "../../../../Hooks/useStores";
+import { UserSummary } from "../../../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -145,11 +146,16 @@ const useStyles = createUseStyles({
   }
 });
 
-const Search = observer(({ excludedUsers, onSelect }) => {
+interface SearchProps {
+  excludedUsers: string[];
+  onSelect: (userId: string) => void;
+}
 
-  const wrapperRef = useRef();
-  const usersRef = useRef();
-  const inputRef = useRef();
+const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const usersRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const classes = useStyles();
 
@@ -157,7 +163,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
 
   useEffect(() => {
     const clickOutHandler = e => {
-      if(!wrapperRef.current.contains(e.target)){
+      if(!wrapperRef.current?.contains(e.target)){
         userStore.clearSearch();
       }
     };
@@ -176,11 +182,11 @@ const Search = observer(({ excludedUsers, onSelect }) => {
 
   const handleLoadSearchResults = () => userStore.searchUsers();
 
-  const handleSelect = (user, event) => {
+  const handleSelect = (user: UserSummary, event: KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => {
     if(event && event.keyCode === 40){ // Down
       event.preventDefault();
-      const users = usersRef.current.querySelectorAll(".option");
-      if (users.length) {
+      const users = usersRef.current?.querySelectorAll(".option");
+      if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
           index = 0;
@@ -189,8 +195,8 @@ const Search = observer(({ excludedUsers, onSelect }) => {
       }
     } else if(event && event.keyCode === 38){ // Up
       event.preventDefault();
-      const users = usersRef.current.querySelectorAll(".option");
-      if (users.length) {
+      const users = usersRef.current?.querySelectorAll(".option");
+      if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
           index = users.length - 1;
@@ -202,16 +208,16 @@ const Search = observer(({ excludedUsers, onSelect }) => {
       userStore.clearSearch();
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
       event.preventDefault();
-      inputRef.current.focus();
+      inputRef.current?.focus();
       typeof onSelect === "function" && onSelect(user.id);
     }
   };
 
-  const handleInputKeyStrokes = event => {
+  const handleInputKeyStrokes = (event: KeyboardEvent<HTMLInputElement>) => {
     if(event && event.keyCode === 40 ){ // Down
       event.preventDefault();
-      const users = usersRef.current.querySelectorAll(".option");
-      if (users.length) {
+      const users = usersRef.current?.querySelectorAll(".option");
+      if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
           index = 0;
@@ -220,8 +226,8 @@ const Search = observer(({ excludedUsers, onSelect }) => {
       }
     } else if(event && event.keyCode === 38){ // Up
       event.preventDefault();
-      const users = usersRef.current.querySelectorAll(".option");
-      if (users.length) {
+      const users = usersRef.current?.querySelectorAll(".option");
+      if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
           index = users.length - 1;
@@ -234,7 +240,7 @@ const Search = observer(({ excludedUsers, onSelect }) => {
     }
   };
 
-  const handleSearchFilterChange = event => {
+  const handleSearchFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event
       && event.keyCode !== 40   // Down
       && event.keyCode !== 38   // Up

@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright 2018 - 2021 Swiss Federal Institute of Technology Lausanne (EPFL)
  *
@@ -22,43 +24,24 @@
  */
 
 import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import IncomingLinkInstances from "./IncomingLinkInstances";
-import Label from "../../../Fields/Label";
-import { IncomingLink } from "../../../types";
 
-const useStyles = createUseStyles({
-  container: {
-    "& > ul": {
-      listStyle: "none",
-      paddingLeft: "20px"
-    }
+import FieldError from "./FieldError";
+import { fieldsMapping } from ".";
+
+const Field = props => {
+  if(!props || !props.fieldStore) {
+    return null;
   }
-});
-
-interface IncomingLinkProps {
-  link: ;
-  readMode: boolean;
-}
-
-const IncomingLink = observer(({ link, readMode }: IncomingLinkProps) => {
-
-  const classes = useStyles();
-
-  return(
-    <div className={classes.container}>
-      <Label label={link.label}/>
-      <ul>
-        {link.links.map((propertyLink, index) => (
-          <li key={index}>
-            <IncomingLinkInstances link={propertyLink} readMode={readMode} />
-          </li>
-        ))}
-      </ul>
-    </div>
+  const fieldMapping = fieldsMapping[props.fieldStore.widget];
+  if (!fieldMapping) {
+    throw new Error(`${props.name} widget is not supported!`);
+  }
+  const Component = fieldMapping.Component;
+  return (
+    <FieldError fieldStore={props.fieldStore}>
+      <Component {...props} />
+    </FieldError>
   );
-});
-IncomingLink.displayName = "IncomingLink";
+};
 
-export default IncomingLink;
+export default Field;

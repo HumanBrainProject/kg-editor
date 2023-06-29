@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
@@ -58,7 +58,7 @@ const CompareInstancesModal = observer(() => {
 
   const { releaseStore } = useStores();
 
-  const handleHideCompare = e => {
+  const handleHideCompare = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     releaseStore.setComparedInstance(null);
   };

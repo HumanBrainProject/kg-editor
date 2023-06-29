@@ -41,7 +41,7 @@ interface UserProps {
   userId: string;
   name: string;
   picture?: string;
-  title: string;
+  title?: string;
 }
 
 const User = ({userId, name, picture, title}: UserProps)  => {

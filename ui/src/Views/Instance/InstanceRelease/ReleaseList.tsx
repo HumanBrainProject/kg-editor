@@ -42,7 +42,7 @@ const useStyles = createUseStyles({
 
 const ReleaseList = observer(() => {
 
-  const wrapperRef = useRef();
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const classes = useStyles();
 
@@ -65,7 +65,7 @@ const ReleaseList = observer(() => {
     };
   }, []);
 
-  const rowRenderer = ({ key, index, style }) => {
+  const rowRenderer = ({ key, index, style }: {key: string, index:number, style:any}) => {
     const rowData =  releaseStore.instanceList[index];
     return (
       <div key={key} style={style}>

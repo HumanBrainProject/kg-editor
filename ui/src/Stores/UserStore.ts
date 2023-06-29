@@ -64,7 +64,7 @@ export class UserStore {
     this.searchUsers();
   }, 750);
 
-  setSearchFilter(queryString: string | null, excludedUsers = []) {
+  setSearchFilter(queryString: string | null, excludedUsers: string[] = []) {
     if (!queryString) {
       queryString = "";
     }

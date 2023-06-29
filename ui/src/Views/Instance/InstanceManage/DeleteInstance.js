@@ -58,6 +58,7 @@ const useStyles = createUseStyles({
     }
   }
 });
+
 const Delete = observer(({ status, onClick, classes, fetchStatus }) => {
   if (status && status.hasFetchError) {
     return (

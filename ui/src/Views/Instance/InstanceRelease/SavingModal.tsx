@@ -65,8 +65,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const AfterSave = observer(({ savingErrors, className }) => {
-  if (savingErrors.length !== 0) {
+interface AfterSaveProps {
+  hasSavingErrors: boolean;
+  className: string;
+}
+
+const AfterSave = observer(({ hasSavingErrors, className }:AfterSaveProps) => {
+  if (hasSavingErrors) {
     return null;
   }
   return (
@@ -121,7 +126,7 @@ const SavingModal = observer(() => {
           </>
         ) : (
           <AfterSave
-            savingErrors={releaseStore.savingErrors}
+            hasSavingErrors={releaseStore.savingErrors.length !== 0}
             className={classes.reloadRelease}
           />
         )}

@@ -22,34 +22,43 @@
  */
 
 import React from "react";
+import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
-import Spinner from "../../../Components/Spinner";
+import IncomingLinkInstances from "./IncomingLinkInstances";
+import Label from "../../../Fields/Label";
+import { IncomingLink } from "../../../types";
 
 const useStyles = createUseStyles({
-  container:{
-    background:"rgba(255,255,255,0.75)",
-    position:"absolute",
-    top:0,
-    left:0,
-    width:"100%",
-    height:"100%",
-    zIndex:1001
+  container: {
+    "& > ul": {
+      listStyle: "none",
+      paddingLeft: "20px"
+    }
   }
 });
 
-const CreatingChildInstancePanel = ({show}) => {
+interface IncomingLinkProps {
+  link: ;
+  readMode: boolean;
+}
+
+const IncomingLink = observer(({ link, readMode }: IncomingLinkProps) => {
 
   const classes = useStyles();
 
-  if (!show) {
-    return null;
-  }
-
-  return (
+  return(
     <div className={classes.container}>
-      <Spinner text="Creating a new instance..." />
+      <Label label={link.label}/>
+      <ul>
+        {link.links.map((propertyLink, index) => (
+          <li key={index}>
+            <IncomingLinkInstances link={propertyLink} readMode={readMode} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
-};
+});
+IncomingLink.displayName = "IncomingLink";
 
-export default CreatingChildInstancePanel;
+export default IncomingLink;

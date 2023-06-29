@@ -27,6 +27,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { observer } from "mobx-react-lite";
+import { SimpleType } from "../../../types";
 
 const useStyles = createUseStyles({
   panel: {
@@ -49,7 +50,7 @@ const useStyles = createUseStyles({
 });
 
 
-const getElementToScroll = elem => {
+const getElementToScroll = (elem: HTMLElement | null) => {
   while(elem !== null && !elem.className.includes("scrolledView")) {
     elem = elem.parentElement;
   }
@@ -59,7 +60,7 @@ const getElementToScroll = elem => {
   return elem;
 };
 
-const getScrollTop = elem => {
+const getScrollTop = (elem: HTMLElement | null) => {
   let distance = 0;
   while(elem !== null && !elem.attributes["data-id"]) {
     elem = elem.parentElement;
@@ -70,12 +71,17 @@ const getScrollTop = elem => {
   return distance;
 };
 
+interface HeaderPanelProps {
+  types: SimpleType[];
+  hasChanged: boolean; 
+  highlight: boolean;
+}
 
-const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
+const HeaderPanel = observer(({ types, hasChanged, highlight }: HeaderPanelProps) => {
 
   const classes = useStyles();
 
-  const scrollIntoViewRef = useRef();
+  const scrollIntoViewRef = useRef<HTMLHeadingElement | null>(null);
 
   useEffect(() => {
     if (highlight) {
@@ -91,7 +97,7 @@ const HeaderPanel = observer(({ className, types, hasChanged, highlight }) => {
   }, [highlight]);
 
   return (
-    <div className={`${classes.panel} ${className ? className : ""}`}>
+    <div className={classes.panel}>
       <Row>
         <Col xs={12}>
           <h6 ref={scrollIntoViewRef}>

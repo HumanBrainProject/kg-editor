@@ -52,7 +52,7 @@ const LabelTooltip = ({tooltip, icon}:LabelTooltipProps) => (
 );
 
 interface LabelProps {
-  className: string;
+  className?: string;
   label?: string;
   labelTooltip?: string;
   labelTooltipIcon?: IconProp;

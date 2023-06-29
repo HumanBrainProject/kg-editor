@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -78,11 +78,19 @@ const useStyles = createUseStyles({
   }
 });
 
-const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
+interface FetchErrorPanelProps {
+  id: string;
+  show: boolean;
+  error: string;
+  inline: boolean;
+  onRetry: (e: MouseEvent<HTMLButtonElement>) => void;
+}
+
+const FetchErrorPanel = ({ id, show, error, inline, onRetry }: FetchErrorPanelProps) => {
 
   const classes = useStyles();
 
-  const handleRetry = e => {
+  const handleRetry = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onRetry(e);
   };
@@ -101,7 +109,7 @@ const FetchErrorPanel = ({ id, show, error, inline, onRetry }) => {
       </div>
       :
       <div className={classes.inlineFetchErrorPanel}>
-        <HeaderPanel className={classes.panelHeader} />
+        <HeaderPanel />
         <h5>{error}</h5>
         <small><span>ID: </span><span>{id}</span></small>
         <div className={classes.action}>

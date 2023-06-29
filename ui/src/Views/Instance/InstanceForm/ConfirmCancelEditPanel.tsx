@@ -21,9 +21,9 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
-import Button  from "react-bootstrap/Button";
+import Button from "react-bootstrap/Button";
 
 const useStyles = createUseStyles({
   container: {
@@ -40,10 +40,7 @@ const useStyles = createUseStyles({
       left: "-10px",
       width: "calc(100% + 20px)",
       height: "calc(100% + 20px)",
-      borderRadius: "0",
-      "& $panel": {
-        position: "fixed"
-      }
+      borderRadius: "0"
     }
   },
   panel: {
@@ -60,7 +57,10 @@ const useStyles = createUseStyles({
     "& h4": {
       margin: "0",
       paddingBottom: "10px",
-      color: "red"
+      color: "#333"
+    },
+    "& button, & a.btn": {
+      minWidth: "80px"
     },
     "& button + button, & a + button, & a + a": {
       marginLeft: "20px"
@@ -68,18 +68,26 @@ const useStyles = createUseStyles({
   }
 });
 
-const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }) => {
+interface ConfirmCancelEditPanelProps {
+  show: boolean;
+  text: string;
+  inline: boolean;
+  onConfirm: (e: MouseEvent<HTMLButtonElement>) => void;
+  onCancel: (e: MouseEvent<HTMLButtonElement>) => void;
+}
+
+const ConfirmCancelEditPanel = ({ show, text, inline, onConfirm, onCancel }: ConfirmCancelEditPanelProps) => {
 
   const classes = useStyles();
 
-  const handleCancel = e => {
+  const handleConfirm = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onCancel(e);
+    onConfirm(e);
   };
 
-  const handleRetry = e => {
+  const handleCancel = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    onRetry(e);
+    onCancel(e);
   };
 
   if (!show) {
@@ -89,14 +97,14 @@ const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }) => {
   return (
     <div className={`${classes.container} ${inline?"":"block"}`}>
       <div className={classes.panel}>
-        <h4>{error}</h4>
+        <h4>{text}</h4>
         <div>
-          <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
-          <Button variant="primary" onClick={handleRetry}>Retry</Button>
+          <Button variant="secondary" onClick={handleConfirm}>Yes</Button>
+          <Button variant="danger" onClick={handleCancel}>No</Button>
         </div>
       </div>
     </div>
   );
 };
 
-export default SaveErrorPanel;
+export default ConfirmCancelEditPanel;

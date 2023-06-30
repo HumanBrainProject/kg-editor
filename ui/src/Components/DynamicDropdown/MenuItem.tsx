@@ -21,9 +21,10 @@
  *
  */
 
-import React, {useRef, useEffect, ChangeEvent, KeyboardEvent} from "react";
+import React, {useRef, useEffect, KeyboardEvent} from "react";
 import { createUseStyles } from "react-jss";
 import DynamicOption from "../../Fields/DynamicOption/DynamicOption";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   item: {
@@ -36,14 +37,13 @@ const useStyles = createUseStyles({
   }
 });
 
-//TODO: Fix this
 interface MenuItemProps {
-  item: any;
+  item: Suggestion;
   searchTerm: string;
   hasFocus: boolean;
-  onSelectNext: (item: any) => void;
-  onSelectPrevious: (item: any) => void;
-  onSelect: (item: any) => void;
+  onSelectNext: (item: Suggestion) => void;
+  onSelectPrevious: (item: Suggestion) => void;
+  onSelect: (item: Suggestion) => void;
   onCancel: () => void;
 }
 

@@ -27,6 +27,7 @@ import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import MenuItem from "./MenuItem";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -45,6 +46,17 @@ const useStyles = createUseStyles({
   }
 });
 
+interface MenuItemsProps {
+  current: Suggestion|null;
+  searchTerm: string;
+  items: Suggestion[];
+  loading: boolean;
+  onSelect: (item: Suggestion) => void;
+  onSelectPrevious: (item: Suggestion) => void;
+  onSelectNext: (item: Suggestion) => void;
+  onCancel: () => void;
+}
+
 const MenuItems = ({ 
   current,
   searchTerm,
@@ -54,7 +66,7 @@ const MenuItems = ({
   onSelectPrevious,
   onSelectNext,
   onCancel
-}) => {
+}: MenuItemsProps) => {
 
   const classes = useStyles();
 

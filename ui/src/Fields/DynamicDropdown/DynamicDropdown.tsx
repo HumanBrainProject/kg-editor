@@ -42,6 +42,7 @@ import TargetTypeSelection from "../TargetTypeSelection";
 import Matomo from "../../Services/Matomo";
 import LinksStore, { Value } from "../Stores/LinksStore";
 import { View } from "../../Stores/ViewStore";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   labelContainer: {
@@ -203,7 +204,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleOnSelectOption = option => {
+  const handleOnSelectOption = (option: Suggestion) => {
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {

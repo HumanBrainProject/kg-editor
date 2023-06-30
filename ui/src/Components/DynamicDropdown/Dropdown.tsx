@@ -21,9 +21,10 @@
  *
  */
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, DragEvent, KeyboardEvent, ChangeEvent, RefObject } from "react";
 import { createUseStyles } from "react-jss";
 import Menu from "./Menu";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -40,13 +41,29 @@ const useStyles = createUseStyles({
   }
 });
 
-const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop }) => {
+interface DropdownProps {
+  className: string;
+  inputRef: RefObject<HTMLInputElement>;
+  options: Suggestion[];
+  inputPlaceholder: string;
+  loading: boolean;
+  hasMore: boolean;
+  searchTerm: string;
+  onSearch: (v: string) => void;
+  onReset: () => void;
+  onSelect: (option: Suggestion) => void;
+  onDeleteLastValue: () => void;
+  onLoadMore: () => void;
+  onDrop: () => void;
+}
+
+const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop }: DropdownProps) => {
 
   const classes = useStyles();
 
-  const wrapperRef = useRef();
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const [current, setCurrent] = useState(null);
+  const [current, setCurrent] = useState<Suggestion|null>(null);
 
   useEffect(() => {
     return () => { // Unmount
@@ -55,8 +72,8 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleInputKeyStrokes = e => {
-    if(e.key === "Backspace" && !e.target.value){
+  const handleInputKeyStrokes = (e: KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === "Backspace" && !e.currentTarget.value){
       e.preventDefault();
       onDeleteLastValue && onDeleteLastValue();
     } else if(e.key === "ArrowDown"){
@@ -81,18 +98,18 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
     }
   };
 
-  const handleChangeUserInput = e => {
+  const handleChangeUserInput = (e: ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     onSearch(e.target.value);
   };
 
-  const handleOnSelect = item => {
+  const handleOnSelect = (item: Suggestion) => {
     setCurrent(null);
     handleFocus();
     onSelect(item);
   }
 
-  const handleOnSelectNext = item => {
+  const handleOnSelectNext = (item: Suggestion) => {
     const index = options.findIndex(o => o === item);
     if(index < options.length - 1){
       const option = options[index + 1] ;
@@ -105,7 +122,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
     }
   };
 
-  const handleOnSelectPrevious = item => {
+  const handleOnSelectPrevious = (item: Suggestion) => {
     const index = options.findIndex(o => o === item);
     if(index > 0){
       const option = options[index- 1] ;
@@ -128,6 +145,11 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
     setCurrent(null);
     listenClickOutHandler();
   };
+
+  const handleOnDrop = (e: DragEvent<HTMLInputElement>) => {
+    e.preventDefault(); 
+    onDrop && onDrop();
+  }
 
   const clickOutHandler = e => {
     if(wrapperRef.current && !wrapperRef.current.contains(e.target)){
@@ -154,7 +176,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
     <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
       <input className={classes.userInput}
         ref={inputRef}
-        onDrop={e => e.preventDefault() && onDrop && onDrop()}
+        onDrop={handleOnDrop}
         onDragOver={e => e.preventDefault()}
         type="text"
         onKeyDown={handleInputKeyStrokes}

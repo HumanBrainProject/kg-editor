@@ -27,6 +27,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { createUseStyles } from "react-jss";
 
 import MenuItems from "./MenuItems";
+import { Suggestion } from "../../types";
 
 const useStyles = createUseStyles({
   container:{
@@ -63,6 +64,19 @@ const useStyles = createUseStyles({
   }
 });
 
+interface MenuProps {
+  current: Suggestion|null;
+  hasMore: boolean;
+  onLoadMore: () => void;
+  searchTerm: string;
+  items: Suggestion[];
+  loading: boolean;
+  onSelect: (item: Suggestion) => void;
+  onSelectNext: (item: Suggestion) => void;
+  onSelectPrevious: (item: Suggestion) => void;
+  onCancel: () => void;
+}
+
 const Menu = ({ 
   current,
   hasMore,
@@ -74,7 +88,7 @@ const Menu = ({
   onSelectNext,
   onSelectPrevious,
   onCancel
-}) => {
+}: MenuProps) => {
 
   const classes = useStyles();
 

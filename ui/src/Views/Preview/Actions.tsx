@@ -21,16 +21,28 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import useStores from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import Instance from "../../Stores/Instance";
 
-const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}) => {
-  const handleClick = event => {
+interface ActionProps {
+  className: string;
+  show?: boolean;
+  label: string;
+  icon: IconProp;
+  mode: string;
+  onClick: (v: string) => void;
+  onCtrlClick: (v: string) => void;
+}
+
+const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}: ActionProps) => {
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.metaKey || event.ctrlKey) {
       typeof onCtrlClick === "function" && onCtrlClick(mode);
     } else {
@@ -71,7 +83,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const Actions = observer(({ instance }) => {
+interface ActionsProps {
+  instance: Instance;
+}
+
+const Actions = observer(({ instance }: ActionsProps) => {
 
   const { id, name, primaryType, permissions } = instance;
   const classes = useStyles();
@@ -79,11 +95,11 @@ const Actions = observer(({ instance }) => {
   const { appStore } = useStores();
   const navigate = useNavigate();
 
-  const handleCtrlClick = mode => {
+  const handleCtrlClick = (mode: string) => {
     appStore.openInstance(id, name, primaryType, mode);
   };
 
-  const handleClick = mode => {
+  const handleClick = (mode: string) => {
     if(mode === "view") {
       navigate(`/instances/${id}`);
     } else {
@@ -93,12 +109,12 @@ const Actions = observer(({ instance }) => {
 
   return (
     <div className={classes.actions}>
-      <Action className={classes.action} show={permissions.canRead}                            icon="eye"              label="Open"     mode="view"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canWrite}                           icon="pencil-alt"       label="Edit"     mode="edit"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  label="Explore"  mode="graph"   onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canRelease}                         icon="cloud-upload-alt" label="Release"  mode="release" onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canDelete || permissions.canCreate} icon="cog"              label="Manage"   mode="manage"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions.canRead}                            icon="code"             label="Raw view" mode="raw"     onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions?.canRead}                            icon="eye"              label="Open"     mode="view"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions?.canWrite}                           icon="pencil-alt"       label="Edit"     mode="edit"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions?.canRead}                            icon="project-diagram"  label="Explore"  mode="graph"   onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions?.canRelease}                         icon="cloud-upload-alt" label="Release"  mode="release" onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions?.canDelete || permissions?.canCreate} icon="cog"              label="Manage"   mode="manage"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action className={classes.action} show={permissions?.canRead}                            icon="code"             label="Raw view" mode="raw"     onClick={handleClick} onCtrlClick={handleCtrlClick} />
     </div>
   );
 });

@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, ReactNode, MouseEvent, KeyboardEvent } from "react";
 import { createUseStyles } from "react-jss";
 import Dropdown from "react-bootstrap/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,6 +29,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useStores from "../Hooks/useStores";
 
 import User from "../Components/User";
+import { Alternative as AlternativeType } from "../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -59,25 +60,37 @@ const useStyles = createUseStyles({
   }
 });
 
-const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }) => {
+interface AlternativeProps {
+  alternative: AlternativeType;
+  ValueRenderer: React.ComponentType;
+  className: string;
+  hasFocus: boolean;
+  onSelect: (v:any) => void;
+  onSelectPrevious: (v: any) => void;
+  onSelectNext: (v: any) => void;
+  onCancel: () => void;
+  onRemove: (e: MouseEvent<SVGSVGElement>) => void;
+}
+
+const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect, onSelectPrevious, onSelectNext, onCancel, onRemove }: AlternativeProps) => {
 
   const { userProfileStore } = useStores();
 
   const classes = useStyles();
 
-  const ref = useRef();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (hasFocus) {
-      ref.current.focus();
+      ref.current?.focus();
     }
   });
 
-  const handleSelect = e => {
-    typeof onSelect === "function" && onSelect(alternative.value, e);
+  const handleSelect = () => {
+    typeof onSelect === "function" && onSelect(alternative.value);
   };
 
-  const handleKeyDown = e => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if(e) {
       switch(e.key) {
       case "ArrowUp": {
@@ -106,13 +119,13 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
     }
   };
 
-  const handleRemoveClick = e => {
+  const handleRemoveClick = (e: MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
     typeof onRemove === "function" && onRemove(e);
   };
 
   const users = (!alternative || !alternative.users)?[]:alternative.users;
-  const isOwnAlternative = users.find(user => userProfileStore.user.id === user.id);
+  const isOwnAlternative = users.find(user => userProfileStore.user?.id === user.id);
   return (
     <Dropdown.Item className={classes.container} onClick={handleSelect}>
       <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >

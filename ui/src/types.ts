@@ -205,7 +205,7 @@ export interface Alternatives {
 }
 
 export interface Alternative {
-  value: unknown;
+  value: any;
   selected: boolean;
   users: UserSummary[];
 }

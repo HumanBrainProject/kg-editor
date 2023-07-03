@@ -21,28 +21,42 @@
  *
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, RefObject } from "react";
 import { observer } from "mobx-react-lite";
 
 import useStores from "../Hooks/useStores";
 
 import Alternatives from "./Alternatives";
+import { Alternative } from "../types";
 
-const AlternativeValue = observer(({alternative}) => alternative.value.map(instance => instance.name).join("; "));
+interface AlternativeValueProps {
+  alternative: Alternative;
+}
+
+const AlternativeValue = observer(({alternative}: AlternativeValueProps) => alternative.value.map(instance => instance.name).join("; "));
 AlternativeValue.displayName = "AlternativeValue";
 
-const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}) => {
+interface LinksAlternativesProps {
+  className: string;
+  list: Alternative[];
+  onSelect: (v: any) => void;
+  onRemove: () => void;
+  mappingValue: string;
+  parentContainerRef: RefObject<HTMLInputElement>;
+}
+
+const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, parentContainerRef}: LinksAlternativesProps) => {
 
   const { instanceStore } = useStores();
 
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Alternative[]>([]);
 
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
       const instances = Array.isArray(value)?value.map(v => {
         if (v[mappingValue] && typeof v[mappingValue] === "string") {
           const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
-          instance.fetchLabel();
+          instance?.fetchLabel();
           return instance;
         }
         return {

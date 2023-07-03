@@ -21,11 +21,12 @@
  *
  */
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, RefObject, ReactNode, MouseEvent, KeyboardEvent } from "react";
 import { createUseStyles } from "react-jss";
 
 import Avatar from "../Components/Avatar";
 import Alternative from "./Alternative";
+import { Alternative as AlternativeType } from "../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -55,17 +56,27 @@ const useStyles = createUseStyles({
   }
 });
 
-const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRenderer, onSelect, onRemove }) => {
+interface AlternativesProps {
+  className: string;
+  list: AlternativeType[];
+  disabled: boolean;
+  parentContainerRef: RefObject<HTMLInputElement>;
+  ValueRenderer: React.ComponentType;
+  onSelect: (value: any) => void;
+  onRemove: () => void;
+}
+
+const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRenderer, onSelect, onRemove }: AlternativesProps) => {
 
   const classes = useStyles();
 
-  const wrapperRef = useRef();
-  const alternativesRef = useRef();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const alternativesRef = useRef<HTMLUListElement>(null);
 
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState(null);
+  const [current, setCurrent] = useState<any>(null);
 
-  const handleToggle = e => {
+  const handleToggle = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setOpen(!open);
   };
@@ -75,12 +86,12 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     setOpen(false);
   };
 
-  const handleSelect = value => {
+  const handleSelect = (value: any) => {
     typeof onSelect === "function" && onSelect(value);
     close();
   };
 
-  const handleSelectPrevious = value => {
+  const handleSelectPrevious = (value: any) => {
     if (!list.length) {
       setCurrent(null);
       return;
@@ -98,7 +109,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     }
   };
 
-  const handleSelectNext = value => {
+  const handleSelectNext = (value: any) => {
     if (!list.length) {
       setCurrent(null);
       return;
@@ -117,13 +128,13 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     close();
   };
 
-  const handleRemove = e => {
+  const handleRemove = (e: MouseEvent<SVGSVGElement>) => {
     e && e.preventDefault();
     typeof onRemove === "function" && onRemove();
     setOpen(false);
   };
 
-  const handleInputKeyStrokes = e => {
+  const handleInputKeyStrokes = (e: KeyboardEvent<HTMLButtonElement>) => {
     if (disabled || !e) {
       return;
     }
@@ -152,7 +163,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
   const clickOutHandler = e => {
     if(!open && wrapperRef.current && wrapperRef.current.contains(e.target)){
       if (alternativesRef.current) {
-        const containerWidth = parentContainerRef.current.offsetWidth;
+        const containerWidth = parentContainerRef.current?.offsetWidth;
         if (containerWidth && containerWidth > wrapperRef.current.offsetLeft) {
           const width = containerWidth - wrapperRef.current.offsetLeft;
           alternativesRef.current.style.width = width + "px";

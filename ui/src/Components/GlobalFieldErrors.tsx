@@ -24,7 +24,7 @@
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
-import { InstanceFull } from "../types";
+import Instance from "../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -37,7 +37,7 @@ const useStyles = createUseStyles({
 });
 
 interface GlobalFieldErrorsProps {
-  instance: InstanceFull;
+  instance: Instance;
 }
 
 const GlobalFieldErrors = observer(({ instance }: GlobalFieldErrorsProps) => {

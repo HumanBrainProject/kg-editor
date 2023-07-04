@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useRef } from "react";
+import React, { MouseEvent, useRef } from "react";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,6 +30,8 @@ import Status from "./Status";
 import { observer } from "mobx-react-lite";
 
 import useStores from "../../Hooks/useStores";
+import Instance from "../../Stores/Instance";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({
   container: {
@@ -138,7 +140,17 @@ const useStyles = createUseStyles({
   }
 });
 
-const Action = ({ className, show, icon, mode, label, onClick, onCtrlClick }) => {
+interface ActionProps {
+  className: string;
+  show?: boolean;
+  icon: IconProp;
+  mode: string;
+  label: string;
+  onClick: (mode: string) => void;
+  onCtrlClick: (mode: string) => void;
+}
+
+const Action = ({ className, show, icon, mode, label, onClick, onCtrlClick }: ActionProps) => {
 
   if(!show) {
     return null;
@@ -163,7 +175,15 @@ const Action = ({ className, show, icon, mode, label, onClick, onCtrlClick }) =>
   );
 };
 
-const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActionClick }) => {
+interface InstanceRowProps {
+  instance: Instance;
+  selected: boolean;
+  onClick: () => void;
+  onCtrlClick: (instance: Instance) => void;
+  onActionClick: (instance: Instance, mode: string) => void;
+}
+
+const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActionClick }:InstanceRowProps) => {
 
   const classes = useStyles();
 
@@ -175,7 +195,7 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
 
   const timeout = useRef(null);
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.target)) {
       return;
@@ -194,7 +214,7 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     }
   };
 
-  const handleDoubleClick = e => {
+  const handleDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     clearTimeout(timeout.current);
     timeout.current = null;
@@ -214,7 +234,7 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     typeof onCtrlClick === "function" && onCtrlClick(instance);
   };
 
-  const handleActionClick = mode => {
+  const handleActionClick = (mode: string) => {
     typeof onActionClick === "function" && onActionClick(instance, mode);
   };
 
@@ -233,12 +253,12 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
         ))}
       </Form>
       <div className={classes.actions}>
-        <Action className={classes.action} show={permissions.canRead && isTypesSupported}        icon="eye"              mode="view"    label="Open"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canWrite && isTypesSupported}       icon="pencil-alt"       mode="edit"    label="Edit"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRelease && isTypesSupported}     icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
-        <Action className={classes.action} show={permissions.canRead}                            icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions?.canRead && isTypesSupported}        icon="eye"              mode="view"    label="Open"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions?.canWrite && isTypesSupported}       icon="pencil-alt"       mode="edit"    label="Edit"     onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions?.canRead}                            icon="project-diagram"  mode="graph"   label="Explore"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions?.canRelease && isTypesSupported}     icon="cloud-upload-alt" mode="release" label="Release"  onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions?.canRead}                            icon="cog"              mode="manage"  label="Manage"   onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
+        <Action className={classes.action} show={permissions?.canRead}                            icon="code"             mode="raw"     label="Raw view" onClick={handleActionClick} onCtrlClick={handleActionCtrlClick} />
       </div>
     </div>
   );

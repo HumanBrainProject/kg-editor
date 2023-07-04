@@ -39,6 +39,7 @@ import ReleaseAction from "./InstanceRelease/ReleaseAction";
 
 import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
 import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -86,7 +87,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstanceRelease = observer(({ instance }) => {
+interface InstanceReleaseProps {
+  instance: Instance;
+}
+
+const InstanceRelease = observer(({ instance }: InstanceReleaseProps) => {
 
   const classes = useStyles();
 

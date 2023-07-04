@@ -30,6 +30,7 @@ import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 import DuplicateInstance from "./InstanceManage/DuplicateInstance";
 import MoveInstance from "./InstanceManage/MoveInstance";
 import DeleteInstance from "./InstanceManage/DeleteInstance";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -75,7 +76,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstanceManage = observer(({instance}) => {
+interface InstanceManageProps {
+  instance: Instance;
+}
+
+
+const InstanceManage = observer(({instance}: InstanceManageProps) => {
 
   const classes = useStyles();
 

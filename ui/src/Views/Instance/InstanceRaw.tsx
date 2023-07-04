@@ -29,6 +29,7 @@ import ReactJson from "react-json-view";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import ThemeRJV from "../../Themes/ThemeRJV";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -68,7 +69,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstanceRaw = observer(({instance}) => {
+interface InstanceRawProps {
+  instance: Instance;
+}
+
+
+const InstanceRaw = observer(({instance}: InstanceRawProps) => {
 
   const classes = useStyles();
 

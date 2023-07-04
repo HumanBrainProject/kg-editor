@@ -32,6 +32,7 @@ import GraphViz from "./InstanceGraph/GraphViz";
 import GraphSettings from "./InstanceGraph/GraphSettings";
 import SpinnerPanel from "../../Components/SpinnerPanel";
 import ErrorPanel from "../../Components/ErrorPanel";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -59,7 +60,11 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstanceGraph = observer(({ instance }) => {
+interface InstanceGraphProps {
+  instance: Instance;
+}
+
+const InstanceGraph = observer(({ instance }: InstanceGraphProps) => {
 
   const classes = useStyles();
 

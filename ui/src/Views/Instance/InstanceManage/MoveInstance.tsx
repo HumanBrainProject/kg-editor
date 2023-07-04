@@ -33,6 +33,8 @@ import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
 import { useNavigate, useLocation } from "react-router-dom";
 import Matomo from "../../../Services/Matomo";
+import Instance from "../../../Stores/Instance";
+import { Status } from "../../../Stores/StatusStore";
 
 const useStyles = createUseStyles({
   title: {
@@ -97,6 +99,15 @@ const useStyles = createUseStyles({
   }
 });
 
+interface StatusProps {
+  status?: Status;
+  fetchStatus: () => void;
+  onClick: () => void;
+  classes: any;
+  variant: string;
+  isDisabled: boolean;
+}
+
 const Status = observer(({
   status,
   fetchStatus,
@@ -104,7 +115,7 @@ const Status = observer(({
   classes,
   variant,
   isDisabled
-}) => {
+}: StatusProps) => {
   if (status && status.hasFetchError) {
     return (
       <div className={classes.error}>
@@ -148,7 +159,12 @@ const Status = observer(({
   );
 });
 
-const MoveInstance = observer(({ instance, className }) => {
+interface MoveInstanceProps {
+  instance: Instance;
+  className: string;
+}
+
+const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
   const classes = useStyles();
 
   const { appStore, statusStore, userProfileStore } = useStores();
@@ -163,7 +179,7 @@ const MoveInstance = observer(({ instance, className }) => {
 
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
-  const [spaceId, setSpaceId] = useState(appStore.currentSpace.id);
+  const [spaceId, setSpaceId] = useState(appStore.currentSpace?.id);
 
   const permissions = instance.permissions;
   const status = statusStore.getInstance(instance.id);
@@ -172,13 +188,13 @@ const MoveInstance = observer(({ instance, className }) => {
     return null;
   }
 
-  const spaces = userProfileStore.spaces.filter((s) => {
-    if (s.id === appStore.currentSpace.id) {
+  const spaces = userProfileStore.spaces?.filter((s) => {
+    if (s.id === appStore.currentSpace?.id) {
       return true;
     }
     if (
       !s.id.startsWith("private-") ||
-      appStore.currentSpace.id.startsWith("private-")
+      appStore.currentSpace?.id.startsWith("private-")
     ) {
       // only instance in a private space can be moved to another private space
       return s.permissions.canCreate;
@@ -196,12 +212,12 @@ const MoveInstance = observer(({ instance, className }) => {
   const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
-  const variant = spaceId === appStore.currentSpace.id ? "secondary" : "warning";
-  const isDisabled = status.data !== "UNRELEASED" || spaceId === appStore.currentSpace.id;
+  const variant = spaceId === appStore.currentSpace?.id ? "secondary" : "warning";
+  const isDisabled = status.data !== "UNRELEASED" || spaceId === appStore.currentSpace?.id;
 
   return (
     <>
-      {permissions.canDelete && spaces.length > 1 && (
+      {permissions?.canDelete && spaces && spaces.length > 1 && (
         <div className={className}>
           <div>
             <h4 className={classes.title}>Move this instance to space</h4>
@@ -240,7 +256,7 @@ const MoveInstance = observer(({ instance, className }) => {
       )}
       {!appStore.instanceMovingError && appStore.isMovingInstance && (
         <SpinnerModal
-          text={`Moving instance "${appStore.instanceToMove.id}" to space "${appStore.instanceToMove.space}" ...`}
+          text={`Moving instance "${appStore.instanceToMove?.id}" to space "${appStore.instanceToMove?.space}" ...`}
         />
       )}
     </>

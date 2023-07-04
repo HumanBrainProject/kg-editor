@@ -30,6 +30,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import useStores from "../../../Hooks/useStores";
+import Instance from "../../../Stores/Instance";
 
 const useStyles = createUseStyles({
   panel:{
@@ -88,7 +89,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const FooterPanel = observer(({ className, instance, showOpenActions }) => {
+interface FooterPanelProps {
+  className: string;
+  instance: Instance;
+  showOpenActions: boolean;
+}
+
+const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPanelProps) => {
 
   const classes = useStyles();
 
@@ -99,7 +106,7 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
 
   const handleOpenInstance = async e => {
     e.stopPropagation();
-    if(appStore.currentSpace.id !== instance.space) {
+    if(appStore.currentSpace?.id !== instance.space) {
       await appStore.switchSpace(location, navigate, instance.space);
     }
     if(e.metaKey || e.ctrlKey){
@@ -118,7 +125,7 @@ const FooterPanel = observer(({ className, instance, showOpenActions }) => {
         </Col>
         <Col xs={2}>
           <div className={classes.actions}>
-            {instance.permissions.canRead && (
+            {instance.permissions?.canRead && (
               <div className={classes.action} onClick={handleOpenInstance}>
                 <FontAwesomeIcon icon="folder-open"/>
               </div>

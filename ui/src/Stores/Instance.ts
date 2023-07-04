@@ -404,7 +404,7 @@ export class Instance {
   isNew = false;
   labelField = null;
   _promotedFields = [];
-  primaryType = { name: "", color: "", label: "" };
+  primaryType = { name: "", color: "", label: "", description: "" };
   space = "";
   metadata = {};
   permissions?: Permissions;

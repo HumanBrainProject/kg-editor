@@ -35,6 +35,7 @@ import useStores from "../../Hooks/useStores";
 
 import CompareChanges from "./CompareChanges";
 import Matomo from "../../Services/Matomo";
+import { Instance as InstanceType } from "../../Stores/InstanceStore";
 
 const useStyles = createUseStyles({
   container:{
@@ -133,7 +134,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const CompareModal = ({ instance, onSave, onReset, onClose }) => {
+interface CompareModalProps {
+  instance: InstanceType;
+  onSave: (i: InstanceType) => void;
+  onReset: (i: InstanceType) => void;
+  onClose: () => void;
+}
+
+const CompareModal = ({ instance, onSave, onReset, onClose }: CompareModalProps) => {
   const classes = useStyles();
 
   if (!instance) {
@@ -162,7 +170,15 @@ const CompareModal = ({ instance, onSave, onReset, onClose }) => {
   );
 };
 
-const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSaveError }) => {
+interface InstanceProps {
+  instance: InstanceType;
+  onSave: (i: InstanceType) => void;
+  onReset: (i: InstanceType) => void;
+  onCompare: (i: InstanceType) => void;
+  onDismissSaveError: (i: InstanceType) => void;
+}
+
+const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSaveError }: InstanceProps) => {
 
   const classes = useStyles();
 
@@ -195,7 +211,7 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
       </div>
       {instance.hasSaveError && (
         <div className={classes.errors}>
-          {instance.saveError} <Button size="small" variant={"link"} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
+          {instance.saveError} <Button size="sm" variant={"link"} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
         </div>
       )}
     </div>
@@ -209,7 +225,7 @@ const SaveBar = observer(() => {
 
   const { appStore, instanceStore } = useStores();
 
-  const [comparedInstance, setComparedInstance] = useState(null);
+  const [comparedInstance, setComparedInstance] = useState<InstanceType|null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -232,21 +248,21 @@ const SaveBar = observer(() => {
     instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance, navigate));
   };
 
-  const handleSave = instance => {
+  const handleSave = (instance: InstanceType) => {
     Matomo.trackEvent("Instance", "InstanceSave", instance.id);
     appStore.saveInstance(instance, navigate);
     setComparedInstance(null);
   };
 
-  const handleReset = instance => {
+  const handleReset = (instance: InstanceType) => {
     Matomo.trackEvent("Instance", "InstanceReset", instance.id);
     instanceStore.confirmCancelInstanceChanges(instance.id);
     setComparedInstance(null);
   };
 
-  const handleDismissSaveError = instance => instance.cancelSave();
+  const handleDismissSaveError = (instance: InstanceType) => instance.cancelSave();
 
-  const handleCompare = instance => {
+  const handleCompare = (instance: InstanceType) => {
     Matomo.trackEvent("Instance", "InstanceCompare", instance.id);
     setComparedInstance(instance);
   };
@@ -258,7 +274,7 @@ const SaveBar = observer(() => {
   return(
     <div className={classes.container}>
       <Scrollbars autoHide>
-        {appStore.currentSpace.autorelease && (
+        {appStore.currentSpace?.autorelease && (
           <div className={`alert alert-warning ${classes.autoreleaseWarning}`} role="alert"><FontAwesomeIcon icon="exclamation-triangle"  /> Saved changes will be released automatically.</div>
         )}
         <h4>Unsaved instances &nbsp;{instanceStore.hasUnsavedChanges && <Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button>}</h4>

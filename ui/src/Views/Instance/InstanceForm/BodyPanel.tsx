@@ -32,6 +32,7 @@ import Field from "../../../Fields/Field";
 import Label from "../../../Fields/Label";
 import IncomingLinks from "../IncomingLinks/IncomingLinks";
 import PossibleIncomingLinks from "../IncomingLinks/PossibleIncomingLinks";
+import Instance from "../../../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -64,7 +65,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const NoPermissionForView = observer(({ instance, mode }) => {
+interface NoPermissionForViewProps {
+  instance: Instance;
+  mode: string;
+}
+
+const NoPermissionForView = observer(({ instance, mode }: NoPermissionForViewProps) => {
 
   const classes = useStyles();
 
@@ -79,7 +85,13 @@ const NoPermissionForView = observer(({ instance, mode }) => {
 });
 NoPermissionForView.displayName = "NoPermissionForView";
 
-const BodyPanel = observer(({ className, instance, readMode}) => {
+interface BodyPanelProps {
+  className: string;
+  instance: Instance; 
+  readMode: boolean;
+}
+
+const BodyPanel = observer(({ className, instance, readMode}: BodyPanelProps) => {
 
   const classes = useStyles();
 
@@ -87,7 +99,7 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
   const pane = React.useContext(PaneContext);
 
   if (readMode) {
-    if(!instance.permissions.canRead) {
+    if(!instance.permissions?.canRead) {
       return (
         <Form className={`${classes.container} ${className}`} >
           <NoPermissionForView instance={instance} mode="view" />
@@ -95,7 +107,7 @@ const BodyPanel = observer(({ className, instance, readMode}) => {
       );
     }
   } else { // edit
-    if(!instance.permissions.canWrite) {
+    if(!instance.permissions?.canWrite) {
       return (
         <Form className={`${classes.container} ${className}`} >
           <NoPermissionForView instance={instance} mode="edit" />

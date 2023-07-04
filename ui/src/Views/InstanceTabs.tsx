@@ -30,6 +30,8 @@ import useStores from "../Hooks/useStores";
 
 import Tab from "../Components/Tab";
 import Matomo from "../Services/Matomo";
+import Instance from "../Stores/Instance";
+import { View } from "../Stores/ViewStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -38,7 +40,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getLabel = (instance, view) => {
+const getLabel = (instance: Instance, view: View) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.name;
   }
@@ -48,7 +50,7 @@ const getLabel = (instance, view) => {
   return view.instanceId;
 };
 
-const getColor = (instance, view) => {
+const getColor = (instance: Instance, view: View) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.primaryType.color;
   }
@@ -58,7 +60,7 @@ const getColor = (instance, view) => {
   return "";
 };
 
-const getDescription = (instance, view) => {
+const getDescription = (instance: Instance, view: View) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
     if(instance.primaryType.description && instance.primaryType.name) {
       return `${instance.primaryType.name} - ${instance.primaryType.description}`;
@@ -74,7 +76,7 @@ const getDescription = (instance, view) => {
   return "";
 }
 
-const getInstanceTabPath = (instanceId, mode, space, type) => {
+const getInstanceTabPath = (instanceId: string, mode: string, space: string, type: string) => {
   if(mode === "view") {
     return `/instances/${instanceId}`;
   } else if (mode === "create") {
@@ -83,7 +85,12 @@ const getInstanceTabPath = (instanceId, mode, space, type) => {
   return `/instances/${instanceId}/${mode}`;
 };
 
-const InstanceTab = observer(({view, pathname}) => {
+interface InstanceTabProps {
+  view: View;
+  pathname: string;
+}
+
+const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -102,7 +109,7 @@ const InstanceTab = observer(({view, pathname}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance, view]);
 
-  const isCurrent = (instanceId, mode) => {
+  const isCurrent = (instanceId: string, mode: string) => {
     if(mode !== "view") {
       return matchPath({ path: `/instances/${instanceId}/${mode}` }, pathname);
     }
@@ -138,7 +145,11 @@ const InstanceTab = observer(({view, pathname}) => {
 });
 InstanceTab.displayName = "InstanceTab";
 
-const InstanceTabs = observer(({ pathname }) => {
+interface InstanceTabsProps {
+  pathname: string;
+}
+
+const InstanceTabs = observer(({ pathname }: InstanceTabsProps) => {
 
   const classes = useStyles();
 

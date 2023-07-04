@@ -27,7 +27,7 @@ import { StatusResponse } from "../types";
 import API from "../Services/API";
 
 
-interface Status {
+export interface Status {
   isFetching: boolean;
   isFetched: boolean;
   hasFetchError: boolean;
@@ -84,7 +84,7 @@ export class StatusStore {
     this.statuses.clear();
   }
 
-  fetchStatus(instanceIds: string[]) {
+  fetchStatus(instanceIds: string | string[]) {
     if (!Array.isArray(instanceIds)) {
       instanceIds = [instanceIds];
     }

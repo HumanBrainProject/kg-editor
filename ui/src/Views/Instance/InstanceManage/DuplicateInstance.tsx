@@ -29,8 +29,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useStores from "../../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../../../Services/Matomo";
+import Instance from "../../../Stores/Instance";
 
-const DuplicateInstance = observer(({instance, className}) => {
+interface DuplicateInstanceProps {
+  instance: Instance;
+  className: string;
+}
+
+const DuplicateInstance = observer(({ instance, className }: DuplicateInstanceProps) => {
 
   const { appStore, typeStore } = useStores();
   const navigate = useNavigate();
@@ -45,7 +51,7 @@ const DuplicateInstance = observer(({instance, className}) => {
 
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
-  if (!permissions.canCreate || !isTypesSupported) {
+  if (!permissions?.canCreate || !isTypesSupported) {
     return null;
   }
 

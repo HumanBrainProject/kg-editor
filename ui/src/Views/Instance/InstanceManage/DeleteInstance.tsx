@@ -33,6 +33,8 @@ import ErrorModal from "../../../Components/ErrorModal";
 import SpinnerModal from "../../../Components/SpinnerModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import Matomo from "../../../Services/Matomo";
+import Instance from "../../../Stores/Instance";
+import { Status } from "../../../Stores/StatusStore";
 
 const useStyles = createUseStyles({
   error: {
@@ -59,7 +61,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const Delete = observer(({ status, onClick, classes, fetchStatus }) => {
+interface DeleteProps {
+  status?: Status;
+  onClick: () => void;
+  classes: any;
+  fetchStatus: () => void;
+}
+
+const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps) => {
   if (status && status.hasFetchError) {
     return (
       <div className={classes.error}>
@@ -110,7 +119,12 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }) => {
   );
 });
 
-const DeleteInstance = observer(({ instance, className }) => {
+interface DeleteInstanceProps {
+  instance: Instance;
+  className: string;
+}
+
+const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) => {
   const classes = useStyles();
 
   const { appStore, statusStore } = useStores();
@@ -140,7 +154,7 @@ const DeleteInstance = observer(({ instance, className }) => {
 
   return (
     <>
-      {permissions.canDelete && (
+      {permissions?.canDelete && (
         <div className={className}>
           <h4>Delete this instance</h4>
           <Delete

@@ -29,7 +29,7 @@ import API, { APIError } from "../Services/API";
 import RootStore from "./RootStore";
 import { InstanceLabel, Stage, StructureOfType, UUID } from "../types";
 
-class Instance extends BaseInstance {
+export class Instance extends BaseInstance {
 
   cancelChangesPending?: boolean;
   saveError?: string;

@@ -29,6 +29,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useStores from "../../Hooks/useStores";
 
 import ReleaseStatus from "../../Components/ReleaseStatus";
+import { Status } from "../../Stores/StatusStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -67,15 +68,21 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstanceStatus = observer(({ instanceStatus, classes, darkmode }) => {
-  if (instanceStatus.hasFetchError) {
+interface InstanceStatusProps {
+  instanceStatus?: Status;
+  classes: any;
+  darkmode: boolean;
+}
+
+const InstanceStatus = observer(({ instanceStatus, classes, darkmode }: InstanceStatusProps) => {
+  if (instanceStatus?.hasFetchError) {
     return (
       <div className={classes.loader}>
         <FontAwesomeIcon icon={"question-circle"} />
       </div>
     );
   }
-  if (!instanceStatus.isFetched) {
+  if (!instanceStatus?.isFetched) {
     return (
       <div className={classes.loader}>
         <FontAwesomeIcon icon={"circle-notch"} spin />
@@ -87,8 +94,14 @@ const InstanceStatus = observer(({ instanceStatus, classes, darkmode }) => {
   );
 });
 
-const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }) => {
-  if (instanceStatus.hasFetchErrorChildren) {
+interface  InstanceChildrenStatusProps {
+  instanceStatus?: Status;
+  classes: any;
+  darkmode: boolean;
+}
+
+const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }: InstanceChildrenStatusProps) => {
+  if (instanceStatus?.hasFetchErrorChildren) {
     return (
       <div className={classes.loader}>
         <FontAwesomeIcon icon={"question-circle"} />
@@ -96,7 +109,7 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }) 
     );
   }
 
-  if (!instanceStatus.isFetchedChildren) {
+  if (!instanceStatus?.isFetchedChildren) {
     return (
       <div className={classes.loader}>
         <FontAwesomeIcon icon={"circle-notch"} spin />
@@ -111,7 +124,12 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }) 
   );
 });
 
-const Status = observer(({ id, darkmode }) => {
+interface StatusProps {
+  id: string;
+  darkmode: boolean;
+}
+
+const Status = observer(({ id, darkmode }: StatusProps) => {
   const classes = useStyles();
 
   const { statusStore } = useStores();
@@ -121,7 +139,7 @@ const Status = observer(({ id, darkmode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const instanceStatus = statusStore.getInstance(id);
+  const instanceStatus: Status|undefined = statusStore.getInstance(id);
 
   if (!instanceStatus) {
     return null;

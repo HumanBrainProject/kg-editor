@@ -40,6 +40,8 @@ import Filter from "../../Components/Filter";
 import Preview from "../Preview";
 import InstanceRow from "../Instance/InstanceRow";
 import Matomo from "../../Services/Matomo";
+import { InstanceSummary } from "../../types";
+import { Instance } from "../../Stores/InstanceStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -186,6 +188,15 @@ const useStyles = createUseStyles({
   },
 });
 
+interface InstancesResultProps {
+  onRetry: () => void;
+  onClick: (i: Instance) => void;
+  onActionClick: (summaryInstance: InstanceSummary, mode: string) => void;
+  onCtrlClick: (i: Instance) => void;
+  loadMore: () => void;
+  classes: any;
+}
+
 const InstancesResult = observer(({
   onRetry,
   onClick,
@@ -193,7 +204,7 @@ const InstancesResult = observer(({
   onCtrlClick,
   loadMore,
   classes
-}) => {
+}: InstancesResultProps) => {
 
   const navigate = useNavigate();
 
@@ -335,17 +346,17 @@ const Instances = observer(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [browseStore.selectedType, browseStore.instancesFilter]);
 
-  const handleFilterChange = value => {
+  const handleFilterChange = (value: string) => {
     Matomo.trackEvent("Browse", "FilterInstance", value);
     browseStore.setInstancesFilter(value);
   };
 
-  const handleInstanceClick = instance => {
+  const handleInstanceClick = (instance: Instance) => {
     Matomo.trackEvent("Browse", "InstancePreview", instance.id);
     browseStore.selectInstance(instance);
   };
 
-  const handleInstanceCtrlClick = instance => {
+  const handleInstanceCtrlClick = (instance: Instance) => {
     if (instance && instance.id) {
       Matomo.trackEvent( "Browse", "InstanceOpenTabInBackground", instance.id);
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
@@ -353,7 +364,7 @@ const Instances = observer(() => {
     }
   };
 
-  const handleInstanceActionClick = (summaryInstance, mode) => {
+  const handleInstanceActionClick = (summaryInstance: InstanceSummary, mode: string) => {
     const id = summaryInstance && summaryInstance.id;
     if (id) {
       if (!instanceStore.instances.has(id)) {

@@ -73,7 +73,9 @@ const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
 
   useEffect(() => {
     const selectedSpace = getSpace(userProfileStore.spaces as SpaceType[], space);
-    appStore.setSpace(selectedSpace);
+    if(selectedSpace) {
+      appStore.setSpace(selectedSpace);
+    }
     if (skipHistory) {
       viewStore.flushStoredViewsforSpace();
       setInitialized(true);

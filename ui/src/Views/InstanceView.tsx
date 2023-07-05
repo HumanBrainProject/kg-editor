@@ -28,10 +28,14 @@ import useStores from "../Hooks/useStores";
 import Matomo from "../Services/Matomo";
 import Instance from "./Instance/Instance";
 import { useNavigate, useParams } from "react-router-dom";
+import { ViewMode } from "../types";
 
 
+interface InstanceViewProps {
+  mode: ViewMode;
+}
 
-const InstanceView = observer(({ mode }: {mode:string}) => {
+const InstanceView = observer(({ mode }: InstanceViewProps) => {
 
   const { appStore, instanceStore, viewStore, typeStore } = useStores();
   const navigate = useNavigate();
@@ -46,8 +50,8 @@ const InstanceView = observer(({ mode }: {mode:string}) => {
     instanceStore.togglePreviewInstance();
     viewStore.selectViewByInstanceId(instanceId);
     const instance = instanceStore.instances.get(instanceId); //NOSONAR
-    if (instance.space ===  typeStore.space) {
-      const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
+    if (instance?.space ===  typeStore.space) {
+      const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
       if (!isTypesSupported && !["raw", "graph", "manage"].includes(mode)) {
         navigate(`/instances/${instanceId}/raw`, {replace: true});
       }
@@ -56,8 +60,8 @@ const InstanceView = observer(({ mode }: {mode:string}) => {
   }, [instanceId, mode, typeStore.space]);
 
   const instance = instanceStore.instances.get(instanceId);
-  const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
-  if (instance.space !== typeStore.space || (!isTypesSupported && !["raw", "graph", "manage"].includes(mode))) {
+  const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
+  if (instance?.space !== typeStore.space || (!isTypesSupported && !["raw", "graph", "manage"].includes(mode))) {
     return null;
   }
 

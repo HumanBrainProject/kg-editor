@@ -192,7 +192,7 @@ const UserProfileTab = observer(({ className, size=30 }: UserProfileTabProps) =>
     }
     return () => {
       if (showPopOver) {
-        handlePopOverClose();
+        setShowPopOver(false);
       }
     };
   }, [showPopOver]);
@@ -238,7 +238,7 @@ const UserProfileTab = observer(({ className, size=30 }: UserProfileTabProps) =>
   return (
     <div className={`${classes.container} ${className??""}`}>
       <button className={classes.button} onClick={handleButtonClick} title="Account" ref={buttonRef}>
-        <Avatar userId={userProfileStore.user.id} name={userProfileStore.user.name} picture={userProfileStore.user.picture} size={size} />
+        <Avatar userId={userProfileStore.user?.id} name={userProfileStore.user?.name} picture={userProfileStore.user?.picture} size={size} />
       </button>
       <Overlay
         show={showPopOver}
@@ -253,11 +253,11 @@ const UserProfileTab = observer(({ className, size=30 }: UserProfileTabProps) =>
           <PopOverContent onSizeChange={handlePopOverPosition}>
             <div className={classes.popOverContent}>
               <div className={classes.icon} >
-                <Avatar userId={userProfileStore.user.id} name={userProfileStore.user.name} picture={userProfileStore.user.picture} size={100}  title={userProfileStore.user.name} />
+                <Avatar userId={userProfileStore.user?.id} name={userProfileStore.user?.name} picture={userProfileStore.user?.picture} size={100}  title={userProfileStore.user?.name} />
               </div>
               <div>
-                <div className={classes.name}>{userProfileStore.user.name}</div>
-                <div className={classes.email}>{userProfileStore.user.email}</div>
+                <div className={classes.name}>{userProfileStore.user?.name}</div>
+                <div className={classes.email}>{userProfileStore.user?.email}</div>
               </div>
             </div>
             <div className={classes.popOverFooterBar}>

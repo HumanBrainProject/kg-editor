@@ -160,7 +160,7 @@ const useStyles = createUseStyles({
 interface CreateInstanceProps {
   canCreate: boolean;
   isCreatingNewInstance: boolean;
-  classes: unknown; // TODO: fix me
+  classes: any;
   onClick: () => void; // TODO: fix me
   cannotCreateTooltip?: string;
   label: string;

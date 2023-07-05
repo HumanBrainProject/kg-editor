@@ -55,7 +55,7 @@ const Types = observer(({ children }: TypesProps) => {
     refetch,
   } = useListTypesQuery(space, !space || isReady);
 
-  console.log("Types.tsx", space, typeStore.space, isUninitialized, isFetching);
+  //console.log("Types.tsx", space, typeStore.space, isUninitialized, isFetching);
 
   useEffect(() => {
     if (isFetching) {

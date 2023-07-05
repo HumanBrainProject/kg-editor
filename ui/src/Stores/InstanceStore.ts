@@ -58,7 +58,7 @@ export class Instance extends BaseInstance {
     this.store = store;
   }
 
-  get linkedIds() {
+  get linkedIds(): string[] {
     const ids = this.childrenIds.reduce((acc, id) => {
       if (id !== this.id) {
         const instance = this.store.instances.get(id);
@@ -67,7 +67,7 @@ export class Instance extends BaseInstance {
         }
       }
       return acc;
-    }, new Set().add(this.id));
+    }, this.id ? new Set<string>().add(this.id):new Set<string>());
     return Array.from(ids);
   }
 

@@ -46,16 +46,19 @@ const RawInstance = observer(({ children }: RawInstanceProps) => {
   const {instanceStore, userProfileStore} = useStores();
 
   useEffect(() => {
-    const instance = instanceStore.createInstanceOrGet(instanceId);
-    instance.fetchRaw();
+    if(instanceId) {
+      const instance = instanceStore.createInstanceOrGet(instanceId);
+      instance?.fetchRaw();
+    }
+    
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
-  const handleRetry = () => instance.fetchRaw();
+  const handleRetry = () => instance?.fetchRaw();
 
   const handleContinue = () => navigate("/browse");
 
-  const instance = instanceStore.instances.get(instanceId);
+  const instance =  instanceId ? instanceStore.instances.get(instanceId):undefined;
 
   if(!instance) {
     return null;

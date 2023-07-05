@@ -44,15 +44,18 @@ const DisplayName = observer(() => {
     return userProfileStore.user.givenName;
   }
 
-  if (userProfileStore.user.name) {
+  if (userProfileStore.user?.name) {
     const firstNameReg = /^([^ ]+) .*$/;
-    if (firstNameReg.test(userProfileStore.user.name)) {
-      return userProfileStore.user.name.match(firstNameReg)[1];
-    }
+    if (userProfileStore.user.name && firstNameReg.test(userProfileStore.user.name)) {
+      const match = userProfileStore.user.name.match(firstNameReg)
+      if(match) {
+        return match[1];
+      }
+    } 
     return userProfileStore.user.name;
   }
 
-  if (userProfileStore.user.username) {
+  if (userProfileStore.user?.username) {
     return userProfileStore.user.username;
   }
 

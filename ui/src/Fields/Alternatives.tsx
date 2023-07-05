@@ -160,7 +160,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     }
   };
 
-  const clickOutHandler = e => {
+  const clickOutHandler = (e: MouseEvent|Event) => {
     if(!open && wrapperRef.current && wrapperRef.current.contains(e.target)){
       if (alternativesRef.current) {
         const containerWidth = parentContainerRef.current?.offsetWidth;

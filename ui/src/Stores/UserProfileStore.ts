@@ -98,7 +98,7 @@ export class UserProfileStore {
         if (firstNameReg.test(this.user.name)) {
           const match = this.user.name.match(firstNameReg);
           if (match) {
-            return [1];
+            return match[1];
           }
         }
         return this.user.name;

@@ -24,7 +24,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { observer } from "mobx-react-lite";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 
 import useStores from "../Hooks/useStores";
@@ -34,72 +34,87 @@ import SpinnerPanel from "../Components/SpinnerPanel";
 import ErrorPanel from "../Components/ErrorPanel";
 
 interface InstanceProps {
-  children: (instanceId: UUID, space: string) => null|undefined|string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children: (
+    instanceId: UUID,
+    space: string
+  ) =>
+    | null
+    | undefined
+    | string
+    | JSX.Element
+    | (null | undefined | string | JSX.Element)[];
 }
 
-const Instance = observer(({children }: InstanceProps) => {
+const Instance = observer(({ children }: InstanceProps) => {
   const navigate = useNavigate();
   const params = useParams();
 
   const instanceId = params.id;
 
-  const {instanceStore, userProfileStore} = useStores();
+  const { instanceStore, userProfileStore } = useStores();
 
-  const handleRetry = () => instance.fetch();
+  const handleRetry = () => instance?.fetch();
 
   const handleContinue = () => navigate("/browse");
 
   useEffect(() => {
-    const instance = instanceStore.createInstanceOrGet(instanceId);
-    if (!instance.isNew) {
-      instance.fetch();
+    if (instanceId) {
+      const instance = instanceStore.createInstanceOrGet(instanceId);
+      if (instance && !instance.isNew) {
+        instance.fetch();
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
-  const instance = instanceStore.instances.get(instanceId);
+  const instance = instanceId
+    ? instanceStore.instances.get(instanceId)
+    : undefined;
 
   if (!instance) {
     return null;
   }
 
   if (!instance.isNew) {
-
     if (instance.fetchError) {
       return (
         <ErrorPanel>
-          There was a network problem retrieving the instance.<br />
-          If the problem persists, please contact the support.<br />
-          <small>{instance.fetchError}</small><br /><br />
+          There was a network problem retrieving the instance.
+          <br />
+          If the problem persists, please contact the support.
+          <br />
+          <small>{instance.fetchError}</small>
+          <br />
+          <br />
           <Button variant={"primary"} onClick={handleRetry}>
-            <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+            <FontAwesomeIcon icon={"redo-alt"} />
+            &nbsp;&nbsp; Retry
           </Button>
-          <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+          <Button variant={"primary"} onClick={handleContinue}>
+            Continue
+          </Button>
         </ErrorPanel>
       );
     }
 
     if (!instance.isFetched || instance.isFetching) {
-      return (
-        <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />
-      );
+      return <SpinnerPanel text={`Retrieving instance ${instanceId}...`} />;
     }
 
     if (!userProfileStore.hasSpace(instance.space)) {
       return (
         <ErrorPanel>
-          You do not have permission to access the space &quot;<i>{instance.space}&quot;</i>.<br /><br />
-          <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+          You do not have permission to access the space &quot;
+          <i>{instance.space}&quot;</i>.<br />
+          <br />
+          <Button variant={"primary"} onClick={handleContinue}>
+            Continue
+          </Button>
         </ErrorPanel>
       );
     }
-
   }
-  return (
-    <>
-      {children(instanceId as UUID, instance.space)}
-    </>
-  );
+  return <>{children(instanceId as UUID, instance.space)}</>;
 });
 Instance.displayName = "Instance";
 

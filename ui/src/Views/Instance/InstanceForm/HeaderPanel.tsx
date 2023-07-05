@@ -72,9 +72,9 @@ const getScrollTop = (elem: HTMLElement | null) => {
 };
 
 interface HeaderPanelProps {
-  types: SimpleType[];
-  hasChanged: boolean; 
-  highlight: boolean;
+  types?: SimpleType[];
+  hasChanged?: boolean; 
+  highlight?: boolean;
 }
 
 const HeaderPanel = observer(({ types, hasChanged, highlight }: HeaderPanelProps) => {

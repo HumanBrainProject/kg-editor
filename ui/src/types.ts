@@ -39,7 +39,7 @@ import { PiwikOptions } from "react-piwik";
 
 export type UUID = string;
 
-export type ViewMode = "view" | "edit" | "graph" | "manage" | "release" | "create";
+export type ViewMode = "view" | "edit" | "graph" | "manage" | "release" | "create" | "raw";
 
 export interface Settings {
   commit: string;
@@ -110,7 +110,7 @@ export interface SimpleType {
   description: string;
   label: string;
   color: string;
-  labelField: string;
+  labelField?: string;
 }
 
 export interface SimpleTypeWithSpaces extends SimpleType {

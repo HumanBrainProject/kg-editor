@@ -369,7 +369,9 @@ const Instances = observer(() => {
     if (id) {
       if (!instanceStore.instances.has(id)) {
         const instance = instanceStore.createInstanceOrGet(id);
-        instance.initializeLabelData(toJS(summaryInstance));
+        if(instance) {
+          instance.initializeLabelData(toJS(summaryInstance));
+        }
       }
       Matomo.trackEvent("Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
       if (mode === "view") {

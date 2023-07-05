@@ -24,7 +24,7 @@
 import { observable, action, computed, makeObservable } from "mobx";
 
 import { fieldsMapping } from "../Fields";
-import { Alternative, Alternatives, InstanceIncomingLinkFull, Permissions, StructureOfField, StructureOfType, UUID } from "../types";
+import { Alternative, Alternatives, InstanceIncomingLinkFull, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from "../types";
 import API, { APIError } from "../Services/API";
 import RootStore from "./RootStore";
 import FieldStore from "../Fields/Stores/FieldStore";
@@ -404,7 +404,7 @@ export class Instance {
   isNew = false;
   labelField = null;
   _promotedFields = [];
-  primaryType = { name: "", color: "", label: "", description: "" };
+  primaryType: SimpleType = { name: "", color: "", label: "", description: "" };
   space = "";
   metadata = {};
   permissions?: Permissions;

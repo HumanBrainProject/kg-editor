@@ -27,12 +27,18 @@ import React from "react";
 
 import FieldError from "./FieldError";
 import { fieldsMapping } from ".";
+import FieldStore from "./Stores/FieldStore";
 
-const Field = props => {
+interface FieldProps {
+  [key: string]: any;
+  fieldStore: FieldStore;
+}
+
+const Field = (props:FieldProps) => {
   if(!props || !props.fieldStore) {
     return null;
   }
-  const fieldMapping = fieldsMapping[props.fieldStore.widget];
+  const fieldMapping = props.fieldStore.widget && fieldsMapping[props.fieldStore.widget];
   if (!fieldMapping) {
     throw new Error(`${props.name} widget is not supported!`);
   }

@@ -30,15 +30,16 @@ import useStores from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import Instance from "../../Stores/Instance";
+import { ViewMode } from "../../types";
 
 interface ActionProps {
   className: string;
   show?: boolean;
   label: string;
   icon: IconProp;
-  mode: string;
-  onClick: (v: string) => void;
-  onCtrlClick: (v: string) => void;
+  mode: ViewMode;
+  onClick: (v: ViewMode) => void;
+  onCtrlClick: (v: ViewMode) => void;
 }
 
 const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}: ActionProps) => {
@@ -95,11 +96,13 @@ const Actions = observer(({ instance }: ActionsProps) => {
   const { appStore } = useStores();
   const navigate = useNavigate();
 
-  const handleCtrlClick = (mode: string) => {
-    appStore.openInstance(id, name, primaryType, mode);
+  const handleCtrlClick = (mode: ViewMode) => {
+    if(id) {
+      appStore.openInstance(id, name, primaryType, mode);
+    }
   };
 
-  const handleClick = (mode: string) => {
+  const handleClick = (mode: ViewMode) => {
     if(mode === "view") {
       navigate(`/instances/${id}`);
     } else {

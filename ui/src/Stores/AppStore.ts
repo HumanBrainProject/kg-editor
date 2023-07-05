@@ -278,11 +278,14 @@ export class AppStore{
     }
   }
 
-  navigateToInstance(navigate:NavigateFunction, instanceId: string, mode: string, type: string) {
+  navigateToInstance(navigate:NavigateFunction, instanceId: string, mode?: string, type?: string) {
     if(mode === "view"){
       navigate(`/instances/${instanceId}`);
     } else if(mode === "create"){
-      navigate(`/instances/${instanceId}/create?space=${this.currentSpaceName}&type=${encodeURIComponent(type)}`);
+      if (type) {
+        navigate(`/instances/${instanceId}/create?space=${this.currentSpaceName}&type=${encodeURIComponent(type)}`);
+      } 
+      navigate(`/instances/${instanceId}/${mode}`);
     } else {
       navigate(`/instances/${instanceId}/${mode}`);
     }
@@ -397,7 +400,7 @@ export class AppStore{
         const newCurrentInstanceId = currentInstanceIndex >= openedInstances.length - 1 ? openedInstances[currentInstanceIndex - 1] : openedInstances[currentInstanceIndex + 1];
 
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
-        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
+        this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance?.mode, openedInstance?.type);
       } else {
         navigate("/browse");
         this.rootStore?.browseStore.clearSelectedInstance();
@@ -407,7 +410,7 @@ export class AppStore{
     const instance = this.rootStore?.instanceStore.instances.get(instanceId);
     if (instance) {
       const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore?.instanceStore, this.rootStore?.viewStore.instancesIds);
-      const instanceIdsToBeRemoved = instance.linkedIds.filter((id:string) => !instanceIdsToBeKept.includes(id));
+      const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
       this.rootStore?.instanceStore.removeInstances(instanceIdsToBeRemoved);
     }
   }

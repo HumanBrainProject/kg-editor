@@ -82,7 +82,7 @@ const ExternalCreateModal = observer(() => {
   const handleCancel = () => appStore.clearExternalCreateModal();
 
   return(
-    <div className={classes.container}>
+    <div>
       <Modal  dialogClassName={classes.modal} show={true}>
         <Modal.Body>
           {appStore.externalCreateModal.toSave ?

@@ -152,13 +152,13 @@ const ReleaseAction = observer(() => {
     if(releaseStore.isSaving) {
       return "Saving...";
     }
-    if (releaseStore.treeStats.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0) {
+    if (releaseStore.treeStats?.proceed_release === 0 && releaseStore.treeStats.proceed_unrelease === 0) {
       return "No pending changes to release";
     }
     return "Proceed";
   };
 
-  const instance = instanceStore.instances.get(releaseStore.topInstanceId);
+  const instance = releaseStore.topInstanceId ? instanceStore.instances.get(releaseStore.topInstanceId): undefined;
   const permissions = instance && instance.permissions;
   const title = getTitle();
   return (

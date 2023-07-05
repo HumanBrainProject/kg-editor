@@ -26,10 +26,10 @@ import debounce from "lodash/debounce";
 
 import Instance from "./Instance";
 import API, { APIError } from "../Services/API";
-import { Type } from "./TypeStore";
+import Type from "./TypeStore";
 import RootStore from "./RootStore";
 
-const normalizeInstancesData = (api, rootStore, data) => {
+const normalizeInstancesData = (api: API, rootStore: RootStore, data:any) => {
   return (Array.isArray(data))?data.map(rowData => {
     Object.values(rowData.fields).forEach(d => {
       if(d.widget === "TextArea") {
@@ -37,7 +37,7 @@ const normalizeInstancesData = (api, rootStore, data) => {
         delete d.label;
       }
     });
-    const instance = new Instance(rowData.id);
+    const instance = new Instance(rowData.id, api);
     instance.initializeData(api, rootStore, rowData);
     return instance;
   }):[];
@@ -145,7 +145,7 @@ export class BrowseStore {
     }
     this.fetchError = undefined;
     try {
-      const data  = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      const data  = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace?.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
         this.isFetching = false;
         const instances = normalizeInstancesData(this.api, this.rootStore, data.data);

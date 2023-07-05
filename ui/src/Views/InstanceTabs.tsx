@@ -32,6 +32,7 @@ import Tab from "../Components/Tab";
 import Matomo from "../Services/Matomo";
 import Instance from "../Stores/Instance";
 import { View } from "../Stores/ViewStore";
+import { ViewMode } from "../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -76,7 +77,7 @@ const getDescription = (instance: Instance, view: View) => {
   return "";
 }
 
-const getInstanceTabPath = (instanceId: string, mode: string, space: string, type: string) => {
+const getInstanceTabPath = (instanceId: string, mode: ViewMode, space: string, type: string) => {
   if(mode === "view") {
     return `/instances/${instanceId}`;
   } else if (mode === "create") {

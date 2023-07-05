@@ -177,7 +177,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
     );
   }
 
-  if(instance.isFetched && !instance.permissions.canRead) {
+  if(instance.isFetched && !instance.permissions?.canRead) {
     if (instance.labelField) {
       const fieldStore = instance.fields[instance.labelField];
       return (

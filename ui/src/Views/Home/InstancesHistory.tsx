@@ -33,6 +33,8 @@ import PopOverButton from "../../Components/PopOverButton";
 import useStores from "../../Hooks/useStores";
 import { useNavigate } from "react-router-dom";
 import Matomo from "../../Services/Matomo";
+import { ViewMode } from "../../types";
+import { Instance } from "../../Stores/InstanceStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -133,7 +135,7 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
   const { appStore, historyStore, instanceStore } = useStores();
   const navigate = useNavigate();
 
-  const handleInstanceClick = instance => {
+  const handleInstanceClick = (instance: Instance) => {
     let id = instance && instance.id;
     if (id) {
       Matomo.trackEvent("Home", "InstanceOpenTab", instance.id);
@@ -141,7 +143,7 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
     }
   };
 
-  const handleInstanceCtrlClick = instance => {
+  const handleInstanceCtrlClick = (instance: Instance) => {
     const id = instance?.id;
     if (id) {
       Matomo.trackEvent("Home", "InstanceOpenTabInBackground", instance.id);
@@ -149,12 +151,14 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
     }
   };
 
-  const handleInstanceActionClick = (historyInstance, mode) => {
+  const handleInstanceActionClick = (historyInstance: Instance, mode: ViewMode) => {
     const id = historyInstance?.id;
     if (id) {
       if (!instanceStore.instances.has(id)) {
         const instance = instanceStore.createInstanceOrGet(id);
-        instance.initializeLabelData(toJS(historyInstance));
+        if(instance) {
+          instance.initializeLabelData(toJS(historyInstance));
+        }
       }
       Matomo.trackEvent("Home", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
       if(mode === "view") {

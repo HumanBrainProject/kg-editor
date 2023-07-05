@@ -27,6 +27,7 @@ import Markdown from "../../Components/Markdown";
 import { createUseStyles } from "react-jss";
 import Form from "react-bootstrap/Form";
 import Label from "../Label";
+import InputTextStore from "../Stores/InputTextStore";
 
 const useStyles = createUseStyles({
   label: {},
@@ -42,7 +43,15 @@ const useStyles = createUseStyles({
   }
 });
 
-const TextArea = props => {
+interface TextAreaProps {
+  [key: string]: any;
+  readMode: boolean;
+  fieldStore: InputTextStore;
+  className: string;
+  showIfNoValue: boolean;
+}
+
+const TextArea = (props: TextAreaProps) => {
   const classes = useStyles();
   const { readMode, fieldStore, className, showIfNoValue } = props;
   const { label, value } = fieldStore;
@@ -52,7 +61,7 @@ const TextArea = props => {
       return null;
     }
 
-    if (fieldStore.markdown) {
+    if (fieldStore.markdown) { //TODO: fix me. This property is not set at all! Is it still used ?
       return (
         <Form.Group className={`${classes.readMode} ${className}`} >
           {label && (
@@ -72,7 +81,7 @@ const TextArea = props => {
     );
   }
   return (
-    <InputText {...props} className={`${classes.editMode} ${className}`} as="textarea" autosize={true} />
+    <InputText {...props} className={`${classes.editMode} ${className}`} as="textarea" />
   );
 };
 

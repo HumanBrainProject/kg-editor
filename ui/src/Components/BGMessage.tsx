@@ -21,10 +21,9 @@
  *
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { createUseStyles } from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { ReactNode } from "react-markdown/lib/ast-to-react";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const useStyles = createUseStyles({

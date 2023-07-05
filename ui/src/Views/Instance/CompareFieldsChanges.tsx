@@ -30,6 +30,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Spinner from "../../Components/Spinner";
 import BGMessage from "../../Components/BGMessage";
 import CompareValue from "./CompareValue";
+import InstanceStore from "../../Stores/InstanceStore";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   container: {
@@ -42,7 +44,7 @@ const useStyles = createUseStyles({
 
 const separator = "; ";
 
-const getLabel = (instanceStore, field, value) => {
+const getLabel = (instanceStore: InstanceStore, field, value) => {
   const id = value[field.mappingValue];
   if (!id) {
     return "Unknown instance";
@@ -56,7 +58,7 @@ const getLabel = (instanceStore, field, value) => {
   return id;
 };
 
-const getNestedFieldValue = (instanceStore, fields, level) => {
+const getNestedFieldValue = (instanceStore: InstanceStore, fields, level: number) => {
   const tabs = Array.from({ length: level }, () => "\t").join("");
   let result = `${tabs}[`;
   fields.forEach(row => {
@@ -68,7 +70,7 @@ const getNestedFieldValue = (instanceStore, fields, level) => {
   return result;
 };
 
-const getFieldValue = (instanceStore, field, level) => {
+const getFieldValue = (instanceStore: InstanceStore, field, level: number) => {
   if (field.widget === "Nested") {
     return getNestedFieldValue(instanceStore, field.nestedFieldsStores, level);
   }
@@ -101,7 +103,7 @@ const getFieldValue = (instanceStore, field, level) => {
   return value;
 };
 
-const getValue = (instanceStore, instance, name) => {
+const getValue = (instanceStore: InstanceStore, instance:Instance, name: string) => {
   if (!instance) {
     return "";
   }
@@ -109,7 +111,7 @@ const getValue = (instanceStore, instance, name) => {
   return getFieldValue(instanceStore, field, 0);
 };
 
-const getStatus = (store, ids) => ids.reduce((acc, id) => {
+const getStatus = (store: InstanceStore, ids: string[]) => ids.reduce((acc, id) => {
   const instance = store.instances.get(id);
   acc.isFetched = acc.isFetched && instance && (instance.isFetched || instance.isLabelFetched || instance.isNotFound || instance.isLabelNotFound);
   acc.isFetching = acc.isFetching || (instance && (instance.isFetching || instance.isLabelFetching));
@@ -121,7 +123,18 @@ const getStatus = (store, ids) => ids.reduce((acc, id) => {
   hasFetchError: false
 });
 
-const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance, leftInstanceStore, rightInstanceStore, leftChildrenIds, rightChildrenIds, onClose }) => {
+interface CompareFieldsChangesProps {
+  instanceId: string;
+  leftInstance: Instance;
+  rightInstance: Instance;
+  leftInstanceStore: InstanceStore;
+  rightInstanceStore: InstanceStore;
+  leftChildrenIds: string[];
+  rightChildrenIds: string[];
+  onClose: () => void;
+}
+
+const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance, leftInstanceStore, rightInstanceStore, leftChildrenIds, rightChildrenIds, onClose }: CompareFieldsChangesProps) => {
 
   const classes = useStyles();
 
@@ -131,8 +144,8 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   }, [leftChildrenIds, rightChildrenIds]);
 
   const fetchInstances = (forceFetch=false) => {
-    leftChildrenIds.forEach(id => leftInstanceStore.createInstanceOrGet(id).fetchLabel(forceFetch));
-    rightChildrenIds.forEach(id => rightInstanceStore.createInstanceOrGet(id).fetchLabel(forceFetch));
+    leftChildrenIds.forEach(id => leftInstanceStore.createInstanceOrGet(id)?.fetchLabel(forceFetch));
+    rightChildrenIds.forEach(id => rightInstanceStore.createInstanceOrGet(id)?.fetchLabel(forceFetch));
   };
 
   const handleRetryFetchInstances = () => fetchInstances(true);

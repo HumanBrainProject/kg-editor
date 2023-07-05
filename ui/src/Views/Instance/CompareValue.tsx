@@ -68,7 +68,7 @@ const useStyles = createUseStyles({
 });
 
 interface CompareValueProps {
-  label: string;
+  label?: string;
   leftValue: string;
   rightValue: string
   separator: string;

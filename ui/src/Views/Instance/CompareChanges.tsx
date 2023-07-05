@@ -26,7 +26,7 @@ import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 
 import CompareFieldsChanges from "./CompareFieldsChanges";
-import { createInstanceStore } from "../../Stores/InstanceStore";
+import InstanceStore, { createInstanceStore } from "../../Stores/InstanceStore";
 import useStores from "../../Hooks/useStores";
 
 const useStyles = createUseStyles({
@@ -35,11 +35,16 @@ const useStyles = createUseStyles({
   }
 });
 
-const CompareChanges = observer(({ instanceId, onClose }) => {
+interface CompareChangesProps {
+  instanceId: string;
+  onClose: () => void;
+}
+
+const CompareChanges = observer(({ instanceId, onClose }: CompareChangesProps) => {
 
   const classes = useStyles();
 
-  const [savedInstanceStore, setSavedInstanceStore] = useState(null);
+  const [savedInstanceStore, setSavedInstanceStore] = useState<InstanceStore>();
 
   const { instanceStore } = useStores();
 
@@ -55,8 +60,8 @@ const CompareChanges = observer(({ instanceId, onClose }) => {
     if(savedInstanceStore) {
       const savedInst = savedInstanceStore.createInstanceOrGet(instanceId);
       const inst = instanceStore.instances.get(instanceId);
-      const data = inst.cloneInitialData;
-      savedInst.initializeData(savedInstanceStore.api, inst.store.rootStore, data);
+      const data = inst?.cloneInitialData;
+      savedInst?.initializeData(savedInstanceStore.api, inst.store.rootStore, data);
     }
     return () => {
       savedInstanceStore && savedInstanceStore.flush();

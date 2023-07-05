@@ -156,7 +156,7 @@ const Action = ({ className, show, icon, mode, label, onClick, onCtrlClick }: Ac
     return null;
   }
 
-  const handleClick = e => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (!e.currentTarget.contains(e.target)) {
       return;

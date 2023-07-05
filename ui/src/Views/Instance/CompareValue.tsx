@@ -67,7 +67,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const CompareValue = ({ label, leftValue, rightValue, separator }) => {
+interface CompareValueProps {
+  label: string;
+  leftValue: string;
+  rightValue: string
+  separator: string;
+}
+
+const CompareValue = ({ label, leftValue, rightValue, separator }: CompareValueProps) => {
 
   const classes = useStyles();
 

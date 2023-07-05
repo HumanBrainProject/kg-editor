@@ -43,7 +43,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const CompareWithReleasedVersionChanges = observer(({ instanceId, status }) => {
+interface CompareWithReleasedVersionChangesProps {
+  instanceId: string;
+  status: string;
+}
+
+const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: CompareWithReleasedVersionChangesProps) => {
 
   const classes = useStyles();
 

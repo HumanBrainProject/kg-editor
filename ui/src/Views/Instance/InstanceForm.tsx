@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect } from "react";
+import React, { MouseEvent, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import { observer } from "mobx-react-lite";
 import Color from "color";
@@ -40,6 +40,7 @@ import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
 import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
 import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
 import { useNavigate } from "react-router-dom";
+import { View } from "../../Stores/ViewStore";
 
 const useStyles = createUseStyles({
   container: {
@@ -136,7 +137,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const InstanceForm = observer(({ id, view, pane, provenance }) => {
+interface InstanceFormProps {
+  id: string;
+  view: View;
+  pane: string;
+  provenance: string;
+}
+
+const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps) => {
 
   const classes = useStyles();
 
@@ -167,32 +175,32 @@ const InstanceForm = observer(({ id, view, pane, provenance }) => {
     }
   };
 
-  const handleOpenInstance = e => {
+  const handleOpenInstance = (e: MouseEvent<HTMLDivElement>) => {
     if ((e.metaKey || e.ctrlKey)) {
       appStore.openInstance(id, instance.name, instance.primaryType);
     } else {
-      navigate(`/instances/${this.props.id}`);
+      navigate(`/instances/${id}`);
     }
   };
 
-  const handleConfirmCancelEdit = e => {
+  const handleConfirmCancelEdit = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     if (instance.hasChanged) {
       instanceStore.confirmCancelInstanceChanges(id);
     }
   };
 
-  const handleContinueEditing = e => {
+  const handleContinueEditing = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     instanceStore.abortCancelInstanceChange(id);
   };
 
-  const handleSave = e => {
+  const handleSave = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     instance && appStore.saveInstance(instance, navigate);
   };
 
-  const handleCancelSave = e => {
+  const handleCancelSave = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     instance.cancelSave();
   };

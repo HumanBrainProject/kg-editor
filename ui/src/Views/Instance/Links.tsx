@@ -29,6 +29,7 @@ import Pane from "./Pane";
 import InstanceForm from "./InstanceForm";
 
 import useStores from "../../Hooks/useStores";
+import Instance from "../../Stores/Instance";
 
 const useStyles = createUseStyles({
   pane: {
@@ -36,7 +37,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getGroups = (instance, instancePath) => {
+const getGroups = (instance: Instance, instancePath: string[]) => {
   if (!instance) {
     return [];
   }
@@ -57,7 +58,11 @@ const getGroups = (instance, instancePath) => {
   }, []);
 };
 
-const Links = observer(({ instanceId }) => {
+interface LinksProps {
+  instanceId: string;
+}
+
+const Links = observer(({ instanceId }: LinksProps) => {
 
   const classes = useStyles();
 
@@ -76,7 +81,7 @@ const Links = observer(({ instanceId }) => {
   const fetchInstance = (forceFetch = false) => {
     if (instanceId) {
       const inst = instanceStore.createInstanceOrGet(instanceId);
-      inst.fetch(forceFetch);
+      inst?.fetch(forceFetch);
     }
   };
 

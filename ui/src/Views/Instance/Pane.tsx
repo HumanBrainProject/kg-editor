@@ -76,9 +76,9 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
   const view = React.useContext(ViewContext);
 
   useEffect(() => {
-    view.registerPane(paneId);
+    view?.registerPane(paneId);
     return () => {
-      view.unregisterPane(paneId);
+      view?.unregisterPane(paneId);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paneId]);
@@ -90,7 +90,7 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
           paneRef.current.style.pointerEvents = "auto";
         }
       }, 1000);
-      if (view.selectedPane !== paneId) {
+      if (view?.selectedPane !== paneId) {
         paneRef.current.style.pointerEvents = "none";
         restorePointerEvents();
       } else {
@@ -98,11 +98,11 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
         restorePointerEvents.cancel();
       }
     }
-  }, [view.selectedPane, paneId]);
+  }, [view?.selectedPane, paneId]);
 
   const handleFocus = () => {
-    if (view.selectedPane !== paneId) {
-      view.selectPane(paneId);
+    if (view?.selectedPane !== paneId) {
+      view?.selectPane(paneId);
     }
   };
 
@@ -113,7 +113,7 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
     if(paneId === view.selectedPane) {
       return "active";
     }
-    if(index > view.selectedPaneIndex) {
+    if(view.selectedPaneIndex && index > view.selectedPaneIndex) {
       return "after";
     }
     return "before";

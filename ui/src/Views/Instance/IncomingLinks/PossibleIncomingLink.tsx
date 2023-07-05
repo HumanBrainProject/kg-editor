@@ -29,6 +29,7 @@ import Button from "react-bootstrap/Button";
 import useStores from "../../../Hooks/useStores";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLocation, useNavigate } from "react-router-dom";
+import { SimpleType } from "../../../types";
 
 const useStyles = createUseStyles({
   btn: {
@@ -44,7 +45,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const PossibleIncomingLink = observer(({ type, spaces }) => {
+interface PossibleIncomingLinkProps {
+  type: SimpleType;
+  spaces: string[];
+}
+
+const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkProps) => {
 
   const classes = useStyles();
   const { appStore, browseStore } = useStores();
@@ -52,8 +58,8 @@ const PossibleIncomingLink = observer(({ type, spaces }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLinkFrom = space => {
-    if(appStore.currentSpace.id !== space) {
+  const handleLinkFrom = (space: string) => {
+    if(appStore.currentSpace?.id !== space) {
       const changeSpace = appStore.switchSpace(location, navigate, space);
       if(!changeSpace) {
         return;

@@ -31,6 +31,7 @@ import Color from "color";
 import useStores from "../../../Hooks/useStores";
 
 import IncomingLinkInstance from "./IncomingLinkInstance";
+import { InstanceIncomingLink } from "../../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -66,7 +67,13 @@ const useStyles = createUseStyles({
   }
 });
 
-const ShowMore = observer(({ link, classes, onClick }) => {
+interface ShowMoreProps {
+  link: InstanceIncomingLink;
+  classes: any;
+  onClick: () => void;
+}
+
+const ShowMore = observer(({ link, classes, onClick }: ShowMoreProps) => {
   if (link.fetchError) {
     return (
       <li className={classes.showMoreError}>
@@ -97,7 +104,12 @@ const ShowMore = observer(({ link, classes, onClick }) => {
   return null;
 });
 
-const IncomingLinkInstances = observer(({ link, readMode }) => {
+interface IncomingLinkInstancesProps {
+  link: InstanceIncomingLink;
+  readMode: boolean;
+}
+
+const IncomingLinkInstances = observer(({ link, readMode }: IncomingLinkInstancesProps) => {
   const classes = useStyles();
 
   const { instanceStore } = useStores();

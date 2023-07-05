@@ -24,7 +24,7 @@
 import { observable, action, computed, makeObservable } from "mobx";
 
 import { fieldsMapping } from "../Fields";
-import { Alternative, Alternatives, Permissions, StructureOfField, StructureOfType, UUID } from "../types";
+import { Alternative, Alternatives, InstanceIncomingLinkFull, Permissions, StructureOfField, StructureOfType, UUID } from "../types";
 import API, { APIError } from "../Services/API";
 import RootStore from "./RootStore";
 import FieldStore from "../Fields/Stores/FieldStore";
@@ -409,7 +409,7 @@ export class Instance {
   metadata = {};
   permissions?: Permissions;
   fields: InstanceFields = {};
-  incomingLinks=[];
+  incomingLinks: InstanceIncomingLinkFull[] = [];
   possibleIncomingLinks=[];
   alternatives = {};
 

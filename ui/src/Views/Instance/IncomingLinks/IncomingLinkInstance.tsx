@@ -28,6 +28,7 @@ import Badge from "react-bootstrap/Badge";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import useStores from "../../../Hooks/useStores";
+import { InstanceLabel } from "../../../types";
 
 const useStyles = createUseStyles({
   pill: {
@@ -41,8 +42,13 @@ const useStyles = createUseStyles({
   }
 });
 
+interface IncomingLinkInstanceProps {
+  instance: InstanceLabel;
+  readMode: boolean;
+}
 
-const IncomingLinkInstance = observer(({instance, readMode }) => {
+
+const IncomingLinkInstance = observer(({instance, readMode }: IncomingLinkInstanceProps) => {
 
   const classes = useStyles();
 
@@ -51,17 +57,17 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  let label = instance.label?instance.label:instance.id;
+  let label = instance.label?instance.label:instance.id; // TODO: Fix this one. Where is the label calculated ?
 
-  if (instance.space === appStore.currentSpace.id && instanceStore.instances.has(instance.id)) {
-    label = instanceStore.instances.get(instance.id).name;
+  if (instance.space === appStore.currentSpace?.id && instanceStore.instances.has(instance.id)) {
+    label = instanceStore.instances.get(instance.id)?.name;
   }
 
   const isForbidden = !userProfileStore.hasSpace(instance.space);
 
   if (readMode || isForbidden) {
     return (
-      <span className={isForbidden?classes.isForbidden:""} title={isForbidden?"You don't have the permission to access this instance!": null}>
+      <span className={isForbidden?classes.isForbidden:""} title={isForbidden?"You don't have the permission to access this instance!": undefined}>
         <Badge pill bg="secondary" >
           {label}
         </Badge>
@@ -70,7 +76,7 @@ const IncomingLinkInstance = observer(({instance, readMode }) => {
   }
 
   const handleOpenInstance = () => {
-    if(appStore.currentSpace.id !== instance.space) {
+    if(appStore.currentSpace?.id !== instance.space) {
       appStore.switchSpace(location, navigate, instance.space);
     }
     navigate(`/instances/${instance.id}`);

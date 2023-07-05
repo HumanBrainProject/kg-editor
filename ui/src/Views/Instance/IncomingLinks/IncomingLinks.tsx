@@ -26,6 +26,7 @@ import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
 
 import IncomingLink from "./IncomingLink";
+import { InstanceIncomingLinkFull } from "../../../types";
 
 const useStyles = createUseStyles({
   container: {
@@ -36,7 +37,12 @@ const useStyles = createUseStyles({
   }
 });
 
-const IncomingLinks = observer(({ links, readMode }) => {
+interface IncomingLinksProps {
+  links: InstanceIncomingLinkFull[];
+  readMode: boolean;
+}
+
+const IncomingLinks = observer(({ links, readMode }: IncomingLinksProps) => {
   const classes = useStyles();
 
   if(!links || !links.length) {

@@ -220,6 +220,24 @@ export interface IncomingLinksByType {
   nameForReverseLink: string;
 }
 
+export interface InstanceIncomingLink {
+  instanceId: string;
+  property: string;
+  type: SimpleType;
+  instances: InstanceLabel[];
+  from: number;
+  size: number;
+  total: number;
+  isFetching: boolean;
+  fetchError?: string;
+}
+
+export interface InstanceIncomingLinkFull {
+  property: string;
+  label: string;
+  links: InstanceIncomingLink[];
+}
+
 export interface IncomingLink {
   id: UUID;
   label: string;

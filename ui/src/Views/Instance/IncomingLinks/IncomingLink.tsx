@@ -24,45 +24,41 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { createUseStyles } from "react-jss";
+import IncomingLinkInstances from "./IncomingLinkInstances";
 import Label from "../../../Fields/Label";
-import PossibleIncomingLink from "./PossibleIncomingLink";
+import { InstanceIncomingLinkFull } from "../../../types";
 
 const useStyles = createUseStyles({
   container: {
     "& > ul": {
       listStyle: "none",
-      paddingLeft: "20px",
-      "& > li": {
-        display: "inline",
-        "& + li:before": {
-          content: "' '"
-        }
-      }
+      paddingLeft: "20px"
     }
   }
 });
 
-const PossibleIncomingLinks = observer(({ links, type }) => {
+interface IncomingLinkProps {
+  link: InstanceIncomingLinkFull;
+  readMode: boolean;
+}
+
+const IncomingLink = observer(({ link, readMode }: IncomingLinkProps) => {
 
   const classes = useStyles();
 
-  if(!links || !links.length) {
-    return null;
-  }
-
   return(
     <div className={classes.container}>
-      <Label label={`${type} can be linked from`}/>
+      <Label label={link.label}/>
       <ul>
-        {links.map((l, index) => (
+        {link.links.map((propertyLink, index) => (
           <li key={index}>
-            <PossibleIncomingLink type={l.type} spaces={l.spaces} />
+            <IncomingLinkInstances link={propertyLink} readMode={readMode} />
           </li>
         ))}
       </ul>
     </div>
   );
 });
-PossibleIncomingLinks.displayName = "PossibleIncomingLinks";
+IncomingLink.displayName = "IncomingLink";
 
-export default PossibleIncomingLinks;
+export default IncomingLink;

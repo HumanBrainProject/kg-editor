@@ -22,8 +22,9 @@
  */
 
 import Color from "color";
+import { Theme } from "./Theme";
 
-const theme = {
+const theme: Theme = {
   name: "cupcake",
   background: {
     gradient: {

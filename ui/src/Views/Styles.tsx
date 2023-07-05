@@ -20,9 +20,11 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import { DefaultTheme, createUseStyles, useTheme } from "react-jss";
+import { createUseStyles, DefaultTheme, useTheme, Styles as JssStyles } from "react-jss";
 
-const getBtnLinkStyle = theme => {
+import { Theme as AppTheme } from "../Themes/Theme";
+
+const getBtnLinkStyle = (theme: AppTheme) => {
   if (theme.name === "bright") {
     return {
       color: "var(--ft-color-selected)"
@@ -31,7 +33,7 @@ const getBtnLinkStyle = theme => {
   return {};
 };
 
-const getBtnLinkHoverStyle = theme => {
+const getBtnLinkHoverStyle = (theme: AppTheme) => {
   if (theme.name === "bright") {
     return {
       color: "var(--ft-color-selected-hover)"
@@ -40,7 +42,7 @@ const getBtnLinkHoverStyle = theme => {
   return {};
 };
 
-const getPrimaryBtnStyle = theme => {
+const getPrimaryBtnStyle = (theme: AppTheme) => {
   if (theme.name === "bright") {
     return {
       backgroundColor: "#45b07c",
@@ -50,7 +52,7 @@ const getPrimaryBtnStyle = theme => {
   return {};
 };
 
-const getPrimaryBtnHoverStyle = theme => {
+const getPrimaryBtnHoverStyle = (theme: AppTheme) => {
   if (theme.name === "bright") {
     return {
       backgroundColor: "#378b62",
@@ -61,82 +63,83 @@ const getPrimaryBtnHoverStyle = theme => {
 };
 
 const getUseStyles = () => createUseStyles((theme: Jss.Theme)  => {
+  const appTheme = theme as AppTheme;
   const styles = {
     "@global": {
       ":root": {
-        "--bg-gradient-start": theme.background.gradient.colorStart,
-        "--bg-gradient-end": theme.background.gradient.colorEnd,
-        "--bg-gradient-angle": theme.background.gradient.angle,
+        "--bg-gradient-start": appTheme.background.gradient.colorStart,
+        "--bg-gradient-end": appTheme.background.gradient.colorEnd,
+        "--bg-gradient-angle": appTheme.background.gradient.angle,
 
-        "--bg-color-ui-contrast1": theme.contrast1.backgroundColor,
-        "--bg-color-ui-contrast2": theme.contrast2.backgroundColor,
-        "--bg-color-ui-contrast3": theme.contrast3.backgroundColor,
-        "--bg-color-ui-contrast4": theme.contrast4.backgroundColor,
-        "--bg-color-ui-contrast6": theme.contrast6.backgroundColor,
+        "--bg-color-ui-contrast1": appTheme.contrast1.backgroundColor,
+        "--bg-color-ui-contrast2": appTheme.contrast2.backgroundColor,
+        "--bg-color-ui-contrast3": appTheme.contrast3.backgroundColor,
+        "--bg-color-ui-contrast4": appTheme.contrast4.backgroundColor,
+        "--bg-color-ui-contrast6": appTheme.contrast6.backgroundColor,
 
-        "--button-primary-bg-color": theme.button.primary.backgroundColor,
-        "--button-primary-border-color": theme.button.primary.borderColor,
-        "--button-primary-active-bg-color": theme.button.primary.active.backgroundColor,
-        "--button-primary-active-border-color": theme.button.primary.active.borderColor,
+        "--button-primary-bg-color": appTheme.button.primary.backgroundColor,
+        "--button-primary-border-color": appTheme.button.primary.borderColor,
+        "--button-primary-active-bg-color": appTheme.button.primary.active.backgroundColor,
+        "--button-primary-active-border-color": appTheme.button.primary.active.borderColor,
 
-        "--button-secondary-bg-color": theme.button.secondary.backgroundColor,
-        "--button-secondary-border-color": theme.button.secondary.borderColor,
-        "--button-secondary-active-bg-color": theme.button.secondary.active.backgroundColor,
-        "--button-secondary-active-border-color": theme.button.secondary.active.borderColor,
+        "--button-secondary-bg-color": appTheme.button.secondary.backgroundColor,
+        "--button-secondary-border-color": appTheme.button.secondary.borderColor,
+        "--button-secondary-active-bg-color": appTheme.button.secondary.active.backgroundColor,
+        "--button-secondary-active-border-color": appTheme.button.secondary.active.borderColor,
 
-        "--border-color-ui-contrast1": theme.contrast1.borderColor,
-        "--border-color-ui-contrast2": theme.contrast2.borderColor,
-        "--border-color-ui-contrast5": theme.contrast5.borderColor,
-        "--border-color-ui-contrast6": theme.contrast6.borderColor,
+        "--border-color-ui-contrast1": appTheme.contrast1.borderColor,
+        "--border-color-ui-contrast2": appTheme.contrast2.borderColor,
+        "--border-color-ui-contrast5": appTheme.contrast5.borderColor,
+        "--border-color-ui-contrast6": appTheme.contrast6.borderColor,
 
-        "--bg-color-blend-contrast1": theme.blendContrast1.backgroundColor,
+        "--bg-color-blend-contrast1": appTheme.blendContrast1.backgroundColor,
 
-        "--list-bg-hover": theme.list.hover.backgroundColor,
-        "--list-border-hover": theme.list.hover.borderColor,
-        "--list-bg-selected": theme.list.selected.backgroundColor,
-        "--list-border-selected": theme.list.selected.borderColor,
+        "--list-bg-hover": appTheme.list.hover.backgroundColor,
+        "--list-border-hover": appTheme.list.hover.borderColor,
+        "--list-bg-selected": appTheme.list.selected.backgroundColor,
+        "--list-border-selected": appTheme.list.selected.borderColor,
 
-        "--ft-color-quiet": theme.quiet.color,
-        "--ft-color-normal": theme.normal.color,
-        "--ft-color-loud": theme.loud.color,
-        "--ft-color-louder": theme.louder.color,
+        "--ft-color-quiet": appTheme.quiet.color,
+        "--ft-color-normal": appTheme.normal.color,
+        "--ft-color-loud": appTheme.loud.color,
+        "--ft-color-louder": appTheme.louder.color,
 
-        "--ft-color-error": theme.error.color,
-        "--bg-color-error-quiet": theme.error.quiet.color,
-        "--bg-color-error-normal": theme.error.normal.color,
-        "--bg-color-error-loud": theme.error.loud.color,
+        "--ft-color-error": appTheme.error.color,
+        "--bg-color-error-quiet": appTheme.error.quiet?.color,
+        "--bg-color-error-normal": appTheme.error.normal.color,
+        "--bg-color-error-loud": appTheme.error.loud.color,
 
-        "--bg-color-warn-quiet": theme.warn.quiet.backgroundColor,
-        "--bg-color-warn-normal": theme.warn.normal.backgroundColor,
-        "--bg-color-warn-loud": theme.warn.loud.backgroundColor,
-        "--ft-color-warn": theme.warn.color,
+        "--bg-color-warn-quiet": appTheme.warn.quiet.backgroundColor,
+        "--bg-color-warn-normal": appTheme.warn.normal.backgroundColor,
+        "--bg-color-warn-loud": appTheme.warn.loud.backgroundColor,
+        "--ft-color-warn": appTheme.warn.color,
 
-        "--ft-color-info": theme.info.color,
-        "--bg-color-info-normal": theme.info.normal.color,
+        "--ft-color-info": appTheme.info.color,
+        "--bg-color-info-normal": appTheme.info.normal.color,
 
-        "--ft-color-selected": theme.selected.color,
-        "--ft-color-selected-hover": theme.selected.hover.color,
+        "--ft-color-selected": appTheme.selected.color,
+        "--ft-color-selected-hover": appTheme.selected.hover.color,
 
-        "--link-ft-color-hover": theme.link.hover.color,
-        "--link-bg-color-hover": theme.link.hover.backgroundColor,
-        "--link-border-color-hover": theme.link.hover.borderColor,
-        "--link-bg-color-hover-quiet": theme.link.quiet.hover.backgroundColor,
+        "--link-ft-color-hover": appTheme.link.hover.color,
+        "--link-bg-color-hover": appTheme.link.hover.backgroundColor,
+        "--link-border-color-hover": appTheme.link.hover.borderColor,
+        "--link-bg-color-hover-quiet": appTheme.link.quiet.hover.backgroundColor,
 
-        "--pane-box-shadow": theme.pane.boxShadow.color,
+        "--pane-box-shadow": appTheme.pane.boxShadow.color,
 
-        "--release-status-box-shadow": theme.release.status.boxShadow,
-        "--release-color-released": theme.release.status.released.color,
-        "--release-bg-released": theme.release.status.released.backgroundColor,
-        "--release-color-not-released": theme.release.status.notReleased.color,
-        "--release-bg-not-released": theme.release.status.notReleased.backgroundColor,
-        "--release-color-has-changed": theme.release.status.hasChanged.color,
-        "--release-bg-has-changed": theme.release.status.hasChanged.backgroundColor,
+        "--release-status-box-shadow": appTheme.release.status.boxShadow,
+        "--release-color-released": appTheme.release.status.released.color,
+        "--release-bg-released": appTheme.release.status.released.backgroundColor,
+        "--release-color-not-released": appTheme.release.status.notReleased.color,
+        "--release-bg-not-released": appTheme.release.status.notReleased.backgroundColor,
+        "--release-color-has-changed": appTheme.release.status.hasChanged.color,
+        "--release-bg-has-changed": appTheme.release.status.hasChanged.backgroundColor,
 
-        "--release-color-highlight": theme.release.highlight.color,
-        "--release-bg-highlight": theme.release.highlight.backgroundColor,
+        "--release-color-highlight": appTheme.release.highlight.color,
+        "--release-bg-highlight": appTheme.release.highlight.backgroundColor,
 
-        "--bookmark-on-color": theme.bookmark.on.color,
-        "--bookmark-on-color-highlight": theme.bookmark.on.highlight.color,
+        "--bookmark-on-color": appTheme.bookmark.on.color,
+        "--bookmark-on-color-highlight": appTheme.bookmark.on.highlight.color,
         "--bookmark-off-color":"var(--ft-color-normal)",
         "--bookmark-off-color-highlight":"var(--bookmark-on-color-highlight)"
       }
@@ -157,10 +160,10 @@ const getUseStyles = () => createUseStyles((theme: Jss.Theme)  => {
       "-webkit-touch-callout": "none",
       userSelect: "none"
     },
-    "@global .btn-link": getBtnLinkStyle(theme),
-    "@global .btn-link:hover": getBtnLinkHoverStyle(theme),
-    "@global .btn-primary": getPrimaryBtnStyle(theme),
-    "@global .btn-primary:hover": getPrimaryBtnHoverStyle(theme)
+    "@global .btn-link": getBtnLinkStyle(appTheme),
+    "@global .btn-link:hover": getBtnLinkHoverStyle(appTheme),
+    "@global .btn-primary": getPrimaryBtnStyle(appTheme),
+    "@global .btn-primary:hover": getPrimaryBtnHoverStyle(appTheme)
     // "@global .modal .btn-link": getBtnLinkStyle(theme),
     // "@global .modal .btn-link:hover": getBtnLinkStyle(theme),
     // "@global .modal .btn-primary": getPrimaryBtnStyle(theme),
@@ -171,7 +174,7 @@ const getUseStyles = () => createUseStyles((theme: Jss.Theme)  => {
     // "@global [role=\"tooltip\"] .btn-primary:hover": getPrimaryBtnHoverStyle(theme)
   };
   
-  if (theme.name === "cupcake") {
+  if (appTheme.name === "cupcake") {
     return {
       ...styles,
       ".copyright": {
@@ -196,10 +199,10 @@ const getUseStyles = () => createUseStyles((theme: Jss.Theme)  => {
           display:"none"
         }
       }
-    };
+    } as JssStyles;
   }
 
-  return styles;
+  return styles as JssStyles;
 });
 
 const Styles = () => {

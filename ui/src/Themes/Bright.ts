@@ -21,7 +21,9 @@
  *
  */
 
-const theme = {
+import { Theme } from "./Theme";
+
+const theme: Theme = {
   name: "bright",
   background: {
     gradient: {

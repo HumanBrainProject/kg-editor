@@ -21,17 +21,19 @@
  *
  */
 
-import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import { Location, NavigateFunction, matchPath } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import { observable, computed, action, runInAction, makeObservable } from 'mobx';
+import { matchPath } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import DefaultTheme from "../Themes/Default";
-import BrightTheme from "../Themes/Bright";
-import CupcakeTheme from "../Themes/Cupcake";
-import RootStore from "./RootStore";
-import { Space, Permissions, StructureOfType } from "../types";
-import API, { APIError } from "../Services/API";
-import InstanceStore from "./InstanceStore";
+import BrightTheme from '../Themes/Bright';
+import CupcakeTheme from '../Themes/Cupcake';
+import DefaultTheme from '../Themes/Default';
+import type InstanceStore from './InstanceStore';
+import type RootStore from './RootStore';
+import type API from '../Services/API';
+import type { APIError } from '../Services/API';
+import type { Space, Permissions, StructureOfType } from '../types';
+import type { Location, NavigateFunction} from 'react-router-dom';
 
 const themes = {
   [DefaultTheme.name]: DefaultTheme,
@@ -151,9 +153,9 @@ export class AppStore{
     this.api = api;
     this.rootStore = rootStore;
 
-    this.setTheme(localStorage.getItem("theme") as string);
+    this.setTheme(localStorage.getItem('theme') as string);
     let savedHistorySettings = null;
-    const localStorageHistorySettings = localStorage.getItem("historySettings");
+    const localStorageHistorySettings = localStorage.getItem('historySettings');
     if (localStorageHistorySettings) {
       try {
         savedHistorySettings = JSON.parse(localStorageHistorySettings);
@@ -177,7 +179,7 @@ export class AppStore{
   setCommit(commit: string) {
     this.commit = commit;
   }
-  
+
   async createExternalInstance(space: string, typeName: string, value: string, location: Location, navigate: NavigateFunction) {
     if (this.rootStore?.instanceStore.hasUnsavedChanges) {
       this.externalCreateModal = {space: space, type: typeName, value: value};
@@ -218,7 +220,7 @@ export class AppStore{
     this.pathsToResolve.clear();
   }
 
-  matchInstancePath = (pathname: string, id=":id") => { //NOSONAR
+  matchInstancePath = (pathname: string, id=':id') => { //NOSONAR
     let path =  matchPath({ path: `/instances/${id}/:mode` }, pathname);
     if(path) {
       return path;
@@ -230,25 +232,25 @@ export class AppStore{
     return {
       params: {
         id: path.params.id,
-        mode: "view"
+        mode: 'view'
       }
     };
-  }
+  };
 
   closeAllInstances(location: Location, navigate: NavigateFunction) {
-    if (!(matchPath({ path: "/" }, location.pathname)
-      || matchPath({ path: "/browse" }, location.pathname)
-      || matchPath({ path: "/help/*" }, location.pathname))) {
-      navigate("/browse");
+    if (!(matchPath({ path: '/' }, location.pathname)
+      || matchPath({ path: '/browse' }, location.pathname)
+      || matchPath({ path: '/help/*' }, location.pathname))) {
+      navigate('/browse');
     }
     this.rootStore?.viewStore.unregisterAllViews();
   }
 
   clearViews(location: Location, navigate: NavigateFunction) {
-    if (!(matchPath({ path: "/" }, location.pathname)
-      || matchPath({ path: "/browse" }, location.pathname)
-      || matchPath({ path: "/help/*" }, location.pathname))) {
-        navigate("/browse");
+    if (!(matchPath({ path: '/' }, location.pathname)
+      || matchPath({ path: '/browse' }, location.pathname)
+      || matchPath({ path: '/help/*' }, location.pathname))) {
+      navigate('/browse');
     }
     this.rootStore?.viewStore.clearViews();
   }
@@ -267,7 +269,7 @@ export class AppStore{
 
   setTheme(name: string){
     this._currentThemeName = themes[name]? name: DefaultTheme.name;
-    localStorage.setItem("theme", this._currentThemeName);
+    localStorage.setItem('theme', this._currentThemeName);
   }
 
   toggleTheme(){
@@ -279,31 +281,31 @@ export class AppStore{
   }
 
   navigateToInstance(navigate:NavigateFunction, instanceId: string, mode?: string, type?: string) {
-    if(mode === "view"){
+    if(mode === 'view'){
       navigate(`/instances/${instanceId}`);
-    } else if(mode === "create"){
+    } else if(mode === 'create'){
       if (type) {
         navigate(`/instances/${instanceId}/create?space=${this.currentSpaceName}&type=${encodeURIComponent(type)}`);
-      } 
+      }
       navigate(`/instances/${instanceId}/${mode}`);
     } else {
       navigate(`/instances/${instanceId}/${mode}`);
     }
   }
-  
+
 
   get currentSpaceName() {
     if (this.currentSpace) {
       return this.currentSpace.name || this.currentSpace.id;
     }
-    return "";
+    return '';
   }
 
   get currentSpacePermissions() {
     if (this.currentSpace) {
       return this.currentSpace.permissions;
     }
-    
+
     return {
       canCreate: false,
       canInviteForReview: false,
@@ -320,46 +322,46 @@ export class AppStore{
     const sizeAsNumber = Number(size);
     if(this.historySettings) {
       this.historySettings.size = (!isNaN(sizeAsNumber) && sizeAsNumber > 0)?sizeAsNumber:10;
-      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+      localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }
 
   toggleViewedFlagHistorySetting(on: boolean){
     if(this.historySettings) {
       this.historySettings.eventTypes.viewed = on?true:false;
-      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+      localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }
 
   toggleEditedFlagHistorySetting(on: boolean){
     if(this.historySettings) {
       this.historySettings.eventTypes.edited = on?true:false;
-      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+      localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }
 
   toggleReleasedFlagHistorySetting(on: boolean) {
     if(this.historySettings) {
       this.historySettings.eventTypes.released = on?true:false;
-      localStorage.setItem("historySettings", JSON.stringify(this.historySettings));
+      localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }
 
   setSpace = (spaceName: string) => {
     if (spaceName) {
       this.currentSpace = this.rootStore?.userProfileStore.getSpace(spaceName);
-      localStorage.setItem("space", spaceName);
+      localStorage.setItem('space', spaceName);
     } else {
       this.currentSpace = undefined;
-      localStorage.removeItem("space");
+      localStorage.removeItem('space');
     }
-  }
+  };
 
   async switchSpace(location: Location, navigate: NavigateFunction, spaceName: string) {
     const space = this.rootStore?.userProfileStore.getSpaceOrDefault(spaceName);
     if(space && this.currentSpace !== space) {
       if(this.rootStore?.instanceStore.hasUnsavedChanges) {
-        if (window.confirm("You are about to change space. All unsaved changes will be lost. Continue ?")) {
+        if (window.confirm('You are about to change space. All unsaved changes will be lost. Continue ?')) {
           this.rootStore.instanceStore.clearUnsavedChanges();
           this.clearViews(location, navigate);
           this.rootStore.browseStore.clearInstancesFilter();
@@ -380,14 +382,14 @@ export class AppStore{
     }
   }
 
-  openInstance(instanceId: string, instanceName: string, instancePrimaryType: StructureOfType|undefined, viewMode = "view") {
+  openInstance(instanceId: string, instanceName: string, instancePrimaryType: StructureOfType|undefined, viewMode = 'view') {
     const instance = this.rootStore?.instanceStore.instances.get(instanceId);
     const isFetched = instance && (instance.isLabelFetched || instance.isFetched);
     const name = isFetched?instance.name:instanceName;
     const primaryType = isFetched?instance.primaryType:instancePrimaryType;
     this.rootStore?.viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
-    if(viewMode !== "create") {
-      this.rootStore?.historyStore.updateInstanceHistory(instanceId, "viewed");
+    if(viewMode !== 'create') {
+      this.rootStore?.historyStore.updateInstanceHistory(instanceId, 'viewed');
     }
     this.rootStore?.viewStore.syncStoredViews();
   }
@@ -402,7 +404,7 @@ export class AppStore{
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance?.mode, openedInstance?.type);
       } else {
-        navigate("/browse");
+        navigate('/browse');
         this.rootStore?.browseStore.clearSelectedInstance();
       }
     }
@@ -428,7 +430,7 @@ export class AppStore{
             if (newId !== id) {
               this.rootStore?.viewStore.replaceViewByNewInstanceId(id, newId);
             } else {
-              view.mode = "edit";
+              view.mode = 'edit';
             }
             this.pathsToResolve.set(`/instances/${id}/create`, `/instances/${newId}/edit`);
             this.replaceInstanceResolvedIdPath(`/instances/${id}/create`, navigate);
@@ -437,7 +439,7 @@ export class AppStore{
         this.rootStore?.viewStore.syncStoredViews();
       }
     }
-    this.rootStore?.historyStore.updateInstanceHistory(instance.id, "edited");
+    this.rootStore?.historyStore.updateInstanceHistory(instance.id, 'edited');
     this.rootStore?.statusStore.flush();
   }
 
@@ -466,7 +468,7 @@ export class AppStore{
               const view = this.rootStore?.viewStore.views.get(newInstanceId);
               nextLocation = `/instances/${newInstanceId}/${view.mode}`;
             } else {
-              nextLocation = "/browse";
+              nextLocation = '/browse';
             }
           }
           this.rootStore?.browseStore.refreshFilter();
@@ -479,7 +481,7 @@ export class AppStore{
       } catch(e){
         const err = e as APIError;
         runInAction(() => {
-          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:"";
+          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:'';
           this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${err?.message}) ${errorMessage}`;
           this.isDeletingInstance = false;
         });
@@ -536,7 +538,7 @@ export class AppStore{
       const err = e as APIError;
       runInAction(() => {
         const message = err.message?err.message:err;
-        const errorMessage = err.response && err.response.status !== 500 ? err.response.data:"";
+        const errorMessage = err.response && err.response.status !== 500 ? err.response.data:'';
         this.instanceMovingError = `Failed to move instance "${instanceId}" to space "${space}" (${message}) ${errorMessage}`;
         this.isMovingInstance = false;
       });
@@ -583,7 +585,7 @@ export class AppStore{
         const openedInstance = this.rootStore?.viewStore.views.get(newCurrentInstanceId);
         this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
-        navigate("/browse");
+        navigate('/browse');
       }
     } else {
       if (this.rootStore && this.rootStore.viewStore && this.rootStore.viewStore.views.size > 1) {
@@ -592,7 +594,7 @@ export class AppStore{
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
-        navigate("/browse");
+        navigate('/browse');
       }
     }
   }
@@ -607,7 +609,7 @@ export class AppStore{
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
-        navigate("/browse");
+        navigate('/browse');
       }
     } else {
       if (this.rootStore && this.rootStore.viewStore && this.rootStore.viewStore.views.size > 1) {
@@ -616,7 +618,7 @@ export class AppStore{
         const openedInstance = this.rootStore.viewStore.views.get(newCurrentInstanceId);
         this.navigateToInstance(navigate, newCurrentInstanceId, openedInstance.mode, openedInstance.type);
       } else {
-        navigate("/browse");
+        navigate('/browse');
       }
     }
   }

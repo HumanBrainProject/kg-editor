@@ -21,165 +21,165 @@
  *
  */
 
-import Color from "color";
-import { Theme } from "./Theme";
+import Color from 'color';
+import type { Theme } from './Theme';
 
 const theme: Theme = {
-  name: "cupcake",
+  name: 'cupcake',
   background: {
     gradient: {
-      colorStart: "#e5b8d6",
-      colorEnd: "#edac95",
-      angle: "165deg"
+      colorStart: '#e5b8d6',
+      colorEnd: '#edac95',
+      angle: '165deg'
     },
     image: `${window.rootPath}/assets/background-bright.png`,
-    position: "50% 50%"
+    position: '50% 50%'
   },
   button: {
     primary: {
-      backgroundColor: "#007bff",
-      borderColor: "#007bff",
+      backgroundColor: '#007bff',
+      borderColor: '#007bff',
       active: {
-        backgroundColor: "#0069d9",
-        borderColor: "#0062cc"
+        backgroundColor: '#0069d9',
+        borderColor: '#0062cc'
       }
     },
     secondary: {
-      backgroundColor: "#6c757d",
-      borderColor: "#6c757d",
+      backgroundColor: '#6c757d',
+      borderColor: '#6c757d',
       active: {
-        backgroundColor: "#545b62",
-        borderColor: "#4e555b"
+        backgroundColor: '#545b62',
+        borderColor: '#4e555b'
       }
     }
   },
   contrast1: {
-    backgroundColor: new Color("#94789a").darken(0.5).rgb().string(),
-    borderColor: new Color("#94789a").darken(0.2).rgb().string()
+    backgroundColor: new Color('#94789a').darken(0.5).rgb().string(),
+    borderColor: new Color('#94789a').darken(0.2).rgb().string()
   },
   contrast2: {
-    backgroundColor: new Color("#94789a").darken(0.3).rgb().string(),
-    borderColor: new Color("#94789a").darken(0.5).rgb().string()
+    backgroundColor: new Color('#94789a').darken(0.3).rgb().string(),
+    borderColor: new Color('#94789a').darken(0.5).rgb().string()
   },
   contrast3: {
-    backgroundColor: new Color("#94789a").darken(0.1).rgb().string()
+    backgroundColor: new Color('#94789a').darken(0.1).rgb().string()
   },
   contrast4: {
-    backgroundColor: new Color("#94789a").darken(0).rgb().string()
+    backgroundColor: new Color('#94789a').darken(0).rgb().string()
   },
   contrast5: {
-    borderColor: new Color("#94789a").lighten(0.5).rgb().string()
+    borderColor: new Color('#94789a').lighten(0.5).rgb().string()
   },
   contrast6: {
-    backgroundColor: new Color("#94789a").darken(0.5).rgb().string(),
-    borderColor: new Color("#94789a").darken(0.2).rgb().string()
+    backgroundColor: new Color('#94789a').darken(0.5).rgb().string(),
+    borderColor: new Color('#94789a').darken(0.2).rgb().string()
   },
   blendContrast1: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)"
+    backgroundColor: 'rgba(0, 0, 0, 0.2)'
   },
   list: {
     hover: {
-      backgroundColor: new Color("#d8afae").alpha(0.5).rgb().string(),
-      borderColor: new Color("#f4b3a9").alpha(0.5).rgb().string()
+      backgroundColor: new Color('#d8afae').alpha(0.5).rgb().string(),
+      borderColor: new Color('#f4b3a9').alpha(0.5).rgb().string()
     },
     selected: {
-      backgroundColor: "#d8afae",
-      borderColor: "#f4b3a9"
+      backgroundColor: '#d8afae',
+      borderColor: '#f4b3a9'
     }
   },
   quiet: {
-    color: new Color("#f6bec9").alpha(0.4).rgb().string()
+    color: new Color('#f6bec9').alpha(0.4).rgb().string()
   },
   normal: {
-    color: new Color("#f6bec9").alpha(0.6).rgb().string()
+    color: new Color('#f6bec9').alpha(0.6).rgb().string()
   },
   loud: {
-    color: new Color("#f6bec9").alpha(0.8).rgb().string()
+    color: new Color('#f6bec9').alpha(0.8).rgb().string()
   },
   louder: {
-    color: new Color("#f6bec9").alpha(1).rgb().string()
+    color: new Color('#f6bec9').alpha(1).rgb().string()
   },
   error: {
-    color: "#e74c3c",
+    color: '#e74c3c',
     quiet: {
-      color: "#5b130b"
+      color: '#5b130b'
     },
     normal: {
-      color: "#ac2415"
+      color: '#ac2415'
     },
     loud: {
-      color: "#ac2415"
+      color: '#ac2415'
     }
   },
   warn: {
-    color: "#e67e22",
+    color: '#e67e22',
     quiet: {
-      backgroundColor: "#473600"
+      backgroundColor: '#473600'
     },
     normal: {
-      backgroundColor: "#8f6b00"
+      backgroundColor: '#8f6b00'
     },
     loud: {
-      backgroundColor: "#b88a00"
+      backgroundColor: '#b88a00'
     }
   },
   info: {
-    color: "#24282a",
+    color: '#24282a',
     normal: {
-      color: "#ffc107"
+      color: '#ffc107'
     }
   },
   selected: {
-    color: "#45b07c",
+    color: '#45b07c',
     hover: {
-      color: "#2f7955"
+      color: '#2f7955'
     }
   },
   link: {
     hover: {
-      color: "#337ab7",
-      borderColor: "#337ab7",
-      backgroundColor: "#a5c7e9"
+      color: '#337ab7',
+      borderColor: '#337ab7',
+      backgroundColor: '#a5c7e9'
     },
     quiet: {
       hover: {
-        backgroundColor: "#eff5fb"
+        backgroundColor: '#eff5fb'
       }
     }
   },
   pane: {
     boxShadow: {
-      color: "#333"
+      color: '#333'
     }
   },
   release: {
     status: {
       boxShadow: {
-        color: "#00000080"
+        color: '#00000080'
       },
       released: {
-        backgroundColor: "rgba(52, 152, 219, 0.25)",
-        color: "rgb(52, 152, 219)"
+        backgroundColor: 'rgba(52, 152, 219, 0.25)',
+        color: 'rgb(52, 152, 219)'
       },
       notReleased: {
-        backgroundColor: "rgba(231, 76, 60, 0.25)",
-        color: "rgb(231, 76, 60)"
+        backgroundColor: 'rgba(231, 76, 60, 0.25)',
+        color: 'rgb(231, 76, 60)'
       },
       hasChanged: {
-        backgroundColor: "rgba(241, 196, 15, 0.25)",
-        color: "rgb(241, 196, 15)"
+        backgroundColor: 'rgba(241, 196, 15, 0.25)',
+        color: 'rgb(241, 196, 15)'
       }
     },
     highlight: {
-      backgroundColor: "rgb(46, 204, 113, 0.25)",
-      color: "rgb(46, 204, 113)"
+      backgroundColor: 'rgb(46, 204, 113, 0.25)',
+      color: 'rgb(46, 204, 113)'
     }
   },
   bookmark: {
     on: {
-      color: "#EFEC2D",
+      color: '#EFEC2D',
       highlight: {
-        color: "#ffe100"
+        color: '#ffe100'
       }
     }
   }

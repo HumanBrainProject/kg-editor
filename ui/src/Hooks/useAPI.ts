@@ -21,15 +21,15 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
-import API from "../Services/API";
-import APIContext from "../Contexts/APIContext";
+import APIContext from '../Contexts/APIContext';
+import type API from '../Services/API';
 
 const useAPI = ():API => {
   const api = React.useContext<API|undefined>(APIContext);
   if (!api) {
-    throw new Error("useAPI must be used within a APIContext.Provider.");
+    throw new Error('useAPI must be used within a APIContext.Provider.');
   }
   return api;
 };

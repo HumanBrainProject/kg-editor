@@ -21,9 +21,10 @@
  *
  */
 
-import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import API, { APIError } from "../Services/API";
-import { UserSummary } from "../types";
+import { observable, computed, action, runInAction, makeObservable } from 'mobx';
+import type { APIError } from '../Services/API';
+import type API from '../Services/API';
+import type { UserSummary } from '../types';
 
 
 export class InvitedUsersStore {
@@ -79,7 +80,7 @@ export class InvitedUsersStore {
         this.isFetched = false;
         this.isFetching = false;
       });
-    } 
+    }
   }
 
   async inviteUser(instanceId: string, userId: string) {

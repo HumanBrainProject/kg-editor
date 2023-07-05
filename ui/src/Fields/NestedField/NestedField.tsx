@@ -21,100 +21,101 @@
  *
  */
 
-import React, { MouseEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import Label from "../Label";
-import Field from "../Field";
-import Add from "./Add";
-import { ViewContext, PaneContext } from "../../Stores/ViewStore";
-import { compareField } from "../../Stores/Instance";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
-import NestedFieldStore from "../Stores/NestedFieldStore";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { compareField } from '../../Stores/Instance';
+import { ViewContext, PaneContext } from '../../Stores/ViewStore';
+import Field from '../Field';
+import Invalid from '../Invalid';
+import Label from '../Label';
+import Warning from '../Warning';
+import Add from './Add';
+import type NestedFieldStore from '../Stores/NestedFieldStore';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
   label: {},
   readMode:{
-    "&:.readOnly $label:after": {
-      content: "':\\00a0'"
+    '&:.readOnly $label:after': {
+      content: '\':\\00a0\''
     },
-    "& $item": {
-      padding: "10px"
+    '& $item': {
+      padding: '10px'
     },
-    "& $item$single": {
+    '& $item$single': {
       padding: 0
     },
-    "& $item:first-child:last-child": {
+    '& $item:first-child:last-child': {
       border: 0
     },
-    "& $field + $field": {
-      marginTop: "0.5rem"
+    '& $field + $field': {
+      marginTop: '0.5rem'
     }
   },
   form: {
-    position: "relative",
-    border: "1px solid #ced4da",
-    borderRadius: ".25rem",
-    padding: "10px"
+    position: 'relative',
+    border: '1px solid #ced4da',
+    borderRadius: '.25rem',
+    padding: '10px'
   },
   item: {
-    position: "relative",
-    border: "1px solid #ced4da",
-    borderRadius: ".25rem",
-    padding: "40px 10px 10px 10px",
-    minHeight: "40px",
-    "& + $item": {
-      marginTop: "10px"
+    position: 'relative',
+    border: '1px solid #ced4da',
+    borderRadius: '.25rem',
+    padding: '40px 10px 10px 10px',
+    minHeight: '40px',
+    '& + $item': {
+      marginTop: '10px'
     }
   },
   field: {
     marginBottom: 0,
-    "& + $field": {
-      marginTop: "1rem"
+    '& + $field': {
+      marginTop: '1rem'
     }
   },
   actions: {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    display: "flex",
-    alignItems: "flex-end"
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    display: 'flex',
+    alignItems: 'flex-end'
   },
   action: {
-    fontSize: "0.9em",
-    lineHeight: "27px",
-    textAlign: "center",
-    backgroundColor: "var(--button-secondary-bg-color)",
-    color: "var(--ft-color-loud)",
-    cursor: "pointer",
-    width: "25px",
-    "&:hover": {
-      backgroundColor: "var(--button-secondary-active-bg-color)"
+    fontSize: '0.9em',
+    lineHeight: '27px',
+    textAlign: 'center',
+    backgroundColor: 'var(--button-secondary-bg-color)',
+    color: 'var(--ft-color-loud)',
+    cursor: 'pointer',
+    width: '25px',
+    '&:hover': {
+      backgroundColor: 'var(--button-secondary-active-bg-color)'
     },
-    "&:first-child": {
-      borderRadius: "4px 0 0 4px"
+    '&:first-child': {
+      borderRadius: '4px 0 0 4px'
     },
-    "&:last-child": {
-      borderRadius: "0 4px 4px 0"
+    '&:last-child': {
+      borderRadius: '0 4px 4px 0'
     },
-    "&$single": {
-      borderRadius: "4px"
+    '&$single': {
+      borderRadius: '4px'
     }
   },
   single: {},
   actionBtn: {
-    marginTop: "10px",
-    "&$noItems": {
-      marginTop: "0"
+    marginTop: '10px',
+    '&$noItems': {
+      marginTop: '0'
     }
   },
   noItems: {},
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -134,11 +135,11 @@ const Action = ({ icon, title, single, onClick }: ActionProps) => {
     if (!e.currentTarget.contains(e.target)) {
       return;
     }
-    typeof onClick === "function" && onClick();
+    typeof onClick === 'function' && onClick();
   };
 
   return (
-    <div className={`${classes.action} ${single?classes.single:""}`} onClick={handleClick} title={title}>
+    <div className={`${classes.action} ${single?classes.single:''}`} onClick={handleClick} title={title}>
       <FontAwesomeIcon icon={icon} />
     </div>
   );
@@ -169,7 +170,7 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
   const sortedStores = Object.values(itemFieldStores).sort((a, b) => compareField(a, b, true));
 
   return (
-    <div className={`${classes.item} ${total === 1?classes.single:""}`} >
+    <div className={`${classes.item} ${total === 1?classes.single:''}`} >
       {sortedStores.map(store => (
         <Field key={store.fullyQualifiedName} name={store.fullyQualifiedName} className={classes.field} fieldStore={store} view={view} pane={pane} readMode={readMode} enablePointerEvents={true} showIfNoValue={false} />
       ))}
@@ -191,7 +192,7 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
 interface NestedFieldProps {
   className: string;
   fieldStore: NestedFieldStore;
-  readMode: boolean; 
+  readMode: boolean;
   showIfNoValue: boolean;
 }
 
@@ -231,17 +232,17 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: 
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !readMode && !isReadOnly && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
-    <div className={`${(readMode || isReadOnly)?classes.readMode:""} ${className} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
+    <div className={`${(readMode || isReadOnly)?classes.readMode:''} ${className} ${isReadOnly?'readOnly':''}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} isReadOnly={isReadOnly} />
       }
-      <div className={`${classes.form} ${hasValidationWarnings?classes.warning:""}`} >
+      <div className={`${classes.form} ${hasValidationWarnings?classes.warning:''}`} >
         {nestedFieldsStores.map((row, idx) => (
           <Item key={idx} itemFieldStores={row.stores} readMode={readMode || isReadOnly} active={active} index={idx} total={nestedFieldsStores.length} onDelete={handleDeleteItem} onMoveUp={handleMoveItemUp} onMoveDown={handleMoveItemDown} />
         ))}
         {!readMode && !isReadOnly && active && (
-          <Add className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:""}`} onClick={addValue} types={fieldStore.resolvedTargetTypes} />
+          <Add className={`${classes.actionBtn} ${nestedFieldsStores.length === 0?classes.noItems:''}`} onClick={addValue} types={fieldStore.resolvedTargetTypes} />
         )}
       </div>
       <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
@@ -249,6 +250,6 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: 
     </div>
   );
 });
-NestedField.displayName = "NestedField";
+NestedField.displayName = 'NestedField';
 
 export default NestedField;

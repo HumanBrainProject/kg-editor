@@ -21,33 +21,33 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import Spinner from "../../Components/Spinner";
-import BGMessage from "../../Components/BGMessage";
-import CompareValue from "./CompareValue";
-import InstanceStore from "../../Stores/InstanceStore";
-import Instance from "../../Stores/Instance";
+import BGMessage from '../../Components/BGMessage';
+import Spinner from '../../Components/Spinner';
+import CompareValue from './CompareValue';
+import type Instance from '../../Stores/Instance';
+import type InstanceStore from '../../Stores/InstanceStore';
 
 const useStyles = createUseStyles({
   container: {
-    padding: "12px 15px",
-    "& button + button": {
-      marginLeft: "20px"
+    padding: '12px 15px',
+    '& button + button': {
+      marginLeft: '20px'
     }
   }
 });
 
-const separator = "; ";
+const separator = '; ';
 
 const getLabel = (instanceStore: InstanceStore, field, value) => {
   const id = value[field.mappingValue];
   if (!id) {
-    return "Unknown instance";
+    return 'Unknown instance';
   }
 
   const instance = instanceStore.instances.get(id);
@@ -59,45 +59,45 @@ const getLabel = (instanceStore: InstanceStore, field, value) => {
 };
 
 const getNestedFieldValue = (instanceStore: InstanceStore, fields, level: number) => {
-  const tabs = Array.from({ length: level }, () => "\t").join("");
+  const tabs = Array.from({ length: level }, () => '\t').join('');
   let result = `${tabs}[`;
   fields.forEach(row => {
     result += `\n\t${tabs}{`;
     Object.values(row).forEach(store => result += `\n\t\t${tabs}${store.label}:${getFieldValue(instanceStore, store, level + 1)}`);
     result += `\n\t${tabs}}\n`;
   });
-  result += "]";
+  result += ']';
   return result;
 };
 
 const getFieldValue = (instanceStore: InstanceStore, field, level: number) => {
-  if (field.widget === "Nested") {
+  if (field.widget === 'Nested') {
     return getNestedFieldValue(instanceStore, field.nestedFieldsStores, level);
   }
   const value = field.returnValue;
-  if (value === "https://core.kg.ebrains.eu/vocab/resetValue") {
-    return "";
+  if (value === 'https://core.kg.ebrains.eu/vocab/resetValue') {
+    return '';
   }
   if (field.isLink) {
     if (!value) {
-      return "null";
+      return 'null';
     }
     const vals = Array.isArray(value)?value:[value];
     if (vals.length) {
       return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
     }
-    return "";
+    return '';
   }
   if (!value) {
-    return "";
+    return '';
   }
   if (Array.isArray(value)) {
     return value.join(separator);
   }
-  if (typeof value === "object") {
-    return "Unknown value";
+  if (typeof value === 'object') {
+    return 'Unknown value';
   }
-  if (typeof value === "boolean" || typeof value === "number") {
+  if (typeof value === 'boolean' || typeof value === 'number') {
     return value.toString();
   }
   return value;
@@ -105,7 +105,7 @@ const getFieldValue = (instanceStore: InstanceStore, field, level: number) => {
 
 const getValue = (instanceStore: InstanceStore, instance:Instance, name: string) => {
   if (!instance) {
-    return "";
+    return '';
   }
   const field = instance.fields[name];
   return getFieldValue(instanceStore, field, 0);
@@ -164,12 +164,12 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   if (leftStatus.hasFetchError || rightStatus.hasFetchError) {
     return (
       <div className={classes.container}>
-        <BGMessage icon={"ban"}>
+        <BGMessage icon={'ban'}>
             There was a network problem retrieving the links of instance &quot;<i>{instanceId}</i>&quot;.<br/>
             If the problem persists, please contact the support.<br/><br/>
           <div>
-            <Button onClick={onClose}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-            <Button variant={"primary"} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            <Button onClick={onClose}><FontAwesomeIcon icon={'times'}/>&nbsp;&nbsp; Cancel</Button>
+            <Button variant={'primary'} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={'redo-alt'}/>&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>
@@ -195,6 +195,6 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   }
   return null;
 });
-CompareFieldsChanges.displayName = "CompareFieldsChanges";
+CompareFieldsChanges.displayName = 'CompareFieldsChanges';
 
 export default CompareFieldsChanges;

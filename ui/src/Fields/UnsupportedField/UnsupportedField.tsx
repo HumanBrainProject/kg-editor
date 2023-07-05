@@ -20,8 +20,8 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).`
  *
  */
-import React from "react";
-import UnsupportedFieldStore from "../Stores/UnsupportedFieldStore";
+
+import type UnsupportedFieldStore from '../Stores/UnsupportedFieldStore';
 
 interface UnsupportedFieldProps {
   fieldStore: UnsupportedFieldStore;

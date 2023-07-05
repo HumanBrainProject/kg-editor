@@ -21,57 +21,58 @@
  *
  */
 
-import React, { MouseEvent, SyntheticEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import Form from "react-bootstrap/Form";
-import { createUseStyles } from "react-jss";
-import { v4 as uuidv4 } from "uuid";
-import { useLocation, useNavigate } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import useStores from "../../Hooks/useStores";
+import DropdownComponent  from '../../Components/DynamicDropdown/Dropdown';
+import useStores from '../../Hooks/useStores';
 
-import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
-import LinksAlternatives from "../LinksAlternatives";
-import Label from "../Label";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
+import Matomo from '../../Services/Matomo';
+import ListItem from '../DynamicDropdown/ListItem';
+import Invalid from '../Invalid';
+import Label from '../Label';
+import LinksAlternatives from '../LinksAlternatives';
+import TargetTypeSelection from '../TargetTypeSelection';
+import Warning from '../Warning';
 
-import ListItem from "../DynamicDropdown/ListItem";
-import TargetTypeSelection from "../TargetTypeSelection";
-import Matomo from "../../Services/Matomo";
-import LinkStore from "../Stores/LinkStore";
-import { View } from "../../Stores/ViewStore";
-import { Suggestion } from "../../types";
+import type { View } from '../../Stores/ViewStore';
+import type { Suggestion } from '../../types';
+import type LinkStore from '../Stores/LinkStore';
+import type { MouseEvent, SyntheticEvent} from 'react';
 
 const useStyles = createUseStyles({
   labelContainer: {
-    display: "flex"
+    display: 'flex'
   },
   labelPanel: {
-    flex: "1"
+    flex: '1'
   },
   values:{
     flex: 1,
-    height:"auto",
-    paddingBottom:"3px",
-    position:"relative",
-    minHeight: "34px",
-    "&[disabled]": {
-      backgroundColor: "#e9ecef",
-      pointerEvents:"none"
+    height:'auto',
+    paddingBottom:'3px',
+    position:'relative',
+    minHeight: '34px',
+    '&[disabled]': {
+      backgroundColor: '#e9ecef',
+      pointerEvents:'none'
     }
   },
   label: {},
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   alternatives: {
-    marginLeft: "3px"
+    marginLeft: '3px'
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -86,7 +87,7 @@ const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }: ReadOnl
   if (!id) {
     return null;
   }
-  const isClickable = typeof onClick === "function";
+  const isClickable = typeof onClick === 'function';
   if (isClickable) {
     return (
       <ListItem
@@ -113,10 +114,10 @@ const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }: ReadOnl
 });
 
 interface SimpleDropdownProps {
-  className: string; 
-  fieldStore: LinkStore; 
+  className: string;
+  fieldStore: LinkStore;
   readMode: boolean;
-  showIfNoValue: boolean; 
+  showIfNoValue: boolean;
   view: View;
   pane: string;
 }
@@ -169,7 +170,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
       const newValue = {[mappingValue]: newId};
       fieldStore.addValue(newValue);
       setTimeout(() => {
-        const index = view.panes.findIndex(p => p === pane); 
+        const index = view.panes.findIndex(p => p === pane);
         if (index !== -1 && index < view.panes.length -1) {
           const targetPane = view.panes[index+1];
           view.setInstanceHighlight(targetPane, newId, fieldStore.label);
@@ -235,10 +236,10 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-        Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
+        Matomo.trackEvent('Instance', 'CreateInstanceInExternalSpace', option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
-        Matomo.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
+        Matomo.trackEvent('Instance', 'CreateInstanceInCurrentSpace', option.type.name);
         addNewValue(name, option.type.name);
       }
     } else {
@@ -279,7 +280,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
   };
 
   const id = value && value[mappingValue];
-  const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)))
+  const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)));
 
   if (readMode && !id && !showIfNoValue) {
     return null;
@@ -322,7 +323,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         {value &&
         <ListItem
           isCircular={instance?.id===id}
@@ -356,6 +357,6 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     </Form.Group>
   );
 });
-SimpleDropdown.displayName = "SimpleDropdown";
+SimpleDropdown.displayName = 'SimpleDropdown';
 
 export default SimpleDropdown;

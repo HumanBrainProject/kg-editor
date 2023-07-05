@@ -21,24 +21,24 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import {observer} from "mobx-react-lite";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {observer} from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import MultiToggle from '../../Components/MultiToggle';
+import useStores from '../../Hooks/useStores';
 
-import MultiToggle from "../../Components/MultiToggle";
 
 const useStyles = createUseStyles({
   container:{
-    textAlign: "right",
-    paddingTop: "35px"
+    textAlign: 'right',
+    paddingTop: '35px'
   },
   icon:{
-    color:"var(--ft-color-normal)",
-    fontSize:"3em",
-    marginBottom:"3px"//"10px"
+    color:'var(--ft-color-normal)',
+    fontSize:'3em',
+    marginBottom:'3px'//"10px"
   }
 });
 
@@ -53,17 +53,17 @@ const ThemeSwitcher = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.icon}>
-        <FontAwesomeIcon icon={appStore.currentTheme.name === "bright"? "sun": "moon"}/>
+        <FontAwesomeIcon icon={appStore.currentTheme.name === 'bright'? 'sun': 'moon'}/>
       </div>
       <div className={classes.switcher}>
         <MultiToggle selectedValue={appStore.currentTheme.name} onChange={handleChange}>
-          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"moon"} value="default"/>
-          <MultiToggle.Toggle color={"var(--ft-color-loud)"} icon={"sun"} value="bright"/>
+          <MultiToggle.Toggle color={'var(--ft-color-loud)'} icon={'moon'} value="default"/>
+          <MultiToggle.Toggle color={'var(--ft-color-loud)'} icon={'sun'} value="bright"/>
         </MultiToggle>
       </div>
     </div>
   );
 });
-ThemeSwitcher.displayName = "ThemeSwitcher";
+ThemeSwitcher.displayName = 'ThemeSwitcher';
 
 export default ThemeSwitcher;

@@ -21,38 +21,39 @@
  *
  */
 
-import React, { useState, useEffect, useRef, RefObject, ReactNode, MouseEvent, KeyboardEvent } from "react";
-import { createUseStyles } from "react-jss";
+import React, { useState, useEffect, useRef } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import Avatar from "../Components/Avatar";
-import Alternative from "./Alternative";
-import { Alternative as AlternativeType } from "../types";
+import Avatar from '../Components/Avatar';
+import Alternative from './Alternative';
+import type { Alternative as AlternativeType } from '../types';
+import type { RefObject, MouseEvent, KeyboardEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    display: "inline-block",
-    position: "relative"
+    display: 'inline-block',
+    position: 'relative'
   },
   button: {
-    background: "none",
-    borderRadius: "20px",
-    "&:not(:hover), &:disabled, &:hover:disabled": {
-      borderColor: "transparent"
+    background: 'none',
+    borderRadius: '20px',
+    '&:not(:hover), &:disabled, &:hover:disabled': {
+      borderColor: 'transparent'
     },
-    "& .avatar + .avatar": {
-      marginLeft: "5px"
+    '& .avatar + .avatar': {
+      marginLeft: '5px'
     }
   },
   dropdown: {
-    maxHeight:"33vh",
-    overflowY:"auto",
-    "&.open":{
-      display:"block"
+    maxHeight:'33vh',
+    overflowY:'auto',
+    '&.open':{
+      display:'block'
     }
   },
   fixedWidthDropdownItem: {
-    wordWBreak: "normal",
-    whiteSpace: "normal"
+    wordWBreak: 'normal',
+    whiteSpace: 'normal'
   }
 });
 
@@ -87,7 +88,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
   };
 
   const handleSelect = (value: any) => {
-    typeof onSelect === "function" && onSelect(value);
+    typeof onSelect === 'function' && onSelect(value);
     close();
   };
 
@@ -130,7 +131,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
 
   const handleRemove = (e: MouseEvent<SVGSVGElement>) => {
     e && e.preventDefault();
-    typeof onRemove === "function" && onRemove();
+    typeof onRemove === 'function' && onRemove();
     setOpen(false);
   };
 
@@ -138,20 +139,20 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     if (disabled || !e) {
       return;
     }
-    if(e.key === "ArrowDown"){
+    if(e.key === 'ArrowDown'){
       e.preventDefault();
       handleSelectNext(current);
-    } else if(e.key === "ArrowUp"){
+    } else if(e.key === 'ArrowUp'){
       e.preventDefault();
       handleSelectPrevious(current);
-    } else if(e.key === "Escape") {
+    } else if(e.key === 'Escape') {
       e.preventDefault();
       close();
-    } else if (e.key === "Enter") {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
       if (open) {
         if (current) {
-          typeof onSelect === "function" && onSelect(current);
+          typeof onSelect === 'function' && onSelect(current);
         }
         close();
       } else {
@@ -166,7 +167,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
         const containerWidth = parentContainerRef.current?.offsetWidth;
         if (containerWidth && containerWidth > wrapperRef.current.offsetLeft) {
           const width = containerWidth - wrapperRef.current.offsetLeft;
-          alternativesRef.current.style.width = width + "px";
+          alternativesRef.current.style.width = width + 'px';
         }
       }
     } else {
@@ -175,13 +176,13 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
   };
 
   useEffect(() => {
-    window.addEventListener("mouseup", clickOutHandler, false);
-    window.addEventListener("touchend", clickOutHandler, false);
-    window.addEventListener("keyup", clickOutHandler, false);
+    window.addEventListener('mouseup', clickOutHandler, false);
+    window.addEventListener('touchend', clickOutHandler, false);
+    window.addEventListener('keyup', clickOutHandler, false);
     return () => {
-      window.removeEventListener("mouseup", clickOutHandler, false);
-      window.removeEventListener("touchend", clickOutHandler, false);
-      window.removeEventListener("keyup", clickOutHandler, false);
+      window.removeEventListener('mouseup', clickOutHandler, false);
+      window.removeEventListener('touchend', clickOutHandler, false);
+      window.removeEventListener('keyup', clickOutHandler, false);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -190,42 +191,38 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
     return null;
   }
 
-  const renderUsers = () => {
-    return list.map(alternative => (
-      alternative.users.map(user => (
-        <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
-      ))
-    ));
-  };
+  const renderUsers = () => list.map(alternative => (
+    alternative.users.map(user => (
+      <Avatar userId={user.id} name={user.name} key={user.id} picture={user.picture} />
+    ))
+  ));
 
-  const renderAlternative = () => {
-    return list.map(alternative => {
-      const key = alternative.users.map(user => user.id).join(";");
-      return (
-        <Alternative
-          key={key}
-          alternative={alternative}
-          hasFocus={alternative.value === current}
-          ValueRenderer={ValueRenderer}
-          onRemove={handleRemove}
-          onSelect={handleSelect}
-          onSelectNext={handleSelectNext}
-          onSelectPrevious={handleSelectPrevious}
-          onCancel={handleCancel}
-          className={classes.fixedWidthDropdownItem} />
-      );
-    });
-  };
+  const renderAlternative = () => list.map(alternative => {
+    const key = alternative.users.map(user => user.id).join(';');
+    return (
+      <Alternative
+        key={key}
+        alternative={alternative}
+        hasFocus={alternative.value === current}
+        ValueRenderer={ValueRenderer}
+        onRemove={handleRemove}
+        onSelect={handleSelect}
+        onSelectNext={handleSelectNext}
+        onSelectPrevious={handleSelectPrevious}
+        onCancel={handleCancel}
+        className={classes.fixedWidthDropdownItem} />
+    );
+  });
 
   return (
-    <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
+    <div className={`${classes.container} ${className?className:''}`} ref={wrapperRef}>
       <button className={classes.button}
         title="show alternatives"
         onKeyDown={handleInputKeyStrokes}
         onClick={handleToggle}>
         {renderUsers()}
       </button>
-      <ul className={`dropdown-menu ${classes.dropdown} ${open?"open":""}`} ref={alternativesRef} >
+      <ul className={`dropdown-menu ${classes.dropdown} ${open?'open':''}`} ref={alternativesRef} >
         {renderAlternative()}
       </ul>
     </div>

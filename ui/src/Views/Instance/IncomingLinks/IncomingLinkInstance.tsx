@@ -21,24 +21,24 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Badge from "react-bootstrap/Badge";
-import { useLocation, useNavigate } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Badge from 'react-bootstrap/Badge';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import useStores from "../../../Hooks/useStores";
-import { InstanceLabel } from "../../../types";
+import useStores from '../../../Hooks/useStores';
+import type { InstanceLabel } from '../../../types';
 
 const useStyles = createUseStyles({
   pill: {
-    cursor: "pointer",
-    "& > .rounded-pill": {
-      whiteSpace: "break-spaces"
+    cursor: 'pointer',
+    '& > .rounded-pill': {
+      whiteSpace: 'break-spaces'
     }
   },
   isForbidden: {
-    cursor: "not-allowed"
+    cursor: 'not-allowed'
   }
 });
 
@@ -67,7 +67,7 @@ const IncomingLinkInstance = observer(({instance, readMode }: IncomingLinkInstan
 
   if (readMode || isForbidden) {
     return (
-      <span className={isForbidden?classes.isForbidden:""} title={isForbidden?"You don't have the permission to access this instance!": undefined}>
+      <span className={isForbidden?classes.isForbidden:''} title={isForbidden?'You don\'t have the permission to access this instance!': undefined}>
         <Badge pill bg="secondary" >
           {label}
         </Badge>
@@ -91,6 +91,6 @@ const IncomingLinkInstance = observer(({instance, readMode }: IncomingLinkInstan
   );
 
 });
-IncomingLinkInstance.displayName = "IncomingLinkInstance";
+IncomingLinkInstance.displayName = 'IncomingLinkInstance';
 
 export default IncomingLinkInstance;

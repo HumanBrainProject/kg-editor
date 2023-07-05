@@ -21,53 +21,53 @@
  *
  */
 
-import React, { useState } from "react";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import { createUseStyles } from "react-jss";
+import React, { useState } from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
 
-import Filter from "./Filter";
+import Filter from './Filter';
 
 const useStyles = createUseStyles({
   container: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    boxShadow: "0 2px 10px var(--pane-box-shadow)"
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+    background: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-normal)',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    boxShadow: '0 2px 10px var(--pane-box-shadow)'
   },
   body: {
     flex: 1,
-    padding: "0 0 10px 0"
+    padding: '0 0 10px 0'
   },
   list: {
-    listStyleType: "none",
-    display: "grid",
-    gridTemplateColumns: "repeat(1, 1fr)",
-    gridGap: "10px",
+    listStyleType: 'none',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(1, 1fr)',
+    gridGap: '10px',
     margin: 0,
-    padding: "0 10px",
-    "@media screen and (min-width:1200px)": {
-      gridTemplateColumns: "repeat(2, 1fr)"
+    padding: '0 10px',
+    '@media screen and (min-width:1200px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)'
     },
-    "@media screen and (min-width:1600px)": {
-      gridTemplateColumns: "repeat(3, 1fr)"
+    '@media screen and (min-width:1600px)': {
+      gridTemplateColumns: 'repeat(3, 1fr)'
     }
   },
   item: {
-    position: "relative",
-    padding: "15px",
-    background: "var(--bg-color-ui-contrast3)",
-    border: "1px solid var(--border-color-ui-contrast2)",
-    borderRadius: "10px",
-    cursor: "pointer",
-    wordBreak: "break-word",
-    transition: "background .3s ease-in-out, color .3s ease-in-out",
-    "&:hover": {
-      background: "var(--bg-color-blend-contrast1)",
-      color: "var(--ft-color-loud)"
+    position: 'relative',
+    padding: '15px',
+    background: 'var(--bg-color-ui-contrast3)',
+    border: '1px solid var(--border-color-ui-contrast2)',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    wordBreak: 'break-word',
+    transition: 'background .3s ease-in-out, color .3s ease-in-out',
+    '&:hover': {
+      background: 'var(--bg-color-blend-contrast1)',
+      color: 'var(--ft-color-loud)'
     }
   }
 });
@@ -83,10 +83,10 @@ interface GridSelectorProps<T> {
 }
 
 const GridSelector = <T,>({ list, itemComponent, getKey, onSelect, onFilter, filterPlaceholder, className }: GridSelectorProps<T>) => {
-  
+
   const classes = useStyles();
 
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string>('');
 
   const filterList = (list: T[], term: string) => {
     term = term && term.trim().toLowerCase();

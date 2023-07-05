@@ -21,25 +21,25 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import Dropdown from "react-bootstrap/Dropdown";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SimpleType } from "../../types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import { createUseStyles } from 'react-jss';
+import type { SimpleType } from '../../types';
 
 const useStyles = createUseStyles({
   actionBtn: {
-    fontSize: "x-small"
+    fontSize: 'x-small'
   },
   dropdownBtn: {
-    "& > button": {
-      fontSize: "x-small",
-      "&::after": {
-        display: "none !important"
+    '& > button': {
+      fontSize: 'x-small',
+      '&::after': {
+        display: 'none !important'
       }
     }
   }
@@ -63,7 +63,7 @@ const Add = observer(({ className, types, onClick }: AddProps) => {
   if (types.length === 1) {
     return (
       <Button
-        className={`${classes.actionBtn} ${className ? className : ""}`}
+        className={`${classes.actionBtn} ${className ? className : ''}`}
         size="sm"
         variant="primary"
         onClick={handleSingleTypeAdd}
@@ -82,7 +82,7 @@ const Add = observer(({ className, types, onClick }: AddProps) => {
       drop="end"
       variant="primary"
       title={<FontAwesomeIcon icon="plus" />}
-      className={`${classes.dropdownBtn} ${className ? className : ""}`}
+      className={`${classes.dropdownBtn} ${className ? className : ''}`}
     >
       {types.map(type => (
         <Dropdown.Item
@@ -96,6 +96,6 @@ const Add = observer(({ className, types, onClick }: AddProps) => {
     </DropdownButton>
   );
 });
-Add.displayName = "Add";
+Add.displayName = 'Add';
 
 export default Add;

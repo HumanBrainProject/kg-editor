@@ -21,127 +21,128 @@
  *
  */
 
-import React, { ChangeEvent, KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useRef } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import User from "./User";
+import useStores from '../../../../Hooks/useStores';
+import User from './User';
 
-import useStores from "../../../../Hooks/useStores";
-import { UserSummary } from "../../../../types";
+import type { UserSummary } from '../../../../types';
+import type { ChangeEvent, KeyboardEvent, MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width: "100%",
-    color: "var(--ft-color-normal)",
-    "& .errorPanel, & .spinnerPanel": {
-      color: "var(--ft-color-loud)",
-      "& svg path": {
-        stroke: "var(--ft-color-loud)",
-        fill: "var(--ft-color-quiet)"
+    position: 'relative',
+    width: '100%',
+    color: 'var(--ft-color-normal)',
+    '& .errorPanel, & .spinnerPanel': {
+      color: 'var(--ft-color-loud)',
+      '& svg path': {
+        stroke: 'var(--ft-color-loud)',
+        fill: 'var(--ft-color-quiet)'
       }
     }
   },
   search:{
-    display: "grid",
-    gridTemplateColumns: "1fr auto",
-    padding: "0 22px 6px 0",
-    position: "relative"
+    display: 'grid',
+    gridTemplateColumns: '1fr auto',
+    padding: '0 22px 6px 0',
+    position: 'relative'
   },
   searchInput:{
-    width: "calc(100% - 36px)",
-    margin: "0 0 0 26px",
-    padding: "10px 12px 14px 35px",
-    border: "1px solid transparent",
-    borderRadius: "2px",
-    backgroundColor: "var(--bg-color-blend-contrast1)",
-    color: "var(--ft-color-loud)",
-    "&:focus": {
-      borderColor: "rgba(64, 169, 243, 0.5)",
-      backgroundColor: "var(--bg-color-blend-contrast1)",
-      color: "var(--ft-color-normal)"
+    width: 'calc(100% - 36px)',
+    margin: '0 0 0 26px',
+    padding: '10px 12px 14px 35px',
+    border: '1px solid transparent',
+    borderRadius: '2px',
+    backgroundColor: 'var(--bg-color-blend-contrast1)',
+    color: 'var(--ft-color-loud)',
+    '&:focus': {
+      borderColor: 'rgba(64, 169, 243, 0.5)',
+      backgroundColor: 'var(--bg-color-blend-contrast1)',
+      color: 'var(--ft-color-normal)'
     },
-    "&.disabled,&:disabled": {
-      backgroundColor: "var(--bg-color-blend-contrast1)"
+    '&.disabled,&:disabled': {
+      backgroundColor: 'var(--bg-color-blend-contrast1)'
     }
   },
   searchDropdown: {
-    "& .dropdown-menu": {
-      display: "block",
-      width: "calc(100% - 58px)",
-      margin: "50px 0 0 27px",
+    '& .dropdown-menu': {
+      display: 'block',
+      width: 'calc(100% - 58px)',
+      margin: '50px 0 0 27px',
       padding: 0,
       left: 0,
       borderTopLeftRadius: 0,
       borderTopRightRadius: 0,
-      "& .dropdown-list": {
-        maxHeight: "33vh",
-        overflowY: "auto",
-        "& ul": {
-          position: "static",
-          float: "none",
-          listStyleType: "none",
+      '& .dropdown-list': {
+        maxHeight: '33vh',
+        overflowY: 'auto',
+        '& ul': {
+          position: 'static',
+          float: 'none',
+          listStyleType: 'none',
           margin: 0,
           padding: 0
         }
       }
     },
-    "&.open":{
-      display:"block"
+    '&.open':{
+      display:'block'
     },
-    "&:not(.open)":{
-      "& .dropdown-menu": {
-        borderColor: "transparent",
-        boxShadow: "none"
+    '&:not(.open)':{
+      '& .dropdown-menu': {
+        borderColor: 'transparent',
+        boxShadow: 'none'
       }
     }
   },
   addIcon: {
-    position: "absolute",
-    top: "15px",
-    left: "2px",
-    color: "var(--ft-color-normal)"
+    position: 'absolute',
+    top: '15px',
+    left: '2px',
+    color: 'var(--ft-color-normal)'
   },
   searchIcon:{
-    position: "absolute",
-    top: "15px",
-    left: "40px",
-    color: "var(--ft-color-normal)"
+    position: 'absolute',
+    top: '15px',
+    left: '40px',
+    color: 'var(--ft-color-normal)'
   },
   footerPanel: {
-    display: "flex",
-    padding: "6px",
-    fontSize: "0.9rem",
-    color: "#555"
+    display: 'flex',
+    padding: '6px',
+    fontSize: '0.9rem',
+    color: '#555'
   },
   searchCount:{
     flex: 1,
-    textAlign: "right"
+    textAlign: 'right'
   },
   errorPanel: {
-    display: "flex",
-    width: "100%",
+    display: 'flex',
+    width: '100%',
     margin: 0,
-    padding: "6px",
+    padding: '6px',
     border: 0,
-    background: "#ffa18f",
-    fontSize: "0.9rem",
-    color: "black",
+    background: '#ffa18f',
+    fontSize: '0.9rem',
+    color: 'black',
     outline: 0,
-    "& .error": {
-      width: "calc(100% - 20px)",
-      color: "#ff0029",
-      textAlign: "left",
-      wordBreak: "keep-all",
-      whiteSpace: "nowrap",
-      textOverflow: "ellipsis",
-      overflow: "hidden"
+    '& .error': {
+      width: 'calc(100% - 20px)',
+      color: '#ff0029',
+      textAlign: 'left',
+      wordBreak: 'keep-all',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden'
     },
-    "& .retry": {
+    '& .retry': {
       flex: 1,
-      textAlign: "right"
+      textAlign: 'right'
     }
   }
 });
@@ -168,14 +169,14 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
       }
     };
 
-    window.addEventListener("mouseup", clickOutHandler, false);
-    window.addEventListener("touchend", clickOutHandler, false);
-    window.addEventListener("keyup", clickOutHandler, false);
+    window.addEventListener('mouseup', clickOutHandler, false);
+    window.addEventListener('touchend', clickOutHandler, false);
+    window.addEventListener('keyup', clickOutHandler, false);
 
     return () => {
-      window.removeEventListener("mouseup", clickOutHandler, false);
-      window.removeEventListener("touchend", clickOutHandler, false);
-      window.removeEventListener("keyup", clickOutHandler, false);
+      window.removeEventListener('mouseup', clickOutHandler, false);
+      window.removeEventListener('touchend', clickOutHandler, false);
+      window.removeEventListener('keyup', clickOutHandler, false);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -185,7 +186,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
   const handleSelect = (user: UserSummary, event: KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => {
     if(event && event.keyCode === 40){ // Down
       event.preventDefault();
-      const users = usersRef.current?.querySelectorAll(".option");
+      const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
@@ -195,7 +196,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
       }
     } else if(event && event.keyCode === 38){ // Up
       event.preventDefault();
-      const users = usersRef.current?.querySelectorAll(".option");
+      const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
@@ -209,14 +210,14 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
       event.preventDefault();
       inputRef.current?.focus();
-      typeof onSelect === "function" && onSelect(user.id);
+      typeof onSelect === 'function' && onSelect(user.id);
     }
   };
 
   const handleInputKeyStrokes = (event: KeyboardEvent<HTMLInputElement>) => {
     if(event && event.keyCode === 40 ){ // Down
       event.preventDefault();
-      const users = usersRef.current?.querySelectorAll(".option");
+      const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
@@ -226,7 +227,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
       }
     } else if(event && event.keyCode === 38){ // Up
       event.preventDefault();
-      const users = usersRef.current?.querySelectorAll(".option");
+      const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
@@ -257,7 +258,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
       <div className={classes.search}>
         <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Invite a user for review" type="text" value={userStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
         <FontAwesomeIcon icon="search" className={classes.searchIcon} />
-        <div className={`${classes.searchDropdown} ${userStore.hasSearchFilter?"open":""}`} ref={usersRef}>
+        <div className={`${classes.searchDropdown} ${userStore.hasSearchFilter?'open':''}`} ref={usersRef}>
           <div className="dropdown-menu">
             <div className="dropdown-list">
               {userStore.searchResult.map(user => (
@@ -276,7 +277,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
                 <div className={classes.searchCount}>
                   { showTotalSearchCount && (
                     <>
-                      {userStore.totalSearchCount} user{`${userStore.totalSearchCount > 1?"s":""} found`}
+                      {userStore.totalSearchCount} user{`${userStore.totalSearchCount > 1?'s':''} found`}
                     </>
                   )}
                 </div>
@@ -285,7 +286,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
             {userStore.searchFetchError && (
               <button className={classes.errorPanel} title={userStore.searchFetchError} onClick={handleLoadSearchResults}>
                 <div className="error"><FontAwesomeIcon icon="exclamation-triangle" />&nbsp;&nbsp;<span>{userStore.searchFetchError}</span></div>
-                <div className="retry"><FontAwesomeIcon icon={"redo-alt"}/></div>
+                <div className="retry"><FontAwesomeIcon icon={'redo-alt'}/></div>
               </button>
             )}
           </div>
@@ -294,6 +295,6 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     </div>
   );
 });
-Search.displayName = "Search";
+Search.displayName = 'Search';
 
 export default Search;

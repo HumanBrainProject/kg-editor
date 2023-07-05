@@ -21,27 +21,27 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { useNavigate } from "react-router-dom";
-import { createUseStyles } from "react-jss";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
+import useStores from '../Hooks/useStores';
 
 const useStyles = createUseStyles({
   container: {
-    padding: "10px",
-    cursor: "pointer",
-    "& span": {
-      color: "var(--ft-color-loud)",
-      display: "inline-block",
-      paddingLeft: "10px",
-      fontSize: "0.9em",
-      borderLeft: "1px solid var(--border-color-ui-contrast5)",
-      marginLeft: "10px"
+    padding: '10px',
+    cursor: 'pointer',
+    '& span': {
+      color: 'var(--ft-color-loud)',
+      display: 'inline-block',
+      paddingLeft: '10px',
+      fontSize: '0.9em',
+      borderLeft: '1px solid var(--border-color-ui-contrast5)',
+      marginLeft: '10px'
     },
-    "&:hover span": {
-      color: "var(--ft-color-louder)"
+    '&:hover span': {
+      color: 'var(--ft-color-louder)'
     }
   }
 });
@@ -52,9 +52,9 @@ const Logo = observer(() => {
   const { appStore } = useStores();
   const navigate = useNavigate();
 
-  const handleGoToHome = () => navigate("/")
+  const handleGoToHome = () => navigate('/');
 
-  const logo = appStore.currentTheme.name === "default"?`${window.rootPath}/assets/ebrains.svg`:`${window.rootPath}/assets/ebrains_dark.svg`;
+  const logo = appStore.currentTheme.name === 'default'?`${window.rootPath}/assets/ebrains.svg`:`${window.rootPath}/assets/ebrains_dark.svg`;
 
   return (
     <div className={`${classes.container} layout-logo`} onClick={handleGoToHome}>
@@ -63,7 +63,7 @@ const Logo = observer(() => {
     </div>
   );
 });
-Logo.displayName = "Logo";
+Logo.displayName = 'Logo';
 
 export default Logo;
 

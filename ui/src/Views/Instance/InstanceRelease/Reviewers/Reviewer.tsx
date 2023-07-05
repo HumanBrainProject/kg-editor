@@ -21,69 +21,69 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import User from "../../../../Components/User";
-import { UserSummary } from "../../../../types";
+import User from '../../../../Components/User';
+import type { UserSummary } from '../../../../types';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    display: "grid",
-    overflow: "hidden",
-    gridTemplateColumns: "1fr 30px",
-    gridTemplateRows: "auto",
-    alignItems: "center",
-    width: "100%",
-    margin: "6px 0",
+    position: 'relative',
+    display: 'grid',
+    overflow: 'hidden',
+    gridTemplateColumns: '1fr 30px',
+    gridTemplateRows: 'auto',
+    alignItems: 'center',
+    width: '100%',
+    margin: '6px 0',
     padding: 0,
-    "& .review-status": {
-      opacity: "0.6"
+    '& .review-status': {
+      opacity: '0.6'
     },
-    "& .user": {
-      display: "flex",
-      alignItems: "center",
-      margin: "0 3px 0 20px",
-      padding: "6px",
-      background: "var(--bg-color-ui-contrast3)",
-      "& .avatar": {
-        margin: "0 5px",
-        "&.default": {
-          margin: "0 8px 0 10px"
+    '& .user': {
+      display: 'flex',
+      alignItems: 'center',
+      margin: '0 3px 0 20px',
+      padding: '6px',
+      background: 'var(--bg-color-ui-contrast3)',
+      '& .avatar': {
+        margin: '0 5px',
+        '&.default': {
+          margin: '0 8px 0 10px'
         }
       }
     },
-    "& button": {
-      color: "transparent",
+    '& button': {
+      color: 'transparent',
       margin: 0,
       border: 0,
-      background: "none",
-      "&:hover, &:active, &:focus": {
-        color: "var(--ft-color-louder)"
+      background: 'none',
+      '&:hover, &:active, &:focus': {
+        color: 'var(--ft-color-louder)'
       }
     },
-    "&:hover": {
-      color: "var(--ft-color-louder)",
-      "& .review-status": {
-        opacity: "1"
+    '&:hover': {
+      color: 'var(--ft-color-louder)',
+      '& .review-status': {
+        opacity: '1'
       },
-      "& .user .name:not(.is-curator)": {
-        color: "#84b3dc"
+      '& .user .name:not(.is-curator)': {
+        color: '#84b3dc'
       },
-      "& button": {
-        color: "var(--ft-color-normal)",
-        "&:hover, &:active, &:focus": {
-          color: "var(--ft-color-louder)"
+      '& button': {
+        color: 'var(--ft-color-normal)',
+        '&:hover, &:active, &:focus': {
+          color: 'var(--ft-color-louder)'
         }
       }
     }
   },
   reviewStatus: {
-    padding: "6px 0",
-    verticalAlign: "middle"
+    padding: '6px 0',
+    verticalAlign: 'middle'
   }
 });
 
@@ -109,6 +109,6 @@ const Reviewer = observer(({ review, onRemoveInvitation }: ReviewerProps) => {
     </div>
   );
 });
-Reviewer.displayName = "Reviewer";
+Reviewer.displayName = 'Reviewer';
 
 export default Reviewer;

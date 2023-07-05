@@ -21,71 +21,72 @@
  *
  */
 
-import React, { DragEvent, FocusEvent, KeyboardEvent, MouseEvent, useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
-import { Value } from "../Stores/LinksStore";
-import Instance from "../../Stores/Instance";
+import useStores from '../../Hooks/useStores';
+import type Instance from '../../Stores/Instance';
+import type { Value } from '../Stores/LinksStore';
+import type { DragEvent, FocusEvent, KeyboardEvent, MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
   value: {
-    "&:not(:last-child):after":{
-      content: "';\\00a0'"
+    '&:not(:last-child):after':{
+      content: '\';\\00a0\''
     }
   },
   circular: {
-    color: "var(--bs-danger)",
-    "&:hover": {
-      color: "var(--bs-danger)"
+    color: 'var(--bs-danger)',
+    '&:hover': {
+      color: 'var(--bs-danger)'
     }
   },
   valueTag: {
-    marginBottom: "5px",
-    padding: "1px 5px",
-    border: "1px solid #ced4da",
-    "&:not($circular):hover": {
-      backgroundColor: "var(--link-bg-color-hover)",
-      borderColor: "var(--link-border-color-hover)",
-      color: "#143048"
+    marginBottom: '5px',
+    padding: '1px 5px',
+    border: '1px solid #ced4da',
+    '&:not($circular):hover': {
+      backgroundColor: 'var(--link-bg-color-hover)',
+      borderColor: 'var(--link-border-color-hover)',
+      color: '#143048'
     },
-    "& + $valueTag": {
-      marginLeft: "5px"
+    '& + $valueTag': {
+      marginLeft: '5px'
     }
   },
   valueLabel: {
-    display: "inline-block",
-    maxWidth: "200px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    verticalAlign: "bottom"
+    display: 'inline-block',
+    maxWidth: '200px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    verticalAlign: 'bottom'
   },
   remove: {
-    fontSize: "0.8em",
+    fontSize: '0.8em',
     opacity: 0.5,
-    marginLeft: "3px",
-    "&:hover": {
+    marginLeft: '3px',
+    '&:hover': {
       opacity: 1
     }
   },
   notFound: {
-    fontStyle: "italic",
-    backgroundColor: "lightgrey",
-    "&:hover": {
-      backgroundColor: "lightgrey"
+    fontStyle: 'italic',
+    backgroundColor: 'lightgrey',
+    '&:hover': {
+      backgroundColor: 'lightgrey'
     }
   }
 });
 
 const getLabel = (instance?: Instance, hasError?: boolean, isFetching?: boolean) => {
   if (!instance) {
-    return  "Unknown instance"
+    return  'Unknown instance';
   }
   if (hasError) {
-    return "Not found";
+    return 'Not found';
   }
   if (isFetching) {
     return instance.id;
@@ -95,7 +96,7 @@ const getLabel = (instance?: Instance, hasError?: boolean, isFetching?: boolean)
 
 interface ListItemProps {
   index?: number;
-  instanceId: string; 
+  instanceId: string;
   readOnly: boolean;
   disabled: boolean;
   isCircular: boolean;
@@ -178,7 +179,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     onBlur && onBlur(index);
   };
 
-  
+
   const instance = instanceStore.instances.get(instanceId);
 
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
@@ -201,8 +202,8 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     }
 
     return (
-      <div className={`btn btn-xs btn-default ${classes.valueTag}  ${isDisabled? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
-        disabled={isDisabled}  
+      <div className={`btn btn-xs btn-default ${classes.valueTag}  ${isDisabled? 'disabled' : ''} ${hasError ? classes.notFound : ''}`}
+        disabled={isDisabled}
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
@@ -215,27 +216,27 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
   if (isCircular) {
     return (
       <div
-      tabIndex={0}
-      className={`btn btn-xs btn-default ${classes.valueTag} ${classes.circular} ${hasError ? classes.notFound : ""}`}
-      disabled={isDisabled}
-      draggable={!isDisabled}
-      onDragEnd={handleDragEnd}
-      onDragOver={handleDragOver}
-      onDragStart={handleDragStart}
-      onDrop={handleDrop}
-      onKeyDown={handleKeyDown}
-      title="This link points to itself!"
-    >
-      <span className={classes.valueLabel}>{label}</span>
-      {!disabled && <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />}
-    </div>
+        tabIndex={0}
+        className={`btn btn-xs btn-default ${classes.valueTag} ${classes.circular} ${hasError ? classes.notFound : ''}`}
+        disabled={isDisabled}
+        draggable={!isDisabled}
+        onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
+        onDragStart={handleDragStart}
+        onDrop={handleDrop}
+        onKeyDown={handleKeyDown}
+        title="This link points to itself!"
+      >
+        <span className={classes.valueLabel}>{label}</span>
+        {!disabled && <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />}
+      </div>
     );
   }
 
   return (
     <div
       tabIndex={0}
-      className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled ? "disabled" : ""} ${hasError ? classes.notFound : ""}`}
+      className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled ? 'disabled' : ''} ${hasError ? classes.notFound : ''}`}
       disabled={isDisabled}
       draggable={!isDisabled}
       onClick={handleClick}
@@ -253,6 +254,6 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     </div>
   );
 });
-ListItem.displayName = "ListItem";
+ListItem.displayName = 'ListItem';
 
 export default ListItem;

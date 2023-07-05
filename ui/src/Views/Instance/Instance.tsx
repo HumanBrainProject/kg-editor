@@ -21,83 +21,83 @@
  *
  */
 
-import React from "react";
-import {observer} from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {observer} from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import { Link } from 'react-router-dom';
 
-import useStores from "../../Hooks/useStores";
+import BGMessage from '../../Components/BGMessage';
+import useStores from '../../Hooks/useStores';
 
-import Preview from "../Preview";
-import InstanceView from "./InstanceView";
-import InstanceGraph from "./InstanceGraph";
-import InstanceRelease from "./InstanceRelease";
-import InstanceManage from "./InstanceManage";
-import InstanceRaw from "./InstanceRaw";
-import ExternalCreateModal from "../ExternalCreateModal";
-import SaveBar from "./SaveBar";
-import Tabs from "./Tabs";
-import BGMessage from "../../Components/BGMessage";
+import ExternalCreateModal from '../ExternalCreateModal';
+import Preview from '../Preview';
+import InstanceGraph from './InstanceGraph';
+import InstanceManage from './InstanceManage';
+import InstanceRaw from './InstanceRaw';
+import InstanceRelease from './InstanceRelease';
+import InstanceView from './InstanceView';
+import SaveBar from './SaveBar';
+import Tabs from './Tabs';
 
 const useStyles = createUseStyles({
   container: {
-    display: "grid",
-    height: "100%",
-    gridTemplateRows: "100%",
-    gridTemplateColumns: "50px 1fr 400px",
-    "&.hide-savebar": {
-      gridTemplateColumns: "50px 1fr",
-      "& $sidebar": {
-        display: "none"
+    display: 'grid',
+    height: '100%',
+    gridTemplateRows: '100%',
+    gridTemplateColumns: '50px 1fr 400px',
+    '&.hide-savebar': {
+      gridTemplateColumns: '50px 1fr',
+      '& $sidebar': {
+        display: 'none'
       }
     }
   },
   body: {
-    position: "relative",
-    overflow: "hidden"
+    position: 'relative',
+    overflow: 'hidden'
   },
   sidebar: {
-    position: "relative",
-    background: "var(--bg-color-ui-contrast2)",
-    borderLeft: "1px solid var(--border-color-ui-contrast1)",
-    overflow: "auto",
-    color: "var(--ft-color-loud)"
+    position: 'relative',
+    background: 'var(--bg-color-ui-contrast2)',
+    borderLeft: '1px solid var(--border-color-ui-contrast1)',
+    overflow: 'auto',
+    color: 'var(--ft-color-loud)'
   },
   previewPanel: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
-    right: "-600px",
-    maxWidth: "45%",
-    width: "600px",
-    height: "100%",
-    color: "var(--ft-color-loud)",
-    background: "var(--bg-color-ui-contrast2)",
+    right: '-600px',
+    maxWidth: '45%',
+    width: '600px',
+    height: '100%',
+    color: 'var(--ft-color-loud)',
+    background: 'var(--bg-color-ui-contrast2)',
     border: 0,
-    borderLeft: "1px solid var(--border-color-ui-contrast1)",
-    borderTopLeftRadius: "10px",
-    borderBottomLeftRadius: "10px",
-    transition: "right 0.3s ease-in-out",
+    borderLeft: '1px solid var(--border-color-ui-contrast1)',
+    borderTopLeftRadius: '10px',
+    borderBottomLeftRadius: '10px',
+    transition: 'right 0.3s ease-in-out',
     zIndex: 3,
-    "&.show": {
+    '&.show': {
       right: 0
     },
-    "& h3": {
-      margin: "10px 10px 0 10px"
+    '& h3': {
+      margin: '10px 10px 0 10px'
     }
   },
   closePreviewBtn: {
-    position: "absolute",
-    top: "5px",
-    right: "5px",
-    width: "28px",
-    height: "30px",
-    padding: "5px",
-    textAlign: "center",
-    cursor: "pointer"
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+    width: '28px',
+    height: '30px',
+    padding: '5px',
+    textAlign: 'center',
+    cursor: 'pointer'
   },
   errorMessage: {
-    color: "var(--ft-color-loud)"
+    color: 'var(--ft-color-loud)'
   }
 });
 
@@ -114,49 +114,49 @@ const View = observer(({instance, mode}: InstanceProps) => {
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
   switch (mode) {
-  case "create":
+  case 'create':
     if(instance.permissions.canCreate && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
-  case "edit":
+  case 'edit':
     if(instance.permissions.canWrite && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
-  case "view":
+  case 'view':
     if(instance.permissions.canRead && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
-  case "graph":
+  case 'graph':
     if(instance.permissions.canRead) {
       return (
         <InstanceGraph instance={instance} />
       );
     }
     break;
-  case "release":
+  case 'release':
     if(instance.permissions.canRelease && isTypesSupported) {
       return (
         <InstanceRelease instance={instance} />
       );
     }
     break;
-  case "manage":
+  case 'manage':
     if(instance.permissions.canRead) {
       return (
         <InstanceManage instance={instance} />
       );
     }
     break;
-  case "raw":
+  case 'raw':
     if(instance.permissions.canRead) {
       return (
         <InstanceRaw instance={instance} />
@@ -170,14 +170,14 @@ const View = observer(({instance, mode}: InstanceProps) => {
     <NoPermissionForView instance={instance} mode={mode} />
   );
 });
-View.displayName = "View";
+View.displayName = 'View';
 
 const getActionLabel = mode => {
-  if (mode === "raw") {
-    return "view";
+  if (mode === 'raw') {
+    return 'view';
   }
-  if (mode === "graph") {
-    return "visualize";
+  if (mode === 'graph') {
+    return 'visualize';
   }
   return mode;
 };
@@ -188,11 +188,11 @@ const NoPermissionForView = observer(({instance, mode}) => {
 
   return (
     <div className={classes.errorMessage} >
-      <BGMessage icon={"ban"}>
+      <BGMessage icon={'ban'}>
       You do not have permission to {getActionLabel(mode)} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
         {instance.permissions.canRead?
           <Link className="btn btn-primary" to={`/instances/${instance.id}`}>Go to view</Link>:
-          <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>}
+          <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>}
       </BGMessage>
     </div>
   );
@@ -213,7 +213,7 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
 
   return (
     <>
-      <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && mode !== "edit"? "hide-savebar":""}`}>
+      <div className={`${classes.container} ${!instanceStore.hasUnsavedChanges && mode !== 'edit'? 'hide-savebar':''}`}>
         <Tabs mode={mode} instance={instance} />
         <div className={classes.body}>
           <View instance={instance} mode={mode} />
@@ -222,7 +222,7 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
           <SaveBar/>
         </div>
       </div>
-      <div className={`${classes.previewPanel} ${previewInstance?"show":""}`}>
+      <div className={`${classes.previewPanel} ${previewInstance?'show':''}`}>
         {previewInstance && (
           <>
             <h3>Preview</h3>
@@ -233,7 +233,7 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
               showType={previewOptions.showType}
               showStatus={previewOptions.showStatus} />
             <div className={classes.closePreviewBtn} title="close preview" onClick={handleHidePreview}>
-              <FontAwesomeIcon icon={"times"} />
+              <FontAwesomeIcon icon={'times'} />
             </div>
           </>
         )}
@@ -242,6 +242,6 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
     </>
   );
 });
-Instance.displayName = "Instance";
+Instance.displayName = 'Instance';
 
 export default Instance;

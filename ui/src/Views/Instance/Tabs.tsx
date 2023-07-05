@@ -21,48 +21,48 @@
  *
  */
 
-import React from "react";
-import {observer} from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {observer} from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
 
-import useStores from "../../Hooks/useStores";
-import Matomo from "../../Services/Matomo";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import Instance from "../../Stores/Instance";
-import { Permissions, ViewMode } from "../../types";
+import useStores from '../../Hooks/useStores';
+import Matomo from '../../Services/Matomo';
+import type Instance from '../../Stores/Instance';
+import type { Permissions, ViewMode } from '../../types';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
   tabs: {
-    borderRight: "1px solid var(--border-color-ui-contrast1)",
-    background: "var(--bg-color-ui-contrast2)"
+    borderRight: '1px solid var(--border-color-ui-contrast1)',
+    background: 'var(--bg-color-ui-contrast2)'
   },
   tab: {
-    color: "var(--ft-color-normal)",
-    borderLeft: "2px solid transparent",
-    opacity: "0.7",
-    cursor: "pointer",
-    height: "50px",
-    lineHeight: "50px",
-    fontSize: "1.75em",
-    textAlign: "center",
-    "&:hover": {
-      background: "var(--list-bg-hover)",
-      borderColor: "var(--list-border-hover)",
-      color: "var(--ft-color-loud)",
-      opacity: "1"
+    color: 'var(--ft-color-normal)',
+    borderLeft: '2px solid transparent',
+    opacity: '0.7',
+    cursor: 'pointer',
+    height: '50px',
+    lineHeight: '50px',
+    fontSize: '1.75em',
+    textAlign: 'center',
+    '&:hover': {
+      background: 'var(--list-bg-hover)',
+      borderColor: 'var(--list-border-hover)',
+      color: 'var(--ft-color-loud)',
+      opacity: '1'
     },
-    "&.active": {
-      background: "var(--list-bg-selected)",
-      borderColor: "var(--list-border-selected)",
-      color: "var(--ft-color-loud)",
-      opacity: "1"
+    '&.active': {
+      background: 'var(--list-bg-selected)',
+      borderColor: 'var(--list-border-selected)',
+      color: 'var(--ft-color-loud)',
+      opacity: '1'
     },
-    "&.disabled, &.disabled:hover":{
-      color: "var(--ft-color-normal)",
-      opacity: "0.2",
-      cursor: "not-allowed"
+    '&.disabled, &.disabled:hover':{
+      color: 'var(--ft-color-normal)',
+      opacity: '0.2',
+      cursor: 'not-allowed'
     }
   }
 });
@@ -86,12 +86,12 @@ const Tab = ({ className, show, disabled, active, icon, mode, label, onClick }: 
 
   const props = disabled || active ?
     {
-      className: `${className} ${disabled?"disabled":""} ${active?"active":""}`
+      className: `${className} ${disabled?'disabled':''} ${active?'active':''}`
     }:
     {
       className: className,
       title: label,
-      onClick: () => typeof onClick === "function" && onClick(mode)
+      onClick: () => typeof onClick === 'function' && onClick(mode)
     };
 
   return(
@@ -117,8 +117,8 @@ const Tabs = observer(({ instance, mode }:TabsProps) => {
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
   const handleClick = (instanceMode: ViewMode) => {
-    Matomo.trackEvent("Instance", `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id);
-    if(instanceMode === "view") {
+    Matomo.trackEvent('Instance', `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`, instance.id);
+    if(instanceMode === 'view') {
       navigate(`/instances/${instance.id}`);
     } else {
       navigate(`/instances/${instance.id}/${instanceMode}`);
@@ -129,15 +129,15 @@ const Tabs = observer(({ instance, mode }:TabsProps) => {
 
   return (
     <div className={classes.tabs}>
-      <Tab className={classes.tab} icon="eye"              mode="view"    label="View"     disabled={mode === "create"} active={mode === "view"}                      onClick={handleClick} show={permissions?.canRead && isTypesSupported} />
-      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    label="Edit"     disabled={false}             active={mode === "edit" || mode === "create"} onClick={handleClick} show={(permissions?.canWrite || permissions?.canCreate) && isTypesSupported } />
-      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   label="Explore"  disabled={mode === "create"} active={mode === "graph"}                     onClick={handleClick} show={!instance.isNew && permissions?.canRead} />
-      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" label="Release"  disabled={mode === "create"} active={mode === "release"}                   onClick={handleClick} show={!instance.isNew && permissions?.canRelease && isTypesSupported} />
-      <Tab className={classes.tab} icon="cog"              mode="manage"  label="Manage"   disabled={mode === "create"} active={mode === "manage"}                    onClick={handleClick} show={!instance.isNew && permissions?.canRead} />
-      <Tab className={classes.tab} icon="code"             mode="raw"     label="Raw view" disabled={mode === "create"} active={mode === "raw"}                       onClick={handleClick} show={!instance.isNew && permissions?.canRead} />
+      <Tab className={classes.tab} icon="eye"              mode="view"    label="View"     disabled={mode === 'create'} active={mode === 'view'}                      onClick={handleClick} show={permissions?.canRead && isTypesSupported} />
+      <Tab className={classes.tab} icon="pencil-alt"       mode="edit"    label="Edit"     disabled={false}             active={mode === 'edit' || mode === 'create'} onClick={handleClick} show={(permissions?.canWrite || permissions?.canCreate) && isTypesSupported } />
+      <Tab className={classes.tab} icon="project-diagram"  mode="graph"   label="Explore"  disabled={mode === 'create'} active={mode === 'graph'}                     onClick={handleClick} show={!instance.isNew && permissions?.canRead} />
+      <Tab className={classes.tab} icon="cloud-upload-alt" mode="release" label="Release"  disabled={mode === 'create'} active={mode === 'release'}                   onClick={handleClick} show={!instance.isNew && permissions?.canRelease && isTypesSupported} />
+      <Tab className={classes.tab} icon="cog"              mode="manage"  label="Manage"   disabled={mode === 'create'} active={mode === 'manage'}                    onClick={handleClick} show={!instance.isNew && permissions?.canRead} />
+      <Tab className={classes.tab} icon="code"             mode="raw"     label="Raw view" disabled={mode === 'create'} active={mode === 'raw'}                       onClick={handleClick} show={!instance.isNew && permissions?.canRead} />
     </div>
   );
 });
-Tabs.displayName = "Tabs";
+Tabs.displayName = 'Tabs';
 
 export default Tabs;

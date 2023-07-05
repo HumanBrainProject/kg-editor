@@ -21,7 +21,7 @@
  *
  */
 
-import { extend } from "lodash";
+
 
 class Style {
   [index:string]: string;

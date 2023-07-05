@@ -21,63 +21,63 @@
  *
  */
 
-import React, { useState } from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   container: {
-    display: "flex",
-    position: "absolute",
+    display: 'flex',
+    position: 'absolute',
     top: 0,
-    width: "100%",
-    background: "hsla(191, 32%, 31%, 0.3)",
-    color: "var(--ft-color-quiet)",
-    padding: "5px 0 7px 20px",
-    "& > svg": {
-      transform: "translateY(3px)"
+    width: '100%',
+    background: 'hsla(191, 32%, 31%, 0.3)',
+    color: 'var(--ft-color-quiet)',
+    padding: '5px 0 7px 20px',
+    '& > svg': {
+      transform: 'translateY(3px)'
     },
-    "& > h3": {
-      margin: "0 10px",
-      fontSize: "16px"
+    '& > h3': {
+      margin: '0 10px',
+      fontSize: '16px'
     },
-    "& > button": {
-      position: "absolute",
-      color: "var(--ft-color-loud)",
+    '& > button': {
+      position: 'absolute',
+      color: 'var(--ft-color-loud)',
       right: 0,
       top: 0,
-      height: "100%",
-      padding: "5px 10px 5px 15px",
-      textAlign: "right",
-      background: "none",
-      border: "0",
-      cursor: "pointer",
-      outline: "0",
-      "&:hover": {
-        color: "var(--ft-color-loud)"
+      height: '100%',
+      padding: '5px 10px 5px 15px',
+      textAlign: 'right',
+      background: 'none',
+      border: '0',
+      cursor: 'pointer',
+      outline: '0',
+      '&:hover': {
+        color: 'var(--ft-color-loud)'
       }
     }
   },
   tip: {
-    flex: "1",
-    "& .kbd": {
-      display: "inline-block",
-      margin: "0 0.1em",
-      padding: "0.1em 0.6em",
-      border: "1px solid var(--border-color-ui-contrast2)",
-      borderRadius: "3px",
-      backgroundColor: "#f7f7f7",
-      fontFamily: "Arial,Helvetica,sans-serif",
-      fontSize: "11px",
-      lineHeight: "1.4",
-      color: "#333",
-      boxShadow: "0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset",
-      textShadow: "0 1px 0 #fff",
-      whiteSpace: "nowrap"
+    flex: '1',
+    '& .kbd': {
+      display: 'inline-block',
+      margin: '0 0.1em',
+      padding: '0.1em 0.6em',
+      border: '1px solid var(--border-color-ui-contrast2)',
+      borderRadius: '3px',
+      backgroundColor: '#f7f7f7',
+      fontFamily: 'Arial,Helvetica,sans-serif',
+      fontSize: '11px',
+      lineHeight: '1.4',
+      color: '#333',
+      boxShadow: '0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset',
+      textShadow: '0 1px 0 #fff',
+      whiteSpace: 'nowrap'
     }
   },
   bookmarkIcon: {
-    color: "var(--bookmark-on-color)"
+    color: 'var(--bookmark-on-color)'
   }
 });
 
@@ -106,7 +106,7 @@ const TipsOfTheDay = () => {
 
   return (
     <div className={classes.container}>
-      <FontAwesomeIcon icon={"lightbulb"} />
+      <FontAwesomeIcon icon={'lightbulb'} />
       <h3>Tips of the day:</h3>
       <div className={classes.tip}>{tips[currentIndex]}</div>
       <button onClick={handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>

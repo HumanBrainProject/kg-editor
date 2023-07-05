@@ -21,61 +21,62 @@
  *
  */
 
-import React, { useState, useEffect, useRef, ReactNode, MouseEvent } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Overlay from "react-bootstrap/Overlay";
-import Popover from "react-bootstrap/Popover";
-import Button from "react-bootstrap/Button";
-import uniqueId from "lodash/uniqueId";
-import { Placement } from "react-bootstrap/esm/types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import uniqueId from 'lodash/uniqueId';
+import { observer } from 'mobx-react-lite';
+import React, { useState, useEffect, useRef } from 'react';
+import Button from 'react-bootstrap/Button';
+import Overlay from 'react-bootstrap/Overlay';
+import Popover from 'react-bootstrap/Popover';
+import { createUseStyles } from 'react-jss';
+import type { ReactNode, MouseEvent } from 'react';
+import type { Placement } from 'react-bootstrap/esm/types';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    display: "inline-block"
+    position: 'relative',
+    display: 'inline-block'
   },
   button: {
-    position: "relative",
-    minWidth: "1.1em",
+    position: 'relative',
+    minWidth: '1.1em',
     margin: 0,
     padding: 0,
     border: 0,
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
     outline: 0
   },
   popOver: {
-    background: "var(--bg-color-ui-contrast6)",
-    border: "1px solid var(--border-color-ui-contrast6)",
-    "& .arrow:after": {
-      borderBottomColor: "var(--border-color-ui-contrast6) !important"
+    background: 'var(--bg-color-ui-contrast6)',
+    border: '1px solid var(--border-color-ui-contrast6)',
+    '& .arrow:after': {
+      borderBottomColor: 'var(--border-color-ui-contrast6) !important'
     }
   },
   popOverContent: {
-    margin: "20px 0",
-    color:"var(--ft-color-loud)"
+    margin: '20px 0',
+    color:'var(--ft-color-loud)'
   },
   popOverCloseButton: {
-    position: "absolute",
-    top: "3px",
-    right: "3px",
-    color:"var(--ft-color-loud)",
-    backgroundColor: "transparent",
-    border: "transparent"
+    position: 'absolute',
+    top: '3px',
+    right: '3px',
+    color:'var(--ft-color-loud)',
+    backgroundColor: 'transparent',
+    border: 'transparent'
   },
   popOverFooterBar: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
+    marginBottom: '10px',
+    width: '100%',
+    textAlign: 'center',
+    wordBreak: 'keep-all',
+    whiteSpace: 'nowrap',
+    '& button + button': {
+      marginLeft: '20px'
     }
   },
   fetchErrorIcon: {
-    color: "var(--ft-color-error)"
+    color: 'var(--ft-color-error)'
   }
 });
 
@@ -83,7 +84,7 @@ const windowHeight = () => {
   const w = window,
     d = document,
     e = d.documentElement,
-    g = d.getElementsByTagName("body")[0];
+    g = d.getElementsByTagName('body')[0];
   return w.innerHeight || e.clientHeight || g.clientHeight;
 };
 
@@ -98,7 +99,7 @@ const PopOverContent = ({ onSizeChange, children}: PopOverContentProps) => {
 
   useEffect(() => {
     if (ref.current) {
-      typeof onSizeChange === "function" && onSizeChange(ref.current.getBoundingClientRect());
+      typeof onSizeChange === 'function' && onSizeChange(ref.current.getBoundingClientRect());
     }
   });
 
@@ -120,14 +121,14 @@ const PopOverButton = observer(({ buttonTitle, children, onOk }: PopOverButtonPr
   const classes = useStyles();
 
   const [showPopOver, setShowPopOver] = useState(false);
-  const [popOverPosition, setPopOverPosition] = useState<Placement>("bottom");
+  const [popOverPosition, setPopOverPosition] = useState<Placement>('bottom');
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handlePopOverPosition = (popOverRect:DOMRect ) => {
     if (!popOverRect) { return null; }
     const buttonRect = buttonRef.current?.getBoundingClientRect();
-    const position = buttonRect && (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?"top":"bottom";
+    const position = buttonRect && (buttonRect.bottom + popOverRect.height + 5) >= windowHeight()?'top':'bottom';
     if (popOverPosition !== position) {
       setPopOverPosition(position);
     }
@@ -162,21 +163,21 @@ const PopOverButton = observer(({ buttonTitle, children, onOk }: PopOverButtonPr
         rootClose={true}
         onHide={handlePopOverClose}
       >
-        <Popover id={uniqueId("popover")} className={classes.popOver}>
+        <Popover id={uniqueId('popover')} className={classes.popOver}>
           <PopOverContent onSizeChange={handlePopOverPosition}>
             <div className={classes.popOverContent}>
               {children}
-            </div>            
+            </div>
             <div className={classes.popOverFooterBar}>
               <Button variant="primary" size="sm" onClick={handleOkClick}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
             </div>
-            <button className={classes.popOverCloseButton} onClick={handlePopOverClose} title="close"><FontAwesomeIcon icon="times"></FontAwesomeIcon></button>
+            <button className={classes.popOverCloseButton} onClick={handlePopOverClose} title="close"><FontAwesomeIcon icon="times" /></button>
           </PopOverContent>
         </Popover>
       </Overlay>
     </div>
   );
 });
-PopOverButton.displayName = "PopOverButton";
+PopOverButton.displayName = 'PopOverButton';
 
 export default PopOverButton;

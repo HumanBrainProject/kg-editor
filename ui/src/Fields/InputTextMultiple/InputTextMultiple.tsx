@@ -21,58 +21,59 @@
  *
  */
 
-import React, { ClipboardEvent, FocusEvent, KeyboardEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import Form from "react-bootstrap/Form";
-import { createUseStyles } from "react-jss";
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
 
-import List from "./List";
-import Label from "../Label";
 
-import Alternatives from "../Alternatives";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
-import { Alternative } from "../../types";
-import InputTextMultipleStore from "../Stores/InputTextMultipleStore";
+import Alternatives from '../Alternatives';
+import Invalid from '../Invalid';
+import Label from '../Label';
+import Warning from '../Warning';
+import List from './List';
+import type { Alternative } from '../../types';
+import type InputTextMultipleStore from '../Stores/InputTextMultipleStore';
+import type { ClipboardEvent, FocusEvent, KeyboardEvent} from 'react';
 
 const useStyles = createUseStyles({
   values:{
-    height:"auto",
-    paddingBottom:"3px",
-    position:"relative",
-    minHeight: "34px",
-    "& .btn":{
-      marginRight:"3px",
-      marginBottom:"3px"
+    height:'auto',
+    paddingBottom:'3px',
+    position:'relative',
+    minHeight: '34px',
+    '& .btn':{
+      marginRight:'3px',
+      marginBottom:'3px'
     },
-    "&[disabled]": {
-      pointerEvents:"none",
-      display: "none !important"
+    '&[disabled]': {
+      pointerEvents:'none',
+      display: 'none !important'
     }
   },
   label: {},
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   alternatives: {
-    marginLeft: "3px"
+    marginLeft: '3px'
   },
   userInput:{
-    background:"transparent",
-    border:"none",
-    color:"currentColor",
-    outline:"none",
-    width:"200px",
-    maxWidth:"33%",
-    marginBottom:"3px",
-    "&:disabled":{
-      cursor: "not-allowed"
+    background:'transparent',
+    border:'none',
+    color:'currentColor',
+    outline:'none',
+    width:'200px',
+    maxWidth:'33%',
+    marginBottom:'3px',
+    '&:disabled':{
+      cursor: 'not-allowed'
     }
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -81,8 +82,8 @@ interface AlternativeValueProps {
 }
 
 const getAlternativeValue = () => {
-  const AlternativeValue = observer(({alternative}: AlternativeValueProps) => Array.isArray(alternative.value) ? alternative.value.map(v => typeof v === "string"?v:JSON.stringify(v)).join("; "):JSON.stringify(alternative.value));
-  AlternativeValue.displayName = "AlternativeValue";
+  const AlternativeValue = observer(({alternative}: AlternativeValueProps) => Array.isArray(alternative.value) ? alternative.value.map(v => typeof v === 'string'?v:JSON.stringify(v)).join('; '):JSON.stringify(alternative.value));
+  AlternativeValue.displayName = 'AlternativeValue';
   return AlternativeValue;
 };
 
@@ -143,11 +144,11 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     if (value) {
       handleOnAddValue(value);
     }
-    e.target.value = "";
+    e.target.value = '';
   };
 
   const handleKeyDown = (value: number, e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
+    if (e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
     }
@@ -155,7 +156,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
   const handleNativePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    e.clipboardData.getData("text").split("\n").forEach(value => {
+    e.clipboardData.getData('text').split('\n').forEach(value => {
       const val = value.trim();
       if (val) {
         handleOnAddValue(val);
@@ -164,14 +165,14 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   };
 
   const handleKeyStrokes = (e: KeyboardEvent<HTMLInputElement>) => {
-    if(e.key === "Enter"){
+    if(e.key === 'Enter'){
       //User pressed "Enter" while focus on input and we have not reached the maximum number of values
       const value = e.currentTarget.value.trim();
       if (value) {
         handleOnAddValue(value);
       }
-      e.currentTarget.value = "";
-    } else if(!e.currentTarget.value && fieldStore.value.length > 0 && e.key === "Backspace"){
+      e.currentTarget.value = '';
+    } else if(!e.currentTarget.value && fieldStore.value.length > 0 && e.key === 'Backspace'){
       // User pressed "Backspace" while focus on input, and input is empty, and values have been entered
       e.preventDefault();
       e.currentTarget.value = list[list.length-1];
@@ -210,7 +211,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
         <List
           list={list}
           readOnly={false}
@@ -236,6 +237,6 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     </Form.Group>
   );
 });
-InputTextMultiple.displayName = "InputTextMultiple";
+InputTextMultiple.displayName = 'InputTextMultiple';
 
 export default InputTextMultiple;

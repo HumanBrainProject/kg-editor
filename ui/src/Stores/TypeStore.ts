@@ -21,8 +21,8 @@
  *
  */
 
-import { observable, action, computed, makeObservable } from "mobx";
-import { StructureOfType } from "../types";
+import { observable, action, computed, makeObservable } from 'mobx';
+import type { StructureOfType } from '../types';
 
 export class TypeStore {
   space?: string;

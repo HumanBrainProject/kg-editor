@@ -21,19 +21,19 @@
  *
  */
 
-import React, { useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import { observer } from "mobx-react-lite";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
 
-import useGetSettingsQuery from "../Hooks/useGetSettingsQuery";
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
-import useStores from "../Hooks/useStores";
-import AuthAdapter from "../Services/AuthAdapter";
-import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
-import Matomo from "../Services/Matomo";
-import Sentry from "../Services/Sentry";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useGetSettingsQuery from '../Hooks/useGetSettingsQuery';
+import useStores from '../Hooks/useStores';
+import KeycloakAuthAdapter from '../Services/KeycloakAuthAdapter';
+import Matomo from '../Services/Matomo';
+import Sentry from '../Services/Sentry';
+import type AuthAdapter from '../Services/AuthAdapter';
 
 interface SettingsProps {
   authAdapter?: AuthAdapter;
@@ -65,16 +65,16 @@ const Settings = observer(({ authAdapter, children }: SettingsProps) => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings]);
-  
+
 
   if (isError) {
     return (
       <ErrorPanel>
         The service is temporary unavailable. Please retry in a moment. ({error}).<br /><br />
-      <Button variant={"primary"} onClick={refetch}>
-        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-      </Button>
-    </ErrorPanel>
+        <Button variant={'primary'} onClick={refetch}>
+          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+        </Button>
+      </ErrorPanel>
     );
   }
 
@@ -90,7 +90,7 @@ const Settings = observer(({ authAdapter, children }: SettingsProps) => {
       return (
         <ErrorPanel>
           <p>Failed to initialize authentication!</p>
-          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+          <p>Please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
         </ErrorPanel>
       );
     }
@@ -104,6 +104,6 @@ const Settings = observer(({ authAdapter, children }: SettingsProps) => {
 
   return null;
 });
-Settings.displayName = "Settings";
+Settings.displayName = 'Settings';
 
 export default Settings;

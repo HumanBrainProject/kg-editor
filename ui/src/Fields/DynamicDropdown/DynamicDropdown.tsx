@@ -21,58 +21,60 @@
  *
  */
 
-import React, { KeyboardEvent, MouseEvent, SyntheticEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import Form from "react-bootstrap/Form";
-import { createUseStyles } from "react-jss";
-import { v4 as uuidv4 } from "uuid";
-import { useLocation, useNavigate } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import useStores from "../../Hooks/useStores";
+import DropdownComponent  from '../../Components/DynamicDropdown/Dropdown';
+import useStores from '../../Hooks/useStores';
 
-import DropdownComponent  from "../../Components/DynamicDropdown/Dropdown";
-import DynamicOption  from "../DynamicOption/DynamicOption";
-import LinksAlternatives from "../LinksAlternatives";
-import Label from "../Label";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
+import Matomo from '../../Services/Matomo';
+import DynamicOption  from '../DynamicOption/DynamicOption';
+import Invalid from '../Invalid';
+import Label from '../Label';
+import LinksAlternatives from '../LinksAlternatives';
+import TargetTypeSelection from '../TargetTypeSelection';
+import Warning from '../Warning';
 
-import List from "./List";
-import TargetTypeSelection from "../TargetTypeSelection";
-import Matomo from "../../Services/Matomo";
-import LinksStore, { Value } from "../Stores/LinksStore";
-import { View } from "../../Stores/ViewStore";
-import { Suggestion } from "../../types";
+import List from './List';
+import type { View } from '../../Stores/ViewStore';
+import type { Suggestion } from '../../types';
+import type LinksStore from '../Stores/LinksStore';
+
+import type { KeyboardEvent, MouseEvent, SyntheticEvent} from 'react';
 
 const useStyles = createUseStyles({
   labelContainer: {
-    display: "flex"
+    display: 'flex'
   },
   labelPanel: {
-    flex: "1"
+    flex: '1'
   },
   values:{
     flex: 1,
-    height:"auto",
-    paddingBottom:"3px",
-    position:"relative",
-    minHeight: "34px",
-    "&[disabled]": {
-      backgroundColor: "#e9ecef",
-      pointerEvents:"none"
+    height:'auto',
+    paddingBottom:'3px',
+    position:'relative',
+    minHeight: '34px',
+    '&[disabled]': {
+      backgroundColor: '#e9ecef',
+      pointerEvents:'none'
     }
   },
   label: {},
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   alternatives: {
-    marginLeft: "3px"
+    marginLeft: '3px'
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -134,7 +136,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {
-        const index = view.panes.findIndex(p => p === pane); 
+        const index = view.panes.findIndex(p => p === pane);
         if (index !== -1 && index < view.panes.length -1) {
           const targetPane = view.panes[index+1];
           view.setInstanceHighlight(targetPane, id, fieldStore.label);
@@ -208,10 +210,10 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-        Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
+        Matomo.trackEvent('Instance', 'CreateInstanceInExternalSpace', option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
-        Matomo.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
+        Matomo.trackEvent('Instance', 'CreateInstanceInCurrentSpace', option.type.name);
         addNewValue(name, option.type.name);
       }
     } else {
@@ -234,7 +236,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   };
 
   const handleKeyDown = (value: number , e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Backspace") { //User pressed "Backspace" while focus on a value
+    if (e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
       instanceStore.togglePreviewInstance();
@@ -277,7 +279,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     return null;
   }
 
-  const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)))
+  const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)));
 
   if(readMode || isReadOnly){
     return (
@@ -328,7 +330,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:""}`} disabled={isDisabled} onClick={handleDropDownFocus} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         <List
           mainInstanceId={instance.id}
           list={links}
@@ -367,6 +369,6 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     </Form.Group>
   );
 });
-DynamicDropdown.displayName = "DynamicDropdown";
+DynamicDropdown.displayName = 'DynamicDropdown';
 
 export default DynamicDropdown;

@@ -23,11 +23,11 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
-import FieldError from "./FieldError";
-import { fieldsMapping } from ".";
-import FieldStore from "./Stores/FieldStore";
+import FieldError from './FieldError';
+import { fieldsMapping } from '.';
+import type FieldStore from './Stores/FieldStore';
 
 interface FieldProps {
   [key: string]: any;

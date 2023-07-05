@@ -22,43 +22,43 @@
  */
 
 
-import React from "react";
-import InfiniteScroll from "react-infinite-scroller";
-import { createUseStyles } from "react-jss";
+import React from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import { createUseStyles } from 'react-jss';
 
-import MenuItems from "./MenuItems";
-import { Suggestion } from "../../types";
+import MenuItems from './MenuItems';
+import type { Suggestion } from '../../types';
 
 const useStyles = createUseStyles({
   container:{
-    display:"block",
-    position: "absolute",
-    top: "100%",
-    left: "0",
-    width:"100%",
-    maxHeight:"33vh",
-    zIndex: "1000",
-    float: "left",
-    overflowY:"auto",
-    minWidth: "160px",
-    padding: "5px 0",
-    margin: "2px 0 0",
-    fontSize: "14px",
-    textAlign: "left",
-    backgroundColor: "#fff",
-    backgroundClip: "padding-box",
-    border: "1px solid rgba(0,0,0,.15)",
-    borderRadius: "4px",
-    boxShadow: "0 6px 12px rgba(0,0,0,.175)"
+    display:'block',
+    position: 'absolute',
+    top: '100%',
+    left: '0',
+    width:'100%',
+    maxHeight:'33vh',
+    zIndex: '1000',
+    float: 'left',
+    overflowY:'auto',
+    minWidth: '160px',
+    padding: '5px 0',
+    margin: '2px 0 0',
+    fontSize: '14px',
+    textAlign: 'left',
+    backgroundColor: '#fff',
+    backgroundClip: 'padding-box',
+    border: '1px solid rgba(0,0,0,.15)',
+    borderRadius: '4px',
+    boxShadow: '0 6px 12px rgba(0,0,0,.175)'
   },
   menu:{
-    position:"static",
-    display:"block",
-    float:"none",
-    width:"100%",
-    background:"none",
-    border:"none",
-    boxShadow:"none",
+    position:'static',
+    display:'block',
+    float:'none',
+    width:'100%',
+    background:'none',
+    border:'none',
+    boxShadow:'none',
     padding: 0,
     margin:0
   }
@@ -77,7 +77,7 @@ interface MenuProps {
   onCancel: () => void;
 }
 
-const Menu = ({ 
+const Menu = ({
   current,
   hasMore,
   onLoadMore,
@@ -100,16 +100,16 @@ const Menu = ({
         hasMore={hasMore}
         loadMore={onLoadMore}
         useWindow={false}>
-          <MenuItems
-            current={current}
-            searchTerm={searchTerm}
-            items={items}
-            loading={loading}
-            hasMore={hasMore}
-            onSelect={onSelect}
-            onSelectNext={onSelectNext}
-            onSelectPrevious={onSelectPrevious}
-            onCancel={onCancel}
+        <MenuItems
+          current={current}
+          searchTerm={searchTerm}
+          items={items}
+          loading={loading}
+          hasMore={hasMore}
+          onSelect={onSelect}
+          onSelectNext={onSelectNext}
+          onSelectPrevious={onSelectPrevious}
+          onCancel={onCancel}
         />
       </InfiniteScroll>
     </div>

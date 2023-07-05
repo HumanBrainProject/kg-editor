@@ -21,30 +21,31 @@
  *
  */
 
-import React, { ChangeEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
 
-import Alternatives from "../Alternatives";
-import Label from "../Label";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
-import { Alternative } from "../../types";
-import InputNumberStore from "../Stores/InputNumberStore";
+import Alternatives from '../Alternatives';
+import Invalid from '../Invalid';
+import Label from '../Label';
+import Warning from '../Warning';
+import type { Alternative } from '../../types';
+import type InputNumberStore from '../Stores/InputNumberStore';
+import type { ChangeEvent} from 'react';
 
 const useStyles = createUseStyles({
   alternatives: {
-    marginLeft: "3px"
+    marginLeft: '3px'
   },
   label: {},
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -53,14 +54,14 @@ interface AlternativeValueProps {
 }
 
 const AlternativeValue = observer(({alternative}: AlternativeValueProps) => JSON.stringify(alternative.value));
-AlternativeValue.displayName = "AlternativeValue";
+AlternativeValue.displayName = 'AlternativeValue';
 
 interface InputNumberProps {
   fieldStore: InputNumberStore;
   className: string;
   readMode: boolean;
   showIfNoValue: boolean;
-} 
+}
 
 const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }: InputNumberProps) => {
 
@@ -93,7 +94,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
 
   if(readMode || isReadOnly){
 
-    const val = !value || typeof value === "string"? value:String(value);
+    const val = !value || typeof value === 'string'? value:String(value);
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} isReadOnly={readMode?false:isReadOnly} />
@@ -121,13 +122,13 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         type={inputType}
         onChange={handleChange}
         disabled={isDisabled}
-        className={hasValidationWarnings?classes.warning:""}
+        className={hasValidationWarnings?classes.warning:''}
       />
       <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
       <Warning show={hasWarning} message={fieldStore.warning} />
     </Form.Group>
   );
 });
-InputNumber.displayName = "InputNumber";
+InputNumber.displayName = 'InputNumber';
 
 export default InputNumber;

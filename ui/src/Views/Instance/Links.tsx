@@ -21,19 +21,19 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import Pane from "./Pane";
-import InstanceForm from "./InstanceForm";
+import useStores from '../../Hooks/useStores';
+import InstanceForm from './InstanceForm';
+import Pane from './Pane';
 
-import useStores from "../../Hooks/useStores";
-import Instance from "../../Stores/Instance";
+import type Instance from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   pane: {
-    position: "relative"
+    position: 'relative'
   }
 });
 
@@ -89,7 +89,7 @@ const Links = observer(({ instanceId }: LinksProps) => {
 
   const path = view.instancePath;
   const index = path.findIndex(id => id === instanceId);
-  const instancePath = index > 0?path.slice(0, index):[instanceId]; 
+  const instancePath = index > 0?path.slice(0, index):[instanceId];
 
   const groups = getGroups(instance, instancePath);
   if (!groups.length) {
@@ -106,7 +106,7 @@ const Links = observer(({ instanceId }: LinksProps) => {
         {groups.map(group => (
           <div key={group.label} data-provenance={group.label}>
             <h4>{group.label}{group.pagination?
-              <em style={{fontWeight:"lighter"}}>
+              <em style={{fontWeight:'lighter'}}>
                       (showing {group.pagination.count} out of {group.pagination.total})</em>:null}
             </h4>
             {group.ids.map(id => (
@@ -119,7 +119,7 @@ const Links = observer(({ instanceId }: LinksProps) => {
     </>
   );
 });
-Links.displayName = "Links";
+Links.displayName = 'Links';
 
 const DecoratedLinks = Links;
 export default Links;

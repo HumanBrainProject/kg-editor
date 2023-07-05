@@ -21,30 +21,30 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import Spinner from "./Spinner";
+import Spinner from './Spinner';
 
 const useStyles = createUseStyles({
   container: {
-    height: "100%"
+    height: '100%'
   },
   panel: {
-    position: "fixed",
+    position: 'fixed',
     top: 0,
     left: 0,
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     zIndex: 10000,
-    background: "var(--bg-color-blend-contrast1)",
-    "& .spinnerPanel": {
-      width: "auto",
-      padding: "30px",
-      border: "1px solid var(--border-color-ui-contrast6)",
-      borderRadius: "4px",
-      color: "var(--ft-color-loud)",
-      background: "var(--bg-color-ui-contrast6)"
+    background: 'var(--bg-color-blend-contrast1)',
+    '& .spinnerPanel': {
+      width: 'auto',
+      padding: '30px',
+      border: '1px solid var(--border-color-ui-contrast6)',
+      borderRadius: '4px',
+      color: 'var(--ft-color-loud)',
+      background: 'var(--bg-color-ui-contrast6)'
     }
   }
 });

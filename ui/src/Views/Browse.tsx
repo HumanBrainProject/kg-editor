@@ -21,32 +21,32 @@
  *
  */
 
-import React, {useEffect} from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React, {useEffect} from 'react';
+import { createUseStyles } from 'react-jss';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import Matomo from "../Services/Matomo";
-import useStores from "../Hooks/useStores";
-import Instances from "./Browse/Instances";
-import NavigationPanel from "./Browse/NavigationPanel";
+import useStores from '../Hooks/useStores';
+import Matomo from '../Services/Matomo';
+import Instances from './Browse/Instances';
+import NavigationPanel from './Browse/NavigationPanel';
 
 const useStyles = createUseStyles({
   container: {
-    display:"grid",
-    gridTemplateColumns:"318px 1fr",
-    gridTemplateRows:"1fr",
-    overflow:"hidden",
-    height:"100%"
+    display:'grid',
+    gridTemplateColumns:'318px 1fr',
+    gridTemplateRows:'1fr',
+    overflow:'hidden',
+    height:'100%'
   }
 });
 
 const Browse = observer(() => {
- 
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const space = searchParams.get("space");
-  const type = searchParams.get("type");
+  const space = searchParams.get('space');
+  const type = searchParams.get('type');
 
   const { browseStore, typeStore } = useStores();
 
@@ -60,7 +60,7 @@ const Browse = observer(() => {
     }
 
     if (space || type) {
-      navigate("/browse", { replace: true});
+      navigate('/browse', { replace: true});
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,6 +75,6 @@ const Browse = observer(() => {
     </div>
   );
 });
-Browse.displayName = "Browse";
+Browse.displayName = 'Browse';
 
 export default Browse;

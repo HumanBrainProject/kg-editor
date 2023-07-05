@@ -21,51 +21,51 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import ReactJson from "react-json-view";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import ReactJson from 'react-json-view';
+import { createUseStyles } from 'react-jss';
 
-import ThemeRJV from "../../Themes/ThemeRJV";
-import Instance from "../../Stores/Instance";
+import ThemeRJV from '../../Themes/ThemeRJV';
+import type Instance from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    padding: "10px",
-    color: "var(--ft-color-normal)"
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    padding: '10px',
+    color: 'var(--ft-color-normal)'
   },
   panel: {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-    padding: "15px",
-    background: "var(--bg-color-ui-contrast2)",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    overflow: "hidden",
-    position: "relative"
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    padding: '15px',
+    background: 'var(--bg-color-ui-contrast2)',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    overflow: 'hidden',
+    position: 'relative'
   },
   content: {
     flex: 1,
-    margin: "15px 0",
-    padding: "10px 0 10px 10px",
-    border: "1px solid var(--border-color-ui-contrast1)"
+    margin: '15px 0',
+    padding: '10px 0 10px 10px',
+    border: '1px solid var(--border-color-ui-contrast1)'
   },
   types: {
-    marginBottom: "10px"
+    marginBottom: '10px'
   },
   type: {
-    paddingRight: "10px"
+    paddingRight: '10px'
   },
   label: {
-    margin: "0"
+    margin: '0'
   },
   id: {
-    fontSize: "0.75em"
+    fontSize: '0.75em'
   }
 });
 
@@ -84,7 +84,7 @@ const InstanceRaw = observer(({instance}: InstanceRawProps) => {
         {instance.types && !!instance.types.length && (
           <h6 className={classes.types}>
             {instance.types && instance.types.map(({name, label, color}) => (
-              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
+              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={'circle'} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
             ))}
           </h6>
         )}
@@ -95,7 +95,7 @@ const InstanceRaw = observer(({instance}: InstanceRawProps) => {
         )}
         <div className={classes.content}>
           <Scrollbars autoHide>
-                <ReactJson collapsed={1} name={false} theme={ThemeRJV} src={instance.rawData} />
+            <ReactJson collapsed={1} name={false} theme={ThemeRJV} src={instance.rawData} />
           </Scrollbars>
         </div>
         <div className={classes.id}>
@@ -108,6 +108,6 @@ const InstanceRaw = observer(({instance}: InstanceRawProps) => {
     </div>
   );
 });
-InstanceRaw.displayName = "InstanceRaw";
+InstanceRaw.displayName = 'InstanceRaw';
 
 export default InstanceRaw;

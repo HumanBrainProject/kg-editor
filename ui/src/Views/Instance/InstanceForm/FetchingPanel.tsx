@@ -21,50 +21,50 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   panel: {
-    position: "relative",
-    padding: "10px 10px 0 10px",
-    fontSize: "18px",
-    fontWeight: "lighter",
-    "@media screen and (max-width:576px)": {
-      width: "220px",
-      "&[inline='false']": {
-        width: "180px"
+    position: 'relative',
+    padding: '10px 10px 0 10px',
+    fontSize: '18px',
+    fontWeight: 'lighter',
+    '@media screen and (max-width:576px)': {
+      width: '220px',
+      '&[inline=\'false\']': {
+        width: '180px'
       }
     },
-    "&.block": {
-      position: "absolute !important",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)"
+    '&.block': {
+      position: 'absolute !important',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
     },
-    "& small": {
-      display: "block",
-      padding: "10px 0",
-      color:"grey",
-      fontWeight:"400",
-      fontSize:"0.6em",
-      fontStyle: "italic",
-      "@media screen and (max-width:576px)": {
-        wordBreak: "break-all",
-        wordWrap: "break-word",
-        whiteSpace: "normal"
+    '& small': {
+      display: 'block',
+      padding: '10px 0',
+      color:'grey',
+      fontWeight:'400',
+      fontSize:'0.6em',
+      fontStyle: 'italic',
+      '@media screen and (max-width:576px)': {
+        wordBreak: 'break-all',
+        wordWrap: 'break-word',
+        whiteSpace: 'normal'
       }
     }
   },
   label: {
-    paddingLeft: "6px"
+    paddingLeft: '6px'
   }
 });
 
 interface FetchingPanelProps {
   id: string;
-  show: boolean; 
+  show: boolean;
   inline: boolean;
 }
 
@@ -77,7 +77,7 @@ const FetchingPanel = ({ id, show, inline }: FetchingPanelProps) => {
   }
 
   return(
-    <div className={`${classes.panel} ${inline?"":"block"} `}>
+    <div className={`${classes.panel} ${inline?'':'block'} `}>
       <FontAwesomeIcon icon="circle-notch" spin/>
       <span className={classes.label}>Retrieving instance...</span>
       <small>ID: {id}</small>

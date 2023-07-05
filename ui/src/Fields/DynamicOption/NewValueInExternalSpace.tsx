@@ -24,51 +24,51 @@
  */
 
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Suggestion } from "../../types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import type { Suggestion } from '../../types';
 
 const useStyles = createUseStyles({
   create: {
-    whiteSpace: "normal"
+    whiteSpace: 'normal'
   },
   info: {
-    position: "relative",
-    backgroundColor: "rgba(255, 226, 20, 0.6)",
-    padding: "5px",
-    marginTop: "2px",
-    whiteSpace: "normal"
+    position: 'relative',
+    backgroundColor: 'rgba(255, 226, 20, 0.6)',
+    padding: '5px',
+    marginTop: '2px',
+    whiteSpace: 'normal'
   }
 });
 
 interface NewValueInExternalSpaceProps {
   item: Suggestion;
 }
-  
+
 const NewValueInExternalSpace = ({item:{space, type}}: NewValueInExternalSpaceProps) => {
 
-    const classes = useStyles();
-  
-    const style = type.color ? { color: type.color } : {};
-  
-    if (space.permissions.canCreate) {
-      return (
-        <em className={classes.create}>
-          Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
-          {type.label} in space <strong>{space.name}</strong>
-        </em>
-      );
-    }
-  
+  const classes = useStyles();
+
+  const style = type.color ? { color: type.color } : {};
+
+  if (space.permissions.canCreate) {
     return (
-      <div className={classes.info}>
-        <em>You are not allowed to create a new <span style={style}>
-          <FontAwesomeIcon fixedWidth icon="circle" />
-        </span>
-        {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>
-      </div>
+      <em className={classes.create}>
+          Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
+        {type.label} in space <strong>{space.name}</strong>
+      </em>
     );
-  };
-  
+  }
+
+  return (
+    <div className={classes.info}>
+      <em>You are not allowed to create a new <span style={style}>
+        <FontAwesomeIcon fixedWidth icon="circle" />
+      </span>
+      {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>
+    </div>
+  );
+};
+
 export default NewValueInExternalSpace;

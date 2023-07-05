@@ -21,46 +21,46 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react-lite";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
 
-import { ViewContext, PaneContext } from "../../../Stores/ViewStore";
-import Field from "../../../Fields/Field";
-import Label from "../../../Fields/Label";
-import IncomingLinks from "../IncomingLinks/IncomingLinks";
-import PossibleIncomingLinks from "../IncomingLinks/PossibleIncomingLinks";
-import Instance from "../../../Stores/Instance";
+import Field from '../../../Fields/Field';
+import Label from '../../../Fields/Label';
+import { ViewContext, PaneContext } from '../../../Stores/ViewStore';
+import IncomingLinks from '../IncomingLinks/IncomingLinks';
+import PossibleIncomingLinks from '../IncomingLinks/PossibleIncomingLinks';
+import type Instance from '../../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
-    margin: "0",
-    padding: "0",
-    border: "0",
-    borderRadius: "0",
-    boxShadow: "none",
-    backgroundColor: "transparent"
+    margin: '0',
+    padding: '0',
+    border: '0',
+    borderRadius: '0',
+    boxShadow: 'none',
+    backgroundColor: 'transparent'
   },
   field: {
-    marginBottom: "10px",
-    wordBreak: "break-word"
+    marginBottom: '10px',
+    wordBreak: 'break-word'
   },
   label: {
-    "&:after": {
-      content: "':\\00a0'"
+    '&:after': {
+      content: '\':\\00a0\''
     }
   },
   errorMessage: {
-    marginBottom: "15px",
-    fontWeight:"300",
-    fontSize:"1em",
-    color: "var(--ft-color-error)",
-    "& path":{
-      fill:"var(--ft-color-error)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px"
+    marginBottom: '15px',
+    fontWeight:'300',
+    fontSize:'1em',
+    color: 'var(--ft-color-error)',
+    '& path':{
+      fill:'var(--ft-color-error)',
+      stroke:'rgba(200,200,200,.1)',
+      strokeWidth:'3px'
     }
   }
 });
@@ -83,11 +83,11 @@ const NoPermissionForView = observer(({ instance, mode }: NoPermissionForViewPro
     </>
   );
 });
-NoPermissionForView.displayName = "NoPermissionForView";
+NoPermissionForView.displayName = 'NoPermissionForView';
 
 interface BodyPanelProps {
   className: string;
-  instance: Instance; 
+  instance: Instance;
   readMode: boolean;
 }
 
@@ -129,6 +129,6 @@ const BodyPanel = observer(({ className, instance, readMode}: BodyPanelProps) =>
     </Form>
   );
 });
-BodyPanel.displayName = "BodyPanel";
+BodyPanel.displayName = 'BodyPanel';
 
 export default BodyPanel;

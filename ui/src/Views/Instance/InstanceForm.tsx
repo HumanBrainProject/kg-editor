@@ -21,119 +21,120 @@
  *
  */
 
-import React, { MouseEvent, useEffect } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import Color from "color";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Color from 'color';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import { useNavigate } from 'react-router-dom';
+import GlobalFieldErrors from '../../Components/GlobalFieldErrors';
+import useStores from '../../Hooks/useStores';
 
-import HeaderPanel from "./InstanceForm/HeaderPanel";
-import BodyPanel from "./InstanceForm/BodyPanel";
-import FooterPanel from "./InstanceForm/FooterPanel";
-import FetchErrorPanel from "./InstanceForm/FetchErrorPanel";
-import SaveErrorPanel from "./InstanceForm/SaveErrorPanel";
-import FetchingPanel from "./InstanceForm/FetchingPanel";
-import SavingPanel from "./InstanceForm/SavingPanel";
-import ConfirmCancelEditPanel from "./InstanceForm/ConfirmCancelEditPanel";
-import CreatingChildInstancePanel from "./InstanceForm/CreatingChildInstancePanel";
-import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
-import { useNavigate } from "react-router-dom";
-import { View } from "../../Stores/ViewStore";
+import BodyPanel from './InstanceForm/BodyPanel';
+import ConfirmCancelEditPanel from './InstanceForm/ConfirmCancelEditPanel';
+import CreatingChildInstancePanel from './InstanceForm/CreatingChildInstancePanel';
+import FetchErrorPanel from './InstanceForm/FetchErrorPanel';
+import FetchingPanel from './InstanceForm/FetchingPanel';
+import FooterPanel from './InstanceForm/FooterPanel';
+import HeaderPanel from './InstanceForm/HeaderPanel';
+import SaveErrorPanel from './InstanceForm/SaveErrorPanel';
+import SavingPanel from './InstanceForm/SavingPanel';
+import type { View } from '../../Stores/ViewStore';
+import type { MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    transition: "all 0.25s linear",
-    "&:not(.current)": {
-      borderRadius: "10px",
-      color: "#555",
-      cursor: "pointer"
+    transition: 'all 0.25s linear',
+    '&:not(.current)': {
+      borderRadius: '10px',
+      color: '#555',
+      cursor: 'pointer'
     },
-    "&.main:not(.current)": {
-      border: "1px solid transparent",
-      padding: "10px"
+    '&.main:not(.current)': {
+      border: '1px solid transparent',
+      padding: '10px'
     },
-    "&:not(.main)": {
-      position: "relative",
-      marginBottom: "10px",
-      border: "1px solid var(--border-color-ui-contrast2)",
-      borderRadius: "10px"
+    '&:not(.main)': {
+      position: 'relative',
+      marginBottom: '10px',
+      border: '1px solid var(--border-color-ui-contrast2)',
+      borderRadius: '10px'
     },
-    "&:not(.main).current": {
-      borderColor: "#666",
-      backgroundColor: "white",
-      boxShadow: "2px 2px 4px #a5a1a1"
+    '&:not(.main).current': {
+      borderColor: '#666',
+      backgroundColor: 'white',
+      boxShadow: '2px 2px 4px #a5a1a1'
     },
-    "&:not(.main).hasChanged": {
-      background: new Color("#f39c12").lighten(0.66).hex()
+    '&:not(.main).hasChanged': {
+      background: new Color('#f39c12').lighten(0.66).hex()
     },
-    "&:hover:not(.current)": {
-      backgroundColor: "var(--link-bg-color-hover-quiet)",
-      borderColor: "var(--link-border-color-hover)"
+    '&:hover:not(.current)': {
+      backgroundColor: 'var(--link-bg-color-hover-quiet)',
+      borderColor: 'var(--link-border-color-hover)'
     },
-    "&:hover:not(.current).readMode": {
-      color: "var(--link-ft-color-hover)"
+    '&:hover:not(.current).readMode': {
+      color: 'var(--link-ft-color-hover)'
     },
-    "& > div:first-Child": {
-      position: "relative"
+    '& > div:first-Child': {
+      position: 'relative'
     },
-    "&:not(.current).highlight": {
-      backgroundColor: "var(--link-bg-color-hover)",
-      borderColor: "var(--link-border-color-hover)",
-      color: "#143048"
+    '&:not(.current).highlight': {
+      backgroundColor: 'var(--link-bg-color-hover)',
+      borderColor: 'var(--link-border-color-hover)',
+      color: '#143048'
     },
-    "& .highlightArrow": {
-      display: "none",
-      position: "absolute",
-      top: "50%",
-      left: "-26px",
-      color: "transparent",
-      fontSize: "xx-large",
-      transform: "translateY(-50%) scale(0.5,0.8)"
+    '& .highlightArrow': {
+      display: 'none',
+      position: 'absolute',
+      top: '50%',
+      left: '-26px',
+      color: 'transparent',
+      fontSize: 'xx-large',
+      transform: 'translateY(-50%) scale(0.5,0.8)'
     },
-    "&:not(.current) .highlightArrow": {
-      display: "inline",
-      position: "absolute",
-      top: "50%",
-      left: "-25px",
-      color: "transparent",
-      fontSize: "xx-large",
-      transform: "translateY(-50%) scale(0.5,0.7)",
-      transition: "color 0.25s ease-in-out"
+    '&:not(.current) .highlightArrow': {
+      display: 'inline',
+      position: 'absolute',
+      top: '50%',
+      left: '-25px',
+      color: 'transparent',
+      fontSize: 'xx-large',
+      transform: 'translateY(-50%) scale(0.5,0.7)',
+      transition: 'color 0.25s ease-in-out'
     },
-    "&:not(.current).highlight .highlightArrow": {
-      color: "var(--link-ft-color-hover)"
+    '&:not(.current).highlight .highlightArrow': {
+      color: 'var(--link-ft-color-hover)'
     },
-    "&:not(.main) $panelHeader": {
-      padding: "10px 10px 0 10px"
+    '&:not(.main) $panelHeader': {
+      padding: '10px 10px 0 10px'
     },
-    "&.current $panelHeader h6": {
-      margin: "10px 0",
-      color: "#333"
+    '&.current $panelHeader h6': {
+      margin: '10px 0',
+      color: '#333'
     },
-    "&:not(.main) $panelBody": {
-      padding: "10px 10px 0 10px"
+    '&:not(.main) $panelBody': {
+      padding: '10px 10px 0 10px'
     },
-    "&:not(.main) $panelFooter": {
-      padding: "0 10px"
+    '&:not(.main) $panelFooter': {
+      padding: '0 10px'
     }
   },
   panelHeader: {
-    padding: "0"
+    padding: '0'
   },
   panelBody: {
-    padding: "10px 0 0 0"
+    padding: '10px 0 0 0'
   },
   panelFooter: {
-    padding: "0"
+    padding: '0'
   },
   hasChangedIndicator: {
-    height: "9px",
-    width: "9px",
-    backgroundColor: "#FC3D3A",
-    borderRadius: "50%",
-    display: "inline-block"
+    height: '9px',
+    width: '9px',
+    backgroundColor: '#FC3D3A',
+    borderRadius: '50%',
+    display: 'inline-block'
   }
 });
 
@@ -207,14 +208,14 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
 
   const belongsToCurrentSpace = appStore.currentSpace && instance.space === appStore.currentSpace.id;
 
-  const isReadMode = view.mode === "view" || !belongsToCurrentSpace;
+  const isReadMode = view.mode === 'view' || !belongsToCurrentSpace;
 
   const mainInstanceId = view.instanceId;
   const isMainInstance = id === mainInstanceId;
   const isCurrentInstance = id === view.currentInstanceId;
   const highlight = view.instanceHighlight && view.instanceHighlight.pane === pane && view.instanceHighlight.instanceId === id && view.instanceHighlight.provenance === provenance;
 
-  const className = `${classes.container} ${isReadMode?"readMode":""} ${isCurrentInstance?"current":""} ${isMainInstance?"main":""} ${instance.hasChanged?"hasChanged":""} ${highlight?"highlight":""}`;
+  const className = `${classes.container} ${isReadMode?'readMode':''} ${isCurrentInstance?'current':''} ${isMainInstance?'main':''} ${instance.hasChanged?'hasChanged':''} ${highlight?'highlight':''}`;
 
   if (instance.hasFetchError) {
     return (
@@ -257,7 +258,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
             showOpenActions={isCurrentInstance && !isMainInstance} />
           <ConfirmCancelEditPanel
             show={instance.cancelChangesPending}
-            text={"There are some unsaved changes. Are you sure you want to cancel the changes of this instance?"}
+            text={'There are some unsaved changes. Are you sure you want to cancel the changes of this instance?'}
             onConfirm={handleConfirmCancelEdit}
             onCancel={handleContinueEditing}
             inline={!isMainInstance} />
@@ -272,6 +273,6 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
 
   return null;
 });
-InstanceForm.displayName = "InstanceForm";
+InstanceForm.displayName = 'InstanceForm';
 
 export default InstanceForm;

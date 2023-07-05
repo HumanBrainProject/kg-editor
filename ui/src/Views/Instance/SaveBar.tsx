@@ -21,31 +21,31 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Modal from "react-bootstrap/Modal";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Modal from 'react-bootstrap/Modal';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
 
-import useStores from "../../Hooks/useStores";
+import useStores from '../../Hooks/useStores';
 
-import CompareChanges from "./CompareChanges";
-import Matomo from "../../Services/Matomo";
-import { Instance as InstanceType } from "../../Stores/InstanceStore";
+import Matomo from '../../Services/Matomo';
+import CompareChanges from './CompareChanges';
+import type { Instance as InstanceType } from '../../Stores/InstanceStore';
 
 const useStyles = createUseStyles({
   container:{
-    height:"100%",
-    "& h4":{
+    height:'100%',
+    '& h4':{
       padding:10,
       marginTop:0,
-      lineHeight:"1.8",
-      "& .btn":{
-        float:"right"
+      lineHeight:'1.8',
+      '& .btn':{
+        float:'right'
       }
     }
   },
@@ -54,83 +54,83 @@ const useStyles = createUseStyles({
   },
   instance:{
     padding:10,
-    display:"grid",
-    "&:nth-child(odd)":{
-      background:"var(--bg-color-ui-contrast3)"
+    display:'grid',
+    '&:nth-child(odd)':{
+      background:'var(--bg-color-ui-contrast3)'
     },
-    "&:nth-child(even)":{
-      background:"var(--bg-color-ui-contrast2)"
+    '&:nth-child(even)':{
+      background:'var(--bg-color-ui-contrast2)'
     },
-    gridTemplateColumns:"1fr 50px"
+    gridTemplateColumns:'1fr 50px'
   },
   actions:{
-    gridRow:"span 4",
-    textAlign:"right"
+    gridRow:'span 4',
+    textAlign:'right'
   },
   id:{
-    fontSize:"0.7em",
-    color:"#aaa",
-    fontStyle:"italic",
-    wordBreak:"break-all",
+    fontSize:'0.7em',
+    color:'#aaa',
+    fontStyle:'italic',
+    wordBreak:'break-all',
     marginTop:5
   },
   type:{
-    fontWeight:"bold",
-    fontSize:"0.8em"
+    fontWeight:'bold',
+    fontSize:'0.8em'
   },
   label:{
-    fontSize:"0.9em"
+    fontSize:'0.9em'
   },
   errors:{
-    color:"red",
-    fontSize:"0.7em",
+    color:'red',
+    fontSize:'0.7em',
     marginTop:5
   },
   saveIcon: {
-    color: "red",
-    animation: "$animationIdBar 1.4s infinite linear"
+    color: 'red',
+    animation: '$animationIdBar 1.4s infinite linear'
   },
-  "@keyframes animationIdBar": {
-    "0%": {
-      transform: "scale(1)"
+  '@keyframes animationIdBar': {
+    '0%': {
+      transform: 'scale(1)'
     },
-    "50%": {
-      transform: "scale(0.1)"
+    '50%': {
+      transform: 'scale(0.1)'
     },
-    "100%": {
-      transform: "scale(1)"
+    '100%': {
+      transform: 'scale(1)'
     }
   },
   noChanges:{
-    textAlign:"center",
-    marginTop:"20px"
+    textAlign:'center',
+    marginTop:'20px'
   },
   allGreenIcon:{
-    color:"white",
-    background:"#2ecc71",
-    fontSize:"2em",
-    borderRadius:"50%",
-    width:"50px",
-    height:"50px",
-    lineHeight:"50px",
-    display:"inline-block"
+    color:'white',
+    background:'#2ecc71',
+    fontSize:'2em',
+    borderRadius:'50%',
+    width:'50px',
+    height:'50px',
+    lineHeight:'50px',
+    display:'inline-block'
   },
   allGreenText:{
-    fontWeight:"bold",
-    marginTop:"20px"
+    fontWeight:'bold',
+    marginTop:'20px'
   },
   compareModal:{
-    width:"90%",
-    "@media screen and (min-width:1024px)": {
-      width:"900px"
+    width:'90%',
+    '@media screen and (min-width:1024px)': {
+      width:'900px'
     },
-    "& .modal-body": {
-      height: "calc(95vh - 112px)",
-      padding: "3px 0"
+    '& .modal-body': {
+      height: 'calc(95vh - 112px)',
+      padding: '3px 0'
     }
   },
   autoreleaseWarning: {
-    margin: "10px 10px 0 10px"
+    margin: '10px 10px 0 10px'
   }
 });
 
@@ -211,13 +211,13 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
       </div>
       {instance.hasSaveError && (
         <div className={classes.errors}>
-          {instance.saveError} <Button size="sm" variant={"link"} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
+          {instance.saveError} <Button size="sm" variant={'link'} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
         </div>
       )}
     </div>
   );
 });
-Instance.displayName = "Instance";
+Instance.displayName = 'Instance';
 
 const SaveBar = observer(() => {
 
@@ -229,33 +229,33 @@ const SaveBar = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    
+
     const onUnload = e => {
       if (instanceStore.hasUnsavedChanges) {
         e.returnValue = true;
       }
     };
 
-    window.addEventListener("beforeunload", onUnload);
+    window.addEventListener('beforeunload', onUnload);
     return () => {
-      window.removeEventListener("beforeunload", onUnload);
+      window.removeEventListener('beforeunload', onUnload);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSaveAll = () => {
-    Matomo.trackEvent("Instance", "SaveAll");
+    Matomo.trackEvent('Instance', 'SaveAll');
     instanceStore.getUnsavedInstances.forEach(instance => !instance.isSaving && appStore.saveInstance(instance, navigate));
   };
 
   const handleSave = (instance: InstanceType) => {
-    Matomo.trackEvent("Instance", "InstanceSave", instance.id);
+    Matomo.trackEvent('Instance', 'InstanceSave', instance.id);
     appStore.saveInstance(instance, navigate);
     setComparedInstance(null);
   };
 
   const handleReset = (instance: InstanceType) => {
-    Matomo.trackEvent("Instance", "InstanceReset", instance.id);
+    Matomo.trackEvent('Instance', 'InstanceReset', instance.id);
     instanceStore.confirmCancelInstanceChanges(instance.id);
     setComparedInstance(null);
   };
@@ -263,7 +263,7 @@ const SaveBar = observer(() => {
   const handleDismissSaveError = (instance: InstanceType) => instance.cancelSave();
 
   const handleCompare = (instance: InstanceType) => {
-    Matomo.trackEvent("Instance", "InstanceCompare", instance.id);
+    Matomo.trackEvent('Instance', 'InstanceCompare', instance.id);
     setComparedInstance(instance);
   };
 
@@ -294,6 +294,6 @@ const SaveBar = observer(() => {
     </div>
   );
 });
-SaveBar.displayName = "SaveBar";
+SaveBar.displayName = 'SaveBar';
 
 export default SaveBar;

@@ -21,56 +21,56 @@
  *
  */
 
-import React from "react";
-import { createUseStyles, useTheme } from "react-jss";
+import React from 'react';
+import { createUseStyles, useTheme } from 'react-jss';
 
-import Logo from "./Logo";
-import Nav from "./Nav";
-import Copyright from "./Copyright";
-import Commit from "./Commit";
+import Commit from './Commit';
+import Copyright from './Copyright';
+import Logo from './Logo';
+import Nav from './Nav';
 
 const getBackgroundSize = theme => {
   if(theme.background.size) {
     return theme.background.size;
   }
   if(theme.background.image) {
-    return "unset";
+    return 'unset';
   }
-  return "200%";
+  return '200%';
 };
 
 const useStyles = createUseStyles(theme => ({
   container: {
-    height: "100vh",
-    display: "grid",
-    overflow: "hidden",
-    gridTemplateColumns: "1fr",
-    gridTemplateRows: "auto 1fr 20px"
+    height: '100vh',
+    display: 'grid',
+    overflow: 'hidden',
+    gridTemplateColumns: '1fr',
+    gridTemplateRows: 'auto 1fr 20px'
   },
   header: {
-    position: "relative",
-    display: "grid",
-    gridTemplateRows: "1fr",
-    gridTemplateColumns: "auto 1fr",
-    background: "var(--bg-color-ui-contrast1)"
+    position: 'relative',
+    display: 'grid',
+    gridTemplateRows: '1fr',
+    gridTemplateColumns: 'auto 1fr',
+    background: 'var(--bg-color-ui-contrast1)'
   },
   main: {
-    position: "relative",
-    overflow: "hidden",
-    background: "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
+    position: 'relative',
+    overflow: 'hidden',
+    background: 'linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))',
     backgroundSize: getBackgroundSize(theme),
-    backgroundImage: theme.background.image?`url('${theme.background.image}')`:"unset",
-    backgroundPosition: theme.background.position?theme.background.position:"unset",
-    backgroundColor: theme.backgroundColor?theme.backgroundColor:"unset",
+    backgroundImage: theme.background.image?`url('${theme.background.image}')`:'unset',
+    backgroundPosition: theme.background.position?theme.background.position:'unset',
+    backgroundColor: theme.backgroundColor?theme.backgroundColor:'unset',
   },
   footer: {
-    position: "relative",
-    display: "grid",
-    gridTemplateRows: "1fr",
-    gridTemplateColumns: "1fr auto",
-    background: "var(--bg-color-ui-contrast1)",
-    color: "var(--ft-color-loud)",
-    padding: "0 10px"
+    position: 'relative',
+    display: 'grid',
+    gridTemplateRows: '1fr',
+    gridTemplateColumns: '1fr auto',
+    background: 'var(--bg-color-ui-contrast1)',
+    color: 'var(--ft-color-loud)',
+    padding: '0 10px'
   }
 }));
 
@@ -78,7 +78,7 @@ const Layout = ({ children }) => {
 
   const theme = useTheme();
   const classes = useStyles({ theme });
-  
+
   return (
     <div className={classes.container}>
       <header className={classes.header}>

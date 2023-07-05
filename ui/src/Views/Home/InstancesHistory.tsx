@@ -21,106 +21,107 @@
  *
  */
 
-import React, { ChangeEvent, useEffect } from "react";
-import { toJS } from "mobx";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import InstanceRow from "../Instance/InstanceRow";
-import PopOverButton from "../../Components/PopOverButton";
+import { useNavigate } from 'react-router-dom';
+import PopOverButton from '../../Components/PopOverButton';
+import useStores from '../../Hooks/useStores';
+import Matomo from '../../Services/Matomo';
+import InstanceRow from '../Instance/InstanceRow';
 
-import useStores from "../../Hooks/useStores";
-import { useNavigate } from "react-router-dom";
-import Matomo from "../../Services/Matomo";
-import { ViewMode } from "../../types";
-import { Instance } from "../../Stores/InstanceStore";
+import type { Instance } from '../../Stores/InstanceStore';
+import type { ViewMode } from '../../types';
+import type { ChangeEvent} from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    color:"var(--ft-color-normal)",
-    "& .header": {
-      display: "flex",
-      margin: "25px 0 10px 0",
-      "& h3": {
+    color:'var(--ft-color-normal)',
+    '& .header': {
+      display: 'flex',
+      margin: '25px 0 10px 0',
+      '& h3': {
         flex: 1,
         margin: 0,
-        "& .selector": {
-          display: "inline-block",
-          position: "relative",
-          marginRight: "4px",
-          "& select": {
-            background: "transparent",
+        '& .selector': {
+          display: 'inline-block',
+          position: 'relative',
+          marginRight: '4px',
+          '& select': {
+            background: 'transparent',
             border: 0,
-            margin: "0",
-            padding: "0 25px 0 0",
-            "-webkit-appearance": "none",
-            cursor: "pointer",
-            color: "inherit"
+            margin: '0',
+            padding: '0 25px 0 0',
+            '-webkit-appearance': 'none',
+            cursor: 'pointer',
+            color: 'inherit'
           },
-          "&:before": {
-            content: "\" \"",
-            display: "block",
-            position: "absolute",
-            top: "50%",
-            right: "10px",
-            transform: "translateY(-3px)",
+          '&:before': {
+            content: '" "',
+            display: 'block',
+            position: 'absolute',
+            top: '50%',
+            right: '10px',
+            transform: 'translateY(-3px)',
             width: 0,
             height: 0,
-            borderLeft: "6px solid transparent",
-            borderRight: "6px solid transparent",
-            borderTop: "6px solid var(--ft-color-normal)",
-            cursor: "pointer",
-            pointerEvents: "none"
+            borderLeft: '6px solid transparent',
+            borderRight: '6px solid transparent',
+            borderTop: '6px solid var(--ft-color-normal)',
+            cursor: 'pointer',
+            pointerEvents: 'none'
           }
         }
       },
-      "& ul": {
-        display: "inline-block",
-        margin: "6px 0 0 0",
-        "& li": {
-          display: "inline-block",
-          margin: "0 0 0 10px",
-          "& input": {
-            marginRight: "4px"
+      '& ul': {
+        display: 'inline-block',
+        margin: '6px 0 0 0',
+        '& li': {
+          display: 'inline-block',
+          margin: '0 0 0 10px',
+          '& input': {
+            marginRight: '4px'
           }
         }
       }
     },
-    "& ul": {
-      listStyleType: "none",
+    '& ul': {
+      listStyleType: 'none',
       paddingLeft: 0,
-      "& li": {
+      '& li': {
       }
     }
   },
   message: {
-    position: "relative",
-    width: "100%",
-    padding: "15px",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)"
+    position: 'relative',
+    width: '100%',
+    padding: '15px',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    background: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-normal)'
   },
   noHistory: {
-    extend: "message"
+    extend: 'message'
   },
   retrieving: {
-    extend: "message",
-    "& span": {
-      paddingLeft: "10px"
+    extend: 'message',
+    '& span': {
+      paddingLeft: '10px'
     }
   },
   fetchError: {
-    extend: "message",
-    "& span": {
-      paddingLeft: "10px"
+    extend: 'message',
+    '& span': {
+      paddingLeft: '10px'
     }
   },
   textError: {
     margin: 0,
-    wordBreak: "keep-all",
-    padding: "5px"
+    wordBreak: 'keep-all',
+    padding: '5px'
   }
 });
 
@@ -136,9 +137,9 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
   const navigate = useNavigate();
 
   const handleInstanceClick = (instance: Instance) => {
-    let id = instance && instance.id;
+    const id = instance && instance.id;
     if (id) {
-      Matomo.trackEvent("Home", "InstanceOpenTab", instance.id);
+      Matomo.trackEvent('Home', 'InstanceOpenTab', instance.id);
       navigate(`/instances/${id}`);
     }
   };
@@ -146,7 +147,7 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
   const handleInstanceCtrlClick = (instance: Instance) => {
     const id = instance?.id;
     if (id) {
-      Matomo.trackEvent("Home", "InstanceOpenTabInBackground", instance.id);
+      Matomo.trackEvent('Home', 'InstanceOpenTabInBackground', instance.id);
       appStore.openInstance(id, instance.name, instance.primaryType);
     }
   };
@@ -160,8 +161,8 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
           instance.initializeLabelData(toJS(historyInstance));
         }
       }
-      Matomo.trackEvent("Home", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
-      if(mode === "view") {
+      Matomo.trackEvent('Home', `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
+      if(mode === 'view') {
         navigate(`/instances/${id}`);
       } else {
         navigate(`/instances/${id}/${mode}`);
@@ -197,17 +198,15 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
 
   return (
     <ul>
-      {historyStore.instances.map(instance => {
-        return (
-          <li key={instance.id}>
-            <InstanceRow instance={instance} selected={false} onClick={handleInstanceClick}  onCtrlClick={handleInstanceCtrlClick}  onActionClick={handleInstanceActionClick} />
-          </li>
-        );
-      })}
+      {historyStore.instances.map(instance => (
+        <li key={instance.id}>
+          <InstanceRow instance={instance} selected={false} onClick={handleInstanceClick}  onCtrlClick={handleInstanceCtrlClick}  onActionClick={handleInstanceActionClick} />
+        </li>
+      ))}
     </ul>
   );
 });
-InstancesHistoryBody.displayName = "InstancesHistoryBody";
+InstancesHistoryBody.displayName = 'InstancesHistoryBody';
 
 interface InstancesHistoryHeaderProps {
   onChange: () => void;
@@ -259,7 +258,7 @@ const InstancesHistoryHeader = observer(({ onChange }: InstancesHistoryHeaderPro
     </div>
   );
 });
-InstancesHistoryHeader.displayName = "InstancesHistoryHeader";
+InstancesHistoryHeader.displayName = 'InstancesHistoryHeader';
 
 const InstancesHistory = observer(() => {
 
@@ -292,6 +291,6 @@ const InstancesHistory = observer(() => {
     </div>
   );
 });
-InstancesHistory.displayName = "InstancesHistory";
+InstancesHistory.displayName = 'InstancesHistory';
 
 export default InstancesHistory;

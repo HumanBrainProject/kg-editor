@@ -21,14 +21,14 @@
  *
  */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import { FieldStoreDefinition } from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition } from '../../types';
 
 
 class CheckBoxStore extends FieldStore {
@@ -77,8 +77,8 @@ class CheckBoxStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (typeof this.initialValue === "object") {
-      return typeof this.returnValue !== "object"; // user did not change the value
+    if (typeof this.initialValue === 'object') {
+      return typeof this.returnValue !== 'object'; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
   }

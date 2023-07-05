@@ -21,80 +21,81 @@
  *
  */
 
-import React, { MouseEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import Label from "../Label";
-import Field from "../Field";
-import Add from "./Add";
-import { ViewContext, PaneContext } from "../../Stores/ViewStore";
-import { compareField } from "../../Stores/Instance";
-import { ActionProps } from "./NestedField";
-import SingleNestedFieldStore from "../Stores/SingleNestedFieldStore";
+import { compareField } from '../../Stores/Instance';
+import { ViewContext, PaneContext } from '../../Stores/ViewStore';
+import Field from '../Field';
+import Label from '../Label';
+import Add from './Add';
+import type { ActionProps } from './NestedField';
+import type SingleNestedFieldStore from '../Stores/SingleNestedFieldStore';
+import type { MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
   label: {},
   readMode:{
-    "& $item": {
+    '& $item': {
       padding: 0
     },
-    "&:.readOnly $label:after": {
-      content: "':\\00a0'"
+    '&:.readOnly $label:after': {
+      content: '\':\\00a0\''
     },
-    "& $field + $field": {
-      marginTop: "0.5rem"
+    '& $field + $field': {
+      marginTop: '0.5rem'
     }
   },
   form: {
-    position: "relative",
-    border: "1px solid #ced4da",
-    borderRadius: ".25rem",
-    padding: "10px"
+    position: 'relative',
+    border: '1px solid #ced4da',
+    borderRadius: '.25rem',
+    padding: '10px'
   },
   item: {
-    position: "relative",
+    position: 'relative',
     border: 0,
-    borderRadius: ".25rem",
-    padding: "30px 0 0 0 ",
-    minHeight: "40px"
+    borderRadius: '.25rem',
+    padding: '30px 0 0 0 ',
+    minHeight: '40px'
   },
   field: {
     marginBottom: 0,
-    "& + $field": {
-      marginTop: "1rem"
+    '& + $field': {
+      marginTop: '1rem'
     }
   },
   actions: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
-    display: "flex",
-    alignItems: "flex-end"
+    display: 'flex',
+    alignItems: 'flex-end'
   },
   action: {
-    fontSize: "0.9em",
-    lineHeight: "27px",
-    textAlign: "center",
-    backgroundColor: "var(--button-secondary-bg-color)",
-    color: "var(--ft-color-loud)",
-    cursor: "pointer",
-    width: "25px",
-    borderRadius: "4px",
-    "&:hover": {
-      backgroundColor: "var(--button-secondary-active-bg-color)"
+    fontSize: '0.9em',
+    lineHeight: '27px',
+    textAlign: 'center',
+    backgroundColor: 'var(--button-secondary-bg-color)',
+    color: 'var(--ft-color-loud)',
+    cursor: 'pointer',
+    width: '25px',
+    borderRadius: '4px',
+    '&:hover': {
+      backgroundColor: 'var(--button-secondary-active-bg-color)'
     }
   },
   actionBtn: {
-    marginTop: "10px",
-    "&$noItems": {
-      marginTop: "0"
+    marginTop: '10px',
+    '&$noItems': {
+      marginTop: '0'
     }
   },
   noItems: {},
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -108,7 +109,7 @@ const Action = ({ icon, title, onClick }: ActionProps) => {
     if (!e.currentTarget.contains(e.target)) {
       return;
     }
-    typeof onClick === "function" && onClick();
+    typeof onClick === 'function' && onClick();
   };
 
   return (
@@ -155,7 +156,7 @@ const Item = ({ itemFieldStores, readMode, active, index, onDelete }: ItemProps)
 interface SingleNestedFieldProps {
   className: string;
   fieldStore: SingleNestedFieldStore;
-  readMode: boolean; 
+  readMode: boolean;
   showIfNoValue: boolean;
 }
 
@@ -189,7 +190,7 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
   }
 
   return (
-    <div className={`${(readMode || isReadOnly)?classes.readMode:""} ${className} ${isReadOnly?"readOnly":""}`} ref={formGroupRef}>
+    <div className={`${(readMode || isReadOnly)?classes.readMode:''} ${className} ${isReadOnly?'readOnly':''}`} ref={formGroupRef}>
       {readMode ?
         <Label className={classes.label} label={label} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isPublic={isPublic} isReadOnly={isReadOnly} />
@@ -199,12 +200,12 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
           <Item itemFieldStores={nestedFieldsStores.stores} readMode={readMode || isReadOnly} active={active}  onDelete={handleDelete} />
         )}
         {!readMode && !isReadOnly && active && !nestedFieldsStores && (
-          <Add className={`${classes.actionBtn} ${nestedFieldsStores?"":classes.noItems}`} onClick={handleAdd} types={fieldStore.resolvedTargetTypes} />
+          <Add className={`${classes.actionBtn} ${nestedFieldsStores?'':classes.noItems}`} onClick={handleAdd} types={fieldStore.resolvedTargetTypes} />
         )}
       </div>
     </div>
   );
 });
-SingleNestedField.displayName = "SingleNestedField";
+SingleNestedField.displayName = 'SingleNestedField';
 
 export default SingleNestedField;

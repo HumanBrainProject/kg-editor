@@ -21,10 +21,11 @@
  *
  */
 
-import React, { KeyboardEvent } from "react";
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
 
-import ListItem from "./ListItem";
+import ListItem from './ListItem';
+import type { KeyboardEvent } from 'react';
 
 interface ListProps {
   list: string[];

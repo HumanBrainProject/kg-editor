@@ -21,14 +21,14 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   warning: {
-    marginBottom: "15px",
-    color: "var(--ft-color-error)"
+    marginBottom: '15px',
+    color: 'var(--ft-color-error)'
   }
 });
 
@@ -38,7 +38,7 @@ interface WarningProps {
 }
 
 const Warning = ({ show, message }: WarningProps) => {
-  
+
   const classes = useStyles();
 
   if (!show || !message) {

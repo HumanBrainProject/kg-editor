@@ -21,49 +21,49 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import ReleaseStatus from '../../Components/ReleaseStatus';
+import useStores from '../../Hooks/useStores';
 
-import ReleaseStatus from "../../Components/ReleaseStatus";
-import { Status } from "../../Stores/StatusStore";
+import { Status } from '../../Stores/StatusStore';
 
 const useStyles = createUseStyles({
   container: {
-    fontSize: "0.75em",
-    display: "inline-block",
-    "& > div:only-child": {
-      display: "block",
-      position: "relative",
-      zIndex: "5"
+    fontSize: '0.75em',
+    display: 'inline-block',
+    '& > div:only-child': {
+      display: 'block',
+      position: 'relative',
+      zIndex: '5'
     },
-    "& > div:first-child:not(:only-of-type)": {
-      display: "block",
-      position: "relative",
-      zIndex: "5",
-      boxShadow: "0.2em 0.2em 0.1em var(--release-status-box-shadow)"
+    '& > div:first-child:not(:only-of-type)': {
+      display: 'block',
+      position: 'relative',
+      zIndex: '5',
+      boxShadow: '0.2em 0.2em 0.1em var(--release-status-box-shadow)'
     },
-    "& > div:not(:first-child)": {
-      position: "relative",
-      top: "-0.3em",
-      left: "0.6em",
-      display: "block",
-      zIndex: "3"
+    '& > div:not(:first-child)': {
+      position: 'relative',
+      top: '-0.3em',
+      left: '0.6em',
+      display: 'block',
+      zIndex: '3'
     }
   },
   loader: {
-    borderRadius: "0.14em",
-    width: "2.5em",
-    background: "var(--bg-color-ui-contrast2)",
-    textAlign: "center",
-    color: "var(--ft-color-loud)",
-    border: "1px solid var(--ft-color-loud)",
-    "& .svg-inline--fa": {
-      fontSize: "0.8em",
-      verticalAlign: "baseline"
+    borderRadius: '0.14em',
+    width: '2.5em',
+    background: 'var(--bg-color-ui-contrast2)',
+    textAlign: 'center',
+    color: 'var(--ft-color-loud)',
+    border: '1px solid var(--ft-color-loud)',
+    '& .svg-inline--fa': {
+      fontSize: '0.8em',
+      verticalAlign: 'baseline'
     }
   }
 });
@@ -78,14 +78,14 @@ const InstanceStatus = observer(({ instanceStatus, classes, darkmode }: Instance
   if (instanceStatus?.hasFetchError) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={"question-circle"} />
+        <FontAwesomeIcon icon={'question-circle'} />
       </div>
     );
   }
   if (!instanceStatus?.isFetched) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={"circle-notch"} spin />
+        <FontAwesomeIcon icon={'circle-notch'} spin />
       </div>
     );
   }
@@ -104,7 +104,7 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }: 
   if (instanceStatus?.hasFetchErrorChildren) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={"question-circle"} />
+        <FontAwesomeIcon icon={'question-circle'} />
       </div>
     );
   }
@@ -112,7 +112,7 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }: 
   if (!instanceStatus?.isFetchedChildren) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={"circle-notch"} spin />
+        <FontAwesomeIcon icon={'circle-notch'} spin />
       </div>
     );
   }

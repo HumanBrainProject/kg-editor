@@ -21,16 +21,16 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { useParams, useSearchParams, Navigate, Link } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { useParams, useSearchParams, Navigate, Link } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
 
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
-import useCheckInstanceQuery from "../Hooks/useCheckInstanceQuery";
-import useAPI from "../Hooks/useAPI";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useAPI from '../Hooks/useAPI';
+import useCheckInstanceQuery from '../Hooks/useCheckInstanceQuery';
+import useStores from '../Hooks/useStores';
 
 interface InstanceCreationProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -47,7 +47,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
   const [searchParams] = useSearchParams();
 
   const instanceId = params.id;
-  const typeName = searchParams.get("type");
+  const typeName = searchParams.get('type');
 
   const {
     data,
@@ -97,7 +97,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
     return (
       <ErrorPanel>
         query parameter &quot;type&quot; is missing!<br /><br />
-        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+        <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>
       </ErrorPanel>
     );
   }
@@ -106,7 +106,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
     return (
       <ErrorPanel>
         Your current space credentials does not allow you to create instances in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
-        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+        <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>
       </ErrorPanel>
     );
   }
@@ -115,7 +115,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
     return (
       <ErrorPanel>
         Creation of instance of type &quot;{typeName}&quot; is not supported<br /><br />
-        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+        <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>
       </ErrorPanel>
     );
   }
@@ -124,7 +124,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
     return (
       <ErrorPanel>
         Creating an instance of type &quot;{typeName}&quot; is currently not allowed in space &quot;{appStore.currentSpaceName}&quot;<br /><br />
-        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+        <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>
       </ErrorPanel>
     );
   }
@@ -133,7 +133,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
     return (
       <ErrorPanel>
         {error}<br /><br />
-        <Link className="btn btn-primary" to={"/browse"}>Go to browse</Link>
+        <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>
       </ErrorPanel>
     );
   }
@@ -158,6 +158,6 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
 
   return null;
 });
-InstanceCreation.displayName = "InstanceCreation";
+InstanceCreation.displayName = 'InstanceCreation';
 
 export default InstanceCreation;

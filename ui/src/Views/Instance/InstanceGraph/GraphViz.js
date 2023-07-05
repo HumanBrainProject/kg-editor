@@ -21,47 +21,47 @@
  *
  */
 
-import React, { useEffect, useState, useRef } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { ForceGraph2D } from "react-force-graph";
-import debounce from "lodash/debounce";
-import Color from "color";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Color from 'color';
+import debounce from 'lodash/debounce';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState, useRef } from 'react';
+import { ForceGraph2D } from 'react-force-graph';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
 const useStyles = createUseStyles({
   graph: {
-    width: "100%",
-    height: "100%",
-    borderRadius: "4px",
-    overflow: "hidden",
-    zIndex: "2",
-    position: "relative"
+    width: '100%',
+    height: '100%',
+    borderRadius: '4px',
+    overflow: 'hidden',
+    zIndex: '2',
+    position: 'relative'
   },
   slider: {
-    width: "5%",
-    height: "20%",
-    position: "absolute",
-    bottom: "10px",
-    right: "0px"
+    width: '5%',
+    height: '20%',
+    position: 'absolute',
+    bottom: '10px',
+    right: '0px'
   },
   capture: {
-    position: "absolute",
-    top: "10px",
-    right: "10px"
+    position: 'absolute',
+    top: '10px',
+    right: '10px'
   },
   settings: {
-    position: "absolute",
-    top: "20px",
-    right: "20px"
+    position: 'absolute',
+    top: '20px',
+    right: '20px'
   },
   edit: {
-    position: "absolute",
-    top: "20px",
-    right: "74px"
+    position: 'absolute',
+    top: '20px',
+    right: '74px'
   }
 });
 
@@ -87,9 +87,9 @@ const GraphViz = observer(() => {
     }, 250);
     updateDimensions();
     graphRef.current && graphRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
-    window.addEventListener("resize", updateDimensions);
+    window.addEventListener('resize', updateDimensions);
     return () => {
-      window.removeEventListener("resize", updateDimensions);
+      window.removeEventListener('resize', updateDimensions);
     };
   }, []);
 
@@ -114,14 +114,14 @@ const GraphViz = observer(() => {
 
   const getNodeName = node => {
     if(node.isGroup) {
-      return `Group of ${node.types.length > 1?("(" + node.name + ")"):node.name} (${node.nodes.length})`;
+      return `Group of ${node.types.length > 1?('(' + node.name + ')'):node.name} (${node.nodes.length})`;
     }
     return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
   };
 
   const getNodeLabel = node =>  {
     const nodeName = getNodeName(node);
-    let space = "";
+    let space = '';
     if(node.space && node.space !== appStore.currentSpace.id) {
       space = `(Space: ${node.space})`;
     }
@@ -133,7 +133,7 @@ const GraphViz = observer(() => {
   const wrapText = (context, text, x, y, maxWidth, lineHeight, node) => {
     if (node.labelLines === undefined) {
       let words = text.split(/( |_|-|\.)/gi); //NOSONAR
-      let line = "";
+      let line = '';
       let lines = [];
 
       for (let n = 0; n < words.length; n++) {
@@ -185,9 +185,9 @@ const GraphViz = observer(() => {
     ctx.fill();
     if (scale > 3) {
       ctx.beginPath();
-      ctx.font = "1.2px Arial";
-      ctx.textAlign = "center";
-      ctx.fillStyle = "black";
+      ctx.font = '1.2px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'black';
 
       const label = getNodeName(node);
 
@@ -200,24 +200,24 @@ const GraphViz = observer(() => {
   const getLinkColor = link => {
     if (graphStore.highlightedNode) {
       if (link.target === graphStore.highlightedNode) {
-        return new Color("#f39c12").alpha(1).rgb();
+        return new Color('#f39c12').alpha(1).rgb();
       } else if (link.source === graphStore.highlightedNode) {
-        return new Color("#1abc9c").alpha(1).rgb();
+        return new Color('#1abc9c').alpha(1).rgb();
       } else {
-        return new Color("#ccc").alpha(0.1).rgb();
+        return new Color('#ccc').alpha(0.1).rgb();
       }
     } else {
-      return new Color("#ccc").alpha(1).rgb();
+      return new Color('#ccc').alpha(1).rgb();
     }
   };
 
   const getLinkWidth = link => (graphStore.highlightedNode && link.highlighted)?2:1;
 
   const handleCapture = e => {
-    e.target.href = wrapperRef.current && wrapperRef.current.querySelector("canvas").toDataURL("image/png");
-    e.target.download = "test.png";
+    e.target.href = wrapperRef.current && wrapperRef.current.querySelector('canvas').toDataURL('image/png');
+    e.target.download = 'test.png';
   };
-  
+
   return (
     <div className={classes.graph} ref={wrapperRef}>
       <ForceGraph2D
@@ -240,6 +240,6 @@ const GraphViz = observer(() => {
     </div>
   );
 });
-GraphViz.displayName = "GraphViz";
+GraphViz.displayName = 'GraphViz';
 
 export default GraphViz;

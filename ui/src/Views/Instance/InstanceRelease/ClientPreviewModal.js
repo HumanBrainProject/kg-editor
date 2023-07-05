@@ -21,59 +21,59 @@
  *
  */
 
-import React from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Iframe from "react-iframe";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import Iframe from 'react-iframe';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   frameContainer: {
-    height: "100%"
+    height: '100%'
   },
   greatModal: {
-    "& .modal-dialog": {
-      maxWidth: "unset",
-      width: "60%",
-      height: "95%"
+    '& .modal-dialog': {
+      maxWidth: 'unset',
+      width: '60%',
+      height: '95%'
     },
-    "& .modal-content": {
-      height: "100%",
-      minHeight: "100%",
-      backgroundColor: "var(--bg-color-ui-contrast3)"
+    '& .modal-content': {
+      height: '100%',
+      minHeight: '100%',
+      backgroundColor: 'var(--bg-color-ui-contrast3)'
     },
-    "& .modal-body": {
-      height: "94%"
+    '& .modal-body': {
+      height: '94%'
     }
   },
   frame: {
-    border: "0",
-    minHeight: "100%",
-    minWidth: "100%"
+    border: '0',
+    minHeight: '100%',
+    minWidth: '100%'
   }
 });
 
 const getUrl = instanceId => {
   switch(window.location.hostname) {
-    case "localhost":
-    case "editor.kg-dev.ebrains.eu":
-      return `https://search.kg-dev.ebrains.eu/live/${instanceId}`;
-    case "editor.kg-int.ebrains.eu":
-      return `https://search.kg-int.ebrains.eu/live/${instanceId}`;
-    case "editor.kg-ppd.ebrains.eu":
-      return `https://search.kg-ppd.ebrains.eu/live/${instanceId}`;
-    case "editor.kg.ebrains.eu":
-    default:
-      return `https://kg.ebrains.eu/search/live/${instanceId}`;
+  case 'localhost':
+  case 'editor.kg-dev.ebrains.eu':
+    return `https://search.kg-dev.ebrains.eu/live/${instanceId}`;
+  case 'editor.kg-int.ebrains.eu':
+    return `https://search.kg-int.ebrains.eu/live/${instanceId}`;
+  case 'editor.kg-ppd.ebrains.eu':
+    return `https://search.kg-ppd.ebrains.eu/live/${instanceId}`;
+  case 'editor.kg.ebrains.eu':
+  default:
+    return `https://kg.ebrains.eu/search/live/${instanceId}`;
   }
-}
+};
 
 const ClientPreviewModal = observer(({ store, show, handleClose }) => {
 
   const classes = useStyles();
 
-  const url = getUrl(store.topInstanceId); 
+  const url = getUrl(store.topInstanceId);
 
   return (
     <Modal show={show} className={classes.greatModal}>
@@ -94,6 +94,6 @@ const ClientPreviewModal = observer(({ store, show, handleClose }) => {
     </Modal>
   );
 });
-ClientPreviewModal.displayName = "ClientPreviewModal";
+ClientPreviewModal.displayName = 'ClientPreviewModal';
 
 export default ClientPreviewModal;

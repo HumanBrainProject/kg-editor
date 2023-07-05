@@ -21,58 +21,58 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import GlobalFieldErrors from "../../Components/GlobalFieldErrors";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
+import GlobalFieldErrors from '../../Components/GlobalFieldErrors';
 
-import DuplicateInstance from "./InstanceManage/DuplicateInstance";
-import MoveInstance from "./InstanceManage/MoveInstance";
-import DeleteInstance from "./InstanceManage/DeleteInstance";
-import Instance from "../../Stores/Instance";
+import DeleteInstance from './InstanceManage/DeleteInstance';
+import DuplicateInstance from './InstanceManage/DuplicateInstance';
+import MoveInstance from './InstanceManage/MoveInstance';
+import type Instance from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    color: "var(--ft-color-loud)"
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    color: 'var(--ft-color-loud)'
   },
   panel: {
-    position: "relative",
-    width: "60%",
-    height: "calc(100% - 40px)",
-    margin: "20px 20%"
+    position: 'relative',
+    width: '60%',
+    height: 'calc(100% - 40px)',
+    margin: '20px 20%'
   },
   content: {
-    backgroundColor: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
-    border: "1px solid var(--bg-color-blend-contrast1)",
-    marginBottom: "15px",
-    padding: "15px",
-    "& h4": {
-      marginBottom: "15px"
+    backgroundColor: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-normal)',
+    border: '1px solid var(--bg-color-blend-contrast1)',
+    marginBottom: '15px',
+    padding: '15px',
+    '& h4': {
+      marginBottom: '15px'
     },
-    "& p": {
-      marginBottom: "15px"
+    '& p': {
+      marginBottom: '15px'
     },
-    "& ul": {
-      marginBottom: "15px"
+    '& ul': {
+      marginBottom: '15px'
     },
-    "& strong": {
-      color: "var(--ft-color-louder)"
+    '& strong': {
+      color: 'var(--ft-color-louder)'
     }
   },
   id: {
-    fontSize: "0.75em",
-    color: "var(--ft-color-normal)",
-    marginTop: "20px",
-    marginBottom: "20px"
+    fontSize: '0.75em',
+    color: 'var(--ft-color-normal)',
+    marginTop: '20px',
+    marginBottom: '20px'
   },
   field: {
-    marginBottom: "10px",
-    wordBreak: "break-word"
+    marginBottom: '10px',
+    wordBreak: 'break-word'
   }
 });
 
@@ -108,6 +108,6 @@ const InstanceManage = observer(({instance}: InstanceManageProps) => {
     </div>
   );
 });
-InstanceManage.displayName = "InstanceManage";
+InstanceManage.displayName = 'InstanceManage';
 
 export default InstanceManage;

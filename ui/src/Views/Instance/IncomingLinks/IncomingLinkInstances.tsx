@@ -21,49 +21,49 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
-import Color from "color";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Color from 'color';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
-import IncomingLinkInstance from "./IncomingLinkInstance";
-import { InstanceIncomingLink } from "../../../types";
+import IncomingLinkInstance from './IncomingLinkInstance';
+import type { InstanceIncomingLink } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
-    "& > ul": {
-      listStyle: "none",
-      paddingLeft: "20px",
-      "& > li": {
-        marginRight: "2px",
-        display: "inline-block",
-        "& + li:before": {
-          content: "' '"
+    '& > ul': {
+      listStyle: 'none',
+      paddingLeft: '20px',
+      '& > li': {
+        marginRight: '2px',
+        display: 'inline-block',
+        '& + li:before': {
+          content: '\' \''
         },
-        "& + li": {
-          marginTop: "2px"
+        '& + li': {
+          marginTop: '2px'
         }
       }
     }
   },
   type: {
-    paddingRight: "10px"
+    paddingRight: '10px'
   },
   showMore: {
     paddingLeft: 0,
     paddingTop: 0,
-    transform: "translateY(1px)"
+    transform: 'translateY(1px)'
   },
   showMoreLoading: {
-    display: "block"
+    display: 'block'
   },
   showMoreError: {
-    display: "block",
-    color: "var(--ft-color-error)"
+    display: 'block',
+    color: 'var(--ft-color-error)'
   }
 });
 
@@ -77,7 +77,7 @@ const ShowMore = observer(({ link, classes, onClick }: ShowMoreProps) => {
   if (link.fetchError) {
     return (
       <li className={classes.showMoreError}>
-        <FontAwesomeIcon icon="exclamation-triangle" /> {link.fetchError}.{" "}
+        <FontAwesomeIcon icon="exclamation-triangle" /> {link.fetchError}.{' '}
         <Button variant="primary" onClick={onClick}>
           Retry
         </Button>
@@ -121,8 +121,8 @@ const IncomingLinkInstances = observer(({ link, readMode }: IncomingLinkInstance
       link.type.name
     );
 
-  const badgeColor = link.type.color ? link.type.color : "black";
-  const badgeTextColor = new Color(badgeColor).isLight() ? "black" : "white";
+  const badgeColor = link.type.color ? link.type.color : 'black';
+  const badgeTextColor = new Color(badgeColor).isLight() ? 'black' : 'white';
   const badgeStyle = {
     backgroundColor: badgeColor,
     color: badgeTextColor
@@ -137,7 +137,7 @@ const IncomingLinkInstances = observer(({ link, readMode }: IncomingLinkInstance
               {link.total}
             </span>
           ) : (
-            <FontAwesomeIcon icon={"circle"} color={badgeColor} />
+            <FontAwesomeIcon icon={'circle'} color={badgeColor} />
           )}
           &nbsp;&nbsp;
           <span>{link.type.label ? link.type.label : link.type.name}</span>
@@ -154,6 +154,6 @@ const IncomingLinkInstances = observer(({ link, readMode }: IncomingLinkInstance
     </div>
   );
 });
-IncomingLinkInstances.displayName = "IncomingLinkInstances";
+IncomingLinkInstances.displayName = 'IncomingLinkInstances';
 
 export default IncomingLinkInstances;

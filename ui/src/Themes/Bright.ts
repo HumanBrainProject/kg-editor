@@ -21,165 +21,165 @@
  *
  */
 
-import { Theme } from "./Theme";
+import type { Theme } from './Theme';
 
 const theme: Theme = {
-  name: "bright",
+  name: 'bright',
   background: {
     gradient: {
-      colorStart: "#ffffff",
-      colorEnd: "a8caba",
-      angle: "165deg"
+      colorStart: '#ffffff',
+      colorEnd: 'a8caba',
+      angle: '165deg'
     },
     image: `${window.rootPath}/assets/background-bright.png`,
-    position: "50% 50%"
+    position: '50% 50%'
   },
-  backgroundColor: "#f4fbf7",
+  backgroundColor: '#f4fbf7',
   button: {
     primary: {
-      backgroundColor: "#007bff",
-      borderColor: "#007bff",
+      backgroundColor: '#007bff',
+      borderColor: '#007bff',
       active: {
-        backgroundColor: "#0069d9",
-        borderColor: "#0062cc"
+        backgroundColor: '#0069d9',
+        borderColor: '#0062cc'
       }
     },
     secondary: {
-      backgroundColor: "#6c757d",
-      borderColor: "#6c757d",
+      backgroundColor: '#6c757d',
+      borderColor: '#6c757d',
       active: {
-        backgroundColor: "#545b62",
-        borderColor: "#4e555b"
+        backgroundColor: '#545b62',
+        borderColor: '#4e555b'
       }
     }
   },
   contrast1: {
-    backgroundColor: "#ffffff",
-    borderColor: "#ffffff"
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff'
   },
   contrast2: {
-    backgroundColor: "#eeeeee",
-    borderColor: "#ffffff"
+    backgroundColor: '#eeeeee',
+    borderColor: '#ffffff'
   },
   contrast3: {
-    borderColor: "#dddddd"
+    borderColor: '#dddddd'
   },
   contrast4: {
-    backgroundColor: "#cccccc"
+    backgroundColor: '#cccccc'
   },
   contrast5: {
-    borderColor: "rgba(0, 0, 0, 0.3)"
+    borderColor: 'rgba(0, 0, 0, 0.3)'
   },
   contrast6: {
-    backgroundColor: "#ffffff",
-    borderColor: "#ffffff"
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff'
   },
   blendContrast1: {
-    backgroundColor: "rgba(0, 0, 0, 0.1)"
+    backgroundColor: 'rgba(0, 0, 0, 0.1)'
   },
   list: {
     hover: {
-      backgroundColor: "#aee0c8",
-      borderColor: "#368c62"
+      backgroundColor: '#aee0c8',
+      borderColor: '#368c62'
     },
     selected: {
-      backgroundColor: "#68c498",
-      borderColor: "#2f7955"
+      backgroundColor: '#68c498',
+      borderColor: '#2f7955'
     }
   },
   quiet: {
-    color: "rgba(0, 0, 0, 0.4)"
+    color: 'rgba(0, 0, 0, 0.4)'
   },
   normal: {
-    color: "#1a202c"
+    color: '#1a202c'
   },
   loud: {
-    color: "#444444"
+    color: '#444444'
   },
   louder: {
-    color: "#222222"
+    color: '#222222'
   },
   error: {
-    color: "#e74c3c",
+    color: '#e74c3c',
     quiet: {
-      color: "#5b130b"
+      color: '#5b130b'
     },
     normal: {
-      color: "#ac2415"
+      color: '#ac2415'
     },
     loud: {
-      color: "#ac2415"
+      color: '#ac2415'
     }
   },
   warn: {
-    color: "#e67e22",
+    color: '#e67e22',
     quiet: {
-      backgroundColor: "#473600"
+      backgroundColor: '#473600'
     },
     normal: {
-      backgroundColor: "#8f6b00"
+      backgroundColor: '#8f6b00'
     },
     loud: {
-      backgroundColor: "#b88a00"
+      backgroundColor: '#b88a00'
     }
   },
   info: {
-    color: "#24282a",
+    color: '#24282a',
     normal: {
-      color: "#ffc107"
+      color: '#ffc107'
     }
   },
   selected: {
-    color: "#45b07c",
+    color: '#45b07c',
     hover: {
-      color: "#2f7955"
+      color: '#2f7955'
     }
   },
   link: {
     hover: {
-      color: "#143048",
-      borderColor: "#368c62",
-      backgroundColor: "#aee0c8"
+      color: '#143048',
+      borderColor: '#368c62',
+      backgroundColor: '#aee0c8'
     },
     quiet: {
       hover: {
-        backgroundColor: "#effbf5"
+        backgroundColor: '#effbf5'
       }
     }
   },
   pane: {
     boxShadow: {
-      color: "rgba(0,0,0,0.3)"
+      color: 'rgba(0,0,0,0.3)'
     }
   },
   release: {
     status: {
       boxShadow: {
-        color: "#00000080"
+        color: '#00000080'
       },
       released: {
-        backgroundColor: "rgba(52, 152, 219, 0.25)",
-        color: "rgb(52, 152, 219)"
+        backgroundColor: 'rgba(52, 152, 219, 0.25)',
+        color: 'rgb(52, 152, 219)'
       },
       notReleased: {
-        backgroundColor: "rgba(231, 76, 60, 0.25)",
-        color: "rgb(231, 76, 60)"
+        backgroundColor: 'rgba(231, 76, 60, 0.25)',
+        color: 'rgb(231, 76, 60)'
       },
       hasChanged: {
-        backgroundColor: "rgba(241, 196, 15, 0.25)",
-        color: "rgb(241, 196, 15)"
+        backgroundColor: 'rgba(241, 196, 15, 0.25)',
+        color: 'rgb(241, 196, 15)'
       }
     },
     highlight: {
-      backgroundColor: "rgb(46, 204, 113, 0.25)",
-      color: "rgb(46, 204, 113)"
+      backgroundColor: 'rgb(46, 204, 113, 0.25)',
+      color: 'rgb(46, 204, 113)'
     }
   },
   bookmark: {
     on: {
-      color: "#f2c85c",
+      color: '#f2c85c',
       highlight: {
-        color: "#ffe100"
+        color: '#ffe100'
       }
     }
   }

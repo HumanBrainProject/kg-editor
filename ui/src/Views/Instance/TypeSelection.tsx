@@ -21,36 +21,36 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
-import { StructureOfType } from "../../types";
+import GridSelector from '../../Components/GridSelector';
+import useStores from '../../Hooks/useStores';
+import type { StructureOfType } from '../../types';
 
-import GridSelector from "../../Components/GridSelector";
 
 const useStyles = createUseStyles({
   type: {
-    display: "grid",
-    gridTemplateColumns: "auto 1fr",
-    gridGap: "8px",
-    fontSize: "1.1em",
-    fontWeight: "300",
-    wordBreak: "break-word"
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+    gridGap: '8px',
+    fontSize: '1.1em',
+    fontWeight: '300',
+    wordBreak: 'break-word'
   },
   icon: {
-    alignSelf: "center"
+    alignSelf: 'center'
   },
   infoCircle: {
-    marginLeft: "5px",
-    transform: "translateY(2px)"
+    marginLeft: '5px',
+    transform: 'translateY(2px)'
   }
 });
 
 const TypeComponent = ({ item: type }: { item: StructureOfType }) => {
-  
+
   const classes = useStyles();
 
   return (
@@ -86,6 +86,6 @@ const TypeSelection = observer(({ onSelect }: TypeSelectionProps) => {
     <Component list={list} itemComponent={TypeComponent} getKey={type => type.name} onSelect={onSelect} onFilter={handleFilter} filterPlaceholder="Filter types" />
   );
 });
-TypeSelection.displayName = "TypeSelection";
+TypeSelection.displayName = 'TypeSelection';
 
 export default TypeSelection;

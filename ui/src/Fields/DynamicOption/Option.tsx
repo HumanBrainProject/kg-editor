@@ -21,44 +21,45 @@
  *
  */
 
-import React, { MouseEvent } from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
-import { Option } from "../Stores/LinkStore";
-import { Suggestion } from "../../types";
+import useStores from '../../Hooks/useStores';
+import { Option } from '../Stores/LinkStore';
+import type { Suggestion } from '../../types';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   option: {
-    position: "relative",
-    display: "grid",
-    gridTemplateColumns: "min-content min-content 1fr",
-    "&:hover $preview": {
-      display: "block"
+    position: 'relative',
+    display: 'grid',
+    gridTemplateColumns: 'min-content min-content 1fr',
+    '&:hover $preview': {
+      display: 'block'
     }
   },
   additionalInformation: {
-    overflow: "hidden",
-    padding: "0 6px",
-    fontStyle: "italic",
-    textOverflow: "ellipsis",
-    color: "grey"
+    overflow: 'hidden',
+    padding: '0 6px',
+    fontStyle: 'italic',
+    textOverflow: 'ellipsis',
+    color: 'grey'
   },
   preview: {
-    display: "none",
-    position: "absolute",
-    top: "50%",
-    right: "4px",
-    borderRadius: "2px",
-    background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-louder)",
-    padding: "3px 6px",
-    cursor: "pointer",
-    transform: "translateY(-50%)"
+    display: 'none',
+    position: 'absolute',
+    top: '50%',
+    right: '4px',
+    borderRadius: '2px',
+    background: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-louder)',
+    padding: '3px 6px',
+    cursor: 'pointer',
+    transform: 'translateY(-50%)'
   },
   icon: {
-    paddingRight: "8px"
+    paddingRight: '8px'
   }
 });
 
@@ -91,7 +92,7 @@ const Option = ({ item }: OptionProps) => {
       <div className={classes.preview} title="preview" onClick={handlePreview}>
         <FontAwesomeIcon icon="eye" />
       </div>
-  </div>
+    </div>
   );
 };
 

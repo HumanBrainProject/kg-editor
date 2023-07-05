@@ -21,25 +21,25 @@
  *
  */
 
-import React from "react";
-import {observer} from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
+import {observer} from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
-import { ViewContext} from "../../Stores/ViewStore";
+import useStores from '../../Hooks/useStores';
+import { ViewContext} from '../../Stores/ViewStore';
 
-import InstanceForm from "./InstanceForm";
-import Pane from "./Pane";
-import Links from "./Links";
+import InstanceForm from './InstanceForm';
+import Links from './Links';
+import Pane from './Pane';
 
 const useStyles = createUseStyles({
   container: {
-    height: "100%",
-    width: "100%",
-    display: "grid",
-    position:"relative",
-    overflow: "hidden",
-    "--selected-index":"0"
+    height: '100%',
+    width: '100%',
+    display: 'grid',
+    position:'relative',
+    overflow: 'hidden',
+    '--selected-index':'0'
   }
 });
 
@@ -55,7 +55,7 @@ const InstanceView = observer(({ instance }: { instance: any}) => {
 
   return (
     <ViewContext.Provider value={viewStore.selectedView} >
-      <div className={classes.container} style={{ "--selected-index": viewStore.selectedView.selectedPaneIndex }}>
+      <div className={classes.container} style={{ '--selected-index': viewStore.selectedView.selectedPaneIndex }}>
         <Pane paneId={instance.id} >
           <InstanceForm view={viewStore.selectedView} pane={instance.id} id={instance.id} />
         </Pane>
@@ -64,6 +64,6 @@ const InstanceView = observer(({ instance }: { instance: any}) => {
     </ViewContext.Provider>
   );
 });
-InstanceView.displayName = "InstanceView";
+InstanceView.displayName = 'InstanceView';
 
 export default InstanceView;

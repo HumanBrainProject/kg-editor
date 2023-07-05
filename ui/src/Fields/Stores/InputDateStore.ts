@@ -21,10 +21,10 @@
  *
  */
 
-import InputTextStore from "./InputTextStore";
+import InputTextStore from './InputTextStore';
 
 class InputDateStore extends InputTextStore {
-  inputType = "date";
+  inputType = 'date';
 }
 
 export default InputDateStore;

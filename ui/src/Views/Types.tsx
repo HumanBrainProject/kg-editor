@@ -21,17 +21,17 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button"
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
 
-import useStores from "../Hooks/useStores";
-import { Space as SpaceType } from "../types";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useListTypesQuery from '../Hooks/useListTypesQuery';
+import useStores from '../Hooks/useStores';
+import type { Space as SpaceType } from '../types';
 
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
-import useListTypesQuery from "../Hooks/useListTypesQuery";
 
 interface TypesProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -41,7 +41,7 @@ const Types = observer(({ children }: TypesProps) => {
 
   const { appStore, typeStore } = useStores();
 
-  const space = (appStore.currentSpace as SpaceType|null)?.id??"";
+  const space = (appStore.currentSpace as SpaceType|null)?.id??'';
 
   const isReady = !!space && typeStore.space === space;
 
@@ -79,8 +79,8 @@ const Types = observer(({ children }: TypesProps) => {
     return (
       <ErrorPanel>
         {error}<br /><br />
-        <Button variant={"primary"} onClick={refetch}>
-          <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+        <Button variant={'primary'} onClick={refetch}>
+          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
         </Button>
       </ErrorPanel>
     );
@@ -92,6 +92,6 @@ const Types = observer(({ children }: TypesProps) => {
 
   return null;
 });
-Types.displayName = "Types";
+Types.displayName = 'Types';
 
 export default Types;

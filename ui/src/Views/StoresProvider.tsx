@@ -33,9 +33,9 @@
  *
  */
 
-import React from "react";
-import RootStore from "../Stores/RootStore";
-import StoresContext from "../Contexts/StoresContext";
+import React from 'react';
+import StoresContext from '../Contexts/StoresContext';
+import type RootStore from '../Stores/RootStore';
 
 interface StoresProviderProps {
   stores: RootStore;

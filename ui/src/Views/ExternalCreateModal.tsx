@@ -21,36 +21,36 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import ProgressBar from "react-bootstrap/ProgressBar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
+import useStores from '../Hooks/useStores';
 
 
 const useStyles = createUseStyles({
   modal: {
-    "&.modal-dialog": {
-      marginTop: "40vh",
-      "& .modal-content":{
-        backgroundColor: "var(--bg-color-ui-contrast2)",
-        color: "var(--ft-color-loud)",
-        padding: "20px",
-        "& .modal-body": {
-          padding: "15px 30px",
-          fontSize: "1.6rem",
-          textAlign: "center"
+    '&.modal-dialog': {
+      marginTop: '40vh',
+      '& .modal-content':{
+        backgroundColor: 'var(--bg-color-ui-contrast2)',
+        color: 'var(--ft-color-loud)',
+        padding: '20px',
+        '& .modal-body': {
+          padding: '15px 30px',
+          fontSize: '1.6rem',
+          textAlign: 'center'
         }
       }
     }
   },
   save: {
-    marginLeft: "10px"
+    marginLeft: '10px'
   }
 });
 
@@ -102,6 +102,6 @@ const ExternalCreateModal = observer(() => {
     </div>
   );
 });
-ExternalCreateModal.displayName = "ExternalCreateModal";
+ExternalCreateModal.displayName = 'ExternalCreateModal';
 
 export default ExternalCreateModal;

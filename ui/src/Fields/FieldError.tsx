@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
 class FieldError extends React.Component {
   constructor(props) {

@@ -21,43 +21,44 @@
  *
  */
 
-import React, { DragEvent, KeyboardEvent, MouseEvent } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import type { DragEvent, KeyboardEvent, MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   value: {
-    "&:not(:last-child):after": {
-      content: "';\\00a0'"
+    '&:not(:last-child):after': {
+      content: '\';\\00a0\''
     }
   },
   valueTag: {
-    marginBottom: "5px",
-    padding: "1px 5px",
-    border: "1px solid #ced4da",
-    "&:hover": {
-      backgroundColor: "var(--link-bg-color-hover)",
-      borderColor: "var(--link-border-color-hover)",
-      color: "#143048"
+    marginBottom: '5px',
+    padding: '1px 5px',
+    border: '1px solid #ced4da',
+    '&:hover': {
+      backgroundColor: 'var(--link-bg-color-hover)',
+      borderColor: 'var(--link-border-color-hover)',
+      color: '#143048'
     },
-    "& + $valueTag": {
-      marginLeft: "5px"
+    '& + $valueTag': {
+      marginLeft: '5px'
     }
   },
   valueLabel: {
-    display: "inline-block",
-    maxWidth: "200px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    verticalAlign: "bottom"
+    display: 'inline-block',
+    maxWidth: '200px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    verticalAlign: 'bottom'
   },
   remove: {
-    fontSize: "0.8em",
+    fontSize: '0.8em',
     opacity: 0.5,
-    marginLeft: "3px",
-    "&:hover": {
+    marginLeft: '3px',
+    '&:hover': {
       opacity: 1
     }
   }
@@ -124,7 +125,7 @@ const ListItem = observer(
       <div
         tabIndex={0}
         className={`btn btn-xs btn-default ${classes.valueTag} ${
-          disabled ? "disabled" : ""
+          disabled ? 'disabled' : ''
         }}`}
         disabled={disabled}
         draggable={!disabled}
@@ -145,6 +146,6 @@ const ListItem = observer(
     );
   }
 );
-ListItem.displayName = "ListItem";
+ListItem.displayName = 'ListItem';
 
 export default ListItem;

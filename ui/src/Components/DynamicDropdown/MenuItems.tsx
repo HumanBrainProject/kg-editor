@@ -22,27 +22,27 @@
  */
 
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import MenuItem from "./MenuItem";
-import { Suggestion } from "../../types";
+import MenuItem from './MenuItem';
+import type { Suggestion } from '../../types';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    "& > ul": {
-      listStyleType: "none",
+    position: 'relative',
+    '& > ul': {
+      listStyleType: 'none',
       paddingLeft: 0,
       marginBottom: 0
     }
   },
   noResult: {
-    padding: "10px"
+    padding: '10px'
   },
   loading: {
-    padding: "0 10px 0 10px"
+    padding: '0 10px 0 10px'
   }
 });
 
@@ -57,7 +57,7 @@ interface MenuItemsProps {
   onCancel: () => void;
 }
 
-const MenuItems = ({ 
+const MenuItems = ({
   current,
   searchTerm,
   items,
@@ -72,32 +72,32 @@ const MenuItems = ({
 
   if(!loading && !items.length) {
     return (
-        <div className={classes.noResult}><em>No results found for: </em> <strong>{searchTerm}</strong></div>
+      <div className={classes.noResult}><em>No results found for: </em> <strong>{searchTerm}</strong></div>
     );
   }
 
   return(
-      <div className={classes.container}>
-        <ul>
-          {items.map(item => 
-            <MenuItem 
-              key={item.id}
-              searchTerm={searchTerm}
-              item={item} 
-              hasFocus={item === current} 
-              onSelectNext={onSelectNext} 
-              onSelectPrevious={onSelectPrevious} 
-              onSelect={onSelect} 
-              onCancel={onCancel} 
-            />
-          )}      
-        </ul>
-        {loading && (
-          <div tabIndex={-1} className={classes.loading}>
-            <FontAwesomeIcon spin icon="circle-notch"/>
-          </div>
+    <div className={classes.container}>
+      <ul>
+        {items.map(item =>
+          <MenuItem
+            key={item.id}
+            searchTerm={searchTerm}
+            item={item}
+            hasFocus={item === current}
+            onSelectNext={onSelectNext}
+            onSelectPrevious={onSelectPrevious}
+            onSelect={onSelect}
+            onCancel={onCancel}
+          />
         )}
-      </div>
+      </ul>
+      {loading && (
+        <div tabIndex={-1} className={classes.loading}>
+          <FontAwesomeIcon spin icon="circle-notch"/>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -21,41 +21,41 @@
  *
  */
 
-import InputText from "./InputText/InputText";
-import InputNumber from "./InputNumber/InputNumber";
-import TextArea from "./TextArea/TextArea";
-import InputColor from "./InputColor/InputColor";
-import DynamicDropdown from "./DynamicDropdown/DynamicDropdown";
-import DynamicTable from "./DynamicTable/DynamicTable";
-import CheckBox from "./CheckBox/CheckBox";
-import UnsupportedField from "./UnsupportedField/UnsupportedField";
-import NestedField from "./NestedField/NestedField";
-import SingleNestedField from "./NestedField/SingleNestedField";
-import InputDateTime from "./InputDateTime/InputDateTime";
 
-import AnnotatedInputText from "./AnnotedInputText/AnnotatedInputText";
-import AnnotatedInputTextStore from "./Stores/AnnotatedInputTextStore";
+import AnnotatedInputText from './AnnotedInputText/AnnotatedInputText';
+import CheckBox from './CheckBox/CheckBox';
+import DynamicDropdown from './DynamicDropdown/DynamicDropdown';
+import DynamicTable from './DynamicTable/DynamicTable';
+import InputColor from './InputColor/InputColor';
+import InputDateTime from './InputDateTime/InputDateTime';
+import InputNumber from './InputNumber/InputNumber';
 
-import InputTextMultiple from "./InputTextMultiple/InputTextMultiple";
-import InputTextMultipleStore from "./Stores/InputTextMultipleStore";
 
-import InputNumberMultiple from "./InputNumberMultiple/InputNumberMultiple";
-import InputNumberMultipleStore from "./Stores/InputNumberMultipleStore";
+import InputNumberMultiple from './InputNumberMultiple/InputNumberMultiple';
+import InputText from './InputText/InputText';
+import InputTextMultiple from './InputTextMultiple/InputTextMultiple';
+import NestedField from './NestedField/NestedField';
+import SingleNestedField from './NestedField/SingleNestedField';
 
-import SimpleDropdown from "./SimpleDropdown/SimpleDropdown";
-import LinkStore from "./Stores/LinkStore";
+import SimpleDropdown from './SimpleDropdown/SimpleDropdown';
+import AnnotatedInputTextStore from './Stores/AnnotatedInputTextStore';
 
-import FieldStore from "./Stores/FieldStore";
-import InputTextStore from "./Stores/InputTextStore";
-import LinksStore from "./Stores/LinksStore";
-import CheckBoxStore from "./Stores/CheckBoxStore";
-import UnsupportedFieldStore from "./Stores/UnsupportedFieldStore";
-import InputNumberStore from "./Stores/InputNumberStore";
-import InputDateStore from "./Stores/InputDateStore";
-import InputTimeStore from "./Stores/InputTimeStore";
-import NestedFieldStore from "./Stores/NestedFieldStore";
-import SingleNestedFieldStore from "./Stores/SingleNestedFieldStore";
-import React from "react";
+import CheckBoxStore from './Stores/CheckBoxStore';
+import InputDateStore from './Stores/InputDateStore';
+import InputNumberMultipleStore from './Stores/InputNumberMultipleStore';
+import InputNumberStore from './Stores/InputNumberStore';
+import InputTextMultipleStore from './Stores/InputTextMultipleStore';
+import InputTextStore from './Stores/InputTextStore';
+import InputTimeStore from './Stores/InputTimeStore';
+import LinkStore from './Stores/LinkStore';
+import LinksStore from './Stores/LinksStore';
+import NestedFieldStore from './Stores/NestedFieldStore';
+import SingleNestedFieldStore from './Stores/SingleNestedFieldStore';
+import UnsupportedFieldStore from './Stores/UnsupportedFieldStore';
+import TextArea from './TextArea/TextArea';
+import UnsupportedField from './UnsupportedField/UnsupportedField';
+import type FieldStore from './Stores/FieldStore';
+import type React from 'react';
 
 export interface WidgetOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,74 +75,74 @@ interface FieldMapping {
 }
 
 export const fieldsMapping: FieldMapping = {
-  "InputText":  {
+  'InputText':  {
     Component: InputText,
     Store: InputTextStore
   },
-  "InputNumber":  {
+  'InputNumber':  {
     Component: InputNumber,
     Store: InputNumberStore
   },
-  "InputDate": {
+  'InputDate': {
     Component: InputText,
     Store: InputDateStore
   },
-  "InputDateTime": {
+  'InputDateTime': {
     Component: InputDateTime,
     Store: InputTextStore
   },
-  "InputTime": {
+  'InputTime': {
     Component: InputText,
     Store: InputTimeStore
   },
-  "InputNumberMultiple":  {
+  'InputNumberMultiple':  {
     Component: InputNumberMultiple,
     Store: InputNumberMultipleStore
   },
-  "InputColor": {
+  'InputColor': {
     Component: InputColor,
     Store: InputTextStore
   },
-  "TextArea": {
+  'TextArea': {
     Component: TextArea,
     Store: InputTextStore
   },
-  "SimpleDropdown": {
+  'SimpleDropdown': {
     Component: SimpleDropdown,
     Store: LinkStore
   },
-  "DynamicDropdown": {
+  'DynamicDropdown': {
     Component: DynamicDropdown,
     Store: LinksStore
   },
-  "DynamicTable": {
+  'DynamicTable': {
     Component: DynamicTable,
     Store: LinksStore,
     options: {
       lazyShowLinks: true
     }
   },
-  "CheckBox": {
+  'CheckBox': {
     Component: CheckBox,
     Store: CheckBoxStore
   },
-  "AnnotatedInputText" : {
+  'AnnotatedInputText' : {
     Component: AnnotatedInputText,
     Store: AnnotatedInputTextStore
   },
-  "InputTextMultiple": {
+  'InputTextMultiple': {
     Component: InputTextMultiple,
     Store: InputTextMultipleStore
   },
-  "UnsupportedField": {
+  'UnsupportedField': {
     Component: UnsupportedField,
     Store: UnsupportedFieldStore
   },
-  "Nested": {
+  'Nested': {
     Component: NestedField,
     Store: NestedFieldStore
   },
-  "SingleNested": {
+  'SingleNested': {
     Component: SingleNestedField,
     Store: SingleNestedFieldStore
   }

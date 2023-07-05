@@ -21,17 +21,18 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import CompareFieldsChanges from "./CompareFieldsChanges";
-import InstanceStore, { createInstanceStore } from "../../Stores/InstanceStore";
-import useStores from "../../Hooks/useStores";
+import useStores from '../../Hooks/useStores';
+import { createInstanceStore } from '../../Stores/InstanceStore';
+import CompareFieldsChanges from './CompareFieldsChanges';
+import type InstanceStore from '../../Stores/InstanceStore';
 
 const useStyles = createUseStyles({
   container: {
-    padding: "12px 15px"
+    padding: '12px 15px'
   }
 });
 
@@ -90,6 +91,6 @@ const CompareChanges = observer(({ instanceId, onClose }: CompareChangesProps) =
     </div>
   );
 });
-CompareChanges.displayName = "CompareChanges";
+CompareChanges.displayName = 'CompareChanges';
 
 export default CompareChanges;

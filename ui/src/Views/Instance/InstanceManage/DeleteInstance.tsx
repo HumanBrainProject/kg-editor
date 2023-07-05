@@ -21,42 +21,42 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import { useLocation, useNavigate } from 'react-router-dom';
+import ErrorModal from '../../../Components/ErrorModal';
+import SpinnerModal from '../../../Components/SpinnerModal';
+import useStores from '../../../Hooks/useStores';
 
-import ErrorModal from "../../../Components/ErrorModal";
-import SpinnerModal from "../../../Components/SpinnerModal";
-import { useLocation, useNavigate } from "react-router-dom";
-import Matomo from "../../../Services/Matomo";
-import Instance from "../../../Stores/Instance";
-import { Status } from "../../../Stores/StatusStore";
+import Matomo from '../../../Services/Matomo';
+import type Instance from '../../../Stores/Instance';
+import type { Status } from '../../../Stores/StatusStore';
 
 const useStyles = createUseStyles({
   error: {
-    color: "var(--ft-color-error)"
+    color: 'var(--ft-color-error)'
   },
   btn: {
-    "&[disabled]": {
-      cursor: "not-allowed"
+    '&[disabled]': {
+      cursor: 'not-allowed'
     }
   },
   deleteErrorMessage: {
-    margin: "20px 0",
-    color: "var(--ft-color-error)"
+    margin: '20px 0',
+    color: 'var(--ft-color-error)'
   },
   deleteErrorActions: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
+    marginBottom: '10px',
+    width: '100%',
+    textAlign: 'center',
+    wordBreak: 'keep-all',
+    whiteSpace: 'nowrap',
+    '& button + button': {
+      marginLeft: '20px'
     }
   }
 });
@@ -72,7 +72,7 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
   if (status && status.hasFetchError) {
     return (
       <div className={classes.error}>
-        <FontAwesomeIcon icon={"exclamation-triangle"} />
+        <FontAwesomeIcon icon={'exclamation-triangle'} />
         &nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
         <Button variant="primary" onClick={fetchStatus}>
           <FontAwesomeIcon icon="redo-alt" />
@@ -84,7 +84,7 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
   if (!status || !status.isFetched) {
     return (
       <>
-        <FontAwesomeIcon icon={"circle-notch"} spin />
+        <FontAwesomeIcon icon={'circle-notch'} spin />
         &nbsp;&nbsp;Retrieving instance release status
       </>
     );
@@ -92,7 +92,7 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
 
   return (
     <>
-      {status.data !== "UNRELEASED" ? (
+      {status.data !== 'UNRELEASED' ? (
         <ul>
           <li>
             This instance has been released and therefore cannot be deleted.
@@ -107,12 +107,12 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
         </p>
       )}
       <Button
-        variant={status.data !== "UNRELEASED" ? "secondary" : "danger"}
+        variant={status.data !== 'UNRELEASED' ? 'secondary' : 'danger'}
         onClick={onClick}
         className={classes.btn}
-        disabled={status.data !== "UNRELEASED"}
+        disabled={status.data !== 'UNRELEASED'}
       >
-        <FontAwesomeIcon icon={"trash-alt"} />
+        <FontAwesomeIcon icon={'trash-alt'} />
         &nbsp;&nbsp; Delete this instance
       </Button>
     </>
@@ -141,7 +141,7 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
   const fetchStatus = () => statusStore.fetchStatus(instance.id);
 
   const handleDeleteInstance = () => {
-    Matomo.trackEvent("Instance", "Delete", instance.id);
+    Matomo.trackEvent('Instance', 'Delete', instance.id);
     appStore.deleteInstance(instance.id, location, navigate);
   };
 
@@ -172,18 +172,18 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
             <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
             <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
           </div>
-       </ErrorModal>
+        </ErrorModal>
       )}
       {!appStore.deleteInstanceError &&
         appStore.isDeletingInstance &&
         !!appStore.instanceToDelete && (
-          <SpinnerModal
-            text={`Deleting instance ${appStore.instanceToDelete}...`}
-          />
-        )}
+        <SpinnerModal
+          text={`Deleting instance ${appStore.instanceToDelete}...`}
+        />
+      )}
     </>
   );
 });
-DeleteInstance.displayName = "DeleteInstance";
+DeleteInstance.displayName = 'DeleteInstance';
 
 export default DeleteInstance;

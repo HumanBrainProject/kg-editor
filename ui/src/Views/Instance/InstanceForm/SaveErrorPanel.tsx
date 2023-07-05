@@ -21,49 +21,50 @@
  *
  */
 
-import React, { MouseEvent } from "react";
-import { createUseStyles } from "react-jss";
-import Button  from "react-bootstrap/Button";
+import React from 'react';
+import Button  from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    position: "absolute",
-    top: "0",
-    left: "0",
-    width: "100%",
-    height: "100%",
-    backgroundColor: "rgba(0,0,0,0.25)",
-    borderRadius: "9px",
-    zIndex: "1200",
-    "&.block": {
-      top: "-10px",
-      left: "-10px",
-      width: "calc(100% + 20px)",
-      height: "calc(100% + 20px)",
-      borderRadius: "0",
-      "& $panel": {
-        position: "fixed"
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: '9px',
+    zIndex: '1200',
+    '&.block': {
+      top: '-10px',
+      left: '-10px',
+      width: 'calc(100% + 20px)',
+      height: 'calc(100% + 20px)',
+      borderRadius: '0',
+      '& $panel': {
+        position: 'fixed'
       }
     }
   },
   panel: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    minWidth: "220px",
-    transform: "translate(-50%, -50%)",
-    padding: "10px",
-    borderRadius: "5px",
-    background: "white",
-    textAlign: "center",
-    boxShadow: "2px 2px 4px #7f7a7a",
-    "& h4": {
-      margin: "0",
-      paddingBottom: "10px",
-      color: "red"
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    minWidth: '220px',
+    transform: 'translate(-50%, -50%)',
+    padding: '10px',
+    borderRadius: '5px',
+    background: 'white',
+    textAlign: 'center',
+    boxShadow: '2px 2px 4px #7f7a7a',
+    '& h4': {
+      margin: '0',
+      paddingBottom: '10px',
+      color: 'red'
     },
-    "& button + button, & a + button, & a + a": {
-      marginLeft: "20px"
+    '& button + button, & a + button, & a + a': {
+      marginLeft: '20px'
     }
   }
 });
@@ -95,7 +96,7 @@ const SaveErrorPanel = ({ show, error, inline, onCancel, onRetry }: SaveErrorPan
   }
 
   return (
-    <div className={`${classes.container} ${inline?"":"block"}`}>
+    <div className={`${classes.container} ${inline?'':'block'}`}>
       <div className={classes.panel}>
         <h4>{error}</h4>
         <div>

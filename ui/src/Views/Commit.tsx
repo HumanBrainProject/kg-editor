@@ -21,10 +21,10 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
 
-import useStores from "../Hooks/useStores";
+import useStores from '../Hooks/useStores';
 
 const Commit = observer(() => {
 
@@ -38,6 +38,6 @@ const Commit = observer(() => {
     </div>
   );
 });
-Commit.displayName = "Commit";
+Commit.displayName = 'Commit';
 
 export default Commit;

@@ -21,19 +21,19 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Form from "react-bootstrap/Form";
-import Tooltip from "react-bootstrap/Tooltip";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import uniqueId from "lodash/uniqueId";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import uniqueId from 'lodash/uniqueId';
+import React from 'react';
+import Form from 'react-bootstrap/Form';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
+import { createUseStyles } from 'react-jss';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
   label: {
-    fontWeight: "bold",
-    marginBottom: "5px"
+    fontWeight: 'bold',
+    marginBottom: '5px'
   }
 });
 
@@ -45,8 +45,8 @@ interface LabelTooltipProps {
 const LabelTooltip = ({tooltip, icon}:LabelTooltipProps) => (
   <>
   &nbsp;
-    <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId("label-tooltip")}>{tooltip}</Tooltip>}>
-      <span><FontAwesomeIcon icon={icon?icon:"info-circle"}/></span>
+    <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId('label-tooltip')}>{tooltip}</Tooltip>}>
+      <span><FontAwesomeIcon icon={icon?icon:'info-circle'}/></span>
     </OverlayTrigger>
   </>
 );
@@ -64,8 +64,8 @@ interface LabelProps {
 const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic }: LabelProps) => {
   const classes = useStyles();
   return (
-    <Form.Label className={`${classes.label} ${className?className:""}`}>
-      {label}{isRequired && " *"}
+    <Form.Label className={`${classes.label} ${className?className:''}`}>
+      {label}{isRequired && ' *'}
       {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" icon="cogs" />}
       {isPublic && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon="globe" />}
       {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}

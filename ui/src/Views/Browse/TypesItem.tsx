@@ -21,139 +21,140 @@
  *
  */
 
-import React, { MouseEvent } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
-import uniqueId from "lodash/uniqueId";
-import { v4 as uuidv4 } from "uuid";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import uniqueId from 'lodash/uniqueId';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
+import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import useStores from "../../Hooks/useStores";
-import { useNavigate } from "react-router-dom";
-import Matomo from "../../Services/Matomo";
-import { Type } from "../../Stores/TypeStore";
+import useStores from '../../Hooks/useStores';
+import Matomo from '../../Services/Matomo';
+import type { Type } from '../../Stores/TypeStore';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    padding: "5px 5px 5px 30px",
-    borderLeft: "2px solid transparent",
-    color: "var(--ft-color-normal)",
-    cursor: "pointer",
-    position: "relative",
-    "&:hover": {
-      background: "var(--list-bg-hover)",
-      borderColor: "var(--list-border-hover)",
-      color: "var(--ft-color-loud)",
-      "& $cannotCreateTooltip": {
+    padding: '5px 5px 5px 30px',
+    borderLeft: '2px solid transparent',
+    color: 'var(--ft-color-normal)',
+    cursor: 'pointer',
+    position: 'relative',
+    '&:hover': {
+      background: 'var(--list-bg-hover)',
+      borderColor: 'var(--list-border-hover)',
+      color: 'var(--ft-color-loud)',
+      '& $cannotCreateTooltip': {
         opacity: 0.75
       },
-      "& $actions": {
+      '& $actions': {
         opacity: 0.75
       },
-      "& $createInstance": {
-        position: "absolute",
-        top: "0",
-        right: "0",
-        height: "100%",
-        padding: "5px 10px",
-        display: "block",
-        color: "var(--ft-color-normal)",
-        "&:hover": {
-          color: "var(--ft-color-loud)"
+      '& $createInstance': {
+        position: 'absolute',
+        top: '0',
+        right: '0',
+        height: '100%',
+        padding: '5px 10px',
+        display: 'block',
+        color: 'var(--ft-color-normal)',
+        '&:hover': {
+          color: 'var(--ft-color-loud)'
         }
       }
     },
-    "&.selected": {
-      background: "var(--list-bg-selected)",
-      borderColor: "var(--list-border-selected)",
-      color: "var(--ft-color-loud)"
+    '&.selected': {
+      background: 'var(--list-bg-selected)',
+      borderColor: 'var(--list-border-selected)',
+      color: 'var(--ft-color-loud)'
     },
-    "&.edited": {
-      padding: "0 5px 0 30px"
+    '&.edited': {
+      padding: '0 5px 0 30px'
     },
-    "&.disabled": {
-      pointerEvents: "none",
-      opacity: "0.8"
+    '&.disabled': {
+      pointerEvents: 'none',
+      opacity: '0.8'
     }
   },
   icon: {
-    position: "absolute",
-    top: "8px",
-    "& + span": {
-      display: "inline-block",
-      marginLeft: "22px"
+    position: 'absolute',
+    top: '8px',
+    '& + span': {
+      display: 'inline-block',
+      marginLeft: '22px'
     }
   },
   cannotCreateTooltip: {
-    position: "absolute",
-    top: "5px",
-    right: "15px",
+    position: 'absolute',
+    top: '5px',
+    right: '15px',
     opacity: 0,
-    "&:hover": {
-      opacity: "1 !important"
+    '&:hover': {
+      opacity: '1 !important'
     }
   },
   actions: {
-    position: "absolute",
-    top: "2px",
-    right: "10px",
-    display: "grid",
+    position: 'absolute',
+    top: '2px',
+    right: '10px',
+    display: 'grid',
     opacity: 0,
-    width: "25px",
-    gridTemplateColumns: "repeat(1, 1fr)",
-    "&:hover": {
-      opacity: "1 !important"
+    width: '25px',
+    gridTemplateColumns: 'repeat(1, 1fr)',
+    '&:hover': {
+      opacity: '1 !important'
     }
   },
   action: {
-    fontSize: "0.9em",
-    lineHeight: "27px",
-    textAlign: "center",
-    backgroundColor: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
-    "&:hover": {
-      color: "var(--ft-color-loud)"
+    fontSize: '0.9em',
+    lineHeight: '27px',
+    textAlign: 'center',
+    backgroundColor: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-normal)',
+    '&:hover': {
+      color: 'var(--ft-color-loud)'
     },
-    "&:first-child": {
-      borderRadius: "4px 0 0 4px"
+    '&:first-child': {
+      borderRadius: '4px 0 0 4px'
     },
-    "&:last-child": {
-      borderRadius: "0 4px 4px 0"
+    '&:last-child': {
+      borderRadius: '0 4px 4px 0'
     },
-    "&:first-child:last-child": {
-      borderRadius: "4px"
+    '&:first-child:last-child': {
+      borderRadius: '4px'
     }
   },
   deleteBookmarkDialog: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
-    right: "-200px",
-    transition: "right .2s ease",
-    "&.show": {
-      right: "5px"
+    right: '-200px',
+    transition: 'right .2s ease',
+    '&.show': {
+      right: '5px'
     }
   },
   error: {
-    position: "absolute",
-    top: "5px",
-    right: "10px"
+    position: 'absolute',
+    top: '5px',
+    right: '10px'
   },
   errorButton: {
-    color: "var(--ft-color-error)"
+    color: 'var(--ft-color-error)'
   },
   textError: {
     margin: 0,
-    wordBreak: "keep-all"
+    wordBreak: 'keep-all'
   },
   createInstance: {
-    display: "none",
-    cursor: "pointer"
+    display: 'none',
+    cursor: 'pointer'
   },
   infoCircle: {
-    marginLeft: "5px",
-    transform: "translateY(2px)"
+    marginLeft: '5px',
+    transform: 'translateY(2px)'
   }
 });
 
@@ -178,7 +179,7 @@ const CreateInstance = observer(({
     if (isCreatingNewInstance) {
       return (
         <div className={classes.createInstance}>
-          <FontAwesomeIcon icon={"circle-notch"} spin />
+          <FontAwesomeIcon icon={'circle-notch'} spin />
         </div>
       );
     }
@@ -189,7 +190,7 @@ const CreateInstance = observer(({
           onClick={onClick}
           title={`create a new ${label}`}
         >
-          <FontAwesomeIcon icon={"plus"} />
+          <FontAwesomeIcon icon={'plus'} />
         </div>
       </div>
     );
@@ -199,7 +200,7 @@ const CreateInstance = observer(({
       <OverlayTrigger
         placement="top"
         overlay={
-          <Tooltip id={uniqueId("cannotCreate-tooltip")}>
+          <Tooltip id={uniqueId('cannotCreate-tooltip')}>
             {cannotCreateTooltip}
           </Tooltip>
         }
@@ -224,12 +225,12 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
 
   const handleSelect = (e: MouseEvent<HTMLDivElement> ) => {
     e && e.stopPropagation();
-    Matomo.trackEvent("Browse", "SelectType", type.name);
+    Matomo.trackEvent('Browse', 'SelectType', type.name);
     browseStore.selectType(type);
   };
 
   const handleCreateInstance = () => {
-    Matomo.trackEvent("Browse", "CreateInstance", type.name);
+    Matomo.trackEvent('Browse', 'CreateInstance', type.name);
     const uuid = uuidv4();
     navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(type.name)}`);
   };
@@ -251,15 +252,15 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
   return (
     <div
       key={type.name}
-      className={`${classes.container} ${selected ? "selected" : ""} ${
-        browseStore.isFetching.instances ? "disabled" : ""
+      className={`${classes.container} ${selected ? 'selected' : ''} ${
+        browseStore.isFetching.instances ? 'disabled' : ''
       }`}
       onClick={handleSelect}
       title={type.description ? type.description : type.name}
     >
       <FontAwesomeIcon
         fixedWidth
-        icon={color?"circle":"code-branch"}
+        icon={color?'circle':'code-branch'}
         className={classes.icon}
         style={color?{ color: color }:undefined}
       />
@@ -280,6 +281,6 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
     </div>
   );
 });
-TypesItem.displayName = "TypesItem";
+TypesItem.displayName = 'TypesItem';
 
 export default TypesItem;

@@ -21,9 +21,9 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
-import RootStore from "../Stores/RootStore";
+import type RootStore from '../Stores/RootStore';
 
 const StoresContext = React.createContext<RootStore|undefined>(undefined);
 

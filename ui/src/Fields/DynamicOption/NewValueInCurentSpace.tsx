@@ -21,41 +21,41 @@
  *
  */
 
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createUseStyles } from "react-jss";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
-import { DynamicOptionProps } from "./DynamicOption";
+import useStores from '../../Hooks/useStores';
+import type { DynamicOptionProps } from './DynamicOption';
 
 const useStyles = createUseStyles({
   container: {
-    whiteSpace: "normal"
+    whiteSpace: 'normal'
   }
 });
 
 const NewValueInCurentSpace = ({ item, searchTerm }: DynamicOptionProps) => {
-    const classes = useStyles();  
+  const classes = useStyles();
 
-    const  { typeStore } = useStores();
-  
-    const style = item.type.color ? { color: item.type.color } : {};
-  
-    const typeDefinition = typeStore.typesMap.get(item.type.name);
-  
-    return (
-      <span className={classes.container}>
-        <em>Add a new&nbsp;
-          <span style={style}>
-            <FontAwesomeIcon fixedWidth icon="circle" />
-          </span>{item.type.label}
-        </em>&nbsp;
-        {!!typeDefinition && !!typeDefinition.labelField && (
-          <strong>{searchTerm}</strong>
-        )}
-      </span>
-    );
-  };
-  
+  const  { typeStore } = useStores();
 
-  export default NewValueInCurentSpace;
+  const style = item.type.color ? { color: item.type.color } : {};
+
+  const typeDefinition = typeStore.typesMap.get(item.type.name);
+
+  return (
+    <span className={classes.container}>
+      <em>Add a new&nbsp;
+        <span style={style}>
+          <FontAwesomeIcon fixedWidth icon="circle" />
+        </span>{item.type.label}
+      </em>&nbsp;
+      {!!typeDefinition && !!typeDefinition.labelField && (
+        <strong>{searchTerm}</strong>
+      )}
+    </span>
+  );
+};
+
+
+export default NewValueInCurentSpace;

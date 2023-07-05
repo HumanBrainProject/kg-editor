@@ -21,21 +21,21 @@
  *
  */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import { FieldStoreDefinition, FieldStoreRegexRule, FieldStoreValidation } from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition, FieldStoreRegexRule, FieldStoreValidation } from '../../types';
 
 const getRegexRules = (validation?: FieldStoreValidation[]): FieldStoreRegexRule[] =>
   Array.isArray(validation)
     ? validation.map(rule => ({
-        regex: new RegExp(rule.regex),
-        errorMessage: rule.errorMessage
-      }))
+      regex: new RegExp(rule.regex),
+      errorMessage: rule.errorMessage
+    }))
     : [];
 
 interface Message {
@@ -75,7 +75,7 @@ class InputTextMultipleStore extends FieldStore {
       this.regexRules = [
         {
           regex: definition.regex,
-          errorMessage: "this is not a valid value"
+          errorMessage: 'this is not a valid value'
         }
       ];
     }
@@ -122,7 +122,7 @@ class InputTextMultipleStore extends FieldStore {
   get returnValue() {
     //NOSONAR, by design spec it can return that specific string constant or a list of value
     if (!this.value.length && this.returnAsNull) {
-      return "https://core.kg.ebrains.eu/vocab/resetValue";
+      return 'https://core.kg.ebrains.eu/vocab/resetValue';
     }
     return toJS(this.value);
   }
@@ -168,7 +168,7 @@ class InputTextMultipleStore extends FieldStore {
     const messages: Message = {};
     if (this.shouldCheckValidation) {
       if (this.requiredValidationWarning) {
-        messages.required = "This field is marked as required.";
+        messages.required = 'This field is marked as required.';
       }
       if (this.numberOfItemsWarning) {
         if (this.minItems && this.maxItems) {

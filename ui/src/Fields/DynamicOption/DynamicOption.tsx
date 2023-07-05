@@ -21,11 +21,11 @@
  *
  */
 
-import React from "react";
-import NewValueInExternalSpace from "./NewValueInExternalSpace";
-import NewValueInCurentSpace from "./NewValueInCurentSpace";
-import Option from "./Option";
-import { Suggestion } from "../../types";
+import React from 'react';
+import NewValueInCurentSpace from './NewValueInCurentSpace';
+import NewValueInExternalSpace from './NewValueInExternalSpace';
+import Option from './Option';
+import type { Suggestion } from '../../types';
 
 export interface DynamicOptionProps {
   item: Suggestion;
@@ -36,7 +36,7 @@ const DynamicOption = ({ item, searchTerm }: DynamicOptionProps) => {
   if (item.isNew) {
     if (item.isExternal) {
       return (
-        <NewValueInExternalSpace item={item} /> 
+        <NewValueInExternalSpace item={item} />
       );
     }
     return (

@@ -21,45 +21,45 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import Color from "color";
-import uniqueId from "lodash/uniqueId";
+import Color from 'color';
+import uniqueId from 'lodash/uniqueId';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const jsdiff = require("diff");
+const jsdiff = require('diff');
 
 const useStyles = createUseStyles({
   container:{
-    margin: "0 0 5px 0",
+    margin: '0 0 5px 0',
     padding: 0,
     border: 0,
-    background: "transparent",
-    overflowWrap: "anywhere",
-    fontFamily: "unset",
-    fontSize: "unset"
+    background: 'transparent',
+    overflowWrap: 'anywhere',
+    fontFamily: 'unset',
+    fontSize: 'unset'
   },
   label: {
     marginBottom: 0,
-    wordBreak: "keep-all",
-    "&::after": {
-      content: "':\\00a0'"
+    wordBreak: 'keep-all',
+    '&::after': {
+      content: '\':\\00a0\''
     }
   },
   value:{
-    wordBreak: "keep-all",
-    whiteSpace: "pre-wrap"
+    wordBreak: 'keep-all',
+    whiteSpace: 'pre-wrap'
   },
   removed:{
-    background:new Color("#e74c3c").lighten(0.6).hex(),
-    textDecoration: "line-through",
-    "& + $added": {
-      marginLeft: "3px"
+    background:new Color('#e74c3c').lighten(0.6).hex(),
+    textDecoration: 'line-through',
+    '& + $added': {
+      marginLeft: '3px'
     }
   },
   added:{
-    background:new Color("#2ecc71").lighten(0.6).hex(),
-    "& + $removed": {
-      marginLeft: "3px"
+    background:new Color('#2ecc71').lighten(0.6).hex(),
+    '& + $removed': {
+      marginLeft: '3px'
     }
   },
   unchanged: {
@@ -88,7 +88,7 @@ const CompareValue = ({ label, leftValue, rightValue, separator }: CompareValueP
       return classes.removed;
     }
     return classes.unchanged;
-  }
+  };
 
   return (
     <pre className={classes.container}>
@@ -100,7 +100,7 @@ const CompareValue = ({ label, leftValue, rightValue, separator }: CompareValueP
           }
           const className = getClassname(part);
           let [, , first, value, , last] = [null, null, null, part.value, null, null];
-          const match = part.value.match(new RegExp("^((" + separator + "){0,1})(.*[^" + separator[separator.length-1] + "])((" + separator + "){0,1})$"));
+          const match = part.value.match(new RegExp('^((' + separator + '){0,1})(.*[^' + separator[separator.length-1] + '])((' + separator + '){0,1})$'));
           if (match && match.length >= 6) {
             [, , first, value, , last] = match;
           }

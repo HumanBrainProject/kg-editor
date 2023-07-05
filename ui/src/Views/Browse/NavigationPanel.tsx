@@ -21,30 +21,30 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { Scrollbars } from "react-custom-scrollbars-2";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import Filter from '../../Components/Filter';
+import useStores from '../../Hooks/useStores';
 
-import Types from "./Types";
-import Filter from "../../Components/Filter";
+import Types from './Types';
 
 const useStyles = createUseStyles({
   container: {
-    background: "var(--bg-color-ui-contrast2)",
-    borderRight: "1px solid var(--border-color-ui-contrast1)",
-    color: "var(--ft-color-loud)",
-    position: "relative",
-    display: "grid",
-    gridTemplateRows:"auto 1fr"
+    background: 'var(--bg-color-ui-contrast2)',
+    borderRight: '1px solid var(--border-color-ui-contrast1)',
+    color: 'var(--ft-color-loud)',
+    position: 'relative',
+    display: 'grid',
+    gridTemplateRows:'auto 1fr'
   },
   header: {
-    position: "relative"
+    position: 'relative'
   },
   noMatch: {
-    padding: "0 15px"
+    padding: '0 15px'
   }
 });
 
@@ -72,6 +72,6 @@ const NavigationPanel = observer(() => {
     </div>
   );
 });
-NavigationPanel.displayName = "NavigationPanel";
+NavigationPanel.displayName = 'NavigationPanel';
 
 export default NavigationPanel;

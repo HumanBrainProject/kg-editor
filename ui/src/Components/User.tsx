@@ -21,18 +21,18 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import Avatar from "./Avatar";
+import Avatar from './Avatar';
 
 const useStyles = createUseStyles({
   user: {
-    "& .avatar.default": {
-      margin: "0 5px"
+    '& .avatar.default': {
+      margin: '0 5px'
     },
-    "& .avatar.picture": {
-      margin: "0 2px 0 5px"
+    '& .avatar.picture': {
+      margin: '0 2px 0 5px'
     }
   }
 });
@@ -51,7 +51,7 @@ const User = ({userId, name, picture, title}: UserProps)  => {
   return (
     <span className={`${classes.user} user`}>
       <Avatar userId={userId} name={name} picture={picture} />
-      <span title={title?title:""}>{name?name:userId}</span>
+      <span title={title?title:''}>{name?name:userId}</span>
     </span>
   );
 };

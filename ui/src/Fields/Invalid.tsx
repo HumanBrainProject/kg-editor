@@ -21,17 +21,17 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   invalid: {
-    display: "block",
-    width: "100%",
-    marginTop: ".25rem",
-    fontSize: "80%",
-    color: "var(--ft-color-warn)",
-    fontWeight: "bold"
+    display: 'block',
+    width: '100%',
+    marginTop: '.25rem',
+    fontSize: '80%',
+    color: 'var(--ft-color-warn)',
+    fontWeight: 'bold'
   }
 });
 
@@ -42,7 +42,7 @@ interface InvalidProps {
 
 const Invalid = ({ show, messages }: InvalidProps) => {
   const classes = useStyles();
-  if (!show || typeof messages !== "object") {
+  if (!show || typeof messages !== 'object') {
     return null;
   }
   return (

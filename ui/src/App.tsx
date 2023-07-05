@@ -21,47 +21,47 @@
  *
  */
 
-import React, { Suspense } from "react";
-import { observer } from "mobx-react-lite";
-import { BrowserRouter, Navigate, useSearchParams, Route, Routes } from "react-router-dom";
-import { JssProvider, ThemeProvider } from "react-jss";
+import { observer } from 'mobx-react-lite';
+import React, { Suspense } from 'react';
+import { JssProvider, ThemeProvider } from 'react-jss';
+import { BrowserRouter, Navigate, useSearchParams, Route, Routes } from 'react-router-dom';
 
-import "react-virtualized/styles.css";
-import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-virtualized/styles.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import "./Services/IconsImport";
+import './Services/IconsImport';
 
-import API from "./Services/API";
-import RootStore from "./Stores/RootStore";
-import StoresProvider from "./Views/StoresProvider";
-import AuthAdapter from "./Services/AuthAdapter";
-import APIProvider from "./Views/APIProvider";
-import { Space as SpaceType } from "./types";
+import SpinnerPanel from './Components/SpinnerPanel';
+import APIProvider from './Views/APIProvider';
 
-import ErrorBoundary from "./Views/ErrorBoundary";
-import BrowserEventHandler from "./Views/BrowserEventHandler";
-import Shortcuts from "./Views/Shortcuts";
-import Styles from "./Views/Styles";
-import Layout from "./Views/Layout";
-import GlobalError from "./Views/GlobalError";
-import SpinnerPanel from "./Components/SpinnerPanel";
-import Settings from "./Views/Settings";
+import BrowserEventHandler from './Views/BrowserEventHandler';
+import ErrorBoundary from './Views/ErrorBoundary';
+import GlobalError from './Views/GlobalError';
+import Layout from './Views/Layout';
+import Settings from './Views/Settings';
+import Shortcuts from './Views/Shortcuts';
+import StoresProvider from './Views/StoresProvider';
+import Styles from './Views/Styles';
+import type API from './Services/API';
+import type AuthAdapter from './Services/AuthAdapter';
+import type RootStore from './Stores/RootStore';
+import type { Space as SpaceType } from './types';
 
-const AuthProvider = React.lazy(() => import("./Views/AuthProvider"));
-const UserProfile = React.lazy(() => import("./Views/UserProfile"));
-const Authenticate = React.lazy(() => import("./Views/Authenticate"));
-const Space = React.lazy(() => import("./Views/Space"));
-const Types = React.lazy(() => import("./Views/Types"));
-const NotFound = React.lazy(() => import("./Views/NotFound"));
-const Home = React.lazy(() => import("./Views/Home"));
-const Help = React.lazy(() => import("./Views/Help"));
-const Browse = React.lazy(() => import("./Views/Browse"));
+const AuthProvider = React.lazy(() => import('./Views/AuthProvider'));
+const UserProfile = React.lazy(() => import('./Views/UserProfile'));
+const Authenticate = React.lazy(() => import('./Views/Authenticate'));
+const Space = React.lazy(() => import('./Views/Space'));
+const Types = React.lazy(() => import('./Views/Types'));
+const NotFound = React.lazy(() => import('./Views/NotFound'));
+const Home = React.lazy(() => import('./Views/Home'));
+const Help = React.lazy(() => import('./Views/Help'));
+const Browse = React.lazy(() => import('./Views/Browse'));
 
-const Instance = React.lazy(() => import("./Views/Instance"));
-const RawInstance = React.lazy(() => import("./Views/RawInstance"));
-const InstanceCreation = React.lazy(() => import("./Views/InstanceCreation"));
-const InstanceView = React.lazy(() => import("./Views/InstanceView"));
-const Logout = React.lazy(() => import("./Views/Logout"));
+const Instance = React.lazy(() => import('./Views/Instance'));
+const RawInstance = React.lazy(() => import('./Views/RawInstance'));
+const InstanceCreation = React.lazy(() => import('./Views/InstanceCreation'));
+const InstanceView = React.lazy(() => import('./Views/InstanceView'));
+const Logout = React.lazy(() => import('./Views/Logout'));
 
 interface AppProps {
   stores: RootStore;
@@ -78,8 +78,8 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
   const theme = appStore.currentTheme;
 
   const currentSpace = appStore.currentSpace as SpaceType|null;
-  const spaceParam = searchParams.get("space");
-  const skipHistory = searchParams.get("skipHistory") === "true";
+  const spaceParam = searchParams.get('space');
+  const skipHistory = searchParams.get('skipHistory') === 'true';
 
   const isTypeFetched = currentSpace && typeStore.space === currentSpace.id;
   const InstanceComponent = isTypeFetched?Instance:RawInstance;
@@ -97,8 +97,8 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                 <Settings authAdapter={authAdapter}>
                   <Suspense fallback={<SpinnerPanel text="Loading resource..." />} >
                     <Routes>
-                      <Route path={"/logout"} element={<Logout />}/>
-                      <Route path={"*"} element={
+                      <Route path={'/logout'} element={<Logout />}/>
+                      <Route path={'*'} element={
                         <Authenticate >
                           <UserProfile>
                             <Shortcuts />
@@ -108,20 +108,20 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                 <Route
                                   path="/instances/:id/create"
                                   element={
-                                      <>
-                                        {spaceParam?
-                                          <Space space={spaceParam} skipHistory={skipHistory} >
-                                            <Types>
-                                              <InstanceCreation>
-                                                <InstanceView mode="create" />
-                                              </InstanceCreation>
-                                            </Types>
-                                          </Space>
-                                          :
-                                          <Navigate to="/browse" />
-                                        }
-                                      </>
-                                  } 
+                                    <>
+                                      {spaceParam?
+                                        <Space space={spaceParam} skipHistory={skipHistory} >
+                                          <Types>
+                                            <InstanceCreation>
+                                              <InstanceView mode="create" />
+                                            </InstanceCreation>
+                                          </Types>
+                                        </Space>
+                                        :
+                                        <Navigate to="/browse" />
+                                      }
+                                    </>
+                                  }
                                 />
                                 <Route
                                   path="/instances/:id/raw"
@@ -133,12 +133,12 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                             <InstanceView mode="raw" />
                                           </Types>
                                         </Space>
-                                      )}  
+                                      )}
                                     </RawInstance>
-                                  } 
+                                  }
                                 />
-                                <Route 
-                                  path="/instances/:id/*" 
+                                <Route
+                                  path="/instances/:id/*"
                                   element={
                                     <InstanceComponent>
                                       {(instanceId, space) => (
@@ -154,9 +154,9 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                             </Routes>
                                           </Types>
                                         </Space>
-                                      )}  
+                                      )}
                                     </InstanceComponent>
-                                  } 
+                                  }
                                 />
                                 <Route
                                   path="/browse"
@@ -166,7 +166,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                         <Browse />
                                       </Types>
                                     </Space>
-                                  } 
+                                  }
                                 />
                                 <Route path="/help/*" element={<Help/>} />
                                 <Route
@@ -177,7 +177,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                         <Home />
                                       </Types>
                                     </Space>
-                                  } 
+                                  }
                                 />
                                 <Route path="*" element={<NotFound/>} />
                               </Routes>
@@ -196,7 +196,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
     </ThemeProvider>
   );
 });
-App.displayName = "App";
+App.displayName = 'App';
 
 const Component = ({ stores, api, authAdapter }: AppProps) => (
   <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>

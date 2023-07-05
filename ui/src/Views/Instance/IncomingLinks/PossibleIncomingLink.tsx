@@ -21,26 +21,26 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useLocation, useNavigate } from "react-router-dom";
-import { SimpleType } from "../../../types";
+import { useLocation, useNavigate } from 'react-router-dom';
+import useStores from '../../../Hooks/useStores';
+import type { SimpleType } from '../../../types';
 
 const useStyles = createUseStyles({
   btn: {
-    padding: ".175rem .75rem",
-    marginRight: "5px",
-    marginTop: "5px",
-    color: "#212529",
-    "&:hover": {
-      backgroundColor: "transparent",
-      borderColor: "var(--link-border-color-hover)",
-      color: "#212529"
+    padding: '.175rem .75rem',
+    marginRight: '5px',
+    marginTop: '5px',
+    color: '#212529',
+    '&:hover': {
+      backgroundColor: 'transparent',
+      borderColor: 'var(--link-border-color-hover)',
+      color: '#212529'
     }
   }
 });
@@ -65,7 +65,7 @@ const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkPro
         return;
       }
     }
-    navigate("/browse");
+    navigate('/browse');
     browseStore.selectType(type);
   };
 
@@ -73,12 +73,12 @@ const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkPro
     <>
       {spaces.map(space => (
         <Button key={`${space}-${type.label}`} className={classes.btn}  onClick={() => handleLinkFrom(space)} variant="outline-secondary">
-          <FontAwesomeIcon icon={"circle"} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="space"><i>({space})</i></strong></span>
+          <FontAwesomeIcon icon={'circle'} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="space"><i>({space})</i></strong></span>
         </Button>
       ))}
     </>
   );
 });
-PossibleIncomingLink.displayName = "PossibleIncomingLink";
+PossibleIncomingLink.displayName = 'PossibleIncomingLink';
 
 export default PossibleIncomingLink;

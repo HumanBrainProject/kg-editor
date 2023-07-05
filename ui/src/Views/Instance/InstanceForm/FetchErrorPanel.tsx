@@ -21,60 +21,61 @@
  *
  */
 
-import React, { MouseEvent } from "react";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import HeaderPanel from "./HeaderPanel";
+import HeaderPanel from './HeaderPanel';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   fetchErrorPanel: {
-    position: "absolute !important",
-    top: "50%",
-    left: "50%",
-    padding: "20px",
-    border: "1px solid gray",
-    borderRadius: "5px",
-    transform: "translate(-50%, -50%)",
-    textAlign: "center",
-    minWidth: "220px",
-    "& h4": {
-      paddingBottom: "10px",
-      color: "var(--ft-color-error)"
+    position: 'absolute !important',
+    top: '50%',
+    left: '50%',
+    padding: '20px',
+    border: '1px solid gray',
+    borderRadius: '5px',
+    transform: 'translate(-50%, -50%)',
+    textAlign: 'center',
+    minWidth: '220px',
+    '& h4': {
+      paddingBottom: '10px',
+      color: 'var(--ft-color-error)'
     },
-    "& button + button, & a + button, & a + a": {
-      marginLeft: "20px"
+    '& button + button, & a + button, & a + a': {
+      marginLeft: '20px'
     }
   },
   inlineFetchErrorPanel: {
-    padding: "10px",
-    "& h5": {
-      marginTop: "0",
-      color: "var(--ft-color-error)"
+    padding: '10px',
+    '& h5': {
+      marginTop: '0',
+      color: 'var(--ft-color-error)'
     },
-    "& small": {
-      display: "block",
-      paddingBottom: "6px",
-      color:"grey",
-      fontWeight:"400",
-      fontSize:"0.8em",
-      fontStyle: "italic",
-      "@media screen and (max-width:576px)": {
-        wordBreak: "break-all",
-        wordWrap: "break-word",
-        whiteSpace: "normal"
+    '& small': {
+      display: 'block',
+      paddingBottom: '6px',
+      color:'grey',
+      fontWeight:'400',
+      fontSize:'0.8em',
+      fontStyle: 'italic',
+      '@media screen and (max-width:576px)': {
+        wordBreak: 'break-all',
+        wordWrap: 'break-word',
+        whiteSpace: 'normal'
       }
     },
-    "& button span + span": {
-      marginLeft: "4px"
+    '& button span + span': {
+      marginLeft: '4px'
     }
   },
   retryIcon: {
-    marginRight: "4px"
+    marginRight: '4px'
   },
   action: {
-    textAlign: "center"
+    textAlign: 'center'
   }
 });
 

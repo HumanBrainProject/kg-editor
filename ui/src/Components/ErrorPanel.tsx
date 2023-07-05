@@ -21,8 +21,9 @@
  *
  */
 
-import React, { ReactNode } from "react";
-import Panel from "./Panel";
+import React from 'react';
+import Panel from './Panel';
+import type { ReactNode } from 'react';
 
 interface ErrorPanelProps {
   children: ReactNode;

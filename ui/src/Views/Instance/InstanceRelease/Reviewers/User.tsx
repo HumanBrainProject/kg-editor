@@ -21,57 +21,58 @@
  *
  */
 
-import React, { KeyboardEvent, MouseEvent } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Dropdown from "react-bootstrap/Dropdown";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { createUseStyles } from 'react-jss';
 
-import UserComponent from "../../../../Components/User";
-import { UserSummary } from "../../../../types";
+import UserComponent from '../../../../Components/User';
+import type { UserSummary } from '../../../../types';
+import type { KeyboardEvent, MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    width: "100%",
-    padding: "6px 5px",
-    "& > a": {
-      padding: "0 !important",
-      color: "#333",
-      textDecoration: "none",
+    width: '100%',
+    padding: '6px 5px',
+    '& > a': {
+      padding: '0 !important',
+      color: '#333',
+      textDecoration: 'none',
       outline: 0,
-      "& .option": {
-        "& .user": {
-          display: "flex",
-          alignItems: "center",
-          "& .avatar": {
-            margin: "0 5px",
-            "&.default": {
-              margin: "0 9px"
+      '& .option': {
+        '& .user': {
+          display: 'flex',
+          alignItems: 'center',
+          '& .avatar': {
+            margin: '0 5px',
+            '&.default': {
+              margin: '0 9px'
             }
           }
         }
       },
-      "&:hover, &:active, &:focus, &:visited": {
-        textDecoration: "none",
+      '&:hover, &:active, &:focus, &:visited': {
+        textDecoration: 'none',
         outline: 0
       },
-      "&:visited": {
-        color: "#333"
+      '&:visited': {
+        color: '#333'
       },
-      "&:hover, &:active, &:focus": {
-        color: "black"
+      '&:hover, &:active, &:focus': {
+        color: 'black'
       }
     },
-    "&:hover": {
-      background: "#f5f5f5",
-      color: "black",
-      "& .user .name:not(.is-curator)": {
-        color: "#1c4263"
+    '&:hover': {
+      background: '#f5f5f5',
+      color: 'black',
+      '& .user .name:not(.is-curator)': {
+        color: '#1c4263'
       }
     }
   },
   reviewStatus: {
-    padding: "6px 0",
-    verticalAlign: "middle"
+    padding: '6px 0',
+    verticalAlign: 'middle'
   }
 });
 
@@ -98,6 +99,6 @@ const User = observer(({ user, onSelect }: UserProps) => {
     </Dropdown.Item>
   );
 });
-User.displayName = "User";
+User.displayName = 'User';
 
 export default User;

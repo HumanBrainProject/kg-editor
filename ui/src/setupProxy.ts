@@ -22,14 +22,14 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { createProxyMiddleware } = require("http-proxy-middleware"); //setup proxy currently supports only node syntax 
+const { createProxyMiddleware } = require('http-proxy-middleware'); //setup proxy currently supports only node syntax
 
 module.exports = function(app: any) {
   app.use(
-    "/editor/api/**",
+    '/editor/api/**',
     createProxyMiddleware({
       // target:"http://localhost:8080",
-      target:"https://editor.kg-dev.ebrains.eu",
+      target:'https://editor.kg-dev.ebrains.eu',
       secure:false,
       changeOrigin: false,
       // pathRewrite: function(path) {

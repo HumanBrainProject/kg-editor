@@ -32,7 +32,7 @@
  *   limitations under the License.
  *
  */
-import { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from "../types";
+import type { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from '../types';
 
 interface APIErrorResponse {
   status: number;
@@ -45,7 +45,7 @@ export interface APIError {
   response?: APIErrorResponse;
 }
 
-export default interface API {
+interface API {
 
   getSettings(): Promise<Settings>;
 
@@ -97,3 +97,5 @@ export default interface API {
 
   getMoreIncomingLinks(instanceId: UUID, property: string, type: string, from: number, size: number): Promise<KGCoreResult<IncomingLink[]>>;
 }
+
+export default API;

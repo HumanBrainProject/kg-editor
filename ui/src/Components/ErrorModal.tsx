@@ -21,28 +21,29 @@
  *
  */
 
-import React, { ReactNode } from "react";
-import { createUseStyles } from "react-jss";
-import Modal from "react-bootstrap/Modal";
+import React from 'react';
+import Modal from 'react-bootstrap/Modal';
+import { createUseStyles } from 'react-jss';
+import type { ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   modal: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     top: 0,
     left: 0,
-    background: "rgba(0, 0, 0, 0.3)",
-    "& .modal-dialog": {
-      top: "35%",
-      width: "max-content",
-      maxWidth: "800px",
-      "& .modal-body": {
-        padding: "30px",
-        border: "1px solid var(--ft-color-loud)",
-        borderRadius: "4px",
-        color: "var(--ft-color-loud)",
-        background: "var(--bg-color-ui-contrast6)"
+    background: 'rgba(0, 0, 0, 0.3)',
+    '& .modal-dialog': {
+      top: '35%',
+      width: 'max-content',
+      maxWidth: '800px',
+      '& .modal-body': {
+        padding: '30px',
+        border: '1px solid var(--ft-color-loud)',
+        borderRadius: '4px',
+        color: 'var(--ft-color-loud)',
+        background: 'var(--bg-color-ui-contrast6)'
       }
     }
   }
@@ -60,7 +61,7 @@ const ErrorModal = ({children}:ErrorModalProps) => {
     <div className={classes.modal}>
       <Modal.Dialog>
         <Modal.Body>
-        {children}
+          {children}
         </Modal.Body>
       </Modal.Dialog>
     </div>

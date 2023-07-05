@@ -21,20 +21,21 @@
  *
  */
 
-import React, { useState, useEffect, RefObject } from "react";
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
+import React, { useState, useEffect } from 'react';
 
-import useStores from "../Hooks/useStores";
+import useStores from '../Hooks/useStores';
 
-import Alternatives from "./Alternatives";
-import { Alternative } from "../types";
+import Alternatives from './Alternatives';
+import type { Alternative } from '../types';
+import type { RefObject } from 'react';
 
 interface AlternativeValueProps {
   alternative: Alternative;
 }
 
-const AlternativeValue = observer(({alternative}: AlternativeValueProps) => alternative.value.map(instance => instance.name).join("; "));
-AlternativeValue.displayName = "AlternativeValue";
+const AlternativeValue = observer(({alternative}: AlternativeValueProps) => alternative.value.map(instance => instance.name).join('; '));
+AlternativeValue.displayName = 'AlternativeValue';
 
 interface LinksAlternativesProps {
   className: string;
@@ -54,13 +55,13 @@ const LinksAlternatives = ({className, list, onSelect, onRemove, mappingValue, p
   useEffect(() => {
     setItems(list.map(({users, selected, value }) => {
       const instances = Array.isArray(value)?value.map(v => {
-        if (v[mappingValue] && typeof v[mappingValue] === "string") {
+        if (v[mappingValue] && typeof v[mappingValue] === 'string') {
           const instance = instanceStore.createInstanceOrGet(v[mappingValue]);
           instance?.fetchLabel();
           return instance;
         }
         return {
-          name: "Unknown instance",
+          name: 'Unknown instance',
           value: value
         };
       }):[

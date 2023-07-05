@@ -21,8 +21,8 @@
  *
  */
 
-import { observable, computed, action, makeObservable, toJS } from "mobx";
-import { Space, UserProfile } from "../types";
+import { observable, computed, action, makeObservable, toJS } from 'mobx';
+import type { Space, UserProfile } from '../types';
 
 
 export class UserProfileStore {
@@ -107,11 +107,11 @@ export class UserProfileStore {
         return this.user.username;
       }
     }
-    return "";
+    return '';
   }
 
   setUserProfile(user: UserProfile) {
-    this.user = user
+    this.user = user;
   }
 }
 

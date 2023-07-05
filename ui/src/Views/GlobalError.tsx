@@ -21,19 +21,19 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../Hooks/useStores";
+import BGMessage from '../Components/BGMessage';
+import useStores from '../Hooks/useStores';
 
-import BGMessage from "../Components/BGMessage";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const useStyles = createUseStyles({
   container: {
-    height: "100%",
-    color: "var(--ft-color-loud)"
+    height: '100%',
+    color: 'var(--ft-color-loud)'
   }
 });
 
@@ -49,12 +49,12 @@ const GlobalError = () => {
 
   return (
     <div className={classes.container}>
-      <BGMessage icon={"exclamation-circle"}>
+      <BGMessage icon={'exclamation-circle'}>
           An unexpected error has occured.<br />
           We recommend you to save all your changes and reload the application in your browser.<br />
           If the problem persists, please contact the support.<br /><br />
-        <Button variant={"primary"} onClick={handleDismiss}>
-          <FontAwesomeIcon icon={"check"} /> &nbsp; Dismiss
+        <Button variant={'primary'} onClick={handleDismiss}>
+          <FontAwesomeIcon icon={'check'} /> &nbsp; Dismiss
         </Button>
       </BGMessage>
     </div >

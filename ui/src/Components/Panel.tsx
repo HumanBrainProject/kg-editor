@@ -21,20 +21,21 @@
  *
  */
 
-import React, { ReactNode } from "react";
-import { createUseStyles } from "react-jss";
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import BGMessage from "./BGMessage";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import BGMessage from './BGMessage';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    height: "100%"
+    height: '100%'
   },
   panel: {
-    color: "var(--ft-color-loud)",
-    "& button + button": {
-      marginLeft: "60px"
+    color: 'var(--ft-color-loud)',
+    '& button + button': {
+      marginLeft: '60px'
     }
   },
 });

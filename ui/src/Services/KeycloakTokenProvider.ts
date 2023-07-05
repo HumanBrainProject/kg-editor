@@ -32,19 +32,19 @@
  *   limitations under the License.
  *
  */
-import TokenProvider from "./TokenProvider";
-import { KeycloakInstance } from "keycloak-js";
+import type TokenProvider from './TokenProvider';
+import type { KeycloakInstance } from 'keycloak-js';
 
 class KeycloakTokenProvider implements TokenProvider {
-    private _keycloak: KeycloakInstance | undefined = undefined;
+  private _keycloak: KeycloakInstance | undefined = undefined;
 
-    get token() {
-        return this._keycloak?.token;
-    }
+  get token() {
+    return this._keycloak?.token;
+  }
 
-    setKeycloak(keycloak: KeycloakInstance) {
-        this._keycloak = keycloak;
-    }
+  setKeycloak(keycloak: KeycloakInstance) {
+    this._keycloak = keycloak;
+  }
 }
 
 export default KeycloakTokenProvider;

@@ -19,7 +19,19 @@
     "removeComments": true,
     "allowSyntheticDefaultImports": true,
     "noFallthroughCasesInSwitch": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "*": [
+        "./src/customTypings/*"
+      ]
+    },
+    "plugins": [
+      { "name": "typescript-tslint-plugin" }
+    ],
+    "typeRoots": [
+      "src/customTypings",
+      "node_modules/@types"
+    ]
   },
   "include": [
     "src"

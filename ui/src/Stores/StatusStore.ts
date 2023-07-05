@@ -21,10 +21,10 @@
  *
  */
 
-import { observable, action, runInAction, makeObservable } from "mobx";
-import debounce from "lodash/debounce";
-import { StatusResponse } from "../types";
-import API from "../Services/API";
+import debounce from 'lodash/debounce';
+import { observable, action, runInAction, makeObservable } from 'mobx';
+import type API from '../Services/API';
+import type { StatusResponse } from '../types';
 
 
 export interface Status {

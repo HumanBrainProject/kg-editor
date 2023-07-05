@@ -21,35 +21,35 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import Dropdown from "react-bootstrap/Dropdown";
-import { createUseStyles } from "react-jss";
-import { useLocation, useNavigate } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import useStores from "../../Hooks/useStores";
+import useStores from '../../Hooks/useStores';
 
-import SpaceDropdownToggle from "./SpaceDropdownToggle";
-import SpaceDropdownMenu from "./SpaceDropdownMenu";
-import Matomo from "../../Services/Matomo";
+import Matomo from '../../Services/Matomo';
+import SpaceDropdownMenu from './SpaceDropdownMenu';
+import SpaceDropdownToggle from './SpaceDropdownToggle';
 
 const useStyles = createUseStyles({
   container: {
-    height: "50px",
-    lineHeight: "50px",
-    color: "var(--ft-color-normal)",
-    background: "var(--bg-color-ui-contrast2)",
-    padding: "0 20px 0 20px",
-    border: "1px solid var(--border-color-ui-contrast2)",
-    borderLeft: "none",
-    cursor: "pointer",
-    display: "grid",
-    gridTemplateColumns: "auto 1fr auto",
-    "& .btn-group": {
-      margin: "-2px"
+    height: '50px',
+    lineHeight: '50px',
+    color: 'var(--ft-color-normal)',
+    background: 'var(--bg-color-ui-contrast2)',
+    padding: '0 20px 0 20px',
+    border: '1px solid var(--border-color-ui-contrast2)',
+    borderLeft: 'none',
+    cursor: 'pointer',
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr auto',
+    '& .btn-group': {
+      margin: '-2px'
     },
-    "& .inputFilter": {
-      minWidth: "286px"
+    '& .inputFilter': {
+      minWidth: '286px'
     }
   }
 });
@@ -64,10 +64,10 @@ const SpaceSelector = observer(() => {
 
   const handleSelectSpace = (space: string | null) => {
     if(space) {
-      Matomo.trackEvent("Space", "Select", space);
+      Matomo.trackEvent('Space', 'Select', space);
       appStore.switchSpace(location, navigate, space);
     }
-  }
+  };
 
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
@@ -82,6 +82,6 @@ const SpaceSelector = observer(() => {
     </div>
   );
 });
-SpaceSelector.displayName = "SpaceSelector";
+SpaceSelector.displayName = 'SpaceSelector';
 
 export default SpaceSelector;

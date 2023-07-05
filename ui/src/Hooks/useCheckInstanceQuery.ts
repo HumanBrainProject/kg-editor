@@ -21,11 +21,12 @@
  *
  */
 
-import { useMemo, useState } from "react";
-import useAPI from "./useAPI";
-import useGenericQuery, { GenericQuery } from "./useGenericQuery";
-import { InstanceFull, UUID } from "../types";
-import { APIError } from "../Services/API";
+import { useMemo, useState } from 'react';
+import useAPI from './useAPI';
+import useGenericQuery from './useGenericQuery';
+import type { GenericQuery } from './useGenericQuery';
+import type { APIError } from '../Services/API';
+import type { InstanceFull, UUID } from '../types';
 
 export interface CheckInstanceQuery extends GenericQuery<InstanceFull|undefined> {
   isAvailable?: boolean;
@@ -33,7 +34,7 @@ export interface CheckInstanceQuery extends GenericQuery<InstanceFull|undefined>
 }
 
 const useCheckInstanceQuery = (instanceId: UUID, skip: boolean): CheckInstanceQuery => {
-  
+
   const [isAvailable, setAvailability] = useState<boolean|undefined>(undefined);
   const [resolvedId, setResolvedId] = useState<UUID|undefined>(undefined);
 
@@ -56,18 +57,18 @@ const useCheckInstanceQuery = (instanceId: UUID, skip: boolean): CheckInstanceQu
       const status = response?.status;
       const message = error?.message;
       switch (status) {
-        case 401: // Unauthorized
-        case 403: { // Forbidden
-          throw new Error(`You do not have permission to access the instance "${instanceId}".`);
-        }
-        case 404: {
-          setAvailability(true);
-          return undefined;
-        }
-        default: {
-          const errorMessage = error.response && error.response.status !== 500 ? error.response.data:"";
-          throw new Error(`Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`);
-        }
+      case 401: // Unauthorized
+      case 403: { // Forbidden
+        throw new Error(`You do not have permission to access the instance "${instanceId}".`);
+      }
+      case 404: {
+        setAvailability(true);
+        return undefined;
+      }
+      default: {
+        const errorMessage = error.response && error.response.status !== 500 ? error.response.data:'';
+        throw new Error(`Failed to fetch instance "${instanceId}" (${message}) ${errorMessage}`);
+      }
       }
     }
   }, [API, instanceId]);

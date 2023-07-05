@@ -21,67 +21,67 @@
  *
  */
 
-import React, { useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import DatePicker from "react-datepicker";
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import DatePicker from 'react-datepicker';
+import { createUseStyles } from 'react-jss';
 
-import Alternatives from "../Alternatives";
-import Label from "../Label";
-import "react-datepicker/dist/react-datepicker.css";
-import { Alternative } from "../../types";
-import InputDateStore from "../Stores/InputDateStore";
+import Alternatives from '../Alternatives';
+import Label from '../Label';
+import 'react-datepicker/dist/react-datepicker.css';
+import type { Alternative } from '../../types';
+import type InputDateStore from '../Stores/InputDateStore';
 
 const useStyles = createUseStyles({
   containerDatepicker: {
-    "& > .react-datepicker-wrapper": {
-      display: "block"
+    '& > .react-datepicker-wrapper': {
+      display: 'block'
     },
-    "& .react-datepicker__triangle": {
-      left: "50px !important"
+    '& .react-datepicker__triangle': {
+      left: '50px !important'
     }
   },
   alternatives: {
-    marginLeft: "3px"
+    marginLeft: '3px'
   },
   label: {},
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   datePicker: {
-    display: "block",
-    width: "100%",
-    padding: ".375rem .75rem",
-    fontSize: "1rem",
-    fontWeight: "400",
-    lineHeight: "1.5",
-    color: "#495057",
-    backgroundColor: "#fff",
-    backgroundClip: "padding-box",
-    border: "1px solid #ced4da",
-    borderRadius: ".25rem",
-    transition: "border-color .15s ease-in-out,box-shadow .15s ease-in-out",
-    height: "auto",
-    position: "relative",
-    minHeight: "34px",
-    paddingBottom: "3px"
+    display: 'block',
+    width: '100%',
+    padding: '.375rem .75rem',
+    fontSize: '1rem',
+    fontWeight: '400',
+    lineHeight: '1.5',
+    color: '#495057',
+    backgroundColor: '#fff',
+    backgroundClip: 'padding-box',
+    border: '1px solid #ced4da',
+    borderRadius: '.25rem',
+    transition: 'border-color .15s ease-in-out,box-shadow .15s ease-in-out',
+    height: 'auto',
+    position: 'relative',
+    minHeight: '34px',
+    paddingBottom: '3px'
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
 
 const getDateTimeValue = (value?: any) => {
-  if (value && typeof value === "string") {
+  if (value && typeof value === 'string') {
     const d = new Date(value);
     if (d && d instanceof Date) {
       return d.toLocaleString();
     }
-    return value
+    return value;
   }
   return JSON.stringify(value);
 };
@@ -91,14 +91,14 @@ interface AlternativeValueProps {
 }
 
 const AlternativeValue = observer(({alternative}: AlternativeValueProps) => getDateTimeValue(alternative.value));
-AlternativeValue.displayName = "AlternativeValue";
+AlternativeValue.displayName = 'AlternativeValue';
 
 interface InputDateTimeProps {
   fieldStore: InputDateStore;
   className: string;
   readMode: boolean;
   showIfNoValue: boolean;
-} 
+}
 
 const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue }:InputDateTimeProps) => {
 
@@ -137,7 +137,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
       </Form.Group>
     );
   }
-  const dateValue = value === "" ? null:new Date(value);
+  const dateValue = value === '' ? null:new Date(value);
   const isDisabled = returnAsNull;
   const checkValidationWarnings = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
@@ -152,7 +152,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
         ValueRenderer={AlternativeValue}
       />
       <DatePicker
-        className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:""}`}
+        className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:''}`}
         selected={dateValue}
         disabled={isDisabled}
         onChange={handleChange}
@@ -164,6 +164,6 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     </Form.Group>
   );
 });
-InputDateTime.displayName = "InputDateTime";
+InputDateTime.displayName = 'InputDateTime';
 
 export default InputDateTime;

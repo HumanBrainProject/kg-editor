@@ -21,19 +21,19 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   avatar: {
-    verticalAlign: "middle",
-    "&.picture": {
+    verticalAlign: 'middle',
+    '&.picture': {
       border: 0,
-      borderRadius: "50%"
+      borderRadius: '50%'
     },
-    "&.default": {
-      transform: "scale(1.35)"
+    '&.default': {
+      transform: 'scale(1.35)'
     }
   }
 });

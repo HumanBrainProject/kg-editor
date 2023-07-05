@@ -33,11 +33,11 @@
  *
  */
 export default class UnauthorizedRequestResponseHandlerProvider {
-    private _handler: (() => void)|undefined = undefined;
-    get unauthorizedRequestResponseHandler() {
-        return this._handler;
-    }
-    set unauthorizedRequestResponseHandler(handler: (() => void)|undefined) {
-        this._handler = handler;
-    }
+  private _handler: (() => void)|undefined = undefined;
+  get unauthorizedRequestResponseHandler() {
+    return this._handler;
+  }
+  set unauthorizedRequestResponseHandler(handler: (() => void)|undefined) {
+    this._handler = handler;
+  }
 }

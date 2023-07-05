@@ -21,10 +21,11 @@
  *
  */
 
-import React, { KeyboardEvent } from "react";
+import React from 'react';
 
-import ListItem from "./ListItem";
-import { Value } from "../Stores/LinksStore";
+import ListItem from './ListItem';
+import type { Value } from '../Stores/LinksStore';
+import type { KeyboardEvent } from 'react';
 
 interface ListProps {
   list: string[];

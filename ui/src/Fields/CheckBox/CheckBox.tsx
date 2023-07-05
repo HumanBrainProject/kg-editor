@@ -21,24 +21,24 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import Label from "../Label";
-import CheckBoxStore from "../Stores/CheckBoxStore";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import Label from '../Label';
+import type CheckBoxStore from '../Stores/CheckBoxStore';
 
 const useStyles = createUseStyles({
   container: {
-    "& .form-check": {
-      verticalAlign: "middle",
-      marginLeft: "4px",
-      transform: "translateY(-2px)",
-      display: "inline-block"
+    '& .form-check': {
+      verticalAlign: 'middle',
+      marginLeft: '4px',
+      transform: 'translateY(-2px)',
+      display: 'inline-block'
     }
   },
   label: {
-    display: "inline"
+    display: 'inline'
   }
 });
 
@@ -78,6 +78,6 @@ const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }: C
     </Form.Group>
   );
 });
-CheckBox.displayName = "CheckBox";
+CheckBox.displayName = 'CheckBox';
 
 export default CheckBox;

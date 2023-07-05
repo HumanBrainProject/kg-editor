@@ -21,23 +21,23 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { matchPath, useLocation, useNavigate } from "react-router-dom";
-import { createUseStyles } from "react-jss";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
+import { matchPath, useLocation, useNavigate } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
+import Tab from '../Components/Tab';
+import useStores from '../Hooks/useStores';
 
-import Tab from "../Components/Tab";
-import Matomo from "../Services/Matomo";
-import Instance from "../Stores/Instance";
-import { View } from "../Stores/ViewStore";
-import { ViewMode } from "../types";
+import Matomo from '../Services/Matomo';
+import type Instance from '../Stores/Instance';
+import type { View } from '../Stores/ViewStore';
+import type { ViewMode } from '../types';
 
 const useStyles = createUseStyles({
   container: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(120px, 0.5fr))"
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 0.5fr))'
   }
 });
 
@@ -58,7 +58,7 @@ const getColor = (instance: Instance, view: View) => {
   if(view.color) {
     return view.color;
   }
-  return "";
+  return '';
 };
 
 const getDescription = (instance: Instance, view: View) => {
@@ -74,13 +74,13 @@ const getDescription = (instance: Instance, view: View) => {
   if(view.description) {
     return view.description;
   }
-  return "";
-}
+  return '';
+};
 
 const getInstanceTabPath = (instanceId: string, mode: ViewMode, space: string, type: string) => {
-  if(mode === "view") {
+  if(mode === 'view') {
     return `/instances/${instanceId}`;
-  } else if (mode === "create") {
+  } else if (mode === 'create') {
     return `/instances/${instanceId}/create?space=${space}&type=${encodeURIComponent(type)}`;
   }
   return `/instances/${instanceId}/${mode}`;
@@ -102,7 +102,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
 
   useEffect(() => {
     if (instance && instance.name !== view.name && instance.primaryType.color !== view.color) {
-      if (instance.name !== instance.id) { 
+      if (instance.name !== instance.id) {
         view.setNameAndColor(instance.name, instance.primaryType.color);
         viewStore.syncStoredViews();
       }
@@ -111,7 +111,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
   }, [instance, view]);
 
   const isCurrent = (instanceId: string, mode: string) => {
-    if(mode !== "view") {
+    if(mode !== 'view') {
       return matchPath({ path: `/instances/${instanceId}/${mode}` }, pathname);
     }
     return matchPath({ path: `/instances/${instanceId}` }, pathname);
@@ -120,12 +120,12 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
 
   const handleClose = () => {
     if(isCurrent(view.instanceId, view.mode)) {
-      Matomo.trackEvent("Tab", "CloseCurrentInstance", view.instanceId);
+      Matomo.trackEvent('Tab', 'CloseCurrentInstance', view.instanceId);
     } else {
-      Matomo.trackEvent("Tab", "CloseOtherInstance", view.instanceId);
+      Matomo.trackEvent('Tab', 'CloseOtherInstance', view.instanceId);
     }
     appStore.closeInstance(location, navigate, view.instanceId);
-  }
+  };
 
   const label = getLabel(instance, view);
   const color = getColor(instance, view);
@@ -133,7 +133,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
 
   return (
     <Tab
-      icon={instance?.isFetching ? "circle-notch" : "circle"}
+      icon={instance?.isFetching ? 'circle-notch' : 'circle'}
       iconSpin={instance?.isFetching}
       iconColor={color}
       active={isCurrent(view.instanceId, view.mode)}
@@ -144,7 +144,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
     />
   );
 });
-InstanceTab.displayName = "InstanceTab";
+InstanceTab.displayName = 'InstanceTab';
 
 interface InstanceTabsProps {
   pathname: string;
@@ -164,6 +164,6 @@ const InstanceTabs = observer(({ pathname }: InstanceTabsProps) => {
     </div>
   );
 });
-InstanceTabs.displayName = "InstanceTabs";
+InstanceTabs.displayName = 'InstanceTabs';
 
 export default InstanceTabs;

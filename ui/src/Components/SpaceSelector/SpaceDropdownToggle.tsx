@@ -21,20 +21,21 @@
  *
  */
 
-import React, { MouseEvent, ReactNode } from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import type { MouseEvent, ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   dropdownLink: {
-    color: "var(--ft-color-selected)",
-    textDecoration: "none",
-    backgroundColor: "transparent",
-    border: "none",
-    transform: "translateY(-4px)",
-    "&:hover": {
-      color: "var(--ft-color-selected-hover)",
-      textDecoration: "none"
+    color: 'var(--ft-color-selected)',
+    textDecoration: 'none',
+    backgroundColor: 'transparent',
+    border: 'none',
+    transform: 'translateY(-4px)',
+    '&:hover': {
+      color: 'var(--ft-color-selected-hover)',
+      textDecoration: 'none'
     }
   }
 });
@@ -56,11 +57,11 @@ const SpaceDropdownToggle = React.forwardRef<RefType,  SpaceDropdownToggleProps>
 
   return (
     <button onClick={handleClick} className={classes.dropdownLink} ref={ref}>
-      {children} <FontAwesomeIcon icon={"caret-down"} />
+      {children} <FontAwesomeIcon icon={'caret-down'} />
     </button>
   );
 });
 
-SpaceDropdownToggle.displayName = "SpaceDropdownToggle";
+SpaceDropdownToggle.displayName = 'SpaceDropdownToggle';
 
 export default SpaceDropdownToggle;

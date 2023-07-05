@@ -20,24 +20,24 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import { observable, toJS, makeObservable, action, computed } from "mobx";
+import { observable, toJS, makeObservable, action, computed } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import { FieldStoreDefinition } from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition } from '../../types';
 
 interface Messages {
   minMaxValue?: string;
 }
 
 class InputNumberStore extends FieldStore {
-  value = "";
+  value = '';
   returnAsNull = false;
   initialValue = null;
-  inputType = "number";
+  inputType = 'number';
   minValue?: number;
   maxValue?: number;
 
@@ -74,7 +74,7 @@ class InputNumberStore extends FieldStore {
   get validationWarnings() {
     const messages: Messages = {};
     if (this.shouldCheckValidation) {
-      if(this.minMaxValueWarning && this.value !== "") {
+      if(this.minMaxValueWarning && this.value !== '') {
         const v = parseInt(this.value);
         if(this.minValue && this.maxValue) {
           if(v < this.minValue || v > this.maxValue) {
@@ -96,9 +96,9 @@ class InputNumberStore extends FieldStore {
 
   get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
     if (this.value === null && this.returnAsNull) {
-      return "https://core.kg.ebrains.eu/vocab/resetValue";
+      return 'https://core.kg.ebrains.eu/vocab/resetValue';
     }
-    if (this.value === "" || this.value === null) {
+    if (this.value === '' || this.value === null) {
       return null;
     }
     const value = parseFloat(toJS(this.value));
@@ -134,8 +134,8 @@ class InputNumberStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (this.initialValue !== null && typeof this.initialValue === "object") {
-      return typeof this.returnValue !== "object"; // user did not change the value
+    if (this.initialValue !== null && typeof this.initialValue === 'object') {
+      return typeof this.returnValue !== 'object'; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
   }
@@ -146,13 +146,13 @@ class InputNumberStore extends FieldStore {
 
   setValue(value) {
     if (value !== null && value !== undefined) {
-      if (value !== "" || !this.returnAsNull) {
+      if (value !== '' || !this.returnAsNull) {
         this.returnAsNull = false;
         this.value = value;
       }
     } else  {
       this.returnAsNull = true;
-      this.value = "";
+      this.value = '';
     }
   }
 }

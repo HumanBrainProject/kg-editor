@@ -32,14 +32,14 @@
  *   limitations under the License.
  *
  */
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { BrowserOptions } from "@sentry/browser";
-import { KeycloakConfig } from "keycloak-js";
-import { PiwikOptions } from "react-piwik";
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { BrowserOptions } from '@sentry/browser';
+import type { KeycloakConfig } from 'keycloak-js';
+import type { PiwikOptions } from 'react-piwik';
 
 export type UUID = string;
 
-export type ViewMode = "view" | "edit" | "graph" | "manage" | "release" | "create" | "raw";
+export type ViewMode = 'view' | 'edit' | 'graph' | 'manage' | 'release' | 'create' | 'raw';
 
 export interface Settings {
   commit: string;
@@ -82,7 +82,7 @@ export interface UserSummary {
   picture?: string;
 }
 
-export type Stage = "IN_PROGRESS" | "RELEASED";
+export type Stage = 'IN_PROGRESS' | 'RELEASED';
 
 export interface KGCoreError {
   code: number;
@@ -346,7 +346,7 @@ export interface FieldStoreDefinition {
     isReadOnly: boolean;
     warning: string;
     minValue?: number;
-    maxValue?: number; 
+    maxValue?: number;
     minItems?: number;
     maxItems?: number;
     maxLength?: number;
@@ -356,5 +356,5 @@ export interface FieldStoreDefinition {
     allowCustomValues?: boolean;
     lazyShowLinks?: boolean;
     targetTypes?: SimpleType[];
-    fields: Map<string, StructureOfField>; 
+    fields: Map<string, StructureOfField>;
 }

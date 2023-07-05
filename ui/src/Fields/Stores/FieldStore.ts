@@ -21,13 +21,13 @@
  *
  */
 
-import { observable, action, computed, makeObservable } from "mobx";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import { FieldStoreDefinition } from "../../types";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { WidgetOptions } from "..";
-import Instance from "../../Stores/Instance";
+import { observable, action, computed, makeObservable } from 'mobx';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition } from '../../types';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 class FieldStore {
   value: any;
@@ -95,7 +95,7 @@ class FieldStore {
   /**
    * @param {any} value field value
    */
-  updateValue(value: any): void {
+  updateValue(): void {
     throw new Error(`update method is not implemented for ${this.widget} store`);
   }
 

@@ -21,14 +21,14 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import useStores from "../Hooks/useStores";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import useStores from '../Hooks/useStores';
 
-import Matomo from "../Services/Matomo";
-import Instance from "./Instance/Instance";
-import { useNavigate, useParams } from "react-router-dom";
-import { ViewMode } from "../types";
+import Matomo from '../Services/Matomo';
+import Instance from './Instance/Instance';
+import type { ViewMode } from '../types';
 
 
 interface InstanceViewProps {
@@ -52,7 +52,7 @@ const InstanceView = observer(({ mode }: InstanceViewProps) => {
     const instance = instanceStore.instances.get(instanceId); //NOSONAR
     if (instance?.space ===  typeStore.space) {
       const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
-      if (!isTypesSupported && !["raw", "graph", "manage"].includes(mode)) {
+      if (!isTypesSupported && !['raw', 'graph', 'manage'].includes(mode)) {
         navigate(`/instances/${instanceId}/raw`, {replace: true});
       }
     }
@@ -61,7 +61,7 @@ const InstanceView = observer(({ mode }: InstanceViewProps) => {
 
   const instance = instanceStore.instances.get(instanceId);
   const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
-  if (instance?.space !== typeStore.space || (!isTypesSupported && !["raw", "graph", "manage"].includes(mode))) {
+  if (instance?.space !== typeStore.space || (!isTypesSupported && !['raw', 'graph', 'manage'].includes(mode))) {
     return null;
   }
 
@@ -69,6 +69,6 @@ const InstanceView = observer(({ mode }: InstanceViewProps) => {
     <Instance instance={instance} mode={mode} />
   );
 });
-InstanceView.displayName = "InstanceView";
+InstanceView.displayName = 'InstanceView';
 
 export default InstanceView;

@@ -21,13 +21,14 @@
  *
  */
 
-import { observable, action, computed, makeObservable, toJS } from "mobx";
-import FieldStore from "./FieldStore";
-import { WidgetOptions, fieldsMapping } from "..";
-import { FieldStoreDefinition, SimpleType } from "../../types";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import { observable, action, computed, makeObservable, toJS } from 'mobx';
+import { fieldsMapping } from '..';
+import FieldStore from './FieldStore';
+import type { WidgetOptions} from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition, SimpleType } from '../../types';
 
 interface Messages {
   numberOfItems?: string;
@@ -92,12 +93,10 @@ class NestedFieldStore extends FieldStore {
   }
 
   get returnValue() {
-    return this.nestedFieldsStores.map(row => {
-      return Object.values(row.stores).reduce((acc, store) => {
-        acc[store.fullyQualifiedName] = store.returnValue;
-        return acc;
-      }, {"@type": row["@type"]});
-    });
+    return this.nestedFieldsStores.map(row => Object.values(row.stores).reduce((acc, store) => {
+      acc[store.fullyQualifiedName] = store.returnValue;
+      return acc;
+    }, {'@type': row['@type']}));
   }
 
   get numberOfItemsWarning() {
@@ -142,26 +141,26 @@ class NestedFieldStore extends FieldStore {
     const field = JSON.parse(JSON.stringify(toJS(template)));
     let warning = null;
     if(name === this.labelField) {
-      field.labelTooltip = "This field will be publicly accessible for every user. (Even for users without read access)";
-      field.labelTooltipIcon = "globe";
+      field.labelTooltip = 'This field will be publicly accessible for every user. (Even for users without read access)';
+      field.labelTooltipIcon = 'globe';
     }
     if (!stores[name]) {
       if (!field.widget) {
         warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
-        field.widget = "UnsupportedField";
+        field.widget = 'UnsupportedField';
       } else if (!fieldsMapping[field.widget]) {
         warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
-        field.widget = "UnsupportedField";
+        field.widget = 'UnsupportedField';
       }
       const fieldMapping = fieldsMapping[field.widget];
-      if(field.widget === "Nested") {
-        const type = this.getType(value["@type"]);
+      if(field.widget === 'Nested') {
+        const type = this.getType(value['@type']);
         if(type) {
           const fields = JSON.parse(JSON.stringify(toJS(type.fields)));
           field.fields = fields;
         }
       }
-      const options = {...fieldMapping.options, sourceType: value["@type"]};
+      const options = {...fieldMapping.options, sourceType: value['@type']};
       stores[name] = new fieldMapping.Store(field, options, this.instance, this.api, this.rootStore);
     }
     const store = stores[name];
@@ -169,14 +168,14 @@ class NestedFieldStore extends FieldStore {
     if (warning) {
       store.setWarning(warning);
     }
-  }
-  
+  };
+
   _setValue(values) {
     this.nestedFieldsStores = [];
     if(values) {
       values.forEach(value => {
-        const rowFieldStores = {stores: {}, "@type": value["@type"]};
-        const type = this.getType(value["@type"]);
+        const rowFieldStores = {stores: {}, '@type': value['@type']};
+        const type = this.getType(value['@type']);
         if (type) {
           const fieldsTemplate = type.fields;
           Object.entries(fieldsTemplate).forEach(([name, template]) => this._addNestedStore(rowFieldStores.stores, name, template, value));
@@ -195,7 +194,7 @@ class NestedFieldStore extends FieldStore {
   addValue(type: string) {
     const values = this.returnValue;
     values.push({
-      "@type": [type] // for embeded: value should only belong to a single type.
+      '@type': [type] // for embeded: value should only belong to a single type.
     });
     this._setValue(values);
   }

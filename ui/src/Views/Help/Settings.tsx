@@ -21,12 +21,10 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
 const Settings = () => (
-  <div>
-
-  </div>
+  <div />
 );
 
 export default Settings;

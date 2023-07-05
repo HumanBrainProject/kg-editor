@@ -21,15 +21,16 @@
  *
  */
 
-import { observable, action, computed, makeObservable } from "mobx";
+import { observable, action, computed, makeObservable } from 'mobx';
 
-import { fieldsMapping } from "../Fields";
-import { Alternative, Alternatives, InstanceIncomingLinkFull, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from "../types";
-import API, { APIError } from "../Services/API";
-import RootStore from "./RootStore";
-import FieldStore from "../Fields/Stores/FieldStore";
-import NestedFieldStore from "../Fields/Stores/NestedFieldStore";
-import SingleNestedFieldStore from "../Fields/Stores/SingleNestedFieldStore";
+import { fieldsMapping } from '../Fields';
+import type RootStore from './RootStore';
+import type FieldStore from '../Fields/Stores/FieldStore';
+import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
+import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
+import type API from '../Services/API';
+import type { APIError } from '../Services/API';
+import type { Alternative, Alternatives, InstanceIncomingLinkFull, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from '../types';
 
 const compareAlternatives = (a: Alternative, b: Alternative) => {
   if (a.selected === b.selected) {
@@ -52,7 +53,7 @@ const normalizeAlternative = (name: string, field: StructureOfField, alternative
 };
 
 const normalizeField = (field: StructureOfField, instanceId: UUID) => {
-  if (field instanceof Object && !Array.isArray(field) && (field.widget === "Nested" || field.widget === "SingleNested")) {
+  if (field instanceof Object && !Array.isArray(field) && (field.widget === 'Nested' || field.widget === 'SingleNested')) {
     normalizeFields(field.fields, instanceId);
   }
 };
@@ -71,12 +72,12 @@ const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
     return new Set();
   }
   return Object.values(fields).reduce((acc, field) => {
-    if (field.widget === "SingleNested") {
+    if (field.widget === 'SingleNested') {
       //const singleNestedField = field as fieldsMapping["SingleNested"].Store;
       const singleNestedField = field as SingleNestedFieldStore;
       const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(singleNestedField.nestedFieldsStores);
       idsOfNestedFields.forEach(id => acc.add(id));
-    } else if (field.widget === "Nested") {
+    } else if (field.widget === 'Nested') {
       //const nestedField = field as fieldsMapping["Nested"].Store;
       const nestedField = field as NestedFieldStore;
       const idsOfNestedFields = getChildrenIdsOfNestedFields(nestedField.nestedFieldsStores);
@@ -153,8 +154,8 @@ export const normalizeLabelInstanceData = data => {
     id: null,
     name: null,
     types: [],
-    primaryType: { name: "", color: "", label: "" },
-    space: "",
+    primaryType: { name: '', color: '', label: '' },
+    space: '',
     error: null
   };
 
@@ -176,7 +177,7 @@ export const normalizeLabelInstanceData = data => {
   if (data.name) {
     instance.name = data.name;
   }
-  if (typeof data.error === "object") {
+  if (typeof data.error === 'object') {
     instance.error = data.error;
   }
   return instance;
@@ -219,7 +220,7 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
   }
   if(data.incomingLinks) {
     const incomingLinks = Object.entries(data.incomingLinks).map(([property, field])=> {
-      let label = "";
+      let label = '';
       const links = Object.entries(field).map(([typeName, type]) => {
         label = type.nameForReverseLink;
         return {
@@ -266,7 +267,7 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
   if (data.metadata instanceof Object) {
     const metadata = data.metadata;
     instance.metadata = Object.keys(metadata).map(key => {
-      if (key === "lastUpdateAt" || key === "createdAt") {
+      if (key === 'lastUpdateAt' || key === 'createdAt') {
         const d = new Date(metadata[key].value);
         metadata[key].value = d.toLocaleString();
       }
@@ -307,7 +308,7 @@ const getIds = field => {
   const mappingValue = field.mappingValue;
   if(Array.isArray(values)) {
     return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => id !== field.instance.id).filter(id => showId(field, id));
-  } else if (typeof values === "object" && values && values[mappingValue] && showId(field, values[mappingValue])) { 
+  } else if (typeof values === 'object' && values && values[mappingValue] && showId(field, values[mappingValue])) {
     return [values[mappingValue]];
   }
   return [];
@@ -338,15 +339,15 @@ const getGroupsForFields = fields => {
     const groups = getGroupsForField(field);
     acc.push(...groups);
     return acc;
-  }, [])
+  }, []);
 };
 
 const getGroupsForField = field => {
   const groups = [];
-  if (field.widget === "Nested") {
+  if (field.widget === 'Nested') {
     const nestedGroups = getNestedFields(field.nestedFieldsStores);
     groups.push(...nestedGroups);
-  } else if (field.widget === "SingleNested") {
+  } else if (field.widget === 'SingleNested') {
     const nestedGroups = getSingleNestedFields(field.nestedFieldsStores);
     groups.push(...nestedGroups);
   } else if (field.isLink) {
@@ -404,8 +405,8 @@ export class Instance {
   isNew = false;
   labelField = null;
   _promotedFields = [];
-  primaryType: SimpleType = { name: "", color: "", label: "", description: "" };
-  space = "";
+  primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
+  space = '';
   metadata = {};
   permissions?: Permissions;
   fields: InstanceFields = {};
@@ -422,7 +423,7 @@ export class Instance {
   isFetching = false;
   isFetched = false;
   fetchError?:string;
-  isNotFound = false
+  isNotFound = false;
   hasFetchError = false;
 
   rawData = null;
@@ -508,7 +509,7 @@ export class Instance {
 
   get returnValue() {
     const payload = {
-      "@type": this.types.map(t => t.name)
+      '@type': this.types.map(t => t.name)
     };
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
       if (field.hasChanged) {
@@ -520,17 +521,17 @@ export class Instance {
 
   get payload() {
     const payload = {
-      "@type": this.types.map(t => t.name)
+      '@type': this.types.map(t => t.name)
     };
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
       if (Array.isArray(field.returnValue)) {
         if (field.returnValue.length) {
           acc[name] = field.returnValue;
-        } 
-      } else if (typeof field.returnValue === "string") {
-          if (field.returnValue !== "") {
-            acc[name] = field.returnValue;
-          }
+        }
+      } else if (typeof field.returnValue === 'string') {
+        if (field.returnValue !== '') {
+          acc[name] = field.returnValue;
+        }
       } else if (field.returnValue !== null && field.returnValue !== undefined) {
         acc[name] = field.returnValue;
       }
@@ -618,7 +619,7 @@ export class Instance {
     this.isRawFetched = true;
     this.isRawFetching = false;
     this.permissions = (permissions instanceof Object)?permissions:{};
-    this.space = data["https://core.kg.ebrains.eu/vocab/meta/space"];
+    this.space = data['https://core.kg.ebrains.eu/vocab/meta/space'];
   }
 
   get typeNames() {
@@ -627,8 +628,8 @@ export class Instance {
         .map(t => t.name)
         .filter(t => t !== null);
     }
-    if (this.isRawFetched && Array.isArray(this.rawData?.["@type"])) {
-      return this.rawData["@type"];
+    if (this.isRawFetched && Array.isArray(this.rawData?.['@type'])) {
+      return this.rawData['@type'];
     }
     return [];
   }
@@ -638,11 +639,11 @@ export class Instance {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
         field.isPublic = name === this.labelField;
-        if (field.widget === "DynamicDropdown" && Array.isArray(field.value) && field.value.length > 30) {
-          field.widget = "DynamicTable";
+        if (field.widget === 'DynamicDropdown' && Array.isArray(field.value) && field.value.length > 30) {
+          field.widget = 'DynamicTable';
         }
         //TODO: temporary fix to support invalid array value
-        if ((field.widget === "SimpleDropdown" || field.widget === "SingleNested") && Array.isArray(field.value)) {
+        if ((field.widget === 'SimpleDropdown' || field.widget === 'SingleNested') && Array.isArray(field.value)) {
           if (field.value.length >= 1) {
             field.value = field.value[0];
           } else {
@@ -651,9 +652,9 @@ export class Instance {
           window.console.warn(`the field ${field.name} of instance ${this.id}  is a ${field.widget} which require an object as value but received an array.`, field.value);
         }
         //TODO: temporary fix to support invalid object value
-        if ((field.widget === "DynamicDropdown" || field.widget === "DynamicTable" || field.widget === "Nested") && !Array.isArray(field.value) && field.value !== undefined && field.value !== null ) {
-            window.console.warn(`The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`, field.value);
-            field.value = [field.value];
+        if ((field.widget === 'DynamicDropdown' || field.widget === 'DynamicTable' || field.widget === 'Nested') && !Array.isArray(field.value) && field.value !== undefined && field.value !== null ) {
+          window.console.warn(`The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`, field.value);
+          field.value = [field.value];
         }
         // TO TEST regexRules RULES
         // if ([
@@ -670,10 +671,10 @@ export class Instance {
         if (!this.fields[name]) {
           if (!field.widget) {
             warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
-            field.widget = "UnsupportedField";
+            field.widget = 'UnsupportedField';
           } else if (!fieldsMapping[field.widget]) {
             warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
-            field.widget = "UnsupportedField";
+            field.widget = 'UnsupportedField';
           }
           const fieldMapping = fieldsMapping[field.widget];
           this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, api, rootStore) as FieldStore;
@@ -687,7 +688,7 @@ export class Instance {
       });
     };
 
-    const typeFromStore = (Array.isArray(data.types) && data.types.length) ? rootStore.typeStore.typesMap.get(data.types[0].name):undefined; 
+    const typeFromStore = (Array.isArray(data.types) && data.types.length) ? rootStore.typeStore.typesMap.get(data.types[0].name):undefined;
 
     const normalizedData = normalizeInstanceData(data, typeFromStore);
     this._name = normalizedData.name;
@@ -712,7 +713,7 @@ export class Instance {
 
   buildErrorMessage(e: APIError) {
     const message = e.message ? e.message : e;
-    const errorMessage = e.response && e.response.status !== 500 ? e.response.data : "";
+    const errorMessage = e.response && e.response.status !== 500 ? e.response.data : '';
     if (e.response && e.response.status === 404) {
       return `The instance "${this.id}" can not be found - it either could have been removed or it is not accessible by your user account.`;
     }
@@ -725,7 +726,7 @@ export class Instance {
 
   errorLabelInstance(e: APIError|string, isNotFound=false) {
     this.isLabelNotFound = isNotFound;
-    this.fetchError = typeof e === "string" ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
+    this.fetchError = typeof e === 'string' ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
     this.hasLabelFetchError = true;
     this.isLabelFetched = false;
     this.isLabelFetching = false;
@@ -733,7 +734,7 @@ export class Instance {
 
   errorInstance(e: APIError|string, isNotFound=false) {
     this.isNotFound = isNotFound;
-    this.fetchError = typeof e === "string" ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
+    this.fetchError = typeof e === 'string' ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;

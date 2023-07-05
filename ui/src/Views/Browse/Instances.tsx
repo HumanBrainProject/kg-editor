@@ -21,169 +21,169 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { createUseStyles } from "react-jss";
-import { toJS } from "mobx";
-import { observer } from "mobx-react-lite";
-import InfiniteScroll from "react-infinite-scroller";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import { v4 as uuidv4 } from "uuid";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toJS } from 'mobx';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import InfiniteScroll from 'react-infinite-scroller';
+import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import useStores from "../../Hooks/useStores";
 
-import Spinner from "../../Components/Spinner";
-import BGMessage from "../../Components/BGMessage";
-import Filter from "../../Components/Filter";
-import Preview from "../Preview";
-import InstanceRow from "../Instance/InstanceRow";
-import Matomo from "../../Services/Matomo";
-import { InstanceSummary } from "../../types";
-import { Instance } from "../../Stores/InstanceStore";
+import BGMessage from '../../Components/BGMessage';
+import Filter from '../../Components/Filter';
+import Spinner from '../../Components/Spinner';
+import useStores from '../../Hooks/useStores';
+import Matomo from '../../Services/Matomo';
+import InstanceRow from '../Instance/InstanceRow';
+import Preview from '../Preview';
+import type { Instance } from '../../Stores/InstanceStore';
+import type { InstanceSummary } from '../../types';
 
 const useStyles = createUseStyles({
   container: {
-    color: "var(--ft-color-loud)",
-    overflow: "hidden",
-    position: "relative",
-    display: "grid",
-    gridTemplateColumns: "1fr 33%",
-    gridTemplateRows: "auto 1fr"
+    color: 'var(--ft-color-loud)',
+    overflow: 'hidden',
+    position: 'relative',
+    display: 'grid',
+    gridTemplateColumns: '1fr 33%',
+    gridTemplateRows: 'auto 1fr'
   },
   preview: {
-    position: "relative",
-    gridRow: "1 / span 2",
-    gridColumn: "2",
-    background: "var(--bg-color-ui-contrast2)",
-    borderLeft: "1px solid var(--border-color-ui-contrast1)",
-    overflow: "auto",
-    color: "var(--ft-color-loud)"
+    position: 'relative',
+    gridRow: '1 / span 2',
+    gridColumn: '2',
+    background: 'var(--bg-color-ui-contrast2)',
+    borderLeft: '1px solid var(--border-color-ui-contrast1)',
+    overflow: 'auto',
+    color: 'var(--ft-color-loud)'
   },
   loader: {
-    textAlign: "center",
-    margin: "20px 0 30px",
-    fontSize: "1.25em",
-    fontWeight: "300"
+    textAlign: 'center',
+    margin: '20px 0 30px',
+    fontSize: '1.25em',
+    fontWeight: '300'
   },
   list: {
-    "& ul": {
-      listStyleType: "none",
-      padding: "1px 11px 1px 11px"
+    '& ul': {
+      listStyleType: 'none',
+      padding: '1px 11px 1px 11px'
     }
   },
   header: {
-    display: "grid",
-    gridTemplateColumns: "1fr auto",
-    gridGap: "10px",
-    padding: "5px 10px 0 0",
-    position: "relative"
+    display: 'grid',
+    gridTemplateColumns: '1fr auto',
+    gridGap: '10px',
+    padding: '5px 10px 0 0',
+    position: 'relative'
   },
   instanceCount: {
-    color: "var(--ft-color-normal)",
-    lineHeight: "34px",
-    background: "var(--bg-color-ui-contrast2)",
-    padding: "0 10px",
-    margin: "10px 0 10px -10px"
+    color: 'var(--ft-color-normal)',
+    lineHeight: '34px',
+    background: 'var(--bg-color-ui-contrast2)',
+    padding: '0 10px',
+    margin: '10px 0 10px -10px'
   },
   noInstancesPanel:{
-    position:"absolute !important",
-    top:"50%",
-    left:"50%",
-    transform:"translate(-50%,-200px)",
-    textAlign:"center"
+    position:'absolute !important',
+    top:'50%',
+    left:'50%',
+    transform:'translate(-50%,-200px)',
+    textAlign:'center'
   },
   noInstancesText:{
-    fontWeight:"300",
-    fontSize:"1.2em"
+    fontWeight:'300',
+    fontSize:'1.2em'
   },
   createFirstInstanceButton:{
-    marginTop: "20px",
-    display: "flex",
-    alignItems: "center",
+    marginTop: '20px',
+    display: 'flex',
+    alignItems: 'center',
     //border: "1px solid rgba(0, 0, 0, 0.4)",
-    border: "1px solid var(--ft-color-normal)",
-    borderRadius: "10px",
-    padding: "0 20px",
+    border: '1px solid var(--ft-color-normal)',
+    borderRadius: '10px',
+    padding: '0 20px',
     //background: "rgba(0, 0, 0, 0.4)",
-    background: "rgba(255, 255, 255, 0.1)",
-    cursor: "pointer",
-    transition: "border 0.25s ease",
-    "&:hover": {
-      border: "1px solid var(--ft-color-loud)",
-      "& $createFirstInstanceIcon path": {
-        fill: "rgba(255,255,255,0.6)"
+    background: 'rgba(255, 255, 255, 0.1)',
+    cursor: 'pointer',
+    transition: 'border 0.25s ease',
+    '&:hover': {
+      border: '1px solid var(--ft-color-loud)',
+      '& $createFirstInstanceIcon path': {
+        fill: 'rgba(255,255,255,0.6)'
       },
-      "& $createFirstInstanceText": {
-        color: "var(--ft-color-loud)"
+      '& $createFirstInstanceText': {
+        color: 'var(--ft-color-loud)'
       }
     }
   },
   createFirstInstanceIcon:{
-    fontSize:"5em",
-    "& path":{
+    fontSize:'5em',
+    '& path':{
       //fill:"var(--bg-color-blend-contrast1)",
-      fill: "rgba(255,255,255,0.4)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px",
-      transition: "fill 0.25s ease"
+      fill: 'rgba(255,255,255,0.4)',
+      stroke:'rgba(200,200,200,.1)',
+      strokeWidth:'3px',
+      transition: 'fill 0.25s ease'
     }
   },
   createFirstInstanceText:{
-    fontSize: "1.5em",
-    whiteSpace: "nowrap",
-    paddingLeft: "10px",
+    fontSize: '1.5em',
+    whiteSpace: 'nowrap',
+    paddingLeft: '10px',
     //color: "rgba(0,0,0,0.4)",
-    color: "var(--ft-color-normal)",
-    fontWeight: "800",
-    transition: "color 0.25s ease"
+    color: 'var(--ft-color-normal)',
+    fontWeight: '800',
+    transition: 'color 0.25s ease'
   },
   createInstanceButton:{
-    padding: "5px 20px",
-    background: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
-    margin: "-16px 10px 0 10px",
-    display: "inline-block",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    cursor: "pointer",
-    transition: "border 0.25s ease",
-    "&:hover": {
-      background: "var(--list-bg-hover)",
-      borderColor: "transparent",
-      "& $createInstanceIcon path": {
-        fill: "rgba(255,255,255,0.6)"
+    padding: '5px 20px',
+    background: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-normal)',
+    margin: '-16px 10px 0 10px',
+    display: 'inline-block',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    cursor: 'pointer',
+    transition: 'border 0.25s ease',
+    '&:hover': {
+      background: 'var(--list-bg-hover)',
+      borderColor: 'transparent',
+      '& $createInstanceIcon path': {
+        fill: 'rgba(255,255,255,0.6)'
       },
-      "& $createInstanceText": {
-        color: "var(--ft-color-loud)"
+      '& $createInstanceText': {
+        color: 'var(--ft-color-loud)'
       }
     }
   },
   createInstanceIcon:{
-    display: "inline-block",
-    fontSize: "2em",
-    "& path":{
-      fill: "rgba(255,255,255,0.4)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px",
-      transition: "fill 0.25s ease"
+    display: 'inline-block',
+    fontSize: '2em',
+    '& path':{
+      fill: 'rgba(255,255,255,0.4)',
+      stroke:'rgba(200,200,200,.1)',
+      strokeWidth:'3px',
+      transition: 'fill 0.25s ease'
     }
   },
   createInstanceText:{
-    display: "inline-block",
-    fontSize: "1.2em",
-    whiteSpace: "nowrap",
-    paddingLeft: "10px",
-    color: "var(--ft-color-normal)",
-    transform: "translateY(-5px)",
-    transition: "color 0.25s ease"
+    display: 'inline-block',
+    fontSize: '1.2em',
+    whiteSpace: 'nowrap',
+    paddingLeft: '10px',
+    color: 'var(--ft-color-normal)',
+    transform: 'translateY(-5px)',
+    transition: 'color 0.25s ease'
   },
   typeIcon: {
-    position: "absolute",
-    top: "8px",
-    "& + span": {
-      display: "inline-block",
-      marginLeft: "22px"
+    position: 'absolute',
+    top: '8px',
+    '& + span': {
+      display: 'inline-block',
+      marginLeft: '22px'
     }
   },
 });
@@ -211,28 +211,28 @@ const InstancesResult = observer(({
   const { appStore, browseStore } = useStores();
 
   const handleCreateInstance = () => {
-    Matomo.trackEvent("Browse", "CreateInstance", browseStore.selectedType.name);
+    Matomo.trackEvent('Browse', 'CreateInstance', browseStore.selectedType.name);
     const uuid = uuidv4();
     navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(browseStore.selectedType.name)}`);
   };
 
   if (!browseStore.selectedType) {
     return (
-      <BGMessage icon={"code-branch"} transform={"flip-h rotate--90"}>
+      <BGMessage icon={'code-branch'} transform={'flip-h rotate--90'}>
         Select a instance type in the left panel
       </BGMessage>
     );
   }
   if (browseStore.fetchError) {
     return (
-      <BGMessage icon={"ban"}>
+      <BGMessage icon={'ban'}>
         There was a network problem retrieving {browseStore.selectedType.label} instances.
         <br />
         If the problem persists, please contact the support.
         <br />
         <br />
-        <Button variant={"primary"} onClick={onRetry}>
-          <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+        <Button variant={'primary'} onClick={onRetry}>
+          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
         </Button>
       </BGMessage>
     );
@@ -250,14 +250,14 @@ const InstancesResult = observer(({
       <div className={classes.noInstancesPanel}>
         <div className={classes.noInstancesText}>
           <p>No&nbsp;
-          <FontAwesomeIcon
-            fixedWidth
-            icon="circle"
-            className={classes.typIcon}
-            style={browseStore.selectedType.color?{ color: browseStore.selectedType.color }:undefined}
-          />
+            <FontAwesomeIcon
+              fixedWidth
+              icon="circle"
+              className={classes.typIcon}
+              style={browseStore.selectedType.color?{ color: browseStore.selectedType.color }:undefined}
+            />
           &nbsp;{browseStore.selectedType.label}&nbsp;
-          {browseStore.instancesFilter?`could be found with the search term "${browseStore.instancesFilter}"`:"exists yet"}!</p>
+            {browseStore.instancesFilter?`could be found with the search term "${browseStore.instancesFilter}"`:'exists yet'}!</p>
           {!canCreate && (
             <p>You are currently not granted permission to create a {browseStore.selectedType.label} in space {appStore.currentSpaceName}.</p>
           )}
@@ -290,7 +290,7 @@ const InstancesResult = observer(({
       hasMore={browseStore.canLoadMoreInstances}
       loader={
         <div className={classes.loader} key={0}>
-          <FontAwesomeIcon icon={"circle-notch"} spin />
+          <FontAwesomeIcon icon={'circle-notch'} spin />
           &nbsp;&nbsp;<span>Loading more  {browseStore.selectedType.label} instances...</span>
         </div>
       }
@@ -347,20 +347,20 @@ const Instances = observer(() => {
   }, [browseStore.selectedType, browseStore.instancesFilter]);
 
   const handleFilterChange = (value: string) => {
-    Matomo.trackEvent("Browse", "FilterInstance", value);
+    Matomo.trackEvent('Browse', 'FilterInstance', value);
     browseStore.setInstancesFilter(value);
   };
 
   const handleInstanceClick = (instance: Instance) => {
-    Matomo.trackEvent("Browse", "InstancePreview", instance.id);
+    Matomo.trackEvent('Browse', 'InstancePreview', instance.id);
     browseStore.selectInstance(instance);
   };
 
   const handleInstanceCtrlClick = (instance: Instance) => {
     if (instance && instance.id) {
-      Matomo.trackEvent( "Browse", "InstanceOpenTabInBackground", instance.id);
+      Matomo.trackEvent( 'Browse', 'InstanceOpenTabInBackground', instance.id);
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
-      appStore.openInstance(instance.id, instance.name, instance.primaryType, isTypesSupported?"view":"raw");
+      appStore.openInstance(instance.id, instance.name, instance.primaryType, isTypesSupported?'view':'raw');
     }
   };
 
@@ -373,8 +373,8 @@ const Instances = observer(() => {
           instance.initializeLabelData(toJS(summaryInstance));
         }
       }
-      Matomo.trackEvent("Browse", `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
-      if (mode === "view") {
+      Matomo.trackEvent('Browse', `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
+      if (mode === 'view') {
         navigate(`/instances/${id}`);
       } else {
         navigate(`/instances/${id}/${mode}`);
@@ -400,7 +400,7 @@ const Instances = observer(() => {
             />
             <div className={classes.instanceCount}>
               {browseStore.totalInstances} Result
-              {`${browseStore.totalInstances !== 0 ? "s" : ""}`}
+              {`${browseStore.totalInstances !== 0 ? 's' : ''}`}
             </div>
           </>
         )}
@@ -423,11 +423,11 @@ const Instances = observer(() => {
               instanceName={browseStore.selectedInstance.name}
             />
             :
-            <BGMessage icon={"code"}>
+            <BGMessage icon={'code'}>
               This instance doesn&apos;t support preview.
             </BGMessage>
           :
-          <BGMessage icon={"money-check"}>
+          <BGMessage icon={'money-check'}>
             Select an instance to display its preview here.
           </BGMessage>
         }
@@ -435,6 +435,6 @@ const Instances = observer(() => {
     </div>
   );
 });
-Instances.displayName = "Instances";
+Instances.displayName = 'Instances';
 
 export default Instances;

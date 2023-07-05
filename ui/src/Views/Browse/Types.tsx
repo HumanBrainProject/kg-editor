@@ -21,52 +21,52 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import useStores from '../../Hooks/useStores';
 
-import TypesItem from "./TypesItem";
+import TypesItem from './TypesItem';
 
 const useStyles = createUseStyles({
   folder: {
-    "& .spinnerPanel": {
-      position: "unset !important",
-      top: "unset",
-      left: "unset",
-      transform: "unset",
-      width: "auto",
-      margin: "0 33px",
-      padding: "3px 6px",
-      borderRadius: "3px",
-      background: "rgba(255,255,255, 0.05)",
-      color: "var(--ft-color-quiet)",
-      fontSize: "1em",
-      textAlign: "left"
+    '& .spinnerPanel': {
+      position: 'unset !important',
+      top: 'unset',
+      left: 'unset',
+      transform: 'unset',
+      width: 'auto',
+      margin: '0 33px',
+      padding: '3px 6px',
+      borderRadius: '3px',
+      background: 'rgba(255,255,255, 0.05)',
+      color: 'var(--ft-color-quiet)',
+      fontSize: '1em',
+      textAlign: 'left'
     }
   },
   folderName: {
-    color: "var(--ft-color-quiet)",
-    textTransform: "uppercase",
-    fontWeight: "bold",
-    fontSize: "0.9em",
-    padding: "10px 10px 5px 10px",
-    cursor: "pointer"
+    color: 'var(--ft-color-quiet)',
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
+    fontSize: '0.9em',
+    padding: '10px 10px 5px 10px',
+    cursor: 'pointer'
   },
   fetchErrorPanel: {
-    margin: "0 34px",
-    padding: "3px",
-    borderRadius: "4px",
-    backgroundColor: "rgba(255,255,255,0.05)",
-    textAlign: "center",
-    fontSize: "0.9em",
-    wordBreak: "break-all",
-    "& .btn": {
-      width: "100px",
-      margin: "10px 6px 6px 6px"
+    margin: '0 34px',
+    padding: '3px',
+    borderRadius: '4px',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    textAlign: 'center',
+    fontSize: '0.9em',
+    wordBreak: 'break-all',
+    '& .btn': {
+      width: '100px',
+      margin: '10px 6px 6px 6px'
     },
-    color: "var(--ft-color-error)"
+    color: 'var(--ft-color-error)'
   }
 });
 
@@ -91,6 +91,6 @@ const Types = observer(() => {
     </div>
   );
 });
-Types.displayName = "Types";
+Types.displayName = 'Types';
 
 export default Types;

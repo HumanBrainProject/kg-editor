@@ -21,23 +21,24 @@
  *
  */
 
-import React, { useEffect, useState, useRef, DragEvent, KeyboardEvent, ChangeEvent, RefObject } from "react";
-import { createUseStyles } from "react-jss";
-import Menu from "./Menu";
-import { Suggestion } from "../../types";
+import React, { useEffect, useState, useRef } from 'react';
+import { createUseStyles } from 'react-jss';
+import Menu from './Menu';
+import type { Suggestion } from '../../types';
+import type { DragEvent, KeyboardEvent, ChangeEvent, RefObject } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    display: "inline"
+    display: 'inline'
   },
   userInput:{
-    background:"transparent",
-    border:"none",
-    color:"currentColor",
-    outline:"none",
-    width:"200px",
-    maxWidth:"33%",
-    marginBottom:"3px"
+    background:'transparent',
+    border:'none',
+    color:'currentColor',
+    outline:'none',
+    width:'200px',
+    maxWidth:'33%',
+    marginBottom:'3px'
   }
 });
 
@@ -65,18 +66,18 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
 
   const [current, setCurrent] = useState<Suggestion|null>(null);
 
-  useEffect(() => {
-    return () => { // Unmount
+  useEffect(() =>
+    () => { // Unmount
       unlistenClickOutHandler();
-    };
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  , []);
 
   const handleInputKeyStrokes = (e: KeyboardEvent<HTMLInputElement>) => {
-    if(e.key === "Backspace" && !e.currentTarget.value){
+    if(e.key === 'Backspace' && !e.currentTarget.value){
       e.preventDefault();
       onDeleteLastValue && onDeleteLastValue();
-    } else if(e.key === "ArrowDown"){
+    } else if(e.key === 'ArrowDown'){
       e.preventDefault();
       if(options.length){
         const option = options[0];
@@ -84,7 +85,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
       } else {
         setCurrent(null);
       }
-    } else if(e.key === "ArrowUp"){
+    } else if(e.key === 'ArrowUp'){
       e.preventDefault();
       if(options.length){
         const option = options[options.length - 1];
@@ -92,7 +93,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
       } else {
         setCurrent(null);
       }
-    } else if(e.key === "Escape") {
+    } else if(e.key === 'Escape') {
       //escape key -> we want to reset the search
       handleReset();
     }
@@ -107,7 +108,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
     setCurrent(null);
     handleFocus();
     onSelect(item);
-  }
+  };
 
   const handleOnSelectNext = (item: Suggestion) => {
     const index = options.findIndex(o => o === item);
@@ -141,15 +142,15 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
   };
 
   const handleFocus = () => {
-    onSearch("");
+    onSearch('');
     setCurrent(null);
     listenClickOutHandler();
   };
 
   const handleOnDrop = (e: DragEvent<HTMLInputElement>) => {
-    e.preventDefault(); 
+    e.preventDefault();
     onDrop && onDrop();
-  }
+  };
 
   const clickOutHandler = (e: MouseEvent | Event) => {
     if(wrapperRef.current && !wrapperRef.current.contains(e.target)){
@@ -159,21 +160,21 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
   };
 
   const listenClickOutHandler = () => {
-    window.addEventListener("mouseup", clickOutHandler, false);
-    window.addEventListener("touchend", clickOutHandler, false);
-    window.addEventListener("keyup", clickOutHandler, false);
+    window.addEventListener('mouseup', clickOutHandler, false);
+    window.addEventListener('touchend', clickOutHandler, false);
+    window.addEventListener('keyup', clickOutHandler, false);
   };
 
   const unlistenClickOutHandler = () => {
-    window.removeEventListener("mouseup", clickOutHandler, false);
-    window.removeEventListener("touchend", clickOutHandler, false);
-    window.removeEventListener("keyup", clickOutHandler, false);
+    window.removeEventListener('mouseup', clickOutHandler, false);
+    window.removeEventListener('touchend', clickOutHandler, false);
+    window.removeEventListener('keyup', clickOutHandler, false);
   };
 
   const showMenu = options.length || searchTerm || loading;
 
   return (
-    <div className={`${classes.container} ${className?className:""}`} ref={wrapperRef}>
+    <div className={`${classes.container} ${className?className:''}`} ref={wrapperRef}>
       <input className={classes.userInput}
         ref={inputRef}
         onDrop={handleOnDrop}
@@ -185,7 +186,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
         value={searchTerm}
         placeholder={inputPlaceholder} />
       {showMenu && (
-        <Menu 
+        <Menu
           current={current}
           searchTerm={searchTerm}
           items={options}

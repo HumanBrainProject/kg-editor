@@ -21,40 +21,40 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    padding: "15px",
-    background: "var(--bg-color-ui-contrast2)",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    color: "var(--ft-color-normal)",
-    "& h3": {
+    position: 'relative',
+    padding: '15px',
+    background: 'var(--bg-color-ui-contrast2)',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    color: 'var(--ft-color-normal)',
+    '& h3': {
       marginTop: 0
     },
-    "& ul": {
-      listStyleType: "none",
+    '& ul': {
+      listStyleType: 'none',
       paddingLeft: 0,
-      "& li": {
-        "& + li": {
-          marginTop: "15px"
+      '& li': {
+        '& + li': {
+          marginTop: '15px'
         },
-        "& .kbd": {
-          display: "inline-block",
-          margin: "0 0.1em",
-          padding: "0.1em 0.6em",
-          border: "1px solid var(--border-color-ui-contrast2)",
-          borderRadius: "3px",
-          backgroundColor: "#f7f7f7",
-          fontFamily: "Arial,Helvetica,sans-serif",
-          fontSize: "11px",
-          lineHeight: "1.4",
-          color: "#333",
-          boxShadow: "0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset",
-          textShadow: "0 1px 0 #fff",
-          whiteSpace: "nowrap"
+        '& .kbd': {
+          display: 'inline-block',
+          margin: '0 0.1em',
+          padding: '0.1em 0.6em',
+          border: '1px solid var(--border-color-ui-contrast2)',
+          borderRadius: '3px',
+          backgroundColor: '#f7f7f7',
+          fontFamily: 'Arial,Helvetica,sans-serif',
+          fontSize: '11px',
+          lineHeight: '1.4',
+          color: '#333',
+          boxShadow: '0 1px 0px rgba(0, 0, 0, 0.2),0 0 0 2px #ffffff inset',
+          textShadow: '0 1px 0 #fff',
+          whiteSpace: 'nowrap'
         }
       }
     }

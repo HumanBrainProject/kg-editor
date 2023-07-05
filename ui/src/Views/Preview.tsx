@@ -21,99 +21,99 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
-import { Scrollbars } from "react-custom-scrollbars-2";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../Hooks/useStores";
 
-import Field from "../Fields/Field";
-import BGMessage from "../Components/BGMessage";
-import Status from "./Instance/Status";
-import Actions from "./Preview/Actions";
-import GlobalFieldErrors from "../Components/GlobalFieldErrors";
-import IncomingLinks from "./Instance/IncomingLinks/IncomingLinks";
-import Spinner from "../Components/Spinner";
+import BGMessage from '../Components/BGMessage';
+import GlobalFieldErrors from '../Components/GlobalFieldErrors';
+import Spinner from '../Components/Spinner';
+import Field from '../Fields/Field';
+import useStores from '../Hooks/useStores';
+import IncomingLinks from './Instance/IncomingLinks/IncomingLinks';
+import Status from './Instance/Status';
+import Actions from './Preview/Actions';
 
 const useStyles = createUseStyles({
   container: {
-    height: "100%",
-    padding: "10px 0"
+    height: '100%',
+    padding: '10px 0'
   },
   noPermission: {
-    padding: "10px"
+    padding: '10px'
   },
   content: {
-    display: "grid",
-    gridTemplateRows: "auto 1fr",
-    gridTemplateColumns: "100%",
-    height: "100%",
-    "& > .header": {
-      padding: "0 10px"
+    display: 'grid',
+    gridTemplateRows: 'auto 1fr',
+    gridTemplateColumns: '100%',
+    height: '100%',
+    '& > .header': {
+      padding: '0 10px'
     },
-    "& .popover-popup": {
-      display: "none !important"
+    '& .popover-popup': {
+      display: 'none !important'
     },
-    "&:hover .popover-popup": {
-      display: "block !important"
+    '&:hover .popover-popup': {
+      display: 'block !important'
     }
   },
   status: {
-    position: "absolute",
-    top: "6px",
-    right: "-54px",
-    fontSize: "25px"
+    position: 'absolute',
+    top: '6px',
+    right: '-54px',
+    fontSize: '25px'
   },
   type: {
-    display: "inline-block",
-    paddingRight: "8px",
-    verticalAlign: "text-bottom"
+    display: 'inline-block',
+    paddingRight: '8px',
+    verticalAlign: 'text-bottom'
   },
   titlePanel: {
-    position: "relative",
-    width: "calc(100% - 70px)"
+    position: 'relative',
+    width: 'calc(100% - 70px)'
   },
   title: {
-    fontSize: "1.5em",
-    fontWeight: "300"
+    fontSize: '1.5em',
+    fontWeight: '300'
   },
   metadataTitle: {
-    display: "inline-block",
-    marginBottom: "10px"
+    display: 'inline-block',
+    marginBottom: '10px'
   },
   info: {
-    fontSize: "0.75em",
-    color: "var(--ft-color-normal)",
-    marginTop: "20px",
-    marginBottom: "20px"
+    fontSize: '0.75em',
+    color: 'var(--ft-color-normal)',
+    marginTop: '20px',
+    marginBottom: '20px'
   },
   field: {
-    marginBottom: "10px",
-    wordBreak: "break-word"
+    marginBottom: '10px',
+    wordBreak: 'break-word'
   },
   duplicate: {
-    extend: "action"
+    extend: 'action'
   },
   errorReport: {
-    margin: "10px"
+    margin: '10px'
   },
   errorMessage: {
-    marginBottom: "15px",
-    fontWeight:"300",
-    fontSize:"1em",
-    color: "var(--ft-color-error)",
-    "& path":{
-      fill:"var(--ft-color-error)",
-      stroke:"rgba(200,200,200,.1)",
-      strokeWidth:"3px"
+    marginBottom: '15px',
+    fontWeight:'300',
+    fontSize:'1em',
+    color: 'var(--ft-color-error)',
+    '& path':{
+      fill:'var(--ft-color-error)',
+      stroke:'rgba(200,200,200,.1)',
+      strokeWidth:'3px'
     }
   },
   form: {
-    padding: "0 10px"
+    padding: '0 10px'
   }
 });
 
@@ -122,8 +122,8 @@ interface PreviewProps {
   instanceName: string;
   showEmptyFields: boolean;
   showAction: boolean;
-  showTypes: boolean; 
-  showStatus: boolean; 
+  showTypes: boolean;
+  showStatus: boolean;
   showMetaData: boolean;
 }
 
@@ -153,7 +153,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
   if(instance.hasFetchError) {
     return(
       <div className={classes.container}>
-        <BGMessage icon={"ban"}>
+        <BGMessage icon={'ban'}>
                 There was a network problem retrieving the instance &quot;<i>{instanceId}&quot;</i>.
           <br />
                 If the problem persists, please contact the support.
@@ -161,8 +161,8 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
           <small>{instance.fetchError}</small>
           <br />
           <br />
-          <Button variant={"primary"} onClick={handleRetry}>
-            <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+          <Button variant={'primary'} onClick={handleRetry}>
+            <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
           </Button>
         </BGMessage>
       </div>
@@ -204,7 +204,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
   }
 
   return (
-    <div className={`${classes.container} ${showEmptyFields?"":"hide-empty-fields"}`}>
+    <div className={`${classes.container} ${showEmptyFields?'':'hide-empty-fields'}`}>
       <div className={classes.content}>
         <div className="header">
           {showAction && (
@@ -250,8 +250,8 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
                 <div>
                   <hr />
                   <span className={`${classes.title} ${classes.metadataTitle}`}>
-                    {" "}
-                      Metadata{" "}
+                    {' '}
+                      Metadata{' '}
                   </span>
                   {instance.metadata.map(field => (
                     <div key={instanceId + field.label} className={classes.field}>
@@ -266,6 +266,6 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
     </div>
   );
 });
-Preview.displayName = "Preview";
+Preview.displayName = 'Preview';
 
 export default Preview;

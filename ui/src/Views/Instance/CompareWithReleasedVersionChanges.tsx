@@ -21,24 +21,24 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
-import { createInstanceStore } from "../../Stores/InstanceStore";
+import BGMessage from '../../Components/BGMessage';
+import Spinner from '../../Components/Spinner';
+import useStores from '../../Hooks/useStores';
+import { createInstanceStore } from '../../Stores/InstanceStore';
 
-import Spinner from "../../Components/Spinner";
-import BGMessage from "../../Components/BGMessage";
-import CompareFieldsChanges from "./CompareFieldsChanges";
+import CompareFieldsChanges from './CompareFieldsChanges';
 
 const useStyles = createUseStyles({
   container: {
-    padding: "12px 15px",
-    "& button + button": {
-      marginLeft: "20px"
+    padding: '12px 15px',
+    '& button + button': {
+      marginLeft: '20px'
     }
   }
 });
@@ -58,14 +58,14 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
 
   useEffect(() => {
     if(!releasedInstanceStore) {
-      const store = createInstanceStore(instanceStore.api, instanceStore.rootStore, "RELEASED");
+      const store = createInstanceStore(instanceStore.api, instanceStore.rootStore, 'RELEASED');
       setReleasedInstanceStore(store);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (instanceId && status !== "UNRELEASED" && releasedInstanceStore) {
+    if (instanceId && status !== 'UNRELEASED' && releasedInstanceStore) {
       fetchReleasedInstance(true);
       fetchInstance();
     }
@@ -76,7 +76,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   }, [instanceId, status, releasedInstanceStore]);
 
   const fetchReleasedInstance = (forceFetch=false) => {
-    if (status !== "UNRELEASED") {
+    if (status !== 'UNRELEASED') {
       const inst = releasedInstanceStore.createInstanceOrGet(instanceId);
       inst.fetch(forceFetch);
     }
@@ -96,7 +96,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   if (!instanceId) {
     return null;
   }
-  const releasedInstance = (releasedInstanceStore && status !== "UNRELEASED")?releasedInstanceStore.instances.get(instanceId):null;
+  const releasedInstance = (releasedInstanceStore && status !== 'UNRELEASED')?releasedInstanceStore.instances.get(instanceId):null;
   const instance = instanceStore.instances.get(instanceId);
 
   if (!instance) {
@@ -114,13 +114,13 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   if(instance.fetchError) {
     return(
       <div className={classes.container}>
-        <BGMessage icon={"ban"}>
+        <BGMessage icon={'ban'}>
             There was a network problem retrieving instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
           <small>{instance.fetchError}</small><br/><br/>
           <div>
-            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-            <Button variant={"primary"} onClick={handleRetryFetchInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={'times'}/>&nbsp;&nbsp; Cancel</Button>
+            <Button variant={'primary'} onClick={handleRetryFetchInstance}><FontAwesomeIcon icon={'redo-alt'}/>&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>
@@ -130,13 +130,13 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   if(releasedInstance && releasedInstance.fetchError) {
     return(
       <div className={classes.container}>
-        <BGMessage icon={"ban"}>
+        <BGMessage icon={'ban'}>
             There was a network problem retrieving the released instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
           <small>{releasedInstance.fetchError}</small><br/><br/>
           <div>
-            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={"times"}/>&nbsp;&nbsp; Cancel</Button>
-            <Button variant={"primary"} onClick={handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={"redo-alt"}/>&nbsp;&nbsp; Retry</Button>
+            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={'times'}/>&nbsp;&nbsp; Cancel</Button>
+            <Button variant={'primary'} onClick={handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={'redo-alt'}/>&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>
@@ -161,6 +161,6 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   }
   return null;
 });
-CompareWithReleasedVersionChanges.displayName = "CompareWithReleasedVersionChanges";
+CompareWithReleasedVersionChanges.displayName = 'CompareWithReleasedVersionChanges';
 
 export default CompareWithReleasedVersionChanges;

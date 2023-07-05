@@ -21,17 +21,17 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { observer } from "mobx-react-lite";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
-import { UUID } from "../types";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useStores from '../Hooks/useStores';
+import type { UUID } from '../types';
 
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
 
 interface InstanceProps {
   children: (
@@ -55,7 +55,7 @@ const Instance = observer(({ children }: InstanceProps) => {
 
   const handleRetry = () => instance?.fetch();
 
-  const handleContinue = () => navigate("/browse");
+  const handleContinue = () => navigate('/browse');
 
   useEffect(() => {
     if (instanceId) {
@@ -86,11 +86,11 @@ const Instance = observer(({ children }: InstanceProps) => {
           <small>{instance.fetchError}</small>
           <br />
           <br />
-          <Button variant={"primary"} onClick={handleRetry}>
-            <FontAwesomeIcon icon={"redo-alt"} />
+          <Button variant={'primary'} onClick={handleRetry}>
+            <FontAwesomeIcon icon={'redo-alt'} />
             &nbsp;&nbsp; Retry
           </Button>
-          <Button variant={"primary"} onClick={handleContinue}>
+          <Button variant={'primary'} onClick={handleContinue}>
             Continue
           </Button>
         </ErrorPanel>
@@ -107,7 +107,7 @@ const Instance = observer(({ children }: InstanceProps) => {
           You do not have permission to access the space &quot;
           <i>{instance.space}&quot;</i>.<br />
           <br />
-          <Button variant={"primary"} onClick={handleContinue}>
+          <Button variant={'primary'} onClick={handleContinue}>
             Continue
           </Button>
         </ErrorPanel>
@@ -116,6 +116,6 @@ const Instance = observer(({ children }: InstanceProps) => {
   }
   return <>{children(instanceId as UUID, instance.space)}</>;
 });
-Instance.displayName = "Instance";
+Instance.displayName = 'Instance';
 
 export default Instance;

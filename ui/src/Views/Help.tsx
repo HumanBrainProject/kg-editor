@@ -21,83 +21,83 @@
  *
  */
 
-import React, {useEffect} from "react";
-import { Route, Routes, NavLink, Navigate } from "react-router-dom";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Scrollbars } from "react-custom-scrollbars-2";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, {useEffect} from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
+import { Route, Routes, NavLink, Navigate } from 'react-router-dom';
 
-import Matomo from "../Services/Matomo";
-import Introduction from "./Help/Introduction";
+import Matomo from '../Services/Matomo';
+import Browse from './Help/Browse';
+import BrowseNodetypes from './Help/Browse/Nodetypes';
+import ContactTheSupport from './Help/ContactTheSupport';
+import CreateAnInstance from './Help/CreateAnInstance';
+import FAQ from './Help/FAQ';
+import Introduction from './Help/Introduction';
 
-import Browse from "./Help/Browse";
-import BrowseNodetypes from "./Help/Browse/Nodetypes";
 
-import CreateAnInstance from "./Help/CreateAnInstance";
 
-import OpenAnInstance from "./Help/OpenAnInstance";
-import OAIView from "./Help/OpenAnInstance/View";
-import OAIEdit from "./Help/OpenAnInstance/Edit";
-import OAIEditSave from "./Help/OpenAnInstance/Edit/Save";
-import OAIExplore from "./Help/OpenAnInstance/Explore";
-import OAIRelease from "./Help/OpenAnInstance/Release";
+import OpenAnInstance from './Help/OpenAnInstance';
+import OAIEdit from './Help/OpenAnInstance/Edit';
+import OAIEditSave from './Help/OpenAnInstance/Edit/Save';
+import OAIExplore from './Help/OpenAnInstance/Explore';
+import OAIRelease from './Help/OpenAnInstance/Release';
+import OAIView from './Help/OpenAnInstance/View';
 
-import Statistics from "./Help/Statistics";
+import Settings from './Help/Settings';
+import Statistics from './Help/Statistics';
 
-import Settings from "./Help/Settings";
 
-import FAQ from "./Help/FAQ";
 
-import ContactTheSupport from "./Help/ContactTheSupport";
 
 const useStyles = createUseStyles({
   container:{
-    display:"grid",
-    height:"100%",
-    padding:"10px",
-    gridTemplateColumns:"320px 1fr",
-    gridTemplateRows:"1fr",
-    gridGap:"10px"
+    display:'grid',
+    height:'100%',
+    padding:'10px',
+    gridTemplateColumns:'320px 1fr',
+    gridTemplateRows:'1fr',
+    gridGap:'10px'
   },
   navigation:{
-    background:"var(--bg-color-ui-contrast2)",
-    padding:"10px",
-    border:"1px solid var(--border-color-ui-contrast1)",
-    "& ul":{
-      listStyle:"none",
+    background:'var(--bg-color-ui-contrast2)',
+    padding:'10px',
+    border:'1px solid var(--border-color-ui-contrast1)',
+    '& ul':{
+      listStyle:'none',
       padding:0,
-      "& li":{
-        margin:"10px 0 10px 20px",
-        "& a":{
-          fontSize:"1.2em",
-          color:"var(--ft-color-normal)",
-          "&.active":{
-            color:"var(--ft-color-louder)"
+      '& li':{
+        margin:'10px 0 10px 20px',
+        '& a':{
+          fontSize:'1.2em',
+          color:'var(--ft-color-normal)',
+          '&.active':{
+            color:'var(--ft-color-louder)'
           },
-          "& .svg-inline--fa":{
-            marginRight:"10px"
+          '& .svg-inline--fa':{
+            marginRight:'10px'
           }
         }
       }
     }
   },
   content:{
-    background:"var(--bg-color-ui-contrast2)",
-    border:"1px solid var(--border-color-ui-contrast1)",
-    color:"var(--ft-color-loud)",
-    fontSize:"1.05em"
+    background:'var(--bg-color-ui-contrast2)',
+    border:'1px solid var(--border-color-ui-contrast1)',
+    color:'var(--ft-color-loud)',
+    fontSize:'1.05em'
   },
   contentInner:{
-    padding:"10px 20px",
-    "& img.screenshot":{
-      border:"5px solid #ccc",
-      display:"block",
-      borderRadius:"4px",
-      margin:"20px 0",
-      maxWidth:"800px"
+    padding:'10px 20px',
+    '& img.screenshot':{
+      border:'5px solid #ccc',
+      display:'block',
+      borderRadius:'4px',
+      margin:'20px 0',
+      maxWidth:'800px'
     },
-    "& p":{
-      margin:"10px 0"
+    '& p':{
+      margin:'10px 0'
     }
   }
 });
@@ -115,54 +115,54 @@ const Help = () => {
     <div className={classes.container}>
       <div className={classes.navigation}>
         <ul>
-          <li><NavLink to={"introduction"}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</NavLink></li>
+          <li><NavLink to={'introduction'}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</NavLink></li>
           <li>
-            <NavLink to={"browse"}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
+            <NavLink to={'browse'}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
             <ul>
-              <li><NavLink to={"browse/nodetypes"}><FontAwesomeIcon fixedWidth icon="code-branch" transform={"flip-h rotate--90"}/>Nodetypes</NavLink></li>
+              <li><NavLink to={'browse/nodetypes'}><FontAwesomeIcon fixedWidth icon="code-branch" transform={'flip-h rotate--90'}/>Nodetypes</NavLink></li>
             </ul>
           </li>
-          <li><NavLink to={"create"}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
+          <li><NavLink to={'create'}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
           <li>
-            <NavLink to={"instance"}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</NavLink>
+            <NavLink to={'instance'}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</NavLink>
             <ul>
-              <li><NavLink to={"instance/view"}><FontAwesomeIcon fixedWidth icon="eye"/>View</NavLink></li>
+              <li><NavLink to={'instance/view'}><FontAwesomeIcon fixedWidth icon="eye"/>View</NavLink></li>
               <li>
-                <NavLink to={"instance/edit"}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</NavLink>
+                <NavLink to={'instance/edit'}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</NavLink>
                 <ul>
-                  <li><NavLink to={"instance/edit/save"}><FontAwesomeIcon fixedWidth icon="save"/>Save</NavLink></li>
+                  <li><NavLink to={'instance/edit/save'}><FontAwesomeIcon fixedWidth icon="save"/>Save</NavLink></li>
                 </ul>
               </li>
-              <li><NavLink to={"instance/graph"}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</NavLink></li>
-              <li><NavLink to={"instance/release"}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</NavLink></li>
+              <li><NavLink to={'instance/graph'}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</NavLink></li>
+              <li><NavLink to={'instance/release'}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</NavLink></li>
             </ul>
           </li>
           {/*<li><NavLink to={"statistics"}><FontAwesomeIcon fixedWidth icon="chart-bar"/>Statistics</NavLink></li>*/}
           {/*<li><NavLink to={"settings"}><FontAwesomeIcon fixedWidth icon="cog"/>Settings</NavLink></li>*/}
-          <li><NavLink to={"faq"}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</NavLink></li>
-          <li><NavLink to={"contact"}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</NavLink></li>
+          <li><NavLink to={'faq'}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</NavLink></li>
+          <li><NavLink to={'contact'}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</NavLink></li>
         </ul>
       </div>
       <div className={classes.content}>
         <Scrollbars autoHide>
           <div className={classes.contentInner}>
             <Routes>
-              <Route path={"introduction"} element={<Introduction />}/>
-              <Route path={"browse"} element={<Browse />} />
-              <Route path={"browse/nodetypes"} element={<BrowseNodetypes />}/>
-              <Route path={"create"} element={<CreateAnInstance />}/>
-              <Route path={"instance"} element={<OpenAnInstance />}/>
-              <Route path={"instance/view"} element={<OAIView />}/>
-              <Route path={"instance/edit"} element={<OAIEdit />}/>
-              <Route path={"instance/edit/save"} element={<OAIEditSave />}/>
-              <Route path={"instance/graph"} element={<OAIExplore />}/>
-              <Route path={"instance/release"} element={<OAIRelease />}/>
+              <Route path={'introduction'} element={<Introduction />}/>
+              <Route path={'browse'} element={<Browse />} />
+              <Route path={'browse/nodetypes'} element={<BrowseNodetypes />}/>
+              <Route path={'create'} element={<CreateAnInstance />}/>
+              <Route path={'instance'} element={<OpenAnInstance />}/>
+              <Route path={'instance/view'} element={<OAIView />}/>
+              <Route path={'instance/edit'} element={<OAIEdit />}/>
+              <Route path={'instance/edit/save'} element={<OAIEditSave />}/>
+              <Route path={'instance/graph'} element={<OAIExplore />}/>
+              <Route path={'instance/release'} element={<OAIRelease />}/>
 
-              <Route path={"statistics"} element={<Statistics />}/>
-              <Route path={"settings"} element={<Settings />}/>
-              <Route path={"faq"} element={<FAQ />}/>
-              <Route path={"contact"} element={<ContactTheSupport />}/>
-              <Route path={"*"} element={<Navigate to={"introduction"} replace={true} />}/>
+              <Route path={'statistics'} element={<Statistics />}/>
+              <Route path={'settings'} element={<Settings />}/>
+              <Route path={'faq'} element={<FAQ />}/>
+              <Route path={'contact'} element={<ContactTheSupport />}/>
+              <Route path={'*'} element={<Navigate to={'introduction'} replace={true} />}/>
             </Routes>
           </div>
         </Scrollbars>

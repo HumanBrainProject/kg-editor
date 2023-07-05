@@ -21,22 +21,22 @@
  *
  */
 
-import React, { useEffect, useState, useRef } from "react";
-import { createUseStyles } from "react-jss";
-import { List } from "react-virtualized";
-import { observer } from "mobx-react-lite";
-import debounce from "lodash/debounce";
+import debounce from 'lodash/debounce';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState, useRef } from 'react';
+import { createUseStyles } from 'react-jss';
+import { List } from 'react-virtualized';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
-import ReleaseNode from "./ReleaseNode";
+import ReleaseNode from './ReleaseNode';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width:"100%",
-    height:"100%",
-    maxHeight: "100%"
+    position: 'relative',
+    width:'100%',
+    height:'100%',
+    maxHeight: '100%'
   }
 });
 
@@ -59,9 +59,9 @@ const ReleaseList = observer(() => {
     }, 250);
 
     updateDimensions();
-    window.addEventListener("resize", updateDimensions);
+    window.addEventListener('resize', updateDimensions);
     return () => {
-      window.removeEventListener("resize", updateDimensions);
+      window.removeEventListener('resize', updateDimensions);
     };
   }, []);
 
@@ -86,6 +86,6 @@ const ReleaseList = observer(() => {
     </div>
   );
 });
-ReleaseList.displayName = "ReleaseList";
+ReleaseList.displayName = 'ReleaseList';
 
 export default ReleaseList;

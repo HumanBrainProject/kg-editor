@@ -21,18 +21,18 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import Spinner from "../../../Components/Spinner";
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import Spinner from '../../../Components/Spinner';
 
 const useStyles = createUseStyles({
   container:{
-    background:"rgba(255,255,255,0.75)",
-    position:"absolute",
+    background:'rgba(255,255,255,0.75)',
+    position:'absolute',
     top:0,
     left:0,
-    width:"100%",
-    height:"100%",
+    width:'100%',
+    height:'100%',
     zIndex:1001
   }
 });

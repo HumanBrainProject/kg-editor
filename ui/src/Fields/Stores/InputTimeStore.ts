@@ -21,10 +21,10 @@
  *
  */
 
-import InputTextStore from "./InputTextStore";
+import InputTextStore from './InputTextStore';
 
 class InputTimeStore extends InputTextStore {
-  inputType = "time";
+  inputType = 'time';
 }
 
 export default InputTimeStore;

@@ -21,37 +21,37 @@
  *
  */
 
-import React, { useEffect, useRef } from "react";
-import { createUseStyles } from "react-jss";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react-lite";
-import { SimpleType } from "../../../types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useRef } from 'react';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { createUseStyles } from 'react-jss';
+import type { SimpleType } from '../../../types';
 
 const useStyles = createUseStyles({
   panel: {
-    position:"relative",
-    "& h6": {
-      margin: "0 !important",
-      color: "#333",
-      fontWeight: "bold"
+    position:'relative',
+    '& h6': {
+      margin: '0 !important',
+      color: '#333',
+      fontWeight: 'bold'
     }
   },
   hasChanged: {
-    position:"absolute",
+    position:'absolute',
     top:5,
     right:10,
-    color:"#e67e22"
+    color:'#e67e22'
   },
   type: {
-    paddingRight: "10px"
+    paddingRight: '10px'
   }
 });
 
 
 const getElementToScroll = (elem: HTMLElement | null) => {
-  while(elem !== null && !elem.className.includes("scrolledView")) {
+  while(elem !== null && !elem.className.includes('scrolledView')) {
     elem = elem.parentElement;
   }
   if(elem !== null) {
@@ -62,7 +62,7 @@ const getElementToScroll = (elem: HTMLElement | null) => {
 
 const getScrollTop = (elem: HTMLElement | null) => {
   let distance = 0;
-  while(elem !== null && !elem.attributes["data-id"]) {
+  while(elem !== null && !elem.attributes['data-id']) {
     elem = elem.parentElement;
     if(elem !== null) {
       distance += elem.offsetTop;
@@ -73,7 +73,7 @@ const getScrollTop = (elem: HTMLElement | null) => {
 
 interface HeaderPanelProps {
   types?: SimpleType[];
-  hasChanged?: boolean; 
+  hasChanged?: boolean;
   highlight?: boolean;
 }
 
@@ -90,7 +90,7 @@ const HeaderPanel = observer(({ types, hasChanged, highlight }: HeaderPanelProps
       if(elem) {
         elem.scrollTo({
           top: distance - 20, // -20 because scrolledView contains padding-top:20px;
-          behavior: "smooth"
+          behavior: 'smooth'
         });
       }
     }
@@ -102,21 +102,21 @@ const HeaderPanel = observer(({ types, hasChanged, highlight }: HeaderPanelProps
         <Col xs={12}>
           <h6 ref={scrollIntoViewRef}>
             {types && types.map(({name, label, color}) => (
-              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={"circle"} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
+              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={'circle'} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
             ))}
           </h6>
         </Col>
       </Row>
       {hasChanged && (
         <div className={classes.hasChanged}>
-          <FontAwesomeIcon icon={"exclamation-triangle"}/>&nbsp;
-          <FontAwesomeIcon icon={"caret-right"}/>&nbsp;
-          <FontAwesomeIcon icon={"pencil-alt"}/>
+          <FontAwesomeIcon icon={'exclamation-triangle'}/>&nbsp;
+          <FontAwesomeIcon icon={'caret-right'}/>&nbsp;
+          <FontAwesomeIcon icon={'pencil-alt'}/>
         </div>
       )}
     </div>
   );
 });
-HeaderPanel.displayName = "HeaderPanel";
+HeaderPanel.displayName = 'HeaderPanel';
 
 export default HeaderPanel;

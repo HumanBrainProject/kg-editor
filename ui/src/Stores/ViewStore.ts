@@ -21,11 +21,11 @@
  *
  */
 
-import React from "react";
-import { observable, action, computed, makeObservable } from "mobx";
-import { StructureOfType, UUID, ViewMode } from "../types";
-import RootStore from "./RootStore";
-import API from "../Services/API";
+import { observable, action, computed, makeObservable } from 'mobx';
+import React from 'react';
+import type RootStore from './RootStore';
+import type API from '../Services/API';
+import type { StructureOfType, UUID, ViewMode } from '../types';
 
 interface StoredSpaceView {
   id: UUID;
@@ -40,7 +40,7 @@ interface StoredViews {
   [space: string]: StoredSpaceView[];
 }
 
-const STORED_INSTANCE_VIEWS_KEY = "views";
+const STORED_INSTANCE_VIEWS_KEY = 'views';
 
 const getStoredViews = (): StoredViews => {
   const value = localStorage.getItem(STORED_INSTANCE_VIEWS_KEY);
@@ -49,7 +49,7 @@ const getStoredViews = (): StoredViews => {
   }
   try {
     const views = JSON.parse(value);
-    if (views && typeof views === "object") {
+    if (views && typeof views === 'object') {
       return views;
     }
     return {};
@@ -61,7 +61,7 @@ const getStoredViews = (): StoredViews => {
 interface InstanceHighlight {
   pane?: string;
   instanceId?: string;
-  provenance?: string; 
+  provenance?: string;
 }
 
 export class View {
@@ -103,7 +103,7 @@ export class View {
     this.instanceId = instanceId;
     this.name = name;
     this.color = color;
-    this.description = description??"";
+    this.description = description??'';
     this.mode = mode;
     this.instancePath = [instanceId];
   }
@@ -175,7 +175,7 @@ export class View {
   }
 
   setType(type?: string) {
-    this.type = type??"";
+    this.type = type??'';
   }
 }
 
@@ -208,7 +208,7 @@ export class ViewStore{
   syncStoredViews(){
     if (this.rootStore.appStore.currentSpace) {
       const views = getStoredViews();
-      views[this.rootStore.appStore.currentSpace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== "create").map(([id, view])=> ({id:id, name:view.name, color:view.color, description: view.description, mode: view.mode, selected:this.selectedView ? this.selectedView.instanceId === id:false}));
+      views[this.rootStore.appStore.currentSpace.id] = [...this.views.entries()].filter(([, view]) => view.mode !== 'create').map(([id, view])=> ({id:id, name:view.name, color:view.color, description: view.description, mode: view.mode, selected:this.selectedView ? this.selectedView.instanceId === id:false}));
       localStorage.setItem(STORED_INSTANCE_VIEWS_KEY, JSON.stringify(views));
     }
   }
@@ -243,9 +243,9 @@ export class ViewStore{
       if (!selectedView) {
         return null;
       }
-      if (selectedView.mode === "view") {
+      if (selectedView.mode === 'view') {
         return `/instances/${selectedView.id}`;
-      } 
+      }
       return `/instances/${selectedView.id}/${selectedView.mode}`;
     }
     return null;
@@ -280,8 +280,8 @@ export class ViewStore{
       existingView.mode = viewMode;
     } else {
       const typeDescription = type?.description??type?.name;
-      const view = new View(instanceId, name, type?type.color:"", viewMode, typeDescription);
-      if (viewMode === "create") {
+      const view = new View(instanceId, name, type?type.color:'', viewMode, typeDescription);
+      if (viewMode === 'create') {
         view.setType(type?.name);
       }
       this.views.set(instanceId, view);
@@ -290,7 +290,7 @@ export class ViewStore{
 
   replaceViewByNewInstanceId(id: string, newId: string) {
     const view = this.views.get(id);
-    this.views.set(newId, new View(newId, view?view.name:"", view?.color??"", "edit", view?.description??""));
+    this.views.set(newId, new View(newId, view?view.name:'', view?.color??'', 'edit', view?.description??''));
     this.views.delete(id);
   }
 

@@ -21,122 +21,123 @@
  *
  */
 
-import React, { MouseEvent, useRef } from "react";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Field from "../../Fields/Field";
-import Status from "./Status";
-import { observer } from "mobx-react-lite";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import Field from '../../Fields/Field';
+import useStores from '../../Hooks/useStores';
+import Status from './Status';
 
-import useStores from "../../Hooks/useStores";
-import Instance from "../../Stores/Instance";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import type Instance from '../../Stores/Instance';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    minHeight: "47px",
-    cursor: "pointer",
-    padding: "10px",
-    background: "var(--bg-color-ui-contrast2)",
-    borderLeft: "4px solid transparent",
-    color: "var(--ft-color-normal)",
-    outline: "1px solid var(--border-color-ui-contrast1)",
-    marginBottom: "11px",
-    "&:hover": {
-      background: "var(--list-bg-hover)",
-      borderColor: "var(--list-border-hover)",
-      color: "var(--ft-color-loud)",
-      outline: "1px solid transparent",
-      "& $actions": {
+    position: 'relative',
+    minHeight: '47px',
+    cursor: 'pointer',
+    padding: '10px',
+    background: 'var(--bg-color-ui-contrast2)',
+    borderLeft: '4px solid transparent',
+    color: 'var(--ft-color-normal)',
+    outline: '1px solid var(--border-color-ui-contrast1)',
+    marginBottom: '11px',
+    '&:hover': {
+      background: 'var(--list-bg-hover)',
+      borderColor: 'var(--list-border-hover)',
+      color: 'var(--ft-color-loud)',
+      outline: '1px solid transparent',
+      '& $actions': {
         opacity: 0.75
       },
-      "& .status": {
+      '& .status': {
         opacity: 1
       },
-      "& $type": {
-        opacity: "1"
+      '& $type': {
+        opacity: '1'
       }
     },
-    "& .status": {
-      marginRight: "13px",
+    '& .status': {
+      marginRight: '13px',
       opacity: 0.5,
-      verticalAlign: "text-top"
+      verticalAlign: 'text-top'
     },
-    "&.selected": {
-      background: "var(--list-bg-selected)",
-      borderColor: "var(--list-border-selected)",
-      color: "var(--ft-color-loud)",
-      outline: "1px solid transparent",
-      "& .status": {
-        opacity: "1"
+    '&.selected': {
+      background: 'var(--list-bg-selected)',
+      borderColor: 'var(--list-border-selected)',
+      color: 'var(--ft-color-loud)',
+      outline: '1px solid transparent',
+      '& .status': {
+        opacity: '1'
       },
-      "& $type": {
-        opacity: "1"
+      '& $type': {
+        opacity: '1'
       }
     }
   },
   type: {
-    display: "inline-block",
-    opacity: "0.5",
-    paddingRight: "8px",
-    verticalAlign: "text-bottom"
+    display: 'inline-block',
+    opacity: '0.5',
+    paddingRight: '8px',
+    verticalAlign: 'text-bottom'
   },
   name: {
-    display: "inline",
-    fontSize: "1.25em",
-    fontWeight: "300",
-    color: "var(--ft-color-louder)"
+    display: 'inline',
+    fontSize: '1.25em',
+    fontWeight: '300',
+    color: 'var(--ft-color-louder)'
   },
   description: {
-    overflow: "hidden",
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    marginTop: "5px"
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    marginTop: '5px'
   },
   actions: {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    display: "flex",
-    alignItems: "flex-end",
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    display: 'flex',
+    alignItems: 'flex-end',
     opacity: 0,
-    "&:hover": {
-      opacity: "1 !important"
+    '&:hover': {
+      opacity: '1 !important'
     }
   },
   action: {
-    fontSize: "0.9em",
-    lineHeight: "27px",
-    textAlign: "center",
-    backgroundColor: "var(--bg-color-ui-contrast2)",
-    color: "var(--ft-color-normal)",
-    width: "25px",
-    "&:hover": {
-      color: "var(--ft-color-loud)"
+    fontSize: '0.9em',
+    lineHeight: '27px',
+    textAlign: 'center',
+    backgroundColor: 'var(--bg-color-ui-contrast2)',
+    color: 'var(--ft-color-normal)',
+    width: '25px',
+    '&:hover': {
+      color: 'var(--ft-color-loud)'
     },
-    "&:first-child": {
-      borderRadius: "4px 0 0 4px"
+    '&:first-child': {
+      borderRadius: '4px 0 0 4px'
     },
-    "&:last-child": {
-      borderRadius: "0 4px 4px 0"
+    '&:last-child': {
+      borderRadius: '0 4px 4px 0'
     }
   },
   separator: {
-    position: "absolute",
-    top: "10px",
-    left: "55px",
-    height: "calc(100% - 20px)",
-    borderRight: "1px solid var(--border-color-ui-contrast1)"
+    position: 'absolute',
+    top: '10px',
+    left: '55px',
+    height: 'calc(100% - 20px)',
+    borderRight: '1px solid var(--border-color-ui-contrast1)'
   },
   statusAndNameRow: {
-    display: "flex",
-    alignItems: "center"
+    display: 'flex',
+    alignItems: 'center'
   },
   fields: {
-    marginTop: "8px",
-    wordBreak: "break-word"
+    marginTop: '8px',
+    wordBreak: 'break-word'
   }
 });
 
@@ -162,9 +163,9 @@ const Action = ({ className, show, icon, mode, label, onClick, onCtrlClick }: Ac
       return;
     }
     if (e.metaKey || e.ctrlKey) {
-      typeof onCtrlClick === "function" && onCtrlClick(mode);
+      typeof onCtrlClick === 'function' && onCtrlClick(mode);
     } else {
-      typeof onClick === "function" && onClick(mode);
+      typeof onClick === 'function' && onClick(mode);
     }
   };
 
@@ -201,9 +202,9 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
       return;
     }
     if(timeout.current === null) {
-      let action = typeof onClick === "function"?onClick:null;
+      let action = typeof onClick === 'function'?onClick:null;
       if (e.metaKey || e.ctrlKey) {
-        action = typeof onCtrlClick === "function"?onCtrlClick:null;
+        action = typeof onCtrlClick === 'function'?onCtrlClick:null;
       }
       if (action) {
         timeout.current = setTimeout((i, act) => {
@@ -221,25 +222,25 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     if (!e.currentTarget.contains(e.target)) {
       return;
     }
-    if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === "function") {
+    if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === 'function') {
       onCtrlClick(instance);
     } else {
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
-      const mode = isTypesSupported?"view":"raw";
-      typeof onActionClick === "function" && onActionClick(instance, mode);
+      const mode = isTypesSupported?'view':'raw';
+      typeof onActionClick === 'function' && onActionClick(instance, mode);
     }
   };
 
   const handleActionCtrlClick = () => {
-    typeof onCtrlClick === "function" && onCtrlClick(instance);
+    typeof onCtrlClick === 'function' && onCtrlClick(instance);
   };
 
   const handleActionClick = (mode: string) => {
-    typeof onActionClick === "function" && onActionClick(instance, mode);
+    typeof onActionClick === 'function' && onActionClick(instance, mode);
   };
 
   return (
-    <div className={`${classes.container} ${selected ? "selected" : ""}`} onClick={handleClick} onDoubleClick={handleDoubleClick} >
+    <div className={`${classes.container} ${selected ? 'selected' : ''}`} onClick={handleClick} onDoubleClick={handleDoubleClick} >
       <div className={classes.statusAndNameRow}>
         <Status id={instance.id} darkmode={true} />
         <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
@@ -263,6 +264,6 @@ const InstanceRow = observer(({ instance, selected, onClick, onCtrlClick, onActi
     </div>
   );
 });
-InstanceRow.displayName = "InstanceRow";
+InstanceRow.displayName = 'InstanceRow';
 
 export default InstanceRow;

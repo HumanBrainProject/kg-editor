@@ -21,11 +21,12 @@
  *
  */
 
-import { useMemo } from "react";
-import { UserProfile, Space } from "../types";
-import useAPI from "./useAPI";
-import { APIError } from "../Services/API";
-import useGenericQuery, { GenericQuery } from "./useGenericQuery";
+import { useMemo } from 'react';
+import useAPI from './useAPI';
+import useGenericQuery from './useGenericQuery';
+import type { GenericQuery } from './useGenericQuery';
+import type { APIError } from '../Services/API';
+import type { UserProfile, Space } from '../types';
 
 const spaceComparer = (a: Space, b: Space) => a.name.localeCompare(b.name);
 
@@ -34,12 +35,12 @@ const sortSpaces = (spaces?: Space[]) => {
     return spaces.sort(spaceComparer);
   }
   return [];
-}
+};
 
 export type GetUserProfileQuery = GenericQuery<UserProfile|undefined>;
 
 const useGetUserProfileQuery = (): GetUserProfileQuery => {
-  
+
   const API = useAPI();
 
   const fetch = useMemo(() => async () => {

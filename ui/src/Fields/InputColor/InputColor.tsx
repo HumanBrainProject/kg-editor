@@ -21,52 +21,53 @@
  *
  */
 
-import React, { ChangeEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Color from "color";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Color from 'color';
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
 
-import Label from "../Label";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
-import InputTextStore from "../Stores/InputTextStore";
+import Invalid from '../Invalid';
+import Label from '../Label';
+import Warning from '../Warning';
+import type InputTextStore from '../Stores/InputTextStore';
+import type { ChangeEvent} from 'react';
 
 const useStyles = createUseStyles({
   label: {},
   inputColor: {
-    display: "inline-block",
-    width: "revert",
-    padding: "0",
-    minWidth: "70px",
-    paddingRight: "25px"
+    display: 'inline-block',
+    width: 'revert',
+    padding: '0',
+    minWidth: '70px',
+    paddingRight: '25px'
   },
   blockColor: {
-    display: "inline-block",
-    padding: "3px 8px",
-    border: "1px solid #ced4da"
+    display: 'inline-block',
+    padding: '3px 8px',
+    border: '1px solid #ced4da'
   },
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   },
   addColorBtn: {
-    fontSize: "x-small",
-    marginLeft: "4px"
+    fontSize: 'x-small',
+    marginLeft: '4px'
   },
   removeColorBtn: {
-    display: "inline-block",
-    borderRadius: "50px",
-    padding: "2px 5px",
-    fontSize: "xx-small",
-    marginTop: "-15px",
-    marginLeft: "-23px"
+    display: 'inline-block',
+    borderRadius: '50px',
+    padding: '2px 5px',
+    fontSize: 'xx-small',
+    marginTop: '-15px',
+    marginLeft: '-23px'
   }
 });
 
@@ -75,7 +76,7 @@ interface InputColorProps {
   className: string;
   readMode: boolean;
   showIfNoValue: boolean;
-} 
+}
 
 const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }: InputColorProps) => {
 
@@ -97,7 +98,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
-  const handleAddColor = () => fieldStore.setValue("#000");
+  const handleAddColor = () => fieldStore.setValue('#000');
 
   const handleRemoveColor = () => fieldStore.setValue(null);
 
@@ -115,7 +116,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
   if(readMode || isReadOnly){
 
     const color = new Color(value);
-    const textColor = color.isLight()?"black":"white";
+    const textColor = color.isLight()?'black':'white';
 
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
@@ -150,7 +151,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
           onChange={handleChange}
           disabled={isDisabled}
           rows={rows}
-          className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:""}`}
+          className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:''}`}
         />
         <Button className={classes.removeColorBtn} size="sm" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
           <FontAwesomeIcon icon="times"/>
@@ -161,6 +162,6 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
     </Form.Group>
   );
 });
-InputColor.displayName = "InputColor";
+InputColor.displayName = 'InputColor';
 
 export default InputColor;

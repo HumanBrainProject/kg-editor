@@ -21,15 +21,15 @@
  *
  */
 
-import React from "react";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import useStores from "../../Hooks/useStores";
-import Sentry from "../../Services/Sentry";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import useStores from '../../Hooks/useStores';
+import Sentry from '../../Services/Sentry';
 
 const ContactTheSupport = () => {
   const { userProfileStore } = useStores();
-  
+
   const handleErrorReport = () => {
     Sentry.showReportDialog({
       user: {
@@ -42,9 +42,9 @@ const ContactTheSupport = () => {
   return(
     <div>
       <h1>Contact us</h1>
-      <p>Should you encounter any problem with this application, please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
-      <Button variant={"warning"} onClick={handleErrorReport}>
-        <FontAwesomeIcon icon={"envelope"} /> &nbsp; Send an error report
+      <p>Should you encounter any problem with this application, please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
+      <Button variant={'warning'} onClick={handleErrorReport}>
+        <FontAwesomeIcon icon={'envelope'} /> &nbsp; Send an error report
       </Button>
     </div>
   );

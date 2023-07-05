@@ -21,17 +21,17 @@
  *
  */
 
-import { observable, action, computed, runInAction, set, values, makeObservable } from "mobx";
-import API from "../Services/API";
-import { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, GraphSource, GraphTarget, SimpleType, UUID } from "../types";
+import { observable, action, computed, runInAction, set, values, makeObservable } from 'mobx';
+import type API from '../Services/API';
+import type { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, GraphSource, GraphTarget, SimpleType, UUID } from '../types';
 
-const typeDefaultColor = "white";
-const typeDefaultName = "-";
-const typeDefaultLabel = "Unknown";
+const typeDefaultColor = 'white';
+const typeDefaultName = '-';
+const typeDefaultLabel = 'Unknown';
 
-const getGroupId = (types: SimpleType[]) => types.map(t => t.name).join("|");
+const getGroupId = (types: SimpleType[]) => types.map(t => t.name).join('|');
 
-const getGroupName = (types: SimpleType[]) => types.map(t => t.label).join(", ");
+const getGroupName = (types: SimpleType[]) => types.map(t => t.label).join(', ');
 
 const getColor = (types: SimpleType[]) => types[0].color?types[0].color:typeDefaultColor;
 
@@ -128,7 +128,7 @@ export class GraphStore {
 
     this.api = api;
   }
-  
+
   get graphDataNodes() {
     return getGraphNodes(this.groups);
   }
@@ -179,28 +179,28 @@ export class GraphStore {
   setHighlightNodeConnections(node: GraphNode, highlighted=false) {
     this.highlightedNode = highlighted?node:undefined;
     if(node) {
-      set(node, "highlighted", highlighted);
+      set(node, 'highlighted', highlighted);
     }
     this.links.forEach(link => {
-      set(link.source, "highlighted", false);
-      set(link.target, "highlighted", false);
+      set(link.source, 'highlighted', false);
+      set(link.target, 'highlighted', false);
     });
     if (node && highlighted) {
       this.graphDataLinks.forEach(link => {
         if (link.source.id === node.id || link.target.id === node.id) {
-          set(link.source, "highlighted", true);
-          set(link.target, "highlighted", true);
+          set(link.source, 'highlighted', true);
+          set(link.target, 'highlighted', true);
         }
       });
     }
   }
 
   setGroupVisibility(group: GraphGroup, show=true) {
-    set(group, "show", show);
+    set(group, 'show', show);
   }
 
   setGrouping(group: GraphGroup, grouped=true) {
-    set(group, "grouped", grouped);
+    set(group, 'grouped', grouped);
   }
 
   extractGroupsAndLinks = rootData => {

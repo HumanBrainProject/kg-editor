@@ -21,8 +21,9 @@
  *
  */
 
-import React, { ReactNode } from "react";
-import RootStore from "../Stores/RootStore";
+import React from 'react';
+import type RootStore from '../Stores/RootStore';
+import type { ReactNode } from 'react';
 
 class ErrorBoundaryComponent extends React.Component {
 

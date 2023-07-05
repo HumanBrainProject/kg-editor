@@ -22,68 +22,68 @@
  */
 
 /* eslint-disable indent */
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import ErrorPanel from '../../Components/ErrorPanel';
+import SpinnerPanel from '../../Components/SpinnerPanel';
+import useStores from '../../Hooks/useStores';
 
-import SpinnerPanel from "../../Components/SpinnerPanel";
-import ErrorPanel from "../../Components/ErrorPanel";
-import SavingModal from "./InstanceRelease/SavingModal";
-import CompareInstancesModal from "./InstanceRelease/CompareInstancesModal";
+import CompareInstancesModal from './InstanceRelease/CompareInstancesModal';
+import HideReleasedInstancesToggle from './InstanceRelease/HideReleasedInstancesToggle';
+import ReleaseAction from './InstanceRelease/ReleaseAction';
+import ReleaseList from './InstanceRelease/ReleaseList';
+import ReleaseNodeAndChildrenToggle from './InstanceRelease/ReleaseNodeAndChildrenToggle';
+import SavingModal from './InstanceRelease/SavingModal';
 
-import ReleaseList from "./InstanceRelease/ReleaseList";
-import ReleaseAction from "./InstanceRelease/ReleaseAction";
 
-import ReleaseNodeAndChildrenToggle from "./InstanceRelease/ReleaseNodeAndChildrenToggle";
-import HideReleasedInstancesToggle from "./InstanceRelease/HideReleasedInstancesToggle";
-import Instance from "../../Stores/Instance";
+import type Instance from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width: "calc(100% - 30px)",
-    height: "calc(100% - 30px)",
-    color: "var(--ft-color-normal)",
-    margin: "15px"
+    position: 'relative',
+    width: 'calc(100% - 30px)',
+    height: 'calc(100% - 30px)',
+    color: 'var(--ft-color-normal)',
+    margin: '15px'
   },
   panel: {
-    display: "grid",
-    gridTemplateRows: "auto 1fr",
-    gridTemplateColumns: "1fr 580px",
-    gridColumnGap: "15px",
-    height: "100%"
+    display: 'grid',
+    gridTemplateRows: 'auto 1fr',
+    gridTemplateColumns: '1fr 580px',
+    gridColumnGap: '15px',
+    height: '100%'
   },
   header: {
-    gridColumn: "span 2",
-    position: "relative",
-    "& h2": {
-      margin: "10px 0 0 0",
-      color: "var(--ft-color-loud)"
+    gridColumn: 'span 2',
+    position: 'relative',
+    '& h2': {
+      margin: '10px 0 0 0',
+      color: 'var(--ft-color-loud)'
     }
   },
   action: {
-    marginTop: "64px"
+    marginTop: '64px'
   },
   listPnl: {
-    display: "flex",
-    flexDirection: "column"
+    display: 'flex',
+    flexDirection: 'column'
   },
   listHeader: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginRight: "45px",
-    paddingTop: "35px",
-    paddingBottom: "5px"
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginRight: '45px',
+    paddingTop: '35px',
+    paddingBottom: '5px'
   },
   list: {
     flex: 1,
-    backgroundColor: "var(--bg-color-ui-contrast3)",
-    padding: "10px",
-    border: "1px solid var(--border-color-ui-contrast1)"
+    backgroundColor: 'var(--bg-color-ui-contrast3)',
+    padding: '10px',
+    border: '1px solid var(--border-color-ui-contrast1)'
   }
 });
 
@@ -109,7 +109,7 @@ const InstanceRelease = observer(({ instance }: InstanceReleaseProps) => {
 
   if (!releaseStore) {
     return (
-      <div className={classes.container}></div>
+      <div className={classes.container} />
     );
   }
 
@@ -182,6 +182,6 @@ const InstanceRelease = observer(({ instance }: InstanceReleaseProps) => {
     </div>
   );
 });
-InstanceRelease.displayName = "InstanceRelease";
+InstanceRelease.displayName = 'InstanceRelease';
 
 export default InstanceRelease;

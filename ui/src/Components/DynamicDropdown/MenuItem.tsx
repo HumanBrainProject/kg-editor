@@ -21,17 +21,18 @@
  *
  */
 
-import React, {useRef, useEffect, KeyboardEvent} from "react";
-import { createUseStyles } from "react-jss";
-import DynamicOption from "../../Fields/DynamicOption/DynamicOption";
-import { Suggestion } from "../../types";
+import React, {useRef, useEffect} from 'react';
+import { createUseStyles } from 'react-jss';
+import DynamicOption from '../../Fields/DynamicOption/DynamicOption';
+import type { Suggestion } from '../../types';
+import type { KeyboardEvent} from 'react';
 
 const useStyles = createUseStyles({
   item: {
-    paddingLeft: "10px",
+    paddingLeft: '10px',
     paddingRight: 0,
-    cursor: "default",
-    "&:hover, &:active, &:focus": {
+    cursor: 'default',
+    '&:hover, &:active, &:focus': {
       outline: 0
     }
   }
@@ -64,22 +65,22 @@ const MenuItem = ({ item, searchTerm, hasFocus, onSelectNext, onSelectPrevious, 
   const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     if(e) {
       switch(e.key) {
-      case "ArrowUp": {
+      case 'ArrowUp': {
         e.preventDefault();
         onSelectPrevious(item);
         break;
       }
-      case "ArrowDown": {
+      case 'ArrowDown': {
         e.preventDefault();
         onSelectNext(item);
         break;
       }
-      case "Enter": {
+      case 'Enter': {
         e.preventDefault();
         onSelect(item);
         break;
       }
-      case "Escape": {
+      case 'Escape': {
         e.preventDefault();
         onCancel();
         break;

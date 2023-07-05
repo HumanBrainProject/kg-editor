@@ -21,103 +21,104 @@
  *
  */
 
-import React, { MouseEvent, SyntheticEvent, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { v4 as uuidv4 } from "uuid";
-import Form from "react-bootstrap/Form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useRef } from 'react';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import useStores from "../../Hooks/useStores";
+import DropdownComponent from '../../Components/DynamicDropdown/Dropdown';
+import useStores from '../../Hooks/useStores';
 
-import DropdownComponent from "../../Components/DynamicDropdown/Dropdown";
-import DynamicOption  from "../DynamicOption/DynamicOption";
-import Table from "./Table";
-import Label from "../Label";
-import Invalid from "../Invalid";
-import Warning from "../Warning";
-import TargetTypeSelection from "../TargetTypeSelection";
-import Matomo from "../../Services/Matomo";
-import LinksStore from "../Stores/LinksStore";
-import { View } from "../../Stores/ViewStore";
+import Matomo from '../../Services/Matomo';
+import DynamicOption  from '../DynamicOption/DynamicOption';
+import Invalid from '../Invalid';
+import Label from '../Label';
+import TargetTypeSelection from '../TargetTypeSelection';
+import Warning from '../Warning';
+import Table from './Table';
+import type { View } from '../../Stores/ViewStore';
+import type LinksStore from '../Stores/LinksStore';
+import type { MouseEvent, SyntheticEvent} from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative"
+    position: 'relative'
   },
   field: {
-    marginBottom: "0"
+    marginBottom: '0'
   },
   table: {
-    border: "1px solid var(--border-color-ui-contrast2)",
-    paddingTop: "10px",
-    marginBottom: "15px",
-    "&.disabled": {
-      background: "rgb(238, 238, 238)",
-      color: "rgb(85,85,85)"
+    border: '1px solid var(--border-color-ui-contrast2)',
+    paddingTop: '10px',
+    marginBottom: '15px',
+    '&.disabled': {
+      background: 'rgb(238, 238, 238)',
+      color: 'rgb(85,85,85)'
     },
-    "& .form-control": {
-      paddingLeft: "9px"
+    '& .form-control': {
+      paddingLeft: '9px'
     }
   },
   addValueContainer: {
-    position: "relative",
-    "&.hasMultipleTypes": {
-      "& $dropdownContainer": {
-        paddingRight: "30%"
+    position: 'relative',
+    '&.hasMultipleTypes': {
+      '& $dropdownContainer': {
+        paddingRight: '30%'
       },
-      "& $dropdown": {
-        display: "block",
-        marginRight: "10px",
-        "& > input": {
-          maxWidth: "unset !important",
-          width: "100% !important"
+      '& $dropdown': {
+        display: 'block',
+        marginRight: '10px',
+        '& > input': {
+          maxWidth: 'unset !important',
+          width: '100% !important'
         }
       }
     }
   },
   dropdownContainer:{
-    height:"auto",
-    borderRadius: "0",
-    borderLeft: "0",
-    borderRight: "0",
-    borderBottom: "0",
-    paddingTop: "4px",
-    paddingBottom: "1px",
-    position:"relative"
+    height:'auto',
+    borderRadius: '0',
+    borderLeft: '0',
+    borderRight: '0',
+    borderBottom: '0',
+    paddingTop: '4px',
+    paddingBottom: '1px',
+    position:'relative'
   },
   dropdown: {},
   emptyMessage: {
-    position: "absolute !important",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    fontSize: "1.2em",
-    fontWeight: "lighter",
-    width:"100%",
-    textAlign:"center"
+    position: 'absolute !important',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    fontSize: '1.2em',
+    fontWeight: 'lighter',
+    width:'100%',
+    textAlign:'center'
   },
   emptyMessageLabel: {
-    paddingLeft: "6px",
-    display:"inline-block"
+    paddingLeft: '6px',
+    display:'inline-block'
   },
   deleteBtn: {
-    float: "right",
-    marginRight: "9px",
-    "& .btn": {
-      padding: "1px 6px 1px 6px"
+    float: 'right',
+    marginRight: '9px',
+    '& .btn': {
+      padding: '1px 6px 1px 6px'
     }
   },
   label: {},
   readMode:{
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   },
   warning: {
-    borderColor: "var(--ft-color-warn)"
+    borderColor: 'var(--ft-color-warn)'
   }
 });
 
@@ -137,7 +138,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { typeStore, instanceStore, userProfileStore, appStore } = useStores();
+  const { typeStore, instanceStore,  appStore } = useStores();
 
   const formControlRef = useRef<HTMLDivElement>(null);
   const dropdownInputRef = useRef<HTMLInputElement>(null);
@@ -219,10 +220,10 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
-        Matomo.trackEvent("Instance", "CreateInstanceInExternalSpace", option.type.name);
+        Matomo.trackEvent('Instance', 'CreateInstanceInExternalSpace', option.type.name);
         appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
       } else {
-        Matomo.trackEvent("Instance", "CreateInstanceInCurrentSpace", option.type.name);
+        Matomo.trackEvent('Instance', 'CreateInstanceInCurrentSpace', option.type.name);
         addNewValue(name, option.type.name);
       }
     } else {
@@ -304,19 +305,19 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   }
 
   return (
-    <Form.Group className={`${classes.container} ${readMode?classes.readMode:""} ${className}`}>
+    <Form.Group className={`${classes.container} ${readMode?classes.readMode:''} ${className}`}>
       {readMode ?
         <Label className={classes.label} label={label} isRequired={isRequired} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}/>
       }
       {!isDisabled && (view && view.currentInstanceId === instance?.id) && (
         <div className={classes.deleteBtn}>
-          <Button size="sm" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
+          <Button size="sm" variant={'primary'} onClick={handleDeleteAll} disabled={links.length === 0}>
             <FontAwesomeIcon icon="times"/>
           </Button>
         </div>
       )}
-      <div className={`${classes.table} ${hasValidationWarnings?classes.warning:""} ${returnAsNull?"disabled":""}`}>
+      <div className={`${classes.table} ${hasValidationWarnings?classes.warning:''} ${returnAsNull?'disabled':''}`}>
         {(view && view.currentInstanceId === instance?.id)?
           <Table
             mainInstanceId={instance.id}
@@ -338,7 +339,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           />
         }
         {!isDisabled && (
-          <div className={`${classes.addValueContainer} ${hasMultipleTypes?"hasMultipleTypes":""}`}>
+          <div className={`${classes.addValueContainer} ${hasMultipleTypes?'hasMultipleTypes':''}`}>
             <div ref={formControlRef} className={`form-control ${classes.dropdownContainer}`} onClick={handleDropDownFocus} >
               <DropdownComponent
                 inputRef={dropdownInputRef}
@@ -371,6 +372,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     </Form.Group>
   );
 });
-DynamicTable.displayName = "DynamicTable";
+DynamicTable.displayName = 'DynamicTable';
 
 export default DynamicTable;

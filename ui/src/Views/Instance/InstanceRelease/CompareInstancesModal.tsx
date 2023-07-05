@@ -21,33 +21,34 @@
  *
  */
 
-import React, { MouseEvent } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
-import CompareWithReleasedVersionChanges from "../CompareWithReleasedVersionChanges";
+import CompareWithReleasedVersionChanges from '../CompareWithReleasedVersionChanges';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    width: "90%",
-    "@media screen and (min-width:1024px)": {
-      width: "900px",
-      maxWidth: "unset"
+    width: '90%',
+    '@media screen and (min-width:1024px)': {
+      width: '900px',
+      maxWidth: 'unset'
     },
-    "& .modal-header": {
-      overflow: "hidden",
-      whiteSpace: "nowrap",
-      textOverflow: "ellipsis"
+    '& .modal-header': {
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis'
     },
-    "& .modal-body": {
-      height: "calc(95vh - 112px)",
-      padding: "3px 0"
+    '& .modal-body': {
+      height: 'calc(95vh - 112px)',
+      padding: '3px 0'
     }
   }
 });
@@ -92,6 +93,6 @@ const CompareInstancesModal = observer(() => {
     </Modal>
   );
 });
-CompareInstancesModal.displayName = "CompareInstancesModal";
+CompareInstancesModal.displayName = 'CompareInstancesModal';
 
 export default CompareInstancesModal;

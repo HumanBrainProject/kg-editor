@@ -21,27 +21,26 @@
  *
  */
 
-import { observable, action, runInAction, makeObservable } from "mobx";
-import debounce from "lodash/debounce";
+import debounce from 'lodash/debounce';
+import { observable, action, runInAction, makeObservable } from 'mobx';
 
-import Instance from "./Instance";
-import API, { APIError } from "../Services/API";
-import Type from "./TypeStore";
-import RootStore from "./RootStore";
+import Instance from './Instance';
+import type RootStore from './RootStore';
+import type Type from './TypeStore';
+import type API from '../Services/API';
+import type { APIError } from '../Services/API';
 
-const normalizeInstancesData = (api: API, rootStore: RootStore, data:any) => {
-  return (Array.isArray(data))?data.map(rowData => {
-    Object.values(rowData.fields).forEach(d => {
-      if(d.widget === "TextArea") {
-        d.value = d.value && d.value.substr(0, 197) + "...";
-        delete d.label;
-      }
-    });
-    const instance = new Instance(rowData.id, api);
-    instance.initializeData(api, rootStore, rowData);
-    return instance;
-  }):[];
-};
+const normalizeInstancesData = (api: API, rootStore: RootStore, data:any) => (Array.isArray(data))?data.map(rowData => {
+  Object.values(rowData.fields).forEach(d => {
+    if(d.widget === 'TextArea') {
+      d.value = d.value && d.value.substr(0, 197) + '...';
+      delete d.label;
+    }
+  });
+  const instance = new Instance(rowData.id, api);
+  instance.initializeData(api, rootStore, rowData);
+  return instance;
+}):[];
 
 export class BrowseStore {
   isFetching = false;
@@ -51,12 +50,12 @@ export class BrowseStore {
   selectedInstance = null;
 
   instances = [];
-  instancesFilter = "";
+  instancesFilter = '';
 
   canLoadMoreInstances = false;
   totalInstances = 0;
 
-  navigationFilter = "";
+  navigationFilter = '';
 
   pageStart = 0;
   pageSize = 20;
@@ -124,7 +123,7 @@ export class BrowseStore {
   }
 
   clearInstancesFilter() {
-    this.instancesFilter = "";
+    this.instancesFilter = '';
   }
 
   applyInstancesFilter = debounce(() => {

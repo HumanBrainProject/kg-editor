@@ -32,11 +32,11 @@
  *   limitations under the License.
  *
  */
-import { AxiosInstance } from "axios";
-import API from "./API";
-import { UUID, Stage, Settings, UserProfile, KGCoreResult, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from "../types";
+import type API from './API';
+import type { UUID, Stage, Settings, UserProfile, KGCoreResult, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from '../types';
+import type { AxiosInstance } from 'axios';
 
-const RELATIVE_ROOT_PATH = "/editor/api";
+const RELATIVE_ROOT_PATH = '/editor/api';
 
 declare global {
 	interface Window {
@@ -48,8 +48,8 @@ const getStage = (stage?: Stage) => {
   if(stage) {
     return `?stage=${stage}`;
   }
-  return "";
-}
+  return '';
+};
 
 const endpoints = {
   settings: () => `${RELATIVE_ROOT_PATH}/settings`,
@@ -61,11 +61,11 @@ const endpoints = {
   instancesSummary: (stage?: Stage) => `${RELATIVE_ROOT_PATH}/instancesBulk/summary${getStage(stage)}`,
   instancesLabel: (stage?: Stage) => `${RELATIVE_ROOT_PATH}/instancesBulk/label${getStage(stage)}`,
   searchInstancesByType: (space: string, type: string, from: number, size: number, search: string) => `${RELATIVE_ROOT_PATH}/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${encodeURIComponent(search)}`,
-  suggestions: (instanceId: UUID, field: string, sourceType: string, targetType: string, start:number, size:number, search: string) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?"&sourceType=" + encodeURIComponent(sourceType):""}${targetType?"&targetType=" + encodeURIComponent(targetType):""}&start=${start}&size=${size}&search=${search}`,
+  suggestions: (instanceId: UUID, field: string, sourceType: string, targetType: string, start:number, size:number, search: string) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?'&sourceType=' + encodeURIComponent(sourceType):''}${targetType?'&targetType=' + encodeURIComponent(targetType):''}&start=${start}&size=${size}&search=${search}`,
   instance: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}`,
   rawInstance: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/raw`,
   instanceScope: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/scope`,
-  createInstance: (space: string, instanceId?: UUID) => `${RELATIVE_ROOT_PATH}/instances${instanceId?("/" + instanceId):""}?space=${space}`,
+  createInstance: (space: string, instanceId?: UUID) => `${RELATIVE_ROOT_PATH}/instances${instanceId?('/' + instanceId):''}?space=${space}`,
   moveInstance: (instanceId: UUID, space: string) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/spaces/${space}`,
   release: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/releases/${instanceId}/release`,
   releaseStatusTopInstance: () => `${RELATIVE_ROOT_PATH}/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY`,
@@ -81,7 +81,7 @@ class APIBackendAdapter implements API {
   constructor(axios: AxiosInstance) {
     this._axios = axios;
   }
-  
+
   async getSettings(): Promise<Settings> {
     const { data } = await this._axios.get(endpoints.settings());
     return data?.data as Settings;

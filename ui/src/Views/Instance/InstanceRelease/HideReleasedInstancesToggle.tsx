@@ -21,27 +21,27 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import MultiToggle from "../../../Components/MultiToggle";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import MultiToggle from '../../../Components/MultiToggle';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
 const useStyles = createUseStyles({
   container: {
-    display: "flex",
-    flexDirection: "row"
+    display: 'flex',
+    flexDirection: 'row'
   },
   toggle: {
-    height: "24px",
-    background: "var(--bg-color-ui-contrast4)",
-    borderRadius: "20px"
+    height: '24px',
+    background: 'var(--bg-color-ui-contrast4)',
+    borderRadius: '20px'
   },
   text: {
-    display: "inline-block",
-    marginLeft: "4px",
-    lineHeight: "1.7em"
+    display: 'inline-block',
+    marginLeft: '4px',
+    lineHeight: '1.7em'
   }
 });
 
@@ -57,14 +57,14 @@ const HideReleasedInstancesToggle = observer(() => {
     <div className={classes.container}>
       <div className={classes.toggle}>
         <MultiToggle selectedValue={releaseStore.hideReleasedInstances} onChange={handleClick}>
-          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?"var(--ft-color-normal)":"var(--ft-color-loud)"} icon={"eye"} value={false} />
-          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?"var(--ft-color-loud)":"var(--ft-color-normal)"} icon={"eye-slash"} value={true} />
+          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?'var(--ft-color-normal)':'var(--ft-color-loud)'} icon={'eye'} value={false} />
+          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?'var(--ft-color-loud)':'var(--ft-color-normal)'} icon={'eye-slash'} value={true} />
         </MultiToggle>
       </div>
-      <span className={classes.text}>{releaseStore.hideReleasedInstances?"Hide": "Show"} released instances</span>
+      <span className={classes.text}>{releaseStore.hideReleasedInstances?'Hide': 'Show'} released instances</span>
     </div>
   );
 });
-HideReleasedInstancesToggle.displayName = "HideReleasedInstancesToggle";
+HideReleasedInstancesToggle.displayName = 'HideReleasedInstancesToggle';
 
 export default HideReleasedInstancesToggle;

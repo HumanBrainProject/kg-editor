@@ -21,106 +21,106 @@
  *
  */
 
-import React, { useState } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { useLocation, useNavigate } from "react-router-dom";
-import MultiToggle from "../../../Components/MultiToggle";
-import Color from "color";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Color from 'color';
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
+import MultiToggle from '../../../Components/MultiToggle';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
 const useStyles = createUseStyles({
   container: {
-    height: "100%"
+    height: '100%'
   },
   groups: {
 
   },
   group: {
-    position: "relative",
-    height: "45px",
-    padding: "0 10px",
-    "&:nth-child(odd)": {
-      background: "var(--bg--color-ui-contrast3)"
+    position: 'relative',
+    height: '45px',
+    padding: '0 10px',
+    '&:nth-child(odd)': {
+      background: 'var(--bg--color-ui-contrast3)'
     },
-    overflow: "hidden",
-    transition: "height 0.25s ease-in-out",
-    "&.expanded": {
-      height: "auto",
-      "& $expandButton": {
-        transform: "rotateZ(90deg)"
+    overflow: 'hidden',
+    transition: 'height 0.25s ease-in-out',
+    '&.expanded': {
+      height: 'auto',
+      '& $expandButton': {
+        transform: 'rotateZ(90deg)'
       }
     },
-    "&.disabled": {
-      opacity: "0.2",
-      display: "none"
+    '&.disabled': {
+      opacity: '0.2',
+      display: 'none'
     }
   },
   groupActions: {
-    position: "absolute",
-    right: "10px",
-    top: "10px",
-    fontSize: "1.25em"
+    position: 'absolute',
+    right: '10px',
+    top: '10px',
+    fontSize: '1.25em'
   },
   groupLabel: {
-    lineHeight: "45px",
-    color: "var(--ft-color-normal)",
-    cursor: "pointer",
-    "&:hover": {
-      color: "var(--ft-color-loud)"
+    lineHeight: '45px',
+    color: 'var(--ft-color-normal)',
+    cursor: 'pointer',
+    '&:hover': {
+      color: 'var(--ft-color-loud)'
     }
   },
   typeIcon: {
-    display: "inline-block",
-    width: "20px",
-    height: "20px",
-    margin: "0 4px 2px 8px",
-    borderRadius: "50%",
-    background: "white",
-    border: "2px solid gray",
-    verticalAlign: "middle",
+    display: 'inline-block',
+    width: '20px',
+    height: '20px',
+    margin: '0 4px 2px 8px',
+    borderRadius: '50%',
+    background: 'white',
+    border: '2px solid gray',
+    verticalAlign: 'middle',
     zIndex: 2
   },
   nodes: {
-    paddingBottom: "10px",
-    paddingLeft: "30px"
+    paddingBottom: '10px',
+    paddingLeft: '30px'
   },
   node: {
-    padding: "5px 0",
-    position: "relative",
-    cursor: "pointer",
-    color: "var(--ft-color-normal)",
-    "&:hover": {
-      color: "var(--ft-color-loud)"
+    padding: '5px 0',
+    position: 'relative',
+    cursor: 'pointer',
+    color: 'var(--ft-color-normal)',
+    '&:hover': {
+      color: 'var(--ft-color-loud)'
     },
-    "&::before": {
-      content: "''",
-      display: "block",
-      position: "absolute",
+    '&::before': {
+      content: '\'\'',
+      display: 'block',
+      position: 'absolute',
       left: -23,
       top: -15,
       height: 32,
       width: 1,
-      borderLeft: "1px dashed #bdc3c7"
+      borderLeft: '1px dashed #bdc3c7'
     },
-    "&::after": {
-      content: "''",
-      display: "block",
-      position: "absolute",
+    '&::after': {
+      content: '\'\'',
+      display: 'block',
+      position: 'absolute',
       left: -22,
       top: 16,
-      width: "17px",
+      width: '17px',
       height: 1,
-      borderBottom: "1px dashed #bdc3c7"
+      borderBottom: '1px dashed #bdc3c7'
     }
   },
   expandButton: {
-    color: "#bdc3c7",
-    cursor: "pointer",
-    transition: "transform 0.25s ease-in-out"
+    color: '#bdc3c7',
+    cursor: 'pointer',
+    transition: 'transform 0.25s ease-in-out'
   }
 });
 
@@ -162,7 +162,7 @@ const Node = ({ node, isGrouped }) => {
   }
 
   return (
-    <div className={classes.node} {...actions}>{node.name} {node.space !== appStore.currentSpace.id? <em style={{color:"var(--ft-color-error)"}}>(Space: {node.space})</em> : null}</div>
+    <div className={classes.node} {...actions}>{node.name} {node.space !== appStore.currentSpace.id? <em style={{color:'var(--ft-color-error)'}}>(Space: {node.space})</em> : null}</div>
   );
 };
 
@@ -177,7 +177,7 @@ const Nodes = ({className, nodes, isGrouped}) => (
 const TypeIcon= ({color, grouped}) => {
   const classes = useStyles();
   const style = {
-    borderRadius: grouped?"0":"50%",
+    borderRadius: grouped?'0':'50%',
     background: color,
     borderColor: new Color(color).darken(0.25).hex()
   };
@@ -214,7 +214,7 @@ const GroupLabel = observer(({ className, group }) => {
     </span>
   );
 });
-GroupLabel.displayName = "GroupLabel";
+GroupLabel.displayName = 'GroupLabel';
 
 const Actions = observer(({ className, group }) => {
 
@@ -222,16 +222,16 @@ const Actions = observer(({ className, group }) => {
 
   const handleChange = action => {
     switch (action) {
-    case "show":
+    case 'show':
       graphStore.setGroupVisibility(group, true);
       break;
-    case "hide":
+    case 'hide':
       graphStore.setGroupVisibility(group, false);
       break;
-    case "group":
+    case 'group':
       graphStore.setGrouping(group, true);
       break;
-    case "ungroup":
+    case 'ungroup':
       graphStore.setGrouping(group, false);
       break;
     default:
@@ -239,17 +239,17 @@ const Actions = observer(({ className, group }) => {
     }
   };
 
-  let value = group.show?"show":"hide";
+  let value = group.show?'show':'hide';
   let actions = [
-    {value: "show", icon:"eye"},
-    {value: "hide", icon:"eye-slash"}
+    {value: 'show', icon:'eye'},
+    {value: 'hide', icon:'eye-slash'}
   ];
   if (group.show && group.nodes.length > 1) {
-    value = group.grouped?"group":"ungroup";
+    value = group.grouped?'group':'ungroup';
     actions = [
-      {value: "group",   icon: "compress"},
-      {value: "ungroup", icon: "expand-arrows-alt"},
-      {value: "hide",    icon: "eye-slash"}
+      {value: 'group',   icon: 'compress'},
+      {value: 'ungroup', icon: 'expand-arrows-alt'},
+      {value: 'hide',    icon: 'eye-slash'}
     ];
   }
 
@@ -257,13 +257,13 @@ const Actions = observer(({ className, group }) => {
     <div className={className}>
       <MultiToggle selectedValue={value} onChange={handleChange}>
         {actions.map(action => (
-          <MultiToggle.Toggle key={action.value} color={"var(--ft-color-loud)"} value={action.value} icon={action.icon} />
+          <MultiToggle.Toggle key={action.value} color={'var(--ft-color-loud)'} value={action.value} icon={action.icon} />
         ))}
       </MultiToggle>
     </div>
   );
 });
-Actions.displayName = "Actions";
+Actions.displayName = 'Actions';
 
 const Group = ({ group }) => {
 
@@ -276,7 +276,7 @@ const Group = ({ group }) => {
   };
 
   return (
-    <div className={`${classes.group} ${expanded ? "expanded" : ""}`}>
+    <div className={`${classes.group} ${expanded ? 'expanded' : ''}`}>
       <FontAwesomeIcon icon="arrow-right" className={classes.expandButton} onClick={handleClick} />
       <GroupLabel className={classes.groupLabel} group={group} />
       <Actions className={classes.groupActions} group={group} />
@@ -311,6 +311,6 @@ const GraphSettings = observer(() => {
     </div>
   );
 });
-GraphSettings.displayName = "GraphSettings";
+GraphSettings.displayName = 'GraphSettings';
 
 export default GraphSettings;

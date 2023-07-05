@@ -21,17 +21,18 @@
  *
  */
 
-import React, { ReactNode } from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   container:{
-    display:"inline-grid",
-    background:"var(--bg-color-ui-contrast4)",
-    borderRadius:"20px",
-    height:"24px"
+    display:'inline-grid',
+    background:'var(--bg-color-ui-contrast4)',
+    borderRadius:'20px',
+    height:'24px'
   }
 });
 
@@ -46,7 +47,7 @@ const MultiToggle = ({ selectedValue, children, onChange}: MultiToggleProps) => 
   const classes = useStyles();
 
   const handleSelect = (value: string) => {
-    if(typeof onChange === "function"){
+    if(typeof onChange === 'function'){
       onChange(value);
     }
   };
@@ -62,24 +63,24 @@ const MultiToggle = ({ selectedValue, children, onChange}: MultiToggleProps) => 
 
 const useToggleStyles = createUseStyles({
   container:{
-    textAlign:"center",
-    height:"24px",
-    lineHeight:"24px",
-    cursor:"pointer",
-    fontSize:"0.66em",
-    transition:"all .2s ease",
-    background:"none",
-    "&.selected":{
-      background:"var(--bg-color-ui-contrast1)",
-      borderRadius:"50%",
-      transform:"scale(1.12)",
-      fontSize:"0.8em",
+    textAlign:'center',
+    height:'24px',
+    lineHeight:'24px',
+    cursor:'pointer',
+    fontSize:'0.66em',
+    transition:'all .2s ease',
+    background:'none',
+    '&.selected':{
+      background:'var(--bg-color-ui-contrast1)',
+      borderRadius:'50%',
+      transform:'scale(1.12)',
+      fontSize:'0.8em',
       /*backgroundColor:"currentColor",
       "& svg":{
         color:"white"
       },*/
-      "&.noscale":{
-        transform:"scale(1)"
+      '&.noscale':{
+        transform:'scale(1)'
       }
     }
   }
@@ -99,14 +100,14 @@ const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}: TogglePr
   const classes = useToggleStyles();
 
   const handleClick = () => {
-    if(typeof onSelect === "function") {
+    if(typeof onSelect === 'function') {
       onSelect(value);
     }
   };
 
   return(
-    <div onClick={handleClick} className={`${classes.container}${selectedValue === value?" selected":""}${noscale !== undefined?" noscale":""}`} style={{color:color}}>
-      <FontAwesomeIcon icon={icon || "dot-circle"}/>
+    <div onClick={handleClick} className={`${classes.container}${selectedValue === value?' selected':''}${noscale !== undefined?' noscale':''}`} style={{color:color}}>
+      <FontAwesomeIcon icon={icon || 'dot-circle'}/>
     </div>
   );
 };

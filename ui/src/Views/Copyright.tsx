@@ -21,10 +21,10 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
 const Copyright = () => (
-    <div className="copyright">Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.</div>
+  <div className="copyright">Copyright &copy; {new Date().getFullYear()} EBRAINS. All rights reserved.</div>
 );
 
 export default Copyright;

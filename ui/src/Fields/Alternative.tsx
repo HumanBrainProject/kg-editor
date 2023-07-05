@@ -21,42 +21,43 @@
  *
  */
 
-import React, { useRef, useEffect, ReactNode, MouseEvent, KeyboardEvent } from "react";
-import { createUseStyles } from "react-jss";
-import Dropdown from "react-bootstrap/Dropdown";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useRef, useEffect } from 'react';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../Hooks/useStores";
+import User from '../Components/User';
+import useStores from '../Hooks/useStores';
 
-import User from "../Components/User";
-import { Alternative as AlternativeType } from "../types";
+import type { Alternative as AlternativeType } from '../types';
+import type { MouseEvent, KeyboardEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    "& .option em .user + .user:before": {
-      content: "'; '"
+    '& .option em .user + .user:before': {
+      content: '\'; \''
     },
-    "& .option": {
-      position: "relative",
-      paddingLeft: "3px"
+    '& .option': {
+      position: 'relative',
+      paddingLeft: '3px'
     },
-    "& .option .parenthesis": {
-      display: "inline-block",
-      transform: "scaleY(1.4)"
+    '& .option .parenthesis': {
+      display: 'inline-block',
+      transform: 'scaleY(1.4)'
     },
-    "& .selected": {
-      position: "absolute",
-      top: "50%",
-      left: "-15px",
-      transform: "translateY(-50%)"
+    '& .selected': {
+      position: 'absolute',
+      top: '50%',
+      left: '-15px',
+      transform: 'translateY(-50%)'
     }
   },
   nullValue:{
-    color: "grey",
-    fontStyle: "italic"
+    color: 'grey',
+    fontStyle: 'italic'
   },
   removeIcon: {
-    marginLeft: "3%"
+    marginLeft: '3%'
   }
 });
 
@@ -87,33 +88,33 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   });
 
   const handleSelect = () => {
-    typeof onSelect === "function" && onSelect(alternative.value);
+    typeof onSelect === 'function' && onSelect(alternative.value);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if(e) {
       switch(e.key) {
-      case "ArrowUp": {
+      case 'ArrowUp': {
         e.preventDefault();
         onSelectPrevious(alternative.value);
         break;
       }
-      case "ArrowDown": {
+      case 'ArrowDown': {
         e.preventDefault();
         onSelectNext(alternative.value);
         break;
       }
-      case "Enter": {
+      case 'Enter': {
         e.preventDefault();
         onSelect(alternative.value);
         break;
       }
-      case "Escape": {
+      case 'Escape': {
         e.preventDefault();
         onCancel();
         break;
       }
-      default: 
+      default:
         break;
       }
     }
@@ -121,14 +122,14 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
 
   const handleRemoveClick = (e: MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
-    typeof onRemove === "function" && onRemove(e);
+    typeof onRemove === 'function' && onRemove(e);
   };
 
   const users = (!alternative || !alternative.users)?[]:alternative.users;
   const isOwnAlternative = users.find(user => userProfileStore.user?.id === user.id);
   return (
     <Dropdown.Item className={classes.container} onClick={handleSelect}>
-      <div tabIndex={-1} className={`option ${className?className:""}`} onKeyDown={handleKeyDown} ref={ref} >
+      <div tabIndex={-1} className={`option ${className?className:''}`} onKeyDown={handleKeyDown} ref={ref} >
         {alternative.value !== null ? <strong>
           <ValueRenderer alternative={alternative} />
         </strong> : <span className={classes.nullValue}>no value</span>} <em><div className="parenthesis">(</div>{

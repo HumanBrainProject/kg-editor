@@ -21,42 +21,42 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../Hooks/useStores";
+import ErrorPanel from '../../Components/ErrorPanel';
+import SpinnerPanel from '../../Components/SpinnerPanel';
+import useStores from '../../Hooks/useStores';
 
-import GraphViz from "./InstanceGraph/GraphViz";
-import GraphSettings from "./InstanceGraph/GraphSettings";
-import SpinnerPanel from "../../Components/SpinnerPanel";
-import ErrorPanel from "../../Components/ErrorPanel";
-import Instance from "../../Stores/Instance";
+import GraphSettings from './InstanceGraph/GraphSettings';
+import GraphViz from './InstanceGraph/GraphViz';
+import type Instance from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-    display: "grid",
-    gridGap: "10px",
-    gridTemplateRows: "1fr",
-    gridTemplateColumns: "1fr 450px",
-    padding: "10px",
-    color: "var(--ft-color-normal)"
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    display: 'grid',
+    gridGap: '10px',
+    gridTemplateRows: '1fr',
+    gridTemplateColumns: '1fr 450px',
+    padding: '10px',
+    color: 'var(--ft-color-normal)'
   },
   graph: {
-    background: "var(--bg-color-ui-contrast2)",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    overflow: "hidden",
-    position: "relative"
+    background: 'var(--bg-color-ui-contrast2)',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    overflow: 'hidden',
+    position: 'relative'
   },
   settings: {
-    background: "var(--bg-color-ui-contrast2)",
-    border: "1px solid var(--border-color-ui-contrast1)",
-    overflow: "auto",
-    position: "relative"
+    background: 'var(--bg-color-ui-contrast2)',
+    border: '1px solid var(--border-color-ui-contrast1)',
+    overflow: 'auto',
+    position: 'relative'
   }
 });
 
@@ -103,6 +103,6 @@ const InstanceGraph = observer(({ instance }: InstanceGraphProps) => {
     </div>
   );
 });
-InstanceGraph.displayName = "InstanceGraph";
+InstanceGraph.displayName = 'InstanceGraph';
 
 export default InstanceGraph;

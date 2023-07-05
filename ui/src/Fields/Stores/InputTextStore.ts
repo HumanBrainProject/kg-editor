@@ -21,18 +21,18 @@
  *
  */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import {
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type {
   FieldStoreDefinition,
   FieldStoreRegexRule,
   FieldStoreValidation
-} from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+} from '../../types';
 
 interface Message {
   required?: string;
@@ -43,7 +43,7 @@ interface Message {
 const DEFAULT_REGEX = {
   // regex: /^(?!\s)(.|\n)*(?<!\s)$/, -> Negative lookout is not supported by safari
   regex: /^[^\s]([^]*[^\s])?$/,
-  errorMessage: "leading/trailling spaces are not allowed"
+  errorMessage: 'leading/trailling spaces are not allowed'
 };
 
 const getRegexRules = (
@@ -51,19 +51,19 @@ const getRegexRules = (
 ): FieldStoreRegexRule[] => {
   const rules = Array.isArray(validation)
     ? validation.map(rule => ({
-        regex: new RegExp(rule.regex),
-        errorMessage: rule.errorMessage
-      }))
+      regex: new RegExp(rule.regex),
+      errorMessage: rule.errorMessage
+    }))
     : [];
   rules.push(DEFAULT_REGEX);
   return rules;
 };
 
 class InputTextStore extends FieldStore {
-  inputType = "text";
-  value = "";
+  inputType = 'text';
+  value = '';
   returnAsNull = false;
-  initialValue = "";
+  initialValue = '';
   maxLength?: number;
   regexRules: FieldStoreRegexRule[] = [DEFAULT_REGEX];
 
@@ -85,7 +85,7 @@ class InputTextStore extends FieldStore {
       this.regexRules = [
         {
           regex: new RegExp(definition.regex),
-          errorMessage: "this is not a valid value"
+          errorMessage: 'this is not a valid value'
         },
         DEFAULT_REGEX
       ];
@@ -115,8 +115,8 @@ class InputTextStore extends FieldStore {
 
   get returnValue() {
     //NOSONAR, by design spec it can return that specific string constant or a value
-    if (this.value === "" && this.returnAsNull) {
-      return "https://core.kg.ebrains.eu/vocab/resetValue";
+    if (this.value === '' && this.returnAsNull) {
+      return 'https://core.kg.ebrains.eu/vocab/resetValue';
     }
     return toJS(this.value);
   }
@@ -125,7 +125,7 @@ class InputTextStore extends FieldStore {
     if (!this.isRequired) {
       return false;
     }
-    return this.value === "";
+    return this.value === '';
   }
 
   get maxLengthWarning() {
@@ -152,7 +152,7 @@ class InputTextStore extends FieldStore {
     const messages: Message = {};
     if (this.shouldCheckValidation) {
       if (this.requiredValidationWarning) {
-        messages.required = "This field is marked as required.";
+        messages.required = 'This field is marked as required.';
       }
       if (this.hasRegexWarning && !this.requiredValidationWarning) {
         messages.regex = this.regexWarning;
@@ -181,7 +181,7 @@ class InputTextStore extends FieldStore {
 
   updateValue(value: string | null | undefined) {
     this.returnAsNull = false;
-    this.initialValue = value !== null && value !== undefined ? value : "";
+    this.initialValue = value !== null && value !== undefined ? value : '';
     this.value = this.initialValue;
   }
 
@@ -191,25 +191,25 @@ class InputTextStore extends FieldStore {
   }
 
   get hasChanged() {
-    if (typeof this.initialValue === "object") {
-      return typeof this.returnValue !== "object"; // user did not change the value
+    if (typeof this.initialValue === 'object') {
+      return typeof this.returnValue !== 'object'; // user did not change the value
     }
     return this.returnValue !== this.initialValue;
   }
 
   get shouldCheckValidation() {
-    return this.initialValue !== "" || this.hasChanged;
+    return this.initialValue !== '' || this.hasChanged;
   }
 
   setValue(value: string | null | undefined) {
     if (value !== null && value !== undefined) {
-      if (value !== "" || !this.returnAsNull) {
+      if (value !== '' || !this.returnAsNull) {
         this.returnAsNull = false;
         this.value = value;
       }
     } else {
       this.returnAsNull = true;
-      this.value = "";
+      this.value = '';
     }
   }
 }

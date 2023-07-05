@@ -27,14 +27,14 @@ import {
   runInAction,
   computed,
   makeObservable
-} from "mobx";
-import API from "../Services/API";
-import RootStore from "./RootStore";
+} from 'mobx';
+import type RootStore from './RootStore';
+import type API from '../Services/API';
 
 const setNodeTypesAndSortChildren = node => {
   node.typesName = node.types.reduce(
-    (acc, current) => `${acc}${acc.length ? ", " : ""}${current.label}`,
-    ""
+    (acc, current) => `${acc}${acc.length ? ', ' : ''}${current.label}`,
+    ''
   );
   if (Array.isArray(node.children) && node.children.length) {
     node.children.forEach((child) => setNodeTypesAndSortChildren(child)); // Change child permissions here in case you want to test permissions.
@@ -43,7 +43,7 @@ const setNodeTypesAndSortChildren = node => {
       const tb = b.typesName.toUpperCase();
       if (ta === tb) {
         if (!a.label && !b.label) {
-            return 0;
+          return 0;
         }
         if (!a.label) {
           return 1;
@@ -59,7 +59,7 @@ const setNodeTypesAndSortChildren = node => {
 };
 
 const removeDuplicates = (node, ids) => {
-  if (typeof node === "object" && Array.isArray(node.children)) {
+  if (typeof node === 'object' && Array.isArray(node.children)) {
     if (!(ids instanceof Set)) {
       ids = new Set();
       ids.add(node.id);
@@ -78,41 +78,41 @@ const removeDuplicates = (node, ids) => {
   }
 };
 
-const populateStatuses = (node, prefix = "") => {
+const populateStatuses = (node, prefix = '') => {
   if (node.permissions.canRelease) {
-    node[prefix + "childrenStatus"] = null;
+    node[prefix + 'childrenStatus'] = null;
     if (node.children && node.children.length > 0) {
-      let childrenStatuses = node.children.map((child) =>
+      const childrenStatuses = node.children.map((child) =>
         populateStatuses(child, prefix)
       );
-      if (childrenStatuses.some((status) => status === "UNRELEASED")) {
-        node[prefix + "childrenStatus"] = "UNRELEASED";
-        node[prefix + "globalStatus"] = "UNRELEASED";
-      } else if (childrenStatuses.some((status) => status === "HAS_CHANGED")) {
-        node[prefix + "childrenStatus"] = "HAS_CHANGED";
-        node[prefix + "globalStatus"] =
-          node[prefix + "status"] === "UNRELEASED"
-            ? "UNRELEASED"
-            : "HAS_CHANGED";
+      if (childrenStatuses.some((status) => status === 'UNRELEASED')) {
+        node[prefix + 'childrenStatus'] = 'UNRELEASED';
+        node[prefix + 'globalStatus'] = 'UNRELEASED';
+      } else if (childrenStatuses.some((status) => status === 'HAS_CHANGED')) {
+        node[prefix + 'childrenStatus'] = 'HAS_CHANGED';
+        node[prefix + 'globalStatus'] =
+          node[prefix + 'status'] === 'UNRELEASED'
+            ? 'UNRELEASED'
+            : 'HAS_CHANGED';
       } else {
-        node[prefix + "childrenStatus"] = "RELEASED";
-        node[prefix + "globalStatus"] = node[prefix + "status"];
+        node[prefix + 'childrenStatus'] = 'RELEASED';
+        node[prefix + 'globalStatus'] = node[prefix + 'status'];
       }
     } else {
-      node[prefix + "childrenStatus"] = null;
-      node[prefix + "globalStatus"] = node[prefix + "status"];
+      node[prefix + 'childrenStatus'] = null;
+      node[prefix + 'globalStatus'] = node[prefix + 'status'];
     }
-    return node[prefix + "globalStatus"];
+    return node[prefix + 'globalStatus'];
   }
 };
 
 const processChildrenInstanceList = (node, list, level, hideReleasedInstances) => {
   if (
     !hideReleasedInstances ||
-    node.status === "UNRELEASED" ||
-    node.status === "HAS_CHANGED" ||
-    node.childrenStatus === "UNRELEASED" ||
-    node.childrenStatus === "HAS_CHANGED" ||
+    node.status === 'UNRELEASED' ||
+    node.status === 'HAS_CHANGED' ||
+    node.childrenStatus === 'UNRELEASED' ||
+    node.childrenStatus === 'HAS_CHANGED' ||
     node.pending_status !== node.status ||
     node.pending_childrenStatus !== node.childrenStatus
   ) {
@@ -131,7 +131,7 @@ export class ReleaseStore {
   savingProgress = 0;
   savingErrors = [];
   savingLastEndedNode = null;
-  savingLastEndedRequest = "";
+  savingLastEndedRequest = '';
   fetchError = null;
   saveError = null;
   isStopped = false;
@@ -206,30 +206,30 @@ export class ReleaseStore {
 
     const getStatsFromNode = node => {
       count.total++;
-      if (node.status === "RELEASED") {
+      if (node.status === 'RELEASED') {
         count.released++;
       }
-      if (node.status === "UNRELEASED") {
+      if (node.status === 'UNRELEASED') {
         count.not_released++;
       }
-      if (node.status === "HAS_CHANGED") {
+      if (node.status === 'HAS_CHANGED') {
         count.has_changed++;
       }
 
-      if (node.pending_status === "RELEASED") {
+      if (node.pending_status === 'RELEASED') {
         count.pending_released++;
       }
-      if (node.pending_status === "UNRELEASED") {
+      if (node.pending_status === 'UNRELEASED') {
         count.pending_not_released++;
       }
-      if (node.pending_status === "HAS_CHANGED") {
+      if (node.pending_status === 'HAS_CHANGED') {
         count.pending_has_changed++;
       }
 
       if (node.status === node.pending_status) {
         count.proceed_do_nothing++;
       } else {
-        if (node.pending_status === "RELEASED") {
+        if (node.pending_status === 'RELEASED') {
           count.proceed_release++;
         } else {
           count.proceed_unrelease++;
@@ -305,7 +305,7 @@ export class ReleaseStore {
         populateStatuses(data);
         // Default release state
         this.recursiveMarkNodeForChange(data, null); // "RELEASED"
-        populateStatuses(data, "pending_");
+        populateStatuses(data, 'pending_');
         setNodeTypesAndSortChildren(data);
         removeDuplicates(data); // after sorting!
         this.instancesTree = data;
@@ -322,33 +322,33 @@ export class ReleaseStore {
   }
 
   async commitStatusChanges() {
-    let nodesToProceed = this.getNodesToProceed();
+    const nodesToProceed = this.getNodesToProceed();
     this.savingProgress = 0;
     this.savingTotal =
-      nodesToProceed["UNRELEASED"].length + nodesToProceed["RELEASED"].length;
+      nodesToProceed['UNRELEASED'].length + nodesToProceed['RELEASED'].length;
     this.savingErrors = [];
     this.isStopped = false;
     if (!this.savingTotal) {
       return;
     }
-    this.savingLastEndedRequest = "Initializing actions...";
+    this.savingLastEndedRequest = 'Initializing actions...';
     this.isSaving = true;
 
     for (
       let i = 0;
-      i < nodesToProceed["RELEASED"].length && !this.isStopped;
+      i < nodesToProceed['RELEASED'].length && !this.isStopped;
       i++
     ) {
-      const node = nodesToProceed["RELEASED"][i];
+      const node = nodesToProceed['RELEASED'][i];
       await this.releaseNode(node);
     }
 
     for (
       let i = 0;
-      i < nodesToProceed["UNRELEASED"].length && !this.isStopped;
+      i < nodesToProceed['UNRELEASED'].length && !this.isStopped;
       i++
     ) {
-      const node = nodesToProceed["UNRELEASED"][i];
+      const node = nodesToProceed['UNRELEASED'][i];
       await this.unreleaseNode(node);
     }
 
@@ -363,7 +363,7 @@ export class ReleaseStore {
         this.savingLastEndedNode = node;
         this.rootStore.historyStore.updateInstanceHistory(
           node.id,
-          "released",
+          'released',
           false
         );
       });
@@ -388,7 +388,7 @@ export class ReleaseStore {
         this.savingLastEndedNode = node;
         this.rootStore.historyStore.updateInstanceHistory(
           node.id,
-          "released",
+          'released',
           true
         );
       });
@@ -435,12 +435,12 @@ export class ReleaseStore {
 
   markNodeForChange(node, newStatus) {
     node.pending_status = newStatus;
-    populateStatuses(this.instancesTree, "pending_");
+    populateStatuses(this.instancesTree, 'pending_');
   }
 
   markAllNodeForChange(node, newStatus) {
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
-    populateStatuses(this.instancesTree, "pending_");
+    populateStatuses(this.instancesTree, 'pending_');
   }
 
   recursiveMarkNodeForChange(node, newStatus) {

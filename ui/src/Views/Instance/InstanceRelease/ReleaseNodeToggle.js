@@ -21,30 +21,30 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import MultiToggle from "../../../Components/MultiToggle";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import MultiToggle from '../../../Components/MultiToggle';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
 const useStyles = createUseStyles({
   container: {
     height: 0,
-    marginTop: "-1px",
-    "&.no-release": {
-      marginLeft: "24px"
+    marginTop: '-1px',
+    '&.no-release': {
+      marginLeft: '24px'
     },
-    "&.no-unrelease": {
-      marginRight: "24px"
+    '&.no-unrelease': {
+      marginRight: '24px'
     },
-    "& .ban svg": {
-      color: "var(--release-color-not-released)",
-      fontSize: "1.5em"
+    '& .ban svg': {
+      color: 'var(--release-color-not-released)',
+      fontSize: '1.5em'
     },
-    "&.status-undefined .ban svg": {
-      color: "gray"
+    '&.status-undefined .ban svg': {
+      color: 'gray'
     }
   }
 });
@@ -70,32 +70,32 @@ const ReleaseNodeToggle = observer(({ node }) => {
 
   if(!node.permissions.canRelease || node.status === null) {
     return (
-      <div className={`${classes.container} status-${node.status}`} title={node.status === null ? "Unknown entity": "You do not have permission to release the instance."} >
+      <div className={`${classes.container} status-${node.status}`} title={node.status === null ? 'Unknown entity': 'You do not have permission to release the instance.'} >
         <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
       </div>
     );
   }
 
   return(
-    <div className={`${classes.container} ${node.status === "RELEASED" ? "no-release" : ""} ${node.status === "UNRELEASED" ? "no-unrelease" : ""}`} onClick={handleStopClick}>
+    <div className={`${classes.container} ${node.status === 'RELEASED' ? 'no-release' : ''} ${node.status === 'UNRELEASED' ? 'no-unrelease' : ''}`} onClick={handleStopClick}>
       <MultiToggle selectedValue={node.pending_status} onChange={handleChange}>
-        {node.status !== "RELEASED" && (
+        {node.status !== 'RELEASED' && (
           <MultiToggle.Toggle
-            color={"#3498db"}
-            value={"RELEASED"}
+            color={'#3498db'}
+            value={'RELEASED'}
             icon="check"
           />
         )}
         <MultiToggle.Toggle
-          color={"#999"}
+          color={'#999'}
           value={node.status}
           icon="dot-circle"
           noscale
         />
-        {node.status !== "UNRELEASED" && (
+        {node.status !== 'UNRELEASED' && (
           <MultiToggle.Toggle
-            color={"#e74c3c"}
-            value={"UNRELEASED"}
+            color={'#e74c3c'}
+            value={'UNRELEASED'}
             icon="unlink"
           />
         )}
@@ -103,6 +103,6 @@ const ReleaseNodeToggle = observer(({ node }) => {
     </div>
   );
 });
-ReleaseNodeToggle.displayName = "ReleaseNodeToggle";
+ReleaseNodeToggle.displayName = 'ReleaseNodeToggle';
 
 export default ReleaseNodeToggle;

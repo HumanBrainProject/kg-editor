@@ -21,13 +21,14 @@
  *
  */
 
-import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
-import debounce from "lodash/debounce";
+import debounce from 'lodash/debounce';
+import { observable, action, runInAction, computed, toJS, makeObservable } from 'mobx';
 
-import { Instance as BaseInstance } from "./Instance";
-import API, { APIError } from "../Services/API";
-import RootStore from "./RootStore";
-import { InstanceLabel, Stage, StructureOfType, UUID } from "../types";
+import { Instance as BaseInstance } from './Instance';
+import type RootStore from './RootStore';
+import type { APIError } from '../Services/API';
+import type API from '../Services/API';
+import type { InstanceLabel, Stage, StructureOfType, UUID } from '../types';
 
 export class Instance extends BaseInstance {
 
@@ -150,7 +151,7 @@ export class Instance extends BaseInstance {
     } catch (e) {
       const err = e as APIError;
       runInAction(() => {
-        const errorMessage = err.response && err.response.status !== 500 ? err.response.data : "";
+        const errorMessage = err.response && err.response.status !== 500 ? err.response.data : '';
         this.saveError = `Error while saving instance "${this.id}" (${err?.message}) ${errorMessage}`;
         this.hasSaveError = true;
         this.isSaving = false;
@@ -267,7 +268,7 @@ export class InstanceStore {
       } catch(e){
         const err = e as APIError;
         runInAction(() => {
-          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:"";
+          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:'';
           links.fetchError = `Failed to retrieve more incoming links "(${err?.message}) ${errorMessage}"`;
           links.isFetching = false;
         });
@@ -338,7 +339,7 @@ export class InstanceStore {
           instance.hasSaveError = false;
           instance.clearFieldsErrors();
         }
-        
+
       }
     });
     try {
@@ -350,7 +351,7 @@ export class InstanceStore {
             const data = response?response[identifier]:undefined;
             if (data) {
               if (data.error) {
-                const code = data.error.code?` [error ${data.error.code}]`:"";
+                const code = data.error.code?` [error ${data.error.code}]`:'';
                 const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
                 if(instance) {
                   instance.errorInstance(message, data.error.code === 404);
@@ -360,11 +361,11 @@ export class InstanceStore {
               } else {
                 if(instance) {
                   instance.initializeData(this.api, this.rootStore, data, false);
-                  this.rootStore.appStore.syncInstancesHistory(instance, "viewed");
+                  this.rootStore.appStore.syncInstancesHistory(instance, 'viewed');
                 }
               }
             } else {
-              const message = "Unexpected error: no response returned.";
+              const message = 'Unexpected error: no response returned.';
               if(instance) {
                 instance.errorInstance(message, true);
                 instance.isFetching = false;
@@ -423,18 +424,18 @@ export class InstanceStore {
             const data = response?response[identifier]:undefined;
             if (data) {
               if (data.error) {
-                const code = data.error.code?` [${data.error.code}]`:"";
+                const code = data.error.code?` [${data.error.code}]`:'';
                 const message = `Instance not found - it either could have been removed or it's not a recognized ressource${code}.`;
                 if(instance) {
                   instance.errorLabelInstance(message, data.error.code === 404);
                   instance.isLabelFetching = false;
-                  instance.isLabelFetched = false;  
+                  instance.isLabelFetched = false;
                 }
               } else {
                 instance?.initializeLabelData(data);
               }
             } else {
-              const message = "Unexpected error: no response returned.";
+              const message = 'Unexpected error: no response returned.';
               if(instance) {
                 instance.errorLabelInstance(message, true);
                 instance.isLabelFetching = false;
@@ -478,7 +479,7 @@ export class InstanceStore {
     return this.instances.get(instanceId);
   }
 
-  createNewInstance(type: StructureOfType, id: UUID, name="") {
+  createNewInstance(type: StructureOfType, id: UUID, name='') {
     const instanceType = {name: type.name, label: type.label, color: type.color};
     const fields = toJS(type.fields);
     const data = {
@@ -504,7 +505,7 @@ export class InstanceStore {
     }
     this.instances.set(id, instance);
   }
-  
+
   removeInstances(instanceIds: UUID[]) {
     instanceIds.forEach(id => this.instances.delete(id));
   }
@@ -531,8 +532,6 @@ export class InstanceStore {
   }
 }
 
-export const createInstanceStore = (api: API, rootStore:RootStore, stage?: Stage) => {
-  return new InstanceStore(api, rootStore, stage);
-};
+export const createInstanceStore = (api: API, rootStore:RootStore, stage?: Stage) => new InstanceStore(api, rootStore, stage);
 
 export default InstanceStore;

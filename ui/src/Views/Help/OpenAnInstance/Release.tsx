@@ -21,8 +21,8 @@
  *
  */
 
-import React from "react";
-import ReleaseStatus from "../../../Components/ReleaseStatus";
+import React from 'react';
+import ReleaseStatus from '../../../Components/ReleaseStatus';
 
 const Release = () => (
   <div>

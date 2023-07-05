@@ -21,14 +21,14 @@
  *
  */
 
-import { observable, action, computed, toJS, makeObservable } from "mobx";
+import { observable, action, computed, toJS, makeObservable } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import { FieldStoreDefinition } from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition } from '../../types';
 
 class UnsupportedFieldStore extends FieldStore {
   value: any = null;

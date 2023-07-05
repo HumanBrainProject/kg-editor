@@ -21,18 +21,18 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import IncomingLink from "./IncomingLink";
-import { InstanceIncomingLinkFull } from "../../../types";
+import IncomingLink from './IncomingLink';
+import type { InstanceIncomingLinkFull } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
-    "& > ul": {
-      listStyle: "none",
-      padding: "0"
+    '& > ul': {
+      listStyle: 'none',
+      padding: '0'
     }
   }
 });
@@ -61,6 +61,6 @@ const IncomingLinks = observer(({ links, readMode }: IncomingLinksProps) => {
     </div>
   );
 });
-IncomingLinks.displayName = "IncomingLinks";
+IncomingLinks.displayName = 'IncomingLinks';
 
 export default IncomingLinks;

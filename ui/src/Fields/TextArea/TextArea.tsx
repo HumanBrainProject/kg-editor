@@ -21,24 +21,24 @@
  *
  */
 
-import React from "react";
-import InputText from "../InputText/InputText";
-import Markdown from "../../Components/Markdown";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import Label from "../Label";
-import InputTextStore from "../Stores/InputTextStore";
+import React from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import Markdown from '../../Components/Markdown';
+import InputText from '../InputText/InputText';
+import Label from '../Label';
+import type InputTextStore from '../Stores/InputTextStore';
 
 const useStyles = createUseStyles({
   label: {},
   editMode: {
-    "& textarea": {
-      minHeight: "200px"
+    '& textarea': {
+      minHeight: '200px'
     }
   },
   readMode: {
-    "& $label:after": {
-      content: "':\\00a0'"
+    '& $label:after': {
+      content: '\':\\00a0\''
     }
   }
 });

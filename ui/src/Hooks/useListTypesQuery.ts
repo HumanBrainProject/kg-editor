@@ -21,15 +21,16 @@
  *
  */
 
-import { useMemo } from "react";
-import useAPI from "./useAPI";
-import useGenericQuery, { GenericQuery } from "./useGenericQuery";
-import { StructureOfType } from "../types";
+import { useMemo } from 'react';
+import useAPI from './useAPI';
+import useGenericQuery from './useGenericQuery';
+import type { GenericQuery } from './useGenericQuery';
+import type { StructureOfType } from '../types';
 
 export type ListTypesQuery = GenericQuery<StructureOfType[]>;
 
 const useListTypesQuery = (space: string, skip: boolean): ListTypesQuery => {
-  
+
   const API = useAPI();
 
   const fetch = useMemo(() => async () => {

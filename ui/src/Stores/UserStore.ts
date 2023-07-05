@@ -21,10 +21,11 @@
  *
  */
 
-import { observable, action, runInAction, computed, makeObservable } from "mobx";
-import debounce from "lodash/debounce";
-import API, { APIError } from "../Services/API";
-import { SearchFilter, UserSummary } from "../types";
+import debounce from 'lodash/debounce';
+import { observable, action, runInAction, computed, makeObservable } from 'mobx';
+import type { APIError } from '../Services/API';
+import type API from '../Services/API';
+import type { SearchFilter, UserSummary } from '../types';
 
 export class UserStore {
   isFetchingSearch = false;
@@ -32,7 +33,7 @@ export class UserStore {
   searchFetchError?: string = undefined;
   searchResult: UserSummary[] = [];
   searchFilter: SearchFilter = {
-    queryString: "",
+    queryString: '',
     excludedUsers: []
   };
   totalSearchCount = 0;
@@ -57,7 +58,7 @@ export class UserStore {
   }
 
   get hasSearchFilter() {
-    return this.searchFilter.queryString !== "";
+    return this.searchFilter.queryString !== '';
   }
 
   applySearchFilter = debounce(() => {
@@ -66,9 +67,9 @@ export class UserStore {
 
   setSearchFilter(queryString: string | null, excludedUsers: string[] = []) {
     if (!queryString) {
-      queryString = "";
+      queryString = '';
     }
-    if (queryString === "") {
+    if (queryString === '') {
       this.clearSearch();
     } else if (queryString !== this.searchFilter.queryString) {
       this.searchFilter.queryString = queryString;
@@ -79,7 +80,7 @@ export class UserStore {
   }
 
   clearSearch() {
-    this.searchFilter.queryString = "";
+    this.searchFilter.queryString = '';
     this.searchFilter.excludedUsers = [];
     this.searchResult = [];
     this.isSearchFetched = false;

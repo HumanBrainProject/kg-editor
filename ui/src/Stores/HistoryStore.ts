@@ -21,11 +21,12 @@
  *
  */
 
-import { observable, action, runInAction, makeObservable } from "mobx";
+import { observable, action, runInAction, makeObservable } from 'mobx';
 
-import Instance from "./Instance";
-import API, { APIError } from "../Services/API";
-import RootStore from "./RootStore";
+import Instance from './Instance';
+import type RootStore from './RootStore';
+import type { APIError } from '../Services/API';
+import type API from '../Services/API';
 
 const maxItems = 100;
 
@@ -51,7 +52,7 @@ export class HistoryStore {
 
     this.api = api;
     this.rootStore = rootStore;
-    const localStorageInstancesHistory = localStorage.getItem("instancesHistory")
+    const localStorageInstancesHistory = localStorage.getItem('instancesHistory');
     if (localStorageInstancesHistory) {
       try {
         this.instancesHistory = JSON.parse(localStorageInstancesHistory);
@@ -84,7 +85,7 @@ export class HistoryStore {
     if (!remove && this.rootStore.appStore.currentSpace) {
       this.instancesHistory.unshift({id: id, space: this.rootStore.appStore.currentSpace.id, mode: mode});
     }
-    localStorage.setItem("instancesHistory", JSON.stringify(this.instancesHistory));
+    localStorage.setItem('instancesHistory', JSON.stringify(this.instancesHistory));
     return this.instancesHistory;
   }
 
@@ -135,8 +136,8 @@ export class HistoryStore {
             if(data) {
               if (!data.error) {
                 Object.values(data.fields).forEach(d => {
-                  if(d.widget === "TextArea") {
-                    d.value = d.value && d.value.substr(0, 197) + "...";
+                  if(d.widget === 'TextArea') {
+                    d.value = d.value && d.value.substr(0, 197) + '...';
                     delete d.label;
                   }
                 });

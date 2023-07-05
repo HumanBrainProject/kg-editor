@@ -21,18 +21,18 @@
  *
  */
 
-import React, { useState } from "react";
-import { observer } from "mobx-react-lite";
-import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
-import useStores from "../Hooks/useStores";
-import { StructureOfType } from "../types";
+import Modal from '../Components/Modal';
+import Tab from '../Components/Tab';
+import useStores from '../Hooks/useStores';
+import Matomo from '../Services/Matomo';
+import TypeSelection from './Instance/TypeSelection';
+import type { StructureOfType } from '../types';
 
-import Tab from "../Components/Tab";
-import Modal from "../Components/Modal";
-import TypeSelection from "./Instance/TypeSelection";
-import Matomo from "../Services/Matomo";
 
 const NewInstanceTab = observer(() => {
   const [showTypeSelection, setShowTypeSelection] = useState(false);
@@ -41,7 +41,7 @@ const NewInstanceTab = observer(() => {
   const navigate = useNavigate();
 
   const handleCreateInstance = () => {
-    Matomo.trackEvent("Tab", "CreateInstance");
+    Matomo.trackEvent('Tab', 'CreateInstance');
     setShowTypeSelection(true);
   };
 
@@ -49,7 +49,7 @@ const NewInstanceTab = observer(() => {
     setShowTypeSelection(false);
     const uuid = uuidv4();
     navigate(`/instances/${uuid}/create?space=${appStore.currentSpaceName}&type=${encodeURIComponent(type.name)}`);
-  }
+  };
 
   const handleClose = () => setShowTypeSelection(false);
 
@@ -68,7 +68,7 @@ const NewInstanceTab = observer(() => {
     </>
   );
 });
-NewInstanceTab.displayName = "NewInstanceTab";
+NewInstanceTab.displayName = 'NewInstanceTab';
 
 export default NewInstanceTab;
 

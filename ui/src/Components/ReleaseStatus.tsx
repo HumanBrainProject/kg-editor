@@ -21,53 +21,53 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Tooltip from "react-bootstrap/Tooltip";
-import uniqueId from "lodash/uniqueId";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import uniqueId from 'lodash/uniqueId';
+import React from 'react';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   status: {
-    borderRadius: "0.14em",
-    width: "2.5em",
-    textAlign: "center",
+    borderRadius: '0.14em',
+    width: '2.5em',
+    textAlign: 'center',
     opacity: 1,
-    padding: "2px",
-    lineHeight: "normal",
-    background: "currentColor",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(50%, 1fr))",
-    color: "#404040",
-    "&.status-UNRELEASED": {
-      color: "var(--ft-color-error)"
+    padding: '2px',
+    lineHeight: 'normal',
+    background: 'currentColor',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(50%, 1fr))',
+    color: '#404040',
+    '&.status-UNRELEASED': {
+      color: 'var(--ft-color-error)'
     },
-    "&.status-HAS_CHANGED": {
-      color: "#f39c12"
+    '&.status-HAS_CHANGED': {
+      color: '#f39c12'
     },
-    "&.status-RELEASED": {
-      color: "#337ab7"
+    '&.status-RELEASED': {
+      color: '#337ab7'
     },
-    "&.status-undefined $instanceStatus": {
-      color: "gray"
+    '&.status-undefined $instanceStatus': {
+      color: 'gray'
     },
-    "&.darkmode $instanceStatus": {
-      color: "var(--bg-color-ui-contrast2)"
+    '&.darkmode $instanceStatus': {
+      color: 'var(--bg-color-ui-contrast2)'
     },
-    "&.high-contrast $instanceStatus": {
-      backgroundColor: "var(--bg-color-ui-contrast2)"
+    '&.high-contrast $instanceStatus': {
+      backgroundColor: 'var(--bg-color-ui-contrast2)'
     }
   },
   instanceStatus: {
-    color: "white",
-    "& .svg-inline--fa": {
-      fontSize: "0.7em",
-      verticalAlign: "baseline"
+    color: 'white',
+    '& .svg-inline--fa': {
+      fontSize: '0.7em',
+      verticalAlign: 'baseline'
     },
-    "&:only-child": {
-      "& .svg-inline--fa": {
-        fontSize: "0.8em"
+    '&:only-child': {
+      '& .svg-inline--fa': {
+        fontSize: '0.8em'
       }
     }
 
@@ -76,12 +76,12 @@ const useStyles = createUseStyles({
 
 const getIconStatus = (status: string) => {
   switch (status) {
-  case "UNRELEASED": return "unlink";
-  case "HAS_CHANGED": return "pencil-alt";
-  case "RELEASED": return "check";
+  case 'UNRELEASED': return 'unlink';
+  case 'HAS_CHANGED': return 'pencil-alt';
+  case 'RELEASED': return 'check';
   default: break;
   }
-  return "question";
+  return 'question';
 };
 
 interface MessageStatusProps {
@@ -90,9 +90,9 @@ interface MessageStatusProps {
 
 const MessageStatus = ({status}: MessageStatusProps) => {
   switch (status) {
-  case "UNRELEASED": return <span>This instance is <strong>not released</strong>.</span>;
-  case "HAS_CHANGED": return <span>This instance is <strong>different</strong> than its released version</span>;
-  case "RELEASED": return <span>This instance is <strong>released</strong></span>;
+  case 'UNRELEASED': return <span>This instance is <strong>not released</strong>.</span>;
+  case 'HAS_CHANGED': return <span>This instance is <strong>different</strong> than its released version</span>;
+  case 'RELEASED': return <span>This instance is <strong>released</strong></span>;
   default: break;
   }
   return <strong>Unknown entity</strong>;
@@ -107,13 +107,13 @@ const ReleaseStatus = ({instanceStatus, darkmode}: ReleaseStatusProps) => {
   const classes = useStyles();
   return (
     <OverlayTrigger placement="top" overlay={
-      <Tooltip id={uniqueId("release-tooltip")}>
-      <div>
-        <MessageStatus status={instanceStatus} />
-      </div>
-    </Tooltip>
+      <Tooltip id={uniqueId('release-tooltip')}>
+        <div>
+          <MessageStatus status={instanceStatus} />
+        </div>
+      </Tooltip>
     }>
-      <div className={`${classes.status} ${darkmode? "darkmode" : ""} status-${instanceStatus}`}>
+      <div className={`${classes.status} ${darkmode? 'darkmode' : ''} status-${instanceStatus}`}>
         <div className={`${classes.instanceStatus}  `}>
           <FontAwesomeIcon icon={getIconStatus(instanceStatus)} />
         </div>

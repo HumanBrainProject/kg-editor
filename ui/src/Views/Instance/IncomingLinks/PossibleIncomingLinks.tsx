@@ -21,22 +21,22 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Label from "../../../Fields/Label";
-import PossibleIncomingLink from "./PossibleIncomingLink";
-import { SimpleType, SourceType } from "../../../types";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import Label from '../../../Fields/Label';
+import PossibleIncomingLink from './PossibleIncomingLink';
+import type { SimpleType, SourceType } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
-    "& > ul": {
-      listStyle: "none",
-      paddingLeft: "20px",
-      "& > li": {
-        display: "inline",
-        "& + li:before": {
-          content: "' '"
+    '& > ul': {
+      listStyle: 'none',
+      paddingLeft: '20px',
+      '& > li': {
+        display: 'inline',
+        '& + li:before': {
+          content: '\' \''
         }
       }
     }
@@ -69,6 +69,6 @@ const PossibleIncomingLinks = observer(({ links, type }: PossibleIncomingLinksPr
     </div>
   );
 });
-PossibleIncomingLinks.displayName = "PossibleIncomingLinks";
+PossibleIncomingLinks.displayName = 'PossibleIncomingLinks';
 
 export default PossibleIncomingLinks;

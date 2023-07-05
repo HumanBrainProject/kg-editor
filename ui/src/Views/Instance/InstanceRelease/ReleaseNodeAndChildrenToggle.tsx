@@ -21,46 +21,46 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
 const useStyles = createUseStyles({
   container: {
-    display: "flex",
-    flexDirection: "row",
-    height: "24px",
-    background: "var(--bg-color-ui-contrast4)",
-    borderRadius: "20px"
+    display: 'flex',
+    flexDirection: 'row',
+    height: '24px',
+    background: 'var(--bg-color-ui-contrast4)',
+    borderRadius: '20px'
   },
   btn: {
-    textAlign:"center",
-    width: "24px",
-    height:"24px",
-    lineHeight:"24px",
-    cursor:"pointer",
-    fontSize:"0.66em",
-    transition:"all .2s ease",
-    background:"none",
-    "&:hover":{
-      background:"var(--bg-color-ui-contrast1)",
-      borderRadius:"50%",
-      transform:"scale(1.12)",
-      fontSize:"0.8em"
+    textAlign:'center',
+    width: '24px',
+    height:'24px',
+    lineHeight:'24px',
+    cursor:'pointer',
+    fontSize:'0.66em',
+    transition:'all .2s ease',
+    background:'none',
+    '&:hover':{
+      background:'var(--bg-color-ui-contrast1)',
+      borderRadius:'50%',
+      transform:'scale(1.12)',
+      fontSize:'0.8em'
     }
   },
   releaseBtn: {
-    extend: "btn",
-    color: "#3498db"
+    extend: 'btn',
+    color: '#3498db'
   },
   doNothingBtn: {
-    extend: "btn",
-    color: "#999",
-    "&:hover":{
-      transform: "scale(1)"
+    extend: 'btn',
+    color: '#999',
+    '&:hover':{
+      transform: 'scale(1)'
     }
   }
 });
@@ -73,7 +73,7 @@ const ReleaseNodeAndChildrenToggle = observer(() => {
 
   const handleMarkAllNodeForRelease = () => {
     const node = releaseStore.instancesTree;
-    releaseStore.markAllNodeForChange(node, "RELEASED");
+    releaseStore.markAllNodeForChange(node, 'RELEASED');
   };
 
   const handleMarkAllNodeToCurrentState = () => {
@@ -92,6 +92,6 @@ const ReleaseNodeAndChildrenToggle = observer(() => {
     </div>
   );
 });
-ReleaseNodeAndChildrenToggle.displayName = "ReleaseNodeAndChildrenToggle";
+ReleaseNodeAndChildrenToggle.displayName = 'ReleaseNodeAndChildrenToggle';
 
 export default ReleaseNodeAndChildrenToggle;

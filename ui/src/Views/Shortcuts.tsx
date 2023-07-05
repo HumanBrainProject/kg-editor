@@ -21,14 +21,14 @@
  *
  */
 
-import { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { useNavigate, useLocation } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
-import Matomo from "../Services/Matomo";
+import useStores from '../Hooks/useStores';
+import Matomo from '../Services/Matomo';
 
-const kCode = { step: 0, ref: ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "KeyB", "KeyA"] };
+const kCode = { step: 0, ref: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'] };
 
 const Shortcuts = observer(() => {
 
@@ -38,55 +38,55 @@ const Shortcuts = observer(() => {
   const { appStore } = useStores();
 
   useEffect(() => {
-  
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === "KeyT") {
-        Matomo.trackEvent("Shortcut", "ToggleTheme");
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyT') {
+        Matomo.trackEvent('Shortcut', 'ToggleTheme');
         appStore.toggleTheme();
-      } else if (e.altKey && e.shiftKey && e.code === "KeyF") { // alt+shift+f, browse
-        Matomo.trackEvent("Shortcut", "Browse");
-        navigate("/browse");
-      } else if (e.altKey && e.code === "KeyD") { // alt+d, dashboard
-        Matomo.trackEvent("Shortcut", "Home");
-        navigate("/");
-      } else if (e.code === "F1") { // F1, help
-        Matomo.trackEvent("Shortcut", "Help");
-        navigate("/help");
-      } else if (e.altKey && e.code === "KeyW") { // alt+w, close
+      } else if (e.altKey && e.shiftKey && e.code === 'KeyF') { // alt+shift+f, browse
+        Matomo.trackEvent('Shortcut', 'Browse');
+        navigate('/browse');
+      } else if (e.altKey && e.code === 'KeyD') { // alt+d, dashboard
+        Matomo.trackEvent('Shortcut', 'Home');
+        navigate('/');
+      } else if (e.code === 'F1') { // F1, help
+        Matomo.trackEvent('Shortcut', 'Help');
+        navigate('/help');
+      } else if (e.altKey && e.code === 'KeyW') { // alt+w, close
         if (e.shiftKey) { // alt+shift+w, close all
-          Matomo.trackEvent("Shortcut", "CloseAllInstances");
+          Matomo.trackEvent('Shortcut', 'CloseAllInstances');
           appStore.closeAllInstances(location, navigate);
         } else {
           const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
           if (matchInstanceTab) {
-            Matomo.trackEvent("Shortcut", "InstanceClose", matchInstanceTab.params.id);
+            Matomo.trackEvent('Shortcut', 'InstanceClose', matchInstanceTab.params.id);
             appStore.closeInstance(location, navigate, matchInstanceTab.params.id);
           }
         }
-      } else if (e.altKey && e.code === "ArrowLeft") { // left arrow, previous
+      } else if (e.altKey && e.code === 'ArrowLeft') { // left arrow, previous
         const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
         appStore.focusPreviousInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
-      } else if (e.altKey && e.code === "ArrowRight") { // right arrow, next
+      } else if (e.altKey && e.code === 'ArrowRight') { // right arrow, next
         const matchInstanceTab = appStore.matchInstancePath(location.pathname) as { params: { id: string }};
         appStore.focusNextInstance(matchInstanceTab && matchInstanceTab.params.id, location, navigate);
       } else {
         kCode.step = kCode.ref[kCode.step] === e.code ? kCode.step + 1 : 0;
         if (kCode.step === kCode.ref.length) {
           kCode.step = 0;
-          Matomo.trackEvent("Shortcut", "KonamiCode", ":-D");
-          appStore.setTheme("cupcake");
+          Matomo.trackEvent('Shortcut', 'KonamiCode', ':-D');
+          appStore.setTheme('cupcake');
         }
       }
     };
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;
 });
-Shortcuts.displayName = "Shortcuts";
+Shortcuts.displayName = 'Shortcuts';
 
 export default Shortcuts;

@@ -21,44 +21,45 @@
  *
  */
 
-import React, { ReactNode, useEffect, useRef } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { Scrollbars } from "react-custom-scrollbars-2";
-import debounce from "lodash/debounce";
+import debounce from 'lodash/debounce';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useRef } from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
+import { createUseStyles } from 'react-jss';
 
-import { ViewContext, PaneContext } from "../../Stores/ViewStore";
+import { ViewContext, PaneContext } from '../../Stores/ViewStore';
+import type { ReactNode} from 'react';
 
 const useStyles = createUseStyles({
   pane: {
-    position:"absolute",
-    width:"50%",
-    height:"calc(100% - 40px)",
-    top:"20px",
-    "--pane-index":"0",
-    left:"calc(calc(50% * calc(var(--pane-index) - var(--selected-index))) + 25%)",
-    overflow: "auto",
-    background: "#ebebeb",
-    boxShadow: "0 2px 10px var(--pane-box-shadow)",
-    transform: "scale(0.90)",
-    transition: "left 0.5s ease, transform 0.5s ease",
-    "&.active": {
-      background: "#f5f5f5",
-      transform: "scale(1)"
+    position:'absolute',
+    width:'50%',
+    height:'calc(100% - 40px)',
+    top:'20px',
+    '--pane-index':'0',
+    left:'calc(calc(50% * calc(var(--pane-index) - var(--selected-index))) + 25%)',
+    overflow: 'auto',
+    background: '#ebebeb',
+    boxShadow: '0 2px 10px var(--pane-box-shadow)',
+    transform: 'scale(0.90)',
+    transition: 'left 0.5s ease, transform 0.5s ease',
+    '&.active': {
+      background: '#f5f5f5',
+      transform: 'scale(1)'
     },
-    "&.main, &.main.active": {
-      background: "white"
+    '&.main, &.main.active': {
+      background: 'white'
     },
-    "& > div": {
-      opacity: "0.75",
-      transition: "opacity 0.25s ease"
+    '& > div': {
+      opacity: '0.75',
+      transition: 'opacity 0.25s ease'
     },
-    "&.active > div, &.after:hover > div, &.before:hover > div": {
-      opacity: "1"
+    '&.active > div, &.after:hover > div, &.before:hover > div': {
+      opacity: '1'
     }
   },
   scrolledView:{
-    padding:"20px"
+    padding:'20px'
   }
 });
 
@@ -87,14 +88,14 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
     if(paneRef.current) {
       const restorePointerEvents = debounce(() => {
         if(paneRef.current) {
-          paneRef.current.style.pointerEvents = "auto";
+          paneRef.current.style.pointerEvents = 'auto';
         }
       }, 1000);
       if (view?.selectedPane !== paneId) {
-        paneRef.current.style.pointerEvents = "none";
+        paneRef.current.style.pointerEvents = 'none';
         restorePointerEvents();
       } else {
-        paneRef.current.style.pointerEvents = "auto";
+        paneRef.current.style.pointerEvents = 'auto';
         restorePointerEvents.cancel();
       }
     }
@@ -108,27 +109,27 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
 
   const geActiveClass = () => {
     if (!view) {
-      return "";
+      return '';
     }
     if(paneId === view.selectedPane) {
-      return "active";
+      return 'active';
     }
     if(view.selectedPaneIndex && index > view.selectedPaneIndex) {
-      return "after";
+      return 'after';
     }
-    return "before";
-  }
+    return 'before';
+  };
 
   if (!view) {
     return null;
   }
 
   const index = view.getPaneIndex(paneId);
-  const mainClass = index === 0?"main":"";
+  const mainClass = index === 0?'main':'';
   const activeClass = geActiveClass();
   return (
     <PaneContext.Provider value={paneId} >
-      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{"--pane-index":index}} onFocus={handleFocus} onClick={handleFocus}>
+      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{'--pane-index':index}} onFocus={handleFocus} onClick={handleFocus}>
         <Scrollbars autoHide>
           <div className={`${classes.scrolledView} scrolledView`} >
             {children}
@@ -138,6 +139,6 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
     </PaneContext.Provider>
   );
 });
-Pane.displayName = "Pane";
+Pane.displayName = 'Pane';
 
 export default Pane;

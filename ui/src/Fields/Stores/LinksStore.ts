@@ -22,20 +22,20 @@
  */
 
 
-import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
-import debounce from "lodash/debounce";
+import debounce from 'lodash/debounce';
+import { observable, action, runInAction, computed, toJS, makeObservable } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import { FieldStoreDefinition, SimpleType } from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition, SimpleType } from '../../types';
 
 const defaultNumberOfVisibleLinks = 10;
 
 interface Messages {
-  required?: string; 
+  required?: string;
   numberOfItems?: string;
 }
 
@@ -51,7 +51,7 @@ class LinksStore extends FieldStore {
   allowCustomValues = true;
   returnAsNull = false;
   optionsSearchActive = false;
-  optionsSearchTerm = "";
+  optionsSearchTerm = '';
   optionsPreviousSearchTerm?: string;
   optionsFrom = 0;
   optionsPageSize = 50;
@@ -64,7 +64,7 @@ class LinksStore extends FieldStore {
   isLink = true;
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
-  mappingValue = "@id";
+  mappingValue = '@id';
   minItems?: number;
   maxItems?: number;
   sourceType = null;
@@ -162,7 +162,7 @@ class LinksStore extends FieldStore {
 
   get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
     if (!this.value.length && this.returnAsNull) {
-      return "https://core.kg.ebrains.eu/vocab/resetValue";
+      return 'https://core.kg.ebrains.eu/vocab/resetValue';
     }
     return toJS(this.value);
   }
@@ -185,7 +185,7 @@ class LinksStore extends FieldStore {
     const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.requiredValidationWarning) {
-        messages.required = "This field is marked as required.";
+        messages.required = 'This field is marked as required.';
       }
       if(this.numberOfItemsWarning) {
         if(this.minItems && this.maxItems) {
@@ -210,7 +210,7 @@ class LinksStore extends FieldStore {
     if(Array.isArray(value)) {
       return value;
     }
-    if(value !== null && value !== undefined && typeof value === "object") {
+    if(value !== null && value !== undefined && typeof value === 'object') {
       return [value];
     }
     return [];
@@ -370,7 +370,7 @@ class LinksStore extends FieldStore {
     this.optionsFrom = from;
     this.optionsPreviousSearchTerm = this.optionsSearchTerm;
     const payload = this.instance.payload;
-    payload["@type"] = this.instance.types.map(t => t.name);
+    payload['@type'] = this.instance.types.map(t => t.name);
     try{
       const { data: { suggestions: { data: values, total }, types }}  = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const newOptions = Array.isArray(values)?values:[];
@@ -387,7 +387,7 @@ class LinksStore extends FieldStore {
                 isExternal: space !== this.rootStore.appStore.currentSpace?.id,
                 isNew: true
               });
-            })
+            });
           });
           newValues = newValues.filter(value => !value.isExternal || value.space.permissions.canCreate);
           newValues.sort((a, b) => {
@@ -427,7 +427,7 @@ class LinksStore extends FieldStore {
 
   resetOptionsSearch() {
     this.optionsSearchActive = false;
-    this.optionsSearchTerm = "";
+    this.optionsSearchTerm = '';
     this.optionsPreviousSearchTerm = undefined;
     this.optionsFrom = 0;
     this.optionsTotal = Infinity;

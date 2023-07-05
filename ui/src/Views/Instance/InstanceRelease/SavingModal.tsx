@@ -21,47 +21,47 @@
  *
  */
 
-import React from "react";
-import Modal from "react-bootstrap/Modal";
-import ProgressBar from "react-bootstrap/ProgressBar";
-import Button from "react-bootstrap/Button";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
 const useStyles = createUseStyles({
   lastEndedOperation: {
-    fontWeight: "bold",
-    fontSize: "0.8em",
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    overflow: "hidden"
+    fontWeight: 'bold',
+    fontSize: '0.8em',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden'
   },
   reloadRelease: {
-    extend: "lastEndedOperation"
+    extend: 'lastEndedOperation'
   },
   error: {
-    background: "rgba(255,0,0,0.1)",
-    borderTop: "1px solid #f5f5f5",
-    padding: "10px 5px",
-    fontWeight: "bold",
-    fontSize: "0.8em",
-    "&:last-child": {
-      borderBottom: "1px solid #f5f5f5"
+    background: 'rgba(255,0,0,0.1)',
+    borderTop: '1px solid #f5f5f5',
+    padding: '10px 5px',
+    fontWeight: 'bold',
+    fontSize: '0.8em',
+    '&:last-child': {
+      borderBottom: '1px solid #f5f5f5'
     },
-    "&:nth-child(odd)": {
-      background: "rgba(255,0,0,0.15)"
+    '&:nth-child(odd)': {
+      background: 'rgba(255,0,0,0.15)'
     }
   },
   errors: {
-    marginTop: "10px"
+    marginTop: '10px'
   },
   absoluteProgress: {
-    fontSize: "12px",
-    transform: "translateY(-10px)",
-    marginTop: "-10px"
+    fontSize: '12px',
+    transform: 'translateY(-10px)',
+    marginTop: '-10px'
   }
 });
 
@@ -76,7 +76,7 @@ const AfterSave = observer(({ hasSavingErrors, className }:AfterSaveProps) => {
   }
   return (
     <div className={className}>
-      <FontAwesomeIcon icon={"circle-notch"} spin />
+      <FontAwesomeIcon icon={'circle-notch'} spin />
       &nbsp;&nbsp;Reloading current instance release status
     </div>
   );
@@ -100,15 +100,15 @@ const SavingModal = observer(() => {
             releaseStore.savingTotal <= 0
               ? 100
               : Math.round(
-                  (releaseStore.savingProgress / releaseStore.savingTotal) * 100
-                )
+                (releaseStore.savingProgress / releaseStore.savingTotal) * 100
+              )
           }
           label={`${
             releaseStore.savingTotal <= 0
               ? 100
               : Math.round(
-                  (releaseStore.savingProgress / releaseStore.savingTotal) * 100
-                )
+                (releaseStore.savingProgress / releaseStore.savingTotal) * 100
+              )
           }%`}
         />
         <div className={classes.absoluteProgress}>
@@ -132,34 +132,32 @@ const SavingModal = observer(() => {
         )}
         {releaseStore.savingErrors.length > 0 && (
           <div className={classes.errors}>
-            {releaseStore.savingErrors.map((error) => {
-              return (
-                <div key={error.id} className={classes.error}>
-                  <FontAwesomeIcon icon={"times-circle"} />
+            {releaseStore.savingErrors.map((error) => (
+              <div key={error.id} className={classes.error}>
+                <FontAwesomeIcon icon={'times-circle'} />
                   &nbsp; ({error.node.type}) {error.node.label}
-                  <br />
-                  <br />
-                  {error.message}
-                </div>
-              );
-            })}
+                <br />
+                <br />
+                {error.message}
+              </div>
+            ))}
           </div>
         )}
       </Modal.Body>
       {releaseStore.savingErrors.length > 0 &&
       releaseStore.savingProgress === releaseStore.savingTotal ? (
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleDismissSavingReport}>
+          <Modal.Footer>
+            <Button variant="primary" onClick={handleDismissSavingReport}>
             Dismiss
-          </Button>
-        </Modal.Footer>
-      ) : (
-        <Modal.Footer>
-          <Button variant="danger" onClick={handleStop}>
+            </Button>
+          </Modal.Footer>
+        ) : (
+          <Modal.Footer>
+            <Button variant="danger" onClick={handleStop}>
             Stop
-          </Button>
-        </Modal.Footer>
-      )}
+            </Button>
+          </Modal.Footer>
+        )}
     </Modal>
   );
 });

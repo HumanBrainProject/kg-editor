@@ -21,70 +21,70 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { createUseStyles } from 'react-jss';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import useStores from "../../../Hooks/useStores";
-import Instance from "../../../Stores/Instance";
+import useStores from '../../../Hooks/useStores';
+import type Instance from '../../../Stores/Instance';
 
 const useStyles = createUseStyles({
   panel:{
-    "& .btn":{
-      display:"block",
-      width:"100%"
+    '& .btn':{
+      display:'block',
+      width:'100%'
     }
   },
   info:{
-    color:"grey",
-    fontWeight:"300",
-    fontSize:"0.7em",
-    wordBreak: "break-all",
-    "&:last-child": {
-      paddingBottom: "10px"
+    color:'grey',
+    fontWeight:'300',
+    fontSize:'0.7em',
+    wordBreak: 'break-all',
+    '&:last-child': {
+      paddingBottom: '10px'
     }
   },
   showActions:{
-    "& $panel":{
-      height:"36px"
+    '& $panel':{
+      height:'36px'
     },
-    "& $actions":{
-      display:"grid"
+    '& $actions':{
+      display:'grid'
     }
   },
   actions:{
-    display:"none",
-    position:"absolute",
-    right:"15px",
-    width:"25px",
-    gridTemplateColumns:"repeat(1, 1fr)",
+    display:'none',
+    position:'absolute',
+    right:'15px',
+    width:'25px',
+    gridTemplateColumns:'repeat(1, 1fr)',
     opacity:0.25,
-    "&:hover":{
-      opacity:"1 !important"
+    '&:hover':{
+      opacity:'1 !important'
     },
-    cursor:"pointer"
+    cursor:'pointer'
   },
   action:{
-    fontSize:"0.9em",
-    lineHeight:"27px",
-    textAlign:"center",
-    backgroundColor: "var(--bg-color-ui-contrast4)",
-    color:"var(--ft-color-normal)",
-    "&:hover":{
-      color:"var(--ft-color-loud)"
+    fontSize:'0.9em',
+    lineHeight:'27px',
+    textAlign:'center',
+    backgroundColor: 'var(--bg-color-ui-contrast4)',
+    color:'var(--ft-color-normal)',
+    '&:hover':{
+      color:'var(--ft-color-loud)'
     },
-    "&:first-child":{
-      borderRadius:"4px 0 0 4px"
+    '&:first-child':{
+      borderRadius:'4px 0 0 4px'
     },
-    "&:last-child":{
-      borderRadius:"0 4px 4px 0"
+    '&:last-child':{
+      borderRadius:'0 4px 4px 0'
     },
-    "&:first-child:last-child":{
-      borderRadius:"4px"
+    '&:first-child:last-child':{
+      borderRadius:'4px'
     }
   }
 });
@@ -110,17 +110,17 @@ const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPa
       await appStore.switchSpace(location, navigate, instance.space);
     }
     if(e.metaKey || e.ctrlKey){
-      appStore.openInstance(instance.id, instance.name, instance.primaryType, "view");
+      appStore.openInstance(instance.id, instance.name, instance.primaryType, 'view');
     } else {
       navigate(`/instances/${instance.id}`);
     }
   };
 
   return(
-    <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:""}`}>
+    <div className={`${classes.panel} ${className} ${showOpenActions?classes.showActions:''}`}>
       <Row>
         <Col xs={10}>
-          <div className={classes.info}>ID: {instance.id?instance.id:"<New>"}</div>
+          <div className={classes.info}>ID: {instance.id?instance.id:'<New>'}</div>
           <div className={classes.info}>Space: {instance.space}</div>
         </Col>
         <Col xs={2}>
@@ -136,6 +136,6 @@ const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPa
     </div>
   );
 });
-FooterPanel.displayName = "FooterPanel";
+FooterPanel.displayName = 'FooterPanel';
 
 export default FooterPanel;

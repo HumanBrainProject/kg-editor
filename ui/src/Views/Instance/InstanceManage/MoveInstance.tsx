@@ -21,80 +21,80 @@
  *
  */
 
-import React, { useState, useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import { useNavigate, useLocation } from 'react-router-dom';
+import ErrorModal from '../../../Components/ErrorModal';
+import SpinnerModal from '../../../Components/SpinnerModal';
+import useStores from '../../../Hooks/useStores';
 
-import ErrorModal from "../../../Components/ErrorModal";
-import SpinnerModal from "../../../Components/SpinnerModal";
-import { useNavigate, useLocation } from "react-router-dom";
-import Matomo from "../../../Services/Matomo";
-import Instance from "../../../Stores/Instance";
-import { Status } from "../../../Stores/StatusStore";
+import Matomo from '../../../Services/Matomo';
+import { Status } from '../../../Stores/StatusStore';
+import type Instance from '../../../Stores/Instance';
 
 const useStyles = createUseStyles({
   title: {
-    display: "inline"
+    display: 'inline'
   },
   selector: {
-    display: "inline-block",
-    position: "relative",
-    margin: "0 4px 12px 10px",
-    background: "var(--bg-color-ui-contrast4)",
-    "& select": {
-      background: "transparent",
+    display: 'inline-block',
+    position: 'relative',
+    margin: '0 4px 12px 10px',
+    background: 'var(--bg-color-ui-contrast4)',
+    '& select': {
+      background: 'transparent',
       border: 0,
       margin: 0,
-      padding: "4px 25px 4px 6px",
-      lineHeight: "1.2",
-      fontSize: "1.5rem",
-      "-webkit-appearance": "none",
-      cursor: "pointer",
-      color: "inherit",
-      "&[disabled]": {
-        cursor: "not-allowed"
+      padding: '4px 25px 4px 6px',
+      lineHeight: '1.2',
+      fontSize: '1.5rem',
+      '-webkit-appearance': 'none',
+      cursor: 'pointer',
+      color: 'inherit',
+      '&[disabled]': {
+        cursor: 'not-allowed'
       }
     },
-    "&:before": {
+    '&:before': {
       content: '" "',
-      display: "block",
-      position: "absolute",
-      top: "50%",
-      right: "10px",
-      transform: "translateY(-3px)",
+      display: 'block',
+      position: 'absolute',
+      top: '50%',
+      right: '10px',
+      transform: 'translateY(-3px)',
       width: 0,
       height: 0,
-      borderLeft: "6px solid transparent",
-      borderRight: "6px solid transparent",
-      borderTop: "6px solid var(--ft-color-normal)",
-      cursor: "pointer",
-      pointerEvents: "none"
+      borderLeft: '6px solid transparent',
+      borderRight: '6px solid transparent',
+      borderTop: '6px solid var(--ft-color-normal)',
+      cursor: 'pointer',
+      pointerEvents: 'none'
     }
   },
   error: {
-    color: "var(--ft-color-error)"
+    color: 'var(--ft-color-error)'
   },
   btn: {
-    "&[disabled]": {
-      cursor: "not-allowed"
+    '&[disabled]': {
+      cursor: 'not-allowed'
     }
   },
   moveErrorMessage: {
-    margin: "20px 0",
-    color: "var(--ft-color-error)"
+    margin: '20px 0',
+    color: 'var(--ft-color-error)'
   },
   moveErrorActions: {
-    marginBottom: "10px",
-    width: "100%",
-    textAlign: "center",
-    wordBreak: "keep-all",
-    whiteSpace: "nowrap",
-    "& button + button": {
-      marginLeft: "20px"
+    marginBottom: '10px',
+    width: '100%',
+    textAlign: 'center',
+    wordBreak: 'keep-all',
+    whiteSpace: 'nowrap',
+    '& button + button': {
+      marginLeft: '20px'
     }
   }
 });
@@ -119,7 +119,7 @@ const Status = observer(({
   if (status && status.hasFetchError) {
     return (
       <div className={classes.error}>
-        <FontAwesomeIcon icon={"exclamation-triangle"} />
+        <FontAwesomeIcon icon={'exclamation-triangle'} />
         &nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
         <Button variant="primary" onClick={fetchStatus}>
           <FontAwesomeIcon icon="redo-alt" />
@@ -131,14 +131,14 @@ const Status = observer(({
   if (!status || !status.isFetched) {
     return (
       <>
-        <FontAwesomeIcon icon={"circle-notch"} spin />
+        <FontAwesomeIcon icon={'circle-notch'} spin />
         &nbsp;&nbsp;Retrieving instance release status
       </>
     );
   }
   return (
     <>
-      {status.data !== "UNRELEASED" && (
+      {status.data !== 'UNRELEASED' && (
         <ul>
           <li>
             This instance has been released and therefore cannot be moved.
@@ -152,7 +152,7 @@ const Status = observer(({
         className={classes.btn}
         onClick={onClick}
       >
-        <FontAwesomeIcon icon={"angle-double-right"} /> &nbsp; Move this
+        <FontAwesomeIcon icon={'angle-double-right'} /> &nbsp; Move this
         instance
       </Button>
     </>
@@ -171,9 +171,9 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  
+
   useEffect(() => {
-    fetchStatus()
+    fetchStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance.id]);
 
@@ -193,8 +193,8 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
       return true;
     }
     if (
-      !s.id.startsWith("private-") ||
-      appStore.currentSpace?.id.startsWith("private-")
+      !s.id.startsWith('private-') ||
+      appStore.currentSpace?.id.startsWith('private-')
     ) {
       // only instance in a private space can be moved to another private space
       return s.permissions.canCreate;
@@ -205,15 +205,15 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
   const handleSetSpaceId = e => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
-    Matomo.trackEvent("Instance", "Move", instance.id);
+    Matomo.trackEvent('Instance', 'Move', instance.id);
     appStore.moveInstance(instance.id, spaceId, location, navigate);
   };
 
   const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
-  const variant = spaceId === appStore.currentSpace?.id ? "secondary" : "warning";
-  const isDisabled = status.data !== "UNRELEASED" || spaceId === appStore.currentSpace?.id;
+  const variant = spaceId === appStore.currentSpace?.id ? 'secondary' : 'warning';
+  const isDisabled = status.data !== 'UNRELEASED' || spaceId === appStore.currentSpace?.id;
 
   return (
     <>
@@ -225,7 +225,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
               <select
                 value={spaceId}
                 onChange={handleSetSpaceId}
-                disabled={!status || status.data !== "UNRELEASED"}
+                disabled={!status || status.data !== 'UNRELEASED'}
               >
                 {spaces.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -252,7 +252,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
             <Button onClick={handleCancelMoveInstance}>Cancel</Button>
             <Button variant="primary" onClick={handleRetryMoveInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
           </div>
-       </ErrorModal>
+        </ErrorModal>
       )}
       {!appStore.instanceMovingError && appStore.isMovingInstance && (
         <SpinnerModal

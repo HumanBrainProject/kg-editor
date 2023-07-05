@@ -22,49 +22,49 @@
  */
 
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { createUseStyles } from "react-jss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import { createUseStyles } from 'react-jss';
 
-import useStores from "../../../Hooks/useStores";
+import useStores from '../../../Hooks/useStores';
 
-import Reviewer from "./Reviewers/Reviewer";
-import Search from "./Reviewers/Search";
+import Reviewer from './Reviewers/Reviewer';
+import Search from './Reviewers/Search';
 
 const useStyles = createUseStyles({
   container: {
-    position: "relative",
-    width: "100%"
+    position: 'relative',
+    width: '100%'
   },
   fetchingLabel: {
-    position: "relative !important",
-    padding: "15px 0 0 0",
-    background: "transparent",
+    position: 'relative !important',
+    padding: '15px 0 0 0',
+    background: 'transparent',
     border: 0,
-    textAlign: "left",
-    fontSize: "1rem"
+    textAlign: 'left',
+    fontSize: '1rem'
   },
   panel: {
-    position: "relative",
-    width: "100%"
+    position: 'relative',
+    width: '100%'
   },
   title: {
-    fontSize: "1.0285em",
-    fontWeight: "bold"
+    fontSize: '1.0285em',
+    fontWeight: 'bold'
   },
   reviewers: {
-    "& h4": {
-      padding: "0 25px"
+    '& h4': {
+      padding: '0 25px'
     },
-    "& ul": {
-      display: "block",
-      listStyleType: "none",
+    '& ul': {
+      display: 'block',
+      listStyleType: 'none',
       margin: 0,
       padding: 0,
-      "& li": {
-        width: "100%",
-        margin: "6px 0",
+      '& li': {
+        width: '100%',
+        margin: '6px 0',
         padding: 0
       }
     }
@@ -102,10 +102,10 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-        <FontAwesomeIcon icon="circle-notch" spin/>
-        <span className={classes.fetchingLabel}>&nbsp;&nbsp;
+          <FontAwesomeIcon icon="circle-notch" spin/>
+          <span className={classes.fetchingLabel}>&nbsp;&nbsp;
           Retrieving reviewers...
-        </span>
+          </span>
         </div>
       </div>
     );
@@ -116,8 +116,8 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{invitedUsersStore.fetchError}</small>
-          &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: "pointer"}} title="retry" onClick={fetchInstanceReviews}/>
+          <FontAwesomeIcon icon="exclamation-triangle" style={{color: 'var(--ft-color-error)'}}/>&nbsp;&nbsp;<small>{invitedUsersStore.fetchError}</small>
+          &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: 'pointer'}} title="retry" onClick={fetchInstanceReviews}/>
         </div>
       </div>
     );
@@ -128,7 +128,7 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="exclamation-triangle" style={{color: "var(--ft-color-error)"}}/>&nbsp;&nbsp;<small>{invitedUsersStore.error}</small>
+          <FontAwesomeIcon icon="exclamation-triangle" style={{color: 'var(--ft-color-error)'}}/>&nbsp;&nbsp;<small>{invitedUsersStore.error}</small>
         </div>
       </div>
     );
@@ -152,6 +152,6 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
     </div>
   );
 });
-Reviewers.displayName = "Reviewers";
+Reviewers.displayName = 'Reviewers';
 
 export default Reviewers;

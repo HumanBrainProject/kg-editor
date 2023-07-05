@@ -21,15 +21,15 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import Button from 'react-bootstrap/Button';
 
-import useStores from "../../../Hooks/useStores";
-import { useNavigate } from "react-router-dom";
-import Matomo from "../../../Services/Matomo";
-import Instance from "../../../Stores/Instance";
+import { useNavigate } from 'react-router-dom';
+import useStores from '../../../Hooks/useStores';
+import Matomo from '../../../Services/Matomo';
+import type Instance from '../../../Stores/Instance';
 
 interface DuplicateInstanceProps {
   instance: Instance;
@@ -42,7 +42,7 @@ const DuplicateInstance = observer(({ instance, className }: DuplicateInstancePr
   const navigate = useNavigate();
 
   const handleDuplicateInstance = () => {
-    Matomo.trackEvent("Instance", "Duplicate", instance.id);
+    Matomo.trackEvent('Instance', 'Duplicate', instance.id);
     appStore.duplicateInstance(instance.id, navigate);
   };
 
@@ -62,12 +62,12 @@ const DuplicateInstance = observer(({ instance, className }: DuplicateInstancePr
         <li>Be careful. After duplication both instances will look the same.</li>
         <li>After duplication you should update the name &amp; description fields.</li>
       </ul>
-      <Button variant={"primary"} onClick={handleDuplicateInstance}>
-        <FontAwesomeIcon icon={"copy"} /> &nbsp; Duplicate this instance
+      <Button variant={'primary'} onClick={handleDuplicateInstance}>
+        <FontAwesomeIcon icon={'copy'} /> &nbsp; Duplicate this instance
       </Button>
     </div>
   );
 });
-DuplicateInstance.displayName = "DuplicateInstance";
+DuplicateInstance.displayName = 'DuplicateInstance';
 
 export default DuplicateInstance;

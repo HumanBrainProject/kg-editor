@@ -21,38 +21,39 @@
  *
  */
 
-import React, { ChangeEvent, SyntheticEvent, useState } from "react";
-import { createUseStyles } from "react-jss";
-import { observer } from "mobx-react-lite";
-import { Dropdown, Form } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SimpleType } from "../types";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import { Dropdown, Form } from 'react-bootstrap';
+import { createUseStyles } from 'react-jss';
+import type { SimpleType } from '../types';
+import type { ChangeEvent, SyntheticEvent} from 'react';
 
 const useStyles = createUseStyles({
   targetTypes: {
-    minWidth: "30%",
-    "&.dropdown > .dropdown-menu": {
-      minWidth: "270px"
+    minWidth: '30%',
+    '&.dropdown > .dropdown-menu': {
+      minWidth: '270px'
     },
-    "&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active":
+    '&.dropdown > button.btn.dropdown-toggle, &.dropdown > button.btn.dropdown-toggle:hover, &.dropdown > button.btn.dropdown-toggle:active':
       {
         border: 0, //"1px solid #ced4da",
-        background: "transparent",
-        color: "#212529",
-        width: "100%",
-        paddingRight: "2px",
-        textOverflow: "ellipsis",
-        textAlign: "right",
+        background: 'transparent',
+        color: '#212529',
+        width: '100%',
+        paddingRight: '2px',
+        textOverflow: 'ellipsis',
+        textAlign: 'right',
         outline: 0
       }
   },
   targetTypesSearch: {
-    paddingLeft: "5px",
-    paddingRight: "5px"
+    paddingLeft: '5px',
+    paddingRight: '5px'
   },
   infoCircle: {
-    marginLeft: "5px",
-    transform: "translateY(2px)"
+    marginLeft: '5px',
+    transform: 'translateY(2px)'
   }
 });
 
@@ -66,61 +67,61 @@ interface TargetTypeSelectionProps {
 const FILTER_THRESHOLD = 10; //Show filter only if there are more than 5 elements
 
 const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }: TargetTypeSelectionProps) => {
-    const [filter, setFilter] = useState("");
-    const [filteredTypes, setFilteredTypes] = useState(types);
-    const classes = useStyles();
+  const [filter, setFilter] = useState('');
+  const [filteredTypes, setFilteredTypes] = useState(types);
+  const classes = useStyles();
 
-    const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-      const { value } = e.target;
-      setFilter(value);
-      const filtered = types.filter(type =>
-        type.label.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredTypes(filtered);
-    };
-
-    return (
-      <Dropdown className={classes.targetTypes} onSelect={onSelect}>
-        <Dropdown.Toggle id={id}>
-          <FontAwesomeIcon icon={"circle"} color={selectedType?.color} />
-          &nbsp;&nbsp;
-          {selectedType?.label ? selectedType.label : selectedType?.name}
-        </Dropdown.Toggle>
-        <Dropdown.Menu align="end">
-          {types.length > FILTER_THRESHOLD && (
-            <>
-              <div className={classes.targetTypesSearch}>
-                <Form.Control
-                  type="text"
-                  placeholder="Search type..."
-                  value={filter}
-                  onChange={handleFilterChange}
-                />
-              </div>
-              <Dropdown.Divider />
-            </>
-          )}
-          {filteredTypes.map(type => (
-            <Dropdown.Item
-              key={type.name}
-              eventKey={type.name}
-              title={type.description ? type.description : type.name}
-            >
-              <FontAwesomeIcon icon={"circle"} color={type.color} />
-              &nbsp;&nbsp;{type.label ? type.label : type.name}
-              {type.description && (
-                <FontAwesomeIcon
-                  className={classes.infoCircle}
-                  icon="info-circle"
-                />
-              )}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setFilter(value);
+    const filtered = types.filter(type =>
+      type.label.toLowerCase().includes(value.toLowerCase())
     );
-  }
+    setFilteredTypes(filtered);
+  };
+
+  return (
+    <Dropdown className={classes.targetTypes} onSelect={onSelect}>
+      <Dropdown.Toggle id={id}>
+        <FontAwesomeIcon icon={'circle'} color={selectedType?.color} />
+          &nbsp;&nbsp;
+        {selectedType?.label ? selectedType.label : selectedType?.name}
+      </Dropdown.Toggle>
+      <Dropdown.Menu align="end">
+        {types.length > FILTER_THRESHOLD && (
+          <>
+            <div className={classes.targetTypesSearch}>
+              <Form.Control
+                type="text"
+                placeholder="Search type..."
+                value={filter}
+                onChange={handleFilterChange}
+              />
+            </div>
+            <Dropdown.Divider />
+          </>
+        )}
+        {filteredTypes.map(type => (
+          <Dropdown.Item
+            key={type.name}
+            eventKey={type.name}
+            title={type.description ? type.description : type.name}
+          >
+            <FontAwesomeIcon icon={'circle'} color={type.color} />
+              &nbsp;&nbsp;{type.label ? type.label : type.name}
+            {type.description && (
+              <FontAwesomeIcon
+                className={classes.infoCircle}
+                icon="info-circle"
+              />
+            )}
+          </Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}
 );
-TargetTypeSelection.displayName = "TargetTypeSelection";
+TargetTypeSelection.displayName = 'TargetTypeSelection';
 
 export default TargetTypeSelection;

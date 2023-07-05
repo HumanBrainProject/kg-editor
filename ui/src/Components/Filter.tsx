@@ -21,39 +21,39 @@
  *
  */
 
-import React, { useRef, useEffect } from "react";
-import { createUseStyles } from "react-jss";
-import Form from "react-bootstrap/Form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useRef, useEffect } from 'react';
+import Form from 'react-bootstrap/Form';
+import { createUseStyles } from 'react-jss';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
 
   container: {
-    position: "relative",
-    color: "var(--ft-color-loud)",
+    position: 'relative',
+    color: 'var(--ft-color-loud)',
     borderBottom: 0
   },
   input: {
-    color: "var(--ft-color-loud)",
-    width: "calc(100% - 20px)",
-    margin: "10px",
-    border: "1px solid transparent",
-    paddingLeft: "30px",
-    borderRadius: "2px",
-    backgroundColor: "var(--bg-color-blend-contrast1)",
-    "&:focus":{
-      color: "var(--ft-color-loud)",
-      borderColor: "rgba(64, 169, 243, 0.5)",
-      backgroundColor: "transparent"
+    color: 'var(--ft-color-loud)',
+    width: 'calc(100% - 20px)',
+    margin: '10px',
+    border: '1px solid transparent',
+    paddingLeft: '30px',
+    borderRadius: '2px',
+    backgroundColor: 'var(--bg-color-blend-contrast1)',
+    '&:focus':{
+      color: 'var(--ft-color-loud)',
+      borderColor: 'rgba(64, 169, 243, 0.5)',
+      backgroundColor: 'transparent'
     }
   },
   icon: {
-    position: "absolute",
-    top: "50%",
-    left: "20px",
-    transform: "translateY(-50%)",
-    color: "var(--ft-color-normal)"
+    position: 'absolute',
+    top: '50%',
+    left: '20px',
+    transform: 'translateY(-50%)',
+    color: 'var(--ft-color-normal)'
   }
 });
 
@@ -64,7 +64,7 @@ interface FilterProps {
   onChange: (value: string) => void;
 }
 
-const Filter = ({ value, placeholder="filter...", icon="search", onChange }: FilterProps) => {
+const Filter = ({ value, placeholder='filter...', icon='search', onChange }: FilterProps) => {
 
   const classes = useStyles();
 

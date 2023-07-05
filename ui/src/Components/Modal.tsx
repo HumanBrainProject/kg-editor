@@ -21,33 +21,33 @@
  *
  */
 
-import React from "react";
-import { createUseStyles } from "react-jss";
-import ModalComponent from "react-bootstrap/Modal";
+import React from 'react';
+import ModalComponent from 'react-bootstrap/Modal';
+import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   modal: {
-    overflow: "hidden",
-    width: "90%",
-    margin: "auto",
-    "@media screen and (min-width:1024px)": {
-      width: "900px"
+    overflow: 'hidden',
+    width: '90%',
+    margin: 'auto',
+    '@media screen and (min-width:1024px)': {
+      width: '900px'
     },
-    "&.modal-dialog": {
-      marginTop: "5vh",
-      maxWidth: "unset",
-      "& .modal-content": {
-        background: "var(--bg-color-ui-contrast2)",
-        color: "var(--ft-color-normal)",
-        border: "1px solid var(--border-color-ui-contrast5)",
-        "& .modal-header": {
-          borderBottom: "1px solid var(--border-color-ui-contrast5)"
+    '&.modal-dialog': {
+      marginTop: '5vh',
+      maxWidth: 'unset',
+      '& .modal-content': {
+        background: 'var(--bg-color-ui-contrast2)',
+        color: 'var(--ft-color-normal)',
+        border: '1px solid var(--border-color-ui-contrast5)',
+        '& .modal-header': {
+          borderBottom: '1px solid var(--border-color-ui-contrast5)'
         },
-        "& .modal-body": {
-          borderRadius: "var(--bs-modal-border-radius)",
-          padding: "0",
-          height: "80vh",
-          overflowY: "hidden"
+        '& .modal-body': {
+          borderRadius: 'var(--bs-modal-border-radius)',
+          padding: '0',
+          height: '80vh',
+          overflowY: 'hidden'
         }
       }
     }
@@ -63,7 +63,7 @@ interface ModalProps {
 }
 
 const Modal = ({ title, show, closeButton, onHide, children }: ModalProps) => {
-  
+
   const classes = useStyles();
 
   return (

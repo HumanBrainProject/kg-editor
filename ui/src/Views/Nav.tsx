@@ -21,56 +21,56 @@
  *
  */
 
-import React from "react";
-import { observer } from "mobx-react-lite";
-import { matchPath, useLocation } from "react-router-dom";
-import { createUseStyles } from "react-jss";
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import { matchPath, useLocation } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
+import SpaceSelector from '../Components/SpaceSelector/SpaceSelector';
+import Tab from '../Components/Tab';
+import useStores from '../Hooks/useStores';
 
-import InstanceTabs from "./InstanceTabs";
-import UserProfileTab from "./UserProfileTab";
-import SpaceSelector from "../Components/SpaceSelector/SpaceSelector";
-import Tab from "../Components/Tab";
-import NewInstanceTab from "./NewInstanceTab";
+import InstanceTabs from './InstanceTabs';
+import NewInstanceTab from './NewInstanceTab';
+import UserProfileTab from './UserProfileTab';
 
 const useStyles = createUseStyles({
   container: {
-    display: "grid",
-    gridTemplateRows: "1fr",
-    gridTemplateColumns: "auto 1fr auto"
+    display: 'grid',
+    gridTemplateRows: '1fr',
+    gridTemplateColumns: 'auto 1fr auto'
   },
   fixedTabsLeft: {
-    display: "grid",
-    gridTemplateColumns: "repeat(6, auto)"
+    display: 'grid',
+    gridTemplateColumns: 'repeat(6, auto)'
   },
   fixedTabsRight: {
-    display: "grid",
-    gridTemplateColumns: "repeat(6, auto)"
+    display: 'grid',
+    gridTemplateColumns: 'repeat(6, auto)'
   },
   logo: {
-    padding: "10px",
-    cursor: "pointer",
-    "& span": {
-      color: "var(--ft-color-loud)",
-      display: "inline-block",
-      paddingLeft: "10px",
-      fontSize: "0.9em",
-      borderLeft: "1px solid var(--border-color-ui-contrast5)",
-      marginLeft: "10px"
+    padding: '10px',
+    cursor: 'pointer',
+    '& span': {
+      color: 'var(--ft-color-loud)',
+      display: 'inline-block',
+      paddingLeft: '10px',
+      fontSize: '0.9em',
+      borderLeft: '1px solid var(--border-color-ui-contrast5)',
+      marginLeft: '10px'
     },
-    "&:hover span": {
-      color: "var(--ft-color-louder)"
+    '&:hover span': {
+      color: 'var(--ft-color-louder)'
     }
   },
   userProfileTab: {
-    width: "50px",
-    height: "50px",
-    lineHeight: "41px",
-    color: "var(--ft-color-normal)",
-    background: "var(--bg-color-ui-contrast2)",
-    border: "1px solid var(--border-color-ui-contrast2)",
-    borderLeft: "none"
+    width: '50px',
+    height: '50px',
+    lineHeight: '41px',
+    color: 'var(--ft-color-normal)',
+    background: 'var(--bg-color-ui-contrast2)',
+    border: '1px solid var(--border-color-ui-contrast2)',
+    borderLeft: 'none'
   }
 });
 
@@ -90,8 +90,8 @@ const Nav = observer(() => {
         {userProfileStore.isAuthorized && userProfileStore.hasSpaces && !!appStore.currentSpace && (
           <>
             <SpaceSelector />
-            <Tab icon={"home"} active={!!matchPath({ path: "/" }, location.pathname)} path={"/"} label={"Home"} hideLabel />
-            <Tab icon={"search"} active={!!matchPath({ path: "/browse" }, location.pathname)} path={"/browse"} hideLabel label={"Browse"} />
+            <Tab icon={'home'} active={!!matchPath({ path: '/' }, location.pathname)} path={'/'} label={'Home'} hideLabel />
+            <Tab icon={'search'} active={!!matchPath({ path: '/browse' }, location.pathname)} path={'/browse'} hideLabel label={'Browse'} />
             <NewInstanceTab />
           </>
         )}
@@ -100,7 +100,7 @@ const Nav = observer(() => {
       <div className={classes.fixedTabsRight}>
         {userProfileStore.isAuthorized && (
           <>
-            <Tab icon="question-circle" active={!!matchPath({ path: "/help" }, location.pathname)} path={"/help"} hideLabel label={"Help"} />
+            <Tab icon="question-circle" active={!!matchPath({ path: '/help' }, location.pathname)} path={'/help'} hideLabel label={'Help'} />
             <UserProfileTab className={classes.userProfileTab} size={32} />
           </>
         )}
@@ -108,7 +108,7 @@ const Nav = observer(() => {
     </nav>
   );
 });
-Nav.displayName = "Nav";
+Nav.displayName = 'Nav';
 
 export default Nav;
 

@@ -22,15 +22,15 @@
  */
 
 
-import { observable, action, runInAction, computed, toJS, makeObservable } from "mobx";
-import debounce from "lodash/debounce";
+import debounce from 'lodash/debounce';
+import { observable, action, runInAction, computed, toJS, makeObservable } from 'mobx';
 
-import FieldStore from "./FieldStore";
-import { FieldStoreDefinition, SimpleType, Space } from "../../types";
-import { WidgetOptions } from "..";
-import API from "../../Services/API";
-import RootStore from "../../Stores/RootStore";
-import Instance from "../../Stores/Instance";
+import FieldStore from './FieldStore';
+import type { WidgetOptions } from '..';
+import type API from '../../Services/API';
+import type Instance from '../../Stores/Instance';
+import type RootStore from '../../Stores/RootStore';
+import type { FieldStoreDefinition, SimpleType, Space } from '../../types';
 
 interface Value {
   [key: string]: string;
@@ -56,7 +56,7 @@ class LinkStore extends FieldStore {
   allowCustomValues = true;
   returnAsNull = false;
   optionsSearchActive = false;
-  optionsSearchTerm = "";
+  optionsSearchTerm = '';
   optionsPreviousSearchTerm?: string;
   optionsFrom = 0;
   optionsPageSize = 50;
@@ -66,7 +66,7 @@ class LinkStore extends FieldStore {
   isLink = true;
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
-  mappingValue = "@id";
+  mappingValue = '@id';
   sourceType = null;
 
   appStore = null;
@@ -85,7 +85,7 @@ class LinkStore extends FieldStore {
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;
     }
-    
+
     makeObservable(this, {
       value: observable,
       initialValue: observable,
@@ -140,7 +140,7 @@ class LinkStore extends FieldStore {
 
   get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
     if (!this.value && this.returnAsNull) {
-      return "https://core.kg.ebrains.eu/vocab/resetValue";
+      return 'https://core.kg.ebrains.eu/vocab/resetValue';
     }
     return toJS(this.value);
   }
@@ -156,7 +156,7 @@ class LinkStore extends FieldStore {
     const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.requiredValidationWarning) {
-        messages.required = "This field is marked as required.";
+        messages.required = 'This field is marked as required.';
       }
     }
     return messages;
@@ -168,7 +168,7 @@ class LinkStore extends FieldStore {
 
   updateValue(value: Value | null | undefined) {
     this.returnAsNull = false;
-    const v = (value !== null && value !== undefined && typeof value === "object")?value:null;
+    const v = (value !== null && value !== undefined && typeof value === 'object')?value:null;
     this.initialValue = v;
     this.value = v;
   }
@@ -235,7 +235,7 @@ class LinkStore extends FieldStore {
     this.optionsFrom = from;
     this.optionsPreviousSearchTerm = this.optionsSearchTerm;
     const payload = this.instance.payload;
-    payload["@type"] = this.instance.types.map(t => t.name);
+    payload['@type'] = this.instance.types.map(t => t.name);
     try{
       const { data: { suggestions: { data: values, total }, types }} = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const newOptions = Array.isArray(values)?values:[];
@@ -252,7 +252,7 @@ class LinkStore extends FieldStore {
                 isExternal: space !== this.rootStore.appStore.currentSpace?.id,
                 isNew: true
               });
-            })
+            });
           });
           newValues = newValues.filter(value => !value.isExternal || value.space.permissions.canCreate);
           newValues.sort((a, b) => {
@@ -292,7 +292,7 @@ class LinkStore extends FieldStore {
 
   resetOptionsSearch() {
     this.optionsSearchActive = false;
-    this.optionsSearchTerm = "";
+    this.optionsSearchTerm = '';
     this.optionsPreviousSearchTerm = undefined;
     this.optionsFrom = 0;
     this.optionsTotal = Infinity;

@@ -33,17 +33,17 @@
  *
  */
 
-import React, { useEffect } from "react";
-import Auth from "../Services/Auth";
-import AuthContext from "../Contexts/AuthContext";
-import AuthAdapter from "../Services/AuthAdapter";
-import KeycloakAuthAdapter from "../Services/KeycloakAuthAdapter";
-import useAuth from "../Hooks/useAuth";
-import KeycloakAuthProvider from "./KeycloakAuthProvider";
+import React, { useEffect } from 'react';
+import AuthContext from '../Contexts/AuthContext';
+import useAuth from '../Hooks/useAuth';
+import KeycloakAuthAdapter from '../Services/KeycloakAuthAdapter';
+import KeycloakAuthProvider from './KeycloakAuthProvider';
+import type Auth from '../Services/Auth';
+import type AuthAdapter from '../Services/AuthAdapter';
 
 /* For debugging purpose only, when running the ui app locally but connecting to
- * backend prod (where keycloak is not allowing localhost), 
- * if the authentication is not required, you can bypass the keycloak authentication 
+ * backend prod (where keycloak is not allowing localhost),
+ * if the authentication is not required, you can bypass the keycloak authentication
  * by setting the following variable to true
 */
 const BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING = false;
@@ -65,14 +65,14 @@ const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   return (
     <>
       {children}
     </>
   );
-}
+};
 
 const bypassAuth = {
   tokenProvider: undefined,
@@ -108,13 +108,13 @@ const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) =>
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   if (adapter instanceof KeycloakAuthAdapter) {
-    const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === "login-required";
-    const canBypassKeyCloak = BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING && window.location.host.startsWith("localhost") && !isLoginRequired;
+    const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === 'login-required';
+    const canBypassKeyCloak = BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING && window.location.host.startsWith('localhost') && !isLoginRequired;
     if (canBypassKeyCloak) {
-      console.info("%cAuth: Keycloak authentication is disabled for local development", "color: #f88900;");
+      console.info('%cAuth: Keycloak authentication is disabled for local development', 'color: #f88900;');
     } else {
       return (
         <KeycloakAuthProvider adapter={adapter} loginRequired={loginRequired} >

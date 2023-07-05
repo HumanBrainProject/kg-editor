@@ -21,16 +21,16 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
 
-import useGetUserProfileQuery from "../Hooks/useGetUserProfileQuery";
-import useAuth from "../Hooks/useAuth";
-import useStores from "../Hooks/useStores";
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useAuth from '../Hooks/useAuth';
+import useGetUserProfileQuery from '../Hooks/useGetUserProfileQuery';
+import useStores from '../Hooks/useStores';
 
 interface UserProfileProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -64,8 +64,8 @@ const UserProfile = observer(({ children }: UserProfileProps) => {
       <ErrorPanel>
         There was a problem retrieving the user profile ({error}).
           If the problem persists, please contact the support.<br /><br />
-        <Button variant={"primary"} onClick={refetch}>
-          <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
+        <Button variant={'primary'} onClick={refetch}>
+          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
         </Button>
       </ErrorPanel>
     );
@@ -84,7 +84,7 @@ const UserProfile = observer(({ children }: UserProfileProps) => {
         <ErrorPanel>
           <h1>Welcome</h1>
           <p>You are currently not granted permission to acccess the application.</p>
-          <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+          <p>Please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
           <Button onClick={logout}>Logout</Button>
         </ErrorPanel>
       );
@@ -97,6 +97,6 @@ const UserProfile = observer(({ children }: UserProfileProps) => {
     </>
   );
 });
-UserProfile.displayName = "UserProfile";
+UserProfile.displayName = 'UserProfile';
 
 export default UserProfile;

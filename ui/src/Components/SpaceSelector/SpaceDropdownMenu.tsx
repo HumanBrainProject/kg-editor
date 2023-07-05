@@ -55,7 +55,7 @@ const useStyles = createUseStyles({
 interface SpaceDropdownMenuComponentProps {
   className: string;
   labeledBy: string;
-  wrapperRef: HTMLDivElement;
+  wrapperRef: ForwardedRef<HTMLDivElement>;
 }
 
 const SpaceDropdownMenuComponent = observer(({className, labeledBy, wrapperRef}: SpaceDropdownMenuComponentProps) => {

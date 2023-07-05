@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -73,7 +73,7 @@ const Option = ({ item }: OptionProps) => {
 
   const style = item.type.color ? { color: item.type.color } : {};
 
-  const handlePreview = e => {
+  const handlePreview = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     const options = { showEmptyFields:false, showAction:false, showType:true, showStatus:false };
     instanceStore.togglePreviewInstance(item.id, item.name, options);

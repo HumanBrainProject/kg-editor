@@ -21,7 +21,7 @@
  *
  */
 
-import React, { ClipboardEvent, FocusEvent, KeyboardEvent, useRef } from "react";
+import React, { ClipboardEvent, ComponentType, FocusEvent, KeyboardEvent, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import Form from "react-bootstrap/Form";
 import { createUseStyles } from "react-jss";

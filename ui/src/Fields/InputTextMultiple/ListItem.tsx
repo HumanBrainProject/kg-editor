@@ -68,11 +68,11 @@ interface ListItemProps {
   value: string;
   readOnly: boolean;
   disabled: boolean;
-  onDelete: (index: number) => void;
-  onDragEnd: () => void;
-  onDragStart: (index: number) => void;
-  onDrop: (droppedIndex: number) => void;
-  onKeyDown: (value: number, e: KeyboardEvent<HTMLDivElement>) => void;
+  onDelete?: (index: number) => void;
+  onDragEnd?: () => void;
+  onDragStart?: (index: number) => void;
+  onDrop?: (droppedIndex: number) => void;
+  onKeyDown?: (value: number, e: KeyboardEvent<HTMLDivElement>) => void;
 }
 
 const ListItem = observer(

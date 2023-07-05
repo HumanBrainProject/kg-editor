@@ -21,7 +21,7 @@
  *
  */
 
-import React from "react";
+import React, { MouseEvent } from "react";
 import { createUseStyles } from "react-jss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -108,8 +108,8 @@ interface TabProps {
   iconSpin?: boolean;
   hideLabel?: boolean;
   path?: string;
-  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  onClose?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
+  onClose?: (e: MouseEvent<HTMLDivElement>) => void;
 }
 
 const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, hideLabel, path, onClick, onClose}: TabProps) => {
@@ -119,7 +119,7 @@ const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, h
   const classes = useStyles();
   const closeable = typeof onClose === "function";
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     if(path){
       Matomo.trackEvent("Tab", "Select", path);
@@ -128,7 +128,7 @@ const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, h
     typeof onClick === "function" && onClick(e);
   };
 
-  const handleClose = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClose = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     typeof onClose === "function" && onClose(e);
   };

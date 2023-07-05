@@ -54,7 +54,7 @@ const MultiToggle = ({ selectedValue, children, onChange}: MultiToggleProps) => 
   const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: selectedValue, onSelect: handleSelect }));
 
   return(
-    <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps.length}, 24px)`}}>
+    <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps?.length}, 24px)`}}>
       {childrenWithProps}
     </div>
   );

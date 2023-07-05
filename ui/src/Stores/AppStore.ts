@@ -22,7 +22,7 @@
  */
 
 import { observable, computed, action, runInAction, makeObservable } from "mobx";
-import { NavigateFunction, matchPath } from "react-router-dom";
+import { Location, NavigateFunction, matchPath } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import DefaultTheme from "../Themes/Default";

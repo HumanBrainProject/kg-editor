@@ -71,7 +71,7 @@ const SpaceSelector = observer(() => {
 
   return (
     <div className={classes.container} title={`${appStore.currentSpaceName} space`}>
-      {userProfileStore.spaces.length > 1 ?
+      {userProfileStore.spaces && userProfileStore.spaces.length > 1 ?
         <Dropdown onSelect={handleSelectSpace}>
           <Dropdown.Toggle as={SpaceDropdownToggle}>
             {appStore.currentSpaceName}

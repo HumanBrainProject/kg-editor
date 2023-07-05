@@ -42,7 +42,6 @@ import TargetTypeSelection from "../TargetTypeSelection";
 import Matomo from "../../Services/Matomo";
 import LinksStore from "../Stores/LinksStore";
 import { View } from "../../Stores/ViewStore";
-import { Dropdown } from "react-bootstrap";
 
 const useStyles = createUseStyles({
   container: {
@@ -252,7 +251,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const { value: values } = fieldStore;
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
-      if (id && id !== instance.id) {
+      if (id && id !== instance?.id) {
         fieldStore.showLink(id);
         setTimeout(() => {
           view.resetInstanceHighlight();
@@ -271,7 +270,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       const { value: values } = fieldStore;
       const value = values[index];
       const id = value && value[fieldStore.mappingValue];
-      if (id && id !== instance.id && fieldStore.isLinkVisible(id)) {
+      if (id && id !== instance?.id && fieldStore.isLinkVisible(id)) {
         const idx = view.panes.findIndex(p => p === pane);
         if (idx !== -1 && idx < view.panes.length -1) {
           const targetPane = view.panes[idx+1];
@@ -299,7 +298,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
-  const sortedTargetTypes = hasMultipleTypes && [...targetTypes].sort((a, b) => a.label.localeCompare(b.label));
+  const sortedTargetTypes = hasMultipleTypes ? [...targetTypes].sort((a, b) => a.label.localeCompare(b.label)): targetTypes;
   if (readMode && !links.length && !showIfNoValue) {
     return null;
   }
@@ -310,7 +309,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         <Label className={classes.label} label={label} isRequired={isRequired} />:
         <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}/>
       }
-      {!isDisabled && (view && view.currentInstanceId === instance.id) && (
+      {!isDisabled && (view && view.currentInstanceId === instance?.id) && (
         <div className={classes.deleteBtn}>
           <Button size="sm" variant={"primary"} onClick={handleDeleteAll} disabled={links.length === 0}>
             <FontAwesomeIcon icon="times"/>
@@ -318,7 +317,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
         </div>
       )}
       <div className={`${classes.table} ${hasValidationWarnings?classes.warning:""} ${returnAsNull?"disabled":""}`}>
-        {(view && view.currentInstanceId === instance.id)?
+        {(view && view.currentInstanceId === instance?.id)?
           <Table
             mainInstanceId={instance.id}
             list={links}
@@ -346,7 +345,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 className={classes.dropdown}
                 searchTerm={optionsSearchTerm}
                 options={options}
-                spaces={userProfileStore.spaces}
                 loading={fetchingOptions}
                 hasMore={hasMoreOptions}
                 inputPlaceholder={`type to add a ${fieldStoreLabel}`}

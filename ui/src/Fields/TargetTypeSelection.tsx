@@ -58,7 +58,7 @@ const useStyles = createUseStyles({
 
 interface TargetTypeSelectionProps {
   types: SimpleType[];
-  selectedType: SimpleType;
+  selectedType?: SimpleType;
   id: string;
   onSelect: (eventKey: string | null, e: SyntheticEvent<Item>) => void; //TODO: fix this
 }
@@ -82,9 +82,9 @@ const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }: Tar
     return (
       <Dropdown className={classes.targetTypes} onSelect={onSelect}>
         <Dropdown.Toggle id={id}>
-          <FontAwesomeIcon icon={"circle"} color={selectedType.color} />
+          <FontAwesomeIcon icon={"circle"} color={selectedType?.color} />
           &nbsp;&nbsp;
-          {selectedType.label ? selectedType.label : selectedType.name}
+          {selectedType?.label ? selectedType.label : selectedType?.name}
         </Dropdown.Toggle>
         <Dropdown.Menu align="end">
           {types.length > FILTER_THRESHOLD && (

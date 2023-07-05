@@ -30,6 +30,7 @@ import { WidgetOptions } from "..";
 import Instance from "../../Stores/Instance";
 
 class FieldStore {
+  value: any;
   label?:string;
   labelTooltip?: string;
   labelTooltipIcon?: IconProp;
@@ -50,6 +51,7 @@ class FieldStore {
 
   constructor(definition: FieldStoreDefinition, _options: WidgetOptions, instance: Instance, api:API, rootStore: RootStore) {
     makeObservable(this, {
+      value: observable,
       label: observable,
       labelTooltip: observable,
       labelTooltipIcon: observable,

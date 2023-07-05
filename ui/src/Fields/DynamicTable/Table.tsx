@@ -165,15 +165,15 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
 ActionsCellRenderer.displayName = "ActionsCellRenderer";
 
 interface TableProps {
-  mainInstanceId: string;
+  mainInstanceId?: string;
   list: any;
   fieldStore: LinksStore;
   readOnly: boolean;
   enablePointerEvents: boolean;
-  onRowDelete: (index: number) => void;
-  onRowClick: (index: number) => void;
-  onRowMouseOver: (index: number) => void;
-  onRowMouseOut: (index: number) => void;
+  onRowDelete?: (index: number) => void;
+  onRowClick?: (index: number) => void;
+  onRowMouseOver?: (index: number) => void;
+  onRowMouseOut?: (index: number) => void;
 }
 
 const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut }: TableProps) => {

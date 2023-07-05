@@ -159,7 +159,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectAlternative = value => {
+  const handleSelectAlternative = (value: any) => {
     const vals = value.map(v => ({[fieldStore.mappingValue]: v.id}));
     fieldStore.setValues(vals);
     instanceStore.togglePreviewInstance();
@@ -277,11 +277,13 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     return null;
   }
 
+  const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)))
+
   if(readMode || isReadOnly){
     return (
       <Form.Group className={`${classes.readMode} ${className}`}>
         <Label className={classes.label} label={label} isRequired={isRequired} isReadOnly={readMode?false:isReadOnly} />
-        {(view && view.currentInstanceId === instance.id)?
+        {(view && view.currentInstanceId === instance?.id)?
           <List
             mainInstanceId={instance.id}
             list={links}
@@ -289,7 +291,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             disabled={false}
             enablePointerEvents={true}
             onClick={handleClick}
-            fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+            fetchLabel={fetchLabel}
           />
           :
           <List
@@ -297,7 +299,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             readOnly={true}
             disabled={false}
             enablePointerEvents={false}
-            fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+            fetchLabel={fetchLabel}
           />
         }
       </Form.Group>

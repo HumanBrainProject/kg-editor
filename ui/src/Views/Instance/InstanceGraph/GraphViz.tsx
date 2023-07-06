@@ -25,12 +25,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import debounce from 'lodash/debounce';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, MouseEvent } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import { createUseStyles } from 'react-jss';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import useStores from '../../../Hooks/useStores';
+import { GraphGroup, GraphLink, GraphNode } from '../../../types';
+import { ForceGraphInstance, LinkObject, NodeObject } from 'force-graph';
 
 const useStyles = createUseStyles({
   graph: {
@@ -67,8 +69,8 @@ const useStyles = createUseStyles({
 
 const GraphViz = observer(() => {
 
-  const wrapperRef = useRef();
-  const graphRef = useRef();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const graphRef = useRef<ForceGraphInstance>();
 
   const classes = useStyles();
 
@@ -93,15 +95,16 @@ const GraphViz = observer(() => {
     };
   }, []);
 
-  const handleNodeClick = node => {
-    if (node.isGroup) {
-      graphStore.setGrouping(node, false);
+  const handleNodeClick = (node: NodeObject) => {
+    const graphNode = node as GraphNode;
+    if (graphNode.isGroup) {
+      graphStore.setGrouping(graphNode as GraphGroup, false);
     } else if (node.id !== graphStore.mainId) {
       graphStore.reset();
-      if(node.space && node.space !== appStore.currentSpace.id) {
-        const space = userProfileStore.getSpaceInfo(node.space);
+      if(graphNode.space && graphNode.space !== appStore.currentSpace?.id) {
+        const space = userProfileStore.getSpaceInfo(graphNode.space);
         if(space.permissions.canRead) {
-          appStore.switchSpace(location, navigate, node.space);
+          appStore.switchSpace(location, navigate, graphNode.space);
           navigate(`/instances/${node.id}/graph`);
         }
       } else {
@@ -110,27 +113,29 @@ const GraphViz = observer(() => {
     }
   };
 
-  const handleNodeHover = node => graphStore.setHighlightNodeConnections(node, true);
+  const handleNodeHover = (node: NodeObject | null, previewsNode: NodeObject| null) => graphStore.setHighlightNodeConnections(node as GraphNode, true);
 
-  const getNodeName = node => {
+  const getNodeName = (node: GraphNode) => {
     if(node.isGroup) {
-      return `Group of ${node.types.length > 1?('(' + node.name + ')'):node.name} (${node.nodes.length})`;
+      const group = node as GraphGroup;
+      return `Group of ${group.types.length > 1?('(' + group.name + ')'):group.name} (${group.nodes.length})`;
     }
     return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
   };
 
-  const getNodeLabel = node =>  {
-    const nodeName = getNodeName(node);
+  const getNodeLabel = (node: NodeObject) =>  {
+    const graphNode  = node as GraphNode;
+    const nodeName = getNodeName(graphNode);
     let space = '';
-    if(node.space && node.space !== appStore.currentSpace.id) {
-      space = `(Space: ${node.space})`;
+    if(graphNode.space && graphNode.space !== appStore.currentSpace?.id) {
+      space = `(Space: ${graphNode.space})`;
     }
     return `${nodeName} ${space}`;
   };
 
-  const getNodeAutoColorBy = node => node.color;
+  const getNodeAutoColorBy = (node: NodeObject) => (node as GraphNode).color;
 
-  const wrapText = (context, text, x, y, maxWidth, lineHeight, node) => {
+  const wrapText = (context: any, text: string, x: number, y: number, maxWidth: number, lineHeight: number, node: GraphNode) => {
     if (node.labelLines === undefined) {
       let words = text.split(/( |_|-|\.)/gi); //NOSONAR
       let line = '';
@@ -159,24 +164,27 @@ const GraphViz = observer(() => {
     });
   };
 
-  const getNodeCanvasObject = (node, ctx, scale) => {
+  const getNodeCanvasObject = (node: NodeObject, ctx: any, scale: number) => {
+    const graphNode = node as GraphNode;
     ctx.beginPath();
-    if (node.isGroup) {
-      ctx.rect(node.x - 6, node.y - 6, 12, 12);
+    if (graphNode.isGroup) {
+      if(graphNode.x && graphNode.y) {
+        ctx.rect(graphNode.x - 6, graphNode.y - 6, 12, 12);
+      }
     } else {
-      ctx.arc(node.x, node.y, node.isMainNode ? 10 : 6, 0, 2 * Math.PI);
+      ctx.arc(graphNode.x, graphNode.y, graphNode.isMainNode ? 10 : 6, 0, 2 * Math.PI);
     }
 
     if (graphStore.highlightedNode) {
-      if (!node.highlighted) {
+      if (!graphNode.highlighted) {
         ctx.globalAlpha = 0.1;
       }
     }
-    const color = node.color;
+    const color = graphNode.color;
     ctx.strokeStyle = new Color(color).darken(0.25).hex();
     ctx.fillStyle = color;
 
-    if (node.isMainNode) {
+    if (graphNode.isMainNode) {
       ctx.setLineDash([2, 0.5]);
     } else {
       ctx.setLineDash([]);
@@ -189,32 +197,33 @@ const GraphViz = observer(() => {
       ctx.textAlign = 'center';
       ctx.fillStyle = 'black';
 
-      const label = getNodeName(node);
-
-      wrapText(ctx, label, node.x, node.y, 10, 1.3, node);
+      const label = getNodeName(graphNode);
+      if(graphNode.x && graphNode.y) {
+        wrapText(ctx, label, graphNode.x, graphNode.y, 10, 1.3, graphNode);
+      }       
     }
 
     ctx.globalAlpha = 1;
   };
 
-  const getLinkColor = link => {
+  const getLinkColor = (link: LinkObject) => {
     if (graphStore.highlightedNode) {
       if (link.target === graphStore.highlightedNode) {
-        return new Color('#f39c12').alpha(1).rgb();
+        return new Color('#f39c12').alpha(1).rgb().toString();
       } else if (link.source === graphStore.highlightedNode) {
-        return new Color('#1abc9c').alpha(1).rgb();
+        return new Color('#1abc9c').alpha(1).rgb().toString();
       } else {
-        return new Color('#ccc').alpha(0.1).rgb();
+        return new Color('#ccc').alpha(0.1).rgb().toString();
       }
     } else {
-      return new Color('#ccc').alpha(1).rgb();
+      return new Color('#ccc').alpha(1).rgb().toString();
     }
   };
 
-  const getLinkWidth = link => (graphStore.highlightedNode && link.highlighted)?2:1;
+  const getLinkWidth = (link: LinkObject) => (graphStore.highlightedNode && (link as GraphLink).highlighted)?2:1;
 
-  const handleCapture = e => {
-    e.target.href = wrapperRef.current && wrapperRef.current.querySelector('canvas').toDataURL('image/png');
+  const handleCapture = (e: MouseEvent<HTMLButtonElement>) => {
+    e.target.href = wrapperRef?.current && wrapperRef.current.querySelector('canvas')?.toDataURL('image/png');
     e.target.download = 'test.png';
   };
 

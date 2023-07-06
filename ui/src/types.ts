@@ -34,6 +34,7 @@
  */
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 import type { BrowserOptions } from '@sentry/browser';
+import { LinkObject, NodeObject } from 'force-graph';
 import type { KeycloakConfig } from 'keycloak-js';
 import type { PiwikOptions } from 'react-piwik';
 
@@ -277,13 +278,15 @@ export interface StatusResponse {
   data: string;
 }
 
-export interface GraphNode {
-  id: string;
+export interface GraphNode extends NodeObject{
   name: string;
   space: string;
   color: string;
   groupId: string;
   highlighted: boolean;
+  isGroup?: boolean;
+  isMainNode?: boolean;
+  labelLines: string[];
 }
 
 export interface GraphNodes {
@@ -293,34 +296,20 @@ export interface GraphNodes {
 export interface GraphGroups {
   [key: string]: GraphGroup;
 }
-export interface GraphSource {
+export interface GraphLink extends LinkObject{
   id: string;
-}
-
-export interface GraphTarget {
-  id: string;
-}
-
-export interface GraphLink {
-  id: string;
-  source: GraphSource;
-  target: GraphTarget;
+  highlighted: boolean;
 }
 
 export interface GraphLinks {
   [key:string]: GraphLink;
 }
 
-export interface GraphGroup {
-  id: string;
-  name: string;
-  color: string;
-  isGroup: boolean;
+export interface GraphGroup extends GraphNode {
   types: SimpleType[];
   nodes: GraphNode[];
   show: boolean;
   grouped: boolean;
-  highlighted: boolean;
 }
 
 export interface FieldStoreValidation {

@@ -22,7 +22,7 @@
  */
 
 import { observable, computed, action, makeObservable, toJS } from 'mobx';
-import type { Space, UserProfile } from '../types';
+import type { Permissions, Space, UserProfile } from '../types';
 
 
 export class UserProfileStore {
@@ -85,7 +85,7 @@ export class UserProfileStore {
     if (space) {
       return toJS(space);
     }
-    return {id: id, name: id, permissions: {}};
+    return {id: id, name: id, permissions: {} as Permissions};
   }
 
   get firstName() {

@@ -31,6 +31,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
+import { GraphGroup, GraphGroups, GraphNode, SimpleType } from '../../../types';
+import { NodeObject } from 'force-graph';
 
 const useStyles = createUseStyles({
   container: {
@@ -124,7 +126,18 @@ const useStyles = createUseStyles({
   }
 });
 
-const Node = ({ node, isGrouped }) => {
+interface NodeProps{
+  node: GraphNode;
+  isGrouped: boolean;
+}
+
+interface ActionFunctions {
+  onClick: () => void;
+  onMouseOver?: () => void;
+  onMouseOut?: () => void;
+}
+
+const Node = ({ node, isGrouped }:NodeProps) => {
 
   const classes = useStyles();
 
@@ -140,7 +153,7 @@ const Node = ({ node, isGrouped }) => {
   const handleClick = () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
-      if(node.space !== appStore.currentSpace.id) {
+      if(node.space !== appStore.currentSpace?.id) {
         const space = userProfileStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
           appStore.switchSpace(location, navigate, node.space);
@@ -152,21 +165,24 @@ const Node = ({ node, isGrouped }) => {
     }
   };
 
-  let actions = {onClick: handleClick};
+  const actions: ActionFunctions = {onClick: handleClick};
   if(!isGrouped) {
-    actions = {
-      onMouseOver: handelMouseOver,
-      onMouseOut: handelMouseOut,
-      onClick: handleClick
-    };
-  }
+    actions.onMouseOver = handelMouseOver;
+    actions.onMouseOut = handelMouseOut; 
+  };
 
   return (
-    <div className={classes.node} {...actions}>{node.name} {node.space !== appStore.currentSpace.id? <em style={{color:'var(--ft-color-error)'}}>(Space: {node.space})</em> : null}</div>
+    <div className={classes.node} {...actions}>{node.name} {node.space !== appStore.currentSpace?.id? <em style={{color:'var(--ft-color-error)'}}>(Space: {node.space})</em> : null}</div>
   );
 };
 
-const Nodes = ({className, nodes, isGrouped}) => (
+interface NodesProps {
+  className: string;
+  nodes: GraphNode[];
+  isGrouped: boolean;
+}
+
+const Nodes = ({className, nodes, isGrouped}: NodesProps) => (
   <div className={className}>
     {nodes.map(node => (
       <Node key={node.id} node={node} isGrouped={isGrouped} />
@@ -174,7 +190,12 @@ const Nodes = ({className, nodes, isGrouped}) => (
   </div>
 );
 
-const TypeIcon= ({color, grouped}) => {
+interface TypeIconProps {
+  color?: string;
+  grouped: boolean;
+}
+
+const TypeIcon= ({color, grouped}: TypeIconProps) => {
   const classes = useStyles();
   const style = {
     borderRadius: grouped?'0':'50%',
@@ -187,14 +208,25 @@ const TypeIcon= ({color, grouped}) => {
   );
 };
 
-const Type = ({type, defaultColor, grouped}) => (
+interface TypeProps {
+  type: SimpleType;
+  defaultColor?: string;
+  grouped: boolean;
+}
+
+const Type = ({type, defaultColor, grouped}: TypeProps) => (
   <span>
     <TypeIcon color={type.color?type.color:defaultColor} grouped={grouped} />
     {type.label}
   </span>
 );
 
-const GroupLabel = observer(({ className, group }) => {
+interface GroupLabelProps {
+  className: string;
+  group: GraphGroup;
+}
+
+const GroupLabel = observer(({ className, group }: GroupLabelProps) => {
 
   const { graphStore } = useStores();
 
@@ -216,11 +248,16 @@ const GroupLabel = observer(({ className, group }) => {
 });
 GroupLabel.displayName = 'GroupLabel';
 
-const Actions = observer(({ className, group }) => {
+interface ActionsProps {
+  className: string;
+  group: GraphGroup;
+}
+
+const Actions = observer(({ className, group }:ActionsProps) => {
 
   const { graphStore } = useStores();
 
-  const handleChange = action => {
+  const handleChange = (action: any) => {
     switch (action) {
     case 'show':
       graphStore.setGroupVisibility(group, true);
@@ -265,7 +302,11 @@ const Actions = observer(({ className, group }) => {
 });
 Actions.displayName = 'Actions';
 
-const Group = ({ group }) => {
+interface GroupProps {
+  group: GraphGroup;
+}
+
+const Group = ({ group }:GroupProps) => {
 
   const classes = useStyles();
 
@@ -287,7 +328,12 @@ const Group = ({ group }) => {
   );
 };
 
-const Groups = ({className, groups}) => (
+interface GroupsProps{
+  className: string;
+  groups: GraphGroup[];
+}
+
+const Groups = ({className, groups}:GroupsProps) => (
   <div className={className}>
     {groups.map(group => (
       <Group key={group.id} group={group} />

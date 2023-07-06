@@ -100,7 +100,7 @@ const MessageStatus = ({status}: MessageStatusProps) => {
 
 interface ReleaseStatusProps {
   instanceStatus: string;
-  darkmode: boolean;
+  darkmode?: boolean;
 }
 
 const ReleaseStatus = ({instanceStatus, darkmode}: ReleaseStatusProps) => {

@@ -23,11 +23,12 @@
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { createUseStyles } from 'react-jss';
 import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
+import { ReleaseScope } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -49,18 +50,22 @@ const useStyles = createUseStyles({
   }
 });
 
-const ReleaseNodeToggle = observer(({ node }) => {
+interface ReleaseNodeToggleProps {
+  node: ReleaseScope;
+}
+
+const ReleaseNodeToggle = observer(({ node }: ReleaseNodeToggleProps) => {
 
   const classes = useStyles();
 
   const { instanceStore, releaseStore } = useStores();
 
-  const handleChange = status => {
+  const handleChange = (status: string) => {
     instanceStore.togglePreviewInstance();
     releaseStore.markNodeForChange(node, status);
   };
 
-  const handleStopClick = e => {
+  const handleStopClick = (e: MouseEvent<HTMLDivElement>) => {
     e && e.stopPropagation();
   };
 

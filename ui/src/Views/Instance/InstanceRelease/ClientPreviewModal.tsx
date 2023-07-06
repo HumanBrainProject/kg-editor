@@ -70,7 +70,7 @@ const getUrl = (instanceId: string) => {
 };
 
 interface ClientPreviewModalProps {
-  instanceId: string;
+  instanceId?: string;
   show: boolean;
   handleClose: () => void;
 }
@@ -78,6 +78,10 @@ interface ClientPreviewModalProps {
 const ClientPreviewModal = observer(({ instanceId, show, handleClose }: ClientPreviewModalProps) => {
 
   const classes = useStyles();
+
+  if(!instanceId) {
+    return null;
+  }
 
   const url = getUrl(instanceId);
 

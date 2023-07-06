@@ -20,7 +20,7 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import React from 'react';
+import React, { MouseEvent } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
@@ -30,6 +30,7 @@ import ReleaseStatus from '../../../Components/ReleaseStatus';
 import useStores from '../../../Hooks/useStores';
 
 import ReleaseNodeToggle from './ReleaseNodeToggle';
+import { ReleaseScope } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -138,21 +139,30 @@ const useStyles = createUseStyles({
   }
 });
 
-const ReleaseNode = observer(({ node, level = 0 }) => {
+interface ReleaseNodeProps {
+  node: ReleaseScope;
+  level: number;
+}
+
+const ReleaseNode = observer(({ node, level = 0 }: ReleaseNodeProps) => {
 
   const classes = useStyles();
 
   const { instanceStore, releaseStore } = useStores();
 
-  const handleOptionPreview = e => {
+  const handleOptionPreview = (e: MouseEvent<HTMLDivElement>) => {
     e && e.stopPropagation();
-    const options = { showEmptyFields:false, showAction:true, showType:true, showStatus:false };
-    instanceStore.togglePreviewInstance(node.id, node.label, options );
+    if(!node.isAssociation) {
+      const options = { showEmptyFields:false, showAction:true, showType:true, showStatus:false };
+      instanceStore.togglePreviewInstance(node.id, node.label, options );
+    }
   };
 
-  const handleShowCompare = e => {
+  const handleShowCompare = (e: MouseEvent<HTMLDivElement>) => {
     e && e.stopPropagation();
-    releaseStore.setComparedInstance(node);
+    if(!node.isAssociation) {
+      releaseStore.setComparedInstance(node);
+    }
   };
 
   if (!node || !releaseStore) {
@@ -167,7 +177,6 @@ const ReleaseNode = observer(({ node, level = 0 }) => {
           <ReleaseStatus
             key={`${node['status']}`}
             instanceStatus={node['status']}
-            isChildren={false}
           />
         </div>
         <span className={'node-type'}>({node.typesName})</span>
@@ -180,12 +189,12 @@ const ReleaseNode = observer(({ node, level = 0 }) => {
       {node.status !== null && (
         <div className="node-actions">
           <div className={`node-action ${node.isAssociation ? 'disabled' : ''}`}
-            onClick={node.isAssociation? null: handleOptionPreview}
+            onClick={handleOptionPreview}
             title={node.isAssociation ? 'linking instances are not available for preview' : `view ${node.typesName} ${node.label}`}>
             <FontAwesomeIcon icon="eye" />
           </div>
           <div className={`node-action ${node.isAssociation ? 'disabled' : ''}`}
-            onClick={node.isAssociation? null: handleShowCompare}
+            onClick={handleShowCompare}
             title={node.isAssociation? 'linking instances are not available for comparison': 'compare the changes with released vesion'}>
             <FontAwesomeIcon icon="glasses" />
           </div>

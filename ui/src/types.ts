@@ -42,6 +42,11 @@ export type UUID = string;
 
 export type ViewMode = 'view' | 'edit' | 'graph' | 'manage' | 'release' | 'create' | 'raw';
 
+export enum ReleaseStatus{
+  UNRELEASED = "UNRELEASED",
+  HAS_CHANGED = "HAS_CHANGED",
+  RELEASED = "RELEASED" 
+}
 export interface Settings {
   commit: string;
   keycloak: KeycloakConfig;
@@ -269,9 +274,21 @@ export interface Scope {
   id: UUID;
   label: string;
   permissions: Permissions;
-  children: Scope[];
+  children?: Scope[];
   types: SimpleType[];
   status: string;
+}
+
+export interface ReleaseScope extends Scope {
+  childrenStatus?: ReleaseStatus;
+  globalStatus?: ReleaseStatus;
+  status?: ReleaseStatus;
+  pending_childrenStatus?: ReleaseStatus;
+  pending_globalStatus?: ReleaseStatus;
+  pending_status?: ReleaseStatus;
+  children?: ReleaseScope[];
+  typesName: string;
+  isAssociation?: boolean;
 }
 
 export interface StatusResponse {

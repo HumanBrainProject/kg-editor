@@ -30,8 +30,25 @@ import {
 } from 'mobx';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
+import { ReleaseScope, ReleaseStatus, UUID } from '../types';
+import { APIError } from '../Services/API';
 
-const setNodeTypesAndSortChildren = node => {
+interface  ReleaseResult { 
+  node: ReleaseScope; 
+  level: number;
+}
+
+interface SavingErrors {
+  node: ReleaseScope;
+  message?: string;
+}
+
+interface NodesByStatus {
+  RELEASED: ReleaseScope[];
+  UNRELEASED: ReleaseScope[];
+}
+
+const setNodeTypesAndSortChildren = (node: ReleaseScope) => {
   node.typesName = node.types.reduce(
     (acc, current) => `${acc}${acc.length ? ', ' : ''}${current.label}`,
     ''
@@ -58,55 +75,87 @@ const setNodeTypesAndSortChildren = node => {
   }
 };
 
-const removeDuplicates = (node, ids) => {
+const removeDuplicates = (node: ReleaseScope, ids?: Set<UUID>) => {
   if (typeof node === 'object' && Array.isArray(node.children)) {
-    if (!(ids instanceof Set)) {
-      ids = new Set();
-      ids.add(node.id);
-    }
+    const _ids = ids ?? new Set<UUID>(node.id);
     node.children = node.children.filter((n) => {
-      if (ids.has(n.id)) {
+      if (_ids.has(n.id)) {
         return false;
       }
-      ids.add(n.id);
+      _ids.add(n.id);
       return true;
     });
-    node.children.forEach((c) => removeDuplicates(c, ids));
+    node.children.forEach((c) => removeDuplicates(c, _ids));
     if (!node.children.length) {
       delete node.children;
     }
   }
 };
 
-const populateStatuses = (node, prefix = '') => {
+const setReleaseScopeStatus = (node: ReleaseScope, pending: boolean, status?: ReleaseStatus) => {
+  if (pending) {
+    node.pending_status = status??undefined;
+  } else {
+    node.status = status??undefined;
+  }
+}
+
+const setReleaseScopeChildrenStatus = (node: ReleaseScope, pending: boolean, status?: ReleaseStatus) => {
+  if (pending) {
+    node.pending_childrenStatus = status??undefined;
+  } else {
+    node.childrenStatus = status??undefined;
+  }
+}
+
+const setReleaseScopeGlobalStatus = (node: ReleaseScope, pending: boolean, status?: ReleaseStatus) => {
+  if (pending) {
+    node.pending_globalStatus = status??undefined;
+  } else {
+    node.globalStatus = status??undefined;
+  }
+}
+
+const getReleaseScopeStatus = (node: ReleaseScope, pending: boolean) : ReleaseStatus|undefined => {
+  if (pending) {
+    return node.pending_status;
+  }
+  return node.status;
+}
+
+const getReleaseScopeGlobalStatus = (node: ReleaseScope, pending: boolean) : ReleaseStatus|undefined => {
+  if (pending) {
+    return node.pending_globalStatus;
+  }
+  return node.globalStatus;
+}
+
+const populateStatuses = (node: ReleaseScope, pending: boolean) => {
   if (node.permissions.canRelease) {
-    node[prefix + 'childrenStatus'] = null;
+    setReleaseScopeChildrenStatus(node, pending);
     if (node.children && node.children.length > 0) {
       const childrenStatuses = node.children.map((child) =>
-        populateStatuses(child, prefix)
+        populateStatuses(child, pending)
       );
-      if (childrenStatuses.some((status) => status === 'UNRELEASED')) {
-        node[prefix + 'childrenStatus'] = 'UNRELEASED';
-        node[prefix + 'globalStatus'] = 'UNRELEASED';
-      } else if (childrenStatuses.some((status) => status === 'HAS_CHANGED')) {
-        node[prefix + 'childrenStatus'] = 'HAS_CHANGED';
-        node[prefix + 'globalStatus'] =
-          node[prefix + 'status'] === 'UNRELEASED'
-            ? 'UNRELEASED'
-            : 'HAS_CHANGED';
+      if (childrenStatuses.some((status) => status === ReleaseStatus.UNRELEASED)) {
+        setReleaseScopeChildrenStatus(node, pending, ReleaseStatus.UNRELEASED);
+        setReleaseScopeGlobalStatus(node, pending, ReleaseStatus.UNRELEASED);
+      } else if (childrenStatuses.some((status) => status === ReleaseStatus.HAS_CHANGED)) {
+        setReleaseScopeChildrenStatus(node, pending, ReleaseStatus.HAS_CHANGED);
+        setReleaseScopeGlobalStatus(node, pending, getReleaseScopeStatus(node, pending) === ReleaseStatus.UNRELEASED? ReleaseStatus.UNRELEASED: ReleaseStatus.HAS_CHANGED);
       } else {
-        node[prefix + 'childrenStatus'] = 'RELEASED';
-        node[prefix + 'globalStatus'] = node[prefix + 'status'];
+        setReleaseScopeChildrenStatus(node, pending, ReleaseStatus.RELEASED);
+        setReleaseScopeGlobalStatus(node, pending, getReleaseScopeStatus(node, pending));
       }
     } else {
-      node[prefix + 'childrenStatus'] = null;
-      node[prefix + 'globalStatus'] = node[prefix + 'status'];
+      setReleaseScopeChildrenStatus(node, pending);
+      setReleaseScopeGlobalStatus(node, pending, getReleaseScopeStatus(node, pending));
     }
-    return node[prefix + 'globalStatus'];
+    return getReleaseScopeGlobalStatus(node, pending);
   }
 };
 
-const processChildrenInstanceList = (node, list, level, hideReleasedInstances) => {
+const processChildrenInstanceList = (node: ReleaseScope, list: ReleaseResult[], level: number, hideReleasedInstances: boolean) => {
   if (
     !hideReleasedInstances ||
     node.status === 'UNRELEASED' ||
@@ -116,23 +165,23 @@ const processChildrenInstanceList = (node, list, level, hideReleasedInstances) =
     node.pending_status !== node.status ||
     node.pending_childrenStatus !== node.childrenStatus
   ) {
-    const obj = { node: node, level: level };
+    const obj: ReleaseResult = { node: node, level: level };
     list.push(obj);
     node.children && node.children.forEach((child) => processChildrenInstanceList(child, list, level + 1, hideReleasedInstances));
   }
 };
 export class ReleaseStore {
   topInstanceId?: string;
-  instancesTree = null;
+  instancesTree?: ReleaseScope;
   isFetching = false;
   isFetched = false;
   isSaving = false;
   savingTotal = 0;
   savingProgress = 0;
-  savingErrors = [];
-  savingLastEndedNode = null;
+  savingErrors: SavingErrors[] = [];
+  savingLastEndedNode?: ReleaseScope;
   savingLastEndedRequest = '';
-  fetchError = null;
+  fetchError?: string;
   saveError = null;
   isStopped = false;
   hideReleasedInstances = false;
@@ -204,7 +253,7 @@ export class ReleaseStore {
       proceed_do_nothing: 0
     };
 
-    const getStatsFromNode = node => {
+    const getStatsFromNode = (node: ReleaseScope) => {
       count.total++;
       if (node.status === 'RELEASED') {
         count.released++;
@@ -237,17 +286,19 @@ export class ReleaseStore {
       }
 
       if (node.children && node.children.length > 0) {
-        node.children.forEach((child) => getStatsFromNode(child));
+        node.children.forEach((child: ReleaseScope) => getStatsFromNode(child));
       }
     };
 
-    getStatsFromNode(this.instancesTree);
+    if(this.instancesTree) {
+      getStatsFromNode(this.instancesTree);
+    } 
 
     return count;
   }
 
   get instanceList() {
-    const result = [];
+    const result: ReleaseResult[] = [];
     if (this.instancesTree) {
       processChildrenInstanceList(this.instancesTree, result, 0, this.hideReleasedInstances);
     }
@@ -255,22 +306,28 @@ export class ReleaseStore {
   }
 
   getNodesToProceed() {
-    const nodesByStatus = {
+    const nodesByStatus: NodesByStatus = {
       RELEASED: [],
       UNRELEASED: []
     };
 
-    const rseek = node => {
+    const rseek = (node: ReleaseScope) => {
       if (node.permissions && node.permissions.canRelease) {
-        if (node.status !== node.pending_status) {
-          nodesByStatus[node.pending_status].push(node);
+        if (node.pending_status && node.status !== node.pending_status) {
+          if (node.pending_status === ReleaseStatus.RELEASED) {
+            nodesByStatus.RELEASED.push(node);
+          } else if (node.pending_status === ReleaseStatus.UNRELEASED) {
+            nodesByStatus.UNRELEASED.push(node);
+          }
         }
         if (node.children && node.children.length > 0) {
           node.children.forEach((child) => rseek(child));
         }
       }
     };
-    rseek(this.instancesTree);
+    if(this.instancesTree) {
+      rseek(this.instancesTree);
+    }
     nodesByStatus.RELEASED = Array.from(new Set(nodesByStatus.RELEASED));
     nodesByStatus.UNRELEASED = Array.from(new Set(nodesByStatus.UNRELEASED));
     return nodesByStatus;
@@ -292,30 +349,31 @@ export class ReleaseStore {
   }
 
   async fetchReleaseData() {
-    if (this.isFetching) {
+    if (this.isFetching || !this.topInstanceId) {
       return;
     }
     this.isFetched = false;
     this.isFetching = true;
-    this.fetchError = null;
+    this.fetchError = undefined;
     try {
       const { data } = await this.api.getInstanceScope(this.topInstanceId);
+      const releaseScope = data as ReleaseScope;
       runInAction(() => {
         this.hideReleasedInstances = false;
-        populateStatuses(data);
+        populateStatuses(releaseScope, false);
         // Default release state
-        this.recursiveMarkNodeForChange(data, null); // "RELEASED"
-        populateStatuses(data, 'pending_');
-        setNodeTypesAndSortChildren(data);
-        removeDuplicates(data); // after sorting!
-        this.instancesTree = data;
+        this.recursiveMarkNodeForChange(releaseScope); // "RELEASED"
+        populateStatuses(releaseScope, true);
+        setNodeTypesAndSortChildren(releaseScope);
+        removeDuplicates(releaseScope); // after sorting!
+        this.instancesTree = releaseScope;
         this.isFetched = true;
         this.isFetching = false;
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message ? e.message : e;
-        this.fetchError = message;
+        this.fetchError = err?.message;
         this.isFetching = false;
       });
     }
@@ -355,7 +413,7 @@ export class ReleaseStore {
     this.afterSave();
   }
 
-  async releaseNode(node) {
+  async releaseNode(node: ReleaseScope) {
     try {
       await this.api.releaseInstance(node.id);
       runInAction(() => {
@@ -368,8 +426,9 @@ export class ReleaseStore {
         );
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        this.savingErrors.push({ node: node, message: e.message });
+        this.savingErrors.push({ node: node, message: err?.message });
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to release this instance`;
         this.savingLastEndedNode = node;
       });
@@ -380,7 +439,7 @@ export class ReleaseStore {
     }
   }
 
-  async unreleaseNode(node) {
+  async unreleaseNode(node: ReleaseScope) {
     try {
       await this.api.unreleaseInstance(node.id);
       runInAction(() => {
@@ -393,8 +452,9 @@ export class ReleaseStore {
         );
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        this.savingErrors.push({ node: node, message: e.message });
+        this.savingErrors.push({ node: node, message: err?.message });
         this.savingLastEndedRequest = `(${node.typesName}) : an error occured while trying to unrelease this instance`;
         this.savingLastEndedNode = node;
       });
@@ -433,17 +493,21 @@ export class ReleaseStore {
     this.fetchReleaseData();
   }
 
-  markNodeForChange(node, newStatus) {
+  markNodeForChange(node: ReleaseScope, newStatus: ReleaseStatus) {
     node.pending_status = newStatus;
-    populateStatuses(this.instancesTree, 'pending_');
+    if(this.instancesTree) {
+      populateStatuses(this.instancesTree, true);
+    }
   }
 
-  markAllNodeForChange(node, newStatus) {
+  markAllNodeForChange(node: ReleaseScope, newStatus: ReleaseStatus) {
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
-    populateStatuses(this.instancesTree, 'pending_');
+    if(this.instancesTree) {
+      populateStatuses(this.instancesTree, true);
+    }
   }
 
-  recursiveMarkNodeForChange(node, newStatus) {
+  recursiveMarkNodeForChange(node: ReleaseScope, newStatus?: ReleaseStatus) {
     if (node.permissions.canRelease) {
       node.pending_status = newStatus ? newStatus : node.status;
       if (node.children && node.children.length > 0) {

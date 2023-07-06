@@ -38,7 +38,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getImageTitle = (title, name, userId) => {
+const getImageTitle = (title: string|undefined, name: string|undefined, userId: string) => {
   if (title) {
     return title;
   }

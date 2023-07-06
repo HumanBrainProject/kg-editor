@@ -21,14 +21,15 @@
  *
  */
 
-import React from "react";
-import { DefaultTheme, createUseStyles, useTheme } from "react-jss";
+import React from 'react';
+import { createUseStyles, useTheme } from 'react-jss';
 
-import Commit from "./Commit";
-import Copyright from "./Copyright";
-import Logo from "./Logo";
-import Nav from "./Nav";
-import { Theme } from "../Themes/Theme";
+import Commit from './Commit';
+import Copyright from './Copyright';
+import Logo from './Logo';
+import Nav from './Nav';
+import type { Theme } from '../Themes/Theme';
+import type { DefaultTheme} from 'react-jss';
 
 const getBackgroundSize = (theme: Jss.Theme) => {
   const appTheme = theme as Theme;
@@ -36,52 +37,52 @@ const getBackgroundSize = (theme: Jss.Theme) => {
     return appTheme.background.size;
   }
   if (appTheme.background.image) {
-    return "unset";
+    return 'unset';
   }
-  return "200%";
+  return '200%';
 };
 
 const useStyles = createUseStyles((theme: Jss.Theme) => {
   const appTheme = theme as Theme;
   return {
     container: {
-      height: "100vh",
-      display: "grid",
-      overflow: "hidden",
-      gridTemplateColumns: "1fr",
-      gridTemplateRows: "auto 1fr 20px"
+      height: '100vh',
+      display: 'grid',
+      overflow: 'hidden',
+      gridTemplateColumns: '1fr',
+      gridTemplateRows: 'auto 1fr 20px'
     },
     header: {
-      position: "relative",
-      display: "grid",
-      gridTemplateRows: "1fr",
-      gridTemplateColumns: "auto 1fr",
-      background: "var(--bg-color-ui-contrast1)"
+      position: 'relative',
+      display: 'grid',
+      gridTemplateRows: '1fr',
+      gridTemplateColumns: 'auto 1fr',
+      background: 'var(--bg-color-ui-contrast1)'
     },
     main: {
-      position: "relative",
-      overflow: "hidden",
+      position: 'relative',
+      overflow: 'hidden',
       background:
-        "linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))",
+        'linear-gradient(var(--bg-gradient-angle), var(--bg-gradient-start), var(--bg-gradient-end))',
       backgroundSize: getBackgroundSize(theme),
       backgroundImage: appTheme.background.image
         ? `url('${appTheme.background.image}')`
-        : "unset",
+        : 'unset',
       backgroundPosition: appTheme.background.position
         ? appTheme.background.position
-        : "unset",
+        : 'unset',
       backgroundColor: appTheme.backgroundColor
         ? appTheme.backgroundColor
-        : "unset"
+        : 'unset'
     },
     footer: {
-      position: "relative",
-      display: "grid",
-      gridTemplateRows: "1fr",
-      gridTemplateColumns: "1fr auto",
-      background: "var(--bg-color-ui-contrast1)",
-      color: "var(--ft-color-loud)",
-      padding: "0 10px"
+      position: 'relative',
+      display: 'grid',
+      gridTemplateRows: '1fr',
+      gridTemplateColumns: '1fr auto',
+      background: 'var(--bg-color-ui-contrast1)',
+      color: 'var(--ft-color-loud)',
+      padding: '0 10px'
     }
   };
 });

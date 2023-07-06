@@ -20,10 +20,10 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
+import React from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import ReleaseStatus from '../../../Components/ReleaseStatus';

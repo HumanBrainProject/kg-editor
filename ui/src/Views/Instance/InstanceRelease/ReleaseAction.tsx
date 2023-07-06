@@ -31,7 +31,6 @@ import useStores from '../../../Hooks/useStores';
 
 import Matomo from '../../../Services/Matomo';
 import ClientPreviewModal from './ClientPreviewModal';
-import ReleaseMessages from './ReleaseMessages';
 import ReleaseStats from './ReleaseStats';
 import Reviewers from './Reviewers';
 
@@ -184,7 +183,6 @@ const ReleaseAction = observer(() => {
           <Reviewers id={releaseStore.topInstanceId} />
         )}
       </div>
-      <ReleaseMessages />
       <div className={classes.releasePnl} >
         <Button
           onClick={handleProceed}
@@ -205,7 +203,7 @@ const ReleaseAction = observer(() => {
         </Button>
       </div>
       <ClientPreviewModal
-        store={releaseStore}
+        instanceId={releaseStore.topInstanceId}
         show={showModal}
         handleClose={handleCloseModal}
       />

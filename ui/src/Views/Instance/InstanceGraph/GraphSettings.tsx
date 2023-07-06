@@ -31,8 +31,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
-import { GraphGroup, GraphGroups, GraphNode, SimpleType } from '../../../types';
-import { NodeObject } from 'force-graph';
+import { GraphGroup, GraphNode, SimpleType } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {

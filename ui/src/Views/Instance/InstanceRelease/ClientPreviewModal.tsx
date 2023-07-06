@@ -21,8 +21,8 @@
  *
  */
 
-import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Iframe from 'react-iframe';
@@ -54,7 +54,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getUrl = instanceId => {
+const getUrl = (instanceId: string) => {
   switch(window.location.hostname) {
   case 'localhost':
   case 'editor.kg-dev.ebrains.eu':
@@ -69,11 +69,17 @@ const getUrl = instanceId => {
   }
 };
 
-const ClientPreviewModal = observer(({ store, show, handleClose }) => {
+interface ClientPreviewModalProps {
+  instanceId: string;
+  show: boolean;
+  handleClose: () => void;
+}
+
+const ClientPreviewModal = observer(({ instanceId, show, handleClose }: ClientPreviewModalProps) => {
 
   const classes = useStyles();
 
-  const url = getUrl(store.topInstanceId);
+  const url = getUrl(instanceId);
 
   return (
     <Modal show={show} className={classes.greatModal}>
@@ -82,7 +88,7 @@ const ClientPreviewModal = observer(({ store, show, handleClose }) => {
           <Iframe url={url}
             width="100%"
             height="100%"
-            id={store.topInstanceId}
+            id={instanceId}
             className={classes.frame}
             display="initial"
             position="relative" />

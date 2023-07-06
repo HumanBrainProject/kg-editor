@@ -158,10 +158,10 @@ const populateStatuses = (node: ReleaseScope, pending: boolean) => {
 const processChildrenInstanceList = (node: ReleaseScope, list: ReleaseResult[], level: number, hideReleasedInstances: boolean) => {
   if (
     !hideReleasedInstances ||
-    node.status === 'UNRELEASED' ||
-    node.status === 'HAS_CHANGED' ||
-    node.childrenStatus === 'UNRELEASED' ||
-    node.childrenStatus === 'HAS_CHANGED' ||
+    node.status === ReleaseStatus.UNRELEASED ||
+    node.status === ReleaseStatus.HAS_CHANGED ||
+    node.childrenStatus === ReleaseStatus.UNRELEASED ||
+    node.childrenStatus === ReleaseStatus.HAS_CHANGED ||
     node.pending_status !== node.status ||
     node.pending_childrenStatus !== node.childrenStatus
   ) {
@@ -255,30 +255,30 @@ export class ReleaseStore {
 
     const getStatsFromNode = (node: ReleaseScope) => {
       count.total++;
-      if (node.status === 'RELEASED') {
+      if (node.status === ReleaseStatus.RELEASED) {
         count.released++;
       }
-      if (node.status === 'UNRELEASED') {
+      if (node.status === ReleaseStatus.UNRELEASED) {
         count.not_released++;
       }
-      if (node.status === 'HAS_CHANGED') {
+      if (node.status === ReleaseStatus.HAS_CHANGED) {
         count.has_changed++;
       }
 
-      if (node.pending_status === 'RELEASED') {
+      if (node.pending_status === ReleaseStatus.RELEASED) {
         count.pending_released++;
       }
-      if (node.pending_status === 'UNRELEASED') {
+      if (node.pending_status === ReleaseStatus.UNRELEASED) {
         count.pending_not_released++;
       }
-      if (node.pending_status === 'HAS_CHANGED') {
+      if (node.pending_status === ReleaseStatus.HAS_CHANGED) {
         count.pending_has_changed++;
       }
 
       if (node.status === node.pending_status) {
         count.proceed_do_nothing++;
       } else {
-        if (node.pending_status === 'RELEASED') {
+        if (node.pending_status === ReleaseStatus.RELEASED) {
           count.proceed_release++;
         } else {
           count.proceed_unrelease++;
@@ -383,7 +383,7 @@ export class ReleaseStore {
     const nodesToProceed = this.getNodesToProceed();
     this.savingProgress = 0;
     this.savingTotal =
-      nodesToProceed['UNRELEASED'].length + nodesToProceed['RELEASED'].length;
+      nodesToProceed.UNRELEASED.length + nodesToProceed.RELEASED.length;
     this.savingErrors = [];
     this.isStopped = false;
     if (!this.savingTotal) {
@@ -394,19 +394,19 @@ export class ReleaseStore {
 
     for (
       let i = 0;
-      i < nodesToProceed['RELEASED'].length && !this.isStopped;
+      i < nodesToProceed.RELEASED.length && !this.isStopped;
       i++
     ) {
-      const node = nodesToProceed['RELEASED'][i];
+      const node = nodesToProceed.RELEASED[i];
       await this.releaseNode(node);
     }
 
     for (
       let i = 0;
-      i < nodesToProceed['UNRELEASED'].length && !this.isStopped;
+      i < nodesToProceed.UNRELEASED.length && !this.isStopped;
       i++
     ) {
-      const node = nodesToProceed['UNRELEASED'][i];
+      const node = nodesToProceed.UNRELEASED[i];
       await this.unreleaseNode(node);
     }
 

@@ -25,6 +25,7 @@ import debounce from 'lodash/debounce';
 import { observable, action, runInAction, makeObservable } from 'mobx';
 import type API from '../Services/API';
 import type { StatusResponse } from '../types';
+import { APIError } from '../Services/API';
 
 
 export interface Status {
@@ -161,14 +162,14 @@ export class StatusStore {
         });
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message ? e.message : e;
         toProcess.forEach(id => {
           const status = this.statuses.get(id);
           if (status) {
             status.isFetching = false;
             status.hasFetchError = true;
-            status.fetchError = `Error while retrieving instance status (${message})`;
+            status.fetchError = `Error while retrieving instance status (${err?.message})`;
           }
         });
         this.isFetching = false;
@@ -212,13 +213,13 @@ export class StatusStore {
       });
     } catch (e) {
       runInAction(() => {
-        const message = e.message ? e.message : e;
+        const err = e as APIError;
         toProcessChildren.forEach(id => {
           const status = this.statuses.get(id);
           if (status) {
             status.isFetchingChildren = false;
             status.hasFetchErrorChildren = true;
-            status.fetchErrorChildren = `Error while retrieving instance child status (${message})`;
+            status.fetchErrorChildren = `Error while retrieving instance child status (${err?.message})`;
           }
         });
         this.isFetchingChildren = false;

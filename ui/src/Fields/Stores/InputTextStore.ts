@@ -66,6 +66,7 @@ class InputTextStore extends FieldStore {
   initialValue = '';
   maxLength?: number;
   regexRules: FieldStoreRegexRule[] = [DEFAULT_REGEX];
+  markdown: boolean = false;
 
   constructor(
     definition: FieldStoreDefinition,
@@ -76,6 +77,7 @@ class InputTextStore extends FieldStore {
   ) {
     super(definition, options, instance, api, rootStore);
     this.maxLength = definition.maxLength;
+    this.markdown = !!definition.markdown;
     this.regexRules = getRegexRules(definition.validation);
     //TODO: remove backward compatibility for deprecated regex property
     if (

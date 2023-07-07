@@ -61,7 +61,7 @@ const TextArea = (props: TextAreaProps) => {
       return null;
     }
 
-    if (fieldStore.markdown) { //TODO: fix me. This property is not set at all! Is it still used ?
+    if (fieldStore.markdown) {
       return (
         <Form.Group className={`${classes.readMode} ${className}`} >
           {label && (

@@ -366,4 +366,5 @@ export interface FieldStoreDefinition {
   lazyShowLinks?: boolean;
   targetTypes?: SimpleType[];
   fields: Map<string, StructureOfField>;
+  markdown?: boolean;
 }

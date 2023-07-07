@@ -55,6 +55,8 @@ export enum ReleaseStatus {
   HAS_CHANGED = "HAS_CHANGED",
   RELEASED = "RELEASED"
 }
+
+export type Stage = "IN_PROGRESS" | "RELEASED"; //TODO: change this to Enum
 export interface Settings {
   commit: string;
   keycloak: KeycloakConfig;
@@ -95,8 +97,6 @@ export interface UserSummary {
   name: string;
   picture?: string;
 }
-
-export type Stage = "IN_PROGRESS" | "RELEASED";
 
 export interface KGCoreError {
   code: number;
@@ -140,11 +140,7 @@ export interface Suggestion {
   isExternal?: boolean;
 }
 
-export interface StructureOfType {
-  label: string;
-  name: string;
-  description: string;
-  color: string;
+export interface StructureOfType extends SimpleType {
   labelField: string;
   embeddedOnly: boolean;
   fields: Map<string, StructureOfField>;
@@ -322,6 +318,8 @@ export interface GraphGroups {
 export interface GraphLink extends LinkObject {
   id: string;
   highlighted: boolean;
+  source: GraphNode;
+  target: GraphNode;
 }
 
 export interface GraphLinks {

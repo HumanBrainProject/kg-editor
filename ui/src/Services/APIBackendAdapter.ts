@@ -135,7 +135,7 @@ class APIBackendAdapter implements API {
     return data;
   }
 
-  async getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor[]>> {
+  async getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor>> {
     const { data } = await this._axios.get(endpoints.neighbors(instanceId));
     return data;
   }

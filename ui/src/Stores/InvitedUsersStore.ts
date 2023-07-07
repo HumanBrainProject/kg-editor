@@ -104,12 +104,12 @@ export class InvitedUsersStore {
         this.users = data ?? [];
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        const message = e.message ? e.message : e;
-        this.error = `Error while removing invitation to user "${userId}" to review instance "${instanceId}" (${message})`;
+        this.error = `Error while removing invitation to user "${userId}" to review instance "${instanceId}" (${err?.message})`;
       });
     }
   }
 }
 
-export default new InvitedUsersStore();
+export default InvitedUsersStore;

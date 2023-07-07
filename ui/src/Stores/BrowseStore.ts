@@ -29,8 +29,9 @@ import type RootStore from './RootStore';
 import type Type from './TypeStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
+import { InstanceSummary, SimpleType } from '../types';
 
-const normalizeInstancesData = (api: API, rootStore: RootStore, data:any) => (Array.isArray(data))?data.map(rowData => {
+const normalizeInstancesData = (api: API, rootStore: RootStore, data:InstanceSummary[]) => (Array.isArray(data))?data.map(rowData => {
   Object.values(rowData.fields).forEach(d => {
     if(d.widget === 'TextArea') {
       d.value = d.value && d.value.substr(0, 197) + '...';
@@ -46,10 +47,10 @@ export class BrowseStore {
   isFetching = false;
   isFetched = false;
   fetchError?: string;
-  selectedType?: Type;
+  selectedType?: SimpleType;
   selectedInstance?: Instance;
 
-  instances = [];
+  instances: Instance[] = [];
   instancesFilter = '';
 
   canLoadMoreInstances = false;
@@ -90,9 +91,9 @@ export class BrowseStore {
     this.rootStore = rootStore;
   }
 
-  selectType(item: Type) {
+  selectType(type: SimpleType) {
     this.clearInstancesFilter();
-    this.selectedType = item;
+    this.selectedType = type;
     this.fetchInstances();
   }
 
@@ -144,7 +145,8 @@ export class BrowseStore {
     }
     this.fetchError = undefined;
     try {
-      const data  = await this.api.searchInstancesByType(this.rootStore.appStore.currentSpace?.id, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
+      const space = this.rootStore.appStore.currentSpace?.id as string;
+      const data  = await this.api.searchInstancesByType(space, this.selectedType.name, this.pageStart*this.pageSize, this.pageSize, this.instancesFilter);
       runInAction(() => {
         this.isFetching = false;
         const instances = normalizeInstancesData(this.api, this.rootStore, data.data);

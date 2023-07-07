@@ -69,7 +69,7 @@ interface API {
 
   getSuggestions(instanceId: UUID, field: string, sourceType: string, targetType: string, from: number, size: number, search: string, payload: object): Promise<KGCoreResult<SuggestionStructure>>;
 
-  getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor[]>>;
+  getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor>>;
 
   getInstanceScope(instanceId: UUID): Promise<KGCoreResult<Scope>>;
 

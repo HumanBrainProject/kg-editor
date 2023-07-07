@@ -23,8 +23,9 @@
 
 import { observable, action, computed, runInAction, set, values, makeObservable } from 'mobx';
 import type API from '../Services/API';
-import type { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, GraphSource, GraphTarget, SimpleType, UUID } from '../types';
+import type { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, Neighbor, SimpleType, UUID } from '../types';
 import { APIError } from '../Services/API';
+import { LinkObject } from 'force-graph';
 
 const typeDefaultColor = 'white';
 const typeDefaultName = '-';
@@ -57,16 +58,18 @@ const createNode = (id: UUID, name: string, space: string, color: string, groupI
   highlighted: false
 });
 
-const createLink = (id: string, source: GraphSource, target: GraphTarget) => ({
+const createLink = (id: string, source: GraphNode, target: GraphNode): GraphLink => ({
   id: id,
   source: source,
-  target: target
+  target: target,
+  highlighted: false
 });
 
-const isNodeVisible = (groups: GraphGroups, node) => {
+const isNodeVisible = (groups: GraphGroups, node: GraphNode) => {
   if(node.isGroup) {
-    if (node.grouped) {
-      return node.show;
+    const graphGroup = node as GraphGroup;
+    if (graphGroup.grouped) {
+      return graphGroup.show;
     }
   } else {
     const group = groups[node.groupId];
@@ -86,7 +89,7 @@ const getGraphNodes = (groups: GraphGroups) => Object.values(groups).reduce((acc
     }
   }
   return acc;
-}, []);
+}, [] as GraphNode[]);
 
 const getGraphLinks = (groups: GraphGroups, links: GraphLink[]) => links.filter(link => isNodeVisible(groups, link.source) && isNodeVisible(groups, link.target)).map(link => ({
   id: link.id,
@@ -139,7 +142,7 @@ export class GraphStore {
   }
 
   get groupsList() {
-    return values(this.groups).sort((a, b) => a.name.localeCompare(b.name));
+    return (values(this.groups) as GraphGroup[]).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async fetch(id: UUID) {
@@ -205,13 +208,13 @@ export class GraphStore {
     set(group, 'grouped', grouped);
   }
 
-  extractGroupsAndLinks = rootData => {
+  extractGroupsAndLinks = (rootNeighbor: Neighbor) => {
     const links: GraphLinks = {};
 
     const getOrCreateNode = (id: string, name: string, space: string, group: GraphGroup) => {
       let node = this.nodes[id];
       if (!node) {
-        set(this.nodes, id, createNode(id, name, space, group.color, group.id));
+        set(this.nodes, id, createNode(id, name, space, group.color, group.id as string));
         node = this.nodes[id];
         group.nodes.push(node);
         if (group.nodes.length > 1) { // by default we group nodes when more than one
@@ -221,7 +224,7 @@ export class GraphStore {
       return node;
     };
 
-    const getOrCreateGroup = types => {
+    const getOrCreateGroup = (types: SimpleType[]) => {
       const groupId = getGroupId(types);
       let group = this.groups[groupId];
       if (!group) {
@@ -231,14 +234,14 @@ export class GraphStore {
       return group;
     };
 
-    const addDirectionalLink = (source: GraphSource, target: GraphTarget) => {
+    const addDirectionalLink = (source: GraphNode, target: GraphNode) => {
       const id = `${source.id}->${target.id}`;
       if (!links[id]) {
         links[id] = createLink(id, source, target);
       }
     };
 
-    const addLink = (source: GraphSource, target: GraphTarget, isReverse?: boolean) => {
+    const addLink = (source: GraphNode, target: GraphNode, isReverse?: boolean) => {
       if (isReverse) {
         addDirectionalLink(target, source); //NOSONAR swap of target & source order are intended, it is reverse
       } else {
@@ -246,10 +249,10 @@ export class GraphStore {
       }
     };
 
-    const extractData = (data, parentNode?: GraphNode, parentGroup?: GraphGroup, isReverse?: boolean) => {
-      const types = (data.types && data.types.length)?data.types:[{name: typeDefaultName, label: typeDefaultLabel}];
+    const extractData = (neighbor: Neighbor, parentNode?: GraphNode, parentGroup?: GraphGroup, isReverse?: boolean) => {
+      const types = (neighbor.types && neighbor.types.length)?neighbor.types:[{name: typeDefaultName, label: typeDefaultLabel} as SimpleType];
       const group = getOrCreateGroup(types);
-      const node = getOrCreateNode(data.id, data.name, data.space, group);
+      const node = getOrCreateNode(neighbor.id, neighbor.name, neighbor.space, group);
 
       if (!parentNode) {
         node.isMainNode = true;
@@ -264,13 +267,13 @@ export class GraphStore {
         addLink(group, parentGroup, isReverse);
       }
 
-      Array.isArray(data.inbound) && data.inbound.forEach(child => extractData(child, node, group, false));
-      Array.isArray(data.outbound) && data.outbound.forEach(child => extractData(child, node, group, true));
+      Array.isArray(neighbor.inbound) && neighbor.inbound.forEach(child => extractData(child, node, group, false));
+      Array.isArray(neighbor.outbound) && neighbor.outbound.forEach(child => extractData(child, node, group, true));
     };
 
-    extractData(rootData, undefined, undefined, false);
+    extractData(rootNeighbor, undefined, undefined, false);
 
-    values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:a.id).localeCompare(b.name?b.name:b.id)));
+    values(this.groups).forEach(group => group.nodes = group.nodes.sort((a, b) => (a.name?a.name:(a.id as string)).localeCompare(b.name?b.name:(b.id as string))));
 
     this.links =  Object.values(links);
   };

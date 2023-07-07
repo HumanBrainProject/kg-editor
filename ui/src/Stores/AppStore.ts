@@ -89,7 +89,7 @@ export class AppStore{
   isDeletingInstance = false;
   deleteInstanceError?: string;
   isCreatingNewInstance = false;
-  instanceCreationError = null;
+  instanceCreationError?: string;
   isMovingInstance = false;
   instanceMovingError?: string;
   instanceToMove?: InstanceToMove;
@@ -216,7 +216,7 @@ export class AppStore{
     this.rootStore?.statusStore.flush();
     this.showSaveBar = false;
     this.isCreatingNewInstance = false;
-    this.instanceCreationError = null;
+    this.instanceCreationError = undefined;
     this.instanceToMove = undefined;
     this.isMovingInstance = false;
     this.instanceMovingError = undefined;
@@ -515,9 +515,10 @@ export class AppStore{
         navigate(`/instances/${newId}/edit`);
       }
     } catch(e){
+      const err = e as APIError;
       runInAction(() => {
         this.isCreatingNewInstance = false;
-        this.instanceCreationError = e.message;
+        this.instanceCreationError = err?.message;
       });
     }
   }

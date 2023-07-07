@@ -25,7 +25,7 @@ import { observable, action, computed, makeObservable } from 'mobx';
 import React from 'react';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
-import type { StructureOfType, UUID, ViewMode } from '../types';
+import { StructureOfType, UUID, ViewMode } from '../types';
 
 interface StoredSpaceView {
   id: UUID;
@@ -290,7 +290,7 @@ export class ViewStore{
 
   replaceViewByNewInstanceId(id: string, newId: string) {
     const view = this.views.get(id);
-    this.views.set(newId, new View(newId, view?view.name:'', view?.color??'', 'edit', view?.description??''));
+    this.views.set(newId, new View(newId, view?view.name:'', view?.color??'', ViewMode.EDIT, view?.description??''));
     this.views.delete(id);
   }
 

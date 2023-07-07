@@ -45,7 +45,7 @@ import Styles from './Views/Styles';
 import type API from './Services/API';
 import type AuthAdapter from './Services/AuthAdapter';
 import type RootStore from './Stores/RootStore';
-import type { Space as SpaceType } from './types';
+import { ViewMode, type Space as SpaceType } from './types';
 
 const AuthProvider = React.lazy(() => import('./Views/AuthProvider'));
 const UserProfile = React.lazy(() => import('./Views/UserProfile'));
@@ -113,7 +113,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                         <Space space={spaceParam} skipHistory={skipHistory} >
                                           <Types>
                                             <InstanceCreation>
-                                              <InstanceView mode="create" />
+                                              <InstanceView mode={ViewMode.CREATE} />
                                             </InstanceCreation>
                                           </Types>
                                         </Space>
@@ -130,7 +130,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                       {(_, space) => (
                                         <Space space={space} skipHistory={skipHistory} >
                                           <Types>
-                                            <InstanceView mode="raw" />
+                                            <InstanceView mode={ViewMode.RAW} />
                                           </Types>
                                         </Space>
                                       )}
@@ -145,11 +145,11 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                         <Space space={space} skipHistory={skipHistory} >
                                           <Types>
                                             <Routes>
-                                              <Route path="" element={<InstanceView mode="view" />} />
-                                              <Route path="edit" element={<InstanceView mode="edit" />} />
-                                              <Route path="graph" element={<InstanceView mode="graph" />} />
-                                              <Route path="release" element={<InstanceView mode="release" />} />
-                                              <Route path="manage"  element={<InstanceView mode="manage" />} />
+                                              <Route path="" element={<InstanceView mode={ViewMode.VIEW} />} />
+                                              <Route path="edit" element={<InstanceView mode={ViewMode.EDIT} />} />
+                                              <Route path="graph" element={<InstanceView mode={ViewMode.GRAPH} />} />
+                                              <Route path="release" element={<InstanceView mode={ViewMode.RELEASE} />} />
+                                              <Route path="manage"  element={<InstanceView mode={ViewMode.MANAGE} />} />
                                               <Route path="*" element={<Navigate to={`/instances/${instanceId}`} />} />
                                             </Routes>
                                           </Types>

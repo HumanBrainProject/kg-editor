@@ -27,11 +27,22 @@ import Instance from './Instance';
 import type RootStore from './RootStore';
 import type { APIError } from '../Services/API';
 import type API from '../Services/API';
+import { UUID, ViewMode } from '../types';
 
 const maxItems = 100;
 
+interface InstancesHistory {
+  id: UUID;
+  space: string;
+  mode: ViewMode;
+  color?: string;
+  description?: string;
+  name?: string;
+  selected?: boolean;
+}
+
 export class HistoryStore {
-  instancesHistory = [];
+  instancesHistory: InstancesHistory[] = [];
   instances = [];
   isFetching = false;
   fetchError?: string;
@@ -65,7 +76,7 @@ export class HistoryStore {
     }
   }
 
-  updateInstanceHistory(id: string, mode: string, remove?: boolean) {
+  updateInstanceHistory(id: string, mode: ViewMode, remove?: boolean) {
     if (!this.rootStore.appStore.currentSpace) {
       return;
     }
@@ -145,13 +156,6 @@ export class HistoryStore {
                 instance.initializeData(this.api, this.rootStore, data);
                 this.instances.push(instance);
               }
-              // else {
-              //   if(data.error.code && [401, 403, 404, 410].includes(data.error.code)) {
-              //     //TO DO: ignore those errors because instance id in localstorage may have been deleted or permissions may have changed
-              //   } else {
-              //     //TO DO: set error message to the instance
-              //   }
-              // }
             }
           });
           this.isFetching = false;

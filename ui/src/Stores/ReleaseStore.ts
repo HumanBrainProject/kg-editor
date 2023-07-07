@@ -30,7 +30,7 @@ import {
 } from 'mobx';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
-import { ReleaseScope, ReleaseStatus, UUID } from '../types';
+import { ReleaseScope, ReleaseStatus, UUID, ViewMode } from '../types';
 import { APIError } from '../Services/API';
 
 interface  ReleaseResult { 
@@ -185,7 +185,7 @@ export class ReleaseStore {
   saveError = null;
   isStopped = false;
   hideReleasedInstances = false;
-  comparedInstance = null;
+  comparedInstance?: ReleaseScope;
 
   historyStore = null;
   statusStore = null;
@@ -231,7 +231,7 @@ export class ReleaseStore {
     this.rootStore = rootStore;
   }
 
-  setComparedInstance(instance) {
+  setComparedInstance(instance: ReleaseScope) {
     this.comparedInstance = instance;
   }
 
@@ -421,7 +421,7 @@ export class ReleaseStore {
         this.savingLastEndedNode = node;
         this.rootStore.historyStore.updateInstanceHistory(
           node.id,
-          'released',
+          ViewMode.RELEASE,
           false
         );
       });
@@ -447,7 +447,7 @@ export class ReleaseStore {
         this.savingLastEndedNode = node;
         this.rootStore.historyStore.updateInstanceHistory(
           node.id,
-          'released',
+          ViewMode.RELEASE,
           true
         );
       });

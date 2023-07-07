@@ -24,6 +24,7 @@
 import { observable, action, computed, runInAction, set, values, makeObservable } from 'mobx';
 import type API from '../Services/API';
 import type { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, GraphSource, GraphTarget, SimpleType, UUID } from '../types';
+import { APIError } from '../Services/API';
 
 const typeDefaultColor = 'white';
 const typeDefaultName = '-';
@@ -96,7 +97,7 @@ const getGraphLinks = (groups: GraphGroups, links: GraphLink[]) => links.filter(
 export class GraphStore {
   isFetching = false;
   isFetched = false;
-  fetchError = null;
+  fetchError?: string;
   mainId?: string;
   groups: GraphGroups = {};
   nodes: GraphNodes = {};
@@ -145,7 +146,7 @@ export class GraphStore {
     if (this.isFetching) {
       return;
     }
-    this.fetchError = null;
+    this.fetchError = undefined;
     this.isFetched = false;
     this.isFetching = true;
     this.highlightedNode = undefined;
@@ -161,8 +162,9 @@ export class GraphStore {
         this.isFetching = false;
       });
     } catch (e) {
+      const err = e as APIError;
       runInAction(() => {
-        this.fetchError = e.message ? e.message : e;
+        this.fetchError = err?.message;
         this.isFetching = false;
       });
     }

@@ -403,7 +403,7 @@ export class Instance {
   _name = null;
   types: StructureOfType[] = [];
   isNew = false;
-  labelField = null;
+  labelField?: string;
   _promotedFields = [];
   primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
   space = '';

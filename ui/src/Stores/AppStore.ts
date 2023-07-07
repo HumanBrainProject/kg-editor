@@ -51,7 +51,7 @@ const getLinkedInstanceIds = (instanceStore: InstanceStore, instanceIds: string 
       }
     }
     return acc;
-  }, []);
+  }, [] as string[]);
   return Array.from(new Set(result));
 };
 
@@ -59,7 +59,7 @@ interface ExternalCreateModal {
   space: string;
   type: string;
   value: string;
-  toSave?: boolean;
+  toSave?: number;
   saved?: number;
 }
 
@@ -80,7 +80,7 @@ export class AppStore{
   commit?: string;
   globalError?: boolean;
   currentSpace?: Space;
-  savePercentage = null;
+  savePercentage?: number;
   _currentThemeName = DefaultTheme.name;
   historySettings?: HistorySettings;
   showSaveBar = false;
@@ -192,13 +192,19 @@ export class AppStore{
   }
 
   updateExternalInstanceModal(toSave=null) {
-    if (toSave) {
-      this.externalCreateModal.toSave = toSave;
-      this.externalCreateModal.saved = 0;
-    } else {
-      this.externalCreateModal.saved += 1;
+    if(this.externalCreateModal) {
+      if (toSave) {
+        this.externalCreateModal.toSave = toSave;
+        this.externalCreateModal.saved = 0;
+      } else {
+        if(this.externalCreateModal.saved !== undefined) {
+          this.externalCreateModal.saved += 1;
+        }
+      }
+      if(this.externalCreateModal.saved !== undefined && this.externalCreateModal.toSave !== undefined) {
+        this.savePercentage = Math.round(this.externalCreateModal.saved/this.externalCreateModal.toSave*100);
+      }
     }
-    this.savePercentage = Math.round(this.externalCreateModal.saved/this.externalCreateModal.toSave*100);
   }
 
   clearExternalCreateModal() {
@@ -491,9 +497,9 @@ export class AppStore{
 
   async duplicateInstance(fromInstanceId: string, navigate: NavigateFunction) {
     const instanceToCopy = this.rootStore?.instanceStore.instances.get(fromInstanceId);
-    const payload = instanceToCopy.payload;
-    const labelField = instanceToCopy.labelField;
-    if(labelField) {
+    const payload = instanceToCopy?.payload;
+    const labelField = instanceToCopy?.labelField;
+    if(labelField && payload) {
       payload[labelField] = `${payload[labelField]} (Copy)`;
     }
     this.isCreatingNewInstance = true;

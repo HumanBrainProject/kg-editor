@@ -21,17 +21,17 @@
  *
  */
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { observer } from 'mobx-react-lite';
-import React from 'react';
-import { createUseStyles } from 'react-jss';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react-lite";
+import React from "react";
+import { createUseStyles } from "react-jss";
 
-import { useNavigate } from 'react-router-dom';
-import useStores from '../../Hooks/useStores';
-import type Instance from '../../Stores/Instance';
-import type { ViewMode } from '../../types';
-import type { IconProp } from '@fortawesome/fontawesome-svg-core';
-import type { MouseEvent } from 'react';
+import { useNavigate } from "react-router-dom";
+import useStores from "../../Hooks/useStores";
+import type Instance from "../../Stores/Instance";
+import { ViewMode } from "../../types";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+import type { MouseEvent } from "react";
 
 interface ActionProps {
   className: string;
@@ -43,44 +43,53 @@ interface ActionProps {
   onCtrlClick: (v: ViewMode) => void;
 }
 
-const Action = ({className, show, label, icon, mode, onClick, onCtrlClick}: ActionProps) => {
+const Action = ({
+  className,
+  show,
+  label,
+  icon,
+  mode,
+  onClick,
+  onCtrlClick
+}: ActionProps) => {
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === 'function' && onCtrlClick(mode);
+      typeof onCtrlClick === "function" && onCtrlClick(mode);
     } else {
-      typeof onClick === 'function' && onClick(mode);
+      typeof onClick === "function" && onClick(mode);
     }
   };
 
-  if(!show) {
+  if (!show) {
     return null;
   }
 
   return (
     <div className={className} onClick={handleClick}>
-      <FontAwesomeIcon icon={icon} />&nbsp;&nbsp;{label}
+      <FontAwesomeIcon icon={icon} />
+      &nbsp;&nbsp;{label}
     </div>
   );
 };
 
 const useStyles = createUseStyles({
   actions: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(6, 1fr)',
-    gridGap: '10px',
-    marginBottom: '20px'
+    display: "grid",
+    gridTemplateColumns: "repeat(6, 1fr)",
+    gridGap: "10px",
+    marginBottom: "20px"
   },
   action: {
-    height: '34px',
-    cursor: 'pointer',
-    overflow: 'hidden',
-    lineHeight: '34px',
-    textAlign: 'center',
-    borderRadius: '2px',
-    backgroundColor: 'var(--bg-color-blend-contrast1)',
-    color: 'var(--ft-color-normal)',
-    '&:hover': {
-      color: 'var(--ft-color-loud)'
+    height: "34px",
+    cursor: "pointer",
+    overflow: "hidden",
+    lineHeight: "34px",
+    textAlign: "center",
+    borderRadius: "2px",
+    backgroundColor: "var(--bg-color-blend-contrast1)",
+    color: "var(--ft-color-normal)",
+    "&:hover": {
+      color: "var(--ft-color-loud)"
     }
   }
 });
@@ -90,7 +99,6 @@ interface ActionsProps {
 }
 
 const Actions = observer(({ instance }: ActionsProps) => {
-
   const { id, name, primaryType, permissions } = instance;
   const classes = useStyles();
 
@@ -98,13 +106,13 @@ const Actions = observer(({ instance }: ActionsProps) => {
   const navigate = useNavigate();
 
   const handleCtrlClick = (mode: ViewMode) => {
-    if(id) {
+    if (id) {
       appStore.openInstance(id, name, primaryType, mode);
     }
   };
 
   const handleClick = (mode: ViewMode) => {
-    if(mode === 'view') {
+    if (mode === ViewMode.VIEW) {
       navigate(`/instances/${id}`);
     } else {
       navigate(`/instances/${id}/${mode}`);
@@ -113,15 +121,63 @@ const Actions = observer(({ instance }: ActionsProps) => {
 
   return (
     <div className={classes.actions}>
-      <Action className={classes.action} show={permissions?.canRead}                            icon="eye"              label="Open"     mode="view"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions?.canWrite}                           icon="pencil-alt"       label="Edit"     mode="edit"    onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions?.canRead}                            icon="project-diagram"  label="Explore"  mode="graph"   onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions?.canRelease}                         icon="cloud-upload-alt" label="Release"  mode="release" onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions?.canDelete || permissions?.canCreate} icon="cog"              label="Manage"   mode="manage"  onClick={handleClick} onCtrlClick={handleCtrlClick} />
-      <Action className={classes.action} show={permissions?.canRead}                            icon="code"             label="Raw view" mode="raw"     onClick={handleClick} onCtrlClick={handleCtrlClick} />
+      <Action
+        className={classes.action}
+        show={permissions?.canRead}
+        icon="eye"
+        label="Open"
+        mode={ViewMode.VIEW}
+        onClick={handleClick}
+        onCtrlClick={handleCtrlClick}
+      />
+      <Action
+        className={classes.action}
+        show={permissions?.canWrite}
+        icon="pencil-alt"
+        label="Edit"
+        mode={ViewMode.EDIT}
+        onClick={handleClick}
+        onCtrlClick={handleCtrlClick}
+      />
+      <Action
+        className={classes.action}
+        show={permissions?.canRead}
+        icon="project-diagram"
+        label="Explore"
+        mode={ViewMode.GRAPH}
+        onClick={handleClick}
+        onCtrlClick={handleCtrlClick}
+      />
+      <Action
+        className={classes.action}
+        show={permissions?.canRelease}
+        icon="cloud-upload-alt"
+        label="Release"
+        mode={ViewMode.RELEASE}
+        onClick={handleClick}
+        onCtrlClick={handleCtrlClick}
+      />
+      <Action
+        className={classes.action}
+        show={permissions?.canDelete || permissions?.canCreate}
+        icon="cog"
+        label="Manage"
+        mode={ViewMode.MANAGE}
+        onClick={handleClick}
+        onCtrlClick={handleCtrlClick}
+      />
+      <Action
+        className={classes.action}
+        show={permissions?.canRead}
+        icon="code"
+        label="Raw view"
+        mode={ViewMode.RAW}
+        onClick={handleClick}
+        onCtrlClick={handleCtrlClick}
+      />
     </div>
   );
 });
-Actions.displayName = 'Actions';
+Actions.displayName = "Actions";
 
 export default Actions;

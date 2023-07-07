@@ -47,7 +47,7 @@ export class BrowseStore {
   isFetched = false;
   fetchError?: string;
   selectedType?: Type;
-  selectedInstance = null;
+  selectedInstance?: Instance;
 
   instances = [];
   instancesFilter = '';
@@ -108,12 +108,12 @@ export class BrowseStore {
     this.navigationFilter = filter;
   }
 
-  selectInstance(selectedInstance) {
+  selectInstance(selectedInstance: Instance) {
     this.selectedInstance = selectedInstance;
   }
 
   clearSelectedInstance() {
-    this.selectedInstance = null;
+    this.selectedInstance = undefined;
   }
 
   setInstancesFilter(filter: string) {
@@ -139,7 +139,7 @@ export class BrowseStore {
     } else {
       this.pageStart = 0;
       this.isFetching = true;
-      this.selectedInstance = null;
+      this.selectedInstance = undefined;
       this.instances = [];
     }
     this.fetchError = undefined;

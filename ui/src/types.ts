@@ -32,20 +32,28 @@
  *   limitations under the License.
  *
  */
-import type { IconProp } from '@fortawesome/fontawesome-svg-core';
-import type { BrowserOptions } from '@sentry/browser';
-import { LinkObject, NodeObject } from 'force-graph';
-import type { KeycloakConfig } from 'keycloak-js';
-import type { PiwikOptions } from 'react-piwik';
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+import type { BrowserOptions } from "@sentry/browser";
+import { LinkObject, NodeObject } from "force-graph";
+import type { KeycloakConfig } from "keycloak-js";
+import type { PiwikOptions } from "react-piwik";
 
 export type UUID = string;
 
-export type ViewMode = 'view' | 'edit' | 'graph' | 'manage' | 'release' | 'create' | 'raw';
+export enum ViewMode {
+  VIEW = "view",
+  EDIT = "edit",
+  GRAPH = "graph",
+  MANAGE = "manage",
+  RELEASE = "release",
+  CREATE = "create",
+  RAW = "raw"
+}
 
-export enum ReleaseStatus{
+export enum ReleaseStatus {
   UNRELEASED = "UNRELEASED",
   HAS_CHANGED = "HAS_CHANGED",
-  RELEASED = "RELEASED" 
+  RELEASED = "RELEASED"
 }
 export interface Settings {
   commit: string;
@@ -88,7 +96,7 @@ export interface UserSummary {
   picture?: string;
 }
 
-export type Stage = 'IN_PROGRESS' | 'RELEASED';
+export type Stage = "IN_PROGRESS" | "RELEASED";
 
 export interface KGCoreError {
   code: number;
@@ -109,7 +117,6 @@ export interface SearchFilter {
   queryString: string;
   excludedUsers: string[];
 }
-
 
 export interface SimpleType {
   name: string;
@@ -295,7 +302,7 @@ export interface StatusResponse {
   data: string;
 }
 
-export interface GraphNode extends NodeObject{
+export interface GraphNode extends NodeObject {
   name: string;
   space: string;
   color: string;
@@ -313,13 +320,13 @@ export interface GraphNodes {
 export interface GraphGroups {
   [key: string]: GraphGroup;
 }
-export interface GraphLink extends LinkObject{
+export interface GraphLink extends LinkObject {
   id: string;
   highlighted: boolean;
 }
 
 export interface GraphLinks {
-  [key:string]: GraphLink;
+  [key: string]: GraphLink;
 }
 
 export interface GraphGroup extends GraphNode {
@@ -339,28 +346,27 @@ export interface FieldStoreRegexRule {
   regex: RegExp | string;
 }
 
-
 export interface FieldStoreDefinition {
-    widget: string;
-    label: string;
-    labelTooltip: string;
-    labelTooltipIcon: IconProp;
-    isPublic: boolean;
-    fullyQualifiedName: string;
-    order: number;
-    isRequired: boolean;
-    isReadOnly: boolean;
-    warning: string;
-    minValue?: number;
-    maxValue?: number;
-    minItems?: number;
-    maxItems?: number;
-    maxLength?: number;
-    validation?: FieldStoreValidation[];
-    regex?: string;
-    defaultTargetType?: string;
-    allowCustomValues?: boolean;
-    lazyShowLinks?: boolean;
-    targetTypes?: SimpleType[];
-    fields: Map<string, StructureOfField>;
+  widget: string;
+  label: string;
+  labelTooltip: string;
+  labelTooltipIcon: IconProp;
+  isPublic: boolean;
+  fullyQualifiedName: string;
+  order: number;
+  isRequired: boolean;
+  isReadOnly: boolean;
+  warning: string;
+  minValue?: number;
+  maxValue?: number;
+  minItems?: number;
+  maxItems?: number;
+  maxLength?: number;
+  validation?: FieldStoreValidation[];
+  regex?: string;
+  defaultTargetType?: string;
+  allowCustomValues?: boolean;
+  lazyShowLinks?: boolean;
+  targetTypes?: SimpleType[];
+  fields: Map<string, StructureOfField>;
 }

@@ -33,6 +33,7 @@ import { ViewContext, PaneContext } from '../../../Stores/ViewStore';
 import IncomingLinks from '../IncomingLinks/IncomingLinks';
 import PossibleIncomingLinks from '../IncomingLinks/PossibleIncomingLinks';
 import type Instance from '../../../Stores/Instance';
+import { ViewMode } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -102,7 +103,7 @@ const BodyPanel = observer(({ className, instance, readMode}: BodyPanelProps) =>
     if(!instance.permissions?.canRead) {
       return (
         <Form className={`${classes.container} ${className}`} >
-          <NoPermissionForView instance={instance} mode="view" />
+          <NoPermissionForView instance={instance} mode={ViewMode.VIEW} />
         </Form>
       );
     }
@@ -110,7 +111,7 @@ const BodyPanel = observer(({ className, instance, readMode}: BodyPanelProps) =>
     if(!instance.permissions?.canWrite) {
       return (
         <Form className={`${classes.container} ${className}`} >
-          <NoPermissionForView instance={instance} mode="edit" />
+          <NoPermissionForView instance={instance} mode={ViewMode.EDIT} />
         </Form>
       );
     }

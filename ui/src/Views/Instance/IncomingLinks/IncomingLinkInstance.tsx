@@ -28,7 +28,7 @@ import { createUseStyles } from 'react-jss';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import useStores from '../../../Hooks/useStores';
-import type { InstanceLabel } from '../../../types';
+import type { IncomingLink, InstanceLabel } from '../../../types';
 
 const useStyles = createUseStyles({
   pill: {
@@ -43,7 +43,7 @@ const useStyles = createUseStyles({
 });
 
 interface IncomingLinkInstanceProps {
-  instance: InstanceLabel;
+  instance: IncomingLink;
   readMode: boolean;
 }
 
@@ -57,7 +57,7 @@ const IncomingLinkInstance = observer(({instance, readMode }: IncomingLinkInstan
   const location = useLocation();
   const navigate = useNavigate();
 
-  let label = instance.label?instance.label:instance.id; // TODO: Fix this one. Where is the label calculated ?
+  let label = instance.label?instance.label:instance.id;
 
   if (instance.space === appStore.currentSpace?.id && instanceStore.instances.has(instance.id)) {
     label = instanceStore.instances.get(instance.id)?.name;

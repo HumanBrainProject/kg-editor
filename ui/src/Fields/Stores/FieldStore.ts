@@ -40,7 +40,6 @@ class FieldStore {
   warning?: string;
   errorMessage?: string;
   errorInfo?: string;
-  type = null;
   order?: number;
   widget?: string;
   isRequired = false;
@@ -83,7 +82,6 @@ class FieldStore {
     this.isRequired = definition.isRequired;
     this.isReadOnly = definition.isReadOnly;
     this.warning = definition.warning;
-    this.type = definition.type; // TODO: Check if this is still valid
     this.api = api;
     this.rootStore = rootStore;
   }

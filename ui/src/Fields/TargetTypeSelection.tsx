@@ -61,7 +61,7 @@ interface TargetTypeSelectionProps {
   types: SimpleType[];
   selectedType?: SimpleType;
   id: string;
-  onSelect: (eventKey: string | null, e: SyntheticEvent<Item>) => void; //TODO: fix this
+  onSelect: (eventKey: string | null, e: SyntheticEvent<unknown>) => void;
 }
 
 const FILTER_THRESHOLD = 10; //Show filter only if there are more than 5 elements

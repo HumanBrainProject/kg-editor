@@ -27,6 +27,7 @@ import React from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { createUseStyles } from 'react-jss';
+import { ReleaseStatus as Status } from '../types';
 
 const useStyles = createUseStyles({
   status: {
@@ -76,9 +77,9 @@ const useStyles = createUseStyles({
 
 const getIconStatus = (status: string) => {
   switch (status) {
-  case 'UNRELEASED': return 'unlink';
-  case 'HAS_CHANGED': return 'pencil-alt';
-  case 'RELEASED': return 'check';
+  case Status.UNRELEASED: return 'unlink';
+  case Status.HAS_CHANGED: return 'pencil-alt';
+  case Status.RELEASED: return 'check';
   default: break;
   }
   return 'question';
@@ -90,9 +91,9 @@ interface MessageStatusProps {
 
 const MessageStatus = ({status}: MessageStatusProps) => {
   switch (status) {
-  case 'UNRELEASED': return <span>This instance is <strong>not released</strong>.</span>;
-  case 'HAS_CHANGED': return <span>This instance is <strong>different</strong> than its released version</span>;
-  case 'RELEASED': return <span>This instance is <strong>released</strong></span>;
+  case Status.UNRELEASED: return <span>This instance is <strong>not released</strong>.</span>;
+  case Status.HAS_CHANGED: return <span>This instance is <strong>different</strong> than its released version</span>;
+  case Status.RELEASED: return <span>This instance is <strong>released</strong></span>;
   default: break;
   }
   return <strong>Unknown entity</strong>;

@@ -237,7 +237,7 @@ export interface InstanceIncomingLink {
   instanceId: string;
   property: string;
   type: SimpleType;
-  instances: InstanceLabel[];
+  instances: IncomingLink[];
   from: number;
   size: number;
   total: number;
@@ -283,13 +283,12 @@ export interface Scope {
   permissions: Permissions;
   children?: Scope[];
   types: SimpleType[];
-  status: string;
+  status?: ReleaseStatus;
 }
 
 export interface ReleaseScope extends Scope {
   childrenStatus?: ReleaseStatus;
   globalStatus?: ReleaseStatus;
-  status?: ReleaseStatus;
   pending_childrenStatus?: ReleaseStatus;
   pending_globalStatus?: ReleaseStatus;
   pending_status?: ReleaseStatus;

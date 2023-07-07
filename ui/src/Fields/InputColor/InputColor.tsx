@@ -86,7 +86,6 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
 
   const {
     value,
-    rows,
     returnAsNull,
     label,
     labelTooltip,
@@ -150,7 +149,6 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
           as="input"
           onChange={handleChange}
           disabled={isDisabled}
-          rows={rows}
           className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:''}`}
         />
         <Button className={classes.removeColorBtn} size="sm" variant="secondary" onClick={handleRemoveColor} title="Remove color" >

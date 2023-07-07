@@ -183,6 +183,7 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
   const scrollToIndex = -1;
 
   const [containerWidth, setContainerWidth] = useState(0);
+  const { instanceStore } = useStores();
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -195,9 +196,12 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDeleteRow = (index: number) => onRowDelete(index);
+  const handleDeleteRow = (index: number) => onRowDelete && onRowDelete(index);
 
-  const handleRetry = (id: string) => fieldStore.fetchInstance(id); //TODO: fix this. THis is not correct!
+  const handleRetry = (id: string) => {
+   const instance = instanceStore.instances.get(id);
+   instance?.fetch();
+  };
 
   const handleRowClick = ({index}: {index:number}) => onRowClick && onRowClick(index);
 

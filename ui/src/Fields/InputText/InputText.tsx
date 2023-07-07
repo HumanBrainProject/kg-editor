@@ -123,7 +123,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const {
     value,
     inputType,
-    rows, //TODO: is this still needed ? Remove if not. Currently it always resolved to undefined
     returnAsNull,
     alternatives,
     label,
@@ -177,7 +176,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
           as={as}
           onChange={handleChange}
           disabled={isDisabled}
-          rows={rows}
           className={hasValidationWarnings?classes.warning:''}
         />:
         <Form.Control
@@ -186,7 +184,6 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
           as={as}
           onChange={handleChange}
           disabled={isDisabled}
-          rows={rows}
           className={hasValidationWarnings?classes.warning:''}
         />
       }

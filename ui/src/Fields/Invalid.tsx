@@ -46,7 +46,7 @@ const Invalid = ({ show, messages }: InvalidProps) => {
     return null;
   }
   return (
-    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message}</div>)
+    Object.values(messages).map((message, index) => <div key={`${message}-${index}`} className={classes.invalid}>{message as string}</div>)
   );
 };
 

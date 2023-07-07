@@ -333,7 +333,7 @@ export class InstanceStore {
           instance.isFetching = true;
           instance.isSaving = false;
           instance.isFetched = false;
-          instance.fetchError = null;
+          instance.fetchError = undefined;
           instance.hasFetchError = false;
           instance.saveError = undefined;
           instance.hasSaveError = false;

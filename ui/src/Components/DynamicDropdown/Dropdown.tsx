@@ -153,7 +153,7 @@ const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, has
   };
 
   const clickOutHandler = (e: MouseEvent | Event) => {
-    if(wrapperRef.current && !wrapperRef.current.contains(e.target)){
+    if(wrapperRef.current && !wrapperRef.current.contains(e.target as Node)){
       unlistenClickOutHandler();
       handleReset();
     }

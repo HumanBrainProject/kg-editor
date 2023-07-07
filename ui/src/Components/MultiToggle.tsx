@@ -25,7 +25,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   container:{
@@ -37,22 +37,22 @@ const useStyles = createUseStyles({
 });
 
 interface MultiToggleProps {
-  selectedValue: string;
+  selectedValue: string | boolean;
   children: ReactNode;
-  onChange: (value: string) => void;
+  onChange: (value: string | boolean) => void;
 }
 
 const MultiToggle = ({ selectedValue, children, onChange}: MultiToggleProps) => {
 
   const classes = useStyles();
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: string | boolean) => {
     if(typeof onChange === 'function'){
       onChange(value);
     }
   };
 
-  const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child, { selectedValue: selectedValue, onSelect: handleSelect }));
+  const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child as ReactElement<any> , { selectedValue: selectedValue, onSelect: handleSelect }));
 
   return(
     <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps?.length}, 24px)`}}>
@@ -88,9 +88,9 @@ const useToggleStyles = createUseStyles({
 
 
 interface ToggleProps {
-  onSelect?: (value: string) => void;
-  value: string;
-  selectedValue?: string;
+  onSelect?: (value: string | boolean) => void;
+  value: string | boolean;
+  selectedValue?: string | boolean;
   noscale?: boolean;
   icon: IconProp;
   color: string;

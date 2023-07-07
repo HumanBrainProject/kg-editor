@@ -90,7 +90,7 @@ export class Instance extends BaseInstance {
     if (!this.isRawFetching && (!this.isRawFetched || this.rawFetchError || forceFetch)) {
       this.isRawFetching = true;
       this.hasRawFetchError = false;
-      this.rawFetchError = null;
+      this.rawFetchError = undefined;
       try {
         const data = await this.store.api.getRawInstance(this.id);
         this.initializeRawData(data?.data, data?.permissions);
@@ -123,7 +123,7 @@ export class Instance extends BaseInstance {
           this.hasSaveError = false;
           this.isSaving = false;
           this.rawData = null;
-          this.rawFetchError = null;
+          this.rawFetchError = undefined;
           this.hasRawFetchError = false;
           this.isRawFetched = false;
           this.isRawFetching = false;
@@ -141,7 +141,7 @@ export class Instance extends BaseInstance {
           this.hasSaveError = false;
           this.isSaving = false;
           this.rawData = null;
-          this.rawFetchError = null;
+          this.rawFetchError = undefined;
           this.hasRawFetchError = false;
           this.isRawFetched = false;
           this.isRawFetching = false;
@@ -256,7 +256,7 @@ export class InstanceStore {
     const links = this.getIncomingLinksOfType(instanceId, property, type);
     if (links) {
       links.isFetching = true;
-      links.fetchError = null;
+      links.fetchError = undefined;
       try {
         const data = await this.api.getMoreIncomingLinks(instanceId, property, type, links.from + links.size, 50);
         runInAction(() => {
@@ -409,7 +409,7 @@ export class InstanceStore {
         if(instance) {
           instance.isLabelFetching = true;
           instance.isLabelFetched = false;
-          instance.fetchLabelError = null;
+          instance.fetchLabelError = undefined;
           instance.hasLabelFetchError = false;
           instance.saveError = undefined;
         }

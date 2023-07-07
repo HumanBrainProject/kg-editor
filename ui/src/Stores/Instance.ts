@@ -188,7 +188,7 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
   const instance = {
     ...normalizeLabelInstanceData(data),
     fields: {},
-    labelField: null,
+    labelField: undefined,
     promotedFields: [],
     alternatives: {},
     metadata: {},
@@ -618,7 +618,7 @@ export class Instance {
     this.hasRawFetchError = false;
     this.isRawFetched = true;
     this.isRawFetching = false;
-    this.permissions = (permissions instanceof Object)?permissions:{};
+    this.permissions = (permissions instanceof Object) ? permissions:undefined;
     this.space = data['https://core.kg.ebrains.eu/vocab/meta/space'];
   }
 

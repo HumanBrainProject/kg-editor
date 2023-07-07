@@ -43,6 +43,7 @@ import Table from './Table';
 import type { View } from '../../Stores/ViewStore';
 import type LinksStore from '../Stores/LinksStore';
 import type { MouseEvent, SyntheticEvent} from 'react';
+import { Suggestion } from '../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -208,7 +209,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectTargetType =  (eventKey: string | null, e: SyntheticEvent<Dropdown.Item>)  => {
+  const handleSelectTargetType =  (eventKey: string | null, e: SyntheticEvent<unknown>)  => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
     if (type) {
@@ -216,7 +217,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     }
   };
 
-  const handleOnSelectOption = option => {
+  const handleOnSelectOption = (option: Suggestion) => {
     if (option.isNew) {
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {

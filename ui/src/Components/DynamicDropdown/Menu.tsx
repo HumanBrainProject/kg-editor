@@ -105,7 +105,6 @@ const Menu = ({
           searchTerm={searchTerm}
           items={items}
           loading={loading}
-          hasMore={hasMore}
           onSelect={onSelect}
           onSelectNext={onSelectNext}
           onSelectPrevious={onSelectPrevious}

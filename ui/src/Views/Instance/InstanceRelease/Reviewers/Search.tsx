@@ -164,7 +164,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
 
   useEffect(() => {
     const clickOutHandler = e => {
-      if(!wrapperRef.current?.contains(e.target)){
+      if(!wrapperRef.current?.contains(e.target as Node)){
         userStore.clearSearch();
       }
     };
@@ -184,7 +184,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
   const handleLoadSearchResults = () => userStore.searchUsers();
 
   const handleSelect = (user: UserSummary, event: KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => {
-    if(event && event.keyCode === 40){ // Down
+    if(event && event.key === "ArrowDown"){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -194,7 +194,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         }
         users[index].focus();
       }
-    } else if(event && event.keyCode === 38){ // Up
+    } else if(event && event.key === "ArrowUp"){ // Up
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -204,10 +204,10 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         }
         users[index].focus();
       }
-    } else if(event && event.keyCode === 27) { //escape
+    } else if(event && event.key === "Escape") { //escape
       event.preventDefault();
       userStore.clearSearch();
-    } else if (user && (!event || (event && (!event.keyCode || event.keyCode === 13)))) { // enter
+    } else if (user && (!event || (event && (!event.key || event.key === "Enter")))) { // enter
       event.preventDefault();
       inputRef.current?.focus();
       typeof onSelect === 'function' && onSelect(user.id);
@@ -215,7 +215,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
   };
 
   const handleInputKeyStrokes = (event: KeyboardEvent<HTMLInputElement>) => {
-    if(event && event.keyCode === 40 ){ // Down
+    if(event && event.key === "ArrowDown" ){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -225,7 +225,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         }
         users[index].focus();
       }
-    } else if(event && event.keyCode === 38){ // Up
+    } else if(event && event.key === "ArrowUp"){ // Up
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -235,7 +235,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         }
         users[index].focus();
       }
-    } else if(event && event.keyCode === 27) { //escape
+    } else if(event && event.key === "Escape") { //escape
       event.preventDefault();
       userStore.clearSearch();
     }
@@ -243,9 +243,9 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
 
   const handleSearchFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event
-      && event.keyCode !== 40   // Down
-      && event.keyCode !== 38   // Up
-      && event.keyCode !== 27) { //escape
+      && event.key !== "ArrowDown"   // Down
+      && event.key !== "ArrowUp"   // Up
+      && event.key !== "Escape") { //escape
       userStore.setSearchFilter(event.target.value, excludedUsers);
     }
   };

@@ -150,7 +150,7 @@ class APIBackendAdapter implements API {
     return data;
   }
 
-  async getInstancesSummary(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>> {
+  async getInstancesSummary(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>> {
     const { data } = await this._axios.post(endpoints.instancesSummary(stage), instanceIds);
     return data;
   }

@@ -32,13 +32,13 @@ interface ListProps {
   readOnly: boolean;
   disabled: boolean;
   enablePointerEvents: boolean;
-  onClick?: (index: number) => void;
-  onDelete?: (index: number) => void;
+  onClick?: (index?: number) => void;
+  onDelete?: (index?: number) => void;
   onDragEnd?: () => void;
-  onDragStart?: (index: number) => void;
-  onDrop?: (droppedIndex: number) => void;
+  onDragStart?: (index?: number) => void;
+  onDrop?: (droppedIndex?: number) => void;
   onKeyDown?: (value: Value, e: KeyboardEvent<HTMLDivElement>) => void;
-  onFocus?: (index: number) => void;
+  onFocus?: (index?: number) => void;
   onBlur?: () => void;
   fetchLabel: boolean;
   mainInstanceId?: string;

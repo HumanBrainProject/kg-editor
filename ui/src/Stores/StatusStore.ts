@@ -26,6 +26,7 @@ import { observable, action, runInAction, makeObservable } from 'mobx';
 import type API from '../Services/API';
 import type { StatusResponse } from '../types';
 import { APIError } from '../Services/API';
+import { UUID } from 'crypto';
 
 
 export interface Status {
@@ -44,7 +45,7 @@ export interface Status {
 type Statuses = Map<string, Status>;
 
 export class StatusStore {
-  statuses: Statuses = new Map<string, Status>();
+  statuses: Statuses = new Map<UUID, Status>();
   isFetching = false;
   isFetchingChildren = false;
 
@@ -70,7 +71,7 @@ export class StatusStore {
     this.api = api;
   }
 
-  getInstance(id) {
+  getInstance(id: UUID) {
     return this.statuses.get(id);
   }
 

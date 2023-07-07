@@ -253,7 +253,7 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
     <div
       key={type.name}
       className={`${classes.container} ${selected ? 'selected' : ''} ${
-        browseStore.isFetching.instances ? 'disabled' : ''
+        browseStore.isFetching ? 'disabled' : ''
       }`}
       onClick={handleSelect}
       title={type.description ? type.description : type.name}

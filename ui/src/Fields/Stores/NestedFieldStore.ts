@@ -146,10 +146,10 @@ class NestedFieldStore extends FieldStore {
     }
     if (!stores[name]) {
       if (!field.widget) {
-        warning = `no widget defined for field "${name}" of type "${this.instance.primaryType.name}"!`;
+        warning = `no widget defined for field "${name}" of type "${this.instance?.primaryType.name}"!`;
         field.widget = 'UnsupportedField';
       } else if (!fieldsMapping[field.widget]) {
-        warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance.primaryType.name}" is not supported!`;
+        warning = `widget "${field.widget}" defined in field "${name}" of type "${this.instance?.primaryType.name}" is not supported!`;
         field.widget = 'UnsupportedField';
       }
       const fieldMapping = fieldsMapping[field.widget];

@@ -75,7 +75,7 @@ interface API {
 
   getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceLabel>>>;
 
-  getInstancesSummary(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>>;
+  getInstancesSummary(stage: Stage|undefined, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>>;
 
   getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceFull>>>;
 

@@ -106,7 +106,7 @@ const Action = ({ icon, title, onClick }: ActionProps) => {
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (!e.currentTarget.contains(e.target)) {
+    if (!e.currentTarget.contains(e.target as Node)) {
       return;
     }
     typeof onClick === 'function' && onClick();
@@ -164,7 +164,7 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
 
   const classes = useStyles();
 
-  const formGroupRef = useRef();
+  const formGroupRef = useRef<HTMLDivElement>(null);
 
   const view = React.useContext(ViewContext);
 
@@ -183,7 +183,7 @@ const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoVa
 
   const handleDelete = () => fieldStore.delete();
 
-  const active = view && view.currentInstanceId === instance.id;
+  const active = (view && view.currentInstanceId === instance?.id)?true:false;
 
   if(readMode && !showIfNoValue && (!initialValue || !nestedFieldsStores )) {
     return null;

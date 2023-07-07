@@ -132,7 +132,7 @@ const Action = ({ icon, title, single, onClick }: ActionProps) => {
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (!e.currentTarget.contains(e.target)) {
+    if (!e.currentTarget.contains(e.target as Node)) {
       return;
     }
     typeof onClick === 'function' && onClick();
@@ -221,7 +221,7 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: 
   const handleMoveItemUp = (index: number) => fieldStore.moveItemUpByIndex(index);
   const handleMoveItemDown = (index: number) => fieldStore.moveItemDownByIndex(index);
 
-  const active = view && view.currentInstanceId === instance.id?true: false;
+  const active = view && view.currentInstanceId === instance?.id?true: false;
 
   if(readMode && !showIfNoValue && (!initialValue || !initialValue.length )) {
     return null;

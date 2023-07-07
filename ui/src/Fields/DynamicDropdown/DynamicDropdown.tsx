@@ -332,11 +332,11 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       </div>
       <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} onClick={handleDropDownFocus} >
         <List
-          mainInstanceId={instance.id}
+          mainInstanceId={instance?.id}
           list={links}
           readOnly={false}
           disabled={isDisabled}
-          enablePointerEvents={(view && view.currentInstanceId === instance.id)}
+          enablePointerEvents={(view && view.currentInstanceId === instance?.id)}
           onClick={handleClick}
           onDelete={handleDelete}
           onDragEnd={handleDragEnd}
@@ -345,7 +345,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          fetchLabel={!view || (view.selectedPane && (pane !== view.selectedPane))}
+          fetchLabel={fetchLabel}
         />
         {canAddValues && (
           <DropdownComponent

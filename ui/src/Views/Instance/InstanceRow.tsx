@@ -167,7 +167,7 @@ const Action = ({
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (!e.currentTarget.contains(e.target)) {
+    if (!e.currentTarget.contains(e.target as Node)) {
       return;
     }
     if (e.metaKey || e.ctrlKey) {
@@ -212,7 +212,7 @@ const InstanceRow = observer(
 
     const handleClick = (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-      if (!e.currentTarget.contains(e.target)) {
+      if (!e.currentTarget.contains(e.target as Node)) {
         return;
       }
       if (timeout.current === null) {
@@ -238,7 +238,7 @@ const InstanceRow = observer(
       e.stopPropagation();
       clearTimeout(timeout.current);
       timeout.current = null;
-      if (!e.currentTarget.contains(e.target)) {
+      if (!e.currentTarget.contains(e.target as Node)) {
         return;
       }
       if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === "function") {

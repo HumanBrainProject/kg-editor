@@ -82,7 +82,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
 
   const classes = useStyles();
 
-  const formGroupRef = useRef();
+  const formGroupRef = useRef<HTMLDivElement>(null);
 
   const {
     value,

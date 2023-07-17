@@ -165,7 +165,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
-      onKeyDown && onKeyDown(index, e);
+      onKeyDown && onKeyDown(index, e); //TODO: Fix me. This is not working.
     }
   };
 
@@ -176,7 +176,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
 
   const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    onBlur && onBlur(index);
+    onBlur && onBlur();
   };
 
 

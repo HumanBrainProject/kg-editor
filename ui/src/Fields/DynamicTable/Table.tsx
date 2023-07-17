@@ -70,7 +70,7 @@ const useStyles = createUseStyles({
 
 interface LabelCellRendererProps {
   instanceId: string;
-  mainInstanceId: string;
+  mainInstanceId?: string;
   className: string;
 }
 

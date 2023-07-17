@@ -43,19 +43,19 @@ const useStyles = createUseStyles({
 });
 
 interface DropdownProps {
-  className: string;
+  className?: string;
   inputRef: RefObject<HTMLInputElement>;
   options: Suggestion[];
-  inputPlaceholder: string;
+  inputPlaceholder?: string;
   loading: boolean;
   hasMore: boolean;
   searchTerm: string;
   onSearch: (v: string) => void;
   onReset: () => void;
   onSelect: (option: Suggestion) => void;
-  onDeleteLastValue: () => void;
+  onDeleteLastValue?: () => void;
   onLoadMore: () => void;
-  onDrop: () => void;
+  onDrop?: () => void;
 }
 
 const Dropdown = ({ className, inputRef, options, inputPlaceholder, loading, hasMore, searchTerm, onSearch, onReset, onSelect, onDeleteLastValue, onLoadMore, onDrop }: DropdownProps) => {

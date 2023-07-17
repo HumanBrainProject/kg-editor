@@ -354,7 +354,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
                 onLoadMore={handleLoadMoreOptions}
                 onReset={handleDropdownReset}
                 onSelect={handleOnSelectOption}
-                optionComponent={DynamicOption}
               />
             </div>
             {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}

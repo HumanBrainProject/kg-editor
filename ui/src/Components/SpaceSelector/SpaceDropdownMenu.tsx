@@ -94,7 +94,7 @@ interface SpaceDropdownMenuProps {
   'aria-labelledby': string;
 }
 
-type WrapperRef = ForwardedRef<HTMLDivElement>;
+type WrapperRef = HTMLDivElement;
 
 const SpaceDropdownMenu = React.forwardRef<WrapperRef, SpaceDropdownMenuProps>(
   ({ className, 'aria-labelledby': labeledBy }, ref) => <SpaceDropdownMenuComponent className={className} labeledBy={labeledBy} wrapperRef={ref} />);

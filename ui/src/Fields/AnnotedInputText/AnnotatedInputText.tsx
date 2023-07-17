@@ -82,10 +82,10 @@ interface AlternativeValueProps {
   alternative: Alternative;
 }
 
-const getAlternativeValue = (mappingValue: string) => {
+const getAlternativeValue = (mappingValue: string): React.ComponentType => {
   const AlternativeValue = observer(({alternative}: AlternativeValueProps) => Array.isArray(alternative.value)?alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:'Unknown resource').join('; '):JSON.stringify(alternative.value));
   AlternativeValue.displayName = 'AlternativeValue';
-  return AlternativeValue;
+  return AlternativeValue as React.ComponentType;
 };
 
 interface AnnotatedInputTextProps {
@@ -116,12 +116,12 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     isReadOnly
   } = fieldStore;
 
-  const handleOnAddValue = resource => {
+  const handleOnAddValue = (resource: string) => {
     const value = {[fieldStore.mappingValue]: resource};
     fieldStore.addValue(value);
   };
 
-  const handleSelectAlternative = vals => fieldStore.setValues([...vals]);
+  const handleSelectAlternative = (vals: Value[]) => fieldStore.setValues([...vals]);
 
   const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 
@@ -233,12 +233,12 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
           onDragEnd={handleDragEnd}
           onDragStart={handleDragStart}
           onDrop={handleDrop}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleKeyDown} //TODO: Fix me! Is this even working ?
         />
         <input type="text"
           className={classes.userInput}
           disabled={isDisabled}
-          onDrop={handleDrop}
+          onDrop={handleDrop} //TODO: Again, is this really needed? What is it doing ?
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

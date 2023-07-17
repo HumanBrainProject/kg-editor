@@ -60,7 +60,7 @@ const useStyles = createUseStyles({
 interface AlternativesProps {
   className: string;
   list: AlternativeType[];
-  disabled: boolean;
+  disabled?: boolean;
   parentContainerRef: RefObject<HTMLInputElement>;
   ValueRenderer: React.ComponentType;
   onSelect: (value: any) => void;
